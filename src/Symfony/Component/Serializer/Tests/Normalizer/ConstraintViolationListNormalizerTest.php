@@ -128,7 +128,7 @@ error',
         $this->assertSame($expected, $violation['payload']);
     }
 
-    public function payloadFieldsProvider(): iterable
+    public static function payloadFieldsProvider(): iterable
     {
         yield [['severity', 'anotherField1'], ['severity' => 'warning']];
         yield [null, ['severity' => 'warning', 'anotherField2' => 'aValue']];

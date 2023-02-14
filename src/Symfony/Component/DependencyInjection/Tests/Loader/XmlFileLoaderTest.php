@@ -824,7 +824,7 @@ class XmlFileLoaderTest extends TestCase
         $this->assertContains('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar', $resources);
     }
 
-    public function prototypeExcludeWithArrayDataProvider(): iterable
+    public static function prototypeExcludeWithArrayDataProvider(): iterable
     {
         return [
             ['services_prototype_array.xml'],

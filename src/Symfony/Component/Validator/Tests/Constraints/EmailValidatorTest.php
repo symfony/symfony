@@ -73,7 +73,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidEmails()
+    public static function getValidEmails()
     {
         return [
             ['fabien@symfony.com'],
@@ -116,7 +116,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidEmailsWithWhitespaces()
+    public static function getValidEmailsWithWhitespaces()
     {
         return [
             ["\x20example@example.co.uk\x20"],
@@ -157,7 +157,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidEmailsHtml5()
+    public static function getValidEmailsHtml5()
     {
         return [
             ['fabien@symfony.com'],
@@ -184,7 +184,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidEmails()
+    public static function getInvalidEmails()
     {
         return [
             ['example'],
@@ -212,7 +212,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
              ->assertRaised();
     }
 
-    public function getInvalidHtml5Emails()
+    public static function getInvalidHtml5Emails()
     {
         return [
             ['example'],
@@ -339,7 +339,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     /**
      * @see https://github.com/egulias/EmailValidator/blob/1.2.8/tests/egulias/Tests/EmailValidator/EmailValidatorTest.php
      */
-    public function getInvalidEmailsForStrictChecks()
+    public static function getInvalidEmailsForStrictChecks()
     {
         return [
             ['test@example.com test'],

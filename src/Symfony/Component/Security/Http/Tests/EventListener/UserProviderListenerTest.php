@@ -53,7 +53,7 @@ class UserProviderListenerTest extends TestCase
         $this->assertEquals($passport->hasBadge(UserBadge::class) ? $passport->getBadge(UserBadge::class) : null, $badgeBefore);
     }
 
-    public function provideCompletePassports()
+    public static function provideCompletePassports()
     {
         yield [new SelfValidatingPassport(new UserBadge('wouter', function () {}))];
     }

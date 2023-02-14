@@ -49,7 +49,7 @@ class IsFalseValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function provideInvalidConstraints(): iterable
+    public static function provideInvalidConstraints(): iterable
     {
         yield 'Doctrine style' => [new IsFalse([
             'message' => 'myMessage',

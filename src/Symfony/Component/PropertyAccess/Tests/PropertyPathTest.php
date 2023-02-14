@@ -36,7 +36,7 @@ class PropertyPathTest extends TestCase
         new PropertyPath('.property');
     }
 
-    public function providePathsContainingUnexpectedCharacters()
+    public static function providePathsContainingUnexpectedCharacters()
     {
         return [
             ['property.'],

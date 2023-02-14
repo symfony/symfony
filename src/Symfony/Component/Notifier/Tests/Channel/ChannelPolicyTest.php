@@ -39,7 +39,7 @@ class ChannelPolicyTest extends TestCase
         $this->assertSame($expectedChannels, $channels);
     }
 
-    public function provideValidPolicies(): \Generator
+    public static function provideValidPolicies(): \Generator
     {
         yield [['urgent' => ['chat']], 'urgent', ['chat']];
         yield [['urgent' => ['chat', 'sms']], 'urgent', ['chat', 'sms']];

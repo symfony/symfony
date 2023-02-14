@@ -89,7 +89,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertStringMatchesFormatFile($fixtures.'/config/'.$file.'.expected.yml', $dumper->dump());
     }
 
-    public function provideConfig()
+    public static function provideConfig()
     {
         yield ['basic'];
         yield ['object'];

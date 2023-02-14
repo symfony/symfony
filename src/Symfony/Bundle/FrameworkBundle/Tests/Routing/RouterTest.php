@@ -511,7 +511,7 @@ class RouterTest extends TestCase
         $this->assertSame('1 or 0', $route->getCondition());
     }
 
-    public function getNonStringValues()
+    public static function getNonStringValues()
     {
         return [[null], [false], [true], [new \stdClass()], [['foo', 'bar']], [[[]]]];
     }
@@ -591,7 +591,7 @@ class RouterTest extends TestCase
         $this->assertEquals(['GET', 'POST'], $route->getMethods());
     }
 
-    public function getContainerParameterForRoute()
+    public static function getContainerParameterForRoute()
     {
         yield 'String' => ['"foo"'];
         yield 'Integer' => [0];

@@ -119,7 +119,7 @@ class AuthenticatorManagerTest extends TestCase
         $this->assertTrue($listenerCalled, 'The CheckPassportEvent listener is not called');
     }
 
-    public function provideMatchingAuthenticatorIndex()
+    public static function provideMatchingAuthenticatorIndex()
     {
         yield [0];
         yield [1];
@@ -187,7 +187,7 @@ class AuthenticatorManagerTest extends TestCase
         $manager->authenticateRequest($this->request);
     }
 
-    public function provideEraseCredentialsData()
+    public static function provideEraseCredentialsData()
     {
         yield [true];
         yield [false];

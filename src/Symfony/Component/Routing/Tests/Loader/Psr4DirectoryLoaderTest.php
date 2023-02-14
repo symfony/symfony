@@ -81,7 +81,7 @@ class Psr4DirectoryLoaderTest extends TestCase
         $this->assertSame(MyController::class.'::__invoke', $route->getDefault('_controller'));
     }
 
-    public function provideNamespacesThatNeedTrimming(): array
+    public static function provideNamespacesThatNeedTrimming(): array
     {
         return [
             ['\\Symfony\Component\Routing\Tests\Fixtures\Psr4Controllers'],

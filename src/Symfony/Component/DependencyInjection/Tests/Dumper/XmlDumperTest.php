@@ -115,7 +115,7 @@ class XmlDumperTest extends TestCase
         $this->assertEquals($expectedXmlDump, $dumper->dump());
     }
 
-    public function provideDecoratedServicesData()
+    public static function provideDecoratedServicesData()
     {
         $fixturesPath = realpath(__DIR__.'/../Fixtures/');
 
@@ -161,7 +161,7 @@ class XmlDumperTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function provideCompiledContainerData()
+    public static function provideCompiledContainerData()
     {
         return [
             ['container8'],

@@ -156,7 +156,7 @@ class UploadedFileTest extends TestCase
         $file->move(__DIR__.'/Fixtures/directory');
     }
 
-    public function failedUploadedFile()
+    public static function failedUploadedFile()
     {
         foreach ([\UPLOAD_ERR_INI_SIZE, \UPLOAD_ERR_FORM_SIZE, \UPLOAD_ERR_PARTIAL, \UPLOAD_ERR_NO_FILE, \UPLOAD_ERR_CANT_WRITE, \UPLOAD_ERR_NO_TMP_DIR, \UPLOAD_ERR_EXTENSION, -1] as $error) {
             yield [new UploadedFile(
@@ -283,7 +283,7 @@ class UploadedFileTest extends TestCase
         $this->assertFalse($file->isValid());
     }
 
-    public function uploadedFileErrorProvider()
+    public static function uploadedFileErrorProvider()
     {
         return [
             [\UPLOAD_ERR_INI_SIZE],

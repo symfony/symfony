@@ -161,7 +161,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $this->assertEquals('token', $view['csrf']->vars['value']);
     }
 
-    public function provideBoolean()
+    public static function provideBoolean()
     {
         return [
             [true],

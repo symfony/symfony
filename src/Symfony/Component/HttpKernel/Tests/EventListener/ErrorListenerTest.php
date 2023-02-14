@@ -184,7 +184,7 @@ class ErrorListenerTest extends TestCase
         $this->assertEquals(new Response('foo', 401), $event->getResponse());
     }
 
-    public function provider()
+    public static function provider()
     {
         if (!class_exists(Request::class)) {
             return [[null, null]];
@@ -263,7 +263,7 @@ class ErrorListenerTest extends TestCase
         $this->assertSame('OK: foo', $event->getResponse()->getContent());
     }
 
-    public function controllerProvider()
+    public static function controllerProvider()
     {
         yield [fn (FlattenException $exception) => new Response('OK: '.$exception->getMessage())];
 

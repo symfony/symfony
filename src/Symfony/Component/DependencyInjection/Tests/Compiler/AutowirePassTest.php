@@ -939,7 +939,7 @@ class AutowirePassTest extends TestCase
         }
     }
 
-    public function provideNotWireableCalls()
+    public static function provideNotWireableCalls()
     {
         return [
             ['setNotAutowireable', 'Cannot autowire service "foo": argument "$n" of method "Symfony\Component\DependencyInjection\Tests\Compiler\NotWireable::setNotAutowireable()" has type "Symfony\Component\DependencyInjection\Tests\Compiler\NotARealClass" but this class was not found.'],

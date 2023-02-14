@@ -96,7 +96,7 @@ final class MetadataAwareNameConverterTest extends TestCase
         $this->assertEquals($expected, $nameConverter->denormalize($propertyName, SerializedNameDummy::class));
     }
 
-    public function attributeProvider(): array
+    public static function attributeProvider(): array
     {
         return [
             ['foo', 'baz'],
@@ -106,7 +106,7 @@ final class MetadataAwareNameConverterTest extends TestCase
         ];
     }
 
-    public function fallbackAttributeProvider(): array
+    public static function fallbackAttributeProvider(): array
     {
         return [
             ['foo', 'baz'],
@@ -140,7 +140,7 @@ final class MetadataAwareNameConverterTest extends TestCase
         $this->assertEquals($expected, $nameConverter->denormalize($propertyName, OtherSerializedNameDummy::class, null, $context));
     }
 
-    public function attributeAndContextProvider()
+    public static function attributeAndContextProvider()
     {
         return [
             ['buz', 'buz', ['groups' => ['a']]],

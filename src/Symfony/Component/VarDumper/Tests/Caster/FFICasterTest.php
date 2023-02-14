@@ -90,7 +90,7 @@ class FFICasterTest extends TestCase
         PHP, \FFI::new('enum Example { a, b }'));
     }
 
-    public function scalarsDataProvider(): array
+    public static function scalarsDataProvider(): array
     {
         return [
             'int8_t' => ['int8_t', '0', 1, 1],

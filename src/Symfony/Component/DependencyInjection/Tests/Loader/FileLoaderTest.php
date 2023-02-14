@@ -245,7 +245,7 @@ class FileLoaderTest extends TestCase
         $this->assertTrue($container->getDefinition($excludedId)->hasTag('container.excluded'));
     }
 
-    public function excludeTrailingSlashConsistencyProvider(): iterable
+    public static function excludeTrailingSlashConsistencyProvider(): iterable
     {
         yield ['Prototype/OtherDir/AnotherSub/', AnotherSub::class];
         yield ['Prototype/OtherDir/AnotherSub', AnotherSub::class];

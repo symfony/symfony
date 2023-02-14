@@ -45,7 +45,7 @@ class UidNormalizerContextBuilderTest extends TestCase
     /**
      * @return iterable<array{0: array<string, mixed>}>
      */
-    public function withersDataProvider(): iterable
+    public static function withersDataProvider(): iterable
     {
         yield 'With values' => [[
             UidNormalizer::NORMALIZATION_FORMAT_KEY => UidNormalizer::NORMALIZATION_FORMAT_BASE32,

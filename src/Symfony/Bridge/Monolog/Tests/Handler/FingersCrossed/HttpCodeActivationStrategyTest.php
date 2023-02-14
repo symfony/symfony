@@ -56,7 +56,7 @@ class HttpCodeActivationStrategyTest extends TestCase
         self::assertEquals($expected, $strategy->isHandlerActivated($record));
     }
 
-    public function isActivatedProvider(): array
+    public static function isActivatedProvider(): array
     {
         return [
             ['/test',  RecordFactory::create(Logger::ERROR), true],
@@ -72,7 +72,7 @@ class HttpCodeActivationStrategyTest extends TestCase
         ];
     }
 
-    private function getContextException(int $code): array
+    private static function getContextException(int $code): array
     {
         return ['exception' => new HttpException($code)];
     }

@@ -90,7 +90,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function provideMaxSizeExceededTests()
+    public static function provideMaxSizeExceededTests()
     {
         // We have various interesting limit - size combinations to test.
         // Assume a limit of 1000 bytes (1 kB). Then the following table
@@ -187,7 +187,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function provideMaxSizeNotExceededTests()
+    public static function provideMaxSizeNotExceededTests()
     {
         return [
             // 0 has no effect
@@ -242,7 +242,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
         $this->validator->validate($this->path, $constraint);
     }
 
-    public function provideBinaryFormatTests()
+    public static function provideBinaryFormatTests()
     {
         return [
             [11, 10, null, '11', '10', 'bytes'],
@@ -388,7 +388,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function provideMimeTypeConstraints(): iterable
+    public static function provideMimeTypeConstraints(): iterable
     {
         yield 'Doctrine style' => [new File([
             'mimeTypes' => ['image/png', 'image/jpg'],
@@ -446,7 +446,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function provideDisallowEmptyConstraints(): iterable
+    public static function provideDisallowEmptyConstraints(): iterable
     {
         yield 'Doctrine style' => [new File([
             'disallowEmptyMessage' => 'myMessage',
@@ -476,7 +476,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function uploadedFileErrorProvider()
+    public static function uploadedFileErrorProvider()
     {
         $tests = [
             [(string) \UPLOAD_ERR_FORM_SIZE, 'uploadFormSizeErrorMessage'],

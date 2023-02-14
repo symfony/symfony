@@ -141,7 +141,7 @@ class ConnectionTest extends TestCase
         Connection::fromDsn($dsn, [], $redis);
     }
 
-    public function provideAuthDsn(): \Generator
+    public static function provideAuthDsn(): \Generator
     {
         yield 'Password only' => ['password', 'redis://password@localhost/queue'];
         yield 'User and password' => [['user', 'password'], 'redis://user:password@localhost/queue'];
@@ -367,23 +367,21 @@ class ConnectionTest extends TestCase
     /**
      * @dataProvider provideIdPatterns
      */
-    public function testAddReturnId(string $expected, \Redis $redis, int $delay = 0)
+    public function testAddReturnId(string $expected, int $delay, string $command, string $return)
     {
+        $redis = $this->createMock(\Redis::class);
+        $redis->expects($this->atLeastOnce())->method($command)->willReturn($return);
+
         $id = Connection::fromDsn(dsn: 'redis://localhost/queue', redis: $redis)->add('body', [], $delay);
 
         $this->assertMatchesRegularExpression($expected, $id);
     }
 
-    public function provideIdPatterns(): \Generator
+    public static function provideIdPatterns(): \Generator
     {
-        $redis = $this->createMock(\Redis::class);
-        $redis->expects($this->atLeastOnce())->method('xadd')->willReturn('THE_MESSAGE_ID');
+        yield 'No delay' => ['/^THE_MESSAGE_ID$/', 0, 'xadd', 'THE_MESSAGE_ID'];
 
-        yield 'No delay' => ['/^THE_MESSAGE_ID$/', $redis];
-
-        $redis = $this->createMock(\Redis::class);
-        $redis->expects($this->atLeastOnce())->method('rawCommand')->willReturn('1');
-        yield '100ms delay' => ['/^\w+\.\d+$/', $redis, 100];
+        yield '100ms delay' => ['/^\w+\.\d+$/', 100, 'rawCommand', '1'];
     }
 
     public function testInvalidSentinelMasterName()

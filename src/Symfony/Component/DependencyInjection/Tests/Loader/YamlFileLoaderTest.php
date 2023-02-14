@@ -91,7 +91,7 @@ class YamlFileLoaderTest extends TestCase
         $loader->load($file.'.yml');
     }
 
-    public function provideInvalidFiles()
+    public static function provideInvalidFiles()
     {
         return [
             ['bad_parameters'],
@@ -565,7 +565,7 @@ class YamlFileLoaderTest extends TestCase
         $loader->load($fileName);
     }
 
-    public function prototypeWithNullOrEmptyNodeDataProvider(): iterable
+    public static function prototypeWithNullOrEmptyNodeDataProvider(): iterable
     {
         return [
             ['services_prototype_with_null_node.yml'],

@@ -108,7 +108,7 @@ class WebProfilerExtensionTest extends TestCase
         self::assertSaneContainer($this->getCompiledContainer());
     }
 
-    public function getDebugModes()
+    public static function getDebugModes()
     {
         return [
             ['debug' => false],
@@ -134,7 +134,7 @@ class WebProfilerExtensionTest extends TestCase
         }
     }
 
-    public function getToolbarConfig()
+    public static function getToolbarConfig()
     {
         return [
             [
@@ -175,7 +175,7 @@ class WebProfilerExtensionTest extends TestCase
         }
     }
 
-    public function getInterceptRedirectsToolbarConfig()
+    public static function getInterceptRedirectsToolbarConfig()
     {
         return [
              [

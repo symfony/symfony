@@ -43,7 +43,7 @@ class StopwatchPeriodTest extends TestCase
         $this->assertEqualsWithDelta($duration, $period->getDuration(), \PHP_FLOAT_EPSILON);
     }
 
-    public function provideTimeValues()
+    public static function provideTimeValues()
     {
         yield [0, false, 0];
         yield [0, true, 0.0];
@@ -53,7 +53,7 @@ class StopwatchPeriodTest extends TestCase
         yield [2.71, true, 2.71];
     }
 
-    public function provideDurationValues()
+    public static function provideDurationValues()
     {
         yield [0, 0, false, 0];
         yield [0, 0, true, 0.0];

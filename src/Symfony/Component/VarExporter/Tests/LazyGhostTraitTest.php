@@ -149,7 +149,7 @@ class LazyGhostTraitTest extends TestCase
         $this->assertSame(123, $clone->bar);
     }
 
-    public function provideMagicClass()
+    public static function provideMagicClass()
     {
         yield [new MagicClass()];
 

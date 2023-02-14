@@ -26,7 +26,7 @@ class AsciiSluggerTest extends TestCase
         $this->assertSame($expected, (string) $slugger->slug($string, $separator, $locale));
     }
 
-    public function provideSlugTests(): iterable
+    public static function provideSlugTests(): iterable
     {
         yield ['', ''];
         yield ['foo', ' foo '];
@@ -60,7 +60,7 @@ class AsciiSluggerTest extends TestCase
         $this->assertSame($expected, (string) $slugger->slug($string, '-', $locale));
     }
 
-    public function provideSlugEmojiTests(): iterable
+    public static function provideSlugEmojiTests(): iterable
     {
         yield [
             'un-chat-qui-sourit-chat-noir-et-un-tete-de-lion-vont-au-parc-national',

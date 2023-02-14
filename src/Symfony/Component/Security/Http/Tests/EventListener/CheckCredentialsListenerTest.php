@@ -62,7 +62,7 @@ class CheckCredentialsListenerTest extends TestCase
         }
     }
 
-    public function providePasswords()
+    public static function providePasswords()
     {
         yield ['ThePa$$word', true, true];
         yield ['Invalid', false, false];
@@ -98,7 +98,7 @@ class CheckCredentialsListenerTest extends TestCase
         }
     }
 
-    public function provideCustomAuthenticatedResults()
+    public static function provideCustomAuthenticatedResults()
     {
         yield [true];
         yield [false];

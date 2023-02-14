@@ -345,7 +345,7 @@ class DataMapperTest extends TestCase
         self::assertSame($publishedAtValue, $article['publishedAt']);
     }
 
-    public function provideDate(): array
+    public static function provideDate(): array
     {
         return [
             [new \DateTime()],

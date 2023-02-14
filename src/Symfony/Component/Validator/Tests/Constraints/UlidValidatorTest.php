@@ -71,7 +71,7 @@ class UlidValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidUlids()
+    public static function getInvalidUlids()
     {
         return [
             ['01ARZ3NDEKTSV4RRFFQ69G5FA', Ulid::TOO_SHORT_ERROR],

@@ -38,7 +38,7 @@ class RecipientTest extends TestCase
         $this->assertSame($phone, $recipient->getPhone());
     }
 
-    public function provideValidEmailAndPhone()
+    public static function provideValidEmailAndPhone()
     {
         yield ['test@test.de', '+0815'];
         yield ['test@test.de', ''];

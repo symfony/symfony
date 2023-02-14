@@ -154,7 +154,7 @@ class DebugHandlersListenerTest extends TestCase
         $this->assertSame($userHandler, $eHandler->setExceptionHandler('var_dump'));
     }
 
-    public function provideLevelsAssignedToLoggers(): array
+    public static function provideLevelsAssignedToLoggers(): array
     {
         return [
             [false, false, '0', null, null],

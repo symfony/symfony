@@ -87,7 +87,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $this->assertEquals(2, $transformer->reverseTransform('200'));
     }
 
-    public function reverseTransformWithRoundingProvider()
+    public static function reverseTransformWithRoundingProvider()
     {
         return [
             // towards positive infinity (1.6 -> 2, -1.6 -> -1)

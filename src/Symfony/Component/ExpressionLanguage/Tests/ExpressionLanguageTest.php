@@ -168,7 +168,7 @@ class ExpressionLanguageTest extends TestCase
         $expressionLanguage->parse('node.', ['node']);
     }
 
-    public function shortCircuitProviderEvaluate()
+    public static function shortCircuitProviderEvaluate()
     {
         $object = new class(\Closure::fromCallable([static::class, 'fail'])) {
             private $fail;
@@ -192,7 +192,7 @@ class ExpressionLanguageTest extends TestCase
         ];
     }
 
-    public function shortCircuitProviderCompile()
+    public static function shortCircuitProviderCompile()
     {
         return [
             ['false and foo', ['foo' => 'foo'], false],
@@ -315,7 +315,7 @@ class ExpressionLanguageTest extends TestCase
         $this->assertNull(eval(sprintf('return %s;', $expressionLanguage->compile($expression, ['foo' => 'foo']))));
     }
 
-    public function provideNullSafe()
+    public static function provideNullSafe()
     {
         $foo = new class() extends \stdClass {
             public function bar()
@@ -368,7 +368,7 @@ class ExpressionLanguageTest extends TestCase
         eval(sprintf('return %s;', $expressionLanguage->compile($expression, ['foo' => 'foo'])));
     }
 
-    public function provideInvalidNullSafe()
+    public static function provideInvalidNullSafe()
     {
         yield ['foo?.bar.baz', (object) ['bar' => null], 'Unable to get property "baz" of non-object "foo.bar".'];
         yield ['foo?.bar["baz"]', (object) ['bar' => null], 'Unable to get an item of non-array "foo.bar".'];
@@ -393,7 +393,7 @@ class ExpressionLanguageTest extends TestCase
         $this->assertSame(eval(sprintf('return %s;', $expressionLanguage->compile($expression, ['foo' => 'foo']))), 'default');
     }
 
-    public function provideNullCoalescing()
+    public static function provideNullCoalescing()
     {
         $foo = new class() extends \stdClass {
             public function bar()
@@ -424,7 +424,7 @@ class ExpressionLanguageTest extends TestCase
         $registerCallback($el);
     }
 
-    public function getRegisterCallbacks()
+    public static function getRegisterCallbacks()
     {
         return [
             [

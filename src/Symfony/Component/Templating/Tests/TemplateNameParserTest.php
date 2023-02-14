@@ -40,7 +40,7 @@ class TemplateNameParserTest extends TestCase
         $this->assertEquals($template->getLogicalName(), $name);
     }
 
-    public function getLogicalNameToTemplateProvider()
+    public static function getLogicalNameToTemplateProvider()
     {
         return [
             ['/path/to/section/name.engine', new TemplateReference('/path/to/section/name.engine', 'engine')],

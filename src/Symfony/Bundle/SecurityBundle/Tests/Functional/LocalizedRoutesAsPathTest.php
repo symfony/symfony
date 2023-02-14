@@ -73,7 +73,7 @@ class LocalizedRoutesAsPathTest extends AbstractWebTestCase
         $this->assertCount(1, $crawler->selectButton('login'), (string) $client->getResponse());
     }
 
-    public function getLocales()
+    public static function getLocales()
     {
         yield ['en'];
         yield ['de'];

@@ -43,7 +43,7 @@ class TranslationFilesTest extends TestCase
         $this->assertCount(0, $errors, sprintf('"%s" is invalid:%s', $filePath, \PHP_EOL.implode(\PHP_EOL, array_column($errors, 'message'))));
     }
 
-    public function provideTranslationFiles()
+    public static function provideTranslationFiles()
     {
         return array_map(
             fn ($filePath) => (array) $filePath,

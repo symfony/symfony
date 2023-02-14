@@ -36,7 +36,7 @@ class BackedEnumValueResolverTest extends TestCase
         self::assertSame($expectedSupport, $resolver->supports($request, $metadata));
     }
 
-    public function provideTestSupportsData(): iterable
+    public static function provideTestSupportsData(): iterable
     {
         yield 'unsupported type' => [
             self::createRequest(['suit' => 'H']),
@@ -85,7 +85,7 @@ class BackedEnumValueResolverTest extends TestCase
         self::assertSame($expected, $results);
     }
 
-    public function provideTestResolveData(): iterable
+    public static function provideTestResolveData(): iterable
     {
         yield 'resolves from attributes' => [
             self::createRequest(['suit' => 'H']),

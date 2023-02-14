@@ -194,7 +194,7 @@ class ConnectionTest extends TestCase
         $connection->publish('body');
     }
 
-    public function invalidQueueArgumentsDataProvider(): iterable
+    public static function invalidQueueArgumentsDataProvider(): iterable
     {
         $baseDsn = 'amqp://localhost/%2f/messages';
 

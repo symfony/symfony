@@ -64,7 +64,7 @@ class ExceptionListenerTest extends TestCase
         $this->assertSame($exception, $event->getThrowable());
     }
 
-    public function getAuthenticationExceptionProvider()
+    public static function getAuthenticationExceptionProvider()
     {
         return [
             [$e = new AuthenticationException(), new HttpException(Response::HTTP_UNAUTHORIZED, '', $e, [], 0)],
@@ -192,7 +192,7 @@ class ExceptionListenerTest extends TestCase
         $this->assertEmpty($dispatcher->getListeners());
     }
 
-    public function getAccessDeniedExceptionProvider()
+    public static function getAccessDeniedExceptionProvider()
     {
         return [
             [new AccessDeniedException()],

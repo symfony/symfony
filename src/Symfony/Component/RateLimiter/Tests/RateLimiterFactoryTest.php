@@ -32,7 +32,7 @@ class RateLimiterFactoryTest extends TestCase
         $this->assertInstanceOf($expectedClass, $rateLimiter);
     }
 
-    public function validConfigProvider()
+    public static function validConfigProvider()
     {
         yield [TokenBucketLimiter::class, [
             'policy' => 'token_bucket',
@@ -70,7 +70,7 @@ class RateLimiterFactoryTest extends TestCase
         $factory->create('key');
     }
 
-    public function invalidConfigProvider()
+    public static function invalidConfigProvider()
     {
         yield [MissingOptionsException::class, [
             'policy' => 'token_bucket',

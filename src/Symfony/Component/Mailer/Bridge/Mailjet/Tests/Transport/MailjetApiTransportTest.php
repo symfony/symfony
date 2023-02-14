@@ -34,7 +34,7 @@ class MailjetApiTransportTest extends TestCase
         $this->assertSame($expected, (string) $transport);
     }
 
-    public function getTransportData()
+    public static function getTransportData()
     {
         return [
             [
@@ -253,7 +253,7 @@ class MailjetApiTransportTest extends TestCase
         $transport->send($email);
     }
 
-    public function getMalformedResponse(): \Generator
+    public static function getMalformedResponse(): \Generator
     {
         yield 'Missing Messages key' => [
             [

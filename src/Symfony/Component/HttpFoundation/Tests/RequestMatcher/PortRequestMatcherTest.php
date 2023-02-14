@@ -27,7 +27,7 @@ class PortRequestMatcherTest extends TestCase
         $this->assertSame($expected, $matcher->matches($request));
     }
 
-    public function getData()
+    public static function getData()
     {
         return [
             [8000, true],

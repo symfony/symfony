@@ -105,7 +105,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTestCase
         RedisAdapter::createConnection($dsn);
     }
 
-    public function provideFailedCreateConnection(): array
+    public static function provideFailedCreateConnection(): array
     {
         return [
             ['redis://localhost:1234'],
@@ -125,7 +125,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTestCase
         RedisAdapter::createConnection($dsn);
     }
 
-    public function provideInvalidCreateConnection(): array
+    public static function provideInvalidCreateConnection(): array
     {
         return [
             ['redis://localhost/foo'],

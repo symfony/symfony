@@ -80,7 +80,7 @@ class CheckRememberMeConditionsListenerTest extends TestCase
         $this->assertTrue($passport->getBadge(RememberMeBadge::class)->isEnabled());
     }
 
-    public function provideRememberMeOptInValues()
+    public static function provideRememberMeOptInValues()
     {
         yield ['true'];
         yield ['1'];

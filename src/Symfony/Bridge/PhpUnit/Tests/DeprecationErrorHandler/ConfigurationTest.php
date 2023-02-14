@@ -179,7 +179,7 @@ class ConfigurationTest extends TestCase
         $this->assertTrue($configuration->shouldDisplayStackTrace('interesting'));
     }
 
-    public function provideItCanBeDisabled(): array
+    public static function provideItCanBeDisabled(): array
     {
         return [
             ['disabled', false],
@@ -248,7 +248,7 @@ class ConfigurationTest extends TestCase
         }
     }
 
-    public function provideDataForToleratesForGroup() {
+    public static function provideDataForToleratesForGroup() {
 
         yield 'total threshold not reached' => ['max[total]=1', [
             'unsilenced' => 0,

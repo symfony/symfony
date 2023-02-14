@@ -24,7 +24,7 @@ class RoutingConditionServiceTest extends AbstractWebTestCase
         $this->assertSame($code, $client->getResponse()->getStatusCode());
     }
 
-    public function provideRoutes(): iterable
+    public static function provideRoutes(): iterable
     {
         yield 'allowed by an autoconfigured service' => [
             200,

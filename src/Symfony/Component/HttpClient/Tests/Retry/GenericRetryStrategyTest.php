@@ -41,14 +41,14 @@ class GenericRetryStrategyTest extends TestCase
         self::assertFalse($strategy->shouldRetry($this->getContext(0, $method, 'http://example.com/', $code), null, $exception));
     }
 
-    public function provideRetryable(): iterable
+    public static function provideRetryable(): iterable
     {
         yield ['GET', 200, new TransportException()];
         yield ['GET', 500, null];
         yield ['POST', 429, null];
     }
 
-    public function provideNotRetryable(): iterable
+    public static function provideNotRetryable(): iterable
     {
         yield ['POST', 200, null];
         yield ['POST', 200, new TransportException()];
@@ -65,7 +65,7 @@ class GenericRetryStrategyTest extends TestCase
         self::assertSame($expectedDelay, $strategy->getDelay($this->getContext($previousRetries, 'GET', 'http://example.com/', 200), null, null));
     }
 
-    public function provideDelay(): iterable
+    public static function provideDelay(): iterable
     {
         // delay, multiplier, maxDelay, retries, expectedDelay
         yield [1000, 1, 5000, 0, 1000];

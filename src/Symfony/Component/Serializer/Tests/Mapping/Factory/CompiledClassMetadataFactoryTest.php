@@ -128,7 +128,7 @@ final class CompiledClassMetadataFactoryTest extends TestCase
         $this->assertTrue($compiledClassMetadataFactory->hasMetadataFor(SerializedNameDummy::class));
     }
 
-    public function valueProvider()
+    public static function valueProvider()
     {
         return [
             [Dummy::class],

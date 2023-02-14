@@ -67,7 +67,7 @@ class EntryManagerTest extends TestCase
         $this->assertSame($expectedRdn, $cn);
     }
 
-    public function moveWithRFC4514DistinguishedNameProvider(): array
+    public static function moveWithRFC4514DistinguishedNameProvider(): array
     {
         return [
             ['CN=Simple,DC=example,DC=net', 'CN=Simple'],

@@ -15,34 +15,35 @@ use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\ContactEveryone\ContactEveryoneTransport;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
+use Symfony\Component\Notifier\Tests\Fixtures\DummyHttpClient;
+use Symfony\Component\Notifier\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class ContactEveryoneTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null): ContactEveryoneTransport
+    public static function createTransport(HttpClientInterface $client = null): ContactEveryoneTransport
     {
-        return new ContactEveryoneTransport('API_TOKEN', 'Symfony', 'Foo', $client ?? $this->createMock(HttpClientInterface::class));
+        return new ContactEveryoneTransport('API_TOKEN', 'Symfony', 'Foo', $client ?? new DummyHttpClient());
     }
 
-    public function toStringProvider(): iterable
+    public static function toStringProvider(): iterable
     {
-        yield ['contact-everyone://contact-everyone.orange-business.com?diffusionname=Symfony&category=Foo', $this->createTransport()];
+        yield ['contact-everyone://contact-everyone.orange-business.com?diffusionname=Symfony&category=Foo', self::createTransport()];
     }
 
-    public function supportedMessagesProvider(): iterable
+    public static function supportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
     }
 
-    public function unsupportedMessagesProvider(): iterable
+    public static function unsupportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [new DummyMessage()];
     }
 
     public function testSendSuccessfully()

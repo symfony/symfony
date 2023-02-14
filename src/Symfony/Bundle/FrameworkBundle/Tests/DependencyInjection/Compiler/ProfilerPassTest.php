@@ -62,7 +62,7 @@ class ProfilerPassTest extends TestCase
         $this->assertEquals('add', $methodCalls[0][0]); // grab the method part of the first call
     }
 
-    public function provideValidCollectorWithTemplateUsingAutoconfigure(): \Generator
+    public static function provideValidCollectorWithTemplateUsingAutoconfigure(): \Generator
     {
         yield [new class() implements TemplateAwareDataCollectorInterface {
             public function collect(Request $request, Response $response, \Throwable $exception = null)

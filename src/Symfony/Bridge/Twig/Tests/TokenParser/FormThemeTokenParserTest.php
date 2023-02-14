@@ -40,7 +40,7 @@ class FormThemeTokenParserTest extends TestCase
         $this->assertEquals($expected, $parser->parse($stream)->getNode('body')->getNode(0));
     }
 
-    public function getTestsForFormTheme()
+    public static function getTestsForFormTheme()
     {
         return [
             [

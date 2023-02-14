@@ -34,7 +34,7 @@ class RoutingExtensionTest extends TestCase
         $this->assertSame($mustBeEscaped, $nodes->getNode('body')->getNode(0)->getNode('expr') instanceof FilterExpression);
     }
 
-    public function getEscapingTemplates()
+    public static function getEscapingTemplates()
     {
         return [
             ['{{ path("foo") }}', false],

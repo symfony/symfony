@@ -32,7 +32,7 @@ class SecretsSetCommandTest extends TestCase
         $this->assertSame($expectedSuggestions, $suggestions);
     }
 
-    public function provideCompletionSuggestions()
+    public static function provideCompletionSuggestions()
     {
         yield 'name' => [[''], ['SECRET', 'OTHER_SECRET']];
         yield '--local name (with local vault)' => [['--local', ''], ['SECRET', 'OTHER_SECRET']];

@@ -45,7 +45,7 @@ class StopWorkerOnFailureLimitListenerTest extends TestCase
         $failureLimitListener->onWorkerRunning($runningEvent);
     }
 
-    public function countProvider(): iterable
+    public static function countProvider(): iterable
     {
         yield [1, true];
         yield [2, true];

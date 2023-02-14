@@ -59,7 +59,7 @@ class VcsIgnoredFilterIteratorTest extends IteratorTestCase
         $this->assertIterator($this->toAbsolute($expectedResult), $iterator);
     }
 
-    public function getAcceptData(): iterable
+    public static function getAcceptData(): iterable
     {
         yield 'simple file' => [
             [

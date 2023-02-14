@@ -71,7 +71,7 @@ class DateTimeValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidDateTimes()
+    public static function getValidDateTimes()
     {
         return [
             ['Y-m-d H:i:s e', '1995-03-24 00:00:00 UTC'],
@@ -100,7 +100,7 @@ class DateTimeValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidDateTimes()
+    public static function getInvalidDateTimes()
     {
         return [
             ['Y-m-d', 'foobar', DateTime::INVALID_FORMAT_ERROR],

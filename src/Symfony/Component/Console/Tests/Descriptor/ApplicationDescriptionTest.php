@@ -31,7 +31,7 @@ final class ApplicationDescriptionTest extends TestCase
         $this->assertSame($expected, array_keys((new ApplicationDescription($application))->getNamespaces()));
     }
 
-    public function getNamespacesProvider()
+    public static function getNamespacesProvider()
     {
         return [
             [['_global'], ['foobar']],

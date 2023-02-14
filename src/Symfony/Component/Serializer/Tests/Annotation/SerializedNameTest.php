@@ -33,7 +33,7 @@ class SerializedNameTest extends TestCase
         new SerializedName([]);
     }
 
-    public function provideInvalidValues(): array
+    public static function provideInvalidValues(): array
     {
         return [
             [''],

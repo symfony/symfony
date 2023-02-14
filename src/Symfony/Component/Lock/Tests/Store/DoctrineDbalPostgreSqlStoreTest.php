@@ -63,7 +63,7 @@ class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTestCase
         $store->exists(new Key('foo'));
     }
 
-    public function getInvalidDrivers()
+    public static function getInvalidDrivers()
     {
         yield ['sqlite:///tmp/foo.db'];
         yield [DriverManager::getConnection(['url' => 'sqlite:///tmp/foo.db'])];

@@ -289,25 +289,25 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
         $this->assertEquals(302, $client->getResponse()->getStatusCode());
     }
 
-    public function provideClientOptions()
+    public static function provideClientOptions()
     {
         yield [['test_case' => 'StandardFormLogin', 'root_config' => 'base_config.yml', 'enable_authenticator_manager' => true]];
         yield [['test_case' => 'StandardFormLogin', 'root_config' => 'routes_as_path.yml', 'enable_authenticator_manager' => true]];
     }
 
-    public function provideLegacyClientOptions()
+    public static function provideLegacyClientOptions()
     {
         yield [['test_case' => 'StandardFormLogin', 'root_config' => 'base_config.yml', 'enable_authenticator_manager' => true]];
         yield [['test_case' => 'StandardFormLogin', 'root_config' => 'routes_as_path.yml', 'enable_authenticator_manager' => true]];
     }
 
-    public function provideConfigs()
+    public static function provideConfigs()
     {
         yield [['test_case' => 'StandardFormLogin', 'root_config' => 'base_config.yml']];
         yield [['test_case' => 'StandardFormLogin', 'root_config' => 'routes_as_path.yml']];
     }
 
-    public function provideLegacyConfigs()
+    public static function provideLegacyConfigs()
     {
         yield [['test_case' => 'StandardFormLogin', 'root_config' => 'legacy_config.yml']];
         yield [['test_case' => 'StandardFormLogin', 'root_config' => 'legacy_routes_as_path.yml']];

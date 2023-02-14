@@ -67,7 +67,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         $this->assertEquals($expectedStamps, $envelope->all(HandledStamp::class));
     }
 
-    public function itAddsHandledStampsProvider(): iterable
+    public static function itAddsHandledStampsProvider(): iterable
     {
         $first = new class() extends HandleMessageMiddlewareTestCallable {
             public function __invoke()

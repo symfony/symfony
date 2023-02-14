@@ -22,7 +22,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class NoPrivateNetworkHttpClientTest extends TestCase
 {
-    public function getExcludeData(): array
+    public static function getExcludeData(): array
     {
         return [
             // private

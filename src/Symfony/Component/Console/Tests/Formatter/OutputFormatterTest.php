@@ -185,7 +185,7 @@ class OutputFormatterTest extends TestCase
         }
     }
 
-    public function provideInlineStyleOptionsCases()
+    public static function provideInlineStyleOptionsCases()
     {
         return [
             ['<unknown=_unknown_>'],
@@ -258,7 +258,7 @@ class OutputFormatterTest extends TestCase
         }
     }
 
-    public function provideDecoratedAndNonDecoratedOutput()
+    public static function provideDecoratedAndNonDecoratedOutput()
     {
         return [
             ['<error>some error</error>', 'some error', "\033[37;41msome error\033[39;49m"],

@@ -1751,7 +1751,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         }
     }
 
-    public function appRedisTagAwareConfigProvider(): array
+    public static function appRedisTagAwareConfigProvider(): array
     {
         return [
             ['cache_app_redis_tag_aware'],
@@ -1930,7 +1930,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         ], $defaultOptions['peer_fingerprint']);
     }
 
-    public function provideMailer(): array
+    public static function provideMailer(): array
     {
         return [
             ['mailer_with_dsn', ['main' => 'smtp://example.com']],

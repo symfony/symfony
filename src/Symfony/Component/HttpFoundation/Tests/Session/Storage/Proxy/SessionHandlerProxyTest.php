@@ -170,7 +170,7 @@ class SessionHandlerProxyTest extends TestCase
         $this->assertSame('files', (new NativeSessionStorage([], $handler))->getSaveHandler()->getSaveHandlerName());
     }
 
-    public function provideNativeSessionStorageHandler()
+    public static function provideNativeSessionStorageHandler()
     {
         return [
             [new \SessionHandler()],

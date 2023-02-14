@@ -301,7 +301,7 @@ class ProcessTest extends TestCase
         $process->setInput($value);
     }
 
-    public function provideInvalidInputValues()
+    public static function provideInvalidInputValues()
     {
         return [
             [[]],
@@ -319,7 +319,7 @@ class ProcessTest extends TestCase
         $this->assertSame($expected, $process->getInput());
     }
 
-    public function provideInputValues()
+    public static function provideInputValues()
     {
         return [
             [null, null],
@@ -328,7 +328,7 @@ class ProcessTest extends TestCase
         ];
     }
 
-    public function chainedCommandsOutputProvider()
+    public static function chainedCommandsOutputProvider()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
             return [
@@ -422,7 +422,7 @@ class ProcessTest extends TestCase
         fclose($h);
     }
 
-    public function provideIncrementalOutput()
+    public static function provideIncrementalOutput()
     {
         return [
             ['getOutput', 'getIncrementalOutput', 'php://stdout'],
@@ -957,7 +957,7 @@ class ProcessTest extends TestCase
         $process->{$method}();
     }
 
-    public function provideMethodsThatNeedARunningProcess()
+    public static function provideMethodsThatNeedARunningProcess()
     {
         return [
             ['getOutput'],
@@ -988,7 +988,7 @@ class ProcessTest extends TestCase
         throw $e;
     }
 
-    public function provideMethodsThatNeedATerminatedProcess()
+    public static function provideMethodsThatNeedATerminatedProcess()
     {
         return [
             ['hasBeenSignaled'],
@@ -1093,7 +1093,7 @@ class ProcessTest extends TestCase
         $p->{$fetchMethod}();
     }
 
-    public function provideOutputFetchingMethods()
+    public static function provideOutputFetchingMethods()
     {
         return [
             ['getOutput'],
@@ -1130,7 +1130,7 @@ class ProcessTest extends TestCase
         $this->assertTrue(true, 'A call to signal() is not expected to cause wait() to throw a RuntimeException');
     }
 
-    public function responsesCodeProvider()
+    public static function responsesCodeProvider()
     {
         return [
             // expected output / getter / code to execute
@@ -1140,7 +1140,7 @@ class ProcessTest extends TestCase
         ];
     }
 
-    public function pipesCodeProvider()
+    public static function pipesCodeProvider()
     {
         $variations = [
             'fwrite(STDOUT, $in = file_get_contents(\'php://stdin\')); fwrite(STDERR, $in);',
@@ -1183,7 +1183,7 @@ class ProcessTest extends TestCase
         $process->stop();
     }
 
-    public function provideVariousIncrementals()
+    public static function provideVariousIncrementals()
     {
         return [
             ['php://stdout', 'getIncrementalOutput'],
@@ -1449,7 +1449,7 @@ class ProcessTest extends TestCase
         $this->assertSame($expected, str_replace('Standard input code', '-', $p->getOutput()));
     }
 
-    public function provideEscapeArgument()
+    public static function provideEscapeArgument()
     {
         yield ['a"b%c%'];
         yield ['a"b^c^'];

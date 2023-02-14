@@ -134,7 +134,7 @@ class DoctrineDataCollectorTest extends TestCase
         $this->assertTrue($collectedQueries['default'][0]['runnable']);
     }
 
-    public function paramProvider(): array
+    public static function paramProvider(): array
     {
         return [
             ['some value', [], 'some value'],

@@ -119,7 +119,7 @@ class ErrorListenerTest extends TestCase
         $this->assertCount(1, $logger->getLogs('warning'));
     }
 
-    public function provider()
+    public static function provider()
     {
         if (!class_exists(Request::class)) {
             return [[null, null]];
@@ -202,7 +202,7 @@ class ErrorListenerTest extends TestCase
         $this->assertSame('OK: foo', $event->getResponse()->getContent());
     }
 
-    public function controllerProvider()
+    public static function controllerProvider()
     {
         yield [function (FlattenException $exception) {
             return new Response('OK: '.$exception->getMessage());

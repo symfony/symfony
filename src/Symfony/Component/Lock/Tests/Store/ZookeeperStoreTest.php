@@ -46,7 +46,7 @@ class ZookeeperStoreTest extends AbstractStoreTestCase
         $this->assertInstanceOf(\Zookeeper::class, ZookeeperStore::createConnection($connectionString));
     }
 
-    public function provideValidConnectionString(): iterable
+    public static function provideValidConnectionString(): iterable
     {
         yield 'single host' => ['zookeeper://localhost:2181'];
         yield 'single multiple host' => ['zookeeper://localhost:2181,localhost:2181'];

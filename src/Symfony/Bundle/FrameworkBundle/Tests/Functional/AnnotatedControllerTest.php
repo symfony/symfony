@@ -29,7 +29,7 @@ class AnnotatedControllerTest extends AbstractWebTestCase
         $this->assertSame('/annotated/create-transaction', $router->generate('symfony_framework_tests_functional_test_annotated_createtransaction'));
     }
 
-    public function getRoutes()
+    public static function getRoutes()
     {
         return [
             ['/null_request', 'Symfony\Component\HttpFoundation\Request'],

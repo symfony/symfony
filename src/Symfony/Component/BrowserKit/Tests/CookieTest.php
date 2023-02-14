@@ -42,7 +42,7 @@ class CookieTest extends TestCase
         $this->assertEquals($cookie, (string) Cookie::fromString($cookie, $url));
     }
 
-    public function getTestsForToFromString()
+    public static function getTestsForToFromString()
     {
         return [
             ['foo=bar; path=/'],
@@ -71,7 +71,7 @@ class CookieTest extends TestCase
         $this->assertEquals(1596185377, Cookie::fromString($cookie)->getExpiresTime());
     }
 
-    public function getExpireCookieStrings()
+    public static function getExpireCookieStrings()
     {
         return [
             ['foo=bar; expires=Fri, 31-Jul-2020 08:49:37 GMT'],

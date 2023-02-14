@@ -91,7 +91,7 @@ class LinkTest extends TestCase
         $this->assertFalse($link->isTemplated());
     }
 
-    public function templatedHrefProvider()
+    public static function templatedHrefProvider()
     {
         return [
             ['http://www.google.com/{param}/foo'],
@@ -99,7 +99,7 @@ class LinkTest extends TestCase
         ];
     }
 
-    public function notTemplatedHrefProvider()
+    public static function notTemplatedHrefProvider()
     {
         return [
             ['http://www.google.com/foo'],

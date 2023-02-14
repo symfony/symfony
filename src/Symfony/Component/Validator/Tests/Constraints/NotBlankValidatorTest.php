@@ -32,7 +32,7 @@ class NotBlankValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidValues()
+    public static function getValidValues()
     {
         return [
             ['foobar'],
@@ -143,7 +143,7 @@ class NotBlankValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getWhitespaces()
+    public static function getWhitespaces()
     {
         return [
             ["\x20"],

@@ -28,7 +28,7 @@ class ExcludeDirectoryFilterIteratorTest extends RealIteratorTestCase
         $this->assertIterator($expected, $iterator);
     }
 
-    public function getAcceptData()
+    public static function getAcceptData()
     {
         $foo = [
             '.bar',

@@ -179,7 +179,7 @@ YAML;
         $this->assertSame($expectedSuggestions, $tester->complete($input));
     }
 
-    public function provideCompletionSuggestions()
+    public static function provideCompletionSuggestions()
     {
         yield 'option' => [['--format', ''], ['txt', 'json', 'github']];
     }

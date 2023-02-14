@@ -59,7 +59,7 @@ class RedisReceiverTest extends TestCase
         $receiver->get();
     }
 
-    public function redisEnvelopeProvider(): \Generator
+    public static function redisEnvelopeProvider(): \Generator
     {
         yield [
             [
@@ -96,7 +96,7 @@ class RedisReceiverTest extends TestCase
         ];
     }
 
-    public function rejectedRedisEnvelopeProvider(): \Generator
+    public static function rejectedRedisEnvelopeProvider(): \Generator
     {
         yield [
             [

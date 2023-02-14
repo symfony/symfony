@@ -157,7 +157,7 @@ EOTXT
             , $dump);
     }
 
-    public function provideDumpWithCommaFlagTests()
+    public static function provideDumpWithCommaFlagTests()
     {
         $expected = <<<'EOTXT'
 array:3 [
@@ -492,7 +492,7 @@ EOTXT
         );
     }
 
-    public function provideDumpArrayWithColor()
+    public static function provideDumpArrayWithColor()
     {
         yield [
             ['foo' => 'bar'],

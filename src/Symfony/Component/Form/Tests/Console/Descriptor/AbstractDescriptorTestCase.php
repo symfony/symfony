@@ -80,7 +80,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
         }
     }
 
-    public function getDescribeDefaultsTestData()
+    public static function getDescribeDefaultsTestData()
     {
         $options['core_types'] = ['Symfony\Component\Form\Extension\Core\Type\FormType'];
         $options['service_types'] = ['Symfony\Bridge\Doctrine\Form\Type\EntityType'];
@@ -96,7 +96,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
         yield [null, $options, 'types_with_deprecated_options'];
     }
 
-    public function getDescribeResolvedFormTypeTestData()
+    public static function getDescribeResolvedFormTypeTestData()
     {
         $typeExtensions = [new FormTypeCsrfExtension(new CsrfTokenManager())];
         $parent = new ResolvedFormType(new FormType(), $typeExtensions);
@@ -106,7 +106,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
         yield [new ResolvedFormType(new FooType(), [], $parent), ['decorated' => false, 'show_deprecated' => true], 'deprecated_options_of_type'];
     }
 
-    public function getDescribeOptionTestData()
+    public static function getDescribeOptionTestData()
     {
         $parent = new ResolvedFormType(new FormType());
         $options['decorated'] = false;

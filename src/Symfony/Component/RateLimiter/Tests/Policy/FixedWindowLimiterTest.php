@@ -108,7 +108,7 @@ class FixedWindowLimiterTest extends TestCase
         $this->assertSame(100, $window->getAvailableTokens($serverOneClock));
     }
 
-    public function provideConsumeOutsideInterval(): \Generator
+    public static function provideConsumeOutsideInterval(): \Generator
     {
         yield ['PT15S'];
 

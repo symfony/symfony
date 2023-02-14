@@ -262,7 +262,7 @@ class FileLoaderTest extends TestCase
         $this->assertFalse($container->has(DeeperBaz::class));
     }
 
-    public function excludeTrailingSlashConsistencyProvider(): iterable
+    public static function excludeTrailingSlashConsistencyProvider(): iterable
     {
         yield ['Prototype/OtherDir/AnotherSub/'];
         yield ['Prototype/OtherDir/AnotherSub'];

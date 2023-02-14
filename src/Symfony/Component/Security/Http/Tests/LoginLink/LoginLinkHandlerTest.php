@@ -89,7 +89,7 @@ class LoginLinkHandlerTest extends TestCase
         $this->assertSame('https://example.com/login/verify?user=weaverryan&hash=abchash&expires=1601235000', $loginLink->getUrl());
     }
 
-    public function provideCreateLoginLinkData()
+    public static function provideCreateLoginLinkData()
     {
         yield [
             new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash'),

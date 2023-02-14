@@ -153,7 +153,7 @@ class AttributeBagTest extends TestCase
         $this->assertEquals([], $this->bag->all());
     }
 
-    public function attributesProvider()
+    public static function attributesProvider()
     {
         return [
             ['hello', 'world', true],

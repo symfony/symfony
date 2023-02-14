@@ -33,7 +33,7 @@ class RetryAuthenticationEntryPointTest extends TestCase
         $this->assertEquals($expectedUrl, $response->headers->get('Location'));
     }
 
-    public function dataForStart()
+    public static function dataForStart()
     {
         if (!class_exists(Request::class)) {
             return [[]];

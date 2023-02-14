@@ -84,7 +84,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function provideConstraintsWithChoicesArray(): iterable
+    public static function provideConstraintsWithChoicesArray(): iterable
     {
         yield 'Doctrine style' => [new Choice(['choices' => ['foo', 'bar']])];
         yield 'Doctrine default option' => [new Choice(['value' => ['foo', 'bar']])];
@@ -105,7 +105,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function provideConstraintsWithCallbackFunction(): iterable
+    public static function provideConstraintsWithCallbackFunction(): iterable
     {
         yield 'doctrine style, namespaced function' => [new Choice(['callback' => __NAMESPACE__.'\choice_callback'])];
         yield 'doctrine style, closure' => [new Choice([
@@ -156,7 +156,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function provideConstraintsWithMultipleTrue(): iterable
+    public static function provideConstraintsWithMultipleTrue(): iterable
     {
         yield 'Doctrine style' => [new Choice([
             'choices' => ['foo', 'bar', 'baz'],
@@ -185,7 +185,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function provideConstraintsWithMessage(): iterable
+    public static function provideConstraintsWithMessage(): iterable
     {
         yield 'Doctrine style' => [new Choice(['choices' => ['foo', 'bar'], 'message' => 'myMessage'])];
 
@@ -227,7 +227,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function provideConstraintsWithMultipleMessage(): iterable
+    public static function provideConstraintsWithMultipleMessage(): iterable
     {
         yield 'Doctrine style' => [new Choice([
             'choices' => ['foo', 'bar'],
@@ -263,7 +263,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function provideConstraintsWithMin(): iterable
+    public static function provideConstraintsWithMin(): iterable
     {
         yield 'Doctrine style' => [new Choice([
             'choices' => ['foo', 'bar', 'moo', 'maa'],
@@ -301,7 +301,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function provideConstraintsWithMax(): iterable
+    public static function provideConstraintsWithMax(): iterable
     {
         yield 'Doctrine style' => [new Choice([
             'choices' => ['foo', 'bar', 'moo', 'maa'],

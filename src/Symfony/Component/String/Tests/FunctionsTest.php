@@ -30,7 +30,7 @@ final class FunctionsTest extends TestCase
         $this->assertEquals($expected, s($input));
     }
 
-    public function provideSStrings(): array
+    public static function provideSStrings(): array
     {
         return [
             [new UnicodeString(''), ''],
@@ -50,7 +50,7 @@ final class FunctionsTest extends TestCase
         $this->assertEquals($expected, u($input));
     }
 
-    public function provideUStrings(): array
+    public static function provideUStrings(): array
     {
         return [
             [new UnicodeString(''), ''],
@@ -68,7 +68,7 @@ final class FunctionsTest extends TestCase
         $this->assertEquals($expected, b($input));
     }
 
-    public function provideBStrings(): array
+    public static function provideBStrings(): array
     {
         return [
             [new ByteString(''), ''],

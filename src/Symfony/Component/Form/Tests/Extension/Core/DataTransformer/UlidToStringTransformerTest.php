@@ -18,7 +18,7 @@ use Symfony\Component\Uid\Ulid;
 
 class UlidToStringTransformerTest extends TestCase
 {
-    public function provideValidUlid()
+    public static function provideValidUlid()
     {
         return [
             ['01D85PP1982GF6KTVFHQ7W78FB', new Ulid('01d85pp1982gf6ktvfhq7w78fb')],

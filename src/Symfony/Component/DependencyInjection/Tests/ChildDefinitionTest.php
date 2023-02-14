@@ -40,7 +40,7 @@ class ChildDefinitionTest extends TestCase
         $this->assertSame([$changeKey => true], $def->getChanges());
     }
 
-    public function getPropertyTests()
+    public static function getPropertyTests()
     {
         return [
             ['class', 'class'],

@@ -101,7 +101,7 @@ class SetupTransportsCommandTest extends TestCase
         $this->assertSame($expectedSuggestions, $suggestions);
     }
 
-    public function provideCompletionSuggestions()
+    public static function provideCompletionSuggestions()
     {
         yield 'transport' => [[''], ['amqp', 'other_transport']];
     }

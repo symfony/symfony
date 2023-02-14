@@ -117,7 +117,7 @@ class TranslatorTest extends TestCase
         $this->assertEquals('en', $translator->getLocale());
     }
 
-    public function getTransTests()
+    public static function getTransTests()
     {
         return [
             ['Symfony is great!', 'Symfony is great!', []],
@@ -125,7 +125,7 @@ class TranslatorTest extends TestCase
         ];
     }
 
-    public function getTransChoiceTests()
+    public static function getTransChoiceTests()
     {
         return [
             ['There are no apples', '{0} There are no apples|{1} There is one apple|]1,Inf] There are %count% apples', 0],
@@ -149,7 +149,7 @@ class TranslatorTest extends TestCase
         $this->assertEquals($expected, $translator->trans($interval.' foo|[1,Inf[ bar', ['%count%' => $number]));
     }
 
-    public function getInterval()
+    public static function getInterval()
     {
         return [
             ['foo', 3, '{1,2, 3 ,4}'],
@@ -192,7 +192,7 @@ class TranslatorTest extends TestCase
         $translator->trans($id, ['%count%' => $number]);
     }
 
-    public function getNonMatchingMessages()
+    public static function getNonMatchingMessages()
     {
         return [
             ['{0} There are no apples|{1} There is one apple', 2],
@@ -202,7 +202,7 @@ class TranslatorTest extends TestCase
         ];
     }
 
-    public function getChooseTests()
+    public static function getChooseTests()
     {
         return [
             ['There are no apples', '{0} There are no apples|{1} There is one apple|]1,Inf] There are %count% apples', 0],
@@ -320,7 +320,7 @@ class TranslatorTest extends TestCase
      *
      * @return array
      */
-    public function successLangcodes()
+    public static function successLangcodes()
     {
         return [
             ['1', ['ay', 'bo', 'cgg', 'dz', 'id', 'ja', 'jbo', 'ka', 'kk', 'km', 'ko', 'ky']],
@@ -339,7 +339,7 @@ class TranslatorTest extends TestCase
      *
      * @return array with nplural together with langcodes
      */
-    public function failingLangcodes()
+    public static function failingLangcodes()
     {
         return [
             ['1', ['fa']],

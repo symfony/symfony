@@ -78,7 +78,7 @@ class ValidatorTypeGuesserTest extends TestCase
         $this->assertEquals($guess, $this->guesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY));
     }
 
-    public function guessTypeProvider()
+    public static function guessTypeProvider()
     {
         return [
             [new Type('array'), new TypeGuess(CollectionType::class, [], Guess::MEDIUM_CONFIDENCE)],
@@ -97,7 +97,7 @@ class ValidatorTypeGuesserTest extends TestCase
         ];
     }
 
-    public function guessRequiredProvider()
+    public static function guessRequiredProvider()
     {
         return [
             [new NotNull(), new ValueGuess(true, Guess::HIGH_CONFIDENCE)],
@@ -182,7 +182,7 @@ class ValidatorTypeGuesserTest extends TestCase
         $this->assertArrayNotHasKey('attr', $typeGuess->getOptions());
     }
 
-    public function maxLengthTypeProvider()
+    public static function maxLengthTypeProvider()
     {
         return [
             ['double'],

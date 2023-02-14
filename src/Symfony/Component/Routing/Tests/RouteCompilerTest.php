@@ -32,7 +32,7 @@ class RouteCompilerTest extends TestCase
         $this->assertEquals($tokens, $compiled->getTokens(), $name.' (tokens)');
     }
 
-    public function provideCompileData()
+    public static function provideCompileData()
     {
         return [
             [
@@ -199,7 +199,7 @@ class RouteCompilerTest extends TestCase
         $this->assertEquals($tokens, $compiled->getTokens(), $name.' (tokens)');
     }
 
-    public function provideCompileImplicitUtf8Data()
+    public static function provideCompileImplicitUtf8Data()
     {
         return [
             [
@@ -284,7 +284,7 @@ class RouteCompilerTest extends TestCase
         $route->compile();
     }
 
-    public function getVariableNamesStartingWithADigit()
+    public static function getVariableNamesStartingWithADigit()
     {
         return [
            ['09'],
@@ -312,7 +312,7 @@ class RouteCompilerTest extends TestCase
         $this->assertEquals($hostTokens, $compiled->getHostTokens(), $name.' (host tokens)');
     }
 
-    public function provideCompileWithHostData()
+    public static function provideCompileWithHostData()
     {
         return [
             [
@@ -381,7 +381,7 @@ class RouteCompilerTest extends TestCase
         $this->assertSame($regex, $route->compile()->getRegex());
     }
 
-    public function provideRemoveCapturingGroup()
+    public static function provideRemoveCapturingGroup()
     {
         yield ['{^/(?P<foo>a(?:b|c)(?:d|e)f)$}sD', 'a(b|c)(d|e)f'];
         yield ['{^/(?P<foo>a\(b\)c)$}sD', 'a\(b\)c'];

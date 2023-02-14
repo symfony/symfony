@@ -23,7 +23,7 @@ use Symfony\Component\Messenger\Worker;
 
 class StopWorkerOnCustomStopExceptionListenerTest extends TestCase
 {
-    public function provideTests(): \Generator
+    public static function provideTests(): \Generator
     {
         yield 'it should not stop (1)' => [new \Exception(), false];
         yield 'it should not stop (2)' => [new HandlerFailedException(new Envelope(new \stdClass()), [new \Exception()]), false];

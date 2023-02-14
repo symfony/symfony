@@ -267,7 +267,7 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
         $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
-    public function postOnlyDataProvider(): array
+    public static function postOnlyDataProvider(): array
     {
         return [
             [true],
@@ -275,7 +275,7 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
         ];
     }
 
-    public function getUsernameForLength(): array
+    public static function getUsernameForLength(): array
     {
         return [
             [str_repeat('x', Security::MAX_USERNAME_LENGTH + 1), false],
@@ -283,7 +283,7 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
         ];
     }
 
-    public function provideInvalidCsrfTokens(): array
+    public static function provideInvalidCsrfTokens(): array
     {
         return [
             ['invalid'],

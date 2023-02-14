@@ -205,7 +205,7 @@ class PropertyInfoLoaderTest extends TestCase
         $this->assertSame($expected, $propertyInfoLoader->loadClassMetadata($classMetadata));
     }
 
-    public function regexpProvider()
+    public static function regexpProvider()
     {
         return [
             [false, null],

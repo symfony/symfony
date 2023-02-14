@@ -39,7 +39,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidValues()
+    public static function getValidValues()
     {
         return [
             yield 'null' => [[null]],
@@ -72,7 +72,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
              ->assertRaised();
     }
 
-    public function getInvalidValues()
+    public static function getInvalidValues()
     {
         $object = new \stdClass();
 
@@ -156,7 +156,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getCallback()
+    public static function getCallback()
     {
         return [
             yield 'static function' => [static function (\stdClass $object) {

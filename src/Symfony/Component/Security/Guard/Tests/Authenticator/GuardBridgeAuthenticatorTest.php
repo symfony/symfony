@@ -140,7 +140,7 @@ class GuardBridgeAuthenticatorTest extends TestCase
         $this->assertEquals($rememberMeSupported, $passport->hasBadge(RememberMeBadge::class));
     }
 
-    public function provideRememberMeData()
+    public static function provideRememberMeData()
     {
         yield [true];
         yield [false];

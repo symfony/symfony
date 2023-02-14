@@ -58,7 +58,7 @@ class ArrayNodeTest extends TestCase
         $node->normalize(['beta' => 'foo']);
     }
 
-    public function ignoreAndRemoveMatrixProvider(): array
+    public static function ignoreAndRemoveMatrixProvider(): array
     {
         $unrecognizedOptionException = new InvalidConfigurationException('Unrecognized option "foo" under "root"');
 
@@ -100,7 +100,7 @@ class ArrayNodeTest extends TestCase
         $this->assertSame($normalized, $r->invoke($node, $denormalized));
     }
 
-    public function getPreNormalizationTests(): array
+    public static function getPreNormalizationTests(): array
     {
         return [
             [
@@ -142,7 +142,7 @@ class ArrayNodeTest extends TestCase
         $this->assertSame($normalized, $r->invoke($rootNode, $denormalized));
     }
 
-    public function getZeroNamedNodeExamplesData(): array
+    public static function getZeroNamedNodeExamplesData(): array
     {
         return [
             [
@@ -189,7 +189,7 @@ class ArrayNodeTest extends TestCase
         $this->assertSame($normalized, $r->invoke($node, $prenormalized));
     }
 
-    public function getPreNormalizedNormalizedOrderedData(): array
+    public static function getPreNormalizedNormalizedOrderedData(): array
     {
         return [
             [
@@ -353,7 +353,7 @@ class ArrayNodeTest extends TestCase
         $this->assertEquals($merged, $r->invoke($node, ...$prenormalizeds));
     }
 
-    public function getDataWithIncludedExtraKeys(): array
+    public static function getDataWithIncludedExtraKeys(): array
     {
         return [
             [

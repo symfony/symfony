@@ -256,7 +256,7 @@ class GuardAuthenticationListenerTest extends TestCase
         $listener($this->event);
     }
 
-    public function exceptionsToHide()
+    public static function exceptionsToHide()
     {
         return [
             [new UserNotFoundException()],

@@ -54,7 +54,7 @@ class GuardAuthenticationFactoryTest extends TestCase
         $node->finalize($normalizedConfig);
     }
 
-    public function getValidConfigurationTests()
+    public static function getValidConfigurationTests()
     {
         $tests = [];
 
@@ -86,7 +86,7 @@ class GuardAuthenticationFactoryTest extends TestCase
         return $tests;
     }
 
-    public function getInvalidConfigurationTests()
+    public static function getInvalidConfigurationTests()
     {
         $tests = [];
 

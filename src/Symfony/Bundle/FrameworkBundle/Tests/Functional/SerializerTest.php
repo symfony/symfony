@@ -52,7 +52,7 @@ class SerializerTest extends AbstractWebTestCase
         self::assertEquals('foo', $defaultContext['fake_context_option']);
     }
 
-    public function provideNormalizersAndEncodersWithDefaultContextOption(): array
+    public static function provideNormalizersAndEncodersWithDefaultContextOption(): array
     {
         return [
             ['serializer.normalizer.constraint_violation_list.alias'],

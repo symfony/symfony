@@ -213,13 +213,13 @@ class CsrfFormLoginTest extends AbstractWebTestCase
         $this->assertStringContainsString('You\'re browsing to path "/protected-resource".', $text);
     }
 
-    public function provideClientOptions()
+    public static function provideClientOptions()
     {
         yield [['test_case' => 'CsrfFormLogin', 'root_config' => 'config.yml', 'enable_authenticator_manager' => true]];
         yield [['test_case' => 'CsrfFormLogin', 'root_config' => 'routes_as_path.yml', 'enable_authenticator_manager' => true]];
     }
 
-    public function provideLegacyClientOptions()
+    public static function provideLegacyClientOptions()
     {
         yield [['test_case' => 'CsrfFormLogin', 'root_config' => 'legacy_config.yml', 'enable_authenticator_manager' => false]];
         yield [['test_case' => 'CsrfFormLogin', 'root_config' => 'legacy_routes_as_path.yml', 'enable_authenticator_manager' => false]];

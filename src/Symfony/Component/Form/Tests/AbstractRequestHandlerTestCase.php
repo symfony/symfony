@@ -75,7 +75,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
         ];
     }
 
-    public function methodProvider()
+    public static function methodProvider()
     {
         return array_merge([
             ['GET'],
@@ -348,7 +348,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
         }
     }
 
-    public function getPostMaxSizeFixtures()
+    public static function getPostMaxSizeFixtures()
     {
         return [
             [1024 ** 3 + 1, '1G', true, ['{{ max }}' => '1G']],
@@ -381,7 +381,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
         $this->assertSame($expectedErrorCode, $this->requestHandler->getUploadFileError($this->getFailedUploadedFile($errorCode)));
     }
 
-    public function uploadFileErrorCodes()
+    public static function uploadFileErrorCodes()
     {
         return [
             'no error' => [\UPLOAD_ERR_OK, null],

@@ -308,7 +308,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertEquals($expected, $locator->getArgument(0));
     }
 
-    public function provideBindings()
+    public static function provideBindings()
     {
         return [
             [ControllerDummy::class.'$bar'],
@@ -343,7 +343,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertSame('foo_val', $locator->get('foo::fooAction')->get('someArg'));
     }
 
-    public function provideBindScalarValueToControllerArgument()
+    public static function provideBindScalarValueToControllerArgument()
     {
         yield ['$someArg'];
         yield ['string $someArg'];

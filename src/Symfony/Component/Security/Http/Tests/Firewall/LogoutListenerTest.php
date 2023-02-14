@@ -204,7 +204,7 @@ class LogoutListenerTest extends TestCase
         $this->assertSame($response, $event->getResponse());
     }
 
-    public function provideInvalidCsrfTokens(): array
+    public static function provideInvalidCsrfTokens(): array
     {
         return [
             ['invalid'],

@@ -124,7 +124,7 @@ class CommandTest extends TestCase
         $command->setName($name);
     }
 
-    public function provideInvalidCommandNames()
+    public static function provideInvalidCommandNames()
     {
         return [
             [''],
@@ -338,7 +338,7 @@ class CommandTest extends TestCase
         $this->assertEquals('interact called'.\PHP_EOL.'from the code...'.\PHP_EOL, $tester->getDisplay());
     }
 
-    public function getSetCodeBindToClosureTests()
+    public static function getSetCodeBindToClosureTests()
     {
         return [
             [true, 'not bound to the command'],

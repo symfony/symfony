@@ -277,7 +277,7 @@ class ConnectionTest extends TestCase
         $this->assertSame($queueUrl, $queueProperty->getValue($connection));
     }
 
-    public function provideQueueUrl()
+    public static function provideQueueUrl()
     {
         yield ['https://sqs.us-east-2.amazonaws.com/123456/queue', 'https://sqs.us-east-2.amazonaws.com/123456/queue'];
         yield ['https://KEY:SECRET@sqs.us-east-2.amazonaws.com/123456/queue', 'https://sqs.us-east-2.amazonaws.com/123456/queue'];
@@ -298,7 +298,7 @@ class ConnectionTest extends TestCase
         $this->assertNull($queueProperty->getValue($connection));
     }
 
-    public function provideNotQueueUrl()
+    public static function provideNotQueueUrl()
     {
         yield ['https://sqs.us-east-2.amazonaws.com/queue'];
         yield ['https://us-east-2/123456/ab1-MyQueue-A2BCDEF3GHI4'];

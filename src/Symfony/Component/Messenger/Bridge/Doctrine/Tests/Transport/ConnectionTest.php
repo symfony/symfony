@@ -178,7 +178,7 @@ class ConnectionTest extends TestCase
         $this->assertEquals($expectedAutoSetup, $config['auto_setup']);
     }
 
-    public function buildConfigurationProvider(): iterable
+    public static function buildConfigurationProvider(): iterable
     {
         yield 'no options' => [
             'dsn' => 'doctrine://default',
@@ -387,7 +387,7 @@ class ConnectionTest extends TestCase
         $connection->get();
     }
 
-    public function providePlatformSql(): iterable
+    public static function providePlatformSql(): iterable
     {
         yield 'MySQL' => [
             new MySQL57Platform(),

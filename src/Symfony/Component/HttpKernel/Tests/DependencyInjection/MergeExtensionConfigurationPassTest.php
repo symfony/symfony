@@ -58,7 +58,7 @@ class MergeExtensionConfigurationPassTest extends TestCase
 
 class LoadedExtension extends Extension
 {
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $container->register('loaded.foo');
     }
@@ -66,7 +66,7 @@ class LoadedExtension extends Extension
 
 class NotLoadedExtension extends Extension
 {
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $container->register('not_loaded.bar');
     }

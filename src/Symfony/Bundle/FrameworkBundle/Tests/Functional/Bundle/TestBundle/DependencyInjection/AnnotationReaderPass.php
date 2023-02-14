@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class AnnotationReaderPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         // simulate using "annotation_reader" in a compiler pass
         $container->get('test.annotation_reader');

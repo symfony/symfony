@@ -24,12 +24,16 @@ interface ParameterBagInterface
     /**
      * Clears all parameters.
      *
+     * @return void
+     *
      * @throws LogicException if the ParameterBagInterface cannot be cleared
      */
     public function clear();
 
     /**
      * Adds parameters to the service container parameters.
+     *
+     * @return void
      *
      * @throws LogicException if the parameter cannot be added
      */
@@ -49,11 +53,15 @@ interface ParameterBagInterface
 
     /**
      * Removes a parameter.
+     *
+     * @return void
      */
     public function remove(string $name);
 
     /**
      * Sets a service container parameter.
+     *
+     * @return void
      *
      * @throws LogicException if the parameter cannot be set
      */
@@ -66,11 +74,15 @@ interface ParameterBagInterface
 
     /**
      * Replaces parameter placeholders (%name%) by their values for all parameters.
+     *
+     * @return void
      */
     public function resolve();
 
     /**
      * Replaces parameter placeholders (%name%) by their values.
+     *
+     * @return mixed
      *
      * @throws ParameterNotFoundException if a placeholder references a parameter that does not exist
      */

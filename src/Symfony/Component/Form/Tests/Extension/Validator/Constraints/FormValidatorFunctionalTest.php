@@ -486,7 +486,7 @@ class Foo
     public $bar;
     public $baz;
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('bar', new NotBlank());
     }
@@ -494,7 +494,7 @@ class Foo
 
 class FooType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('bar')
@@ -504,7 +504,7 @@ class FooType extends AbstractType
         ;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefault('data_class', Foo::class);
     }
@@ -516,7 +516,7 @@ class Review
     public $title;
     public $author;
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('title', new NotBlank());
         $metadata->addPropertyConstraint('rating', new NotBlank());
@@ -525,7 +525,7 @@ class Review
 
 class ReviewType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('rating', IntegerType::class, [
@@ -538,7 +538,7 @@ class ReviewType extends AbstractType
         ;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefault('data_class', Review::class);
     }
@@ -548,7 +548,7 @@ class Customer
 {
     public $email;
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('email', new NotBlank());
     }
@@ -556,14 +556,14 @@ class Customer
 
 class CustomerType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('email')
         ;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefault('data_class', Customer::class);
     }

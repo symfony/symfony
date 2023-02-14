@@ -959,7 +959,7 @@ class PhpDumperTest extends TestCase
         $container->register(TestDefinition1::class, TestDefinition1::class)->setPublic(true);
 
         $container->addCompilerPass(new class() implements CompilerPassInterface {
-            public function process(ContainerBuilder $container)
+            public function process(ContainerBuilder $container): void
             {
                 $container->setDefinition('late_alias', new Definition(TestDefinition1::class))->setPublic(true);
                 $container->setAlias(TestDefinition1::class, 'late_alias')->setPublic(true);

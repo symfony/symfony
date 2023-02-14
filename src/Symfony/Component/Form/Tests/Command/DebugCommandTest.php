@@ -284,7 +284,7 @@ TXT
 
 class FooType extends AbstractType
 {
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired('foo');
         $resolver->setDefined('bar');

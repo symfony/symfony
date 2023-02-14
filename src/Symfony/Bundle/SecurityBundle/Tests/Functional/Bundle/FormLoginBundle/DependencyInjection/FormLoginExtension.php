@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class FormLoginExtension extends Extension
 {
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $container
             ->register('localized_form_failure_handler', LocalizedFormFailureHandler::class)

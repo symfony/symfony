@@ -2350,7 +2350,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
  */
 class TestAnnotationsPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $container->setDefinition('annotation_reader', $container->getDefinition('annotations.cached_reader'));
         $container->removeDefinition('annotations.cached_reader');

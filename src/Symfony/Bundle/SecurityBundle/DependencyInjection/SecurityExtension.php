@@ -78,6 +78,9 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     private array $sortedFactories = [];
     private array $userProviderFactories = [];
 
+    /**
+     * @return void
+     */
     public function prepend(ContainerBuilder $container)
     {
         foreach ($this->getSortedFactories() as $factory) {
@@ -87,6 +90,9 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
     }
 
+    /**
+     * @return void
+     */
     public function load(array $configs, ContainerBuilder $container)
     {
         if (!array_filter($configs)) {
@@ -200,7 +206,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         };
     }
 
-    private function createRoleHierarchy(array $config, ContainerBuilder $container)
+    private function createRoleHierarchy(array $config, ContainerBuilder $container): void
     {
         if (!isset($config['role_hierarchy']) || 0 === \count($config['role_hierarchy'])) {
             $container->removeDefinition('security.access.role_hierarchy_voter');
@@ -212,7 +218,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $container->removeDefinition('security.access.simple_role_voter');
     }
 
-    private function createAuthorization(array $config, ContainerBuilder $container)
+    private function createAuthorization(array $config, ContainerBuilder $container): void
     {
         foreach ($config['access_control'] as $access) {
             if (isset($access['request_matcher'])) {
@@ -265,7 +271,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
     }
 
-    private function createFirewalls(array $config, ContainerBuilder $container)
+    private function createFirewalls(array $config, ContainerBuilder $container): void
     {
         if (!isset($config['firewalls'])) {
             return;
@@ -692,7 +698,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         return $userProvider;
     }
 
-    private function createHashers(array $hashers, ContainerBuilder $container)
+    private function createHashers(array $hashers, ContainerBuilder $container): void
     {
         $hasherMap = [];
         foreach ($hashers as $class => $hasher) {
@@ -705,7 +711,12 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         ;
     }
 
-    private function createHasher(array $config)
+    /**
+     * @param array<string, mixed> $config
+     *
+     * @return Reference|array<string, mixed>
+     */
+    private function createHasher(array $config): Reference|array
     {
         // a custom hasher service
         if (isset($config['id'])) {
@@ -996,13 +1007,13 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         return $this->requestMatchers[$id] = new Reference($id);
     }
 
-    public function addAuthenticatorFactory(AuthenticatorFactoryInterface $factory)
+    public function addAuthenticatorFactory(AuthenticatorFactoryInterface $factory): void
     {
         $this->factories[] = [$factory->getPriority(), $factory];
         $this->sortedFactories = [];
     }
 
-    public function addUserProviderFactory(UserProviderFactoryInterface $factory)
+    public function addUserProviderFactory(UserProviderFactoryInterface $factory): void
     {
         $this->userProviderFactories[] = $factory;
     }

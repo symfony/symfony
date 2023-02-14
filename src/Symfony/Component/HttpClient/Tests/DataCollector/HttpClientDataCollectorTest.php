@@ -179,7 +179,7 @@ class HttpClientDataCollectorTest extends TestCase
         self::assertEquals(sprintf($expectedCurlCommand, '\\' === \DIRECTORY_SEPARATOR ? '"' : "'"), $curlCommand);
     }
 
-    public function provideCurlRequests(): iterable
+    public static function provideCurlRequests(): iterable
     {
         yield 'GET' => [
             [

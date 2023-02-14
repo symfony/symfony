@@ -21,7 +21,7 @@ class SplCasterTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    public function getCastFileInfoTests()
+    public static function getCastFileInfoTests()
     {
         return [
             [__FILE__, <<<'EOTXT'
@@ -135,7 +135,7 @@ EOTXT;
         $this->assertDumpMatchesFormat($dump, $var);
     }
 
-    public function provideCastSplDoublyLinkedList()
+    public static function provideCastSplDoublyLinkedList()
     {
         return [
             [\SplDoublyLinkedList::IT_MODE_FIFO, 'IT_MODE_FIFO | IT_MODE_KEEP'],

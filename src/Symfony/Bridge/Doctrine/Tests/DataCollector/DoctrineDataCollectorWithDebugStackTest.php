@@ -107,7 +107,7 @@ class DoctrineDataCollectorWithDebugStackTest extends TestCase
         $this->assertSame($runnable, $collectedQueries['default'][0]['runnable']);
     }
 
-    public function paramProvider(): array
+    public static function paramProvider(): array
     {
         return [
             ['some value', [], 'some value', true],

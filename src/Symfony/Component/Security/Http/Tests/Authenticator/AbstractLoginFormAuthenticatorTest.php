@@ -31,7 +31,7 @@ class AbstractLoginFormAuthenticatorTest extends TestCase
         $this->assertSame($expected, $authenticator->supports($request));
     }
 
-    public function provideSupportsData(): iterable
+    public static function provideSupportsData(): iterable
     {
         yield [
             '/login',

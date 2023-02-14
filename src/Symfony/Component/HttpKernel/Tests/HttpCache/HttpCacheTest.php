@@ -1477,7 +1477,7 @@ class HttpCacheTest extends HttpCacheTestCase
         Request::setTrustedProxies([], -1);
     }
 
-    public function getTrustedProxyData()
+    public static function getTrustedProxyData()
     {
         return [
             [[]],
@@ -1506,7 +1506,7 @@ class HttpCacheTest extends HttpCacheTestCase
         Request::setTrustedProxies([], -1);
     }
 
-    public function getForwardedData()
+    public static function getForwardedData()
     {
         return [
             [null, 'for="10.0.0.1";host="localhost";proto=http'],
@@ -1698,7 +1698,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertTraceContains('stale-if-error');
     }
 
-    public function getResponseDataThatMayBeServedStaleIfError()
+    public static function getResponseDataThatMayBeServedStaleIfError()
     {
         // All data sets assume that a 10s stale-if-error grace period has been configured
         yield 'public, max-age expired' => [['Cache-Control' => 'public, max-age=60'], 65];
@@ -1740,7 +1740,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertEquals(500, $this->response->getStatusCode());
     }
 
-    public function getResponseDataThatMustNotBeServedStaleIfError()
+    public static function getResponseDataThatMustNotBeServedStaleIfError()
     {
         // All data sets assume that a 10s stale-if-error grace period has been configured
         yield 'public, no TTL but beyond grace period' => [['Cache-Control' => 'public'], 15];

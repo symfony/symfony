@@ -49,7 +49,7 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor = new PropertyAccessor();
     }
 
-    public function getPathsWithMissingProperty()
+    public static function getPathsWithMissingProperty()
     {
         return [
             [(object) ['firstName' => 'Bernhard'], 'lastName'],
@@ -69,7 +69,7 @@ class PropertyAccessorTest extends TestCase
         ];
     }
 
-    public function getPathsWithMissingIndex()
+    public static function getPathsWithMissingIndex()
     {
         return [
             [['firstName' => 'Bernhard'], '[lastName]'],
@@ -515,7 +515,7 @@ class PropertyAccessorTest extends TestCase
         $this->assertTrue($this->propertyAccessor->isWritable(new TestClassMagicCall('Bernhard'), 'magicCallProperty'));
     }
 
-    public function getValidWritePropertyPaths()
+    public static function getValidWritePropertyPaths()
     {
         return [
             [['Bernhard', 'Schussek'], '[0]', 'Bernhard'],
@@ -561,9 +561,9 @@ class PropertyAccessorTest extends TestCase
         ];
     }
 
-    public function getValidReadPropertyPaths(): iterable
+    public static function getValidReadPropertyPaths(): iterable
     {
-        yield from $this->getValidWritePropertyPaths();
+        yield from self::getValidWritePropertyPaths();
 
         // Optional paths can only be read and can't be written to.
         yield [(object) [], 'foo?', null];
@@ -596,7 +596,7 @@ class PropertyAccessorTest extends TestCase
         $this->assertSame('Updated', $obj->publicProperty['foo']['bar']);
     }
 
-    public function getReferenceChainObjectsForSetValue()
+    public static function getReferenceChainObjectsForSetValue()
     {
         return [
             [['a' => ['b' => ['c' => 'old-value']]], '[a][b][c]', 'new-value'],
@@ -617,7 +617,7 @@ class PropertyAccessorTest extends TestCase
         $this->assertEquals($value, $this->propertyAccessor->getValue($object, $path));
     }
 
-    public function getReferenceChainObjectsForIsWritable()
+    public static function getReferenceChainObjectsForIsWritable()
     {
         return [
             [new TestClassIsWritable(['a' => ['b' => 'old-value']]), 'value[a][b]', false],

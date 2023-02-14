@@ -20,7 +20,7 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\DateIntervalToStringTr
  */
 class DateIntervalToStringTransformerTest extends DateIntervalTestCase
 {
-    public function dataProviderISO()
+    public static function dataProviderISO()
     {
         $data = [
             ['P%YY%MM%DDT%HH%IM%SS', 'P00Y00M00DT00H00M00S', 'PT0S'],
@@ -34,7 +34,7 @@ class DateIntervalToStringTransformerTest extends DateIntervalTestCase
         return $data;
     }
 
-    public function dataProviderDate()
+    public static function dataProviderDate()
     {
         $data = [
             [

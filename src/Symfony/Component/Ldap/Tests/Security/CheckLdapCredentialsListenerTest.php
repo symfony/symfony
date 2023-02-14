@@ -55,7 +55,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
         $listener->onCheckPassport(new CheckPassportEvent($authenticator, $passport));
     }
 
-    public function provideShouldNotCheckPassport()
+    public static function provideShouldNotCheckPassport()
     {
         // no LdapBadge
         yield [new TestAuthenticator(), new Passport(new UserBadge('test'), new PasswordCredentials('s3cret'))];
@@ -100,7 +100,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
         $listener->onCheckPassport(new CheckPassportEvent(new TestAuthenticator(), $passport));
     }
 
-    public function provideWrongPassportData()
+    public static function provideWrongPassportData()
     {
         // no password credentials
         yield [new SelfValidatingPassport(new UserBadge('test'), [new LdapBadge('app.ldap')])];
@@ -156,7 +156,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
         $listener->onCheckPassport($this->createEvent('s3cr3t', new LdapBadge('app.ldap', $dnString, 'elsa', 'test1234A$', $queryString)));
     }
 
-    public function queryForDnProvider(): iterable
+    public static function queryForDnProvider(): iterable
     {
         yield ['{username}', '{username}_test'];
         yield ['{user_identifier}', '{username}_test'];

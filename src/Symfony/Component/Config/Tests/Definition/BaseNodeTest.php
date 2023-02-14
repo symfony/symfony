@@ -41,7 +41,7 @@ class BaseNodeTest extends TestCase
         $this->assertSame($expected, $node->getPath());
     }
 
-    public function providePath(): array
+    public static function providePath(): array
     {
         return [
             'name only' => ['root', ['root']],

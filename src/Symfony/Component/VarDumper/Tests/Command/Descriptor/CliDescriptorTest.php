@@ -54,7 +54,7 @@ class CliDescriptorTest extends TestCase
         $this->assertStringMatchesFormat(trim($expectedOutput), str_replace(\PHP_EOL, "\n", trim($output->fetch())));
     }
 
-    public function provideContext()
+    public static function provideContext()
     {
         yield 'source' => [
             [

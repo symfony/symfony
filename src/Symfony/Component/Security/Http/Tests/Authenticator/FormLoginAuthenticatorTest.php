@@ -60,7 +60,7 @@ class FormLoginAuthenticatorTest extends TestCase
         $this->authenticator->authenticate($request);
     }
 
-    public function provideUsernamesForLength()
+    public static function provideUsernamesForLength()
     {
         yield [str_repeat('x', UserBadge::MAX_USERNAME_LENGTH + 1), false];
         yield [str_repeat('x', UserBadge::MAX_USERNAME_LENGTH - 1), true];
@@ -126,7 +126,7 @@ class FormLoginAuthenticatorTest extends TestCase
         $this->authenticator->authenticate($request);
     }
 
-    public function postOnlyDataProvider()
+    public static function postOnlyDataProvider()
     {
         yield [true];
         yield [false];
@@ -171,7 +171,7 @@ class FormLoginAuthenticatorTest extends TestCase
         $this->assertSame($shouldSupport, $this->authenticator->supports($request));
     }
 
-    public function provideContentTypes()
+    public static function provideContentTypes()
     {
         yield ['application/json', false];
         yield ['application/x-www-form-urlencoded', true];

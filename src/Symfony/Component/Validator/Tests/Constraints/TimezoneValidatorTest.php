@@ -57,7 +57,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidTimezones(): iterable
+    public static function getValidTimezones(): iterable
     {
         // ICU standard (alias/BC in PHP)
         yield ['Etc/UTC'];
@@ -105,7 +105,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidGroupedTimezones(): iterable
+    public static function getValidGroupedTimezones(): iterable
     {
         yield ['America/Buenos_Aires', \DateTimeZone::AMERICA | \DateTimeZone::AUSTRALIA]; // icu
         yield ['America/Argentina/Buenos_Aires', \DateTimeZone::AMERICA]; // php
@@ -141,7 +141,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidTimezones(): iterable
+    public static function getInvalidTimezones(): iterable
     {
         yield ['Buenos_Aires/America'];
         yield ['Buenos_Aires/Argentina/America'];
@@ -167,7 +167,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidGroupedTimezones(): iterable
+    public static function getInvalidGroupedTimezones(): iterable
     {
         yield ['America/Buenos_Aires', \DateTimeZone::ASIA | \DateTimeZone::AUSTRALIA]; // icu
         yield ['America/Argentina/Buenos_Aires', \DateTimeZone::EUROPE]; // php
@@ -207,7 +207,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidGroupedTimezonesByCountry(): iterable
+    public static function getValidGroupedTimezonesByCountry(): iterable
     {
         yield ['America/Buenos_Aires', 'AR']; // icu
         yield ['America/Argentina/Buenos_Aires', 'AR']; // php
@@ -248,7 +248,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidGroupedTimezonesByCountry(): iterable
+    public static function getInvalidGroupedTimezonesByCountry(): iterable
     {
         yield ['America/Argentina/Cordoba', 'FR'];
         yield ['America/Barbados', 'PT'];
@@ -302,7 +302,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getDeprecatedTimezones(): iterable
+    public static function getDeprecatedTimezones(): iterable
     {
         yield ['Australia/ACT'];
         yield ['Australia/LHI'];

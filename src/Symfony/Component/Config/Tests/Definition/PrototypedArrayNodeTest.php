@@ -280,7 +280,7 @@ class PrototypedArrayNodeTest extends TestCase
         $this->assertEquals($expected, $normalized);
     }
 
-    public function getDataForKeyRemovedLeftValueOnly(): array
+    public static function getDataForKeyRemovedLeftValueOnly(): array
     {
         $scalarValue = new ScalarNode('value');
 
@@ -354,7 +354,7 @@ class PrototypedArrayNodeTest extends TestCase
         self::assertSame($result, $expected);
     }
 
-    public function getPrototypedArrayNodeDataToMerge(): array
+    public static function getPrototypedArrayNodeDataToMerge(): array
     {
         return [
             // data to merged is a plain array

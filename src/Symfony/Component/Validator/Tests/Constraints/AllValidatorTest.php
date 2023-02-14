@@ -77,7 +77,7 @@ class AllValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidArguments()
+    public static function getValidArguments()
     {
         return [
             [[5, 6, 7]],

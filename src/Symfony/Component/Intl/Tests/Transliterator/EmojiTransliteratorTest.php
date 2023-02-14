@@ -30,7 +30,7 @@ class EmojiTransliteratorTest extends TestCase
         $this->assertSame($expected, $tr->transliterate($input));
     }
 
-    public function provideTransliterateTests(): iterable
+    public static function provideTransliterateTests(): iterable
     {
         yield [
             'fr',
@@ -76,7 +76,7 @@ class EmojiTransliteratorTest extends TestCase
         $this->assertNotEmpty($tr->transliterate('😀'));
     }
 
-    public function provideLocaleTest(): iterable
+    public static function provideLocaleTest(): iterable
     {
         $file = (new Finder())
             ->in(__DIR__.'/../../Resources/data/transliterator/emoji')

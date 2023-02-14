@@ -42,7 +42,7 @@ class MockHttpClientTest extends HttpClientTestCase
         $this->assertSame(2, $client->getRequestsCount());
     }
 
-    public function mockingProvider(): iterable
+    public static function mockingProvider(): iterable
     {
         yield 'callable' => [
             static function (string $method, string $url, array $options = []) {
@@ -112,7 +112,7 @@ class MockHttpClientTest extends HttpClientTestCase
         $this->addToAssertionCount(1);
     }
 
-    public function validResponseFactoryProvider()
+    public static function validResponseFactoryProvider()
     {
         return [
             [static function (): MockResponse { return new MockResponse(); }],
@@ -138,7 +138,7 @@ class MockHttpClientTest extends HttpClientTestCase
         $client->request('POST', '/foo');
     }
 
-    public function transportExceptionProvider(): iterable
+    public static function transportExceptionProvider(): iterable
     {
         yield 'array of callable' => [
             [
@@ -179,7 +179,7 @@ class MockHttpClientTest extends HttpClientTestCase
         (new MockHttpClient($responseFactory))->request('GET', 'https://foo.bar');
     }
 
-    public function invalidResponseFactoryProvider()
+    public static function invalidResponseFactoryProvider()
     {
         return [
             [static function (): \Generator { yield new MockResponse(); }, 'The response factory passed to MockHttpClient must return/yield an instance of ResponseInterface, "Generator" given.'],

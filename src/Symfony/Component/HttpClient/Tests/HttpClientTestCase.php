@@ -483,7 +483,7 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         }
     }
 
-    public function getRedirectWithAuthTests()
+    public static function getRedirectWithAuthTests()
     {
         return [
             'same host and port' => ['url' => 'http://localhost:8057/302', 'redirectWithAuth' => true],

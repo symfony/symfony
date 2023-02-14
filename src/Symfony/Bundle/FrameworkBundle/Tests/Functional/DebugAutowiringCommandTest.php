@@ -129,7 +129,7 @@ class DebugAutowiringCommandTest extends AbstractWebTestCase
         }
     }
 
-    public function provideCompletionSuggestions(): \Generator
+    public static function provideCompletionSuggestions(): \Generator
     {
         yield 'search' => [[''], ['SessionHandlerInterface', 'Psr\\Log\\LoggerInterface', 'Psr\\Container\\ContainerInterface $parameterBag']];
     }

@@ -706,7 +706,7 @@ class DateTimeTypeTest extends BaseTypeTestCase
         $this->assertEquals($expectedData, $form->getData());
     }
 
-    public function provideEmptyData()
+    public static function provideEmptyData()
     {
         $expectedData = \DateTime::createFromFormat('Y-m-d H:i', '2018-11-11 21:23');
         $lazyEmptyData = static function (FormInterface $form) {

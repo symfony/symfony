@@ -24,7 +24,7 @@ class RateTest extends TestCase
         $this->assertEquals($rate, Rate::fromString((string) $rate));
     }
 
-    public function provideRate(): iterable
+    public static function provideRate(): iterable
     {
         yield [new Rate(new \DateInterval('PT15S'), 10)];
         yield [Rate::perSecond(10)];

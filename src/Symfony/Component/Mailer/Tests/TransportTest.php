@@ -34,7 +34,7 @@ class TransportTest extends TestCase
         $this->assertEquals($transport, $transportFactory->fromString($dsn));
     }
 
-    public function fromStringProvider(): iterable
+    public static function fromStringProvider(): iterable
     {
         $transportA = new DummyTransport('a');
         $transportB = new DummyTransport('b');
@@ -68,7 +68,7 @@ class TransportTest extends TestCase
         $this->assertEquals($transport, Transport::fromDsn($dsn));
     }
 
-    public function fromDsnProvider(): iterable
+    public static function fromDsnProvider(): iterable
     {
         yield 'multiple transports' => [
             'failover(smtp://a smtp://b)',
@@ -88,7 +88,7 @@ class TransportTest extends TestCase
         $transportFactory->fromString($dsn);
     }
 
-    public function fromWrongStringProvider(): iterable
+    public static function fromWrongStringProvider(): iterable
     {
         yield 'garbage at the end' => ['dummy://a some garbage here', 'The DSN has some garbage at the end: " some garbage here".'];
 

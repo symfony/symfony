@@ -432,7 +432,7 @@ class ApplicationTest extends TestCase
         $application->find($abbreviation);
     }
 
-    public function provideAmbiguousAbbreviations()
+    public static function provideAmbiguousAbbreviations()
     {
         return [
             ['f', 'Command "f" is not defined.'],
@@ -548,7 +548,7 @@ class ApplicationTest extends TestCase
         $this->assertStringContainsString('Do you want to run "foo" instead?  (yes/no) [no]:', $display);
     }
 
-    public function provideInvalidCommandNamesSingle()
+    public static function provideInvalidCommandNamesSingle()
     {
         return [
             ['foo3:barr'],
@@ -1256,7 +1256,7 @@ class ApplicationTest extends TestCase
         $application->run($input, $output);
     }
 
-    public function getAddingAlreadySetDefinitionElementData()
+    public static function getAddingAlreadySetDefinitionElementData()
     {
         return [
             [new InputArgument('command', InputArgument::REQUIRED)],

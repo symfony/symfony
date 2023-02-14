@@ -306,7 +306,7 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
     }
 
-    public function provideAdditionalRequestMatcherConstraints()
+    public static function provideAdditionalRequestMatcherConstraints()
     {
         yield 'Invalid configuration with path' => [['path' => '^/url']];
         yield 'Invalid configuration with host' => [['host' => 'example.com']];
@@ -606,7 +606,7 @@ class SecurityExtensionTest extends TestCase
         ];
     }
 
-    public function acceptableIpsProvider(): iterable
+    public static function acceptableIpsProvider(): iterable
     {
         yield [['127.0.0.1']];
         yield ['127.0.0.1'];
@@ -711,7 +711,7 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
     }
 
-    public function provideEntryPointRequiredData()
+    public static function provideEntryPointRequiredData()
     {
         // more than one entry point available and not explicitly set
         yield [
@@ -742,7 +742,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertEquals($expectedAuthenticators, array_map('strval', $container->getDefinition('security.authenticator.manager.main')->getArgument(0)));
     }
 
-    public function provideConfigureCustomAuthenticatorData()
+    public static function provideConfigureCustomAuthenticatorData()
     {
         yield [
             ['custom_authenticator' => TestAuthenticator::class],
@@ -819,7 +819,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertEquals($expectedUserCheckerClass, $container->findDefinition($userCheckerId)->getClass());
     }
 
-    public function provideUserCheckerConfig()
+    public static function provideUserCheckerConfig()
     {
         yield [[], InMemoryUserChecker::class];
         yield [['user_checker' => TestUserChecker::class], TestUserChecker::class];

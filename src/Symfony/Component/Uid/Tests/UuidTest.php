@@ -41,7 +41,7 @@ class UuidTest extends TestCase
         Uuid::fromString($uuid);
     }
 
-    public function provideInvalidUuids(): iterable
+    public static function provideInvalidUuids(): iterable
     {
         yield ['this is not a uuid'];
         yield ['these are just thirty-six characters'];
@@ -64,7 +64,7 @@ class UuidTest extends TestCase
         new $class($uuid);
     }
 
-    public function provideInvalidVariant(): iterable
+    public static function provideInvalidVariant(): iterable
     {
         yield ['8dac64d3-937a-1e7c-fa1d-d5d6c06a61f5'];
         yield ['8dac64d3-937a-3e7c-fa1d-d5d6c06a61f5'];
@@ -240,7 +240,7 @@ class UuidTest extends TestCase
         $this->assertFalse((new UuidV4(self::A_UUID_V4))->equals($other));
     }
 
-    public function provideInvalidEqualType()
+    public static function provideInvalidEqualType()
     {
         yield [null];
         yield [self::A_UUID_V1];
@@ -319,7 +319,7 @@ class UuidTest extends TestCase
         Uuid::fromBinary($ulid);
     }
 
-    public function provideInvalidBinaryFormat()
+    public static function provideInvalidBinaryFormat()
     {
         return [
             ['01EW2RYKDCT2SAK454KBR2QG08'],
@@ -346,7 +346,7 @@ class UuidTest extends TestCase
         Uuid::fromBase58($ulid);
     }
 
-    public function provideInvalidBase58Format()
+    public static function provideInvalidBase58Format()
     {
         return [
             ["\x41\x4C\x08\x92\x57\x1B\x11\xEB\xBF\x70\x93\xF9\xB0\x82\x2C\x57"],
@@ -373,7 +373,7 @@ class UuidTest extends TestCase
         Uuid::fromBase32($ulid);
     }
 
-    public function provideInvalidBase32Format()
+    public static function provideInvalidBase32Format()
     {
         return [
             ["\x5B\xA8\x32\x72\x45\x6D\x5A\xC0\xAB\xE3\xAA\x8B\xF7\x01\x96\x73"],
@@ -400,7 +400,7 @@ class UuidTest extends TestCase
         Uuid::fromRfc4122($ulid);
     }
 
-    public function provideInvalidRfc4122Format()
+    public static function provideInvalidRfc4122Format()
     {
         return [
             ["\x1E\xB5\x71\xB4\x14\xC0\x68\x93\xBF\x70\x2D\x4C\x83\xCF\x75\x5A"],

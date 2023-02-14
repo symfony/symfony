@@ -43,9 +43,9 @@ abstract class AbstractHandlerTestCase extends TestCase
         $this->assertRemainingContent($reader, $value);
     }
 
-    abstract public function getHandleValueTestData();
+    abstract public static function getHandleValueTestData();
 
-    abstract public function getDontHandleValueTestData();
+    abstract public static function getDontHandleValueTestData();
 
     abstract protected function generateHandler();
 

@@ -81,7 +81,7 @@ class CompleteCommandTest extends TestCase
         }
     }
 
-    public function provideInputAndCurrentOptionValues()
+    public static function provideInputAndCurrentOptionValues()
     {
         yield [[], 'The "--current" option must be set and it must be an integer'];
         yield [['--current' => 'a'], 'The "--current" option must be set and it must be an integer'];
@@ -100,7 +100,7 @@ class CompleteCommandTest extends TestCase
         $this->assertEquals(implode("\n", $suggestions).\PHP_EOL, $this->tester->getDisplay());
     }
 
-    public function provideCompleteCommandNameInputs()
+    public static function provideCompleteCommandNameInputs()
     {
         yield 'empty' => [['bin/console'], ['help', 'list', 'completion', 'hello', 'ahoy']];
         yield 'partial' => [['bin/console', 'he'], ['help', 'list', 'completion', 'hello', 'ahoy']];
@@ -117,7 +117,7 @@ class CompleteCommandTest extends TestCase
         $this->assertEquals(implode("\n", $suggestions).\PHP_EOL, $this->tester->getDisplay());
     }
 
-    public function provideCompleteCommandInputDefinitionInputs()
+    public static function provideCompleteCommandInputDefinitionInputs()
     {
         yield 'definition' => [['bin/console', 'hello', '-'], ['--help', '--quiet', '--verbose', '--version', '--ansi', '--no-ansi', '--no-interaction']];
         yield 'custom' => [['bin/console', 'hello'], ['Fabien', 'Robin', 'Wouter']];

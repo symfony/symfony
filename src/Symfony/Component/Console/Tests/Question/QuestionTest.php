@@ -24,7 +24,7 @@ class QuestionTest extends TestCase
         $this->question = new Question('Test question');
     }
 
-    public function providerTrueFalse()
+    public static function providerTrueFalse()
     {
         return [[true], [false]];
     }
@@ -104,7 +104,7 @@ class QuestionTest extends TestCase
         self::assertTrue($this->question->isHiddenFallback());
     }
 
-    public function providerGetSetAutocompleterValues()
+    public static function providerGetSetAutocompleterValues()
     {
         return [
             'array' => [
@@ -135,7 +135,7 @@ class QuestionTest extends TestCase
         );
     }
 
-    public function providerSetAutocompleterValuesInvalid()
+    public static function providerSetAutocompleterValuesInvalid()
     {
         return [
             ['Potato'],
@@ -229,7 +229,7 @@ class QuestionTest extends TestCase
         $this->assertNull($exception);
     }
 
-    public function providerGetSetValidator()
+    public static function providerGetSetValidator()
     {
         return [
             [function ($input) { return $input; }],
@@ -251,7 +251,7 @@ class QuestionTest extends TestCase
         self::assertNull($this->question->getValidator());
     }
 
-    public function providerGetSetMaxAttempts()
+    public static function providerGetSetMaxAttempts()
     {
         return [[1], [5], [null]];
     }
@@ -265,7 +265,7 @@ class QuestionTest extends TestCase
         self::assertSame($attempts, $this->question->getMaxAttempts());
     }
 
-    public function providerSetMaxAttemptsInvalid()
+    public static function providerSetMaxAttemptsInvalid()
     {
         return [[0], [-1]];
     }

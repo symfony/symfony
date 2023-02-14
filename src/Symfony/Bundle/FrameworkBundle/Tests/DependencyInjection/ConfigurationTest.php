@@ -61,7 +61,7 @@ class ConfigurationTest extends TestCase
         );
     }
 
-    public function getTestInvalidSessionName()
+    public static function getTestInvalidSessionName()
     {
         return [
             ['a.b'],
@@ -115,7 +115,7 @@ class ConfigurationTest extends TestCase
         $this->assertArrayHasKey($packageName, $config['assets']['packages']);
     }
 
-    public function provideValidAssetsPackageNameConfigurationTests()
+    public static function provideValidAssetsPackageNameConfigurationTests()
     {
         return [
             ['foobar'],
@@ -142,7 +142,7 @@ class ConfigurationTest extends TestCase
             ]);
     }
 
-    public function provideInvalidAssetConfigurationTests()
+    public static function provideInvalidAssetConfigurationTests()
     {
         // helper to turn config into embedded package config
         $createPackageConfig = function (array $packageConfig) {
@@ -196,7 +196,7 @@ class ConfigurationTest extends TestCase
         $this->assertEquals($processedConfig, $config['lock']);
     }
 
-    public function provideValidLockConfigurationTests()
+    public static function provideValidLockConfigurationTests()
     {
         yield [null, ['enabled' => true, 'resources' => ['default' => [class_exists(SemaphoreStore::class) && SemaphoreStore::isSupported() ? 'semaphore' : 'flock']]]];
 
@@ -290,7 +290,7 @@ class ConfigurationTest extends TestCase
         $this->assertEquals($processedConfig, $config['semaphore']);
     }
 
-    public function provideValidSemaphoreConfigurationTests()
+    public static function provideValidSemaphoreConfigurationTests()
     {
         yield [null, ['enabled' => true, 'resources' => []]];
 

@@ -1702,7 +1702,7 @@ class ChoiceTypeTest extends BaseTypeTestCase
         $this->assertTrue($view->vars['placeholder_in_choices']);
     }
 
-    public function getOptionsWithPlaceholder()
+    public static function getOptionsWithPlaceholder()
     {
         return [
             // single non-expanded
@@ -1958,7 +1958,7 @@ class ChoiceTypeTest extends BaseTypeTestCase
         }
     }
 
-    public function invalidNestedValueTestMatrix()
+    public static function invalidNestedValueTestMatrix()
     {
         return [
             'non-multiple, non-expanded' => [false, false, [[]]],
@@ -2153,7 +2153,7 @@ class ChoiceTypeTest extends BaseTypeTestCase
         $this->assertSame($multiple ? (array) $valueWhitWhiteSpace : $valueWhitWhiteSpace, $form->getData());
     }
 
-    public function provideTrimCases()
+    public static function provideTrimCases()
     {
         return [
             'Simple' => [false, false],
@@ -2188,7 +2188,7 @@ class ChoiceTypeTest extends BaseTypeTestCase
         $this->assertSame($expected, $form->isEmpty());
     }
 
-    public function expandedIsEmptyWhenNoRealChoiceIsSelectedProvider()
+    public static function expandedIsEmptyWhenNoRealChoiceIsSelectedProvider()
     {
         // Some invalid cases are voluntarily not tested:
         //   - multiple with placeholder

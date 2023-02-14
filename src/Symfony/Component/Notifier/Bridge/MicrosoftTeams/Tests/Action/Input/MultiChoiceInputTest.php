@@ -65,7 +65,7 @@ final class MultiChoiceInputTest extends AbstractInputTestCase
     /**
      * @return \Generator<string, array{0: string}>
      */
-    public function styles(): \Generator
+    public static function styles(): \Generator
     {
         yield 'style-expanded' => ['expanded'];
         yield 'style-normal' => ['normal'];

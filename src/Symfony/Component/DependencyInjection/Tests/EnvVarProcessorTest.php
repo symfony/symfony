@@ -45,7 +45,7 @@ class EnvVarProcessorTest extends TestCase
         $this->assertSame($processed, $result);
     }
 
-    public function validStrings()
+    public static function validStrings()
     {
         return [
             ['hello', 'hello'],
@@ -91,7 +91,7 @@ class EnvVarProcessorTest extends TestCase
         $this->assertSame(!$processed, $result);
     }
 
-    public function validBools()
+    public static function validBools()
     {
         return [
             ['true', true],
@@ -120,7 +120,7 @@ class EnvVarProcessorTest extends TestCase
         $this->assertSame($processed, $result);
     }
 
-    public function validInts()
+    public static function validInts()
     {
         return [
             ['1', 1],
@@ -145,7 +145,7 @@ class EnvVarProcessorTest extends TestCase
         });
     }
 
-    public function invalidInts()
+    public static function invalidInts()
     {
         return [
             ['foo'],
@@ -170,7 +170,7 @@ class EnvVarProcessorTest extends TestCase
         $this->assertSame($processed, $result);
     }
 
-    public function validFloats()
+    public static function validFloats()
     {
         return [
             ['1', 1.0],
@@ -195,7 +195,7 @@ class EnvVarProcessorTest extends TestCase
         });
     }
 
-    public function invalidFloats()
+    public static function invalidFloats()
     {
         return [
             ['foo'],
@@ -220,7 +220,7 @@ class EnvVarProcessorTest extends TestCase
         $this->assertSame($processed, $result);
     }
 
-    public function validConsts()
+    public static function validConsts()
     {
         return [
             ['Symfony\Component\DependencyInjection\Tests\EnvVarProcessorTest::TEST_CONST', self::TEST_CONST],
@@ -244,7 +244,7 @@ class EnvVarProcessorTest extends TestCase
         });
     }
 
-    public function invalidConsts()
+    public static function invalidConsts()
     {
         return [
             ['Symfony\Component\DependencyInjection\Tests\EnvVarProcessorTest::UNDEFINED_CONST'],
@@ -300,7 +300,7 @@ class EnvVarProcessorTest extends TestCase
         $this->assertSame($processed, $result);
     }
 
-    public function validJson()
+    public static function validJson()
     {
         return [
             ['[1]', [1]],
@@ -338,7 +338,7 @@ class EnvVarProcessorTest extends TestCase
         });
     }
 
-    public function otherJsonValues()
+    public static function otherJsonValues()
     {
         return [
             [1],
@@ -389,7 +389,7 @@ class EnvVarProcessorTest extends TestCase
         });
     }
 
-    public function noArrayValues()
+    public static function noArrayValues()
     {
         return [
             [null],
@@ -415,7 +415,7 @@ class EnvVarProcessorTest extends TestCase
         });
     }
 
-    public function invalidArrayValues()
+    public static function invalidArrayValues()
     {
         return [
             [[]],
@@ -438,7 +438,7 @@ class EnvVarProcessorTest extends TestCase
         }));
     }
 
-    public function arrayValues()
+    public static function arrayValues()
     {
         return [
             [['index' => 'password']],
@@ -482,7 +482,7 @@ class EnvVarProcessorTest extends TestCase
         $this->assertSame($backedEnum, $result);
     }
 
-    public function provideGetEnvEnum(): iterable
+    public static function provideGetEnvEnum(): iterable
     {
         return [
             [StringBackedEnum::Bar],
@@ -552,7 +552,7 @@ class EnvVarProcessorTest extends TestCase
         $this->assertSame($processed, $result);
     }
 
-    public function validNullables()
+    public static function validNullables()
     {
         return [
             ['hello', 'hello'],
@@ -607,7 +607,7 @@ class EnvVarProcessorTest extends TestCase
         $this->assertSame($processed, $result);
     }
 
-    public function validResolve()
+    public static function validResolve()
     {
         return [
             ['string', 'string'],
@@ -648,7 +648,7 @@ class EnvVarProcessorTest extends TestCase
         });
     }
 
-    public function notScalarResolve()
+    public static function notScalarResolve()
     {
         return [
             [null],
@@ -725,7 +725,7 @@ class EnvVarProcessorTest extends TestCase
         (new EnvVarProcessor(new Container()))->getEnv('shuffle', 'foo', fn () => 'bar');
     }
 
-    public function validCsv()
+    public static function validCsv()
     {
         $complex = <<<'CSV'
 ,"""","foo""","\""",\,foo\
@@ -840,7 +840,7 @@ CSV;
         })['path']);
     }
 
-    public function provideGetEnvUrlPath()
+    public static function provideGetEnvUrlPath()
     {
         return [
             ['', 'https://symfony.com'],

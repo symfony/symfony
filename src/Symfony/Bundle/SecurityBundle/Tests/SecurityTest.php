@@ -74,7 +74,7 @@ class SecurityTest extends TestCase
         $this->assertSame($expectedUser, $security->getUser());
     }
 
-    public function getUserTests()
+    public static function getUserTests()
     {
         yield [null, null];
 
@@ -115,7 +115,7 @@ class SecurityTest extends TestCase
         $this->assertSame($expectedFirewallConfig, $security->getFirewallConfig($request));
     }
 
-    public function getFirewallConfigTests()
+    public static function getFirewallConfigTests()
     {
         $request = new Request();
 

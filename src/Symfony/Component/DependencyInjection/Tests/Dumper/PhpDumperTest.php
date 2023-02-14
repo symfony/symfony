@@ -394,7 +394,7 @@ class PhpDumperTest extends TestCase
         $dumper->dump();
     }
 
-    public function provideInvalidFactories()
+    public static function provideInvalidFactories()
     {
         return [
             [['', 'method']],
@@ -1102,7 +1102,7 @@ class PhpDumperTest extends TestCase
         $this->assertInstanceOf(\stdClass::class, $listener4);
     }
 
-    public function provideAlmostCircular()
+    public static function provideAlmostCircular()
     {
         yield ['public'];
         yield ['private'];

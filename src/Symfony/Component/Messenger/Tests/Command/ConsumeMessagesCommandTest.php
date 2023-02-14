@@ -105,7 +105,7 @@ class ConsumeMessagesCommandTest extends TestCase
         $this->assertStringContainsString('[OK] Consuming messages from transport "dummy-receiver"', $tester->getDisplay());
     }
 
-    public function provideRunWithResetServicesOption(): iterable
+    public static function provideRunWithResetServicesOption(): iterable
     {
         yield [true];
         yield [false];
@@ -174,7 +174,7 @@ class ConsumeMessagesCommandTest extends TestCase
         ]);
     }
 
-    public function getInvalidOptions()
+    public static function getInvalidOptions()
     {
         yield 'Zero message limit' => ['--limit', '0', 'Option "limit" must be a positive integer, "0" passed.'];
         yield 'Non-numeric message limit' => ['--limit', 'whatever', 'Option "limit" must be a positive integer, "whatever" passed.'];
@@ -227,7 +227,7 @@ class ConsumeMessagesCommandTest extends TestCase
         $this->assertSame($expectedSuggestions, $suggestions);
     }
 
-    public function provideCompletionSuggestions()
+    public static function provideCompletionSuggestions()
     {
         yield 'receiver' => [[''], ['async', 'async_high', 'failed']];
         yield 'receiver (value)' => [['async'], ['async', 'async_high', 'failed']];

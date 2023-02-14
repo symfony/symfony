@@ -78,7 +78,7 @@ EOT);
         return $res;
     }
 
-    public function provideExecuteMethod(): array
+    public static function provideExecuteMethod(): array
     {
         return [
             'executeStatement' => [
@@ -168,7 +168,7 @@ EOT;
         $this->assertGreaterThan(0, $debug[1]['executionMS']);
     }
 
-    public function provideEndTransactionMethod(): array
+    public static function provideEndTransactionMethod(): array
     {
         return [
             'commit' => [static fn (Connection $conn) => $conn->commit(), '"COMMIT"'],
@@ -208,7 +208,7 @@ EOT;
         $this->assertGreaterThan(0, $debug[6]['executionMS']);
     }
 
-    public function provideExecuteAndEndTransactionMethods(): array
+    public static function provideExecuteAndEndTransactionMethods(): array
     {
         return [
             'commit and exec' => [

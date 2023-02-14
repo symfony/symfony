@@ -90,7 +90,7 @@ class ProxyDumperTest extends TestCase
         $this->assertStringMatchesFormat('%A$this->'.$access.'[\'foo\'] = %A', $code);
     }
 
-    public function getPrivatePublicDefinitions()
+    public static function getPrivatePublicDefinitions()
     {
         return [
             [
@@ -161,7 +161,7 @@ EOPHP;
         $this->assertSame(123, @$foo->dynamicProp);
     }
 
-    public function getProxyCandidates(): array
+    public static function getProxyCandidates(): array
     {
         $definitions = [
             [new Definition(__CLASS__), true],

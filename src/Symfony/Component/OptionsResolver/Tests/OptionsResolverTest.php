@@ -539,7 +539,7 @@ class OptionsResolverTest extends TestCase
         $this->assertSame($expectedCount, $count);
     }
 
-    public function provideDeprecationData()
+    public static function provideDeprecationData()
     {
         yield 'It deprecates an option with default message' => [
             function (OptionsResolver $resolver) {
@@ -837,7 +837,7 @@ class OptionsResolverTest extends TestCase
         $this->resolver->resolve(['option' => $actualType]);
     }
 
-    public function provideInvalidTypes()
+    public static function provideInvalidTypes()
     {
         return [
             [true, 'string', 'The option "option" with value true is expected to be of type "string", but is of type "bool".'],

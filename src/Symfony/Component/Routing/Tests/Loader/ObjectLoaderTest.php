@@ -50,7 +50,7 @@ class ObjectLoaderTest extends TestCase
         $loader->load($resourceString);
     }
 
-    public function getBadResourceStrings()
+    public static function getBadResourceStrings()
     {
         return [
             ['Foo:Bar:baz'],

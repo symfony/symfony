@@ -115,7 +115,7 @@ class TerminalTest extends TestCase
         }
     }
 
-    public function provideTerminalColorEnv(): \Generator
+    public static function provideTerminalColorEnv(): \Generator
     {
         yield ['truecolor', null, AnsiColorMode::Ansi24];
         yield ['TRUECOLOR', null, AnsiColorMode::Ansi24];

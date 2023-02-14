@@ -32,7 +32,7 @@ class AttributesRequestMatcherTest extends TestCase
         $this->assertSame($expected, $matcher->matches($request));
     }
 
-    public function getData(): array
+    public static function getData(): array
     {
         return [
             ['foo', 'foo_.*', true],

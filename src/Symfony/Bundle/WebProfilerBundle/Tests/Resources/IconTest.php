@@ -32,7 +32,7 @@ class IconTest extends TestCase
         $this->assertMatchesRegularExpression('~<svg .* viewBox="0 0 \d+ \d+".+>.*</svg>~s', file_get_contents($iconFilePath), sprintf('The SVG file of the "%s" icon must include a "viewBox" attribute.', $iconFilePath));
     }
 
-    public function provideIconFilePaths()
+    public static function provideIconFilePaths()
     {
         return array_map(function ($filePath) { return (array) $filePath; }, glob(__DIR__.'/../../Resources/views/Icon/*.svg'));
     }

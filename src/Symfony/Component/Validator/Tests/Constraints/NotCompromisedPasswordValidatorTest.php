@@ -105,7 +105,7 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function provideConstraintsWithThreshold(): iterable
+    public static function provideConstraintsWithThreshold(): iterable
     {
         yield 'Doctrine style' => [new NotCompromisedPassword(['threshold' => 10])];
         yield 'named arguments' => [new NotCompromisedPassword(threshold: 10)];
@@ -217,7 +217,7 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
         $this->assertTrue(true); // No exception have been thrown
     }
 
-    public function provideErrorSkippingConstraints(): iterable
+    public static function provideErrorSkippingConstraints(): iterable
     {
         yield 'Doctrine style' => [new NotCompromisedPassword(['skipOnError' => true])];
         yield 'named arguments' => [new NotCompromisedPassword(skipOnError: true)];

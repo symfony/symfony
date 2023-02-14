@@ -88,7 +88,7 @@ class TableTest extends TestCase
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
-    public function renderProvider()
+    public static function renderProvider()
     {
         $books = [
             ['99921-58-10-7', 'Divine Comedy', 'Dante Alighieri'],
@@ -1268,7 +1268,7 @@ TABLE;
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
-    public function renderSetTitle()
+    public static function renderSetTitle()
     {
         return [
             [
@@ -1481,7 +1481,7 @@ TABLE;
         $this->assertSame($expected, $this->getOutputContent($output));
     }
 
-    public function provideRenderHorizontalTests()
+    public static function provideRenderHorizontalTests()
     {
         $headers = ['foo', 'bar', 'baz'];
         $rows = [['one', 'two', 'tree'], ['1', '2', '3']];
@@ -1600,7 +1600,7 @@ TABLE;
         $this->assertSame($expected, $this->getOutputContent($output));
     }
 
-    public function provideRenderVerticalTests(): \Traversable
+    public static function provideRenderVerticalTests(): \Traversable
     {
         $books = [
             ['99921-58-10-7', 'Divine Comedy', 'Dante Alighieri', '9.95'],

@@ -127,7 +127,7 @@ EOF;
         $this->assertSame($expectedSuggestions, $suggestions);
     }
 
-    public function provideCompletionSuggestions()
+    public static function provideCompletionSuggestions()
     {
         yield 'option --format' => [
             ['--format', ''],

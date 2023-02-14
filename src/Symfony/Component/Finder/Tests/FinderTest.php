@@ -1436,7 +1436,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertIterator($this->toAbsoluteFixtures($expected), $finder);
     }
 
-    public function getContainsTestData()
+    public static function getContainsTestData()
     {
         return [
             ['', '', []],
@@ -1454,7 +1454,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         ];
     }
 
-    public function getRegexNameTestData()
+    public static function getRegexNameTestData()
     {
         return [
             ['~.*t\\.p.+~i'],
@@ -1475,7 +1475,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertIterator($this->toAbsoluteFixtures($expected), $finder);
     }
 
-    public function getTestPathData()
+    public static function getTestPathData()
     {
         return [
             ['', '', []],

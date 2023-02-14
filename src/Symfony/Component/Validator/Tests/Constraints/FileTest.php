@@ -86,7 +86,7 @@ class FileTest extends TestCase
         new File(['maxSize' => $maxSize]);
     }
 
-    public function provideValidSizes()
+    public static function provideValidSizes()
     {
         return [
             ['500', 500, false],
@@ -106,7 +106,7 @@ class FileTest extends TestCase
         ];
     }
 
-    public function provideInvalidSizes()
+    public static function provideInvalidSizes()
     {
         return [
             ['+100'],
@@ -126,7 +126,7 @@ class FileTest extends TestCase
         $this->assertSame($binaryFormat, $file->binaryFormat);
     }
 
-    public function provideFormats()
+    public static function provideFormats()
     {
         return [
             [100, null, false],

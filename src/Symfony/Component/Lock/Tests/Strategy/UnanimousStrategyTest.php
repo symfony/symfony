@@ -27,7 +27,7 @@ class UnanimousStrategyTest extends TestCase
         $this->strategy = new UnanimousStrategy();
     }
 
-    public function provideMetResults()
+    public static function provideMetResults()
     {
         // success, failure, total, isMet
         yield [3, 0, 3, true];
@@ -49,7 +49,7 @@ class UnanimousStrategyTest extends TestCase
         yield [0, 0, 2, false];
     }
 
-    public function provideIndeterminate()
+    public static function provideIndeterminate()
     {
         // success, failure, total, canBeMet
         yield [3, 0, 3, true];

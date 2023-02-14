@@ -110,16 +110,11 @@ class Inline
 
                 return self::dumpNull($flags);
             case $value instanceof \DateTimeInterface:
-                $length = \strlen(rtrim($value->format('u'), '0'));
-                if (0 === $length) {
-                    $format = 'c';
-                } elseif ($length < 4) {
-                    $format = 'Y-m-d\TH:i:s.vP';
-                } else {
-                    $format = 'Y-m-d\TH:i:s.uP';
-                }
-
-                return $value->format($format);
+                return $value->format(match (true) {
+                    !$length = \strlen(rtrim($value->format('u'), '0')) => 'c',
+                    $length < 4 => 'Y-m-d\TH:i:s.vP',
+                    default => 'Y-m-d\TH:i:s.uP',
+                });
             case $value instanceof \UnitEnum:
                 return sprintf('!php/const %s::%s', $value::class, $value->name);
             case \is_object($value):
@@ -721,20 +716,19 @@ class Inline
                             return $time;
                         }
 
-                        $length = \strlen(rtrim($time->format('u'), '0'));
-                        if (0 === $length) {
-                            try {
-                                if (false !== $scalar = $time->getTimestamp()) {
-                                    return $scalar;
-                                }
-                            } catch (\ValueError) {
-                                // no-op
-                            }
-
-                            return (int) $time->format('U');
+                        if ('' !== rtrim($time->format('u'), '0')) {
+                            return (float) $time->format('U.u');
                         }
 
-                        return (float) $time->format('U.u');
+                        try {
+                            if (false !== $scalar = $time->getTimestamp()) {
+                                return $scalar;
+                            }
+                        } catch (\ValueError) {
+                            // no-op
+                        }
+
+                        return $time->format('U');
                 }
         }
 

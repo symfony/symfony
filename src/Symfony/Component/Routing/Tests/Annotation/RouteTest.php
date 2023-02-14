@@ -57,7 +57,7 @@ class RouteTest extends TestCase
         $this->assertEquals($route->$getter(), $expectedReturn);
     }
 
-    public function getValidParameters(): iterable
+    public static function getValidParameters(): iterable
     {
         return [
             ['simplePath', 'getPath', '/Blog'],

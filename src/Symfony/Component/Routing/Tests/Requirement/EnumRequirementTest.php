@@ -54,7 +54,7 @@ class EnumRequirementTest extends TestCase
         $this->assertSame($expected, (string) new EnumRequirement($cases));
     }
 
-    public function provideToString()
+    public static function provideToString()
     {
         return [
             ['hearts|diamonds|clubs|spades', TestStringBackedEnum::class],

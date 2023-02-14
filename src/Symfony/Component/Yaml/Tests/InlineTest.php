@@ -54,7 +54,7 @@ class InlineTest extends TestCase
         $this->assertSame($value, $actual);
     }
 
-    public function getTestsForParsePhpConstants()
+    public static function getTestsForParsePhpConstants()
     {
         return [
             ['!php/const Symfony\Component\Yaml\Yaml::PARSE_CONSTANT', Yaml::PARSE_CONSTANT],
@@ -225,7 +225,7 @@ class InlineTest extends TestCase
         $this->assertSame($expected, Inline::parse($yaml, 0, $references));
     }
 
-    public function getDataForParseReferences()
+    public static function getDataForParseReferences()
     {
         return [
             'scalar' => ['*var', 'var-value'],
@@ -275,7 +275,7 @@ class InlineTest extends TestCase
         Inline::parse(sprintf('{ foo: %sfoo }', $indicator));
     }
 
-    public function getReservedIndicators()
+    public static function getReservedIndicators()
     {
         return [['@'], ['`']];
     }
@@ -291,7 +291,7 @@ class InlineTest extends TestCase
         Inline::parse(sprintf('{ foo: %sfoo }', $indicator));
     }
 
-    public function getScalarIndicators()
+    public static function getScalarIndicators()
     {
         return [['|'], ['>'], ['%']];
     }
@@ -304,7 +304,7 @@ class InlineTest extends TestCase
         $this->assertSame($expected, Inline::isHash($array));
     }
 
-    public function getDataForIsHash()
+    public static function getDataForIsHash()
     {
         return [
             [[], false],
@@ -314,7 +314,7 @@ class InlineTest extends TestCase
         ];
     }
 
-    public function getTestsForParse()
+    public static function getTestsForParse()
     {
         return [
             ['', ''],
@@ -400,7 +400,7 @@ class InlineTest extends TestCase
         ];
     }
 
-    public function getTestsForParseWithMapObjects()
+    public static function getTestsForParseWithMapObjects()
     {
         return [
             ['', ''],
@@ -481,7 +481,7 @@ class InlineTest extends TestCase
         ];
     }
 
-    public function getTestsForDump()
+    public static function getTestsForDump()
     {
         return [
             ['null', null],
@@ -583,7 +583,7 @@ class InlineTest extends TestCase
         $this->assertSame($timezone, $date->format('O'));
     }
 
-    public function getTimestampTests(): array
+    public static function getTimestampTests(): array
     {
         return [
             'canonical' => ['2001-12-15T02:59:43.1Z', 2001, 12, 15, 2, 59, 43, 100000, '+0000'],
@@ -632,7 +632,7 @@ class InlineTest extends TestCase
         $this->assertSame(FooBackedEnum::BAR->value, Inline::parse("!php/enum Symfony\Component\Yaml\Tests\Fixtures\FooBackedEnum::BAR->value", Yaml::PARSE_CONSTANT));
     }
 
-    public function getDateTimeDumpTests()
+    public static function getDateTimeDumpTests()
     {
         $tests = [];
 
@@ -653,7 +653,7 @@ class InlineTest extends TestCase
         $this->assertSame('Hello world', Inline::parse($data));
     }
 
-    public function getBinaryData()
+    public static function getBinaryData()
     {
         return [
             'enclosed with double quotes' => ['!!binary "SGVsbG8gd29ybGQ="'],
@@ -673,7 +673,7 @@ class InlineTest extends TestCase
         Inline::parse($data);
     }
 
-    public function getInvalidBinaryData()
+    public static function getInvalidBinaryData()
     {
         return [
             'length not a multiple of four' => ['!!binary "SGVsbG8d29ybGQ="', '/The normalized base64 encoded data \(data without whitespace characters\) length must be a multiple of four \(\d+ bytes given\)/'],
@@ -715,7 +715,7 @@ class InlineTest extends TestCase
         $this->assertSame($expected, Inline::parse($yaml));
     }
 
-    public function getTestsForNullValues()
+    public static function getTestsForNullValues()
     {
         return [
             'null before closing curly brace' => ['{foo:}', ['foo' => null]],
@@ -738,7 +738,7 @@ class InlineTest extends TestCase
         $this->assertSame($expected, Inline::parse($yaml));
     }
 
-    public function getNotPhpCompatibleMappingKeyData()
+    public static function getNotPhpCompatibleMappingKeyData()
     {
         return [
             'boolean-true' => ['{true: "foo"}', ['true' => 'foo']],
@@ -817,7 +817,7 @@ class InlineTest extends TestCase
         self::assertSame($expected, Inline::parse($yaml));
     }
 
-    public function getTestsForOctalNumbers()
+    public static function getTestsForOctalNumbers()
     {
         return [
             'positive octal number' => [28, '0o34'],
@@ -834,7 +834,7 @@ class InlineTest extends TestCase
         self::assertSame($expected, Inline::parse($yaml));
     }
 
-    public function getTestsForOctalNumbersYaml11Notation()
+    public static function getTestsForOctalNumbersYaml11Notation()
     {
         return [
             'positive octal number' => ['034', '034'],
@@ -856,7 +856,7 @@ class InlineTest extends TestCase
         Inline::parse($value, Yaml::PARSE_OBJECT);
     }
 
-    public function phpObjectTagWithEmptyValueProvider()
+    public static function phpObjectTagWithEmptyValueProvider()
     {
         return [
             ['!php/object'],
@@ -890,7 +890,7 @@ class InlineTest extends TestCase
         Inline::parse(str_replace('!php/const', '!php/enum', $value), Yaml::PARSE_CONSTANT);
     }
 
-    public function phpConstTagWithEmptyValueProvider()
+    public static function phpConstTagWithEmptyValueProvider()
     {
         return [
             ['!php/const'],
@@ -926,7 +926,7 @@ class InlineTest extends TestCase
         Inline::parse($value);
     }
 
-    public function unquotedExclamationMarkThrowsProvider()
+    public static function unquotedExclamationMarkThrowsProvider()
     {
         return [
             ['!'],
@@ -958,7 +958,7 @@ class InlineTest extends TestCase
     }
 
     // This provider should stay consistent with unquotedExclamationMarkThrowsProvider
-    public function quotedExclamationMarkProvider()
+    public static function quotedExclamationMarkProvider()
     {
         return [
             ['!', '"!"'],
@@ -988,7 +988,7 @@ class InlineTest extends TestCase
         $this->assertSame($expected, Inline::parse($yaml));
     }
 
-    public function ideographicSpaceProvider(): array
+    public static function ideographicSpaceProvider(): array
     {
         return [
             ["\u{3000}", '　'],

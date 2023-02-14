@@ -73,7 +73,7 @@ class ContextTest extends TestCase
         $this->assertDumpEquals($expectedDump, $factory());
     }
 
-    public function provideValidInputs(): iterable
+    public static function provideValidInputs(): iterable
     {
         yield 'named arguments: with context option' => [
             function () { return new Context(context: ['foo' => 'bar']); },

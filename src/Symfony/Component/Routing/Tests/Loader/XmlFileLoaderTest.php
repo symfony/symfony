@@ -619,7 +619,7 @@ class XmlFileLoaderTest extends TestCase
         $this->assertSame(MyController::class.'::__invoke', $route->getDefault('_controller'));
     }
 
-    public function providePsr4ConfigFiles(): array
+    public static function providePsr4ConfigFiles(): array
     {
         return [
             ['psr4-attributes.xml'],

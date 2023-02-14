@@ -418,7 +418,7 @@ class PhpDocExtractorTest extends TestCase
         $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\PseudoTypesDummy', $property));
     }
 
-    public function pseudoTypesProvider(): array
+    public static function pseudoTypesProvider(): array
     {
         return [
             ['classString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
@@ -441,7 +441,7 @@ class PhpDocExtractorTest extends TestCase
         $this->assertEquals($types, $this->extractor->getTypes(Php80Dummy::class, $property));
     }
 
-    public function promotedPropertyProvider(): array
+    public static function promotedPropertyProvider(): array
     {
         return [
             ['promoted', null],

@@ -395,7 +395,7 @@ class PhpStanExtractorTest extends TestCase
         $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\PhpStanPseudoTypesDummy', $property));
     }
 
-    public function pseudoTypesProvider(): array
+    public static function pseudoTypesProvider(): array
     {
         return [
             ['classString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
@@ -462,7 +462,7 @@ class PhpStanExtractorTest extends TestCase
         $this->assertEquals($type, $this->extractor->getTypes($class, $property, []));
     }
 
-    public function php80TypesProvider()
+    public static function php80TypesProvider()
     {
         return [
             [Php80Dummy::class, 'promotedAndMutated', [new Type(Type::BUILTIN_TYPE_STRING)]],

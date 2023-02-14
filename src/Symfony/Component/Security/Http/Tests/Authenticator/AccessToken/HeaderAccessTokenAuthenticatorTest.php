@@ -45,7 +45,7 @@ class HeaderAccessTokenAuthenticatorTest extends TestCase
         $this->assertNull($this->authenticator->supports($request));
     }
 
-    public function provideSupportData(): iterable
+    public static function provideSupportData(): iterable
     {
         yield [new Request([], [], [], [], [], ['HTTP_AUTHORIZATION' => 'Bearer VALID_ACCESS_TOKEN'])];
         yield [new Request([], [], [], [], [], ['HTTP_AUTHORIZATION' => 'Bearer INVALID_ACCESS_TOKEN'])];
@@ -61,7 +61,7 @@ class HeaderAccessTokenAuthenticatorTest extends TestCase
         $this->assertSame($result, $this->authenticator->supports($request));
     }
 
-    public function provideSupportsWithCustomTokenTypeData(): iterable
+    public static function provideSupportsWithCustomTokenTypeData(): iterable
     {
         yield [new Request([], [], [], [], [], ['HTTP_AUTHORIZATION' => 'JWT VALID_ACCESS_TOKEN']), null];
         yield [new Request([], [], [], [], [], ['HTTP_AUTHORIZATION' => 'JWT INVALID_ACCESS_TOKEN']), null];
@@ -79,7 +79,7 @@ class HeaderAccessTokenAuthenticatorTest extends TestCase
         $this->assertSame($result, $this->authenticator->supports($request));
     }
 
-    public function provideSupportsWithCustomHeaderParameter(): iterable
+    public static function provideSupportsWithCustomHeaderParameter(): iterable
     {
         yield [new Request([], [], [], [], [], ['HTTP_X_FOO' => 'Bearer VALID_ACCESS_TOKEN']), null];
         yield [new Request([], [], [], [], [], ['HTTP_X_FOO' => 'Bearer INVALID_ACCESS_TOKEN']), null];
@@ -120,7 +120,7 @@ class HeaderAccessTokenAuthenticatorTest extends TestCase
         $this->authenticator->authenticate($request);
     }
 
-    public function provideInvalidAuthenticateData(): iterable
+    public static function provideInvalidAuthenticateData(): iterable
     {
         $request = new Request();
         yield [$request, 'Invalid credentials.', BadCredentialsException::class];

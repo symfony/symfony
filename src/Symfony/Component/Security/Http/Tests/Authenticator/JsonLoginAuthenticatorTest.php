@@ -142,7 +142,7 @@ class JsonLoginAuthenticatorTest extends TestCase
         $this->authenticator->authenticate($request);
     }
 
-    public function provideEmptyAuthenticateData()
+    public static function provideEmptyAuthenticateData()
     {
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": "", "password": "notempty"}');
         yield [$request];

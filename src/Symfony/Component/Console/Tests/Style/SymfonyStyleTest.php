@@ -151,7 +151,7 @@ class SymfonyStyleTest extends TestCase
         $style = new SymfonyStyle($input, $output);
 
         $this->expectException(RuntimeException::class);
-        $this->expectDeprecationMessage('Output should be an instance of "Symfony\Component\Console\Output\ConsoleSectionOutput"');
+        $this->expectExceptionMessage('Output should be an instance of "Symfony\Component\Console\Output\ConsoleSectionOutput"');
 
         $style->createTable()->appendRow(['row']);
     }

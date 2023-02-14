@@ -47,7 +47,7 @@ EOT;
     public function testCreateWithNotSupportedScheme()
     {
         $this->expectException(UnsupportedSchemeException::class);
-        $this->expectErrorMessageMatches('#The ".*" scheme is not supported#');
+        $this->expectExceptionMessage('The "sendmail" scheme is not supported');
 
         $sut = new NativeTransportFactory();
         $sut->create(Dsn::fromString('sendmail://default'));

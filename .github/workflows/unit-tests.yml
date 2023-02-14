@@ -28,7 +28,7 @@ jobs:
         include:
           - php: '7.2'
           - php: '7.4'
-          - php: '8.0'
+          - php: '8.1'
             mode: high-deps
           - php: '8.1'
             mode: low-deps

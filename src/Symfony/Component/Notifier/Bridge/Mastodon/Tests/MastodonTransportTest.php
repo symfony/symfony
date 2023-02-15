@@ -17,7 +17,6 @@ use Symfony\Component\Mime\Part\File;
 use Symfony\Component\Notifier\Bridge\Mastodon\MastodonOptions;
 use Symfony\Component\Notifier\Bridge\Mastodon\MastodonTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -27,25 +26,24 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class MastodonTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null): MastodonTransport
+    public static function createTransport(HttpClientInterface $client = null): MastodonTransport
     {
-        return (new MastodonTransport('testAccessToken', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
+        return (new MastodonTransport('testAccessToken', $client ?? new MockHttpClient()))->setHost('host.test');
     }
 
-    public function toStringProvider(): iterable
+    public static function toStringProvider(): iterable
     {
-        yield ['mastodon://host.test', $this->createTransport()];
+        yield ['mastodon://host.test', self::createTransport()];
     }
 
-    public function supportedMessagesProvider(): iterable
+    public static function supportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello World!')];
     }
 
-    public function unsupportedMessagesProvider(): iterable
+    public static function unsupportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello World!')];
-        yield [$this->createMock(MessageInterface::class)];
     }
 
     public function testBasicStatus()

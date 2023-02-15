@@ -61,6 +61,12 @@ Messenger
    `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport` and
    `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransportFactory`
 
+Notifier
+--------
+
+ * [BC BREAK] The following data providers for `TransportTestCase` are now static: `toStringProvider()`, `supportedMessagesProvider()` and `unsupportedMessagesProvider()`
+ * [BC BREAK] The `TransportTestCase::createTransport()` method is now static
+
 SecurityBundle
 --------------
 

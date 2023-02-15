@@ -373,7 +373,7 @@ class InfobipApiTransportTest extends TestCase
         $email = $this->basicValidEmail();
 
         $this->expectException(HttpTransportException::class);
-        $this->expectDeprecationMessage('Unable to send an email: ""');
+        $this->expectExceptionMessage('Unable to send an email: ""');
 
         $this->transport->send($email);
     }
@@ -384,7 +384,7 @@ class InfobipApiTransportTest extends TestCase
         $email = $this->basicValidEmail();
 
         $this->expectException(HttpTransportException::class);
-        $this->expectDeprecationMessage('Unable to send an email: "{"requestError": {"serviceException": {"messageId": "string","text": "string"}}}" (code 400)');
+        $this->expectExceptionMessage('Unable to send an email: "{"requestError": {"serviceException": {"messageId": "string","text": "string"}}}" (code 400)');
 
         $this->transport->send($email);
     }
@@ -395,7 +395,7 @@ class InfobipApiTransportTest extends TestCase
         $email = $this->basicValidEmail();
 
         $this->expectException(HttpTransportException::class);
-        $this->expectDeprecationMessage('Could not reach the remote Infobip server.');
+        $this->expectExceptionMessage('Could not reach the remote Infobip server.');
         $this->transport->send($email);
     }
 

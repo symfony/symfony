@@ -21,37 +21,40 @@ use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\Test\TransportTestCase;
+use Symfony\Component\Notifier\Tests\Fixtures\DummyHttpClient;
+use Symfony\Component\Notifier\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class MicrosoftTeamsTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null): MicrosoftTeamsTransport
+    public static function createTransport(HttpClientInterface $client = null): MicrosoftTeamsTransport
     {
-        return (new MicrosoftTeamsTransport('/testPath', $client ?: $this->createMock(HttpClientInterface::class)))->setHost('host.test');
+        return (new MicrosoftTeamsTransport('/testPath', $client ?? new DummyHttpClient()))->setHost('host.test');
     }
 
-    public function toStringProvider(): iterable
+    public static function toStringProvider(): iterable
     {
-        yield ['microsoftteams://host.test/testPath', $this->createTransport()];
+        yield ['microsoftteams://host.test/testPath', self::createTransport()];
     }
 
-    public function supportedMessagesProvider(): iterable
+    public static function supportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
     }
 
-    public function unsupportedMessagesProvider(): iterable
+    public static function unsupportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [new DummyMessage()];
     }
 
     public function testSendWithErrorResponseThrows()
     {
         $client = new MockHttpClient(fn (string $method, string $url, array $options = []): ResponseInterface => new MockResponse('testErrorMessage', ['response_headers' => ['request-id' => ['testRequestId']], 'http_code' => 400]));
 
-        $transport = $this->createTransport($client);
+        $transport = self::createTransport($client);
 
         $this->expectException(TransportException::class);
         $this->expectExceptionMessageMatches('/testErrorMessage/');
@@ -63,7 +66,7 @@ final class MicrosoftTeamsTransportTest extends TransportTestCase
     {
         $client = new MockHttpClient(new MockResponse());
 
-        $transport = $this->createTransport($client);
+        $transport = self::createTransport($client);
 
         $this->expectException(TransportException::class);
         $this->expectExceptionMessageMatches('/request-id not found/');
@@ -85,7 +88,7 @@ final class MicrosoftTeamsTransportTest extends TransportTestCase
             return new MockResponse('1', ['response_headers' => ['request-id' => ['testRequestId']], 'http_code' => 200]);
         });
 
-        $transport = $this->createTransport($client);
+        $transport = self::createTransport($client);
 
         $transport->send(new ChatMessage($message));
     }
@@ -107,7 +110,7 @@ final class MicrosoftTeamsTransportTest extends TransportTestCase
             return new MockResponse('1', ['response_headers' => ['request-id' => ['testRequestId']], 'http_code' => 200]);
         });
 
-        $transport = $this->createTransport($client);
+        $transport = self::createTransport($client);
 
         $transport->send(new ChatMessage($message, $options));
     }
@@ -134,7 +137,7 @@ final class MicrosoftTeamsTransportTest extends TransportTestCase
             return new MockResponse('1', ['response_headers' => ['request-id' => ['testRequestId']], 'http_code' => 200]);
         });
 
-        $transport = $this->createTransport($client);
+        $transport = self::createTransport($client);
 
         $transport->send(new ChatMessage($message, $options));
     }
@@ -154,7 +157,7 @@ final class MicrosoftTeamsTransportTest extends TransportTestCase
             return new MockResponse('1', ['response_headers' => ['request-id' => ['testRequestId']], 'http_code' => 200]);
         });
 
-        $transport = $this->createTransport($client);
+        $transport = self::createTransport($client);
 
         $transport->send($chatMessage);
     }

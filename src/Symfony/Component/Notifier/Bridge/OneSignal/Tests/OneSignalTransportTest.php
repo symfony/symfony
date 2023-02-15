@@ -21,6 +21,9 @@ use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\PushMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
+use Symfony\Component\Notifier\Tests\Fixtures\DummyHttpClient;
+use Symfony\Component\Notifier\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -29,14 +32,14 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class OneSignalTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null, string $recipientId = null): OneSignalTransport
+    public static function createTransport(HttpClientInterface $client = null, string $recipientId = null): OneSignalTransport
     {
-        return new OneSignalTransport('9fb175f0-0b32-4e99-ae97-bd228b9eb246', 'api_key', $recipientId, $client ?? $this->createMock(HttpClientInterface::class));
+        return new OneSignalTransport('9fb175f0-0b32-4e99-ae97-bd228b9eb246', 'api_key', $recipientId, $client ?? new DummyHttpClient());
     }
 
     public function testCanSetCustomHost()
     {
-        $transport = $this->createTransport();
+        $transport = self::createTransport();
 
         $transport->setHost($customHost = self::CUSTOM_HOST);
 
@@ -45,7 +48,7 @@ final class OneSignalTransportTest extends TransportTestCase
 
     public function testCanSetCustomHostAndPort()
     {
-        $transport = $this->createTransport();
+        $transport = self::createTransport();
 
         $transport->setHost($customHost = self::CUSTOM_HOST);
         $transport->setPort($customPort = self::CUSTOM_PORT);
@@ -53,33 +56,33 @@ final class OneSignalTransportTest extends TransportTestCase
         $this->assertSame(sprintf('onesignal://9fb175f0-0b32-4e99-ae97-bd228b9eb246@%s:%d', $customHost, $customPort), (string) $transport);
     }
 
-    public function toStringProvider(): iterable
+    public static function toStringProvider(): iterable
     {
-        yield ['onesignal://9fb175f0-0b32-4e99-ae97-bd228b9eb246@onesignal.com', $this->createTransport()];
-        yield ['onesignal://9fb175f0-0b32-4e99-ae97-bd228b9eb246@onesignal.com?recipientId=ea345989-d273-4f21-a33b-0c006efc5edb', $this->createTransport(null, 'ea345989-d273-4f21-a33b-0c006efc5edb')];
+        yield ['onesignal://9fb175f0-0b32-4e99-ae97-bd228b9eb246@onesignal.com', self::createTransport()];
+        yield ['onesignal://9fb175f0-0b32-4e99-ae97-bd228b9eb246@onesignal.com?recipientId=ea345989-d273-4f21-a33b-0c006efc5edb', self::createTransport(null, 'ea345989-d273-4f21-a33b-0c006efc5edb')];
     }
 
-    public function supportedMessagesProvider(): iterable
+    public static function supportedMessagesProvider(): iterable
     {
-        yield [new PushMessage('Hello', 'World'), $this->createTransport(null, 'ea345989-d273-4f21-a33b-0c006efc5edb')];
+        yield [new PushMessage('Hello', 'World'), self::createTransport(null, 'ea345989-d273-4f21-a33b-0c006efc5edb')];
         yield [new PushMessage('Hello', 'World', (new OneSignalOptions())->recipient('ea345989-d273-4f21-a33b-0c006efc5edb'))];
     }
 
-    public function unsupportedMessagesProvider(): iterable
+    public static function unsupportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
         yield [new ChatMessage('Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [new DummyMessage()];
     }
 
     public function testUnsupportedWithoutRecipientId()
     {
-        $this->assertFalse($this->createTransport()->supports(new PushMessage('Hello', 'World')));
+        $this->assertFalse(self::createTransport()->supports(new PushMessage('Hello', 'World')));
     }
 
     public function testSendThrowsWithoutRecipient()
     {
-        $transport = $this->createTransport();
+        $transport = self::createTransport();
 
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The "Symfony\Component\Notifier\Bridge\OneSignal\OneSignalTransport" transport should have configured `defaultRecipientId` via DSN or provided with message options.');
@@ -99,7 +102,7 @@ final class OneSignalTransportTest extends TransportTestCase
 
         $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
-        $transport = $this->createTransport($client, 'ea345989-d273-4f21-a33b-0c006efc5edb');
+        $transport = self::createTransport($client, 'ea345989-d273-4f21-a33b-0c006efc5edb');
 
         $this->expectException(TransportException::class);
         $this->expectExceptionMessageMatches('/Message Notifications must have English language content/');
@@ -119,7 +122,7 @@ final class OneSignalTransportTest extends TransportTestCase
 
         $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
-        $transport = $this->createTransport($client, 'ea345989-d273-4f21-a33b-0c006efc5edb');
+        $transport = self::createTransport($client, 'ea345989-d273-4f21-a33b-0c006efc5edb');
 
         $this->expectException(TransportException::class);
         $this->expectExceptionMessageMatches('/All included players are not subscribed/');
@@ -145,7 +148,7 @@ final class OneSignalTransportTest extends TransportTestCase
             return $response;
         });
 
-        $transport = $this->createTransport($client, 'ea345989-d273-4f21-a33b-0c006efc5edb');
+        $transport = self::createTransport($client, 'ea345989-d273-4f21-a33b-0c006efc5edb');
 
         $sentMessage = $transport->send(new PushMessage('Hello', 'World'));
 

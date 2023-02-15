@@ -26,6 +26,9 @@ use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
+use Symfony\Component\Notifier\Tests\Fixtures\DummyHub;
+use Symfony\Component\Notifier\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use TypeError;
 
@@ -34,29 +37,29 @@ use TypeError;
  */
 final class MercureTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null, HubInterface $hub = null, string $hubId = 'hubId', $topics = null): MercureTransport
+    public static function createTransport(HttpClientInterface $client = null, HubInterface $hub = null, string $hubId = 'hubId', $topics = null): MercureTransport
     {
-        $hub ??= $this->createMock(HubInterface::class);
+        $hub ??= new DummyHub();
 
         return new MercureTransport($hub, $hubId, $topics);
     }
 
-    public function toStringProvider(): iterable
+    public static function toStringProvider(): iterable
     {
-        yield ['mercure://hubId?topic=https%3A%2F%2Fsymfony.com%2Fnotifier', $this->createTransport()];
-        yield ['mercure://customHubId?topic=%2Ftopic', $this->createTransport(null, null, 'customHubId', '/topic')];
-        yield ['mercure://customHubId?topic%5B0%5D=%2Ftopic%2F1&topic%5B1%5D%5B0%5D=%2Ftopic%2F2', $this->createTransport(null, null, 'customHubId', ['/topic/1', ['/topic/2']])];
+        yield ['mercure://hubId?topic=https%3A%2F%2Fsymfony.com%2Fnotifier', self::createTransport()];
+        yield ['mercure://customHubId?topic=%2Ftopic', self::createTransport(null, null, 'customHubId', '/topic')];
+        yield ['mercure://customHubId?topic%5B0%5D=%2Ftopic%2F1&topic%5B1%5D%5B0%5D=%2Ftopic%2F2', self::createTransport(null, null, 'customHubId', ['/topic/1', ['/topic/2']])];
     }
 
-    public function supportedMessagesProvider(): iterable
+    public static function supportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
     }
 
-    public function unsupportedMessagesProvider(): iterable
+    public static function unsupportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [new DummyMessage()];
     }
 
     public function testCanSetCustomPort()
@@ -77,13 +80,13 @@ final class MercureTransportTest extends TransportTestCase
     public function testConstructWithWrongTopicsThrows()
     {
         $this->expectException(TypeError::class);
-        $this->createTransport(null, null, 'publisherId', new \stdClass());
+        self::createTransport(null, null, 'publisherId', new \stdClass());
     }
 
     public function testSendWithNonMercureOptionsThrows()
     {
         $this->expectException(LogicException::class);
-        $this->createTransport()->send(new ChatMessage('testMessage', $this->createMock(MessageOptionsInterface::class)));
+        self::createTransport()->send(new ChatMessage('testMessage', $this->createMock(MessageOptionsInterface::class)));
     }
 
     public function testSendWithTransportFailureThrows()
@@ -95,7 +98,7 @@ final class MercureTransportTest extends TransportTestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Unable to post the Mercure message: Cannot connect to mercure');
 
-        $this->createTransport(null, $hub)->send(new ChatMessage('subject'));
+        self::createTransport(null, $hub)->send(new ChatMessage('subject'));
     }
 
     public function testSendWithWrongTokenThrows()
@@ -107,7 +110,7 @@ final class MercureTransportTest extends TransportTestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Unable to post the Mercure message: The provided JWT is not valid');
 
-        $this->createTransport(null, $hub)->send(new ChatMessage('subject'));
+        self::createTransport(null, $hub)->send(new ChatMessage('subject'));
     }
 
     public function testSendWithMercureOptions()
@@ -123,7 +126,7 @@ final class MercureTransportTest extends TransportTestCase
             return 'id';
         });
 
-        $this->createTransport(null, $hub)->send(new ChatMessage('subject', new MercureOptions(['/topic/1', '/topic/2'], true, 'id', 'type', 1)));
+        self::createTransport(null, $hub)->send(new ChatMessage('subject', new MercureOptions(['/topic/1', '/topic/2'], true, 'id', 'type', 1)));
     }
 
     public function testSendWithMercureOptionsButWithoutOptionTopic()
@@ -139,7 +142,7 @@ final class MercureTransportTest extends TransportTestCase
             return 'id';
         });
 
-        $this->createTransport(null, $hub)->send(new ChatMessage('subject', new MercureOptions(null, true, 'id', 'type', 1)));
+        self::createTransport(null, $hub)->send(new ChatMessage('subject', new MercureOptions(null, true, 'id', 'type', 1)));
     }
 
     public function testSendWithoutMercureOptions()
@@ -152,7 +155,7 @@ final class MercureTransportTest extends TransportTestCase
             return 'id';
         });
 
-        $this->createTransport(null, $hub)->send(new ChatMessage('subject'));
+        self::createTransport(null, $hub)->send(new ChatMessage('subject'));
     }
 
     public function testSendSuccessfully()
@@ -161,7 +164,7 @@ final class MercureTransportTest extends TransportTestCase
 
         $hub = new MockHub('https://foo.com/.well-known/mercure', new StaticTokenProvider('foo'), fn (Update $update): string => $messageId);
 
-        $sentMessage = $this->createTransport(null, $hub)->send(new ChatMessage('subject'));
+        $sentMessage = self::createTransport(null, $hub)->send(new ChatMessage('subject'));
         $this->assertSame($messageId, $sentMessage->getMessageId());
     }
 }

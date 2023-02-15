@@ -17,28 +17,30 @@ use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
+use Symfony\Component\Notifier\Tests\Fixtures\DummyHttpClient;
+use Symfony\Component\Notifier\Tests\Fixtures\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class SmsFactorTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null): SmsFactorTransport
+    public static function createTransport(HttpClientInterface $client = null): SmsFactorTransport
     {
-        return (new SmsFactorTransport('TOKEN', 'MY_COMPANY', SmsFactorPushType::Alert, $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
+        return (new SmsFactorTransport('TOKEN', 'MY_COMPANY', SmsFactorPushType::Alert, $client ?? new DummyHttpClient()))->setHost('host.test');
     }
 
-    public function toStringProvider(): iterable
+    public static function toStringProvider(): iterable
     {
-        yield ['sms-factor://host.test?sender=MY_COMPANY&push_type=alert', $this->createTransport()];
+        yield ['sms-factor://host.test?sender=MY_COMPANY&push_type=alert', self::createTransport()];
     }
 
-    public function supportedMessagesProvider(): iterable
+    public static function supportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('+33611223344', 'Hello World!')];
     }
 
-    public function unsupportedMessagesProvider(): iterable
+    public static function unsupportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello World!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [new DummyMessage()];
     }
 }

@@ -37,11 +37,12 @@ class_exists(ArgumentServiceLocator::class);
  * The container can have four possible behaviors when a service
  * does not exist (or is not initialized for the last case):
  *
- *  * EXCEPTION_ON_INVALID_REFERENCE: Throws an exception (the default)
+ *  * EXCEPTION_ON_INVALID_REFERENCE: Throws an exception at compilation time (the default)
  *  * NULL_ON_INVALID_REFERENCE:      Returns null
  *  * IGNORE_ON_INVALID_REFERENCE:    Ignores the wrapping command asking for the reference
  *                                    (for instance, ignore a setter if the service does not exist)
  *  * IGNORE_ON_UNINITIALIZED_REFERENCE: Ignores/returns null for uninitialized services or invalid references
+ *  * RUNTIME_EXCEPTION_ON_INVALID_REFERENCE: Throws an exception at runtime
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>

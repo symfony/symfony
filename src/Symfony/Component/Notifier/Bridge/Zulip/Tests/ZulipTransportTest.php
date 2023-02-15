@@ -11,13 +11,12 @@
 
 namespace Symfony\Component\Notifier\Bridge\Zulip\Tests;
 
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\Zulip\ZulipTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
-use Symfony\Component\Notifier\Tests\Fixtures\DummyHttpClient;
-use Symfony\Component\Notifier\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -28,7 +27,7 @@ final class ZulipTransportTest extends TransportTestCase
      */
     public static function createTransport(HttpClientInterface $client = null): TransportInterface
     {
-        return (new ZulipTransport('testEmail', 'testToken', 'testChannel', $client ?? new DummyHttpClient()))->setHost('test.host');
+        return (new ZulipTransport('testEmail', 'testToken', 'testChannel', $client ?? new MockHttpClient()))->setHost('test.host');
     }
 
     public static function toStringProvider(): iterable

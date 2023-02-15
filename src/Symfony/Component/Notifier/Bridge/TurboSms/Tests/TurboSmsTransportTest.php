@@ -16,12 +16,10 @@ use Symfony\Component\Notifier\Bridge\TurboSms\TurboSmsTransport;
 use Symfony\Component\Notifier\Exception\LengthException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
-use Symfony\Component\Notifier\Tests\Fixtures\DummyHttpClient;
-use Symfony\Component\Notifier\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -33,7 +31,7 @@ final class TurboSmsTransportTest extends TransportTestCase
      */
     public static function createTransport(HttpClientInterface $client = null): TransportInterface
     {
-        return new TurboSmsTransport('authToken', 'sender', $client ?? new DummyHttpClient());
+        return new TurboSmsTransport('authToken', 'sender', $client ?? new MockHttpClient());
     }
 
     public static function toStringProvider(): iterable

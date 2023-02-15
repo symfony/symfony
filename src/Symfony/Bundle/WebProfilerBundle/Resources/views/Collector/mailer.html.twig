@@ -121,18 +121,18 @@
                                                 <h3 class="tab-title">Headers</h3>
                                                 <div class="tab-content">
                                                     <span class="label">Subject</span>
-                                                    <h2 class="m-t-10">{{ message.headers.get('subject').bodyAsString() ?? '(empty)' }}</h2>
+                                                    <h2 class="m-t-10">{{ message.getSubject() ?? '(empty)' }}</h2>
                                                     <div class="row">
                                                         <div class="col col-4">
                                                             <span class="label">From</span>
-                                                            <pre class="prewrap">{{ (message.headers.get('from').bodyAsString() ?? '(empty)')|replace({'From:': ''}) }}</pre>
+                                                            <pre class="prewrap">{{ message.getFrom()|map(addr => addr.toString())|join(', ')|default('(empty)') }}</pre>
 
                                                             <span class="label">To</span>
-                                                            <pre class="prewrap">{{ (message.headers.get('to').bodyAsString() ?? '(empty)')|replace({'To:': ''}) }}</pre>
+                                                            <pre class="prewrap">{{ message.getTo()|map(addr => addr.toString())|join(', ')|default('(empty)') }}</pre>
                                                         </div>
                                                         <div class="col">
                                                             <span class="label">Headers</span>
-                                                            <pre class="prewrap">{% for header in message.headers.all|filter(header => (header.name ?? '') not in ['Subject', 'From', 'To']) %}
+                                                            <pre class="prewrap">{% for header in message.headers.all|filter(header => (header.name ?? '')|lower not in ['subject', 'from', 'to']) %}
                                                                 {{- header.toString }}
                                                             {%~ endfor %}</pre>
                                                         </div>

@@ -482,10 +482,24 @@ class ConfigurationTest extends TestCase
     {
         $filename = $this->createFile();
         chmod($filename, 0444);
-        $this->expectError();
-        $this->expectErrorMessageMatches('/[Ff]ailed to open stream: Permission denied/');
         $configuration = Configuration::fromUrlEncodedString('generateBaseline=true&baselineFile='.urlencode($filename));
-        $configuration->writeBaseline();
+
+        $this->expectException(\ErrorException::class);
+        $this->expectExceptionMessageMatches('/[Ff]ailed to open stream: Permission denied/');
+
+        set_error_handler(static function (int $errno, string $errstr, string $errfile = null, int $errline = null): bool {
+            if ($errno & (E_WARNING | E_WARNING)) {
+                throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
+            }
+
+            return false;
+        });
+
+        try {
+            $configuration->writeBaseline();
+        } finally {
+            restore_error_handler();
+        }
     }
 
     protected function setUp(): void

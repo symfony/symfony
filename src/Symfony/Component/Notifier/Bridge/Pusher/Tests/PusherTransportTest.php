@@ -16,6 +16,7 @@ use Symfony\Component\Notifier\Bridge\Pusher\PusherTransport;
 use Symfony\Component\Notifier\Message\PushMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
+use Symfony\Component\Notifier\Tests\Fixtures\DummyHttpClient;
 use Symfony\Component\Notifier\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -37,7 +38,7 @@ final class PusherTransportTest extends TransportTestCase
      */
     public static function createTransport(HttpClientInterface $client = null): TransportInterface
     {
-        return new PusherTransport(new Pusher('key', 'secret', 'app'), $client);
+        return new PusherTransport(new Pusher('key', 'secret', 'app'), $client ?? new DummyHttpClient());
     }
 
     public static function supportedMessagesProvider(): iterable

@@ -1,0 +1,86 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2023-02-04T08:55:48Z
+
+All right, the output gives us a couple of tasks to work on for PHPUnit 10.
+
+cc @OskarStark
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-02-04T09:37:08Z
+
+👍 I would have expected a lot of messages about the deprecated `setMethods()` method though (see #49218). 🤔
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-02-04T09:41:44Z
+
+It was fixed in
+* https://github.com/symfony/symfony/pull/49220
+
+Referenced PR in https://github.com/symfony/symfony/issues/49218
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-02-04T09:42:48Z
+
+Yeah, for that particular case which is a file that can be used by users of Symfony. But we make heavy use of `setMethods()` in our own tests.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-02-04T09:43:12Z
+
+<img width="1299" alt="CleanShot 2023-02-04 at 10 42 51@2x" src="https://user-images.githubusercontent.com/995707/216760400-95ca6da9-4d34-404a-a195-e54b724f0d0d.png">
+
+Ok... but why 🤷‍♂️ ...
+
+That will be a lot of work for the abstract test cases in `/Test/`
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-02-04T09:55:07Z
+
+> That will be a lot of work for the abstract test cases in /Test/
+
+Oh no, we already named them `*TestCase` 💪
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-02-14T08:11:27Z
+
+Can you please rebase ?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-02-14T11:26:13Z
+
+Done.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-02-14T12:26:08Z
+
+Cool, we have very few failures. Up to fix them?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-02-14T12:53:39Z
+
+What's the fix for…
+
+> Expecting E_ERROR and E_USER_ERROR is deprecated and will no longer be possible in PHPUnit 10.
+
+? Registering a custom error handler? 🤔
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-02-14T14:11:50Z
+
+I think it's easier: #49375 (I need to check all places though)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-02-14T22:01:01Z
+
+🟢

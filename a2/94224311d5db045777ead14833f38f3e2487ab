@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2023-02-14T06:44:24Z
+
+I tend to think that this is for 6.3.
+
+---------------------------------------------------------------------------
+
+by ymorocutti at 2023-02-14T08:40:31Z
+
+> I tend to think that this is for 6.3.
+
+I see your point. My app is running in 5.4 so "to me", it's kind of a bug cause I can't start it.
+But this kind of modification may not be wanted to all apps and may be considered as a feature.
+
+Tell me what best for you. If you want it in 6.3, I'll fix my own app and override manually this warmer.

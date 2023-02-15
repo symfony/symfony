@@ -19,31 +19,34 @@ use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
+use Symfony\Component\Notifier\Tests\Fixtures\DummyHttpClient;
+use Symfony\Component\Notifier\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class MessageMediaTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null, string $from = null): MessageMediaTransport
+    public static function createTransport(HttpClientInterface $client = null, string $from = null): MessageMediaTransport
     {
-        return new MessageMediaTransport('apiKey', 'apiSecret', $from, $client ?? $this->createMock(HttpClientInterface::class));
+        return new MessageMediaTransport('apiKey', 'apiSecret', $from, $client ?? new DummyHttpClient());
     }
 
-    public function toStringProvider(): iterable
+    public static function toStringProvider(): iterable
     {
-        yield ['messagemedia://api.messagemedia.com', $this->createTransport()];
-        yield ['messagemedia://api.messagemedia.com?from=TEST', $this->createTransport(null, 'TEST')];
+        yield ['messagemedia://api.messagemedia.com', self::createTransport()];
+        yield ['messagemedia://api.messagemedia.com?from=TEST', self::createTransport(null, 'TEST')];
     }
 
-    public function supportedMessagesProvider(): iterable
+    public static function supportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0491570156', 'Hello!')];
     }
 
-    public function unsupportedMessagesProvider(): iterable
+    public static function unsupportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [new DummyMessage()];
     }
 
     /**

@@ -19,32 +19,35 @@ use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
+use Symfony\Component\Notifier\Tests\Fixtures\DummyHttpClient;
+use Symfony\Component\Notifier\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class SmsapiTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null, bool $fast = false, bool $test = false): SmsapiTransport
+    public static function createTransport(HttpClientInterface $client = null, bool $fast = false, bool $test = false): SmsapiTransport
     {
-        return (new SmsapiTransport('testToken', 'testFrom', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('test.host')->setFast($fast)->setTest($test);
+        return (new SmsapiTransport('testToken', 'testFrom', $client ?? new DummyHttpClient()))->setHost('test.host')->setFast($fast)->setTest($test);
     }
 
-    public function toStringProvider(): iterable
+    public static function toStringProvider(): iterable
     {
-        yield ['smsapi://test.host?from=testFrom', $this->createTransport()];
-        yield ['smsapi://test.host?from=testFrom&fast=1', $this->createTransport(null, true)];
-        yield ['smsapi://test.host?from=testFrom&test=1', $this->createTransport(null, false, true)];
-        yield ['smsapi://test.host?from=testFrom&fast=1&test=1', $this->createTransport(null, true, true)];
+        yield ['smsapi://test.host?from=testFrom', self::createTransport()];
+        yield ['smsapi://test.host?from=testFrom&fast=1', self::createTransport(null, true)];
+        yield ['smsapi://test.host?from=testFrom&test=1', self::createTransport(null, false, true)];
+        yield ['smsapi://test.host?from=testFrom&fast=1&test=1', self::createTransport(null, true, true)];
     }
 
-    public function supportedMessagesProvider(): iterable
+    public static function supportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
     }
 
-    public function unsupportedMessagesProvider(): iterable
+    public static function unsupportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [new DummyMessage()];
     }
 
     public function createClient(int $statusCode, string $content): HttpClientInterface
@@ -74,7 +77,7 @@ final class SmsapiTransportTest extends TransportTestCase
     public function testThrowExceptionWhenMessageWasNotSent(int $statusCode, string $content, string $errorMessage)
     {
         $client = $this->createClient($statusCode, $content);
-        $transport = $this->createTransport($client);
+        $transport = self::createTransport($client);
         $message = new SmsMessage('0611223344', 'Hello!');
 
         $this->expectException(TransportException::class);

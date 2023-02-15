@@ -90,8 +90,8 @@
                             {% for event in collector.events.events(transport) %}
                                 <tr class="mailer-email-summary-table-row {{ loop.first ? 'active' }}" data-target="#email-{{ loop.index }}">
                                     <td>{{ loop.index }}</td>
-                                    <td>{{ event.message.headers.get('subject').bodyAsString() ?? '(No subject)' }}</td>
-                                    <td>{{ (event.message.headers.get('to').bodyAsString() ?? '(empty)')|replace({'To:': ''}) }}</td>
+                                    <td>{{ event.message.getSubject() ?? '(No subject)' }}</td>
+                                    <td>{{ event.message.getTo()|map(addr => addr.toString())|join(', ')|default('(empty)') }}</td>
                                     <td class="visually-hidden"><button class="mailer-email-summary-table-row-button" data-target="#email-{{ loop.index }}">View email details</button></td>
                                 </tr>
                             {% endfor %}
@@ -137,12 +137,12 @@
                     <div class="tab-content">
                         <div class="card-block">
                             <p class="mailer-message-subject">
-                                {{ message.headers.get('subject').bodyAsString() ?? '(No subject)' }}
+                                {{ message.getSubject() ?? '(No subject)' }}
                             </p>
                             <div class="mailer-message-headers">
-                                <p><strong>From:</strong> {{ (message.headers.get('from').bodyAsString() ?? '(empty)')|replace({'From:': ''}) }}</p>
-                                <p><strong>To:</strong> {{ (message.headers.get('to').bodyAsString() ?? '(empty)')|replace({'To:': ''}) }}</p>
-                                {% for header in message.headers.all|filter(header => (header.name ?? '') not in ['Subject', 'From', 'To']) %}
+                                <p><strong>From:</strong> {{ message.getFrom()|map(addr => addr.toString())|join(', ')|default('(empty)') }}</p>
+                                <p><strong>To:</strong> {{ message.getTo()|map(addr => addr.toString())|join(', ')|default('(empty)') }}</p>
+                                {% for header in message.headers.all|filter(header => (header.name ?? '')|lower not in ['subject', 'from', 'to']) %}
                                     <p class="mailer-message-header-secondary">{{ header.toString }}</p>
                                 {% endfor %}
                             </div>
@@ -183,6 +183,17 @@
                                     {% if message.htmlBody %}
                                         {% set htmlBody = message.htmlBody() %}
                                         <div class="tab">
+                                            <h3 class="tab-title">HTML preview</h3>
+                                            <div class="tab-content">
+                                                <iframe
+                                                    src="data:text/html;charset=utf-8;base64,{{ collector.base64Encode(htmlBody) }}"
+                                                    style="height: 80vh;width: 100%;max-height: 600px;"
+                                                >
+                                                </iframe>
+                                            </div>
+                                        </div>
+
+                                        <div class="tab">
                                             <h3 class="tab-title">HTML content</h3>
                                             <div class="tab-content">
                                                 <pre class="prewrap" style="max-height: 600px">
@@ -191,19 +202,6 @@
                                                     {%- else %}
                                                         {{- htmlBody }}
                                                     {%- endif -%}
-                                                </pre>
-                                            </div>
-                                        </div>
-
-                                        <div class="tab">
-                                            <h3 class="tab-title">HTML preview</h3>
-                                            <div class="tab-content">
-                                                <pre class="prewrap" style="max-height: 600px">
-                                                    <iframe
-                                                        src="data:text/html;charset=utf-8;base64,{{ collector.base64Encode(htmlBody) }}"
-                                                        style="height: 80vh;width: 100%;"
-                                                    >
-                                                    </iframe>
                                                 </pre>
                                             </div>
                                         </div>

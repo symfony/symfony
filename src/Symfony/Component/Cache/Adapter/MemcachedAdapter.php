@@ -32,13 +32,6 @@ class MemcachedAdapter extends AbstractAdapter
 
     protected $maxIdLength = 250;
 
-    private const DEFAULT_CLIENT_OPTIONS = [
-        'persistent_id' => null,
-        'username' => null,
-        'password' => null,
-        \Memcached::OPT_SERIALIZER => \Memcached::SERIALIZER_PHP,
-    ];
-
     private $marshaller;
     private $client;
     private $lazyClient;
@@ -106,10 +99,9 @@ class MemcachedAdapter extends AbstractAdapter
         }
         set_error_handler(function ($type, $msg, $file, $line) { throw new \ErrorException($msg, 0, $type, $file, $line); });
         try {
-            $options += static::DEFAULT_CLIENT_OPTIONS;
-            $client = new \Memcached($options['persistent_id']);
-            $username = $options['username'];
-            $password = $options['password'];
+            $client = new \Memcached($options['persistent_id'] ?? null);
+            $username = $options['username'] ?? null;
+            $password = $options['password'] ?? null;
 
             // parse any DSN in $servers
             foreach ($servers as $i => $dsn) {
@@ -199,7 +191,7 @@ class MemcachedAdapter extends AbstractAdapter
                     $options[\constant('Memcached::OPT_'.$name)] = $value;
                 }
             }
-            $client->setOptions($options);
+            $client->setOptions($options + [\Memcached::OPT_SERIALIZER => \Memcached::SERIALIZER_PHP]);
 
             // set client's servers, taking care of persistent connections
             if (!$client->isPristine()) {

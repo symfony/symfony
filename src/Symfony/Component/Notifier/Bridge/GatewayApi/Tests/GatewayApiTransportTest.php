@@ -14,10 +14,11 @@ namespace Symfony\Component\Notifier\Bridge\GatewayApi\Tests;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\GatewayApi\GatewayApiTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
+use Symfony\Component\Notifier\Tests\Fixtures\DummyHttpClient;
+use Symfony\Component\Notifier\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -31,25 +32,25 @@ final class GatewayApiTransportTest extends TransportTestCase
     /**
      * @return GatewayApiTransport
      */
-    public function createTransport(HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(HttpClientInterface $client = null): TransportInterface
     {
-        return new GatewayApiTransport('authtoken', 'Symfony', $client ?? $this->createMock(HttpClientInterface::class));
+        return new GatewayApiTransport('authtoken', 'Symfony', $client ?? new DummyHttpClient());
     }
 
-    public function toStringProvider(): iterable
+    public static function toStringProvider(): iterable
     {
-        yield ['gatewayapi://gatewayapi.com?from=Symfony', $this->createTransport()];
+        yield ['gatewayapi://gatewayapi.com?from=Symfony', self::createTransport()];
     }
 
-    public function supportedMessagesProvider(): iterable
+    public static function supportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
     }
 
-    public function unsupportedMessagesProvider(): iterable
+    public static function unsupportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [new DummyMessage()];
     }
 
     public function testSend()
@@ -68,7 +69,7 @@ final class GatewayApiTransportTest extends TransportTestCase
 
         $message = new SmsMessage('3333333333', 'Hello!');
 
-        $transport = $this->createTransport($client);
+        $transport = self::createTransport($client);
         $sentMessage = $transport->send($message);
 
         $this->assertInstanceOf(SentMessage::class, $sentMessage);

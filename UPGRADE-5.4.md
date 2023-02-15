@@ -75,6 +75,12 @@ Monolog
  * Deprecate `ResetLoggersWorkerSubscriber` to reset buffered logs in messenger
    workers, use `framework.messenger.reset_on_message` option in FrameworkBundle messenger configuration instead.
 
+Notifier
+--------
+
+ * [BC BREAK] The following data providers for `TransportTestCase` are now static: `toStringProvider()`, `supportedMessagesProvider()` and `unsupportedMessagesProvider()`
+ * [BC BREAK] The `TransportTestCase::createTransport()` method is now static
+
 SecurityBundle
 --------------
 

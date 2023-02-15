@@ -18,6 +18,8 @@ use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
+use Symfony\Component\Notifier\Tests\Fixtures\DummyHttpClient;
+use Symfony\Component\Notifier\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -27,25 +29,25 @@ final class TwilioTransportTest extends TransportTestCase
     /**
      * @return TwilioTransport
      */
-    public function createTransport(HttpClientInterface $client = null, string $from = 'from'): TransportInterface
+    public static function createTransport(HttpClientInterface $client = null, string $from = 'from'): TransportInterface
     {
-        return new TwilioTransport('accountSid', 'authToken', $from, $client ?? $this->createMock(HttpClientInterface::class));
+        return new TwilioTransport('accountSid', 'authToken', $from, $client ?? new DummyHttpClient());
     }
 
-    public function toStringProvider(): iterable
+    public static function toStringProvider(): iterable
     {
-        yield ['twilio://api.twilio.com?from=from', $this->createTransport()];
+        yield ['twilio://api.twilio.com?from=from', self::createTransport()];
     }
 
-    public function supportedMessagesProvider(): iterable
+    public static function supportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
     }
 
-    public function unsupportedMessagesProvider(): iterable
+    public static function unsupportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [new DummyMessage()];
     }
 
     /**
@@ -53,7 +55,7 @@ final class TwilioTransportTest extends TransportTestCase
      */
     public function testInvalidArgumentExceptionIsThrownIfFromIsInvalid(string $from)
     {
-        $transport = $this->createTransport(null, $from);
+        $transport = self::createTransport(null, $from);
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID.', $from));
@@ -98,7 +100,7 @@ final class TwilioTransportTest extends TransportTestCase
             return $response;
         });
 
-        $transport = $this->createTransport($client, $from);
+        $transport = self::createTransport($client, $from);
 
         $sentMessage = $transport->send($message);
 

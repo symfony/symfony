@@ -20,6 +20,8 @@ use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
+use Symfony\Component\Notifier\Tests\Fixtures\DummyHttpClient;
+use Symfony\Component\Notifier\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -29,25 +31,25 @@ final class TurboSmsTransportTest extends TransportTestCase
     /**
      * @return TurboSmsTransport
      */
-    public function createTransport(HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(HttpClientInterface $client = null): TransportInterface
     {
-        return new TurboSmsTransport('authToken', 'sender', $client ?? $this->createMock(HttpClientInterface::class));
+        return new TurboSmsTransport('authToken', 'sender', $client ?? new DummyHttpClient());
     }
 
-    public function toStringProvider(): iterable
+    public static function toStringProvider(): iterable
     {
-        yield ['turbosms://api.turbosms.ua?from=sender', $this->createTransport()];
+        yield ['turbosms://api.turbosms.ua?from=sender', self::createTransport()];
     }
 
-    public function supportedMessagesProvider(): iterable
+    public static function supportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('380931234567', 'Hello!')];
     }
 
-    public function unsupportedMessagesProvider(): iterable
+    public static function unsupportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [new DummyMessage()];
     }
 
     public function testSuccessfulSend()
@@ -81,7 +83,7 @@ final class TurboSmsTransportTest extends TransportTestCase
 
         $message = new SmsMessage('380931234567', 'Тест/Test');
 
-        $transport = $this->createTransport($client);
+        $transport = self::createTransport($client);
         $sentMessage = $transport->send($message);
 
         self::assertInstanceOf(SentMessage::class, $sentMessage);
@@ -112,7 +114,7 @@ final class TurboSmsTransportTest extends TransportTestCase
 
         $message = new SmsMessage('380931234567', 'Тест/Test');
 
-        $transport = $this->createTransport($client);
+        $transport = self::createTransport($client);
 
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage('Unable to send SMS with TurboSMS: Error code 103 with message "REQUIRED_TOKEN".');

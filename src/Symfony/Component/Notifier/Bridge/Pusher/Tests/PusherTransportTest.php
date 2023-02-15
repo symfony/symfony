@@ -13,10 +13,10 @@ namespace Symfony\Component\Notifier\Bridge\Pusher\Tests;
 
 use Pusher\Pusher;
 use Symfony\Component\Notifier\Bridge\Pusher\PusherTransport;
-use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\PushMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
+use Symfony\Component\Notifier\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -35,20 +35,20 @@ final class PusherTransportTest extends TransportTestCase
     /**
      * @return PusherTransport
      */
-    public function createTransport(HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(HttpClientInterface $client = null): TransportInterface
     {
-        return new PusherTransport(new Pusher('key', 'secret', 'app'), $client ?? $this->createMock(HttpClientInterface::class));
+        return new PusherTransport(new Pusher('key', 'secret', 'app'), $client);
     }
 
-    public function supportedMessagesProvider(): iterable
+    public static function supportedMessagesProvider(): iterable
     {
         yield [new PushMessage('event', 'data')];
     }
 
-    public function unsupportedMessagesProvider(): iterable
+    public static function unsupportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [new DummyMessage()];
     }
 
     public function testCanSetCustomHost()

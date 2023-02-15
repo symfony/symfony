@@ -82,7 +82,9 @@ class CollectionDenormalizer implements DenormalizerInterface, DenormalizerAware
     private function getCollectionReturnType(string $type): string
     {
         $reflectionType = new \ReflectionClass($type);
+        /** @var \ReflectionNamedType $returnType */
+        $returnType = $reflectionType->getMethod('offsetGet')->getReturnType();
 
-        return $reflectionType->getMethod('offsetGet')->getReturnType()->getName().'[]';
+        return $returnType->getName().'[]';
     }
 }

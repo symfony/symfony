@@ -71,6 +71,7 @@ class NodeExtension extends AbstractExtension
             'Class' => $this->translateClass(...),
             'Hash' => $this->translateHash(...),
             'Element' => $this->translateElement(...),
+            'Relation' => $this->translateRelation(...)
         ];
     }
 
@@ -207,6 +208,19 @@ class NodeExtension extends AbstractExtension
         }
 
         return $xpath;
+    }
+
+    public function translateRelation(Node\RelationNode $node, Translator $translator): XPathExpr
+    {
+        $xpath = $translator->nodeToXPath($node->getSelector());
+        $subXpath = $translator->nodeToXPath($node->getSubSelector());
+        $subXpath->addNameTest();
+
+        if ($subXpath->getCondition()) {
+            return $xpath->addCondition(sprintf('count(descendant-or-self::*[%s]) > 0', $subXpath->getCondition()));
+        }
+
+        return $xpath->addCondition('0');
     }
 
     public function getName(): string

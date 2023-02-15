@@ -17,7 +17,7 @@ use Symfony\Component\CssSelector\Parser\Token;
  * ParseException is thrown when a CSS selector syntax is not valid.
  *
  * This component is a port of the Python cssselect library,
- * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
+ * which is copyright Ian Bicking, @see https://github.com/scrapy/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
  */
@@ -46,6 +46,11 @@ class SyntaxErrorException extends ParseException
     public static function notAtTheStartOfASelector(string $pseudoElement): self
     {
         return new self(\sprintf('Got immediate child pseudo-element ":%s" not at the start of a selector', $pseudoElement));
+    }
+
+    public static function nestedHas(): self
+    {
+        return new self('Got nested :has().');
     }
 
     public static function stringAsFunctionArgument(): self

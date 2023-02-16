@@ -78,7 +78,7 @@ class TranslationDebugCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDefinition([
@@ -120,8 +120,7 @@ You can display information about translations in all registered bundles in a sp
   <info>php %command.full_name% --all en</info>
 
 EOF
-            )
-        ;
+            );
     }
 
     /**
@@ -191,14 +190,14 @@ EOF
                         $states[] = self::MESSAGE_MISSING;
 
                         if (!$onlyUnused) {
-                            $exitCode = $exitCode | self::EXIT_CODE_MISSING;
+                            $exitCode |= self::EXIT_CODE_MISSING;
                         }
                     }
                 } elseif ($currentCatalogue->defines($messageId, $domain)) {
                     $states[] = self::MESSAGE_UNUSED;
 
                     if (!$onlyMissing) {
-                        $exitCode = $exitCode | self::EXIT_CODE_UNUSED;
+                        $exitCode |= self::EXIT_CODE_UNUSED;
                     }
                 }
 
@@ -212,7 +211,7 @@ EOF
                     if ($fallbackCatalogue->defines($messageId, $domain) && $value === $fallbackCatalogue->get($messageId, $domain)) {
                         $states[] = self::MESSAGE_EQUALS_FALLBACK;
 
-                        $exitCode = $exitCode | self::EXIT_CODE_FALLBACK;
+                        $exitCode |= self::EXIT_CODE_FALLBACK;
 
                         break;
                     }
@@ -366,6 +365,9 @@ EOF
         return $fallbackCatalogues;
     }
 
+    /**
+     * @return array<int,string>
+     */
     private function getRootTransPaths(): array
     {
         $transPaths = $this->transPaths;
@@ -376,6 +378,9 @@ EOF
         return $transPaths;
     }
 
+    /**
+     * @return array<int,string>
+     */
     private function getRootCodePaths(KernelInterface $kernel): array
     {
         $codePaths = $this->codePaths;
@@ -398,15 +403,15 @@ EOF
         try {
             foreach ($this->iterateBundles($kernel, $input) as $bundle) {
                 $bundleDir = $bundle->getPath();
-                $transPaths[] = is_dir($bundleDir . '/Resources/translations') ? $bundleDir . '/Resources/translations' : $bundleDir . '/translations';
-                $codePaths[] = is_dir($bundleDir . '/Resources/views') ? $bundleDir . '/Resources/views' : $bundleDir . '/templates';
+                $transPaths[] = is_dir($bundleDir.'/Resources/translations') ? $bundleDir.'/Resources/translations' : $bundleDir.'/translations';
+                $codePaths[] = is_dir($bundleDir.'/Resources/views') ? $bundleDir.'/Resources/views' : $bundleDir.'/templates';
             }
         } catch (\InvalidArgumentException $e) {
             // such a bundle does not exist, so treat the argument as path
             $path = $input->getArgument('bundle');
 
-            $transPaths = [$path . '/translations'];
-            $codePaths = [$path . '/templates'];
+            $transPaths = [$path.'/translations'];
+            $codePaths = [$path.'/templates'];
 
             if (!is_dir($transPaths[0])) {
                 throw new InvalidArgumentException(sprintf('"%s" is neither an enabled bundle nor a directory.', $transPaths[0]));

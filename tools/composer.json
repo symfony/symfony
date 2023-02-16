@@ -1,5 +1,0 @@
-{
-    "require-dev": {
-        "rector/rector": "dev-main"
-    }
-}

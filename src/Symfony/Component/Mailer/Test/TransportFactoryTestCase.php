@@ -13,6 +13,8 @@ namespace Symfony\Component\Mailer\Test;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Mailer\Exception\IncompleteDsnException;
 use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 use Symfony\Component\Mailer\Transport\Dsn;
@@ -31,11 +33,11 @@ abstract class TransportFactoryTestCase extends TestCase
     protected const USER = 'u$er';
     protected const PASSWORD = 'pa$s';
 
-    protected $dispatcher;
-    protected $client;
-    protected $logger;
+    protected static $dispatcher;
+    protected static $client;
+    protected static $logger;
 
-    abstract public function getFactory(): TransportFactoryInterface;
+    abstract public static function getFactory(): TransportFactoryInterface;
 
     abstract public static function supportsProvider(): iterable;
 
@@ -100,18 +102,22 @@ abstract class TransportFactoryTestCase extends TestCase
         $factory->create($dsn);
     }
 
-    protected function getDispatcher(): EventDispatcherInterface
+    protected static function getDispatcher(): EventDispatcherInterface
     {
-        return $this->dispatcher ?? $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
+        return self::$dispatcher ?? self::$dispatcher = new class() implements EventDispatcherInterface {
+            public function dispatch($event, string $eventName = null): object
+            {
+            }
+        };
     }
 
-    protected function getClient(): HttpClientInterface
+    protected static function getClient(): HttpClientInterface
     {
-        return $this->client ?? $this->client = $this->createMock(HttpClientInterface::class);
+        return self::$client ?? self::$client = new MockHttpClient();
     }
 
-    protected function getLogger(): LoggerInterface
+    protected static function getLogger(): LoggerInterface
     {
-        return $this->logger ?? $this->logger = $this->createMock(LoggerInterface::class);
+        return self::$logger ?? self::$logger = new NullLogger();
     }
 }

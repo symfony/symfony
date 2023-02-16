@@ -4,7 +4,7 @@ CHANGELOG
 5.4.21
 ------
 
-* [BC BREAK] `AccessDecisionStrategyTestCase::provideStrategyTests()` is now static
+ * [BC BREAK] `AccessDecisionStrategyTestCase::provideStrategyTests()` is now static
 
 5.4
 ---

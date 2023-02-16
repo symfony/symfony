@@ -19,9 +19,9 @@ use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
 class GmailTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function getFactory(): TransportFactoryInterface
+    public static function getFactory(): TransportFactoryInterface
     {
-        return new GmailTransportFactory($this->getDispatcher(), null, $this->getLogger());
+        return new GmailTransportFactory(self::getDispatcher(), null, self::getLogger());
     }
 
     public static function supportsProvider(): iterable
@@ -51,17 +51,17 @@ class GmailTransportFactoryTest extends TransportFactoryTestCase
     {
         yield [
             new Dsn('gmail', 'default', self::USER, self::PASSWORD),
-            new GmailSmtpTransport(self::USER, self::PASSWORD, $this->getDispatcher(), $this->getLogger()),
+            new GmailSmtpTransport(self::USER, self::PASSWORD, self::getDispatcher(), self::getLogger()),
         ];
 
         yield [
             new Dsn('gmail+smtp', 'default', self::USER, self::PASSWORD),
-            new GmailSmtpTransport(self::USER, self::PASSWORD, $this->getDispatcher(), $this->getLogger()),
+            new GmailSmtpTransport(self::USER, self::PASSWORD, self::getDispatcher(), self::getLogger()),
         ];
 
         yield [
             new Dsn('gmail+smtps', 'default', self::USER, self::PASSWORD),
-            new GmailSmtpTransport(self::USER, self::PASSWORD, $this->getDispatcher(), $this->getLogger()),
+            new GmailSmtpTransport(self::USER, self::PASSWORD, self::getDispatcher(), self::getLogger()),
         ];
     }
 

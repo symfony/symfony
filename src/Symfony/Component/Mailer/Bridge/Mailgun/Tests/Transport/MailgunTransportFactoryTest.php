@@ -21,9 +21,9 @@ use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
 class MailgunTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function getFactory(): TransportFactoryInterface
+    public static function getFactory(): TransportFactoryInterface
     {
-        return new MailgunTransportFactory($this->getDispatcher(), $this->getClient(), $this->getLogger());
+        return new MailgunTransportFactory(self::getDispatcher(), self::getClient(), self::getLogger());
     }
 
     public static function supportsProvider(): iterable
@@ -61,9 +61,9 @@ class MailgunTransportFactoryTest extends TransportFactoryTestCase
 
     public static function createProvider(): iterable
     {
-        $client = $this->getClient();
-        $dispatcher = $this->getDispatcher();
-        $logger = $this->getLogger();
+        $client = self::getClient();
+        $dispatcher = self::getDispatcher();
+        $logger = self::getLogger();
 
         yield [
             new Dsn('mailgun+api', 'default', self::USER, self::PASSWORD),

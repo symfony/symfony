@@ -20,9 +20,9 @@ use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
 final class OhMySmtpTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function getFactory(): TransportFactoryInterface
+    public static function getFactory(): TransportFactoryInterface
     {
-        return new OhMySmtpTransportFactory($this->getDispatcher(), $this->getClient(), $this->getLogger());
+        return new OhMySmtpTransportFactory(self::getDispatcher(), self::getClient(), self::getLogger());
     }
 
     public static function supportsProvider(): iterable
@@ -55,17 +55,17 @@ final class OhMySmtpTransportFactoryTest extends TransportFactoryTestCase
 
     public static function createProvider(): iterable
     {
-        $dispatcher = $this->getDispatcher();
-        $logger = $this->getLogger();
+        $dispatcher = self::getDispatcher();
+        $logger = self::getLogger();
 
         yield [
             new Dsn('ohmysmtp+api', 'default', self::USER),
-            new OhMySmtpApiTransport(self::USER, $this->getClient(), $dispatcher, $logger),
+            new OhMySmtpApiTransport(self::USER, self::getClient(), $dispatcher, $logger),
         ];
 
         yield [
             new Dsn('ohmysmtp+api', 'example.com', self::USER, '', 8080),
-            (new OhMySmtpApiTransport(self::USER, $this->getClient(), $dispatcher, $logger))->setHost('example.com')->setPort(8080),
+            (new OhMySmtpApiTransport(self::USER, self::getClient(), $dispatcher, $logger))->setHost('example.com')->setPort(8080),
         ];
 
         yield [

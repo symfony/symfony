@@ -20,9 +20,9 @@ use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
 class EsmtpTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function getFactory(): TransportFactoryInterface
+    public static function getFactory(): TransportFactoryInterface
     {
-        return new EsmtpTransportFactory($this->getDispatcher(), $this->getClient(), $this->getLogger());
+        return new EsmtpTransportFactory(self::getDispatcher(), self::getClient(), self::getLogger());
     }
 
     public static function supportsProvider(): iterable
@@ -45,8 +45,8 @@ class EsmtpTransportFactoryTest extends TransportFactoryTestCase
 
     public static function createProvider(): iterable
     {
-        $eventDispatcher = $this->getDispatcher();
-        $logger = $this->getLogger();
+        $eventDispatcher = self::getDispatcher();
+        $logger = self::getLogger();
 
         $transport = new EsmtpTransport('localhost', 25, false, $eventDispatcher, $logger);
 

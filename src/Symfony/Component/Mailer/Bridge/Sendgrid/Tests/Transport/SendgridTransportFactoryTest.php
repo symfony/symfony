@@ -20,9 +20,9 @@ use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
 class SendgridTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function getFactory(): TransportFactoryInterface
+    public static function getFactory(): TransportFactoryInterface
     {
-        return new SendgridTransportFactory($this->getDispatcher(), $this->getClient(), $this->getLogger());
+        return new SendgridTransportFactory(self::getDispatcher(), self::getClient(), self::getLogger());
     }
 
     public static function supportsProvider(): iterable
@@ -55,17 +55,17 @@ class SendgridTransportFactoryTest extends TransportFactoryTestCase
 
     public static function createProvider(): iterable
     {
-        $dispatcher = $this->getDispatcher();
-        $logger = $this->getLogger();
+        $dispatcher = self::getDispatcher();
+        $logger = self::getLogger();
 
         yield [
             new Dsn('sendgrid+api', 'default', self::USER),
-            new SendgridApiTransport(self::USER, $this->getClient(), $dispatcher, $logger),
+            new SendgridApiTransport(self::USER, self::getClient(), $dispatcher, $logger),
         ];
 
         yield [
             new Dsn('sendgrid+api', 'example.com', self::USER, '', 8080),
-            (new SendgridApiTransport(self::USER, $this->getClient(), $dispatcher, $logger))->setHost('example.com')->setPort(8080),
+            (new SendgridApiTransport(self::USER, self::getClient(), $dispatcher, $logger))->setHost('example.com')->setPort(8080),
         ];
 
         yield [

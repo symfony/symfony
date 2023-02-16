@@ -19,9 +19,9 @@ use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
 class SendmailTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function getFactory(): TransportFactoryInterface
+    public static function getFactory(): TransportFactoryInterface
     {
-        return new SendmailTransportFactory($this->getDispatcher(), $this->getClient(), $this->getLogger());
+        return new SendmailTransportFactory(self::getDispatcher(), self::getClient(), self::getLogger());
     }
 
     public static function supportsProvider(): iterable
@@ -36,12 +36,12 @@ class SendmailTransportFactoryTest extends TransportFactoryTestCase
     {
         yield [
             new Dsn('sendmail+smtp', 'default'),
-            new SendmailTransport(null, $this->getDispatcher(), $this->getLogger()),
+            new SendmailTransport(null, self::getDispatcher(), self::getLogger()),
         ];
 
         yield [
             new Dsn('sendmail+smtp', 'default', null, null, null, ['command' => '/usr/sbin/sendmail -oi -t']),
-            new SendmailTransport('/usr/sbin/sendmail -oi -t', $this->getDispatcher(), $this->getLogger()),
+            new SendmailTransport('/usr/sbin/sendmail -oi -t', self::getDispatcher(), self::getLogger()),
         ];
     }
 

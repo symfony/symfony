@@ -13,9 +13,11 @@ namespace Symfony\Component\Translation\Test;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Translation\Dumper\XliffFileDumper;
 use Symfony\Component\Translation\Loader\LoaderInterface;
+use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Provider\ProviderInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -28,13 +30,13 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 abstract class ProviderTestCase extends TestCase
 {
-    protected $client;
-    protected $logger;
-    protected $defaultLocale;
-    protected $loader;
-    protected $xliffFileDumper;
+    protected static $client;
+    protected static $logger;
+    protected static $defaultLocale;
+    protected static $loader;
+    protected static $xliffFileDumper;
 
-    abstract public function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint): ProviderInterface;
+    abstract public static function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint): ProviderInterface;
 
     /**
      * @return iterable<array{0: ProviderInterface, 1: string}>
@@ -49,28 +51,33 @@ abstract class ProviderTestCase extends TestCase
         $this->assertSame($expected, (string) $provider);
     }
 
-    protected function getClient(): MockHttpClient
+    protected static function getClient(): MockHttpClient
     {
-        return $this->client ?? $this->client = new MockHttpClient();
+        return static::$client ?? static::$client = new MockHttpClient();
     }
 
-    protected function getLoader(): LoaderInterface
+    protected static function getLoader(): LoaderInterface
     {
-        return $this->loader ?? $this->loader = $this->createMock(LoaderInterface::class);
+        return static::$loader ?? static::$loader = new class() implements LoaderInterface {
+            public function load($resource, string $locale, string $domain = 'messages'): MessageCatalogue
+            {
+                return new MessageCatalogue($locale);
+            }
+        };
     }
 
-    protected function getLogger(): LoggerInterface
+    protected static function getLogger(): LoggerInterface
     {
-        return $this->logger ?? $this->logger = $this->createMock(LoggerInterface::class);
+        return static::$logger ?? static::$logger = new NullLogger();
     }
 
-    protected function getDefaultLocale(): string
+    protected static function getDefaultLocale(): string
     {
-        return $this->defaultLocale ?? $this->defaultLocale = 'en';
+        return static::$defaultLocale ?? static::$defaultLocale = 'en';
     }
 
-    protected function getXliffFileDumper(): XliffFileDumper
+    protected static function getXliffFileDumper(): XliffFileDumper
     {
-        return $this->xliffFileDumper ?? $this->xliffFileDumper = $this->createMock(XliffFileDumper::class);
+        return static::$xliffFileDumper ?? static::$xliffFileDumper = new XliffFileDumper();
     }
 }

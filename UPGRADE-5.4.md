@@ -66,10 +66,8 @@ Lock
 Mailer
 ------
 
- * The following data providers for `TransportFactoryTestCase` are now static:
-   `supportsProvider()`, `createProvider()`, `unsupportedSchemeProvider()`and `incompleteDsnProvider()`
- * The following data providers for `TransportTestCase` are now static:
-   `toStringProvider()`, `supportedMessagesProvider()` and `unsupportedMessagesProvider()`
+ * The following data providers for `TransportFactoryTestCase` are now static: `supportsProvider()`, `createProvider()`, `unsupportedSchemeProvider()`and `incompleteDsnProvider()`
+ * The following data providers for `TransportTestCase` are now static: `toStringProvider()`, `supportedMessagesProvider()` and `unsupportedMessagesProvider()`
 
 Messenger
 ---------
@@ -210,6 +208,5 @@ Security
 Translation
 -----------
 
- * The following data providers for `ProviderFactoryTestCase` are now static:
-   `supportsProvider()`, `createProvider()`, `unsupportedSchemeProvider()`and `incompleteDsnProvider()`
+ * The following data providers for `ProviderFactoryTestCase` are now static: `supportsProvider()`, `createProvider()`, `unsupportedSchemeProvider()`and `incompleteDsnProvider()`
  * `ProviderTestCase::toStringProvider()` is now static

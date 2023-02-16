@@ -23,9 +23,9 @@ use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
 class SesTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function getFactory(): TransportFactoryInterface
+    public static function getFactory(): TransportFactoryInterface
     {
-        return new SesTransportFactory($this->getDispatcher(), $this->getClient(), $this->getLogger());
+        return new SesTransportFactory(self::getDispatcher(), self::getClient(), self::getLogger());
     }
 
     public static function supportsProvider(): iterable
@@ -63,9 +63,9 @@ class SesTransportFactoryTest extends TransportFactoryTestCase
 
     public static function createProvider(): iterable
     {
-        $client = $this->getClient();
-        $dispatcher = $this->getDispatcher();
-        $logger = $this->getLogger();
+        $client = self::getClient();
+        $dispatcher = self::getDispatcher();
+        $logger = self::getLogger();
 
         yield [
             new Dsn('ses+api', 'default', self::USER, self::PASSWORD),

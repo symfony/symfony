@@ -28,41 +28,41 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class CrowdinProviderTest extends ProviderTestCase
 {
-    public function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint): ProviderInterface
+    public static function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint): ProviderInterface
     {
-        return new CrowdinProvider($client, $loader, $logger, $this->getXliffFileDumper(), $defaultLocale, $endpoint);
+        return new CrowdinProvider($client, $loader, $logger, self::getXliffFileDumper(), $defaultLocale, $endpoint);
     }
 
     public static function toStringProvider(): iterable
     {
         yield [
-            $this->createProvider($this->getClient()->withOptions([
+            self::createProvider(self::getClient()->withOptions([
                 'base_uri' => 'https://api.crowdin.com/api/v2/projects/1/',
                 'auth_bearer' => 'API_TOKEN',
-            ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com'),
+            ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'api.crowdin.com'),
             'crowdin://api.crowdin.com',
         ];
 
         yield [
-            $this->createProvider($this->getClient()->withOptions([
+            self::createProvider(self::getClient()->withOptions([
                 'base_uri' => 'https://domain.api.crowdin.com/api/v2/projects/1/',
                 'auth_bearer' => 'API_TOKEN',
-            ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'domain.api.crowdin.com'),
+            ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'domain.api.crowdin.com'),
             'crowdin://domain.api.crowdin.com',
         ];
 
         yield [
-            $this->createProvider($this->getClient()->withOptions([
+            self::createProvider(self::getClient()->withOptions([
                 'base_uri' => 'https://api.crowdin.com:99/api/v2/projects/1/',
                 'auth_bearer' => 'API_TOKEN',
-            ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com:99'),
+            ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'api.crowdin.com:99'),
             'crowdin://api.crowdin.com:99',
         ];
     }
 
     public function testCompleteWriteProcessAddFiles()
     {
-        $this->xliffFileDumper = new XliffFileDumper();
+        self::$xliffFileDumper = new XliffFileDumper();
 
         $expectedMessagesFileContent = <<<'XLIFF'
 <?xml version="1.0" encoding="utf-8"?>
@@ -151,14 +151,14 @@ XLIFF;
         $provider = $this->createProvider((new MockHttpClient($responses))->withOptions([
             'base_uri' => 'https://api.crowdin.com/api/v2/projects/1/',
             'auth_bearer' => 'API_TOKEN',
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com/api/v2/projects/1/');
+        ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'api.crowdin.com/api/v2/projects/1/');
 
         $provider->write($translatorBag);
     }
 
     public function testWriteAddFileServerError()
     {
-        $this->xliffFileDumper = new XliffFileDumper();
+        self::$xliffFileDumper = new XliffFileDumper();
 
         $expectedMessagesFileContent = <<<'XLIFF'
 <?xml version="1.0" encoding="utf-8"?>
@@ -213,7 +213,7 @@ XLIFF;
         $provider = $this->createProvider((new MockHttpClient($responses))->withOptions([
             'base_uri' => 'https://api.crowdin.com/api/v2/projects/1/',
             'auth_bearer' => 'API_TOKEN',
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com/api/v2/projects/1/');
+        ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'api.crowdin.com/api/v2/projects/1/');
 
         $this->expectException(ProviderException::class);
         $this->expectExceptionMessage('Unable to create a File in Crowdin for domain "messages".');
@@ -223,7 +223,7 @@ XLIFF;
 
     public function testWriteUpdateFileServerError()
     {
-        $this->xliffFileDumper = new XliffFileDumper();
+        self::$xliffFileDumper = new XliffFileDumper();
 
         $expectedMessagesFileContent = <<<'XLIFF'
 <?xml version="1.0" encoding="utf-8"?>
@@ -285,7 +285,7 @@ XLIFF;
         $provider = $this->createProvider((new MockHttpClient($responses))->withOptions([
             'base_uri' => 'https://api.crowdin.com/api/v2/projects/1/',
             'auth_bearer' => 'API_TOKEN',
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com/api/v2/projects/1/');
+        ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'api.crowdin.com/api/v2/projects/1/');
 
         $this->expectException(ProviderException::class);
         $this->expectExceptionMessage('Unable to update file in Crowdin for file ID "12" and domain "messages".');
@@ -295,7 +295,7 @@ XLIFF;
 
     public function testWriteUploadTranslationsServerError()
     {
-        $this->xliffFileDumper = new XliffFileDumper();
+        self::$xliffFileDumper = new XliffFileDumper();
 
         $expectedMessagesTranslationsContent = <<<'XLIFF'
 <?xml version="1.0" encoding="utf-8"?>
@@ -392,7 +392,7 @@ XLIFF;
         $provider = $this->createProvider((new MockHttpClient($responses))->withOptions([
             'base_uri' => 'https://api.crowdin.com/api/v2/projects/1/',
             'auth_bearer' => 'API_TOKEN',
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com/api/v2/projects/1/');
+        ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'api.crowdin.com/api/v2/projects/1/');
 
         $this->expectException(ProviderException::class);
         $this->expectExceptionMessage('Unable to upload translations to Crowdin.');
@@ -402,7 +402,7 @@ XLIFF;
 
     public function testCompleteWriteProcessUpdateFiles()
     {
-        $this->xliffFileDumper = new XliffFileDumper();
+        self::$xliffFileDumper = new XliffFileDumper();
 
         $expectedMessagesFileContent = <<<'XLIFF'
 <?xml version="1.0" encoding="utf-8"?>
@@ -466,7 +466,7 @@ XLIFF;
         $provider = $this->createProvider((new MockHttpClient($responses))->withOptions([
             'base_uri' => 'https://api.crowdin.com/api/v2/projects/1/',
             'auth_bearer' => 'API_TOKEN',
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com/api/v2/projects/1/');
+        ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'api.crowdin.com/api/v2/projects/1/');
 
         $provider->write($translatorBag);
     }
@@ -476,7 +476,7 @@ XLIFF;
      */
     public function testCompleteWriteProcessAddFileAndUploadTranslations(TranslatorBag $translatorBag, string $expectedLocale, string $expectedMessagesTranslationsContent)
     {
-        $this->xliffFileDumper = new XliffFileDumper();
+        self::$xliffFileDumper = new XliffFileDumper();
 
         $expectedMessagesFileContent = <<<'XLIFF'
 <?xml version="1.0" encoding="utf-8"?>
@@ -547,7 +547,7 @@ XLIFF;
         $provider = $this->createProvider((new MockHttpClient($responses))->withOptions([
             'base_uri' => 'https://api.crowdin.com/api/v2/projects/1/',
             'auth_bearer' => 'API_TOKEN',
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com/api/v2/projects/1/');
+        ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'api.crowdin.com/api/v2/projects/1/');
 
         $provider->write($translatorBag);
     }
@@ -645,15 +645,15 @@ XLIFF
             },
         ];
 
-        $loader = $this->getLoader();
-        $loader->expects($this->once())
+        static::$loader = $this->createMock(LoaderInterface::class);
+        static::$loader->expects($this->once())
             ->method('load')
             ->willReturn($expectedTranslatorBag->getCatalogue($locale));
 
         $crowdinProvider = $this->createProvider((new MockHttpClient($responses))->withOptions([
             'base_uri' => 'https://api.crowdin.com/api/v2/projects/1/',
             'auth_bearer' => 'API_TOKEN',
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com/api/v2');
+        ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'api.crowdin.com/api/v2');
 
         $translatorBag = $crowdinProvider->read([$domain], [$locale]);
 
@@ -758,7 +758,7 @@ XLIFF
             },
         ];
 
-        $loader = $this->getLoader();
+        $loader = $this->createMock(LoaderInterface::class);
         $loader->expects($this->once())
             ->method('load')
             ->willReturn($expectedTranslatorBag->getCatalogue($locale));
@@ -766,7 +766,7 @@ XLIFF
         $crowdinProvider = $this->createProvider((new MockHttpClient($responses))->withOptions([
             'base_uri' => 'https://api.crowdin.com/api/v2/projects/1/',
             'auth_bearer' => 'API_TOKEN',
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com/api/v2');
+        ]), $loader, self::getLogger(), self::getDefaultLocale(), 'api.crowdin.com/api/v2');
 
         $translatorBag = $crowdinProvider->read([$domain], [$locale]);
 
@@ -835,7 +835,7 @@ XLIFF
         $crowdinProvider = $this->createProvider((new MockHttpClient($responses))->withOptions([
             'base_uri' => 'https://api.crowdin.com/api/v2/projects/1/',
             'auth_bearer' => 'API_TOKEN',
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com/api/v2');
+        ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'api.crowdin.com/api/v2');
 
         $this->expectException(ProviderException::class);
         $this->expectExceptionMessage('Unable to export file.');
@@ -876,7 +876,7 @@ XLIFF
         $crowdinProvider = $this->createProvider((new MockHttpClient($responses))->withOptions([
             'base_uri' => 'https://api.crowdin.com/api/v2/projects/1/',
             'auth_bearer' => 'API_TOKEN',
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com/api/v2');
+        ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'api.crowdin.com/api/v2');
 
         $this->expectException(ProviderException::class);
         $this->expectExceptionMessage('Unable to download file content.');
@@ -948,7 +948,7 @@ XLIFF
         $provider = $this->createProvider((new MockHttpClient($responses))->withOptions([
             'base_uri' => 'https://api.crowdin.com/api/v2/projects/1/',
             'auth_bearer' => 'API_TOKEN',
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com/api/v2/projects/1/');
+        ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'api.crowdin.com/api/v2/projects/1/');
 
         $provider->delete($translatorBag);
     }
@@ -987,7 +987,7 @@ XLIFF
         $provider = $this->createProvider((new MockHttpClient($responses))->withOptions([
             'base_uri' => 'https://api.crowdin.com/api/v2/projects/1/',
             'auth_bearer' => 'API_TOKEN',
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com/api/v2/projects/1/');
+        ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'api.crowdin.com/api/v2/projects/1/');
 
         $this->expectException(ProviderException::class);
         $this->expectExceptionMessage('Unable to list strings for file "12".');
@@ -1052,7 +1052,7 @@ XLIFF
         $provider = $this->createProvider((new MockHttpClient($responses))->withOptions([
             'base_uri' => 'https://api.crowdin.com/api/v2/projects/1/',
             'auth_bearer' => 'API_TOKEN',
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com/api/v2/projects/1/');
+        ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'api.crowdin.com/api/v2/projects/1/');
 
         $this->expectException(ProviderException::class);
         $this->expectExceptionMessage('Unable to delete string.');

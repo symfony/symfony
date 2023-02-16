@@ -17,12 +17,15 @@ use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Config\Loader\FileLoader as BaseFileLoader;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Config\Resource\GlobResource;
+use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\When;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\RegisterAutoconfigureAttributesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 
 /**
  * FileLoader is the abstract class used by all built-in loaders that are file based.
@@ -38,6 +41,8 @@ abstract class FileLoader extends BaseFileLoader
     protected $instanceof = [];
     protected $interfaces = [];
     protected $singlyImplemented = [];
+    /** @var array<string, Alias> */
+    protected $aliases = [];
     protected $autoRegisterAliasesForSinglyImplementedInterfaces = true;
 
     public function __construct(ContainerBuilder $container, FileLocatorInterface $locator, string $env = null)
@@ -140,10 +145,35 @@ abstract class FileLoader extends BaseFileLoader
 
                     continue;
                 }
+                $interfaces = [];
                 foreach (class_implements($class, false) as $interface) {
                     $this->singlyImplemented[$interface] = ($this->singlyImplemented[$interface] ?? $class) !== $class ? false : $class;
+                    $interfaces[] = $interface;
+                }
+
+                if (!$autoconfigureAttributes) {
+                    continue;
+                }
+                $r = $this->container->getReflectionClass($class);
+                $defaultAlias = 1 === \count($interfaces) ? $interfaces[0] : null;
+                foreach ($r->getAttributes(AsAlias::class) as $attr) {
+                    /** @var AsAlias $attribute */
+                    $attribute = $attr->newInstance();
+                    $alias = $attribute->id ?? $defaultAlias;
+                    $public = $attribute->public;
+                    if (null === $alias) {
+                        throw new LogicException(sprintf('Alias cannot be automatically determined for class "%s". If you have used the #[AsAlias] attribute with a class implementing multiple interfaces, add the interface you want to alias to the first parameter of #[AsAlias].', $class));
+                    }
+                    if (isset($this->aliases[$alias])) {
+                        throw new LogicException(sprintf('The "%s" alias has already been defined with the #[AsAlias] attribute in "%s".', $alias, $this->aliases[$alias]));
+                    }
+                    $this->aliases[$alias] = new Alias($class, $public);
                 }
             }
+        }
+
+        foreach ($this->aliases as $alias => $aliasDefinition) {
+            $this->container->setAlias($alias, $aliasDefinition);
         }
 
         if ($this->autoRegisterAliasesForSinglyImplementedInterfaces) {
@@ -157,12 +187,12 @@ abstract class FileLoader extends BaseFileLoader
     public function registerAliasesForSinglyImplementedInterfaces()
     {
         foreach ($this->interfaces as $interface) {
-            if (!empty($this->singlyImplemented[$interface]) && !$this->container->has($interface)) {
+            if (!empty($this->singlyImplemented[$interface]) && !isset($this->aliases[$interface]) && !$this->container->has($interface)) {
                 $this->container->setAlias($interface, $this->singlyImplemented[$interface]);
             }
         }
 
-        $this->interfaces = $this->singlyImplemented = [];
+        $this->interfaces = $this->singlyImplemented = $this->aliases = [];
     }
 
     /**

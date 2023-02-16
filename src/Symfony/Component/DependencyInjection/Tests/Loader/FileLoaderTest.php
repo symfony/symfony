@@ -14,10 +14,12 @@ namespace Symfony\Component\DependencyInjection\Tests\Loader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderResolver;
+use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\FileLoader;
 use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
@@ -32,6 +34,12 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\OtherDir\Anot
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\OtherDir\Baz;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\BarInterface;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\AliasBarInterface;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\AliasFooInterface;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithAsAlias;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithAsAliasIdMultipleInterface;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithAsAliasInterface;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithAsAliasMultiple;
 
 class FileLoaderTest extends TestCase
 {
@@ -273,6 +281,73 @@ class FileLoaderTest extends TestCase
         );
 
         $this->assertSame($expected, $container->has(Foo::class));
+    }
+
+    /**
+     * @dataProvider provideResourcesWithAsAliasAttributes
+     */
+    public function testRegisterClassesWithAsAlias(string $resource, array $expectedAliases)
+    {
+        $container = new ContainerBuilder();
+        $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
+        $loader->registerClasses(
+            (new Definition())->setAutoconfigured(true),
+            'Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\\',
+            $resource
+        );
+
+        $this->assertEquals($expectedAliases, $container->getAliases());
+    }
+
+    public static function provideResourcesWithAsAliasAttributes(): iterable
+    {
+        yield 'Private' => ['PrototypeAsAlias/{WithAsAlias,AliasFooInterface}.php', [AliasFooInterface::class => new Alias(WithAsAlias::class)]];
+        yield 'Interface' => ['PrototypeAsAlias/{WithAsAliasInterface,AliasFooInterface}.php', [AliasFooInterface::class => new Alias(WithAsAliasInterface::class)]];
+        yield 'Multiple' => ['PrototypeAsAlias/{WithAsAliasMultiple,AliasFooInterface}.php', [
+            AliasFooInterface::class => new Alias(WithAsAliasMultiple::class, true),
+            'some-alias' => new Alias(WithAsAliasMultiple::class),
+        ]];
+        yield 'Multiple with id' => ['PrototypeAsAlias/{WithAsAliasIdMultipleInterface,AliasBarInterface,AliasFooInterface}.php', [
+            AliasBarInterface::class => new Alias(WithAsAliasIdMultipleInterface::class),
+            AliasFooInterface::class => new Alias(WithAsAliasIdMultipleInterface::class),
+        ]];
+    }
+
+    /**
+     * @dataProvider provideResourcesWithDuplicatedAsAliasAttributes
+     */
+    public function testRegisterClassesWithDuplicatedAsAlias(string $resource, string $expectedExceptionMessage)
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage($expectedExceptionMessage);
+
+        $container = new ContainerBuilder();
+        $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
+        $loader->registerClasses(
+            (new Definition())->setAutoconfigured(true),
+            'Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\\',
+            $resource
+        );
+    }
+
+    public static function provideResourcesWithDuplicatedAsAliasAttributes(): iterable
+    {
+        yield 'Duplicated' => ['PrototypeAsAlias/{WithAsAlias,WithAsAliasDuplicate,AliasFooInterface}.php', 'The "Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\AliasFooInterface" alias has already been defined with the #[AsAlias] attribute in "Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithAsAlias".'];
+        yield 'Interface duplicated' => ['PrototypeAsAlias/{WithAsAliasInterface,WithAsAlias,AliasFooInterface}.php', 'The "Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\AliasFooInterface" alias has already been defined with the #[AsAlias] attribute in "Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithAsAlias".'];
+    }
+
+    public function testRegisterClassesWithAsAliasAndImplementingMultipleInterfaces()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Alias cannot be automatically determined for class "Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithAsAliasMultipleInterface". If you have used the #[AsAlias] attribute with a class implementing multiple interfaces, add the interface you want to alias to the first parameter of #[AsAlias].');
+
+        $container = new ContainerBuilder();
+        $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
+        $loader->registerClasses(
+            (new Definition())->setAutoconfigured(true),
+            'Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\\',
+            'PrototypeAsAlias/{WithAsAliasMultipleInterface,AliasBarInterface,AliasFooInterface}.php'
+        );
     }
 }
 

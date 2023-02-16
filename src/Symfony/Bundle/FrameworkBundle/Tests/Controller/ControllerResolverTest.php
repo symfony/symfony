@@ -170,14 +170,14 @@ class ControllerResolverTest extends ContainerControllerResolverTest
 
 class ContainerAwareController implements ContainerAwareInterface
 {
-    private ?Container $container = null;
+    private ?ContainerInterface $container = null;
 
     public function setContainer(?ContainerInterface $container): void
     {
         $this->container = $container;
     }
 
-    public function getContainer(): ?Container
+    public function getContainer(): ?ContainerInterface
     {
         return $this->container;
     }

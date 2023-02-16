@@ -17,6 +17,17 @@ index bb5560a7b5..be86cbf98e 100644
 +    protected static function getContainer(): Container
      {
          if (!static::$booted) {
+diff --git a/src/Symfony/Bundle/WebProfilerBundle/Tests/Controller/ProfilerControllerTest.php b/src/Symfony/Bundle/WebProfilerBundle/Tests/Controller/ProfilerControllerTest.php
+index 67355d9030..b2006ecd2f 100644
+--- a/src/Symfony/Bundle/WebProfilerBundle/Tests/Controller/ProfilerControllerTest.php
++++ b/src/Symfony/Bundle/WebProfilerBundle/Tests/Controller/ProfilerControllerTest.php
+@@ -449,5 +449,5 @@ class ProfilerControllerTest extends WebTestCase
+      * @return MockObject&DumpDataCollector
+      */
+-    private function createDumpDataCollector(): MockObject
++    private function createDumpDataCollector(): MockObject&DumpDataCollector
+     {
+         $dumpDataCollector = $this->createMock(DumpDataCollector::class);
 diff --git a/src/Symfony/Component/BrowserKit/AbstractBrowser.php b/src/Symfony/Component/BrowserKit/AbstractBrowser.php
 index b27ca37529..5b80175850 100644
 --- a/src/Symfony/Component/BrowserKit/AbstractBrowser.php
@@ -156,7 +167,7 @@ index 6b1c6c5fbe..bb80ed461e 100644
 +    public function isFresh(ResourceInterface $resource, int $timestamp): bool;
  }
 diff --git a/src/Symfony/Component/Console/Application.php b/src/Symfony/Component/Console/Application.php
-index 3a3d4da744..0a825fc1ee 100644
+index d4ec1be090..747e093b1b 100644
 --- a/src/Symfony/Component/Console/Application.php
 +++ b/src/Symfony/Component/Console/Application.php
 @@ -215,5 +215,5 @@ class Application implements ResetInterface
@@ -166,42 +177,42 @@ index 3a3d4da744..0a825fc1ee 100644
 +    public function doRun(InputInterface $input, OutputInterface $output): int
      {
          if (true === $input->hasParameterOption(['--version', '-V'], true)) {
-@@ -462,5 +462,5 @@ class Application implements ResetInterface
+@@ -464,5 +464,5 @@ class Application implements ResetInterface
       * @return string
       */
 -    public function getLongVersion()
 +    public function getLongVersion(): string
      {
          if ('UNKNOWN' !== $this->getName()) {
-@@ -505,5 +505,5 @@ class Application implements ResetInterface
+@@ -507,5 +507,5 @@ class Application implements ResetInterface
       * @return Command|null
       */
 -    public function add(Command $command)
 +    public function add(Command $command): ?Command
      {
          $this->init();
-@@ -542,5 +542,5 @@ class Application implements ResetInterface
+@@ -544,5 +544,5 @@ class Application implements ResetInterface
       * @throws CommandNotFoundException When given command name does not exist
       */
 -    public function get(string $name)
 +    public function get(string $name): Command
      {
          $this->init();
-@@ -649,5 +649,5 @@ class Application implements ResetInterface
+@@ -651,5 +651,5 @@ class Application implements ResetInterface
       * @throws CommandNotFoundException When command name is incorrect or ambiguous
       */
 -    public function find(string $name)
 +    public function find(string $name): Command
      {
          $this->init();
-@@ -759,5 +759,5 @@ class Application implements ResetInterface
+@@ -761,5 +761,5 @@ class Application implements ResetInterface
       * @return Command[]
       */
 -    public function all(string $namespace = null)
 +    public function all(string $namespace = null): array
      {
          $this->init();
-@@ -968,5 +968,5 @@ class Application implements ResetInterface
+@@ -970,5 +970,5 @@ class Application implements ResetInterface
       * @return int 0 if everything went fine, or an error code
       */
 -    protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output)
@@ -312,10 +323,10 @@ index 08bab02ee4..1181f0795e 100644
      {
          if (\is_array($value)) {
 diff --git a/src/Symfony/Component/DependencyInjection/Container.php b/src/Symfony/Component/DependencyInjection/Container.php
-index 9c830e77c8..e530cafb43 100644
+index f5d33682ff..e644489097 100644
 --- a/src/Symfony/Component/DependencyInjection/Container.php
 +++ b/src/Symfony/Component/DependencyInjection/Container.php
-@@ -109,5 +109,5 @@ class Container implements ContainerInterface, ResetInterface
+@@ -110,5 +110,5 @@ class Container implements ContainerInterface, ResetInterface
       * @throws ParameterNotFoundException if the parameter is not defined
       */
 -    public function getParameter(string $name)
@@ -584,7 +595,7 @@ index 1cb865fd66..f6f4efe7a7 100644
 +    public function getName(): string;
  }
 diff --git a/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php b/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php
-index bf2d6efb63..ae9c354971 100644
+index f77a99e0ff..a6829efa75 100644
 --- a/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php
 +++ b/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php
 @@ -457,5 +457,5 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
@@ -911,7 +922,7 @@ index 84a84ad1f3..6f66b6d32a 100644
 +    public function supportsDecoding(string $format): bool;
  }
 diff --git a/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php
-index 12c778cb80..4ad55fb3e1 100644
+index 829e178407..1ac8101771 100644
 --- a/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php
 @@ -210,5 +210,5 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
@@ -1079,10 +1090,10 @@ index ee1d68c78f..9baaabb04c 100644
      {
          return self::PROPERTY_CONSTRAINT;
 diff --git a/src/Symfony/Component/Validator/Test/ConstraintValidatorTestCase.php b/src/Symfony/Component/Validator/Test/ConstraintValidatorTestCase.php
-index d9bb9bd390..b981038042 100644
+index 9aa01a9dec..c18b07ac46 100644
 --- a/src/Symfony/Component/Validator/Test/ConstraintValidatorTestCase.php
 +++ b/src/Symfony/Component/Validator/Test/ConstraintValidatorTestCase.php
-@@ -301,5 +301,5 @@ abstract class ConstraintValidatorTestCase extends TestCase
+@@ -307,5 +307,5 @@ abstract class ConstraintValidatorTestCase extends TestCase
       * @psalm-return T
       */
 -    abstract protected function createValidator();
@@ -1090,7 +1101,7 @@ index d9bb9bd390..b981038042 100644
  }
  
 diff --git a/src/Symfony/Component/VarExporter/Internal/Exporter.php b/src/Symfony/Component/VarExporter/Internal/Exporter.php
-index 57c229eb14..b9aa92fcb7 100644
+index ae12ec414a..971280f868 100644
 --- a/src/Symfony/Component/VarExporter/Internal/Exporter.php
 +++ b/src/Symfony/Component/VarExporter/Internal/Exporter.php
 @@ -36,5 +36,5 @@ class Exporter

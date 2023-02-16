@@ -41,7 +41,7 @@ final class PusherTransport extends AbstractTransport
         $settings = $this->pusherClient->getSettings();
         preg_match('/api-([\w]+)\.pusher\.com$/m', $settings['host'], $server);
 
-        return sprintf('pusher://%s:%s@%s?server=%s', $settings['auth_key'], $settings['secret'], $settings['app_id'], $server[1]);
+        return sprintf('pusher://%s?server=%s', $settings['app_id'], $server[1]);
     }
 
     public function supports(MessageInterface $message): bool

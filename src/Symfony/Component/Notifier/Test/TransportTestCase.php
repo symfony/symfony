@@ -27,7 +27,7 @@ abstract class TransportTestCase extends TestCase
     protected const CUSTOM_HOST = 'host.test';
     protected const CUSTOM_PORT = 42;
 
-    abstract static public function createTransport(HttpClientInterface $client = null): TransportInterface;
+    abstract public static function createTransport(HttpClientInterface $client = null): TransportInterface;
 
     /**
      * @return iterable<array{0: string, 1: TransportInterface}>

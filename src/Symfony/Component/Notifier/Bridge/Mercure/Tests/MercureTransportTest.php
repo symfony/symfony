@@ -19,18 +19,16 @@ use Symfony\Component\Mercure\MockHub;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Notifier\Bridge\Mercure\MercureOptions;
 use Symfony\Component\Notifier\Bridge\Mercure\MercureTransport;
+use Symfony\Component\Notifier\Bridge\Mercure\Tests\Fixtures\DummyHub;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\RuntimeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
-use Symfony\Component\Notifier\Tests\Fixtures\DummyHub;
-use Symfony\Component\Notifier\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use TypeError;
 
 /**
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
@@ -79,7 +77,7 @@ final class MercureTransportTest extends TransportTestCase
 
     public function testConstructWithWrongTopicsThrows()
     {
-        $this->expectException(TypeError::class);
+        $this->expectException(\TypeError::class);
         self::createTransport(null, null, 'publisherId', new \stdClass());
     }
 

@@ -11,15 +11,15 @@
 
 namespace Symfony\Component\Notifier\Bridge\FakeChat\Tests;
 
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Notifier\Bridge\FakeChat\FakeChatEmailTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
-use Symfony\Component\Notifier\Tests\Fixtures\DummyHttpClient;
-use Symfony\Component\Notifier\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Notifier\Tests\Fixtures\TestOptions;
 use Symfony\Component\Notifier\Tests\Mailer\DummyMailer;
+use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -27,7 +27,7 @@ final class FakeChatEmailTransportTest extends TransportTestCase
 {
     public static function createTransport(HttpClientInterface $client = null, string $transportName = null): TransportInterface
     {
-        $transport = (new FakeChatEmailTransport(new DummyMailer(), 'recipient@email.net', 'sender@email.net', $client ?? new DummyHttpClient()));
+        $transport = (new FakeChatEmailTransport(new DummyMailer(), 'recipient@email.net', 'sender@email.net', $client ?? new MockHttpClient()));
 
         if (null !== $transportName) {
             $transport->setHost($transportName);

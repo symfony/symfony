@@ -12033,6 +12033,17 @@ index 7c960ffee1..3952a146b0 100644
 +    public function validate(mixed $value, Constraint $constraint): void
      {
          if (!$constraint instanceof Valid) {
+diff --git a/src/Symfony/Component/Validator/Context/ExecutionContextInterface.php b/src/Symfony/Component/Validator/Context/ExecutionContextInterface.php
+index 365e0dd05c..81c2698665 100644
+--- a/src/Symfony/Component/Validator/Context/ExecutionContextInterface.php
++++ b/src/Symfony/Component/Validator/Context/ExecutionContextInterface.php
+@@ -70,5 +70,5 @@ interface ExecutionContextInterface
+      * @return void
+      */
+-    public function addViolation(string $message, array $params = []);
++    public function addViolation(string $message, array $params = []): void;
+ 
+     /**
 diff --git a/src/Symfony/Component/Validator/DependencyInjection/AddAutoMappingConfigurationPass.php b/src/Symfony/Component/Validator/DependencyInjection/AddAutoMappingConfigurationPass.php
 index b1680b7cd4..805d093001 100644
 --- a/src/Symfony/Component/Validator/DependencyInjection/AddAutoMappingConfigurationPass.php

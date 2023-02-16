@@ -33,6 +33,7 @@ class RememberMeCookieTest extends AbstractWebTestCase
 
     /**
      * @dataProvider getSessionRememberMeSecureCookieFlagAutoHttpsMap
+     *
      * @group legacy
      */
     public function testLegacySessionRememberMeSecureCookieFlagAuto($https, $expectedSecureFlag)

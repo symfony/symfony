@@ -114,6 +114,7 @@ class CurrencyValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @requires PHP 8
+     *
      * @dataProvider getInvalidCurrencies
      */
     public function testInvalidCurrenciesNamed($currency)

@@ -211,9 +211,9 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns whether the form and all children are valid.
      *
-     * @throws Exception\LogicException if the form is not submitted
-     *
      * @return bool
+     *
+     * @throws Exception\LogicException if the form is not submitted
      */
     public function isValid();
 

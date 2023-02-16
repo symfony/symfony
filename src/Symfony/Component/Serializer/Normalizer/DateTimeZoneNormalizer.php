@@ -25,9 +25,9 @@ class DateTimeZoneNormalizer implements NormalizerInterface, DenormalizerInterfa
     /**
      * {@inheritdoc}
      *
-     * @throws InvalidArgumentException
-     *
      * @return string
+     *
+     * @throws InvalidArgumentException
      */
     public function normalize($object, string $format = null, array $context = [])
     {
@@ -49,9 +49,9 @@ class DateTimeZoneNormalizer implements NormalizerInterface, DenormalizerInterfa
     /**
      * {@inheritdoc}
      *
-     * @throws NotNormalizableValueException
-     *
      * @return \DateTimeZone
+     *
+     * @throws NotNormalizableValueException
      */
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {

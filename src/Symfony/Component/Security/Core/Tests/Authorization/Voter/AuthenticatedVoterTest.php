@@ -55,6 +55,7 @@ class AuthenticatedVoterTest extends TestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider getLegacyVoteTests
      */
     public function testLegacyVote($authenticated, $attributes, $expected)

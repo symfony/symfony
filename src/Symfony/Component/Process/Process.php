@@ -617,10 +617,10 @@ class Process implements \IteratorAggregate
      *
      * @param int $flags A bit field of Process::ITER_* flags
      *
+     * @return \Generator<string, string>
+     *
      * @throws LogicException in case the output has been disabled
      * @throws LogicException In case the process is not started
-     *
-     * @return \Generator<string, string>
      */
     #[\ReturnTypeWillChange]
     public function getIterator(int $flags = 0)

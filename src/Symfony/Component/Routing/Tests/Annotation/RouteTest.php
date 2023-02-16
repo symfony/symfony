@@ -60,6 +60,7 @@ class RouteTest extends TestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider provideDeprecationArrayAsFirstArgument
      */
     public function testDeprecationArrayAsFirstArgument(string $parameter, $value, string $getter)
@@ -72,6 +73,7 @@ class RouteTest extends TestCase
 
     /**
      * @requires PHP 8
+     *
      * @dataProvider getValidParameters
      */
     public function testLoadFromAttribute(string $methodName, string $getter, $expectedReturn)

@@ -23,6 +23,7 @@ use Symfony\Component\Lock\Store\PdoStore;
  * @author Jérémy Derussé <jeremy@derusse.com>
  *
  * @requires extension pdo_sqlite
+ *
  * @group legacy
  */
 class PdoDbalStoreTest extends AbstractStoreTestCase

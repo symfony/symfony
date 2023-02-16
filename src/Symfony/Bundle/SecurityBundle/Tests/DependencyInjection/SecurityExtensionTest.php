@@ -403,6 +403,7 @@ class SecurityExtensionTest extends TestCase
 
     /**
      * @dataProvider sessionConfigurationProvider
+     *
      * @group legacy
      */
     public function testRememberMeCookieInheritFrameworkSessionCookie($config, $samesite, $secure)
@@ -634,6 +635,7 @@ class SecurityExtensionTest extends TestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider provideEntryPointFirewalls
      */
     public function testAuthenticatorManagerEnabledEntryPoint(array $firewall, $entryPointId)

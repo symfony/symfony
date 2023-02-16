@@ -95,6 +95,7 @@ class RememberMeTest extends AbstractWebTestCase
 
     /**
      * @dataProvider provideLegacyConfigs
+     *
      * @group legacy
      */
     public function testLegacyRememberMe(array $options)

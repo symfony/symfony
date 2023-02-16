@@ -85,6 +85,7 @@ class RangeTest extends TestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider provideDeprecationTriggeredIfMinMaxAndMinMessageOrMaxMessageSet
      */
     public function testDeprecationTriggeredIfMinMaxAndMinMessageOrMaxMessageSet(array $options, bool $expectedDeprecatedMinMessageSet, bool $expectedDeprecatedMaxMessageSet)
@@ -107,6 +108,7 @@ class RangeTest extends TestCase
 
     /**
      * @doesNotPerformAssertions
+     *
      * @dataProvider provideDeprecationNotTriggeredIfNotMinMaxOrNotMinMessageNorMaxMessageSet
      */
     public function testDeprecationNotTriggeredIfNotMinMaxOrNotMinMessageNorMaxMessageSet(array $options)

@@ -76,9 +76,9 @@ interface AuthenticatorInterface extends AuthenticationEntryPointInterface
      *
      * @param mixed $credentials
      *
-     * @throws AuthenticationException
-     *
      * @return UserInterface|null
+     *
+     * @throws AuthenticationException
      */
     public function getUser($credentials, UserProviderInterface $userProvider);
 

@@ -18,7 +18,9 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\MongoDbSessionHandl
 
 /**
  * @author Markus Bachmann <markus.bachmann@bachi.biz>
+ *
  * @group time-sensitive
+ *
  * @requires extension mongodb
  */
 class MongoDbSessionHandlerTest extends TestCase

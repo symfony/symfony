@@ -45,8 +45,8 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     {
         return $this->guess($class, $property, function (Constraint $constraint) {
             return $this->guessRequiredForConstraint($constraint);
-        // If we don't find any constraint telling otherwise, we can assume
-        // that a field is not required (with LOW_CONFIDENCE)
+            // If we don't find any constraint telling otherwise, we can assume
+            // that a field is not required (with LOW_CONFIDENCE)
         }, false);
     }
 

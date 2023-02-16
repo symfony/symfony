@@ -94,6 +94,7 @@ class AddressTest extends TestCase
 
     /**
      * @dataProvider fromStringProvider
+     *
      * @group legacy
      */
     public function testFromString($string, $displayName, $addrSpec)

@@ -25,9 +25,9 @@ final class BackedEnumNormalizer implements NormalizerInterface, DenormalizerInt
     /**
      * {@inheritdoc}
      *
-     * @throws InvalidArgumentException
-     *
      * @return int|string
+     *
+     * @throws InvalidArgumentException
      */
     public function normalize($object, string $format = null, array $context = [])
     {

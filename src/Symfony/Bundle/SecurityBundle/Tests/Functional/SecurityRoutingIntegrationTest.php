@@ -141,6 +141,7 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
 
     /**
      * @dataProvider provideLegacyClientOptions
+     *
      * @group legacy
      */
     public function testLegacyRoutingErrorIsNotExposedForProtectedResourceWhenAnonymous(array $options)
@@ -153,6 +154,7 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
 
     /**
      * @dataProvider provideLegacyClientOptions
+     *
      * @group legacy
      */
     public function testLegacyRoutingErrorIsExposedWhenNotProtected(array $options)
@@ -165,6 +167,7 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
 
     /**
      * @dataProvider provideLegacyClientOptions
+     *
      * @group legacy
      */
     public function testLegacyRoutingErrorIsNotExposedForProtectedResourceWhenLoggedInWithInsufficientRights(array $options)
@@ -183,6 +186,7 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider provideLegacyClientOptions
      */
     public function testLegacySecurityConfigurationForSingleIPAddress(array $options)
@@ -199,6 +203,7 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider provideLegacyClientOptions
      */
     public function testLegacySecurityConfigurationForMultipleIPAddresses(array $options)
@@ -229,6 +234,7 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider provideLegacyConfigs
      */
     public function testLegacySecurityConfigurationForExpression(array $options)

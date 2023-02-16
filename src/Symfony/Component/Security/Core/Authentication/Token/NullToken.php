@@ -115,6 +115,7 @@ class NullToken implements TokenInterface
      * @return string
      *
      * @internal in 5.3
+     *
      * @final in 5.3
      */
     public function serialize()
@@ -126,6 +127,7 @@ class NullToken implements TokenInterface
      * @return void
      *
      * @internal in 5.3
+     *
      * @final in 5.3
      */
     public function unserialize($serialized)

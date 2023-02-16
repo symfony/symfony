@@ -77,6 +77,7 @@ class SessionTest extends AbstractWebTestCase
      * Tests flash messages work when flashbag service is injected to the constructor.
      *
      * @group legacy
+     *
      * @dataProvider getConfigs
      */
     public function testFlashOnInjectedFlashbag($config, $insulate)
@@ -101,6 +102,7 @@ class SessionTest extends AbstractWebTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider getConfigs
      */
     public function testSessionServiceTriggerDeprecation($config, $insulate)

@@ -48,6 +48,7 @@ class IsNullValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @requires PHP 8
+     *
      * @dataProvider getInvalidValues
      */
     public function testInvalidValuesNamed($value, $valueAsString)

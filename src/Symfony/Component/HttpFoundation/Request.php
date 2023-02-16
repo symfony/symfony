@@ -1573,9 +1573,9 @@ class Request
     /**
      * Gets the request body decoded as array, typically from a JSON payload.
      *
-     * @throws JsonException When the body cannot be decoded to an array
-     *
      * @return array
+     *
+     * @throws JsonException When the body cannot be decoded to an array
      */
     public function toArray()
     {

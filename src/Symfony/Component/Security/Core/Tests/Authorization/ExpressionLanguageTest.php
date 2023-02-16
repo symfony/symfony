@@ -75,6 +75,7 @@ class ExpressionLanguageTest extends TestCase
 
     /**
      * @dataProvider legacyProvider
+     *
      * @group legacy
      */
     public function testLegacyIsAuthenticated($token, $expression, $result)

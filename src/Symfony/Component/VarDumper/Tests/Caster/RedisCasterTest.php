@@ -16,7 +16,9 @@ use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
+ *
  * @requires extension redis
+ *
  * @group integration
  */
 class RedisCasterTest extends TestCase

@@ -25,6 +25,7 @@ use Symfony\Component\Security\Core\User\InMemoryUser;
  * Tests UserPasswordEncoderCommand.
  *
  * @author Sarah Khalil <mkhalil.sarah@gmail.com>
+ *
  * @group legacy
  */
 class UserPasswordEncoderCommandTest extends AbstractWebTestCase

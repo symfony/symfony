@@ -229,6 +229,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @requires PHP 8
+     *
      * @dataProvider getInvalidBics
      */
     public function testInvalidBicsNamed($bic, $code)

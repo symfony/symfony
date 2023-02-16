@@ -707,9 +707,9 @@ class YamlFileLoader extends FileLoader
      *
      * @param string|array $callable A callable reference
      *
-     * @throws InvalidArgumentException When errors occur
-     *
      * @return string|array|Reference
+     *
+     * @throws InvalidArgumentException When errors occur
      */
     private function parseCallable($callable, string $parameter, string $id, string $file)
     {

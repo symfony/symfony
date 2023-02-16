@@ -530,8 +530,8 @@ class PdoSessionHandler extends AbstractSessionHandler
                         return $dsn;
                     }
                 }
-            // If "unix_socket" is not in the query, we continue with the same process as pgsql
-            // no break
+                // If "unix_socket" is not in the query, we continue with the same process as pgsql
+                // no break
             case 'pgsql':
                 $dsn ?? $dsn = 'pgsql:';
 

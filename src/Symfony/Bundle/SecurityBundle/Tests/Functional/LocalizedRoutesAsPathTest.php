@@ -36,6 +36,7 @@ class LocalizedRoutesAsPathTest extends AbstractWebTestCase
 
     /**
      * @group issue-32995
+     *
      * @dataProvider getLocalesAndClientConfig
      */
     public function testLoginFailureWithLocalizedFailurePath($locale, array $options)
@@ -75,6 +76,7 @@ class LocalizedRoutesAsPathTest extends AbstractWebTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider getLegacyLocalesAndClientConfig
      */
     public function testLegacyLoginLogoutProcedure($locale, array $options)
@@ -98,6 +100,7 @@ class LocalizedRoutesAsPathTest extends AbstractWebTestCase
     /**
      * @group issue-32995
      * @group legacy
+     *
      * @dataProvider getLegacyLocalesAndClientConfig
      */
     public function testLegacyLoginFailureWithLocalizedFailurePath($locale, array $options)
@@ -115,6 +118,7 @@ class LocalizedRoutesAsPathTest extends AbstractWebTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider getLegacyLocalesAndClientConfig
      */
     public function testLegacyAccessRestrictedResource($locale, array $options)
@@ -127,6 +131,7 @@ class LocalizedRoutesAsPathTest extends AbstractWebTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider getLegacyLocalesAndClientConfig
      */
     public function testLegacyAccessRestrictedResourceWithForward($locale, array $options)

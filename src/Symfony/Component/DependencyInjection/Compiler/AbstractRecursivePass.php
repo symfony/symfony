@@ -175,9 +175,9 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
     }
 
     /**
-     * @throws RuntimeException
-     *
      * @return \ReflectionFunctionAbstract
+     *
+     * @throws RuntimeException
      */
     protected function getReflectionMethod(Definition $definition, string $method)
     {

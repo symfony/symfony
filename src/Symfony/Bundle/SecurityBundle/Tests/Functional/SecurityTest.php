@@ -66,6 +66,7 @@ class SecurityTest extends AbstractWebTestCase
 
     /**
      * @dataProvider userWillBeMarkedAsChangedIfRolesHasChangedProvider
+     *
      * @group legacy
      */
     public function testLegacyUserWillBeMarkedAsChangedIfRolesHasChanged(UserInterface $userWithAdminRole, UserInterface $userWithoutAdminRole)

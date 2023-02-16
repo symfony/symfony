@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Messenger\Bridge\Beanstalkd\Tests\Transport;
 
-use InvalidArgumentException;
 use Pheanstalk\Contract\PheanstalkInterface;
 use Pheanstalk\Exception;
 use Pheanstalk\Exception\ClientException;
@@ -30,7 +29,7 @@ final class ConnectionTest extends TestCase
 {
     public function testFromInvalidDsn()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The given Beanstalkd DSN "beanstalkd://" is invalid.');
 
         Connection::fromDsn('beanstalkd://');

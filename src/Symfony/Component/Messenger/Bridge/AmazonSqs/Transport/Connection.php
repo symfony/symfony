@@ -26,6 +26,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * @author Jérémy Derussé <jeremy@derusse.com>
  *
  * @internal
+ *
  * @final
  */
 class Connection

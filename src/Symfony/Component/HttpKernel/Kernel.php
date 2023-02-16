@@ -404,9 +404,9 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     /**
      * Gets the container class.
      *
-     * @throws \InvalidArgumentException If the generated classname is invalid
-     *
      * @return string
+     *
+     * @throws \InvalidArgumentException If the generated classname is invalid
      */
     protected function getContainerClass()
     {

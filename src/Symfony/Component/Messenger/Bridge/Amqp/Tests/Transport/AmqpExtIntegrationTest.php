@@ -33,6 +33,7 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 /**
  * @requires extension amqp
+ *
  * @group integration
  */
 class AmqpExtIntegrationTest extends TestCase

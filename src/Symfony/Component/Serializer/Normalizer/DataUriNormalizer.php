@@ -88,10 +88,10 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
      *
      * @see https://gist.github.com/bgrins/6194623
      *
+     * @return \SplFileInfo
+     *
      * @throws InvalidArgumentException
      * @throws NotNormalizableValueException
-     *
-     * @return \SplFileInfo
      */
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {

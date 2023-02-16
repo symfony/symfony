@@ -189,6 +189,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @requires PHP 8
+     *
      * @dataProvider getThreeOrLessCharacters
      */
     public function testInvalidValuesMinNamed($value)
@@ -229,6 +230,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @requires PHP 8
+     *
      * @dataProvider getFiveOrMoreCharacters
      */
     public function testInvalidValuesMaxNamed($value)
@@ -270,6 +272,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @requires PHP 8
+     *
      * @dataProvider getThreeOrLessCharacters
      */
     public function testInvalidValuesExactLessThanFourNamed($value)

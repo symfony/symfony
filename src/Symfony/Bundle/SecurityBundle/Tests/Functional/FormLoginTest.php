@@ -155,6 +155,7 @@ class FormLoginTest extends AbstractWebTestCase
 
     /**
      * @dataProvider provideLegacyClientOptions
+     *
      * @group legacy
      */
     public function testLegacyFormLogin(array $options)
@@ -175,6 +176,7 @@ class FormLoginTest extends AbstractWebTestCase
 
     /**
      * @dataProvider provideLegacyClientOptions
+     *
      * @group legacy
      */
     public function testLegacyFormLogout(array $options)
@@ -209,6 +211,7 @@ class FormLoginTest extends AbstractWebTestCase
 
     /**
      * @dataProvider provideLegacyClientOptions
+     *
      * @group legacy
      */
     public function testLegacyFormLoginWithCustomTargetPath(array $options)
@@ -230,6 +233,7 @@ class FormLoginTest extends AbstractWebTestCase
 
     /**
      * @dataProvider provideLegacyClientOptions
+     *
      * @group legacy
      */
     public function testLegacyFormLoginRedirectsToProtectedResourceAfterLogin(array $options)

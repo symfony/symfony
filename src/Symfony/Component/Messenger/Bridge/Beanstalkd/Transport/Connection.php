@@ -23,6 +23,7 @@ use Symfony\Component\Messenger\Exception\TransportException;
  * @author Antonio Pauletich <antonio.pauletich95@gmail.com>
  *
  * @internal
+ *
  * @final
  */
 class Connection

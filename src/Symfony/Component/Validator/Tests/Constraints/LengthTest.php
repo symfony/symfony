@@ -48,6 +48,7 @@ class LengthTest extends TestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider allowEmptyStringOptionData
      */
     public function testDeprecatedAllowEmptyStringOption(bool $value)

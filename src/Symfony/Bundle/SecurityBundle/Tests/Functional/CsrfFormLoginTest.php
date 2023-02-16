@@ -124,6 +124,7 @@ class CsrfFormLoginTest extends AbstractWebTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider provideLegacyClientOptions
      */
     public function testLegacyFormLoginAndLogoutWithCsrfTokens($options)
@@ -154,6 +155,7 @@ class CsrfFormLoginTest extends AbstractWebTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider provideLegacyClientOptions
      */
     public function testLegacyFormLoginWithInvalidCsrfToken($options)
@@ -172,6 +174,7 @@ class CsrfFormLoginTest extends AbstractWebTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider provideLegacyClientOptions
      */
     public function testFormLegacyLoginWithCustomTargetPath($options)
@@ -193,6 +196,7 @@ class CsrfFormLoginTest extends AbstractWebTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider provideLegacyClientOptions
      */
     public function testLegacyFormLoginRedirectsToProtectedResourceAfterLogin($options)

@@ -23,6 +23,7 @@ trait SkipUninitializedValuesTestTrait
 
     /**
      * @requires PHP 7.4
+     *
      * @dataProvider skipUninitializedValuesFlagProvider
      */
     public function testSkipUninitializedValues(array $context)

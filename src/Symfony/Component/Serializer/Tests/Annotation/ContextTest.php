@@ -41,6 +41,7 @@ class ContextTest extends TestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider provideTestThrowsOnEmptyContextLegacyData
      */
     public function testThrowsOnEmptyContextLegacy(callable $factory)
@@ -60,6 +61,7 @@ class ContextTest extends TestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider provideTestThrowsOnNonArrayContextData
      */
     public function testThrowsOnNonArrayContext(array $options)
@@ -129,6 +131,7 @@ class ContextTest extends TestCase
 
     /**
      * @requires PHP 8
+     *
      * @dataProvider provideValidInputs
      */
     public function testValidInputs(callable $factory, string $expectedDump)
@@ -216,6 +219,7 @@ DUMP
 
     /**
      * @group legacy
+     *
      * @dataProvider provideValidLegacyInputs
      */
     public function testValidLegacyInputs(callable $factory, string $expectedDump)

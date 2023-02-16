@@ -173,7 +173,7 @@ final class PhpDocTypeHelper
             case 'boolean':
                 return 'bool';
 
-            // real is not part of the PHPDoc standard, so we ignore it
+                // real is not part of the PHPDoc standard, so we ignore it
             case 'double':
                 return 'float';
 

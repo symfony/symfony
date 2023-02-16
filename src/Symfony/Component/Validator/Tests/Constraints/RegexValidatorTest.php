@@ -67,6 +67,7 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @requires PHP 8
+     *
      * @dataProvider getValidValuesWithWhitespaces
      */
     public function testValidValuesWithWhitespacesNamed($value)
@@ -125,6 +126,7 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @requires PHP 8
+     *
      * @dataProvider getInvalidValues
      */
     public function testInvalidValuesNamed($value)

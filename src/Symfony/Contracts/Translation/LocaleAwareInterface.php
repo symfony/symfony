@@ -16,6 +16,8 @@ interface LocaleAwareInterface
     /**
      * Sets the current locale.
      *
+     * @return void
+     *
      * @throws \InvalidArgumentException If the locale contains invalid characters
      */
     public function setLocale(string $locale);

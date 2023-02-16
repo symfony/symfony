@@ -517,7 +517,7 @@ EOF
     public function testKernelExtension()
     {
         $kernel = new class() extends CustomProjectDirKernel implements ExtensionInterface {
-            public function load(array $configs, ContainerBuilder $container)
+            public function load(array $configs, ContainerBuilder $container): void
             {
                 $container->setParameter('test.extension-registered', true);
             }
@@ -726,7 +726,7 @@ class TestKernel implements HttpKernelInterface
 {
     public $terminateCalled = false;
 
-    public function terminate()
+    public function terminate(): void
     {
         $this->terminateCalled = true;
     }
@@ -745,15 +745,14 @@ class CustomProjectDirKernel extends Kernel implements WarmableInterface
 {
     public $warmedUp = false;
     private $baseDir;
-    private $buildContainer;
-    private $httpKernel;
 
-    public function __construct(\Closure $buildContainer = null, HttpKernelInterface $httpKernel = null, $env = 'custom')
-    {
+    public function __construct(
+        private readonly ?\Closure $buildContainer = null,
+        private readonly ?HttpKernelInterface $httpKernel = null,
+        $env = 'custom',
+    ) {
         parent::__construct($env, true);
 
-        $this->buildContainer = $buildContainer;
-        $this->httpKernel = $httpKernel;
     }
 
     public function registerBundles(): iterable
@@ -761,7 +760,7 @@ class CustomProjectDirKernel extends Kernel implements WarmableInterface
         return [];
     }
 
-    public function registerContainerConfiguration(LoaderInterface $loader)
+    public function registerContainerConfiguration(LoaderInterface $loader): void
     {
     }
 
@@ -777,7 +776,7 @@ class CustomProjectDirKernel extends Kernel implements WarmableInterface
         return [];
     }
 
-    protected function build(ContainerBuilder $container)
+    protected function build(ContainerBuilder $container): void
     {
         if ($build = $this->buildContainer) {
             $build($container);
@@ -798,7 +797,7 @@ class PassKernel extends CustomProjectDirKernel implements CompilerPassInterface
         Kernel::__construct('pass', true);
     }
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $container->setParameter('test.processed', true);
     }

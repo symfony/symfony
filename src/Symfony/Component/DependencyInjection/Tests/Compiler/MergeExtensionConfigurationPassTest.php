@@ -174,7 +174,7 @@ class FooExtension extends Extension
         return new FooConfiguration();
     }
 
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
@@ -190,7 +190,7 @@ class FooExtension extends Extension
 
 class BarExtension extends Extension
 {
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $container->resolveEnvPlaceholders('%env(int:FOO)%', true);
     }
@@ -208,7 +208,7 @@ class ThrowingExtension extends Extension
         return new FooConfiguration();
     }
 
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         throw new \Exception();
     }
@@ -240,7 +240,7 @@ final class TestCccExtension extends Extension
         return new TestCccConfiguration();
     }
 
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = $this->getConfiguration($configs, $container);
         $this->processConfiguration($configuration, $configs);

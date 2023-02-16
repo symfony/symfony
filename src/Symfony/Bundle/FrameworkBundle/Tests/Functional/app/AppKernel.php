@@ -73,12 +73,12 @@ class AppKernel extends Kernel implements ExtensionInterface, ConfigurationInter
         return sys_get_temp_dir().'/'.$this->varDir.'/'.$this->testCase.'/logs';
     }
 
-    public function registerContainerConfiguration(LoaderInterface $loader)
+    public function registerContainerConfiguration(LoaderInterface $loader): void
     {
         $loader->load($this->rootConfig);
     }
 
-    protected function build(ContainerBuilder $container)
+    protected function build(ContainerBuilder $container): void
     {
         $container->register('logger', NullLogger::class);
         $container->registerExtension(new TestDumpExtension());
@@ -117,7 +117,7 @@ class AppKernel extends Kernel implements ExtensionInterface, ConfigurationInter
         return $treeBuilder;
     }
 
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
     }
 

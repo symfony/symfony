@@ -151,11 +151,11 @@ class ContainerBuilderTest extends TestCase
     public function testDeprecateParameterThrowsWhenParameterBagIsNotInternal()
     {
         $builder = new ContainerBuilder(new class() implements ParameterBagInterface {
-            public function clear()
+            public function clear(): void
             {
             }
 
-            public function add(array $parameters)
+            public function add(array $parameters): void
             {
             }
 
@@ -169,11 +169,11 @@ class ContainerBuilderTest extends TestCase
                 return null;
             }
 
-            public function remove(string $name)
+            public function remove(string $name): void
             {
             }
 
-            public function set(string $name, \UnitEnum|float|int|bool|array|string|null $value)
+            public function set(string $name, \UnitEnum|float|int|bool|array|string|null $value): void
             {
             }
 
@@ -182,12 +182,13 @@ class ContainerBuilderTest extends TestCase
                 return false;
             }
 
-            public function resolve()
+            public function resolve(): void
             {
             }
 
-            public function resolveValue(mixed $value)
+            public function resolveValue(mixed $value): mixed
             {
+                return null;
             }
 
             public function escapeValue(mixed $value): mixed

@@ -168,6 +168,9 @@ EOF
             return self::EXIT_CODE_GENERAL_ERROR;
         }
 
+        $onlyMissing = $input->getOption('only-missing');
+        $onlyUnused = $input->getOption('only-unused');
+
         // Load the fallback catalogues
         $fallbackCatalogues = $this->loadFallbackCatalogues($locale, $transPaths);
 
@@ -187,20 +190,20 @@ EOF
                     if (!$currentCatalogue->defines($messageId, $domain)) {
                         $states[] = self::MESSAGE_MISSING;
 
-                        if (!$input->getOption('only-unused')) {
+                        if (!$onlyUnused) {
                             $exitCode = $exitCode | self::EXIT_CODE_MISSING;
                         }
                     }
                 } elseif ($currentCatalogue->defines($messageId, $domain)) {
                     $states[] = self::MESSAGE_UNUSED;
 
-                    if (!$input->getOption('only-missing')) {
+                    if (!$onlyMissing) {
                         $exitCode = $exitCode | self::EXIT_CODE_UNUSED;
                     }
                 }
 
-                if (!\in_array(self::MESSAGE_UNUSED, $states) && $input->getOption('only-unused')
-                    || !\in_array(self::MESSAGE_MISSING, $states) && $input->getOption('only-missing')
+                if (($onlyUnused && !\in_array(self::MESSAGE_UNUSED, $states, true))
+                    || ($onlyMissing && !\in_array(self::MESSAGE_MISSING, $states, true))
                 ) {
                     continue;
                 }

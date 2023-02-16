@@ -41,6 +41,7 @@ return static function (ContainerConfigurator $container) {
         'mercure' => Bridge\Mercure\MercureTransportFactory::class,
         'microsoft-teams' => Bridge\MicrosoftTeams\MicrosoftTeamsTransportFactory::class,
         'pager-duty' => Bridge\PagerDuty\PagerDutyTransportFactory::class,
+        'pusher' => Bridge\Pusher\PusherTransportFactory::class,
         'rocket-chat' => Bridge\RocketChat\RocketChatTransportFactory::class,
         'slack' => Bridge\Slack\SlackTransportFactory::class,
         'telegram' => Bridge\Telegram\TelegramTransportFactory::class,

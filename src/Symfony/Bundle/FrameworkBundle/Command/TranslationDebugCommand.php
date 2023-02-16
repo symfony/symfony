@@ -149,12 +149,6 @@ EOF
                 $bundleDir = $bundle->getPath();
                 $transPaths = [is_dir($bundleDir.'/Resources/translations') ? $bundleDir.'/Resources/translations' : $bundleDir.'/translations'];
                 $codePaths = [is_dir($bundleDir.'/Resources/views') ? $bundleDir.'/Resources/views' : $bundleDir.'/templates'];
-                if ($this->defaultTransPath) {
-                    $transPaths[] = $this->defaultTransPath;
-                }
-                if ($this->defaultViewsPath) {
-                    $codePaths[] = $this->defaultViewsPath;
-                }
             } catch (\InvalidArgumentException $e) {
                 // such a bundle does not exist, so treat the argument as path
                 $path = $input->getArgument('bundle');

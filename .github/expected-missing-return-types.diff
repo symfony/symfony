@@ -5420,6 +5420,23 @@ index 9b6b830341..9c656316e4 100644
 +    protected function configure(): void
      {
          $this
+diff --git a/src/Symfony/Component/Form/DataMapperInterface.php b/src/Symfony/Component/Form/DataMapperInterface.php
+index 7979db836d..ac37f715f1 100644
+--- a/src/Symfony/Component/Form/DataMapperInterface.php
++++ b/src/Symfony/Component/Form/DataMapperInterface.php
+@@ -30,5 +30,5 @@ interface DataMapperInterface
+      * @throws Exception\UnexpectedTypeException if the type of the data parameter is not supported
+      */
+-    public function mapDataToForms(mixed $viewData, \Traversable $forms);
++    public function mapDataToForms(mixed $viewData, \Traversable $forms): void;
+ 
+     /**
+@@ -63,4 +63,4 @@ interface DataMapperInterface
+      * @throws Exception\UnexpectedTypeException if the type of the data parameter is not supported
+      */
+-    public function mapFormsToData(\Traversable $forms, mixed &$viewData);
++    public function mapFormsToData(\Traversable $forms, mixed &$viewData): void;
+ }
 diff --git a/src/Symfony/Component/Form/DataTransformerInterface.php b/src/Symfony/Component/Form/DataTransformerInterface.php
 index 85fb99d218..6cc654f681 100644
 --- a/src/Symfony/Component/Form/DataTransformerInterface.php
@@ -6332,6 +6349,59 @@ index 41a52e091e..fce936b740 100644
 +    public function postSubmit(FormEvent $event): void
      {
          if ($event->getForm()->isRoot()) {
+diff --git a/src/Symfony/Component/Form/Extension/DataCollector/FormDataCollectorInterface.php b/src/Symfony/Component/Form/Extension/DataCollector/FormDataCollectorInterface.php
+index 346c101fe3..40ed4b5e8f 100644
+--- a/src/Symfony/Component/Form/Extension/DataCollector/FormDataCollectorInterface.php
++++ b/src/Symfony/Component/Form/Extension/DataCollector/FormDataCollectorInterface.php
+@@ -29,5 +29,5 @@ interface FormDataCollectorInterface extends DataCollectorInterface
+      * @return void
+      */
+-    public function collectConfiguration(FormInterface $form);
++    public function collectConfiguration(FormInterface $form): void;
+ 
+     /**
+@@ -36,5 +36,5 @@ interface FormDataCollectorInterface extends DataCollectorInterface
+      * @return void
+      */
+-    public function collectDefaultData(FormInterface $form);
++    public function collectDefaultData(FormInterface $form): void;
+ 
+     /**
+@@ -43,5 +43,5 @@ interface FormDataCollectorInterface extends DataCollectorInterface
+      * @return void
+      */
+-    public function collectSubmittedData(FormInterface $form);
++    public function collectSubmittedData(FormInterface $form): void;
+ 
+     /**
+@@ -50,5 +50,5 @@ interface FormDataCollectorInterface extends DataCollectorInterface
+      * @return void
+      */
+-    public function collectViewVariables(FormView $view);
++    public function collectViewVariables(FormView $view): void;
+ 
+     /**
+@@ -57,5 +57,5 @@ interface FormDataCollectorInterface extends DataCollectorInterface
+      * @return void
+      */
+-    public function associateFormWithView(FormInterface $form, FormView $view);
++    public function associateFormWithView(FormInterface $form, FormView $view): void;
+ 
+     /**
+@@ -67,5 +67,5 @@ interface FormDataCollectorInterface extends DataCollectorInterface
+      * @return void
+      */
+-    public function buildPreliminaryFormTree(FormInterface $form);
++    public function buildPreliminaryFormTree(FormInterface $form): void;
+ 
+     /**
+@@ -89,5 +89,5 @@ interface FormDataCollectorInterface extends DataCollectorInterface
+      * @return void
+      */
+-    public function buildFinalFormTree(FormInterface $form, FormView $view);
++    public function buildFinalFormTree(FormInterface $form, FormView $view): void;
+ 
+     /**
 diff --git a/src/Symfony/Component/Form/Extension/DataCollector/Proxy/ResolvedTypeDataCollectorProxy.php b/src/Symfony/Component/Form/Extension/DataCollector/Proxy/ResolvedTypeDataCollectorProxy.php
 index 6c8cf3ee24..0d8fba357e 100644
 --- a/src/Symfony/Component/Form/Extension/DataCollector/Proxy/ResolvedTypeDataCollectorProxy.php
@@ -6595,15 +6665,64 @@ index 18dec4946b..9272277b5c 100644
      {
          $this->engine->setTheme($view, $themes, $useDefaultThemes);
 diff --git a/src/Symfony/Component/Form/FormRendererEngineInterface.php b/src/Symfony/Component/Form/FormRendererEngineInterface.php
-index aa249270a0..3c9d04ff9a 100644
+index e7de3544a1..739c7b835e 100644
 --- a/src/Symfony/Component/Form/FormRendererEngineInterface.php
 +++ b/src/Symfony/Component/Form/FormRendererEngineInterface.php
-@@ -131,4 +131,4 @@ interface FormRendererEngineInterface
+@@ -28,5 +28,5 @@ interface FormRendererEngineInterface
+      * @return void
+      */
+-    public function setTheme(FormView $view, mixed $themes, bool $useDefaultThemes = true);
++    public function setTheme(FormView $view, mixed $themes, bool $useDefaultThemes = true): void;
+ 
+     /**
+@@ -133,4 +133,4 @@ interface FormRendererEngineInterface
       * @return string
       */
 -    public function renderBlock(FormView $view, mixed $resource, string $blockName, array $variables = []);
 +    public function renderBlock(FormView $view, mixed $resource, string $blockName, array $variables = []): string;
  }
+diff --git a/src/Symfony/Component/Form/FormRendererInterface.php b/src/Symfony/Component/Form/FormRendererInterface.php
+index 8e805727ce..188a668c77 100644
+--- a/src/Symfony/Component/Form/FormRendererInterface.php
++++ b/src/Symfony/Component/Form/FormRendererInterface.php
+@@ -35,5 +35,5 @@ interface FormRendererInterface
+      * @return void
+      */
+-    public function setTheme(FormView $view, mixed $themes, bool $useDefaultThemes = true);
++    public function setTheme(FormView $view, mixed $themes, bool $useDefaultThemes = true): void;
+ 
+     /**
+diff --git a/src/Symfony/Component/Form/FormTypeExtensionInterface.php b/src/Symfony/Component/Form/FormTypeExtensionInterface.php
+index 1937834515..25712a13d7 100644
+--- a/src/Symfony/Component/Form/FormTypeExtensionInterface.php
++++ b/src/Symfony/Component/Form/FormTypeExtensionInterface.php
+@@ -31,5 +31,5 @@ interface FormTypeExtensionInterface
+      * @see FormTypeInterface::buildForm()
+      */
+-    public function buildForm(FormBuilderInterface $builder, array $options);
++    public function buildForm(FormBuilderInterface $builder, array $options): void;
+ 
+     /**
+@@ -45,5 +45,5 @@ interface FormTypeExtensionInterface
+      * @see FormTypeInterface::buildView()
+      */
+-    public function buildView(FormView $view, FormInterface $form, array $options);
++    public function buildView(FormView $view, FormInterface $form, array $options): void;
+ 
+     /**
+@@ -59,10 +59,10 @@ interface FormTypeExtensionInterface
+      * @see FormTypeInterface::finishView()
+      */
+-    public function finishView(FormView $view, FormInterface $form, array $options);
++    public function finishView(FormView $view, FormInterface $form, array $options): void;
+ 
+     /**
+      * @return void
+      */
+-    public function configureOptions(OptionsResolver $resolver);
++    public function configureOptions(OptionsResolver $resolver): void;
+ 
+     /**
 diff --git a/src/Symfony/Component/Form/FormTypeGuesserInterface.php b/src/Symfony/Component/Form/FormTypeGuesserInterface.php
 index 61e2c5f80d..4d6b335474 100644
 --- a/src/Symfony/Component/Form/FormTypeGuesserInterface.php
@@ -6702,6 +6821,17 @@ index 11c4d4d9c0..a09361d59a 100644
 +    public function handleRequest(FormInterface $form, mixed $request = null): void
      {
          if (null !== $request) {
+diff --git a/src/Symfony/Component/Form/RequestHandlerInterface.php b/src/Symfony/Component/Form/RequestHandlerInterface.php
+index 39fd458ee4..ccd77ccecc 100644
+--- a/src/Symfony/Component/Form/RequestHandlerInterface.php
++++ b/src/Symfony/Component/Form/RequestHandlerInterface.php
+@@ -24,5 +24,5 @@ interface RequestHandlerInterface
+      * @return void
+      */
+-    public function handleRequest(FormInterface $form, mixed $request = null);
++    public function handleRequest(FormInterface $form, mixed $request = null): void;
+ 
+     /**
 diff --git a/src/Symfony/Component/Form/ResolvedFormType.php b/src/Symfony/Component/Form/ResolvedFormType.php
 index f05db1533b..0e67c63c66 100644
 --- a/src/Symfony/Component/Form/ResolvedFormType.php
@@ -6727,6 +6857,31 @@ index f05db1533b..0e67c63c66 100644
 +    public function finishView(FormView $view, FormInterface $form, array $options): void
      {
          $this->parent?->finishView($view, $form, $options);
+diff --git a/src/Symfony/Component/Form/ResolvedFormTypeInterface.php b/src/Symfony/Component/Form/ResolvedFormTypeInterface.php
+index e0b96a5ac3..7982e0cab3 100644
+--- a/src/Symfony/Component/Form/ResolvedFormTypeInterface.php
++++ b/src/Symfony/Component/Form/ResolvedFormTypeInterface.php
+@@ -60,5 +60,5 @@ interface ResolvedFormTypeInterface
+      * @return void
+      */
+-    public function buildForm(FormBuilderInterface $builder, array $options);
++    public function buildForm(FormBuilderInterface $builder, array $options): void;
+ 
+     /**
+@@ -69,5 +69,5 @@ interface ResolvedFormTypeInterface
+      * @return void
+      */
+-    public function buildView(FormView $view, FormInterface $form, array $options);
++    public function buildView(FormView $view, FormInterface $form, array $options): void;
+ 
+     /**
+@@ -78,5 +78,5 @@ interface ResolvedFormTypeInterface
+      * @return void
+      */
+-    public function finishView(FormView $view, FormInterface $form, array $options);
++    public function finishView(FormView $view, FormInterface $form, array $options): void;
+ 
+     /**
 diff --git a/src/Symfony/Component/HttpClient/CachingHttpClient.php b/src/Symfony/Component/HttpClient/CachingHttpClient.php
 index 05a8e6b4c6..232bed6fac 100644
 --- a/src/Symfony/Component/HttpClient/CachingHttpClient.php

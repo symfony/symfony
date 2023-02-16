@@ -658,11 +658,11 @@ index bda9ca9515..c0d1f91339 100644
      {
          if (!$container->hasParameter('workflow.has_guard_listeners')) {
 diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
-index 7d1d6dd5a4..712e7f872f 100644
+index 7292ed0f79..6b3403f2b8 100644
 --- a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
 @@ -270,5 +270,5 @@ class FrameworkExtension extends Extension
-      * @return void
+      * @throws LogicException
       */
 -    public function load(array $configs, ContainerBuilder $container)
 +    public function load(array $configs, ContainerBuilder $container): void
@@ -1172,7 +1172,7 @@ index cffea43c49..0645fbd756 100644
      {
          $this->packages[$name] = $package;
 diff --git a/src/Symfony/Component/BrowserKit/AbstractBrowser.php b/src/Symfony/Component/BrowserKit/AbstractBrowser.php
-index 71d165a5a0..a31098d7e0 100644
+index f69beb5da9..c86558e269 100644
 --- a/src/Symfony/Component/BrowserKit/AbstractBrowser.php
 +++ b/src/Symfony/Component/BrowserKit/AbstractBrowser.php
 @@ -63,5 +63,5 @@ abstract class AbstractBrowser
@@ -1197,7 +1197,7 @@ index 71d165a5a0..a31098d7e0 100644
      {
          $this->maxRedirects = $maxRedirects < 0 ? -1 : $maxRedirects;
 @@ -112,5 +112,5 @@ abstract class AbstractBrowser
-      * @return void
+      * @throws \RuntimeException When Symfony Process Component is not installed
       */
 -    public function insulate(bool $insulated = true)
 +    public function insulate(bool $insulated = true): void
@@ -1361,11 +1361,11 @@ index d447e9f2fd..1f99e0725e 100644
      {
          return \extension_loaded('memcached') && version_compare(phpversion('memcached'), '3.1.6', '>=');
 diff --git a/src/Symfony/Component/Cache/Adapter/PdoAdapter.php b/src/Symfony/Component/Cache/Adapter/PdoAdapter.php
-index a4c629bb3d..280ca0f7c8 100644
+index 8efbe06efd..b73690d91a 100644
 --- a/src/Symfony/Component/Cache/Adapter/PdoAdapter.php
 +++ b/src/Symfony/Component/Cache/Adapter/PdoAdapter.php
 @@ -101,5 +101,5 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
-      * @return void
+      * @throws \DomainException When an unsupported PDO driver is used
       */
 -    public function createTable()
 +    public function createTable(): void
@@ -1498,7 +1498,7 @@ index be7f0986c3..fa5347e34b 100644
 +    public function write(string $content, array $metadata = null): void;
  }
 diff --git a/src/Symfony/Component/Config/Definition/ArrayNode.php b/src/Symfony/Component/Config/Definition/ArrayNode.php
-index 0f0f18a915..d9b4460b66 100644
+index 1448220cdd..12935fb079 100644
 --- a/src/Symfony/Component/Config/Definition/ArrayNode.php
 +++ b/src/Symfony/Component/Config/Definition/ArrayNode.php
 @@ -36,5 +36,5 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
@@ -1558,7 +1558,7 @@ index 0f0f18a915..d9b4460b66 100644
      {
          $this->name = $name;
 @@ -199,5 +199,5 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
-      * @return void
+      * @throws \InvalidArgumentException when the child node's name is not unique
       */
 -    public function addChild(NodeInterface $node)
 +    public function addChild(NodeInterface $node): void
@@ -1671,7 +1671,7 @@ index 7ec903cd67..9a86de2559 100644
      {
          if (!\is_bool($value)) {
 diff --git a/src/Symfony/Component/Config/Definition/Builder/ArrayNodeDefinition.php b/src/Symfony/Component/Config/Definition/Builder/ArrayNodeDefinition.php
-index f24271b80f..ce219e95b9 100644
+index 0110f0502f..a5754c1464 100644
 --- a/src/Symfony/Component/Config/Definition/Builder/ArrayNodeDefinition.php
 +++ b/src/Symfony/Component/Config/Definition/Builder/ArrayNodeDefinition.php
 @@ -49,5 +49,5 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
@@ -1682,14 +1682,14 @@ index f24271b80f..ce219e95b9 100644
      {
          $this->nodeBuilder = $builder;
 @@ -430,5 +430,5 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
-      * @return void
+      * @throws InvalidDefinitionException
       */
 -    protected function validateConcreteNode(ArrayNode $node)
 +    protected function validateConcreteNode(ArrayNode $node): void
      {
          $path = $node->getPath();
 @@ -462,5 +462,5 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
-      * @return void
+      * @throws InvalidDefinitionException
       */
 -    protected function validatePrototypeNode(PrototypedArrayNode $node)
 +    protected function validatePrototypeNode(PrototypedArrayNode $node): void
@@ -2052,11 +2052,11 @@ index 670e320122..134e4069e7 100644
      {
          $this->loaders[] = $loader;
 diff --git a/src/Symfony/Component/Config/ResourceCheckerConfigCache.php b/src/Symfony/Component/Config/ResourceCheckerConfigCache.php
-index d505af161c..9721864d8d 100644
+index 93e5c44d39..e00acc3d7f 100644
 --- a/src/Symfony/Component/Config/ResourceCheckerConfigCache.php
 +++ b/src/Symfony/Component/Config/ResourceCheckerConfigCache.php
 @@ -110,5 +110,5 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
-      * @return void
+      * @throws \RuntimeException When cache file can't be written
       */
 -    public function write(string $content, array $metadata = null)
 +    public function write(string $content, array $metadata = null): void
@@ -2505,11 +2505,11 @@ index 746cd27e79..52c61429cf 100644
 +    public function formatAndWrap(?string $message, int $width): string;
  }
 diff --git a/src/Symfony/Component/Console/Helper/DescriptorHelper.php b/src/Symfony/Component/Console/Helper/DescriptorHelper.php
-index a860c30860..4d17315e52 100644
+index eb32bce8fc..57edd56954 100644
 --- a/src/Symfony/Component/Console/Helper/DescriptorHelper.php
 +++ b/src/Symfony/Component/Console/Helper/DescriptorHelper.php
 @@ -55,5 +55,5 @@ class DescriptorHelper extends Helper
-      * @return void
+      * @throws InvalidArgumentException when the given format is not supported
       */
 -    public function describe(OutputInterface $output, ?object $object, array $options = [])
 +    public function describe(OutputInterface $output, ?object $object, array $options = []): void
@@ -2580,7 +2580,7 @@ index 6f8225973c..5f3640c346 100644
      {
          $this->input = $input;
 diff --git a/src/Symfony/Component/Console/Helper/ProgressIndicator.php b/src/Symfony/Component/Console/Helper/ProgressIndicator.php
-index c7e9fc1734..276115118f 100644
+index 84dbef950c..5a38c8c28a 100644
 --- a/src/Symfony/Component/Console/Helper/ProgressIndicator.php
 +++ b/src/Symfony/Component/Console/Helper/ProgressIndicator.php
 @@ -74,5 +74,5 @@ class ProgressIndicator
@@ -2604,14 +2604,14 @@ index c7e9fc1734..276115118f 100644
 +    public function advance(): void
      {
          if (!$this->started) {
-@@ -135,5 +135,5 @@ class ProgressIndicator
+@@ -133,5 +133,5 @@ class ProgressIndicator
       * @return void
       */
 -    public function finish(string $message)
 +    public function finish(string $message): void
      {
          if (!$this->started) {
-@@ -162,5 +162,5 @@ class ProgressIndicator
+@@ -160,5 +160,5 @@ class ProgressIndicator
       * @return void
       */
 -    public static function setPlaceholderFormatterDefinition(string $name, callable $callable)
@@ -2748,11 +2748,11 @@ index 22ede15e11..d8e5f58b74 100644
      {
          $this->stream = $stream;
 diff --git a/src/Symfony/Component/Console/Input/InputArgument.php b/src/Symfony/Component/Console/Input/InputArgument.php
-index ff8e9276fd..0be143da1b 100644
+index 0db0c7709b..5fbca28f99 100644
 --- a/src/Symfony/Component/Console/Input/InputArgument.php
 +++ b/src/Symfony/Component/Console/Input/InputArgument.php
 @@ -96,5 +96,5 @@ class InputArgument
-      * @return void
+      * @throws LogicException When incorrect default value is given
       */
 -    public function setDefault(string|bool|int|float|array $default = null)
 +    public function setDefault(string|bool|int|float|array $default = null): void
@@ -2769,7 +2769,7 @@ index 0ad27b4558..f5e544930e 100644
 +    public function setInput(InputInterface $input): void;
  }
 diff --git a/src/Symfony/Component/Console/Input/InputDefinition.php b/src/Symfony/Component/Console/Input/InputDefinition.php
-index 0ee85b4990..0de1fc4193 100644
+index b7162d7706..3d41be7340 100644
 --- a/src/Symfony/Component/Console/Input/InputDefinition.php
 +++ b/src/Symfony/Component/Console/Input/InputDefinition.php
 @@ -50,5 +50,5 @@ class InputDefinition
@@ -2794,7 +2794,7 @@ index 0ee85b4990..0de1fc4193 100644
      {
          if (null !== $arguments) {
 @@ -103,5 +103,5 @@ class InputDefinition
-      * @return void
+      * @throws LogicException When incorrect argument is given
       */
 -    public function addArgument(InputArgument $argument)
 +    public function addArgument(InputArgument $argument): void
@@ -2815,7 +2815,7 @@ index 0ee85b4990..0de1fc4193 100644
      {
          foreach ($options as $option) {
 @@ -229,5 +229,5 @@ class InputDefinition
-      * @return void
+      * @throws LogicException When option given already exist
       */
 -    public function addOption(InputOption $option)
 +    public function addOption(InputOption $option): void
@@ -2881,7 +2881,7 @@ index aaed5fd01d..e7de9bcdec 100644
 +    public function setInteractive(bool $interactive): void;
  }
 diff --git a/src/Symfony/Component/Console/Input/InputOption.php b/src/Symfony/Component/Console/Input/InputOption.php
-index 231e6cc616..9ba217a593 100644
+index fdf88dcc27..cf7a71a3c4 100644
 --- a/src/Symfony/Component/Console/Input/InputOption.php
 +++ b/src/Symfony/Component/Console/Input/InputOption.php
 @@ -182,5 +182,5 @@ class InputOption
@@ -3564,11 +3564,11 @@ index 1fb8935c3e..1cfccaa671 100644
      {
          $graph = $container->getCompiler()->getServiceReferenceGraph();
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/CheckDefinitionValidityPass.php b/src/Symfony/Component/DependencyInjection/Compiler/CheckDefinitionValidityPass.php
-index b7ee4b6973..f28a2b992d 100644
+index c62345f26e..098772e2ef 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/CheckDefinitionValidityPass.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/CheckDefinitionValidityPass.php
 @@ -38,5 +38,5 @@ class CheckDefinitionValidityPass implements CompilerPassInterface
-      * @return void
+      * @throws RuntimeException When the Definition is invalid
       */
 -    public function process(ContainerBuilder $container)
 +    public function process(ContainerBuilder $container): void
@@ -3678,11 +3678,11 @@ index cd8ebfe0f7..36cd2b93a4 100644
      {
          throw new LogicException(sprintf('Cannot compile the container in extension "%s".', $this->extensionClass));
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/PassConfig.php b/src/Symfony/Component/DependencyInjection/Compiler/PassConfig.php
-index 7575318524..5602e8556f 100644
+index 16b24cc710..c8296e7c1d 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/PassConfig.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/PassConfig.php
 @@ -126,5 +126,5 @@ class PassConfig
-      * @return void
+      * @throws InvalidArgumentException when a pass type doesn't exist
       */
 -    public function addPass(CompilerPassInterface $pass, string $type = self::TYPE_BEFORE_OPTIMIZATION, int $priority = 0)
 +    public function addPass(CompilerPassInterface $pass, string $type = self::TYPE_BEFORE_OPTIMIZATION, int $priority = 0): void
@@ -3797,11 +3797,11 @@ index df97a62f7e..60126d8d06 100644
      {
          try {
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/ReplaceAliasByActualDefinitionPass.php b/src/Symfony/Component/DependencyInjection/Compiler/ReplaceAliasByActualDefinitionPass.php
-index 22278bc607..22c6fa918d 100644
+index 808cde2081..83063d607d 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/ReplaceAliasByActualDefinitionPass.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/ReplaceAliasByActualDefinitionPass.php
 @@ -34,5 +34,5 @@ class ReplaceAliasByActualDefinitionPass extends AbstractRecursivePass
-      * @return void
+      * @throws InvalidArgumentException if the service definition does not exist
       */
 -    public function process(ContainerBuilder $container)
 +    public function process(ContainerBuilder $container): void
@@ -3885,11 +3885,11 @@ index 3302dd2cd2..459c22434b 100644
      {
          $this->container = $container;
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/ResolveParameterPlaceHoldersPass.php b/src/Symfony/Component/DependencyInjection/Compiler/ResolveParameterPlaceHoldersPass.php
-index 2c0e330abb..b6c472cb8e 100644
+index c4a1412ff2..2bb03c253e 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/ResolveParameterPlaceHoldersPass.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/ResolveParameterPlaceHoldersPass.php
 @@ -37,5 +37,5 @@ class ResolveParameterPlaceHoldersPass extends AbstractRecursivePass
-      * @return void
+      * @throws ParameterNotFoundException
       */
 -    public function process(ContainerBuilder $container)
 +    public function process(ContainerBuilder $container): void
@@ -4003,7 +4003,7 @@ index ac67b468c5..bc1e395810 100644
      {
          if (1 > \func_num_args()) {
 diff --git a/src/Symfony/Component/DependencyInjection/ContainerBuilder.php b/src/Symfony/Component/DependencyInjection/ContainerBuilder.php
-index 2329ad570b..dddad4f5b8 100644
+index adeba8cfe3..6dc444bd08 100644
 --- a/src/Symfony/Component/DependencyInjection/ContainerBuilder.php
 +++ b/src/Symfony/Component/DependencyInjection/ContainerBuilder.php
 @@ -176,5 +176,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
@@ -4028,7 +4028,7 @@ index 2329ad570b..dddad4f5b8 100644
      {
          $this->extensions[$extension->getAlias()] = $extension;
 @@ -484,5 +484,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
-      * @return void
+      * @throws BadMethodCallException When this ContainerBuilder is compiled
       */
 -    public function set(string $id, ?object $service)
 +    public function set(string $id, ?object $service): void
@@ -4042,7 +4042,7 @@ index 2329ad570b..dddad4f5b8 100644
      {
          if (isset($this->definitions[$id])) {
 @@ -613,5 +613,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
-      * @return void
+      * @throws BadMethodCallException When this ContainerBuilder is compiled
       */
 -    public function merge(self $container)
 +    public function merge(self $container): void
@@ -4428,7 +4428,7 @@ index d4933af33e..47b4778c26 100644
      {
          throw new LogicException('Impossible to call remove() on a frozen ParameterBag.');
 diff --git a/src/Symfony/Component/DependencyInjection/ParameterBag/ParameterBag.php b/src/Symfony/Component/DependencyInjection/ParameterBag/ParameterBag.php
-index 0ad11194dd..7ef6b2e7ab 100644
+index 4a420464ec..d28df164f5 100644
 --- a/src/Symfony/Component/DependencyInjection/ParameterBag/ParameterBag.php
 +++ b/src/Symfony/Component/DependencyInjection/ParameterBag/ParameterBag.php
 @@ -35,5 +35,5 @@ class ParameterBag implements ParameterBagInterface
@@ -4453,7 +4453,7 @@ index 0ad11194dd..7ef6b2e7ab 100644
      {
          if (is_numeric($name)) {
 @@ -122,5 +122,5 @@ class ParameterBag implements ParameterBagInterface
-      * @return void
+      * @throws ParameterNotFoundException if the parameter is not defined
       */
 -    public function deprecate(string $name, string $package, string $version, string $message = 'The parameter "%s" is deprecated.')
 +    public function deprecate(string $name, string $package, string $version, string $message = 'The parameter "%s" is deprecated.'): void
@@ -4531,7 +4531,7 @@ index 9b431cd65b..5fdb0643cd 100644
      {
          return $this->type;
 diff --git a/src/Symfony/Component/DomCrawler/Crawler.php b/src/Symfony/Component/DomCrawler/Crawler.php
-index 02e3915d2e..936ae278c8 100644
+index 8176fee4e6..b33de6c377 100644
 --- a/src/Symfony/Component/DomCrawler/Crawler.php
 +++ b/src/Symfony/Component/DomCrawler/Crawler.php
 @@ -95,5 +95,5 @@ class Crawler implements \Countable, \IteratorAggregate
@@ -4542,7 +4542,7 @@ index 02e3915d2e..936ae278c8 100644
      {
          $this->nodes = [];
 @@ -114,5 +114,5 @@ class Crawler implements \Countable, \IteratorAggregate
-      * @return void
+      * @throws \InvalidArgumentException when node is not the expected type
       */
 -    public function add(\DOMNodeList|\DOMNode|array|string|null $node)
 +    public function add(\DOMNodeList|\DOMNode|array|string|null $node): void
@@ -4612,7 +4612,7 @@ index 02e3915d2e..936ae278c8 100644
      {
          $this->namespaces[$prefix] = $namespace;
 diff --git a/src/Symfony/Component/DomCrawler/Field/ChoiceFormField.php b/src/Symfony/Component/DomCrawler/Field/ChoiceFormField.php
-index 58aff3613e..ec15ede591 100644
+index dcae5490ad..4357de8275 100644
 --- a/src/Symfony/Component/DomCrawler/Field/ChoiceFormField.php
 +++ b/src/Symfony/Component/DomCrawler/Field/ChoiceFormField.php
 @@ -64,5 +64,5 @@ class ChoiceFormField extends FormField
@@ -4623,39 +4623,39 @@ index 58aff3613e..ec15ede591 100644
      {
          $this->setValue($value);
 @@ -76,5 +76,5 @@ class ChoiceFormField extends FormField
-      * @return void
+      * @throws \LogicException When the type provided is not correct
       */
 -    public function tick()
 +    public function tick(): void
      {
          if ('checkbox' !== $this->type) {
 @@ -92,5 +92,5 @@ class ChoiceFormField extends FormField
-      * @return void
+      * @throws \LogicException When the type provided is not correct
       */
 -    public function untick()
 +    public function untick(): void
      {
          if ('checkbox' !== $this->type) {
 @@ -108,5 +108,5 @@ class ChoiceFormField extends FormField
-      * @return void
+      * @throws \InvalidArgumentException When value type provided is not correct
       */
 -    public function setValue(string|array|bool|null $value)
 +    public function setValue(string|array|bool|null $value): void
      {
          if ('checkbox' === $this->type && false === $value) {
 @@ -187,5 +187,5 @@ class ChoiceFormField extends FormField
-      * @return void
+      * @throws \LogicException When node type is incorrect
       */
 -    protected function initialize()
 +    protected function initialize(): void
      {
          if ('input' !== $this->node->nodeName && 'select' !== $this->node->nodeName) {
 diff --git a/src/Symfony/Component/DomCrawler/Field/FileFormField.php b/src/Symfony/Component/DomCrawler/Field/FileFormField.php
-index 4238e5a73c..ce38830f9f 100644
+index 4ebe766f0b..eca59a131d 100644
 --- a/src/Symfony/Component/DomCrawler/Field/FileFormField.php
 +++ b/src/Symfony/Component/DomCrawler/Field/FileFormField.php
 @@ -28,5 +28,5 @@ class FileFormField extends FormField
-      * @return void
+      * @throws \InvalidArgumentException When error code doesn't exist
       */
 -    public function setErrorCode(int $error)
 +    public function setErrorCode(int $error): void
@@ -4683,7 +4683,7 @@ index 4238e5a73c..ce38830f9f 100644
      {
          parent::setValue($path);
 @@ -98,5 +98,5 @@ class FileFormField extends FormField
-      * @return void
+      * @throws \LogicException When node type is incorrect
       */
 -    protected function initialize()
 +    protected function initialize(): void
@@ -4701,29 +4701,29 @@ index 483b08f089..f0f7d96f67 100644
      {
          $this->value = $value ?? '';
 diff --git a/src/Symfony/Component/DomCrawler/Field/InputFormField.php b/src/Symfony/Component/DomCrawler/Field/InputFormField.php
-index a7542a7f80..af2d70a962 100644
+index 19d77352fc..ece901b578 100644
 --- a/src/Symfony/Component/DomCrawler/Field/InputFormField.php
 +++ b/src/Symfony/Component/DomCrawler/Field/InputFormField.php
 @@ -29,5 +29,5 @@ class InputFormField extends FormField
-      * @return void
+      * @throws \LogicException When node type is incorrect
       */
 -    protected function initialize()
 +    protected function initialize(): void
      {
          if ('input' !== $this->node->nodeName && 'button' !== $this->node->nodeName) {
 diff --git a/src/Symfony/Component/DomCrawler/Field/TextareaFormField.php b/src/Symfony/Component/DomCrawler/Field/TextareaFormField.php
-index 1bf85600ac..9233fac5d0 100644
+index 5168c52251..cf22473776 100644
 --- a/src/Symfony/Component/DomCrawler/Field/TextareaFormField.php
 +++ b/src/Symfony/Component/DomCrawler/Field/TextareaFormField.php
 @@ -26,5 +26,5 @@ class TextareaFormField extends FormField
-      * @return void
+      * @throws \LogicException When node type is incorrect
       */
 -    protected function initialize()
 +    protected function initialize(): void
      {
          if ('textarea' !== $this->node->nodeName) {
 diff --git a/src/Symfony/Component/DomCrawler/Form.php b/src/Symfony/Component/DomCrawler/Form.php
-index ab644ffa12..80ad0799da 100644
+index 9e53bbb680..51477a8ed7 100644
 --- a/src/Symfony/Component/DomCrawler/Form.php
 +++ b/src/Symfony/Component/DomCrawler/Form.php
 @@ -249,5 +249,5 @@ class Form extends Link implements \ArrayAccess
@@ -4741,7 +4741,7 @@ index ab644ffa12..80ad0799da 100644
      {
          $this->fields->add($field);
 @@ -358,5 +358,5 @@ class Form extends Link implements \ArrayAccess
-      * @return void
+      * @throws \LogicException If given node is not a button or input or does not have a form ancestor
       */
 -    protected function setNode(\DOMElement $node)
 +    protected function setNode(\DOMElement $node): void
@@ -4967,11 +4967,11 @@ index 479aeef880..272954c082 100644
 +    public function getFunctions(): array;
  }
 diff --git a/src/Symfony/Component/ExpressionLanguage/ExpressionLanguage.php b/src/Symfony/Component/ExpressionLanguage/ExpressionLanguage.php
-index c6cc4047e4..936ff228fa 100644
+index 9e107401a2..7f92321a2b 100644
 --- a/src/Symfony/Component/ExpressionLanguage/ExpressionLanguage.php
 +++ b/src/Symfony/Component/ExpressionLanguage/ExpressionLanguage.php
 @@ -117,5 +117,5 @@ class ExpressionLanguage
-      * @return void
+      * @see ExpressionFunction
       */
 -    public function register(string $name, callable $compiler, callable $evaluator)
 +    public function register(string $name, callable $compiler, callable $evaluator): void
@@ -5170,95 +5170,95 @@ index 241725b9c5..420932897f 100644
      {
          $token = $this->current;
 diff --git a/src/Symfony/Component/Filesystem/Filesystem.php b/src/Symfony/Component/Filesystem/Filesystem.php
-index 75fd81a9ac..e71e98a57a 100644
+index f7b839898f..32fa8eac6d 100644
 --- a/src/Symfony/Component/Filesystem/Filesystem.php
 +++ b/src/Symfony/Component/Filesystem/Filesystem.php
 @@ -37,5 +37,5 @@ class Filesystem
-      * @return void
+      * @throws IOException           When copy fails
       */
 -    public function copy(string $originFile, string $targetFile, bool $overwriteNewerFiles = false)
 +    public function copy(string $originFile, string $targetFile, bool $overwriteNewerFiles = false): void
      {
          $originIsLocal = stream_is_local($originFile) || 0 === stripos($originFile, 'file://');
 @@ -89,5 +89,5 @@ class Filesystem
-      * @return void
+      * @throws IOException On any directory creation failure
       */
 -    public function mkdir(string|iterable $dirs, int $mode = 0777)
 +    public function mkdir(string|iterable $dirs, int $mode = 0777): void
      {
          foreach ($this->toIterable($dirs) as $dir) {
 @@ -132,5 +132,5 @@ class Filesystem
-      * @return void
+      * @throws IOException When touch fails
       */
 -    public function touch(string|iterable $files, int $time = null, int $atime = null)
 +    public function touch(string|iterable $files, int $time = null, int $atime = null): void
      {
          foreach ($this->toIterable($files) as $file) {
 @@ -148,5 +148,5 @@ class Filesystem
-      * @return void
+      * @throws IOException When removal fails
       */
 -    public function remove(string|iterable $files)
 +    public function remove(string|iterable $files): void
      {
          if ($files instanceof \Traversable) {
 @@ -216,5 +216,5 @@ class Filesystem
-      * @return void
+      * @throws IOException When the change fails
       */
 -    public function chmod(string|iterable $files, int $mode, int $umask = 0000, bool $recursive = false)
 +    public function chmod(string|iterable $files, int $mode, int $umask = 0000, bool $recursive = false): void
      {
          foreach ($this->toIterable($files) as $file) {
 @@ -238,5 +238,5 @@ class Filesystem
-      * @return void
+      * @throws IOException When the change fails
       */
 -    public function chown(string|iterable $files, string|int $user, bool $recursive = false)
 +    public function chown(string|iterable $files, string|int $user, bool $recursive = false): void
      {
          foreach ($this->toIterable($files) as $file) {
 @@ -266,5 +266,5 @@ class Filesystem
-      * @return void
+      * @throws IOException When the change fails
       */
 -    public function chgrp(string|iterable $files, string|int $group, bool $recursive = false)
 +    public function chgrp(string|iterable $files, string|int $group, bool $recursive = false): void
      {
          foreach ($this->toIterable($files) as $file) {
 @@ -292,5 +292,5 @@ class Filesystem
-      * @return void
+      * @throws IOException When origin cannot be renamed
       */
 -    public function rename(string $origin, string $target, bool $overwrite = false)
 +    public function rename(string $origin, string $target, bool $overwrite = false): void
      {
          // we check that target does not exist
 @@ -334,5 +334,5 @@ class Filesystem
-      * @return void
+      * @throws IOException When symlink fails
       */
 -    public function symlink(string $originDir, string $targetDir, bool $copyOnWindows = false)
 +    public function symlink(string $originDir, string $targetDir, bool $copyOnWindows = false): void
      {
          self::assertFunctionExists('symlink');
 @@ -373,5 +373,5 @@ class Filesystem
-      * @return void
+      * @throws IOException           When link fails, including if link already exists
       */
 -    public function hardlink(string $originFile, string|iterable $targetFiles)
 +    public function hardlink(string $originFile, string|iterable $targetFiles): void
      {
          self::assertFunctionExists('link');
 @@ -531,5 +531,5 @@ class Filesystem
-      * @return void
+      * @throws IOException When file type is unknown
       */
 -    public function mirror(string $originDir, string $targetDir, \Traversable $iterator = null, array $options = [])
 +    public function mirror(string $originDir, string $targetDir, \Traversable $iterator = null, array $options = []): void
      {
          $targetDir = rtrim($targetDir, '/\\');
 @@ -657,5 +657,5 @@ class Filesystem
-      * @return void
+      * @throws IOException if the file cannot be written to
       */
 -    public function dumpFile(string $filename, $content)
 +    public function dumpFile(string $filename, $content): void
      {
          if (\is_array($content)) {
 @@ -698,5 +698,5 @@ class Filesystem
-      * @return void
+      * @throws IOException If the file is not writable
       */
 -    public function appendToFile(string $filename, $content/* , bool $lock = false */)
 +    public function appendToFile(string $filename, $content/* , bool $lock = false */): void
@@ -6561,11 +6561,11 @@ index 09b9149801..6b22b9f9e8 100644
  
      /**
 diff --git a/src/Symfony/Component/Form/FormError.php b/src/Symfony/Component/Form/FormError.php
-index 5b19d6ea5b..2455a91076 100644
+index 572783c7ac..37d609af00 100644
 --- a/src/Symfony/Component/Form/FormError.php
 +++ b/src/Symfony/Component/Form/FormError.php
 @@ -104,5 +104,5 @@ class FormError
-      * @return void
+      * @throws BadMethodCallException If the method is called more than once
       */
 -    public function setOrigin(FormInterface $origin)
 +    public function setOrigin(FormInterface $origin): void
@@ -6691,11 +6691,11 @@ index e04fa13b09..231b75810e 100644
      {
          $this->methodRendered = true;
 diff --git a/src/Symfony/Component/Form/NativeRequestHandler.php b/src/Symfony/Component/Form/NativeRequestHandler.php
-index bf240de37e..677c92bc1b 100644
+index 11c4d4d9c0..a09361d59a 100644
 --- a/src/Symfony/Component/Form/NativeRequestHandler.php
 +++ b/src/Symfony/Component/Form/NativeRequestHandler.php
 @@ -45,5 +45,5 @@ class NativeRequestHandler implements RequestHandlerInterface
-      * @return void
+      * @throws Exception\UnexpectedTypeException If the $request is not null
       */
 -    public function handleRequest(FormInterface $form, mixed $request = null)
 +    public function handleRequest(FormInterface $form, mixed $request = null): void
@@ -6914,7 +6914,7 @@ index 44d8d96d28..43124c0ea0 100644
      {
          unset($this->parameters[$key]);
 diff --git a/src/Symfony/Component/HttpFoundation/Request.php b/src/Symfony/Component/HttpFoundation/Request.php
-index fdb701d00b..60b3b60b81 100644
+index b5bd672f34..68f91c99ea 100644
 --- a/src/Symfony/Component/HttpFoundation/Request.php
 +++ b/src/Symfony/Component/HttpFoundation/Request.php
 @@ -267,5 +267,5 @@ class Request
@@ -7001,7 +7001,7 @@ index fdb701d00b..60b3b60b81 100644
 +    public function setLocale(string $locale): void
      {
          $this->setPhpDefaultLocale($this->locale = $locale);
-@@ -1887,5 +1887,5 @@ class Request
+@@ -1888,5 +1888,5 @@ class Request
       * @return void
       */
 -    protected static function initializeFormats()
@@ -7303,11 +7303,11 @@ index b45be2f8c3..ce73fdb85f 100644
      {
          $this->storage->registerBag(new SessionBagProxy($bag, $this->data, $this->usageIndex, $this->usageReporter));
 diff --git a/src/Symfony/Component/HttpFoundation/Session/Storage/Handler/PdoSessionHandler.php b/src/Symfony/Component/HttpFoundation/Session/Storage/Handler/PdoSessionHandler.php
-index 7d7d49ddb4..88ea67f3ac 100644
+index 65452a5207..ce0357e36b 100644
 --- a/src/Symfony/Component/HttpFoundation/Session/Storage/Handler/PdoSessionHandler.php
 +++ b/src/Symfony/Component/HttpFoundation/Session/Storage/Handler/PdoSessionHandler.php
 @@ -242,5 +242,5 @@ class PdoSessionHandler extends AbstractSessionHandler
-      * @return void
+      * @throws \DomainException When an unsupported PDO driver is used
       */
 -    public function createTable()
 +    public function createTable(): void
@@ -7410,7 +7410,7 @@ index 95f69f2e13..971b890f0f 100644
      {
          if (!$this->started) {
 diff --git a/src/Symfony/Component/HttpFoundation/Session/Storage/NativeSessionStorage.php b/src/Symfony/Component/HttpFoundation/Session/Storage/NativeSessionStorage.php
-index 2bf5e8dc19..9d79f8c488 100644
+index 7c6b6f9296..0b63abb810 100644
 --- a/src/Symfony/Component/HttpFoundation/Session/Storage/NativeSessionStorage.php
 +++ b/src/Symfony/Component/HttpFoundation/Session/Storage/NativeSessionStorage.php
 @@ -187,5 +187,5 @@ class NativeSessionStorage implements SessionStorageInterface
@@ -7455,21 +7455,21 @@ index 2bf5e8dc19..9d79f8c488 100644
 +    public function setMetadataBag(MetadataBag $metaBag = null): void
      {
          if (1 > \func_num_args()) {
-@@ -352,5 +352,5 @@ class NativeSessionStorage implements SessionStorageInterface
+@@ -351,5 +351,5 @@ class NativeSessionStorage implements SessionStorageInterface
       * @return void
       */
 -    public function setOptions(array $options)
 +    public function setOptions(array $options): void
      {
          if (headers_sent() || \PHP_SESSION_ACTIVE === session_status()) {
-@@ -398,5 +398,5 @@ class NativeSessionStorage implements SessionStorageInterface
-      * @return void
+@@ -397,5 +397,5 @@ class NativeSessionStorage implements SessionStorageInterface
+      * @throws \InvalidArgumentException
       */
 -    public function setSaveHandler(AbstractProxy|\SessionHandlerInterface $saveHandler = null)
 +    public function setSaveHandler(AbstractProxy|\SessionHandlerInterface $saveHandler = null): void
      {
          if (1 > \func_num_args()) {
-@@ -431,5 +431,5 @@ class NativeSessionStorage implements SessionStorageInterface
+@@ -430,5 +430,5 @@ class NativeSessionStorage implements SessionStorageInterface
       * @return void
       */
 -    protected function loadSession(array &$session = null)
@@ -7488,18 +7488,18 @@ index 28cb3c3d05..fc5452c5b0 100644
      {
          // clear out the bags and nothing else that may be set
 diff --git a/src/Symfony/Component/HttpFoundation/Session/Storage/Proxy/AbstractProxy.php b/src/Symfony/Component/HttpFoundation/Session/Storage/Proxy/AbstractProxy.php
-index de4fca5fba..688ab56a32 100644
+index 2fcd06b10b..4981f75360 100644
 --- a/src/Symfony/Component/HttpFoundation/Session/Storage/Proxy/AbstractProxy.php
 +++ b/src/Symfony/Component/HttpFoundation/Session/Storage/Proxy/AbstractProxy.php
 @@ -76,5 +76,5 @@ abstract class AbstractProxy
-      * @return void
+      * @throws \LogicException
       */
 -    public function setId(string $id)
 +    public function setId(string $id): void
      {
          if ($this->isActive()) {
 @@ -100,5 +100,5 @@ abstract class AbstractProxy
-      * @return void
+      * @throws \LogicException
       */
 -    public function setName(string $name)
 +    public function setName(string $name): void
@@ -8033,7 +8033,7 @@ index 4730b33c13..da8fdccfaa 100644
      {
          if (str_contains($response->getContent(), '<esi:include')) {
 diff --git a/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php b/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php
-index 60ff78cf27..d37c61f7f1 100644
+index 78531624fb..2b568e62de 100644
 --- a/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php
 +++ b/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php
 @@ -240,5 +240,5 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
@@ -8051,7 +8051,7 @@ index 60ff78cf27..d37c61f7f1 100644
      {
          $this->surrogate?->addSurrogateCapability($request);
 @@ -594,5 +594,5 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
-      * @return void
+      * @throws \Exception
       */
 -    protected function store(Request $request, Response $response)
 +    protected function store(Request $request, Response $response): void
@@ -8094,7 +8094,7 @@ index bde72914a7..c1656f2ac0 100644
      {
          if (str_contains($response->getContent(), '<!--#include')) {
 diff --git a/src/Symfony/Component/HttpKernel/HttpCache/Store.php b/src/Symfony/Component/HttpKernel/HttpCache/Store.php
-index e7ea54ae15..616a3deff6 100644
+index f838f1bfb4..4250fd8c49 100644
 --- a/src/Symfony/Component/HttpKernel/HttpCache/Store.php
 +++ b/src/Symfony/Component/HttpKernel/HttpCache/Store.php
 @@ -59,5 +59,5 @@ class Store implements StoreInterface
@@ -8105,7 +8105,7 @@ index e7ea54ae15..616a3deff6 100644
      {
          // unlock everything
 @@ -254,5 +254,5 @@ class Store implements StoreInterface
-      * @return void
+      * @throws \RuntimeException
       */
 -    public function invalidate(Request $request)
 +    public function invalidate(Request $request): void
@@ -8162,7 +8162,7 @@ index 0f3630e7fe..ddf77b8a19 100644
      {
          return <<<'EOF'
 diff --git a/src/Symfony/Component/HttpKernel/Kernel.php b/src/Symfony/Component/HttpKernel/Kernel.php
-index 8157d0a2ad..6f2e1a42f0 100644
+index f9a969b659..e8d115c435 100644
 --- a/src/Symfony/Component/HttpKernel/Kernel.php
 +++ b/src/Symfony/Component/HttpKernel/Kernel.php
 @@ -107,5 +107,5 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
@@ -8194,7 +8194,7 @@ index 8157d0a2ad..6f2e1a42f0 100644
      {
          if (false === $this->booted) {
 @@ -340,5 +340,5 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
-      * @return void
+      * @throws \LogicException if two bundles share a common name
       */
 -    protected function initializeBundles()
 +    protected function initializeBundles(): void
@@ -8825,25 +8825,25 @@ index 88233655f9..abfb1fe7a6 100644
      {
          $token = $this->getUniqueToken($key);
 diff --git a/src/Symfony/Component/Lock/Store/MongoDbStore.php b/src/Symfony/Component/Lock/Store/MongoDbStore.php
-index 717df9b4e7..893043bcd2 100644
+index 53df93cda9..31bc038130 100644
 --- a/src/Symfony/Component/Lock/Store/MongoDbStore.php
 +++ b/src/Symfony/Component/Lock/Store/MongoDbStore.php
 @@ -194,5 +194,5 @@ class MongoDbStore implements PersistingStoreInterface
-      * @return void
+      * @throws DriverRuntimeException        for other driver errors (e.g. connection errors)
       */
 -    public function createTtlIndex(int $expireAfterSeconds = 0)
 +    public function createTtlIndex(int $expireAfterSeconds = 0): void
      {
          $this->getCollection()->createIndex(
 @@ -211,5 +211,5 @@ class MongoDbStore implements PersistingStoreInterface
-      * @return void
+      * @throws LockExpiredException when save is called on an expired lock
       */
 -    public function save(Key $key)
 +    public function save(Key $key): void
      {
          $key->reduceLifetime($this->initialTtl);
 @@ -237,5 +237,5 @@ class MongoDbStore implements PersistingStoreInterface
-      * @return void
+      * @throws LockExpiredException
       */
 -    public function putOffExpiration(Key $key, float $ttl)
 +    public function putOffExpiration(Key $key, float $ttl): void
@@ -9046,7 +9046,7 @@ index 1a1305f5d8..95fb4347c3 100644
      {
          return $this->receiver ??= new AmazonSqsReceiver($this->connection, $this->serializer);
 diff --git a/src/Symfony/Component/Messenger/Command/ConsumeMessagesCommand.php b/src/Symfony/Component/Messenger/Command/ConsumeMessagesCommand.php
-index a6b0d881df..6391a76313 100644
+index 04ad92d116..6606e2bbc4 100644
 --- a/src/Symfony/Component/Messenger/Command/ConsumeMessagesCommand.php
 +++ b/src/Symfony/Component/Messenger/Command/ConsumeMessagesCommand.php
 @@ -128,5 +128,5 @@ EOF
@@ -9254,11 +9254,11 @@ index e636c2e8e5..4c0597d16f 100644
      {
          if (!$this->headers->has('To') && !$this->headers->has('Cc') && !$this->headers->has('Bcc')) {
 diff --git a/src/Symfony/Component/Mime/RawMessage.php b/src/Symfony/Component/Mime/RawMessage.php
-index 90e7caee9e..421331ac5c 100644
+index aec398c588..687d4e2612 100644
 --- a/src/Symfony/Component/Mime/RawMessage.php
 +++ b/src/Symfony/Component/Mime/RawMessage.php
 @@ -59,5 +59,5 @@ class RawMessage
-      * @return void
+      * @throws LogicException if the message is not valid
       */
 -    public function ensureValidity()
 +    public function ensureValidity(): void
@@ -9416,7 +9416,7 @@ index 843031f01e..cec83a3c5a 100644
      {
          if (\is_object($objectOrArray) && false === strpbrk((string) $propertyPath, '.[')) {
 diff --git a/src/Symfony/Component/PropertyAccess/PropertyPathBuilder.php b/src/Symfony/Component/PropertyAccess/PropertyPathBuilder.php
-index a3c79e667b..4a7ebb8832 100644
+index a0154bd7ce..70c0d942e2 100644
 --- a/src/Symfony/Component/PropertyAccess/PropertyPathBuilder.php
 +++ b/src/Symfony/Component/PropertyAccess/PropertyPathBuilder.php
 @@ -37,5 +37,5 @@ class PropertyPathBuilder
@@ -9441,28 +9441,28 @@ index a3c79e667b..4a7ebb8832 100644
      {
          $this->elements[] = $name;
 @@ -84,5 +84,5 @@ class PropertyPathBuilder
-      * @return void
+      * @throws OutOfBoundsException if offset is invalid
       */
 -    public function remove(int $offset, int $length = 1)
 +    public function remove(int $offset, int $length = 1): void
      {
          if (!isset($this->elements[$offset])) {
 @@ -103,5 +103,5 @@ class PropertyPathBuilder
-      * @return void
+      * @throws OutOfBoundsException If the offset is invalid
       */
 -    public function replace(int $offset, int $length, PropertyPathInterface|string $path, int $pathOffset = 0, int $pathLength = 0)
 +    public function replace(int $offset, int $length, PropertyPathInterface|string $path, int $pathOffset = 0, int $pathLength = 0): void
      {
          if (\is_string($path)) {
 @@ -135,5 +135,5 @@ class PropertyPathBuilder
-      * @return void
+      * @throws OutOfBoundsException If the offset is invalid
       */
 -    public function replaceByIndex(int $offset, string $name = null)
 +    public function replaceByIndex(int $offset, string $name = null): void
      {
          if (!isset($this->elements[$offset])) {
 @@ -155,5 +155,5 @@ class PropertyPathBuilder
-      * @return void
+      * @throws OutOfBoundsException If the offset is invalid
       */
 -    public function replaceByProperty(int $offset, string $name = null)
 +    public function replaceByProperty(int $offset, string $name = null): void
@@ -9774,32 +9774,32 @@ index 03d54d5909..f0219187b2 100644
      {
          return new Route($path, $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
 diff --git a/src/Symfony/Component/Routing/Loader/XmlFileLoader.php b/src/Symfony/Component/Routing/Loader/XmlFileLoader.php
-index 942cc2214f..5f56c63a21 100644
+index 24ec21bb5c..1dac35dc8e 100644
 --- a/src/Symfony/Component/Routing/Loader/XmlFileLoader.php
 +++ b/src/Symfony/Component/Routing/Loader/XmlFileLoader.php
 @@ -67,5 +67,5 @@ class XmlFileLoader extends FileLoader
-      * @return void
+      * @throws \InvalidArgumentException When the XML is invalid
       */
 -    protected function parseNode(RouteCollection $collection, \DOMElement $node, string $path, string $file)
 +    protected function parseNode(RouteCollection $collection, \DOMElement $node, string $path, string $file): void
      {
          if (self::NAMESPACE_URI !== $node->namespaceURI) {
 @@ -107,5 +107,5 @@ class XmlFileLoader extends FileLoader
-      * @return void
+      * @throws \InvalidArgumentException When the XML is invalid
       */
 -    protected function parseRoute(RouteCollection $collection, \DOMElement $node, string $path)
 +    protected function parseRoute(RouteCollection $collection, \DOMElement $node, string $path): void
      {
          if ('' === $id = $node->getAttribute('id')) {
 @@ -156,5 +156,5 @@ class XmlFileLoader extends FileLoader
-      * @return void
+      * @throws \InvalidArgumentException When the XML is invalid
       */
 -    protected function parseImport(RouteCollection $collection, \DOMElement $node, string $path, string $file)
 +    protected function parseImport(RouteCollection $collection, \DOMElement $node, string $path, string $file): void
      {
          /** @var \DOMElement $resourceElement */
 diff --git a/src/Symfony/Component/Routing/Loader/YamlFileLoader.php b/src/Symfony/Component/Routing/Loader/YamlFileLoader.php
-index 8bae74b4de..911f1b1b8f 100644
+index bde72c0eb0..3d6813e1d4 100644
 --- a/src/Symfony/Component/Routing/Loader/YamlFileLoader.php
 +++ b/src/Symfony/Component/Routing/Loader/YamlFileLoader.php
 @@ -116,5 +116,5 @@ class YamlFileLoader extends FileLoader
@@ -9817,7 +9817,7 @@ index 8bae74b4de..911f1b1b8f 100644
      {
          $type = $config['type'] ?? null;
 @@ -248,5 +248,5 @@ class YamlFileLoader extends FileLoader
-      * @return void
+      *                                   something is missing or the combination is nonsense
       */
 -    protected function validate(mixed $config, string $name, string $path)
 +    protected function validate(mixed $config, string $name, string $path): void
@@ -9966,18 +9966,18 @@ index f244e62bed..a5e918317c 100644
      {
          $key = (string) $resource;
 diff --git a/src/Symfony/Component/Routing/Router.php b/src/Symfony/Component/Routing/Router.php
-index 058613072e..d921721850 100644
+index b41dd55ef0..c03c3888cd 100644
 --- a/src/Symfony/Component/Routing/Router.php
 +++ b/src/Symfony/Component/Routing/Router.php
 @@ -121,5 +121,5 @@ class Router implements RouterInterface, RequestMatcherInterface
-      * @return void
+      * @throws \InvalidArgumentException When unsupported option is provided
       */
 -    public function setOptions(array $options)
 +    public function setOptions(array $options): void
      {
          $this->options = [
 @@ -156,5 +156,5 @@ class Router implements RouterInterface, RequestMatcherInterface
-      * @return void
+      * @throws \InvalidArgumentException
       */
 -    public function setOption(string $key, mixed $value)
 +    public function setOption(string $key, mixed $value): void
@@ -10141,10 +10141,10 @@ index 70dddcfff9..15ac44eae8 100644
      {
          return $token->getRoleNames();
 diff --git a/src/Symfony/Component/Security/Core/Authorization/Voter/VoterInterface.php b/src/Symfony/Component/Security/Core/Authorization/Voter/VoterInterface.php
-index ba52c8ea65..e879a84982 100644
+index 8eea57e769..ff4b6142d4 100644
 --- a/src/Symfony/Component/Security/Core/Authorization/Voter/VoterInterface.php
 +++ b/src/Symfony/Component/Security/Core/Authorization/Voter/VoterInterface.php
-@@ -37,4 +37,4 @@ interface VoterInterface
+@@ -38,4 +38,4 @@ interface VoterInterface
       * @psalm-return self::ACCESS_* must be transformed into @return on Symfony 7
       */
 -    public function vote(TokenInterface $token, mixed $subject, array $attributes);
@@ -10260,11 +10260,11 @@ index a493b00e79..377dcacc09 100644
      {
      }
 diff --git a/src/Symfony/Component/Security/Core/User/InMemoryUserProvider.php b/src/Symfony/Component/Security/Core/User/InMemoryUserProvider.php
-index b4ffa1dcd4..dd3c58a6d0 100644
+index ed6c2d8b38..7b61505fd5 100644
 --- a/src/Symfony/Component/Security/Core/User/InMemoryUserProvider.php
 +++ b/src/Symfony/Component/Security/Core/User/InMemoryUserProvider.php
 @@ -98,5 +98,5 @@ class InMemoryUserProvider implements UserProviderInterface
-      * @return InMemoryUser change return type on 7.0
+      * @throws UserNotFoundException if user whose given username does not exist
       */
 -    private function getUser(string $username): UserInterface
 +    private function getUser(string $username): InMemoryUser
@@ -10819,18 +10819,18 @@ index 1835568745..2b98fc11d6 100644
      {
          $this->serializer = $serializer;
 diff --git a/src/Symfony/Component/Stopwatch/Stopwatch.php b/src/Symfony/Component/Stopwatch/Stopwatch.php
-index 33976a0e87..27f8dbfdc4 100644
+index 139d6651d5..603e9bb980 100644
 --- a/src/Symfony/Component/Stopwatch/Stopwatch.php
 +++ b/src/Symfony/Component/Stopwatch/Stopwatch.php
 @@ -62,5 +62,5 @@ class Stopwatch implements ResetInterface
-      * @return void
+      * @throws \LogicException When the section to re-open is not reachable
       */
 -    public function openSection(string $id = null)
 +    public function openSection(string $id = null): void
      {
          $current = end($this->activeSections);
 @@ -86,5 +86,5 @@ class Stopwatch implements ResetInterface
-      * @return void
+      * @throws \LogicException When there's no started section to be stopped
       */
 -    public function stopSection(string $id)
 +    public function stopSection(string $id): void
@@ -10906,18 +10906,18 @@ index 5dade65db5..db0d0a00ea 100644
  
      /**
 diff --git a/src/Symfony/Component/Templating/Helper/SlotsHelper.php b/src/Symfony/Component/Templating/Helper/SlotsHelper.php
-index 7d5e7e008b..abbbff101c 100644
+index 358e5fc071..2a716108d2 100644
 --- a/src/Symfony/Component/Templating/Helper/SlotsHelper.php
 +++ b/src/Symfony/Component/Templating/Helper/SlotsHelper.php
 @@ -32,5 +32,5 @@ class SlotsHelper extends Helper
-      * @return void
+      * @throws \InvalidArgumentException if a slot with the same name is already started
       */
 -    public function start(string $name)
 +    public function start(string $name): void
      {
          if (\in_array($name, $this->openSlots)) {
 @@ -52,5 +52,5 @@ class SlotsHelper extends Helper
-      * @return void
+      * @throws \LogicException if no slot has been started
       */
 -    public function stop()
 +    public function stop(): void
@@ -11285,7 +11285,7 @@ index 01408d4dcd..cd49c7a920 100644
      {
          if (!is_dir($directory)) {
 diff --git a/src/Symfony/Component/Translation/Translator.php b/src/Symfony/Component/Translation/Translator.php
-index f87218997e..34cca41175 100644
+index 132138e922..22f4a060a1 100644
 --- a/src/Symfony/Component/Translation/Translator.php
 +++ b/src/Symfony/Component/Translation/Translator.php
 @@ -84,5 +84,5 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
@@ -11303,7 +11303,7 @@ index f87218997e..34cca41175 100644
      {
          $this->loaders[$format] = $loader;
 @@ -111,5 +111,5 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
-      * @return void
+      * @throws InvalidArgumentException If the locale contains invalid characters
       */
 -    public function addResource(string $format, mixed $resource, string $locale, string $domain = null)
 +    public function addResource(string $format, mixed $resource, string $locale, string $domain = null): void
@@ -11317,7 +11317,7 @@ index f87218997e..34cca41175 100644
      {
          $this->assertValidLocale($locale);
 @@ -150,5 +150,5 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
-      * @return void
+      * @throws InvalidArgumentException If a locale contains invalid characters
       */
 -    public function setFallbackLocales(array $locales)
 +    public function setFallbackLocales(array $locales): void
@@ -11345,14 +11345,14 @@ index f87218997e..34cca41175 100644
      {
          $this->parentLocales ??= json_decode(file_get_contents(__DIR__.'/Resources/data/parents.json'), true);
 @@ -436,5 +436,5 @@ EOF
-      * @return void
+      * @throws InvalidArgumentException If the locale contains invalid characters
       */
 -    protected function assertValidLocale(string $locale)
 +    protected function assertValidLocale(string $locale): void
      {
          if (!preg_match('/^[a-z0-9@_\\.\\-]*$/i', $locale)) {
 diff --git a/src/Symfony/Component/Translation/Writer/TranslationWriter.php b/src/Symfony/Component/Translation/Writer/TranslationWriter.php
-index 00d40192cd..6c25c7e716 100644
+index 61e03cb0ea..46dc804662 100644
 --- a/src/Symfony/Component/Translation/Writer/TranslationWriter.php
 +++ b/src/Symfony/Component/Translation/Writer/TranslationWriter.php
 @@ -34,5 +34,5 @@ class TranslationWriter implements TranslationWriterInterface
@@ -11363,7 +11363,7 @@ index 00d40192cd..6c25c7e716 100644
      {
          $this->dumpers[$format] = $dumper;
 @@ -57,5 +57,5 @@ class TranslationWriter implements TranslationWriterInterface
-      * @return void
+      * @throws InvalidArgumentException
       */
 -    public function write(MessageCatalogue $catalogue, string $format, array $options = [])
 +    public function write(MessageCatalogue $catalogue, string $format, array $options = []): void
@@ -11880,11 +11880,11 @@ index fa6c794c02..f46f38845e 100644
      {
          if (!$constraint instanceof NotBlank) {
 diff --git a/src/Symfony/Component/Validator/Constraints/NotCompromisedPasswordValidator.php b/src/Symfony/Component/Validator/Constraints/NotCompromisedPasswordValidator.php
-index 3894551807..e51ce88a88 100644
+index 477e98fab0..daa9a684d1 100644
 --- a/src/Symfony/Component/Validator/Constraints/NotCompromisedPasswordValidator.php
 +++ b/src/Symfony/Component/Validator/Constraints/NotCompromisedPasswordValidator.php
 @@ -55,5 +55,5 @@ class NotCompromisedPasswordValidator extends ConstraintValidator
-      * @return void
+      * @throws ExceptionInterface
       */
 -    public function validate(mixed $value, Constraint $constraint)
 +    public function validate(mixed $value, Constraint $constraint): void
@@ -12089,7 +12089,7 @@ index a7eda1457d..28630f205f 100644
      {
          return $this->options;
 diff --git a/src/Symfony/Component/Validator/Mapping/ClassMetadata.php b/src/Symfony/Component/Validator/Mapping/ClassMetadata.php
-index 33c0bc45f0..2b20fbc574 100644
+index 7909020b4d..51d0c2dd14 100644
 --- a/src/Symfony/Component/Validator/Mapping/ClassMetadata.php
 +++ b/src/Symfony/Component/Validator/Mapping/ClassMetadata.php
 @@ -321,5 +321,5 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
@@ -12100,7 +12100,7 @@ index 33c0bc45f0..2b20fbc574 100644
      {
          if ($source->isGroupSequenceProvider()) {
 @@ -430,5 +430,5 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
-      * @return void
+      * @throws GroupDefinitionException
       */
 -    public function setGroupSequenceProvider(bool $active)
 +    public function setGroupSequenceProvider(bool $active): void

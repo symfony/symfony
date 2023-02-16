@@ -139,6 +139,47 @@ $foo = FooLazyProxy::createLazyProxy(initializer: function (): Foo {
 // be called only when and if a *method* is called.
 ```
 
+### Optimizing for Production
+
+When using generated proxy code in production, the following recipe is
+recommended to maximize performance:
+
+```php
+// 1. check if proxy already loaded
+if (class_exists(\FooProxy::class)) {
+    // 1a. return the class
+    return \FooProxy::class;
+}
+
+// 2. check if proxy file exists
+if (\file_exists($pathToGeneratedFile)) {
+    // 2a: require the generated file
+    require_once $pathToGeneratedFile;
+
+    // 2b: return the class
+    return \FooProxy::class;
+}
+
+// 3. generate proxy
+// 3a. generate the code
+$proxyCode = ProxyHelper::generateX(...);
+
+// 3b. write code to file
+file_put_contents($pathToGeneratedFile, 'class FooProxy'.$proxyCode);
+
+// 3c. require the generated file
+require_once $pathToGeneratedFile;
+
+// 3d. return the class
+return \FooProxy::class;
+```
+
+In production, when the proxy is first requested, it is generated and saved
+to a file. Subsequent requests load the proxy from the generated file.
+
+> **Note**: to improve performance further, _step 3_ above can be done in
+> some kind of warmup task.
+
 Resources
 ---------
 

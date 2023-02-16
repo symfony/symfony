@@ -3,6 +3,7 @@ sed -i 's/ *"\*\*\/Tests\/"//' composer.json
 composer u -o
 SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.1' php .github/patch-types.php
 head=$(sed '/^diff /Q' .github/expected-missing-return-types.diff)
+git checkout src/Symfony/Contracts/Service/ResetInterface.php
 (echo "$head" && echo && git diff -U2 src/) > .github/expected-missing-return-types.diff
 git checkout composer.json src/
 
@@ -13417,6 +13418,17 @@ index c1a77ad157..1e926dc83a 100644
 +    public function setParsedLine(int $parsedLine): void
      {
          $this->parsedLine = $parsedLine;
+diff --git a/src/Symfony/Contracts/Translation/LocaleAwareInterface.php b/src/Symfony/Contracts/Translation/LocaleAwareInterface.php
+index db40ba13e0..48928ca959 100644
+--- a/src/Symfony/Contracts/Translation/LocaleAwareInterface.php
++++ b/src/Symfony/Contracts/Translation/LocaleAwareInterface.php
+@@ -21,5 +21,5 @@ interface LocaleAwareInterface
+      * @throws \InvalidArgumentException If the locale contains invalid characters
+      */
+-    public function setLocale(string $locale);
++    public function setLocale(string $locale): void;
+ 
+     /**
 diff --git a/src/Symfony/Contracts/Translation/TranslatorTrait.php b/src/Symfony/Contracts/Translation/TranslatorTrait.php
 index e3b0adff05..19d90162ab 100644
 --- a/src/Symfony/Contracts/Translation/TranslatorTrait.php

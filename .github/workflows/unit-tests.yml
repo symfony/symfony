@@ -143,7 +143,9 @@ jobs:
           git add .
           composer install -q --optimize-autoloader
           SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.1' php .github/patch-types.php
+          git checkout src/Symfony/Contracts/Service/ResetInterface.php
           SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.1' php .github/patch-types.php # ensure the script is idempotent
+          git checkout src/Symfony/Contracts/Service/ResetInterface.php
           git diff --exit-code
 
       - name: Run tests

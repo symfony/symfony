@@ -22,7 +22,6 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 /**
  * @author Yasmany Cubela Medina <yasmanycm@gmail.com>
  */
-#[Autoconfigure(tags: ['texter.transport_factory'])]
 final class PusherTransportFactory extends AbstractTransportFactory
 {
     public function create(Dsn $dsn): TransportInterface

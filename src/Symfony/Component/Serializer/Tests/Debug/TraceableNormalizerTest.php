@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Serializer\Tests\Debug;
 
-use BadMethodCallException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\DataCollector\SerializerDataCollector;
 use Symfony\Component\Serializer\Debug\TraceableNormalizer;
@@ -75,14 +74,14 @@ class TraceableNormalizerTest extends TestCase
 
     public function testCannotNormalizeIfNotNormalizer()
     {
-        $this->expectException(BadMethodCallException::class);
+        $this->expectException(\BadMethodCallException::class);
 
         (new TraceableNormalizer($this->createMock(DenormalizerInterface::class), new SerializerDataCollector()))->normalize('data');
     }
 
     public function testCannotDenormalizeIfNotDenormalizer()
     {
-        $this->expectException(BadMethodCallException::class);
+        $this->expectException(\BadMethodCallException::class);
 
         (new TraceableNormalizer($this->createMock(NormalizerInterface::class), new SerializerDataCollector()))->denormalize('data', 'type');
     }

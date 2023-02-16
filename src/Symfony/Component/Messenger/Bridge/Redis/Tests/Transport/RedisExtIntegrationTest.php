@@ -18,6 +18,7 @@ use Symfony\Component\Messenger\Exception\TransportException;
 
 /**
  * @requires extension redis
+ *
  * @group time-sensitive
  * @group integration
  */

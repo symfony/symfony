@@ -38,7 +38,7 @@ final class WrappedTemplatedEmail
     }
 
     /**
-     * @param string $image            A Twig path to the image file. It's recommended to define
+     * @param string      $image       A Twig path to the image file. It's recommended to define
      *                                 some Twig namespace for email images (e.g. '@email/images/logo.png').
      * @param string|null $contentType The media type (i.e. MIME type) of the image file (e.g. 'image/png').
      *                                 Some email clients require this to display embedded images.
@@ -53,9 +53,9 @@ final class WrappedTemplatedEmail
     }
 
     /**
-     * @param string $file             A Twig path to the file. It's recommended to define
+     * @param string      $file        A Twig path to the file. It's recommended to define
      *                                 some Twig namespace for email files (e.g. '@email/files/contract.pdf').
-     * @param string|null $name        A custom file name that overrides the original name of the attached file.
+     * @param string|null $name        A custom file name that overrides the original name of the attached file
      * @param string|null $contentType The media type (i.e. MIME type) of the file (e.g. 'application/pdf').
      *                                 Some email clients require this to display attached files.
      */

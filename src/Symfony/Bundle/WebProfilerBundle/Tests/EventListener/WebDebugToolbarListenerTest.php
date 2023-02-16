@@ -133,6 +133,7 @@ class WebDebugToolbarListenerTest extends TestCase
 
     /**
      * @depends testToolbarIsInjected
+     *
      * @dataProvider provideRedirects
      */
     public function testToolbarIsNotInjectedOnRedirection($statusCode)

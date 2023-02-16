@@ -22,6 +22,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\StrictSessionHandle
  * @author Simon <simon.chrzanowski@quentic.com>
  *
  * @runTestsInSeparateProcesses
+ *
  * @preserveGlobalState disabled
  */
 class SessionHandlerFactoryTest extends TestCase

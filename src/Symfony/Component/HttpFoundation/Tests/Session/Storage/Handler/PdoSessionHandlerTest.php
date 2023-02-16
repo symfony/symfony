@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler;
 
 /**
  * @requires extension pdo_sqlite
+ *
  * @group time-sensitive
  */
 class PdoSessionHandlerTest extends TestCase

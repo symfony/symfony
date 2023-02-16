@@ -27,6 +27,7 @@ class GitRepositoryTest extends TestCase
 
     /**
      * @before
+     *
      * @after
      */
     protected function cleanup()

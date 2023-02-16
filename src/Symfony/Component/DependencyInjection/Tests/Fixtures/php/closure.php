@@ -21,6 +21,7 @@ class ProjectServiceContainer extends Container
         $this->services = $this->privates = [];
         $this->methodMap = [
             'closure' => 'getClosureService',
+            'closure_of_service_closure' => 'getClosureOfServiceClosureService',
         ];
 
         $this->aliases = [];
@@ -40,6 +41,7 @@ class ProjectServiceContainer extends Container
     {
         return [
             'bar' => true,
+            'bar2' => true,
         ];
     }
 
@@ -51,5 +53,17 @@ class ProjectServiceContainer extends Container
     protected function getClosureService()
     {
         return $this->services['closure'] = (new \stdClass())->__invoke(...);
+    }
+
+    /**
+     * Gets the public 'closure_of_service_closure' shared service.
+     *
+     * @return \Closure
+     */
+    protected function getClosureOfServiceClosureService()
+    {
+        return $this->services['closure_of_service_closure'] = static fn(): \Closure => ${($_ = #[\Closure(name: 'bar2', class: 'stdClass')] function () {
+            return ($this->privates['bar2'] ??= new \stdClass());
+        }) && false ?: "_"};
     }
 }

@@ -1132,6 +1132,10 @@ EOTXT
 
             if (['Closure', 'fromCallable'] === $callable && [0] === array_keys($definition->getArguments())) {
                 $callable = $definition->getArgument(0);
+                if ($callable instanceof ServiceClosureArgument) {
+                    return $return.sprintf('static fn(): \Closure => %s', $this->dumpLiteralClass($this->dumpValue($callable))).$tail;
+                }
+
                 $arguments = ['...'];
 
                 if ($callable instanceof Reference || $callable instanceof Definition) {

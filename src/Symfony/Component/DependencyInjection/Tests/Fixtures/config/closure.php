@@ -9,6 +9,10 @@ return new class() {
             ->set('closure_property', 'stdClass')
                 ->public()
                 ->property('foo', closure(service('bar')))
-            ->set('bar', 'stdClass');
+            ->set('bar', 'stdClass')
+            ->set('closure_of_service_closure', 'stdClass')
+                ->public()
+                ->args([closure(service_closure('bar2'))])
+            ->set('bar2', 'stdClass');
     }
 };

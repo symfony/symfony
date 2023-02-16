@@ -8,3 +8,9 @@ services:
         class: stdClass
         public: true
         properties: { foo: !service { class: Closure, arguments: [!service { class: stdClass }], factory: [Closure, fromCallable] } }
+    closure_of_service_closure:
+        class: stdClass
+        public: true
+        arguments: [!service { class: Closure, arguments: [!service_closure '@bar2'], factory: [Closure, fromCallable] }]
+    bar2:
+        class: stdClass

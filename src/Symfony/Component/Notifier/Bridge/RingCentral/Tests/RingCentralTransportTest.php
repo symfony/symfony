@@ -15,26 +15,26 @@ use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\RingCentral\RingCentralTransport;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
+use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class RingCentralTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null, string $from = 'from'): RingCentralTransport
+    public static function createTransport(HttpClientInterface $client = null, string $from = 'from'): RingCentralTransport
     {
-        return new RingCentralTransport('apiToken', $from, $client ?? $this->createMock(HttpClientInterface::class));
+        return new RingCentralTransport('apiToken', $from, $client ?? new MockHttpClient());
     }
 
-    public function invalidFromProvider(): iterable
+    public static function invalidFromProvider(): iterable
     {
         yield 'no zero at start if phone number' => ['+0'];
         yield 'phone number too short' => ['+1'];
     }
 
-    public function supportedMessagesProvider(): iterable
+    public static function supportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
     }
@@ -74,18 +74,18 @@ final class RingCentralTransportTest extends TransportTestCase
         self::assertSame('foo', $sentMessage->getMessageId());
     }
 
-    public function toStringProvider(): iterable
+    public static function toStringProvider(): iterable
     {
-        yield ['ringcentral://platform.ringcentral.com?from=from', $this->createTransport()];
+        yield ['ringcentral://platform.ringcentral.com?from=from', self::createTransport()];
     }
 
-    public function unsupportedMessagesProvider(): iterable
+    public static function unsupportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [new DummyMessage()];
     }
 
-    public function validFromProvider(): iterable
+    public static function validFromProvider(): iterable
     {
         yield ['+11'];
         yield ['+112'];

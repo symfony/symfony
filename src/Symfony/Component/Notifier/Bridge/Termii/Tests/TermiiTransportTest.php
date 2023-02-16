@@ -18,17 +18,18 @@ use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
+use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class TermiiTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null, string $from = 'from'): TermiiTransport
+    public static function createTransport(HttpClientInterface $client = null, string $from = 'from'): TermiiTransport
     {
-        return new TermiiTransport('apiKey', $from, 'generic', $client ?? $this->createMock(HttpClientInterface::class));
+        return new TermiiTransport('apiKey', $from, 'generic', $client ?? new MockHttpClient());
     }
 
-    public function invalidFromProvider(): iterable
+    public static function invalidFromProvider(): iterable
     {
         yield 'too short' => ['aa'];
         yield 'too long' => ['abcdefghijkl'];
@@ -36,7 +37,7 @@ final class TermiiTransportTest extends TransportTestCase
         yield 'phone number too short' => ['+1'];
     }
 
-    public function supportedMessagesProvider(): iterable
+    public static function supportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
     }
@@ -76,18 +77,18 @@ final class TermiiTransportTest extends TransportTestCase
         self::assertSame('foo', $sentMessage->getMessageId());
     }
 
-    public function toStringProvider(): iterable
+    public static function toStringProvider(): iterable
     {
-        yield ['termii://api.ng.termii.com?from=from&channel=generic', $this->createTransport()];
+        yield ['termii://api.ng.termii.com?from=from&channel=generic', self::createTransport()];
     }
 
-    public function unsupportedMessagesProvider(): iterable
+    public static function unsupportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [new DummyMessage()];
     }
 
-    public function validFromProvider(): iterable
+    public static function validFromProvider(): iterable
     {
         yield ['abc'];
         yield ['abcd'];

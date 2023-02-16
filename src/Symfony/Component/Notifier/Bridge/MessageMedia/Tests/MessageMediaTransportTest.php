@@ -16,12 +16,9 @@ use Symfony\Component\Notifier\Bridge\MessageMedia\MessageMediaTransport;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\TransportExceptionInterface;
 use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
-use Symfony\Component\Notifier\Tests\Fixtures\DummyHttpClient;
-use Symfony\Component\Notifier\Tests\Fixtures\DummyMessage;
-use Symfony\Component\Notifier\Transport\TransportInterface;
+use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -29,7 +26,7 @@ final class MessageMediaTransportTest extends TransportTestCase
 {
     public static function createTransport(HttpClientInterface $client = null, string $from = null): MessageMediaTransport
     {
-        return new MessageMediaTransport('apiKey', 'apiSecret', $from, $client ?? new DummyHttpClient());
+        return new MessageMediaTransport('apiKey', 'apiSecret', $from, $client ?? new MockHttpClient());
     }
 
     public static function toStringProvider(): iterable

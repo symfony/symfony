@@ -14,12 +14,9 @@ namespace Symfony\Component\Notifier\Bridge\SmsBiuras\Tests;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\SmsBiuras\SmsBiurasTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
-use Symfony\Component\Notifier\Tests\Fixtures\DummyHttpClient;
-use Symfony\Component\Notifier\Tests\Fixtures\DummyMessage;
-use Symfony\Component\Notifier\Transport\TransportInterface;
+use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -27,7 +24,7 @@ final class SmsBiurasTransportTest extends TransportTestCase
 {
     public static function createTransport(HttpClientInterface $client = null): SmsBiurasTransport
     {
-        return new SmsBiurasTransport('uid', 'api_key', 'from', true, $client ?? new DummyHttpClient());
+        return new SmsBiurasTransport('uid', 'api_key', 'from', true, $client ?? new MockHttpClient());
     }
 
     public static function toStringProvider(): iterable

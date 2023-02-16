@@ -16,14 +16,11 @@ use Symfony\Component\Notifier\Bridge\LinkedIn\LinkedInTransport;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\Test\TransportTestCase;
-use Symfony\Component\Notifier\Tests\Fixtures\DummyHttpClient;
-use Symfony\Component\Notifier\Tests\Fixtures\DummyMessage;
-use Symfony\Component\Notifier\Transport\TransportInterface;
+use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -31,7 +28,7 @@ final class LinkedInTransportTest extends TransportTestCase
 {
     public static function createTransport(HttpClientInterface $client = null): LinkedInTransport
     {
-        return (new LinkedInTransport('AuthToken', 'AccountId', $client ?? new DummyHttpClient()))->setHost('host.test');
+        return (new LinkedInTransport('AuthToken', 'AccountId', $client ?? new MockHttpClient()))->setHost('host.test');
     }
 
     public static function toStringProvider(): iterable

@@ -15,11 +15,9 @@ use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Notifier\Bridge\KazInfoTeh\KazInfoTehTransport;
 use Symfony\Component\Notifier\Exception\TransportException;
-use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
-use Symfony\Component\Notifier\Tests\Fixtures\DummyHttpClient;
-use Symfony\Component\Notifier\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -30,7 +28,7 @@ final class KazInfoTehTransportTest extends TransportTestCase
 {
     public static function createTransport(HttpClientInterface $client = null): TransportInterface
     {
-        return (new KazInfoTehTransport('username', 'password', 'sender', $client ?? new DummyHttpClient()))->setHost('test.host');
+        return (new KazInfoTehTransport('username', 'password', 'sender', $client ?? new MockHttpClient()))->setHost('test.host');
     }
 
     public static function toStringProvider(): iterable

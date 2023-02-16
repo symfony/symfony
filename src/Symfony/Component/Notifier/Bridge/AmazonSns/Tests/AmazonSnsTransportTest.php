@@ -13,22 +13,22 @@ namespace Symfony\Component\Notifier\Bridge\AmazonSns\Tests;
 
 use AsyncAws\Sns\Result\PublishResponse;
 use AsyncAws\Sns\SnsClient;
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\AmazonSns\AmazonSnsOptions;
 use Symfony\Component\Notifier\Bridge\AmazonSns\AmazonSnsTransport;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
-use Symfony\Component\Notifier\Tests\Fixtures\DummyHttpClient;
-use Symfony\Component\Notifier\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Notifier\Tests\Fixtures\TestOptions;
+use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class AmazonSnsTransportTest extends TransportTestCase
 {
     public static function createTransport(HttpClientInterface $client = null): AmazonSnsTransport
     {
-        return (new AmazonSnsTransport(new SnsClient(['region' => 'eu-west-3']), $client ?? new DummyHttpClient()))->setHost('host.test');
+        return (new AmazonSnsTransport(new SnsClient(['region' => 'eu-west-3']), $client ?? new MockHttpClient()))->setHost('host.test');
     }
 
     public static function toStringProvider(): iterable

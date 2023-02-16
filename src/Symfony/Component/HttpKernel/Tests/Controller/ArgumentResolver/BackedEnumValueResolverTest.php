@@ -24,6 +24,7 @@ class BackedEnumValueResolverTest extends TestCase
      * In Symfony 7, keep this test case but remove the call to supports().
      *
      * @group legacy
+     *
      * @dataProvider provideTestSupportsData
      */
     public function testSupports(Request $request, ArgumentMetadata $metadata, bool $expectedSupport)

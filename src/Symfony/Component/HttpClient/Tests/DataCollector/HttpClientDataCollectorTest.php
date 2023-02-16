@@ -166,6 +166,7 @@ class HttpClientDataCollectorTest extends TestCase
 
     /**
      * @requires extension openssl
+     *
      * @dataProvider provideCurlRequests
      */
     public function testItGeneratesCurlCommandsAsExpected(array $request, string $expectedCurlCommand)

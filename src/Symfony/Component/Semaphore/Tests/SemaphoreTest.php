@@ -12,7 +12,6 @@
 namespace Symfony\Component\Semaphore\Tests;
 
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 use Symfony\Component\Semaphore\Exception\SemaphoreAcquiringException;
 use Symfony\Component\Semaphore\Exception\SemaphoreExpiredException;
 use Symfony\Component\Semaphore\Exception\SemaphoreReleasingException;
@@ -72,7 +71,7 @@ class SemaphoreTest extends TestCase
             ->willThrowException(new \RuntimeException())
         ;
 
-        $this->expectException(RuntimeException::class);
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Failed to acquire the "key" semaphore.');
 
         $semaphore->acquire();
@@ -142,7 +141,7 @@ class SemaphoreTest extends TestCase
             ->willThrowException(new \RuntimeException())
         ;
 
-        $this->expectException(RuntimeException::class);
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Failed to define an expiration for the "key" semaphore.');
 
         $semaphore->refresh();
@@ -195,7 +194,7 @@ class SemaphoreTest extends TestCase
             ->willThrowException(new \RuntimeException())
         ;
 
-        $this->expectException(RuntimeException::class);
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Failed to release the "key" semaphore.');
 
         $semaphore->release();

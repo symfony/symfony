@@ -265,9 +265,9 @@ class FrameworkExtension extends Extension
     /**
      * Responds to the app.config configuration parameter.
      *
-     * @throws LogicException
-     *
      * @return void
+     *
+     * @throws LogicException
      */
     public function load(array $configs, ContainerBuilder $container)
     {

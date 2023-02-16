@@ -186,6 +186,7 @@ class NestedPathAndName
 {
     /**
      * @SerializedName("five")
+     *
      * @SerializedPath("[one][two][three]")
      */
     public $foo;

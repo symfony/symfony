@@ -425,9 +425,9 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     /**
      * Validate the configuration of a concrete node.
      *
-     * @throws InvalidDefinitionException
-     *
      * @return void
+     *
+     * @throws InvalidDefinitionException
      */
     protected function validateConcreteNode(ArrayNode $node)
     {
@@ -457,9 +457,9 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     /**
      * Validate the configuration of a prototype node.
      *
-     * @throws InvalidDefinitionException
-     *
      * @return void
+     *
+     * @throws InvalidDefinitionException
      */
     protected function validatePrototypeNode(PrototypedArrayNode $node)
     {

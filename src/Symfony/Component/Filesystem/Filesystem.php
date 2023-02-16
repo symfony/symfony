@@ -31,10 +31,10 @@ class Filesystem
      * If the target file is newer, it is overwritten only when the
      * $overwriteNewerFiles option is set to true.
      *
+     * @return void
+     *
      * @throws FileNotFoundException When originFile doesn't exist
      * @throws IOException           When copy fails
-     *
-     * @return void
      */
     public function copy(string $originFile, string $targetFile, bool $overwriteNewerFiles = false)
     {
@@ -84,9 +84,9 @@ class Filesystem
     /**
      * Creates a directory recursively.
      *
-     * @throws IOException On any directory creation failure
-     *
      * @return void
+     *
+     * @throws IOException On any directory creation failure
      */
     public function mkdir(string|iterable $dirs, int $mode = 0777)
     {
@@ -127,9 +127,9 @@ class Filesystem
      * @param int|null $time  The touch time as a Unix timestamp, if not supplied the current system time is used
      * @param int|null $atime The access time as a Unix timestamp, if not supplied the current system time is used
      *
-     * @throws IOException When touch fails
-     *
      * @return void
+     *
+     * @throws IOException When touch fails
      */
     public function touch(string|iterable $files, int $time = null, int $atime = null)
     {
@@ -143,9 +143,9 @@ class Filesystem
     /**
      * Removes files or directories.
      *
-     * @throws IOException When removal fails
-     *
      * @return void
+     *
+     * @throws IOException When removal fails
      */
     public function remove(string|iterable $files)
     {
@@ -211,9 +211,9 @@ class Filesystem
      * @param int  $umask     The mode mask (octal)
      * @param bool $recursive Whether change the mod recursively or not
      *
-     * @throws IOException When the change fails
-     *
      * @return void
+     *
+     * @throws IOException When the change fails
      */
     public function chmod(string|iterable $files, int $mode, int $umask = 0000, bool $recursive = false)
     {
@@ -233,9 +233,9 @@ class Filesystem
      * @param string|int $user      A user name or number
      * @param bool       $recursive Whether change the owner recursively or not
      *
-     * @throws IOException When the change fails
-     *
      * @return void
+     *
+     * @throws IOException When the change fails
      */
     public function chown(string|iterable $files, string|int $user, bool $recursive = false)
     {
@@ -261,9 +261,9 @@ class Filesystem
      * @param string|int $group     A group name or number
      * @param bool       $recursive Whether change the group recursively or not
      *
-     * @throws IOException When the change fails
-     *
      * @return void
+     *
+     * @throws IOException When the change fails
      */
     public function chgrp(string|iterable $files, string|int $group, bool $recursive = false)
     {
@@ -286,10 +286,10 @@ class Filesystem
     /**
      * Renames a file or a directory.
      *
+     * @return void
+     *
      * @throws IOException When target file or directory already exists
      * @throws IOException When origin cannot be renamed
-     *
-     * @return void
      */
     public function rename(string $origin, string $target, bool $overwrite = false)
     {
@@ -329,9 +329,9 @@ class Filesystem
     /**
      * Creates a symbolic link or copy a directory.
      *
-     * @throws IOException When symlink fails
-     *
      * @return void
+     *
+     * @throws IOException When symlink fails
      */
     public function symlink(string $originDir, string $targetDir, bool $copyOnWindows = false)
     {
@@ -367,10 +367,10 @@ class Filesystem
      *
      * @param string|string[] $targetFiles The target file(s)
      *
+     * @return void
+     *
      * @throws FileNotFoundException When original file is missing or not a file
      * @throws IOException           When link fails, including if link already exists
-     *
-     * @return void
      */
     public function hardlink(string $originFile, string|iterable $targetFiles)
     {
@@ -526,9 +526,9 @@ class Filesystem
      *                                    - $options['copy_on_windows'] Whether to copy files instead of links on Windows (see symlink(), defaults to false)
      *                                    - $options['delete'] Whether to delete files that are not in the source directory (defaults to false)
      *
-     * @throws IOException When file type is unknown
-     *
      * @return void
+     *
+     * @throws IOException When file type is unknown
      */
     public function mirror(string $originDir, string $targetDir, \Traversable $iterator = null, array $options = [])
     {
@@ -652,9 +652,9 @@ class Filesystem
      *
      * @param string|resource $content The data to write into the file
      *
-     * @throws IOException if the file cannot be written to
-     *
      * @return void
+     *
+     * @throws IOException if the file cannot be written to
      */
     public function dumpFile(string $filename, $content)
     {
@@ -693,9 +693,9 @@ class Filesystem
      * @param string|resource $content The content to append
      * @param bool            $lock    Whether the file should be locked when writing to it
      *
-     * @throws IOException If the file is not writable
-     *
      * @return void
+     *
+     * @throws IOException If the file is not writable
      */
     public function appendToFile(string $filename, $content/* , bool $lock = false */)
     {

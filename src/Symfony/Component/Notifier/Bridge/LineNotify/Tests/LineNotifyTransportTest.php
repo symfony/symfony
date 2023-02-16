@@ -44,7 +44,7 @@ final class LineNotifyTransportTest extends TransportTestCase
     public static function unsupportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
-        yield [new DummyMessage];
+        yield [new DummyMessage()];
     }
 
     public function testSendWithErrorResponseThrows()

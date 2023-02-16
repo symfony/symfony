@@ -110,11 +110,11 @@ class ExpressionLanguage
      * @param callable $compiler  A callable able to compile the function
      * @param callable $evaluator A callable able to evaluate the function
      *
+     * @return void
+     *
      * @throws \LogicException when registering a function after calling evaluate(), compile() or parse()
      *
      * @see ExpressionFunction
-     *
-     * @return void
      */
     public function register(string $name, callable $compiler, callable $evaluator)
     {

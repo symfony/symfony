@@ -752,7 +752,6 @@ class CustomProjectDirKernel extends Kernel implements WarmableInterface
         $env = 'custom',
     ) {
         parent::__construct($env, true);
-
     }
 
     public function registerBundles(): iterable

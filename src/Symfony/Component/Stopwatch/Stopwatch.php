@@ -57,9 +57,9 @@ class Stopwatch implements ResetInterface
      *
      * @param string|null $id The id of the session to re-open, null to create a new one
      *
-     * @throws \LogicException When the section to re-open is not reachable
-     *
      * @return void
+     *
+     * @throws \LogicException When the section to re-open is not reachable
      */
     public function openSection(string $id = null)
     {
@@ -81,9 +81,9 @@ class Stopwatch implements ResetInterface
      *
      * @see getSectionEvents()
      *
-     * @throws \LogicException When there's no started section to be stopped
-     *
      * @return void
+     *
+     * @throws \LogicException When there's no started section to be stopped
      */
     public function stopSection(string $id)
     {

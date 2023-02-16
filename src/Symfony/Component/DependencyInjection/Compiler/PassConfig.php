@@ -121,9 +121,9 @@ class PassConfig
     /**
      * Adds a pass.
      *
-     * @throws InvalidArgumentException when a pass type doesn't exist
-     *
      * @return void
+     *
+     * @throws InvalidArgumentException when a pass type doesn't exist
      */
     public function addPass(CompilerPassInterface $pass, string $type = self::TYPE_BEFORE_OPTIMIZATION, int $priority = 0)
     {

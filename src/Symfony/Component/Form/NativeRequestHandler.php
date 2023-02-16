@@ -40,9 +40,9 @@ class NativeRequestHandler implements RequestHandlerInterface
     }
 
     /**
-     * @throws Exception\UnexpectedTypeException If the $request is not null
-     *
      * @return void
+     *
+     * @throws Exception\UnexpectedTypeException If the $request is not null
      */
     public function handleRequest(FormInterface $form, mixed $request = null)
     {

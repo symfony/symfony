@@ -145,7 +145,7 @@ EOF
         $format = $input->getOption('format');
         $xliffVersion = '1.2';
 
-        if (array_key_exists($format, self::FORMATS)) {
+        if (\array_key_exists($format, self::FORMATS)) {
             [$format, $xliffVersion] = self::FORMATS[$format];
         }
 

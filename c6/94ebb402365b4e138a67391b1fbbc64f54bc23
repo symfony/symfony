@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-02-15T08:10:42Z
+
+Please keep `https://github.com/symfony/symfony/blob/6.3/.github/expected-missing-return-types.diff` is sync while working on this, it allows cascading this to the all other classes.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-02-15T17:52:48Z
+
+> Please keep `https://github.com/symfony/symfony/blob/6.3/.github/expected-missing-return-types.diff` is sync
+
+Is there an easy way to do this?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-02-15T17:57:28Z
+
+@derrabus reading the instructions at the top of the file is a good start: https://github.com/symfony/symfony/blob/6.3/.github/expected-missing-return-types.diff#L1
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-02-15T18:04:43Z
+
+> @derrabus reading the instructions at the top of the file is a good start: https://github.com/symfony/symfony/blob/6.3/.github/expected-missing-return-types.diff#L1
+
+Those commands were not fully compatible with the macOS flavor of `sed` it seems…
+
+> sed: 1: "composer.json": command c expects \ followed by text
+> …
+> sed: 1: "/^diff /Q": invalid command code Q
+
+I've committed the resulting file. Not sure if it was updated correctly. 😇
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-02-15T18:21:36Z
+
+Don't miss looking at the failing tests, they're 100% related :)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-02-15T18:37:07Z
+
+> Don't miss looking at the failing tests, they're 100% related :)
+
+The notifier test failures about static methods becoming non-static don't look related, but the rest are. Looking into them.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-02-16T08:13:50Z
+
+btw: fabbot wants me to remove `@return mixed` annotations. I think it should stop doing that.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-02-16T08:29:23Z
+
+Can you please rebase to latest 6.3 to see if this is going to fix Notifier?
+Please also always sync the expected missing type when changing any return type.

@@ -11,21 +11,19 @@
 
 namespace Symfony\Component\Notifier\Bridge\Iqsms\Tests;
 
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\Iqsms\IqsmsTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
-use Symfony\Component\Notifier\Tests\Fixtures\DummyHttpClient;
-use Symfony\Component\Notifier\Tests\Fixtures\DummyMessage;
-use Symfony\Component\Notifier\Transport\TransportInterface;
+use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class IqsmsTransportTest extends TransportTestCase
 {
     public static function createTransport(HttpClientInterface $client = null): IqsmsTransport
     {
-        return new IqsmsTransport('login', 'password', 'sender', $client ?? new DummyHttpClient());
+        return new IqsmsTransport('login', 'password', 'sender', $client ?? new MockHttpClient());
     }
 
     public static function toStringProvider(): iterable

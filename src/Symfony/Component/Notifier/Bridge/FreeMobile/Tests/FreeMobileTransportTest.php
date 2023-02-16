@@ -11,20 +11,20 @@
 
 namespace Symfony\Component\Notifier\Bridge\FreeMobile\Tests;
 
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransport;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
-use Symfony\Component\Notifier\Tests\Fixtures\DummyHttpClient;
-use Symfony\Component\Notifier\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class FreeMobileTransportTest extends TransportTestCase
 {
     public static function createTransport(HttpClientInterface $client = null): FreeMobileTransport
     {
-        return new FreeMobileTransport('login', 'pass', '0611223344', $client ?? new DummyHttpClient());
+        return new FreeMobileTransport('login', 'pass', '0611223344', $client ?? new MockHttpClient());
     }
 
     public static function toStringProvider(): iterable

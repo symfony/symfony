@@ -11,21 +11,19 @@
 
 namespace Symfony\Component\Notifier\Bridge\Smsc\Tests;
 
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\Smsc\SmscTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
-use Symfony\Component\Notifier\Tests\Fixtures\DummyHttpClient;
-use Symfony\Component\Notifier\Tests\Fixtures\DummyMessage;
-use Symfony\Component\Notifier\Transport\TransportInterface;
+use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class SmscTransportTest extends TransportTestCase
 {
     public static function createTransport(HttpClientInterface $client = null): SmscTransport
     {
-        return new SmscTransport('login', 'password', 'MyApp', $client ?? new DummyHttpClient());
+        return new SmscTransport('login', 'password', 'MyApp', $client ?? new MockHttpClient());
     }
 
     public static function toStringProvider(): iterable

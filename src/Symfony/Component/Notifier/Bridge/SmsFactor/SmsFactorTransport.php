@@ -66,7 +66,7 @@ final class SmsFactorTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $messageId = bin2hex(random_bytes(7));;
+        $messageId = bin2hex(random_bytes(7));
         $query = [
             'to' => $message->getPhone(),
             'text' => $message->getSubject(),

@@ -11,22 +11,19 @@
 
 namespace Symfony\Component\Notifier\Bridge\Zendesk\Tests;
 
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\Zendesk\ZendeskOptions;
 use Symfony\Component\Notifier\Bridge\Zendesk\ZendeskTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
-use Symfony\Component\Notifier\Tests\Fixtures\DummyHttpClient;
-use Symfony\Component\Notifier\Tests\Fixtures\DummyMessage;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class ZendeskTransportTest extends TransportTestCase
 {
     public static function createTransport(HttpClientInterface $client = null): ZendeskTransport
     {
-        return (new ZendeskTransport('testEmail', 'testToken', $client ?? new DummyHttpClient()))->setHost('test.zendesk.com');
+        return (new ZendeskTransport('testEmail', 'testToken', $client ?? new MockHttpClient()))->setHost('test.zendesk.com');
     }
 
     public static function toStringProvider(): iterable

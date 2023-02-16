@@ -19,6 +19,7 @@ use Symfony\Component\Notifier\Bridge\Twitter\TwitterTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
+use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class TwitterTransportTest extends TransportTestCase
@@ -41,6 +42,7 @@ class TwitterTransportTest extends TransportTestCase
     public static function unsupportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
+        yield [new DummyMessage()];
     }
 
     public function testBasicTweet()

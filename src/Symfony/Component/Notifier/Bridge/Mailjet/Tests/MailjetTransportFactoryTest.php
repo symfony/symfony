@@ -21,7 +21,7 @@ final class MailjetTransportFactoryTest extends TransportFactoryTestCase
         return new MailjetTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'mailjet://Mailjet@host.test',
@@ -29,18 +29,18 @@ final class MailjetTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'mailjet://Mailjet:authtoken@default'];
         yield [false, 'somethingElse://Mailjet:authtoken@default'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield 'missing from' => ['mailjet://authtoken@default', 'Invalid "mailjet://authtoken@default" notifier DSN: Password is not set.'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://default']; // missing "from" and "token" option
         yield ['somethingElse://authtoken@default']; // missing "from" option

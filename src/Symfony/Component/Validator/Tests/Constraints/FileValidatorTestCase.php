@@ -551,7 +551,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    private function validExtensionProvider(): iterable
+    private static function validExtensionProvider(): iterable
     {
         yield ['test.gif'];
         yield ['test.png.gif'];
@@ -582,7 +582,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    private function invalidExtensionProvider(): iterable
+    private static function invalidExtensionProvider(): iterable
     {
         yield ['test.gif', 'gif'];
         yield ['test.png.gif', 'gif'];

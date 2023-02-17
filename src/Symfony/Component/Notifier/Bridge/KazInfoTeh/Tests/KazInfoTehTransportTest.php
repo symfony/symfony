@@ -53,7 +53,7 @@ final class KazInfoTehTransportTest extends TransportTestCase
         return new MockHttpClient(new MockResponse($content, ['http_code' => $statusCode]));
     }
 
-    public function responseProvider(): iterable
+    public static function responseProvider(): iterable
     {
         $responses = [
             ['status' => 200, 'content' => '<?xml version="1.0" encoding="utf-8" ?><acceptreport><statuscode>1</statuscode><statusmessage>Status code is not valid</statusmessage></acceptreport>', 'error_message' => 'Unable to send the SMS: "Status code is not valid".'],

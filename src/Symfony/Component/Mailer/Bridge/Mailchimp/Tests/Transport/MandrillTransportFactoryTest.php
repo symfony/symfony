@@ -21,12 +21,12 @@ use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
 class MandrillTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function getFactory(): TransportFactoryInterface
+    public static function getFactory(): TransportFactoryInterface
     {
-        return new MandrillTransportFactory($this->getDispatcher(), $this->getClient(), $this->getLogger());
+        return new MandrillTransportFactory(self::getDispatcher(), self::getClient(), self::getLogger());
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [
             new Dsn('mandrill', 'default'),
@@ -59,11 +59,11 @@ class MandrillTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
-        $client = $this->getClient();
-        $dispatcher = $this->getDispatcher();
-        $logger = $this->getLogger();
+        $client = self::getClient();
+        $dispatcher = self::getDispatcher();
+        $logger = self::getLogger();
 
         yield [
             new Dsn('mandrill+api', 'default', self::USER),
@@ -101,7 +101,7 @@ class MandrillTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield [
             new Dsn('mandrill+foo', 'default', self::USER),
@@ -109,7 +109,7 @@ class MandrillTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield [new Dsn('mandrill+api', 'default')];
 

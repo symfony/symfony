@@ -19,12 +19,12 @@ use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
 class GmailTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function getFactory(): TransportFactoryInterface
+    public static function getFactory(): TransportFactoryInterface
     {
-        return new GmailTransportFactory($this->getDispatcher(), null, $this->getLogger());
+        return new GmailTransportFactory(self::getDispatcher(), null, self::getLogger());
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [
             new Dsn('gmail', 'default'),
@@ -47,25 +47,25 @@ class GmailTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             new Dsn('gmail', 'default', self::USER, self::PASSWORD),
-            new GmailSmtpTransport(self::USER, self::PASSWORD, $this->getDispatcher(), $this->getLogger()),
+            new GmailSmtpTransport(self::USER, self::PASSWORD, self::getDispatcher(), self::getLogger()),
         ];
 
         yield [
             new Dsn('gmail+smtp', 'default', self::USER, self::PASSWORD),
-            new GmailSmtpTransport(self::USER, self::PASSWORD, $this->getDispatcher(), $this->getLogger()),
+            new GmailSmtpTransport(self::USER, self::PASSWORD, self::getDispatcher(), self::getLogger()),
         ];
 
         yield [
             new Dsn('gmail+smtps', 'default', self::USER, self::PASSWORD),
-            new GmailSmtpTransport(self::USER, self::PASSWORD, $this->getDispatcher(), $this->getLogger()),
+            new GmailSmtpTransport(self::USER, self::PASSWORD, self::getDispatcher(), self::getLogger()),
         ];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield [
             new Dsn('gmail+foo', 'default', self::USER, self::PASSWORD),
@@ -73,7 +73,7 @@ class GmailTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield [new Dsn('gmail+smtp', 'default', self::USER)];
 

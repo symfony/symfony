@@ -24,7 +24,7 @@ final class MobytTransportFactoryTest extends TransportFactoryTestCase
         return new MobytTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'mobyt://host.test?from=FROM&type_quality=LL',
@@ -37,19 +37,19 @@ final class MobytTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'mobyt://accountSid:authToken@host.test?from=FROM'];
         yield [false, 'somethingElse://accountSid:authToken@host.test?from=FROM'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield 'missing token' => ['mobyt://host.test?from=FROM'];
         yield 'missing option: from' => ['mobyt://accountSid:authToken@host'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://accountSid:authToken@host.test?from=FROM'];
         yield ['somethingElse://accountSid:authToken@host.test']; // missing "from" option

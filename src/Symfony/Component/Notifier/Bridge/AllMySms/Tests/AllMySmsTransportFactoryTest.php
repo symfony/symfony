@@ -21,7 +21,7 @@ final class AllMySmsTransportFactoryTest extends TransportFactoryTestCase
         return new AllMySmsTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'allmysms://host.test',
@@ -34,13 +34,13 @@ final class AllMySmsTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'allmysms://login:apiKey@default'];
         yield [false, 'somethingElse://login:apiKey@default'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://login:apiKey@default'];
     }

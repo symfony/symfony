@@ -95,7 +95,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getEmailsOnlyValidInLooseMode()
+    public static function getEmailsOnlyValidInLooseMode()
     {
         return [
             ['example@example.co..uk'],
@@ -137,7 +137,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getEmailsWithWhitespacesOnlyValidInLooseMode()
+    public static function getEmailsWithWhitespacesOnlyValidInLooseMode()
     {
         return [
             ["\x09\x09example@example.co..uk\x09\x09"],
@@ -252,7 +252,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidAllowNoTldEmails()
+    public static function getInvalidAllowNoTldEmails()
     {
         return [
             ['example bar'],

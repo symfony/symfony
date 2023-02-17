@@ -26,7 +26,7 @@
     },
     "require-dev": {
         "symfony/console": "^5.4|^6.0",
-        "symfony/http-client-contracts": "^1.1|^2|^3",
+        "symfony/http-client": "^5.4|^6.0",
         "symfony/messenger": "^6.2",
         "symfony/twig-bridge": "^6.2"
     },

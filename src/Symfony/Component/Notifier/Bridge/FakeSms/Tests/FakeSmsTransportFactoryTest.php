@@ -23,7 +23,7 @@ final class FakeSmsTransportFactoryTest extends TransportFactoryTestCase
         return new FakeSmsTransportFactory($this->createMock(MailerInterface::class), $this->createMock(LoggerInterface::class));
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'fakesms+email://default?to=recipient@email.net&from=sender@email.net',
@@ -41,25 +41,25 @@ final class FakeSmsTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function missingRequiredOptionProvider(): iterable
+    public static function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: from' => ['fakesms+email://default?to=recipient@email.net'];
         yield 'missing option: to' => ['fakesms+email://default?from=sender@email.net'];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'fakesms+email://default?to=recipient@email.net&from=sender@email.net'];
         yield [false, 'somethingElse://default?to=recipient@email.net&from=sender@email.net'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield 'missing from' => ['fakesms+email://default?to=recipient@email.net'];
         yield 'missing to' => ['fakesms+email://default?from=recipient@email.net'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://default?to=recipient@email.net&from=sender@email.net'];
     }

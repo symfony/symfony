@@ -66,7 +66,7 @@ final class FirebaseTransportTest extends TransportTestCase
         $transport->send(new ChatMessage('Hello!', $options));
     }
 
-    public function sendWithErrorThrowsExceptionProvider(): iterable
+    public static function sendWithErrorThrowsExceptionProvider(): iterable
     {
         yield [new MockResponse(
             json_encode(['results' => [['error' => 'testErrorCode']]]),

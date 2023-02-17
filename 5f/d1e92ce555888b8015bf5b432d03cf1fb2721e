@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-02-16T12:36:35Z
+
+What's the reasoning for this change? Shouldn't we do this on 6.3 only?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-02-16T13:01:24Z
+
+We could 🤷‍♂️ But I do not really see a reason to keep dead code in a script that we only use to execute the Symfony test suite.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-02-16T13:29:31Z
+
+the phpunit bridge still supports PHP 7.1.3+, so this is not dead code
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-02-16T13:31:20Z
+
+This file is not part of the bridge.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-02-16T13:34:29Z
+
+But this file is also used when running the tests of the bridge IIRC

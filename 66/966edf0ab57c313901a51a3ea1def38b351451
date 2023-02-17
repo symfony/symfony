@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by 1ed at 2023-02-16T10:59:26Z
+
+Should I fix the encoding stuff in 5.4 too (the tabs are different, so I think that's ok there)? It will cause conflicts, because the redesign.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-02-17T11:07:16Z
+
+@1ed Having a PR for 5.4 would be great.

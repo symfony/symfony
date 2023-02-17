@@ -12,16 +12,16 @@
 namespace Symfony\Component\Intl\Tests\DateFormatter\Verification;
 
 use Symfony\Component\Intl\DateFormatter\IntlDateFormatter;
-use Symfony\Component\Intl\Tests\DateFormatter\AbstractIntlDateFormatterTest;
+use Symfony\Component\Intl\Tests\DateFormatter\AbstractIntlDateFormatterTestCase;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 /**
- * Verifies that {@link AbstractIntlDateFormatterTest} matches the behavior of
+ * Verifies that {@link AbstractIntlDateFormatterTestCase} matches the behavior of
  * the {@link \IntlDateFormatter} class in a specific version of ICU.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
+class IntlDateFormatterTest extends AbstractIntlDateFormatterTestCase
 {
     protected function setUp(): void
     {

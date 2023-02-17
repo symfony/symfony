@@ -27,7 +27,7 @@
         "symfony/service-contracts": "^1.1|^2|^3"
     },
     "require-dev": {
-        "symfony/http-client-contracts": "^1.1|^2|^3",
+        "symfony/http-client": "^4.4|^5.0|^6.0",
         "symfony/messenger": "^4.4|^5.0|^6.0"
     },
     "conflict": {

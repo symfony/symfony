@@ -20,7 +20,7 @@
         "symfony/http-client": "^5.3|^6.0",
         "symfony/config": "^5.3|^6.0",
         "symfony/polyfill-php80": "^1.23",
-        "symfony/translation": "^5.3|^6.0"
+        "symfony/translation": "^5.4.21|^6.2.7"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Translation\\Bridge\\Loco\\": "" },

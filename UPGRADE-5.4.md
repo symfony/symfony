@@ -63,6 +63,12 @@ Lock
  * Deprecate usage of `PdoStore` with a `Doctrine\DBAL\Connection` or a DBAL url, use the new `DoctrineDbalStore` instead
  * Deprecate usage of `PostgreSqlStore` with a `Doctrine\DBAL\Connection` or a DBAL url, use the new `DoctrineDbalPostgreSqlStore` instead
 
+Mailer
+------
+
+ * The following data providers for `TransportFactoryTestCase` are now static: `supportsProvider()`, `createProvider()`, `unsupportedSchemeProvider()`and `incompleteDsnProvider()`
+ * The following data providers for `TransportTestCase` are now static: `toStringProvider()`, `supportedMessagesProvider()` and `unsupportedMessagesProvider()`
+
 Messenger
 ---------
 
@@ -78,8 +84,8 @@ Monolog
 Notifier
 --------
 
- * [BC BREAK] The following data providers for `TransportTestCase` are now static: `toStringProvider()`, `supportedMessagesProvider()` and `unsupportedMessagesProvider()`
- * [BC BREAK] The `TransportTestCase::createTransport()` method is now static
+ * The following data providers for `TransportTestCase` are now static: `toStringProvider()`, `supportedMessagesProvider()` and `unsupportedMessagesProvider()`
+ * The `TransportTestCase::createTransport()` method is now static
 
 SecurityBundle
 --------------
@@ -108,6 +114,7 @@ SecurityBundle
 Security
 --------
 
+ * `AccessDecisionStrategyTestCase::provideStrategyTests()` is now static
  * Deprecate `AuthenticationEvents::AUTHENTICATION_FAILURE`, use the `LoginFailureEvent` instead
  * Deprecate the `$authenticationEntryPoint` argument of `ChannelListener`, and add `$httpPort` and `$httpsPort` arguments
  * Deprecate `RetryAuthenticationEntryPoint`, this code is now inlined in the `ChannelListener`
@@ -197,3 +204,9 @@ Security
    $token = new PreAuthenticatedToken($user, $firewallName, $roles);
    $token = new SwitchUserToken($user, $firewallName, $roles, $originalToken);
    ```
+
+Translation
+-----------
+
+ * The following data providers for `ProviderFactoryTestCase` are now static: `supportsProvider()`, `createProvider()`, `unsupportedSchemeProvider()`and `incompleteDsnProvider()`
+ * `ProviderTestCase::toStringProvider()` is now static

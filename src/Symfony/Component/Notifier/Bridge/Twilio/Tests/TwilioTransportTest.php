@@ -61,7 +61,7 @@ final class TwilioTransportTest extends TransportTestCase
         $transport->send(new SmsMessage('+33612345678', 'Hello!'));
     }
 
-    public function invalidFromProvider(): iterable
+    public static function invalidFromProvider(): iterable
     {
         // alphanumeric sender ids
         yield 'too short' => ['a'];

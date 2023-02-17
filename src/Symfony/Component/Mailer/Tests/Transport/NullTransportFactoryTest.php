@@ -19,12 +19,12 @@ use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
 class NullTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function getFactory(): TransportFactoryInterface
+    public static function getFactory(): TransportFactoryInterface
     {
-        return new NullTransportFactory($this->getDispatcher(), $this->getClient(), $this->getLogger());
+        return new NullTransportFactory(self::getDispatcher(), self::getClient(), self::getLogger());
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [
             new Dsn('null', ''),
@@ -32,11 +32,11 @@ class NullTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             new Dsn('null', 'null'),
-            new NullTransport($this->getDispatcher(), $this->getLogger()),
+            new NullTransport(self::getDispatcher(), self::getLogger()),
         ];
     }
 }

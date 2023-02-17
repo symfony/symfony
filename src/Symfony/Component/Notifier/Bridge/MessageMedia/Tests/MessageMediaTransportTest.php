@@ -72,7 +72,7 @@ final class MessageMediaTransportTest extends TransportTestCase
         $transport->send(new SmsMessage('+61491570156', 'Hello!'));
     }
 
-    public function exceptionIsThrownWhenHttpSendFailedProvider(): iterable
+    public static function exceptionIsThrownWhenHttpSendFailedProvider(): iterable
     {
         yield [503, '', 'Unable to send the SMS: "Unknown reason".'];
         yield [500, '{"details": ["Something went wrong."]}', 'Unable to send the SMS: "Something went wrong.".'];

@@ -24,7 +24,7 @@ use Symfony\Component\Intl\Util\IcuVersion;
  *
  * @group legacy
  */
-abstract class AbstractIntlDateFormatterTest extends TestCase
+abstract class AbstractIntlDateFormatterTestCase extends TestCase
 {
     private $defaultLocale;
 

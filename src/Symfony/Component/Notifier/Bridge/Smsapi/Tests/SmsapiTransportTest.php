@@ -53,7 +53,7 @@ final class SmsapiTransportTest extends TransportTestCase
         return new MockHttpClient(new MockResponse($content, ['http_code' => $statusCode]));
     }
 
-    public function responseProvider(): iterable
+    public static function responseProvider(): iterable
     {
         $responses = [
             ['status' => 200, 'content' => '{"error":101,"message":"Authorization failed"}', 'errorMessage' => 'Unable to send the SMS: "Authorization failed".'],

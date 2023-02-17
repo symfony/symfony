@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\Test\AccessDecisionStrategyTestCase;
 
 class PriorityStrategyTest extends AccessDecisionStrategyTestCase
 {
-    public function provideStrategyTests(): iterable
+    public static function provideStrategyTests(): iterable
     {
         $strategy = new PriorityStrategy();
 

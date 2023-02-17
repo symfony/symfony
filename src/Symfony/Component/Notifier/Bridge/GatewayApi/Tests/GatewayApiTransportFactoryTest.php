@@ -29,7 +29,7 @@ final class GatewayApiTransportFactoryTest extends TransportFactoryTestCase
         return new GatewayApiTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'gatewayapi://gatewayapi.com?from=Symfony',
@@ -37,18 +37,18 @@ final class GatewayApiTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'gatewayapi://token@host.test?from=Symfony'];
         yield [false, 'somethingElse://token@default?from=Symfony'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield 'missing token' => ['gatewayapi://host.test?from=Symfony'];
     }
 
-    public function missingRequiredOptionProvider(): iterable
+    public static function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: from' => ['gatewayapi://token@host.test'];
     }

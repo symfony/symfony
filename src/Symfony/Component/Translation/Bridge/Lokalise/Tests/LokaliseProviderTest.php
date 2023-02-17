@@ -28,34 +28,34 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class LokaliseProviderTest extends ProviderTestCase
 {
-    public function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint): ProviderInterface
+    public static function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint): ProviderInterface
     {
         return new LokaliseProvider($client, $loader, $logger, $defaultLocale, $endpoint);
     }
 
-    public function toStringProvider(): iterable
+    public static function toStringProvider(): iterable
     {
         yield [
-            $this->createProvider($this->getClient()->withOptions([
+            self::createProvider(self::getclient()->withOptions([
                 'base_uri' => 'https://api.lokalise.com/api2/projects/PROJECT_ID/',
                 'headers' => ['X-Api-Token' => 'API_KEY'],
-            ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.lokalise.com'),
+            ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'api.lokalise.com'),
             'lokalise://api.lokalise.com',
         ];
 
         yield [
-            $this->createProvider($this->getClient()->withOptions([
+            self::createProvider(self::getclient()->withOptions([
                 'base_uri' => 'https://example.com',
                 'headers' => ['X-Api-Token' => 'API_KEY'],
-            ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'example.com'),
+            ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'example.com'),
             'lokalise://example.com',
         ];
 
         yield [
-            $this->createProvider($this->getClient()->withOptions([
+            self::createProvider(self::getclient()->withOptions([
                 'base_uri' => 'https://example.com:99',
                 'headers' => ['X-Api-Token' => 'API_KEY'],
-            ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'example.com:99'),
+            ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'example.com:99'),
             'lokalise://example.com:99',
         ];
     }
@@ -221,7 +221,7 @@ class LokaliseProviderTest extends ProviderTestCase
             return new MockResponse();
         };
 
-        $provider = $this->createProvider((new MockHttpClient([
+        $provider = self::createProvider((new MockHttpClient([
             $getLanguagesResponse,
             $createLanguagesResponse,
             $getKeysIdsForMessagesDomainResponse,
@@ -232,7 +232,7 @@ class LokaliseProviderTest extends ProviderTestCase
         ]))->withOptions([
             'base_uri' => 'https://api.lokalise.com/api2/projects/PROJECT_ID/',
             'headers' => ['X-Api-Token' => 'API_KEY'],
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.lokalise.com');
+        ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'api.lokalise.com');
 
         $translatorBag = new TranslatorBag();
         $translatorBag->addCatalogue(new MessageCatalogue('en', [
@@ -257,12 +257,12 @@ class LokaliseProviderTest extends ProviderTestCase
             return new MockResponse('', ['http_code' => 500]);
         };
 
-        $provider = $this->createProvider((new MockHttpClient([
+        $provider = self::createProvider((new MockHttpClient([
             $getLanguagesResponse,
         ]))->withOptions([
             'base_uri' => 'https://api.lokalise.com/api2/projects/PROJECT_ID/',
             'headers' => ['X-Api-Token' => 'API_KEY'],
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.lokalise.com');
+        ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'api.lokalise.com');
 
         $translatorBag = new TranslatorBag();
         $translatorBag->addCatalogue(new MessageCatalogue('en', [
@@ -298,13 +298,13 @@ class LokaliseProviderTest extends ProviderTestCase
             return new MockResponse('', ['http_code' => 500]);
         };
 
-        $provider = $this->createProvider((new MockHttpClient([
+        $provider = self::createProvider((new MockHttpClient([
             $getLanguagesResponse,
             $createLanguagesResponse,
         ]))->withOptions([
             'base_uri' => 'https://api.lokalise.com/api2/projects/PROJECT_ID/',
             'headers' => ['X-Api-Token' => 'API_KEY'],
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.lokalise.com');
+        ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'api.lokalise.com');
 
         $translatorBag = new TranslatorBag();
         $translatorBag->addCatalogue(new MessageCatalogue('en', [
@@ -355,14 +355,14 @@ class LokaliseProviderTest extends ProviderTestCase
             return new MockResponse('', ['http_code' => 500]);
         };
 
-        $provider = $this->createProvider((new MockHttpClient([
+        $provider = self::createProvider((new MockHttpClient([
             $getLanguagesResponse,
             $createLanguagesResponse,
             $getKeysIdsForMessagesDomainResponse,
         ]))->withOptions([
             'base_uri' => 'https://api.lokalise.com/api2/projects/PROJECT_ID/',
             'headers' => ['X-Api-Token' => 'API_KEY'],
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.lokalise.com');
+        ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'api.lokalise.com');
 
         $translatorBag = new TranslatorBag();
         $translatorBag->addCatalogue(new MessageCatalogue('en', [
@@ -435,7 +435,7 @@ class LokaliseProviderTest extends ProviderTestCase
             return new MockResponse('', ['http_code' => 500]);
         };
 
-        $provider = $this->createProvider((new MockHttpClient([
+        $provider = self::createProvider((new MockHttpClient([
             $getLanguagesResponse,
             $createLanguagesResponse,
             $getKeysIdsForMessagesDomainResponse,
@@ -443,7 +443,7 @@ class LokaliseProviderTest extends ProviderTestCase
         ]))->withOptions([
             'base_uri' => 'https://api.lokalise.com/api2/projects/PROJECT_ID/',
             'headers' => ['X-Api-Token' => 'API_KEY'],
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.lokalise.com');
+        ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'api.lokalise.com');
 
         $translatorBag = new TranslatorBag();
         $translatorBag->addCatalogue(new MessageCatalogue('en', [
@@ -527,7 +527,7 @@ class LokaliseProviderTest extends ProviderTestCase
             return new MockResponse('', ['http_code' => 500]);
         };
 
-        $provider = $this->createProvider((new MockHttpClient([
+        $provider = self::createProvider((new MockHttpClient([
             $getLanguagesResponse,
             $createLanguagesResponse,
             $getKeysIdsForMessagesDomainResponse,
@@ -536,7 +536,7 @@ class LokaliseProviderTest extends ProviderTestCase
         ]))->withOptions([
             'base_uri' => 'https://api.lokalise.com/api2/projects/PROJECT_ID/',
             'headers' => ['X-Api-Token' => 'API_KEY'],
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.lokalise.com');
+        ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'api.lokalise.com');
 
         $translatorBag = new TranslatorBag();
         $translatorBag->addCatalogue(new MessageCatalogue('en', [
@@ -580,15 +580,15 @@ class LokaliseProviderTest extends ProviderTestCase
             ]));
         };
 
-        $loader = $this->getLoader();
-        $loader->expects($this->once())
+        static::$loader = $this->createMock(LoaderInterface::class);
+        static::$loader->expects($this->once())
             ->method('load')
             ->willReturn((new XliffFileLoader())->load($responseContent, $locale, $domain));
 
-        $provider = $this->createProvider((new MockHttpClient($response))->withOptions([
+        $provider = self::createProvider((new MockHttpClient($response))->withOptions([
             'base_uri' => 'https://api.lokalise.com/api2/projects/PROJECT_ID/',
             'headers' => ['X-Api-Token' => 'API_KEY'],
-        ]), $loader, $this->getLogger(), $this->getDefaultLocale(), 'api.lokalise.com');
+        ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'api.lokalise.com');
         $translatorBag = $provider->read([$domain], [$locale]);
 
         // We don't want to assert equality of metadata here, due to the ArrayLoader usage.
@@ -623,16 +623,16 @@ class LokaliseProviderTest extends ProviderTestCase
             }, []),
         ]));
 
-        $loader = $this->getLoader();
+        $loader = self::getLoader();
         $loader->expects($this->exactly(\count($consecutiveLoadArguments)))
             ->method('load')
             ->withConsecutive(...$consecutiveLoadArguments)
             ->willReturnOnConsecutiveCalls(...$consecutiveLoadReturns);
 
-        $provider = $this->createProvider((new MockHttpClient($response))->withOptions([
+        $provider = self::createProvider((new MockHttpClient($response))->withOptions([
             'base_uri' => 'https://api.lokalise.com/api2/projects/PROJECT_ID/',
             'headers' => ['X-Api-Token' => 'API_KEY'],
-        ]), $loader, $this->getLogger(), $this->getDefaultLocale(), 'api.lokalise.com');
+        ]), $loader, self::getLogger(), self::getDefaultLocale(), 'api.lokalise.com');
 
         $translatorBag = $provider->read($domains, $locales);
         // We don't want to assert equality of metadata here, due to the ArrayLoader usage.
@@ -708,22 +708,22 @@ class LokaliseProviderTest extends ProviderTestCase
             'domain_without_missing_messages' => [],
         ]));
 
-        $provider = $this->createProvider(
+        $provider = self::createProvider(
             new MockHttpClient([
                 $getKeysIdsForMessagesDomainResponse,
                 $getKeysIdsForValidatorsDomainResponse,
                 $deleteResponse,
             ], 'https://api.lokalise.com/api2/projects/PROJECT_ID/'),
-            $this->getLoader(),
-            $this->getLogger(),
-            $this->getDefaultLocale(),
+            self::getLoader(),
+            self::getLogger(),
+            self::getDefaultLocale(),
             'api.lokalise.com'
         );
 
         $provider->delete($translatorBag);
     }
 
-    public function getResponsesForOneLocaleAndOneDomain(): \Generator
+    public static function getResponsesForOneLocaleAndOneDomain(): \Generator
     {
         $arrayLoader = new ArrayLoader();
 
@@ -788,7 +788,7 @@ XLIFF
         ];
     }
 
-    public function getResponsesForManyLocalesAndManyDomains(): \Generator
+    public static function getResponsesForManyLocalesAndManyDomains(): \Generator
     {
         $arrayLoader = new ArrayLoader();
 

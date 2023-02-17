@@ -11,16 +11,16 @@
 
 namespace Symfony\Component\Intl\Tests\Collator\Verification;
 
-use Symfony\Component\Intl\Tests\Collator\AbstractCollatorTest;
+use Symfony\Component\Intl\Tests\Collator\AbstractCollatorTestCase;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 /**
- * Verifies that {@link AbstractCollatorTest} matches the behavior of the
+ * Verifies that {@link AbstractCollatorTestCase} matches the behavior of the
  * {@link \Collator} class in a specific version of ICU.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class CollatorTest extends AbstractCollatorTest
+class CollatorTest extends AbstractCollatorTestCase
 {
     protected function setUp(): void
     {

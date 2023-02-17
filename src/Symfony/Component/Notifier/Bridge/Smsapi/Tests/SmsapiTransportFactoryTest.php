@@ -25,7 +25,7 @@ final class SmsapiTransportFactoryTest extends TransportFactoryTestCase
         return new SmsapiTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'smsapi://host.test?from=testFrom',
@@ -33,23 +33,23 @@ final class SmsapiTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'smsapi://host?from=testFrom'];
         yield [false, 'somethingElse://host?from=testFrom'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield 'missing token' => ['smsapi://host.test?from=testFrom'];
     }
 
-    public function missingRequiredOptionProvider(): iterable
+    public static function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: from' => ['smsapi://token@host'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://token@host?from=testFrom'];
         yield ['somethingElse://token@host']; // missing "from" option

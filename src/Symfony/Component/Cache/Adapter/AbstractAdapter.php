@@ -47,7 +47,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
             static function ($key, $value, $isHit) {
                 $item = new CacheItem();
                 $item->key = $key;
-                $item->value = $v = $value;
+                $item->value = $value;
                 $item->isHit = $isHit;
                 $item->unpack();
 

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-02-17T15:54:19Z
+
+this test was only relevant on 5.x (we removed it together with the thrown exception in `6.0` in #41298)

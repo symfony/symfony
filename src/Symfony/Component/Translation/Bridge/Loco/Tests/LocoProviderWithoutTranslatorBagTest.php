@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class LocoProviderWithoutTranslatorBagTest extends LocoProviderTest
 {
-    public function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint): ProviderInterface
+    public static function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint): ProviderInterface
     {
         return new LocoProvider($client, $loader, $logger, $defaultLocale, $endpoint, null);
     }
@@ -59,8 +59,8 @@ class LocoProviderWithoutTranslatorBagTest extends LocoProviderTest
             }
         }
 
-        $loader = $this->getLoader();
-        $loader->expects($this->exactly(\count($consecutiveLoadArguments) * 2))
+        static::$loader = $this->createMock(LoaderInterface::class);
+        static::$loader->expects($this->exactly(\count($consecutiveLoadArguments) * 2))
             ->method('load')
             ->withConsecutive(...$consecutiveLoadArguments, ...$consecutiveLoadArguments)
             ->willReturnOnConsecutiveCalls(...$consecutiveLoadReturns, ...$consecutiveLoadReturns);

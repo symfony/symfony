@@ -20,12 +20,12 @@ use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
 class MailjetTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function getFactory(): TransportFactoryInterface
+    public static function getFactory(): TransportFactoryInterface
     {
-        return new MailjetTransportFactory($this->getDispatcher(), $this->getClient(), $this->getLogger());
+        return new MailjetTransportFactory(self::getDispatcher(), self::getClient(), self::getLogger());
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [
             new Dsn('mailjet+api', 'default'),
@@ -53,19 +53,19 @@ class MailjetTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
-        $dispatcher = $this->getDispatcher();
-        $logger = $this->getLogger();
+        $dispatcher = self::getDispatcher();
+        $logger = self::getLogger();
 
         yield [
             new Dsn('mailjet+api', 'default', self::USER, self::PASSWORD),
-            new MailjetApiTransport(self::USER, self::PASSWORD, $this->getClient(), $dispatcher, $logger),
+            new MailjetApiTransport(self::USER, self::PASSWORD, self::getClient(), $dispatcher, $logger),
         ];
 
         yield [
             new Dsn('mailjet+api', 'example.com', self::USER, self::PASSWORD),
-            (new MailjetApiTransport(self::USER, self::PASSWORD, $this->getClient(), $dispatcher, $logger))->setHost('example.com'),
+            (new MailjetApiTransport(self::USER, self::PASSWORD, self::getClient(), $dispatcher, $logger))->setHost('example.com'),
         ];
 
         yield [
@@ -84,7 +84,7 @@ class MailjetTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield [
             new Dsn('mailjet+foo', 'mailjet', self::USER, self::PASSWORD),
@@ -92,7 +92,7 @@ class MailjetTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield [new Dsn('mailjet+smtp', 'default')];
     }

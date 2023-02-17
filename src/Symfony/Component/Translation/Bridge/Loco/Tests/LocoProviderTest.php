@@ -28,40 +28,40 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class LocoProviderTest extends ProviderTestCase
 {
-    public function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint): ProviderInterface
+    public static function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint): ProviderInterface
     {
         return new LocoProvider($client, $loader, $logger, $defaultLocale, $endpoint);
     }
 
-    public function toStringProvider(): iterable
+    public static function toStringProvider(): iterable
     {
         yield [
-            $this->createProvider($this->getClient()->withOptions([
+            self::createProvider(self::getClient()->withOptions([
                 'base_uri' => 'https://localise.biz/api/',
                 'headers' => [
                     'Authorization' => 'Loco API_KEY',
                 ],
-            ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'localise.biz/api/'),
+            ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'localise.biz/api/'),
             'loco://localise.biz/api/',
         ];
 
         yield [
-            $this->createProvider($this->getClient()->withOptions([
+            self::createProvider(self::getClient()->withOptions([
                 'base_uri' => 'https://example.com',
                 'headers' => [
                     'Authorization' => 'Loco API_KEY',
                 ],
-            ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'example.com'),
+            ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'example.com'),
             'loco://example.com',
         ];
 
         yield [
-            $this->createProvider($this->getClient()->withOptions([
+            self::createProvider(self::getClient()->withOptions([
                 'base_uri' => 'https://example.com:99',
                 'headers' => [
                     'Authorization' => 'Loco API_KEY',
                 ],
-            ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'example.com:99'),
+            ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'example.com:99'),
             'loco://example.com:99',
         ];
     }
@@ -246,7 +246,7 @@ class LocoProviderTest extends ProviderTestCase
         $provider = $this->createProvider((new MockHttpClient($responses))->withOptions([
             'base_uri' => 'https://localise.biz/api/',
             'headers' => ['Authorization' => 'Loco API_KEY'],
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'localise.biz/api/');
+        ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'localise.biz/api/');
 
         $provider->write($translatorBag);
     }
@@ -280,7 +280,7 @@ class LocoProviderTest extends ProviderTestCase
         $provider = $this->createProvider((new MockHttpClient($responses))->withOptions([
             'base_uri' => 'https://localise.biz/api/',
             'headers' => ['Authorization' => 'Loco API_KEY'],
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'localise.biz/api/');
+        ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'localise.biz/api/');
 
         $this->expectException(ProviderException::class);
         $this->expectExceptionMessage('Unable to add new translation key "a" to Loco: (status code: "500").');
@@ -332,7 +332,7 @@ class LocoProviderTest extends ProviderTestCase
         $provider = $this->createProvider((new MockHttpClient($responses))->withOptions([
             'base_uri' => 'https://localise.biz/api/',
             'headers' => ['Authorization' => 'Loco API_KEY'],
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'localise.biz/api/');
+        ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'localise.biz/api/');
 
         $this->expectException(ProviderException::class);
         $this->expectExceptionMessage('Unable to create tag "messages" on Loco.');
@@ -392,7 +392,7 @@ class LocoProviderTest extends ProviderTestCase
         $provider = $this->createProvider((new MockHttpClient($responses))->withOptions([
             'base_uri' => 'https://localise.biz/api/',
             'headers' => ['Authorization' => 'Loco API_KEY'],
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'localise.biz/api/');
+        ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'localise.biz/api/');
 
         $this->expectException(ProviderException::class);
         $this->expectExceptionMessage('Unable to tag assets with "messages" on Loco.');
@@ -452,7 +452,7 @@ class LocoProviderTest extends ProviderTestCase
         $provider = $this->createProvider((new MockHttpClient($responses))->withOptions([
             'base_uri' => 'https://localise.biz/api/',
             'headers' => ['Authorization' => 'Loco API_KEY'],
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'localise.biz/api/');
+        ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'localise.biz/api/');
 
         $this->expectException(ProviderException::class);
         $this->expectExceptionMessage('Unable to tag asset "messages__a,messages__b" with "messages" on Loco.');
@@ -526,7 +526,7 @@ class LocoProviderTest extends ProviderTestCase
         $provider = $this->createProvider((new MockHttpClient($responses))->withOptions([
             'base_uri' => 'https://localise.biz/api/',
             'headers' => ['Authorization' => 'Loco API_KEY'],
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'localise.biz/api/');
+        ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'localise.biz/api/');
 
         $this->expectException(ProviderException::class);
         $this->expectExceptionMessage('Unable to create locale "en" on Loco.');
@@ -603,7 +603,7 @@ class LocoProviderTest extends ProviderTestCase
         $provider = $this->createProvider((new MockHttpClient($responses))->withOptions([
             'base_uri' => 'https://localise.biz/api/',
             'headers' => ['Authorization' => 'Loco API_KEY'],
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'localise.biz/api/');
+        ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'localise.biz/api/');
 
         $this->expectException(ProviderException::class);
         $this->expectExceptionMessage('Unable to get assets from Loco.');
@@ -688,7 +688,7 @@ class LocoProviderTest extends ProviderTestCase
         $provider = $this->createProvider((new MockHttpClient($responses))->withOptions([
             'base_uri' => 'https://localise.biz/api/',
             'headers' => ['Authorization' => 'Loco API_KEY'],
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'localise.biz/api/');
+        ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'localise.biz/api/');
 
         $this->expectException(ProviderException::class);
         $this->expectExceptionMessage('Unable to add translation for key "messages__a" in locale "en" to Loco.');
@@ -701,8 +701,8 @@ class LocoProviderTest extends ProviderTestCase
      */
     public function testReadForOneLocaleAndOneDomain(string $locale, string $domain, string $responseContent, TranslatorBag $expectedTranslatorBag)
     {
-        $loader = $this->getLoader();
-        $loader->expects($this->once())
+        static::$loader = $this->createMock(LoaderInterface::class);
+        static::$loader->expects($this->once())
             ->method('load')
             ->willReturn((new XliffFileLoader())->load($responseContent, $locale, $domain));
 
@@ -711,7 +711,7 @@ class LocoProviderTest extends ProviderTestCase
             'headers' => [
                 'Authorization' => 'Loco API_KEY',
             ],
-        ]), $loader, $this->getLogger(), $this->getDefaultLocale(), 'localise.biz/api/');
+        ]), self::getLoader(), self::getLogger(), self::getDefaultLocale(), 'localise.biz/api/');
         $translatorBag = $provider->read([$domain], [$locale]);
         // We don't want to assert equality of metadata here, due to the ArrayLoader usage.
         foreach ($translatorBag->getCatalogues() as $catalogue) {
@@ -738,8 +738,8 @@ class LocoProviderTest extends ProviderTestCase
             }
         }
 
-        $loader = $this->getLoader();
-        $loader->expects($this->exactly(\count($consecutiveLoadArguments)))
+        static::$loader = $this->createMock(LoaderInterface::class);
+        static::$loader->expects($this->exactly(\count($consecutiveLoadArguments)))
             ->method('load')
             ->withConsecutive(...$consecutiveLoadArguments)
             ->willReturnOnConsecutiveCalls(...$consecutiveLoadReturns);
@@ -749,7 +749,7 @@ class LocoProviderTest extends ProviderTestCase
             'headers' => [
                 'Authorization' => 'Loco API_KEY',
             ],
-        ]), $loader, $this->getLogger(), $this->getDefaultLocale(), 'localise.biz/api/');
+        ]), static::getLoader(), self::getLogger(), self::getDefaultLocale(), 'localise.biz/api/');
         $translatorBag = $provider->read($domains, $locales);
         // We don't want to assert equality of metadata here, due to the ArrayLoader usage.
         foreach ($translatorBag->getCatalogues() as $catalogue) {
@@ -800,9 +800,9 @@ class LocoProviderTest extends ProviderTestCase
                     return new MockResponse();
                 },
             ], 'https://localise.biz/api/'),
-            $this->getLoader(),
-            $this->getLogger(),
-            $this->getDefaultLocale(),
+            self::getLoader(),
+            self::getLogger(),
+            self::getDefaultLocale(),
             'localise.biz/api/'
         );
 
@@ -832,9 +832,9 @@ class LocoProviderTest extends ProviderTestCase
                     return new MockResponse('', ['http_code' => 500]);
                 },
             ], 'https://localise.biz/api/'),
-            $this->getLoader(),
-            $this->getLogger(),
-            $this->getDefaultLocale(),
+            self::getLoader(),
+            self::getLogger(),
+            self::getDefaultLocale(),
             'localise.biz/api/'
         );
 
@@ -844,7 +844,7 @@ class LocoProviderTest extends ProviderTestCase
         $provider->delete($translatorBag);
     }
 
-    public function getResponsesForOneLocaleAndOneDomain(): \Generator
+    public static function getResponsesForOneLocaleAndOneDomain(): \Generator
     {
         $arrayLoader = new ArrayLoader();
 
@@ -909,7 +909,7 @@ XLIFF
         ];
     }
 
-    public function getResponsesForManyLocalesAndManyDomains(): \Generator
+    public static function getResponsesForManyLocalesAndManyDomains(): \Generator
     {
         $arrayLoader = new ArrayLoader();
 

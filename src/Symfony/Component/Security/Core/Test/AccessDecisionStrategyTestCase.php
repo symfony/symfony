@@ -40,7 +40,7 @@ abstract class AccessDecisionStrategyTestCase extends TestCase
     /**
      * @return iterable<array{AccessDecisionStrategyInterface, VoterInterface[], bool}>
      */
-    abstract public function provideStrategyTests(): iterable;
+    abstract public static function provideStrategyTests(): iterable;
 
     /**
      * @return VoterInterface[]

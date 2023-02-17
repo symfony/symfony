@@ -20,12 +20,12 @@ use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
 class SendinblueTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function getFactory(): TransportFactoryInterface
+    public static function getFactory(): TransportFactoryInterface
     {
-        return new SendinblueTransportFactory($this->getDispatcher(), $this->getClient(), $this->getLogger());
+        return new SendinblueTransportFactory(self::getDispatcher(), self::getClient(), self::getLogger());
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [
             new Dsn('sendinblue', 'default'),
@@ -48,30 +48,30 @@ class SendinblueTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             new Dsn('sendinblue', 'default', self::USER, self::PASSWORD),
-            new SendinblueSmtpTransport(self::USER, self::PASSWORD, $this->getDispatcher(), $this->getLogger()),
+            new SendinblueSmtpTransport(self::USER, self::PASSWORD, self::getDispatcher(), self::getLogger()),
         ];
 
         yield [
             new Dsn('sendinblue+smtp', 'default', self::USER, self::PASSWORD),
-            new SendinblueSmtpTransport(self::USER, self::PASSWORD, $this->getDispatcher(), $this->getLogger()),
+            new SendinblueSmtpTransport(self::USER, self::PASSWORD, self::getDispatcher(), self::getLogger()),
         ];
 
         yield [
             new Dsn('sendinblue+smtp', 'default', self::USER, self::PASSWORD, 465),
-            new SendinblueSmtpTransport(self::USER, self::PASSWORD, $this->getDispatcher(), $this->getLogger()),
+            new SendinblueSmtpTransport(self::USER, self::PASSWORD, self::getDispatcher(), self::getLogger()),
         ];
 
         yield [
             new Dsn('sendinblue+api', 'default', self::USER),
-            new SendinblueApiTransport(self::USER, $this->getClient(), $this->getDispatcher(), $this->getLogger()),
+            new SendinblueApiTransport(self::USER, self::getClient(), self::getDispatcher(), self::getLogger()),
         ];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield [
             new Dsn('sendinblue+foo', 'default', self::USER, self::PASSWORD),
@@ -79,7 +79,7 @@ class SendinblueTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield [new Dsn('sendinblue+smtp', 'default', self::USER)];
 

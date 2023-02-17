@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-02-14T19:53:40Z
+
+Rebased
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-02-16T14:13:44Z
+
+(rebase unlocked)
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-02-16T18:58:01Z
+
+Notifier PR against your branch as you asked is ready at https://github.com/OskarStark/symfony/pull/1 👍
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-02-16T19:13:52Z
+
+Rebased and merged https://github.com/OskarStark/symfony/pull/1 👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-02-16T19:24:52Z
+
+please squash when pushing, it'd be great to have only two commits in the PR, one for each of you
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-02-16T19:45:32Z
+
+I think this is the final one before having an all-green on 5.4 🙌
+
+https://github.com/OskarStark/symfony/pull/2
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-02-17T05:07:05Z
+
+Merged. Will squash them properly later today
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-02-17T09:43:30Z
+
+rebased

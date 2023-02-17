@@ -18,11 +18,8 @@ namespace Symfony\Component\EventDispatcher;
  */
 class ImmutableEventDispatcher implements EventDispatcherInterface
 {
-    private EventDispatcherInterface $dispatcher;
-
-    public function __construct(EventDispatcherInterface $dispatcher)
+    public function __construct(private EventDispatcherInterface $dispatcher)
     {
-        $this->dispatcher = $dispatcher;
     }
 
     public function dispatch(object $event, string $eventName = null): object

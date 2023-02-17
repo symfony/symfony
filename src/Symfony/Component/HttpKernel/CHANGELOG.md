@@ -9,6 +9,7 @@ CHANGELOG
  * Add `#[WithHttpStatus]` for defining status codes for exceptions
  * Use an instance of `Psr\Clock\ClockInterface` to generate the current date time in `DateTimeValueResolver`
  * Add `#[WithLogLevel]` for defining log levels for exceptions
+ * Allow extending the `Autowire` attribute
 
 6.2
 ---

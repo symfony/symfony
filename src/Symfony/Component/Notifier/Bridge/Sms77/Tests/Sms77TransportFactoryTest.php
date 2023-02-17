@@ -21,7 +21,7 @@ final class Sms77TransportFactoryTest extends TransportFactoryTestCase
         return new Sms77TransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'sms77://host.test',
@@ -34,18 +34,18 @@ final class Sms77TransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield 'missing api key' => ['sms77://host?from=TEST'];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'sms77://apiKey@default?from=TEST'];
         yield [false, 'somethingElse://apiKey@default?from=TEST'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://apiKey@default?from=FROM'];
     }

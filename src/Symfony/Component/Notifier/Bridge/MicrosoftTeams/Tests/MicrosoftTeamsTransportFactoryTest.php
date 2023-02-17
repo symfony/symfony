@@ -21,7 +21,7 @@ final class MicrosoftTeamsTransportFactoryTest extends TransportFactoryTestCase
         return new MicrosoftTeamsTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'microsoftteams://host/webhook',
@@ -29,13 +29,13 @@ final class MicrosoftTeamsTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'microsoftteams://host/webhook'];
         yield [false, 'somethingElse://host/webhook'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://host/webhook'];
     }

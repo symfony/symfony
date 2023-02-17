@@ -24,7 +24,7 @@ final class KazInfoTehTransportFactoryTest extends TransportFactoryTestCase
         return new KazInfoTehTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'kaz-info-teh://kazinfoteh.org:9507?sender=symfony',
@@ -37,24 +37,24 @@ final class KazInfoTehTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'kaz-info-teh://username:password@default?sender=Symfony'];
         yield [false, 'somethingElse://username:password@default?sender=Symfony'];
     }
 
-    public function missingRequiredOptionProvider(): iterable
+    public static function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: sender' => ['kaz-info-teh://username:password@default'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield 'missing username' => ['kaz-info-teh://default?sender=0611223344'];
         yield 'missing password' => ['kaz-info-teh://username@default?sender=0611223344'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://username:password@default?sender=acme'];
         yield ['somethingElse://username:password@default'];

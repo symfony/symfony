@@ -24,7 +24,7 @@ final class EngagespotTransportFactoryTest extends TransportFactoryTestCase
         return new EngagespotTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'engagespot://api.engagespot.co/2/campaigns?campaign_name=TEST',
@@ -32,13 +32,13 @@ final class EngagespotTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'engagespot://apiKey@default'];
         yield [false, 'somethingElse://username:password@default'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://username:password@default'];
     }

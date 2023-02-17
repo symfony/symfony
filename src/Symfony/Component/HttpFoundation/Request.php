@@ -189,7 +189,7 @@ class Request
     protected $session;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $locale;
 
@@ -1390,7 +1390,7 @@ class Request
      */
     public function getLocale(): string
     {
-        return null === $this->locale ? $this->defaultLocale : $this->locale;
+        return $this->locale ?? $this->defaultLocale;
     }
 
     /**

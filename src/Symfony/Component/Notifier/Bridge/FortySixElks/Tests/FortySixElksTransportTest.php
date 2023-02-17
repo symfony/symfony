@@ -75,7 +75,7 @@ class FortySixElksTransportTest extends TransportTestCase
         $transport->send(new SmsMessage('+46701111111', 'Hello!'));
     }
 
-    public function errorProvider(): iterable
+    public static function errorProvider(): iterable
     {
         yield [
             401,

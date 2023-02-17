@@ -24,7 +24,7 @@ final class RocketChatTransportFactoryTest extends TransportFactoryTestCase
         return new RocketChatTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'rocketchat://host.test?channel=testChannel',
@@ -32,18 +32,18 @@ final class RocketChatTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'rocketchat://token@host?channel=testChannel'];
         yield [false, 'somethingElse://token@host?channel=testChannel'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield 'missing token' => ['rocketchat://host.test?channel=testChannel'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://token@host?channel=testChannel'];
     }

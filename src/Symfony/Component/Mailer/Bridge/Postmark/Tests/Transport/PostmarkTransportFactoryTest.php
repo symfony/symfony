@@ -20,12 +20,12 @@ use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
 class PostmarkTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function getFactory(): TransportFactoryInterface
+    public static function getFactory(): TransportFactoryInterface
     {
-        return new PostmarkTransportFactory($this->getDispatcher(), $this->getClient(), $this->getLogger());
+        return new PostmarkTransportFactory(self::getDispatcher(), self::getClient(), self::getLogger());
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [
             new Dsn('postmark+api', 'default'),
@@ -53,24 +53,24 @@ class PostmarkTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
-        $dispatcher = $this->getDispatcher();
-        $logger = $this->getLogger();
+        $dispatcher = self::getDispatcher();
+        $logger = self::getLogger();
 
         yield [
             new Dsn('postmark+api', 'default', self::USER),
-            new PostmarkApiTransport(self::USER, $this->getClient(), $dispatcher, $logger),
+            new PostmarkApiTransport(self::USER, self::getClient(), $dispatcher, $logger),
         ];
 
         yield [
             new Dsn('postmark+api', 'example.com', self::USER, '', 8080),
-            (new PostmarkApiTransport(self::USER, $this->getClient(), $dispatcher, $logger))->setHost('example.com')->setPort(8080),
+            (new PostmarkApiTransport(self::USER, self::getClient(), $dispatcher, $logger))->setHost('example.com')->setPort(8080),
         ];
 
         yield [
             new Dsn('postmark+api', 'example.com', self::USER, '', 8080, ['message_stream' => 'broadcasts']),
-            (new PostmarkApiTransport(self::USER, $this->getClient(), $dispatcher, $logger))->setHost('example.com')->setPort(8080)->setMessageStream('broadcasts'),
+            (new PostmarkApiTransport(self::USER, self::getClient(), $dispatcher, $logger))->setHost('example.com')->setPort(8080)->setMessageStream('broadcasts'),
         ];
 
         yield [
@@ -94,7 +94,7 @@ class PostmarkTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield [
             new Dsn('postmark+foo', 'default', self::USER),
@@ -102,7 +102,7 @@ class PostmarkTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield [new Dsn('postmark+api', 'default')];
     }

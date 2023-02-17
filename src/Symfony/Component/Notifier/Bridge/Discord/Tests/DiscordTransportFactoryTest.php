@@ -21,7 +21,7 @@ final class DiscordTransportFactoryTest extends TransportFactoryTestCase
         return new DiscordTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'discord://host.test?webhook_id=testWebhookId',
@@ -29,23 +29,23 @@ final class DiscordTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'discord://host?webhook_id=testWebhookId'];
         yield [false, 'somethingElse://host?webhook_id=testWebhookId'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield 'missing token' => ['discord://host.test?webhook_id=testWebhookId'];
     }
 
-    public function missingRequiredOptionProvider(): iterable
+    public static function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: webhook_id' => ['discord://token@host'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://token@host?webhook_id=testWebhookId'];
         yield ['somethingElse://token@host']; // missing "webhook_id" option

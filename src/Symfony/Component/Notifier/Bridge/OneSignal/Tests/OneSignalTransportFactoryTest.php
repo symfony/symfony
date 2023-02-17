@@ -24,7 +24,7 @@ final class OneSignalTransportFactoryTest extends TransportFactoryTestCase
         return new OneSignalTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'onesignal://app_id@host.test',
@@ -32,19 +32,19 @@ final class OneSignalTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'onesignal://token@host'];
         yield [false, 'somethingElse://token@host'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield 'missing app_id' => ['onesignal://:api_key@host.test'];
         yield 'missing api_key' => ['onesignal://app_id:@host.test'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://token@host'];
     }

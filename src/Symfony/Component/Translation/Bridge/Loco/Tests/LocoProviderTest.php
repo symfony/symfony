@@ -798,13 +798,11 @@ class LocoProviderTest extends ProviderTestCase
             }
         }
 
-        $loader = $this->getLoader();
-        $loader->expects($this->exactly(\count($consecutiveLoadArguments)))
+        static::$loader = $this->createMock(LoaderInterface::class);
+        static::$loader->expects($this->exactly(\count($consecutiveLoadArguments)))
             ->method('load')
             ->withConsecutive(...$consecutiveLoadArguments)
             ->willReturnOnConsecutiveCalls(...$consecutiveLoadReturns);
-
-        self::$translatorBag = new TranslatorBag();
 
         $provider = $this->createProvider(
             new MockHttpClient($responses, 'https://localise.biz/api/'),
@@ -814,7 +812,7 @@ class LocoProviderTest extends ProviderTestCase
             'localise.biz/api/'
         );
 
-        $this->translatorBag = $provider->read($domains, $locales);
+        self::$translatorBag = $provider->read($domains, $locales);
 
         $responses = [];
 

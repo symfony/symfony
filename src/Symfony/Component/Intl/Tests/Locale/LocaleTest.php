@@ -14,7 +14,7 @@ namespace Symfony\Component\Intl\Tests\Locale;
 use Symfony\Component\Intl\Exception\MethodNotImplementedException;
 use Symfony\Component\Intl\Locale\Locale;
 
-class LocaleTest extends AbstractLocaleTest
+class LocaleTest extends AbstractLocaleTestCase
 {
     public function testAcceptFromHttp()
     {

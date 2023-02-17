@@ -22,7 +22,7 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
  *
  * @group legacy
  */
-abstract class AbstractNumberFormatterTest extends TestCase
+abstract class AbstractNumberFormatterTestCase extends TestCase
 {
     /**
      * @dataProvider formatCurrencyWithDecimalStyleProvider

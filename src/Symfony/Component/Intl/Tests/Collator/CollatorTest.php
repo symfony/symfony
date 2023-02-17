@@ -19,7 +19,7 @@ use Symfony\Component\Intl\Globals\IntlGlobals;
 /**
  * @group legacy
  */
-class CollatorTest extends AbstractCollatorTest
+class CollatorTest extends AbstractCollatorTestCase
 {
     public function testConstructorWithUnsupportedLocale()
     {

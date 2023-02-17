@@ -883,14 +883,14 @@ class Money
 
 class MoneyDataMapper implements DataMapperInterface
 {
-    public function mapDataToForms($data, $forms)
+    public function mapDataToForms(mixed $viewData, \Traversable $forms): void
     {
         $forms = iterator_to_array($forms);
-        $forms['amount']->setData($data ? $data->getAmount() : 0);
-        $forms['currency']->setData($data ? $data->getCurrency() : 'EUR');
+        $forms['amount']->setData($viewData ? $viewData->getAmount() : 0);
+        $forms['currency']->setData($viewData ? $viewData->getCurrency() : 'EUR');
     }
 
-    public function mapFormsToData($forms, &$data)
+    public function mapFormsToData(\Traversable $forms, mixed &$viewData): void
     {
         $forms = iterator_to_array($forms);
 
@@ -902,7 +902,7 @@ class MoneyDataMapper implements DataMapperInterface
             throw $failure;
         }
 
-        $data = new Money(
+        $viewData = new Money(
             $forms['amount']->getData(),
             $forms['currency']->getData()
         );

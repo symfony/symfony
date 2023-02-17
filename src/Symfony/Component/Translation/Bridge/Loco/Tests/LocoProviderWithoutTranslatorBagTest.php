@@ -19,12 +19,13 @@ use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Loader\XliffFileLoader;
 use Symfony\Component\Translation\Provider\ProviderInterface;
 use Symfony\Component\Translation\TranslatorBag;
+use Symfony\Component\Translation\TranslatorBagInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class LocoProviderWithoutTranslatorBagTest extends LocoProviderTest
 {
-    public static function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint): ProviderInterface
+    public static function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint, TranslatorBagInterface $translatorBag = null): ProviderInterface
     {
         return new LocoProvider($client, $loader, $logger, $defaultLocale, $endpoint, null);
     }
@@ -59,8 +60,8 @@ class LocoProviderWithoutTranslatorBagTest extends LocoProviderTest
             }
         }
 
-        static::$loader = $this->createMock(LoaderInterface::class);
-        static::$loader->expects($this->exactly(\count($consecutiveLoadArguments) * 2))
+        $loader = $this->getLoader();
+        $loader->expects($this->exactly(\count($consecutiveLoadArguments) * 2))
             ->method('load')
             ->withConsecutive(...$consecutiveLoadArguments, ...$consecutiveLoadArguments)
             ->willReturnOnConsecutiveCalls(...$consecutiveLoadReturns, ...$consecutiveLoadReturns);

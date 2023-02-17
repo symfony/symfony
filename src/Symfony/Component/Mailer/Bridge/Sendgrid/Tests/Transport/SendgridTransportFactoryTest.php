@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Mailer\Bridge\Sendgrid\Tests\Transport;
 
+use Psr\Log\NullLogger;
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridApiTransport;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridSmtpTransport;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
@@ -20,9 +22,9 @@ use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
 class SendgridTransportFactoryTest extends TransportFactoryTestCase
 {
-    public static function getFactory(): TransportFactoryInterface
+    public function getFactory(): TransportFactoryInterface
     {
-        return new SendgridTransportFactory(self::getDispatcher(), self::getClient(), self::getLogger());
+        return new SendgridTransportFactory(null, new MockHttpClient(), new NullLogger());
     }
 
     public static function supportsProvider(): iterable
@@ -55,32 +57,31 @@ class SendgridTransportFactoryTest extends TransportFactoryTestCase
 
     public static function createProvider(): iterable
     {
-        $dispatcher = self::getDispatcher();
-        $logger = self::getLogger();
+        $logger = new NullLogger();
 
         yield [
             new Dsn('sendgrid+api', 'default', self::USER),
-            new SendgridApiTransport(self::USER, self::getClient(), $dispatcher, $logger),
+            new SendgridApiTransport(self::USER, new MockHttpClient(), null, $logger),
         ];
 
         yield [
             new Dsn('sendgrid+api', 'example.com', self::USER, '', 8080),
-            (new SendgridApiTransport(self::USER, self::getClient(), $dispatcher, $logger))->setHost('example.com')->setPort(8080),
+            (new SendgridApiTransport(self::USER, new MockHttpClient(), null, $logger))->setHost('example.com')->setPort(8080),
         ];
 
         yield [
             new Dsn('sendgrid', 'default', self::USER),
-            new SendgridSmtpTransport(self::USER, $dispatcher, $logger),
+            new SendgridSmtpTransport(self::USER, null, $logger),
         ];
 
         yield [
             new Dsn('sendgrid+smtp', 'default', self::USER),
-            new SendgridSmtpTransport(self::USER, $dispatcher, $logger),
+            new SendgridSmtpTransport(self::USER, null, $logger),
         ];
 
         yield [
             new Dsn('sendgrid+smtps', 'default', self::USER),
-            new SendgridSmtpTransport(self::USER, $dispatcher, $logger),
+            new SendgridSmtpTransport(self::USER, null, $logger),
         ];
     }
 

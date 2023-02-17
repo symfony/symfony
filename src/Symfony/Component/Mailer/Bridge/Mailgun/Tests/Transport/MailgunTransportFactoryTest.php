@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Mailer\Bridge\Mailgun\Tests\Transport;
 
+use Psr\Log\NullLogger;
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunApiTransport;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunHttpTransport;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunSmtpTransport;
@@ -21,9 +23,9 @@ use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
 class MailgunTransportFactoryTest extends TransportFactoryTestCase
 {
-    public static function getFactory(): TransportFactoryInterface
+    public function getFactory(): TransportFactoryInterface
     {
-        return new MailgunTransportFactory(self::getDispatcher(), self::getClient(), self::getLogger());
+        return new MailgunTransportFactory(null, new MockHttpClient(), new NullLogger());
     }
 
     public static function supportsProvider(): iterable
@@ -61,48 +63,47 @@ class MailgunTransportFactoryTest extends TransportFactoryTestCase
 
     public static function createProvider(): iterable
     {
-        $client = self::getClient();
-        $dispatcher = self::getDispatcher();
-        $logger = self::getLogger();
+        $client = new MockHttpClient();
+        $logger = new NullLogger();
 
         yield [
             new Dsn('mailgun+api', 'default', self::USER, self::PASSWORD),
-            new MailgunApiTransport(self::USER, self::PASSWORD, null, $client, $dispatcher, $logger),
+            new MailgunApiTransport(self::USER, self::PASSWORD, null, $client, null, $logger),
         ];
 
         yield [
             new Dsn('mailgun+api', 'default', self::USER, self::PASSWORD, null, ['region' => 'eu']),
-            new MailgunApiTransport(self::USER, self::PASSWORD, 'eu', $client, $dispatcher, $logger),
+            new MailgunApiTransport(self::USER, self::PASSWORD, 'eu', $client, null, $logger),
         ];
 
         yield [
             new Dsn('mailgun+api', 'example.com', self::USER, self::PASSWORD, 8080),
-            (new MailgunApiTransport(self::USER, self::PASSWORD, null, $client, $dispatcher, $logger))->setHost('example.com')->setPort(8080),
+            (new MailgunApiTransport(self::USER, self::PASSWORD, null, $client, null, $logger))->setHost('example.com')->setPort(8080),
         ];
 
         yield [
             new Dsn('mailgun', 'default', self::USER, self::PASSWORD),
-            new MailgunHttpTransport(self::USER, self::PASSWORD, null, $client, $dispatcher, $logger),
+            new MailgunHttpTransport(self::USER, self::PASSWORD, null, $client, null, $logger),
         ];
 
         yield [
             new Dsn('mailgun+https', 'default', self::USER, self::PASSWORD),
-            new MailgunHttpTransport(self::USER, self::PASSWORD, null, $client, $dispatcher, $logger),
+            new MailgunHttpTransport(self::USER, self::PASSWORD, null, $client, null, $logger),
         ];
 
         yield [
             new Dsn('mailgun+https', 'example.com', self::USER, self::PASSWORD, 8080),
-            (new MailgunHttpTransport(self::USER, self::PASSWORD, null, $client, $dispatcher, $logger))->setHost('example.com')->setPort(8080),
+            (new MailgunHttpTransport(self::USER, self::PASSWORD, null, $client, null, $logger))->setHost('example.com')->setPort(8080),
         ];
 
         yield [
             new Dsn('mailgun+smtp', 'default', self::USER, self::PASSWORD),
-            new MailgunSmtpTransport(self::USER, self::PASSWORD, null, $dispatcher, $logger),
+            new MailgunSmtpTransport(self::USER, self::PASSWORD, null, null, $logger),
         ];
 
         yield [
             new Dsn('mailgun+smtps', 'default', self::USER, self::PASSWORD),
-            new MailgunSmtpTransport(self::USER, self::PASSWORD, null, $dispatcher, $logger),
+            new MailgunSmtpTransport(self::USER, self::PASSWORD, null, null, $logger),
         ];
     }
 

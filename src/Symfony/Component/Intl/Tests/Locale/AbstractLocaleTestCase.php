@@ -18,7 +18,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-abstract class AbstractLocaleTest extends TestCase
+abstract class AbstractLocaleTestCase extends TestCase
 {
     public function testSetDefault()
     {

@@ -16,7 +16,7 @@ use Symfony\Component\Intl\Globals\IntlGlobals;
 /**
  * @group legacy
  */
-class IntlGlobalsTest extends AbstractIntlGlobalsTest
+class IntlGlobalsTest extends AbstractIntlGlobalsTestCase
 {
     protected function getIntlErrorName($errorCode)
     {

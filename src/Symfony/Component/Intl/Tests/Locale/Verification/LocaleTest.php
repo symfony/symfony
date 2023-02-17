@@ -11,16 +11,16 @@
 
 namespace Symfony\Component\Intl\Tests\Locale\Verification;
 
-use Symfony\Component\Intl\Tests\Locale\AbstractLocaleTest;
+use Symfony\Component\Intl\Tests\Locale\AbstractLocaleTestCase;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 /**
- * Verifies that {@link AbstractLocaleTest} matches the behavior of the
+ * Verifies that {@link AbstractLocaleTestCase} matches the behavior of the
  * {@link Locale} class with a specific version of ICU.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class LocaleTest extends AbstractLocaleTest
+class LocaleTest extends AbstractLocaleTestCase
 {
     protected function setUp(): void
     {

@@ -20,7 +20,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @group legacy
  */
-abstract class AbstractIntlGlobalsTest extends TestCase
+abstract class AbstractIntlGlobalsTestCase extends TestCase
 {
     public static function errorNameProvider()
     {

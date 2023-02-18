@@ -21,31 +21,31 @@ final class BandwidthTransportFactoryTest extends TransportFactoryTestCase
         return new BandwidthTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield ['bandwidth://host.test?from=0611223344&account_id=account_id&application_id=application_id&priority=priority', 'bandwidth://username:password@host.test?from=0611223344&account_id=account_id&application_id=application_id&priority=priority'];
         yield ['bandwidth://host.test?from=0611223344&account_id=account_id&application_id=application_id', 'bandwidth://username:password@host.test?from=0611223344&account_id=account_id&application_id=application_id'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield 'missing password' => ['bandwidth://username@default?account_id=account_id&application_id=application_id&priority=priority'];
     }
 
-    public function missingRequiredOptionProvider(): iterable
+    public static function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: from' => ['bandwidth://username:password@default?account_id=account_id&application_id=application_id&priority=priority'];
         yield 'missing option: account_id' => ['bandwidth://username:password@default?from=0611223344&application_id=application_id&priority=priority'];
         yield 'missing option: application_id' => ['bandwidth://username:password@default?from=0611223344&account_id=account_id&priority=priority'];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'bandwidth://username:password@default?from=0611223344&account_id=account_id&application_id=application_id&priority=priority'];
         yield [false, 'somethingElse://username:password@default?from=0611223344&account_id=account_id&application_id=application_id&priority=priority'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://username:password@default?from=0611223344&account_id=account_id&application_id=application_id&priority=priority'];
         yield ['somethingElse://username:password@default?account_id=account_id&application_id=application_id&priority=priority']; // missing "from" option

@@ -11,6 +11,7 @@ CHANGELOG
  * Deprecate undefined and numeric keys with `service_locator` config
  * Fail if Target attribute does not exist during compilation
  * Enable deprecating parameters with `ContainerBuilder::deprecateParameter()`
+ * Add `#[AsAlias]` attribute to tell under which alias a service should be registered or to use the implemented interface if no parameter is given
 
 6.2
 ---

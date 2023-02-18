@@ -22,13 +22,13 @@ final class LineNotifyTransportFactoryTest extends TransportFactoryTestCase
         return new LineNotifyTransportFactory();
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'linenotify://host'];
         yield [false, 'somethingElse://host'];
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'linenotify://host.test',
@@ -36,12 +36,12 @@ final class LineNotifyTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield 'missing token' => ['linenotify://host.test'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://token@host'];
     }

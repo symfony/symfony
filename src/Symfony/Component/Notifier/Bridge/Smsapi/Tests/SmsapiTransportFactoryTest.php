@@ -90,11 +90,6 @@ final class SmsapiTransportFactoryTest extends TransportFactoryTestCase
         yield 'missing token' => ['smsapi://host.test?from=testFrom'];
     }
 
-    public static function missingRequiredOptionProvider(): iterable
-    {
-        yield 'missing option: from' => ['smsapi://token@host'];
-    }
-
     public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://token@host?from=testFrom'];

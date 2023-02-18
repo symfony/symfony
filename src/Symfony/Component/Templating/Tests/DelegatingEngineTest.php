@@ -50,13 +50,10 @@ class DelegatingEngineTest extends TestCase
         $streamingEngine = $this->getStreamingEngineMock('template.php', true);
         $streamingEngine->expects($this->once())
             ->method('stream')
-            ->with('template.php', ['foo' => 'bar'])
-            ->willReturn('<html />');
+            ->with('template.php', ['foo' => 'bar']);
 
         $delegatingEngine = new DelegatingEngine([$streamingEngine]);
-        $result = $delegatingEngine->stream('template.php', ['foo' => 'bar']);
-
-        $this->assertNull($result);
+        $delegatingEngine->stream('template.php', ['foo' => 'bar']);
     }
 
     public function testStreamRequiresStreamingEngine()

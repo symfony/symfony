@@ -22,6 +22,8 @@ interface HeaderInterface
      * Sets the body.
      *
      * The type depends on the Header concrete class.
+     *
+     * @return void
      */
     public function setBody(mixed $body);
 
@@ -32,16 +34,25 @@ interface HeaderInterface
      */
     public function getBody(): mixed;
 
+    /**
+     * @return void
+     */
     public function setCharset(string $charset);
 
     public function getCharset(): ?string;
 
+    /**
+     * @return void
+     */
     public function setLanguage(string $lang);
 
     public function getLanguage(): ?string;
 
     public function getName(): string;
 
+    /**
+     * @return void
+     */
     public function setMaxLineLength(int $lineLength);
 
     public function getMaxLineLength(): int;

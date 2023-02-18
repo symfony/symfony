@@ -85,6 +85,8 @@ interface OutputInterface
 
     /**
      * Sets the decorated flag.
+     *
+     * @return void
      */
     public function setDecorated(bool $decorated);
 

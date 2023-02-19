@@ -25,9 +25,9 @@ final class Key
     private array $state = [];
     private bool $serializable = true;
 
-    public function __construct(string $resource)
+    public function __construct(LockableResourceInterface|string $resource)
     {
-        $this->resource = $resource;
+        $this->resource = $resource instanceof LockableResourceInterface ? $resource->getResourceIdentifier() : $resource;
     }
 
     public function __toString(): string

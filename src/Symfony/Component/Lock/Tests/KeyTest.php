@@ -14,6 +14,7 @@ namespace Symfony\Component\Lock\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Lock\Exception\UnserializableKeyException;
 use Symfony\Component\Lock\Key;
+use Symfony\Component\Lock\Tests\Fixtures\DummyLockableResource;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
@@ -38,5 +39,13 @@ class KeyTest extends TestCase
 
         $this->expectException(UnserializableKeyException::class);
         serialize($key);
+    }
+
+    public function testLockableResource()
+    {
+        $resource = new DummyLockableResource();
+        $key = new Key($resource);
+
+        $this->assertSame($resource->getResourceIdentifier(), (string) $key);
     }
 }

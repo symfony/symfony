@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\PersistingStoreInterface;
+use Symfony\Component\Lock\Tests\Fixtures\DummyLockableResource;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
@@ -81,5 +82,36 @@ class LockFactoryTest extends TestCase
         $lock2->acquire();
 
         $this->assertSame($keys[0], $keys[1]);
+    }
+
+    public function testCreateLockFromLockableResource()
+    {
+        $store = $this->createMock(PersistingStoreInterface::class);
+        $store->expects($this->any())->method('exists')->willReturn(false);
+
+        $keys = [];
+        $store
+            ->expects($this->exactly(2))
+            ->method('save')
+            ->with($this->callback(function ($key) use (&$keys) {
+                $keys[] = $key;
+
+                return true;
+            }))
+            ->willReturn(true);
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $factory = new LockFactory($store);
+        $factory->setLogger($logger);
+
+        $resource = new DummyLockableResource();
+        $lock1 = $factory->createLockFromLockableResource($resource);
+        $lock2 = $factory->createLockFromLockableResource($resource);
+
+        // assert lock1 and lock2 don't share the same state
+        $lock1->acquire();
+        $lock2->acquire();
+
+        $this->assertNotSame($keys[0], $keys[1]);
     }
 }

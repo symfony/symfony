@@ -22,7 +22,8 @@
     },
     "require-dev": {
         "doctrine/dbal": "^2.13|^3.0",
-        "predis/predis": "~1.0"
+        "predis/predis": "~1.0",
+        "symfony/uid": "^6.2"
     },
     "conflict": {
         "doctrine/dbal": "<2.13",

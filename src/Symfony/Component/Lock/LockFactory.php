@@ -64,4 +64,16 @@ class LockFactory implements LoggerAwareInterface
 
         return $lock;
     }
+
+    /**
+     * Creates a lock from the given LockableResource.
+     *
+     * @param LockableResourceInterface $lockableResource The key containing the lock's state
+     * @param float|null                $ttl              Maximum expected lock duration in seconds
+     * @param bool                      $autoRelease      Whether to automatically release the lock or not when the lock instance is destroyed
+     */
+    public function createLockFromLockableResource(LockableResourceInterface $lockableResource, ?float $ttl = 300.0, bool $autoRelease = true): LockInterface
+    {
+        return $this->createLockFromKey(new Key($lockableResource), $ttl, $autoRelease);
+    }
 }

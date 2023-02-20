@@ -42,6 +42,7 @@ use Symfony\Component\Notifier\Bridge\OrangeSms\OrangeSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
 use Symfony\Component\Notifier\Bridge\PagerDuty\PagerDutyTransportFactory;
 use Symfony\Component\Notifier\Bridge\Plivo\PlivoTransportFactory;
+use Symfony\Component\Notifier\Bridge\Pushover\PushoverTransportFactory;
 use Symfony\Component\Notifier\Bridge\RingCentral\RingCentralTransportFactory;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sendberry\SendberryTransportFactory;
@@ -111,6 +112,7 @@ final class Transport
         OvhCloudTransportFactory::class,
         PagerDutyTransportFactory::class,
         PlivoTransportFactory::class,
+        PushoverTransportFactory::class,
         RingCentralTransportFactory::class,
         RocketChatTransportFactory::class,
         SendberryTransportFactory::class,

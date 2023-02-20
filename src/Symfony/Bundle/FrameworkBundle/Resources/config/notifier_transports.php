@@ -50,6 +50,7 @@ use Symfony\Component\Notifier\Bridge\OrangeSms\OrangeSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
 use Symfony\Component\Notifier\Bridge\PagerDuty\PagerDutyTransportFactory;
 use Symfony\Component\Notifier\Bridge\Plivo\PlivoTransportFactory;
+use Symfony\Component\Notifier\Bridge\Pushover\PushoverTransportFactory;
 use Symfony\Component\Notifier\Bridge\RingCentral\RingCentralTransportFactory;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sendberry\SendberryTransportFactory;
@@ -331,5 +332,9 @@ return static function (ContainerConfigurator $container) {
         ->set('notifier.transport_factory.pager-duty', PagerDutyTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')
             ->tag('chatter.transport_factory')
+
+        ->set('notifier.transport_factory.pushover', PushoverTransportFactory::class)
+            ->parent('notifier.transport_factory.abstract')
+            ->tag('texter.transport_factory')
     ;
 };

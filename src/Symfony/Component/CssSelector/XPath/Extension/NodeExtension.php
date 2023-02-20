@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\CssSelector\XPath\Extension;
 
+use Symfony\Component\CssSelector\Exception\ExpressionErrorException;
 use Symfony\Component\CssSelector\Node;
+use Symfony\Component\CssSelector\Parser\Token;
 use Symfony\Component\CssSelector\XPath\Translator;
 use Symfony\Component\CssSelector\XPath\XPathExpr;
 
@@ -71,7 +73,7 @@ class NodeExtension extends AbstractExtension
             'Class' => $this->translateClass(...),
             'Hash' => $this->translateHash(...),
             'Element' => $this->translateElement(...),
-            'Relation' => $this->translateRelation(...)
+            'Relation' => $this->translateRelation(...),
         ];
     }
 
@@ -213,11 +215,20 @@ class NodeExtension extends AbstractExtension
     public function translateRelation(Node\RelationNode $node, Translator $translator): XPathExpr
     {
         $xpath = $translator->nodeToXPath($node->getSelector());
-        $subXpath = $translator->nodeToXPath($node->getSubSelector());
-        $subXpath->addNameTest();
+        $selectors = $node->getArguments();
 
-        if ($subXpath->getCondition()) {
-            return $xpath->addCondition(sprintf('count(descendant-or-self::*[%s]) > 0', $subXpath->getCondition()));
+        foreach ($selectors as $index => $selector) {
+            if (null !== $selector->getPseudoElement()) {
+                throw new ExpressionErrorException('Pseudo-elements are not supported.');
+            }
+
+            $selectors[$index] = $translator->selectorToXPath($selector);
+        }
+
+        $subSelectors =  implode(' | ', $selectors);
+
+        if ($subSelectors) {
+            return $xpath->addCondition(sprintf('count(%s) > 0', $subSelectors));
         }
 
         return $xpath->addCondition('0');

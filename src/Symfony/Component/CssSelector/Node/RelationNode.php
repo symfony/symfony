@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\CssSelector\Node;
 
+use Symfony\Component\CssSelector\Parser\Token;
+
 /**
- * Represents a "<selector>:has(<identifier>)" node.
+ * Represents a "<selector>:has(<arguments>)" node.
  *
  * This component is a port of the Python cssselect library,
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
@@ -24,12 +26,12 @@ namespace Symfony\Component\CssSelector\Node;
 class RelationNode extends AbstractNode
 {
     private NodeInterface $selector;
-    private NodeInterface $subSelector;
+    private array $arguments;
 
-    public function __construct(NodeInterface $selector, NodeInterface $subSelector)
+    public function __construct(NodeInterface $selector, array $arguments)
     {
         $this->selector = $selector;
-        $this->subSelector = $subSelector;
+        $this->arguments = $arguments;
     }
 
     public function getSelector(): NodeInterface
@@ -37,18 +39,20 @@ class RelationNode extends AbstractNode
         return $this->selector;
     }
 
-    public function getSubSelector(): NodeInterface
+    public function getArguments(): array
     {
-        return $this->subSelector;
+        return $this->arguments;
     }
 
     public function getSpecificity(): Specificity
     {
-        return $this->selector->getSpecificity()->plus($this->subSelector->getSpecificity());
+        return $this->selector->getSpecificity()->plus(new Specificity(0, 1, 0));
     }
 
     public function __toString(): string
     {
-        return sprintf('%s[%s:has(%s)]', $this->getNodeName(), $this->selector, $this->subSelector);
+        $arguments = implode(', ', array_map(fn (Token $token) => "'".$token->getValue()."'", $this->arguments));
+
+        return sprintf('%s[%s:has(%s)]', $this->getNodeName(), $this->selector, $arguments ? '['.$arguments.']' : '');
     }
 }

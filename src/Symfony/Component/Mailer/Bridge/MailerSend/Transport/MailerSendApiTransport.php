@@ -13,7 +13,6 @@ namespace Symfony\Component\Mailer\Bridge\MailerSend\Transport;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\SentMessage;
@@ -48,7 +47,7 @@ final class MailerSendApiTransport extends AbstractApiTransport
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/v1/email', [
             'json' => $this->getPayload($email, $envelope),
             'headers' => [
-                'Authorization' => 'Bearer ' . $this->key,
+                'Authorization' => 'Bearer '.$this->key,
             ],
         ]);
 
@@ -62,18 +61,18 @@ final class MailerSendApiTransport extends AbstractApiTransport
 
         if (!empty($result)) {
             try {
-                $result = json_decode($result, true, 512, JSON_THROW_ON_ERROR);
+                $result = json_decode($result, true, 512, \JSON_THROW_ON_ERROR);
             } catch (\JsonException $e) {
                 throw new HttpTransportException(sprintf('Unable to send an email: "%s" (code %d).', $result, $statusCode), $response, 0, $e);
             }
         }
 
         if (202 !== $statusCode) {
-            throw new HttpTransportException('Unable to send an email: '. ($result['message'] ?? '').sprintf(' (code %d).', $statusCode), $response);
+            throw new HttpTransportException('Unable to send an email: '.($result['message'] ?? '').sprintf(' (code %d).', $statusCode), $response);
         }
 
-        if (isset($result['warnings'][0]['type']) && $result['warnings'][0]['type'] === 'ALL_SUPPRESSED') {
-            throw new HttpTransportException('Unable to send an email: ' . $result['message'] ?? 'All suppressed', $response);
+        if (isset($result['warnings'][0]['type']) && 'ALL_SUPPRESSED' === $result['warnings'][0]['type']) {
+            throw new HttpTransportException('Unable to send an email: '.$result['message'] ?? 'All suppressed', $response);
         }
 
         if (isset($headers['x-message-id'][0])) {
@@ -125,7 +124,6 @@ final class MailerSendApiTransport extends AbstractApiTransport
 
     /**
      * @param Address[] $addresses
-     * @return array
      */
     protected function prepareAddresses(array $addresses): array
     {

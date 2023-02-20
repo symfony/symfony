@@ -66,7 +66,7 @@ class MailerSendApiTransportTest extends TestCase
 
             return new MockResponse('', [
                 'http_code' => 202,
-                'response_headers' => ['x-message-id' => 'test_message_id']
+                'response_headers' => ['x-message-id' => 'test_message_id'],
             ]);
         });
 
@@ -104,7 +104,7 @@ class MailerSendApiTransportTest extends TestCase
 
             return new MockResponse('', [
                 'http_code' => 202,
-                'response_headers' => ['x-message-id' => 'test_message_id']
+                'response_headers' => ['x-message-id' => 'test_message_id'],
             ]);
         });
 
@@ -154,10 +154,10 @@ class MailerSendApiTransportTest extends TestCase
                 'message' => 'There are some warnings for your request.',
                 'warnings' => [
                     [
-                        'type' => 'ALL_SUPPRESSED'
-                    ]
-                ]
-            ], JSON_THROW_ON_ERROR), [
+                        'type' => 'ALL_SUPPRESSED',
+                    ],
+                ],
+            ], \JSON_THROW_ON_ERROR), [
                 'http_code' => 202,
             ]);
         });

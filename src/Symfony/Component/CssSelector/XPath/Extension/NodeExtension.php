@@ -13,7 +13,6 @@ namespace Symfony\Component\CssSelector\XPath\Extension;
 
 use Symfony\Component\CssSelector\Exception\ExpressionErrorException;
 use Symfony\Component\CssSelector\Node;
-use Symfony\Component\CssSelector\Parser\Token;
 use Symfony\Component\CssSelector\XPath\Translator;
 use Symfony\Component\CssSelector\XPath\XPathExpr;
 
@@ -225,7 +224,7 @@ class NodeExtension extends AbstractExtension
             $selectors[$index] = $translator->selectorToXPath($selector);
         }
 
-        $subSelectors =  implode(' | ', $selectors);
+        $subSelectors = implode(' | ', $selectors);
 
         if ($subSelectors) {
             return $xpath->addCondition(sprintf('count(%s) > 0', $subSelectors));

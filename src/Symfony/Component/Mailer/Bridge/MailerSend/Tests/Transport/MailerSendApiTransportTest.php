@@ -31,7 +31,7 @@ class MailerSendApiTransportTest extends TestCase
         $this->assertSame($expected, (string) $transport);
     }
 
-    public function getTransportData()
+    public static function getTransportData()
     {
         yield [
             new MailerSendApiTransport('ACCESS_KEY'),

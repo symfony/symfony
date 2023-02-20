@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2023-02-07T22:04:53Z
+
+Thanks for the reviews, suggestions have been taken into account.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-02-08T06:27:13Z
+
+I forgot to ask, are you sur other dumper needs this patch?
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2023-02-08T09:17:52Z
+
+I used the sanitizer so that the tests are not broken but I don't know if Mermaid or Graphviz accept new lines.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-02-08T09:51:36Z
+
+IMHO, you should fix only what is broken ; so there is not need for the trait anymore I guess.
+
+Sorrry to go back and forth!
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2023-02-08T10:13:25Z
+
+Fair enough, let's not remove new lines if the tools support them, I'll check later.
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2023-02-15T22:38:57Z
+
+It took some examples and added new lines in the transitions.
+
+## Graphviz Dot
+
+With this input: https://github.com/symfony/symfony/blob/bc5fea4e2190f00a207871115a83dd7df03d7637/src/Symfony/Component/Workflow/Tests/Dumper/StateMachineGraphvizDumperTest.php#L62
+
+Passing it to the Docker image `nshine/dot` gives this output:
+
+> ![dot](https://user-images.githubusercontent.com/2071331/219200383-818f5ab7-8f9f-41a3-afe4-1c9dd1601989.png)
+
+New lines don't cause errors, and they appear in the result. :heavy_check_mark:
+
+## Mermaid
+
+Adding a new line in any transition in the [live editor](https://mermaid.live/edit) results in a Parse error.
+
+I'm pretty sure that the live editor behaves like Mermaid, so I didn't test further. :negative_squared_cross_mark:
+
+## Summary
+
+Symfony can keep new lines in the Graphviz dumper. The other formats need new lines to be removed.
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2023-02-15T22:43:30Z
+
+Status: Needs review

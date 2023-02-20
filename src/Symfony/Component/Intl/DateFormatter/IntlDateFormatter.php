@@ -124,7 +124,7 @@ abstract class IntlDateFormatter
      * @param int|null                                $datetype Type of date formatting, one of the format type constants
      * @param int|null                                $timetype Type of time formatting, one of the format type constants
      * @param \IntlTimeZone|\DateTimeZone|string|null $timezone Timezone identifier
-     * @param int                                     $calendar Calendar to use for formatting or parsing. The only currently
+     * @param int|null                                $calendar Calendar to use for formatting or parsing. The only currently
      *                                                          supported value is IntlDateFormatter::GREGORIAN (or null using the default calendar, i.e. "GREGORIAN")
      * @param string|null                             $pattern  Optional pattern to use when formatting
      *
@@ -418,11 +418,11 @@ abstract class IntlDateFormatter
     /**
      * Parse string to a timestamp value.
      *
-     * @param string $value    String to convert to a time value
-     * @param int    $position Not supported. Position at which to start the parsing in $value (zero-based)
-     *                         If no error occurs before $value is consumed, $parse_pos will
-     *                         contain -1 otherwise it will contain the position at which parsing
-     *                         ended. If $parse_pos > strlen($value), the parse fails immediately.
+     * @param string   $value    String to convert to a time value
+     * @param int|null $position Not supported. Position at which to start the parsing in $value (zero-based)
+     *                           If no error occurs before $value is consumed, $parse_pos will
+     *                           contain -1 otherwise it will contain the position at which parsing
+     *                           ended. If $parse_pos > strlen($value), the parse fails immediately.
      *
      * @return int|false Parsed value as a timestamp
      *
@@ -494,7 +494,7 @@ abstract class IntlDateFormatter
     /**
      * Set the formatter's pattern.
      *
-     * @param string $pattern A pattern string in conformance with the ICU IntlDateFormatter documentation
+     * @param string|null $pattern A pattern string in conformance with the ICU IntlDateFormatter documentation
      *
      * @return bool true on success or false on failure
      *

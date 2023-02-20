@@ -195,7 +195,7 @@ class PlantUmlDumper implements DumperInterface
     {
         $workflowMetadata = $definition->getMetadataStore();
 
-        $placeEscaped = $this->escape($place);
+        $placeEscaped = str_replace("\n", ' ', $this->escape($place));
 
         $output = "state $placeEscaped".
             (\in_array($place, $definition->getInitialPlaces(), true) ? ' '.self::INITIAL : '').
@@ -208,7 +208,7 @@ class PlantUmlDumper implements DumperInterface
 
         $description = $workflowMetadata->getMetadata('description', $place);
         if (null !== $description) {
-            $output .= \PHP_EOL.$placeEscaped.' : '.$description;
+            $output .= \PHP_EOL.$placeEscaped.' : '.str_replace("\n", ' ', $description);
         }
 
         return $output;
@@ -217,6 +217,7 @@ class PlantUmlDumper implements DumperInterface
     private function getTransitionEscapedWithStyle(MetadataStoreInterface $workflowMetadata, Transition $transition, string $to): string
     {
         $to = $workflowMetadata->getMetadata('label', $transition) ?? $to;
+        $to = str_replace("\n", ' ', $to);
 
         $color = $workflowMetadata->getMetadata('color', $transition) ?? null;
 

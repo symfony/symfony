@@ -109,9 +109,9 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * @param \DOMNodeList|\DOMNode|\DOMNode[]|string|null $node A node
      *
-     * @throws \InvalidArgumentException when node is not the expected type
-     *
      * @return void
+     *
+     * @throws \InvalidArgumentException when node is not the expected type
      */
     public function add(\DOMNodeList|\DOMNode|array|string|null $node)
     {

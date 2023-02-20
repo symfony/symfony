@@ -479,9 +479,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Sets a service.
      *
-     * @throws BadMethodCallException When this ContainerBuilder is compiled
-     *
      * @return void
+     *
+     * @throws BadMethodCallException When this ContainerBuilder is compiled
      */
     public function set(string $id, ?object $service)
     {
@@ -608,9 +608,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * parameter, the value will still be 'bar' as defined in the ContainerBuilder
      * constructor.
      *
-     * @throws BadMethodCallException When this ContainerBuilder is compiled
-     *
      * @return void
+     *
+     * @throws BadMethodCallException When this ContainerBuilder is compiled
      */
     public function merge(self $container)
     {

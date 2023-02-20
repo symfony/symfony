@@ -98,9 +98,9 @@ class InputDefinition
     }
 
     /**
-     * @throws LogicException When incorrect argument is given
-     *
      * @return void
+     *
+     * @throws LogicException When incorrect argument is given
      */
     public function addArgument(InputArgument $argument)
     {
@@ -224,9 +224,9 @@ class InputDefinition
     }
 
     /**
-     * @throws LogicException When option given already exist
-     *
      * @return void
+     *
+     * @throws LogicException When option given already exist
      */
     public function addOption(InputOption $option)
     {

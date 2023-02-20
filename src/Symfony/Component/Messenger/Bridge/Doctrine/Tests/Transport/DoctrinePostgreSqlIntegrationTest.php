@@ -20,6 +20,7 @@ use Symfony\Component\Messenger\Bridge\Doctrine\Transport\PostgreSqlConnection;
 
 /**
  * @requires extension pdo_pgsql
+ *
  * @group integration
  */
 class DoctrinePostgreSqlIntegrationTest extends TestCase

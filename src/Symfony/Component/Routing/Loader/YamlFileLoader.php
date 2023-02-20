@@ -242,10 +242,10 @@ class YamlFileLoader extends FileLoader
     }
 
     /**
+     * @return void
+     *
      * @throws \InvalidArgumentException If one of the provided config keys is not supported,
      *                                   something is missing or the combination is nonsense
-     *
-     * @return void
      */
     protected function validate(mixed $config, string $name, string $path)
     {

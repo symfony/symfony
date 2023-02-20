@@ -23,7 +23,7 @@ use Symfony\Component\Translation\IdentityTranslator;
 
 class FormTypeCsrfExtensionTest_ChildType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // The form needs a child in order to trigger CSRF protection by
         // default

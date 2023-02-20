@@ -50,9 +50,9 @@ class DescriptorHelper extends Helper
      * * format: string, the output format name
      * * raw_text: boolean, sets output type as raw
      *
-     * @throws InvalidArgumentException when the given format is not supported
-     *
      * @return void
+     *
+     * @throws InvalidArgumentException when the given format is not supported
      */
     public function describe(OutputInterface $output, ?object $object, array $options = [])
     {

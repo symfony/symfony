@@ -367,10 +367,10 @@ class ConnectionTest extends TestCase
     /**
      * @dataProvider provideIdPatterns
      */
-    public function testAddReturnId(string $expected, int $delay, string $command, string $return)
+    public function testAddReturnId(string $expected, int $delay, string $method, string $return)
     {
         $redis = $this->createMock(\Redis::class);
-        $redis->expects($this->atLeastOnce())->method($command)->willReturn($return);
+        $redis->expects($this->atLeastOnce())->method($method)->willReturn($return);
 
         $id = Connection::fromDsn(dsn: 'redis://localhost/queue', redis: $redis)->add('body', [], $delay);
 

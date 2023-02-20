@@ -24,6 +24,7 @@ use Symfony\Component\Lock\Store\DoctrineDbalPostgreSqlStore;
  * @author Jérémy Derussé <jeremy@derusse.com>
  *
  * @requires extension pdo_pgsql
+ *
  * @group integration
  */
 class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTestCase
@@ -49,6 +50,7 @@ class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTestCase
 
     /**
      * @requires extension pdo_sqlite
+     *
      * @dataProvider getInvalidDrivers
      */
     public function testInvalidDriver($connOrDsn)

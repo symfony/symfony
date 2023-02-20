@@ -15,9 +15,9 @@ use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\LineNotify\LineNotifyTransport;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
+use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -26,25 +26,25 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class LineNotifyTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null): LineNotifyTransport
+    public static function createTransport(HttpClientInterface $client = null): LineNotifyTransport
     {
-        return (new LineNotifyTransport('testToken', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
+        return (new LineNotifyTransport('testToken', $client ?? new MockHttpClient()))->setHost('host.test');
     }
 
-    public function toStringProvider(): iterable
+    public static function toStringProvider(): iterable
     {
-        yield ['linenotify://host.test', $this->createTransport()];
+        yield ['linenotify://host.test', self::createTransport()];
     }
 
-    public function supportedMessagesProvider(): iterable
+    public static function supportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
     }
 
-    public function unsupportedMessagesProvider(): iterable
+    public static function unsupportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [new DummyMessage()];
     }
 
     public function testSendWithErrorResponseThrows()

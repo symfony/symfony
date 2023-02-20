@@ -20,6 +20,7 @@ use Symfony\Component\Mime\Message;
 
 /**
  * @group time-sensitive
+ *
  * @requires extension openssl
  */
 class DkimSignerTest extends TestCase

@@ -956,7 +956,7 @@ class TestFirewallListenerFactory implements AuthenticatorFactoryInterface, Fire
         return 'custom_listener';
     }
 
-    public function addConfiguration(NodeDefinition $builder)
+    public function addConfiguration(NodeDefinition $builder): void
     {
     }
 }

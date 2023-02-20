@@ -106,9 +106,9 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
      * @param string $format   The name of the loader (@see addLoader())
      * @param mixed  $resource The resource name
      *
-     * @throws InvalidArgumentException If the locale contains invalid characters
-     *
      * @return void
+     *
+     * @throws InvalidArgumentException If the locale contains invalid characters
      */
     public function addResource(string $format, mixed $resource, string $locale, string $domain = null)
     {
@@ -145,9 +145,9 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
      *
      * @param string[] $locales
      *
-     * @throws InvalidArgumentException If a locale contains invalid characters
-     *
      * @return void
+     *
+     * @throws InvalidArgumentException If a locale contains invalid characters
      */
     public function setFallbackLocales(array $locales)
     {
@@ -431,9 +431,9 @@ EOF
     /**
      * Asserts that the locale is valid, throws an Exception if not.
      *
-     * @throws InvalidArgumentException If the locale contains invalid characters
-     *
      * @return void
+     *
+     * @throws InvalidArgumentException If the locale contains invalid characters
      */
     protected function assertValidLocale(string $locale)
     {

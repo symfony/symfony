@@ -501,7 +501,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
             ], '1'];
 
             // access FileValidator::factorizeSizes() private method to format max file size
-            $reflection = new \ReflectionClass((new FileValidator()));
+            $reflection = new \ReflectionClass(new FileValidator());
             $method = $reflection->getMethod('factorizeSizes');
             [, $limit, $suffix] = $method->invokeArgs(new FileValidator(), [0, UploadedFile::getMaxFilesize(), false]);
 
@@ -551,7 +551,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    private function validExtensionProvider(): iterable
+    private static function validExtensionProvider(): iterable
     {
         yield ['test.gif'];
         yield ['test.png.gif'];
@@ -582,7 +582,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    private function invalidExtensionProvider(): iterable
+    private static function invalidExtensionProvider(): iterable
     {
         yield ['test.gif', 'gif'];
         yield ['test.png.gif', 'gif'];

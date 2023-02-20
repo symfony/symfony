@@ -189,7 +189,7 @@ class Request
     protected $session;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $locale;
 
@@ -1390,7 +1390,7 @@ class Request
      */
     public function getLocale(): string
     {
-        return null === $this->locale ? $this->defaultLocale : $this->locale;
+        return $this->locale ?? $this->defaultLocale;
     }
 
     /**
@@ -1459,6 +1459,7 @@ class Request
      * @param bool $asResource If true, a resource will be returned
      *
      * @return string|resource
+     *
      * @psalm-return ($asResource is true ? resource : string)
      */
     public function getContent(bool $asResource = false)

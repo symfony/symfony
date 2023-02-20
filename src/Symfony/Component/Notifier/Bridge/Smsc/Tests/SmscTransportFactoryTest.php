@@ -21,7 +21,7 @@ final class SmscTransportFactoryTest extends TransportFactoryTestCase
         return new SmscTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'smsc://host.test?from=MyApp',
@@ -29,18 +29,18 @@ final class SmscTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'smsc://login:password@default?from=MyApp'];
         yield [false, 'somethingElse://login:password@default?from=MyApp'];
     }
 
-    public function missingRequiredOptionProvider(): iterable
+    public static function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: from' => ['smsc://login:password@default'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://login:password@default?from=MyApp'];
         yield ['somethingElse://login:password@default']; // missing "from" option

@@ -154,7 +154,7 @@ class GetAttrNode extends Node
     }
 
     /**
-     * Provides BC with instances serialized before v6.2
+     * Provides BC with instances serialized before v6.2.
      */
     public function __unserialize(array $data): void
     {

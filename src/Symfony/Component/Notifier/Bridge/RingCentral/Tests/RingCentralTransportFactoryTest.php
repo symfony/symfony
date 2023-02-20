@@ -21,28 +21,28 @@ final class RingCentralTransportFactoryTest extends TransportFactoryTestCase
         return new RingCentralTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield ['ringcentral://host.test?from=0611223344', 'ringcentral://apiToken@host.test?from=0611223344'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield 'missing auth token' => ['ringcentral://@default?from=FROM'];
     }
 
-    public function missingRequiredOptionProvider(): iterable
+    public static function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: from' => ['ringcentral://apiToken@default'];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'ringcentral://apiToken@default?from=0611223344'];
         yield [false, 'somethingElse://apiToken@default?from=0611223344'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://apiToken@default?from=0611223344'];
         yield ['somethingElse://apiToken@default']; // missing "from" option

@@ -36,6 +36,7 @@ class LocalizedRoutesAsPathTest extends AbstractWebTestCase
 
     /**
      * @group issue-32995
+     *
      * @dataProvider getLocales
      */
     public function testLoginFailureWithLocalizedFailurePath(string $locale)

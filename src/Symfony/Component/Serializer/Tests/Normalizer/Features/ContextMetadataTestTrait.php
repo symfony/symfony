@@ -104,6 +104,7 @@ class ContextMetadataDummy
      * @var \DateTime
      *
      * @Groups({ "extended", "simple" })
+     *
      * @Context({ DateTimeNormalizer::FORMAT_KEY = \DateTime::RFC3339 })
      * @Context(
      *     normalizationContext = { DateTimeNormalizer::FORMAT_KEY = \DateTime::RFC3339_EXTENDED },
@@ -123,6 +124,7 @@ class ContextChildMetadataDummy
      * @var \DateTime
      *
      * @Groups({ "extended", "simple" })
+     *
      * @DummyContextChild({ DateTimeNormalizer::FORMAT_KEY = \DateTime::RFC3339 })
      * @DummyContextChild(
      *     normalizationContext = { DateTimeNormalizer::FORMAT_KEY = \DateTime::RFC3339_EXTENDED },

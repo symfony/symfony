@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Test\AccessDecisionStrategyTestCase;
 
 class UnanimousStrategyTest extends AccessDecisionStrategyTestCase
 {
-    public function provideStrategyTests(): iterable
+    public static function provideStrategyTests(): iterable
     {
         $strategy = new UnanimousStrategy();
 

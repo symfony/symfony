@@ -21,7 +21,7 @@ final class ContactEveryoneTransportFactoryTest extends TransportFactoryTestCase
         return new ContactEveryoneTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'contact-everyone://host.test',
@@ -44,18 +44,18 @@ final class ContactEveryoneTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'contact-everyone://token@default'];
         yield [false, 'somethingElse://token@default'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield 'missing token' => ['contact-everyone://default'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://token@default'];
     }

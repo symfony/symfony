@@ -187,11 +187,11 @@ class MongoDbStore implements PersistingStoreInterface
      *
      * @see http://docs.mongodb.org/manual/tutorial/expire-data/
      *
+     * @return void
+     *
      * @throws UnsupportedException          if options are not supported by the selected server
      * @throws MongoInvalidArgumentException for parameter/option parsing errors
      * @throws DriverRuntimeException        for other driver errors (e.g. connection errors)
-     *
-     * @return void
      */
     public function createTtlIndex(int $expireAfterSeconds = 0)
     {
@@ -206,9 +206,9 @@ class MongoDbStore implements PersistingStoreInterface
     }
 
     /**
-     * @throws LockExpiredException when save is called on an expired lock
-     *
      * @return void
+     *
+     * @throws LockExpiredException when save is called on an expired lock
      */
     public function save(Key $key)
     {
@@ -231,10 +231,10 @@ class MongoDbStore implements PersistingStoreInterface
     }
 
     /**
+     * @return void
+     *
      * @throws LockStorageException
      * @throws LockExpiredException
-     *
-     * @return void
      */
     public function putOffExpiration(Key $key, float $ttl)
     {

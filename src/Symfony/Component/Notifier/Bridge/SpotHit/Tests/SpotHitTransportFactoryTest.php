@@ -21,7 +21,7 @@ final class SpotHitTransportFactoryTest extends TransportFactoryTestCase
         return new SpotHitTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'spothit://spot-hit.fr',
@@ -33,13 +33,13 @@ final class SpotHitTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'spothit://api_token@default?from=MyCompany'];
         yield [false, 'somethingElse://api_token@default?from=MyCompany'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['foobar://api_token@default?from=MyCompany'];
         yield ['foobar://api_token@default'];

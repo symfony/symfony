@@ -116,9 +116,9 @@ class Router implements RouterInterface, RequestMatcherInterface
      *   * strict_requirements:    Configure strict requirement checking for generators
      *                             implementing ConfigurableRequirementsInterface (default is true)
      *
-     * @throws \InvalidArgumentException When unsupported option is provided
-     *
      * @return void
+     *
+     * @throws \InvalidArgumentException When unsupported option is provided
      */
     public function setOptions(array $options)
     {
@@ -151,9 +151,9 @@ class Router implements RouterInterface, RequestMatcherInterface
     /**
      * Sets an option.
      *
-     * @throws \InvalidArgumentException
-     *
      * @return void
+     *
+     * @throws \InvalidArgumentException
      */
     public function setOption(string $key, mixed $value)
     {

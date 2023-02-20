@@ -589,9 +589,9 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     /**
      * Writes the Response to the cache.
      *
-     * @throws \Exception
-     *
      * @return void
+     *
+     * @throws \Exception
      */
     protected function store(Request $request, Response $response)
     {

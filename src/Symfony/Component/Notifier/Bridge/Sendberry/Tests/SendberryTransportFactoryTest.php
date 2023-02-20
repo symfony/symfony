@@ -21,7 +21,7 @@ final class SendberryTransportFactoryTest extends TransportFactoryTestCase
         return new SendberryTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'sendberry://host.test?from=+0611223344',
@@ -29,19 +29,19 @@ final class SendberryTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'sendberry://api_key@default?from=%2B0611223344'];
         yield [false, 'somethingElse://api_key@default?from=0611223344'];
     }
 
-    public function missingRequiredOptionProvider(): iterable
+    public static function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: auth_key' => ['sendberry://username:password@default?from=from'];
         yield 'missing option: from' => ['sendberry://username:password@default?auth_key=auth_key'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://api_key@default?from=+0611223344'];
         yield ['somethingElse://api_key@default']; // missing "from" option

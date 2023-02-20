@@ -195,7 +195,7 @@ class Store implements StoreInterface
             if ($this->getPath($digest) !== $response->headers->get('X-Body-File')) {
                 throw new \RuntimeException('X-Body-File and X-Content-Digest do not match.');
             }
-            // Everything seems ok, omit writing content to disk
+        // Everything seems ok, omit writing content to disk
         } else {
             $digest = $this->generateContentDigest($response);
             $response->headers->set('X-Content-Digest', $digest);
@@ -249,9 +249,9 @@ class Store implements StoreInterface
     /**
      * Invalidates all cache entries that match the request.
      *
-     * @throws \RuntimeException
-     *
      * @return void
+     *
+     * @throws \RuntimeException
      */
     public function invalidate(Request $request)
     {

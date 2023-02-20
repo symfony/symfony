@@ -564,7 +564,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function provideInvalidMimeTypeWithNarrowedSet()
+    public static function provideInvalidMimeTypeWithNarrowedSet()
     {
         yield 'Doctrine style' => [new Image([
             'mimeTypes' => [

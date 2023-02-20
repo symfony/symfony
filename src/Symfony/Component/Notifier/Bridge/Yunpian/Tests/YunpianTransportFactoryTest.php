@@ -21,7 +21,7 @@ final class YunpianTransportFactoryTest extends TransportFactoryTestCase
         return new YunpianTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'yunpian://host.test',
@@ -29,13 +29,13 @@ final class YunpianTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'yunpian://api_key@default'];
         yield [false, 'somethingElse://api_key@default'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://api_key@default'];
     }

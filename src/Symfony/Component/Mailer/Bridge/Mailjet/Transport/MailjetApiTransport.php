@@ -66,7 +66,7 @@ class MailjetApiTransport extends AbstractApiTransport
 
     public function __toString(): string
     {
-        return sprintf('mailjet+api://%s', $this->getEndpoint());
+        return sprintf('mailjet+api://%s', $this->getEndpoint().($this->sandbox ? '?sandbox=true' : ''));
     }
 
     protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface

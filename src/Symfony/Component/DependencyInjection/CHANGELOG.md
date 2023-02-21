@@ -12,6 +12,7 @@ CHANGELOG
  * Fail if Target attribute does not exist during compilation
  * Enable deprecating parameters with `ContainerBuilder::deprecateParameter()`
  * Add `#[AsAlias]` attribute to tell under which alias a service should be registered or to use the implemented interface if no parameter is given
+ * Allow to trim XML service parameters value by using `trim="true"` attribute
 
 6.2
 ---

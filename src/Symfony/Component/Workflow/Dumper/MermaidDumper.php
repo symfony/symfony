@@ -215,7 +215,7 @@ class MermaidDumper implements DumperInterface
         string $transitionLabel,
         array $transitionMeta
     ): array {
-        $transitionOutput = [sprintf('%s-->|%s|%s', $from, $this->escape($transitionLabel), $to)];
+        $transitionOutput = [sprintf('%s-->|%s|%s', $from, str_replace("\n", ' ', $this->escape($transitionLabel)), $to)];
 
         $linkStyle = $this->styleLink($transitionMeta);
         if ('' !== $linkStyle) {

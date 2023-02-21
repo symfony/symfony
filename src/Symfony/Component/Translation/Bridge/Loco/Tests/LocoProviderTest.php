@@ -712,7 +712,7 @@ class LocoProviderTest extends ProviderTestCase
             ->method('getCatalogue')
             ->willReturn(new MessageCatalogue($locale));
 
-        $provider = $this->createProvider((new MockHttpClient(new MockResponse($responseContent)))->withOptions([
+        $provider = self::createProvider((new MockHttpClient(new MockResponse($responseContent)))->withOptions([
             'base_uri' => 'https://localise.biz/api/',
             'headers' => [
                 'Authorization' => 'Loco API_KEY',
@@ -803,7 +803,7 @@ class LocoProviderTest extends ProviderTestCase
             ->withConsecutive(...$consecutiveLoadArguments)
             ->willReturnOnConsecutiveCalls(...$consecutiveLoadReturns);
 
-        $provider = $this->createProvider(
+        $provider = self::createProvider(
             new MockHttpClient($responses, 'https://localise.biz/api/'),
             $this->getLoader(),
             $this->getLogger(),
@@ -833,7 +833,7 @@ class LocoProviderTest extends ProviderTestCase
             }
         }
 
-        $provider = $this->createProvider(
+        $provider = self::createProvider(
             new MockHttpClient($responses, 'https://localise.biz/api/'),
             $this->getLoader(),
             $this->getLogger(),
@@ -859,7 +859,7 @@ class LocoProviderTest extends ProviderTestCase
             'validators' => ['post.num_comments' => '{count, plural, one {# commentaire} other {# commentaires}}'],
         ]));
 
-        $provider = $this->createProvider(
+        $provider = self::createProvider(
             new MockHttpClient([
                 function (string $method, string $url, array $options = []): ResponseInterface {
                     $this->assertSame('GET', $method);
@@ -904,7 +904,7 @@ class LocoProviderTest extends ProviderTestCase
             'messages' => ['a' => 'trans_en_a'],
         ]));
 
-        $provider = $this->createProvider(
+        $provider = self::createProvider(
             new MockHttpClient([
                 function (string $method, string $url, array $options = []): ResponseInterface {
                     $this->assertSame('GET', $method);

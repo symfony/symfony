@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\ErrorHandler\ErrorRenderer;
 
+use Symfony\Component\Console\Terminal;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
-use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 
 // Help opcache.preload discover always-needed symbols
@@ -25,71 +25,146 @@ class CliErrorRenderer implements ErrorRendererInterface
 {
     public function render(\Throwable $exception): FlattenException
     {
-        $cloner = new VarCloner();
-        $dumper = new class() extends CliDumper {
-            protected function supportsColors(): bool
-            {
-                $outputStream = $this->outputStream;
-                $this->outputStream = fopen('php://stdout', 'w');
-
-                try {
-                    return parent::supportsColors();
-                } finally {
-                    $this->outputStream = $outputStream;
-                }
-            }
-        };
-
-        $flattenException = FlattenException::createFromThrowable($exception);
-        $exceptionTraceDump = $dumper->dump($cloner->cloneVar($exception)['trace'], true);
-
-        return $flattenException->setAsString($this->doRender($exception, $exceptionTraceDump));
+        return FlattenException::createFromThrowable($exception)->setAsString($this->doRender($exception));
     }
 
-    private function doRender(\Throwable $exception, string $traceAsString): string
+    private function doRender(\Throwable $exception): string
     {
-        $resetStyle = "\033[0m";
-        $textBold = "\033[1m";
-        $textBrightWhite = "\033[37;1m";
-        $textBrightRed = "\033[31;1m";
-        $textGray = "\033[38;5;245m";
-
         $result = '';
 
-        $exceptionFqcn = \get_class($exception);
-        $result .= '👻 '.$textBold.$textBrightRed.$exceptionFqcn.$resetStyle."\n";
-        $result .= $exception->getMessage()."\n\n";
-
-        $sourceCode = file($exception->getFile());
-        $sourceCodeExtract = [];
-        for ($i = $exception->getLine() - 3; $i <= $exception->getLine() + 3; ++$i) {
-            $sourceCodeExtract[$i] = ($sourceCode[$i] ?? '')."\n";
-        }
-
-        $exceptionLineNumber = $exception->getLine();
-        [$exceptionFilePath, $exceptionFileName] = $this->findExceptionFilePathAndName($exception->getFile());
-        $result .= $textGray.sprintf('at %s%s%s:%d', $exceptionFilePath, $textBrightWhite, $exceptionFileName, $exceptionLineNumber).$resetStyle."\n";
-        $maxLineNumberLengthInDigits =  strlen((string) $exceptionLineNumber + 4);
-        foreach ($sourceCodeExtract as $lineNumber => $code) {
-            if ($lineNumber === $exceptionLineNumber) {
-                $result .= sprintf("%s".str_repeat(' ', $maxLineNumberLengthInDigits - 1)."==> %s %s\n", $textBrightRed, $resetStyle, rtrim($code));
-            } else {
-                $result .= sprintf("%s%".$maxLineNumberLengthInDigits."d |%s %s\n", $textGray, $lineNumber, $resetStyle, rtrim($code));
-            }
-        }
-
-        if ($this->shouldTheExceptionTraceBeIncluded($exceptionFqcn)) {
-            $result .= "\n\n";
-            $result .= $textBold.$textBrightWhite."Exception Trace".$resetStyle."\n";
-            $result .= $traceAsString."\n";
-        }
-
+        $result .= $this->renderExceptionSummary($exception);
+        $result .= $this->renderSourceCodeExcerpt($exception);
+        $result .= $this->renderExceptionTrace($exception);
         $result .= "\n\n";
 
         return $result;
     }
 
-    private function shouldTheExceptionTraceBeIncluded(string $exceptionFqcn): bool
+    private function renderExceptionSummary(\Throwable $exception): string
+    {
+        $content = '';
+
+        $exceptionFqcn = \get_class($exception);
+        $content .= $this->fullLineWithRedBackground("👻 $exceptionFqcn")."\n";
+        $content .= $this->textBrightRed($exception->getMessage())."\n\n";
+
+        return $content;
+    }
+
+    private function renderSourceCodeExcerpt(\Throwable $exception): string
+    {
+        $content = '';
+
+        // using the previous line number generates much more precise results
+        $exceptionLineNumber = $exception->getLine() - 1;
+
+        [$exceptionFilePath, $exceptionFileName] = $this->findExceptionFilePathAndName($exception->getFile());
+        $exceptionPathInformation = $this->textGray($this->makePathRelative($exceptionFilePath)).$this->textBrightWhite(sprintf('%s:%d', $exceptionFileName, $exceptionLineNumber))."\n";
+        $content .= $this->textGray('at ').$this->renderAsLink($exceptionPathInformation, $exception->getFile(), $exceptionLineNumber);
+
+        $sourceCode = file($exception->getFile());
+        if (false === $sourceCode) {
+            return $content."\n";
+        }
+
+        $content .= $this->separatorLine()."\n";
+
+        $sourceCodeExtract = [];
+        for ($i = $exception->getLine() - 3; $i <= $exception->getLine() + 3; ++$i) {
+            $sourceCodeExtract[$i] = ($sourceCode[$i] ?? '')."\n";
+        }
+
+        $maxLineNumberLengthInDigits = \strlen((string) $exceptionLineNumber + 4);
+        foreach ($sourceCodeExtract as $lineNumber => $code) {
+            $lineNumberFormatted = sprintf("%{$maxLineNumberLengthInDigits}d |", $lineNumber);
+            if ($lineNumber === $exceptionLineNumber) {
+                $content .= $this->textRedBackground($lineNumberFormatted);
+            } else {
+                $content .= $this->textGray($lineNumberFormatted);
+            }
+
+            $content .= sprintf(" %s\n", rtrim($code));
+        }
+
+        return $content;
+    }
+
+    private function renderExceptionTrace(\Throwable $exception): string
+    {
+        $content = '';
+
+        $exceptionFqcn = \get_class($exception);
+        if (!$this->shouldTraceBeRenderedForException($exceptionFqcn)) {
+            return $content;
+        }
+
+        $content .= "\nException Trace\n";
+        $content .= $this->separatorLine()."\n";
+        foreach ($exception->getTrace() as $frame) {
+            $frameHasClass = $frame['class'] ?? false;
+
+            $content .= $this->textGray(' at ');
+            if ($frameHasClass) {
+                $classPathParts = explode('\\', $frame['class']);
+                $content .= $this->textGray(array_pop($classPathParts));
+            }
+
+            if ($frame['function'] ?? false) {
+                $content .= $frameHasClass ? $this->textGray('::') : '';
+                $content .= $frame['function'].'()';
+            }
+
+            if ($frame['file'] ?? false) {
+                $content .= $this->textGray(' in ');
+                $path = $this->textGray($this->makePathRelative($frame['file']));
+                $path .= ($frame['line'] ?? false) ? $this->textGray(sprintf(':%d', $frame['line'])) : '';
+                $content .= $this->renderAsLink($path, $frame['file'], $frame['line'] ?? 0);
+            }
+
+            $content .= "\n";
+        }
+
+        return $content;
+    }
+
+    private function separatorLine(): string
+    {
+        $terminalWidth = (new Terminal())->getWidth();
+
+        return $this->textGray(str_repeat('═', $terminalWidth));
+    }
+
+    private function fullLineWithRedBackground(string $content): string
+    {
+        return sprintf('%s%s%s', "\033[97;41m\033[K", $content, "\033[0m");
+    }
+
+    private function textRedBackground(string $content): string
+    {
+        return sprintf('%s%s%s', "\033[97;41m", $content, "\033[0m");
+    }
+
+    private function textGray(string $content): string
+    {
+        return sprintf('%s%s%s', "\033[38;5;245m", $content, "\033[0m");
+    }
+
+    private function textRed(string $content): string
+    {
+        return sprintf('%s%s%s', "\033[31m", $content, "\033[0m");
+    }
+
+    private function textBrightRed(string $content): string
+    {
+        return sprintf('%s%s%s', "\033[91m", $content, "\033[0m");
+    }
+
+    private function textBrightWhite(string $content): string
+    {
+        return sprintf('%s%s%s', "\033[37;1m", $content, "\033[0m");
+    }
+
+    private function shouldTraceBeRenderedForException(string $exceptionFqcn): bool
     {
         return !in_array($exceptionFqcn, [\ParseError::class], true);
     }
@@ -107,5 +182,24 @@ class CliErrorRenderer implements ErrorRendererInterface
         }
 
         return [$dirPath, $fileName];
+    }
+
+    private function makePathRelative(string $absolutePath): string
+    {
+        $vendorPrefix = str_replace([
+            'symfony'.DIRECTORY_SEPARATOR.'error-handler'.DIRECTORY_SEPARATOR.'ErrorRenderer'.DIRECTORY_SEPARATOR.'CliErrorRenderer.php',
+            'src'.DIRECTORY_SEPARATOR.'Symfony'.DIRECTORY_SEPARATOR.'Component'.DIRECTORY_SEPARATOR.'ErrorHandler'.DIRECTORY_SEPARATOR.'ErrorRenderer'.DIRECTORY_SEPARATOR.'CliErrorRenderer.php',
+        ], '', __FILE__);
+        $projectPrefix = \dirname($vendorPrefix).DIRECTORY_SEPARATOR;
+
+        return str_replace($projectPrefix, '', $absolutePath);
+    }
+
+    private function renderAsLink(string $content, string $filePath, int $lineNumber): string
+    {
+        $terminalSupportsLinks = 'JetBrains-JediTerm' !== getenv('TERMINAL_EMULATOR') && (!getenv('KONSOLE_VERSION') || (int) getenv('KONSOLE_VERSION') > 201100);
+        $href = sprintf('file://%s#L%d', $filePath, $lineNumber);
+
+        return $terminalSupportsLinks ? "\033]8;;{$href}\033\\{$content}\033]8;;\033\\" : $content;
     }
 }

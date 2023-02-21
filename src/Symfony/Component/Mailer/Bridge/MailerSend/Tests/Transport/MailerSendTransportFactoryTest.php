@@ -20,12 +20,12 @@ use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
 class MailerSendTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function getFactory(): TransportFactoryInterface
+    public static function getFactory(): TransportFactoryInterface
     {
-        return new MailerSendTransportFactory($this->getDispatcher(), $this->getClient(), $this->getLogger());
+        return new MailerSendTransportFactory(self::getDispatcher(), self::getClient(), self::getLogger());
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [
             new Dsn('mailersend', 'default'),
@@ -48,30 +48,30 @@ class MailerSendTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             new Dsn('mailersend', 'default', self::USER, self::PASSWORD),
-            new MailerSendSmtpTransport(self::USER, self::PASSWORD, $this->getDispatcher(), $this->getLogger()),
+            new MailerSendSmtpTransport(self::USER, self::PASSWORD, self::getDispatcher(), self::getLogger()),
         ];
 
         yield [
             new Dsn('mailersend+smtp', 'default', self::USER, self::PASSWORD),
-            new MailerSendSmtpTransport(self::USER, self::PASSWORD, $this->getDispatcher(), $this->getLogger()),
+            new MailerSendSmtpTransport(self::USER, self::PASSWORD, self::getDispatcher(), self::getLogger()),
         ];
 
         yield [
             new Dsn('mailersend+smtp', 'default', self::USER, self::PASSWORD, 465),
-            new MailerSendSmtpTransport(self::USER, self::PASSWORD, $this->getDispatcher(), $this->getLogger()),
+            new MailerSendSmtpTransport(self::USER, self::PASSWORD, self::getDispatcher(), self::getLogger()),
         ];
 
         yield [
             new Dsn('mailersend+api', 'default', self::USER),
-            new MailerSendApiTransport(self::USER, $this->getClient(), $this->getDispatcher(), $this->getLogger()),
+            new MailerSendApiTransport(self::USER, self::getClient(), self::getDispatcher(), self::getLogger()),
         ];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield [
             new Dsn('mailersend+foo', 'default', self::USER, self::PASSWORD),
@@ -79,7 +79,7 @@ class MailerSendTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield [new Dsn('mailersend+smtp', 'default', self::USER)];
 

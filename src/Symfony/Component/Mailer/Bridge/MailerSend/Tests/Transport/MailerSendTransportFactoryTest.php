@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Mailer\Bridge\MailerSend\Tests\Transport;
 
+use Psr\Log\NullLogger;
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Mailer\Bridge\MailerSend\Transport\MailerSendApiTransport;
 use Symfony\Component\Mailer\Bridge\MailerSend\Transport\MailerSendSmtpTransport;
 use Symfony\Component\Mailer\Bridge\MailerSend\Transport\MailerSendTransportFactory;
@@ -22,7 +24,7 @@ class MailerSendTransportFactoryTest extends TransportFactoryTestCase
 {
     public static function getFactory(): TransportFactoryInterface
     {
-        return new MailerSendTransportFactory(self::getDispatcher(), self::getClient(), self::getLogger());
+        return new MailerSendTransportFactory(null, new MockHttpClient(), new NullLogger());
     }
 
     public static function supportsProvider(): iterable
@@ -52,22 +54,22 @@ class MailerSendTransportFactoryTest extends TransportFactoryTestCase
     {
         yield [
             new Dsn('mailersend', 'default', self::USER, self::PASSWORD),
-            new MailerSendSmtpTransport(self::USER, self::PASSWORD, self::getDispatcher(), self::getLogger()),
+            new MailerSendSmtpTransport(self::USER, self::PASSWORD, null, new NullLogger()),
         ];
 
         yield [
             new Dsn('mailersend+smtp', 'default', self::USER, self::PASSWORD),
-            new MailerSendSmtpTransport(self::USER, self::PASSWORD, self::getDispatcher(), self::getLogger()),
+            new MailerSendSmtpTransport(self::USER, self::PASSWORD, null, new NullLogger()),
         ];
 
         yield [
             new Dsn('mailersend+smtp', 'default', self::USER, self::PASSWORD, 465),
-            new MailerSendSmtpTransport(self::USER, self::PASSWORD, self::getDispatcher(), self::getLogger()),
+            new MailerSendSmtpTransport(self::USER, self::PASSWORD, null, new NullLogger()),
         ];
 
         yield [
             new Dsn('mailersend+api', 'default', self::USER),
-            new MailerSendApiTransport(self::USER, self::getClient(), self::getDispatcher(), self::getLogger()),
+            new MailerSendApiTransport(self::USER, self::getClient(), null, new NullLogger()),
         ];
     }
 

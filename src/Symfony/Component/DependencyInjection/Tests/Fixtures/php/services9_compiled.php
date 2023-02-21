@@ -298,7 +298,7 @@ class ProjectServiceContainer extends Container
      */
     protected static function getFooBarService($container)
     {
-        $container->factories['foo_bar'] = static function ($container) {
+        $container->factories['foo_bar'] = function ($container) {
             return new \Bar\FooClass(($container->services['deprecated_service'] ?? self::getDeprecatedServiceService($container)));
         };
 
@@ -332,12 +332,12 @@ class ProjectServiceContainer extends Container
     {
         $containerRef = $container->ref;
 
-        return $container->services['lazy_context'] = new \LazyContext(new RewindableGenerator(static function () use ($containerRef) {
+        return $container->services['lazy_context'] = new \LazyContext(new RewindableGenerator(function () use ($containerRef) {
             $container = $containerRef->get();
 
             yield 'k1' => ($container->services['foo.baz'] ?? self::getFoo_BazService($container));
             yield 'k2' => $container;
-        }, 2), new RewindableGenerator(static function () {
+        }, 2), new RewindableGenerator(function () {
             return new \EmptyIterator();
         }, 0));
     }
@@ -351,11 +351,11 @@ class ProjectServiceContainer extends Container
     {
         $containerRef = $container->ref;
 
-        return $container->services['lazy_context_ignore_invalid_ref'] = new \LazyContext(new RewindableGenerator(static function () use ($containerRef) {
+        return $container->services['lazy_context_ignore_invalid_ref'] = new \LazyContext(new RewindableGenerator(function () use ($containerRef) {
             $container = $containerRef->get();
 
             yield 0 => ($container->services['foo.baz'] ?? self::getFoo_BazService($container));
-        }, 1), new RewindableGenerator(static function () {
+        }, 1), new RewindableGenerator(function () {
             return new \EmptyIterator();
         }, 0));
     }
@@ -434,7 +434,7 @@ class ProjectServiceContainer extends Container
     {
         $containerRef = $container->ref;
 
-        return $container->services['tagged_iterator'] = new \Bar(new RewindableGenerator(static function () use ($containerRef) {
+        return $container->services['tagged_iterator'] = new \Bar(new RewindableGenerator(function () use ($containerRef) {
             $container = $containerRef->get();
 
             yield 0 => ($container->services['foo'] ?? self::getFooService($container));

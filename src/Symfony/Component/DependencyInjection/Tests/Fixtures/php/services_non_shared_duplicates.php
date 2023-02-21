@@ -21,7 +21,7 @@ class ProjectServiceContainer extends Container
     public function __construct()
     {
         $containerRef = $this->ref = \WeakReference::create($this);
-        $this->getService = static function () use ($containerRef) { return $containerRef->get()->getService(...\func_get_args()); };
+        $this->getService = function () use ($containerRef) { return $containerRef->get()->getService(...\func_get_args()); };
         $this->services = $this->privates = [];
         $this->methodMap = [
             'bar' => 'getBarService',
@@ -80,7 +80,7 @@ class ProjectServiceContainer extends Container
      */
     protected static function getFooService($container)
     {
-        $container->factories['service_container']['foo'] = static function ($container) {
+        $container->factories['service_container']['foo'] = function ($container) {
             return new \stdClass();
         };
 

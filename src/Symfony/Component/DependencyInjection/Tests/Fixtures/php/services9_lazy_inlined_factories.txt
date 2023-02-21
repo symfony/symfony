@@ -48,7 +48,7 @@ class ProjectServiceContainer extends Container
 
         $this->aliases = [];
 
-        $this->privates['service_container'] = static function ($container) {
+        $this->privates['service_container'] = function ($container) {
             include_once __DIR__.'/proxy-classes.php';
         };
     }

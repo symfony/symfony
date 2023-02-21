@@ -62,20 +62,20 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
         $instance->foo1 = ($container->services['foo1'] ?? null);
         $instance->foo2 = null;
         $instance->foo3 = ($container->privates['foo3'] ?? null);
-        $instance->closures = [#[\Closure(name: 'foo1', class: 'stdClass')] static function () use ($containerRef) {
+        $instance->closures = [#[\Closure(name: 'foo1', class: 'stdClass')] function () use ($containerRef) {
             $container = $containerRef->get();
 
             return ($container->services['foo1'] ?? null);
-        }, #[\Closure(name: 'foo2')] static function () use ($containerRef) {
+        }, #[\Closure(name: 'foo2')] function () use ($containerRef) {
             $container = $containerRef->get();
 
             return null;
-        }, #[\Closure(name: 'foo3', class: 'stdClass')] static function () use ($containerRef) {
+        }, #[\Closure(name: 'foo3', class: 'stdClass')] function () use ($containerRef) {
             $container = $containerRef->get();
 
             return ($container->privates['foo3'] ?? null);
         }];
-        $instance->iter = new RewindableGenerator(static function () use ($containerRef) {
+        $instance->iter = new RewindableGenerator(function () use ($containerRef) {
             $container = $containerRef->get();
 
             if (isset($container->services['foo1'])) {
@@ -87,7 +87,7 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
             if (isset($container->privates['foo3'])) {
                 yield 'foo3' => ($container->privates['foo3'] ?? null);
             }
-        }, static function () use ($containerRef) {
+        }, function () use ($containerRef) {
             $container = $containerRef->get();
 
             return 0 + (int) (isset($container->services['foo1'])) + (int) (false) + (int) (isset($container->privates['foo3']));

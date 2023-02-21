@@ -244,7 +244,7 @@ class PhpDumper extends Dumper
         if ($this->addGetService) {
             $code = preg_replace(
                 "/(\r?\n\r?\n    public function __construct.+?\\{\r?\n) ++([^\r\n]++)/s",
-                "\n    protected \Closure \$getService;$1        \$containerRef = $2\n        \$this->getService = static function () use (\$containerRef) { return \$containerRef->get()->getService(...\\func_get_args()); };",
+                "\n    protected \Closure \$getService;$1        \$containerRef = $2\n        \$this->getService = function () use (\$containerRef) { return \$containerRef->get()->getService(...\\func_get_args()); };",
                 $code,
                 1
             );
@@ -941,7 +941,7 @@ EOF;
                 $c = implode("\n", array_map(fn ($line) => $line ? '    '.$line : $line, explode("\n", $c)));
                 $lazyloadInitialization = $definition->isLazy() ? ', $lazyLoad = true' : '';
 
-                $c = sprintf("        %s = static function (\$container%s) {\n%s        };\n\n        return %1\$s(\$container);\n", $factory, $lazyloadInitialization, $c);
+                $c = sprintf("        %s = function (\$container%s) {\n%s        };\n\n        return %1\$s(\$container);\n", $factory, $lazyloadInitialization, $c);
             }
 
             $code .= $c;
@@ -1545,7 +1545,7 @@ EOF;
             $code .= "\n            include_once __DIR__.'/proxy-classes.php';";
         }
 
-        return $code ? sprintf("\n        \$this->privates['service_container'] = static function (\$container) {%s\n        };\n", $code) : '';
+        return $code ? sprintf("\n        \$this->privates['service_container'] = function (\$container) {%s\n        };\n", $code) : '';
     }
 
     private function addDefaultParametersMethod(): string
@@ -1831,7 +1831,7 @@ EOF;
                     }
                     $this->addContainerRef = true;
 
-                    return sprintf("%sstatic function () use (\$containerRef)%s {\n            \$container = \$containerRef->get();\n\n            %s\n        }", $attribute, $returnedType, $code);
+                    return sprintf("%sfunction () use (\$containerRef)%s {\n            \$container = \$containerRef->get();\n\n            %s\n        }", $attribute, $returnedType, $code);
                 }
 
                 if ($value instanceof IteratorArgument) {
@@ -1839,15 +1839,15 @@ EOF;
                     $code = [];
 
                     if (!$values = $value->getValues()) {
-                        $code[] = 'new RewindableGenerator(static function () {';
+                        $code[] = 'new RewindableGenerator(function () {';
                         $code[] = '            return new \EmptyIterator();';
                     } else {
                         $this->addContainerRef = true;
-                        $code[] = 'new RewindableGenerator(static function () use ($containerRef) {';
+                        $code[] = 'new RewindableGenerator(function () use ($containerRef) {';
                         $code[] = '            $container = $containerRef->get();';
                         $code[] = '';
                         $countCode = [];
-                        $countCode[] = 'static function () use ($containerRef) {';
+                        $countCode[] = 'function () use ($containerRef) {';
 
                         foreach ($values as $k => $v) {
                             ($c = $this->getServiceConditionals($v)) ? $operands[] = "(int) ($c)" : ++$operands[0];

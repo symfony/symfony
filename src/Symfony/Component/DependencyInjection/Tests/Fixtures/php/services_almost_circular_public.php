@@ -275,7 +275,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
     {
         $containerRef = $container->ref;
 
-        return $container->services['doctrine.entity_listener_resolver'] = new \stdClass(new RewindableGenerator(static function () use ($containerRef) {
+        return $container->services['doctrine.entity_listener_resolver'] = new \stdClass(new RewindableGenerator(function () use ($containerRef) {
             $container = $containerRef->get();
 
             yield 0 => ($container->services['doctrine.listener'] ?? self::getDoctrine_ListenerService($container));
@@ -356,7 +356,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected static function getFoo4Service($container)
     {
-        $container->factories['foo4'] = static function ($container) {
+        $container->factories['foo4'] = function ($container) {
             $instance = new \stdClass();
 
             $instance->foobar = ($container->services['foobar4'] ?? self::getFoobar4Service($container));
@@ -528,7 +528,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
     {
         $containerRef = $container->ref;
 
-        return $container->services['mailer.transport_factory'] = new \FactoryCircular(new RewindableGenerator(static function () use ($containerRef) {
+        return $container->services['mailer.transport_factory'] = new \FactoryCircular(new RewindableGenerator(function () use ($containerRef) {
             $container = $containerRef->get();
 
             yield 0 => ($container->services['mailer.transport_factory.amazon'] ?? self::getMailer_TransportFactory_AmazonService($container));
@@ -559,7 +559,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected static function getMailerInline_TransportFactoryService($container)
     {
-        return $container->services['mailer_inline.transport_factory'] = new \FactoryCircular(new RewindableGenerator(static function () {
+        return $container->services['mailer_inline.transport_factory'] = new \FactoryCircular(new RewindableGenerator(function () {
             return new \EmptyIterator();
         }, 0));
     }

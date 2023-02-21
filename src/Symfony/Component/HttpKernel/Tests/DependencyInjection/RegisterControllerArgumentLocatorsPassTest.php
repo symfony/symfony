@@ -586,7 +586,7 @@ class CustomAutowire extends Autowire
 {
     public function __construct(string $parameter)
     {
-        parent::__construct(param: $parameter);
+        parent::__construct('%'.$parameter.'%');
     }
 }
 

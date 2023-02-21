@@ -35,7 +35,7 @@ class RedisExtIntegrationTest extends TestCase
         }
 
         try {
-            $this->redis = new \Redis();
+            $this->redis = $this->createRedisClient();
             $this->connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), ['sentinel_master' => getenv('MESSENGER_REDIS_SENTINEL_MASTER') ?: null], $this->redis);
             $this->connection->cleanup();
             $this->connection->setup();
@@ -222,7 +222,8 @@ class RedisExtIntegrationTest extends TestCase
         $connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'),
             ['lazy' => true,
              'delete_after_ack' => true,
-             'sentinel_master' => getenv('MESSENGER_REDIS_SENTINEL_MASTER') ?: null, ], $this->redis);
+             'sentinel_master' => getenv('MESSENGER_REDIS_SENTINEL_MASTER') ?: null,
+            ], $this->redis);
 
         $connection->add('1', []);
         $this->assertNotEmpty($message = $connection->get());

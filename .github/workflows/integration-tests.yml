@@ -45,11 +45,11 @@ jobs:
           LDAP_USERS: a
           LDAP_PASSWORDS: a
       redis:
-        image: redis:6.0.0
+        image: redis:6.2.8
         ports:
           - 16379:6379
       redis-cluster:
-        image: grokzen/redis-cluster:latest
+        image: grokzen/redis-cluster:6.2.8
         ports:
           - 7000:7000
           - 7001:7001
@@ -61,7 +61,7 @@ jobs:
         env:
           STANDALONE: 1
       redis-sentinel:
-        image: bitnami/redis-sentinel:6.0
+        image: bitnami/redis-sentinel:6.2.8
         ports:
           - 26379:26379
         env:

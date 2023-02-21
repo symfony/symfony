@@ -53,11 +53,13 @@ class MailjetApiTransport extends AbstractApiTransport
 
     private string $privateKey;
     private string $publicKey;
+    private bool $sandbox;
 
-    public function __construct(string $publicKey, string $privateKey, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
+    public function __construct(string $publicKey, string $privateKey, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null, bool $sandbox = false)
     {
         $this->publicKey = $publicKey;
         $this->privateKey = $privateKey;
+        $this->sandbox = $sandbox;
 
         parent::__construct($client, $dispatcher, $logger);
     }
@@ -153,6 +155,7 @@ class MailjetApiTransport extends AbstractApiTransport
 
         return [
             'Messages' => [$message],
+            'SandBoxMode' => $this->sandbox,
         ];
     }
 

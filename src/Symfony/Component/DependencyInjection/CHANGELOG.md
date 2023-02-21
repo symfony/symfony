@@ -13,6 +13,7 @@ CHANGELOG
  * Enable deprecating parameters with `ContainerBuilder::deprecateParameter()`
  * Add `#[AsAlias]` attribute to tell under which alias a service should be registered or to use the implemented interface if no parameter is given
  * Allow to trim XML service parameters value by using `trim="true"` attribute
+ * Allow extending the `Autowire` attribute
 
 6.2
 ---

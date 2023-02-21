@@ -482,7 +482,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
 
         $locator = $container->get($locatorId)->get('foo::fooAction');
 
-        $this->assertCount(7, $locator->getProvidedServices());
+        $this->assertCount(8, $locator->getProvidedServices());
         $this->assertInstanceOf(\stdClass::class, $locator->get('service1'));
         $this->assertSame('foo/bar', $locator->get('value'));
         $this->assertSame('foo', $locator->get('expression'));
@@ -490,6 +490,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertInstanceOf(\stdClass::class, $locator->get('expressionAsValue'));
         $this->assertSame('bar', $locator->get('rawValue'));
         $this->assertSame('@bar', $locator->get('escapedRawValue'));
+        $this->assertSame('foo', $locator->get('customAutowire'));
         $this->assertFalse($locator->has('service2'));
     }
 }
@@ -580,6 +581,15 @@ class WithResponseArgument
     }
 }
 
+#[\Attribute(\Attribute::TARGET_PARAMETER)]
+class CustomAutowire extends Autowire
+{
+    public function __construct(string $parameter)
+    {
+        parent::__construct(param: $parameter);
+    }
+}
+
 class WithAutowireAttribute
 {
     public function fooAction(
@@ -597,6 +607,8 @@ class WithAutowireAttribute
         string $rawValue,
         #[Autowire('@@bar')]
         string $escapedRawValue,
+        #[CustomAutowire('some.parameter')]
+        string $customAutowire,
         #[Autowire(service: 'invalid.id')]
         \stdClass $service2 = null,
     ) {

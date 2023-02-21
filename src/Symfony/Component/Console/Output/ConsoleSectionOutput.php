@@ -155,6 +155,15 @@ class ConsoleSectionOutput extends StreamOutput
     }
 
     /**
+     * @internal
+     */
+    public function addNewLineOfInputSubmit(): void
+    {
+        $this->content[] = \PHP_EOL;
+        ++$this->lines;
+    }
+
+    /**
      * @return void
      */
     protected function doWrite(string $message, bool $newline)

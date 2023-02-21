@@ -39,7 +39,7 @@ class EarlyExpirationHandlerTest extends TestCase
         $item->set(234);
 
         $computationService = new class() implements CallbackInterface {
-            public function __invoke(CacheItemInterface $item, bool &$save)
+            public function __invoke(CacheItemInterface $item, bool &$save): mixed
             {
                 usleep(30000);
                 $item->expiresAfter(3600);

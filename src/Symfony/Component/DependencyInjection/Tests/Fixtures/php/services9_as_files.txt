@@ -319,7 +319,7 @@ class getFooBarService extends ProjectServiceContainer
      */
     public static function do($container, $lazyLoad = true)
     {
-        $container->factories['foo_bar'] = static function ($container) {
+        $container->factories['foo_bar'] = function ($container) {
             return new \Bar\FooClass(($container->services['deprecated_service'] ?? $container->load('getDeprecatedServiceService')));
         };
 
@@ -363,12 +363,12 @@ class getLazyContextService extends ProjectServiceContainer
     {
         $containerRef = $container->ref;
 
-        return $container->services['lazy_context'] = new \LazyContext(new RewindableGenerator(static function () use ($containerRef) {
+        return $container->services['lazy_context'] = new \LazyContext(new RewindableGenerator(function () use ($containerRef) {
             $container = $containerRef->get();
 
             yield 'k1' => ($container->services['foo.baz'] ?? $container->load('getFoo_BazService'));
             yield 'k2' => $container;
-        }, 2), new RewindableGenerator(static function () {
+        }, 2), new RewindableGenerator(function () {
             return new \EmptyIterator();
         }, 0));
     }
@@ -387,11 +387,11 @@ class getLazyContextIgnoreInvalidRefService extends ProjectServiceContainer
     {
         $containerRef = $container->ref;
 
-        return $container->services['lazy_context_ignore_invalid_ref'] = new \LazyContext(new RewindableGenerator(static function () use ($containerRef) {
+        return $container->services['lazy_context_ignore_invalid_ref'] = new \LazyContext(new RewindableGenerator(function () use ($containerRef) {
             $container = $containerRef->get();
 
             yield 0 => ($container->services['foo.baz'] ?? $container->load('getFoo_BazService'));
-        }, 1), new RewindableGenerator(static function () {
+        }, 1), new RewindableGenerator(function () {
             return new \EmptyIterator();
         }, 0));
     }
@@ -455,7 +455,7 @@ class getNonSharedFooService extends ProjectServiceContainer
     {
         include_once $container->targetDir.''.'/Fixtures/includes/foo.php';
 
-        $container->factories['non_shared_foo'] = static function ($container) {
+        $container->factories['non_shared_foo'] = function ($container) {
             return new \Bar\FooClass();
         };
 
@@ -521,7 +521,7 @@ class getTaggedIteratorService extends ProjectServiceContainer
     {
         $containerRef = $container->ref;
 
-        return $container->services['tagged_iterator'] = new \Bar(new RewindableGenerator(static function () use ($containerRef) {
+        return $container->services['tagged_iterator'] = new \Bar(new RewindableGenerator(function () use ($containerRef) {
             $container = $containerRef->get();
 
             yield 0 => ($container->services['foo'] ?? $container->load('getFooService'));

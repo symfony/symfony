@@ -31,7 +31,7 @@ class getClosureService extends ProjectServiceContainer
 
         $container->services['closure'] = $instance = new \stdClass();
 
-        $instance->closures = [#[\Closure(name: 'foo', class: 'FooClass')] static function () use ($containerRef): ?\stdClass {
+        $instance->closures = [#[\Closure(name: 'foo', class: 'FooClass')] function () use ($containerRef): ?\stdClass {
             $container = $containerRef->get();
 
             return ($container->services['foo'] ?? null);

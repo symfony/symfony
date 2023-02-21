@@ -21,7 +21,7 @@ class Symfony_DI_PhpDumper_Service_Locator_Argument extends Container
     public function __construct()
     {
         $containerRef = $this->ref = \WeakReference::create($this);
-        $this->getService = static function () use ($containerRef) { return $containerRef->get()->getService(...\func_get_args()); };
+        $this->getService = function () use ($containerRef) { return $containerRef->get()->getService(...\func_get_args()); };
         $this->services = $this->privates = [];
         $this->syntheticIds = [
             'foo5' => true,
@@ -107,7 +107,7 @@ class Symfony_DI_PhpDumper_Service_Locator_Argument extends Container
      */
     protected static function getFoo3Service($container)
     {
-        $container->factories['service_container']['foo3'] = static function ($container) {
+        $container->factories['service_container']['foo3'] = function ($container) {
             return new \stdClass();
         };
 

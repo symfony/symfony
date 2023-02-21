@@ -29,7 +29,7 @@ class ProjectServiceContainer extends Container
 
         $this->aliases = [];
 
-        $this->privates['service_container'] = static function ($container) {
+        $this->privates['service_container'] = function ($container) {
             include_once \dirname(__DIR__, 1).'/includes/HotPath/I1.php';
             include_once \dirname(__DIR__, 1).'/includes/HotPath/P1.php';
             include_once \dirname(__DIR__, 1).'/includes/HotPath/T1.php';

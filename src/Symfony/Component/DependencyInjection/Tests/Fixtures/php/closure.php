@@ -66,7 +66,7 @@ class ProjectServiceContainer extends Container
     {
         $containerRef = $container->ref;
 
-        return $container->services['closure_of_service_closure'] = #[\Closure(name: 'bar2', class: 'stdClass')] static function () use ($containerRef) {
+        return $container->services['closure_of_service_closure'] = #[\Closure(name: 'bar2', class: 'stdClass')] function () use ($containerRef) {
             $container = $containerRef->get();
 
             return ($container->privates['bar2'] ??= new \stdClass());

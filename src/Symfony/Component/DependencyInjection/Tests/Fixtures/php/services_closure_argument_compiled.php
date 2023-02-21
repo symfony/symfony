@@ -59,7 +59,7 @@ class ProjectServiceContainer extends Container
     {
         $containerRef = $container->ref;
 
-        return $container->services['service_closure'] = new \Bar(#[\Closure(name: 'foo', class: 'Foo')] static function () use ($containerRef) {
+        return $container->services['service_closure'] = new \Bar(#[\Closure(name: 'foo', class: 'Foo')] function () use ($containerRef) {
             $container = $containerRef->get();
 
             return ($container->services['foo'] ??= new \Foo());
@@ -75,7 +75,7 @@ class ProjectServiceContainer extends Container
     {
         $containerRef = $container->ref;
 
-        return $container->services['service_closure_invalid'] = new \Bar(static function () use ($containerRef) {
+        return $container->services['service_closure_invalid'] = new \Bar(function () use ($containerRef) {
             $container = $containerRef->get();
 
             return NULL;

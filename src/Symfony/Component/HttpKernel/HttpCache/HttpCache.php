@@ -60,6 +60,9 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *                            on responses that don't explicitly state whether the response is
      *                            public or private via a Cache-Control directive. (default: Authorization and Cookie)
      *
+     *   * skip_response_headers  Set of response headers that are never cached even if a response is cacheable (public).
+     *                            (default: Set-Cookie)
+     *
      *   * allow_reload           Specifies whether the client can force a cache reload by including a
      *                            Cache-Control "no-cache" directive in the request. Set it to ``true``
      *                            for compliance with RFC 2616. (default: false)
@@ -97,6 +100,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             'debug' => false,
             'default_ttl' => 0,
             'private_headers' => ['Authorization', 'Cookie'],
+            'skip_response_headers' => ['Set-Cookie'],
             'allow_reload' => false,
             'allow_revalidate' => false,
             'stale_while_revalidate' => 2,
@@ -596,8 +600,17 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     protected function store(Request $request, Response $response)
     {
         try {
-            $this->store->write($request, $response);
+            $restoreHeaders = [];
+            foreach ($this->options['skip_response_headers'] as $header) {
+                if (!$response->headers->has($header)) {
+                    continue;
+                }
 
+                $restoreHeaders[$header] = $response->headers->all($header);
+                $response->headers->remove($header);
+            }
+
+            $this->store->write($request, $response);
             $this->record($request, 'store');
 
             $response->headers->set('Age', $response->getAge());
@@ -606,6 +619,10 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
 
             if ($this->options['debug']) {
                 throw $e;
+            }
+        } finally {
+            foreach ($restoreHeaders as $header => $values) {
+                $response->headers->set($header, $values);
             }
         }
 

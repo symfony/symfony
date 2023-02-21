@@ -69,7 +69,7 @@ class MailerSendTransportFactoryTest extends TransportFactoryTestCase
 
         yield [
             new Dsn('mailersend+api', 'default', self::USER),
-            new MailerSendApiTransport(self::USER, self::getClient(), null, new NullLogger()),
+            new MailerSendApiTransport(self::USER, new MockHttpClient(), null, new NullLogger()),
         ];
     }
 

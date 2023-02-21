@@ -2584,7 +2584,7 @@ class FrameworkExtension extends Extension
             InfobipTransportFactory::class => 'notifier.transport_factory.infobip',
             IqsmsTransportFactory::class => 'notifier.transport_factory.iqsms',
             IsendproTransportFactory::class => 'notifier.transport_factory.isendpro',
-            KazInfoTehTransportFactory::class => 'notifier.transport_factory.kaz-info-the',
+            KazInfoTehTransportFactory::class => 'notifier.transport_factory.kaz-info-teh',
             LightSmsTransportFactory::class => 'notifier.transport_factory.light-sms',
             LineNotifyTransportFactory::class => 'notifier.transport_factory.line-notify',
             LinkedInTransportFactory::class => 'notifier.transport_factory.linked-in',

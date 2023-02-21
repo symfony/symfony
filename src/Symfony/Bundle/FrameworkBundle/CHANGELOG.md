@@ -13,6 +13,7 @@ CHANGELOG
  * Deprecate the `notifier.logger_notification_listener` service, use the `notifier.notification_logger_listener` service instead
  * Allow setting private services with the test container
  * Register alias for argument for workflow services with workflow name only
+ * Configure the `ErrorHandler` on `FrameworkBundle::boot()`
 
 6.2
 ---

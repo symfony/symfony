@@ -1601,6 +1601,11 @@ PHP
             ->setFactory(['Closure', 'fromCallable'])
             ->setArguments([new Reference('bar')]);
         $container->register('bar', 'stdClass');
+        $container->register('closure_of_service_closure', 'Closure')
+            ->setPublic('true')
+            ->setFactory(['Closure', 'fromCallable'])
+            ->setArguments([new ServiceClosureArgument(new Reference('bar2'))]);
+        $container->register('bar2', 'stdClass');
         $container->compile();
         $dumper = new PhpDumper($container);
 

@@ -45,6 +45,10 @@ class MailjetApiTransportTest extends TestCase
                 (new MailjetApiTransport(self::USER, self::PASSWORD))->setHost('example.com'),
                 'mailjet+api://example.com',
             ],
+            [
+                (new MailjetApiTransport(self::USER, self::PASSWORD, sandbox: true))->setHost('example.com'),
+                'mailjet+api://example.com?sandbox=true',
+            ],
         ];
     }
 

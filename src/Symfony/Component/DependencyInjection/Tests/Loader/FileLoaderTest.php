@@ -40,6 +40,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithAs
 use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithAsAliasIdMultipleInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithAsAliasInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithAsAliasMultiple;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Utils\NotAService;
 
 class FileLoaderTest extends TestCase
 {
@@ -143,6 +144,24 @@ class FileLoaderTest extends TestCase
             'Prototype/*',
             'Prototype/NotExistingDir'
         );
+    }
+
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testRegisterClassesWithExcludeAttribute(bool $autoconfigure)
+    {
+        $container = new ContainerBuilder();
+        $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
+
+        $loader->registerClasses(
+            (new Definition())->setAutoconfigured($autoconfigure),
+            'Symfony\Component\DependencyInjection\Tests\Fixtures\Utils\\',
+            'Utils/*',
+        );
+
+        $this->assertSame(!$autoconfigure, $container->hasDefinition(NotAService::class));
     }
 
     public function testRegisterClassesWithExcludeAsArray()

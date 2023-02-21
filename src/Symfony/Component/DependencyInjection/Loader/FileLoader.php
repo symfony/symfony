@@ -19,6 +19,7 @@ use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Config\Resource\GlobResource;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
+use Symfony\Component\DependencyInjection\Attribute\Exclude;
 use Symfony\Component\DependencyInjection\Attribute\When;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\RegisterAutoconfigureAttributesPass;
@@ -122,17 +123,22 @@ abstract class FileLoader extends BaseFileLoader
         $serializedPrototype = serialize($prototype);
 
         foreach ($classes as $class => $errorMessage) {
-            if (null === $errorMessage && $autoconfigureAttributes && $this->env) {
+            if (null === $errorMessage && $autoconfigureAttributes) {
                 $r = $this->container->getReflectionClass($class);
-                $attribute = null;
-                foreach ($r->getAttributes(When::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
-                    if ($this->env === $attribute->newInstance()->env) {
-                        $attribute = null;
-                        break;
-                    }
-                }
-                if (null !== $attribute) {
+                if ($r->getAttributes(Exclude::class)[0] ?? null) {
                     continue;
+                }
+                if ($this->env) {
+                    $attribute = null;
+                    foreach ($r->getAttributes(When::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+                        if ($this->env === $attribute->newInstance()->env) {
+                            $attribute = null;
+                            break;
+                        }
+                    }
+                    if (null !== $attribute) {
+                        continue;
+                    }
                 }
             }
 

@@ -66,11 +66,7 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
             $container = $containerRef->get();
 
             return ($container->services['foo1'] ?? null);
-        }, #[\Closure(name: 'foo2')] function () use ($containerRef) {
-            $container = $containerRef->get();
-
-            return null;
-        }, #[\Closure(name: 'foo3', class: 'stdClass')] function () use ($containerRef) {
+        }, #[\Closure(name: 'foo2')] fn () => null, #[\Closure(name: 'foo3', class: 'stdClass')] function () use ($containerRef) {
             $container = $containerRef->get();
 
             return ($container->privates['foo3'] ?? null);

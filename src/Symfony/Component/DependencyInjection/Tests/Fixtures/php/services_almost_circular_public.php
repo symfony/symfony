@@ -219,7 +219,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
     {
         $container->services['connection3'] = $instance = new \stdClass();
 
-        $instance->listener = [0 => ($container->services['listener3'] ?? self::getListener3Service($container))];
+        $instance->listener = [($container->services['listener3'] ?? self::getListener3Service($container))];
 
         return $instance;
     }
@@ -233,7 +233,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
     {
         $container->services['connection4'] = $instance = new \stdClass();
 
-        $instance->listener = [0 => ($container->services['listener4'] ?? self::getListener4Service($container))];
+        $instance->listener = [($container->services['listener4'] ?? self::getListener4Service($container))];
 
         return $instance;
     }

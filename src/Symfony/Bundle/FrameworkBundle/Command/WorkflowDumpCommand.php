@@ -91,8 +91,6 @@ EOF
     {
         $workflowName = $input->getArgument('name');
 
-        $workflow = null;
-
         if (isset($this->workflows)) {
             if (!$this->workflows->has($workflowName)) {
                 throw new InvalidArgumentException(sprintf('The workflow named "%s" cannot be found.', $workflowName));

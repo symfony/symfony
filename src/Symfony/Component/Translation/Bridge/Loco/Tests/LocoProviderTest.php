@@ -717,7 +717,7 @@ class LocoProviderTest extends ProviderTestCase
             'headers' => [
                 'Authorization' => 'Loco API_KEY',
             ],
-        ]), $loader, new NullLogger(), 'en', 'localise.biz/api/', $this->getTranslatorBag());
+        ]), $loader, new NullLogger(), 'en', 'localise.biz/api/');
         $translatorBag = $provider->read([$domain], [$locale]);
         // We don't want to assert equality of metadata here, due to the ArrayLoader usage.
         foreach ($translatorBag->getCatalogues() as $catalogue) {
@@ -759,7 +759,7 @@ class LocoProviderTest extends ProviderTestCase
             'headers' => [
                 'Authorization' => 'Loco API_KEY',
             ],
-        ]), $loader, $this->getLogger(), 'en', 'localise.biz/api/', $this->getTranslatorBag());
+        ]), $loader, $this->getLogger(), 'en', 'localise.biz/api/');
         $translatorBag = $provider->read($domains, $locales);
         // We don't want to assert equality of metadata here, due to the ArrayLoader usage.
         foreach ($translatorBag->getCatalogues() as $catalogue) {

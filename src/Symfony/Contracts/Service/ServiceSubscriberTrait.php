@@ -66,12 +66,13 @@ trait ServiceSubscriberTrait
     #[Required]
     public function setContainer(ContainerInterface $container): ?ContainerInterface
     {
-        $this->container = $container;
-
+        $ret = null;
         if (method_exists(get_parent_class(self::class) ?: '', __FUNCTION__)) {
-            return parent::setContainer($container);
+            $ret = parent::setContainer($container);
         }
 
-        return null;
+        $this->container = $container;
+
+        return $ret;
     }
 }

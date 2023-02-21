@@ -23,6 +23,24 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class FirePHPHandlerTest extends TestCase
 {
+    public function testOnKernelResponseShouldNotTriggerDeprecation()
+    {
+        $request = Request::create('/');
+        $request->headers->remove('User-Agent');
+
+        $response = new Response('foo');
+        $event = new ResponseEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST, $response);
+
+        $error = null;
+        set_error_handler(function ($type, $message) use (&$error) { $error = $message; }, \E_DEPRECATED);
+
+        $listener = new FirePHPHandler();
+        $listener->onKernelResponse($event);
+        restore_error_handler();
+
+        $this->assertNull($error);
+    }
+
     public function testLogHandling()
     {
         $handler = $this->createHandler();

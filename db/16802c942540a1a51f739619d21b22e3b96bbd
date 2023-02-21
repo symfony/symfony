@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by stof at 2023-02-21T13:53:48Z
+
+A ServiceClosureArgument that does not reference a service looks like an abuse of this argument. Not sure we need to optimize that case. AFAIK, we never promised it is a supported case.
+
+---------------------------------------------------------------------------
+
+by ruudk at 2023-02-21T13:54:39Z
+
+> A ServiceClosureArgument that does not reference a service looks like an abuse of this argument. Not sure we need to optimize that case. AFAIK, we never promised it is a supported case.
+
+I figured, but it works beautifully! I think we need a dedicated ClosureArgument.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-02-21T15:00:16Z
+
+rebase needed, no static anymore :)
+
+---------------------------------------------------------------------------
+
+by ruudk at 2023-02-21T15:11:58Z
+
+@nicolas-grekas done,

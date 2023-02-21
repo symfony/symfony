@@ -368,9 +368,7 @@ class getLazyContextService extends ProjectServiceContainer
 
             yield 'k1' => ($container->services['foo.baz'] ?? $container->load('getFoo_BazService'));
             yield 'k2' => $container;
-        }, 2), new RewindableGenerator(function () {
-            return new \EmptyIterator();
-        }, 0));
+        }, 2), new RewindableGenerator(fn () => new \EmptyIterator(), 0));
     }
 }
 
@@ -391,9 +389,7 @@ class getLazyContextIgnoreInvalidRefService extends ProjectServiceContainer
             $container = $containerRef->get();
 
             yield 0 => ($container->services['foo.baz'] ?? $container->load('getFoo_BazService'));
-        }, 1), new RewindableGenerator(function () {
-            return new \EmptyIterator();
-        }, 0));
+        }, 1), new RewindableGenerator(fn () => new \EmptyIterator(), 0));
     }
 }
 

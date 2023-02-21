@@ -252,7 +252,7 @@ class XmlFileLoader extends FileLoader
         foreach (['class', 'public', 'shared', 'synthetic', 'abstract'] as $key) {
             if ($value = $service->getAttribute($key)) {
                 $method = 'set'.$key;
-                $definition->$method($value = XmlUtils::phpize($value));
+                $definition->$method(XmlUtils::phpize($value));
             }
         }
 

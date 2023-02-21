@@ -69,7 +69,7 @@ final class ControllerEvent extends KernelEvent
 
         if (\is_array($controller) && method_exists(...$controller)) {
             $this->controllerReflector = new \ReflectionMethod(...$controller);
-        } elseif (\is_string($controller) && false !== $i = strpos($controller, '::')) {
+        } elseif (\is_string($controller) && str_contains($controller, '::')) {
             $this->controllerReflector = new \ReflectionMethod($controller);
         } else {
             $this->controllerReflector = new \ReflectionFunction($controller(...));

@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2023-02-20T13:23:43Z
+
+@alexandre-daubois Can you have a look at the failing tests?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-02-20T17:49:53Z
+
+@fabpot I fixed tests by adding `"psr/event-dispatcher": "^1"` to `Postmark/composer.json`. I think remaining tests will be fixed when packages will be created and once this branch is fully back ported to earlier versions. Don't hesitate to tell me, @nicolas-grekas, if you need any help/new PR to ease this work! 👍
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-02-21T06:57:52Z
+
+For your information, we never backport pull requests.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-02-21T08:13:35Z
+
+Right! This one's a bit special as this was a request from Nicolas to target 6.3 before backporting it. I'll do the appropriate updates if this needs to be changed 🙂

@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by maxbeckers at 2023-02-20T10:39:03Z
+
+For now there are failing 5 tests with `Invalid HELLO reply, Redis Server version may be too old (RELAY_ERR_COMPAT; commands.c:6660)`. I'll need to investigate a bit more of time to that or maybe someone else has an idea.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-02-21T11:17:11Z
+
+I suppose we should merge this on 5.4?
+
+---------------------------------------------------------------------------
+
+by maxbeckers at 2023-02-21T11:56:19Z
+
+@nicolas-grekas yes, i didn't check this, in the issue was mentioned the 6.3 branch. Is it possible to handle this during the merge or should I rebase it?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-02-21T11:57:33Z
+
+Please submit another PR for 5.4, I'll use this one when merging up.

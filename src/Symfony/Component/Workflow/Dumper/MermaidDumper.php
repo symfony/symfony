@@ -102,20 +102,9 @@ class MermaidDumper implements DumperInterface
                     $to = $placeNameMap[$to];
 
                     if (self::TRANSITION_TYPE_STATEMACHINE === $this->transitionType) {
-                        $transitionOutput = $this->styleStatemachineTransition(
-                            $from,
-                            $to,
-                            $transitionLabel,
-                            $transitionMeta
-                        );
+                        $transitionOutput = $this->styleStatemachineTransition($from, $to, $transitionLabel, $transitionMeta);
                     } else {
-                        $transitionOutput = $this->styleWorkflowTransition(
-                            $from,
-                            $to,
-                            $transitionId,
-                            $transitionLabel,
-                            $transitionMeta
-                        );
+                        $transitionOutput = $this->styleWorkflowTransition($from, $to, $transitionId, $transitionLabel, $transitionMeta);
                     }
 
                     foreach ($transitionOutput as $line) {
@@ -209,7 +198,7 @@ class MermaidDumper implements DumperInterface
 
     private function styleStatemachineTransition(string $from, string $to, string $transitionLabel, array $transitionMeta): array
     {
-        $transitionOutput = [sprintf('%s-->|%s|%s', $from, $this->escape($transitionLabel), $to)];
+        $transitionOutput = [sprintf('%s-->|%s|%s', $from, str_replace("\n", ' ', $this->escape($transitionLabel)), $to)];
 
         $linkStyle = $this->styleLink($transitionMeta);
         if ('' !== $linkStyle) {

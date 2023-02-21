@@ -1835,35 +1835,35 @@ EOF;
                 }
 
                 if ($value instanceof IteratorArgument) {
-                    $operands = [0];
-                    $code = [];
-
                     if (!$values = $value->getValues()) {
-                        $code[] = 'new RewindableGenerator(function () {';
-                        $code[] = '            return new \EmptyIterator();';
-                    } else {
-                        $this->addContainerRef = true;
-                        $code[] = 'new RewindableGenerator(function () use ($containerRef) {';
-                        $code[] = '            $container = $containerRef->get();';
-                        $code[] = '';
-                        $countCode = [];
-                        $countCode[] = 'function () use ($containerRef) {';
+                        return 'new RewindableGenerator(fn () => new \EmptyIterator(), 0)';
+                    }
 
-                        foreach ($values as $k => $v) {
-                            ($c = $this->getServiceConditionals($v)) ? $operands[] = "(int) ($c)" : ++$operands[0];
-                            $v = $this->wrapServiceConditionals($v, sprintf("        yield %s => %s;\n", $this->dumpValue($k, $interpolate), $this->dumpValue($v, $interpolate)));
-                            foreach (explode("\n", $v) as $v) {
-                                if ($v) {
-                                    $code[] = '    '.$v;
-                                }
+                    $this->addContainerRef = true;
+
+                    $code = [];
+                    $code[] = 'new RewindableGenerator(function () use ($containerRef) {';
+                    $code[] = '            $container = $containerRef->get();';
+                    $code[] = '';
+
+                    $countCode = [];
+                    $countCode[] = 'function () use ($containerRef) {';
+
+                    $operands = [0];
+                    foreach ($values as $k => $v) {
+                        ($c = $this->getServiceConditionals($v)) ? $operands[] = "(int) ($c)" : ++$operands[0];
+                        $v = $this->wrapServiceConditionals($v, sprintf("        yield %s => %s;\n", $this->dumpValue($k, $interpolate), $this->dumpValue($v, $interpolate)));
+                        foreach (explode("\n", $v) as $v) {
+                            if ($v) {
+                                $code[] = '    '.$v;
                             }
                         }
-
-                        $countCode[] = '            $container = $containerRef->get();';
-                        $countCode[] = '';
-                        $countCode[] = sprintf('            return %s;', implode(' + ', $operands));
-                        $countCode[] = '        }';
                     }
+
+                    $countCode[] = '            $container = $containerRef->get();';
+                    $countCode[] = '';
+                    $countCode[] = sprintf('            return %s;', implode(' + ', $operands));
+                    $countCode[] = '        }';
 
                     $code[] = sprintf('        }, %s)', \count($operands) > 1 ? implode("\n", $countCode) : $operands[0]);
 

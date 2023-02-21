@@ -559,9 +559,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected static function getMailerInline_TransportFactoryService($container)
     {
-        return $container->services['mailer_inline.transport_factory'] = new \FactoryCircular(new RewindableGenerator(function () {
-            return new \EmptyIterator();
-        }, 0));
+        return $container->services['mailer_inline.transport_factory'] = new \FactoryCircular(new RewindableGenerator(fn () => new \EmptyIterator(), 0));
     }
 
     /**

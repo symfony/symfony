@@ -559,9 +559,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
      */
     protected static function getMailerInline_MailerService($container)
     {
-        return $container->privates['mailer_inline.mailer'] = new \stdClass((new \FactoryCircular(new RewindableGenerator(function () {
-            return new \EmptyIterator();
-        }, 0)))->create());
+        return $container->privates['mailer_inline.mailer'] = new \stdClass((new \FactoryCircular(new RewindableGenerator(fn () => new \EmptyIterator(), 0)))->create());
     }
 
     /**

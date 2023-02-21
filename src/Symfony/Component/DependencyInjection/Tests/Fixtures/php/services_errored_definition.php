@@ -337,9 +337,7 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
 
             yield 'k1' => ($container->services['foo.baz'] ?? self::getFoo_BazService($container));
             yield 'k2' => $container;
-        }, 2), new RewindableGenerator(function () {
-            return new \EmptyIterator();
-        }, 0));
+        }, 2), new RewindableGenerator(fn () => new \EmptyIterator(), 0));
     }
 
     /**
@@ -355,9 +353,7 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
             $container = $containerRef->get();
 
             yield 0 => ($container->services['foo.baz'] ?? self::getFoo_BazService($container));
-        }, 1), new RewindableGenerator(function () {
-            return new \EmptyIterator();
-        }, 0));
+        }, 1), new RewindableGenerator(fn () => new \EmptyIterator(), 0));
     }
 
     /**

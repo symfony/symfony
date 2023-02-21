@@ -21,7 +21,7 @@ class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
     public function __construct()
     {
         $containerRef = $this->ref = \WeakReference::create($this);
-        $this->getService = function () use ($containerRef) { return $containerRef->get()->getService(...\func_get_args()); };
+        $this->getService = static function () use ($containerRef) { return $containerRef->get()->getService(...\func_get_args()); };
         $this->parameters = $this->getDefaultParameters();
 
         $this->services = $this->privates = [];

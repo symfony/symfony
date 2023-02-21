@@ -21,7 +21,7 @@ class Symfony_DI_PhpDumper_Service_Locator_Argument extends Container
     public function __construct()
     {
         $containerRef = $this->ref = \WeakReference::create($this);
-        $this->getService = function () use ($containerRef) { return $containerRef->get()->getService(...\func_get_args()); };
+        $this->getService = static function () use ($containerRef) { return $containerRef->get()->getService(...\func_get_args()); };
         $this->services = $this->privates = [];
         $this->syntheticIds = [
             'foo5' => true,

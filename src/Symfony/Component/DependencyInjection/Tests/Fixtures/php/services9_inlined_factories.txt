@@ -86,7 +86,7 @@ class ProjectServiceContainer extends Container
             'decorated' => 'decorator_service_with_name',
         ];
 
-        $this->privates['service_container'] = function ($container) {
+        $this->privates['service_container'] = static function ($container) {
             include_once $container->targetDir.''.'/Fixtures/includes/foo.php';
         };
     }

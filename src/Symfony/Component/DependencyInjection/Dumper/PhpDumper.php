@@ -244,7 +244,7 @@ class PhpDumper extends Dumper
         if ($this->addGetService) {
             $code = preg_replace(
                 "/(\r?\n\r?\n    public function __construct.+?\\{\r?\n) ++([^\r\n]++)/s",
-                "\n    protected \Closure \$getService;$1        \$containerRef = $2\n        \$this->getService = function () use (\$containerRef) { return \$containerRef->get()->getService(...\\func_get_args()); };",
+                "\n    protected \Closure \$getService;$1        \$containerRef = $2\n        \$this->getService = static function () use (\$containerRef) { return \$containerRef->get()->getService(...\\func_get_args()); };",
                 $code,
                 1
             );
@@ -1545,7 +1545,7 @@ EOF;
             $code .= "\n            include_once __DIR__.'/proxy-classes.php';";
         }
 
-        return $code ? sprintf("\n        \$this->privates['service_container'] = function (\$container) {%s\n        };\n", $code) : '';
+        return $code ? sprintf("\n        \$this->privates['service_container'] = static function (\$container) {%s\n        };\n", $code) : '';
     }
 
     private function addDefaultParametersMethod(): string

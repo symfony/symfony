@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-02-08T19:06:18Z
+
+what about a form option / serializer context entry to block such input by default
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-02-08T20:06:50Z
+
+@ro0NL I’m not sure this is necessary: few inputs would be concerned by such validation :thinking:
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2023-02-09T14:07:12Z
+
+How does it handle emojis? Could you please add a test case with a simple emoji like “:smiley:”?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-02-09T15:22:34Z
+
+@alexislefebvre emojis belong to the “Common” script and should never be considered suspicious (well unless you set the ASCII restriction level). Not sure this requires a dedicated test case?
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2023-02-09T16:07:25Z
+
+I didn't know that it was built in PHP: https://www.php.net/manual/en/spoofchecker.issuspicious.php The documentation is vague.
+
+Sorry for the bad writing, I thought about testing a string that contain an emoji, not necessarily as a dedicated test case.

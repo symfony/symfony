@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Mailer\Tests\Transport;
 
+use Psr\Log\NullLogger;
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Mailer\Test\TransportFactoryTestCase;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\SendmailTransport;
@@ -19,9 +21,9 @@ use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
 class SendmailTransportFactoryTest extends TransportFactoryTestCase
 {
-    public static function getFactory(): TransportFactoryInterface
+    public function getFactory(): TransportFactoryInterface
     {
-        return new SendmailTransportFactory(self::getDispatcher(), self::getClient(), self::getLogger());
+        return new SendmailTransportFactory(null, new MockHttpClient(), new NullLogger());
     }
 
     public static function supportsProvider(): iterable
@@ -36,12 +38,12 @@ class SendmailTransportFactoryTest extends TransportFactoryTestCase
     {
         yield [
             new Dsn('sendmail+smtp', 'default'),
-            new SendmailTransport(null, self::getDispatcher(), self::getLogger()),
+            new SendmailTransport(null, null, new NullLogger()),
         ];
 
         yield [
             new Dsn('sendmail+smtp', 'default', null, null, null, ['command' => '/usr/sbin/sendmail -oi -t']),
-            new SendmailTransport('/usr/sbin/sendmail -oi -t', self::getDispatcher(), self::getLogger()),
+            new SendmailTransport('/usr/sbin/sendmail -oi -t', null, new NullLogger()),
         ];
     }
 

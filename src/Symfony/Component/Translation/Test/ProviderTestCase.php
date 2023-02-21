@@ -13,12 +13,11 @@ namespace Symfony\Component\Translation\Test;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Translation\Dumper\XliffFileDumper;
 use Symfony\Component\Translation\Loader\LoaderInterface;
-use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Provider\ProviderInterface;
+use Symfony\Component\Translation\TranslatorBagInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -30,13 +29,13 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 abstract class ProviderTestCase extends TestCase
 {
-    protected static $client;
-    protected static $logger;
-    protected static $defaultLocale;
-    protected static $loader;
-    protected static $xliffFileDumper;
+    protected $client;
+    protected $logger;
+    protected $defaultLocale;
+    protected $loader;
+    protected $xliffFileDumper;
 
-    abstract public static function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint): ProviderInterface;
+    abstract public static function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint, TranslatorBagInterface $translatorBag = null): ProviderInterface;
 
     /**
      * @return iterable<array{0: ProviderInterface, 1: string}>
@@ -51,33 +50,28 @@ abstract class ProviderTestCase extends TestCase
         $this->assertSame($expected, (string) $provider);
     }
 
-    protected static function getClient(): MockHttpClient
+    protected function getClient(): MockHttpClient
     {
-        return static::$client ?? static::$client = new MockHttpClient();
+        return $this->client ?? $this->client = new MockHttpClient();
     }
 
-    protected static function getLoader(): LoaderInterface
+    protected function getLoader(): LoaderInterface
     {
-        return static::$loader ?? static::$loader = new class() implements LoaderInterface {
-            public function load($resource, string $locale, string $domain = 'messages'): MessageCatalogue
-            {
-                return new MessageCatalogue($locale);
-            }
-        };
+        return $this->loader ?? $this->loader = $this->createMock(LoaderInterface::class);
     }
 
-    protected static function getLogger(): LoggerInterface
+    protected function getLogger(): LoggerInterface
     {
-        return static::$logger ?? static::$logger = new NullLogger();
+        return $this->logger ?? $this->logger = $this->createMock(LoggerInterface::class);
     }
 
-    protected static function getDefaultLocale(): string
+    protected function getDefaultLocale(): string
     {
-        return static::$defaultLocale ?? static::$defaultLocale = 'en';
+        return $this->defaultLocale ?? $this->defaultLocale = 'en';
     }
 
-    protected static function getXliffFileDumper(): XliffFileDumper
+    protected function getXliffFileDumper(): XliffFileDumper
     {
-        return static::$xliffFileDumper ?? static::$xliffFileDumper = new XliffFileDumper();
+        return $this->xliffFileDumper ?? $this->xliffFileDumper = $this->createMock(XliffFileDumper::class);
     }
 }

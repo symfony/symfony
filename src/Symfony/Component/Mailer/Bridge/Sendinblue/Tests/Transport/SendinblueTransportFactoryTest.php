@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Mailer\Bridge\Sendinblue\Tests\Transport;
 
+use Psr\Log\NullLogger;
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Mailer\Bridge\Sendinblue\Transport\SendinblueApiTransport;
 use Symfony\Component\Mailer\Bridge\Sendinblue\Transport\SendinblueSmtpTransport;
 use Symfony\Component\Mailer\Bridge\Sendinblue\Transport\SendinblueTransportFactory;
@@ -20,9 +22,9 @@ use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
 class SendinblueTransportFactoryTest extends TransportFactoryTestCase
 {
-    public static function getFactory(): TransportFactoryInterface
+    public function getFactory(): TransportFactoryInterface
     {
-        return new SendinblueTransportFactory(self::getDispatcher(), self::getClient(), self::getLogger());
+        return new SendinblueTransportFactory(null, new MockHttpClient(), new NullLogger());
     }
 
     public static function supportsProvider(): iterable
@@ -52,22 +54,22 @@ class SendinblueTransportFactoryTest extends TransportFactoryTestCase
     {
         yield [
             new Dsn('sendinblue', 'default', self::USER, self::PASSWORD),
-            new SendinblueSmtpTransport(self::USER, self::PASSWORD, self::getDispatcher(), self::getLogger()),
+            new SendinblueSmtpTransport(self::USER, self::PASSWORD, null, new NullLogger()),
         ];
 
         yield [
             new Dsn('sendinblue+smtp', 'default', self::USER, self::PASSWORD),
-            new SendinblueSmtpTransport(self::USER, self::PASSWORD, self::getDispatcher(), self::getLogger()),
+            new SendinblueSmtpTransport(self::USER, self::PASSWORD, null, new NullLogger()),
         ];
 
         yield [
             new Dsn('sendinblue+smtp', 'default', self::USER, self::PASSWORD, 465),
-            new SendinblueSmtpTransport(self::USER, self::PASSWORD, self::getDispatcher(), self::getLogger()),
+            new SendinblueSmtpTransport(self::USER, self::PASSWORD, null, new NullLogger()),
         ];
 
         yield [
             new Dsn('sendinblue+api', 'default', self::USER),
-            new SendinblueApiTransport(self::USER, self::getClient(), self::getDispatcher(), self::getLogger()),
+            new SendinblueApiTransport(self::USER, new MockHttpClient(), null, new NullLogger()),
         ];
     }
 

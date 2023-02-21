@@ -762,6 +762,10 @@ class FrameworkExtension extends Extension
             unset($options['private_headers']);
         }
 
+        if (!$options['skip_response_headers']) {
+            unset($options['skip_response_headers']);
+        }
+
         $container->getDefinition('http_cache')
             ->setPublic($config['enabled'])
             ->replaceArgument(3, $options);

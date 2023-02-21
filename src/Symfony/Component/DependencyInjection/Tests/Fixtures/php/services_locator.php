@@ -82,11 +82,7 @@ class ProjectServiceContainer extends Container
             $container = $containerRef->get();
 
             return ($container->privates['baz_service'] ??= new \stdClass());
-        }, 'nil' => function () use ($containerRef) {
-            $container = $containerRef->get();
-
-            return NULL;
-        }]);
+        }, 'nil' => fn () => NULL]);
     }
 
     /**

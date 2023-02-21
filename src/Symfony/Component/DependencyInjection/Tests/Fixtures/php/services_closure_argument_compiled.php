@@ -73,12 +73,6 @@ class ProjectServiceContainer extends Container
      */
     protected static function getServiceClosureInvalidService($container)
     {
-        $containerRef = $container->ref;
-
-        return $container->services['service_closure_invalid'] = new \Bar(function () use ($containerRef) {
-            $container = $containerRef->get();
-
-            return NULL;
-        });
+        return $container->services['service_closure_invalid'] = new \Bar(fn () => NULL);
     }
 }

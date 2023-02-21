@@ -1817,8 +1817,6 @@ EOF;
                         $returnedType = sprintf(': %s\%s', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE >= $value->getInvalidBehavior() ? '' : '?', str_replace(['|', '&'], ['|\\', '&\\'], $value->getType()));
                     }
 
-                    $code = sprintf('return %s;', $code);
-
                     $attribute = '';
                     if ($value instanceof Reference) {
                         $attribute = 'name: '.$this->dumpValue((string) $value, $interpolate);
@@ -1829,9 +1827,14 @@ EOF;
 
                         $attribute = sprintf('#[\Closure(%s)] ', $attribute);
                     }
-                    $this->addContainerRef = true;
 
-                    return sprintf("%sfunction () use (\$containerRef)%s {\n            \$container = \$containerRef->get();\n\n            %s\n        }", $attribute, $returnedType, $code);
+                    if (str_contains($code, '$container')) {
+                        $this->addContainerRef = true;
+
+                        return sprintf("%sfunction () use (\$containerRef)%s {\n            \$container = \$containerRef->get();\n\n            return %s;\n        }", $attribute, $returnedType, $code);
+                    }
+
+                    return sprintf('%sfn ()%s => %s', $attribute, $returnedType, $code);
                 }
 
                 if ($value instanceof IteratorArgument) {

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Mailer\Tests\Transport;
 
+use Psr\Log\NullLogger;
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Mailer\Test\TransportFactoryTestCase;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\NullTransport;
@@ -19,9 +21,9 @@ use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
 class NullTransportFactoryTest extends TransportFactoryTestCase
 {
-    public static function getFactory(): TransportFactoryInterface
+    public function getFactory(): TransportFactoryInterface
     {
-        return new NullTransportFactory(self::getDispatcher(), self::getClient(), self::getLogger());
+        return new NullTransportFactory(null, new MockHttpClient(), new NullLogger());
     }
 
     public static function supportsProvider(): iterable
@@ -36,7 +38,7 @@ class NullTransportFactoryTest extends TransportFactoryTestCase
     {
         yield [
             new Dsn('null', 'null'),
-            new NullTransport(self::getDispatcher(), self::getLogger()),
+            new NullTransport(null, new NullLogger()),
         ];
     }
 }

@@ -13,8 +13,6 @@ namespace Symfony\Component\Mailer\Test;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
-use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Mailer\Exception\IncompleteDsnException;
 use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 use Symfony\Component\Mailer\Transport\Dsn;
@@ -33,11 +31,11 @@ abstract class TransportFactoryTestCase extends TestCase
     protected const USER = 'u$er';
     protected const PASSWORD = 'pa$s';
 
-    protected static $dispatcher;
-    protected static $client;
-    protected static $logger;
+    protected $dispatcher;
+    protected $client;
+    protected $logger;
 
-    abstract public static function getFactory(): TransportFactoryInterface;
+    abstract public function getFactory(): TransportFactoryInterface;
 
     abstract public static function supportsProvider(): iterable;
 
@@ -102,22 +100,18 @@ abstract class TransportFactoryTestCase extends TestCase
         $factory->create($dsn);
     }
 
-    protected static function getDispatcher(): EventDispatcherInterface
+    protected function getDispatcher(): EventDispatcherInterface
     {
-        return self::$dispatcher ??= new class() implements EventDispatcherInterface {
-            public function dispatch($event, string $eventName = null): object
-            {
-            }
-        };
+        return $this->dispatcher ??= $this->createMock(EventDispatcherInterface::class);
     }
 
-    protected static function getClient(): HttpClientInterface
+    protected function getClient(): HttpClientInterface
     {
-        return self::$client ??= new MockHttpClient();
+        return $this->client ??= $this->createMock(HttpClientInterface::class);
     }
 
-    protected static function getLogger(): LoggerInterface
+    protected function getLogger(): LoggerInterface
     {
-        return self::$logger ??= new NullLogger();
+        return $this->logger ??= $this->createMock(LoggerInterface::class);
     }
 }

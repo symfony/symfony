@@ -41,7 +41,7 @@ interface MessageCatalogueInterface
      *
      * If $domain is null, it returns all messages.
      *
-     * @param string $domain The domain name
+     * @param string|null $domain The domain name
      *
      * @return array
      */

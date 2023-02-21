@@ -7,6 +7,7 @@ CHANGELOG
  * Add method `getConstraint()` to `ConstraintViolationInterface`
  * Add `Uuid::TIME_BASED_VERSIONS` to match that a UUID being validated embeds a timestamp
  * Add the `pattern` parameter in violations of the `Regex` constraint
+ * Add a `NoSuspiciousCharacters` constraint to validate a string is not a spoofing attempt
 
 6.2
 ---

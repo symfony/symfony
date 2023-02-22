@@ -1,0 +1,107 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-01-16T18:16:57Z
+
+Thanks for the PR. How did you update the file? Would it make sense to commit some generator in the repo to make it easy to sync with upstream?
+
+---------------------------------------------------------------------------
+
+by smelesh at 2023-01-16T21:46:24Z
+
+@nicolas-grekas, nice idea to keep it up to date.
+
+I have a script that parses registry file and generates regexp list. It was merged manually to preserve existing php comments.
+https://gist.github.com/smelesh/f3a93847982999895a4e1a06c3ccad98
+
+But I have some doubts:
+1. I don't like the list of hardcoded "additional" countries, since I can't find IBAN format for them, so no idea if it's a complete list and if they are still valid - the registry provides only officially supported countries.
+2. That CSV file is not well formatted and has some issues and typos, so auto-generation might be unsafe.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-01-17T11:43:08Z
+
+@smelesh We already have similar scripts in some components (parsing the ICU data for instance). So I suggest including such script in the repository.
+
+Comments can actually be part of the generated output. The Swift file contains the country name.
+
+Regarding experimental countries, I see that the Wikipedia page about IBAN references them with their BBAN format: https://en.wikipedia.org/wiki/International_Bank_Account_Number#cite_ref-48. This is enough to get the IBAN format (as IBAN is 2-letter country code followed by 2-digit checksum followed by BBAN)
+
+---------------------------------------------------------------------------
+
+by smelesh at 2023-02-19T18:19:43Z
+
+Sorry for the delay..
+
+Added a script to collect IBAN formats from Wikipedia (experimental) and SWIFT registry (official):
+```
+php src/Symfony/Component/Validator/Resources/bin/sync-iban-formats.php
+```
+
+I cannot find how similar scripts are triggered (for example, `update_mime_types.php` in String component). I would be happy if someone can share the best practice on how such a script should be added to framework pipeline.
+
+Since comments in `IbanValidator` were removed in auto-generated data, here is a diff between 5.4 and this PR:
+
+```diff
+-'AX' => 'FI\d{2}\d{6}\d{7}\d{1}',
++'AX' => 'FI\d{2}\d{3}\d{11}',
+-'BF' => 'BF\d{2}\d{23}',
++'BF' => 'BF\d{2}[\dA-Z]{2}\d{22}',
+-'BI' => 'BI\d{2}\d{12}',
++'BI' => 'BI\d{2}\d{5}\d{5}\d{11}\d{2}',
+-'BJ' => 'BJ\d{2}[A-Z]{1}\d{23}',
++'BJ' => 'BJ\d{2}[\dA-Z]{2}\d{22}',
+-'BR' => 'BR\d{2}\d{8}\d{5}\d{10}[A-Z][\dA-Z]',
++'BR' => 'BR\d{2}\d{8}\d{5}\d{10}[A-Z]{1}[\dA-Z]{1}',
++'CF' => 'CF\d{2}\d{23}',
+-'CR' => 'CR\d{2}0\d{3}\d{14}',
++'CR' => 'CR\d{2}\d{4}\d{14}',
+-'CZ' => 'CZ\d{2}\d{20}',
++'CZ' => 'CZ\d{2}\d{4}\d{6}\d{10}',
++'DJ' => 'DJ\d{2}\d{5}\d{5}\d{11}\d{2}',
+-'DK' => 'DK\d{2}\d{4}\d{10}',
++'DK' => 'DK\d{2}\d{4}\d{9}\d{1}',
+-'DZ' => 'DZ\d{2}\d{20}',
++'DZ' => 'DZ\d{2}\d{22}',
++'EG' => 'EG\d{2}\d{4}\d{4}\d{17}',
+-'FI' => 'FI\d{2}\d{6}\d{7}\d{1}',
++'FI' => 'FI\d{2}\d{3}\d{11}',
++'GA' => 'GA\d{2}\d{23}',
++'GG' => 'GB\d{2}[A-Z]{4}\d{6}\d{8}',
++'GQ' => 'GQ\d{2}\d{23}',
++'GW' => 'GW\d{2}[\dA-Z]{2}\d{19}',
++'HN' => 'HN\d{2}[A-Z]{4}\d{20}',
++'IM' => 'GB\d{2}[A-Z]{4}\d{6}\d{8}',
++'IQ' => 'IQ\d{2}[A-Z]{4}\d{3}\d{12}',
++'JE' => 'GB\d{2}[A-Z]{4}\d{6}\d{8}',
++'KM' => 'KM\d{2}\d{23}',
+-'KW' => 'KW\d{2}[A-Z]{4}\d{22}',
++'KW' => 'KW\d{2}[A-Z]{4}[\dA-Z]{22}',
++'LC' => 'LC\d{2}[A-Z]{4}[\dA-Z]{24}',
++'LY' => 'LY\d{2}\d{3}\d{3}\d{15}',
++'MA' => 'MA\d{2}\d{24}',
+-'ML' => 'ML\d{2}[A-Z]{1}\d{23}',
++'ML' => 'ML\d{2}[\dA-Z]{2}\d{22}',
++'NE' => 'NE\d{2}[A-Z]{2}\d{22}',
++'NI' => 'NI\d{2}[A-Z]{4}\d{24}',
++'RU' => 'RU\d{2}\d{9}\d{5}[\dA-Z]{15}',
++'SC' => 'SC\d{2}[A-Z]{4}\d{2}\d{2}\d{16}[A-Z]{3}',
++'SD' => 'SD\d{2}\d{2}\d{12}',
+-'SN' => 'SN\d{2}[A-Z]{1}\d{23}',
++'SN' => 'SN\d{2}[A-Z]{2}\d{22}',
++'SO' => 'SO\d{2}\d{4}\d{3}\d{12}',
++'ST' => 'ST\d{2}\d{4}\d{4}\d{11}\d{2}',
++'SV' => 'SV\d{2}[A-Z]{4}\d{20}',
++'TD' => 'TD\d{2}\d{23}',
++'TG' => 'TG\d{2}[A-Z]{2}\d{22}',
+-'TR' => 'TR\d{2}\d{5}[\dA-Z]{1}[\dA-Z]{16}',
++'TR' => 'TR\d{2}\d{5}\d{1}[\dA-Z]{16}',
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2023-02-22T13:30:13Z
+
+> I cannot find how similar scripts are triggered (for example, `update_mime_types.php` in String component).
+
+They are run manually by a contributor once in a while.

@@ -292,9 +292,4 @@ class FlattenExceptionTest extends TestCase
         $this->assertSame($exception->getTraceAsString(), $flattened->getTraceAsString());
         $this->assertSame($exception->__toString(), $flattened->getAsString());
     }
-
-    private function createException($foo): \Exception
-    {
-        return new \Exception();
-    }
 }

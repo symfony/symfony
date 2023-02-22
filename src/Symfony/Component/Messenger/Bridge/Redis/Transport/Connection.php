@@ -524,11 +524,6 @@ class Connection
         $this->autoSetup = false;
     }
 
-    private function getCurrentTimeInMilliseconds(): int
-    {
-        return (int) (microtime(true) * 1000);
-    }
-
     public function cleanup(): void
     {
         static $unlink = true;

@@ -15,6 +15,7 @@ CHANGELOG
  * Register alias for argument for workflow services with workflow name only
  * Configure the `ErrorHandler` on `FrameworkBundle::boot()`
  * Allow setting `debug.container.dump` to `false` to disable dumping the container to XML
+ * Add `framework.http_cache.skip_response_headers` option
 
 6.2
 ---

@@ -47,10 +47,8 @@ class Symfony_DI_PhpDumper_Test_Deep_Graph extends Container
 
     /**
      * Gets the public 'bar' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getBarService($container)
+    protected static function getBarService($container): \stdClass
     {
         $container->services['bar'] = $instance = new \stdClass();
 
@@ -61,10 +59,8 @@ class Symfony_DI_PhpDumper_Test_Deep_Graph extends Container
 
     /**
      * Gets the public 'foo' shared service.
-     *
-     * @return \Symfony\Component\DependencyInjection\Tests\Dumper\FooForDeepGraph
      */
-    protected static function getFooService($container)
+    protected static function getFooService($container): \Symfony\Component\DependencyInjection\Tests\Dumper\FooForDeepGraph
     {
         $a = ($container->services['bar'] ?? self::getBarService($container));
 

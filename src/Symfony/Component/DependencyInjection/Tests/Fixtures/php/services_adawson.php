@@ -52,10 +52,8 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the public 'App\Bus' shared service.
-     *
-     * @return \App\Bus
      */
-    protected static function getBusService($container)
+    protected static function getBusService($container): \App\Bus
     {
         $a = ($container->services['App\\Db'] ?? self::getDbService($container));
 
@@ -75,10 +73,8 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the public 'App\Db' shared service.
-     *
-     * @return \App\Db
      */
-    protected static function getDbService($container)
+    protected static function getDbService($container): \App\Db
     {
         $container->services['App\\Db'] = $instance = new \App\Db();
 
@@ -89,10 +85,8 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the private 'App\Schema' shared service.
-     *
-     * @return \App\Schema
      */
-    protected static function getSchemaService($container)
+    protected static function getSchemaService($container): \App\Schema
     {
         $a = ($container->services['App\\Db'] ?? self::getDbService($container));
 

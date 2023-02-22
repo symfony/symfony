@@ -42,10 +42,8 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the public 'test' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getTestService($container)
+    protected static function getTestService($container): \stdClass
     {
         return $container->services['test'] = new \stdClass(('file://'.\dirname(__DIR__, 1)), [('file://'.\dirname(__DIR__, 1)) => (\dirname(__DIR__, 2).'/')]);
     }

@@ -47,10 +47,8 @@ class Symfony_DI_PhpDumper_Service_WitherStaticReturnType extends Container
 
     /**
      * Gets the public 'wither' shared autowired service.
-     *
-     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\WitherStaticReturnType
      */
-    protected static function getWitherService($container)
+    protected static function getWitherService($container): \Symfony\Component\DependencyInjection\Tests\Fixtures\WitherStaticReturnType
     {
         $instance = new \Symfony\Component\DependencyInjection\Tests\Fixtures\WitherStaticReturnType();
 

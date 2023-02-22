@@ -32,10 +32,8 @@ class getBAR2Service extends ProjectServiceContainer
 {
     /**
      * Gets the public 'BAR' shared service.
-     *
-     * @return \stdClass
      */
-    public static function do($container, $lazyLoad = true)
+    public static function do($container, $lazyLoad = true): \stdClass
     {
         $container->services['BAR'] = $instance = new \stdClass();
 
@@ -51,10 +49,8 @@ class getBAR22Service extends ProjectServiceContainer
 {
     /**
      * Gets the public 'BAR2' shared service.
-     *
-     * @return \stdClass
      */
-    public static function do($container, $lazyLoad = true)
+    public static function do($container, $lazyLoad = true): \stdClass
     {
         return $container->services['BAR2'] = new \stdClass();
     }
@@ -66,10 +62,8 @@ class getAServiceService extends ProjectServiceContainer
 {
     /**
      * Gets the public 'a_service' shared service.
-     *
-     * @return \Bar
      */
-    public static function do($container, $lazyLoad = true)
+    public static function do($container, $lazyLoad = true): \Bar
     {
         return $container->services['a_service'] = ($container->privates['a_factory'] ??= new \Bar())->getBar();
     }
@@ -81,10 +75,8 @@ class getBServiceService extends ProjectServiceContainer
 {
     /**
      * Gets the public 'b_service' shared service.
-     *
-     * @return \Bar
      */
-    public static function do($container, $lazyLoad = true)
+    public static function do($container, $lazyLoad = true): \Bar
     {
         return $container->services['b_service'] = ($container->privates['a_factory'] ??= new \Bar())->getBar();
     }
@@ -96,10 +88,8 @@ class getBar23Service extends ProjectServiceContainer
 {
     /**
      * Gets the public 'bar2' shared service.
-     *
-     * @return \stdClass
      */
-    public static function do($container, $lazyLoad = true)
+    public static function do($container, $lazyLoad = true): \stdClass
     {
         return $container->services['bar2'] = new \stdClass();
     }
@@ -111,10 +101,8 @@ class getBazService extends ProjectServiceContainer
 {
     /**
      * Gets the public 'baz' shared service.
-     *
-     * @return \Baz
      */
-    public static function do($container, $lazyLoad = true)
+    public static function do($container, $lazyLoad = true): \Baz
     {
         $container->services['baz'] = $instance = new \Baz();
 
@@ -130,10 +118,8 @@ class getConfiguredServiceService extends ProjectServiceContainer
 {
     /**
      * Gets the public 'configured_service' shared service.
-     *
-     * @return \stdClass
      */
-    public static function do($container, $lazyLoad = true)
+    public static function do($container, $lazyLoad = true): \stdClass
     {
         $container->services['configured_service'] = $instance = new \stdClass();
 
@@ -152,10 +138,8 @@ class getConfiguredServiceSimpleService extends ProjectServiceContainer
 {
     /**
      * Gets the public 'configured_service_simple' shared service.
-     *
-     * @return \stdClass
      */
-    public static function do($container, $lazyLoad = true)
+    public static function do($container, $lazyLoad = true): \stdClass
     {
         $container->services['configured_service_simple'] = $instance = new \stdClass();
 
@@ -171,10 +155,8 @@ class getDecoratorServiceService extends ProjectServiceContainer
 {
     /**
      * Gets the public 'decorator_service' shared service.
-     *
-     * @return \stdClass
      */
-    public static function do($container, $lazyLoad = true)
+    public static function do($container, $lazyLoad = true): \stdClass
     {
         return $container->services['decorator_service'] = new \stdClass();
     }
@@ -186,10 +168,8 @@ class getDecoratorServiceWithNameService extends ProjectServiceContainer
 {
     /**
      * Gets the public 'decorator_service_with_name' shared service.
-     *
-     * @return \stdClass
      */
-    public static function do($container, $lazyLoad = true)
+    public static function do($container, $lazyLoad = true): \stdClass
     {
         return $container->services['decorator_service_with_name'] = new \stdClass();
     }
@@ -202,11 +182,9 @@ class getDeprecatedServiceService extends ProjectServiceContainer
     /**
      * Gets the public 'deprecated_service' shared service.
      *
-     * @return \stdClass
-     *
      * @deprecated Since vendor/package 1.1: The "deprecated_service" service is deprecated. You should stop using it, as it will be removed in the future.
      */
-    public static function do($container, $lazyLoad = true)
+    public static function do($container, $lazyLoad = true): \stdClass
     {
         trigger_deprecation('vendor/package', '1.1', 'The "deprecated_service" service is deprecated. You should stop using it, as it will be removed in the future.');
 
@@ -220,10 +198,8 @@ class getFactoryServiceService extends ProjectServiceContainer
 {
     /**
      * Gets the public 'factory_service' shared service.
-     *
-     * @return \Bar
      */
-    public static function do($container, $lazyLoad = true)
+    public static function do($container, $lazyLoad = true): \Bar
     {
         return $container->services['factory_service'] = ($container->services['foo.baz'] ?? $container->load('getFoo_BazService'))->getInstance();
     }
@@ -235,10 +211,8 @@ class getFactoryServiceSimpleService extends ProjectServiceContainer
 {
     /**
      * Gets the public 'factory_service_simple' shared service.
-     *
-     * @return \Bar
      */
-    public static function do($container, $lazyLoad = true)
+    public static function do($container, $lazyLoad = true): \Bar
     {
         return $container->services['factory_service_simple'] = $container->load('getFactorySimpleService')->getInstance();
     }
@@ -251,11 +225,9 @@ class getFactorySimpleService extends ProjectServiceContainer
     /**
      * Gets the private 'factory_simple' shared service.
      *
-     * @return \SimpleFactoryClass
-     *
      * @deprecated Since vendor/package 1.1: The "factory_simple" service is deprecated. You should stop using it, as it will be removed in the future.
      */
-    public static function do($container, $lazyLoad = true)
+    public static function do($container, $lazyLoad = true): \SimpleFactoryClass
     {
         trigger_deprecation('vendor/package', '1.1', 'The "factory_simple" service is deprecated. You should stop using it, as it will be removed in the future.');
 
@@ -269,10 +241,8 @@ class getFooService extends ProjectServiceContainer
 {
     /**
      * Gets the public 'foo' shared service.
-     *
-     * @return \Bar\FooClass
      */
-    public static function do($container, $lazyLoad = true)
+    public static function do($container, $lazyLoad = true): \Bar\FooClass
     {
         $a = ($container->services['foo.baz'] ?? $container->load('getFoo_BazService'));
 
@@ -295,10 +265,8 @@ class getFoo_BazService extends ProjectServiceContainer
 {
     /**
      * Gets the public 'foo.baz' shared service.
-     *
-     * @return \BazClass
      */
-    public static function do($container, $lazyLoad = true)
+    public static function do($container, $lazyLoad = true): \BazClass
     {
         $container->services['foo.baz'] = $instance = \BazClass::getInstance();
 
@@ -314,10 +282,8 @@ class getFooBarService extends ProjectServiceContainer
 {
     /**
      * Gets the public 'foo_bar' service.
-     *
-     * @return \Bar\FooClass
      */
-    public static function do($container, $lazyLoad = true)
+    public static function do($container, $lazyLoad = true): \Bar\FooClass
     {
         $container->factories['foo_bar'] = function ($container) {
             return new \Bar\FooClass(($container->services['deprecated_service'] ?? $container->load('getDeprecatedServiceService')));
@@ -333,10 +299,8 @@ class getFooWithInlineService extends ProjectServiceContainer
 {
     /**
      * Gets the public 'foo_with_inline' shared service.
-     *
-     * @return \Foo
      */
-    public static function do($container, $lazyLoad = true)
+    public static function do($container, $lazyLoad = true): \Foo
     {
         $container->services['foo_with_inline'] = $instance = new \Foo();
 
@@ -356,10 +320,8 @@ class getLazyContextService extends ProjectServiceContainer
 {
     /**
      * Gets the public 'lazy_context' shared service.
-     *
-     * @return \LazyContext
      */
-    public static function do($container, $lazyLoad = true)
+    public static function do($container, $lazyLoad = true): \LazyContext
     {
         $containerRef = $container->ref;
 
@@ -378,10 +340,8 @@ class getLazyContextIgnoreInvalidRefService extends ProjectServiceContainer
 {
     /**
      * Gets the public 'lazy_context_ignore_invalid_ref' shared service.
-     *
-     * @return \LazyContext
      */
-    public static function do($container, $lazyLoad = true)
+    public static function do($container, $lazyLoad = true): \LazyContext
     {
         $containerRef = $container->ref;
 
@@ -399,10 +359,8 @@ class getMethodCall1Service extends ProjectServiceContainer
 {
     /**
      * Gets the public 'method_call1' shared service.
-     *
-     * @return \Bar\FooClass
      */
-    public static function do($container, $lazyLoad = true)
+    public static function do($container, $lazyLoad = true): \Bar\FooClass
     {
         include_once $container->targetDir.''.'/Fixtures/includes/foo.php';
 
@@ -422,10 +380,8 @@ class getNewFactoryServiceService extends ProjectServiceContainer
 {
     /**
      * Gets the public 'new_factory_service' shared service.
-     *
-     * @return \FooBarBaz
      */
-    public static function do($container, $lazyLoad = true)
+    public static function do($container, $lazyLoad = true): \FooBarBaz
     {
         $a = new \FactoryClass();
         $a->foo = 'bar';
@@ -444,10 +400,8 @@ class getNonSharedFooService extends ProjectServiceContainer
 {
     /**
      * Gets the public 'non_shared_foo' service.
-     *
-     * @return \Bar\FooClass
      */
-    public static function do($container, $lazyLoad = true)
+    public static function do($container, $lazyLoad = true): \Bar\FooClass
     {
         include_once $container->targetDir.''.'/Fixtures/includes/foo.php';
 
@@ -465,10 +419,8 @@ class getPreloadSidekickService extends ProjectServiceContainer
 {
     /**
      * Gets the public 'preload_sidekick' shared service.
-     *
-     * @return \stdClass
      */
-    public static function do($container, $lazyLoad = true)
+    public static function do($container, $lazyLoad = true): \stdClass
     {
         return $container->services['preload_sidekick'] = new \stdClass();
     }
@@ -480,10 +432,8 @@ class getRuntimeErrorService extends ProjectServiceContainer
 {
     /**
      * Gets the public 'runtime_error' shared service.
-     *
-     * @return \stdClass
      */
-    public static function do($container, $lazyLoad = true)
+    public static function do($container, $lazyLoad = true): \stdClass
     {
         return $container->services['runtime_error'] = new \stdClass(throw new RuntimeException('Service "errored_definition" is broken.'));
     }
@@ -495,10 +445,8 @@ class getServiceFromStaticMethodService extends ProjectServiceContainer
 {
     /**
      * Gets the public 'service_from_static_method' shared service.
-     *
-     * @return \Bar\FooClass
      */
-    public static function do($container, $lazyLoad = true)
+    public static function do($container, $lazyLoad = true): \Bar\FooClass
     {
         return $container->services['service_from_static_method'] = \Bar\FooClass::getInstance();
     }
@@ -510,10 +458,8 @@ class getTaggedIteratorService extends ProjectServiceContainer
 {
     /**
      * Gets the public 'tagged_iterator' shared service.
-     *
-     * @return \Bar
      */
-    public static function do($container, $lazyLoad = true)
+    public static function do($container, $lazyLoad = true): \Bar
     {
         $containerRef = $container->ref;
 
@@ -532,10 +478,8 @@ class getThrowingOneService extends ProjectServiceContainer
 {
     /**
      * Gets the public 'throwing_one' shared service.
-     *
-     * @return \Bar\FooClass
      */
-    public static function do($container, $lazyLoad = true)
+    public static function do($container, $lazyLoad = true): \Bar\FooClass
     {
         return $container->services['throwing_one'] = new \Bar\FooClass(throw new RuntimeException('No-no-no-no'));
     }
@@ -646,10 +590,8 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the public 'bar' shared service.
-     *
-     * @return \Bar\FooClass
      */
-    protected static function getBarService($container)
+    protected static function getBarService($container): \Bar\FooClass
     {
         $a = ($container->services['foo.baz'] ?? $container->load('getFoo_BazService'));
 

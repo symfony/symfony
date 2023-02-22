@@ -42,20 +42,16 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the public 'foo' shared service.
-     *
-     * @return \Foo
      */
-    protected static function getFooService($container)
+    protected static function getFooService($container): \Foo
     {
         return $container->services['foo'] = new \Foo();
     }
 
     /**
      * Gets the public 'service_closure' shared service.
-     *
-     * @return \Bar
      */
-    protected static function getServiceClosureService($container)
+    protected static function getServiceClosureService($container): \Bar
     {
         $containerRef = $container->ref;
 
@@ -68,10 +64,8 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the public 'service_closure_invalid' shared service.
-     *
-     * @return \Bar
      */
-    protected static function getServiceClosureInvalidService($container)
+    protected static function getServiceClosureInvalidService($container): \Bar
     {
         return $container->services['service_closure_invalid'] = new \Bar(fn () => NULL);
     }

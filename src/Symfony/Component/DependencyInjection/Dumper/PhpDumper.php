@@ -819,17 +819,25 @@ EOF;
         $this->referenceVariables[$id] = new Variable('instance');
 
         $return = [];
+        $returnType = '';
 
         if ($class = $definition->getClass()) {
             $class = $class instanceof Parameter ? '%'.$class.'%' : $this->container->resolveEnvPlaceholders($class);
-            $return[] = sprintf(str_starts_with($class, '%') ? '@return object A %1$s instance' : '@return \%s', ltrim($class, '\\'));
+            if (str_starts_with($class, '%')) {
+                $returnType = ': object';
+                $return[] = sprintf('@return object A %1$s instance', ltrim($class, '\\'));
+            } else {
+                $returnType = sprintf(': \%s', ltrim($class, '\\'));
+            }
         } elseif ($definition->getFactory()) {
             $factory = $definition->getFactory();
             if (\is_string($factory) && !str_starts_with($factory, '@=')) {
+                $returnType = ': object';
                 $return[] = sprintf('@return object An instance returned by %s()', $factory);
             } elseif (\is_array($factory) && (\is_string($factory[0]) || $factory[0] instanceof Definition || $factory[0] instanceof Reference)) {
                 $class = $factory[0] instanceof Definition ? $factory[0]->getClass() : (string) $factory[0];
                 $class = $class instanceof Parameter ? '%'.$class.'%' : $this->container->resolveEnvPlaceholders($class);
+                $returnType = ': object';
                 $return[] = sprintf('@return object An instance returned by %s::%s()', $class, $factory[1]);
             }
         }
@@ -843,8 +851,13 @@ EOF;
             $return[] = sprintf('@deprecated %s', ($deprecation['package'] || $deprecation['version'] ? "Since {$deprecation['package']} {$deprecation['version']}: " : '').$deprecation['message']);
         }
 
-        $return = str_replace("\n     * \n", "\n     *\n", implode("\n     * ", $return));
-        $return = $this->container->resolveEnvPlaceholders($return);
+        if ($return) {
+            $return = "\n     *\n     * " . str_replace("\n     * \n", "\n     *\n", implode("\n     * ", $return));
+            $return = $this->container->resolveEnvPlaceholders($return);
+        } else {
+            $return = '';
+        }
+
 
         $shared = $definition->isShared() ? ' shared' : '';
         $public = $definition->isPublic() ? 'public' : 'private';
@@ -862,14 +875,12 @@ EOF;
         $code = <<<EOF
 
     /*{$this->docStar}
-     * Gets the $public '$id'$shared$autowired service.
-     *
-     * $return
+     * Gets the $public '$id'$shared$autowired service.$return
 EOF;
         $code = str_replace('*/', ' ', $code).<<<EOF
 
      */
-    protected static function {$methodName}(\$container$lazyInitialization)
+    protected static function {$methodName}(\$container$lazyInitialization)${returnType}
     {%container_ref%
 
 EOF;

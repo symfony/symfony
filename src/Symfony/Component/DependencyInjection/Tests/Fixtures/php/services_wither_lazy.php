@@ -52,10 +52,8 @@ class Symfony_DI_PhpDumper_Service_Wither_Lazy extends Container
 
     /**
      * Gets the public 'wither' shared autowired service.
-     *
-     * @return \Symfony\Component\DependencyInjection\Tests\Compiler\Wither
      */
-    protected static function getWitherService($container, $lazyLoad = true)
+    protected static function getWitherService($container, $lazyLoad = true): \Symfony\Component\DependencyInjection\Tests\Compiler\Wither
     {
         $containerRef = $container->ref;
 

@@ -46,17 +46,15 @@ class ProjectServiceContainer extends Container
      *
      * @return object A %env(FOO)% instance
      */
-    protected static function getServiceFromAnonymousFactoryService($container)
+    protected static function getServiceFromAnonymousFactoryService($container): object
     {
         return $container->services['service_from_anonymous_factory'] = (new ${($_ = $container->getEnv('FOO')) && false ?: "_"}())->getInstance();
     }
 
     /**
      * Gets the public 'service_with_method_call_and_factory' shared service.
-     *
-     * @return \Bar\FooClass
      */
-    protected static function getServiceWithMethodCallAndFactoryService($container)
+    protected static function getServiceWithMethodCallAndFactoryService($container): \Bar\FooClass
     {
         $container->services['service_with_method_call_and_factory'] = $instance = new \Bar\FooClass();
 

@@ -14,10 +14,8 @@ class getFooService extends ProjectServiceContainer
 {
     /**
      * Gets the public 'foo' shared service.
-     *
-     * @return \FooClass\Foo
      */
-    public static function do($container, $lazyLoad = true)
+    public static function do($container, $lazyLoad = true): \FooClass\Foo
     {
         return $container->services['foo'] = new \FooClass\Foo();
     }

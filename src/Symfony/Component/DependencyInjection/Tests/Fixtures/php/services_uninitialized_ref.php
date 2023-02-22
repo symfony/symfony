@@ -50,10 +50,8 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
 
     /**
      * Gets the public 'bar' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getBarService($container)
+    protected static function getBarService($container): \stdClass
     {
         $containerRef = $container->ref;
 
@@ -94,10 +92,8 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
 
     /**
      * Gets the public 'baz' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getBazService($container)
+    protected static function getBazService($container): \stdClass
     {
         $container->services['baz'] = $instance = new \stdClass();
 
@@ -108,10 +104,8 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
 
     /**
      * Gets the public 'foo1' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getFoo1Service($container)
+    protected static function getFoo1Service($container): \stdClass
     {
         return $container->services['foo1'] = new \stdClass();
     }

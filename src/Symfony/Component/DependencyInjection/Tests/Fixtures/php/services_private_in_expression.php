@@ -48,10 +48,8 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the public 'public_foo' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getPublicFooService($container)
+    protected static function getPublicFooService($container): \stdClass
     {
         return $container->services['public_foo'] = new \stdClass((new \stdClass())->bar);
     }

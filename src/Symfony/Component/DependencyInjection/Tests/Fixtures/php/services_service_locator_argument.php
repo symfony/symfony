@@ -56,10 +56,8 @@ class Symfony_DI_PhpDumper_Service_Locator_Argument extends Container
 
     /**
      * Gets the public 'bar' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getBarService($container)
+    protected static function getBarService($container): \stdClass
     {
         $container->services['bar'] = $instance = new \stdClass();
 
@@ -82,30 +80,24 @@ class Symfony_DI_PhpDumper_Service_Locator_Argument extends Container
 
     /**
      * Gets the public 'foo1' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getFoo1Service($container)
+    protected static function getFoo1Service($container): \stdClass
     {
         return $container->services['foo1'] = new \stdClass();
     }
 
     /**
      * Gets the private 'foo2' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getFoo2Service($container)
+    protected static function getFoo2Service($container): \stdClass
     {
         return $container->privates['foo2'] = new \stdClass();
     }
 
     /**
      * Gets the private 'foo3' service.
-     *
-     * @return \stdClass
      */
-    protected static function getFoo3Service($container)
+    protected static function getFoo3Service($container): \stdClass
     {
         $container->factories['service_container']['foo3'] = function ($container) {
             return new \stdClass();
@@ -116,10 +108,8 @@ class Symfony_DI_PhpDumper_Service_Locator_Argument extends Container
 
     /**
      * Gets the private 'foo4' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getFoo4Service($container)
+    protected static function getFoo4Service($container): \stdClass
     {
         throw new RuntimeException('BOOM');
     }

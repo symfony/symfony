@@ -52,20 +52,16 @@ class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
 
     /**
      * Gets the public 'Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor' shared service.
-     *
-     * @return \Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor
      */
-    protected static function getRot13EnvVarProcessorService($container)
+    protected static function getRot13EnvVarProcessorService($container): \Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor
     {
         return $container->services['Symfony\\Component\\DependencyInjection\\Tests\\Dumper\\Rot13EnvVarProcessor'] = new \Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor();
     }
 
     /**
      * Gets the public 'container.env_var_processors_locator' shared service.
-     *
-     * @return \Symfony\Component\DependencyInjection\ServiceLocator
      */
-    protected static function getContainer_EnvVarProcessorsLocatorService($container)
+    protected static function getContainer_EnvVarProcessorsLocatorService($container): \Symfony\Component\DependencyInjection\ServiceLocator
     {
         return $container->services['container.env_var_processors_locator'] = new \Symfony\Component\DependencyInjection\Argument\ServiceLocator($container->getService, [
             'rot13' => ['services', 'Symfony\\Component\\DependencyInjection\\Tests\\Dumper\\Rot13EnvVarProcessor', 'getRot13EnvVarProcessorService', false],

@@ -103,10 +103,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 
     /**
      * Gets the public 'bar2' shared service.
-     *
-     * @return \BarCircular
      */
-    protected static function getBar2Service($container)
+    protected static function getBar2Service($container): \BarCircular
     {
         $container->services['bar2'] = $instance = new \BarCircular();
 
@@ -117,10 +115,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 
     /**
      * Gets the public 'bar3' shared service.
-     *
-     * @return \BarCircular
      */
-    protected static function getBar3Service($container)
+    protected static function getBar3Service($container): \BarCircular
     {
         $container->services['bar3'] = $instance = new \BarCircular();
 
@@ -133,10 +129,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 
     /**
      * Gets the public 'baz6' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getBaz6Service($container)
+    protected static function getBaz6Service($container): \stdClass
     {
         $container->services['baz6'] = $instance = new \stdClass();
 
@@ -147,10 +141,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 
     /**
      * Gets the public 'connection' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getConnectionService($container)
+    protected static function getConnectionService($container): \stdClass
     {
         $a = new \stdClass();
 
@@ -167,10 +159,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 
     /**
      * Gets the public 'connection2' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getConnection2Service($container)
+    protected static function getConnection2Service($container): \stdClass
     {
         $a = new \stdClass();
 
@@ -193,10 +183,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 
     /**
      * Gets the public 'doctrine.entity_manager' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getDoctrine_EntityManagerService($container)
+    protected static function getDoctrine_EntityManagerService($container): \stdClass
     {
         $containerRef = $container->ref;
 
@@ -213,10 +201,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 
     /**
      * Gets the public 'foo' shared service.
-     *
-     * @return \FooCircular
      */
-    protected static function getFooService($container)
+    protected static function getFooService($container): \FooCircular
     {
         $a = new \BarCircular();
 
@@ -229,10 +215,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 
     /**
      * Gets the public 'foo2' shared service.
-     *
-     * @return \FooCircular
      */
-    protected static function getFoo2Service($container)
+    protected static function getFoo2Service($container): \FooCircular
     {
         $a = ($container->services['bar2'] ?? self::getBar2Service($container));
 
@@ -245,10 +229,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 
     /**
      * Gets the public 'foo5' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getFoo5Service($container)
+    protected static function getFoo5Service($container): \stdClass
     {
         $container->services['foo5'] = $instance = new \stdClass();
 
@@ -262,10 +244,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 
     /**
      * Gets the public 'foo6' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getFoo6Service($container)
+    protected static function getFoo6Service($container): \stdClass
     {
         $container->services['foo6'] = $instance = new \stdClass();
 
@@ -276,10 +256,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 
     /**
      * Gets the public 'foobar4' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getFoobar4Service($container)
+    protected static function getFoobar4Service($container): \stdClass
     {
         $a = new \stdClass();
 
@@ -292,10 +270,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 
     /**
      * Gets the public 'listener3' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getListener3Service($container)
+    protected static function getListener3Service($container): \stdClass
     {
         $container->services['listener3'] = $instance = new \stdClass();
 
@@ -306,10 +282,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 
     /**
      * Gets the public 'listener4' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getListener4Service($container)
+    protected static function getListener4Service($container): \stdClass
     {
         $a = ($container->privates['manager4'] ?? self::getManager4Service($container));
 
@@ -322,10 +296,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 
     /**
      * Gets the public 'logger' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getLoggerService($container)
+    protected static function getLoggerService($container): \stdClass
     {
         $a = ($container->services['connection'] ?? self::getConnectionService($container));
 
@@ -342,10 +314,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 
     /**
      * Gets the public 'manager' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getManagerService($container)
+    protected static function getManagerService($container): \stdClass
     {
         $a = ($container->services['connection'] ?? self::getConnectionService($container));
 
@@ -358,10 +328,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 
     /**
      * Gets the public 'manager2' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getManager2Service($container)
+    protected static function getManager2Service($container): \stdClass
     {
         $a = ($container->services['connection2'] ?? self::getConnection2Service($container));
 
@@ -374,10 +342,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 
     /**
      * Gets the public 'manager3' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getManager3Service($container, $lazyLoad = true)
+    protected static function getManager3Service($container, $lazyLoad = true): \stdClass
     {
         $a = ($container->services['listener3'] ?? self::getListener3Service($container));
 
@@ -392,10 +358,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 
     /**
      * Gets the public 'monolog.logger' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getMonolog_LoggerService($container)
+    protected static function getMonolog_LoggerService($container): \stdClass
     {
         $container->services['monolog.logger'] = $instance = new \stdClass();
 
@@ -406,10 +370,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 
     /**
      * Gets the public 'monolog_inline.logger' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getMonologInline_LoggerService($container)
+    protected static function getMonologInline_LoggerService($container): \stdClass
     {
         $container->services['monolog_inline.logger'] = $instance = new \stdClass();
 
@@ -420,10 +382,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 
     /**
      * Gets the public 'pA' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getPAService($container)
+    protected static function getPAService($container): \stdClass
     {
         $a = ($container->privates['pC'] ?? self::getPCService($container));
 
@@ -441,10 +401,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 
     /**
      * Gets the public 'root' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getRootService($container)
+    protected static function getRootService($container): \stdClass
     {
         $a = new \Symfony\Component\DependencyInjection\Tests\Fixtures\FooForCircularWithAddCalls();
 
@@ -457,10 +415,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 
     /**
      * Gets the public 'subscriber' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getSubscriberService($container)
+    protected static function getSubscriberService($container): \stdClass
     {
         $a = ($container->services['manager'] ?? self::getManagerService($container));
 
@@ -473,10 +429,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 
     /**
      * Gets the private 'bar6' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getBar6Service($container)
+    protected static function getBar6Service($container): \stdClass
     {
         $a = ($container->services['foo6'] ?? self::getFoo6Service($container));
 
@@ -489,10 +443,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 
     /**
      * Gets the private 'doctrine.listener' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getDoctrine_ListenerService($container)
+    protected static function getDoctrine_ListenerService($container): \stdClass
     {
         $a = ($container->services['doctrine.entity_manager'] ?? self::getDoctrine_EntityManagerService($container));
 
@@ -505,10 +457,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 
     /**
      * Gets the private 'level5' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getLevel5Service($container)
+    protected static function getLevel5Service($container): \stdClass
     {
         $a = new \Symfony\Component\DependencyInjection\Tests\Fixtures\FooForCircularWithAddCalls();
 
@@ -521,10 +471,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 
     /**
      * Gets the private 'mailer.transport' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getMailer_TransportService($container)
+    protected static function getMailer_TransportService($container): \stdClass
     {
         $containerRef = $container->ref;
 
@@ -538,10 +486,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 
     /**
      * Gets the private 'mailer.transport_factory.amazon' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getMailer_TransportFactory_AmazonService($container)
+    protected static function getMailer_TransportFactory_AmazonService($container): \stdClass
     {
         $a = new \stdClass();
 
@@ -554,20 +500,16 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 
     /**
      * Gets the private 'mailer_inline.mailer' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getMailerInline_MailerService($container)
+    protected static function getMailerInline_MailerService($container): \stdClass
     {
         return $container->privates['mailer_inline.mailer'] = new \stdClass((new \FactoryCircular(new RewindableGenerator(fn () => new \EmptyIterator(), 0)))->create());
     }
 
     /**
      * Gets the private 'mailer_inline.transport_factory.amazon' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getMailerInline_TransportFactory_AmazonService($container)
+    protected static function getMailerInline_TransportFactory_AmazonService($container): \stdClass
     {
         $a = new \stdClass();
         $a->handler = ($container->privates['mailer_inline.mailer'] ?? self::getMailerInline_MailerService($container));
@@ -577,10 +519,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 
     /**
      * Gets the private 'manager4' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getManager4Service($container, $lazyLoad = true)
+    protected static function getManager4Service($container, $lazyLoad = true): \stdClass
     {
         $a = new \stdClass();
 
@@ -593,10 +533,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 
     /**
      * Gets the private 'pC' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getPCService($container, $lazyLoad = true)
+    protected static function getPCService($container, $lazyLoad = true): \stdClass
     {
         $container->privates['pC'] = $instance = new \stdClass();
 
@@ -607,10 +545,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 
     /**
      * Gets the private 'pD' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getPDService($container)
+    protected static function getPDService($container): \stdClass
     {
         $a = ($container->services['pA'] ?? self::getPAService($container));
 

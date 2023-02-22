@@ -49,20 +49,16 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the public 'closure' shared service.
-     *
-     * @return \Closure
      */
-    protected static function getClosureService($container)
+    protected static function getClosureService($container): \Closure
     {
         return $container->services['closure'] = (new \stdClass())->__invoke(...);
     }
 
     /**
      * Gets the public 'closure_of_service_closure' shared service.
-     *
-     * @return \Closure
      */
-    protected static function getClosureOfServiceClosureService($container)
+    protected static function getClosureOfServiceClosureService($container): \Closure
     {
         $containerRef = $container->ref;
 

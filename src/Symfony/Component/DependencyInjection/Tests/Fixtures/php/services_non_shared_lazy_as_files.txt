@@ -14,10 +14,8 @@ class getNonSharedFooService extends ProjectServiceContainer
 {
     /**
      * Gets the public 'non_shared_foo' service.
-     *
-     * @return \Bar\FooLazyClass
      */
-    public static function do($container, $lazyLoad = true)
+    public static function do($container, $lazyLoad = true): \Bar\FooLazyClass
     {
         $containerRef = $container->ref;
 

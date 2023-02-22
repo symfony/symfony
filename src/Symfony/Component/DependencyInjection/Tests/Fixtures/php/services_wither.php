@@ -47,10 +47,8 @@ class Symfony_DI_PhpDumper_Service_Wither extends Container
 
     /**
      * Gets the public 'wither' shared autowired service.
-     *
-     * @return \Symfony\Component\DependencyInjection\Tests\Compiler\Wither
      */
-    protected static function getWitherService($container)
+    protected static function getWitherService($container): \Symfony\Component\DependencyInjection\Tests\Compiler\Wither
     {
         $instance = new \Symfony\Component\DependencyInjection\Tests\Compiler\Wither();
 

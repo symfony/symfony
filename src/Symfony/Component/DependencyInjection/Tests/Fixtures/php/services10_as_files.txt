@@ -22,10 +22,8 @@ class getClosureService extends ProjectServiceContainer
 {
     /**
      * Gets the public 'closure' shared service.
-     *
-     * @return \stdClass
      */
-    public static function do($container, $lazyLoad = true)
+    public static function do($container, $lazyLoad = true): \stdClass
     {
         $containerRef = $container->ref;
 
@@ -112,10 +110,8 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the public 'foo' shared service.
-     *
-     * @return \FooClass
      */
-    protected static function getFooService($container)
+    protected static function getFooService($container): \FooClass
     {
         return $container->services['foo'] = new \FooClass(new \stdClass());
     }

@@ -57,20 +57,16 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the public 'bar_service' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getBarServiceService($container)
+    protected static function getBarServiceService($container): \stdClass
     {
         return $container->services['bar_service'] = new \stdClass(($container->privates['baz_service'] ??= new \stdClass()));
     }
 
     /**
      * Gets the public 'foo_service' shared service.
-     *
-     * @return \Symfony\Component\DependencyInjection\ServiceLocator
      */
-    protected static function getFooServiceService($container)
+    protected static function getFooServiceService($container): \Symfony\Component\DependencyInjection\ServiceLocator
     {
         $containerRef = $container->ref;
 
@@ -87,40 +83,32 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the public 'translator.loader_1' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getTranslator_Loader1Service($container)
+    protected static function getTranslator_Loader1Service($container): \stdClass
     {
         return $container->services['translator.loader_1'] = new \stdClass();
     }
 
     /**
      * Gets the public 'translator.loader_2' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getTranslator_Loader2Service($container)
+    protected static function getTranslator_Loader2Service($container): \stdClass
     {
         return $container->services['translator.loader_2'] = new \stdClass();
     }
 
     /**
      * Gets the public 'translator.loader_3' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getTranslator_Loader3Service($container)
+    protected static function getTranslator_Loader3Service($container): \stdClass
     {
         return $container->services['translator.loader_3'] = new \stdClass();
     }
 
     /**
      * Gets the public 'translator_1' shared service.
-     *
-     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator
      */
-    protected static function getTranslator1Service($container)
+    protected static function getTranslator1Service($container): \Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator
     {
         $containerRef = $container->ref;
 
@@ -133,10 +121,8 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the public 'translator_2' shared service.
-     *
-     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator
      */
-    protected static function getTranslator2Service($container)
+    protected static function getTranslator2Service($container): \Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator
     {
         $containerRef = $container->ref;
 
@@ -153,10 +139,8 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the public 'translator_3' shared service.
-     *
-     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator
      */
-    protected static function getTranslator3Service($container)
+    protected static function getTranslator3Service($container): \Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator
     {
         $containerRef = $container->ref;
 

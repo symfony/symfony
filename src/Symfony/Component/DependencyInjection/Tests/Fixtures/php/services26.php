@@ -43,10 +43,8 @@ class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
 
     /**
      * Gets the public 'bar' shared service.
-     *
-     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\Bar
      */
-    protected static function getBarService($container)
+    protected static function getBarService($container): \Symfony\Component\DependencyInjection\Tests\Fixtures\Bar
     {
         return $container->services['bar'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\Bar($container->getEnv('QUZ'));
     }
@@ -56,7 +54,7 @@ class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
      *
      * @return object A %env(FOO)% instance
      */
-    protected static function getTestService($container)
+    protected static function getTestService($container): object
     {
         return $container->services['test'] = new ${($_ = $container->getEnv('FOO')) && false ?: "_"}($container->getEnv('Bar'), 'foo'.$container->getEnv('string:FOO').'baz', $container->getEnv('int:Baz'));
     }

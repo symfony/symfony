@@ -40,10 +40,8 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the public 'foo' shared autowired service.
-     *
-     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\NewInInitializer
      */
-    protected static function getFooService($container)
+    protected static function getFooService($container): \Symfony\Component\DependencyInjection\Tests\Fixtures\NewInInitializer
     {
         return $container->services['foo'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\NewInInitializer(bar: 234);
     }

@@ -47,10 +47,8 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the public 'tsantos_serializer' shared service.
-     *
-     * @return \TSantos\Serializer\EventEmitterSerializer
      */
-    protected static function getTsantosSerializerService($container)
+    protected static function getTsantosSerializerService($container): \TSantos\Serializer\EventEmitterSerializer
     {
         $a = new \TSantos\Serializer\NormalizerRegistry();
 

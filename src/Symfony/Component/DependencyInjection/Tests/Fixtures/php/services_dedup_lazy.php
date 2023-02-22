@@ -48,10 +48,8 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the public 'bar' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getBarService($container, $lazyLoad = true)
+    protected static function getBarService($container, $lazyLoad = true): \stdClass
     {
         $containerRef = $container->ref;
 
@@ -64,10 +62,8 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the public 'baz' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getBazService($container, $lazyLoad = true)
+    protected static function getBazService($container, $lazyLoad = true): \stdClass
     {
         $containerRef = $container->ref;
 
@@ -80,10 +76,8 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the public 'buz' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getBuzService($container, $lazyLoad = true)
+    protected static function getBuzService($container, $lazyLoad = true): \stdClass
     {
         $containerRef = $container->ref;
 
@@ -96,10 +90,8 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the public 'foo' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getFooService($container, $lazyLoad = true)
+    protected static function getFooService($container, $lazyLoad = true): \stdClass
     {
         $containerRef = $container->ref;
 

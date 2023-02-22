@@ -40,10 +40,8 @@ class Symfony_DI_PhpDumper_Test_Inline_Self_Ref extends Container
 
     /**
      * Gets the public 'App\Foo' shared service.
-     *
-     * @return \App\Foo
      */
-    protected static function getFooService($container)
+    protected static function getFooService($container): \App\Foo
     {
         $a = new \App\Bar();
 

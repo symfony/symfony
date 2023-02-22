@@ -42,10 +42,8 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the public 'test' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getTestService($container)
+    protected static function getTestService($container): \stdClass
     {
         return $container->services['test'] = new \stdClass(['only dot' => '.', 'concatenation as value' => '.\'\'.', 'concatenation from the start value' => '\'\'.', '.' => 'dot as a key', '.\'\'.' => 'concatenation as a key', '\'\'.' => 'concatenation from the start key', 'optimize concatenation' => 'string1-string2', 'optimize concatenation with empty string' => 'string1string2', 'optimize concatenation from the start' => 'start', 'optimize concatenation at the end' => 'end', 'new line' => 'string with '."\n".'new line']);
     }

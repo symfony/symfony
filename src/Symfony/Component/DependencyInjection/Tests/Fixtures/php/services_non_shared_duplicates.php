@@ -51,20 +51,16 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the public 'bar' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getBarService($container)
+    protected static function getBarService($container): \stdClass
     {
         return $container->services['bar'] = new \stdClass((new \stdClass()), (new \stdClass()));
     }
 
     /**
      * Gets the public 'baz' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getBazService($container)
+    protected static function getBazService($container): \stdClass
     {
         return $container->services['baz'] = new \stdClass(new \Symfony\Component\DependencyInjection\Argument\ServiceLocator($container->getService, [
             'foo' => [false, 'foo', 'getFooService', false],
@@ -75,10 +71,8 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the private 'foo' service.
-     *
-     * @return \stdClass
      */
-    protected static function getFooService($container)
+    protected static function getFooService($container): \stdClass
     {
         $container->factories['service_container']['foo'] = function ($container) {
             return new \stdClass();

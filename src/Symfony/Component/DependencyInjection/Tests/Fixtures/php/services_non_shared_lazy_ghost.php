@@ -52,20 +52,16 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the public 'bar' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getBarService($container)
+    protected static function getBarService($container): \stdClass
     {
         return $container->services['bar'] = new \stdClass((isset($container->factories['service_container']['foo']) ? $container->factories['service_container']['foo']($container) : self::getFooService($container)));
     }
 
     /**
      * Gets the private 'foo' service.
-     *
-     * @return \stdClass
      */
-    protected static function getFooService($container, $lazyLoad = true)
+    protected static function getFooService($container, $lazyLoad = true): \stdClass
     {
         $containerRef = $container->ref;
 

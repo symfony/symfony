@@ -44,30 +44,24 @@ class Symfony_DI_PhpDumper_Test_Unsupported_Characters extends Container
 
     /**
      * Gets the public 'bar$' shared service.
-     *
-     * @return \FooClass
      */
-    protected static function getBarService($container)
+    protected static function getBarService($container): \FooClass
     {
         return $container->services['bar$'] = new \FooClass();
     }
 
     /**
      * Gets the public 'bar$!' shared service.
-     *
-     * @return \FooClass
      */
-    protected static function getBar2Service($container)
+    protected static function getBar2Service($container): \FooClass
     {
         return $container->services['bar$!'] = new \FooClass();
     }
 
     /**
      * Gets the public 'foo oh-no' shared service.
-     *
-     * @return \FooClass
      */
-    protected static function getFooohnoService($container)
+    protected static function getFooohnoService($container): \FooClass
     {
         return $container->services['foo*/oh-no'] = new \FooClass();
     }

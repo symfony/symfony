@@ -42,10 +42,8 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the public 'bar' shared service.
-     *
-     * @return \BarClass
      */
-    protected static function getBarService($container)
+    protected static function getBarService($container): \BarClass
     {
         $container->services['bar'] = $instance = new \BarClass();
 

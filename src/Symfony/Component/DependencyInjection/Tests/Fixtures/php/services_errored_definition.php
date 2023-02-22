@@ -89,10 +89,8 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
 
     /**
      * Gets the public 'BAR' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getBARService($container)
+    protected static function getBARService($container): \stdClass
     {
         $container->services['BAR'] = $instance = new \stdClass();
 
@@ -103,40 +101,32 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
 
     /**
      * Gets the public 'BAR2' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getBAR2Service($container)
+    protected static function getBAR2Service($container): \stdClass
     {
         return $container->services['BAR2'] = new \stdClass();
     }
 
     /**
      * Gets the public 'a_service' shared service.
-     *
-     * @return \Bar
      */
-    protected static function getAServiceService($container)
+    protected static function getAServiceService($container): \Bar
     {
         return $container->services['a_service'] = ($container->privates['a_factory'] ??= new \Bar())->getBar();
     }
 
     /**
      * Gets the public 'b_service' shared service.
-     *
-     * @return \Bar
      */
-    protected static function getBServiceService($container)
+    protected static function getBServiceService($container): \Bar
     {
         return $container->services['b_service'] = ($container->privates['a_factory'] ??= new \Bar())->getBar();
     }
 
     /**
      * Gets the public 'bar' shared service.
-     *
-     * @return \Bar\FooClass
      */
-    protected static function getBar3Service($container)
+    protected static function getBar3Service($container): \Bar\FooClass
     {
         $a = ($container->services['foo.baz'] ?? self::getFoo_BazService($container));
 
@@ -149,20 +139,16 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
 
     /**
      * Gets the public 'bar2' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getBar22Service($container)
+    protected static function getBar22Service($container): \stdClass
     {
         return $container->services['bar2'] = new \stdClass();
     }
 
     /**
      * Gets the public 'baz' shared service.
-     *
-     * @return \Baz
      */
-    protected static function getBazService($container)
+    protected static function getBazService($container): \Baz
     {
         $container->services['baz'] = $instance = new \Baz();
 
@@ -173,10 +159,8 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
 
     /**
      * Gets the public 'configured_service' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getConfiguredServiceService($container)
+    protected static function getConfiguredServiceService($container): \stdClass
     {
         $container->services['configured_service'] = $instance = new \stdClass();
 
@@ -190,10 +174,8 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
 
     /**
      * Gets the public 'configured_service_simple' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getConfiguredServiceSimpleService($container)
+    protected static function getConfiguredServiceSimpleService($container): \stdClass
     {
         $container->services['configured_service_simple'] = $instance = new \stdClass();
 
@@ -204,20 +186,16 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
 
     /**
      * Gets the public 'decorator_service' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getDecoratorServiceService($container)
+    protected static function getDecoratorServiceService($container): \stdClass
     {
         return $container->services['decorator_service'] = new \stdClass();
     }
 
     /**
      * Gets the public 'decorator_service_with_name' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getDecoratorServiceWithNameService($container)
+    protected static function getDecoratorServiceWithNameService($container): \stdClass
     {
         return $container->services['decorator_service_with_name'] = new \stdClass();
     }
@@ -225,11 +203,9 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
     /**
      * Gets the public 'deprecated_service' shared service.
      *
-     * @return \stdClass
-     *
      * @deprecated Since vendor/package 1.1: The "deprecated_service" service is deprecated. You should stop using it, as it will be removed in the future.
      */
-    protected static function getDeprecatedServiceService($container)
+    protected static function getDeprecatedServiceService($container): \stdClass
     {
         trigger_deprecation('vendor/package', '1.1', 'The "deprecated_service" service is deprecated. You should stop using it, as it will be removed in the future.');
 
@@ -238,30 +214,24 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
 
     /**
      * Gets the public 'factory_service' shared service.
-     *
-     * @return \Bar
      */
-    protected static function getFactoryServiceService($container)
+    protected static function getFactoryServiceService($container): \Bar
     {
         return $container->services['factory_service'] = ($container->services['foo.baz'] ?? self::getFoo_BazService($container))->getInstance();
     }
 
     /**
      * Gets the public 'factory_service_simple' shared service.
-     *
-     * @return \Bar
      */
-    protected static function getFactoryServiceSimpleService($container)
+    protected static function getFactoryServiceSimpleService($container): \Bar
     {
         return $container->services['factory_service_simple'] = self::getFactorySimpleService($container)->getInstance();
     }
 
     /**
      * Gets the public 'foo' shared service.
-     *
-     * @return \Bar\FooClass
      */
-    protected static function getFooService($container)
+    protected static function getFooService($container): \Bar\FooClass
     {
         $a = ($container->services['foo.baz'] ?? self::getFoo_BazService($container));
 
@@ -279,10 +249,8 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
 
     /**
      * Gets the public 'foo.baz' shared service.
-     *
-     * @return \BazClass
      */
-    protected static function getFoo_BazService($container)
+    protected static function getFoo_BazService($container): \BazClass
     {
         $container->services['foo.baz'] = $instance = \BazClass::getInstance();
 
@@ -293,10 +261,8 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
 
     /**
      * Gets the public 'foo_bar' service.
-     *
-     * @return \Bar\FooClass
      */
-    protected static function getFooBarService($container)
+    protected static function getFooBarService($container): \Bar\FooClass
     {
         $container->factories['foo_bar'] = function ($container) {
             return new \Bar\FooClass(($container->services['deprecated_service'] ?? self::getDeprecatedServiceService($container)));
@@ -307,10 +273,8 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
 
     /**
      * Gets the public 'foo_with_inline' shared service.
-     *
-     * @return \Foo
      */
-    protected static function getFooWithInlineService($container)
+    protected static function getFooWithInlineService($container): \Foo
     {
         $container->services['foo_with_inline'] = $instance = new \Foo();
 
@@ -325,10 +289,8 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
 
     /**
      * Gets the public 'lazy_context' shared service.
-     *
-     * @return \LazyContext
      */
-    protected static function getLazyContextService($container)
+    protected static function getLazyContextService($container): \LazyContext
     {
         $containerRef = $container->ref;
 
@@ -342,10 +304,8 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
 
     /**
      * Gets the public 'lazy_context_ignore_invalid_ref' shared service.
-     *
-     * @return \LazyContext
      */
-    protected static function getLazyContextIgnoreInvalidRefService($container)
+    protected static function getLazyContextIgnoreInvalidRefService($container): \LazyContext
     {
         $containerRef = $container->ref;
 
@@ -358,10 +318,8 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
 
     /**
      * Gets the public 'method_call1' shared service.
-     *
-     * @return \Bar\FooClass
      */
-    protected static function getMethodCall1Service($container)
+    protected static function getMethodCall1Service($container): \Bar\FooClass
     {
         include_once '%path%foo.php';
 
@@ -376,10 +334,8 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
 
     /**
      * Gets the public 'new_factory_service' shared service.
-     *
-     * @return \FooBarBaz
      */
-    protected static function getNewFactoryServiceService($container)
+    protected static function getNewFactoryServiceService($container): \FooBarBaz
     {
         $a = new \FactoryClass();
         $a->foo = 'bar';
@@ -393,40 +349,32 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
 
     /**
      * Gets the public 'preload_sidekick' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getPreloadSidekickService($container)
+    protected static function getPreloadSidekickService($container): \stdClass
     {
         return $container->services['preload_sidekick'] = new \stdClass();
     }
 
     /**
      * Gets the public 'runtime_error' shared service.
-     *
-     * @return \stdClass
      */
-    protected static function getRuntimeErrorService($container)
+    protected static function getRuntimeErrorService($container): \stdClass
     {
         return $container->services['runtime_error'] = new \stdClass(throw new RuntimeException('Service "errored_definition" is broken.'));
     }
 
     /**
      * Gets the public 'service_from_static_method' shared service.
-     *
-     * @return \Bar\FooClass
      */
-    protected static function getServiceFromStaticMethodService($container)
+    protected static function getServiceFromStaticMethodService($container): \Bar\FooClass
     {
         return $container->services['service_from_static_method'] = \Bar\FooClass::getInstance();
     }
 
     /**
      * Gets the public 'tagged_iterator' shared service.
-     *
-     * @return \Bar
      */
-    protected static function getTaggedIteratorService($container)
+    protected static function getTaggedIteratorService($container): \Bar
     {
         $containerRef = $container->ref;
 
@@ -441,11 +389,9 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
     /**
      * Gets the private 'factory_simple' shared service.
      *
-     * @return \SimpleFactoryClass
-     *
      * @deprecated Since vendor/package 1.1: The "factory_simple" service is deprecated. You should stop using it, as it will be removed in the future.
      */
-    protected static function getFactorySimpleService($container)
+    protected static function getFactorySimpleService($container): \SimpleFactoryClass
     {
         trigger_deprecation('vendor/package', '1.1', 'The "factory_simple" service is deprecated. You should stop using it, as it will be removed in the future.');
 

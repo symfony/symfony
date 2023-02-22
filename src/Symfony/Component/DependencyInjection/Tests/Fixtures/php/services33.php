@@ -41,20 +41,16 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the public 'Bar\Foo' shared service.
-     *
-     * @return \Bar\Foo
      */
-    protected static function getFooService($container)
+    protected static function getFooService($container): \Bar\Foo
     {
         return $container->services['Bar\\Foo'] = new \Bar\Foo();
     }
 
     /**
      * Gets the public 'Foo\Foo' shared service.
-     *
-     * @return \Foo\Foo
      */
-    protected static function getFoo2Service($container)
+    protected static function getFoo2Service($container): \Foo\Foo
     {
         return $container->services['Foo\\Foo'] = new \Foo\Foo();
     }

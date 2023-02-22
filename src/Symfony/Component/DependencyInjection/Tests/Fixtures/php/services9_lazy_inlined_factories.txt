@@ -70,10 +70,8 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the public 'lazy_foo' shared service.
-     *
-     * @return \Bar\FooClass
      */
-    protected static function getLazyFooService($container, $lazyLoad = true)
+    protected static function getLazyFooService($container, $lazyLoad = true): \Bar\FooClass
     {
         $containerRef = $container->ref;
 

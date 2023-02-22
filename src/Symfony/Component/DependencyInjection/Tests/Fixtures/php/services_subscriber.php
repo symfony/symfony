@@ -56,20 +56,16 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the public 'Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber' shared service.
-     *
-     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber
      */
-    protected static function getTestServiceSubscriberService($container)
+    protected static function getTestServiceSubscriberService($container): \Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber
     {
         return $container->services['Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\TestServiceSubscriber'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber();
     }
 
     /**
      * Gets the public 'foo_service' shared autowired service.
-     *
-     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber
      */
-    protected static function getFooServiceService($container)
+    protected static function getFooServiceService($container): \Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber
     {
         return $container->services['foo_service'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber((new \Symfony\Component\DependencyInjection\Argument\ServiceLocator($container->getService, [
             'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition' => ['privates', 'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition', 'getCustomDefinitionService', false],
@@ -88,20 +84,16 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the public 'late_alias' shared service.
-     *
-     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\TestDefinition1
      */
-    protected static function getLateAliasService($container)
+    protected static function getLateAliasService($container): \Symfony\Component\DependencyInjection\Tests\Fixtures\TestDefinition1
     {
         return $container->services['late_alias'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\TestDefinition1();
     }
 
     /**
      * Gets the private 'Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition' shared service.
-     *
-     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition
      */
-    protected static function getCustomDefinitionService($container)
+    protected static function getCustomDefinitionService($container): \Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition
     {
         return $container->privates['Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition();
     }

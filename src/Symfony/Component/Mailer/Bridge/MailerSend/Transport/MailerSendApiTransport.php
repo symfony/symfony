@@ -13,6 +13,7 @@ namespace Symfony\Component\Mailer\Bridge\MailerSend\Transport;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpClient\Exception\JsonException;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\SentMessage;
@@ -30,7 +31,7 @@ final class MailerSendApiTransport extends AbstractApiTransport
 {
     private string $key;
 
-    public function __construct(string $key, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
+    public function __construct(#[\SensitiveParameter] string $key, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
         $this->key = $key;
 
@@ -53,17 +54,17 @@ final class MailerSendApiTransport extends AbstractApiTransport
 
         try {
             $statusCode = $response->getStatusCode();
-            $result = $response->getContent(false);
+            $content = $response->getContent(false);
             $headers = $response->getHeaders(false);
         } catch (TransportExceptionInterface $e) {
             throw new HttpTransportException('Could not reach the remote MailerSend server.', $response, 0, $e);
         }
 
-        if (!empty($result)) {
+        if ('' !== $content) {
             try {
-                $result = json_decode($result, true, 512, \JSON_THROW_ON_ERROR);
+                $result = json_decode($content, true, 512, \JSON_THROW_ON_ERROR);
             } catch (\JsonException $e) {
-                throw new HttpTransportException(sprintf('Unable to send an email: "%s" (code %d).', $result, $statusCode), $response, 0, $e);
+                throw new HttpTransportException(sprintf('Unable to send an email: "%s" (code %d).', $content, $statusCode), $response, 0, $e);
             }
         }
 
@@ -125,7 +126,7 @@ final class MailerSendApiTransport extends AbstractApiTransport
     /**
      * @param Address[] $addresses
      */
-    protected function prepareAddresses(array $addresses): array
+    private function prepareAddresses(array $addresses): array
     {
         $recipients = [];
 
@@ -163,7 +164,7 @@ final class MailerSendApiTransport extends AbstractApiTransport
         return $attachments;
     }
 
-    private function getEndpoint(): ?string
+    private function getEndpoint(): string
     {
         return ($this->host ?: 'api.mailersend.com').($this->port ? ':'.$this->port : '');
     }

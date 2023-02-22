@@ -1,5 +1,5 @@
 MailerSend Bridge
-===============
+=================
 
 Provides MailerSend integration for Symfony Mailer.
 

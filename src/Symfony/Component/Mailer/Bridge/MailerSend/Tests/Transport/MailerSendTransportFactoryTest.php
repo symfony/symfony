@@ -22,7 +22,7 @@ use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
 class MailerSendTransportFactoryTest extends TransportFactoryTestCase
 {
-    public static function getFactory(): TransportFactoryInterface
+    public function getFactory(): TransportFactoryInterface
     {
         return new MailerSendTransportFactory(null, new MockHttpClient(), new NullLogger());
     }

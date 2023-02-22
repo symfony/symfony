@@ -670,7 +670,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
 
         $this->buildViolation($messageViolation)
             ->setParameters([
-                '{{ filename_max_length }}' => $constraintFile->nameMaxLength,
+                '{{ filename_max_length }}' => $constraintFile->filenameMaxLength,
             ])
             ->setCode(File::FILENAME_TOO_LONG)
             ->assertRaised();

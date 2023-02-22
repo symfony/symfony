@@ -9,6 +9,7 @@ CHANGELOG
  * Add the `pattern` parameter in violations of the `Regex` constraint
  * Add a `NoSuspiciousCharacters` constraint to validate a string is not a spoofing attempt
  * Add the `countUnit` option to the `Length` constraint to allow counting the string length either by code points (like before, now the default setting `Length::COUNT_CODEPOINTS`), bytes (`Length::COUNT_BYTES`) or graphemes (`Length::COUNT_GRAPHEMES`)
+ * Add the `filenameMaxLength` option to the `File` constraint
 
 6.2
 ---

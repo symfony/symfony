@@ -28,7 +28,7 @@ class ByteStringTest extends AbstractAsciiTestCase
 
         self::assertSame(32, $random->length());
         foreach ($random->chunk() as $char) {
-            self::assertNotNull((new ByteString('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'))->indexOf($char));
+            self::assertNotNull((new ByteString('123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'))->indexOf($char));
         }
     }
 

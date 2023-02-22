@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-02-21T21:31:54Z
+
+Can't we have a test with dummy translations in any locale?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-02-21T21:35:48Z
+
+I'll have a look at it 👍
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-02-22T17:42:08Z
+
+The test has been added with a dummy translator 👍

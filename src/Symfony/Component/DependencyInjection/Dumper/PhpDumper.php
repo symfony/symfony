@@ -941,7 +941,7 @@ EOF;
                 $c = implode("\n", array_map(fn ($line) => $line ? '    '.$line : $line, explode("\n", $c)));
                 $lazyloadInitialization = $definition->isLazy() ? ', $lazyLoad = true' : '';
 
-                $c = sprintf("        %s = static function (\$container%s) {\n%s        };\n\n        return %1\$s(\$container);\n", $factory, $lazyloadInitialization, $c);
+                $c = sprintf("        %s = function (\$container%s) {\n%s        };\n\n        return %1\$s(\$container);\n", $factory, $lazyloadInitialization, $c);
             }
 
             $code .= $c;
@@ -1156,6 +1156,10 @@ EOTXT
 
             if (['Closure', 'fromCallable'] === $callable && [0] === array_keys($definition->getArguments())) {
                 $callable = $definition->getArgument(0);
+                if ($callable instanceof ServiceClosureArgument) {
+                    return $return.$this->dumpValue($callable).$tail;
+                }
+
                 $arguments = ['...'];
 
                 if ($callable instanceof Reference || $callable instanceof Definition) {
@@ -1792,9 +1796,10 @@ EOF;
             if ($value && $interpolate && false !== $param = array_search($value, $this->container->getParameterBag()->all(), true)) {
                 return $this->dumpValue("%$param%");
             }
+            $isList = array_is_list($value);
             $code = [];
             foreach ($value as $k => $v) {
-                $code[] = sprintf('%s => %s', $this->dumpValue($k, $interpolate), $this->dumpValue($v, $interpolate));
+                $code[] = $isList ? $this->dumpValue($v, $interpolate) : sprintf('%s => %s', $this->dumpValue($k, $interpolate), $this->dumpValue($v, $interpolate));
             }
 
             return sprintf('[%s]', implode(', ', $code));
@@ -1812,8 +1817,6 @@ EOF;
                         $returnedType = sprintf(': %s\%s', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE >= $value->getInvalidBehavior() ? '' : '?', str_replace(['|', '&'], ['|\\', '&\\'], $value->getType()));
                     }
 
-                    $code = sprintf('return %s;', $code);
-
                     $attribute = '';
                     if ($value instanceof Reference) {
                         $attribute = 'name: '.$this->dumpValue((string) $value, $interpolate);
@@ -1824,41 +1827,46 @@ EOF;
 
                         $attribute = sprintf('#[\Closure(%s)] ', $attribute);
                     }
-                    $this->addContainerRef = true;
 
-                    return sprintf("%sstatic function () use (\$containerRef)%s {\n            \$container = \$containerRef->get();\n\n            %s\n        }", $attribute, $returnedType, $code);
+                    if (str_contains($code, '$container')) {
+                        $this->addContainerRef = true;
+
+                        return sprintf("%sfunction () use (\$containerRef)%s {\n            \$container = \$containerRef->get();\n\n            return %s;\n        }", $attribute, $returnedType, $code);
+                    }
+
+                    return sprintf('%sfn ()%s => %s', $attribute, $returnedType, $code);
                 }
 
                 if ($value instanceof IteratorArgument) {
-                    $operands = [0];
-                    $code = [];
-
                     if (!$values = $value->getValues()) {
-                        $code[] = 'new RewindableGenerator(static function () {';
-                        $code[] = '            return new \EmptyIterator();';
-                    } else {
-                        $this->addContainerRef = true;
-                        $code[] = 'new RewindableGenerator(static function () use ($containerRef) {';
-                        $code[] = '            $container = $containerRef->get();';
-                        $code[] = '';
-                        $countCode = [];
-                        $countCode[] = 'static function () use ($containerRef) {';
+                        return 'new RewindableGenerator(fn () => new \EmptyIterator(), 0)';
+                    }
 
-                        foreach ($values as $k => $v) {
-                            ($c = $this->getServiceConditionals($v)) ? $operands[] = "(int) ($c)" : ++$operands[0];
-                            $v = $this->wrapServiceConditionals($v, sprintf("        yield %s => %s;\n", $this->dumpValue($k, $interpolate), $this->dumpValue($v, $interpolate)));
-                            foreach (explode("\n", $v) as $v) {
-                                if ($v) {
-                                    $code[] = '    '.$v;
-                                }
+                    $this->addContainerRef = true;
+
+                    $code = [];
+                    $code[] = 'new RewindableGenerator(function () use ($containerRef) {';
+                    $code[] = '            $container = $containerRef->get();';
+                    $code[] = '';
+
+                    $countCode = [];
+                    $countCode[] = 'function () use ($containerRef) {';
+
+                    $operands = [0];
+                    foreach ($values as $k => $v) {
+                        ($c = $this->getServiceConditionals($v)) ? $operands[] = "(int) ($c)" : ++$operands[0];
+                        $v = $this->wrapServiceConditionals($v, sprintf("        yield %s => %s;\n", $this->dumpValue($k, $interpolate), $this->dumpValue($v, $interpolate)));
+                        foreach (explode("\n", $v) as $v) {
+                            if ($v) {
+                                $code[] = '    '.$v;
                             }
                         }
-
-                        $countCode[] = '            $container = $containerRef->get();';
-                        $countCode[] = '';
-                        $countCode[] = sprintf('            return %s;', implode(' + ', $operands));
-                        $countCode[] = '        }';
                     }
+
+                    $countCode[] = '            $container = $containerRef->get();';
+                    $countCode[] = '';
+                    $countCode[] = sprintf('            return %s;', implode(' + ', $operands));
+                    $countCode[] = '        }';
 
                     $code[] = sprintf('        }, %s)', \count($operands) > 1 ? implode("\n", $countCode) : $operands[0]);
 
@@ -1950,7 +1958,7 @@ EOF;
         } elseif ($value instanceof AbstractArgument) {
             throw new RuntimeException($value->getTextWithContext());
         } elseif (\is_object($value) || \is_resource($value)) {
-            throw new RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');
+            throw new RuntimeException(sprintf('Unable to dump a service container if a parameter is an object or a resource, got "%s".', get_debug_type($value)));
         }
 
         return $this->export($value);

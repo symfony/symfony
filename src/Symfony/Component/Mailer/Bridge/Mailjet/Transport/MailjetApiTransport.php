@@ -53,18 +53,20 @@ class MailjetApiTransport extends AbstractApiTransport
 
     private string $privateKey;
     private string $publicKey;
+    private bool $sandbox;
 
-    public function __construct(string $publicKey, string $privateKey, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
+    public function __construct(string $publicKey, string $privateKey, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null, bool $sandbox = false)
     {
         $this->publicKey = $publicKey;
         $this->privateKey = $privateKey;
+        $this->sandbox = $sandbox;
 
         parent::__construct($client, $dispatcher, $logger);
     }
 
     public function __toString(): string
     {
-        return sprintf('mailjet+api://%s', $this->getEndpoint());
+        return sprintf('mailjet+api://%s', $this->getEndpoint().($this->sandbox ? '?sandbox=true' : ''));
     }
 
     protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface
@@ -153,6 +155,7 @@ class MailjetApiTransport extends AbstractApiTransport
 
         return [
             'Messages' => [$message],
+            'SandBoxMode' => $this->sandbox,
         ];
     }
 

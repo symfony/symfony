@@ -18,6 +18,9 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class LengthValidatorTest extends ConstraintValidatorTestCase
 {
+    // 🧚‍♀️ "Woman Fairy" emoji ZWJ sequence
+    private const SINGLE_GRAPHEME_WITH_FOUR_CODEPOINTS_AND_THIRTEEN_BYTES = "\u{1F9DA}\u{200D}\u{2640}\u{FE0F}";
+
     protected function createValidator(): LengthValidator
     {
         return new LengthValidator();
@@ -152,6 +155,30 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Length(['min' => 3, 'max' => 3, 'normalizer' => 'trim']);
         $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testValidGraphemesValues()
+    {
+        $constraint = new Length(min: 1, max: 1, countUnit: Length::COUNT_GRAPHEMES);
+        $this->validator->validate(self::SINGLE_GRAPHEME_WITH_FOUR_CODEPOINTS_AND_THIRTEEN_BYTES, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testValidCodepointsValues()
+    {
+        $constraint = new Length(min: 4, max: 4, countUnit: Length::COUNT_CODEPOINTS);
+        $this->validator->validate(self::SINGLE_GRAPHEME_WITH_FOUR_CODEPOINTS_AND_THIRTEEN_BYTES, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testValidBytesValues()
+    {
+        $constraint = new Length(min: 13, max: 13, countUnit: Length::COUNT_BYTES);
+        $this->validator->validate(self::SINGLE_GRAPHEME_WITH_FOUR_CODEPOINTS_AND_THIRTEEN_BYTES, $constraint);
 
         $this->assertNoViolation();
     }
@@ -320,5 +347,35 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
                 ->setCode(Length::INVALID_CHARACTERS_ERROR)
                 ->assertRaised();
         }
+    }
+
+    public function testInvalidValuesExactDefaultCountUnitWithGraphemeInput()
+    {
+        $constraint = new Length(min: 1, max: 1, exactMessage: 'myMessage');
+
+        $this->validator->validate(self::SINGLE_GRAPHEME_WITH_FOUR_CODEPOINTS_AND_THIRTEEN_BYTES, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.self::SINGLE_GRAPHEME_WITH_FOUR_CODEPOINTS_AND_THIRTEEN_BYTES.'"')
+            ->setParameter('{{ limit }}', 1)
+            ->setInvalidValue(self::SINGLE_GRAPHEME_WITH_FOUR_CODEPOINTS_AND_THIRTEEN_BYTES)
+            ->setPlural(1)
+            ->setCode(Length::NOT_EQUAL_LENGTH_ERROR)
+            ->assertRaised();
+    }
+
+    public function testInvalidValuesExactBytesCountUnitWithGraphemeInput()
+    {
+        $constraint = new Length(min: 1, max: 1, countUnit: Length::COUNT_BYTES, exactMessage: 'myMessage');
+
+        $this->validator->validate(self::SINGLE_GRAPHEME_WITH_FOUR_CODEPOINTS_AND_THIRTEEN_BYTES, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.self::SINGLE_GRAPHEME_WITH_FOUR_CODEPOINTS_AND_THIRTEEN_BYTES.'"')
+            ->setParameter('{{ limit }}', 1)
+            ->setInvalidValue(self::SINGLE_GRAPHEME_WITH_FOUR_CODEPOINTS_AND_THIRTEEN_BYTES)
+            ->setPlural(1)
+            ->setCode(Length::NOT_EQUAL_LENGTH_ERROR)
+            ->assertRaised();
     }
 }

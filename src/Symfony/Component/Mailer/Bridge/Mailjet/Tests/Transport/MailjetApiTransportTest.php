@@ -45,6 +45,10 @@ class MailjetApiTransportTest extends TestCase
                 (new MailjetApiTransport(self::USER, self::PASSWORD))->setHost('example.com'),
                 'mailjet+api://example.com',
             ],
+            [
+                (new MailjetApiTransport(self::USER, self::PASSWORD, sandbox: true))->setHost('example.com'),
+                'mailjet+api://example.com?sandbox=true',
+            ],
         ];
     }
 
@@ -318,7 +322,6 @@ class MailjetApiTransportTest extends TestCase
 
         $transport = new MailjetApiTransport(self::USER, self::PASSWORD);
         $method = new \ReflectionMethod(MailjetApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         self::assertSame(
             [
                 'Messages' => [
@@ -364,6 +367,59 @@ class MailjetApiTransportTest extends TestCase
                         'TrackOpen' => 'account_default',
                     ],
                 ],
+                'SandBoxMode' => false,
+            ],
+            $method->invoke($transport, $email, $envelope)
+        );
+
+        $transport = new MailjetApiTransport(self::USER, self::PASSWORD, sandbox: true);
+        $method = new \ReflectionMethod(MailjetApiTransport::class, 'getPayload');
+        self::assertSame(
+            [
+                'Messages' => [
+                    [
+                        'From' => [
+                            'Email' => 'foo@example.com',
+                            'Name' => 'Foo',
+                        ],
+                        'To' => [
+                            [
+                                'Email' => 'bar@example.com',
+                                'Name' => '',
+                            ],
+                        ],
+                        'Subject' => 'Sending email to mailjet API',
+                        'Attachments' => [],
+                        'InlinedAttachments' => [],
+                        'ReplyTo' => [
+                            'Email' => 'qux@example.com',
+                            'Name' => 'Qux',
+                        ],
+                        'Headers' => [
+                            'X-authorized-header' => 'authorized',
+                        ],
+                        'TemplateLanguage' => true,
+                        'TemplateID' => 12345,
+                        'TemplateErrorReporting' => [
+                            'Email' => 'errors@mailjet.com',
+                            'Name' => 'Error Email',
+                        ],
+                        'TemplateErrorDeliver' => true,
+                        'Variables' => [
+                            'varname1' => 'value1',
+                            'varname2' => 'value2',
+                            'varname3' => 'value3',
+                        ],
+                        'CustomID' => 'CustomValue',
+                        'EventPayload' => 'Eticket,1234,row,15,seat,B',
+                        'CustomCampaign' => 'SendAPI_campaign',
+                        'DeduplicateCampaign' => true,
+                        'Priority' => 2,
+                        'TrackClick' => 'account_default',
+                        'TrackOpen' => 'account_default',
+                    ],
+                ],
+                'SandBoxMode' => true,
             ],
             $method->invoke($transport, $email, $envelope)
         );

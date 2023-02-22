@@ -763,6 +763,10 @@ class FrameworkExtension extends Extension
             unset($options['private_headers']);
         }
 
+        if (!$options['skip_response_headers']) {
+            unset($options['skip_response_headers']);
+        }
+
         $container->getDefinition('http_cache')
             ->setPublic($config['enabled'])
             ->replaceArgument(3, $options);
@@ -1088,7 +1092,7 @@ class FrameworkExtension extends Extension
 
         $debug = $container->getParameter('kernel.debug');
 
-        if ($debug) {
+        if ($debug && !$container->hasParameter('debug.container.dump')) {
             $container->setParameter('debug.container.dump', '%kernel.build_dir%/%kernel.container_class%.xml');
         }
 
@@ -1096,12 +1100,12 @@ class FrameworkExtension extends Extension
             $loader->load('debug.php');
         }
 
-        $definition = $container->findDefinition('debug.debug_handlers_listener');
+        $definition = $container->findDefinition('debug.error_handler_configurator');
 
         if (false === $config['log']) {
-            $definition->replaceArgument(1, null);
+            $definition->replaceArgument(0, null);
         } elseif (true !== $config['log']) {
-            $definition->replaceArgument(2, $config['log']);
+            $definition->replaceArgument(1, $config['log']);
         }
 
         if (!$config['throw']) {

@@ -478,6 +478,7 @@ class XmlFileLoader extends FileLoader
                 $key = $arg->getAttribute('key');
             }
 
+            $trim = $arg->hasAttribute('trim') && XmlUtils::phpize($arg->getAttribute('trim'));
             $onInvalid = $arg->getAttribute('on-invalid');
             $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
             if ('ignore' == $onInvalid) {
@@ -550,7 +551,7 @@ class XmlFileLoader extends FileLoader
                         $excludes = [$arg->getAttribute('exclude')];
                     }
 
-                    $arguments[$key] = new TaggedIteratorArgument($arg->getAttribute('tag'), $arg->getAttribute('index-by') ?: null, $arg->getAttribute('default-index-method') ?: null, $forLocator, $arg->getAttribute('default-priority-method') ?: null, $excludes, $arg->getAttribute('exclude-self') ?: true);
+                    $arguments[$key] = new TaggedIteratorArgument($arg->getAttribute('tag'), $arg->getAttribute('index-by') ?: null, $arg->getAttribute('default-index-method') ?: null, $forLocator, $arg->getAttribute('default-priority-method') ?: null, $excludes, !$arg->hasAttribute('exclude-self') || XmlUtils::phpize($arg->getAttribute('exclude-self')));
 
                     if ($forLocator) {
                         $arguments[$key] = new ServiceLocatorArgument($arguments[$key]);
@@ -566,13 +567,13 @@ class XmlFileLoader extends FileLoader
                     $arguments[$key] = new AbstractArgument($arg->nodeValue);
                     break;
                 case 'string':
-                    $arguments[$key] = $arg->nodeValue;
+                    $arguments[$key] = $trim ? trim($arg->nodeValue) : $arg->nodeValue;
                     break;
                 case 'constant':
                     $arguments[$key] = \constant(trim($arg->nodeValue));
                     break;
                 default:
-                    $arguments[$key] = XmlUtils::phpize($arg->nodeValue);
+                    $arguments[$key] = XmlUtils::phpize($trim ? trim($arg->nodeValue) : $arg->nodeValue);
             }
         }
 

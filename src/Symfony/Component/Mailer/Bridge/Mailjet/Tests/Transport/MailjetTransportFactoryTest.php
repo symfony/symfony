@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Mailer\Bridge\Mailjet\Tests\Transport;
 
+use Psr\Log\NullLogger;
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetApiTransport;
 use Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetSmtpTransport;
 use Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetTransportFactory;
@@ -20,9 +22,9 @@ use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
 class MailjetTransportFactoryTest extends TransportFactoryTestCase
 {
-    public static function getFactory(): TransportFactoryInterface
+    public function getFactory(): TransportFactoryInterface
     {
-        return new MailjetTransportFactory(self::getDispatcher(), self::getClient(), self::getLogger());
+        return new MailjetTransportFactory(null, new MockHttpClient(), new NullLogger());
     }
 
     public static function supportsProvider(): iterable
@@ -55,32 +57,31 @@ class MailjetTransportFactoryTest extends TransportFactoryTestCase
 
     public static function createProvider(): iterable
     {
-        $dispatcher = self::getDispatcher();
-        $logger = self::getLogger();
+        $logger = new NullLogger();
 
         yield [
             new Dsn('mailjet+api', 'default', self::USER, self::PASSWORD),
-            new MailjetApiTransport(self::USER, self::PASSWORD, self::getClient(), $dispatcher, $logger),
+            new MailjetApiTransport(self::USER, self::PASSWORD, new MockHttpClient(), null, $logger),
         ];
 
         yield [
             new Dsn('mailjet+api', 'example.com', self::USER, self::PASSWORD),
-            (new MailjetApiTransport(self::USER, self::PASSWORD, self::getClient(), $dispatcher, $logger))->setHost('example.com'),
+            (new MailjetApiTransport(self::USER, self::PASSWORD, new MockHttpClient(), null, $logger))->setHost('example.com'),
         ];
 
         yield [
             new Dsn('mailjet', 'default', self::USER, self::PASSWORD),
-            new MailjetSmtpTransport(self::USER, self::PASSWORD, $dispatcher, $logger),
+            new MailjetSmtpTransport(self::USER, self::PASSWORD, null, $logger),
         ];
 
         yield [
             new Dsn('mailjet+smtp', 'default', self::USER, self::PASSWORD),
-            new MailjetSmtpTransport(self::USER, self::PASSWORD, $dispatcher, $logger),
+            new MailjetSmtpTransport(self::USER, self::PASSWORD, null, $logger),
         ];
 
         yield [
             new Dsn('mailjet+smtps', 'default', self::USER, self::PASSWORD),
-            new MailjetSmtpTransport(self::USER, self::PASSWORD, $dispatcher, $logger),
+            new MailjetSmtpTransport(self::USER, self::PASSWORD, null, $logger),
         ];
     }
 

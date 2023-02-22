@@ -766,7 +766,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             if (!$serializedPath = $metadata->getSerializedPath()) {
                 continue;
             }
-            $serializedPath = $metadata->getSerializedPath();
             $pathIdentifier = implode(',', $serializedPath->getElements());
             if (isset($serializedPaths[$pathIdentifier])) {
                 throw new LogicException(sprintf('Duplicate serialized path: "%s" used for properties "%s" and "%s".', $pathIdentifier, $serializedPaths[$pathIdentifier], $name));

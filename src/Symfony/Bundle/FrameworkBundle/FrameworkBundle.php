@@ -94,7 +94,8 @@ class FrameworkBundle extends Bundle
      */
     public function boot()
     {
-        ErrorHandler::register(null, false)->throwAt($this->container->getParameter('debug.error_handler.throw_at'), true);
+        $handler = ErrorHandler::register(null, false);
+        $this->container->get('debug.error_handler_configurator')->configure($handler);
 
         if ($this->container->getParameter('kernel.http_method_override')) {
             Request::enableHttpMethodParameterOverride();

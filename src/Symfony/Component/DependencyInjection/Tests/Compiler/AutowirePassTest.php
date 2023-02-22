@@ -1235,7 +1235,7 @@ class AutowirePassTest extends TestCase
 
         $definition = $container->getDefinition(AutowireAttribute::class);
 
-        $this->assertCount(9, $definition->getArguments());
+        $this->assertCount(10, $definition->getArguments());
         $this->assertEquals(new Reference('some.id'), $definition->getArgument(0));
         $this->assertEquals(new Expression("parameter('some.parameter')"), $definition->getArgument(1));
         $this->assertSame('foo/bar', $definition->getArgument(2));
@@ -1244,7 +1244,8 @@ class AutowirePassTest extends TestCase
         $this->assertEquals(new Expression("parameter('some.parameter')"), $definition->getArgument(5));
         $this->assertSame('bar', $definition->getArgument(6));
         $this->assertSame('@bar', $definition->getArgument(7));
-        $this->assertEquals(new Reference('invalid.id', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(8));
+        $this->assertSame('foo', $definition->getArgument(8));
+        $this->assertEquals(new Reference('invalid.id', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(9));
 
         $container->compile();
 
@@ -1257,6 +1258,7 @@ class AutowirePassTest extends TestCase
         $this->assertSame('foo', $service->expressionAsValue);
         $this->assertSame('bar', $service->rawValue);
         $this->assertSame('@bar', $service->escapedRawValue);
+        $this->assertSame('foo', $service->customAutowire);
         $this->assertNull($service->invalid);
     }
 

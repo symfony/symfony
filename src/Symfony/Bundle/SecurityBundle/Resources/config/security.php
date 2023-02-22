@@ -83,7 +83,7 @@ return static function (ContainerConfigurator $container) {
                 service_locator([
                     'security.token_storage' => service('security.token_storage'),
                     'security.authorization_checker' => service('security.authorization_checker'),
-                    'security.user_authenticator' => service('security.user_authenticator')->ignoreOnInvalid(),
+                    'security.authenticator.managers_locator' => service('security.authenticator.managers_locator')->ignoreOnInvalid(),
                     'request_stack' => service('request_stack'),
                     'security.firewall.map' => service('security.firewall.map'),
                     'security.user_checker' => service('security.user_checker'),

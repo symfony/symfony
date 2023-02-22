@@ -18,6 +18,13 @@
       <parameter key="float">1.3</parameter>
       <parameter>1000.3</parameter>
       <parameter>a string</parameter>
+      <parameter trim="false"> a string not trimmed </parameter>
+      <parameter trim="true">
+        a trimmed string
+      </parameter>
+      <parameter type="string" trim="true">
+        an explicit trimmed string
+      </parameter>
       <parameter type="collection">
         <parameter>foo</parameter>
         <parameter>bar</parameter>

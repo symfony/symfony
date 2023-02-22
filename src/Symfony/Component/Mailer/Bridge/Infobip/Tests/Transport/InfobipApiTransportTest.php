@@ -70,7 +70,7 @@ class InfobipApiTransportTest extends TestCase
         $this->transport->send($email);
 
         $this->assertSame('POST', $this->response->getRequestMethod());
-        $this->assertSame('https://99999.api.infobip.com/email/2/send', $this->response->getRequestUrl());
+        $this->assertSame('https://99999.api.infobip.com/email/3/send', $this->response->getRequestUrl());
         $options = $this->response->getRequestOptions();
         $this->arrayHasKey('headers');
         $this->assertCount(4, $options['headers']);

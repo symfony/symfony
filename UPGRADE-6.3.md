@@ -7,6 +7,11 @@ DependencyInjection
  * Deprecate `PhpDumper` options `inline_factories_parameter` and `inline_class_loader_parameter`, use `inline_factories` and `inline_class_loader` instead
  * Deprecate undefined and numeric keys with `service_locator` config, use string aliases instead
 
+Form
+----
+
+ * Change the signature of `FormTypeValidatorExtension::__construct(ValidatorInterface $validator, bool $legacyErrorMessages = true, FormRendererInterface $formRenderer = null, TranslatorInterface $translator = null)` to `__construct(ValidatorInterface $validator, FormRendererInterface $formRenderer = null, TranslatorInterface $translator = null)`
+
 FrameworkBundle
 ---------------
 

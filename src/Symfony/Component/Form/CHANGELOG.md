@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Change the signature of `FormTypeValidatorExtension::__construct(ValidatorInterface $validator, bool $legacyErrorMessages = true, FormRendererInterface $formRenderer = null, TranslatorInterface $translator = null)` to `__construct(ValidatorInterface $validator, FormRendererInterface $formRenderer = null, TranslatorInterface $translator = null)`
+
 6.2
 ---
 

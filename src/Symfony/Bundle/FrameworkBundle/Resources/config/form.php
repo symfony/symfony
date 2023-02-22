@@ -132,7 +132,6 @@ return static function (ContainerConfigurator $container) {
         ->set('form.type_extension.form.validator', FormTypeValidatorExtension::class)
             ->args([
                 service('validator'),
-                false,
                 service('twig.form.renderer')->ignoreOnInvalid(),
                 service('translator')->ignoreOnInvalid(),
             ])

@@ -1087,7 +1087,7 @@ class FrameworkExtension extends Extension
 
         $debug = $container->getParameter('kernel.debug');
 
-        if ($debug) {
+        if ($debug && !$container->hasParameter('debug.container.dump')) {
             $container->setParameter('debug.container.dump', '%kernel.build_dir%/%kernel.container_class%.xml');
         }
 

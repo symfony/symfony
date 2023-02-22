@@ -241,6 +241,51 @@ class InfobipApiTransportTest extends TestCase
         );
     }
 
+    public function testSendEmailWithHeadersShouldCalledInfobipWithTheRightParameters()
+    {
+        $email = $this->basicValidEmail();
+        $email->getHeaders()
+            ->addTextHeader('X-Infobip-IntermediateReport', 'true')
+            ->addTextHeader('X-Infobip-NotifyUrl', 'https://foo.bar')
+            ->addTextHeader('X-Infobip-NotifyContentType', 'application/json')
+            ->addTextHeader('X-Infobip-MessageId', 'RANDOM-CUSTOM-ID');
+
+        $this->transport->send($email);
+
+        $options = $this->response->getRequestOptions();
+        $this->arrayHasKey('body');
+        $this->assertStringMatchesFormat(<<<'TXT'
+            %a
+            --%s
+            Content-Type: text/plain; charset=utf-8
+            Content-Transfer-Encoding: 8bit
+            Content-Disposition: form-data; name="intermediateReport"
+
+            true
+            --%s
+            Content-Type: text/plain; charset=utf-8
+            Content-Transfer-Encoding: 8bit
+            Content-Disposition: form-data; name="notifyUrl"
+
+            https://foo.bar
+            --%s
+            Content-Type: text/plain; charset=utf-8
+            Content-Transfer-Encoding: 8bit
+            Content-Disposition: form-data; name="notifyContentType"
+
+            application/json
+            --%s
+            Content-Type: text/plain; charset=utf-8
+            Content-Transfer-Encoding: 8bit
+            Content-Disposition: form-data; name="messageId"
+
+            RANDOM-CUSTOM-ID
+            --%s--
+            TXT,
+            $options['body']
+        );
+    }
+
     public function testSendMinimalEmailWithSuccess()
     {
         $email = (new Email())
@@ -352,6 +397,31 @@ class InfobipApiTransportTest extends TestCase
 
             c29tZSBpbmxpbmUgYXR0YWNobWVudA==
             --%s--
+            TXT,
+            $sentMessage->toString()
+        );
+    }
+
+    public function testSendEmailWithHeadersWithSuccess()
+    {
+        $email = $this->basicValidEmail();
+        $email->getHeaders()
+            ->addTextHeader('X-Infobip-IntermediateReport', 'true')
+            ->addTextHeader('X-Infobip-NotifyUrl', 'https://foo.bar')
+            ->addTextHeader('X-Infobip-NotifyContentType', 'application/json')
+            ->addTextHeader('X-Infobip-MessageId', 'RANDOM-CUSTOM-ID');
+
+        $sentMessage = $this->transport->send($email);
+
+        $this->assertInstanceOf(SentMessage::class, $sentMessage);
+        $this->assertStringMatchesFormat(
+            <<<'TXT'
+            %a
+            X-Infobip-IntermediateReport: true
+            X-Infobip-NotifyUrl: https://foo.bar
+            X-Infobip-NotifyContentType: application/json
+            X-Infobip-MessageId: RANDOM-CUSTOM-ID
+            %a
             TXT,
             $sentMessage->toString()
         );

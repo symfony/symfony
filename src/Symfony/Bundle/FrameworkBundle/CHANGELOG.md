@@ -14,6 +14,7 @@ CHANGELOG
  * Allow setting private services with the test container
  * Register alias for argument for workflow services with workflow name only
  * Configure the `ErrorHandler` on `FrameworkBundle::boot()`
+ * Allow setting `debug.container.dump` to `false` to disable dumping the container to XML
 
 6.2
 ---

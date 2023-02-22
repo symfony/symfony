@@ -50,6 +50,19 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('public', $tester->getDisplay());
     }
 
+    public function testNoDumpedXML()
+    {
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true, 'debug.container.dump' => false]);
+
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(['command' => 'debug:container']);
+
+        $this->assertStringContainsString('public', $tester->getDisplay());
+    }
+
     public function testPrivateAlias()
     {
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);

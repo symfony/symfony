@@ -292,7 +292,7 @@ abstract class Descriptor implements DescriptorInterface
             return [];
         }
 
-        if (!is_file($container->getParameter('debug.container.dump'))) {
+        if (!$container->getParameter('debug.container.dump') || !is_file($container->getParameter('debug.container.dump'))) {
             return [];
         }
 

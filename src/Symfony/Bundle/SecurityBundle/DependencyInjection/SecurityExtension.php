@@ -480,6 +480,13 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                     ->addTag('kernel.event_subscriber', ['dispatcher' => $firewallEventDispatcherId]);
             }
 
+            // add clear site data listener
+            if ($firewall['logout']['clear_site_data'] ?? false) {
+                $container->setDefinition('security.logout.listener.clear_site_data.'.$id, new ChildDefinition('security.logout.listener.clear_site_data'))
+                    ->addArgument($firewall['logout']['clear_site_data'])
+                    ->addTag('kernel.event_subscriber', ['dispatcher' => $firewallEventDispatcherId]);
+            }
+
             // register with LogoutUrlGenerator
             $container
                 ->getDefinition('security.logout_url_generator')

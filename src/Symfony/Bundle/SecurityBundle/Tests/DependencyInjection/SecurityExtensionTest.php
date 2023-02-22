@@ -848,6 +848,48 @@ class SecurityExtensionTest extends TestCase
         $this->assertContains('custom_firewall_listener_id', $firewallListeners);
     }
 
+    public function testClearSiteDataLogoutListenerEnabled()
+    {
+        $container = $this->getRawContainer();
+
+        $firewallId = 'logout_firewall';
+        $container->loadFromExtension('security', [
+            'firewalls' => [
+                $firewallId => [
+                    'logout' => [
+                        'clear_site_data' => ['*'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $this->assertTrue($container->has('security.logout.listener.clear_site_data.'.$firewallId));
+        $listenerArgument = $container->getDefinition('security.logout.listener.clear_site_data.'.$firewallId)->getArgument(0);
+        $this->assertSame(['*'], $listenerArgument);
+    }
+
+    public function testClearSiteDataLogoutListenerDisabled()
+    {
+        $container = $this->getRawContainer();
+
+        $firewallId = 'logout_firewall';
+        $container->loadFromExtension('security', [
+            'firewalls' => [
+                $firewallId => [
+                    'logout' => [
+                        'clear_site_data' => [],
+                    ],
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $this->assertFalse($container->has('security.logout.listener.clear_site_data.'.$firewallId));
+    }
+
     /**
      * @group legacy
      */

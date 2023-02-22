@@ -28,7 +28,7 @@ class PathPackageTest extends TestCase
         $this->assertSame($expected, $package->getUrl($path));
     }
 
-    public function getConfigs()
+    public static function getConfigs()
     {
         return [
             ['/foo', '', 'http://example.com/foo', 'http://example.com/foo'],
@@ -60,7 +60,7 @@ class PathPackageTest extends TestCase
         $this->assertSame($expected, $package->getUrl($path));
     }
 
-    public function getContextConfigs()
+    public static function getContextConfigs()
     {
         return [
             ['', '/foo', '', '/baz', '/baz?v1'],

@@ -17,6 +17,7 @@ use Symfony\Component\Notifier\Exception\MissingRequiredOptionException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
+use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * A test case to ease testing a notifier transport factory.
@@ -30,17 +31,17 @@ abstract class TransportFactoryTestCase extends TestCase
     /**
      * @return iterable<array{0: bool, 1: string}>
      */
-    abstract public function supportsProvider(): iterable;
+    abstract public static function supportsProvider(): iterable;
 
     /**
      * @return iterable<array{0: string, 1: string, 2: TransportInterface}>
      */
-    abstract public function createProvider(): iterable;
+    abstract public static function createProvider(): iterable;
 
     /**
      * @return iterable<array{0: string, 1: string|null}>
      */
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         return [];
     }
@@ -48,7 +49,7 @@ abstract class TransportFactoryTestCase extends TestCase
     /**
      * @return iterable<array{0: string, 1: string|null}>
      */
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         return [];
     }
@@ -56,7 +57,7 @@ abstract class TransportFactoryTestCase extends TestCase
     /**
      * @return iterable<array{0: string, 1: string|null}>
      */
-    public function missingRequiredOptionProvider(): iterable
+    public static function missingRequiredOptionProvider(): iterable
     {
         return [];
     }

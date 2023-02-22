@@ -26,7 +26,7 @@ use Twig\Loader\FilesystemLoader;
  *
  * @author Hidde Wieringa <hidde@hiddewieringa.nl>
  */
-class FormExtensionBootstrap4HorizontalLayoutTest extends AbstractBootstrap4HorizontalLayoutTest
+class FormExtensionBootstrap4HorizontalLayoutTest extends AbstractBootstrap4HorizontalLayoutTestCase
 {
     use RuntimeLoaderProvider;
 

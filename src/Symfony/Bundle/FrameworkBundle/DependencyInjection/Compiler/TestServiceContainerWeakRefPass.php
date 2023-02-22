@@ -21,6 +21,9 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class TestServiceContainerWeakRefPass implements CompilerPassInterface
 {
+    /**
+     * @return void
+     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition('test.private_services_locator')) {

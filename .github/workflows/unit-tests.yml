@@ -1,4 +1,4 @@
-name: PHPUnit
+name: Unit Tests
 
 on:
   push:
@@ -18,10 +18,10 @@ permissions:
 jobs:
 
   tests:
-    name: Tests
+    name: Unit Tests
 
     env:
-      extensions: amqp,apcu,igbinary,intl,mbstring,memcached,redis
+      extensions: amqp,apcu,igbinary,intl,mbstring,memcached,redis,relay
 
     strategy:
       matrix:
@@ -123,7 +123,7 @@ jobs:
 
           echo SYMFONY_VERSION=$SYMFONY_VERSION >> $GITHUB_ENV
           echo COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev >> $GITHUB_ENV
-          echo SYMFONY_REQUIRE=">=$([ '${{ matrix.mode }}' = low-deps ] && echo 3.4 || echo $SYMFONY_VERSION)" >> $GITHUB_ENV
+          echo SYMFONY_REQUIRE=">=$([ '${{ matrix.mode }}' = low-deps ] && echo 4.4 || echo $SYMFONY_VERSION)" >> $GITHUB_ENV
           [[ "${{ matrix.mode }}" = *-deps ]] && mv composer.json.phpunit composer.json || true
 
       - name: Install dependencies
@@ -143,7 +143,9 @@ jobs:
           git add .
           composer install -q --optimize-autoloader
           SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.1' php .github/patch-types.php
+          git checkout src/Symfony/Contracts/Service/ResetInterface.php
           SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.1' php .github/patch-types.php # ensure the script is idempotent
+          git checkout src/Symfony/Contracts/Service/ResetInterface.php
           git diff --exit-code
 
       - name: Run tests

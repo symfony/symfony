@@ -30,7 +30,7 @@ use Symfony\Component\Console\Tester\ApplicationTester;
 /**
  * @group tty
  */
-class QuestionHelperTest extends AbstractQuestionHelperTest
+class QuestionHelperTest extends AbstractQuestionHelperTestCase
 {
     public function testAskChoice()
     {
@@ -338,7 +338,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $this->assertSame('b', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
     }
 
-    public function getInputs()
+    public static function getInputs()
     {
         return [
             ['$'], // 1 byte character
@@ -534,7 +534,7 @@ EOD;
         $this->assertEquals($expected, $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question), 'confirmation question should '.($expected ? 'pass' : 'cancel'));
     }
 
-    public function getAskConfirmationData()
+    public static function getAskConfirmationData()
     {
         return [
             ['', true],
@@ -610,7 +610,7 @@ EOD;
         $this->assertSame($expectedValue, $answer);
     }
 
-    public function simpleAnswerProvider()
+    public static function simpleAnswerProvider()
     {
         return [
             [0, 'My environment 1'],
@@ -645,7 +645,7 @@ EOD;
         $this->assertSame($expectedValue, $answer);
     }
 
-    public function specialCharacterInMultipleChoice()
+    public static function specialCharacterInMultipleChoice()
     {
         return [
             ['.', ['.']],
@@ -695,7 +695,7 @@ EOD;
         $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream("My environment\n")), $this->createOutputInterface(), $question);
     }
 
-    public function answerProvider()
+    public static function answerProvider()
     {
         return [
             ['env_1', 'env_1'],

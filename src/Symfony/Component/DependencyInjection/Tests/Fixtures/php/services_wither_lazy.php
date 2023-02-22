@@ -80,8 +80,6 @@ class WitherProxy94fa281 extends \Symfony\Component\DependencyInjection\Tests\Co
     use \Symfony\Component\VarExporter\LazyProxyTrait;
 
     private const LAZY_OBJECT_PROPERTY_SCOPES = [
-        'lazyObjectReal' => [self::class, 'lazyObjectReal', null],
-        "\0".self::class."\0lazyObjectReal" => [self::class, 'lazyObjectReal', null],
         'foo' => [parent::class, 'foo', null],
     ];
 }

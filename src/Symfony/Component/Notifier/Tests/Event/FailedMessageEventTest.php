@@ -95,7 +95,7 @@ class FailedMessageEventTest extends TestCase
         }
     }
 
-    public function messagesProvider(): iterable
+    public static function messagesProvider(): iterable
     {
         yield [$message = new ChatMessage('subject'), $error = new \RuntimeException(), new FailedMessageEvent($message, $error)];
         yield [$message = new SmsMessage('+3312345678', 'subject'), $error = new \Exception(), new FailedMessageEvent($message, $error)];

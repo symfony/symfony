@@ -50,7 +50,6 @@ class AutowirePass extends AbstractRecursivePass
     private ?int $decoratedMethodIndex = null;
     private ?int $decoratedMethodArgumentIndex = null;
     private ?self $typesClone = null;
-    private array $combinedAliases;
 
     public function __construct(bool $throwOnAutowireException = true)
     {
@@ -61,10 +60,11 @@ class AutowirePass extends AbstractRecursivePass
         };
     }
 
+    /**
+     * @return void
+     */
     public function process(ContainerBuilder $container)
     {
-        $this->populateCombinedAliases($container);
-
         try {
             $this->typesClone = clone $this;
             parent::process($container);
@@ -77,7 +77,6 @@ class AutowirePass extends AbstractRecursivePass
             $this->decoratedMethodIndex = null;
             $this->decoratedMethodArgumentIndex = null;
             $this->typesClone = null;
-            $this->combinedAliases = [];
         }
     }
 
@@ -284,27 +283,25 @@ class AutowirePass extends AbstractRecursivePass
         foreach ($parameters as $index => $parameter) {
             $this->defaultArgument->names[$index] = $parameter->name;
 
+            if (\array_key_exists($parameter->name, $arguments)) {
+                $arguments[$index] = $arguments[$parameter->name];
+                unset($arguments[$parameter->name]);
+            }
             if (\array_key_exists($index, $arguments) && '' !== $arguments[$index]) {
                 continue;
             }
 
-            $type = ProxyHelper::exportType($parameter, true);
-
             if ($checkAttributes) {
-                foreach ($parameter->getAttributes() as $attribute) {
-                    if (\in_array($attribute->getName(), [TaggedIterator::class, TaggedLocator::class, Autowire::class, MapDecorated::class], true)) {
+                foreach ([TaggedIterator::class, TaggedLocator::class, Autowire::class, MapDecorated::class] as $attributeClass) {
+                    foreach ($parameter->getAttributes($attributeClass, Autowire::class === $attributeClass ? \ReflectionAttribute::IS_INSTANCEOF : 0) as $attribute) {
                         $arguments[$index] = $this->processAttribute($attribute->newInstance(), $parameter->allowsNull());
 
-                        break;
+                        continue 3;
                     }
-                }
-
-                if ('' !== ($arguments[$index] ?? '')) {
-                    continue;
                 }
             }
 
-            if (!$type) {
+            if (!$type = ProxyHelper::exportType($parameter, true)) {
                 if (isset($arguments[$index])) {
                     continue;
                 }
@@ -380,7 +377,7 @@ class AutowirePass extends AbstractRecursivePass
 
         // it's possible index 1 was set, then index 0, then 2, etc
         // make sure that we re-order so they're injected as expected
-        ksort($arguments);
+        ksort($arguments, \SORT_NATURAL);
 
         return $arguments;
     }
@@ -410,12 +407,12 @@ class AutowirePass extends AbstractRecursivePass
                 return new TypedReference($alias, $type, $reference->getInvalidBehavior());
             }
 
-            if (null !== ($alias = $this->combinedAliases[$alias] ?? null) && !$this->container->findDefinition($alias)->isAbstract()) {
+            if (null !== ($alias = $this->getCombinedAlias($type, $name) ?? null) && !$this->container->findDefinition($alias)->isAbstract()) {
                 return new TypedReference($alias, $type, $reference->getInvalidBehavior());
             }
 
             if ($this->container->has($name) && !$this->container->findDefinition($name)->isAbstract()) {
-                foreach ($this->container->getAliases() + $this->combinedAliases as $id => $alias) {
+                foreach ($this->container->getAliases() as $id => $alias) {
                     if ($name === (string) $alias && str_starts_with($id, $type.' $')) {
                         return new TypedReference($name, $type, $reference->getInvalidBehavior());
                     }
@@ -431,7 +428,7 @@ class AutowirePass extends AbstractRecursivePass
             return new TypedReference($type, $type, $reference->getInvalidBehavior());
         }
 
-        if (null !== ($alias = $this->combinedAliases[$type] ?? null) && !$this->container->findDefinition($alias)->isAbstract()) {
+        if (null !== ($alias = $this->getCombinedAlias($type) ?? null) && !$this->container->findDefinition($alias)->isAbstract()) {
             return new TypedReference($alias, $type, $reference->getInvalidBehavior());
         }
 
@@ -441,7 +438,7 @@ class AutowirePass extends AbstractRecursivePass
     /**
      * Populates the list of available types.
      */
-    private function populateAvailableTypes(ContainerBuilder $container)
+    private function populateAvailableTypes(ContainerBuilder $container): void
     {
         $this->types = [];
         $this->ambiguousServiceTypes = [];
@@ -459,7 +456,7 @@ class AutowirePass extends AbstractRecursivePass
     /**
      * Populates the list of available types for a given definition.
      */
-    private function populateAvailableType(ContainerBuilder $container, string $id, Definition $definition)
+    private function populateAvailableType(ContainerBuilder $container, string $id, Definition $definition): void
     {
         // Never use abstract services
         if ($definition->isAbstract()) {
@@ -484,7 +481,7 @@ class AutowirePass extends AbstractRecursivePass
     /**
      * Associates a type and a service id if applicable.
      */
-    private function set(string $type, string $id)
+    private function set(string $type, string $id): void
     {
         // is this already a type/class that is known to match multiple services?
         if (isset($this->ambiguousServiceTypes[$type])) {
@@ -642,44 +639,31 @@ class AutowirePass extends AbstractRecursivePass
         }
     }
 
-    private function populateCombinedAliases(ContainerBuilder $container): void
+    private function getCombinedAlias(string $type, string $name = null): ?string
     {
-        $this->combinedAliases = [];
-        $reverseAliases = [];
-
-        foreach ($container->getAliases() as $id => $alias) {
-            if (!preg_match('/(?(DEFINE)(?<V>[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+))^((?&V)(?:\\\\(?&V))*+)(?: \$((?&V)))?$/', $id, $m)) {
-                continue;
-            }
-
-            $type = $m[2];
-            $name = $m[3] ?? '';
-            $reverseAliases[(string) $alias][$name][] = $type;
+        if (str_contains($type, '&')) {
+            $types = explode('&', $type);
+        } elseif (str_contains($type, '|')) {
+            $types = explode('|', $type);
+        } else {
+            return null;
         }
 
-        foreach ($reverseAliases as $alias => $names) {
-            foreach ($names as $name => $types) {
-                if (2 > $count = \count($types)) {
-                    continue;
-                }
-                sort($types);
-                $i = 1 << $count;
+        $alias = null;
+        $suffix = $name ? ' $'.$name : '';
 
-                // compute the powerset of the list of types
-                while ($i--) {
-                    $set = [];
-                    for ($j = 0; $j < $count; ++$j) {
-                        if ($i & (1 << $j)) {
-                            $set[] = $types[$j];
-                        }
-                    }
+        foreach ($types as $type) {
+            if (!$this->container->hasAlias($type.$suffix)) {
+                return null;
+            }
 
-                    if (2 <= \count($set)) {
-                        $this->combinedAliases[implode('&', $set).('' === $name ? '' : ' $'.$name)] = $alias;
-                        $this->combinedAliases[implode('|', $set).('' === $name ? '' : ' $'.$name)] = $alias;
-                    }
-                }
+            if (null === $alias) {
+                $alias = (string) $this->container->getAlias($type.$suffix);
+            } elseif ((string) $this->container->getAlias($type.$suffix) !== $alias) {
+                return null;
             }
         }
+
+        return $alias;
     }
 }

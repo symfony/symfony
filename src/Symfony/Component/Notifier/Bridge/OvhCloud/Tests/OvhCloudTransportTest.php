@@ -16,37 +16,37 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransport;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
+use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class OvhCloudTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null, string $sender = null, bool $noStopClause = false): OvhCloudTransport
+    public static function createTransport(HttpClientInterface $client = null, string $sender = null, bool $noStopClause = false): OvhCloudTransport
     {
-        return (new OvhCloudTransport('applicationKey', 'applicationSecret', 'consumerKey', 'serviceName', $client ?? $this->createMock(HttpClientInterface::class)))->setSender($sender)->setNoStopClause($noStopClause);
+        return (new OvhCloudTransport('applicationKey', 'applicationSecret', 'consumerKey', 'serviceName', $client ?? new MockHttpClient()))->setSender($sender)->setNoStopClause($noStopClause);
     }
 
-    public function toStringProvider(): iterable
+    public static function toStringProvider(): iterable
     {
-        yield ['ovhcloud://eu.api.ovh.com?service_name=serviceName', $this->createTransport()];
-        yield ['ovhcloud://eu.api.ovh.com?service_name=serviceName', $this->createTransport(null, null, true)];
-        yield ['ovhcloud://eu.api.ovh.com?service_name=serviceName&sender=sender', $this->createTransport(null, 'sender')];
+        yield ['ovhcloud://eu.api.ovh.com?service_name=serviceName', self::createTransport()];
+        yield ['ovhcloud://eu.api.ovh.com?service_name=serviceName', self::createTransport(null, null, true)];
+        yield ['ovhcloud://eu.api.ovh.com?service_name=serviceName&sender=sender', self::createTransport(null, 'sender')];
     }
 
-    public function supportedMessagesProvider(): iterable
+    public static function supportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
     }
 
-    public function unsupportedMessagesProvider(): iterable
+    public static function unsupportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [new DummyMessage()];
     }
 
-    public function validMessagesProvider(): iterable
+    public static function validMessagesProvider(): iterable
     {
         yield 'without a slash' => ['hello'];
         yield 'including a slash' => ['hel/lo'];
@@ -79,7 +79,7 @@ final class OvhCloudTransportTest extends TransportTestCase
             $lastResponse,
         ];
 
-        $transport = $this->createTransport(new MockHttpClient($responses));
+        $transport = self::createTransport(new MockHttpClient($responses));
         $transport->send($smsMessage);
 
         $body = $lastResponse->getRequestOptions()['body'];
@@ -106,7 +106,7 @@ final class OvhCloudTransportTest extends TransportTestCase
             new MockResponse($data),
         ];
 
-        $transport = $this->createTransport(new MockHttpClient($responses));
+        $transport = self::createTransport(new MockHttpClient($responses));
 
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage('Attempt to send the SMS to invalid receivers: "invalid_receiver"');

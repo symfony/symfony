@@ -17,15 +17,12 @@ use Symfony\Component\HttpKernel\Kernel;
 
 class KernelForTest extends Kernel
 {
-    private $fakeContainer;
-
-    public function __construct(string $environment, bool $debug, bool $fakeContainer = true)
+    public function __construct(string $environment, bool $debug, private readonly bool $fakeContainer = true)
     {
         parent::__construct($environment, $debug);
-        $this->fakeContainer = $fakeContainer;
     }
 
-    public function getBundleMap()
+    public function getBundleMap(): array
     {
         return [];
     }
@@ -35,11 +32,11 @@ class KernelForTest extends Kernel
         return [];
     }
 
-    public function registerContainerConfiguration(LoaderInterface $loader)
+    public function registerContainerConfiguration(LoaderInterface $loader): void
     {
     }
 
-    public function isBooted()
+    public function isBooted(): bool
     {
         return $this->booted;
     }
@@ -49,7 +46,7 @@ class KernelForTest extends Kernel
         return __DIR__;
     }
 
-    protected function initializeContainer()
+    protected function initializeContainer(): void
     {
         if ($this->fakeContainer) {
             $this->container = new ContainerBuilder();

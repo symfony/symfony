@@ -26,7 +26,7 @@
         "psr/log": "^1.1|^2|^3",
         "symfony/cache-contracts": "^2.5|^3",
         "symfony/service-contracts": "^2.5|^3",
-        "symfony/var-exporter": "^6.2"
+        "symfony/var-exporter": "^6.2.7"
     },
     "require-dev": {
         "cache/integration-tests": "dev-master",

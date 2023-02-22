@@ -15,7 +15,7 @@ use Symfony\Component\Form\Extension\Core\Type\DateIntervalType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 
-class DateIntervalTypeTest extends BaseTypeTest
+class DateIntervalTypeTest extends BaseTypeTestCase
 {
     public const TESTED_TYPE = DateIntervalType::class;
 
@@ -440,7 +440,7 @@ class DateIntervalTypeTest extends BaseTypeTest
         $this->assertEquals($expectedData, $form->getData());
     }
 
-    public function provideEmptyData()
+    public static function provideEmptyData()
     {
         $expectedData = new \DateInterval('P6Y4M');
 

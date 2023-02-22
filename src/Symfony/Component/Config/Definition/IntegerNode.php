@@ -20,6 +20,9 @@ use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
  */
 class IntegerNode extends NumericNode
 {
+    /**
+     * @return void
+     */
     protected function validateType(mixed $value)
     {
         if (!\is_int($value)) {

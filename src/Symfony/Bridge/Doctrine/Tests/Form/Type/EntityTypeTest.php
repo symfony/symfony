@@ -35,12 +35,12 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Exception\RuntimeException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Forms;
-use Symfony\Component\Form\Tests\Extension\Core\Type\BaseTypeTest;
+use Symfony\Component\Form\Tests\Extension\Core\Type\BaseTypeTestCase;
 use Symfony\Component\Form\Tests\Extension\Core\Type\FormTypeTest;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
-class EntityTypeTest extends BaseTypeTest
+class EntityTypeTest extends BaseTypeTestCase
 {
     public const TESTED_TYPE = 'Symfony\Bridge\Doctrine\Form\Type\EntityType';
 
@@ -158,7 +158,7 @@ class EntityTypeTest extends BaseTypeTest
         }
     }
 
-    public function choiceTranslationDomainProvider()
+    public static function choiceTranslationDomainProvider()
     {
         return [
             [false],

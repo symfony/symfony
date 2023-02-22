@@ -29,7 +29,7 @@ class AbstractStreamTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function provideReplace()
+    public static function provideReplace()
     {
         yield ['ca', 'ab', 'c', ['a', 'b', 'a']];
         yield ['ac', 'ab', 'c', ['a', 'ab']];

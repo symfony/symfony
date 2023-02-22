@@ -53,11 +53,17 @@ abstract class AbstractToken implements TokenInterface, \Serializable
         return $this->user;
     }
 
+    /**
+     * @return void
+     */
     public function setUser(UserInterface $user)
     {
         $this->user = $user;
     }
 
+    /**
+     * @return void
+     */
     public function eraseCredentials()
     {
         if ($this->getUser() instanceof UserInterface) {
@@ -112,6 +118,9 @@ abstract class AbstractToken implements TokenInterface, \Serializable
         return $this->attributes;
     }
 
+    /**
+     * @return void
+     */
     public function setAttributes(array $attributes)
     {
         $this->attributes = $attributes;
@@ -131,6 +140,9 @@ abstract class AbstractToken implements TokenInterface, \Serializable
         return $this->attributes[$name];
     }
 
+    /**
+     * @return void
+     */
     public function setAttribute(string $name, mixed $value)
     {
         $this->attributes[$name] = $value;

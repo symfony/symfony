@@ -20,6 +20,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CheckboxType extends AbstractType
 {
+    /**
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         // Unlike in other types, where the data is NULL by default, it
@@ -32,6 +35,9 @@ class CheckboxType extends AbstractType
         $builder->addViewTransformer(new BooleanToStringTransformer($options['value'], $options['false_values']));
     }
 
+    /**
+     * @return void
+     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars = array_replace($view->vars, [
@@ -40,6 +46,9 @@ class CheckboxType extends AbstractType
         ]);
     }
 
+    /**
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $emptyData = fn (FormInterface $form, $viewData) => $viewData;

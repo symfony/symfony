@@ -25,7 +25,7 @@ class LessThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCase
         return new LessThanOrEqualValidator();
     }
 
-    protected function createConstraint(array $options = null): Constraint
+    protected static function createConstraint(array $options = null): Constraint
     {
         return new LessThanOrEqual($options);
     }
@@ -35,7 +35,7 @@ class LessThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCase
         return LessThanOrEqual::TOO_HIGH_ERROR;
     }
 
-    public function provideValidComparisons(): array
+    public static function provideValidComparisons(): array
     {
         return [
             [1, 2],
@@ -54,7 +54,7 @@ class LessThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCase
         ];
     }
 
-    public function provideValidComparisonsToPropertyPath(): array
+    public static function provideValidComparisonsToPropertyPath(): array
     {
         return [
             [4],
@@ -62,7 +62,7 @@ class LessThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCase
         ];
     }
 
-    public function provideInvalidComparisons(): array
+    public static function provideInvalidComparisons(): array
     {
         return [
             [2, '2', 1, '1', 'int'],
@@ -74,7 +74,7 @@ class LessThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCase
         ];
     }
 
-    public function provideComparisonsToNullValueAtPropertyPath()
+    public static function provideComparisonsToNullValueAtPropertyPath()
     {
         return [
             [5, '5', true],

@@ -72,7 +72,7 @@ abstract class AbstractFailedMessagesCommand extends Command
         return $stamp?->getId();
     }
 
-    protected function displaySingleMessage(Envelope $envelope, SymfonyStyle $io)
+    protected function displaySingleMessage(Envelope $envelope, SymfonyStyle $io): void
     {
         $io->title('Failed Message Details');
 
@@ -148,7 +148,7 @@ abstract class AbstractFailedMessagesCommand extends Command
         }
     }
 
-    protected function printPendingMessagesMessage(ReceiverInterface $receiver, SymfonyStyle $io)
+    protected function printPendingMessagesMessage(ReceiverInterface $receiver, SymfonyStyle $io): void
     {
         if ($receiver instanceof MessageCountAwareInterface) {
             if (1 === $receiver->getMessageCount()) {

@@ -17,7 +17,7 @@
 
             {% for transport in events.transports %}
                 <div class="sf-toolbar-info-piece">
-                    <b>{{ transport }}</b>
+                    <b>{{ transport ?: '<em>Empty Transport Name</em>' }}</b>
                     <span class="sf-toolbar-status">{{ events.messages(transport)|length }}</span>
                 </div>
             {% endfor %}
@@ -29,7 +29,7 @@
 
 {% block head %}
     {{ parent() }}
-    <style type="text/css">
+    <style>
         /* utility classes */
         .m-t-0 { margin-top: 0 !important; }
         .m-t-10 { margin-top: 10px !important; }
@@ -100,7 +100,7 @@
     </div>
 
     {% for transport in events.transports %}
-        <h3>{{ transport }}</h3>
+        <h3>{{ transport ?: '<em>Empty Transport Name</em>' }}</h3>
 
         <div class="card-block">
             <div class="sf-tabs sf-tabs-sm">
@@ -114,24 +114,24 @@
                                     <span class="label">Subject</span>
                                     <h2 class="m-t-10">{{ message.getSubject() ?? '(empty)' }}</h2>
                                 </div>
-                                {% if message.getNotification is defined %}
+                                {% set notification = message.notification ?? null %}
+                                {% if notification %}
                                     <div class="card-block">
                                         <div class="row">
                                             <div class="col">
                                                 <span class="label">Content</span>
-                                                <pre class="prewrap">{{ message.getNotification().getContent() ?? '(empty)' }}</pre>
+                                                <pre class="prewrap">{{ notification.getContent() ?? '(empty)' }}</pre>
                                                 <span class="label">Importance</span>
-                                                <pre class="prewrap">{{ message.getNotification().getImportance() }}</pre>
+                                                <pre class="prewrap">{{ notification.getImportance() }}</pre>
                                             </div>
                                         </div>
                                     </div>
                                 {% endif %}
                                     <div class="card-block">
                                         <div class="sf-tabs sf-tabs-sm">
-                                            {% if message.getNotification is defined %}
+                                            {% if notification %}
                                                 <div class="tab">
                                                     <h3 class="tab-title">Notification</h3>
-                                                    {% set notification = event.message.getNotification() %}
                                                     <div class="tab-content">
                                                         <pre class="prewrap" style="max-height: 600px">
                                                             {{- 'Subject: ' ~ notification.getSubject() }}<br/>

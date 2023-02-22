@@ -183,7 +183,7 @@ class Configuration implements ConfigurationInterface
         return $treeBuilder;
     }
 
-    private function addSecretsSection(ArrayNodeDefinition $rootNode)
+    private function addSecretsSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
@@ -199,7 +199,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addCsrfSection(ArrayNodeDefinition $rootNode)
+    private function addCsrfSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
@@ -217,7 +217,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addFormSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
+    private function addFormSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
             ->children()
@@ -244,7 +244,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addHttpCacheSection(ArrayNodeDefinition $rootNode)
+    private function addHttpCacheSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
@@ -263,6 +263,10 @@ class Configuration implements ConfigurationInterface
                             ->performNoDeepMerging()
                             ->scalarPrototype()->end()
                         ->end()
+                        ->arrayNode('skip_response_headers')
+                            ->performNoDeepMerging()
+                            ->scalarPrototype()->end()
+                        ->end()
                         ->booleanNode('allow_reload')->end()
                         ->booleanNode('allow_revalidate')->end()
                         ->integerNode('stale_while_revalidate')->end()
@@ -274,7 +278,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addEsiSection(ArrayNodeDefinition $rootNode)
+    private function addEsiSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
@@ -286,7 +290,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addSsiSection(ArrayNodeDefinition $rootNode)
+    private function addSsiSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
@@ -297,7 +301,7 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    private function addFragmentsSection(ArrayNodeDefinition $rootNode)
+    private function addFragmentsSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
@@ -313,7 +317,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addProfilerSection(ArrayNodeDefinition $rootNode)
+    private function addProfilerSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
@@ -333,7 +337,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addWorkflowSection(ArrayNodeDefinition $rootNode)
+    private function addWorkflowSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->fixXmlConfig('workflow')
@@ -596,7 +600,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addRouterSection(ArrayNodeDefinition $rootNode)
+    private function addRouterSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
@@ -629,7 +633,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addSessionSection(ArrayNodeDefinition $rootNode)
+    private function addSessionSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
@@ -678,7 +682,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addRequestSection(ArrayNodeDefinition $rootNode)
+    private function addRequestSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
@@ -704,7 +708,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addAssetsSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
+    private function addAssetsSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
             ->children()
@@ -800,7 +804,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addTranslatorSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
+    private function addTranslatorSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
             ->children()
@@ -870,7 +874,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addValidationSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
+    private function addValidationSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
             ->children()
@@ -960,7 +964,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addAnnotationsSection(ArrayNodeDefinition $rootNode, callable $willBeAvailable)
+    private function addAnnotationsSection(ArrayNodeDefinition $rootNode, callable $willBeAvailable): void
     {
         $rootNode
             ->children()
@@ -980,7 +984,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addSerializerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
+    private function addSerializerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
             ->children()
@@ -1013,7 +1017,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addPropertyAccessSection(ArrayNodeDefinition $rootNode, callable $willBeAvailable)
+    private function addPropertyAccessSection(ArrayNodeDefinition $rootNode, callable $willBeAvailable): void
     {
         $rootNode
             ->children()
@@ -1033,7 +1037,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addPropertyInfoSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
+    private function addPropertyInfoSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
             ->children()
@@ -1045,7 +1049,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addCacheSection(ArrayNodeDefinition $rootNode, callable $willBeAvailable)
+    private function addCacheSection(ArrayNodeDefinition $rootNode, callable $willBeAvailable): void
     {
         $rootNode
             ->children()
@@ -1136,7 +1140,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addPhpErrorsSection(ArrayNodeDefinition $rootNode)
+    private function addPhpErrorsSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
@@ -1182,7 +1186,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addExceptionsSection(ArrayNodeDefinition $rootNode)
+    private function addExceptionsSection(ArrayNodeDefinition $rootNode): void
     {
         $logLevels = (new \ReflectionClass(LogLevel::class))->getConstants();
 
@@ -1242,7 +1246,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addLockSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
+    private function addLockSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
             ->children()
@@ -1305,7 +1309,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addSemaphoreSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
+    private function addSemaphoreSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
             ->children()
@@ -1360,7 +1364,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addWebLinkSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
+    private function addWebLinkSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
             ->children()
@@ -1372,7 +1376,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addMessengerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
+    private function addMessengerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
             ->children()
@@ -1598,7 +1602,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addRobotsIndexSection(ArrayNodeDefinition $rootNode)
+    private function addRobotsIndexSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
@@ -1611,7 +1615,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addHttpClientSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
+    private function addHttpClientSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
             ->children()
@@ -1955,7 +1959,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addMailerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
+    private function addMailerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
             ->children()
@@ -2009,7 +2013,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addNotifierSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
+    private function addNotifierSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
             ->children()
@@ -2061,7 +2065,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addRateLimiterSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
+    private function addRateLimiterSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
             ->children()
@@ -2132,7 +2136,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addUidSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
+    private function addUidSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
             ->children()
@@ -2165,7 +2169,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addHtmlSanitizerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
+    private function addHtmlSanitizerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
             ->children()

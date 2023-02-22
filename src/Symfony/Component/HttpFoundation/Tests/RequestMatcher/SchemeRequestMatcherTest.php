@@ -42,7 +42,7 @@ class SchemeRequestMatcherTest extends TestCase
         }
     }
 
-    public function getData()
+    public static function getData()
     {
         return [
             ['http', 'http', true],

@@ -136,7 +136,7 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
         $this->translator = $translator;
     }
 
-    private function getCredentials(Request $request)
+    private function getCredentials(Request $request): array
     {
         $data = json_decode($request->getContent());
         if (!$data instanceof \stdClass) {

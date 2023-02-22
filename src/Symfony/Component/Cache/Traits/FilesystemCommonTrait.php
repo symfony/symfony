@@ -77,12 +77,15 @@ trait FilesystemCommonTrait
         return $ok;
     }
 
+    /**
+     * @return bool
+     */
     protected function doUnlink(string $file)
     {
         return @unlink($file);
     }
 
-    private function write(string $file, string $data, int $expiresAt = null)
+    private function write(string $file, string $data, int $expiresAt = null): bool
     {
         set_error_handler(__CLASS__.'::throwError');
         try {
@@ -110,10 +113,10 @@ trait FilesystemCommonTrait
         }
     }
 
-    private function getFile(string $id, bool $mkdir = false, string $directory = null)
+    private function getFile(string $id, bool $mkdir = false, string $directory = null): string
     {
-        // Use MD5 to favor speed over security, which is not an issue here
-        $hash = str_replace('/', '-', base64_encode(hash('md5', static::class.$id, true)));
+        // Use xxh128 to favor speed over security, which is not an issue here
+        $hash = str_replace('/', '-', base64_encode(hash('xxh128', static::class.$id, true)));
         $dir = ($directory ?? $this->directory).strtoupper($hash[0].\DIRECTORY_SEPARATOR.$hash[1].\DIRECTORY_SEPARATOR);
 
         if ($mkdir && !is_dir($dir)) {

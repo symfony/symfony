@@ -48,7 +48,7 @@ final class PostgreSqlConnection extends Connection
         $this->unlisten();
     }
 
-    public function reset()
+    public function reset(): void
     {
         parent::reset();
         $this->unlisten();
@@ -143,7 +143,7 @@ SQL
         return sprintf('%1$s.notify_%2$s', $tableConfig[0], $tableConfig[1]);
     }
 
-    private function unlisten()
+    private function unlisten(): void
     {
         $this->executeStatement(sprintf('UNLISTEN "%s"', $this->configuration['table_name']));
     }

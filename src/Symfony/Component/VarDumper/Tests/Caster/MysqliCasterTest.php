@@ -16,6 +16,7 @@ use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
 /**
  * @requires extension mysqli
+ *
  * @group integration
  */
 class MysqliCasterTest extends TestCase

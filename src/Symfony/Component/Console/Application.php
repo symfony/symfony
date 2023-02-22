@@ -105,11 +105,14 @@ class Application implements ResetInterface
     /**
      * @final
      */
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    public function setDispatcher(EventDispatcherInterface $dispatcher): void
     {
         $this->dispatcher = $dispatcher;
     }
 
+    /**
+     * @return void
+     */
     public function setCommandLoader(CommandLoaderInterface $commandLoader)
     {
         $this->commandLoader = $commandLoader;
@@ -124,6 +127,9 @@ class Application implements ResetInterface
         return $this->signalRegistry;
     }
 
+    /**
+     * @return void
+     */
     public function setSignalsToDispatchEvent(int ...$signalsToDispatchEvent)
     {
         $this->signalsToDispatchEvent = $signalsToDispatchEvent;
@@ -317,10 +323,16 @@ class Application implements ResetInterface
         return $exitCode;
     }
 
+    /**
+     * @return void
+     */
     public function reset()
     {
     }
 
+    /**
+     * @return void
+     */
     public function setHelperSet(HelperSet $helperSet)
     {
         $this->helperSet = $helperSet;
@@ -334,6 +346,9 @@ class Application implements ResetInterface
         return $this->helperSet ??= $this->getDefaultHelperSet();
     }
 
+    /**
+     * @return void
+     */
     public function setDefinition(InputDefinition $definition)
     {
         $this->definition = $definition;
@@ -404,6 +419,8 @@ class Application implements ResetInterface
 
     /**
      * Sets whether to catch exceptions or not during commands execution.
+     *
+     * @return void
      */
     public function setCatchExceptions(bool $boolean)
     {
@@ -420,6 +437,8 @@ class Application implements ResetInterface
 
     /**
      * Sets whether to automatically exit after a command execution or not.
+     *
+     * @return void
      */
     public function setAutoExit(bool $boolean)
     {
@@ -436,7 +455,9 @@ class Application implements ResetInterface
 
     /**
      * Sets the application name.
-     **/
+     *
+     * @return void
+     */
     public function setName(string $name)
     {
         $this->name = $name;
@@ -452,6 +473,8 @@ class Application implements ResetInterface
 
     /**
      * Sets the application version.
+     *
+     * @return void
      */
     public function setVersion(string $version)
     {
@@ -490,6 +513,8 @@ class Application implements ResetInterface
      * If a Command is not enabled it will not be added.
      *
      * @param Command[] $commands An array of commands
+     *
+     * @return void
      */
     public function addCommands(array $commands)
     {
@@ -899,6 +924,8 @@ class Application implements ResetInterface
 
     /**
      * Configures the input and output instances based on the user arguments and options.
+     *
+     * @return void
      */
     protected function configureIO(InputInterface $input, OutputInterface $output)
     {
@@ -1250,7 +1277,7 @@ class Application implements ResetInterface
         return $namespaces;
     }
 
-    private function init()
+    private function init(): void
     {
         if ($this->initialized) {
             return;

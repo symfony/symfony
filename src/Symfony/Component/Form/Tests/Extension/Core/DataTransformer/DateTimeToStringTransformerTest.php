@@ -15,9 +15,9 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\BaseDateTimeTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
 
-class DateTimeToStringTransformerTest extends BaseDateTimeTransformerTest
+class DateTimeToStringTransformerTest extends BaseDateTimeTransformerTestCase
 {
-    public function dataProvider(): array
+    public static function dataProvider(): array
     {
         return [
             ['Y-m-d H:i:s', '2010-02-03 16:05:06', '2010-02-03 16:05:06 UTC'],

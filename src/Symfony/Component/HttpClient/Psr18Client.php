@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\HttpClient;
 
-use FriendsOfPHP\WellKnownImplementations\WellKnownPsr17Factory;
-use FriendsOfPHP\WellKnownImplementations\WellKnownPsr7Request;
-use FriendsOfPHP\WellKnownImplementations\WellKnownPsr7Uri;
 use Http\Discovery\Exception\NotFoundException;
 use Http\Discovery\Psr17FactoryDiscovery;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -65,12 +62,12 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
         $streamFactory ??= $responseFactory instanceof StreamFactoryInterface ? $responseFactory : null;
 
         if (null === $responseFactory || null === $streamFactory) {
-            if (!class_exists(Psr17Factory::class) && !class_exists(WellKnownPsr17Factory::class) && !class_exists(Psr17FactoryDiscovery::class)) {
+            if (!class_exists(Psr17Factory::class) && !class_exists(Psr17FactoryDiscovery::class)) {
                 throw new \LogicException('You cannot use the "Symfony\Component\HttpClient\Psr18Client" as no PSR-17 factories have been provided. Try running "composer require nyholm/psr7".');
             }
 
             try {
-                $psr17Factory = class_exists(Psr17Factory::class, false) ? new Psr17Factory() : (class_exists(WellKnownPsr17Factory::class, false) ? new WellKnownPsr17Factory() : null);
+                $psr17Factory = class_exists(Psr17Factory::class, false) ? new Psr17Factory() : null;
                 $responseFactory ??= $psr17Factory ?? Psr17FactoryDiscovery::findResponseFactory();
                 $streamFactory ??= $psr17Factory ?? Psr17FactoryDiscovery::findStreamFactory();
             } catch (NotFoundException $e) {
@@ -149,10 +146,6 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
             return new Request($method, $uri);
         }
 
-        if (class_exists(WellKnownPsr7Request::class)) {
-            return new WellKnownPsr7Request($method, $uri);
-        }
-
         if (class_exists(Psr17FactoryDiscovery::class)) {
             return Psr17FactoryDiscovery::findRequestFactory()->createRequest($method, $uri);
         }
@@ -191,10 +184,6 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
             return new Uri($uri);
         }
 
-        if (class_exists(WellKnownPsr7Uri::class)) {
-            return new WellKnownPsr7Uri($uri);
-        }
-
         if (class_exists(Psr17FactoryDiscovery::class)) {
             return Psr17FactoryDiscovery::findUrlFactory()->createUri($uri);
         }
@@ -202,7 +191,7 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
         throw new \LogicException(sprintf('You cannot use "%s()" as the "nyholm/psr7" package is not installed. Try running "composer require nyholm/psr7".', __METHOD__));
     }
 
-    public function reset()
+    public function reset(): void
     {
         if ($this->client instanceof ResetInterface) {
             $this->client->reset();

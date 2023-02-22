@@ -75,7 +75,7 @@ class TranslationUpdateCommand extends Command
         $this->enabledLocales = $enabledLocales;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDefinition([
@@ -145,7 +145,7 @@ EOF
         $format = $input->getOption('format');
         $xliffVersion = '1.2';
 
-        if (\in_array($format, array_keys(self::FORMATS), true)) {
+        if (\array_key_exists($format, self::FORMATS)) {
             [$format, $xliffVersion] = self::FORMATS[$format];
         }
 

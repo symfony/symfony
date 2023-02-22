@@ -269,7 +269,7 @@ class IntegrationTest extends TestCase
         $this->assertEquals($expectedService, $actualService);
     }
 
-    public function getYamlCompileTests()
+    public static function getYamlCompileTests()
     {
         $container = new ContainerBuilder();
         $container->registerForAutoconfiguration(IntegrationTestStub::class);

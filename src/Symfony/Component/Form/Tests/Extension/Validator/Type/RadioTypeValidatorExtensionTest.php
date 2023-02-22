@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 use Symfony\Component\Form\Extension\Core\Type\RadioType;
 use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 
-class RadioTypeValidatorExtensionTest extends BaseValidatorExtensionTest
+class RadioTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
 {
     use ValidatorExtensionTrait;
 

@@ -9,6 +9,8 @@ CHANGELOG
    `Symfony\Component\Messenger\Transport\InMemoryTransportFactory` in favor of
    `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport` and
    `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransportFactory`
+ * Allow passing a string instead of an array in `TransportNamesStamp`
+ * Allow to define batch size when using `BatchHandlerTrait` with `getBatchSize()`
 
 6.2
 ---

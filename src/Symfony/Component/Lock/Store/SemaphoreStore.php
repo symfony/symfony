@@ -40,23 +40,29 @@ class SemaphoreStore implements BlockingStoreInterface
         }
     }
 
+    /**
+     * @return void
+     */
     public function save(Key $key)
     {
         $this->lock($key, false);
     }
 
+    /**
+     * @return void
+     */
     public function waitAndSave(Key $key)
     {
         $this->lock($key, true);
     }
 
-    private function lock(Key $key, bool $blocking)
+    private function lock(Key $key, bool $blocking): void
     {
         if ($key->hasState(__CLASS__)) {
             return;
         }
 
-        $keyId = unpack('i', md5($key, true))[1];
+        $keyId = unpack('i', hash('xxh128', $key, true))[1];
         $resource = @sem_get($keyId);
         $acquired = $resource && @sem_acquire($resource, !$blocking);
 
@@ -73,6 +79,9 @@ class SemaphoreStore implements BlockingStoreInterface
         $key->markUnserializable();
     }
 
+    /**
+     * @return void
+     */
     public function delete(Key $key)
     {
         // The lock is maybe not acquired.
@@ -87,6 +96,9 @@ class SemaphoreStore implements BlockingStoreInterface
         $key->removeState(__CLASS__);
     }
 
+    /**
+     * @return void
+     */
     public function putOffExpiration(Key $key, float $ttl)
     {
         // do nothing, the semaphore locks forever.

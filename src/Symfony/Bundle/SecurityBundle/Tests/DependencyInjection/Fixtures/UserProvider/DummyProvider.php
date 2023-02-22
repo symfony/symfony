@@ -8,16 +8,16 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class DummyProvider implements UserProviderFactoryInterface
 {
-    public function create(ContainerBuilder $container, $id, $config)
+    public function create(ContainerBuilder $container, $id, $config): void
     {
     }
 
-    public function getKey()
+    public function getKey(): string
     {
         return 'foo';
     }
 
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(NodeDefinition $node): void
     {
     }
 }

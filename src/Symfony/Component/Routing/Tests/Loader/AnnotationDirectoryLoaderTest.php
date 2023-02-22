@@ -14,7 +14,7 @@ namespace Symfony\Component\Routing\Tests\Loader;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Routing\Loader\AnnotationDirectoryLoader;
 
-class AnnotationDirectoryLoaderTest extends AbstractAnnotationLoaderTest
+class AnnotationDirectoryLoaderTest extends AbstractAnnotationLoaderTestCase
 {
     protected $loader;
     protected $reader;

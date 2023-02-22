@@ -47,28 +47,28 @@ class GraphvizDumperTest extends TestCase
         $this->assertEquals($expected, $dump);
     }
 
-    public function provideWorkflowDefinitionWithMarking()
+    public static function provideWorkflowDefinitionWithMarking()
     {
         yield [
-            $this->createComplexWorkflowDefinition(),
+            self::createComplexWorkflowDefinition(),
             new Marking(['b' => 1]),
-            $this->createComplexWorkflowDefinitionDumpWithMarking(),
+            self::createComplexWorkflowDefinitionDumpWithMarking(),
         ];
 
         yield [
-            $this->createSimpleWorkflowDefinition(),
+            self::createSimpleWorkflowDefinition(),
             new Marking(['c' => 1, 'd' => 1]),
-            $this->createSimpleWorkflowDumpWithMarking(),
+            self::createSimpleWorkflowDumpWithMarking(),
         ];
     }
 
-    public function provideWorkflowDefinitionWithoutMarking()
+    public static function provideWorkflowDefinitionWithoutMarking()
     {
-        yield [$this->createComplexWorkflowDefinition(), $this->provideComplexWorkflowDumpWithoutMarking()];
-        yield [$this->createSimpleWorkflowDefinition(), $this->provideSimpleWorkflowDumpWithoutMarking()];
+        yield [self::createComplexWorkflowDefinition(), self::provideComplexWorkflowDumpWithoutMarking()];
+        yield [self::createSimpleWorkflowDefinition(), self::provideSimpleWorkflowDumpWithoutMarking()];
     }
 
-    public function createComplexWorkflowDefinitionDumpWithMarking()
+    public static function createComplexWorkflowDefinitionDumpWithMarking()
     {
         return 'digraph workflow {
   ratio="compress" rankdir="LR"
@@ -106,7 +106,7 @@ class GraphvizDumperTest extends TestCase
 ';
     }
 
-    public function createSimpleWorkflowDumpWithMarking()
+    public static function createSimpleWorkflowDumpWithMarking()
     {
         return 'digraph workflow {
   ratio="compress" rankdir="LR"
@@ -126,7 +126,7 @@ class GraphvizDumperTest extends TestCase
 ';
     }
 
-    public function provideComplexWorkflowDumpWithoutMarking()
+    public static function provideComplexWorkflowDumpWithoutMarking()
     {
         return 'digraph workflow {
   ratio="compress" rankdir="LR"
@@ -164,7 +164,7 @@ class GraphvizDumperTest extends TestCase
 ';
     }
 
-    public function provideSimpleWorkflowDumpWithoutMarking()
+    public static function provideSimpleWorkflowDumpWithoutMarking()
     {
         return 'digraph workflow {
   ratio="compress" rankdir="LR"

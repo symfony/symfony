@@ -57,7 +57,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
         $this->sessionOptions = $sessionOptions;
     }
 
-    public function onKernelRequest(RequestEvent $event)
+    public function onKernelRequest(RequestEvent $event): void
     {
         if (!$event->isMainRequest()) {
             return;
@@ -70,6 +70,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
             $request->setSessionFactory(function () use (&$sess, $request) {
                 if (!$sess) {
                     $sess = $this->getSession();
+                    $request->setSession($sess);
 
                     /*
                      * For supporting sessions in php runtime with runners like roadrunner or swoole, the session
@@ -88,7 +89,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
         }
     }
 
-    public function onKernelResponse(ResponseEvent $event)
+    public function onKernelResponse(ResponseEvent $event): void
     {
         if (!$event->isMainRequest() || (!$this->container->has('initialized_session') && !$event->getRequest()->hasSession())) {
             return;

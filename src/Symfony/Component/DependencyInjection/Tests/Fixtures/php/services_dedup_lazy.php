@@ -127,10 +127,7 @@ class stdClassProxy5a8a5eb extends \stdClass implements \Symfony\Component\VarEx
 {
     use \Symfony\Component\VarExporter\LazyProxyTrait;
 
-    private const LAZY_OBJECT_PROPERTY_SCOPES = [
-        'lazyObjectReal' => [self::class, 'lazyObjectReal', null],
-        "\0".self::class."\0lazyObjectReal" => [self::class, 'lazyObjectReal', null],
-    ];
+    private const LAZY_OBJECT_PROPERTY_SCOPES = [];
 }
 
 // Help opcache.preload discover always-needed symbols

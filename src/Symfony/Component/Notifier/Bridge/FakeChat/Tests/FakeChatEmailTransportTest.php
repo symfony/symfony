@@ -11,22 +11,22 @@
 
 namespace Symfony\Component\Notifier\Bridge\FakeChat\Tests;
 
-use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Notifier\Bridge\FakeChat\FakeChatEmailTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Tests\Fixtures\TestOptions;
 use Symfony\Component\Notifier\Tests\Mailer\DummyMailer;
+use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class FakeChatEmailTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null, string $transportName = null): FakeChatEmailTransport
+    public static function createTransport(HttpClientInterface $client = null, string $transportName = null): FakeChatEmailTransport
     {
-        $transport = (new FakeChatEmailTransport($this->createMock(MailerInterface::class), 'recipient@email.net', 'sender@email.net', $client ?? $this->createMock(HttpClientInterface::class)));
+        $transport = (new FakeChatEmailTransport(new DummyMailer(), 'recipient@email.net', 'sender@email.net', $client ?? new MockHttpClient()));
 
         if (null !== $transportName) {
             $transport->setHost($transportName);
@@ -35,21 +35,21 @@ final class FakeChatEmailTransportTest extends TransportTestCase
         return $transport;
     }
 
-    public function toStringProvider(): iterable
+    public static function toStringProvider(): iterable
     {
-        yield ['fakechat+email://default?to=recipient@email.net&from=sender@email.net', $this->createTransport()];
-        yield ['fakechat+email://mailchimp?to=recipient@email.net&from=sender@email.net', $this->createTransport(null, 'mailchimp')];
+        yield ['fakechat+email://default?to=recipient@email.net&from=sender@email.net', self::createTransport()];
+        yield ['fakechat+email://mailchimp?to=recipient@email.net&from=sender@email.net', self::createTransport(null, 'mailchimp')];
     }
 
-    public function supportedMessagesProvider(): iterable
+    public static function supportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
     }
 
-    public function unsupportedMessagesProvider(): iterable
+    public static function unsupportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [new DummyMessage()];
     }
 
     public function testSendWithDefaultTransportAndWithRecipient()

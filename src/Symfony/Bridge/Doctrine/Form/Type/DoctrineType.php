@@ -97,6 +97,9 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
         $this->registry = $registry;
     }
 
+    /**
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if ($options['multiple'] && interface_exists(Collection::class)) {
@@ -107,6 +110,9 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
         }
     }
 
+    /**
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $choiceLoader = function (Options $options) {
@@ -232,6 +238,9 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
         return ChoiceType::class;
     }
 
+    /**
+     * @return void
+     */
     public function reset()
     {
         $this->idReaders = [];

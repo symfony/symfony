@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Mailer\Bridge\Mailchimp\Tests\Transport;
 
+use Psr\Log\NullLogger;
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillApiTransport;
 use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillHttpTransport;
 use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillSmtpTransport;
@@ -23,10 +25,10 @@ class MandrillTransportFactoryTest extends TransportFactoryTestCase
 {
     public function getFactory(): TransportFactoryInterface
     {
-        return new MandrillTransportFactory($this->getDispatcher(), $this->getClient(), $this->getLogger());
+        return new MandrillTransportFactory(null, new MockHttpClient(), new NullLogger());
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [
             new Dsn('mandrill', 'default'),
@@ -59,49 +61,48 @@ class MandrillTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
-        $client = $this->getClient();
-        $dispatcher = $this->getDispatcher();
-        $logger = $this->getLogger();
+        $client = new MockHttpClient();
+        $logger = new NullLogger();
 
         yield [
             new Dsn('mandrill+api', 'default', self::USER),
-            new MandrillApiTransport(self::USER, $client, $dispatcher, $logger),
+            new MandrillApiTransport(self::USER, $client, null, $logger),
         ];
 
         yield [
             new Dsn('mandrill+api', 'example.com', self::USER, '', 8080),
-            (new MandrillApiTransport(self::USER, $client, $dispatcher, $logger))->setHost('example.com')->setPort(8080),
+            (new MandrillApiTransport(self::USER, $client, null, $logger))->setHost('example.com')->setPort(8080),
         ];
 
         yield [
             new Dsn('mandrill', 'default', self::USER),
-            new MandrillHttpTransport(self::USER, $client, $dispatcher, $logger),
+            new MandrillHttpTransport(self::USER, $client, null, $logger),
         ];
 
         yield [
             new Dsn('mandrill+https', 'default', self::USER),
-            new MandrillHttpTransport(self::USER, $client, $dispatcher, $logger),
+            new MandrillHttpTransport(self::USER, $client, null, $logger),
         ];
 
         yield [
             new Dsn('mandrill+https', 'example.com', self::USER, '', 8080),
-            (new MandrillHttpTransport(self::USER, $client, $dispatcher, $logger))->setHost('example.com')->setPort(8080),
+            (new MandrillHttpTransport(self::USER, $client, null, $logger))->setHost('example.com')->setPort(8080),
         ];
 
         yield [
             new Dsn('mandrill+smtp', 'default', self::USER, self::PASSWORD),
-            new MandrillSmtpTransport(self::USER, self::PASSWORD, $dispatcher, $logger),
+            new MandrillSmtpTransport(self::USER, self::PASSWORD, null, $logger),
         ];
 
         yield [
             new Dsn('mandrill+smtps', 'default', self::USER, self::PASSWORD),
-            new MandrillSmtpTransport(self::USER, self::PASSWORD, $dispatcher, $logger),
+            new MandrillSmtpTransport(self::USER, self::PASSWORD, null, $logger),
         ];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield [
             new Dsn('mandrill+foo', 'default', self::USER),
@@ -109,7 +110,7 @@ class MandrillTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield [new Dsn('mandrill+api', 'default')];
 

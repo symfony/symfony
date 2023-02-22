@@ -12,14 +12,14 @@
 namespace Extension\Core\Type;
 
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
-use Symfony\Component\Form\Tests\Extension\Core\Type\BaseTypeTest;
+use Symfony\Component\Form\Tests\Extension\Core\Type\BaseTypeTestCase;
 use Symfony\Component\Form\Tests\Fixtures\Answer;
 use Symfony\Component\Form\Tests\Fixtures\Number;
 use Symfony\Component\Form\Tests\Fixtures\Suit;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
-class EnumTypeTest extends BaseTypeTest
+class EnumTypeTest extends BaseTypeTestCase
 {
     public const TESTED_TYPE = EnumType::class;
 
@@ -81,7 +81,7 @@ class EnumTypeTest extends BaseTypeTest
         $this->assertTrue($form->isSynchronized());
     }
 
-    public function provideSingleSubmitData(): iterable
+    public static function provideSingleSubmitData(): iterable
     {
         yield 'unbacked' => [
             Answer::class,
@@ -223,7 +223,7 @@ class EnumTypeTest extends BaseTypeTest
         $this->assertTrue($form->isSynchronized());
     }
 
-    public function provideMultiSubmitData(): iterable
+    public static function provideMultiSubmitData(): iterable
     {
         yield 'unbacked' => [
             Answer::class,

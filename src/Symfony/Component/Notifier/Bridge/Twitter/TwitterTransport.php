@@ -83,7 +83,7 @@ final class TwitterTransport extends AbstractTransport
 
         $oauth = [
             'oauth_consumer_key' => $this->apiKey,
-            'oauth_nonce' => self::$nonce = md5(self::$nonce ??= random_bytes(16)),
+            'oauth_nonce' => self::$nonce = hash('xxh128', self::$nonce ??= random_bytes(16)),
             'oauth_signature_method' => 'HMAC-SHA1',
             'oauth_timestamp' => time(),
             'oauth_token' => $this->accessToken,

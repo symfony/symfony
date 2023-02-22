@@ -17,7 +17,7 @@ use Symfony\Component\Workflow\Transition;
 
 trait WorkflowBuilderTrait
 {
-    private function createComplexWorkflowDefinition()
+    private static function createComplexWorkflowDefinition()
     {
         $places = range('a', 'g');
 
@@ -52,7 +52,7 @@ trait WorkflowBuilderTrait
         //           +----+                          +----+     +----+     +----+
     }
 
-    private function createSimpleWorkflowDefinition()
+    private static function createSimpleWorkflowDefinition()
     {
         $places = range('a', 'c');
 
@@ -87,7 +87,7 @@ trait WorkflowBuilderTrait
         // +---+     +----+     +---+     +----+     +---+
     }
 
-    private function createWorkflowWithSameNameTransition()
+    private static function createWorkflowWithSameNameTransition()
     {
         $places = range('a', 'c');
 
@@ -115,7 +115,7 @@ trait WorkflowBuilderTrait
         //   +--------------------------------------------------------------------+
     }
 
-    private function createComplexStateMachineDefinition()
+    private static function createComplexStateMachineDefinition()
     {
         $places = ['a', 'b', 'c', 'd'];
 
@@ -127,8 +127,13 @@ trait WorkflowBuilderTrait
         $transitions[] = new Transition('t3', 'b', 'd');
 
         $transitionsMetadata = new \SplObjectStorage();
+        // PHP 7.2 doesn't allow this heredoc syntax in an array, use a dedicated variable instead
+        $label = <<<'EOTXT'
+My custom transition
+label 3
+EOTXT;
         $transitionsMetadata[$transitionWithMetadataDumpStyle] = [
-            'label' => 'My custom transition label 3',
+            'label' => $label,
             'color' => 'Grey',
             'arrow_color' => 'Red',
         ];

@@ -13,14 +13,14 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor;
 
 use Symfony\Bundle\FrameworkBundle\Console\Descriptor\MarkdownDescriptor;
 
-class MarkdownDescriptorTest extends AbstractDescriptorTest
+class MarkdownDescriptorTest extends AbstractDescriptorTestCase
 {
-    protected function getDescriptor()
+    protected static function getDescriptor()
     {
         return new MarkdownDescriptor();
     }
 
-    protected function getFormat()
+    protected static function getFormat()
     {
         return 'md';
     }

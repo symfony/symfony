@@ -27,7 +27,7 @@ class HostRequestMatcherTest extends TestCase
         $this->assertSame($isMatch, $matcher->matches($request));
     }
 
-    public function getData()
+    public static function getData()
     {
         return [
             ['.*\.example\.com', true],

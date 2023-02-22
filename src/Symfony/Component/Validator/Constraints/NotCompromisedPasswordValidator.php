@@ -50,6 +50,8 @@ class NotCompromisedPasswordValidator extends ConstraintValidator
     }
 
     /**
+     * @return void
+     *
      * @throws ExceptionInterface
      */
     public function validate(mixed $value, Constraint $constraint)

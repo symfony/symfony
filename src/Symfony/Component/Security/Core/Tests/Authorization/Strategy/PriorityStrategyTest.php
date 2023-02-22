@@ -17,28 +17,28 @@ use Symfony\Component\Security\Core\Test\AccessDecisionStrategyTestCase;
 
 class PriorityStrategyTest extends AccessDecisionStrategyTestCase
 {
-    public function provideStrategyTests(): iterable
+    public static function provideStrategyTests(): iterable
     {
         $strategy = new PriorityStrategy();
 
         yield [$strategy, [
-            $this->getVoter(VoterInterface::ACCESS_ABSTAIN),
-            $this->getVoter(VoterInterface::ACCESS_GRANTED),
-            $this->getVoter(VoterInterface::ACCESS_DENIED),
-            $this->getVoter(VoterInterface::ACCESS_DENIED),
+            self::getVoter(VoterInterface::ACCESS_ABSTAIN),
+            self::getVoter(VoterInterface::ACCESS_GRANTED),
+            self::getVoter(VoterInterface::ACCESS_DENIED),
+            self::getVoter(VoterInterface::ACCESS_DENIED),
         ], true];
 
         yield [$strategy, [
-            $this->getVoter(VoterInterface::ACCESS_ABSTAIN),
-            $this->getVoter(VoterInterface::ACCESS_DENIED),
-            $this->getVoter(VoterInterface::ACCESS_GRANTED),
-            $this->getVoter(VoterInterface::ACCESS_GRANTED),
+            self::getVoter(VoterInterface::ACCESS_ABSTAIN),
+            self::getVoter(VoterInterface::ACCESS_DENIED),
+            self::getVoter(VoterInterface::ACCESS_GRANTED),
+            self::getVoter(VoterInterface::ACCESS_GRANTED),
         ], false];
 
-        yield [$strategy, $this->getVoters(0, 0, 2), false];
+        yield [$strategy, self::getVoters(0, 0, 2), false];
 
         $strategy = new PriorityStrategy(true);
 
-        yield [$strategy, $this->getVoters(0, 0, 2), true];
+        yield [$strategy, self::getVoters(0, 0, 2), true];
     }
 }

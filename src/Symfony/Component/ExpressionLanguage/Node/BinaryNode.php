@@ -45,7 +45,7 @@ class BinaryNode extends Node
         );
     }
 
-    public function compile(Compiler $compiler)
+    public function compile(Compiler $compiler): void
     {
         $operator = $this->attributes['operator'];
 
@@ -92,7 +92,7 @@ class BinaryNode extends Node
         ;
     }
 
-    public function evaluate(array $functions, array $values)
+    public function evaluate(array $functions, array $values): mixed
     {
         $operator = $this->attributes['operator'];
         $left = $this->nodes['left']->evaluate($functions, $values);
@@ -171,7 +171,7 @@ class BinaryNode extends Node
         }
     }
 
-    public function toArray()
+    public function toArray(): array
     {
         return ['(', $this->nodes['left'], ' '.$this->attributes['operator'].' ', $this->nodes['right'], ')'];
     }

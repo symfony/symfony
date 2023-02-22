@@ -113,7 +113,7 @@ class AddConsoleCommandPassTest extends TestCase
         $this->assertSame(['new-name' => 'with-default-name'], $container->getDefinition('console.command_loader')->getArgument(1));
     }
 
-    public function visibilityProvider()
+    public static function visibilityProvider()
     {
         return [
             [true],

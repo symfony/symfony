@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 
-class CollectionTypeValidatorExtensionTest extends BaseValidatorExtensionTest
+class CollectionTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
 {
     use ValidatorExtensionTrait;
 

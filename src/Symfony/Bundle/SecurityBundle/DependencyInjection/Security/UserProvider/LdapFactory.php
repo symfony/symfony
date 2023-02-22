@@ -24,6 +24,9 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class LdapFactory implements UserProviderFactoryInterface
 {
+    /**
+     * @return void
+     */
     public function create(ContainerBuilder $container, string $id, array $config)
     {
         $container
@@ -40,11 +43,17 @@ class LdapFactory implements UserProviderFactoryInterface
         ;
     }
 
+    /**
+     * @return string
+     */
     public function getKey()
     {
         return 'ldap';
     }
 
+    /**
+     * @return void
+     */
     public function addConfiguration(NodeDefinition $node)
     {
         $node

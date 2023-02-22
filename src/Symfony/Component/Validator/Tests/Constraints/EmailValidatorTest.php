@@ -73,7 +73,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidEmails()
+    public static function getValidEmails()
     {
         return [
             ['fabien@symfony.com'],
@@ -95,7 +95,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getEmailsOnlyValidInLooseMode()
+    public static function getEmailsOnlyValidInLooseMode()
     {
         return [
             ['example@example.co..uk'],
@@ -116,7 +116,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidEmailsWithWhitespaces()
+    public static function getValidEmailsWithWhitespaces()
     {
         return [
             ["\x20example@example.co.uk\x20"],
@@ -137,7 +137,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getEmailsWithWhitespacesOnlyValidInLooseMode()
+    public static function getEmailsWithWhitespacesOnlyValidInLooseMode()
     {
         return [
             ["\x09\x09example@example.co..uk\x09\x09"],
@@ -157,7 +157,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidEmailsHtml5()
+    public static function getValidEmailsHtml5()
     {
         return [
             ['fabien@symfony.com'],
@@ -184,7 +184,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidEmails()
+    public static function getInvalidEmails()
     {
         return [
             ['example'],
@@ -212,7 +212,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
              ->assertRaised();
     }
 
-    public function getInvalidHtml5Emails()
+    public static function getInvalidHtml5Emails()
     {
         return [
             ['example'],
@@ -252,7 +252,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidAllowNoTldEmails()
+    public static function getInvalidAllowNoTldEmails()
     {
         return [
             ['example bar'],
@@ -298,7 +298,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
      */
     public function testModeLoose()
     {
-        $this->expectDeprecation('Since symfony/validator 6.2: The "loose" mode is deprecated. The default mode will be changed to "html5" in 7.0.');
+        $this->expectDeprecation('Since symfony/validator 6.2: The "loose" mode is deprecated. It will be removed in 7.0 and the default mode will be changed to "html5".');
 
         $constraint = new Email(['mode' => Email::VALIDATION_MODE_LOOSE]);
 
@@ -339,7 +339,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     /**
      * @see https://github.com/egulias/EmailValidator/blob/1.2.8/tests/egulias/Tests/EmailValidator/EmailValidatorTest.php
      */
-    public function getInvalidEmailsForStrictChecks()
+    public static function getInvalidEmailsForStrictChecks()
     {
         return [
             ['test@example.com test'],

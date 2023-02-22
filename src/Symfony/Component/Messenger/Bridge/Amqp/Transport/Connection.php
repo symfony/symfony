@@ -312,7 +312,7 @@ class Connection
     /**
      * @throws \AMQPException
      */
-    private function publishWithDelay(string $body, array $headers, int $delay, AmqpStamp $amqpStamp = null)
+    private function publishWithDelay(string $body, array $headers, int $delay, AmqpStamp $amqpStamp = null): void
     {
         $routingKey = $this->getRoutingKeyForMessage($amqpStamp);
         $isRetryAttempt = $amqpStamp ? $amqpStamp->isRetryAttempt() : false;
@@ -328,7 +328,7 @@ class Connection
         );
     }
 
-    private function publishOnExchange(\AMQPExchange $exchange, string $body, string $routingKey = null, array $headers = [], AmqpStamp $amqpStamp = null)
+    private function publishOnExchange(\AMQPExchange $exchange, string $body, string $routingKey = null, array $headers = [], AmqpStamp $amqpStamp = null): void
     {
         $attributes = $amqpStamp ? $amqpStamp->getAttributes() : [];
         $attributes['headers'] = array_merge($attributes['headers'] ?? [], $headers);
@@ -349,7 +349,7 @@ class Connection
         }
     }
 
-    private function setupDelay(int $delay, ?string $routingKey, bool $isRetryAttempt)
+    private function setupDelay(int $delay, ?string $routingKey, bool $isRetryAttempt): void
     {
         if ($this->autoSetupDelayExchange) {
             $this->setupDelayExchange();
@@ -391,7 +391,7 @@ class Connection
             // delete the delay queue 10 seconds after the message expires
             // publishing another message redeclares the queue which renews the lease
             'x-expires' => $delay + 10000,
-            // message should be broadcasted to all consumers during delay, but to only one queue during retry
+            // message should be broadcast to all consumers during delay, but to only one queue during retry
             // empty name is default direct exchange
             'x-dead-letter-exchange' => $isRetryAttempt ? '' : $this->exchangeOptions['name'],
             // after being released from to DLX, make sure the original routing key will be used
@@ -554,7 +554,7 @@ class Connection
         return $this->exchangeOptions['default_publish_routing_key'] ?? null;
     }
 
-    public function purgeQueues()
+    public function purgeQueues(): void
     {
         foreach ($this->getQueueNames() as $queueName) {
             $this->queue($queueName)->purge();

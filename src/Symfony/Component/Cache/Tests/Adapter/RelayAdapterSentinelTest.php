@@ -19,7 +19,7 @@ use Symfony\Component\Cache\Adapter\AbstractAdapter;
 /**
  * @group integration
  */
-class RelayAdapterSentinelTest extends AbstractRedisAdapterTest
+class RelayAdapterSentinelTest extends AbstractRedisAdapterTestCase
 {
     public static function setUpBeforeClass(): void
     {

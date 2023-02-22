@@ -14,10 +14,11 @@ namespace Symfony\Component\VarExporter;
 use Symfony\Component\VarExporter\Internal\Hydrator;
 use Symfony\Component\VarExporter\Internal\LazyObjectRegistry as Registry;
 use Symfony\Component\VarExporter\Internal\LazyObjectState;
+use Symfony\Component\VarExporter\Internal\LazyObjectTrait;
 
 trait LazyGhostTrait
 {
-    private LazyObjectState $lazyObjectState;
+    use LazyObjectTrait;
 
     /**
      * Creates a lazy-loading ghost instance.
@@ -231,7 +232,6 @@ trait LazyGhostTrait
     {
         $propertyScopes = Hydrator::$propertyScopes[$this::class] ??= Hydrator::getPropertyScopes($this::class);
         $scope = null;
-        $state = null;
 
         if ([$class, , $readonlyScope] = $propertyScopes[$name] ?? null) {
             $scope = Registry::getScope($propertyScopes, $class, $name, $readonlyScope);

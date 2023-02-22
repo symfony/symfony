@@ -72,8 +72,8 @@ final class Dotenv
     /**
      * Loads one or several .env files.
      *
-     * @param string   $path          A file to load
-     * @param string[] ...$extraPaths A list of additional files to load
+     * @param string $path          A file to load
+     * @param string ...$extraPaths A list of additional files to load
      *
      * @throws FormatException when a file has a syntax error
      * @throws PathException   when a file does not exist or is not readable
@@ -158,8 +158,8 @@ final class Dotenv
     /**
      * Loads one or several .env files and enables override existing vars.
      *
-     * @param string   $path          A file to load
-     * @param string[] ...$extraPaths A list of additional files to load
+     * @param string $path          A file to load
+     * @param string ...$extraPaths A list of additional files to load
      *
      * @throws FormatException when a file has a syntax error
      * @throws PathException   when a file does not exist or is not readable
@@ -410,7 +410,7 @@ final class Dotenv
         return $value;
     }
 
-    private function skipEmptyLines()
+    private function skipEmptyLines(): void
     {
         if (preg_match('/(?:\s*+(?:#[^\n]*+)?+)++/A', $this->data, $match, 0, $this->cursor)) {
             $this->moveCursor($match[0]);
@@ -534,7 +534,7 @@ final class Dotenv
         return $value;
     }
 
-    private function moveCursor(string $text)
+    private function moveCursor(string $text): void
     {
         $this->cursor += \strlen($text);
         $this->lineno += substr_count($text, "\n");

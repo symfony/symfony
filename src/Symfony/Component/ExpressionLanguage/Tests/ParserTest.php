@@ -47,7 +47,7 @@ class ParserTest extends TestCase
         $this->assertEquals($node, $parser->parse($lexer->tokenize($expression), $names));
     }
 
-    public function getParseData()
+    public static function getParseData()
     {
         $arguments = new Node\ArgumentsNode();
         $arguments->addElement(new Node\ConstantNode('arg1'));
@@ -176,10 +176,10 @@ class ParserTest extends TestCase
 
             // chained calls
             [
-                $this->createGetAttrNode(
-                    $this->createGetAttrNode(
-                        $this->createGetAttrNode(
-                            $this->createGetAttrNode(new Node\NameNode('foo'), 'bar', Node\GetAttrNode::METHOD_CALL),
+                self::createGetAttrNode(
+                    self::createGetAttrNode(
+                        self::createGetAttrNode(
+                            self::createGetAttrNode(new Node\NameNode('foo'), 'bar', Node\GetAttrNode::METHOD_CALL),
                             'foo', Node\GetAttrNode::METHOD_CALL),
                         'baz', Node\GetAttrNode::PROPERTY_CALL),
                     '3', Node\GetAttrNode::ARRAY_CALL),
@@ -233,7 +233,7 @@ class ParserTest extends TestCase
         ];
     }
 
-    private function createGetAttrNode($node, $item, $type)
+    private static function createGetAttrNode($node, $item, $type)
     {
         return new Node\GetAttrNode($node, new Node\ConstantNode($item, Node\GetAttrNode::ARRAY_CALL !== $type), new Node\ArgumentsNode(), $type);
     }
@@ -249,7 +249,7 @@ class ParserTest extends TestCase
         $parser->parse($lexer->tokenize($expr), $names);
     }
 
-    public function getInvalidPostfixData()
+    public static function getInvalidPostfixData()
     {
         return [
             [
@@ -299,7 +299,7 @@ class ParserTest extends TestCase
         $this->expectNotToPerformAssertions();
     }
 
-    public function getLintData(): array
+    public static function getLintData(): array
     {
         return [
             'valid expression' => [

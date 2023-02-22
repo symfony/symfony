@@ -26,7 +26,7 @@ class ProxyHelperTest extends TestCase
         $this->assertSame($expected, ProxyHelper::exportSignature($method));
     }
 
-    public function provideExportSignature()
+    public static function provideExportSignature()
     {
         $methods = (new \ReflectionClass(TestForProxyHelper::class))->getMethods();
         $source = file(__FILE__);
@@ -66,15 +66,12 @@ class ProxyHelperTest extends TestCase
         {
             use \Symfony\Component\VarExporter\LazyProxyTrait;
 
-            private const LAZY_OBJECT_PROPERTY_SCOPES = [
-                'lazyObjectReal' => [self::class, 'lazyObjectReal', null],
-                "\0".self::class."\0lazyObjectReal" => [self::class, 'lazyObjectReal', null],
-            ];
+            private const LAZY_OBJECT_PROPERTY_SCOPES = [];
 
             public function foo1(): ?\Symfony\Component\VarExporter\Tests\Bar
             {
-                if (isset($this->lazyObjectReal)) {
-                    return $this->lazyObjectReal->foo1(...\func_get_args());
+                if (isset($this->lazyObjectState)) {
+                    return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->foo1(...\func_get_args());
                 }
 
                 return parent::foo1(...\func_get_args());
@@ -82,8 +79,8 @@ class ProxyHelperTest extends TestCase
 
             public function foo4(\Symfony\Component\VarExporter\Tests\Bar|string $b): void
             {
-                if (isset($this->lazyObjectReal)) {
-                    $this->lazyObjectReal->foo4(...\func_get_args());
+                if (isset($this->lazyObjectState)) {
+                    ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->foo4(...\func_get_args());
                 } else {
                     parent::foo4(...\func_get_args());
                 }
@@ -91,8 +88,8 @@ class ProxyHelperTest extends TestCase
 
             protected function foo7()
             {
-                if (isset($this->lazyObjectReal)) {
-                    return $this->lazyObjectReal->foo7(...\func_get_args());
+                if (isset($this->lazyObjectState)) {
+                    return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->foo7(...\func_get_args());
                 }
 
                 return throw new \BadMethodCallException('Cannot forward abstract method "Symfony\Component\VarExporter\Tests\TestForProxyHelper::foo7()".');
@@ -116,15 +113,12 @@ class ProxyHelperTest extends TestCase
         {
             use \Symfony\Component\VarExporter\LazyProxyTrait;
 
-            private const LAZY_OBJECT_PROPERTY_SCOPES = [
-                'lazyObjectReal' => [self::class, 'lazyObjectReal', null],
-                "\0".self::class."\0lazyObjectReal" => [self::class, 'lazyObjectReal', null],
-            ];
+            private const LAZY_OBJECT_PROPERTY_SCOPES = [];
 
             public function initializeLazyObject(): \Symfony\Component\VarExporter\Tests\TestForProxyHelperInterface1&\Symfony\Component\VarExporter\Tests\TestForProxyHelperInterface2
             {
-                if (isset($this->lazyObjectReal)) {
-                    return $this->lazyObjectReal;
+                if ($state = $this->lazyObjectState ?? null) {
+                    return $state->realInstance ??= ($state->initializer)();
                 }
 
                 return $this;
@@ -132,8 +126,8 @@ class ProxyHelperTest extends TestCase
 
             public function foo1(): ?\Symfony\Component\VarExporter\Tests\Bar
             {
-                if (isset($this->lazyObjectReal)) {
-                    return $this->lazyObjectReal->foo1(...\func_get_args());
+                if (isset($this->lazyObjectState)) {
+                    return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->foo1(...\func_get_args());
                 }
 
                 return throw new \BadMethodCallException('Cannot forward abstract method "Symfony\Component\VarExporter\Tests\TestForProxyHelperInterface1::foo1()".');
@@ -141,8 +135,8 @@ class ProxyHelperTest extends TestCase
 
             public function foo2(?\Symfony\Component\VarExporter\Tests\Bar $b): \Symfony\Component\VarExporter\Tests\TestForProxyHelperInterface2
             {
-                if (isset($this->lazyObjectReal)) {
-                    return $this->lazyObjectReal->foo2(...\func_get_args());
+                if (isset($this->lazyObjectState)) {
+                    return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->foo2(...\func_get_args());
                 }
 
                 return throw new \BadMethodCallException('Cannot forward abstract method "Symfony\Component\VarExporter\Tests\TestForProxyHelperInterface2::foo2()".');
@@ -170,8 +164,8 @@ class ProxyHelperTest extends TestCase
 
             public function foo(#[\SensitiveParameter] $a): int
             {
-                if (isset($this->lazyObjectReal)) {
-                    return $this->lazyObjectReal->foo(...\func_get_args());
+                if (isset($this->lazyObjectState)) {
+                    return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->foo(...\func_get_args());
                 }
 
                 return parent::foo(...\func_get_args());

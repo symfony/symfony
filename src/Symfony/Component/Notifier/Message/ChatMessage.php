@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Notification\Notification;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ChatMessage implements MessageInterface
+class ChatMessage implements MessageInterface, FromNotificationInterface
 {
     private ?string $transport = null;
     private string $subject;

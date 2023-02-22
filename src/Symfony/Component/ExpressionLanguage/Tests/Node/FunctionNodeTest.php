@@ -15,30 +15,30 @@ use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 use Symfony\Component\ExpressionLanguage\Node\FunctionNode;
 use Symfony\Component\ExpressionLanguage\Node\Node;
 
-class FunctionNodeTest extends AbstractNodeTest
+class FunctionNodeTest extends AbstractNodeTestCase
 {
-    public function getEvaluateData()
+    public static function getEvaluateData(): array
     {
         return [
-            ['bar', new FunctionNode('foo', new Node([new ConstantNode('bar')])), [], ['foo' => $this->getCallables()]],
+            ['bar', new FunctionNode('foo', new Node([new ConstantNode('bar')])), [], ['foo' => static::getCallables()]],
         ];
     }
 
-    public function getCompileData()
+    public static function getCompileData(): array
     {
         return [
-            ['foo("bar")', new FunctionNode('foo', new Node([new ConstantNode('bar')])), ['foo' => $this->getCallables()]],
+            ['foo("bar")', new FunctionNode('foo', new Node([new ConstantNode('bar')])), ['foo' => static::getCallables()]],
         ];
     }
 
-    public function getDumpData()
+    public static function getDumpData(): array
     {
         return [
-            ['foo("bar")', new FunctionNode('foo', new Node([new ConstantNode('bar')])), ['foo' => $this->getCallables()]],
+            ['foo("bar")', new FunctionNode('foo', new Node([new ConstantNode('bar')])), ['foo' => static::getCallables()]],
         ];
     }
 
-    protected function getCallables()
+    protected static function getCallables(): array
     {
         return [
             'compiler' => fn ($arg) => sprintf('foo(%s)', $arg),

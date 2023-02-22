@@ -15,9 +15,9 @@ use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Notifier\Bridge\KazInfoTeh\KazInfoTehTransport;
 use Symfony\Component\Notifier\Exception\TransportException;
-use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
+use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -26,26 +26,26 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class KazInfoTehTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(HttpClientInterface $client = null): TransportInterface
     {
-        return (new KazInfoTehTransport('username', 'password', 'sender', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('test.host');
+        return (new KazInfoTehTransport('username', 'password', 'sender', $client ?? new MockHttpClient()))->setHost('test.host');
     }
 
-    public function toStringProvider(): iterable
+    public static function toStringProvider(): iterable
     {
-        yield ['kaz-info-teh://test.host?sender=sender', $this->createTransport()];
+        yield ['kaz-info-teh://test.host?sender=sender', self::createTransport()];
     }
 
-    public function supportedMessagesProvider(): iterable
+    public static function supportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('77000000000', 'KazInfoTeh!')];
     }
 
-    public function unsupportedMessagesProvider(): iterable
+    public static function unsupportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('420000000000', 'KazInfoTeh!')];
 
-        yield [$this->createMock(MessageInterface::class)];
+        yield [new DummyMessage()];
     }
 
     public function createClient(int $statusCode, string $content): HttpClientInterface
@@ -53,7 +53,7 @@ final class KazInfoTehTransportTest extends TransportTestCase
         return new MockHttpClient(new MockResponse($content, ['http_code' => $statusCode]));
     }
 
-    public function responseProvider(): iterable
+    public static function responseProvider(): iterable
     {
         $responses = [
             ['status' => 200, 'content' => '<?xml version="1.0" encoding="utf-8" ?><acceptreport><statuscode>1</statuscode><statusmessage>Status code is not valid</statusmessage></acceptreport>', 'error_message' => 'Unable to send the SMS: "Status code is not valid".'],

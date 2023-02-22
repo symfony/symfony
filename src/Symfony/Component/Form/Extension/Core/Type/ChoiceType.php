@@ -420,7 +420,7 @@ class ChoiceType extends AbstractType
         $builder->add($name, $choiceType, $choiceOpts);
     }
 
-    private function createChoiceList(array $options)
+    private function createChoiceList(array $options): ChoiceListInterface
     {
         if (null !== $options['choice_loader']) {
             return $this->choiceListFactory->createListFromLoader(
@@ -440,7 +440,7 @@ class ChoiceType extends AbstractType
         );
     }
 
-    private function createChoiceListView(ChoiceListInterface $choiceList, array $options)
+    private function createChoiceListView(ChoiceListInterface $choiceList, array $options): ChoiceListView
     {
         return $this->choiceListFactory->createView(
             $choiceList,

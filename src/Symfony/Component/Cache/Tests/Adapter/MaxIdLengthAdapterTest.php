@@ -27,7 +27,7 @@ class MaxIdLengthAdapterTest extends TestCase
         $cache->expects($this->exactly(2))
             ->method('doHave')
             ->withConsecutive(
-                [$this->equalTo('----------:nWfzGiCgLczv3SSUzXL3kg:')],
+                [$this->equalTo('----------:z5XrNUPebf0nPxQwjc6C1A:')],
                 [$this->equalTo('----------:---------------------------------------')]
             )->willReturn(false);
 

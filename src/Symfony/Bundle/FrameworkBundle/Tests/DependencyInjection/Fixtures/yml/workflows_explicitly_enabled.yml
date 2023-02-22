@@ -6,7 +6,7 @@ framework:
             foo:
                 type: workflow
                 supports:
-                    - Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest
+                    - Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTestCase
                 initial_marking: [bar]
                 places:
                     - bar

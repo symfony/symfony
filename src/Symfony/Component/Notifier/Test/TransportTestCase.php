@@ -27,22 +27,22 @@ abstract class TransportTestCase extends TestCase
     protected const CUSTOM_HOST = 'host.test';
     protected const CUSTOM_PORT = 42;
 
-    abstract public function createTransport(HttpClientInterface $client = null): TransportInterface;
+    abstract public static function createTransport(HttpClientInterface $client = null): TransportInterface;
 
     /**
      * @return iterable<array{0: string, 1: TransportInterface}>
      */
-    abstract public function toStringProvider(): iterable;
+    abstract public static function toStringProvider(): iterable;
 
     /**
      * @return iterable<array{0: MessageInterface, 1: TransportInterface}>
      */
-    abstract public function supportedMessagesProvider(): iterable;
+    abstract public static function supportedMessagesProvider(): iterable;
 
     /**
      * @return iterable<array{0: MessageInterface, 1: TransportInterface}>
      */
-    abstract public function unsupportedMessagesProvider(): iterable;
+    abstract public static function unsupportedMessagesProvider(): iterable;
 
     /**
      * @dataProvider toStringProvider

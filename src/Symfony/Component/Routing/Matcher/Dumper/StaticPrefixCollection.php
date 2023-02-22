@@ -61,7 +61,7 @@ class StaticPrefixCollection
     /**
      * Adds a route to a group.
      */
-    public function addRoute(string $prefix, array|StaticPrefixCollection $route)
+    public function addRoute(string $prefix, array|StaticPrefixCollection $route): void
     {
         [$prefix, $staticPrefix] = $this->getCommonPrefix($prefix, $prefix);
 
@@ -196,7 +196,7 @@ class StaticPrefixCollection
         return [substr($prefix, 0, $i), substr($prefix, 0, $staticLength ?? $i)];
     }
 
-    public static function handleError(int $type, string $msg)
+    public static function handleError(int $type, string $msg): bool
     {
         return str_contains($msg, 'Compilation failed: lookbehind assertion is not fixed length');
     }

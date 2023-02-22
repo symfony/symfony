@@ -63,7 +63,7 @@ class ProjectServiceContainer extends Container
 
         $b = ($container->privates['App\\Schema'] ?? self::getSchemaService($container));
         $c = new \App\Registry();
-        $c->processor = [0 => $a, 1 => $instance];
+        $c->processor = [$a, $instance];
 
         $d = new \App\Processor($c, $a);
 

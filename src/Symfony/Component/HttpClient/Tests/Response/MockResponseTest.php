@@ -75,7 +75,7 @@ class MockResponseTest extends TestCase
         $this->assertSame($url, $responseMock->getRequestUrl());
     }
 
-    public function toArrayErrors()
+    public static function toArrayErrors()
     {
         yield [
             'content' => '',

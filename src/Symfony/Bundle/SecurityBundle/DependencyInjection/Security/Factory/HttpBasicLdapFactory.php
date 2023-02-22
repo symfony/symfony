@@ -70,7 +70,7 @@ class HttpBasicLdapFactory extends HttpBasicFactory
         return [$provider, $listenerId, $entryPointId];
     }
 
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(NodeDefinition $node): void
     {
         parent::addConfiguration($node);
 

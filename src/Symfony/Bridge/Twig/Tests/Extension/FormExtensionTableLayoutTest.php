@@ -17,12 +17,12 @@ use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\Tests\AbstractTableLayoutTest;
+use Symfony\Component\Form\Tests\AbstractTableLayoutTestCase;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
-class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
+class FormExtensionTableLayoutTest extends AbstractTableLayoutTestCase
 {
     use RuntimeLoaderProvider;
 

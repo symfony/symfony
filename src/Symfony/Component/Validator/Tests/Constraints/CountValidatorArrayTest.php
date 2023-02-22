@@ -14,9 +14,9 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class CountValidatorArrayTest extends CountValidatorTest
+class CountValidatorArrayTest extends CountValidatorTestCase
 {
-    protected function createCollection(array $content)
+    protected static function createCollection(array $content)
     {
         return $content;
     }

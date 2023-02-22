@@ -1,4 +1,4 @@
-name: Package
+name: Verify Packages
 
 on:
   pull_request:
@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   verify:
-    name: Verify
+    name: Verify Packages
     runs-on: Ubuntu-20.04
     steps:
       - name: Checkout code
@@ -42,7 +42,7 @@ jobs:
           }
 
           _correct_license_file() {
-            FIRST_LINE="Copyright (c) $(date +"%Y") Fabien Potencier"
+            FIRST_LINE="Copyright (c) $(date +"%Y")-present Fabien Potencier"
             PACKAGE_FIRST_LINE=$(head -1 ${1})
             if [[ "$FIRST_LINE" != "$PACKAGE_FIRST_LINE" ]]; then
               echo "First line of the license file is wrong. Maybe it is the wrong year?"

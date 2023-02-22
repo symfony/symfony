@@ -36,6 +36,9 @@ class TransformationFailureListener implements EventSubscriberInterface
         ];
     }
 
+    /**
+     * @return void
+     */
     public function convertTransformationFailureToFormError(FormEvent $event)
     {
         $form = $event->getForm();

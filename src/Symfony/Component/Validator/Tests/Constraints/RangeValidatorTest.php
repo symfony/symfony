@@ -31,7 +31,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getTenToTwenty()
+    public static function getTenToTwenty()
     {
         return [
             [10.00001],
@@ -45,7 +45,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function getLessThanTen()
+    public static function getLessThanTen()
     {
         return [
             [9.99999, '9.99999'],
@@ -55,7 +55,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function getMoreThanTwenty()
+    public static function getMoreThanTwenty()
     {
         return [
             [20.000001, '20.000001'],
@@ -277,11 +277,12 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getTenthToTwentiethMarch2014()
+    public static function getTenthToTwentiethMarch2014()
     {
         // The provider runs before setUp(), so we need to manually fix
         // the default timezone
-        $this->setDefaultTimezone('UTC');
+        $timezone = date_default_timezone_get();
+        date_default_timezone_set('UTC');
 
         $tests = [
             [new \DateTime('March 10, 2014')],
@@ -293,16 +294,17 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         $tests[] = [new \DateTimeImmutable('March 15, 2014')];
         $tests[] = [new \DateTimeImmutable('March 20, 2014')];
 
-        $this->restoreDefaultTimezone();
+        date_default_timezone_set($timezone);
 
         return $tests;
     }
 
-    public function getSoonerThanTenthMarch2014()
+    public static function getSoonerThanTenthMarch2014()
     {
         // The provider runs before setUp(), so we need to manually fix
         // the default timezone
-        $this->setDefaultTimezone('UTC');
+        $timezone = date_default_timezone_get();
+        date_default_timezone_set('UTC');
 
         $tests = [
             [new \DateTime('March 20, 2013'), 'Mar 20, 2013, 12:00 AM'],
@@ -312,16 +314,17 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         $tests[] = [new \DateTimeImmutable('March 20, 2013'), 'Mar 20, 2013, 12:00 AM'];
         $tests[] = [new \DateTimeImmutable('March 9, 2014'), 'Mar 9, 2014, 12:00 AM'];
 
-        $this->restoreDefaultTimezone();
+        date_default_timezone_set($timezone);
 
         return $tests;
     }
 
-    public function getLaterThanTwentiethMarch2014()
+    public static function getLaterThanTwentiethMarch2014()
     {
         // The provider runs before setUp(), so we need to manually fix
         // the default timezone
-        $this->setDefaultTimezone('UTC');
+        $timezone = date_default_timezone_get();
+        date_default_timezone_set('UTC');
 
         $tests = [
             [new \DateTime('March 21, 2014'), 'Mar 21, 2014, 12:00 AM'],
@@ -331,7 +334,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         $tests[] = [new \DateTimeImmutable('March 21, 2014'), 'Mar 21, 2014, 12:00 AM'];
         $tests[] = [new \DateTimeImmutable('March 9, 2015'), 'Mar 9, 2015, 12:00 AM'];
 
-        $this->restoreDefaultTimezone();
+        date_default_timezone_set($timezone);
 
         return $tests;
     }
@@ -593,7 +596,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         ]));
     }
 
-    public function throwsOnInvalidStringDatesProvider(): array
+    public static function throwsOnInvalidStringDatesProvider(): array
     {
         return [
             ['The min value "foo" could not be converted to a "DateTimeImmutable" instance in the "Symfony\Component\Validator\Constraints\Range" constraint.', new \DateTimeImmutable(), 'foo', null],
@@ -1017,7 +1020,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function provideMessageIfMinAndMaxSet(): array
+    public static function provideMessageIfMinAndMaxSet(): array
     {
         $notInRangeMessage = (new Range(['min' => '']))->notInRangeMessage;
 

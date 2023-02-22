@@ -16,7 +16,7 @@ use PHPUnit\Framework\SkippedTestSuiteError;
 /**
  * @group integration
  */
-class RedisArrayAdapterTest extends AbstractRedisAdapterTest
+class RedisArrayAdapterTest extends AbstractRedisAdapterTestCase
 {
     public static function setUpBeforeClass(): void
     {

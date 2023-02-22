@@ -182,7 +182,6 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
     private function getReflectionParameterFromConstructor(string $property, \ReflectionMethod $reflectionConstructor): ?\ReflectionParameter
     {
-        $reflectionParameter = null;
         foreach ($reflectionConstructor->getParameters() as $reflectionParameter) {
             if ($reflectionParameter->getName() === $property) {
                 return $reflectionParameter;

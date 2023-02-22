@@ -84,7 +84,7 @@ class DebugCommandTest extends TestCase
         $this->assertStringMatchesFormat($output, $tester->getDisplay(true));
     }
 
-    public function getDebugTemplateNameTestData()
+    public static function getDebugTemplateNameTestData()
     {
         $defaultPaths = [
             'templates/' => null,
@@ -311,7 +311,7 @@ TXT
         $this->assertSame($expectedSuggestions, $suggestions);
     }
 
-    public function provideCompletionSuggestions(): iterable
+    public static function provideCompletionSuggestions(): iterable
     {
         yield 'name' => [['email'], []];
         yield 'option --format' => [['--format', ''], ['text', 'json']];

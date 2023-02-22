@@ -15,9 +15,10 @@ use PHPUnit\Framework\SkippedTestSuiteError;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
+ *
  * @group integration
  */
-class PredisStoreTest extends AbstractRedisStoreTest
+class PredisStoreTest extends AbstractRedisStoreTestCase
 {
     public static function setUpBeforeClass(): void
     {

@@ -17,32 +17,32 @@ use Symfony\Component\Mime\Part\File;
 use Symfony\Component\Notifier\Bridge\Twitter\TwitterOptions;
 use Symfony\Component\Notifier\Bridge\Twitter\TwitterTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
+use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class TwitterTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null): TwitterTransport
+    public static function createTransport(HttpClientInterface $client = null): TwitterTransport
     {
-        return new TwitterTransport('APIK', 'APIS', 'TOKEN', 'SECRET', $client ?? $this->createMock(HttpClientInterface::class));
+        return new TwitterTransport('APIK', 'APIS', 'TOKEN', 'SECRET', $client ?? new MockHttpClient());
     }
 
-    public function toStringProvider(): iterable
+    public static function toStringProvider(): iterable
     {
-        yield ['twitter://api.twitter.com', $this->createTransport()];
+        yield ['twitter://api.twitter.com', self::createTransport()];
     }
 
-    public function supportedMessagesProvider(): iterable
+    public static function supportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
     }
 
-    public function unsupportedMessagesProvider(): iterable
+    public static function unsupportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [new DummyMessage()];
     }
 
     public function testBasicTweet()
@@ -66,7 +66,7 @@ class TwitterTransportTest extends TransportTestCase
         $transport = $this->createTransport(new MockHttpClient((function () {
             yield function (string $method, string $url, array $options) {
                 $this->assertSame('POST', $method);
-                $this->assertSame('https://upload.twitter.com/1.1/media/upload.json?command=INIT&total_bytes=185&media_type=image%2Fgif&media_category=tweet_image', $url);
+                $this->assertSame('https://upload.twitter.com/1.1/media/upload.json?command=INIT&total_bytes=185&media_type=image/gif&media_category=tweet_image', $url);
                 $this->assertArrayHasKey('authorization', $options['normalized_headers']);
 
                 return new MockResponse('{"media_id_string":"gif123"}');
@@ -127,7 +127,7 @@ class TwitterTransportTest extends TransportTestCase
         $transport = $this->createTransport(new MockHttpClient((function () {
             yield function (string $method, string $url, array $options) {
                 $this->assertSame('POST', $method);
-                $this->assertSame('https://upload.twitter.com/1.1/media/upload.json?command=INIT&total_bytes=185&media_type=image%2Fgif&media_category=tweet_video', $url);
+                $this->assertSame('https://upload.twitter.com/1.1/media/upload.json?command=INIT&total_bytes=185&media_type=image/gif&media_category=tweet_video', $url);
                 $this->assertArrayHasKey('authorization', $options['normalized_headers']);
 
                 return new MockResponse('{"media_id_string":"gif123"}');
@@ -135,7 +135,7 @@ class TwitterTransportTest extends TransportTestCase
 
             yield function (string $method, string $url, array $options) {
                 $this->assertSame('POST', $method);
-                $this->assertSame('https://upload.twitter.com/1.1/media/upload.json?command=INIT&total_bytes=185&media_type=image%2Fgif&media_category=subtitles', $url);
+                $this->assertSame('https://upload.twitter.com/1.1/media/upload.json?command=INIT&total_bytes=185&media_type=image/gif&media_category=subtitles', $url);
                 $this->assertArrayHasKey('authorization', $options['normalized_headers']);
 
                 return new MockResponse('{"media_id_string":"sub234"}');

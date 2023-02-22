@@ -63,7 +63,7 @@ class BrowserChannelTest extends TestCase
         $browserChannel->notify($notification, $recipient);
     }
 
-    public function defaultFlashMessageImportanceDataProvider(): array
+    public static function defaultFlashMessageImportanceDataProvider(): array
     {
         return [
             [new DefaultFlashMessageImportanceMapper(), Notification::IMPORTANCE_URGENT, 'notification'],

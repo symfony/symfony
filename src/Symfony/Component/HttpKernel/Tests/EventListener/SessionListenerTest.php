@@ -81,7 +81,7 @@ class SessionListenerTest extends TestCase
         }
     }
 
-    public function provideSessionOptions(): \Generator
+    public static function provideSessionOptions(): \Generator
     {
         yield 'set_samesite_by_php' => [
             'phpSessionOptions' => ['samesite' => Cookie::SAMESITE_STRICT],
@@ -618,6 +618,30 @@ class SessionListenerTest extends TestCase
         $this->assertFalse($response->headers->has(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER));
     }
 
+    public function testPrivateResponseMaxAgeIsRespectedIfSessionStarted()
+    {
+        $kernel = $this->createMock(HttpKernelInterface::class);
+
+        $session = $this->createMock(Session::class);
+        $session->expects($this->once())->method('getUsageIndex')->willReturn(1);
+        $request = new Request([], [], [], [], [], ['SERVER_PROTOCOL' => 'HTTP/1.0']);
+        $request->setSession($session);
+
+        $response = new Response();
+        $response->headers->set('Cache-Control', 'no-cache');
+        $response->prepare($request);
+
+        $listener = new SessionListener(new Container());
+        $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response));
+
+        $this->assertSame(0, $response->getMaxAge());
+        $this->assertFalse($response->headers->hasCacheControlDirective('public'));
+        $this->assertTrue($response->headers->hasCacheControlDirective('private'));
+        $this->assertTrue($response->headers->hasCacheControlDirective('must-revalidate'));
+        $this->assertLessThanOrEqual(new \DateTimeImmutable('now', new \DateTimeZone('UTC')), new \DateTimeImmutable($response->headers->get('Expires')));
+        $this->assertFalse($response->headers->has(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER));
+    }
+
     public function testSurrogateMainRequestIsPublic()
     {
         $session = $this->createMock(Session::class);
@@ -686,6 +710,27 @@ class SessionListenerTest extends TestCase
 
         // calling the factory on the subRequest should not trigger a second call to storage->setOptions()
         $subRequest->getSession();
+    }
+
+    public function testGetSessionSetsSessionOnMainRequest()
+    {
+        $mainRequest = new Request();
+        $listener = $this->createListener($mainRequest, new NativeSessionStorageFactory());
+
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $mainRequest, HttpKernelInterface::MAIN_REQUEST);
+        $listener->onKernelRequest($event);
+
+        $this->assertFalse($mainRequest->hasSession(true));
+
+        $subRequest = $mainRequest->duplicate();
+
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $subRequest, HttpKernelInterface::SUB_REQUEST);
+        $listener->onKernelRequest($event);
+
+        $session = $subRequest->getSession();
+
+        $this->assertTrue($mainRequest->hasSession(true));
+        $this->assertSame($session, $mainRequest->getSession());
     }
 
     public function testSessionUsageExceptionIfStatelessAndSessionUsed()

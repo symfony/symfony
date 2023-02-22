@@ -131,16 +131,22 @@ abstract class ConstraintValidatorTestCase extends TestCase
         $context->setNode($this->value, $this->object, $this->metadata, $this->propertyPath);
         $context->setConstraint($this->constraint);
 
-        $contextualValidator = $this->getMockBuilder(AssertingContextualValidator::class)
-            ->setConstructorArgs([$context])
-            ->setMethods([
-                'atPath',
-                'validate',
-                'validateProperty',
-                'validatePropertyValue',
-                'getViolations',
-            ])
-            ->getMock();
+        $contextualValidatorMockBuilder = $this->getMockBuilder(AssertingContextualValidator::class)
+            ->setConstructorArgs([$context]);
+        $contextualValidatorMethods = [
+            'atPath',
+            'validate',
+            'validateProperty',
+            'validatePropertyValue',
+            'getViolations',
+        ];
+        // PHPUnit 10 removed MockBuilder::setMethods()
+        if (method_exists($contextualValidatorMockBuilder, 'onlyMethods')) {
+            $contextualValidatorMockBuilder->onlyMethods($contextualValidatorMethods);
+        } else {
+            $contextualValidatorMockBuilder->setMethods($contextualValidatorMethods);
+        }
+        $contextualValidator = $contextualValidatorMockBuilder->getMock();
         $contextualValidator->expects($this->any())
             ->method('atPath')
             ->willReturnCallback(fn ($path) => $contextualValidator->doAtPath($path));
@@ -408,7 +414,7 @@ final class ConstraintViolationAssertion
         return new self($this->context, $message, $this->constraint, $assertions);
     }
 
-    public function assertRaised()
+    public function assertRaised(): void
     {
         $expected = [];
         foreach ($this->assertions as $assertion) {
@@ -558,17 +564,17 @@ class AssertingContextualValidator implements ContextualValidatorInterface
         throw new \BadMethodCallException();
     }
 
-    public function doGetViolations()
+    public function doGetViolations(): ConstraintViolationListInterface
     {
         return $this->context->getViolations();
     }
 
-    public function expectNoValidate()
+    public function expectNoValidate(): void
     {
         $this->expectNoValidate = true;
     }
 
-    public function expectValidation(string $call, ?string $propertyPath, mixed $value, string|GroupSequence|array|null $group, callable $constraints, ConstraintViolationInterface $violation = null)
+    public function expectValidation(string $call, ?string $propertyPath, mixed $value, string|GroupSequence|array|null $group, callable $constraints, ConstraintViolationInterface $violation = null): void
     {
         if (null !== $propertyPath) {
             $this->expectedAtPath[$call] = $propertyPath;

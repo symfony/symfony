@@ -45,7 +45,7 @@ final class CachePoolClearCommand extends Command
         $this->poolNames = $poolNames;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDefinition([

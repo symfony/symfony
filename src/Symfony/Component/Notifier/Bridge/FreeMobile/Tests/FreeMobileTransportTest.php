@@ -11,37 +11,38 @@
 
 namespace Symfony\Component\Notifier\Bridge\FreeMobile\Tests;
 
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransport;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
+use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class FreeMobileTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null): FreeMobileTransport
+    public static function createTransport(HttpClientInterface $client = null): FreeMobileTransport
     {
-        return new FreeMobileTransport('login', 'pass', '0611223344', $client ?? $this->createMock(HttpClientInterface::class));
+        return new FreeMobileTransport('login', 'pass', '0611223344', $client ?? new MockHttpClient());
     }
 
-    public function toStringProvider(): iterable
+    public static function toStringProvider(): iterable
     {
-        yield ['freemobile://smsapi.free-mobile.fr/sendmsg?phone=0611223344', $this->createTransport()];
+        yield ['freemobile://smsapi.free-mobile.fr/sendmsg?phone=0611223344', self::createTransport()];
     }
 
-    public function supportedMessagesProvider(): iterable
+    public static function supportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
         yield [new SmsMessage('+33611223344', 'Hello!')];
     }
 
-    public function unsupportedMessagesProvider(): iterable
+    public static function unsupportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0699887766', 'Hello!')]; // because this phone number is not configured on the transport!
         yield [new ChatMessage('Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [new DummyMessage()];
     }
 
     public function testSmsMessageWithFrom()

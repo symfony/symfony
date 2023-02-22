@@ -28,7 +28,7 @@ class AbstractTokenTest extends TestCase
         $this->assertEquals($username, $token->getUserIdentifier());
     }
 
-    public function provideUsers()
+    public static function provideUsers()
     {
         yield [new InMemoryUser('fabien', null), 'fabien'];
     }

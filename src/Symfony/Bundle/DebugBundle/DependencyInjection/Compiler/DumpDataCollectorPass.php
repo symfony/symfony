@@ -22,6 +22,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class DumpDataCollectorPass implements CompilerPassInterface
 {
+    /**
+     * @return void
+     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition('data_collector.dump')) {

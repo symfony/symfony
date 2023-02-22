@@ -225,6 +225,7 @@ class PdoSessionHandler extends AbstractSessionHandler
                 throw new \DomainException(sprintf('Creating the session table is currently not implemented for PDO driver "%s".', $this->driver));
         }
         $table->setPrimaryKey([$this->idCol]);
+        $table->addIndex([$this->lifetimeCol], $this->lifetimeCol.'_idx');
     }
 
     /**
@@ -234,6 +235,8 @@ class PdoSessionHandler extends AbstractSessionHandler
      * for a 512 bit configured session.hash_function like Whirlpool. Session data is
      * saved in a BLOB. One could also use a shorter inlined varbinary column
      * if one was sure the data fits into it.
+     *
+     * @return void
      *
      * @throws \PDOException    When the table already exists
      * @throws \DomainException When an unsupported PDO driver is used
@@ -259,7 +262,7 @@ class PdoSessionHandler extends AbstractSessionHandler
 
         try {
             $this->pdo->exec($sql);
-            $this->pdo->exec("CREATE INDEX expiry ON $this->table ($this->lifetimeCol)");
+            $this->pdo->exec("CREATE INDEX {$this->lifetimeCol}_idx ON $this->table ($this->lifetimeCol)");
         } catch (\PDOException $e) {
             $this->rollback();
 

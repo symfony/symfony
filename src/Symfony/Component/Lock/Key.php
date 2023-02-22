@@ -60,7 +60,7 @@ final class Key
         $this->serializable = false;
     }
 
-    public function resetLifetime()
+    public function resetLifetime(): void
     {
         $this->expiringTime = null;
     }
@@ -68,7 +68,7 @@ final class Key
     /**
      * @param float $ttl the expiration delay of locks in seconds
      */
-    public function reduceLifetime(float $ttl)
+    public function reduceLifetime(float $ttl): void
     {
         $newTime = microtime(true) + $ttl;
 

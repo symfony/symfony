@@ -66,6 +66,9 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
         throw new TokenNotFoundException('No token found.');
     }
 
+    /**
+     * @return void
+     */
     public function deleteTokenBySeries(string $series)
     {
         $sql = 'DELETE FROM rememberme_token WHERE series=:series';
@@ -78,6 +81,9 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
         }
     }
 
+    /**
+     * @return void
+     */
     public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed)
     {
         $sql = 'UPDATE rememberme_token SET value=:value, lastUsed=:lastUsed WHERE series=:series';
@@ -101,6 +107,9 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
         }
     }
 
+    /**
+     * @return void
+     */
     public function createNewToken(PersistentTokenInterface $token)
     {
         $sql = 'INSERT INTO rememberme_token (class, username, series, value, lastUsed) VALUES (:class, :username, :series, :value, :lastUsed)';

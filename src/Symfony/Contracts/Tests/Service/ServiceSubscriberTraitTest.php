@@ -68,6 +68,18 @@ class ServiceSubscriberTraitTest extends TestCase
         $this->assertNull($service->setContainer($container));
         $this->assertSame([], $service::getSubscribedServices());
     }
+
+    public function testSetContainerCalledFirstOnParent()
+    {
+        $container1 = new class([]) implements ContainerInterface {
+            use ServiceLocatorTrait;
+        };
+        $container2 = clone $container1;
+
+        $testService = new TestService2();
+        $this->assertNull($testService->setContainer($container1));
+        $this->assertSame($container1, $testService->setContainer($container2));
+    }
 }
 
 class ParentTestService
@@ -76,7 +88,7 @@ class ParentTestService
     {
     }
 
-    public function setContainer(ContainerInterface $container)
+    public function setContainer(ContainerInterface $container): ?ContainerInterface
     {
         return $container;
     }
@@ -125,4 +137,23 @@ class ParentWithMagicCall
 
 class Service3
 {
+}
+
+class ParentTestService2
+{
+    /** @var ContainerInterface */
+    protected $container;
+
+    public function setContainer(ContainerInterface $container)
+    {
+        $previous = $this->container;
+        $this->container = $container;
+
+        return $previous;
+    }
+}
+
+class TestService2 extends ParentTestService2 implements ServiceSubscriberInterface
+{
+    use ServiceSubscriberTrait;
 }

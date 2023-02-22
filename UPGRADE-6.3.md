@@ -48,6 +48,11 @@ HttpKernel
 
  * Deprecate parameters `container.dumper.inline_factories` and `container.dumper.inline_class_loader`, use `.container.dumper.inline_factories` and `.container.dumper.inline_class_loader` instead
 
+Lock
+----
+
+ * Deprecate the `gcProbablity` option to fix a typo in its name, use the `gcProbability` option instead
+
 Messenger
 ---------
 
@@ -55,6 +60,12 @@ Messenger
    `Symfony\Component\Messenger\Transport\InMemoryTransportFactory` in favor of
    `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport` and
    `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransportFactory`
+
+Notifier
+--------
+
+ * [BC BREAK] The following data providers for `TransportTestCase` are now static: `toStringProvider()`, `supportedMessagesProvider()` and `unsupportedMessagesProvider()`
+ * [BC BREAK] The `TransportTestCase::createTransport()` method is now static
 
 SecurityBundle
 --------------

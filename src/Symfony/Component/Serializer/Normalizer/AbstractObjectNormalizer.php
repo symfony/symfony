@@ -730,7 +730,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         unset($context['cache_key']); // avoid artificially different keys
 
         try {
-            return md5($format.serialize([
+            return hash('xxh128', $format.serialize([
                 'context' => $context,
                 'ignored' => $context[self::IGNORED_ATTRIBUTES] ?? $this->defaultContext[self::IGNORED_ATTRIBUTES],
             ]));
@@ -766,7 +766,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             if (!$serializedPath = $metadata->getSerializedPath()) {
                 continue;
             }
-            $serializedPath = $metadata->getSerializedPath();
             $pathIdentifier = implode(',', $serializedPath->getElements());
             if (isset($serializedPaths[$pathIdentifier])) {
                 throw new LogicException(sprintf('Duplicate serialized path: "%s" used for properties "%s" and "%s".', $pathIdentifier, $serializedPaths[$pathIdentifier], $name));

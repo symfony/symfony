@@ -30,14 +30,14 @@ class FirePHPHandler extends BaseFirePHPHandler
     /**
      * Adds the headers to the response once it's created.
      */
-    public function onKernelResponse(ResponseEvent $event)
+    public function onKernelResponse(ResponseEvent $event): void
     {
         if (!$event->isMainRequest()) {
             return;
         }
 
         $request = $event->getRequest();
-        if (!preg_match('{\bFirePHP/\d+\.\d+\b}', $request->headers->get('User-Agent'))
+        if (!preg_match('{\bFirePHP/\d+\.\d+\b}', $request->headers->get('User-Agent', ''))
             && !$request->headers->has('X-FirePHP-Version')) {
             self::$sendHeaders = false;
             $this->headers = [];

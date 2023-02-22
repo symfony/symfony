@@ -47,6 +47,9 @@ class DateTimeType extends AbstractType
         \IntlDateFormatter::SHORT,
     ];
 
+    /**
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $parts = ['year', 'month', 'day', 'hour'];
@@ -197,6 +200,9 @@ class DateTimeType extends AbstractType
         }
     }
 
+    /**
+     * @return void
+     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['widget'] = $options['widget'];
@@ -218,6 +224,9 @@ class DateTimeType extends AbstractType
         }
     }
 
+    /**
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $compound = fn (Options $options) => 'single_text' !== $options['widget'];

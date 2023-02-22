@@ -39,24 +39,14 @@ class ResponseTest extends ResponseTestCase
     {
         $response = new Response();
         $headers = $response->sendHeaders();
-        $this->assertObjectHasAttribute('headers', $headers);
-        $this->assertObjectHasAttribute('content', $headers);
-        $this->assertObjectHasAttribute('version', $headers);
-        $this->assertObjectHasAttribute('statusCode', $headers);
-        $this->assertObjectHasAttribute('statusText', $headers);
-        $this->assertObjectHasAttribute('charset', $headers);
+        $this->assertSame($response, $headers);
     }
 
     public function testSend()
     {
         $response = new Response();
-        $responseSent = $response->send();
-        $this->assertObjectHasAttribute('headers', $responseSent);
-        $this->assertObjectHasAttribute('content', $responseSent);
-        $this->assertObjectHasAttribute('version', $responseSent);
-        $this->assertObjectHasAttribute('statusCode', $responseSent);
-        $this->assertObjectHasAttribute('statusText', $responseSent);
-        $this->assertObjectHasAttribute('charset', $responseSent);
+        $responseSend = $response->send();
+        $this->assertSame($response, $responseSend);
     }
 
     public function testGetCharset()
@@ -120,12 +110,7 @@ class ResponseTest extends ResponseTestCase
     {
         $response = new Response('foo');
         $modified = $response->setNotModified();
-        $this->assertObjectHasAttribute('headers', $modified);
-        $this->assertObjectHasAttribute('content', $modified);
-        $this->assertObjectHasAttribute('version', $modified);
-        $this->assertObjectHasAttribute('statusCode', $modified);
-        $this->assertObjectHasAttribute('statusText', $modified);
-        $this->assertObjectHasAttribute('charset', $modified);
+        $this->assertSame($response, $modified);
         $this->assertEquals(304, $modified->getStatusCode());
 
         ob_start();
@@ -341,9 +326,8 @@ class ResponseTest extends ResponseTestCase
         $this->assertEquals(3600, $response->getMaxAge(), '->getMaxAge() falls back to Expires when no max-age or s-maxage directive present');
 
         $response = new Response();
-        $response->headers->set('Cache-Control', 'must-revalidate');
         $response->headers->set('Expires', -1);
-        $this->assertLessThanOrEqual(time() - 2 * 86400, $response->getExpires()->format('U'));
+        $this->assertSame(0, $response->getMaxAge());
 
         $response = new Response();
         $this->assertNull($response->getMaxAge(), '->getMaxAge() returns null if no freshness information available');
@@ -462,7 +446,7 @@ class ResponseTest extends ResponseTestCase
 
         $response = new Response();
         $response->headers->set('Expires', $this->createDateTimeOneHourAgo()->format(\DATE_RFC2822));
-        $this->assertLessThan(0, $response->getTtl(), '->getTtl() returns negative values when Expires is in past');
+        $this->assertSame(0, $response->getTtl(), '->getTtl() returns zero when Expires is in past');
 
         $response = new Response();
         $response->headers->set('Expires', $response->getDate()->format(\DATE_RFC2822));
@@ -888,7 +872,7 @@ class ResponseTest extends ResponseTestCase
         $this->assertEquals($expectedText, $statusText->getValue($response));
     }
 
-    public function getStatusCodeFixtures()
+    public static function getStatusCodeFixtures()
     {
         return [
             ['200', null, 'OK'],
@@ -1042,7 +1026,7 @@ class ResponseTest extends ResponseTestCase
         $this->addToAssertionCount(1);
     }
 
-    public function validContentProvider()
+    public static function validContentProvider()
     {
         return [
             'obj' => [new StringableObject()],
@@ -1087,7 +1071,7 @@ class ResponseTest extends ResponseTestCase
      * @copyright Copyright (c) 2015-2016 Zend Technologies USA Inc. (http://www.zend.com)
      * @license https://github.com/zendframework/zend-diactoros/blob/master/LICENSE.md New BSD License
      */
-    public function ianaCodesReasonPhrasesProvider()
+    public static function ianaCodesReasonPhrasesProvider()
     {
         // XML taken from https://www.iana.org/assignments/http-status-codes/http-status-codes.xml
         // (might not be up-to-date for older Symfony versions)

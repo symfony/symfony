@@ -24,11 +24,15 @@ interface BundleInterface extends ContainerAwareInterface
 {
     /**
      * Boots the Bundle.
+     *
+     * @return void
      */
     public function boot();
 
     /**
      * Shutdowns the Bundle.
+     *
+     * @return void
      */
     public function shutdown();
 
@@ -36,6 +40,8 @@ interface BundleInterface extends ContainerAwareInterface
      * Builds the bundle.
      *
      * It is only ever called once when the cache is empty.
+     *
+     * @return void
      */
     public function build(ContainerBuilder $container);
 

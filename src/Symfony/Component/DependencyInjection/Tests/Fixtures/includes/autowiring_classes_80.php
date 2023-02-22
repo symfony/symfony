@@ -33,6 +33,15 @@ class AutowireProperty
     public Foo $foo;
 }
 
+#[\Attribute(\Attribute::TARGET_PARAMETER)]
+class CustomAutowire extends Autowire
+{
+    public function __construct(string $parameter)
+    {
+        parent::__construct(param: $parameter);
+    }
+}
+
 class AutowireAttribute
 {
     public function __construct(
@@ -42,6 +51,8 @@ class AutowireAttribute
         public string $expression,
         #[Autowire(value: '%some.parameter%/bar')]
         public string $value,
+        #[Autowire(value: '%null.parameter%')]
+        public ?string $nullableValue,
         #[Autowire('@some.id')]
         public \stdClass $serviceAsValue,
         #[Autowire("@=parameter('some.parameter')")]
@@ -50,6 +61,8 @@ class AutowireAttribute
         public string $rawValue,
         #[Autowire('@@bar')]
         public string $escapedRawValue,
+        #[CustomAutowire('some.parameter')]
+        public string $customAutowire,
         #[Autowire(service: 'invalid.id')]
         public ?\stdClass $invalid = null,
     ) {

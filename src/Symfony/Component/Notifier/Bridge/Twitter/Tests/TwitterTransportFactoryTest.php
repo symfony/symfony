@@ -21,23 +21,23 @@ class TwitterTransportFactoryTest extends TransportFactoryTestCase
         return new TwitterTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield ['twitter://host.test', 'twitter://A:B:C:D@host.test'];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'twitter://default'];
         yield [false, 'somethingElse://default'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://default'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield ['twitter://A:B@default', 'Invalid "twitter://default" notifier DSN: Access Token is missing'];
     }

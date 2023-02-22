@@ -123,7 +123,7 @@ class ErrorListenerTest extends TestCase
     public function testHandleWithLogLevelAttribute()
     {
         $request = new Request();
-        $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MAIN_REQUEST, new WarningWithLogLevelAttribute());
+        $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MAIN_REQUEST, new ChildOfWarningWithLogLevelAttribute());
         $logger = new TestLogger();
         $l = new ErrorListener('not used', $logger);
 
@@ -184,7 +184,7 @@ class ErrorListenerTest extends TestCase
         $this->assertEquals(new Response('foo', 401), $event->getResponse());
     }
 
-    public function provider()
+    public static function provider()
     {
         if (!class_exists(Request::class)) {
             return [[null, null]];
@@ -263,7 +263,7 @@ class ErrorListenerTest extends TestCase
         $this->assertSame('OK: foo', $event->getResponse()->getContent());
     }
 
-    public function controllerProvider()
+    public static function controllerProvider()
     {
         yield [fn (FlattenException $exception) => new Response('OK: '.$exception->getMessage())];
 
@@ -280,6 +280,7 @@ class ErrorListenerTest extends TestCase
     {
         yield [new WithCustomUserProvidedAttribute(), 208, ['name' => 'value']];
         yield [new WithGeneralAttribute(), 412, ['some' => 'thing']];
+        yield [new ChildOfWithGeneralAttribute(), 412, ['some' => 'thing']];
     }
 }
 
@@ -341,7 +342,15 @@ class WithGeneralAttribute extends \Exception
 {
 }
 
+class ChildOfWithGeneralAttribute extends WithGeneralAttribute
+{
+}
+
 #[WithLogLevel(LogLevel::WARNING)]
 class WarningWithLogLevelAttribute extends \Exception
+{
+}
+
+class ChildOfWarningWithLogLevelAttribute extends WarningWithLogLevelAttribute
 {
 }

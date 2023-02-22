@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 use Symfony\Component\Form\Extension\Core\Type\ColorType;
 use Symfony\Component\Form\FormError;
 
-final class ColorTypeTest extends BaseTypeTest
+final class ColorTypeTest extends BaseTypeTestCase
 {
     public const TESTED_TYPE = ColorType::class;
 
@@ -33,7 +33,7 @@ final class ColorTypeTest extends BaseTypeTest
         $this->assertEmpty($form->getErrors());
     }
 
-    public function validationShouldPassProvider()
+    public static function validationShouldPassProvider()
     {
         return [
             [false, 'foo'],
@@ -71,7 +71,7 @@ final class ColorTypeTest extends BaseTypeTest
         $this->assertEquals([$expectedFormError], iterator_to_array($form->getErrors()));
     }
 
-    public function validationShouldFailProvider()
+    public static function validationShouldFailProvider()
     {
         return [
             ['foo', 'foo'],

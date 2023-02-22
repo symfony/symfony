@@ -55,6 +55,9 @@ class PhpProcess extends Process
         throw new LogicException(sprintf('The "%s()" method cannot be called when using "%s".', __METHOD__, self::class));
     }
 
+    /**
+     * @return void
+     */
     public function start(callable $callback = null, array $env = [])
     {
         if (null === $this->getCommandLine()) {

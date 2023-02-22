@@ -61,12 +61,16 @@ interface InputInterface
     /**
      * Binds the current Input instance with the given arguments and options.
      *
+     * @return void
+     *
      * @throws RuntimeException
      */
     public function bind(InputDefinition $definition);
 
     /**
      * Validates the input.
+     *
+     * @return void
      *
      * @throws RuntimeException When not enough arguments are given
      */
@@ -90,6 +94,8 @@ interface InputInterface
 
     /**
      * Sets an argument value by name.
+     *
+     * @return void
      *
      * @throws InvalidArgumentException When argument given doesn't exist
      */
@@ -119,6 +125,8 @@ interface InputInterface
     /**
      * Sets an option value by name.
      *
+     * @return void
+     *
      * @throws InvalidArgumentException When option given doesn't exist
      */
     public function setOption(string $name, mixed $value);
@@ -135,6 +143,8 @@ interface InputInterface
 
     /**
      * Sets the input interactivity.
+     *
+     * @return void
      */
     public function setInteractive(bool $interactive);
 }

@@ -14,9 +14,9 @@ namespace Symfony\Component\ExpressionLanguage\Tests\Node;
 use Symfony\Component\ExpressionLanguage\Node\ConditionalNode;
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 
-class ConditionalNodeTest extends AbstractNodeTest
+class ConditionalNodeTest extends AbstractNodeTestCase
 {
-    public function getEvaluateData()
+    public static function getEvaluateData(): array
     {
         return [
             [1, new ConditionalNode(new ConstantNode(true), new ConstantNode(1), new ConstantNode(2))],
@@ -24,7 +24,7 @@ class ConditionalNodeTest extends AbstractNodeTest
         ];
     }
 
-    public function getCompileData()
+    public static function getCompileData(): array
     {
         return [
             ['((true) ? (1) : (2))', new ConditionalNode(new ConstantNode(true), new ConstantNode(1), new ConstantNode(2))],
@@ -32,7 +32,7 @@ class ConditionalNodeTest extends AbstractNodeTest
         ];
     }
 
-    public function getDumpData()
+    public static function getDumpData(): array
     {
         return [
             ['(true ? 1 : 2)', new ConditionalNode(new ConstantNode(true), new ConstantNode(1), new ConstantNode(2))],

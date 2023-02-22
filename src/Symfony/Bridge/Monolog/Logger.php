@@ -40,6 +40,9 @@ class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
         return 0;
     }
 
+    /**
+     * @return void
+     */
     public function clear()
     {
         if ($logger = $this->getDebugLogger()) {
@@ -56,6 +59,9 @@ class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
         }
     }
 
+    /**
+     * @return void
+     */
     public function removeDebugLogger()
     {
         foreach ($this->processors as $k => $processor) {

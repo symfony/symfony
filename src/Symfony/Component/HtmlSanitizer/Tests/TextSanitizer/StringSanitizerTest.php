@@ -16,7 +16,7 @@ use Symfony\Component\HtmlSanitizer\TextSanitizer\StringSanitizer;
 
 class StringSanitizerTest extends TestCase
 {
-    public function provideHtmlLower()
+    public static function provideHtmlLower()
     {
         $cases = [
             'exampleAttr' => 'exampleattr',
@@ -38,7 +38,7 @@ class StringSanitizerTest extends TestCase
         $this->assertSame($expected, StringSanitizer::htmlLower($input));
     }
 
-    public function provideEncodeHtmlEntites()
+    public static function provideEncodeHtmlEntites()
     {
         $cases = [
             '' => '',

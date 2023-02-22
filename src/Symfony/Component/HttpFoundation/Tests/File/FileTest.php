@@ -93,7 +93,7 @@ class FileTest extends TestCase
         $this->assertStringEqualsFile(__FILE__, $file->getContent());
     }
 
-    public function getFilenameFixtures()
+    public static function getFilenameFixtures()
     {
         return [
             ['original.gif', 'original.gif'],

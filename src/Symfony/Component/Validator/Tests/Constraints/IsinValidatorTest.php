@@ -47,7 +47,7 @@ class IsinValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidIsin()
+    public static function getValidIsin()
     {
         return [
             ['XS2125535901'], // Goldman Sachs International
@@ -71,7 +71,7 @@ class IsinValidatorTest extends ConstraintValidatorTestCase
         $this->assertViolationRaised($isin, Isin::INVALID_LENGTH_ERROR);
     }
 
-    public function getIsinWithInvalidLenghFormat()
+    public static function getIsinWithInvalidLenghFormat()
     {
         return [
             ['X'],
@@ -96,7 +96,7 @@ class IsinValidatorTest extends ConstraintValidatorTestCase
         $this->assertViolationRaised($isin, Isin::INVALID_PATTERN_ERROR);
     }
 
-    public function getIsinWithInvalidPattern()
+    public static function getIsinWithInvalidPattern()
     {
         return [
             ['X12155696679'],
@@ -115,7 +115,7 @@ class IsinValidatorTest extends ConstraintValidatorTestCase
         $this->assertViolationRaised($isin, Isin::INVALID_CHECKSUM_ERROR);
     }
 
-    public function getIsinWithValidFormatButIncorrectChecksum()
+    public static function getIsinWithValidFormatButIncorrectChecksum()
     {
         return [
             ['XS2112212144'],

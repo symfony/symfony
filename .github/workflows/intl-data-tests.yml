@@ -21,7 +21,7 @@ permissions:
 
 jobs:
   tests:
-    name: Tests
+    name: Intl data
     runs-on: Ubuntu-20.04
 
     steps:

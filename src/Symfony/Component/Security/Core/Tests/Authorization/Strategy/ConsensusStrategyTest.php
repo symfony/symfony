@@ -16,25 +16,25 @@ use Symfony\Component\Security\Core\Test\AccessDecisionStrategyTestCase;
 
 class ConsensusStrategyTest extends AccessDecisionStrategyTestCase
 {
-    public function provideStrategyTests(): iterable
+    public static function provideStrategyTests(): iterable
     {
         $strategy = new ConsensusStrategy();
 
-        yield [$strategy, $this->getVoters(1, 0, 0), true];
-        yield [$strategy, $this->getVoters(1, 2, 0), false];
-        yield [$strategy, $this->getVoters(2, 1, 0), true];
-        yield [$strategy, $this->getVoters(0, 0, 1), false];
+        yield [$strategy, self::getVoters(1, 0, 0), true];
+        yield [$strategy, self::getVoters(1, 2, 0), false];
+        yield [$strategy, self::getVoters(2, 1, 0), true];
+        yield [$strategy, self::getVoters(0, 0, 1), false];
 
-        yield [$strategy, $this->getVoters(2, 2, 0), true];
-        yield [$strategy, $this->getVoters(2, 2, 1), true];
+        yield [$strategy, self::getVoters(2, 2, 0), true];
+        yield [$strategy, self::getVoters(2, 2, 1), true];
 
         $strategy = new ConsensusStrategy(true);
 
-        yield [$strategy, $this->getVoters(0, 0, 1), true];
+        yield [$strategy, self::getVoters(0, 0, 1), true];
 
         $strategy = new ConsensusStrategy(false, false);
 
-        yield [$strategy, $this->getVoters(2, 2, 0), false];
-        yield [$strategy, $this->getVoters(2, 2, 1), false];
+        yield [$strategy, self::getVoters(2, 2, 0), false];
+        yield [$strategy, self::getVoters(2, 2, 1), false];
     }
 }

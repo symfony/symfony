@@ -32,7 +32,7 @@ class ElementParserTest extends TestCase
         $this->assertEquals($representation, (string) $selector->getTree());
     }
 
-    public function getParseTestData()
+    public static function getParseTestData()
     {
         return [
             ['*', 'Element[*]'],

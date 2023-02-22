@@ -15,7 +15,7 @@ use Symfony\Component\Serializer\Exception\MappingException;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 
-class AnnotationLoaderWithAttributesTest extends AnnotationLoaderTest
+class AnnotationLoaderWithAttributesTest extends AnnotationLoaderTestCase
 {
     protected function createLoader(): AnnotationLoader
     {

@@ -31,6 +31,9 @@ class RedisStore implements PersistingStoreInterface
     ) {
     }
 
+    /**
+     * @return void
+     */
     public function save(Key $key, float $ttlInSecond)
     {
         if (0 > $ttlInSecond) {
@@ -94,6 +97,9 @@ class RedisStore implements PersistingStoreInterface
         }
     }
 
+    /**
+     * @return void
+     */
     public function putOffExpiration(Key $key, float $ttlInSecond)
     {
         if (0 > $ttlInSecond) {
@@ -136,6 +142,9 @@ class RedisStore implements PersistingStoreInterface
         }
     }
 
+    /**
+     * @return void
+     */
     public function delete(Key $key)
     {
         $script = '

@@ -18,7 +18,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
-class TimeTypeTest extends BaseTypeTest
+class TimeTypeTest extends BaseTypeTestCase
 {
     public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\TimeType';
 
@@ -874,7 +874,7 @@ class TimeTypeTest extends BaseTypeTest
         $this->assertSame('Empty second', $view['second']->vars['placeholder']);
     }
 
-    public function provideCompoundWidgets()
+    public static function provideCompoundWidgets()
     {
         return [
             ['text'],
@@ -1110,7 +1110,7 @@ class TimeTypeTest extends BaseTypeTest
         $this->assertEquals($expectedData, $form->getData());
     }
 
-    public function provideEmptyData()
+    public static function provideEmptyData()
     {
         $expectedData = \DateTime::createFromFormat('Y-m-d H:i', '1970-01-01 21:23');
         $lazyEmptyData = static fn (FormInterface $form) => $form->getConfig()->getCompound() ? ['hour' => '21', 'minute' => '23'] : '21:23';

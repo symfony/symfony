@@ -109,7 +109,7 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
      * - the route schemes,
      * - the route methods.
      */
-    private function resolveParameters(RouteCollection $collection)
+    private function resolveParameters(RouteCollection $collection): void
     {
         foreach ($collection as $route) {
             foreach ($route->getDefaults() as $name => $value) {

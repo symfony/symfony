@@ -38,6 +38,8 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * @param array $objectManager A configured object manager
      *
+     * @return void
+     *
      * @throws \InvalidArgumentException
      */
     protected function loadMappingInformation(array $objectManager, ContainerBuilder $container)
@@ -105,6 +107,8 @@ abstract class AbstractDoctrineExtension extends Extension
      * Register the alias for this mapping driver.
      *
      * Aliases can be used in the Query languages of all the Doctrine object managers to simplify writing tasks.
+     *
+     * @return void
      */
     protected function setMappingDriverAlias(array $mappingConfig, string $mappingName)
     {
@@ -117,6 +121,8 @@ abstract class AbstractDoctrineExtension extends Extension
 
     /**
      * Register the mapping driver configuration for later use with the object managers metadata driver chain.
+     *
+     * @return void
      *
      * @throws \InvalidArgumentException
      */
@@ -172,6 +178,8 @@ abstract class AbstractDoctrineExtension extends Extension
 
     /**
      * Register all the collected mapping information with the object manager by registering the appropriate mapping drivers.
+     *
+     * @return void
      */
     protected function registerMappingDrivers(array $objectManager, ContainerBuilder $container)
     {
@@ -226,6 +234,8 @@ abstract class AbstractDoctrineExtension extends Extension
 
     /**
      * Assertion if the specified mapping information is valid.
+     *
+     * @return void
      *
      * @throws \InvalidArgumentException
      */
@@ -314,6 +324,8 @@ abstract class AbstractDoctrineExtension extends Extension
 
     /**
      * Loads a configured object manager metadata, query or result cache driver.
+     *
+     * @return void
      *
      * @throws \InvalidArgumentException in case of unknown driver type
      */

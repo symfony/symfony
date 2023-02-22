@@ -21,12 +21,12 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  */
 class LessThanValidatorWithNegativeConstraintTest extends LessThanValidatorTest
 {
-    protected function createConstraint(array $options = null): Constraint
+    protected static function createConstraint(array $options = null): Constraint
     {
         return new Negative();
     }
 
-    public function provideValidComparisons(): array
+    public static function provideValidComparisons(): array
     {
         return [
             [-1, 0],
@@ -36,7 +36,7 @@ class LessThanValidatorWithNegativeConstraintTest extends LessThanValidatorTest
         ];
     }
 
-    public function provideInvalidComparisons(): array
+    public static function provideInvalidComparisons(): array
     {
         return [
             [0, '0', 0, '0', 'int'],

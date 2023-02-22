@@ -25,7 +25,7 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
         return new IdenticalToValidator();
     }
 
-    protected function createConstraint(array $options = null): Constraint
+    protected static function createConstraint(array $options = null): Constraint
     {
         return new IdenticalTo($options);
     }
@@ -35,20 +35,21 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
         return IdenticalTo::NOT_IDENTICAL_ERROR;
     }
 
-    public function provideAllValidComparisons(): array
+    public static function provideAllValidComparisons(): array
     {
-        $this->setDefaultTimezone('UTC');
+        $timezone = date_default_timezone_get();
+        date_default_timezone_set('UTC');
 
         // Don't call addPhp5Dot5Comparisons() automatically, as it does
         // not take care of identical objects
-        $comparisons = $this->provideValidComparisons();
+        $comparisons = self::provideValidComparisons();
 
-        $this->restoreDefaultTimezone();
+        date_default_timezone_set($timezone);
 
         return $comparisons;
     }
 
-    public function provideValidComparisons(): array
+    public static function provideValidComparisons(): array
     {
         $date = new \DateTime('2000-01-01');
         $object = new ComparisonTest_Class(2);
@@ -67,14 +68,14 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
         return $comparisons;
     }
 
-    public function provideValidComparisonsToPropertyPath(): array
+    public static function provideValidComparisonsToPropertyPath(): array
     {
         return [
             [5],
         ];
     }
 
-    public function provideInvalidComparisons(): array
+    public static function provideInvalidComparisons(): array
     {
         return [
             [1, '1', 2, '2', 'int'],
@@ -86,7 +87,7 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
         ];
     }
 
-    public function provideComparisonsToNullValueAtPropertyPath()
+    public static function provideComparisonsToNullValueAtPropertyPath()
     {
         return [
             [5, '5', false],

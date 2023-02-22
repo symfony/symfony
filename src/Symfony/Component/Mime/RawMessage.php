@@ -54,6 +54,8 @@ class RawMessage
     }
 
     /**
+     * @return void
+     *
      * @throws LogicException if the message is not valid
      */
     public function ensureValidity()

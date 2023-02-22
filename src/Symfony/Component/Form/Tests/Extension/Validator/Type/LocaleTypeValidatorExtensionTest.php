@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType;
 use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 
-class LocaleTypeValidatorExtensionTest extends BaseValidatorExtensionTest
+class LocaleTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
 {
     use ValidatorExtensionTrait;
 

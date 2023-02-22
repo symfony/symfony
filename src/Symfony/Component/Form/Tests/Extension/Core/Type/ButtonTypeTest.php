@@ -19,7 +19,7 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class ButtonTypeTest extends BaseTypeTest
+class ButtonTypeTest extends BaseTypeTestCase
 {
     public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\ButtonType';
 
@@ -72,7 +72,7 @@ class ButtonTypeTest extends BaseTypeTest
     public function testFormAttrAsBoolWithNoId()
     {
         $this->expectException(LogicException::class);
-        $this->expectErrorMessage('form_attr');
+        $this->expectExceptionMessage('form_attr');
         $this->factory
             ->createNamedBuilder('', FormType::class, null, [
                 'form_attr' => true,

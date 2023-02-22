@@ -32,6 +32,9 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     protected $removeExtraKeys = true;
     protected $normalizeKeys = true;
 
+    /**
+     * @return void
+     */
     public function setNormalizeKeys(bool $normalizeKeys)
     {
         $this->normalizeKeys = $normalizeKeys;
@@ -77,6 +80,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * Sets the xml remappings that should be performed.
      *
      * @param array $remappings An array of the form [[string, string]]
+     *
+     * @return void
      */
     public function setXmlRemappings(array $remappings)
     {
@@ -96,6 +101,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Sets whether to add default values for this array if it has not been
      * defined in any of the configuration files.
+     *
+     * @return void
      */
     public function setAddIfNotSet(bool $boolean)
     {
@@ -104,6 +111,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
 
     /**
      * Sets whether false is allowed as value indicating that the array should be unset.
+     *
+     * @return void
      */
     public function setAllowFalse(bool $allow)
     {
@@ -112,6 +121,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
 
     /**
      * Sets whether new keys can be defined in subsequent configurations.
+     *
+     * @return void
      */
     public function setAllowNewKeys(bool $allow)
     {
@@ -120,6 +131,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
 
     /**
      * Sets if deep merging should occur.
+     *
+     * @return void
      */
     public function setPerformDeepMerging(bool $boolean)
     {
@@ -131,6 +144,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @param bool $boolean To allow extra keys
      * @param bool $remove  To remove extra keys
+     *
+     * @return void
      */
     public function setIgnoreExtraKeys(bool $boolean, bool $remove = true)
     {
@@ -146,6 +161,9 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         return $this->ignoreExtraKeys;
     }
 
+    /**
+     * @return void
+     */
     public function setName(string $name)
     {
         $this->name = $name;
@@ -174,6 +192,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
 
     /**
      * Adds a child node.
+     *
+     * @return void
      *
      * @throws \InvalidArgumentException when the child node has no name
      * @throws \InvalidArgumentException when the child node's name is not unique
@@ -238,6 +258,9 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         return $value;
     }
 
+    /**
+     * @return void
+     */
     protected function validateType(mixed $value)
     {
         if (!\is_array($value) && (!$this->allowFalse || false !== $value)) {

@@ -19,12 +19,13 @@ use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Loader\XliffFileLoader;
 use Symfony\Component\Translation\Provider\ProviderInterface;
 use Symfony\Component\Translation\TranslatorBag;
+use Symfony\Component\Translation\TranslatorBagInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class LocoProviderWithoutTranslatorBagTest extends LocoProviderTest
 {
-    public function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint): ProviderInterface
+    public static function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint, TranslatorBagInterface $translatorBag = null): ProviderInterface
     {
         return new LocoProvider($client, $loader, $logger, $defaultLocale, $endpoint, null);
     }
@@ -44,7 +45,7 @@ class LocoProviderWithoutTranslatorBagTest extends LocoProviderTest
             foreach ($domains as $domain) {
                 $responses[] = function (string $method, string $url, array $options = []) use ($responseContents, $lastModifieds, $locale, $domain): ResponseInterface {
                     $this->assertSame('GET', $method);
-                    $this->assertSame('https://localise.biz/api/export/locale/'.$locale.'.xlf?filter='.rawurlencode($domain).'&status=translated%2Cblank-translation', $url);
+                    $this->assertSame('https://localise.biz/api/export/locale/'.$locale.'.xlf?filter='.$domain.'&status=translated,blank-translation', $url);
                     $this->assertSame(['filter' => $domain, 'status' => 'translated,blank-translation'], $options['query']);
                     $this->assertSame(['Accept: */*'], $options['headers']);
 
@@ -83,7 +84,7 @@ class LocoProviderWithoutTranslatorBagTest extends LocoProviderTest
             foreach ($domains as $domain) {
                 $responses[] = function (string $method, string $url, array $options = []) use ($responseContents, $lastModifieds, $locale, $domain): ResponseInterface {
                     $this->assertSame('GET', $method);
-                    $this->assertSame('https://localise.biz/api/export/locale/'.$locale.'.xlf?filter='.rawurlencode($domain).'&status=translated%2Cblank-translation', $url);
+                    $this->assertSame('https://localise.biz/api/export/locale/'.$locale.'.xlf?filter='.$domain.'&status=translated,blank-translation', $url);
                     $this->assertSame(['filter' => $domain, 'status' => 'translated,blank-translation'], $options['query']);
                     $this->assertNotContains('If-Modified-Since: '.$lastModifieds[$locale], $options['headers']);
                     $this->assertSame(['Accept: */*'], $options['headers']);

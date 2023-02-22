@@ -19,8 +19,6 @@ use Symfony\Component\HtmlSanitizer\Visitor\DomVisitor;
 
 /**
  * @author Titouan Galopin <galopintitouan@gmail.com>
- *
- * @experimental
  */
 final class HtmlSanitizer implements HtmlSanitizerInterface
 {

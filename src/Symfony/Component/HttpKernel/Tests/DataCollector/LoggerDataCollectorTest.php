@@ -179,7 +179,7 @@ class LoggerDataCollectorTest extends TestCase
         $c->reset();
     }
 
-    public function getCollectTestData()
+    public static function getCollectTestData()
     {
         yield 'simple log' => [
             1,

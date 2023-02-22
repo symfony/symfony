@@ -21,7 +21,7 @@ final class SmsFactorTransportFactoryTest extends TransportFactoryTestCase
         return new SmsFactorTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'sms-factor://api.smsfactor.com?sender=MyCompany&push_type=alert',
@@ -33,7 +33,7 @@ final class SmsFactorTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'sms-factor://TOKEN@default?sender=MyCompany&push_type=alert'];
         yield [true, 'sms-factor://TOKEN@default?sender=MyCompany&push_type=marketing'];
@@ -43,12 +43,12 @@ final class SmsFactorTransportFactoryTest extends TransportFactoryTestCase
         yield [false, 'somethingElse://TOKEN@default'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield 'missing token' => ['sms-factor://default?sender=MyCompany&push_type=marketing'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://TOKEN@default'];
     }

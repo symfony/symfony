@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 use Symfony\Component\Form\Extension\Core\Type\SearchType;
 use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 
-class SearchTypeValidatorExtensionTest extends BaseValidatorExtensionTest
+class SearchTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
 {
     use ValidatorExtensionTrait;
 

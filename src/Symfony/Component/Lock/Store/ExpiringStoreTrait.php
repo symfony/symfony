@@ -16,7 +16,7 @@ use Symfony\Component\Lock\Key;
 
 trait ExpiringStoreTrait
 {
-    private function checkNotExpired(Key $key)
+    private function checkNotExpired(Key $key): void
     {
         if ($key->isExpired()) {
             try {

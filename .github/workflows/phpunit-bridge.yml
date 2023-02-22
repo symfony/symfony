@@ -1,4 +1,4 @@
-name: PhpUnitBridge
+name: Lint PhpUnitBridge
 
 on:
   push:
@@ -21,7 +21,7 @@ permissions:
 
 jobs:
   lint:
-    name: Lint
+    name: Lint PhpUnitBridge
     runs-on: Ubuntu-20.04
 
     steps:

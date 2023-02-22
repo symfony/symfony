@@ -14,13 +14,16 @@ namespace Symfony\Component\Config\Tests\Definition;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\EnumNode;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Config\Tests\Fixtures\TestEnum;
+use Symfony\Component\Config\Tests\Fixtures\TestEnum2;
 
 class EnumNodeTest extends TestCase
 {
     public function testFinalizeValue()
     {
-        $node = new EnumNode('foo', null, ['foo', 'bar']);
+        $node = new EnumNode('foo', null, ['foo', 'bar', TestEnum::Bar]);
         $this->assertSame('foo', $node->finalize('foo'));
+        $this->assertSame(TestEnum::Bar, $node->finalize(TestEnum::Bar));
     }
 
     public function testConstructionWithNoValues()
@@ -51,8 +54,8 @@ class EnumNodeTest extends TestCase
     public function testFinalizeWithInvalidValue()
     {
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('The value "foobar" is not allowed for path "foo". Permissible values: "foo", "bar"');
-        $node = new EnumNode('foo', null, ['foo', 'bar']);
+        $this->expectExceptionMessage('The value "foobar" is not allowed for path "foo". Permissible values: "foo", "bar", Symfony\Component\Config\Tests\Fixtures\TestEnum::Foo');
+        $node = new EnumNode('foo', null, ['foo', 'bar', TestEnum::Foo]);
         $node->finalize('foobar');
     }
 
@@ -80,11 +83,19 @@ class EnumNodeTest extends TestCase
         $this->assertNull($node->finalize(null));
     }
 
-    public function testNonScalarOrNullValueThrows()
+    public function testNonScalarOrEnumOrNullValueThrows()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('"Symfony\Component\Config\Definition\EnumNode" only supports scalar or null values, "stdClass" given.');
+        $this->expectExceptionMessage('"Symfony\Component\Config\Definition\EnumNode" only supports scalar, enum, or null values, "stdClass" given.');
 
         new EnumNode('ccc', null, [new \stdClass()]);
+    }
+
+    public function testTwoDifferentEnumsThrows()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('"Symfony\Component\Config\Definition\EnumNode" only supports one type of enum, "Symfony\Component\Config\Tests\Fixtures\TestEnum" and "Symfony\Component\Config\Tests\Fixtures\TestEnum2" passed.');
+
+        new EnumNode('ccc', null, [...TestEnum::cases(), TestEnum2::Ccc]);
     }
 }

@@ -59,6 +59,9 @@ class UuidValidator extends ConstraintValidator
     public const LOOSE_MAX_LENGTH = 39;
     public const LOOSE_FIRST_HYPHEN_POSITION = 4;
 
+    /**
+     * @return void
+     */
     public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Uuid) {
@@ -88,7 +91,7 @@ class UuidValidator extends ConstraintValidator
         $this->validateLoose($value, $constraint);
     }
 
-    private function validateLoose(string $value, Uuid $constraint)
+    private function validateLoose(string $value, Uuid $constraint): void
     {
         // Error priority:
         // 1. ERROR_INVALID_CHARACTERS
@@ -159,7 +162,7 @@ class UuidValidator extends ConstraintValidator
         }
     }
 
-    private function validateStrict(string $value, Uuid $constraint)
+    private function validateStrict(string $value, Uuid $constraint): void
     {
         // Error priority:
         // 1. ERROR_INVALID_CHARACTERS

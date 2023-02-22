@@ -201,7 +201,7 @@ class AbstractNormalizerTest extends TestCase
         }
     }
 
-    public function getNormalizer()
+    public static function getNormalizer()
     {
         $extractor = new PhpDocExtractor();
 

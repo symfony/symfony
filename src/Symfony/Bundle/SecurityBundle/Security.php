@@ -72,7 +72,7 @@ class Security extends LegacySecurity
 
         $this->container->get('security.user_checker')->checkPreAuth($user);
 
-        return $this->container->get('security.user_authenticator')->authenticateUser($user, $authenticator, $request);
+        return $this->container->get('security.authenticator.managers_locator')->get($firewallName)->authenticateUser($user, $authenticator, $request);
     }
 
     /**

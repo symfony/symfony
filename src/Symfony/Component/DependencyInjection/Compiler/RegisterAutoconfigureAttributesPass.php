@@ -26,7 +26,7 @@ final class RegisterAutoconfigureAttributesPass implements CompilerPassInterface
 {
     private static $registerForAutoconfiguration;
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         foreach ($container->getDefinitions() as $id => $definition) {
             if ($this->accept($definition) && $class = $container->getReflectionClass($definition->getClass(), false)) {
@@ -40,7 +40,7 @@ final class RegisterAutoconfigureAttributesPass implements CompilerPassInterface
         return $definition->isAutoconfigured() && !$definition->hasTag('container.ignore_attributes');
     }
 
-    public function processClass(ContainerBuilder $container, \ReflectionClass $class)
+    public function processClass(ContainerBuilder $container, \ReflectionClass $class): void
     {
         foreach ($class->getAttributes(Autoconfigure::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
             self::registerForAutoconfiguration($container, $class, $attribute);

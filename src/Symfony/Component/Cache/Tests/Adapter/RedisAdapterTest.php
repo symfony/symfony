@@ -20,7 +20,7 @@ use Symfony\Component\Cache\Traits\RedisProxy;
 /**
  * @group integration
  */
-class RedisAdapterTest extends AbstractRedisAdapterTest
+class RedisAdapterTest extends AbstractRedisAdapterTestCase
 {
     public static function setUpBeforeClass(): void
     {
@@ -66,6 +66,9 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
         $this->assertTrue($redis->isConnected());
         $this->assertSame(0, $redis->getDbNum());
 
+        $redis = RedisAdapter::createConnection('redis://'.$uri.'/');
+        $this->assertSame(0, $redis->getDbNum());
+
         $redis = RedisAdapter::createConnection('redis://'.$uri.'/2');
         $this->assertSame(2, $redis->getDbNum());
 
@@ -102,7 +105,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
         RedisAdapter::createConnection($dsn);
     }
 
-    public function provideFailedCreateConnection(): array
+    public static function provideFailedCreateConnection(): array
     {
         return [
             ['redis://localhost:1234'],
@@ -122,7 +125,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
         RedisAdapter::createConnection($dsn);
     }
 
-    public function provideInvalidCreateConnection(): array
+    public static function provideInvalidCreateConnection(): array
     {
         return [
             ['redis://localhost/foo'],

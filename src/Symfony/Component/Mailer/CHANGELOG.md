@@ -6,6 +6,12 @@ CHANGELOG
 
  * Add `MessageEvent::reject()` to allow rejecting an email before sending it
 
+6.2.7
+-----
+
+ * [BC BREAK] The following data providers for `TransportFactoryTestCase` are now static:
+  `supportsProvider()`, `createProvider()`, `unsupportedSchemeProvider()`and `incompleteDsnProvider()`
+
 6.2
 ---
 

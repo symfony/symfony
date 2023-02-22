@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use stdClass;
 use Symfony\Component\Validator\Constraints\Ulid;
 use Symfony\Component\Validator\Constraints\UlidValidator;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
@@ -44,7 +43,7 @@ class UlidValidatorTest extends ConstraintValidatorTestCase
     public function testExpectsStringCompatibleType()
     {
         $this->expectException(UnexpectedValueException::class);
-        $this->validator->validate(new stdClass(), new Ulid());
+        $this->validator->validate(new \stdClass(), new Ulid());
     }
 
     public function testValidUlid()
@@ -71,7 +70,7 @@ class UlidValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidUlids()
+    public static function getInvalidUlids()
     {
         return [
             ['01ARZ3NDEKTSV4RRFFQ69G5FA', Ulid::TOO_SHORT_ERROR],

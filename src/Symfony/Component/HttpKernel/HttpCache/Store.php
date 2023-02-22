@@ -29,21 +29,34 @@ class Store implements StoreInterface
     private \SplObjectStorage $keyCache;
     /** @var array<string, resource> */
     private array $locks = [];
+    private array $options;
 
     /**
+     * Constructor.
+     *
+     * The available options are:
+     *
+     *   * private_headers  Set of response headers that should not be stored
+     *                      when a response is cached. (default: Set-Cookie)
+     *
      * @throws \RuntimeException
      */
-    public function __construct(string $root)
+    public function __construct(string $root, array $options = [])
     {
         $this->root = $root;
         if (!is_dir($this->root) && !@mkdir($this->root, 0777, true) && !is_dir($this->root)) {
             throw new \RuntimeException(sprintf('Unable to create the store directory (%s).', $this->root));
         }
         $this->keyCache = new \SplObjectStorage();
+        $this->options = array_merge([
+            'private_headers' => ['Set-Cookie'],
+        ], $options);
     }
 
     /**
      * Cleanups storage.
+     *
+     * @return void
      */
     public function cleanup()
     {
@@ -182,7 +195,7 @@ class Store implements StoreInterface
             if ($this->getPath($digest) !== $response->headers->get('X-Body-File')) {
                 throw new \RuntimeException('X-Body-File and X-Content-Digest do not match.');
             }
-            // Everything seems ok, omit writing content to disk
+        // Everything seems ok, omit writing content to disk
         } else {
             $digest = $this->generateContentDigest($response);
             $response->headers->set('X-Content-Digest', $digest);
@@ -212,6 +225,10 @@ class Store implements StoreInterface
         $headers = $this->persistResponse($response);
         unset($headers['age']);
 
+        foreach ($this->options['private_headers'] as $h) {
+            unset($headers[strtolower($h)]);
+        }
+
         array_unshift($entries, [$storedEnv, $headers]);
 
         if (!$this->save($key, serialize($entries))) {
@@ -231,6 +248,8 @@ class Store implements StoreInterface
 
     /**
      * Invalidates all cache entries that match the request.
+     *
+     * @return void
      *
      * @throws \RuntimeException
      */
@@ -398,6 +417,9 @@ class Store implements StoreInterface
         return true;
     }
 
+    /**
+     * @return string
+     */
     public function getPath(string $key)
     {
         return $this->root.\DIRECTORY_SEPARATOR.substr($key, 0, 2).\DIRECTORY_SEPARATOR.substr($key, 2, 2).\DIRECTORY_SEPARATOR.substr($key, 4, 2).\DIRECTORY_SEPARATOR.substr($key, 6);

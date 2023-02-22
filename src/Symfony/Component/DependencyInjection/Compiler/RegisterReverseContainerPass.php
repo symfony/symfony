@@ -29,6 +29,9 @@ class RegisterReverseContainerPass implements CompilerPassInterface
         $this->beforeRemoving = $beforeRemoving;
     }
 
+    /**
+     * @return void
+     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition('reverse_container')) {

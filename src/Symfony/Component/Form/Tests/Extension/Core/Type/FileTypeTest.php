@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Translation\IdentityTranslator;
 
-class FileTypeTest extends BaseTypeTest
+class FileTypeTest extends BaseTypeTestCase
 {
     public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\FileType';
 
@@ -183,7 +183,7 @@ class FileTypeTest extends BaseTypeTest
         $this->assertSame([], $form->getViewData());
     }
 
-    public function requestHandlerProvider()
+    public static function requestHandlerProvider()
     {
         return [
             [new HttpFoundationRequestHandler()],
@@ -301,7 +301,7 @@ class FileTypeTest extends BaseTypeTest
         }
     }
 
-    public function uploadFileErrorCodes()
+    public static function uploadFileErrorCodes()
     {
         return [
             'no error' => [\UPLOAD_ERR_OK, null],

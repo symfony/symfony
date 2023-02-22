@@ -11,11 +11,14 @@
 
 namespace Symfony\Component\Security\Core\Exception;
 
+use Symfony\Component\HttpKernel\Attribute\WithHttpStatus;
+
 /**
  * AccessDeniedException is thrown when the account has not the required role.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
+#[WithHttpStatus(403)]
 class AccessDeniedException extends RuntimeException
 {
     private array $attributes = [];
@@ -31,6 +34,9 @@ class AccessDeniedException extends RuntimeException
         return $this->attributes;
     }
 
+    /**
+     * @return void
+     */
     public function setAttributes(array|string $attributes)
     {
         $this->attributes = (array) $attributes;
@@ -41,6 +47,9 @@ class AccessDeniedException extends RuntimeException
         return $this->subject;
     }
 
+    /**
+     * @return void
+     */
     public function setSubject(mixed $subject)
     {
         $this->subject = $subject;

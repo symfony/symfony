@@ -24,9 +24,10 @@ use Symfony\Component\Lock\Strategy\UnanimousStrategy;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
+ *
  * @group integration
  */
-class CombinedStoreTest extends AbstractStoreTest
+class CombinedStoreTest extends AbstractStoreTestCase
 {
     use ExpiringStoreTestTrait;
     use SharedLockStoreTestTrait;

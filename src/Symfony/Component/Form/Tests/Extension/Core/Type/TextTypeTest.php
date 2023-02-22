@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-class TextTypeTest extends BaseTypeTest
+class TextTypeTest extends BaseTypeTestCase
 {
     public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\TextType';
 
@@ -32,7 +32,7 @@ class TextTypeTest extends BaseTypeTest
         $this->assertSame('', $form->getViewData());
     }
 
-    public function provideZeros()
+    public static function provideZeros()
     {
         return [
             [0, '0'],

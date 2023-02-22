@@ -59,6 +59,9 @@ class DebugCommand extends Command
         $this->fileLinkFormatter = $fileLinkFormatter;
     }
 
+    /**
+     * @return void
+     */
     protected function configure()
     {
         $this
@@ -121,7 +124,7 @@ EOF
         }
     }
 
-    private function displayPathsText(SymfonyStyle $io, string $name)
+    private function displayPathsText(SymfonyStyle $io, string $name): void
     {
         $file = new \ArrayIterator($this->findTemplateFiles($name));
         $paths = $this->getLoaderPaths($name);
@@ -196,7 +199,7 @@ EOF
         }
     }
 
-    private function displayPathsJson(SymfonyStyle $io, string $name)
+    private function displayPathsJson(SymfonyStyle $io, string $name): void
     {
         $files = $this->findTemplateFiles($name);
         $paths = $this->getLoaderPaths($name);
@@ -214,7 +217,7 @@ EOF
         $io->writeln(json_encode($data));
     }
 
-    private function displayGeneralText(SymfonyStyle $io, string $filter = null)
+    private function displayGeneralText(SymfonyStyle $io, string $filter = null): void
     {
         $decorated = $io->isDecorated();
         $types = ['functions', 'filters', 'tests', 'globals'];
@@ -248,7 +251,7 @@ EOF
         }
     }
 
-    private function displayGeneralJson(SymfonyStyle $io, ?string $filter)
+    private function displayGeneralJson(SymfonyStyle $io, ?string $filter): void
     {
         $decorated = $io->isDecorated();
         $types = ['functions', 'filters', 'tests', 'globals'];

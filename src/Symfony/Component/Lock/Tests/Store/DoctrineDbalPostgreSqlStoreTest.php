@@ -24,9 +24,10 @@ use Symfony\Component\Lock\Store\DoctrineDbalPostgreSqlStore;
  * @author Jérémy Derussé <jeremy@derusse.com>
  *
  * @requires extension pdo_pgsql
+ *
  * @group integration
  */
-class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTest
+class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTestCase
 {
     use BlockingStoreTestTrait;
     use SharedLockStoreTestTrait;
@@ -49,6 +50,7 @@ class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTest
 
     /**
      * @requires extension pdo_sqlite
+     *
      * @dataProvider getInvalidDrivers
      */
     public function testInvalidDriver($connOrDsn)
@@ -60,7 +62,7 @@ class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTest
         $store->exists(new Key('foo'));
     }
 
-    public function getInvalidDrivers()
+    public static function getInvalidDrivers()
     {
         yield ['sqlite:///tmp/foo.db'];
         yield [DriverManager::getConnection(['url' => 'sqlite:///tmp/foo.db'])];

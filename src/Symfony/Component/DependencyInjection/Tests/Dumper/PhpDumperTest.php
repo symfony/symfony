@@ -203,7 +203,7 @@ class PhpDumperTest extends TestCase
             $this->fail('->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
         } catch (\Exception $e) {
             $this->assertInstanceOf(RuntimeException::class, $e, '->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
-            $this->assertEquals('Unable to dump a service container if a parameter is an object or a resource.', $e->getMessage(), '->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
+            $this->assertEquals('Unable to dump a service container if a parameter is an object or a resource, got "stdClass".', $e->getMessage(), '->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
         }
     }
 
@@ -393,7 +393,7 @@ class PhpDumperTest extends TestCase
         $dumper->dump();
     }
 
-    public function provideInvalidFactories()
+    public static function provideInvalidFactories()
     {
         return [
             [['', 'method']],
@@ -959,7 +959,7 @@ class PhpDumperTest extends TestCase
         $container->register(TestDefinition1::class, TestDefinition1::class)->setPublic(true);
 
         $container->addCompilerPass(new class() implements CompilerPassInterface {
-            public function process(ContainerBuilder $container)
+            public function process(ContainerBuilder $container): void
             {
                 $container->setDefinition('late_alias', new Definition(TestDefinition1::class))->setPublic(true);
                 $container->setAlias(TestDefinition1::class, 'late_alias')->setPublic(true);
@@ -1136,7 +1136,7 @@ class PhpDumperTest extends TestCase
         $this->assertInstanceOf(\stdClass::class, $listener4);
     }
 
-    public function provideAlmostCircular()
+    public static function provideAlmostCircular()
     {
         yield ['public'];
         yield ['private'];
@@ -1601,6 +1601,11 @@ PHP
             ->setFactory(['Closure', 'fromCallable'])
             ->setArguments([new Reference('bar')]);
         $container->register('bar', 'stdClass');
+        $container->register('closure_of_service_closure', 'Closure')
+            ->setPublic('true')
+            ->setFactory(['Closure', 'fromCallable'])
+            ->setArguments([new ServiceClosureArgument(new Reference('bar2'))]);
+        $container->register('bar2', 'stdClass');
         $container->compile();
         $dumper = new PhpDumper($container);
 

@@ -16,7 +16,7 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\BaseDateTimeTransforme
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToRfc3339Transformer;
 use Symfony\Component\Form\Tests\Extension\Core\DataTransformer\Traits\DateTimeEqualsTrait;
 
-class DateTimeToRfc3339TransformerTest extends BaseDateTimeTransformerTest
+class DateTimeToRfc3339TransformerTest extends BaseDateTimeTransformerTestCase
 {
     use DateTimeEqualsTrait;
 
@@ -49,12 +49,12 @@ class DateTimeToRfc3339TransformerTest extends BaseDateTimeTransformerTest
         ];
     }
 
-    public function transformProvider()
+    public static function transformProvider()
     {
         return self::allProvider();
     }
 
-    public function reverseTransformProvider()
+    public static function reverseTransformProvider()
     {
         return array_merge(self::allProvider(), [
             // format without seconds, as appears in some browsers
@@ -132,7 +132,7 @@ class DateTimeToRfc3339TransformerTest extends BaseDateTimeTransformerTest
         $transformer->reverseTransform($date);
     }
 
-    public function invalidDateStringProvider()
+    public static function invalidDateStringProvider()
     {
         return [
             'invalid month' => ['2010-2010-01'],

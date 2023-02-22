@@ -356,7 +356,7 @@ class Deprecation
         return self::$vendors;
     }
 
-    private static function addSourcePathsFromPrefixes(array $prefixesByNamespace, array $paths)
+    private static function addSourcePathsFromPrefixes(array $prefixesByNamespace, array $paths): array
     {
         foreach ($prefixesByNamespace as $prefixes) {
             foreach ($prefixes as $prefix) {

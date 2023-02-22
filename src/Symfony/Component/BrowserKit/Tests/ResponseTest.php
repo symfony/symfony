@@ -103,7 +103,7 @@ class ResponseTest extends TestCase
         $response->toArray();
     }
 
-    public function provideInvalidJson(): iterable
+    public static function provideInvalidJson(): iterable
     {
         yield 'Empty string' => [''];
         yield 'Not json' => ['freferfrefer'];

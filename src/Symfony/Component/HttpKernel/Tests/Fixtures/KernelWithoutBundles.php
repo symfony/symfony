@@ -22,7 +22,7 @@ class KernelWithoutBundles extends Kernel
         return [];
     }
 
-    public function registerContainerConfiguration(LoaderInterface $loader)
+    public function registerContainerConfiguration(LoaderInterface $loader): void
     {
     }
 
@@ -31,7 +31,7 @@ class KernelWithoutBundles extends Kernel
         return __DIR__;
     }
 
-    protected function build(ContainerBuilder $container)
+    protected function build(ContainerBuilder $container): void
     {
         $container->setParameter('test_executed', true);
     }

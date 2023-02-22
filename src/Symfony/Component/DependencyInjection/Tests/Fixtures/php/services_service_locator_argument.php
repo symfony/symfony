@@ -107,7 +107,7 @@ class Symfony_DI_PhpDumper_Service_Locator_Argument extends Container
      */
     protected static function getFoo3Service($container)
     {
-        $container->factories['service_container']['foo3'] = static function ($container) {
+        $container->factories['service_container']['foo3'] = function ($container) {
             return new \stdClass();
         };
 

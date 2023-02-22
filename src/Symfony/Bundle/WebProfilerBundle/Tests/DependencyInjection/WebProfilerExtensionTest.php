@@ -60,11 +60,15 @@ class WebProfilerExtensionTest extends TestCase
 
         $this->kernel = $this->createMock(KernelInterface::class);
 
+        $profiler = $this->createMock(Profiler::class);
+        $profilerStorage = $this->createMock(ProfilerStorageInterface::class);
+        $router = $this->createMock(RouterInterface::class);
+
         $this->container = new ContainerBuilder();
         $this->container->register('data_collector.dump', DumpDataCollector::class)->setPublic(true);
         $this->container->register('error_handler.error_renderer.html', HtmlErrorRenderer::class)->setPublic(true);
         $this->container->register('event_dispatcher', EventDispatcher::class)->setPublic(true);
-        $this->container->register('router', $this->getMockClass(RouterInterface::class))->setPublic(true);
+        $this->container->register('router', $router::class)->setPublic(true);
         $this->container->register('twig', Environment::class)->setPublic(true);
         $this->container->register('twig_loader', ArrayLoader::class)->addArgument([])->setPublic(true);
         $this->container->register('twig', Environment::class)->addArgument(new Reference('twig_loader'))->setPublic(true);
@@ -76,9 +80,9 @@ class WebProfilerExtensionTest extends TestCase
         $this->container->setParameter('kernel.charset', 'UTF-8');
         $this->container->setParameter('debug.file_link_format', null);
         $this->container->setParameter('profiler.class', [Profiler::class]);
-        $this->container->register('profiler', $this->getMockClass(Profiler::class))
+        $this->container->register('profiler', $profiler::class)
             ->setPublic(true)
-            ->addArgument(new Definition($this->getMockClass(ProfilerStorageInterface::class)));
+            ->addArgument(new Definition($profilerStorage::class));
         $this->container->setParameter('data_collector.templates', []);
         $this->container->set('kernel', $this->kernel);
         $this->container->addCompilerPass(new RegisterListenersPass());
@@ -108,7 +112,7 @@ class WebProfilerExtensionTest extends TestCase
         self::assertSaneContainer($this->getCompiledContainer());
     }
 
-    public function getDebugModes()
+    public static function getDebugModes()
     {
         return [
             ['debug' => false],
@@ -134,7 +138,7 @@ class WebProfilerExtensionTest extends TestCase
         }
     }
 
-    public function getToolbarConfig()
+    public static function getToolbarConfig()
     {
         return [
             [
@@ -175,7 +179,7 @@ class WebProfilerExtensionTest extends TestCase
         }
     }
 
-    public function getInterceptRedirectsToolbarConfig()
+    public static function getInterceptRedirectsToolbarConfig()
     {
         return [
              [

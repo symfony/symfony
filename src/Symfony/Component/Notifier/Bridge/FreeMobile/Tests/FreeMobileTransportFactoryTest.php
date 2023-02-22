@@ -21,7 +21,7 @@ final class FreeMobileTransportFactoryTest extends TransportFactoryTestCase
         return new FreeMobileTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'freemobile://host.test?phone=0611223344',
@@ -29,18 +29,18 @@ final class FreeMobileTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'freemobile://login:pass@default?phone=0611223344'];
         yield [false, 'somethingElse://login:pass@default?phone=0611223344'];
     }
 
-    public function missingRequiredOptionProvider(): iterable
+    public static function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: phone' => ['freemobile://login:pass@default'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://login:pass@default?phone=0611223344'];
         yield ['somethingElse://login:pass@default']; // missing "phone" option

@@ -24,6 +24,7 @@ class BackedEnumValueResolverTest extends TestCase
      * In Symfony 7, keep this test case but remove the call to supports().
      *
      * @group legacy
+     *
      * @dataProvider provideTestSupportsData
      */
     public function testSupports(Request $request, ArgumentMetadata $metadata, bool $expectedSupport)
@@ -36,7 +37,7 @@ class BackedEnumValueResolverTest extends TestCase
         self::assertSame($expectedSupport, $resolver->supports($request, $metadata));
     }
 
-    public function provideTestSupportsData(): iterable
+    public static function provideTestSupportsData(): iterable
     {
         yield 'unsupported type' => [
             self::createRequest(['suit' => 'H']),
@@ -85,7 +86,7 @@ class BackedEnumValueResolverTest extends TestCase
         self::assertSame($expected, $results);
     }
 
-    public function provideTestResolveData(): iterable
+    public static function provideTestResolveData(): iterable
     {
         yield 'resolves from attributes' => [
             self::createRequest(['suit' => 'H']),

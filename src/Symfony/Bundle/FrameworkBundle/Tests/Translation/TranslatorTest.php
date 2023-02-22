@@ -178,7 +178,7 @@ class TranslatorTest extends TestCase
         $translator->trans('some_message', [], null, 'some_locale');
     }
 
-    public function getDebugModeAndCacheDirCombinations()
+    public static function getDebugModeAndCacheDirCombinations()
     {
         return [
             [false, false],

@@ -21,6 +21,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class AddSessionDomainConstraintPass implements CompilerPassInterface
 {
+    /**
+     * @return void
+     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasParameter('session.storage.options') || !$container->has('security.http_utils')) {

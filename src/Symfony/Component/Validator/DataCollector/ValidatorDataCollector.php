@@ -37,12 +37,12 @@ class ValidatorDataCollector extends DataCollector implements LateDataCollectorI
         $this->reset();
     }
 
-    public function collect(Request $request, Response $response, \Throwable $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null): void
     {
         // Everything is collected once, on kernel terminate.
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->data = [
             'calls' => $this->cloneVar([]),
@@ -50,7 +50,7 @@ class ValidatorDataCollector extends DataCollector implements LateDataCollectorI
         ];
     }
 
-    public function lateCollect()
+    public function lateCollect(): void
     {
         $collected = $this->validator->getCollectedData();
         $this->data['calls'] = $this->cloneVar($collected);

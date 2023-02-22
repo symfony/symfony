@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\DomCrawler\Tests;
 
-class Html5ParserCrawlerTest extends AbstractCrawlerTest
+class Html5ParserCrawlerTest extends AbstractCrawlerTestCase
 {
     public static function getDoctype(): string
     {
@@ -46,9 +46,9 @@ class Html5ParserCrawlerTest extends AbstractCrawlerTest
         self::assertEmpty($crawler->filterXPath('//h1')->text(), '->addHtmlContent failed as expected');
     }
 
-    public function validHtml5Provider(): iterable
+    public static function validHtml5Provider(): iterable
     {
-        $html = static::getDoctype().'<html><body><h1><p>Foo</p></h1></body></html>';
+        $html = self::getDoctype().'<html><body><h1><p>Foo</p></h1></body></html>';
         $BOM = \chr(0xEF).\chr(0xBB).\chr(0xBF);
 
         yield 'BOM first' => [$BOM.$html];
@@ -59,9 +59,9 @@ class Html5ParserCrawlerTest extends AbstractCrawlerTest
         yield 'All together' => [$BOM.'  <!--c-->'.$html];
     }
 
-    public function invalidHtml5Provider(): iterable
+    public static function invalidHtml5Provider(): iterable
     {
-        $html = static::getDoctype().'<html><body><h1><p>Foo</p></h1></body></html>';
+        $html = self::getDoctype().'<html><body><h1><p>Foo</p></h1></body></html>';
 
         yield 'Text' => ['hello world'.$html];
         yield 'Text between comments' => ['<!--c--> test <!--cc-->'.$html];

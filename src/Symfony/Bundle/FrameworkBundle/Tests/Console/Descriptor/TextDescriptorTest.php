@@ -15,23 +15,23 @@ use Symfony\Bundle\FrameworkBundle\Console\Descriptor\TextDescriptor;
 use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 use Symfony\Component\Routing\Route;
 
-class TextDescriptorTest extends AbstractDescriptorTest
+class TextDescriptorTest extends AbstractDescriptorTestCase
 {
-    private $fileLinkFormatter = null;
+    private static $fileLinkFormatter = null;
 
-    protected function getDescriptor()
+    protected static function getDescriptor()
     {
-        return new TextDescriptor($this->fileLinkFormatter);
+        return new TextDescriptor(static::$fileLinkFormatter);
     }
 
-    protected function getFormat()
+    protected static function getFormat()
     {
         return 'txt';
     }
 
-    public function getDescribeRouteWithControllerLinkTestData()
+    public static function getDescribeRouteWithControllerLinkTestData()
     {
-        $getDescribeData = $this->getDescribeRouteTestData();
+        $getDescribeData = static::getDescribeRouteTestData();
 
         foreach ($getDescribeData as $key => &$data) {
             $routeStub = $data[0];
@@ -48,7 +48,7 @@ class TextDescriptorTest extends AbstractDescriptorTest
     /** @dataProvider getDescribeRouteWithControllerLinkTestData */
     public function testDescribeRouteWithControllerLink(Route $route, $expectedDescription)
     {
-        $this->fileLinkFormatter = new FileLinkFormatter('myeditor://open?file=%f&line=%l');
+        static::$fileLinkFormatter = new FileLinkFormatter('myeditor://open?file=%f&line=%l');
         parent::testDescribeRoute($route, str_replace('[:file:]', __FILE__, $expectedDescription));
     }
 }

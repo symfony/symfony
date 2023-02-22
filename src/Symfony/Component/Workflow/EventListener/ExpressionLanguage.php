@@ -22,6 +22,9 @@ use Symfony\Component\Workflow\Exception\RuntimeException;
  */
 class ExpressionLanguage extends BaseExpressionLanguage
 {
+    /**
+     * @return void
+     */
     protected function registerFunctions()
     {
         parent::registerFunctions();

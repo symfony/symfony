@@ -1,0 +1,69 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\CssSelector\Tests\Parser\Handler;
+
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\CssSelector\Parser\Reader;
+use Symfony\Component\CssSelector\Parser\Token;
+use Symfony\Component\CssSelector\Parser\TokenStream;
+
+/**
+ * @author Jean-François Simon <contact@jfsimon.fr>
+ */
+abstract class AbstractHandlerTestCase extends TestCase
+{
+    /** @dataProvider getHandleValueTestData */
+    public function testHandleValue($value, Token $expectedToken, $remainingContent)
+    {
+        $reader = new Reader($value);
+        $stream = new TokenStream();
+
+        $this->assertTrue($this->generateHandler()->handle($reader, $stream));
+        $this->assertEquals($expectedToken, $stream->getNext());
+        $this->assertRemainingContent($reader, $remainingContent);
+    }
+
+    /** @dataProvider getDontHandleValueTestData */
+    public function testDontHandleValue($value)
+    {
+        $reader = new Reader($value);
+        $stream = new TokenStream();
+
+        $this->assertFalse($this->generateHandler()->handle($reader, $stream));
+        $this->assertStreamEmpty($stream);
+        $this->assertRemainingContent($reader, $value);
+    }
+
+    abstract public static function getHandleValueTestData();
+
+    abstract public static function getDontHandleValueTestData();
+
+    abstract protected function generateHandler();
+
+    protected function assertStreamEmpty(TokenStream $stream)
+    {
+        $property = new \ReflectionProperty($stream, 'tokens');
+
+        $this->assertEquals([], $property->getValue($stream));
+    }
+
+    protected function assertRemainingContent(Reader $reader, $remainingContent)
+    {
+        if ('' === $remainingContent) {
+            $this->assertEquals(0, $reader->getRemainingLength());
+            $this->assertTrue($reader->isEOF());
+        } else {
+            $this->assertEquals(\strlen($remainingContent), $reader->getRemainingLength());
+            $this->assertEquals(0, $reader->getOffset($remainingContent));
+        }
+    }
+}

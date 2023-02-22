@@ -19,9 +19,10 @@ use Symfony\Component\Lock\Store\ZookeeperStore;
  * @author Ganesh Chandrasekaran <gchandrasekaran@wayfair.com>
  *
  * @requires extension zookeeper
+ *
  * @group integration
  */
-class ZookeeperStoreTest extends AbstractStoreTest
+class ZookeeperStoreTest extends AbstractStoreTestCase
 {
     use UnserializableTestTrait;
 
@@ -42,7 +43,7 @@ class ZookeeperStoreTest extends AbstractStoreTest
         $this->assertInstanceOf(\Zookeeper::class, ZookeeperStore::createConnection($connectionString));
     }
 
-    public function provideValidConnectionString(): iterable
+    public static function provideValidConnectionString(): iterable
     {
         yield 'single host' => ['zookeeper://localhost:2181'];
         yield 'single multiple host' => ['zookeeper://localhost:2181,localhost:2181'];

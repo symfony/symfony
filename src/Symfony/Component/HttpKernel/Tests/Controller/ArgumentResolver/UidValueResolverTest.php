@@ -25,9 +25,10 @@ use Symfony\Component\Uid\UuidV4;
 class UidValueResolverTest extends TestCase
 {
     /**
-     * In Symfony 7, keep this test case but remove the call to supports()
+     * In Symfony 7, keep this test case but remove the call to supports().
      *
      * @group legacy
+     *
      * @dataProvider provideSupports
      */
     public function testSupports(bool $expected, Request $request, ArgumentMetadata $argument)
@@ -39,7 +40,7 @@ class UidValueResolverTest extends TestCase
         $this->assertSame($expected, (new UidValueResolver())->supports($request, $argument));
     }
 
-    public function provideSupports()
+    public static function provideSupports()
     {
         return [
             'Variadic argument' => [false, new Request([], [], ['foo' => (string) $uuidV4 = new UuidV4()]), new ArgumentMetadata('foo', UuidV4::class, true, false, null)],
@@ -67,7 +68,7 @@ class UidValueResolverTest extends TestCase
         ));
     }
 
-    public function provideResolveOK()
+    public static function provideResolveOK()
     {
         return [
             [$uuidV1 = new UuidV1(), (string) $uuidV1],
@@ -96,7 +97,7 @@ class UidValueResolverTest extends TestCase
         );
     }
 
-    public function provideResolveKO()
+    public static function provideResolveKO()
     {
         return [
             'Bad value for UUID' => ['ccc', UuidV1::class],

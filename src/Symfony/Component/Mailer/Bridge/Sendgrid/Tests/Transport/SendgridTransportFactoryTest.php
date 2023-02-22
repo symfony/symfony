@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Mailer\Bridge\Sendgrid\Tests\Transport;
 
+use Psr\Log\NullLogger;
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridApiTransport;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridSmtpTransport;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
@@ -22,10 +24,10 @@ class SendgridTransportFactoryTest extends TransportFactoryTestCase
 {
     public function getFactory(): TransportFactoryInterface
     {
-        return new SendgridTransportFactory($this->getDispatcher(), $this->getClient(), $this->getLogger());
+        return new SendgridTransportFactory(null, new MockHttpClient(), new NullLogger());
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [
             new Dsn('sendgrid+api', 'default'),
@@ -53,38 +55,37 @@ class SendgridTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
-        $dispatcher = $this->getDispatcher();
-        $logger = $this->getLogger();
+        $logger = new NullLogger();
 
         yield [
             new Dsn('sendgrid+api', 'default', self::USER),
-            new SendgridApiTransport(self::USER, $this->getClient(), $dispatcher, $logger),
+            new SendgridApiTransport(self::USER, new MockHttpClient(), null, $logger),
         ];
 
         yield [
             new Dsn('sendgrid+api', 'example.com', self::USER, '', 8080),
-            (new SendgridApiTransport(self::USER, $this->getClient(), $dispatcher, $logger))->setHost('example.com')->setPort(8080),
+            (new SendgridApiTransport(self::USER, new MockHttpClient(), null, $logger))->setHost('example.com')->setPort(8080),
         ];
 
         yield [
             new Dsn('sendgrid', 'default', self::USER),
-            new SendgridSmtpTransport(self::USER, $dispatcher, $logger),
+            new SendgridSmtpTransport(self::USER, null, $logger),
         ];
 
         yield [
             new Dsn('sendgrid+smtp', 'default', self::USER),
-            new SendgridSmtpTransport(self::USER, $dispatcher, $logger),
+            new SendgridSmtpTransport(self::USER, null, $logger),
         ];
 
         yield [
             new Dsn('sendgrid+smtps', 'default', self::USER),
-            new SendgridSmtpTransport(self::USER, $dispatcher, $logger),
+            new SendgridSmtpTransport(self::USER, null, $logger),
         ];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield [
             new Dsn('sendgrid+foo', 'sendgrid', self::USER),
@@ -92,7 +93,7 @@ class SendgridTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield [new Dsn('sendgrid+api', 'default')];
     }

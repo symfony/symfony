@@ -12,37 +12,39 @@
 namespace Symfony\Component\Notifier\Bridge\FakeSms\Tests;
 
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\FakeSms\FakeSmsLoggerTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
+use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class FakeSmsLoggerTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null, LoggerInterface $logger = null): FakeSmsLoggerTransport
+    public static function createTransport(HttpClientInterface $client = null, LoggerInterface $logger = null): FakeSmsLoggerTransport
     {
-        $transport = (new FakeSmsLoggerTransport($logger ?? $this->createMock(LoggerInterface::class), $client ?? $this->createMock(HttpClientInterface::class)));
+        $transport = (new FakeSmsLoggerTransport($logger ?? new NullLogger(), $client ?? new MockHttpClient()));
 
         return $transport;
     }
 
-    public function toStringProvider(): iterable
+    public static function toStringProvider(): iterable
     {
-        yield ['fakesms+logger://default', $this->createTransport()];
+        yield ['fakesms+logger://default', self::createTransport()];
     }
 
-    public function supportedMessagesProvider(): iterable
+    public static function supportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
         yield [new SmsMessage('+33611223344', 'Hello!')];
     }
 
-    public function unsupportedMessagesProvider(): iterable
+    public static function unsupportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [new DummyMessage()];
     }
 
     public function testSendWithDefaultTransport()
@@ -51,7 +53,7 @@ final class FakeSmsLoggerTransportTest extends TransportTestCase
 
         $logger = new TestLogger();
 
-        $transport = $this->createTransport(null, $logger);
+        $transport = self::createTransport(null, $logger);
 
         $transport->send($message);
 

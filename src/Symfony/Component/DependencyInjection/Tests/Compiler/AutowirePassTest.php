@@ -939,7 +939,7 @@ class AutowirePassTest extends TestCase
         }
     }
 
-    public function provideNotWireableCalls()
+    public static function provideNotWireableCalls()
     {
         return [
             ['setNotAutowireable', 'Cannot autowire service "foo": argument "$n" of method "Symfony\Component\DependencyInjection\Tests\Compiler\NotWireable::setNotAutowireable()" has type "Symfony\Component\DependencyInjection\Tests\Compiler\NotARealClass" but this class was not found.'],
@@ -1202,6 +1202,21 @@ class AutowirePassTest extends TestCase
         static::assertInstanceOf(DecoratedDecorator::class, $container->get(DecoratorImpl::class));
     }
 
+    public function testAutowireWithNamedArgs()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', MultipleArgumentsOptionalScalar::class)
+            ->setArguments(['foo' => 'abc'])
+            ->setAutowired(true)
+            ->setPublic(true);
+        $container->register(A::class, A::class);
+
+        (new AutowirePass())->process($container);
+
+        $this->assertEquals([new TypedReference(A::class, A::class), 'abc'], $container->getDefinition('foo')->getArguments());
+    }
+
     public function testAutowireAttribute()
     {
         $container = new ContainerBuilder();
@@ -1213,21 +1228,24 @@ class AutowirePassTest extends TestCase
 
         $container->register('some.id', \stdClass::class);
         $container->setParameter('some.parameter', 'foo');
+        $container->setParameter('null.parameter', null);
 
         (new ResolveClassPass())->process($container);
         (new AutowirePass())->process($container);
 
         $definition = $container->getDefinition(AutowireAttribute::class);
 
-        $this->assertCount(8, $definition->getArguments());
+        $this->assertCount(10, $definition->getArguments());
         $this->assertEquals(new Reference('some.id'), $definition->getArgument(0));
         $this->assertEquals(new Expression("parameter('some.parameter')"), $definition->getArgument(1));
         $this->assertSame('foo/bar', $definition->getArgument(2));
-        $this->assertEquals(new Reference('some.id'), $definition->getArgument(3));
-        $this->assertEquals(new Expression("parameter('some.parameter')"), $definition->getArgument(4));
-        $this->assertSame('bar', $definition->getArgument(5));
-        $this->assertSame('@bar', $definition->getArgument(6));
-        $this->assertEquals(new Reference('invalid.id', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(7));
+        $this->assertNull($definition->getArgument(3));
+        $this->assertEquals(new Reference('some.id'), $definition->getArgument(4));
+        $this->assertEquals(new Expression("parameter('some.parameter')"), $definition->getArgument(5));
+        $this->assertSame('bar', $definition->getArgument(6));
+        $this->assertSame('@bar', $definition->getArgument(7));
+        $this->assertSame('foo', $definition->getArgument(8));
+        $this->assertEquals(new Reference('invalid.id', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(9));
 
         $container->compile();
 
@@ -1240,6 +1258,7 @@ class AutowirePassTest extends TestCase
         $this->assertSame('foo', $service->expressionAsValue);
         $this->assertSame('bar', $service->rawValue);
         $this->assertSame('@bar', $service->escapedRawValue);
+        $this->assertSame('foo', $service->customAutowire);
         $this->assertNull($service->invalid);
     }
 

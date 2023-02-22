@@ -50,6 +50,9 @@ class LintCommand extends Command
         $this->isReadableProvider = null === $isReadableProvider ? null : $isReadableProvider(...);
     }
 
+    /**
+     * @return void
+     */
     protected function configure()
     {
         $this
@@ -91,10 +94,6 @@ EOF
         $this->format = $input->getOption('format');
         $flags = $input->getOption('parse-tags');
 
-        if ('github' === $this->format && !class_exists(GithubActionReporter::class)) {
-            throw new \InvalidArgumentException('The "github" format is only available since "symfony/console" >= 5.3.');
-        }
-
         if (null === $this->format) {
             // Autodetect format according to CI environment
             $this->format = class_exists(GithubActionReporter::class) && GithubActionReporter::isGithubActionEnvironment() ? 'github' : 'txt';
@@ -128,7 +127,7 @@ EOF
         return $this->display($io, $filesInfo);
     }
 
-    private function validate(string $content, int $flags, string $file = null)
+    private function validate(string $content, int $flags, string $file = null): array
     {
         $prevErrorHandler = set_error_handler(function ($level, $message, $file, $line) use (&$prevErrorHandler) {
             if (\E_USER_DEPRECATED === $level) {

@@ -10,7 +10,7 @@
         <framework:workflow name="my_workflow" type="state_machine">
             <framework:initial-marking>one</framework:initial-marking>
             <framework:marking-store type="method" property="state" />
-            <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest</framework:support>
+            <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTestCase</framework:support>
             <framework:event-to-dispatch>workflow.leave</framework:event-to-dispatch>
             <framework:event-to-dispatch>workflow.completed</framework:event-to-dispatch>
             <framework:place name="one" />

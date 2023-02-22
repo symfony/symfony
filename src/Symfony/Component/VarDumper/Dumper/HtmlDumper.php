@@ -962,7 +962,7 @@ EOHTML
     }
 }
 
-function esc(string $str)
+function esc(string $str): string
 {
     return htmlspecialchars($str, \ENT_QUOTES, 'UTF-8');
 }

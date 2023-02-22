@@ -32,7 +32,7 @@ class NotNullValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidValues()
+    public static function getValidValues()
     {
         return [
             [0],
@@ -55,7 +55,7 @@ class NotNullValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function provideInvalidConstraints(): iterable
+    public static function provideInvalidConstraints(): iterable
     {
         yield 'Doctrine style' => [new NotNull([
             'message' => 'myMessage',

@@ -16,17 +16,17 @@ use Symfony\Component\Security\Core\Test\AccessDecisionStrategyTestCase;
 
 class AffirmativeStrategyTest extends AccessDecisionStrategyTestCase
 {
-    public function provideStrategyTests(): iterable
+    public static function provideStrategyTests(): iterable
     {
         $strategy = new AffirmativeStrategy();
 
-        yield [$strategy, $this->getVoters(1, 0, 0), true];
-        yield [$strategy, $this->getVoters(1, 2, 0), true];
-        yield [$strategy, $this->getVoters(0, 1, 0), false];
-        yield [$strategy, $this->getVoters(0, 0, 1), false];
+        yield [$strategy, self::getVoters(1, 0, 0), true];
+        yield [$strategy, self::getVoters(1, 2, 0), true];
+        yield [$strategy, self::getVoters(0, 1, 0), false];
+        yield [$strategy, self::getVoters(0, 0, 1), false];
 
         $strategy = new AffirmativeStrategy(true);
 
-        yield [$strategy, $this->getVoters(0, 0, 1), true];
+        yield [$strategy, self::getVoters(0, 0, 1), true];
     }
 }

@@ -63,7 +63,7 @@ class MockClockTest extends TestCase
         $this->assertSame($tz, $clock->now()->getTimezone()->getName());
     }
 
-    public function provideValidModifyStrings(): iterable
+    public static function provideValidModifyStrings(): iterable
     {
         yield 'absolute datetime value' => [
             '2112-09-17 23:53:03.001',
@@ -90,7 +90,7 @@ class MockClockTest extends TestCase
         $this->assertSame($tz, $clock->now()->getTimezone()->getName());
     }
 
-    public function provideInvalidModifyStrings(): iterable
+    public static function provideInvalidModifyStrings(): iterable
     {
         yield 'Named holiday is not recognized' => [
             'Halloween',

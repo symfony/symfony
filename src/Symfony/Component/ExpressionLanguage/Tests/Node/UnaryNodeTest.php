@@ -14,9 +14,9 @@ namespace Symfony\Component\ExpressionLanguage\Tests\Node;
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 use Symfony\Component\ExpressionLanguage\Node\UnaryNode;
 
-class UnaryNodeTest extends AbstractNodeTest
+class UnaryNodeTest extends AbstractNodeTestCase
 {
-    public function getEvaluateData()
+    public static function getEvaluateData(): array
     {
         return [
             [-1, new UnaryNode('-', new ConstantNode(1))],
@@ -26,7 +26,7 @@ class UnaryNodeTest extends AbstractNodeTest
         ];
     }
 
-    public function getCompileData()
+    public static function getCompileData(): array
     {
         return [
             ['(-1)', new UnaryNode('-', new ConstantNode(1))],
@@ -36,7 +36,7 @@ class UnaryNodeTest extends AbstractNodeTest
         ];
     }
 
-    public function getDumpData()
+    public static function getDumpData(): array
     {
         return [
             ['(- 1)', new UnaryNode('-', new ConstantNode(1))],

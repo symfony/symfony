@@ -58,9 +58,9 @@ class InputOption
     private string $description;
 
     /**
-     * @param string|array|null                $shortcut The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
-     * @param int|null                         $mode     The option mode: One of the VALUE_* constants
-     * @param string|bool|int|float|array|null $default  The default value (must be null for self::VALUE_NONE)
+     * @param string|array|null                                                             $shortcut        The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
+     * @param int|null                                                                      $mode            The option mode: One of the VALUE_* constants
+     * @param string|bool|int|float|array|null                                              $default         The default value (must be null for self::VALUE_NONE)
      * @param array|\Closure(CompletionInput,CompletionSuggestions):list<string|Suggestion> $suggestedValues The values used for input completion
      *
      * @throws InvalidArgumentException If option mode is invalid or incompatible
@@ -178,6 +178,9 @@ class InputOption
         return self::VALUE_NEGATABLE === (self::VALUE_NEGATABLE & $this->mode);
     }
 
+    /**
+     * @return void
+     */
     public function setDefault(string|bool|int|float|array $default = null)
     {
         if (1 > \func_num_args()) {

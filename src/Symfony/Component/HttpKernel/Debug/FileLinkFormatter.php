@@ -49,7 +49,10 @@ class FileLinkFormatter
         $this->urlFormat = $urlFormat;
     }
 
-    public function format(string $file, int $line)
+    /**
+     * @return string|false
+     */
+    public function format(string $file, int $line): string|bool
     {
         if ($fmt = $this->getFileLinkFormat()) {
             for ($i = 1; isset($fmt[$i]); ++$i) {

@@ -21,7 +21,7 @@ final class IqsmsTransportFactoryTest extends TransportFactoryTestCase
         return new IqsmsTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'iqsms://host.test?from=FROM',
@@ -29,25 +29,25 @@ final class IqsmsTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'iqsms://login:password@default?from=FROM'];
         yield [false, 'somethingElse://login:password@default?from=FROM'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield 'missing login' => ['iqsms://:password@host.test?from=FROM'];
         yield 'missing password' => ['iqsms://login:@host.test?from=FROM'];
         yield 'missing credentials' => ['iqsms://@host.test?from=FROM'];
     }
 
-    public function missingRequiredOptionProvider(): iterable
+    public static function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: from' => ['iqsms://login:password@default'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://login:password@default?from=FROM'];
         yield ['somethingElse://login:password@default']; // missing "from" option

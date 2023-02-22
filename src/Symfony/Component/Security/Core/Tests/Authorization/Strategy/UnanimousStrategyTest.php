@@ -16,18 +16,18 @@ use Symfony\Component\Security\Core\Test\AccessDecisionStrategyTestCase;
 
 class UnanimousStrategyTest extends AccessDecisionStrategyTestCase
 {
-    public function provideStrategyTests(): iterable
+    public static function provideStrategyTests(): iterable
     {
         $strategy = new UnanimousStrategy();
 
-        yield [$strategy, $this->getVoters(1, 0, 0), true];
-        yield [$strategy, $this->getVoters(1, 0, 1), true];
-        yield [$strategy, $this->getVoters(1, 1, 0), false];
+        yield [$strategy, self::getVoters(1, 0, 0), true];
+        yield [$strategy, self::getVoters(1, 0, 1), true];
+        yield [$strategy, self::getVoters(1, 1, 0), false];
 
-        yield [$strategy, $this->getVoters(0, 0, 2), false];
+        yield [$strategy, self::getVoters(0, 0, 2), false];
 
         $strategy = new UnanimousStrategy(true);
 
-        yield [$strategy, $this->getVoters(0, 0, 2), true];
+        yield [$strategy, self::getVoters(0, 0, 2), true];
     }
 }

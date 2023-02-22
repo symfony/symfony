@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
  * @author Drak <drak@zikula.org>
  *
  * @runTestsInSeparateProcesses
+ *
  * @preserveGlobalState disabled
  */
 class NativeFileSessionHandlerTest extends TestCase
@@ -47,7 +48,7 @@ class NativeFileSessionHandlerTest extends TestCase
         rmdir($path);
     }
 
-    public function savePathDataProvider()
+    public static function savePathDataProvider()
     {
         $base = sys_get_temp_dir();
 

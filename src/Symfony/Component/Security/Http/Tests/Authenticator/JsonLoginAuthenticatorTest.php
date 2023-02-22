@@ -48,7 +48,7 @@ class JsonLoginAuthenticatorTest extends TestCase
         $this->assertTrue($this->authenticator->supports($request));
     }
 
-    public function provideSupportData()
+    public static function provideSupportData()
     {
         yield [new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": "dunglas", "password": "foo"}')];
 
@@ -67,7 +67,7 @@ class JsonLoginAuthenticatorTest extends TestCase
         $this->assertSame($result, $this->authenticator->supports($request));
     }
 
-    public function provideSupportsWithCheckPathData()
+    public static function provideSupportsWithCheckPathData()
     {
         yield [Request::create('/api/login', 'GET', [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json']), true];
         yield [Request::create('/login', 'GET', [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json']), false];
@@ -107,7 +107,7 @@ class JsonLoginAuthenticatorTest extends TestCase
         $this->authenticator->authenticate($request);
     }
 
-    public function provideInvalidAuthenticateData()
+    public static function provideInvalidAuthenticateData()
     {
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json']);
         yield [$request, 'Invalid JSON.'];
@@ -142,7 +142,7 @@ class JsonLoginAuthenticatorTest extends TestCase
         $this->authenticator->authenticate($request);
     }
 
-    public function provideEmptyAuthenticateData()
+    public static function provideEmptyAuthenticateData()
     {
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": "", "password": "notempty"}');
         yield [$request];

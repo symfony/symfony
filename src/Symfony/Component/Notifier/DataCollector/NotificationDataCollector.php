@@ -29,7 +29,7 @@ final class NotificationDataCollector extends DataCollector
         $this->logger = $logger;
     }
 
-    public function collect(Request $request, Response $response, \Throwable $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null): void
     {
         $this->data['events'] = $this->logger->getEvents();
     }
@@ -39,7 +39,7 @@ final class NotificationDataCollector extends DataCollector
         return $this->data['events'];
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->data = [];
     }

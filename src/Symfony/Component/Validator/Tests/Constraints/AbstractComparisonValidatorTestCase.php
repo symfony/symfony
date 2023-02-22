@@ -69,7 +69,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
         return $result;
     }
 
-    public function provideInvalidConstraintOptions()
+    public static function provideInvalidConstraintOptions()
     {
         return [
             [null],
@@ -109,15 +109,16 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
         $this->assertNoViolation();
     }
 
-    public function provideAllValidComparisons(): array
+    public static function provideAllValidComparisons(): array
     {
         // The provider runs before setUp(), so we need to manually fix
         // the default timezone
-        $this->setDefaultTimezone('UTC');
+        $timezone = date_default_timezone_get();
+        date_default_timezone_set('UTC');
 
-        $comparisons = self::addPhp5Dot5Comparisons($this->provideValidComparisons());
+        $comparisons = self::addPhp5Dot5Comparisons(static::provideValidComparisons());
 
-        $this->restoreDefaultTimezone();
+        date_default_timezone_set($timezone);
 
         return $comparisons;
     }
@@ -163,9 +164,9 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
         $this->validator->validate(5, $constraint);
     }
 
-    abstract public function provideValidComparisons(): array;
+    abstract public static function provideValidComparisons(): array;
 
-    abstract public function provideValidComparisonsToPropertyPath(): array;
+    abstract public static function provideValidComparisonsToPropertyPath(): array;
 
     /**
      * @dataProvider provideAllInvalidComparisons
@@ -224,9 +225,9 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
         $this->validator->validate($value, $constraint);
     }
 
-    public function throwsOnInvalidStringDatesProvider(): array
+    public static function throwsOnInvalidStringDatesProvider(): array
     {
-        $constraint = $this->createConstraint([
+        $constraint = static::createConstraint([
             'value' => 'foo',
         ]);
 
@@ -264,24 +265,25 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
         }
     }
 
-    public function provideAllInvalidComparisons(): array
+    public static function provideAllInvalidComparisons(): array
     {
         // The provider runs before setUp(), so we need to manually fix
         // the default timezone
-        $this->setDefaultTimezone('UTC');
+        $timezone = date_default_timezone_get();
+        date_default_timezone_set('UTC');
 
-        $comparisons = self::addPhp5Dot5Comparisons($this->provideInvalidComparisons());
+        $comparisons = self::addPhp5Dot5Comparisons(static::provideInvalidComparisons());
 
-        $this->restoreDefaultTimezone();
+        date_default_timezone_set($timezone);
 
         return $comparisons;
     }
 
-    abstract public function provideInvalidComparisons(): array;
+    abstract public static function provideInvalidComparisons(): array;
 
-    abstract public function provideComparisonsToNullValueAtPropertyPath();
+    abstract public static function provideComparisonsToNullValueAtPropertyPath();
 
-    abstract protected function createConstraint(array $options = null): Constraint;
+    abstract protected static function createConstraint(array $options = null): Constraint;
 
     protected function getErrorCode(): ?string
     {

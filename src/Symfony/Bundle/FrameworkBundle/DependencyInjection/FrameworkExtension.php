@@ -265,6 +265,8 @@ class FrameworkExtension extends Extension
     /**
      * Responds to the app.config configuration parameter.
      *
+     * @return void
+     *
      * @throws LogicException
      */
     public function load(array $configs, ContainerBuilder $container)
@@ -720,7 +722,7 @@ class FrameworkExtension extends Extension
         return class_exists(Application::class);
     }
 
-    private function registerFormConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
+    private function registerFormConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
         $loader->load('form.php');
 
@@ -751,13 +753,17 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerHttpCacheConfiguration(array $config, ContainerBuilder $container, bool $httpMethodOverride)
+    private function registerHttpCacheConfiguration(array $config, ContainerBuilder $container, bool $httpMethodOverride): void
     {
         $options = $config;
         unset($options['enabled']);
 
         if (!$options['private_headers']) {
             unset($options['private_headers']);
+        }
+
+        if (!$options['skip_response_headers']) {
+            unset($options['skip_response_headers']);
         }
 
         $container->getDefinition('http_cache')
@@ -772,7 +778,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerEsiConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
+    private function registerEsiConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
         if (!$this->readConfigEnabled('esi', $container, $config)) {
             $container->removeDefinition('fragment.renderer.esi');
@@ -783,7 +789,7 @@ class FrameworkExtension extends Extension
         $loader->load('esi.php');
     }
 
-    private function registerSsiConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
+    private function registerSsiConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
         if (!$this->readConfigEnabled('ssi', $container, $config)) {
             $container->removeDefinition('fragment.renderer.ssi');
@@ -794,7 +800,7 @@ class FrameworkExtension extends Extension
         $loader->load('ssi.php');
     }
 
-    private function registerFragmentsConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
+    private function registerFragmentsConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
         if (!$this->readConfigEnabled('fragments', $container, $config)) {
             $container->removeDefinition('fragment.renderer.hinclude');
@@ -808,7 +814,7 @@ class FrameworkExtension extends Extension
         $container->setParameter('fragment.path', $config['path']);
     }
 
-    private function registerProfilerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
+    private function registerProfilerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
         if (!$this->readConfigEnabled('profiler', $container, $config)) {
             // this is needed for the WebProfiler to work even if the profiler is disabled
@@ -874,7 +880,7 @@ class FrameworkExtension extends Extension
             ->addArgument($config['collect_parameter']);
     }
 
-    private function registerWorkflowConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
+    private function registerWorkflowConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
         if (!$config['enabled']) {
             $container->removeDefinition('console.command.workflow_dump');
@@ -1072,7 +1078,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerDebugConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
+    private function registerDebugConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
         $loader->load('debug_prod.php');
 
@@ -1085,7 +1091,7 @@ class FrameworkExtension extends Extension
 
         $debug = $container->getParameter('kernel.debug');
 
-        if ($debug) {
+        if ($debug && !$container->hasParameter('debug.container.dump')) {
             $container->setParameter('debug.container.dump', '%kernel.build_dir%/%kernel.container_class%.xml');
         }
 
@@ -1093,12 +1099,12 @@ class FrameworkExtension extends Extension
             $loader->load('debug.php');
         }
 
-        $definition = $container->findDefinition('debug.debug_handlers_listener');
+        $definition = $container->findDefinition('debug.error_handler_configurator');
 
         if (false === $config['log']) {
-            $definition->replaceArgument(1, null);
+            $definition->replaceArgument(0, null);
         } elseif (true !== $config['log']) {
-            $definition->replaceArgument(2, $config['log']);
+            $definition->replaceArgument(1, $config['log']);
         }
 
         if (!$config['throw']) {
@@ -1113,7 +1119,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerRouterConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, array $enabledLocales = [])
+    private function registerRouterConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, array $enabledLocales = []): void
     {
         if (!$this->readConfigEnabled('router', $container, $config)) {
             $container->removeDefinition('console.command.router_debug');
@@ -1164,7 +1170,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerSessionConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
+    private function registerSessionConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
         $loader->load('session.php');
 
@@ -1212,7 +1218,7 @@ class FrameworkExtension extends Extension
         $container->setParameter('session.metadata.update_threshold', $config['metadata_update_threshold']);
     }
 
-    private function registerRequestConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
+    private function registerRequestConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
         if ($config['formats']) {
             $loader->load('request.php');
@@ -1222,7 +1228,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerAssetsConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
+    private function registerAssetsConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
         $loader->load('assets.php');
 
@@ -1300,7 +1306,7 @@ class FrameworkExtension extends Extension
         return new Reference('assets.empty_version_strategy');
     }
 
-    private function registerTranslatorConfiguration(array $config, ContainerBuilder $container, LoaderInterface $loader, string $defaultLocale, array $enabledLocales)
+    private function registerTranslatorConfiguration(array $config, ContainerBuilder $container, LoaderInterface $loader, string $defaultLocale, array $enabledLocales): void
     {
         if (!$this->readConfigEnabled('translator', $container, $config)) {
             $container->removeDefinition('console.command.translation_debug');
@@ -1491,7 +1497,7 @@ class FrameworkExtension extends Extension
         $container->getDefinition('translation.provider_collection')->setArgument(0, $config['providers']);
     }
 
-    private function registerValidationConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, bool $propertyInfoEnabled)
+    private function registerValidationConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, bool $propertyInfoEnabled): void
     {
         if (!$this->readConfigEnabled('validation', $container, $config)) {
             $container->removeDefinition('console.command.validator_debug');
@@ -1564,7 +1570,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerValidatorMapping(ContainerBuilder $container, array $config, array &$files)
+    private function registerValidatorMapping(ContainerBuilder $container, array $config, array &$files): void
     {
         $fileRecorder = function ($extension, $path) use (&$files) {
             $files['yaml' === $extension ? 'yml' : $extension][] = $path;
@@ -1602,14 +1608,14 @@ class FrameworkExtension extends Extension
         $this->registerMappingFilesFromConfig($container, $config, $fileRecorder);
     }
 
-    private function registerMappingFilesFromDir(string $dir, callable $fileRecorder)
+    private function registerMappingFilesFromDir(string $dir, callable $fileRecorder): void
     {
         foreach (Finder::create()->followLinks()->files()->in($dir)->name('/\.(xml|ya?ml)$/')->sortByName() as $file) {
             $fileRecorder($file->getExtension(), $file->getRealPath());
         }
     }
 
-    private function registerMappingFilesFromConfig(ContainerBuilder $container, array $config, callable $fileRecorder)
+    private function registerMappingFilesFromConfig(ContainerBuilder $container, array $config, callable $fileRecorder): void
     {
         foreach ($config['mapping']['paths'] as $path) {
             if (is_dir($path)) {
@@ -1626,7 +1632,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerAnnotationsConfiguration(array $config, ContainerBuilder $container, LoaderInterface $loader)
+    private function registerAnnotationsConfiguration(array $config, ContainerBuilder $container, LoaderInterface $loader): void
     {
         if (!$this->isInitializedConfigEnabled('annotations')) {
             return;
@@ -1676,7 +1682,7 @@ class FrameworkExtension extends Extension
         $container->removeDefinition('annotations.psr_cached_reader');
     }
 
-    private function registerPropertyAccessConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
+    private function registerPropertyAccessConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
         if (!$this->readConfigEnabled('property_access', $container, $config)) {
             return;
@@ -1702,7 +1708,7 @@ class FrameworkExtension extends Extension
         ;
     }
 
-    private function registerSecretsConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
+    private function registerSecretsConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
         if (!$this->readConfigEnabled('secrets', $container, $config)) {
             $container->removeDefinition('console.command.secrets_set');
@@ -1742,7 +1748,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerSecurityCsrfConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
+    private function registerSecurityCsrfConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
         if (!$this->readConfigEnabled('csrf_protection', $container, $config)) {
             return;
@@ -1764,7 +1770,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerSerializerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
+    private function registerSerializerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
         $loader->load('serializer.php');
         if ($container->getParameter('kernel.debug')) {
@@ -1858,7 +1864,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerPropertyInfoConfiguration(ContainerBuilder $container, PhpFileLoader $loader)
+    private function registerPropertyInfoConfiguration(ContainerBuilder $container, PhpFileLoader $loader): void
     {
         if (!interface_exists(PropertyInfoExtractorInterface::class)) {
             throw new LogicException('PropertyInfo support cannot be enabled as the PropertyInfo component is not installed. Try running "composer require symfony/property-info".');
@@ -1885,7 +1891,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerLockConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
+    private function registerLockConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
         $loader->load('lock.php');
 
@@ -1933,7 +1939,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerSemaphoreConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
+    private function registerSemaphoreConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
         $loader->load('semaphore.php');
 
@@ -1966,7 +1972,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerMessengerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, array $validationConfig)
+    private function registerMessengerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, array $validationConfig): void
     {
         if (!interface_exists(MessageBusInterface::class)) {
             throw new LogicException('Messenger support cannot be enabled as the Messenger component is not installed. Try running "composer require symfony/messenger".');
@@ -2207,7 +2213,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerCacheConfiguration(array $config, ContainerBuilder $container)
+    private function registerCacheConfiguration(array $config, ContainerBuilder $container): void
     {
         if (!class_exists(DefaultMarshaller::class)) {
             $container->removeDefinition('cache.default_marshaller');
@@ -2324,7 +2330,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerHttpClientConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
+    private function registerHttpClientConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
         $loader->load('http_client.php');
 
@@ -2394,12 +2400,8 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerRetryableHttpClient(array $options, string $name, ContainerBuilder $container)
+    private function registerRetryableHttpClient(array $options, string $name, ContainerBuilder $container): void
     {
-        if (!class_exists(RetryableHttpClient::class)) {
-            throw new LogicException('Support for retrying failed requests requires symfony/http-client 5.2 or higher, try upgrading.');
-        }
-
         if (null !== $options['retry_strategy']) {
             $retryStrategy = new Reference($options['retry_strategy']);
         } else {
@@ -2431,7 +2433,7 @@ class FrameworkExtension extends Extension
             ->addTag('monolog.logger', ['channel' => 'http_client']);
     }
 
-    private function registerMailerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
+    private function registerMailerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
         if (!class_exists(Mailer::class)) {
             throw new LogicException('Mailer support cannot be enabled as the component is not installed. Try running "composer require symfony/mailer".');
@@ -2499,7 +2501,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerNotifierConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
+    private function registerNotifierConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
         if (!class_exists(Notifier::class)) {
             throw new LogicException('Notifier support cannot be enabled as the component is not installed. Try running "composer require symfony/notifier".');
@@ -2665,7 +2667,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerRateLimiterConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
+    private function registerRateLimiterConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
         $loader->load('rate_limiter.php');
 
@@ -2704,6 +2706,8 @@ class FrameworkExtension extends Extension
 
     /**
      * @deprecated since Symfony 6.2
+     *
+     * @return void
      */
     public static function registerRateLimiter(ContainerBuilder $container, string $name, array $limiterConfig)
     {
@@ -2739,7 +2743,7 @@ class FrameworkExtension extends Extension
         $container->registerAliasForArgument($limiterId, RateLimiterFactory::class, $name.'.limiter');
     }
 
-    private function registerUidConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
+    private function registerUidConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
         $loader->load('uid.php');
 
@@ -2764,7 +2768,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerHtmlSanitizerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
+    private function registerHtmlSanitizerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
         $loader->load('html_sanitizer.php');
 

@@ -19,7 +19,6 @@ use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnFailureLimitListener;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Worker;
-use Throwable;
 
 class StopWorkerOnFailureLimitListenerTest extends TestCase
 {
@@ -45,7 +44,7 @@ class StopWorkerOnFailureLimitListenerTest extends TestCase
         $failureLimitListener->onWorkerRunning($runningEvent);
     }
 
-    public function countProvider(): iterable
+    public static function countProvider(): iterable
     {
         yield [1, true];
         yield [2, true];
@@ -74,6 +73,6 @@ class StopWorkerOnFailureLimitListenerTest extends TestCase
     {
         $envelope = new Envelope(new DummyMessage('hello'));
 
-        return new WorkerMessageFailedEvent($envelope, 'default', $this->createMock(Throwable::class));
+        return new WorkerMessageFailedEvent($envelope, 'default', $this->createMock(\Throwable::class));
     }
 }

@@ -30,6 +30,9 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class LuhnValidator extends ConstraintValidator
 {
+    /**
+     * @return void
+     */
     public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Luhn) {
@@ -60,23 +63,23 @@ class LuhnValidator extends ConstraintValidator
         $checkSum = 0;
         $length = \strlen($value);
 
-        // Starting with the last digit and walking left, add every second
-        // digit to the check sum
-        // e.g. 7  9  9  2  7  3  9  8  7  1  3
-        //      ^     ^     ^     ^     ^     ^
-        //    = 7  +  9  +  7  +  9  +  7  +  3
-        for ($i = $length - 1; $i >= 0; $i -= 2) {
-            $checkSum += $value[$i];
-        }
-
-        // Starting with the second last digit and walking left, double every
-        // second digit and add it to the check sum
-        // For doubles greater than 9, sum the individual digits
-        // e.g. 7  9  9  2  7  3  9  8  7  1  3
-        //         ^     ^     ^     ^     ^
-        //    =    1+8 + 4  +  6  +  1+6 + 2
-        for ($i = $length - 2; $i >= 0; $i -= 2) {
-            $checkSum += array_sum(str_split((int) $value[$i] * 2));
+        for ($i = $length - 1; $i >= 0; --$i) {
+            if (($i % 2) ^ ($length % 2)) {
+                // Starting with the last digit and walking left, add every second
+                // digit to the check sum
+                // e.g. 7  9  9  2  7  3  9  8  7  1  3
+                //      ^     ^     ^     ^     ^     ^
+                //    = 7  +  9  +  7  +  9  +  7  +  3
+                $checkSum += (int) $value[$i];
+            } else {
+                // Starting with the second last digit and walking left, double every
+                // second digit and add it to the check sum
+                // For doubles greater than 9, sum the individual digits
+                // e.g. 7  9  9  2  7  3  9  8  7  1  3
+                //         ^     ^     ^     ^     ^
+                //    =    1+8 + 4  +  6  +  1+6 + 2
+                $checkSum += (((int) (2 * $value[$i] / 10)) + (2 * $value[$i]) % 10);
+            }
         }
 
         if (0 === $checkSum || 0 !== $checkSum % 10) {

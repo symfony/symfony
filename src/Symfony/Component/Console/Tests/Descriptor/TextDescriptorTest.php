@@ -16,19 +16,19 @@ use Symfony\Component\Console\Tests\Fixtures\DescriptorApplication2;
 use Symfony\Component\Console\Tests\Fixtures\DescriptorApplicationMbString;
 use Symfony\Component\Console\Tests\Fixtures\DescriptorCommandMbString;
 
-class TextDescriptorTest extends AbstractDescriptorTest
+class TextDescriptorTest extends AbstractDescriptorTestCase
 {
-    public function getDescribeCommandTestData()
+    public static function getDescribeCommandTestData()
     {
-        return $this->getDescriptionTestData(array_merge(
+        return self::getDescriptionTestData(array_merge(
             ObjectsProvider::getCommands(),
             ['command_mbstring' => new DescriptorCommandMbString()]
         ));
     }
 
-    public function getDescribeApplicationTestData()
+    public static function getDescribeApplicationTestData()
     {
-        return $this->getDescriptionTestData(array_merge(
+        return self::getDescriptionTestData(array_merge(
             ObjectsProvider::getApplications(),
             ['application_mbstring' => new DescriptorApplicationMbString()]
         ));
@@ -46,7 +46,7 @@ class TextDescriptorTest extends AbstractDescriptorTest
         return new TextDescriptor();
     }
 
-    protected function getFormat()
+    protected static function getFormat()
     {
         return 'txt';
     }

@@ -39,7 +39,7 @@ class GeneratorConfig
     /**
      * Adds a writer to be used during the data conversion.
      */
-    public function addBundleWriter(string $targetDir, BundleWriterInterface $writer)
+    public function addBundleWriter(string $targetDir, BundleWriterInterface $writer): void
     {
         $this->bundleWriters[$targetDir] = $writer;
     }

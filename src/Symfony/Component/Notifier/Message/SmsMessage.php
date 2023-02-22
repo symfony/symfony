@@ -18,13 +18,14 @@ use Symfony\Component\Notifier\Recipient\SmsRecipientInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class SmsMessage implements MessageInterface
+class SmsMessage implements MessageInterface, FromNotificationInterface
 {
     private ?string $transport = null;
     private string $subject;
     private string $phone;
     private string $from;
     private ?MessageOptionsInterface $options;
+    private ?Notification $notification = null;
 
     public function __construct(string $phone, string $subject, string $from = '', MessageOptionsInterface $options = null)
     {
@@ -40,7 +41,10 @@ class SmsMessage implements MessageInterface
 
     public static function fromNotification(Notification $notification, SmsRecipientInterface $recipient): self
     {
-        return new self($recipient->getPhone(), $notification->getSubject());
+        $message = new self($recipient->getPhone(), $notification->getSubject());
+        $message->notification = $notification;
+
+        return $message;
     }
 
     /**
@@ -125,5 +129,10 @@ class SmsMessage implements MessageInterface
     public function getOptions(): ?MessageOptionsInterface
     {
         return $this->options;
+    }
+
+    public function getNotification(): ?Notification
+    {
+        return $this->notification;
     }
 }

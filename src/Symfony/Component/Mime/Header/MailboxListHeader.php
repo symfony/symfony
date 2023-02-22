@@ -38,7 +38,7 @@ final class MailboxListHeader extends AbstractHeader
      *
      * @throws RfcComplianceException
      */
-    public function setBody(mixed $body)
+    public function setBody(mixed $body): void
     {
         $this->setAddresses($body);
     }
@@ -60,7 +60,7 @@ final class MailboxListHeader extends AbstractHeader
      *
      * @throws RfcComplianceException
      */
-    public function setAddresses(array $addresses)
+    public function setAddresses(array $addresses): void
     {
         $this->addresses = [];
         $this->addAddresses($addresses);
@@ -73,7 +73,7 @@ final class MailboxListHeader extends AbstractHeader
      *
      * @throws RfcComplianceException
      */
-    public function addAddresses(array $addresses)
+    public function addAddresses(array $addresses): void
     {
         foreach ($addresses as $address) {
             $this->addAddress($address);
@@ -83,7 +83,7 @@ final class MailboxListHeader extends AbstractHeader
     /**
      * @throws RfcComplianceException
      */
-    public function addAddress(Address $address)
+    public function addAddress(Address $address): void
     {
         $this->addresses[] = $address;
     }

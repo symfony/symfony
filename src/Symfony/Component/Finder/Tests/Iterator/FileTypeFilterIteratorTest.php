@@ -27,7 +27,7 @@ class FileTypeFilterIteratorTest extends RealIteratorTestCase
         $this->assertIterator($expected, $iterator);
     }
 
-    public function getAcceptData()
+    public static function getAcceptData()
     {
         $onlyFiles = [
             'test.py',
@@ -59,8 +59,8 @@ class FileTypeFilterIteratorTest extends RealIteratorTestCase
         ];
 
         return [
-            [FileTypeFilterIterator::ONLY_FILES, static::toAbsolute($onlyFiles)],
-            [FileTypeFilterIterator::ONLY_DIRECTORIES, static::toAbsolute($onlyDirectories)],
+            [FileTypeFilterIterator::ONLY_FILES, self::toAbsolute($onlyFiles)],
+            [FileTypeFilterIterator::ONLY_DIRECTORIES, self::toAbsolute($onlyDirectories)],
         ];
     }
 }

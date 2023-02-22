@@ -40,12 +40,12 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         $this->requestStack = $requestStack;
     }
 
-    public function collect(Request $request, Response $response, \Throwable $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null): void
     {
         $this->currentRequest = $this->requestStack && $this->requestStack->getMainRequest() !== $request ? $request : null;
     }
 
-    public function reset()
+    public function reset(): void
     {
         if (isset($this->logger)) {
             $this->logger->clear();
@@ -53,7 +53,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         $this->data = [];
     }
 
-    public function lateCollect()
+    public function lateCollect(): void
     {
         if (isset($this->logger)) {
             $containerDeprecationLogs = $this->getContainerDeprecationLogs();
@@ -227,7 +227,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         return $logs;
     }
 
-    private function sanitizeLogs(array $logs)
+    private function sanitizeLogs(array $logs): array
     {
         $sanitizedLogs = [];
         $silencedLogs = [];
@@ -259,7 +259,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
                 continue;
             }
 
-            $errorId = md5("{$exception->getSeverity()}/{$exception->getLine()}/{$exception->getFile()}\0{$message}", true);
+            $errorId = hash('xxh128', "{$exception->getSeverity()}/{$exception->getLine()}/{$exception->getFile()}\0{$message}", true);
 
             if (isset($sanitizedLogs[$errorId])) {
                 ++$sanitizedLogs[$errorId]['errorCount'];

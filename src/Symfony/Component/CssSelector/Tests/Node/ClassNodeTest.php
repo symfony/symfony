@@ -14,16 +14,16 @@ namespace Symfony\Component\CssSelector\Tests\Node;
 use Symfony\Component\CssSelector\Node\ClassNode;
 use Symfony\Component\CssSelector\Node\ElementNode;
 
-class ClassNodeTest extends AbstractNodeTest
+class ClassNodeTest extends AbstractNodeTestCase
 {
-    public function getToStringConversionTestData()
+    public static function getToStringConversionTestData()
     {
         return [
             [new ClassNode(new ElementNode(), 'class'), 'Class[Element[*].class]'],
         ];
     }
 
-    public function getSpecificityValueTestData()
+    public static function getSpecificityValueTestData()
     {
         return [
             [new ClassNode(new ElementNode(), 'class'), 10],

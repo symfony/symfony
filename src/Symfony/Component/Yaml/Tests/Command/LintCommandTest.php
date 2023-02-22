@@ -13,7 +13,6 @@ namespace Symfony\Component\Yaml\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
-use Symfony\Component\Console\CI\GithubActionReporter;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
@@ -68,11 +67,6 @@ bar';
 
     public function testLintIncorrectFileWithGithubFormat()
     {
-        if (!class_exists(GithubActionReporter::class)) {
-            $this->expectException(\InvalidArgumentException::class);
-            $this->expectExceptionMessage('The "github" format is only available since "symfony/console" >= 5.3.');
-        }
-
         $incorrectContent = <<<YAML
 foo:
 bar
@@ -81,10 +75,6 @@ YAML;
         $filename = $this->createFile($incorrectContent);
 
         $tester->execute(['filename' => $filename, '--format' => 'github'], ['decorated' => false]);
-
-        if (!class_exists(GithubActionReporter::class)) {
-            return;
-        }
 
         self::assertEquals(1, $tester->getStatusCode(), 'Returns 1 in case of error');
         self::assertStringMatchesFormat('%A::error file=%s,line=2,col=0::Unable to parse at line 2 (near "bar")%A', trim($tester->getDisplay()));
@@ -171,7 +161,7 @@ YAML;
         $this->assertSame($expectedSuggestions, $tester->complete($input));
     }
 
-    public function provideCompletionSuggestions()
+    public static function provideCompletionSuggestions()
     {
         yield 'option' => [['--format', ''], ['txt', 'json', 'github']];
     }

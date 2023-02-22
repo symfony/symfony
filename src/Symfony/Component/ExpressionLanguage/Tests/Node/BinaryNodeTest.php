@@ -19,11 +19,11 @@ use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 use Symfony\Component\ExpressionLanguage\Node\NameNode;
 use Symfony\Component\ExpressionLanguage\SyntaxError;
 
-class BinaryNodeTest extends AbstractNodeTest
+class BinaryNodeTest extends AbstractNodeTestCase
 {
     use ExpectDeprecationTrait;
 
-    public function getEvaluateData()
+    public static function getEvaluateData(): array
     {
         $array = new ArrayNode();
         $array->addElement(new ConstantNode('a'));
@@ -78,7 +78,7 @@ class BinaryNodeTest extends AbstractNodeTest
         ];
     }
 
-    public function getCompileData()
+    public static function getCompileData(): array
     {
         $array = new ArrayNode();
         $array->addElement(new ConstantNode('a'));
@@ -130,7 +130,7 @@ class BinaryNodeTest extends AbstractNodeTest
         ];
     }
 
-    public function getDumpData()
+    public static function getDumpData(): array
     {
         $array = new ArrayNode();
         $array->addElement(new ConstantNode('a'));

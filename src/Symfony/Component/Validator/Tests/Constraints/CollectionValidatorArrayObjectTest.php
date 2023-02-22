@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-class CollectionValidatorArrayObjectTest extends CollectionValidatorTest
+class CollectionValidatorArrayObjectTest extends CollectionValidatorTestCase
 {
     public function prepareTestData(array $contents)
     {

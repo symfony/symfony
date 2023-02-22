@@ -37,7 +37,7 @@ class HttpClientTraitTest extends TestCase
         $this->assertSame($expected, implode('', $url));
     }
 
-    public function providePrepareRequestUrl(): iterable
+    public static function providePrepareRequestUrl(): iterable
     {
         yield ['http://example.com/', 'http://example.com/'];
         yield ['http://example.com/?a=1&b=b', '.'];
@@ -54,15 +54,15 @@ class HttpClientTraitTest extends TestCase
         $defaults = [
             'base_uri' => 'http://example.com?c=c',
             'query' => ['a' => 1, 'b' => 'b'],
-            'body' => []
+            'body' => [],
         ];
         [, $defaults] = self::prepareRequest(null, null, $defaults);
 
         [,$options] = self::prepareRequest(null, 'http://example.com', [
             'body' => [1, 2],
             'headers' => [
-                'Content-Type' => 'application/x-www-form-urlencoded; charset=utf-8'
-            ]
+                'Content-Type' => 'application/x-www-form-urlencoded; charset=utf-8',
+            ],
         ], $defaults);
 
         $this->assertContains('Content-Type: application/x-www-form-urlencoded; charset=utf-8', $options['headers']);
@@ -79,7 +79,7 @@ class HttpClientTraitTest extends TestCase
     /**
      * From https://github.com/guzzle/psr7/blob/master/tests/UriResoverTest.php.
      */
-    public function provideResolveUrl(): array
+    public static function provideResolveUrl(): array
     {
         return [
             [self::RFC3986_BASE, 'http:h',        'http:h'],
@@ -167,7 +167,7 @@ class HttpClientTraitTest extends TestCase
         $this->assertSame($expected, self::parseUrl($url, $query));
     }
 
-    public function provideParseUrl(): iterable
+    public static function provideParseUrl(): iterable
     {
         yield [['http:', '//example.com', null, null, null], 'http://Example.coM:80'];
         yield [['https:', '//xn--dj-kia8a.example.com:8000', '/', null, null], 'https://DÉjà.Example.com:8000/'];
@@ -176,12 +176,12 @@ class HttpClientTraitTest extends TestCase
         yield [['http:', null, null, null, null], 'http:'];
         yield [['http:', null, 'bar', null, null], 'http:bar'];
         yield [[null, null, 'bar', '?a=1&c=c', null], 'bar?a=a&b=b', ['b' => null, 'c' => 'c', 'a' => 1]];
-        yield [[null, null, 'bar', '?a=b+c&b=b', null], 'bar?a=b+c', ['b' => 'b']];
-        yield [[null, null, 'bar', '?a=b%2B%20c', null], 'bar?a=b+c', ['a' => 'b+ c']];
-        yield [[null, null, 'bar', '?a%5Bb%5D=c', null], 'bar', ['a' => ['b' => 'c']]];
-        yield [[null, null, 'bar', '?a%5Bb%5Bc%5D=d', null], 'bar?a[b[c]=d', []];
-        yield [[null, null, 'bar', '?a%5Bb%5D%5Bc%5D=dd', null], 'bar?a[b][c]=d&e[f]=g', ['a' => ['b' => ['c' => 'dd']], 'e[f]' => null]];
-        yield [[null, null, 'bar', '?a=b&a%5Bb%20c%5D=d&e%3Df=%E2%9C%93', null], 'bar?a=b', ['a' => ['b c' => 'd'], 'e=f' => '✓']];
+        yield [[null, null, 'bar', '?a=b+c&b=b-._~!$%26/%27()[]*+,;%3D:@%25\\^`{|}', null], 'bar?a=b+c', ['b' => 'b-._~!$&/\'()[]*+,;=:@%\\^`{|}']];
+        yield [[null, null, 'bar', '?a=b+%20c', null], 'bar?a=b+c', ['a' => 'b+ c']];
+        yield [[null, null, 'bar', '?a[b]=c', null], 'bar', ['a' => ['b' => 'c']]];
+        yield [[null, null, 'bar', '?a[b[c]=d', null], 'bar?a[b[c]=d', []];
+        yield [[null, null, 'bar', '?a[b][c]=dd', null], 'bar?a[b][c]=d&e[f]=g', ['a' => ['b' => ['c' => 'dd']], 'e[f]' => null]];
+        yield [[null, null, 'bar', '?a=b&a[b%20c]=d&e%3Df=%E2%9C%93', null], 'bar?a=b', ['a' => ['b c' => 'd'], 'e=f' => '✓']];
         // IDNA 2008 compliance
         yield [['https:', '//xn--fuball-cta.test', null, null, null], 'https://fußball.test'];
     }
@@ -194,7 +194,7 @@ class HttpClientTraitTest extends TestCase
         $this->assertSame($expected, self::removeDotSegments($url));
     }
 
-    public function provideRemoveDotSegments()
+    public static function provideRemoveDotSegments()
     {
         yield ['', ''];
         yield ['', '.'];
@@ -243,7 +243,7 @@ class HttpClientTraitTest extends TestCase
         self::prepareRequest('POST', 'http://example.com', ['json' => ['foo' => 'bar'], 'body' => '<html/>'], HttpClientInterface::OPTIONS_DEFAULTS);
     }
 
-    public function providePrepareAuthBasic()
+    public static function providePrepareAuthBasic()
     {
         yield ['foo:bar', 'Zm9vOmJhcg=='];
         yield [['foo', 'bar'], 'Zm9vOmJhcg=='];
@@ -260,7 +260,7 @@ class HttpClientTraitTest extends TestCase
         $this->assertSame('Authorization: Basic '.$result, $options['normalized_headers']['authorization'][0]);
     }
 
-    public function provideFingerprints()
+    public static function provideFingerprints()
     {
         foreach (['md5', 'sha1', 'sha256'] as $algo) {
             $hash = hash($algo, $algo);

@@ -53,7 +53,7 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidLocales()
+    public static function getValidLocales()
     {
         return [
             ['en'],
@@ -83,7 +83,7 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidLocales()
+    public static function getInvalidLocales()
     {
         return [
             ['baz'],
@@ -151,7 +151,7 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getUncanonicalizedLocales(): iterable
+    public static function getUncanonicalizedLocales(): iterable
     {
         return [
             ['en-US'],

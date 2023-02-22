@@ -48,6 +48,9 @@ trait DecoratorTrait
         return $clone;
     }
 
+    /**
+     * @return void
+     */
     public function reset()
     {
         if ($this->client instanceof ResetInterface) {

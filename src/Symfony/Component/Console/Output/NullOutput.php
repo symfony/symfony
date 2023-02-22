@@ -26,6 +26,9 @@ class NullOutput implements OutputInterface
 {
     private NullOutputFormatter $formatter;
 
+    /**
+     * @return void
+     */
     public function setFormatter(OutputFormatterInterface $formatter)
     {
         // do nothing
@@ -37,6 +40,9 @@ class NullOutput implements OutputInterface
         return $this->formatter ??= new NullOutputFormatter();
     }
 
+    /**
+     * @return void
+     */
     public function setDecorated(bool $decorated)
     {
         // do nothing
@@ -47,6 +53,9 @@ class NullOutput implements OutputInterface
         return false;
     }
 
+    /**
+     * @return void
+     */
     public function setVerbosity(int $level)
     {
         // do nothing
@@ -77,11 +86,17 @@ class NullOutput implements OutputInterface
         return false;
     }
 
+    /**
+     * @return void
+     */
     public function writeln(string|iterable $messages, int $options = self::OUTPUT_NORMAL)
     {
         // do nothing
     }
 
+    /**
+     * @return void
+     */
     public function write(string|iterable $messages, bool $newline = false, int $options = self::OUTPUT_NORMAL)
     {
         // do nothing

@@ -21,7 +21,7 @@ final class IsendproTransportFactoryTest extends TransportFactoryTestCase
         return new IsendproTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'isendpro://host.test?no_stop=0&sandbox=0',
@@ -54,23 +54,23 @@ final class IsendproTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'isendpro://account_key_id@host?from=FROM'];
         yield [false, 'somethingElse://account_key_id@default'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield 'missing credentials' => ['isendpro://host?from=FROM'];
     }
 
-    public function missingRequiredOptionProvider(): iterable
+    public static function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: account_key_id' => ['isendpro://default'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://account_key_id@default'];
     }

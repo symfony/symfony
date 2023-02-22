@@ -16,9 +16,9 @@ use Symfony\Component\Validator\Tests\Fixtures\Countable;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class CountValidatorCountableTest extends CountValidatorTest
+class CountValidatorCountableTest extends CountValidatorTestCase
 {
-    protected function createCollection(array $content)
+    protected static function createCollection(array $content)
     {
         return new Countable($content);
     }

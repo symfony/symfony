@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Mailer\Bridge\Infobip\Tests\Transport;
 
+use Psr\Log\NullLogger;
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Mailer\Bridge\Infobip\Transport\InfobipApiTransport;
 use Symfony\Component\Mailer\Bridge\Infobip\Transport\InfobipSmtpTransport;
 use Symfony\Component\Mailer\Bridge\Infobip\Transport\InfobipTransportFactory;
@@ -22,10 +24,10 @@ class InfobipApiTransportFactoryTest extends TransportFactoryTestCase
 {
     public function getFactory(): TransportFactoryInterface
     {
-        return new InfobipTransportFactory($this->getDispatcher(), $this->getClient(), $this->getLogger());
+        return new InfobipTransportFactory(null, new MockHttpClient(), new NullLogger());
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [
             new Dsn('infobip+api', 'default'),
@@ -53,33 +55,32 @@ class InfobipApiTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
-        $dispatcher = $this->getDispatcher();
-        $logger = $this->getLogger();
+        $logger = new NullLogger();
 
         yield [
             new Dsn('infobip+api', 'example.com', self::PASSWORD),
-            (new InfobipApiTransport(self::PASSWORD, $this->getClient(), $dispatcher, $logger))->setHost('example.com'),
+            (new InfobipApiTransport(self::PASSWORD, new MockHttpClient(), null, $logger))->setHost('example.com'),
         ];
 
         yield [
             new Dsn('infobip', 'default', self::PASSWORD),
-            new InfobipSmtpTransport(self::PASSWORD, $dispatcher, $logger),
+            new InfobipSmtpTransport(self::PASSWORD, null, $logger),
         ];
 
         yield [
             new Dsn('infobip+smtp', 'default', self::PASSWORD),
-            new InfobipSmtpTransport(self::PASSWORD, $dispatcher, $logger),
+            new InfobipSmtpTransport(self::PASSWORD, null, $logger),
         ];
 
         yield [
             new Dsn('infobip+smtps', 'default', self::PASSWORD),
-            new InfobipSmtpTransport(self::PASSWORD, $dispatcher, $logger),
+            new InfobipSmtpTransport(self::PASSWORD, null, $logger),
         ];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield [
             new Dsn('infobip+foo', 'infobip', self::USER, self::PASSWORD),
@@ -87,7 +88,7 @@ class InfobipApiTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield [new Dsn('infobip+smtp', 'default')];
         yield [new Dsn('infobip+api', 'default')];

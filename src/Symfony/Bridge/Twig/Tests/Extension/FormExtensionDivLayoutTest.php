@@ -18,12 +18,12 @@ use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\Tests\AbstractDivLayoutTest;
+use Symfony\Component\Form\Tests\AbstractDivLayoutTestCase;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
-class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
+class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
 {
     use RuntimeLoaderProvider;
 
@@ -100,7 +100,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         );
     }
 
-    public function isSelectedChoiceProvider()
+    public static function isSelectedChoiceProvider()
     {
         return [
             [true, '0', '0'],
@@ -150,7 +150,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         $this->assertSame('<form name="form" method="get" action="0">', $html);
     }
 
-    public function isRootFormProvider()
+    public static function isRootFormProvider()
     {
         return [
             [true, new FormView()],

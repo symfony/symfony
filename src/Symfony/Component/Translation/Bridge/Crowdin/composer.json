@@ -23,7 +23,7 @@
         "php": ">=8.1",
         "symfony/config": "^5.4|^6.0",
         "symfony/http-client": "^5.4|^6.0",
-        "symfony/translation": "^5.4|^6.0"
+        "symfony/translation": "^5.4.21|^6.2.7"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Translation\\Bridge\\Crowdin\\": "" },

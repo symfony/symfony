@@ -71,7 +71,7 @@ class CrossCheckTest extends TestCase
         $this->assertEquals($services2, $services1, 'Iterator on the containers returns the same services');
     }
 
-    public function crossCheckLoadersDumpers()
+    public static function crossCheckLoadersDumpers()
     {
         return [
             ['services1.xml', 'xml'],

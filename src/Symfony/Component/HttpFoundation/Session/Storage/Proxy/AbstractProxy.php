@@ -71,6 +71,8 @@ abstract class AbstractProxy
     /**
      * Sets the session ID.
      *
+     * @return void
+     *
      * @throws \LogicException
      */
     public function setId(string $id)
@@ -92,6 +94,8 @@ abstract class AbstractProxy
 
     /**
      * Sets the session name.
+     *
+     * @return void
      *
      * @throws \LogicException
      */

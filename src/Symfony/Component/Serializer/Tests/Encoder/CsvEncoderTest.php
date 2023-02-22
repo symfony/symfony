@@ -205,6 +205,14 @@ CSV
     {
         $this->assertEquals("\n\n", $this->encoder->encode([], 'csv'));
         $this->assertEquals("\n\n", $this->encoder->encode([[]], 'csv'));
+        $this->assertEquals("\n\n", $this->encoder->encode([['' => null]], 'csv'));
+    }
+
+    public function testDecodeEmptyData()
+    {
+        $data = $this->encoder->decode("\n\n", 'csv');
+
+        $this->assertSame([['' => null]], $data);
     }
 
     public function testEncodeVariableStructure()

@@ -31,12 +31,18 @@ class FileBag extends ParameterBag
         $this->replace($parameters);
     }
 
+    /**
+     * @return void
+     */
     public function replace(array $files = [])
     {
         $this->parameters = [];
         $this->add($files);
     }
 
+    /**
+     * @return void
+     */
     public function set(string $key, mixed $value)
     {
         if (!\is_array($value) && !$value instanceof UploadedFile) {
@@ -46,6 +52,9 @@ class FileBag extends ParameterBag
         parent::set($key, $this->convertFileInformation($value));
     }
 
+    /**
+     * @return void
+     */
     public function add(array $files = [])
     {
         foreach ($files as $key => $file) {

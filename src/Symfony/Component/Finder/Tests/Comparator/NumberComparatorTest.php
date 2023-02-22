@@ -51,7 +51,7 @@ class NumberComparatorTest extends TestCase
         }
     }
 
-    public function getTestData()
+    public static function getTestData()
     {
         return [
             ['< 1000', ['500', '999'], ['1000', '1500']],
@@ -81,7 +81,7 @@ class NumberComparatorTest extends TestCase
         ];
     }
 
-    public function getConstructorTestData()
+    public static function getConstructorTestData()
     {
         return [
             [

@@ -154,7 +154,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
                     $headerCount = array_fill(0, $nbCols, 1);
                 } else {
                     foreach ($cols as $col) {
-                        $header = explode($keySeparator, $col);
+                        $header = explode($keySeparator, $col ?? '');
                         $headers[] = $header;
                         $headerCount[] = \count($header);
                     }
@@ -207,7 +207,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     /**
      * Flattens an array and generates keys including the path.
      */
-    private function flatten(iterable $array, array &$result, string $keySeparator, string $parentKey = '', bool $escapeFormulas = false)
+    private function flatten(iterable $array, array &$result, string $keySeparator, string $parentKey = '', bool $escapeFormulas = false): void
     {
         foreach ($array as $key => $value) {
             if (is_iterable($value)) {

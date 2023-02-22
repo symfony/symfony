@@ -188,7 +188,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidBics()
+    public static function getValidBics()
     {
         // http://formvalidation.io/validators/bic/
         return [
@@ -233,7 +233,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidBics()
+    public static function getInvalidBics()
     {
         return [
             ['DEUTD', Bic::INVALID_LENGTH_ERROR],
@@ -277,7 +277,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidBicSpecialCases()
+    public static function getValidBicSpecialCases()
     {
         // FR related special cases
         yield ['BNPAGFGX', 'FR14 2004 1010 0505 0001 3M02 606'];

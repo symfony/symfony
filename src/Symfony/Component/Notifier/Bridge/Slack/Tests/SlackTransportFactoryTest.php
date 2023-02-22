@@ -21,7 +21,7 @@ final class SlackTransportFactoryTest extends TransportFactoryTestCase
         return new SlackTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'slack://host.test',
@@ -39,18 +39,18 @@ final class SlackTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'slack://xoxb-TestToken@host?channel=testChannel'];
         yield [false, 'somethingElse://xoxb-TestToken@host?channel=testChannel'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield 'missing token' => ['slack://host.test?channel=testChannel'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://xoxb-TestToken@host?channel=testChannel'];
     }

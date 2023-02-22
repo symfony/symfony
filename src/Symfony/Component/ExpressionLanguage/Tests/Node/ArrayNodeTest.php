@@ -14,7 +14,7 @@ namespace Symfony\Component\ExpressionLanguage\Tests\Node;
 use Symfony\Component\ExpressionLanguage\Node\ArrayNode;
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 
-class ArrayNodeTest extends AbstractNodeTest
+class ArrayNodeTest extends AbstractNodeTestCase
 {
     public function testSerialization()
     {
@@ -28,45 +28,45 @@ class ArrayNodeTest extends AbstractNodeTest
         $this->assertNotEquals($this->createArrayNode(), $unserializedNode);
     }
 
-    public function getEvaluateData()
+    public static function getEvaluateData(): array
     {
         return [
-            [['b' => 'a', 'b'], $this->getArrayNode()],
+            [['b' => 'a', 'b'], static::getArrayNode()],
         ];
     }
 
-    public function getCompileData()
+    public static function getCompileData(): array
     {
         return [
-            ['["b" => "a", 0 => "b"]', $this->getArrayNode()],
+            ['["b" => "a", 0 => "b"]', static::getArrayNode()],
         ];
     }
 
-    public function getDumpData()
+    public static function getDumpData(): \Generator
     {
-        yield ['{"b": "a", 0: "b"}', $this->getArrayNode()];
+        yield ['{"b": "a", 0: "b"}', static::getArrayNode()];
 
-        $array = $this->createArrayNode();
+        $array = static::createArrayNode();
         $array->addElement(new ConstantNode('c'), new ConstantNode('a"b'));
         $array->addElement(new ConstantNode('d'), new ConstantNode('a\b'));
         yield ['{"a\\"b": "c", "a\\\\b": "d"}', $array];
 
-        $array = $this->createArrayNode();
+        $array = static::createArrayNode();
         $array->addElement(new ConstantNode('c'));
         $array->addElement(new ConstantNode('d'));
         yield ['["c", "d"]', $array];
     }
 
-    protected function getArrayNode()
+    protected static function getArrayNode(): ArrayNode
     {
-        $array = $this->createArrayNode();
+        $array = static::createArrayNode();
         $array->addElement(new ConstantNode('a'), new ConstantNode('b'));
         $array->addElement(new ConstantNode('b'));
 
         return $array;
     }
 
-    protected function createArrayNode()
+    protected static function createArrayNode(): ArrayNode
     {
         return new ArrayNode();
     }

@@ -128,7 +128,7 @@ final class AmpClientState extends ClientState
             'proxy' => $options['proxy'],
         ];
 
-        $key = md5(serialize($options));
+        $key = hash('xxh128', serialize($options));
 
         if (isset($this->clients[$key])) {
             return $this->clients[$key];

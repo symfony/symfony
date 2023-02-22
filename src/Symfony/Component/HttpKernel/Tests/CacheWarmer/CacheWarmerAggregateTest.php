@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\CacheWarmer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
@@ -90,5 +91,55 @@ class CacheWarmerAggregateTest extends TestCase
 
         $this->expectException(\LogicException::class);
         $aggregate->warmUp(__DIR__);
+    }
+
+    public function testWarmupWhenDebugDisplaysWarmupDuration()
+    {
+        $warmer = $this->createMock(CacheWarmerInterface::class);
+        $io = $this->createMock(SymfonyStyle::class);
+
+        $io
+            ->expects($this->once())
+            ->method('isDebug')
+            ->willReturn(true)
+        ;
+
+        $io
+            ->expects($this->once())
+            ->method('info')
+            ->with($this->matchesRegularExpression('/"(.+)" completed in (.+)ms\./'))
+        ;
+
+        $warmer
+            ->expects($this->once())
+            ->method('warmUp');
+
+        $aggregate = new CacheWarmerAggregate([$warmer]);
+        $aggregate->warmUp(__DIR__, $io);
+    }
+
+    public function testWarmupWhenNotDebugDoesntDisplayWarmupDuration()
+    {
+        $warmer = $this->createMock(CacheWarmerInterface::class);
+        $io = $this->createMock(SymfonyStyle::class);
+
+        $io
+            ->expects($this->once())
+            ->method('isDebug')
+            ->willReturn(false)
+        ;
+
+        $io
+            ->expects($this->never())
+            ->method('info')
+            ->with($this->matchesRegularExpression('/"(.+)" completed in (.+)ms\./'))
+        ;
+
+        $warmer
+            ->expects($this->once())
+            ->method('warmUp');
+
+        $aggregate = new CacheWarmerAggregate([$warmer]);
+        $aggregate->warmUp(__DIR__, $io);
     }
 }

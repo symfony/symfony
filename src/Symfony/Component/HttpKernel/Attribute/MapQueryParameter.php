@@ -11,13 +11,15 @@
 
 namespace Symfony\Component\HttpKernel\Attribute;
 
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\QueryParameterValueResolver;
+
 /**
  * Can be used to pass a query parameter to a controller argument.
  *
  * @author Ruud Kamphuis <ruud@ticketswap.com>
  */
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
-final class MapQueryParameter
+final class MapQueryParameter extends ValueResolver
 {
     /**
      * @see https://php.net/filter.filters.validate for filter, flags and options
@@ -29,6 +31,8 @@ final class MapQueryParameter
         public ?int $filter = null,
         public int $flags = 0,
         public array $options = [],
+        string $resolver = QueryParameterValueResolver::class,
     ) {
+        parent::__construct($resolver);
     }
 }

@@ -62,6 +62,8 @@ final class QueryParameterValueResolver implements ValueResolverInterface
         if ('array' === $argument->getType() || $argument->isVariadic()) {
             $value = (array) $value;
             $options['flags'] |= \FILTER_REQUIRE_ARRAY;
+        } else {
+            $options['flags'] |= \FILTER_REQUIRE_SCALAR;
         }
 
         $filter = match ($argument->getType()) {

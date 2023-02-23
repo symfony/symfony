@@ -16,6 +16,7 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\BackedEnumValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DateTimeValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\QueryParameterValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestAttributeValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestPayloadValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestValueResolver;
@@ -89,6 +90,9 @@ return static function (ContainerConfigurator $container) {
 
         ->set('argument_resolver.variadic', VariadicValueResolver::class)
             ->tag('controller.argument_value_resolver', ['priority' => -150, 'name' => VariadicValueResolver::class])
+
+        ->set('argument_resolver.query_parameter_value_resolver', QueryParameterValueResolver::class)
+            ->tag('controller.targeted_value_resolver', ['name' => QueryParameterValueResolver::class])
 
         ->set('response_listener', ResponseListener::class)
             ->args([

@@ -4,7 +4,7 @@ CHANGELOG
 6.3
 ---
 
- * Change the signature of `FormTypeValidatorExtension::__construct(ValidatorInterface $validator, bool $legacyErrorMessages = true, FormRendererInterface $formRenderer = null, TranslatorInterface $translator = null)` to `__construct(ValidatorInterface $validator, FormRendererInterface $formRenderer = null, TranslatorInterface $translator = null)`
+ * Remove argument `$legacyErrorMessages` from the constructor of `FormTypeValidatorExtension`
 
 6.2
 ---

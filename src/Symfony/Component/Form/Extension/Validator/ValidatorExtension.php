@@ -30,11 +30,18 @@ class ValidatorExtension extends AbstractExtension
     private ValidatorInterface $validator;
     private ?FormRendererInterface $formRenderer;
     private ?TranslatorInterface $translator;
-    private bool $legacyErrorMessages;
 
-    public function __construct(ValidatorInterface $validator, bool $legacyErrorMessages = true, FormRendererInterface $formRenderer = null, TranslatorInterface $translator = null)
+    /**
+     * @param FormRendererInterface|null $formRenderer
+     * @param TranslatorInterface|null   $translator
+     */
+    public function __construct(ValidatorInterface $validator, /* FormRendererInterface */ $formRenderer = null, /* TranslatorInterface */ $translator = null)
     {
-        $this->legacyErrorMessages = $legacyErrorMessages;
+        if (\is_bool($formRenderer)) {
+            trigger_deprecation('symfony/form', '6.3', 'The signature of "%s" constructor requires 3 arguments: "ValidatorInterface $validator, FormRendererInterface $formRenderer = null, TranslatorInterface $translator = null". Passing argument $legacyErrorMessages is deprecated.', __CLASS__);
+            $formRenderer = $translator;
+            $translator = 4 <= \func_num_args() ? func_get_arg(3) : null;
+        }
 
         $metadata = $validator->getMetadataFor(\Symfony\Component\Form\Form::class);
 

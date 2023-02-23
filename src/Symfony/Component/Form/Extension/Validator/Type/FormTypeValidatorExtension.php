@@ -31,19 +31,15 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
     private ViolationMapper $violationMapper;
 
     /**
-     * @param ValidatorInterface         $validator
      * @param FormRendererInterface|null $formRenderer
      * @param TranslatorInterface|null   $translator
      */
-    public function __construct(ValidatorInterface $validator/* , FormRendererInterface $formRenderer = null, TranslatorInterface $translator = null*/)
+    public function __construct(ValidatorInterface $validator, /* FormRendererInterface */ $formRenderer = null, /* TranslatorInterface */ $translator = null)
     {
-        if (\func_num_args() > 3) {
-            trigger_deprecation('symfony/form', '6.3', 'The signature of constructor requires 3 arguments: "ValidatorInterface $validator, FormRendererInterface $formRenderer = null, TranslatorInterface $translator = null". Passing argument $legacyErrorMessages is deprecated.', __METHOD__);
-            $formRenderer = func_get_arg(2);
-            $translator = func_get_arg(3);
-        } else {
-            $formRenderer = func_get_arg(1);
-            $translator = func_get_arg(2);
+        if (\is_bool($formRenderer)) {
+            trigger_deprecation('symfony/form', '6.3', 'The signature of "%s" constructor requires 3 arguments: "ValidatorInterface $validator, FormRendererInterface $formRenderer = null, TranslatorInterface $translator = null". Passing argument $legacyErrorMessages is deprecated.', __CLASS__);
+            $formRenderer = $translator;
+            $translator = 4 <= \func_num_args() ? func_get_arg(3) : null;
         }
 
         $this->validator = $validator;

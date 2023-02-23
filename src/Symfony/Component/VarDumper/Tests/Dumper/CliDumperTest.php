@@ -449,22 +449,4 @@ EOTXT
 
         $this->assertSame($expectedOut, $out);
     }
-
-    private function getSpecialVars()
-    {
-        foreach (array_keys($GLOBALS) as $var) {
-            if ('GLOBALS' !== $var) {
-                unset($GLOBALS[$var]);
-            }
-        }
-
-        $var = function &() {
-            $var = [];
-            $var[] = &$var;
-
-            return $var;
-        };
-
-        return eval('return [$var(), $GLOBALS, &$GLOBALS];');
-    }
 }

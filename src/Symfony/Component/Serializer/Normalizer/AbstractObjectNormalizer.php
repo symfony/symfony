@@ -30,6 +30,7 @@ use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Base class for a normalizer dealing with objects.
@@ -106,7 +107,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     public const PRESERVE_EMPTY_OBJECTS = 'preserve_empty_objects';
 
     private $propertyTypeExtractor;
-    private $typesCache = [];
     private $attributesCache = [];
 
     private $objectClassResolver;
@@ -115,6 +115,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * @var ClassDiscriminatorResolverInterface|null
      */
     protected $classDiscriminatorResolver;
+
+    protected PropertyValueNormalizer $propertyValueNormalizer;
 
     public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = [])
     {
@@ -133,6 +135,14 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         }
         $this->classDiscriminatorResolver = $classDiscriminatorResolver;
         $this->objectClassResolver = $objectClassResolver;
+
+        $this->propertyValueNormalizer = new PropertyValueNormalizer($this->serializer, $this->propertyTypeExtractor, $this->classDiscriminatorResolver);
+    }
+
+    public function setSerializer(SerializerInterface $serializer)
+    {
+        $this->serializer = $serializer;
+        $this->propertyValueNormalizer->setSerializer($serializer);
     }
 
     /**
@@ -362,11 +372,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 }
             }
 
-            $types = $this->getTypes($resolvedClass, $attribute);
+            $types = $this->propertyValueNormalizer->getTypes($resolvedClass, $attribute);
 
             if (null !== $types) {
                 try {
-                    $value = $this->validateAndDenormalize($types, $resolvedClass, $attribute, $value, $format, $attributeContext);
+                    $value = $this->propertyValueNormalizer->validateAndDenormalize($types, $resolvedClass, $attribute, $value, $format, $attributeContext, $this->shouldDisableTypeEnforcement($context), [$this, 'createPropertyValueChildContext']);
                 } catch (NotNormalizableValueException $exception) {
                     if (isset($context['not_normalizable_value_exceptions'])) {
                         $context['not_normalizable_value_exceptions'][] = $exception;
@@ -411,239 +421,28 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     abstract protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = []);
 
     /**
-     * Validates the submitted data and denormalizes it.
-     *
-     * @param Type[] $types
-     *
-     * @throws NotNormalizableValueException
-     * @throws ExtraAttributesException
-     * @throws MissingConstructorArgumentsException
-     * @throws LogicException
-     */
-    private function validateAndDenormalize(array $types, string $currentClass, string $attribute, mixed $data, ?string $format, array $context): mixed
-    {
-        $expectedTypes = [];
-        $isUnionType = \count($types) > 1;
-        $extraAttributesException = null;
-        $missingConstructorArgumentException = null;
-        foreach ($types as $type) {
-            if (null === $data && $type->isNullable()) {
-                return null;
-            }
-
-            $collectionValueType = $type->isCollection() ? $type->getCollectionValueTypes()[0] ?? null : null;
-
-            // Fix a collection that contains the only one element
-            // This is special to xml format only
-            if ('xml' === $format && null !== $collectionValueType && (!\is_array($data) || !\is_int(key($data)))) {
-                $data = [$data];
-            }
-
-            // This try-catch should cover all NotNormalizableValueException (and all return branches after the first
-            // exception) so we could try denormalizing all types of an union type. If the target type is not an union
-            // type, we will just re-throw the catched exception.
-            // In the case of no denormalization succeeds with an union type, it will fall back to the default exception
-            // with the acceptable types list.
-            try {
-                // In XML and CSV all basic datatypes are represented as strings, it is e.g. not possible to determine,
-                // if a value is meant to be a string, float, int or a boolean value from the serialized representation.
-                // That's why we have to transform the values, if one of these non-string basic datatypes is expected.
-                if (\is_string($data) && (XmlEncoder::FORMAT === $format || CsvEncoder::FORMAT === $format)) {
-                    if ('' === $data) {
-                        if (Type::BUILTIN_TYPE_ARRAY === $builtinType = $type->getBuiltinType()) {
-                            return [];
-                        }
-
-                        if ($type->isNullable() && \in_array($builtinType, [Type::BUILTIN_TYPE_BOOL, Type::BUILTIN_TYPE_INT, Type::BUILTIN_TYPE_FLOAT], true)) {
-                            return null;
-                        }
-                    }
-
-                    switch ($builtinType ?? $type->getBuiltinType()) {
-                        case Type::BUILTIN_TYPE_BOOL:
-                            // according to https://www.w3.org/TR/xmlschema-2/#boolean, valid representations are "false", "true", "0" and "1"
-                            if ('false' === $data || '0' === $data) {
-                                $data = false;
-                            } elseif ('true' === $data || '1' === $data) {
-                                $data = true;
-                            } else {
-                                throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type of the "%s" attribute for class "%s" must be bool ("%s" given).', $attribute, $currentClass, $data), $data, [Type::BUILTIN_TYPE_BOOL], $context['deserialization_path'] ?? null);
-                            }
-                            break;
-                        case Type::BUILTIN_TYPE_INT:
-                            if (ctype_digit('-' === $data[0] ? substr($data, 1) : $data)) {
-                                $data = (int) $data;
-                            } else {
-                                throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type of the "%s" attribute for class "%s" must be int ("%s" given).', $attribute, $currentClass, $data), $data, [Type::BUILTIN_TYPE_INT], $context['deserialization_path'] ?? null);
-                            }
-                            break;
-                        case Type::BUILTIN_TYPE_FLOAT:
-                            if (is_numeric($data)) {
-                                return (float) $data;
-                            }
-
-                            return match ($data) {
-                                'NaN' => \NAN,
-                                'INF' => \INF,
-                                '-INF' => -\INF,
-                                default => throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type of the "%s" attribute for class "%s" must be float ("%s" given).', $attribute, $currentClass, $data), $data, [Type::BUILTIN_TYPE_FLOAT], $context['deserialization_path'] ?? null),
-                            };
-                    }
-                }
-
-                if (null !== $collectionValueType && Type::BUILTIN_TYPE_OBJECT === $collectionValueType->getBuiltinType()) {
-                    $builtinType = Type::BUILTIN_TYPE_OBJECT;
-                    $class = $collectionValueType->getClassName().'[]';
-
-                    if (\count($collectionKeyType = $type->getCollectionKeyTypes()) > 0) {
-                        [$context['key_type']] = $collectionKeyType;
-                    }
-
-                    $context['value_type'] = $collectionValueType;
-                } elseif ($type->isCollection() && \count($collectionValueType = $type->getCollectionValueTypes()) > 0 && Type::BUILTIN_TYPE_ARRAY === $collectionValueType[0]->getBuiltinType()) {
-                    // get inner type for any nested array
-                    [$innerType] = $collectionValueType;
-
-                    // note that it will break for any other builtinType
-                    $dimensions = '[]';
-                    while (\count($innerType->getCollectionValueTypes()) > 0 && Type::BUILTIN_TYPE_ARRAY === $innerType->getBuiltinType()) {
-                        $dimensions .= '[]';
-                        [$innerType] = $innerType->getCollectionValueTypes();
-                    }
-
-                    if (null !== $innerType->getClassName()) {
-                        // the builtinType is the inner one and the class is the class followed by []...[]
-                        $builtinType = $innerType->getBuiltinType();
-                        $class = $innerType->getClassName().$dimensions;
-                    } else {
-                        // default fallback (keep it as array)
-                        $builtinType = $type->getBuiltinType();
-                        $class = $type->getClassName();
-                    }
-                } else {
-                    $builtinType = $type->getBuiltinType();
-                    $class = $type->getClassName();
-                }
-
-                $expectedTypes[Type::BUILTIN_TYPE_OBJECT === $builtinType && $class ? $class : $builtinType] = true;
-
-                if (Type::BUILTIN_TYPE_OBJECT === $builtinType) {
-                    if (!$this->serializer instanceof DenormalizerInterface) {
-                        throw new LogicException(sprintf('Cannot denormalize attribute "%s" for class "%s" because injected serializer is not a denormalizer.', $attribute, $class));
-                    }
-
-                    $childContext = $this->createChildContext($context, $attribute, $format);
-                    if ($this->serializer->supportsDenormalization($data, $class, $format, $childContext)) {
-                        return $this->serializer->denormalize($data, $class, $format, $childContext);
-                    }
-                }
-
-                // JSON only has a Number type corresponding to both int and float PHP types.
-                // PHP's json_encode, JavaScript's JSON.stringify, Go's json.Marshal as well as most other JSON encoders convert
-                // floating-point numbers like 12.0 to 12 (the decimal part is dropped when possible).
-                // PHP's json_decode automatically converts Numbers without a decimal part to integers.
-                // To circumvent this behavior, integers are converted to floats when denormalizing JSON based formats and when
-                // a float is expected.
-                if (Type::BUILTIN_TYPE_FLOAT === $builtinType && \is_int($data) && null !== $format && str_contains($format, JsonEncoder::FORMAT)) {
-                    return (float) $data;
-                }
-
-                if ((Type::BUILTIN_TYPE_FALSE === $builtinType && false === $data) || (Type::BUILTIN_TYPE_TRUE === $builtinType && true === $data)) {
-                    return $data;
-                }
-
-                if (('is_'.$builtinType)($data)) {
-                    return $data;
-                }
-            } catch (NotNormalizableValueException $e) {
-                if (!$isUnionType) {
-                    throw $e;
-                }
-            } catch (ExtraAttributesException $e) {
-                if (!$isUnionType) {
-                    throw $e;
-                }
-
-                $extraAttributesException ??= $e;
-            } catch (MissingConstructorArgumentsException $e) {
-                if (!$isUnionType) {
-                    throw $e;
-                }
-
-                $missingConstructorArgumentException ??= $e;
-            }
-        }
-
-        if ($extraAttributesException) {
-            throw $extraAttributesException;
-        }
-
-        if ($missingConstructorArgumentException) {
-            throw $missingConstructorArgumentException;
-        }
-
-        if ($context[self::DISABLE_TYPE_ENFORCEMENT] ?? $this->defaultContext[self::DISABLE_TYPE_ENFORCEMENT] ?? false) {
-            return $data;
-        }
-
-        throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type of the "%s" attribute for class "%s" must be one of "%s" ("%s" given).', $attribute, $currentClass, implode('", "', array_keys($expectedTypes)), get_debug_type($data)), $data, array_keys($expectedTypes), $context['deserialization_path'] ?? $attribute);
-    }
-
-    /**
      * @internal
      */
     protected function denormalizeParameter(\ReflectionClass $class, \ReflectionParameter $parameter, string $parameterName, mixed $parameterData, array $context, string $format = null): mixed
     {
-        if ($parameter->isVariadic() || null === $this->propertyTypeExtractor || null === $types = $this->getTypes($class->getName(), $parameterName)) {
+        if ($parameter->isVariadic() || null === $this->propertyTypeExtractor || null === $types = $this->propertyValueNormalizer->getTypes($class->getName(), $parameterName)) {
             return parent::denormalizeParameter($class, $parameter, $parameterName, $parameterData, $context, $format);
         }
 
-        $parameterData = $this->validateAndDenormalize($types, $class->getName(), $parameterName, $parameterData, $format, $context);
+        $parameterData = $this->propertyValueNormalizer->validateAndDenormalize($types, $class->getName(), $parameterName, $parameterData, $format, $context, $this->shouldDisableTypeEnforcement($context), [$this, 'createPropertyValueChildContext']);
 
         return $this->applyCallbacks($parameterData, $class->getName(), $parameterName, $format, $context);
     }
 
-    /**
-     * @return Type[]|null
-     */
-    private function getTypes(string $currentClass, string $attribute): ?array
+    final protected function shouldDisableTypeEnforcement(array $context): bool
     {
-        if (null === $this->propertyTypeExtractor) {
-            return null;
-        }
-
-        $key = $currentClass.'::'.$attribute;
-        if (isset($this->typesCache[$key])) {
-            return false === $this->typesCache[$key] ? null : $this->typesCache[$key];
-        }
-
-        if (null !== $types = $this->propertyTypeExtractor->getTypes($currentClass, $attribute)) {
-            return $this->typesCache[$key] = $types;
-        }
-
-        if (null !== $this->classDiscriminatorResolver && null !== $discriminatorMapping = $this->classDiscriminatorResolver->getMappingForClass($currentClass)) {
-            if ($discriminatorMapping->getTypeProperty() === $attribute) {
-                return $this->typesCache[$key] = [
-                    new Type(Type::BUILTIN_TYPE_STRING),
-                ];
-            }
-
-            foreach ($discriminatorMapping->getTypesMapping() as $mappedClass) {
-                if (null !== $types = $this->propertyTypeExtractor->getTypes($mappedClass, $attribute)) {
-                    return $this->typesCache[$key] = $types;
-                }
-            }
-        }
-
-        $this->typesCache[$key] = false;
-
-        return null;
+        return $context[self::DISABLE_TYPE_ENFORCEMENT] ?? $this->defaultContext[self::DISABLE_TYPE_ENFORCEMENT] ?? false;
     }
 
     /**
      * Sets an attribute and apply the name converter if necessary.
      */
-    private function updateData(array $data, string $attribute, mixed $attributeValue, string $class, ?string $format, array $context, ?array $attributesMetadata, ?ClassMetadataInterface $classMetadata): array
+    final protected function updateData(array $data, string $attribute, mixed $attributeValue, string $class, ?string $format, array $context, ?array $attributesMetadata, ?ClassMetadataInterface $classMetadata): array
     {
         if (null === $attributeValue && ($context[self::SKIP_NULL_VALUES] ?? $this->defaultContext[self::SKIP_NULL_VALUES] ?? false)) {
             return $data;
@@ -700,6 +499,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         return false;
     }
 
+    final public function createPropertyValueChildContext(array $parentContext, string $attribute, ?string $format): array
+    {
+        return $this->createChildContext($parentContext, $attribute, $format);
+    }
+
     /**
      * Overwritten to update the cache key for the child.
      *
@@ -720,7 +524,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * The key must be different for every option in the context that could change which attributes should be handled.
      */
-    private function getCacheKey(?string $format, array $context): bool|string
+    final protected function getCacheKey(?string $format, array $context): bool|string
     {
         foreach ($context[self::EXCLUDE_FROM_CACHE_KEY] ?? $this->defaultContext[self::EXCLUDE_FROM_CACHE_KEY] as $key) {
             unset($context[$key]);
@@ -744,7 +548,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * This error may occur when specific object normalizer implementation gets attribute value
      * by accessing a public uninitialized property or by calling a method accessing such property.
      */
-    private function isUninitializedValueError(\Error $e): bool
+    final protected function isUninitializedValueError(\Error $e): bool
     {
         return str_starts_with($e->getMessage(), 'Typed property')
             && str_ends_with($e->getMessage(), 'must not be accessed before initialization');

@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2023-02-22T13:16:57Z
+
+FTR: This feature has been discussed and rejected once: #46655
+
+---------------------------------------------------------------------------
+
+by alanpoulain at 2023-02-22T14:14:31Z
+
+Why not just adding the attribute suggested in https://github.com/symfony/symfony/pull/47196?
+```php
+#[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD | Attribute::TARGET_FUNCTION | Attribute::IS_REPEATABLE)]
+final class Exclude extends When
+{
+    public function __construct()
+    {
+        parent::__construct('never');
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-02-22T14:45:31Z
+
+@derrabus I know but I think many people need it
+
+@alanpoulain because this is a hack 😊

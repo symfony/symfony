@@ -166,6 +166,7 @@ use Symfony\Component\Notifier\Bridge\OrangeSms\OrangeSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
 use Symfony\Component\Notifier\Bridge\PagerDuty\PagerDutyTransportFactory;
 use Symfony\Component\Notifier\Bridge\Plivo\PlivoTransportFactory;
+use Symfony\Component\Notifier\Bridge\Pushover\PushoverTransportFactory;
 use Symfony\Component\Notifier\Bridge\RingCentral\RingCentralTransportFactory;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sendberry\SendberryTransportFactory;
@@ -2606,6 +2607,7 @@ class FrameworkExtension extends Extension
             OvhCloudTransportFactory::class => 'notifier.transport_factory.ovh-cloud',
             PagerDutyTransportFactory::class => 'notifier.transport_factory.pager-duty',
             PlivoTransportFactory::class => 'notifier.transport_factory.plivo',
+            PushoverTransportFactory::class => 'notifier.transport_factory.pushover',
             RingCentralTransportFactory::class => 'notifier.transport_factory.ring-central',
             RocketChatTransportFactory::class => 'notifier.transport_factory.rocket-chat',
             SendberryTransportFactory::class => 'notifier.transport_factory.sendberry',

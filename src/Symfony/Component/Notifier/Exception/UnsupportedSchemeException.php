@@ -164,6 +164,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Plivo\PlivoTransportFactory::class,
             'package' => 'symfony/plivo-notifier',
         ],
+        'pushover' => [
+            'class' => Bridge\Pushover\PushoverTransportFactory::class,
+            'package' => 'symfony/pushover-notifier',
+        ],
         'ringcentral' => [
             'class' => Bridge\RingCentral\RingCentralTransportFactory::class,
             'package' => 'symfony/ring-central-notifier',

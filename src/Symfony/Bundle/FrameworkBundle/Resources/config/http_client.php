@@ -23,7 +23,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
-        ->set('http_client', HttpClientInterface::class)
+        ->set('http_client.transport', HttpClientInterface::class)
             ->factory([HttpClient::class, 'create'])
             ->args([
                 [], // default options
@@ -32,6 +32,10 @@ return static function (ContainerConfigurator $container) {
             ->call('setLogger', [service('logger')->ignoreOnInvalid()])
             ->tag('monolog.logger', ['channel' => 'http_client'])
             ->tag('kernel.reset', ['method' => 'reset', 'on_invalid' => 'ignore'])
+
+        ->set('http_client', HttpClientInterface::class)
+            ->factory('current')
+            ->args([[service('http_client.transport')]])
             ->tag('http_client.client')
 
         ->alias(HttpClientInterface::class, 'http_client')

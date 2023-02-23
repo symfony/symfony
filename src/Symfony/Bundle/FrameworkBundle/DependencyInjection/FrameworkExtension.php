@@ -2342,7 +2342,7 @@ class FrameworkExtension extends Extension
         unset($options['retry_failed']);
         $defaultUriTemplateVars = $options['vars'] ?? [];
         unset($options['vars']);
-        $container->getDefinition('http_client')->setArguments([$options, $config['max_host_connections'] ?? 6]);
+        $container->getDefinition('http_client.transport')->setArguments([$options, $config['max_host_connections'] ?? 6]);
 
         if (!$hasPsr18 = ContainerBuilder::willBeAvailable('psr/http-client', ClientInterface::class, ['symfony/framework-bundle', 'symfony/http-client'])) {
             $container->removeDefinition('psr18.http_client');
@@ -2353,7 +2353,7 @@ class FrameworkExtension extends Extension
             $container->removeDefinition(HttpClient::class);
         }
 
-        if ($hasRetryFailed = $this->readConfigEnabled('http_client.retry_failed', $container, $retryOptions)) {
+        if ($this->readConfigEnabled('http_client.retry_failed', $container, $retryOptions)) {
             $this->registerRetryableHttpClient($retryOptions, 'http_client', $container);
         }
 
@@ -2371,15 +2371,8 @@ class FrameworkExtension extends Extension
             throw new LogicException('Support for URI template requires symfony/http-client 6.3 or higher, try upgrading.');
         }
 
-        $httpClientId = match (true) {
-            $hasUriTemplate => 'http_client.uri_template.inner',
-            $hasRetryFailed => 'http_client.retryable.inner',
-            $this->isInitializedConfigEnabled('profiler') => '.debug.http_client.inner',
-            default => 'http_client',
-        };
-
         foreach ($config['scoped_clients'] as $name => $scopeConfig) {
-            if ('http_client' === $name) {
+            if ($container->has($name)) {
                 throw new InvalidArgumentException(sprintf('Invalid scope name: "%s" is reserved.', $name));
             }
 
@@ -2394,17 +2387,17 @@ class FrameworkExtension extends Extension
 
                 $container->register($name, ScopingHttpClient::class)
                     ->setFactory([ScopingHttpClient::class, 'forBaseUri'])
-                    ->setArguments([new Reference($httpClientId), $baseUri, $scopeConfig])
+                    ->setArguments([new Reference('http_client.transport'), $baseUri, $scopeConfig])
                     ->addTag('http_client.client')
                 ;
             } else {
                 $container->register($name, ScopingHttpClient::class)
-                    ->setArguments([new Reference($httpClientId), [$scope => $scopeConfig], $scope])
+                    ->setArguments([new Reference('http_client.transport'), [$scope => $scopeConfig], $scope])
                     ->addTag('http_client.client')
                 ;
             }
 
-            if ($this->readConfigEnabled('http_client.scoped_clients.'.$name.'retry_failed', $container, $retryOptions)) {
+            if ($this->readConfigEnabled('http_client.scoped_clients.'.$name.'.retry_failed', $container, $retryOptions)) {
                 $this->registerRetryableHttpClient($retryOptions, $name, $container);
             }
 
@@ -2413,7 +2406,7 @@ class FrameworkExtension extends Extension
                     ->register($name.'.uri_template', UriTemplateHttpClient::class)
                     ->setDecoratedService($name, null, 7) // Between TraceableHttpClient (5) and RetryableHttpClient (10)
                     ->setArguments([
-                        new Reference('.inner'),
+                        new Reference($name.'.uri_template.inner'),
                         new Reference('http_client.uri_template_expander', ContainerInterface::NULL_ON_INVALID_REFERENCE),
                         $defaultUriTemplateVars,
                     ]);
@@ -2430,8 +2423,8 @@ class FrameworkExtension extends Extension
         }
 
         if ($responseFactoryId = $config['mock_response_factory'] ?? null) {
-            $container->register($httpClientId.'.mock_client', MockHttpClient::class)
-                ->setDecoratedService($httpClientId, null, -10) // lower priority than TraceableHttpClient
+            $container->register('http_client.mock_client', MockHttpClient::class)
+                ->setDecoratedService('http_client.transport', null, -10)  // lower priority than TraceableHttpClient (5)
                 ->setArguments([new Reference($responseFactoryId)]);
         }
     }
@@ -2464,7 +2457,7 @@ class FrameworkExtension extends Extension
 
         $container
             ->register($name.'.retryable', RetryableHttpClient::class)
-            ->setDecoratedService($name, null, 10) // higher priority than TraceableHttpClient
+            ->setDecoratedService($name, null, 10) // higher priority than TraceableHttpClient (5)
             ->setArguments([new Reference($name.'.retryable.inner'), $retryStrategy, $options['max_retries'], new Reference('logger')])
             ->addTag('monolog.logger', ['channel' => 'http_client']);
     }

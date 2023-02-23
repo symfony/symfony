@@ -12,6 +12,7 @@
 namespace Symfony\Component\Mailer\Bridge\MailerSend\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\Exception\JsonException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Mailer\Bridge\MailerSend\Transport\MailerSendApiTransport;
@@ -191,8 +192,8 @@ class MailerSendApiTransportTest extends TestCase
             ->from(new Address('test_from@example.com', 'Test from name'))
             ->text('Lorem ipsum.');
 
-        $this->expectException(HttpTransportException::class);
-        $this->expectExceptionMessage('Unable to send an email: "test" (code 202).');
+        $this->expectException(JsonException::class);
+        $this->expectExceptionMessage('Syntax error for "https://api.mailersend.com/v1/email');
         $transport->send($mail);
     }
 }

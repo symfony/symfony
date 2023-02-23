@@ -1,5 +1,5 @@
 {
-    "name": "symfony/mailer-send-mailer",
+    "name": "symfony/mailersend-mailer",
     "type": "symfony-mailer-bridge",
     "description": "Symfony MailerSend Mailer Bridge",
     "keywords": [],

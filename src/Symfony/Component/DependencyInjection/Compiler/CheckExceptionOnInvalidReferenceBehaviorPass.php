@@ -90,7 +90,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
     {
         $alternatives = [];
         foreach ($this->container->getServiceIds() as $knownId) {
-            if ('' === $knownId || '.' === $knownId[0]) {
+            if ('' === $knownId || '.' === $knownId[0] || $knownId === $this->currentId) {
                 continue;
             }
 

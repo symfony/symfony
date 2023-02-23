@@ -11,11 +11,11 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\HttpKernel\Attribute\Serialize;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class ApiAttributesTest extends AbstractWebTestCase
@@ -87,9 +87,11 @@ class ApiAttributesTest extends AbstractWebTestCase
     }
 
     /**
+     * @param <string, string> $expectedHeaders
+     *
      * @dataProvider mapRequestPayloadProvider
      */
-    public function testMapRequestPayload(string $format, array $parameters, ?string $content, string $expectedResponse, int $expectedStatusCode)
+    public function testMapRequestPayload(string $format, array $parameters, ?string $content, string $expectedResponse, int $expectedStatusCode, array $expectedHeaders = [])
     {
         $client = self::createClient(['test_case' => 'ApiAttributesTest']);
 
@@ -119,6 +121,9 @@ class ApiAttributesTest extends AbstractWebTestCase
         }
 
         self::assertSame($expectedStatusCode, $response->getStatusCode());
+        foreach ($expectedHeaders as $name => $value) {
+            self::assertSame($value, $response->headers->get($name));
+        }
     }
 
     public static function mapRequestPayloadProvider(): iterable
@@ -146,7 +151,10 @@ class ApiAttributesTest extends AbstractWebTestCase
                     "approved": false
                 }
                 JSON,
-            'expectedStatusCode' => 200,
+            'expectedStatusCode' => 201,
+            'expectedHeaders' => [
+                'X-Test-Header' => 'abc',
+            ],
         ];
 
         yield 'malformed json' => [
@@ -192,7 +200,10 @@ class ApiAttributesTest extends AbstractWebTestCase
                     <approved>1</approved>
                 </response>
                 XML,
-            'expectedStatusCode' => 200,
+            'expectedStatusCode' => 201,
+            'expectedHeaders' => [
+                'X-Test-Header' => 'abc',
+            ],
         ];
 
         yield 'invalid type' => [
@@ -309,7 +320,10 @@ class ApiAttributesTest extends AbstractWebTestCase
                     "approved": false
                 }
                 JSON,
-            'expectedStatusCode' => 200,
+            'expectedStatusCode' => 201,
+            'expectedHeaders' => [
+                'X-Test-Header' => 'abc',
+            ],
         ];
 
         yield 'validation error input' => [
@@ -353,38 +367,27 @@ class ApiAttributesTest extends AbstractWebTestCase
 
 class WithMapQueryStringController
 {
-    public function __invoke(#[MapQueryString] ?QueryString $query): Response
+    #[Serialize]
+    public function __invoke(#[MapQueryString] ?QueryString $query): QueryString|Response
     {
         if (!$query) {
             return new Response('', Response::HTTP_NO_CONTENT);
         }
 
-        return new JsonResponse(
-            ['filter' => ['status' => $query->filter->status, 'quantity' => $query->filter->quantity]],
-        );
+        return $query;
     }
 }
 
 class WithMapRequestPayloadController
 {
-    public function __invoke(#[MapRequestPayload] ?RequestBody $body, Request $request): Response
+    #[Serialize(201, ['X-Test-Header' => 'abc'])]
+    public function __invoke(#[MapRequestPayload] ?RequestBody $body, Request $request): RequestBody|Response
     {
-        if ('json' === $request->getPreferredFormat('json')) {
-            if (!$body) {
-                return new Response('', Response::HTTP_NO_CONTENT);
-            }
-
-            return new JsonResponse(['comment' => $body->comment, 'approved' => $body->approved]);
+        if (!$body) {
+            return new Response('', Response::HTTP_NO_CONTENT);
         }
 
-        return new Response(
-            <<<XML
-            <response>
-                <comment>{$body->comment}</comment>
-                <approved>{$body->approved}</approved>
-            </response>
-            XML
-        );
+        return $body;
     }
 }
 

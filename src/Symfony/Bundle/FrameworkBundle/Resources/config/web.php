@@ -33,6 +33,7 @@ use Symfony\Component\HttpKernel\EventListener\DisallowRobotsIndexingListener;
 use Symfony\Component\HttpKernel\EventListener\ErrorListener;
 use Symfony\Component\HttpKernel\EventListener\LocaleListener;
 use Symfony\Component\HttpKernel\EventListener\ResponseListener;
+use Symfony\Component\HttpKernel\EventListener\SerializeControllerResultListener;
 use Symfony\Component\HttpKernel\EventListener\ValidateRequestListener;
 
 return static function (ContainerConfigurator $container) {
@@ -144,5 +145,10 @@ return static function (ContainerConfigurator $container) {
         ->set('controller.cache_attribute_listener', CacheAttributeListener::class)
             ->tag('kernel.event_subscriber')
 
+        ->set('serialize_controller_result_listener', SerializeControllerResultListener::class)
+        ->args([
+            service('serializer')->nullOnInvalid(),
+        ])
+        ->tag('kernel.event_subscriber')
     ;
 };

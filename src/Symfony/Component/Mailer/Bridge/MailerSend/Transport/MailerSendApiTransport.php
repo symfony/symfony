@@ -60,7 +60,11 @@ final class MailerSendApiTransport extends AbstractApiTransport
             throw new HttpTransportException('Could not reach the remote MailerSend server.', $response, 0, $e);
         }
 
-        $result = '' !== $content ? $response->toArray(false) : null;
+        try {
+            $result = '' !== $content ? $response->toArray(false) : null;
+        } catch (JsonException $e) {
+            throw new HttpTransportException(sprintf('Unable to send an email: "%s" (code %d).', $content, $statusCode), $response, 0, $e);
+        }
 
         if (202 !== $statusCode) {
             throw new HttpTransportException('Unable to send an email: '.($result['message'] ?? '').sprintf(' (code %d).', $statusCode), $response);

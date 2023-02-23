@@ -77,3 +77,8 @@ Validator
 ---------
 
  * Implementing the `ConstraintViolationInterface` without implementing the `getConstraint()` method is deprecated
+
+Serializer
+----------
+
+ * Deprecate `MissingConstructorArgumentsException` in favor of `MissingConstructorArgumentException`

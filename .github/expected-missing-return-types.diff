@@ -10818,7 +10818,7 @@ index 829e178407..1ac8101771 100644
      {
          $ignoredAttributes = $context[self::IGNORED_ATTRIBUTES] ?? $this->defaultContext[self::IGNORED_ATTRIBUTES];
 @@ -311,5 +311,5 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
-      * @throws MissingConstructorArgumentsException
+      * @throws MissingConstructorArgumentException
       */
 -    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null)
 +    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null): object

@@ -1,5 +1,5 @@
 {
-    "name": "symfony/mailersend-mailer",
+    "name": "symfony/mailer-send-mailer",
     "type": "symfony-mailer-bridge",
     "description": "Symfony MailerSend Mailer Bridge",
     "keywords": [],
@@ -21,7 +21,7 @@
     ],
     "require": {
         "php": ">=8.1",
-        "symfony/mailer": "^5.4|^6.0"
+        "symfony/mailer": "^5.4.21|^6.2.7"
     },
     "require-dev": {
         "symfony/http-client": "^5.4|^6.0"

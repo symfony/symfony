@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-12-31T10:16:44Z
+
+Hey!
+
+I think @rvanlaak has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by maxbeckers at 2023-01-10T12:35:27Z
+
+Hi @javiereguiluz,
+
+i can't reproduce the problem. When I translate `{{ 'invalid'|trans }}`, then i get one message for missing Translation. When I translate `{{ ''|trans }}` then there is no message.
+
+Tried with a clean symfony 5.4 and 6.1 environment.
+
+**UPDATE**
+I can reproduce with setting this in controller `['test' => new TranslatableMessage(''),]` and then `{{ test|trans }}`. Sorry, didn't read the issue correlctly. Then I'm fine with the fix :) And yes for me it's as well a kind of bugfix, so I'm fine with 5.4.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-01-11T10:57:12Z
+
+Why don't you use this code instead?
+
+```php
+$someCondition ? new TranslatableMessage($someObject->someMethod()) : ''
+```
+
+It would make more sense to me. Why wrap the empty string in a translatable when it's not translatable content?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2023-01-17T15:16:42Z
+
+Looking at Twig Bridge `trans()` function, I think there's an inconsistency:
+
+https://github.com/symfony/symfony/blob/1f7bc1098f0b03181095d35b11fa48523864e6f2/src/Symfony/Bridge/Twig/Extension/TranslationExtension.php#L99-L122
+
+The behavior is different:
+
+(1) If we pass a string:
+* If it's empty, return `''`
+* If it's not empty, translate it
+
+(2) It we pass a `TranslatableInterface` object:
+* Translate it in all cases, even if it's an empty string
+
+That's why we don't get a "missing translation" warning when doing `''|trans` but we get it when doing `t('')|trans`
+
+Would you agree to update `trans()` code to also return `''` when `TranslatableInterface` content is an empty string?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2023-01-19T15:10:39Z
+
+I've changed the proposed solution completely. If you can, please review it again. Thanks.

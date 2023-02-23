@@ -673,6 +673,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
                 '{{ filename_max_length }}' => $constraintFile->filenameMaxLength,
             ])
             ->setCode(File::FILENAME_TOO_LONG)
+            ->setPlural($constraintFile->filenameMaxLength)
             ->assertRaised();
     }
 
@@ -680,7 +681,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
     {
         yield 'Simple case with only the parameter "filenameMaxLength" ' => [
             new File(filenameMaxLength: 30),
-            'The filename is too long. It should have {{ filename_max_length }} characters or less.',
+            'The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.',
         ];
 
         yield 'Case with the parameter "filenameMaxLength" and a custom error message' => [

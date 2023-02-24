@@ -55,7 +55,6 @@ use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
-use Symfony\Component\HttpClient\UriTemplateHttpClient;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\HttpKernel\Fragment\FragmentUriGeneratorInterface;
 use Symfony\Component\Messenger\Transport\TransportFactory;
@@ -1846,14 +1845,14 @@ abstract class FrameworkExtensionTestCase extends TestCase
     public function testHttpClientDefaultOptions()
     {
         $container = $this->createContainerFromFile('http_client_default_options');
-        $this->assertTrue($container->hasDefinition('http_client'), '->registerHttpClientConfiguration() loads http_client.xml');
+        $this->assertTrue($container->hasDefinition('http_client.transport'), '->registerHttpClientConfiguration() loads http_client.xml');
 
         $defaultOptions = [
             'headers' => [],
             'resolve' => [],
             'extra' => [],
         ];
-        $this->assertSame([$defaultOptions, 4], $container->getDefinition('http_client')->getArguments());
+        $this->assertSame([$defaultOptions, 4], $container->getDefinition('http_client.transport')->getArguments());
 
         $this->assertTrue($container->hasDefinition('foo'), 'should have the "foo" service.');
         $this->assertSame(ScopingHttpClient::class, $container->getDefinition('foo')->getClass());
@@ -1871,9 +1870,9 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         $container = $this->createContainerFromFile('http_client_override_default_options');
 
-        $this->assertSame(['foo' => 'bar'], $container->getDefinition('http_client')->getArgument(0)['headers']);
-        $this->assertSame(['foo' => 'bar'], $container->getDefinition('http_client')->getArgument(0)['extra']);
-        $this->assertSame(4, $container->getDefinition('http_client')->getArgument(1));
+        $this->assertSame(['foo' => 'bar'], $container->getDefinition('http_client.transport')->getArgument(0)['headers']);
+        $this->assertSame(['foo' => 'bar'], $container->getDefinition('http_client.transport')->getArgument(0)['extra']);
+        $this->assertSame(4, $container->getDefinition('http_client.transport')->getArgument(1));
         $this->assertSame('http://example.com', $container->getDefinition('foo')->getArgument(1));
 
         $expected = [
@@ -1926,7 +1925,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         $container = $this->createContainerFromFile('http_client_full_default_options');
 
-        $defaultOptions = $container->getDefinition('http_client')->getArgument(0);
+        $defaultOptions = $container->getDefinition('http_client.transport')->getArgument(0);
 
         $this->assertSame(['X-powered' => 'PHP'], $defaultOptions['headers']);
         $this->assertSame(2, $defaultOptions['max_redirects']);
@@ -2004,7 +2003,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         $container = $this->createContainerFromFile('http_client_mock_response_factory');
 
-        $definition = $container->getDefinition(($uriTemplateHttpClientExists = class_exists(UriTemplateHttpClient::class)) ? 'http_client.uri_template.inner.mock_client' : 'http_client.mock_client');
+        $definition = $container->getDefinition('http_client.mock_client');
 
         $this->assertSame(MockHttpClient::class, $definition->getClass());
         $this->assertCount(1, $definition->getArguments());
@@ -2012,7 +2011,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $argument = $definition->getArgument(0);
 
         $this->assertInstanceOf(Reference::class, $argument);
-        $this->assertSame($uriTemplateHttpClientExists ? 'http_client.uri_template.inner' : 'http_client', current($definition->getDecoratedService()));
+        $this->assertSame('http_client.transport', current($definition->getDecoratedService()));
         $this->assertSame('my_response_factory', (string) $argument);
     }
 

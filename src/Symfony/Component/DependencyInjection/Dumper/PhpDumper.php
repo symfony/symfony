@@ -1154,6 +1154,9 @@ EOTXT
         if (null !== $definition->getFactory()) {
             $callable = $definition->getFactory();
 
+            if ('current' === $callable && [0] === array_keys($definition->getArguments()) && \is_array($value) && [0] === array_keys($value)) {
+                return $return.$this->dumpValue($value[0]).$tail;
+            }
             if (['Closure', 'fromCallable'] === $callable && [0] === array_keys($definition->getArguments())) {
                 $callable = $definition->getArgument(0);
                 if ($callable instanceof ServiceClosureArgument) {

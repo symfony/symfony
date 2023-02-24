@@ -1503,6 +1503,37 @@ PHP
         $this->assertInstanceOf(Foo::class, $wither->foo);
     }
 
+    public function testCurrentFactoryInlining()
+    {
+        $container = new ContainerBuilder();
+        $container->register(Foo::class);
+
+        $container
+            ->register('inlined_current', Foo::class)
+            ->setFactory('current')
+            ->setPublic(true)
+            ->setArguments([[new Reference(Foo::class)]]);
+
+        $container
+            ->register('not_inlined_current', Foo::class)
+            ->setFactory('current')
+            ->setPublic(true)
+            ->setArguments([[new Reference(Foo::class), 123]]);
+
+        $container->compile();
+        $dumper = new PhpDumper($container);
+        $dump = $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Service_CurrentFactoryInlining']);
+        file_put_contents(self::$fixturesPath.'/php/services_current_factory_inlining.php', $dump);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_current_factory_inlining.php', $dump);
+        eval('?>'.$dump);
+
+        $container = new \Symfony_DI_PhpDumper_Service_CurrentFactoryInlining();
+
+        $foo = $container->get('inlined_current');
+        $this->assertInstanceOf(Foo::class, $foo);
+        $this->assertSame($foo, $container->get('not_inlined_current'));
+    }
+
     public function testDumpServiceWithAbstractArgument()
     {
         $this->expectException(RuntimeException::class);

@@ -43,6 +43,16 @@ class SessionStrategyListener implements EventSubscriberInterface
             return;
         }
 
+        if ($previousToken = $event->getPreviousToken()) {
+            // @deprecated since Symfony 5.3, change to $token->getUserIdentifier() in 6.0
+            $user = method_exists($token, 'getUserIdentifier') ? $token->getUserIdentifier() : $token->getUsername();
+            $previousUser = method_exists($previousToken, 'getUserIdentifier') ? $previousToken->getUserIdentifier() : $previousToken->getUsername();
+
+            if ('' !== ($user ?? '') && $user === $previousUser) {
+                return;
+            }
+        }
+
         $this->sessionAuthenticationStrategy->onAuthentication($request, $token);
     }
 

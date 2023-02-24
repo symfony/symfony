@@ -49,6 +49,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('Authenticators'),
                 service('logger')->nullOnInvalid(),
                 param('security.authentication.hide_user_not_found'),
+                service('security.token_storage'),
             ])
             ->tag('monolog.logger', ['channel' => 'security'])
             ->deprecate('symfony/security-bundle', '5.3', 'The "%service_id%" service is deprecated, use the new authenticator system instead.')

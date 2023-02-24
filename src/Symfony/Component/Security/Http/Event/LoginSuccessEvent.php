@@ -37,6 +37,7 @@ class LoginSuccessEvent extends Event
     private $authenticator;
     private $passport;
     private $authenticatedToken;
+    private $previousToken;
     private $request;
     private $response;
     private $firewallName;
@@ -44,7 +45,7 @@ class LoginSuccessEvent extends Event
     /**
      * @param Passport $passport
      */
-    public function __construct(AuthenticatorInterface $authenticator, PassportInterface $passport, TokenInterface $authenticatedToken, Request $request, ?Response $response, string $firewallName)
+    public function __construct(AuthenticatorInterface $authenticator, PassportInterface $passport, TokenInterface $authenticatedToken, Request $request, ?Response $response, string $firewallName, TokenInterface $previousToken = null)
     {
         if (!$passport instanceof Passport) {
             trigger_deprecation('symfony/security-http', '5.4', 'Not passing an instance of "%s" as "$passport" argument of "%s()" is deprecated, "%s" given.', Passport::class, __METHOD__, get_debug_type($passport));
@@ -53,6 +54,7 @@ class LoginSuccessEvent extends Event
         $this->authenticator = $authenticator;
         $this->passport = $passport;
         $this->authenticatedToken = $authenticatedToken;
+        $this->previousToken = $previousToken;
         $this->request = $request;
         $this->response = $response;
         $this->firewallName = $firewallName;
@@ -81,6 +83,11 @@ class LoginSuccessEvent extends Event
     public function getAuthenticatedToken(): TokenInterface
     {
         return $this->authenticatedToken;
+    }
+
+    public function getPreviousToken(): ?TokenInterface
+    {
+        return $this->previousToken;
     }
 
     public function getRequest(): Request

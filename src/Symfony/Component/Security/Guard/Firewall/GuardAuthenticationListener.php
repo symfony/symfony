@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -49,12 +50,13 @@ class GuardAuthenticationListener extends AbstractListener
     private $logger;
     private $rememberMeServices;
     private $hideUserNotFoundExceptions;
+    private $tokenStorage;
 
     /**
      * @param string                                      $providerKey         The provider (i.e. firewall) key
      * @param iterable<array-key, AuthenticatorInterface> $guardAuthenticators The authenticators, with keys that match what's passed to GuardAuthenticationProvider
      */
-    public function __construct(GuardAuthenticatorHandler $guardHandler, AuthenticationManagerInterface $authenticationManager, string $providerKey, iterable $guardAuthenticators, LoggerInterface $logger = null, bool $hideUserNotFoundExceptions = true)
+    public function __construct(GuardAuthenticatorHandler $guardHandler, AuthenticationManagerInterface $authenticationManager, string $providerKey, iterable $guardAuthenticators, LoggerInterface $logger = null, bool $hideUserNotFoundExceptions = true, TokenStorageInterface $tokenStorage = null)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
@@ -66,6 +68,7 @@ class GuardAuthenticationListener extends AbstractListener
         $this->guardAuthenticators = $guardAuthenticators;
         $this->logger = $logger;
         $this->hideUserNotFoundExceptions = $hideUserNotFoundExceptions;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
@@ -135,6 +138,7 @@ class GuardAuthenticationListener extends AbstractListener
     private function executeGuardAuthenticator(string $uniqueGuardKey, AuthenticatorInterface $guardAuthenticator, RequestEvent $event)
     {
         $request = $event->getRequest();
+        $previousToken = $this->tokenStorage ? $this->tokenStorage->getToken() : null;
         try {
             if (null !== $this->logger) {
                 $this->logger->debug('Calling getCredentials() on guard authenticator.', ['firewall_key' => $this->providerKey, 'authenticator' => \get_class($guardAuthenticator)]);
@@ -162,7 +166,11 @@ class GuardAuthenticationListener extends AbstractListener
             }
 
             // sets the token on the token storage, etc
-            $this->guardHandler->authenticateWithToken($token, $request, $this->providerKey);
+            if ($this->tokenStorage) {
+                $this->guardHandler->authenticateWithToken($token, $request, $this->providerKey, $previousToken);
+            } else {
+                $this->guardHandler->authenticateWithToken($token, $request, $this->providerKey);
+            }
         } catch (AuthenticationException $e) {
             // oh no! Authentication failed!
 

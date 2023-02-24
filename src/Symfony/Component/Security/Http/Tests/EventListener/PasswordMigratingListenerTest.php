@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
+use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
@@ -28,7 +29,6 @@ use Symfony\Component\Security\Http\Authenticator\Passport\UserPassportInterface
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 use Symfony\Component\Security\Http\EventListener\PasswordMigratingListener;
 use Symfony\Component\Security\Http\Tests\Fixtures\DummyAuthenticator;
-use Symfony\Component\Security\Http\Tests\Fixtures\DummyToken;
 
 class PasswordMigratingListenerTest extends TestCase
 {
@@ -140,7 +140,7 @@ class PasswordMigratingListenerTest extends TestCase
 
     private static function createEvent(PassportInterface $passport)
     {
-        return new LoginSuccessEvent(new DummyAuthenticator(), $passport, new DummyToken(), new Request(), null, 'main');
+        return new LoginSuccessEvent(new DummyAuthenticator(), $passport, new NullToken(), new Request(), null, 'main');
     }
 }
 

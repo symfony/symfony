@@ -245,6 +245,10 @@ trait HttpClientTrait
                 throw new InvalidArgumentException(sprintf('Option "auth_ntlm" is not supported by "%s", '.$msg, __CLASS__, CurlHttpClient::class));
             }
 
+            if ('vars' === $name) {
+                throw new InvalidArgumentException(sprintf('Option "vars" is not supported by "%s", try using "%s" instead.', __CLASS__, UriTemplateHttpClient::class));
+            }
+
             $alternatives = [];
 
             foreach ($defaultOptions as $k => $v) {

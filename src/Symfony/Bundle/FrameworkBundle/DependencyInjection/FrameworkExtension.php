@@ -80,6 +80,7 @@ use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
+use Symfony\Component\HttpClient\UriTemplateHttpClient;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
@@ -2339,6 +2340,8 @@ class FrameworkExtension extends Extension
         $options = $config['default_options'] ?? [];
         $retryOptions = $options['retry_failed'] ?? ['enabled' => false];
         unset($options['retry_failed']);
+        $defaultUriTemplateVars = $options['vars'] ?? [];
+        unset($options['vars']);
         $container->getDefinition('http_client')->setArguments([$options, $config['max_host_connections'] ?? 6]);
 
         if (!$hasPsr18 = ContainerBuilder::willBeAvailable('psr/http-client', ClientInterface::class, ['symfony/framework-bundle', 'symfony/http-client'])) {
@@ -2350,11 +2353,31 @@ class FrameworkExtension extends Extension
             $container->removeDefinition(HttpClient::class);
         }
 
-        if ($this->readConfigEnabled('http_client.retry_failed', $container, $retryOptions)) {
+        if ($hasRetryFailed = $this->readConfigEnabled('http_client.retry_failed', $container, $retryOptions)) {
             $this->registerRetryableHttpClient($retryOptions, 'http_client', $container);
         }
 
-        $httpClientId = ($retryOptions['enabled'] ?? false) ? 'http_client.retryable.inner' : ($this->isInitializedConfigEnabled('profiler') ? '.debug.http_client.inner' : 'http_client');
+        if ($hasUriTemplate = class_exists(UriTemplateHttpClient::class)) {
+            if (ContainerBuilder::willBeAvailable('guzzlehttp/uri-template', \GuzzleHttp\UriTemplate\UriTemplate::class, [])) {
+                $container->setAlias('http_client.uri_template_expander', 'http_client.uri_template_expander.guzzle');
+            } elseif (ContainerBuilder::willBeAvailable('rize/uri-template', \Rize\UriTemplate::class, [])) {
+                $container->setAlias('http_client.uri_template_expander', 'http_client.uri_template_expander.rize');
+            }
+
+            $container
+                ->getDefinition('http_client.uri_template')
+                ->setArgument(2, $defaultUriTemplateVars);
+        } elseif ($defaultUriTemplateVars) {
+            throw new LogicException('Support for URI template requires symfony/http-client 6.3 or higher, try upgrading.');
+        }
+
+        $httpClientId = match (true) {
+            $hasUriTemplate => 'http_client.uri_template.inner',
+            $hasRetryFailed => 'http_client.retryable.inner',
+            $this->isInitializedConfigEnabled('profiler') => '.debug.http_client.inner',
+            default => 'http_client',
+        };
+
         foreach ($config['scoped_clients'] as $name => $scopeConfig) {
             if ('http_client' === $name) {
                 throw new InvalidArgumentException(sprintf('Invalid scope name: "%s" is reserved.', $name));
@@ -2383,6 +2406,17 @@ class FrameworkExtension extends Extension
 
             if ($this->readConfigEnabled('http_client.scoped_clients.'.$name.'retry_failed', $container, $retryOptions)) {
                 $this->registerRetryableHttpClient($retryOptions, $name, $container);
+            }
+
+            if ($hasUriTemplate) {
+                $container
+                    ->register($name.'.uri_template', UriTemplateHttpClient::class)
+                    ->setDecoratedService($name, null, 7) // Between TraceableHttpClient (5) and RetryableHttpClient (10)
+                    ->setArguments([
+                        new Reference('.inner'),
+                        new Reference('http_client.uri_template_expander', ContainerInterface::NULL_ON_INVALID_REFERENCE),
+                        $defaultUriTemplateVars,
+                    ]);
             }
 
             $container->registerAliasForArgument($name, HttpClientInterface::class);

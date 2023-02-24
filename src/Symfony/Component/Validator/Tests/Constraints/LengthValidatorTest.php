@@ -18,9 +18,6 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class LengthValidatorTest extends ConstraintValidatorTestCase
 {
-    // 🧚‍♀️ "Woman Fairy" emoji ZWJ sequence
-    private const SINGLE_GRAPHEME_WITH_FOUR_CODEPOINTS_AND_THIRTEEN_BYTES = "\u{1F9DA}\u{200D}\u{2640}\u{FE0F}";
-
     protected function createValidator(): LengthValidator
     {
         return new LengthValidator();
@@ -162,23 +159,23 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
     public function testValidGraphemesValues()
     {
         $constraint = new Length(min: 1, max: 1, countUnit: Length::COUNT_GRAPHEMES);
-        $this->validator->validate(self::SINGLE_GRAPHEME_WITH_FOUR_CODEPOINTS_AND_THIRTEEN_BYTES, $constraint);
+        $this->validator->validate("A\u{0300}", $constraint);
 
         $this->assertNoViolation();
     }
 
     public function testValidCodepointsValues()
     {
-        $constraint = new Length(min: 4, max: 4, countUnit: Length::COUNT_CODEPOINTS);
-        $this->validator->validate(self::SINGLE_GRAPHEME_WITH_FOUR_CODEPOINTS_AND_THIRTEEN_BYTES, $constraint);
+        $constraint = new Length(min: 2, max: 2, countUnit: Length::COUNT_CODEPOINTS);
+        $this->validator->validate("A\u{0300}", $constraint);
 
         $this->assertNoViolation();
     }
 
     public function testValidBytesValues()
     {
-        $constraint = new Length(min: 13, max: 13, countUnit: Length::COUNT_BYTES);
-        $this->validator->validate(self::SINGLE_GRAPHEME_WITH_FOUR_CODEPOINTS_AND_THIRTEEN_BYTES, $constraint);
+        $constraint = new Length(min: 3, max: 3, countUnit: Length::COUNT_BYTES);
+        $this->validator->validate("A\u{0300}", $constraint);
 
         $this->assertNoViolation();
     }
@@ -353,12 +350,12 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Length(min: 1, max: 1, exactMessage: 'myMessage');
 
-        $this->validator->validate(self::SINGLE_GRAPHEME_WITH_FOUR_CODEPOINTS_AND_THIRTEEN_BYTES, $constraint);
+        $this->validator->validate("A\u{0300}", $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"'.self::SINGLE_GRAPHEME_WITH_FOUR_CODEPOINTS_AND_THIRTEEN_BYTES.'"')
+            ->setParameter('{{ value }}', '"'."A\u{0300}".'"')
             ->setParameter('{{ limit }}', 1)
-            ->setInvalidValue(self::SINGLE_GRAPHEME_WITH_FOUR_CODEPOINTS_AND_THIRTEEN_BYTES)
+            ->setInvalidValue("A\u{0300}")
             ->setPlural(1)
             ->setCode(Length::NOT_EQUAL_LENGTH_ERROR)
             ->assertRaised();
@@ -368,12 +365,12 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Length(min: 1, max: 1, countUnit: Length::COUNT_BYTES, exactMessage: 'myMessage');
 
-        $this->validator->validate(self::SINGLE_GRAPHEME_WITH_FOUR_CODEPOINTS_AND_THIRTEEN_BYTES, $constraint);
+        $this->validator->validate("A\u{0300}", $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"'.self::SINGLE_GRAPHEME_WITH_FOUR_CODEPOINTS_AND_THIRTEEN_BYTES.'"')
+            ->setParameter('{{ value }}', '"'."A\u{0300}".'"')
             ->setParameter('{{ limit }}', 1)
-            ->setInvalidValue(self::SINGLE_GRAPHEME_WITH_FOUR_CODEPOINTS_AND_THIRTEEN_BYTES)
+            ->setInvalidValue("A\u{0300}")
             ->setPlural(1)
             ->setCode(Length::NOT_EQUAL_LENGTH_ERROR)
             ->assertRaised();

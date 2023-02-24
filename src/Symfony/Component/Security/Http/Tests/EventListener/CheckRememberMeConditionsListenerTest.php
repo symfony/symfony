@@ -59,7 +59,7 @@ class CheckRememberMeConditionsListenerTest extends TestCase
     public function testSuccessfulLoginWithoutRequestParameter()
     {
         $this->request = Request::create('/login');
-        $passport = $this->createPassport();
+        $passport = $this->createPassport([new RememberMeBadge()]);
 
         $this->listener->onSuccessfulLogin($this->createLoginSuccessfulEvent($passport));
 
@@ -110,7 +110,7 @@ class CheckRememberMeConditionsListenerTest extends TestCase
     {
         $this->createJsonRequest(['_remember_me' => $optInValue]);
 
-        $passport = $this->createPassport();
+        $passport = $this->createPassport([new RememberMeBadge(['_remember_me' => $optInValue])]);
 
         $this->listener->onSuccessfulLogin($this->createLoginSuccessfulEvent($passport));
 
@@ -133,7 +133,7 @@ class CheckRememberMeConditionsListenerTest extends TestCase
         $this->response = new Response();
     }
 
-    private function createJsonRequest(mixed $content = ['_remember_me' => true]): void
+    private function createJsonRequest(array $content = ['_remember_me' => true]): void
     {
         $this->request = Request::create('/login', 'POST', [], [], [], [], json_encode($content));
         $this->request->headers->add(['Content-Type' => 'application/json']);
@@ -147,6 +147,6 @@ class CheckRememberMeConditionsListenerTest extends TestCase
 
     private function createPassport(array $badges = null)
     {
-        return new SelfValidatingPassport(new UserBadge('test', fn ($username) => new InMemoryUser($username, null)), $badges ?? [new RememberMeBadge()]);
+        return new SelfValidatingPassport(new UserBadge('test', fn ($username) => new InMemoryUser($username, null)), $badges ?? [new RememberMeBadge(['_remember_me' => true])]);
     }
 }

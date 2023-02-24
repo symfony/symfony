@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-02-08T18:59:37Z
+
+global variables / UriTemplateHttpClient feels kinda weird to me, compared to `request(template($uri, $vars))`

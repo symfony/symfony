@@ -247,14 +247,14 @@ class RelayProxy extends Relay implements ResetInterface, LazyObjectInterface
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->flushall($async);
     }
 
-    public function fcall($name, $argv = [], $keys = [], $handler = null): mixed
+    public function fcall($name, $keys = [], $argv = [], $handler = null): mixed
     {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->fcall($name, $argv, $keys, $handler);
+        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->fcall($name, $keys, $argv, $handler);
     }
 
-    public function fcall_ro($name, $argv = [], $keys = [], $handler = null): mixed
+    public function fcall_ro($name, $keys = [], $argv = [], $handler = null): mixed
     {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->fcall_ro($name, $argv, $keys, $handler);
+        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->fcall_ro($name, $keys, $argv, $handler);
     }
 
     public function function($op, ...$args): mixed
@@ -517,7 +517,7 @@ class RelayProxy extends Relay implements ResetInterface, LazyObjectInterface
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->pfadd($key, $elements);
     }
 
-    public function pfcount($key): \Relay\Relay|int
+    public function pfcount($key): \Relay\Relay|false|int
     {
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->pfcount($key);
     }

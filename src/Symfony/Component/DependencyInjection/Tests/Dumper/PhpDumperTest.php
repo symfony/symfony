@@ -1523,7 +1523,6 @@ PHP
         $container->compile();
         $dumper = new PhpDumper($container);
         $dump = $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Service_CurrentFactoryInlining']);
-        file_put_contents(self::$fixturesPath.'/php/services_current_factory_inlining.php', $dump);
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_current_factory_inlining.php', $dump);
         eval('?>'.$dump);
 

@@ -124,6 +124,7 @@ class TranslationExtensionTest extends TestCase
             ['{{ foo|trans }}', '', ['foo' => null]],
 
             // trans object
+            ['{{ t("")|trans }}', ''],
             ['{{ t("Hello")|trans }}', 'Hello'],
             ['{{ t(name)|trans }}', 'Symfony', ['name' => 'Symfony']],
             ['{{ t(hello, { \'%name%\': \'Symfony\' })|trans }}', 'Hello Symfony', ['hello' => 'Hello %name%']],

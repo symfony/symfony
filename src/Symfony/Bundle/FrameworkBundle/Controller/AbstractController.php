@@ -212,7 +212,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     {
         if (!$this->isGranted($attribute, $subject)) {
             $exception = $this->createAccessDeniedException($message);
-            $exception->setAttributes($attribute);
+            $exception->setAttributes([$attribute]);
             $exception->setSubject($subject);
 
             throw $exception;

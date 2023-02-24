@@ -14,24 +14,26 @@ namespace Symfony\Component\CssSelector\Node;
 use Symfony\Component\CssSelector\Parser\Token;
 
 /**
- * Represents a "<selector>:has(<arguments>)" node.
+ * Represents a "<selector>:has(<subselector>)" node.
  *
  * This component is a port of the Python cssselect library,
- * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
+ * which is copyright Ian Bicking, @see https://github.com/scrapy/cssselect.
  *
- * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ * @author Franck Ranaivo-Harisoa <franckranaivo@gmail.com>
  *
  * @internal
  */
 class RelationNode extends AbstractNode
 {
     private NodeInterface $selector;
-    private array $arguments;
+    private NodeInterface $subSelector;
+    private string $combinator;
 
-    public function __construct(NodeInterface $selector, array $arguments)
+    public function __construct(NodeInterface $selector, string $combinator, NodeInterface $subSelector)
     {
         $this->selector = $selector;
-        $this->arguments = $arguments;
+        $this->combinator = $combinator;
+        $this->subSelector = $subSelector;
     }
 
     public function getSelector(): NodeInterface
@@ -39,20 +41,23 @@ class RelationNode extends AbstractNode
         return $this->selector;
     }
 
-    public function getArguments(): array
+    public function getCombinator(): string
     {
-        return $this->arguments;
+        return $this->combinator;
+    }
+
+    public function getSubSelector(): NodeInterface
+    {
+        return $this->subSelector;
     }
 
     public function getSpecificity(): Specificity
     {
-        return $this->selector->getSpecificity()->plus(new Specificity(0, 1, 0));
+        return $this->selector->getSpecificity()->plus($this->subSelector->getSpecificity());
     }
 
     public function __toString(): string
     {
-        $arguments = implode(', ', array_map(fn (Token $token) => "'".$token->getValue()."'", $this->arguments));
-
-        return sprintf('%s[%s:has(%s)]', $this->getNodeName(), $this->selector, $arguments ? '['.$arguments.']' : '');
+        return sprintf('%s[%s:has(%s)]', $this->getNodeName(), $this->selector, $this->subSelector);
     }
 }

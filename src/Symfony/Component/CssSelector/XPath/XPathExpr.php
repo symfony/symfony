@@ -82,7 +82,7 @@ class XPathExpr
      *
      * @return $this
      */
-    public function join(string $combiner, self $expr): static
+    public function join(string $combiner, self $expr, string $closingCombiner = null, bool $hasInnerConditions = false): static
     {
         $path = $this->__toString().$combiner;
 
@@ -91,8 +91,19 @@ class XPathExpr
         }
 
         $this->path = $path;
-        $this->element = $expr->element;
-        $this->condition = $expr->condition;
+
+        if(!$hasInnerConditions) {
+            $this->element = $expr->element . ($closingCombiner ?? '');
+            $this->condition = $expr->condition;
+        } else {
+            $this->element = $expr->element;
+            if($expr->condition) {
+                $this->element .= "[" . $expr->condition."]";
+            }
+            if($closingCombiner) {
+                $this->element .= $closingCombiner;
+            }
+        }
 
         return $this;
     }

@@ -61,6 +61,13 @@ interface ExtensionInterface
     public function getAttributeMatchingTranslators(): array;
 
     /**
+     * Returns relative combinators translators.
+     *
+     * @return callable[]
+     */
+    public function getRelativeCombinationTranslators(): array;
+
+    /**
      * Returns extension name.
      */
     public function getName(): string;

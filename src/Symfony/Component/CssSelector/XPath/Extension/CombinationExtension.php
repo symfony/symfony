@@ -58,6 +58,28 @@ class CombinationExtension extends AbstractExtension
         return $xpath->join('/following-sibling::', $combinedXpath);
     }
 
+
+    public function translateRelationDescendant(XPathExpr $xpath, XPathExpr $combinedXpath): XPathExpr
+    {
+        return $xpath->join('/descendant-or-self::*/', $combinedXpath, ']', true);
+    }
+
+    public function translateRelationChild(XPathExpr $xpath, XPathExpr $combinedXpath): XPathExpr
+    {
+        return $xpath->join('/', $combinedXpath,']');
+    }
+
+    public function translateRelationDirectAdjacent(XPathExpr $xpath, XPathExpr $combinedXpath): XPathExpr
+    {
+        return $xpath
+            ->addCondition(sprintf('/following-sibling::*[(name() = \'%s\') and (position() = 1)]',$combinedXpath->getElement()));
+    }
+
+    public function translateRelationIndirectAdjacent(XPathExpr $xpath, XPathExpr $combinedXpath): XPathExpr
+    {
+        return $xpath->join('[following-sibling::', $combinedXpath,']');
+    } 
+
     public function getName(): string
     {
         return 'combination';

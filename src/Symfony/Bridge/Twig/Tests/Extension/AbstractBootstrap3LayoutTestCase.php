@@ -2154,6 +2154,25 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
             '/input
     [@type="number"]
+    [@step="any"]
+    [@name="name"]
+    [@class="my&class form-control"]
+    [@value="1234.56"]
+'
+        );
+    }
+
+    public function testRenderNumberWithHtml5NumberTypeAndStepAttribute()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\NumberType', 1234.56, [
+            'html5' => true,
+            'attr' => ['step' => '0.1'],
+        ]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
+            '/input
+    [@type="number"]
+    [@step="0.1"]
     [@name="name"]
     [@class="my&class form-control"]
     [@value="1234.56"]

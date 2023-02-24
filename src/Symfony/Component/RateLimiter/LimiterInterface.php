@@ -26,8 +26,8 @@ interface LimiterInterface
      * future token consumptions. Do not use this method if you intend
      * to skip this process.
      *
-     * @param int   $tokens  the number of tokens required
-     * @param float $maxTime maximum accepted waiting time in seconds
+     * @param int        $tokens  the number of tokens required
+     * @param float|null $maxTime maximum accepted waiting time in seconds
      *
      * @throws MaxWaitDurationExceededException if $maxTime is set and the process needs to wait longer than its value (in seconds)
      * @throws ReserveNotSupportedException     if this limiter implementation doesn't support reserving tokens

@@ -1879,6 +1879,26 @@ abstract class AbstractLayoutTestCase extends FormIntegrationTestCase
         $this->assertWidgetMatchesXpath($form->createView(), [],
             '/input
     [@type="number"]
+    [@step="any"]
+    [@name="name"]
+    [@value="1234.56"]
+'
+        );
+    }
+
+    public function testRenderNumberWithHtml5NumberTypeAndStepAttribute()
+    {
+        $this->requiresFeatureSet(403);
+
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\NumberType', 1234.56, [
+            'html5' => true,
+            'attr' => ['step' => '0.1'],
+        ]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), [],
+            '/input
+    [@type="number"]
+    [@step="0.1"]
     [@name="name"]
     [@value="1234.56"]
 '

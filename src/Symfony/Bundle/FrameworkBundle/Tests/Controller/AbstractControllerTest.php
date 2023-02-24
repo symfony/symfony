@@ -364,6 +364,40 @@ class AbstractControllerTest extends TestCase
         $controller->denyAccessUnlessGranted('foo');
     }
 
+    /**
+     * @dataProvider provideDenyAccessUnlessGrantedSetsAttributesAsArray
+     */
+    public function testdenyAccessUnlessGrantedSetsAttributesAsArray($attribute, $exceptionAttributes)
+    {
+        $authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $authorizationChecker->method('isGranted')->willReturn(false);
+
+        $container = new Container();
+        $container->set('security.authorization_checker', $authorizationChecker);
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
+
+        try {
+            $controller->denyAccessUnlessGranted($attribute);
+            $this->fail('there was no exception to check');
+        } catch (AccessDeniedException $e) {
+            $this->assertSame($exceptionAttributes, $e->getAttributes());
+        }
+    }
+
+    public static function provideDenyAccessUnlessGrantedSetsAttributesAsArray()
+    {
+        $obj = new \stdClass();
+        $obj->foo = 'bar';
+
+        return [
+            'string attribute' => ['foo', ['foo']],
+            'array attribute' => [[1, 3, 3, 7], [[1, 3, 3, 7]]],
+            'object attribute' => [$obj, [$obj]],
+        ];
+    }
+
     public function testRenderViewTwig()
     {
         $twig = $this->createMock(Environment::class);

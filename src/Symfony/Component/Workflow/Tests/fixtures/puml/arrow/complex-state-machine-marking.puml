@@ -15,7 +15,7 @@ state "b"
 state "c" <<marked>>
 state "d"
 "a" --> "b": "t1"
-"d" -[#Red]-> "b": "<font color=Grey>My custom transition label 3</font>"
+"d" -[#Red]-> "b": "<font color=Grey>My custom transition</font>\n<font color=Grey>label 3</font>"
 "b" -[#Blue]-> "c": "t2"
 "b" --> "d": "t3"
 @enduml

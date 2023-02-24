@@ -30,6 +30,20 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ConsoleEventsTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        if (\function_exists('pcntl_signal')) {
+            pcntl_async_signals(false);
+            // We reset all signals to their default value to avoid side effects
+            for ($i = 1; $i <= 15; ++$i) {
+                if (9 === $i) {
+                    continue;
+                }
+                pcntl_signal($i, SIG_DFL);
+            }
+        }
+    }
+
     public function testEventAliases()
     {
         $container = new ContainerBuilder();

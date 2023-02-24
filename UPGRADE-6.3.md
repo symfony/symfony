@@ -1,6 +1,12 @@
 UPGRADE FROM 6.2 to 6.3
 =======================
 
+Console
+-------
+
+ * Return int or false from `SignalableCommandInterface::handleSignal()` instead
+   of void and add a second argument `$previousExitCode`
+
 DependencyInjection
 -------------------
 

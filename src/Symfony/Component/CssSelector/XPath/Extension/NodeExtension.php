@@ -213,10 +213,9 @@ class NodeExtension extends AbstractExtension
 
     public function translateRelation(Node\RelationNode $node, Translator $translator): XPathExpr
     {
-        $xpath = $translator->nodeToXPath($node->getSelector());
         $combinator = $node->getCombinator();
 
-        return $xpath->addCondition(sprintf('count(%s) > 0', $translator->addRelativeCombination($combinator,$node->getSelector(),$node->getSubSelector())));
+        return  $translator->addRelativeCombination($combinator,$node->getSelector(),$node->getSubSelector());
     }
 
     public function getName(): string

@@ -21,6 +21,7 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestValueResolve
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\SessionValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\UidValueResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\UploadedFileValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\VariadicValueResolver;
 use Symfony\Component\HttpKernel\Controller\ErrorController;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory;
@@ -63,6 +64,9 @@ return static function (ContainerConfigurator $container) {
 
         ->set('argument_resolver.request_attribute', RequestAttributeValueResolver::class)
             ->tag('controller.argument_value_resolver', ['priority' => 100, 'name' => RequestAttributeValueResolver::class])
+
+        ->set('argument_resolver.uploaded_file', UploadedFileValueResolver::class)
+            ->tag('controller.targeted_value_resolver', ['name' => UploadedFileValueResolver::class])
 
         ->set('argument_resolver.request', RequestValueResolver::class)
             ->tag('controller.argument_value_resolver', ['priority' => 50, 'name' => RequestValueResolver::class])

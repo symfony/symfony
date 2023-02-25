@@ -11,6 +11,7 @@ CHANGELOG
  * Add `#[WithLogLevel]` for defining log levels for exceptions
  * Add `skip_response_headers` to the `HttpCache` options
  * Introduce targeted value resolvers with `#[ValueResolver]` and `#[AsTargetedValueResolver]`
+ * Add `#[MapUploadedFiles]` to map uploaded files to controller arguments
 
 6.2
 ---

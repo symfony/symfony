@@ -66,6 +66,16 @@ class ApplicationTest extends TestCase
         putenv('SHELL_VERBOSITY');
         unset($_ENV['SHELL_VERBOSITY']);
         unset($_SERVER['SHELL_VERBOSITY']);
+
+        if (\function_exists('pcntl_signal')) {
+            // We reset all signals to their default value to avoid side effects
+            for ($i = 1; $i <= 15; ++$i) {
+                if (9 === $i) {
+                    continue;
+                }
+                pcntl_signal($i, SIG_DFL);
+            }
+        }
     }
 
     public static function setUpBeforeClass(): void
@@ -509,15 +519,7 @@ class ApplicationTest extends TestCase
         $application->setAutoExit(false);
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'foos:bar1'], ['decorated' => false]);
-        $this->assertSame('
-                                                          
-  There are no commands defined in the "foos" namespace.  
-                                                          
-  Did you mean this?                                      
-      foo                                                 
-                                                          
-
-', $tester->getDisplay(true));
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application.dont_run_alternative_namespace_name.txt', $tester->getDisplay(true));
     }
 
     public function testCanRunAlternativeCommandName()
@@ -1992,15 +1994,38 @@ class ApplicationTest extends TestCase
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber($subscriber);
 
+        // Since there is no signal handler, and by default PHP will stop even
+        // on SIGUSR1, we need to register a blank handler to avoid the process
+        // being stopped.
+        $blankHandlerSignaled = false;
+        pcntl_signal(\SIGUSR1, function () use (&$blankHandlerSignaled) {
+            $blankHandlerSignaled = true;
+        });
+
         $application = $this->createSignalableApplication($command, $dispatcher);
         $application->setSignalsToDispatchEvent(\SIGUSR2);
         $this->assertSame(0, $application->run(new ArrayInput(['signal'])));
         $this->assertFalse($subscriber->signaled);
+        $this->assertTrue($blankHandlerSignaled);
+
+        // We reset the blank handler to false to make sure it is called again
+        $blankHandlerSignaled = false;
 
         $application = $this->createSignalableApplication($command, $dispatcher);
         $application->setSignalsToDispatchEvent(\SIGUSR1);
         $this->assertSame(1, $application->run(new ArrayInput(['signal'])));
         $this->assertTrue($subscriber->signaled);
+        $this->assertTrue($blankHandlerSignaled);
+
+        // And now we test without the blank handler
+        $blankHandlerSignaled = false;
+        pcntl_signal(\SIGUSR1, SIG_DFL);
+
+        $application = $this->createSignalableApplication($command, $dispatcher);
+        $application->setSignalsToDispatchEvent(\SIGUSR1);
+        $this->assertSame(1, $application->run(new ArrayInput(['signal'])));
+        $this->assertTrue($subscriber->signaled);
+        $this->assertFalse($blankHandlerSignaled);
     }
 
     public function testSignalableCommandInterfaceWithoutSignals()

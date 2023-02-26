@@ -162,6 +162,20 @@ class ExpressionLanguage
                 return $value;
             }
         ));
+
+        $this->addFunction(new ExpressionFunction('is_json',
+            static fn ($str): string => sprintf("\is_string(\$v = (%s)) && json_validate(\$v)", $str),
+            static function ($arguments, $str): bool {
+                return \is_string($str) && json_validate($str);
+            }
+        ));
+
+        $this->addFunction(new ExpressionFunction('is_xml',
+            static fn ($str): string => sprintf("(\is_string(\$v = (%s)) && (new \DOMDocument())->loadXML(\$v, \\LIBXML_NOERROR))", $str),
+            static function ($arguments, $str): bool {
+                return \is_string($str) && (new \DOMDocument())->loadXML($str, \LIBXML_NOERROR);
+            }
+        ));
     }
 
     private function getLexer(): Lexer

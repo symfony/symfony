@@ -7,6 +7,7 @@ CHANGELOG
  * Add `enum` expression function
  * Deprecate loose comparisons when using the "in" operator; normalize the array parameter
    so it only has the expected types or implement loose matching in your own expression function
+ * Add `is_json()` and `is_xml()` expression functions
 
 6.2
 ---

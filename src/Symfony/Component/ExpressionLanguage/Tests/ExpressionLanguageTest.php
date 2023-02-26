@@ -127,6 +127,74 @@ class ExpressionLanguageTest extends TestCase
         $this->assertSame(FooBackedEnum::Bar, $result);
     }
 
+    public function testIsJsonWithValidInputFunction()
+    {
+        $expressionLanguage = new ExpressionLanguage();
+        $this->assertTrue($expressionLanguage->evaluate('is_json(fooJson)', [
+            'fooJson' => '{"foo": true}',
+        ]));
+    }
+
+    public function testCompiledIsJsonWithValidInputFunction()
+    {
+        $result = false;
+        $expressionLanguage = new ExpressionLanguage();
+        eval(sprintf('$result = %s;', $expressionLanguage->compile('is_json(\'{"foo": true}\')')));
+
+        $this->assertTrue($result);
+    }
+
+    public function testIsJsonWithInvalidInputFunction()
+    {
+        $expressionLanguage = new ExpressionLanguage();
+        $this->assertFalse($expressionLanguage->evaluate('is_json(fooJson)', [
+            'fooJson' => '{"malformed": true',
+        ]));
+    }
+
+    public function testCompiledIsJsonWithInvalidInputFunction()
+    {
+        $result = true;
+        $expressionLanguage = new ExpressionLanguage();
+        eval(sprintf('$result = %s;', $expressionLanguage->compile('is_json(\'{"malformed": true\')')));
+
+        $this->assertFalse($result);
+    }
+
+    public function testIsXmlWithValidInputFunction()
+    {
+        $expressionLanguage = new ExpressionLanguage();
+        $this->assertTrue($expressionLanguage->evaluate('is_xml(fooXml)', [
+            'fooXml' => '<node></node>',
+        ]));
+    }
+
+    public function testCompiledIsXmlWithValidInputFunction()
+    {
+        $result = false;
+        $expressionLanguage = new ExpressionLanguage();
+        eval(sprintf('$result = %s;', $expressionLanguage->compile('is_xml(\'<node></node>\')')));
+
+        $this->assertTrue($result);
+    }
+
+    public function testIsXmlWithInvalidInputFunction()
+    {
+        $expressionLanguage = new ExpressionLanguage();
+        $this->assertFalse($expressionLanguage->evaluate('is_xml(fooXml)', [
+            'fooXml' => '<?xml version="1.0"',
+        ]));
+    }
+
+    public function testCompiledIsXmlWithInvalidInputFunction()
+    {
+        $result = true;
+        $expressionLanguage = new ExpressionLanguage();
+        eval(sprintf('$result = %s;', $expressionLanguage->compile('is_xml(\'<?xml version="1.0"\')')));
+
+        $this->assertFalse($result);
+    }
+
     public function testProviders()
     {
         $expressionLanguage = new ExpressionLanguage(null, [new TestProvider()]);

@@ -1,0 +1,149 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-01-17T20:24:33Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.3 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-01-18T10:42:39Z
+
+This is a bugfix to me. I would merge on 5.4 no matter if it's breaking some instanceof checks which should anyway be falling back to the real authenticator already if it's not traceable, in order for the code to work in non debug mode.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2023-01-18T10:47:45Z
+
+I think this is a feature, under the reasons we always apply to ensure the best stability for LTS versions. It's easy to workaround this in userland code and returning `TraceableAuthenticator` will break things in dev and not in production, meaning it's also very likely to be discovered when writing code on older versions.
+
+Given this, and the possibility that it might (although unlikely) break code in dev relying on `TraceableAuthenticator`, I would say this is not something we should backport to LTS versions and just merge as a new feature.
+
+---------------------------------------------------------------------------
+
+by florentdestremau at 2023-01-18T14:58:54Z
+
+I'd add that in the [TraceableAuthenticator](https://github.com/symfony/symfony/blob/6.3/src/Symfony/Component/Security/Http/Authenticator/Debug/TraceableAuthenticator.php#L96), the `getAuthenticator()` method is marked `@internal`, I suppose it's okay in this case since these are internal events ? I have a warning in my own project :smile:
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-01-19T12:17:39Z
+
+> I'd add that in the [TraceableAuthenticator](https://github.com/symfony/symfony/blob/6.3/src/Symfony/Component/Security/Http/Authenticator/Debug/TraceableAuthenticator.php#L96), the getAuthenticator() method is marked @internal, I suppose it's okay in this case since these are internal events ? I have a warning in my own project 😄
+
+Being forced to call some internal API is indeed quite unfortunate and not a valid workaround. We are not adding any new feature nor making an improvement here. So the only remaining criteria is the breakage potential, which looks very low given it's impacting the debug mode only.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-01-19T12:29:39Z
+
+In this PR, using the internal API is perfectly fines as usages are in the same package than the definition (and so they are internal usages).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-01-19T15:47:32Z
+
+@stof what I meant is that merging this as a feature implies to force end users using 5.4 to call that internal method on their own.
+
+---------------------------------------------------------------------------
+
+by florentdestremau at 2023-01-19T15:52:35Z
+
+I'm forced to use the internal method on 6.2 so... :unamused: I agree that this feels like a bugfix rather than a feature. But I get that this was not taken into account when creating the TraceableAuthenticator.
+
+---------------------------------------------------------------------------
+
+by ovrflo at 2023-01-23T21:17:31Z
+
+While I understand the need behind this PR (I found myself fighting with the Traceable decorators quite a few times), I think this is also quite unprecedented. I have yet to see a Symfony event (or service?) that by design hides the Traceable decorators with no alternative other than reflection. Please, correct me if I'm wrong.
+
+Getting the TraceableAuthenticator is an actual feature. I value predictability over magic so, naturally, when calling getAuthenticator() I expect to get the authenticator being used, even if that means it's a decorator (Traceable, or otherwise).
+
+This issue is easily fixable in user-land, while the PR opens a philosophical can of worms whether Symfony should hide profiler decorators or not.
+
+While on the topic, I would also like to suggest removing `@internal` from `TraceableAuthenticator::getAuthenticator()`. It's a very useful method to have on a Traceable decorator.
+
+There are indeed cases where in user-land you need to bypass the Traceable decorator and get to the real implementation, but having the events do it in a piecemeal fashion seems uninspired.
+
+---------------------------------------------------------------------------
+
+by florentdestremau at 2023-01-24T08:14:38Z
+
+I don't know in what use case you would use the traceableAuthenticator in production so I would assume it's for development. Given that, wouldn't an explicit `getTraceableAuthenticator` be more explicit ? Kind of like using `dump` in development: very fine, but not allowed in production environment. Si if you're going to have a local-specific logic, might as well have it explicitly called ?
+
+I don't have a very strong opinion on that. My take is that I have the same code not behaving the same in dev and un prod and I find **this** unprecedented in the symfony framework.
+
+Edit: agree on the `@internal` being unnecessary, especially given my previous statement: if the framework is swapping classes behind the hood, it feels "public" and not "internal" to be able to retrieve the real class I'm working on.
+
+---------------------------------------------------------------------------
+
+by ovrflo at 2023-01-24T11:42:45Z
+
+There is no reason to have the Profiler's Traceable decorators in production (though, a bit off-topic, you could have something else, like Sentry, decorating things to collect data). That's another reason against adding that ternary in an Event class -- it would run on all the production environments out there, whether it's needed or not.
+
+If Symfony must include a workaround for this issue, I'd rather try and find a different way. Some examples (with various pros and cons) I can think of are
+- like you suggested, adding a new getter on the Events, one that either expresses your desired behavior, or one that keeps the existing behavior; this is almost as hack-y as the existing PR, adding a superfluous getter to an otherwise clean class, but it does provide both behaviors and people could choose
+- extending the existing Events (e.g `Traceable*Event`) to include this behavior; this would be cumbersome, but it would allow keeping the production environment clean (in prod those clasess would be almost non-existent)
+- adding some sort of service locator that keeps a mapping (built at compile time) with traceable authenticators and the underlying ones, allowing smth like `AuthenticatorResolver::resolve($event->getAuthenticator())`; in dev it would resolve, while in prod it could be noop (`return $authenticatorArgument);`). It could even be loaded lazily, with almost 0 overhead. The service would be defined in the container, and a late compiler pass would check if the service exists (if it doesn't, it means it has been removed because it was not used) and build the mapping. This approach might also be extended for other  components as well.
+- another idea, although I'm not sure how doable it is, might be to try revamping the Traceable decorators with some auto-generated class that inherits the class of the authenticator, so that when you `getAuthenticator()` you at least get one that inherits the original, no decorator involved. This could also be done at compile-time, only when the profiler is enabled.
+
+That's all I could think of. More ideas are definitely welcome.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-01-24T12:04:18Z
+
+Changing traceable authenticators to use inheritance rather than decoration is a no-go. Earlier versions of Symfony used to rely on inheritance to implement those traceable classes and this caused a bunch of issues (maintenance of those parts was a huge pain due to having to preserve inheritance support, an dit was entirely incompatible with other usages of decoration).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-01-24T12:08:43Z
+
+> agree on the @internal being unnecessary, especially given my previous statement: if the framework is swapping classes behind the hood, it feels "public" and not "internal" to be able to retrieve the real class I'm working on.
+
+There should be no need to call that method, as one is supposed to rely on the interface rather than the concrete implementation. That is part of the motivation for using decoration.
+
+Anyway this patch is fine, we just need to agree about whether it qualifies as a bugfix or a feature.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-01-24T12:12:54Z
+
+@chalasr the use case for having the authenticator in the event is to be able to customize the logic done in the listener based on the authenticator that performed the authentication, not to call the authenticator again. And for that, the only tool we have is `instanceof` as the interface does not have something like `getName()`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-01-26T13:19:59Z
+
+What about just dropping the `@internal` annotation on 6.3?
+That'd make calling the method safe, even on 5.4.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-02-23T17:03:14Z
+
+> we just need to agree about whether it qualifies as a bugfix or a feature.
+
+If it's not obvious, it's a feature.
+
+Still good to merge? If yes, let's go!

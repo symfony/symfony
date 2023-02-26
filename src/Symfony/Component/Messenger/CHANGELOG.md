@@ -11,6 +11,9 @@ CHANGELOG
    `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransportFactory`
  * Allow passing a string instead of an array in `TransportNamesStamp`
  * Allow to define batch size when using `BatchHandlerTrait` with `getBatchSize()`
+ * Deprecate `StopWorkerOnSigtermSignalListener` in favor of
+   `StopWorkerOnSignalsListener` and make it configurable with SIGINT and
+   SIGTERM by default
 
 6.2
 ---

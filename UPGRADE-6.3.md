@@ -73,6 +73,7 @@ Messenger
    `Symfony\Component\Messenger\Transport\InMemoryTransportFactory` in favor of
    `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport` and
    `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransportFactory`
+ * Deprecate `StopWorkerOnSigtermSignalListener` in favor of `StopWorkerOnSignalsListener`
 
 Notifier
 --------

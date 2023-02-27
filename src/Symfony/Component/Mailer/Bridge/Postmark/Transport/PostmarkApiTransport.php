@@ -21,6 +21,7 @@ use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Header\UnstructuredHeader;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -109,6 +110,12 @@ class PostmarkApiTransport extends AbstractApiTransport
 
             if ($header instanceof MetadataHeader) {
                 $payload['Metadata'][$header->getKey()] = $header->getValue();
+
+                continue;
+            }
+            
+            if($header instanceof UnstructuredHeader && in_array($header->getName(), ['MessageStream', 'X-PM-MessageStream']) ) {
+                $payload['MessageStream'] = $header->getValue();
 
                 continue;
             }

@@ -214,7 +214,7 @@ class NodeExtension extends AbstractExtension
     {
         $combinator = $node->getCombinator();
 
-        return  $translator->addRelativeCombination($combinator,$node->getSelector(),$node->getSubSelector());
+        return $translator->addRelativeCombination($combinator, $node->getSelector(), $node->getSubSelector());
     }
 
     public function getName(): string

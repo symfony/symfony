@@ -42,19 +42,19 @@ class RelationExtension extends AbstractExtension
 
     public function translateRelationChild(XPathExpr $xpath, XPathExpr $combinedXpath): XPathExpr
     {
-        return $xpath->join('[./', $combinedXpath,']');
+        return $xpath->join('[./', $combinedXpath, ']');
     }
 
     public function translateRelationDirectAdjacent(XPathExpr $xpath, XPathExpr $combinedXpath): XPathExpr
     {
         return $xpath
-            ->addCondition(sprintf('following-sibling::*[(name() = \'%s\') and (position() = 1)]',$combinedXpath->getElement()));
+            ->addCondition(sprintf('following-sibling::*[(name() = \'%s\') and (position() = 1)]', $combinedXpath->getElement()));
     }
 
     public function translateRelationIndirectAdjacent(XPathExpr $xpath, XPathExpr $combinedXpath): XPathExpr
     {
-        return $xpath->join('[following-sibling::', $combinedXpath,']');
-    } 
+        return $xpath->join('[following-sibling::', $combinedXpath, ']');
+    }
 
     public function getName(): string
     {

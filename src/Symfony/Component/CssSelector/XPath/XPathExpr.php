@@ -92,15 +92,15 @@ class XPathExpr
 
         $this->path = $path;
 
-        if(!$hasInnerConditions) {
-            $this->element = $expr->element . ($closingCombiner ?? '');
+        if (!$hasInnerConditions) {
+            $this->element = $expr->element.($closingCombiner ?? '');
             $this->condition = $expr->condition;
         } else {
             $this->element = $expr->element;
-            if($expr->condition) {
-                $this->element .= "[" . $expr->condition."]";
+            if ($expr->condition) {
+                $this->element .= '['.$expr->condition.']';
             }
-            if($closingCombiner) {
+            if ($closingCombiner) {
                 $this->element .= $closingCombiner;
             }
         }

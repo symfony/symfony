@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\CssSelector\Node;
 
-use Symfony\Component\CssSelector\Parser\Token;
-
 /**
  * Represents a "<selector>:has(<subselector>)" node.
  *

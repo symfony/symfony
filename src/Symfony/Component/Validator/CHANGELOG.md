@@ -11,6 +11,7 @@ CHANGELOG
  * Add the `format` option to the `Ulid` constraint to allow accepting different ULID formats
  * Add the `WordCount` constraint
  * Add the `Week` constraint
+ * Add `CompoundConstraintTestCase` to ease testing Compound Constraints
 
 7.1
 ---

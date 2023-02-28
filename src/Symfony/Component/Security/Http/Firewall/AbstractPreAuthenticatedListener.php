@@ -98,13 +98,14 @@ abstract class AbstractPreAuthenticatedListener extends AbstractListener
         }
 
         try {
+            $previousToken = $token;
             $token = $this->authenticationManager->authenticate(new PreAuthenticatedToken($user, $credentials, $this->providerKey));
 
             if (null !== $this->logger) {
                 $this->logger->info('Pre-authentication successful.', ['token' => (string) $token]);
             }
 
-            $this->migrateSession($request, $token);
+            $this->migrateSession($request, $token, $previousToken);
 
             $this->tokenStorage->setToken($token);
 
@@ -149,10 +150,19 @@ abstract class AbstractPreAuthenticatedListener extends AbstractListener
      */
     abstract protected function getPreAuthenticatedData(Request $request);
 
-    private function migrateSession(Request $request, TokenInterface $token)
+    private function migrateSession(Request $request, TokenInterface $token, ?TokenInterface $previousToken)
     {
         if (!$this->sessionStrategy || !$request->hasSession() || !$request->hasPreviousSession()) {
             return;
+        }
+
+        if ($previousToken) {
+            $user = method_exists($token, 'getUserIdentifier') ? $token->getUserIdentifier() : $token->getUsername();
+            $previousUser = method_exists($previousToken, 'getUserIdentifier') ? $previousToken->getUserIdentifier() : $previousToken->getUsername();
+
+            if ('' !== ($user ?? '') && $user === $previousUser) {
+                return;
+            }
         }
 
         $this->sessionStrategy->onAuthentication($request, $token);

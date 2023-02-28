@@ -101,6 +101,7 @@ class UsernamePasswordJsonAuthenticationListener extends AbstractListener
     {
         $request = $event->getRequest();
         $data = json_decode($request->getContent());
+        $previousToken = $this->tokenStorage->getToken();
 
         try {
             if (!$data instanceof \stdClass) {
@@ -134,7 +135,7 @@ class UsernamePasswordJsonAuthenticationListener extends AbstractListener
             $token = new UsernamePasswordToken($username, $password, $this->providerKey);
 
             $authenticatedToken = $this->authenticationManager->authenticate($token);
-            $response = $this->onSuccess($request, $authenticatedToken);
+            $response = $this->onSuccess($request, $authenticatedToken, $previousToken);
         } catch (AuthenticationException $e) {
             $response = $this->onFailure($request, $e);
         } catch (BadRequestHttpException $e) {
@@ -150,14 +151,14 @@ class UsernamePasswordJsonAuthenticationListener extends AbstractListener
         $event->setResponse($response);
     }
 
-    private function onSuccess(Request $request, TokenInterface $token): ?Response
+    private function onSuccess(Request $request, TokenInterface $token, ?TokenInterface $previousToken): ?Response
     {
         if (null !== $this->logger) {
             // @deprecated since Symfony 5.3, change to $token->getUserIdentifier() in 6.0
             $this->logger->info('User has been authenticated successfully.', ['username' => method_exists($token, 'getUserIdentifier') ? $token->getUserIdentifier() : $token->getUsername()]);
         }
 
-        $this->migrateSession($request, $token);
+        $this->migrateSession($request, $token, $previousToken);
 
         $this->tokenStorage->setToken($token);
 
@@ -224,10 +225,19 @@ class UsernamePasswordJsonAuthenticationListener extends AbstractListener
         $this->translator = $translator;
     }
 
-    private function migrateSession(Request $request, TokenInterface $token)
+    private function migrateSession(Request $request, TokenInterface $token, ?TokenInterface $previousToken)
     {
         if (!$this->sessionStrategy || !$request->hasSession() || !$request->hasPreviousSession()) {
             return;
+        }
+
+        if ($previousToken) {
+            $user = method_exists($token, 'getUserIdentifier') ? $token->getUserIdentifier() : $token->getUsername();
+            $previousUser = method_exists($previousToken, 'getUserIdentifier') ? $previousToken->getUserIdentifier() : $previousToken->getUsername();
+
+            if ('' !== ($user ?? '') && $user === $previousUser) {
+                return;
+            }
         }
 
         $this->sessionStrategy->onAuthentication($request, $token);

@@ -113,6 +113,12 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     public const IGNORED_ATTRIBUTES = 'ignored_attributes';
 
     /**
+     * Require all properties to be listed in the input instead of falling
+     * back to null for nullable ones.
+     */
+    public const REQUIRE_ALL_PROPERTIES = 'require_all_properties';
+
+    /**
      * @internal
      */
     protected const CIRCULAR_REFERENCE_LIMIT_COUNTERS = 'circular_reference_limit_counters';
@@ -383,7 +389,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                     $params[] = $this->defaultContext[self::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class][$key];
                 } elseif ($constructorParameter->isDefaultValueAvailable()) {
                     $params[] = $constructorParameter->getDefaultValue();
-                } elseif ($constructorParameter->hasType() && $constructorParameter->getType()->allowsNull()) {
+                } elseif (!($context[self::REQUIRE_ALL_PROPERTIES] ?? $this->defaultContext[self::REQUIRE_ALL_PROPERTIES] ?? false) && $constructorParameter->hasType() && $constructorParameter->getType()->allowsNull()) {
                     $params[] = null;
                 } else {
                     if (!isset($context['not_normalizable_value_exceptions'])) {

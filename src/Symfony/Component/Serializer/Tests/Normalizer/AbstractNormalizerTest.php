@@ -15,6 +15,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
@@ -164,6 +165,15 @@ class AbstractNormalizerTest extends TestCase
         $dummy = $normalizer->denormalize([], NullableConstructorArgumentDummy::class);
 
         $this->assertNull($dummy->getFoo());
+    }
+
+    public function testObjectWithNullableNonOptionalConstructorArgumentWithoutInputAndRequireAllProperties()
+    {
+        $normalizer = new ObjectNormalizer();
+
+        $this->expectException(MissingConstructorArgumentsException::class);
+
+        $normalizer->denormalize([], NullableConstructorArgumentDummy::class, null, [AbstractNormalizer::REQUIRE_ALL_PROPERTIES => true]);
     }
 
     /**

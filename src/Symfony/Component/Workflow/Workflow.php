@@ -125,17 +125,17 @@ class Workflow implements WorkflowInterface
     /**
      * {@inheritdoc}
      */
-    public function can(object $subject, string $transitionName)
+    public function can(object $subject, string $transitionName, array $context = [])
     {
         $transitions = $this->definition->getTransitions();
-        $marking = $this->getMarking($subject);
+        $marking = $this->getMarking($subject, $context);
 
         foreach ($transitions as $transition) {
             if ($transition->getName() !== $transitionName) {
                 continue;
             }
 
-            $transitionBlockerList = $this->buildTransitionBlockerListForTransition($subject, $marking, $transition);
+            $transitionBlockerList = $this->buildTransitionBlockerListForTransition($subject, $marking, $transition, $context);
 
             if ($transitionBlockerList->isEmpty()) {
                 return true;
@@ -148,10 +148,10 @@ class Workflow implements WorkflowInterface
     /**
      * {@inheritdoc}
      */
-    public function buildTransitionBlockerList(object $subject, string $transitionName): TransitionBlockerList
+    public function buildTransitionBlockerList(object $subject, string $transitionName, array $context = []): TransitionBlockerList
     {
         $transitions = $this->definition->getTransitions();
-        $marking = $this->getMarking($subject);
+        $marking = $this->getMarking($subject, $context);
         $transitionBlockerList = null;
 
         foreach ($transitions as $transition) {
@@ -159,7 +159,7 @@ class Workflow implements WorkflowInterface
                 continue;
             }
 
-            $transitionBlockerList = $this->buildTransitionBlockerListForTransition($subject, $marking, $transition);
+            $transitionBlockerList = $this->buildTransitionBlockerListForTransition($subject, $marking, $transition, $context);
 
             if ($transitionBlockerList->isEmpty()) {
                 return $transitionBlockerList;
@@ -199,7 +199,7 @@ class Workflow implements WorkflowInterface
 
             $transitionExist = true;
 
-            $tmpTransitionBlockerList = $this->buildTransitionBlockerListForTransition($subject, $marking, $transition);
+            $tmpTransitionBlockerList = $this->buildTransitionBlockerListForTransition($subject, $marking, $transition, $context);
 
             if ($tmpTransitionBlockerList->isEmpty()) {
                 $approvedTransitions[] = $transition;
@@ -252,13 +252,13 @@ class Workflow implements WorkflowInterface
     /**
      * {@inheritdoc}
      */
-    public function getEnabledTransitions(object $subject)
+    public function getEnabledTransitions(object $subject, array $context = [])
     {
         $enabledTransitions = [];
-        $marking = $this->getMarking($subject);
+        $marking = $this->getMarking($subject, $context);
 
         foreach ($this->definition->getTransitions() as $transition) {
-            $transitionBlockerList = $this->buildTransitionBlockerListForTransition($subject, $marking, $transition);
+            $transitionBlockerList = $this->buildTransitionBlockerListForTransition($subject, $marking, $transition, $context);
             if ($transitionBlockerList->isEmpty()) {
                 $enabledTransitions[] = $transition;
             }
@@ -267,15 +267,15 @@ class Workflow implements WorkflowInterface
         return $enabledTransitions;
     }
 
-    public function getEnabledTransition(object $subject, string $name): ?Transition
+    public function getEnabledTransition(object $subject, string $name, array $context = []): ?Transition
     {
-        $marking = $this->getMarking($subject);
+        $marking = $this->getMarking($subject, $context);
 
         foreach ($this->definition->getTransitions() as $transition) {
             if ($transition->getName() !== $name) {
                 continue;
             }
-            $transitionBlockerList = $this->buildTransitionBlockerListForTransition($subject, $marking, $transition);
+            $transitionBlockerList = $this->buildTransitionBlockerListForTransition($subject, $marking, $transition, $context);
             if (!$transitionBlockerList->isEmpty()) {
                 continue;
             }
@@ -318,7 +318,7 @@ class Workflow implements WorkflowInterface
         return $this->definition->getMetadataStore();
     }
 
-    private function buildTransitionBlockerListForTransition(object $subject, Marking $marking, Transition $transition): TransitionBlockerList
+    private function buildTransitionBlockerListForTransition(object $subject, Marking $marking, Transition $transition, array $context = []): TransitionBlockerList
     {
         foreach ($transition->getFroms() as $place) {
             if (!$marking->has($place)) {
@@ -332,7 +332,7 @@ class Workflow implements WorkflowInterface
             return new TransitionBlockerList();
         }
 
-        $event = $this->guardTransition($subject, $marking, $transition);
+        $event = $this->guardTransition($subject, $marking, $transition, $context);
 
         if ($event->isBlocked()) {
             return $event->getTransitionBlockerList();
@@ -341,13 +341,13 @@ class Workflow implements WorkflowInterface
         return new TransitionBlockerList();
     }
 
-    private function guardTransition(object $subject, Marking $marking, Transition $transition): ?GuardEvent
+    private function guardTransition(object $subject, Marking $marking, Transition $transition, array $context = []): ?GuardEvent
     {
         if (null === $this->dispatcher) {
             return null;
         }
 
-        $event = new GuardEvent($subject, $marking, $transition, $this);
+        $event = new GuardEvent($subject, $marking, $transition, $this, $context);
 
         $this->dispatcher->dispatch($event, WorkflowEvents::GUARD);
         $this->dispatcher->dispatch($event, sprintf('workflow.%s.guard', $this->name));
@@ -451,7 +451,7 @@ class Workflow implements WorkflowInterface
         $this->dispatcher->dispatch($event, WorkflowEvents::ANNOUNCE);
         $this->dispatcher->dispatch($event, sprintf('workflow.%s.announce', $this->name));
 
-        foreach ($this->getEnabledTransitions($subject) as $transition) {
+        foreach ($this->getEnabledTransitions($subject, $context) as $transition) {
             $this->dispatcher->dispatch($event, sprintf('workflow.%s.announce.%s', $this->name, $transition->getName()));
         }
     }

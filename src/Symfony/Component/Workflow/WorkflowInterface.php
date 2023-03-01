@@ -27,19 +27,19 @@ interface WorkflowInterface
      *
      * @throws LogicException
      */
-    public function getMarking(object $subject);
+    public function getMarking(object $subject, array $context = []);
 
     /**
      * Returns true if the transition is enabled.
      *
      * @return bool
      */
-    public function can(object $subject, string $transitionName);
+    public function can(object $subject, string $transitionName, array $context = []);
 
     /**
      * Builds a TransitionBlockerList to know why a transition is blocked.
      */
-    public function buildTransitionBlockerList(object $subject, string $transitionName): TransitionBlockerList;
+    public function buildTransitionBlockerList(object $subject, string $transitionName, array $context = []): TransitionBlockerList;
 
     /**
      * Fire a transition.
@@ -55,7 +55,7 @@ interface WorkflowInterface
      *
      * @return Transition[]
      */
-    public function getEnabledTransitions(object $subject);
+    public function getEnabledTransitions(object $subject, array $context = []);
 
     /**
      * @return string

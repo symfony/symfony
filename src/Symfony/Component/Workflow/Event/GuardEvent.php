@@ -28,9 +28,9 @@ final class GuardEvent extends Event
     /**
      * {@inheritdoc}
      */
-    public function __construct(object $subject, Marking $marking, Transition $transition, WorkflowInterface $workflow = null)
+    public function __construct(object $subject, Marking $marking, Transition $transition, WorkflowInterface $workflow = null, array $context = [])
     {
-        parent::__construct($subject, $marking, $transition, $workflow);
+        parent::__construct($subject, $marking, $transition, $workflow, $context);
 
         $this->transitionBlockerList = new TransitionBlockerList();
     }

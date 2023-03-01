@@ -1,0 +1,37 @@
+{
+    "name": "symfony/openapi",
+    "type": "library",
+    "description": "Provides a user-friendly, object-oriented library to build OpenAPI specifications using PHP.",
+    "keywords": ["openapi", "api", "specification", "documentation"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Titouan Galopin",
+            "email": "galopintitouan@gmail.com"
+        },
+        {
+            "name": "Selency Team",
+            "homepage": "https://selency.fr"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.1"
+    },
+    "require-dev": {
+        "symfony/validator": "^6.2",
+        "symfony/var-dumper": "^6.2",
+        "symfony/phpunit-bridge": "^6.2"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\OpenApi\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

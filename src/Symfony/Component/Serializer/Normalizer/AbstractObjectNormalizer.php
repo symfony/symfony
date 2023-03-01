@@ -334,7 +334,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             $normalizedData = $this->removeNestedValue($serializedPath->getElements(), $normalizedData);
         }
 
-        $normalizedData = array_merge($normalizedData, $nestedData);
+        $normalizedData = array_replace($normalizedData, $nestedData);
 
         foreach ($normalizedData as $attribute => $value) {
             if ($this->nameConverter) {

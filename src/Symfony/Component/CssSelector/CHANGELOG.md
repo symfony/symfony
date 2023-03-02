@@ -11,7 +11,7 @@ CHANGELOG
 ---
 
  * Add support for `:scope`
- * Added support for `*:has`
+ * Add support for `*:has`
 
 4.4.0
 -----

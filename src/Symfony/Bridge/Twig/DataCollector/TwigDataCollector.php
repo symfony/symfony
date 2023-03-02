@@ -78,7 +78,7 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
         $templateFinder($this->profile);
     }
 
-    public function getTime(): int
+    public function getTime(): float
     {
         return $this->getProfile()->getDuration() * 1000;
     }

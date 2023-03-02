@@ -1237,6 +1237,11 @@ class PhpDumperTest extends TestCase
             ->register('foo', FooClassWithEnumAttribute::class)
             ->setPublic(true)
             ->addArgument(FooUnitEnum::BAR);
+        $container
+            ->register('bar', \stdClass::class)
+            ->setPublic(true)
+            ->addArgument('%unit_enum%')
+            ->addArgument('%enum_array%');
 
         $container->setParameter('unit_enum', FooUnitEnum::BAR);
         $container->setParameter('enum_array', [FooUnitEnum::BAR, FooUnitEnum::FOO]);
@@ -1254,6 +1259,11 @@ class PhpDumperTest extends TestCase
         $this->assertSame(FooUnitEnum::BAR, $container->getParameter('unit_enum'));
         $this->assertSame([FooUnitEnum::BAR, FooUnitEnum::FOO], $container->getParameter('enum_array'));
         $this->assertStringMatchesFormat(<<<'PHP'
+%A
+    protected function getBarService()
+    {
+        return $this->services['bar'] = new \stdClass(\Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::BAR, $this->getParameter('enum_array'));
+    }
 %A
     private function getDynamicParameter(string $name)
     {

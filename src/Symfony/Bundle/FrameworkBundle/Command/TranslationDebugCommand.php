@@ -400,7 +400,6 @@ EOF
     private function getRootCodePaths(KernelInterface $kernel): array
     {
         $codePaths = $this->codePaths;
-        $codePaths[] = $kernel->getProjectDir().'/src';
         if ($this->defaultViewsPath) {
             $codePaths[] = $this->defaultViewsPath;
         }

@@ -18,9 +18,9 @@ namespace Symfony\Component\CssSelector\XPath\Extension;
  * which is copyright Ian Bicking, @see https://github.com/scrapy/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
- * 
+ *
  * @method array<string, callable(XPathExpr, XPathExpr): XPathExpr> getRelativeCombinationTranslators() Returns combination translators found inside ":has()" relation.
- * 
+ *
  * @internal
  */
 interface ExtensionInterface

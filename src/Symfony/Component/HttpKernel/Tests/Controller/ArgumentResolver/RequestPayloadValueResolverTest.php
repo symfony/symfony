@@ -19,6 +19,7 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestPayloadValue
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Validator\ConstraintViolation;
@@ -46,9 +47,29 @@ class RequestPayloadValueResolverTest extends TestCase
         $resolver->resolve($request, $argument);
     }
 
+    public function testWithoutValidatorAndCouldNotDenormalize()
+    {
+        $content = '{"price": 50, "title": ["not a string"]}';
+        $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+
+        $resolver = new RequestPayloadValueResolver($serializer);
+
+        $argument = new ArgumentMetadata('invalid', RequestPayload::class, false, false, null, false, [
+            MapRequestPayload::class => new MapRequestPayload(),
+        ]);
+        $request = Request::create('/', 'POST', server: ['CONTENT_TYPE' => 'application/json'], content: $content);
+
+        try {
+            $resolver->resolve($request, $argument);
+            $this->fail(sprintf('Expected "%s" to be thrown.', HttpException::class));
+        } catch (HttpException $e) {
+            $this->assertInstanceOf(PartialDenormalizationException::class, $e->getPrevious());
+        }
+    }
+
     public function testValidationNotPassed()
     {
-        $content = '{"price": 50}';
+        $content = '{"price": 50, "title": ["not a string"]}';
         $payload = new RequestPayload(50);
         $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
 
@@ -69,7 +90,10 @@ class RequestPayloadValueResolverTest extends TestCase
             $resolver->resolve($request, $argument);
             $this->fail(sprintf('Expected "%s" to be thrown.', HttpException::class));
         } catch (HttpException $e) {
-            $this->assertInstanceOf(ValidationFailedException::class, $e->getPrevious());
+            $validationFailedException = $e->getPrevious();
+            $this->assertInstanceOf(ValidationFailedException::class, $validationFailedException);
+            $this->assertSame('This value should be of type unknown.', $validationFailedException->getViolations()[0]->getMessage());
+            $this->assertSame('Test', $validationFailedException->getViolations()[1]->getMessage());
         }
     }
 
@@ -77,7 +101,7 @@ class RequestPayloadValueResolverTest extends TestCase
     {
         $serializer = new Serializer();
 
-        $resolver = new RequestPayloadValueResolver($serializer, null);
+        $resolver = new RequestPayloadValueResolver($serializer);
 
         $argument = new ArgumentMetadata('invalid', \stdClass::class, false, false, null, false, [
             MapRequestPayload::class => new MapRequestPayload(),
@@ -161,6 +185,8 @@ class RequestPayloadValueResolverTest extends TestCase
 
 class RequestPayload
 {
+    public string $title;
+
     public function __construct(public readonly float $price)
     {
     }

@@ -36,6 +36,16 @@ class Length extends Constraint
         self::INVALID_CHARACTERS_ERROR => 'INVALID_CHARACTERS_ERROR',
     ];
 
+    public const COUNT_BYTES = 'bytes';
+    public const COUNT_CODEPOINTS = 'codepoints';
+    public const COUNT_GRAPHEMES = 'graphemes';
+
+    private const VALID_COUNT_UNITS = [
+        self::COUNT_BYTES,
+        self::COUNT_CODEPOINTS,
+        self::COUNT_GRAPHEMES,
+    ];
+
     /**
      * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
      */
@@ -49,13 +59,19 @@ class Length extends Constraint
     public $min;
     public $charset = 'UTF-8';
     public $normalizer;
+    /* @var self::COUNT_* */
+    public string $countUnit = self::COUNT_CODEPOINTS;
 
+    /**
+     * @param self::COUNT_*|null $countUnit
+     */
     public function __construct(
         int|array $exactly = null,
         int $min = null,
         int $max = null,
         string $charset = null,
         callable $normalizer = null,
+        string $countUnit = null,
         string $exactMessage = null,
         string $minMessage = null,
         string $maxMessage = null,
@@ -84,6 +100,7 @@ class Length extends Constraint
         $this->max = $max;
         $this->charset = $charset ?? $this->charset;
         $this->normalizer = $normalizer ?? $this->normalizer;
+        $this->countUnit = $countUnit ?? $this->countUnit;
         $this->exactMessage = $exactMessage ?? $this->exactMessage;
         $this->minMessage = $minMessage ?? $this->minMessage;
         $this->maxMessage = $maxMessage ?? $this->maxMessage;
@@ -95,6 +112,10 @@ class Length extends Constraint
 
         if (null !== $this->normalizer && !\is_callable($this->normalizer)) {
             throw new InvalidArgumentException(sprintf('The "normalizer" option must be a valid callable ("%s" given).', get_debug_type($this->normalizer)));
+        }
+
+        if (!\in_array($this->countUnit, self::VALID_COUNT_UNITS)) {
+            throw new InvalidArgumentException(sprintf('The "countUnit" option must be one of the "%s"::COUNT_* constants ("%s" given).', __CLASS__, $this->countUnit));
         }
     }
 }

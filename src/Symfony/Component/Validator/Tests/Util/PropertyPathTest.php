@@ -24,7 +24,7 @@ class PropertyPathTest extends TestCase
         $this->assertSame($expectedPath, PropertyPath::append($basePath, $subPath), $message);
     }
 
-    public function provideAppendPaths()
+    public static function provideAppendPaths()
     {
         return [
             ['foo', '', 'foo', 'It returns the basePath if subPath is empty'],

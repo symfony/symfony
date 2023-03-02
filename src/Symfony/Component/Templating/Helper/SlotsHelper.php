@@ -27,9 +27,9 @@ class SlotsHelper extends Helper
      * This method starts an output buffer that will be
      * closed when the stop() method is called.
      *
-     * @throws \InvalidArgumentException if a slot with the same name is already started
-     *
      * @return void
+     *
+     * @throws \InvalidArgumentException if a slot with the same name is already started
      */
     public function start(string $name)
     {
@@ -47,9 +47,9 @@ class SlotsHelper extends Helper
     /**
      * Stops a slot.
      *
-     * @throws \LogicException if no slot has been started
-     *
      * @return void
+     *
+     * @throws \LogicException if no slot has been started
      */
     public function stop()
     {

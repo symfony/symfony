@@ -12,8 +12,6 @@
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\ConsoleEvents;
@@ -36,9 +34,8 @@ class DebugHandlersListenerTest extends TestCase
 {
     public function testConfigure()
     {
-        $logger = $this->createMock(LoggerInterface::class);
         $userHandler = function () {};
-        $listener = new DebugHandlersListener($userHandler, $logger);
+        $listener = new DebugHandlersListener($userHandler);
         $eHandler = new ErrorHandler();
 
         $exception = null;
@@ -57,11 +54,6 @@ class DebugHandlersListenerTest extends TestCase
         }
 
         $this->assertSame($userHandler, $eHandler->setExceptionHandler('var_dump'));
-
-        $loggers = $eHandler->setLoggers([]);
-
-        $this->assertArrayHasKey(\E_DEPRECATED, $loggers);
-        $this->assertSame([$logger, LogLevel::INFO], $loggers[\E_DEPRECATED]);
     }
 
     public function testConfigureForHttpKernelWithNoTerminateWithException()
@@ -152,86 +144,5 @@ class DebugHandlersListenerTest extends TestCase
         }
 
         $this->assertSame($userHandler, $eHandler->setExceptionHandler('var_dump'));
-    }
-
-    public function provideLevelsAssignedToLoggers(): array
-    {
-        return [
-            [false, false, '0', null, null],
-            [false, false, \E_ALL, null, null],
-            [false, false, [], null, null],
-            [false, false, [\E_WARNING => LogLevel::WARNING, \E_USER_DEPRECATED => LogLevel::NOTICE], null, null],
-
-            [true, false, \E_ALL, \E_ALL, null],
-            [true, false, \E_DEPRECATED, \E_DEPRECATED, null],
-            [true, false, [], null, null],
-            [true, false, [\E_WARNING => LogLevel::WARNING, \E_DEPRECATED => LogLevel::NOTICE], [\E_WARNING => LogLevel::WARNING, \E_DEPRECATED => LogLevel::NOTICE], null],
-
-            [false, true, '0', null, null],
-            [false, true, \E_ALL, null, \E_DEPRECATED | \E_USER_DEPRECATED],
-            [false, true, \E_ERROR, null, null],
-            [false, true, [], null, null],
-            [false, true, [\E_ERROR => LogLevel::ERROR, \E_DEPRECATED => LogLevel::DEBUG], null, [\E_DEPRECATED => LogLevel::DEBUG]],
-
-            [true, true, '0', null, null],
-            [true, true, \E_ALL, \E_ALL & ~(\E_DEPRECATED | \E_USER_DEPRECATED), \E_DEPRECATED | \E_USER_DEPRECATED],
-            [true, true, \E_ERROR, \E_ERROR, null],
-            [true, true, \E_USER_DEPRECATED, null, \E_USER_DEPRECATED],
-            [true, true, [\E_ERROR => LogLevel::ERROR, \E_DEPRECATED => LogLevel::DEBUG], [\E_ERROR => LogLevel::ERROR], [\E_DEPRECATED => LogLevel::DEBUG]],
-            [true, true, [\E_ERROR => LogLevel::ALERT], [\E_ERROR => LogLevel::ALERT], null],
-            [true, true, [\E_USER_DEPRECATED => LogLevel::NOTICE], null, [\E_USER_DEPRECATED => LogLevel::NOTICE]],
-        ];
-    }
-
-    /**
-     * @dataProvider provideLevelsAssignedToLoggers
-     *
-     * @param array|string      $levels
-     * @param array|string|null $expectedLoggerLevels
-     * @param array|string|null $expectedDeprecationLoggerLevels
-     */
-    public function testLevelsAssignedToLoggers(bool $hasLogger, bool $hasDeprecationLogger, $levels, $expectedLoggerLevels, $expectedDeprecationLoggerLevels)
-    {
-        $handler = $this->createMock(ErrorHandler::class);
-
-        $expectedCalls = [];
-        $logger = null;
-
-        $deprecationLogger = null;
-        if ($hasDeprecationLogger) {
-            $deprecationLogger = $this->createMock(LoggerInterface::class);
-            if (null !== $expectedDeprecationLoggerLevels) {
-                $expectedCalls[] = [$deprecationLogger, $expectedDeprecationLoggerLevels];
-            }
-        }
-
-        if ($hasLogger) {
-            $logger = $this->createMock(LoggerInterface::class);
-            if (null !== $expectedLoggerLevels) {
-                $expectedCalls[] = [$logger, $expectedLoggerLevels];
-            }
-        }
-
-        $handler
-            ->expects($this->exactly(\count($expectedCalls)))
-            ->method('setDefaultLogger')
-            ->withConsecutive(...$expectedCalls);
-
-        $sut = new DebugHandlersListener(null, $logger, $levels, null, true, true, $deprecationLogger);
-        $prevHander = set_exception_handler([$handler, 'handleError']);
-
-        try {
-            $handler
-                ->method('handleError')
-                ->willReturnCallback(function () use ($prevHander) {
-                    $prevHander(...\func_get_args());
-                });
-
-            $sut->configure();
-            set_exception_handler($prevHander);
-        } catch (\Exception $e) {
-            set_exception_handler($prevHander);
-            throw $e;
-        }
     }
 }

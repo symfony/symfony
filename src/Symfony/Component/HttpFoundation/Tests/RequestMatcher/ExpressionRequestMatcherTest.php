@@ -28,7 +28,7 @@ class ExpressionRequestMatcherTest extends TestCase
         $this->assertSame($expected, $expressionRequestMatcher->matches($request));
     }
 
-    public function provideExpressions()
+    public static function provideExpressions()
     {
         return [
             ['request.getMethod() == method', true],

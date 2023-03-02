@@ -56,7 +56,7 @@ class ImageTest extends TestCase
         $this->assertEquals($expected, $image->getUri());
     }
 
-    public function getGetUriTests()
+    public static function getGetUriTests()
     {
         return [
             ['/foo.png', 'http://localhost/bar/foo/', 'http://localhost/foo.png'],

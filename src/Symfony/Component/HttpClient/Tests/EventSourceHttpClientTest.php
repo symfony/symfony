@@ -152,7 +152,7 @@ TXT;
         }
     }
 
-    public function contentTypeProvider()
+    public static function contentTypeProvider()
     {
         return [
             ['text/event-stream', true],

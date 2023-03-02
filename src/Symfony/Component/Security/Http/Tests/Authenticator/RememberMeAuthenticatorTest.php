@@ -51,7 +51,7 @@ class RememberMeAuthenticatorTest extends TestCase
         $this->assertSame($support, $this->authenticator->supports($request));
     }
 
-    public function provideSupportsData()
+    public static function provideSupportsData()
     {
         yield [Request::create('/'), false];
 

@@ -70,7 +70,7 @@ class LanguageValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidLanguages()
+    public static function getValidLanguages()
     {
         return [
             ['en'],
@@ -95,7 +95,7 @@ class LanguageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidLanguages()
+    public static function getInvalidLanguages()
     {
         return [
             ['EN'],
@@ -115,7 +115,7 @@ class LanguageValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidAlpha3Languages()
+    public static function getValidAlpha3Languages()
     {
         return [
             ['deu'],
@@ -142,7 +142,7 @@ class LanguageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidAlpha3Languages()
+    public static function getInvalidAlpha3Languages()
     {
         return [
             ['foobar'],

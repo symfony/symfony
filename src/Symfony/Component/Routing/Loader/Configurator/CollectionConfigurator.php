@@ -114,9 +114,4 @@ class CollectionConfigurator
 
         return $this;
     }
-
-    private function createRoute(string $path): Route
-    {
-        return (clone $this->route)->setPath($path);
-    }
 }

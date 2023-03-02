@@ -70,7 +70,7 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidCountries()
+    public static function getValidCountries()
     {
         return [
             ['GB'],
@@ -96,7 +96,7 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidCountries()
+    public static function getInvalidCountries()
     {
         return [
             ['foobar'],
@@ -116,7 +116,7 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidAlpha3Countries()
+    public static function getValidAlpha3Countries()
     {
         return [
             ['GBR'],
@@ -143,7 +143,7 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidAlpha3Countries()
+    public static function getInvalidAlpha3Countries()
     {
         return [
             ['foobar'],

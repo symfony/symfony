@@ -95,7 +95,7 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
         ]));
     }
 
-    public function throwsOnNonNumericValuesProvider()
+    public static function throwsOnNonNumericValuesProvider()
     {
         return [
             [\stdClass::class, 2, new \stdClass()],

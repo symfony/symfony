@@ -140,6 +140,9 @@ class XmlFileLoaderTest extends TestCase
                 'float' => 1.3,
                 1000.3,
                 'a string',
+                ' a string not trimmed ',
+                'a trimmed string',
+                'an explicit trimmed string',
                 ['foo', 'bar'],
             ],
             'mixedcase' => ['MixedCaseKey' => 'value'],
@@ -824,7 +827,7 @@ class XmlFileLoaderTest extends TestCase
         $this->assertContains('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar', $resources);
     }
 
-    public function prototypeExcludeWithArrayDataProvider(): iterable
+    public static function prototypeExcludeWithArrayDataProvider(): iterable
     {
         return [
             ['services_prototype_array.xml'],

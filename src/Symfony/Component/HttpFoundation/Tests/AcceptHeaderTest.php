@@ -37,7 +37,7 @@ class AcceptHeaderTest extends TestCase
         $this->assertEquals($items, $parsed);
     }
 
-    public function provideFromStringData()
+    public static function provideFromStringData()
     {
         return [
             ['', []],
@@ -57,7 +57,7 @@ class AcceptHeaderTest extends TestCase
         $this->assertEquals($string, (string) $header);
     }
 
-    public function provideToStringData()
+    public static function provideToStringData()
     {
         return [
             [[], ''],
@@ -76,7 +76,7 @@ class AcceptHeaderTest extends TestCase
         $this->assertEquals($values, array_keys($header->all()));
     }
 
-    public function provideFilterData()
+    public static function provideFilterData()
     {
         return [
             ['fr-FR,fr;q=0.8,en-US;q=0.6,en;q=0.4', '/fr.*/', ['fr-FR', 'fr']],
@@ -92,7 +92,7 @@ class AcceptHeaderTest extends TestCase
         $this->assertEquals($values, array_keys($header->all()));
     }
 
-    public function provideSortingData()
+    public static function provideSortingData()
     {
         return [
             'quality has priority' => ['*;q=0.3,ISO-8859-1,utf-8;q=0.7', ['ISO-8859-1', 'utf-8', '*']],
@@ -110,7 +110,7 @@ class AcceptHeaderTest extends TestCase
         $this->assertSame($expectedQuality, $header->get($value)->getQuality());
     }
 
-    public function provideDefaultValueData()
+    public static function provideDefaultValueData()
     {
         yield ['text/plain;q=0.5, text/html, text/x-dvi;q=0.8, *;q=0.3', 'text/xml', 0.3];
         yield ['text/plain;q=0.5, text/html, text/x-dvi;q=0.8, */*;q=0.3', 'text/xml', 0.3];

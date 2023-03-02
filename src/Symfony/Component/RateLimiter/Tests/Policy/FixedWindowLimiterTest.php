@@ -122,7 +122,7 @@ class FixedWindowLimiterTest extends TestCase
         }
     }
 
-    public function provideConsumeOutsideInterval(): \Generator
+    public static function provideConsumeOutsideInterval(): \Generator
     {
         yield ['PT15S'];
 

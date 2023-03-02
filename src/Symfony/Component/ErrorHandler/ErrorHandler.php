@@ -452,11 +452,10 @@ class ErrorHandler
 
             if ($throw || $this->tracedErrors & $type) {
                 $backtrace = $errorAsException->getTrace();
-                $lightTrace = $this->cleanTrace($backtrace, $type, $file, $line, $throw);
-                ($this->configureException)($errorAsException, $lightTrace, $file, $line);
+                $backtrace = $this->cleanTrace($backtrace, $type, $file, $line, $throw);
+                ($this->configureException)($errorAsException, $backtrace, $file, $line);
             } else {
                 ($this->configureException)($errorAsException, []);
-                $backtrace = [];
             }
         }
 

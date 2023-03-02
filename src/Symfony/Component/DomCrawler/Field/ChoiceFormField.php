@@ -71,9 +71,9 @@ class ChoiceFormField extends FormField
     /**
      * Ticks a checkbox.
      *
-     * @throws \LogicException When the type provided is not correct
-     *
      * @return void
+     *
+     * @throws \LogicException When the type provided is not correct
      */
     public function tick()
     {
@@ -87,9 +87,9 @@ class ChoiceFormField extends FormField
     /**
      * Unticks a checkbox.
      *
-     * @throws \LogicException When the type provided is not correct
-     *
      * @return void
+     *
+     * @throws \LogicException When the type provided is not correct
      */
     public function untick()
     {
@@ -103,9 +103,9 @@ class ChoiceFormField extends FormField
     /**
      * Sets the value of the field.
      *
-     * @throws \InvalidArgumentException When value type provided is not correct
-     *
      * @return void
+     *
+     * @throws \InvalidArgumentException When value type provided is not correct
      */
     public function setValue(string|array|bool|null $value)
     {
@@ -182,9 +182,9 @@ class ChoiceFormField extends FormField
     /**
      * Initializes the form field.
      *
-     * @throws \LogicException When node type is incorrect
-     *
      * @return void
+     *
+     * @throws \LogicException When node type is incorrect
      */
     protected function initialize()
     {

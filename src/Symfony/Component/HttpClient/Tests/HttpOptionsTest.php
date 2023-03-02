@@ -19,7 +19,7 @@ use Symfony\Component\HttpClient\HttpOptions;
  */
 class HttpOptionsTest extends TestCase
 {
-    public function provideSetAuthBasic(): iterable
+    public static function provideSetAuthBasic(): iterable
     {
         yield ['user:password', 'user', 'password'];
         yield ['user:password', 'user:password'];

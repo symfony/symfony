@@ -19,36 +19,37 @@ use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
+use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class ClickatellTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null, string $from = null): ClickatellTransport
+    public static function createTransport(HttpClientInterface $client = null, string $from = null): ClickatellTransport
     {
-        return new ClickatellTransport('authToken', $from, $client ?? $this->createMock(HttpClientInterface::class));
+        return new ClickatellTransport('authToken', $from, $client ?? new MockHttpClient());
     }
 
-    public function toStringProvider(): iterable
+    public static function toStringProvider(): iterable
     {
-        yield ['clickatell://api.clickatell.com', $this->createTransport()];
-        yield ['clickatell://api.clickatell.com?from=TEST', $this->createTransport(null, 'TEST')];
+        yield ['clickatell://api.clickatell.com', self::createTransport()];
+        yield ['clickatell://api.clickatell.com?from=TEST', self::createTransport(null, 'TEST')];
     }
 
-    public function supportedMessagesProvider(): iterable
+    public static function supportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('+33612345678', 'Hello!')];
     }
 
-    public function unsupportedMessagesProvider(): iterable
+    public static function unsupportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [new DummyMessage()];
     }
 
     public function testExceptionIsThrownWhenNonMessageIsSend()
     {
-        $transport = $this->createTransport();
+        $transport = self::createTransport();
 
         $this->expectException(LogicException::class);
 
@@ -73,7 +74,7 @@ final class ClickatellTransportTest extends TransportTestCase
 
         $client = new MockHttpClient($response);
 
-        $transport = $this->createTransport($client);
+        $transport = self::createTransport($client);
 
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage('Unable to send SMS with Clickatell: Error code 105 with message "Invalid Account Reference EX0000000" (https://documentation-page).');

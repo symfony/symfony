@@ -80,6 +80,7 @@ use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
+use Symfony\Component\HttpClient\UriTemplateHttpClient;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
@@ -98,6 +99,7 @@ use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
 use Symfony\Component\Mailer\Bridge\Google\Transport\GmailTransportFactory;
 use Symfony\Component\Mailer\Bridge\Infobip\Transport\InfobipTransportFactory as InfobipMailerTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillTransportFactory;
+use Symfony\Component\Mailer\Bridge\MailerSend\Transport\MailerSendTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetTransportFactory;
 use Symfony\Component\Mailer\Bridge\MailPace\Transport\MailPaceTransportFactory;
@@ -165,6 +167,7 @@ use Symfony\Component\Notifier\Bridge\OrangeSms\OrangeSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
 use Symfony\Component\Notifier\Bridge\PagerDuty\PagerDutyTransportFactory;
 use Symfony\Component\Notifier\Bridge\Plivo\PlivoTransportFactory;
+use Symfony\Component\Notifier\Bridge\Pushover\PushoverTransportFactory;
 use Symfony\Component\Notifier\Bridge\RingCentral\RingCentralTransportFactory;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sendberry\SendberryTransportFactory;
@@ -265,9 +268,9 @@ class FrameworkExtension extends Extension
     /**
      * Responds to the app.config configuration parameter.
      *
-     * @throws LogicException
-     *
      * @return void
+     *
+     * @throws LogicException
      */
     public function load(array $configs, ContainerBuilder $container)
     {
@@ -762,6 +765,10 @@ class FrameworkExtension extends Extension
             unset($options['private_headers']);
         }
 
+        if (!$options['skip_response_headers']) {
+            unset($options['skip_response_headers']);
+        }
+
         $container->getDefinition('http_cache')
             ->setPublic($config['enabled'])
             ->replaceArgument(3, $options);
@@ -1087,7 +1094,7 @@ class FrameworkExtension extends Extension
 
         $debug = $container->getParameter('kernel.debug');
 
-        if ($debug) {
+        if ($debug && !$container->hasParameter('debug.container.dump')) {
             $container->setParameter('debug.container.dump', '%kernel.build_dir%/%kernel.container_class%.xml');
         }
 
@@ -1095,12 +1102,12 @@ class FrameworkExtension extends Extension
             $loader->load('debug.php');
         }
 
-        $definition = $container->findDefinition('debug.debug_handlers_listener');
+        $definition = $container->findDefinition('debug.error_handler_configurator');
 
         if (false === $config['log']) {
-            $definition->replaceArgument(1, null);
+            $definition->replaceArgument(0, null);
         } elseif (true !== $config['log']) {
-            $definition->replaceArgument(2, $config['log']);
+            $definition->replaceArgument(1, $config['log']);
         }
 
         if (!$config['throw']) {
@@ -2333,7 +2340,9 @@ class FrameworkExtension extends Extension
         $options = $config['default_options'] ?? [];
         $retryOptions = $options['retry_failed'] ?? ['enabled' => false];
         unset($options['retry_failed']);
-        $container->getDefinition('http_client')->setArguments([$options, $config['max_host_connections'] ?? 6]);
+        $defaultUriTemplateVars = $options['vars'] ?? [];
+        unset($options['vars']);
+        $container->getDefinition('http_client.transport')->setArguments([$options, $config['max_host_connections'] ?? 6]);
 
         if (!$hasPsr18 = ContainerBuilder::willBeAvailable('psr/http-client', ClientInterface::class, ['symfony/framework-bundle', 'symfony/http-client'])) {
             $container->removeDefinition('psr18.http_client');
@@ -2348,9 +2357,22 @@ class FrameworkExtension extends Extension
             $this->registerRetryableHttpClient($retryOptions, 'http_client', $container);
         }
 
-        $httpClientId = ($retryOptions['enabled'] ?? false) ? 'http_client.retryable.inner' : ($this->isInitializedConfigEnabled('profiler') ? '.debug.http_client.inner' : 'http_client');
+        if ($hasUriTemplate = class_exists(UriTemplateHttpClient::class)) {
+            if (ContainerBuilder::willBeAvailable('guzzlehttp/uri-template', \GuzzleHttp\UriTemplate\UriTemplate::class, [])) {
+                $container->setAlias('http_client.uri_template_expander', 'http_client.uri_template_expander.guzzle');
+            } elseif (ContainerBuilder::willBeAvailable('rize/uri-template', \Rize\UriTemplate::class, [])) {
+                $container->setAlias('http_client.uri_template_expander', 'http_client.uri_template_expander.rize');
+            }
+
+            $container
+                ->getDefinition('http_client.uri_template')
+                ->setArgument(2, $defaultUriTemplateVars);
+        } elseif ($defaultUriTemplateVars) {
+            throw new LogicException('Support for URI template requires symfony/http-client 6.3 or higher, try upgrading.');
+        }
+
         foreach ($config['scoped_clients'] as $name => $scopeConfig) {
-            if ('http_client' === $name) {
+            if ($container->has($name)) {
                 throw new InvalidArgumentException(sprintf('Invalid scope name: "%s" is reserved.', $name));
             }
 
@@ -2365,18 +2387,29 @@ class FrameworkExtension extends Extension
 
                 $container->register($name, ScopingHttpClient::class)
                     ->setFactory([ScopingHttpClient::class, 'forBaseUri'])
-                    ->setArguments([new Reference($httpClientId), $baseUri, $scopeConfig])
+                    ->setArguments([new Reference('http_client.transport'), $baseUri, $scopeConfig])
                     ->addTag('http_client.client')
                 ;
             } else {
                 $container->register($name, ScopingHttpClient::class)
-                    ->setArguments([new Reference($httpClientId), [$scope => $scopeConfig], $scope])
+                    ->setArguments([new Reference('http_client.transport'), [$scope => $scopeConfig], $scope])
                     ->addTag('http_client.client')
                 ;
             }
 
-            if ($this->readConfigEnabled('http_client.scoped_clients.'.$name.'retry_failed', $container, $retryOptions)) {
+            if ($this->readConfigEnabled('http_client.scoped_clients.'.$name.'.retry_failed', $container, $retryOptions)) {
                 $this->registerRetryableHttpClient($retryOptions, $name, $container);
+            }
+
+            if ($hasUriTemplate) {
+                $container
+                    ->register($name.'.uri_template', UriTemplateHttpClient::class)
+                    ->setDecoratedService($name, null, 7) // Between TraceableHttpClient (5) and RetryableHttpClient (10)
+                    ->setArguments([
+                        new Reference($name.'.uri_template.inner'),
+                        new Reference('http_client.uri_template_expander', ContainerInterface::NULL_ON_INVALID_REFERENCE),
+                        $defaultUriTemplateVars,
+                    ]);
             }
 
             $container->registerAliasForArgument($name, HttpClientInterface::class);
@@ -2390,8 +2423,8 @@ class FrameworkExtension extends Extension
         }
 
         if ($responseFactoryId = $config['mock_response_factory'] ?? null) {
-            $container->register($httpClientId.'.mock_client', MockHttpClient::class)
-                ->setDecoratedService($httpClientId, null, -10) // lower priority than TraceableHttpClient
+            $container->register('http_client.mock_client', MockHttpClient::class)
+                ->setDecoratedService('http_client.transport', null, -10)  // lower priority than TraceableHttpClient (5)
                 ->setArguments([new Reference($responseFactoryId)]);
         }
     }
@@ -2424,7 +2457,7 @@ class FrameworkExtension extends Extension
 
         $container
             ->register($name.'.retryable', RetryableHttpClient::class)
-            ->setDecoratedService($name, null, 10) // higher priority than TraceableHttpClient
+            ->setDecoratedService($name, null, 10) // higher priority than TraceableHttpClient (5)
             ->setArguments([new Reference($name.'.retryable.inner'), $retryStrategy, $options['max_retries'], new Reference('logger')])
             ->addTag('monolog.logger', ['channel' => 'http_client']);
     }
@@ -2454,6 +2487,7 @@ class FrameworkExtension extends Extension
         $classToServices = [
             GmailTransportFactory::class => 'mailer.transport_factory.gmail',
             InfobipMailerTransportFactory::class => 'mailer.transport_factory.infobip',
+            MailerSendTransportFactory::class => 'mailer.transport_factory.mailersend',
             MailgunTransportFactory::class => 'mailer.transport_factory.mailgun',
             MailjetTransportFactory::class => 'mailer.transport_factory.mailjet',
             MailPaceTransportFactory::class => 'mailer.transport_factory.mailpace',
@@ -2600,6 +2634,7 @@ class FrameworkExtension extends Extension
             OvhCloudTransportFactory::class => 'notifier.transport_factory.ovh-cloud',
             PagerDutyTransportFactory::class => 'notifier.transport_factory.pager-duty',
             PlivoTransportFactory::class => 'notifier.transport_factory.plivo',
+            PushoverTransportFactory::class => 'notifier.transport_factory.pushover',
             RingCentralTransportFactory::class => 'notifier.transport_factory.ring-central',
             RocketChatTransportFactory::class => 'notifier.transport_factory.rocket-chat',
             SendberryTransportFactory::class => 'notifier.transport_factory.sendberry',

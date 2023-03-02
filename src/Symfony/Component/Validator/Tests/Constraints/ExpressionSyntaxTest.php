@@ -34,7 +34,7 @@ class ExpressionSyntaxTest extends TestCase
         self::assertSame('my_service', $constraint->validatedBy());
     }
 
-    public function provideServiceValidatedConstraints(): iterable
+    public static function provideServiceValidatedConstraints(): iterable
     {
         yield 'Doctrine style' => [new ExpressionSyntax(['service' => 'my_service'])];
 

@@ -107,9 +107,9 @@ abstract class AbstractBrowser
     /**
      * Sets the insulated flag.
      *
-     * @throws \RuntimeException When Symfony Process Component is not installed
-     *
      * @return void
+     *
+     * @throws \RuntimeException When Symfony Process Component is not installed
      */
     public function insulate(bool $insulated = true)
     {

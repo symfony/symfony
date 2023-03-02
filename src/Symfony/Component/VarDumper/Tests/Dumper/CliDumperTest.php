@@ -158,7 +158,7 @@ EOTXT
             , $dump);
     }
 
-    public function provideDumpWithCommaFlagTests()
+    public static function provideDumpWithCommaFlagTests()
     {
         $expected = <<<'EOTXT'
 array:3 [
@@ -399,7 +399,7 @@ EOTXT
         );
     }
 
-    public function provideDumpArrayWithColor()
+    public static function provideDumpArrayWithColor()
     {
         yield [
             ['foo' => 'bar'],
@@ -448,23 +448,5 @@ EOTXT
         $dumper->dump($cloner->cloneVar($value));
 
         $this->assertSame($expectedOut, $out);
-    }
-
-    private function getSpecialVars()
-    {
-        foreach (array_keys($GLOBALS) as $var) {
-            if ('GLOBALS' !== $var) {
-                unset($GLOBALS[$var]);
-            }
-        }
-
-        $var = function &() {
-            $var = [];
-            $var[] = &$var;
-
-            return $var;
-        };
-
-        return eval('return [$var(), $GLOBALS, &$GLOBALS];');
     }
 }

@@ -43,6 +43,25 @@ class LengthTest extends TestCase
         new Length(['min' => 0, 'max' => 10, 'normalizer' => new \stdClass()]);
     }
 
+    public function testDefaultCountUnitIsUsed()
+    {
+        $length = new Length(['min' => 0, 'max' => 10]);
+        $this->assertSame(Length::COUNT_CODEPOINTS, $length->countUnit);
+    }
+
+    public function testNonDefaultCountUnitCanBeSet()
+    {
+        $length = new Length(['min' => 0, 'max' => 10, 'countUnit' => Length::COUNT_GRAPHEMES]);
+        $this->assertSame(Length::COUNT_GRAPHEMES, $length->countUnit);
+    }
+
+    public function testInvalidCountUnitThrowsException()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('The "countUnit" option must be one of the "%s"::COUNT_* constants ("%s" given).', Length::class, 'nonExistentCountUnit'));
+        new Length(['min' => 0, 'max' => 10, 'countUnit' => 'nonExistentCountUnit']);
+    }
+
     public function testConstraintDefaultOption()
     {
         $constraint = new Length(5);

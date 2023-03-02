@@ -261,6 +261,10 @@
         {%- if required -%}
             {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' required')|trim}) -%}
         {%- endif -%}
+        {%- if parent_label_class is defined -%}
+            {% set embed_label_classes = parent_label_class|split(' ')|filter(class => class in ['checkbox-inline', 'radio-inline']) %}
+            {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' ' ~ embed_label_classes|join(' '))|trim}) -%}
+        {% endif %}
 
         {{ widget|raw }}
         <label{% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}>

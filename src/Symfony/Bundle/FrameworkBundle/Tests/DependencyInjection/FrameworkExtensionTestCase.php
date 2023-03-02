@@ -541,9 +541,9 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         $container = $this->createContainerFromFile('php_errors_enabled');
 
-        $definition = $container->getDefinition('debug.debug_handlers_listener');
-        $this->assertEquals(new Reference('monolog.logger.php', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(1));
-        $this->assertNull($definition->getArgument(2));
+        $definition = $container->getDefinition('debug.error_handler_configurator');
+        $this->assertEquals(new Reference('monolog.logger.php', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(0));
+        $this->assertNull($definition->getArgument(1));
         $this->assertSame(-1, $container->getParameter('debug.error_handler.throw_at'));
     }
 
@@ -551,9 +551,9 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         $container = $this->createContainerFromFile('php_errors_disabled');
 
-        $definition = $container->getDefinition('debug.debug_handlers_listener');
+        $definition = $container->getDefinition('debug.error_handler_configurator');
+        $this->assertNull($definition->getArgument(0));
         $this->assertNull($definition->getArgument(1));
-        $this->assertNull($definition->getArgument(2));
         $this->assertSame(0, $container->getParameter('debug.error_handler.throw_at'));
     }
 
@@ -561,21 +561,21 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         $container = $this->createContainerFromFile('php_errors_log_level');
 
-        $definition = $container->getDefinition('debug.debug_handlers_listener');
-        $this->assertEquals(new Reference('monolog.logger.php', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(1));
-        $this->assertSame(8, $definition->getArgument(2));
+        $definition = $container->getDefinition('debug.error_handler_configurator');
+        $this->assertEquals(new Reference('monolog.logger.php', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(0));
+        $this->assertSame(8, $definition->getArgument(1));
     }
 
     public function testPhpErrorsWithLogLevels()
     {
         $container = $this->createContainerFromFile('php_errors_log_levels');
 
-        $definition = $container->getDefinition('debug.debug_handlers_listener');
-        $this->assertEquals(new Reference('monolog.logger.php', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(1));
+        $definition = $container->getDefinition('debug.error_handler_configurator');
+        $this->assertEquals(new Reference('monolog.logger.php', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(0));
         $this->assertSame([
             \E_NOTICE => \Psr\Log\LogLevel::ERROR,
             \E_WARNING => \Psr\Log\LogLevel::ERROR,
-        ], $definition->getArgument(2));
+        ], $definition->getArgument(1));
     }
 
     public function testExceptionsConfig()
@@ -1729,7 +1729,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         }
     }
 
-    public function appRedisTagAwareConfigProvider(): array
+    public static function appRedisTagAwareConfigProvider(): array
     {
         return [
             ['cache_app_redis_tag_aware'],
@@ -1845,14 +1845,14 @@ abstract class FrameworkExtensionTestCase extends TestCase
     public function testHttpClientDefaultOptions()
     {
         $container = $this->createContainerFromFile('http_client_default_options');
-        $this->assertTrue($container->hasDefinition('http_client'), '->registerHttpClientConfiguration() loads http_client.xml');
+        $this->assertTrue($container->hasDefinition('http_client.transport'), '->registerHttpClientConfiguration() loads http_client.xml');
 
         $defaultOptions = [
             'headers' => [],
             'resolve' => [],
             'extra' => [],
         ];
-        $this->assertSame([$defaultOptions, 4], $container->getDefinition('http_client')->getArguments());
+        $this->assertSame([$defaultOptions, 4], $container->getDefinition('http_client.transport')->getArguments());
 
         $this->assertTrue($container->hasDefinition('foo'), 'should have the "foo" service.');
         $this->assertSame(ScopingHttpClient::class, $container->getDefinition('foo')->getClass());
@@ -1870,9 +1870,9 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         $container = $this->createContainerFromFile('http_client_override_default_options');
 
-        $this->assertSame(['foo' => 'bar'], $container->getDefinition('http_client')->getArgument(0)['headers']);
-        $this->assertSame(['foo' => 'bar'], $container->getDefinition('http_client')->getArgument(0)['extra']);
-        $this->assertSame(4, $container->getDefinition('http_client')->getArgument(1));
+        $this->assertSame(['foo' => 'bar'], $container->getDefinition('http_client.transport')->getArgument(0)['headers']);
+        $this->assertSame(['foo' => 'bar'], $container->getDefinition('http_client.transport')->getArgument(0)['extra']);
+        $this->assertSame(4, $container->getDefinition('http_client.transport')->getArgument(1));
         $this->assertSame('http://example.com', $container->getDefinition('foo')->getArgument(1));
 
         $expected = [
@@ -1925,7 +1925,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         $container = $this->createContainerFromFile('http_client_full_default_options');
 
-        $defaultOptions = $container->getDefinition('http_client')->getArgument(0);
+        $defaultOptions = $container->getDefinition('http_client.transport')->getArgument(0);
 
         $this->assertSame(['X-powered' => 'PHP'], $defaultOptions['headers']);
         $this->assertSame(2, $defaultOptions['max_redirects']);
@@ -1950,7 +1950,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame(['foo' => ['bar' => 'baz']], $defaultOptions['extra']);
     }
 
-    public function provideMailer(): array
+    public static function provideMailer(): array
     {
         return [
             ['mailer_with_dsn', ['main' => 'smtp://example.com']],
@@ -2011,7 +2011,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $argument = $definition->getArgument(0);
 
         $this->assertInstanceOf(Reference::class, $argument);
-        $this->assertSame('http_client', current($definition->getDecoratedService()));
+        $this->assertSame('http_client.transport', current($definition->getDecoratedService()));
         $this->assertSame('my_response_factory', (string) $argument);
     }
 
@@ -2350,7 +2350,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
  */
 class TestAnnotationsPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $container->setDefinition('annotation_reader', $container->getDefinition('annotations.cached_reader'));
         $container->removeDefinition('annotations.cached_reader');

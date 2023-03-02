@@ -24,7 +24,7 @@ class Acknowledger
     private mixed $result = null;
 
     /**
-     * @param null|\Closure(\Throwable|null, mixed):void $ack
+     * @param \Closure(\Throwable|null, mixed):void|null $ack
      */
     public function __construct(string $handlerClass, \Closure $ack = null)
     {

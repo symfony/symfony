@@ -193,10 +193,10 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Adds a child node.
      *
+     * @return void
+     *
      * @throws \InvalidArgumentException when the child node has no name
      * @throws \InvalidArgumentException when the child node's name is not unique
-     *
-     * @return void
      */
     public function addChild(NodeInterface $node)
     {

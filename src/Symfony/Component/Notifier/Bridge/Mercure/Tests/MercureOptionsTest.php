@@ -13,7 +13,6 @@ namespace Symfony\Component\Notifier\Bridge\Mercure\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Mercure\MercureOptions;
-use TypeError;
 
 final class MercureOptionsTest extends TestCase
 {
@@ -43,7 +42,7 @@ final class MercureOptionsTest extends TestCase
 
     public function testConstructWithWrongTopicsThrows()
     {
-        $this->expectException(TypeError::class);
+        $this->expectException(\TypeError::class);
         new MercureOptions(new \stdClass());
     }
 }

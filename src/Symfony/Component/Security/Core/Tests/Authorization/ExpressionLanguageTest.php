@@ -44,7 +44,7 @@ class ExpressionLanguageTest extends TestCase
         $this->assertEquals($result, $expressionLanguage->evaluate($expression, $context));
     }
 
-    public function provider()
+    public static function provider()
     {
         $roles = ['ROLE_USER', 'ROLE_ADMIN'];
         $user = new InMemoryUser('username', 'password', $roles);

@@ -18,7 +18,7 @@ use Symfony\Component\CssSelector\Parser\Tokenizer\TokenizerPatterns;
 
 class IdentifierHandlerTest extends AbstractHandlerTestCase
 {
-    public function getHandleValueTestData()
+    public static function getHandleValueTestData()
     {
         return [
             ['foo', new Token(Token::TYPE_IDENTIFIER, 'foo', 0), ''],
@@ -29,7 +29,7 @@ class IdentifierHandlerTest extends AbstractHandlerTestCase
         ];
     }
 
-    public function getDontHandleValueTestData()
+    public static function getDontHandleValueTestData()
     {
         return [
             ['>'],

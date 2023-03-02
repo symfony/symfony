@@ -36,7 +36,7 @@ class NullMessageTest extends TestCase
             : $this->assertSame($message->getTransport(), $nullMessage->getTransport());
     }
 
-    public function messageDataProvider(): \Generator
+    public static function messageDataProvider(): \Generator
     {
         yield [new DummyMessageWithoutTransport()];
         yield [new DummyMessageWithTransport()];

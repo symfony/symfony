@@ -48,7 +48,7 @@ class ChainedAccessTokenExtractorsTest extends TestCase
         $this->assertNull($this->authenticator->supports($request));
     }
 
-    public function provideSupportData(): iterable
+    public static function provideSupportData(): iterable
     {
         yield [new Request([], [], [], [], [], ['HTTP_AUTHORIZATION' => 'Bearer VALID_ACCESS_TOKEN'])];
         yield [new Request([], [], [], [], [], ['HTTP_AUTHORIZATION' => 'Bearer INVALID_ACCESS_TOKEN'])];
@@ -77,7 +77,7 @@ class ChainedAccessTokenExtractorsTest extends TestCase
         $this->authenticator->authenticate($request);
     }
 
-    public function provideInvalidAuthenticateData(): iterable
+    public static function provideInvalidAuthenticateData(): iterable
     {
         $request = new Request();
         yield [$request, 'Invalid credentials.', BadCredentialsException::class];

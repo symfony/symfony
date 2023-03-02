@@ -40,6 +40,10 @@ class PasswordHasherListener
      */
     public function registerPassword(FormEvent $event)
     {
+        if (null === $event->getData() || '' === $event->getData()) {
+            return;
+        }
+
         $this->assertNotMapped($event->getForm());
 
         $this->passwords[] = [

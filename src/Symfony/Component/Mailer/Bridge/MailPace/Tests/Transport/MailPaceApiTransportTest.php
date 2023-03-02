@@ -32,7 +32,7 @@ final class MailPaceApiTransportTest extends TestCase
         $this->assertSame($expected, (string) $transport);
     }
 
-    public function getTransportData(): array
+    public static function getTransportData(): array
     {
         return [
             [

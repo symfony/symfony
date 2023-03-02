@@ -62,7 +62,7 @@ class HostnameValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidMultilevelDomains()
+    public static function getValidMultilevelDomains()
     {
         return [
             ['symfony.com'],
@@ -107,7 +107,7 @@ class HostnameValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidDomains()
+    public static function getInvalidDomains()
     {
         return [
             ['acme..com'],
@@ -144,7 +144,7 @@ class HostnameValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getReservedDomains()
+    public static function getReservedDomains()
     {
         return [
             ['example'],
@@ -197,7 +197,7 @@ class HostnameValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getTopLevelDomains()
+    public static function getTopLevelDomains()
     {
         return [
             ['com'],

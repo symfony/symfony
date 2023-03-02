@@ -22,7 +22,7 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\LogicException;
-use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
+use Symfony\Component\Serializer\Exception\MissingConstructorArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
@@ -417,7 +417,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * @throws NotNormalizableValueException
      * @throws ExtraAttributesException
-     * @throws MissingConstructorArgumentsException
+     * @throws MissingConstructorArgumentException
      * @throws LogicException
      */
     private function validateAndDenormalize(array $types, string $currentClass, string $attribute, mixed $data, ?string $format, array $context): mixed
@@ -565,7 +565,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 }
 
                 $extraAttributesException ??= $e;
-            } catch (MissingConstructorArgumentsException $e) {
+            } catch (MissingConstructorArgumentException $e) {
                 if (!$isUnionType) {
                     throw $e;
                 }
@@ -766,7 +766,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             if (!$serializedPath = $metadata->getSerializedPath()) {
                 continue;
             }
-            $serializedPath = $metadata->getSerializedPath();
             $pathIdentifier = implode(',', $serializedPath->getElements());
             if (isset($serializedPaths[$pathIdentifier])) {
                 throw new LogicException(sprintf('Duplicate serialized path: "%s" used for properties "%s" and "%s".', $pathIdentifier, $serializedPaths[$pathIdentifier], $name));

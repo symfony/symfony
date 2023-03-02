@@ -26,7 +26,7 @@ class AcceptHeaderItemTest extends TestCase
         $this->assertEquals($attributes, $item->getAttributes());
     }
 
-    public function provideFromStringData()
+    public static function provideFromStringData()
     {
         return [
             [
@@ -57,7 +57,7 @@ class AcceptHeaderItemTest extends TestCase
         $this->assertEquals($string, (string) $item);
     }
 
-    public function provideToStringData()
+    public static function provideToStringData()
     {
         return [
             [

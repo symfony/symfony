@@ -120,7 +120,6 @@ class XmlDescriptor extends Descriptor
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($deprecationsXML = $dom->createElement('deprecations'));
 
-        $formattedLogs = [];
         $remainingCount = 0;
         foreach ($logs as $log) {
             $deprecationsXML->appendChild($deprecationXML = $dom->createElement('deprecation'));

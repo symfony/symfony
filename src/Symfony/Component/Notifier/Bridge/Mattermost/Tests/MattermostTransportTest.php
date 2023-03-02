@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\Notifier\Bridge\Mattermost\Tests;
 
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
+use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -23,24 +24,24 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class MattermostTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null): MattermostTransport
+    public static function createTransport(HttpClientInterface $client = null): MattermostTransport
     {
-        return (new MattermostTransport('testAccessToken', 'testChannel', null, $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
+        return (new MattermostTransport('testAccessToken', 'testChannel', null, $client ?? new MockHttpClient()))->setHost('host.test');
     }
 
-    public function toStringProvider(): iterable
+    public static function toStringProvider(): iterable
     {
-        yield ['mattermost://host.test?channel=testChannel', $this->createTransport()];
+        yield ['mattermost://host.test?channel=testChannel', self::createTransport()];
     }
 
-    public function supportedMessagesProvider(): iterable
+    public static function supportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
     }
 
-    public function unsupportedMessagesProvider(): iterable
+    public static function unsupportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [new DummyMessage()];
     }
 }

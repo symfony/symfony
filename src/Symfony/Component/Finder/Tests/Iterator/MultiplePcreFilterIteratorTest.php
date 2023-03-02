@@ -25,7 +25,7 @@ class MultiplePcreFilterIteratorTest extends TestCase
         $this->assertEquals($isRegex, $testIterator->isRegex($string), $message);
     }
 
-    public function getIsRegexFixtures()
+    public static function getIsRegexFixtures()
     {
         yield ['foo', false, 'string'];
         yield [' foo ', false, '" " is not a valid delimiter'];

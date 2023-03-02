@@ -56,7 +56,7 @@ class CheckArgumentsValidityPassTest extends TestCase
         $pass->process($container);
     }
 
-    public function definitionProvider()
+    public static function definitionProvider()
     {
         return [
             [['a' => 'a', null], []],

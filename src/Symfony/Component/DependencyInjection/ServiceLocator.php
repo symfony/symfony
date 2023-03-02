@@ -25,6 +25,7 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
  * @author Nicolas Grekas <p@tchwork.com>
  *
  * @template-covariant T of mixed
+ *
  * @implements ServiceProviderInterface<T>
  */
 class ServiceLocator implements ServiceProviderInterface, \Countable

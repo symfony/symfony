@@ -335,9 +335,9 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     /**
      * Initializes bundles.
      *
-     * @throws \LogicException if two bundles share a common name
-     *
      * @return void
+     *
+     * @throws \LogicException if two bundles share a common name
      */
     protected function initializeBundles()
     {

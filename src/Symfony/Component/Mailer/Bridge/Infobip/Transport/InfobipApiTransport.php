@@ -31,7 +31,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class InfobipApiTransport extends AbstractApiTransport
 {
-    private const API_VERSION = '2';
+    private const API_VERSION = '3';
 
     private string $key;
 

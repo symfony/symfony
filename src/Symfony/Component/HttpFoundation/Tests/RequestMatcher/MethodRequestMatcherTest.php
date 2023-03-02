@@ -27,7 +27,7 @@ class MethodRequestMatcherTest extends TestCase
         $this->assertSame($isMatch, $matcher->matches($request));
     }
 
-    public function getData()
+    public static function getData()
     {
         return [
             ['get', 'get', true],

@@ -21,7 +21,7 @@ final class LightSmsTransportFactoryTest extends TransportFactoryTestCase
         return new LightSmsTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'lightsms://host.test?from=0611223344',
@@ -29,13 +29,13 @@ final class LightSmsTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'lightsms://login:token@default?from=37061234567'];
         yield [false, 'somethingElse://login:token@default?from=37061234567'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://login:token@default?from=37061234567'];
         yield ['somethingElse://login:token@default']; // missing "from" option

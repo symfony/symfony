@@ -24,6 +24,7 @@ use Symfony\Component\Lock\Strategy\UnanimousStrategy;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
+ *
  * @group integration
  */
 class CombinedStoreTest extends AbstractStoreTestCase

@@ -21,7 +21,7 @@ final class ZulipTransportFactoryTest extends TransportFactoryTestCase
         return new ZulipTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'zulip://host.test?channel=testChannel',
@@ -29,23 +29,23 @@ final class ZulipTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'zulip://host?channel=testChannel'];
         yield [false, 'somethingElse://host?channel=testChannel'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield 'missing email or token' => ['zulip://testOneOfEmailOrToken@host.test?channel=testChannel'];
     }
 
-    public function missingRequiredOptionProvider(): iterable
+    public static function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: channel' => ['zulip://email:token@host'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://email:token@host?channel=testChannel'];
         yield ['somethingElse://email:token@host']; // missing "channel" option

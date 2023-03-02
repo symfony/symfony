@@ -33,7 +33,7 @@ class AnsiColorModeTest extends TestCase
         $this->assertSame('8;5;'.$expected[AnsiColorMode::Ansi8->name], AnsiColorMode::Ansi8->convertFromHexToAnsiColorCode($corlorHex));
     }
 
-    public function provideColorsConversion(): \Generator
+    public static function provideColorsConversion(): \Generator
     {
         yield ['#606702', [
             AnsiColorMode::Ansi8->name => 100,

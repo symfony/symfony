@@ -27,7 +27,7 @@ class RoleHierarchyVoterTest extends RoleVoterTest
         $this->assertSame($expected, $voter->vote($this->getTokenWithRoleNames($roles), null, $attributes));
     }
 
-    public function getVoteTests()
+    public static function getVoteTests()
     {
         return array_merge(parent::getVoteTests(), [
             [['ROLE_FOO'], ['ROLE_FOOBAR'], VoterInterface::ACCESS_GRANTED],
@@ -44,7 +44,7 @@ class RoleHierarchyVoterTest extends RoleVoterTest
         $this->assertSame($expected, $voter->vote($this->getTokenWithRoleNames($roles), null, $attributes));
     }
 
-    public function getVoteWithEmptyHierarchyTests()
+    public static function getVoteWithEmptyHierarchyTests()
     {
         return parent::getVoteTests();
     }

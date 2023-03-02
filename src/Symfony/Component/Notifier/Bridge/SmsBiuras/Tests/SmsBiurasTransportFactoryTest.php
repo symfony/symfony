@@ -21,7 +21,7 @@ final class SmsBiurasTransportFactoryTest extends TransportFactoryTestCase
         return new SmsBiurasTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'smsbiuras://host.test?from=0611223344',
@@ -34,18 +34,18 @@ final class SmsBiurasTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'smsbiuras://uid:api_key@default?from=0611223344'];
         yield [false, 'somethingElse://uid:api_key@default?from=0611223344'];
     }
 
-    public function missingRequiredOptionProvider(): iterable
+    public static function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: from' => ['smsbiuras://uid:api_key@default'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://uid:api_key@default?from=0611223344'];
         yield ['somethingElse://uid:api_key@default']; // missing "from" option

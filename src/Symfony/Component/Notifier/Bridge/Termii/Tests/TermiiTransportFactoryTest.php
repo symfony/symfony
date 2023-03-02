@@ -21,29 +21,29 @@ final class TermiiTransportFactoryTest extends TransportFactoryTestCase
         return new TermiiTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield ['termii://host.test?from=0611223344&channel=generic', 'termii://apiKey@host.test?from=0611223344&channel=generic'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield 'missing auth ID' => ['termii://@default?from=FROM'];
     }
 
-    public function missingRequiredOptionProvider(): iterable
+    public static function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: from' => ['termii://apiKey@default?channel=generic'];
         yield 'missing option: channel' => ['termii://apiKey@default?from=0611223344'];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'termii://apiKey@default?from=0611223344&channel=generic'];
         yield [false, 'somethingElse://apiKey@default?from=0611223344&channel=generic'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://apiKey@default?from=0611223344&channel=generic'];
         yield ['somethingElse://apiKey@default']; // missing "from" option

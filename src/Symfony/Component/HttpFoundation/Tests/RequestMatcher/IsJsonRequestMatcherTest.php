@@ -27,7 +27,7 @@ class IsJsonRequestMatcherTest extends TestCase
         $this->assertSame($isValid, $matcher->matches($request));
     }
 
-    public function getData()
+    public static function getData()
     {
         return [
             ['not json', false],

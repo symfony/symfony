@@ -21,7 +21,7 @@ final class OctopushTransportFactoryTest extends TransportFactoryTestCase
         return new OctopushTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'octopush://host.test?from=Heyliot&type=FR',
@@ -29,19 +29,19 @@ final class OctopushTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'octopush://userLogin:apiKey@default?from=Heyliot&type=FR'];
         yield [false, 'somethingElse://userLogin:apiKet@default?from=Heyliot&type=FR'];
     }
 
-    public function missingRequiredOptionProvider(): iterable
+    public static function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: from' => ['octopush://userLogin:apiKey@default?type=FR'];
         yield 'missing option: type' => ['octopush://userLogin:apiKey@default?from=Heyliot'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://userLogin:apiKey@default?from=0611223344'];
         yield ['somethingElse://userLogin:apiKey@default']; // missing "from" option

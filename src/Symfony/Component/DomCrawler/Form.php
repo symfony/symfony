@@ -353,9 +353,9 @@ class Form extends Link implements \ArrayAccess
      *
      * Expects a 'submit' button \DOMElement and finds the corresponding form element, or the form element itself.
      *
-     * @throws \LogicException If given node is not a button or input or does not have a form ancestor
-     *
      * @return void
+     *
+     * @throws \LogicException If given node is not a button or input or does not have a form ancestor
      */
     protected function setNode(\DOMElement $node)
     {

@@ -26,6 +26,8 @@ interface FormTypeExtensionInterface
      *
      * @param array<string, mixed> $options
      *
+     * @return void
+     *
      * @see FormTypeInterface::buildForm()
      */
     public function buildForm(FormBuilderInterface $builder, array $options);
@@ -37,6 +39,8 @@ interface FormTypeExtensionInterface
      * further modify it.
      *
      * @param array<string, mixed> $options
+     *
+     * @return void
      *
      * @see FormTypeInterface::buildView()
      */
@@ -50,10 +54,15 @@ interface FormTypeExtensionInterface
      *
      * @param array<string, mixed> $options
      *
+     * @return void
+     *
      * @see FormTypeInterface::finishView()
      */
     public function finishView(FormView $view, FormInterface $form, array $options);
 
+    /**
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver);
 
     /**

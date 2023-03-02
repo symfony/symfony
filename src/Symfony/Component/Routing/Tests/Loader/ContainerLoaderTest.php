@@ -25,7 +25,7 @@ class ContainerLoaderTest extends TestCase
         $this->assertSame($expected, (new ContainerLoader(new Container()))->supports('foo', $type));
     }
 
-    public function supportsProvider()
+    public static function supportsProvider()
     {
         return [
             [true, 'service'],

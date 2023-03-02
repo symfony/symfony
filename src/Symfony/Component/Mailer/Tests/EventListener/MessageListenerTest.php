@@ -36,7 +36,7 @@ class MessageListenerTest extends TestCase
         $this->assertEquals($expectedHeaders, $event->getMessage()->getHeaders());
     }
 
-    public function provideHeaders(): iterable
+    public static function provideHeaders(): iterable
     {
         $initialHeaders = new Headers();
         $defaultHeaders = (new Headers())

@@ -39,7 +39,7 @@ trait BuildDebugContainerTrait
             return $this->containerBuilder;
         }
 
-        if (!$kernel->isDebug() || !(new ConfigCache($kernel->getContainer()->getParameter('debug.container.dump'), true))->isFresh()) {
+        if (!$kernel->isDebug() || !$kernel->getContainer()->getParameter('debug.container.dump') || !(new ConfigCache($kernel->getContainer()->getParameter('debug.container.dump'), true))->isFresh()) {
             $buildContainer = \Closure::bind(function () {
                 $this->initializeBundles();
 

@@ -159,7 +159,7 @@ class QuestionHelper extends Helper
         }
 
         if ($validator = $question->getValidator()) {
-            return \call_user_func($question->getValidator(), $default);
+            return \call_user_func($validator, $default);
         } elseif ($question instanceof ChoiceQuestion) {
             $choices = $question->getChoices();
 

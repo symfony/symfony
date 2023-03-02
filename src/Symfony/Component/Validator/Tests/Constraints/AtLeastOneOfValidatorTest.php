@@ -22,6 +22,7 @@ use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\IdenticalTo;
+use Symfony\Component\Validator\Constraints\IsNull;
 use Symfony\Component\Validator\Constraints\Language;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\LessThan;
@@ -37,6 +38,9 @@ use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\Mapping\MetadataInterface;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 use Symfony\Component\Validator\Validation;
+use Symfony\Contracts\Translation\LocaleAwareInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorTrait;
 
 /**
  * @author Przemysław Bogusz <przemyslaw.bogusz@tubotax.pl>
@@ -56,7 +60,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
         $this->assertCount(0, Validation::createValidator()->validate($value, new AtLeastOneOf($constraints)));
     }
 
-    public function getValidCombinations()
+    public static function getValidCombinations()
     {
         return [
             ['symfony', [
@@ -125,7 +129,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
         $this->assertEquals(new ConstraintViolation('foo', 'foo', [], $value, '', $value, null, AtLeastOneOf::AT_LEAST_ONE_OF_ERROR, $atLeastOneOf), $violations->get(0));
     }
 
-    public function getInvalidCombinations()
+    public static function getInvalidCombinations()
     {
         return [
             ['symphony', [
@@ -257,6 +261,40 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
         ]), 'senior');
 
         $this->assertCount(1, $violations);
+    }
+
+    public function testTranslatorIsCalledOnConstraintBaseMessageAndViolations()
+    {
+        $translator = new class() implements TranslatorInterface, LocaleAwareInterface {
+            use TranslatorTrait;
+
+            public function trans(?string $id, array $parameters = [], string $domain = null, string $locale = null): string
+            {
+                if ('This value should satisfy at least one of the following constraints:' === $id) {
+                    return 'Dummy translation:';
+                }
+
+                if ('This value should be null.' === $id) {
+                    return 'Dummy violation.';
+                }
+
+                return $id;
+            }
+        };
+
+        $validator = Validation::createValidatorBuilder()
+            ->setTranslator($translator)
+            ->getValidator()
+        ;
+
+        $violations = $validator->validate('Test', [
+            new AtLeastOneOf([
+                new IsNull(),
+            ]),
+        ]);
+
+        $this->assertCount(1, $violations);
+        $this->assertSame('Dummy translation: [1] Dummy violation.', $violations->get(0)->getMessage());
     }
 }
 

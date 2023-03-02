@@ -32,7 +32,7 @@ final class SlackOptionsTest extends TestCase
         $this->assertSame($expected ?? $options, (new SlackOptions($options))->toArray());
     }
 
-    public function toArrayProvider(): iterable
+    public static function toArrayProvider(): iterable
     {
         yield 'empty is allowed' => [
             [],
@@ -58,7 +58,7 @@ final class SlackOptionsTest extends TestCase
         ];
     }
 
-    public function toArraySimpleOptionsProvider(): iterable
+    public static function toArraySimpleOptionsProvider(): iterable
     {
         yield [['as_user' => true]];
         yield [['icon_emoji' => 'foo']];
@@ -80,7 +80,7 @@ final class SlackOptionsTest extends TestCase
         $this->assertSame($expected, $options->getRecipientId());
     }
 
-    public function getRecipientIdProvider(): iterable
+    public static function getRecipientIdProvider(): iterable
     {
         yield [null, new SlackOptions()];
         yield [null, new SlackOptions(['recipient_id' => null])];
@@ -100,7 +100,7 @@ final class SlackOptionsTest extends TestCase
         $this->assertSame($value, $options->toArray()[$optionsKey]);
     }
 
-    public function setProvider(): iterable
+    public static function setProvider(): iterable
     {
         yield ['asUser', 'as_user', true];
         yield ['iconEmoji', 'icon_emoji', 'foo'];
@@ -131,7 +131,7 @@ final class SlackOptionsTest extends TestCase
         $this->assertSame($expected, $options->toArray());
     }
 
-    public function fromNotificationProvider(): iterable
+    public static function fromNotificationProvider(): iterable
     {
         $subject = 'Hi!';
         $emoji = '🌧️';

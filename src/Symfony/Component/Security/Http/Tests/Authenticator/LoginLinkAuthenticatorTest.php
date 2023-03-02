@@ -50,7 +50,7 @@ class LoginLinkAuthenticatorTest extends TestCase
         $this->assertEquals($supported, $this->authenticator->supports($request));
     }
 
-    public function provideSupportData()
+    public static function provideSupportData()
     {
         yield [['check_route' => '/validate_link'], Request::create('/validate_link?hash=abc123'), true];
         yield [['check_route' => '/validate_link'], Request::create('/login?hash=abc123'), false];

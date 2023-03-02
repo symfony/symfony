@@ -35,7 +35,7 @@ final class SentMessageEventTest extends TestCase
         $this->assertSame($message, $event->getMessage());
     }
 
-    public function messagesProvider(): iterable
+    public static function messagesProvider(): iterable
     {
         yield [$message = new SentMessage(new ChatMessage('subject'), 'null_transport'), new SentMessageEvent($message)];
         yield [$message = new SentMessage(new SmsMessage('+3312345678', 'subject'), 'null_transport'), new SentMessageEvent($message)];

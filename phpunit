@@ -10,15 +10,9 @@ if (!file_exists(__DIR__.'/vendor/symfony/phpunit-bridge/bin/simple-phpunit')) {
     exit(1);
 }
 if (!getenv('SYMFONY_PHPUNIT_VERSION')) {
-    if (\PHP_VERSION_ID < 70200) {
-        putenv('SYMFONY_PHPUNIT_VERSION=7.5');
-    } elseif (\PHP_VERSION_ID < 70300) {
-        putenv('SYMFONY_PHPUNIT_VERSION=8.5.26');
-    } else {
-        putenv('SYMFONY_PHPUNIT_VERSION=9.5');
-    }
+    putenv('SYMFONY_PHPUNIT_VERSION=9.6');
 }
-if (!getenv('SYMFONY_PATCH_TYPE_DECLARATIONS') && \PHP_VERSION_ID >= 70300) {
+if (!getenv('SYMFONY_PATCH_TYPE_DECLARATIONS')) {
     putenv('SYMFONY_PATCH_TYPE_DECLARATIONS=deprecations=1');
 }
 if (getcwd() === realpath(__DIR__.'/src/Symfony/Bridge/PhpUnit')) {

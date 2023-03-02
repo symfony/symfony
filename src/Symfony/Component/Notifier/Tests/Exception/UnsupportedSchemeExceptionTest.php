@@ -153,7 +153,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         );
     }
 
-    public function messageWhereSchemeIsPartOfSchemeToPackageMapProvider(): \Generator
+    public static function messageWhereSchemeIsPartOfSchemeToPackageMapProvider(): \Generator
     {
         yield ['allmysms', 'symfony/all-my-sms-notifier'];
         yield ['sns', 'symfony/amazon-sns-notifier'];
@@ -220,7 +220,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         );
     }
 
-    public function messageWhereSchemeIsNotPartOfSchemeToPackageMapProvider(): \Generator
+    public static function messageWhereSchemeIsNotPartOfSchemeToPackageMapProvider(): \Generator
     {
         yield [
             'The "somethingElse" scheme is not supported.',

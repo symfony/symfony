@@ -21,7 +21,7 @@ final class SendinblueTransportFactoryTest extends TransportFactoryTestCase
         return new SendinblueTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'sendinblue://host.test?sender=0611223344',
@@ -29,23 +29,23 @@ final class SendinblueTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'sendinblue://apiKey@default?sender=0611223344'];
         yield [false, 'somethingElse://apiKey@default?sender=0611223344'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield 'missing api_key' => ['sendinblue://default?sender=0611223344'];
     }
 
-    public function missingRequiredOptionProvider(): iterable
+    public static function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: sender' => ['sendinblue://apiKey@host.test'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://apiKey@default?sender=0611223344'];
         yield ['somethingElse://apiKey@host']; // missing "sender" option

@@ -24,6 +24,8 @@ interface FormRendererEngineInterface
      * @param FormView $view   The view to assign the theme(s) to
      * @param mixed    $themes The theme(s). The type of these themes
      *                         is open to the implementation.
+     *
+     * @return void
      */
     public function setTheme(FormView $view, mixed $themes, bool $useDefaultThemes = true);
 

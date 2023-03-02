@@ -33,6 +33,7 @@ final class ExpectDeprecationTraitTest extends TestCase
      * Do not remove this test in the next major version.
      *
      * @group legacy
+     *
      * @runInSeparateProcess
      */
     public function testOneInIsolation()

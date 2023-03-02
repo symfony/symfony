@@ -37,7 +37,7 @@ class ComparatorTest extends TestCase
         $this->assertTrue($c->test($testedValue));
     }
 
-    public function provideMatches(): array
+    public static function provideMatches(): array
     {
         return [
             ['<', '1000', '500'],
@@ -63,7 +63,7 @@ class ComparatorTest extends TestCase
         $this->assertFalse($c->test($testedValue));
     }
 
-    public function provideNonMatches(): array
+    public static function provideNonMatches(): array
     {
         return [
             ['>', '1000', '500'],

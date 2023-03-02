@@ -26,9 +26,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 class MockResponse implements ResponseInterface, StreamableInterface
 {
     use CommonResponseTrait;
-    use TransportResponseTrait {
-        doDestruct as public __destruct;
-    }
+    use TransportResponseTrait;
 
     private string|iterable $body;
     private array $requestOptions = [];
@@ -104,6 +102,11 @@ class MockResponse implements ResponseInterface, StreamableInterface
         } catch (TransportException $e) {
             // ignore errors when canceling
         }
+    }
+
+    public function __destruct()
+    {
+        $this->doDestruct();
     }
 
     protected function close(): void

@@ -52,7 +52,7 @@ final class SectionTest extends TestCase
         $this->assertSame($expected, $section->toArray()['potentialAction']);
     }
 
-    public function allowedActions(): \Generator
+    public static function allowedActions(): \Generator
     {
         yield [[['@type' => 'ActionCard']], new ActionCard()];
         yield [[['@type' => 'HttpPOST']], new HttpPostAction()];

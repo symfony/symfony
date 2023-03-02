@@ -78,7 +78,7 @@ class FileFormFieldTest extends FormFieldTestCase
         );
     }
 
-    public function getSetValueMethods()
+    public static function getSetValueMethods()
     {
         return [
             ['setValue'],

@@ -79,9 +79,9 @@ class PropertyPathBuilder
     /**
      * Removes elements from the current path.
      *
-     * @throws OutOfBoundsException if offset is invalid
-     *
      * @return void
+     *
+     * @throws OutOfBoundsException if offset is invalid
      */
     public function remove(int $offset, int $length = 1)
     {
@@ -98,9 +98,9 @@ class PropertyPathBuilder
      * @param int $pathOffset The offset where the inserted piece starts in $path
      * @param int $pathLength The length of the inserted piece; if 0, the full path is inserted
      *
-     * @throws OutOfBoundsException If the offset is invalid
-     *
      * @return void
+     *
+     * @throws OutOfBoundsException If the offset is invalid
      */
     public function replace(int $offset, int $length, PropertyPathInterface|string $path, int $pathOffset = 0, int $pathLength = 0)
     {
@@ -130,9 +130,9 @@ class PropertyPathBuilder
     /**
      * Replaces a property element by an index element.
      *
-     * @throws OutOfBoundsException If the offset is invalid
-     *
      * @return void
+     *
+     * @throws OutOfBoundsException If the offset is invalid
      */
     public function replaceByIndex(int $offset, string $name = null)
     {
@@ -150,9 +150,9 @@ class PropertyPathBuilder
     /**
      * Replaces an index element by a property element.
      *
-     * @throws OutOfBoundsException If the offset is invalid
-     *
      * @return void
+     *
+     * @throws OutOfBoundsException If the offset is invalid
      */
     public function replaceByProperty(int $offset, string $name = null)
     {

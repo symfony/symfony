@@ -19,7 +19,7 @@ class LazyChoiceTypeExtension extends AbstractTypeExtension
 {
     public static $extendedType;
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefault('choice_loader', ChoiceList::lazy($this, fn () => [
             'Lazy A' => 'lazy_a',

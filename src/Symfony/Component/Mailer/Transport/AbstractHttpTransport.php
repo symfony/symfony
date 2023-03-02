@@ -66,7 +66,6 @@ abstract class AbstractHttpTransport extends AbstractTransport
 
     protected function doSend(SentMessage $message): void
     {
-        $response = null;
         try {
             $response = $this->doSendHttp($message);
             $message->appendDebug($response->getInfo('debug') ?? '');

@@ -52,7 +52,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidAnyColor(): array
+    public static function getValidAnyColor(): array
     {
         return [
             ['#ABCDEF'],
@@ -79,7 +79,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidHexLongColors(): array
+    public static function getValidHexLongColors(): array
     {
         return [['#ABCDEF'], ['#abcdef'], ['#C0FFEE'], ['#c0ffee'], ['#501311']];
     }
@@ -93,7 +93,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidHexLongColorsWithAlpha(): array
+    public static function getValidHexLongColorsWithAlpha(): array
     {
         return [['#ABCDEF00'], ['#abcdef01'], ['#C0FFEE02'], ['#c0ffee03'], ['#501311FF']];
     }
@@ -107,7 +107,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidHexShortColors(): array
+    public static function getValidHexShortColors(): array
     {
         return [['#F4B'], ['#FAB'], ['#f4b'], ['#fab']];
     }
@@ -121,7 +121,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidHexShortColorsWithAlpha(): array
+    public static function getValidHexShortColorsWithAlpha(): array
     {
         return [['#F4B1'], ['#FAB1'], ['#f4b1'], ['#fab1']];
     }
@@ -135,7 +135,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidBasicNamedColors(): array
+    public static function getValidBasicNamedColors(): array
     {
         return [
             ['black'], ['silver'], ['gray'], ['white'], ['maroon'], ['red'], ['purple'], ['fuchsia'], ['green'], ['lime'], ['olive'], ['yellow'], ['navy'], ['blue'], ['teal'], ['aqua'],
@@ -152,7 +152,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidExtendedNamedColors(): array
+    public static function getValidExtendedNamedColors(): array
     {
         return [
             ['aliceblue'], ['antiquewhite'], ['aqua'], ['aquamarine'], ['azure'], ['beige'], ['bisque'], ['black'], ['blanchedalmond'], ['blue'], ['blueviolet'], ['brown'], ['burlywood'], ['cadetblue'], ['chartreuse'], ['chocolate'], ['coral'], ['cornflowerblue'], ['cornsilk'], ['crimson'], ['cyan'], ['darkblue'], ['darkcyan'], ['darkgoldenrod'], ['darkgray'], ['darkgreen'], ['darkgrey'], ['darkkhaki'], ['darkmagenta'], ['darkolivegreen'], ['darkorange'], ['darkorchid'], ['darkred'], ['darksalmon'], ['darkseagreen'], ['darkslateblue'], ['darkslategray'], ['darkslategrey'], ['darkturquoise'], ['darkviolet'], ['deeppink'], ['deepskyblue'], ['dimgray'], ['dimgrey'], ['dodgerblue'], ['firebrick'], ['floralwhite'], ['forestgreen'], ['fuchsia'], ['gainsboro'], ['ghostwhite'], ['gold'], ['goldenrod'], ['gray'], ['green'], ['greenyellow'], ['grey'], ['honeydew'], ['hotpink'], ['indianred'], ['indigo'], ['ivory'], ['khaki'], ['lavender'], ['lavenderblush'], ['lawngreen'], ['lemonchiffon'], ['lightblue'], ['lightcoral'], ['lightcyan'], ['lightgoldenrodyellow'], ['lightgray'], ['lightgreen'], ['lightgrey'], ['lightpink'], ['lightsalmon'], ['lightseagreen'], ['lightskyblue'], ['lightslategray'], ['lightslategrey'], ['lightsteelblue'], ['lightyellow'], ['lime'], ['limegreen'], ['linen'], ['magenta'], ['maroon'], ['mediumaquamarine'], ['mediumblue'], ['mediumorchid'], ['mediumpurple'], ['mediumseagreen'], ['mediumslateblue'], ['mediumspringgreen'], ['mediumturquoise'], ['mediumvioletred'], ['midnightblue'], ['mintcream'], ['mistyrose'], ['moccasin'], ['navajowhite'], ['navy'], ['oldlace'], ['olive'], ['olivedrab'], ['orange'], ['orangered'], ['orchid'], ['palegoldenrod'], ['palegreen'], ['paleturquoise'], ['palevioletred'], ['papayawhip'], ['peachpuff'], ['peru'], ['pink'], ['plum'], ['powderblue'], ['purple'], ['red'], ['rosybrown'], ['royalblue'], ['saddlebrown'], ['salmon'], ['sandybrown'], ['seagreen'], ['seashell'], ['sienna'], ['silver'], ['skyblue'], ['slateblue'], ['slategray'], ['slategrey'], ['snow'], ['springgreen'], ['steelblue'], ['tan'], ['teal'], ['thistle'], ['tomato'], ['turquoise'], ['violet'], ['wheat'], ['white'], ['whitesmoke'], ['yellow'], ['yellowgreen'],
@@ -169,7 +169,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidSystemColors(): array
+    public static function getValidSystemColors(): array
     {
         return [
             ['Canvas'], ['CanvasText'], ['LinkText'], ['VisitedText'], ['ActiveText'], ['ButtonFace'], ['ButtonText'], ['ButtonBorder'], ['Field'], ['FieldText'], ['Highlight'], ['HighlightText'], ['SelectedItem'], ['SelectedItemText'], ['Mark'], ['MarkText'], ['GrayText'],
@@ -187,7 +187,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidKeywords(): array
+    public static function getValidKeywords(): array
     {
         return [['transparent'], ['currentColor']];
     }
@@ -201,7 +201,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidRGB(): array
+    public static function getValidRGB(): array
     {
         return [
             ['rgb(0,      255,     243)'],
@@ -219,7 +219,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidRGBA(): array
+    public static function getValidRGBA(): array
     {
         return [
             ['rgba(   255,      255,     255,    0.3         )'], ['rgba(255,      255,     255,    0.3)'], ['rgba(255,      255,     255,    .3)'],
@@ -238,7 +238,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidHSL(): array
+    public static function getValidHSL(): array
     {
         return [
             ['hsl(0,    0%,   20%)'], ['hsl(     0,    0%,   20%     )'],
@@ -256,7 +256,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidHSLA(): array
+    public static function getValidHSLA(): array
     {
         return [
             ['hsla(   0,    0%,     20%,   0.4     )'], ['hsla(0,    0%,     20%,   0.4)'], ['hsla(0,    0%,     20%,   .4)'],
@@ -280,7 +280,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidHexColors(): array
+    public static function getInvalidHexColors(): array
     {
         return [['ABCDEF'], ['abcdef'], ['#K0FFEE'], ['#k0ffee'], ['#_501311'], ['ABCDEF00'], ['abcdefcc'], ['#K0FFEE33'], ['#k0ffeecc'], ['#_50131100'], ['#FAℬ'], ['#Ⅎab'], ['#F4️⃣B'], ['#f(4)b'], ['#907;']];
     }
@@ -298,7 +298,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidShortHexColors(): array
+    public static function getInvalidShortHexColors(): array
     {
         return [['ABC'], ['ABCD'], ['abc'], ['abcd'], ['#K0F'], ['#K0FF'], ['#k0f'], ['#k0ff'], ['#_50'], ['#_501']];
     }
@@ -321,7 +321,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidNamedColors(): array
+    public static function getInvalidNamedColors(): array
     {
         return [['fabpot'], ['ngrekas'], ['symfony'], ['FABPOT'], ['NGREKAS'], ['SYMFONY']];
     }
@@ -344,7 +344,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidRGB(): array
+    public static function getInvalidRGB(): array
     {
         return [['rgb(999,999,999)'], ['rgb(-99,-99,-99)'], ['rgb(a,b,c)'], ['rgb(99 99, 9 99, 99 9)']];
     }
@@ -367,7 +367,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidRGBA(): array
+    public static function getInvalidRGBA(): array
     {
         return [['rgba(999,999,999,999)'], ['rgba(-99,-99,-99,-99)'], ['rgba(a,b,c,d)'], ['rgba(99 99, 9 99, 99 9, . 9)']];
     }
@@ -390,7 +390,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidHSL(): array
+    public static function getInvalidHSL(): array
     {
         return [['hsl(1000, 1000%, 20000%)'], ['hsl(-100, -10%, -2%)'], ['hsl(a, b, c)'], ['hsl(a, b%, c%)'], ['hsl( 99 99% , 9 99% , 99 9%)']];
     }

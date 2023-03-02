@@ -18,6 +18,11 @@ CHANGELOG
    or `LegacyPasswordAuthenticatedUserInterface` instead
 * `AccessDecisionManager` requires the strategy to be passed as in instance of `AccessDecisionStrategyInterface`
 
+5.4.21
+------
+
+ * [BC BREAK] `AccessDecisionStrategyTestCase::provideStrategyTests()` is now static
+
 5.4
 ---
 

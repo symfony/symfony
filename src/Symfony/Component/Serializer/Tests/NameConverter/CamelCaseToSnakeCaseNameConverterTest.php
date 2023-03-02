@@ -44,7 +44,7 @@ class CamelCaseToSnakeCaseNameConverterTest extends TestCase
         $this->assertEquals($nameConverter->denormalize($underscored), $camelCased);
     }
 
-    public function attributeProvider()
+    public static function attributeProvider()
     {
         return [
             ['coop_tilleuls', 'coopTilleuls', true],

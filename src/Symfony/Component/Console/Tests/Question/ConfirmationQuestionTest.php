@@ -30,7 +30,7 @@ class ConfirmationQuestionTest extends TestCase
         }
     }
 
-    public function normalizerUsecases()
+    public static function normalizerUsecases()
     {
         return [
             [

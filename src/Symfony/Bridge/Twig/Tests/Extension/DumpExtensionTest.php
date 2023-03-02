@@ -53,7 +53,7 @@ class DumpExtensionTest extends TestCase
         $this->assertSame($expectedDumped, $dumped);
     }
 
-    public function getDumpTags()
+    public static function getDumpTags()
     {
         return [
             ['A{% dump %}B', true, 'AB', []],
@@ -88,7 +88,7 @@ class DumpExtensionTest extends TestCase
         $this->assertEquals($expectedOutput, $dump);
     }
 
-    public function getDumpArgs()
+    public static function getDumpArgs()
     {
         return [
             [[], [], '', false],

@@ -21,28 +21,28 @@ final class PlivoTransportFactoryTest extends TransportFactoryTestCase
         return new PlivoTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield ['plivo://host.test?from=0611223344', 'plivo://authId:authToken@host.test?from=0611223344'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield 'missing auth token' => ['plivo://authId@default?from=FROM'];
     }
 
-    public function missingRequiredOptionProvider(): iterable
+    public static function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: from' => ['plivo://authId:authToken@default'];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'plivo://authId:authToken@default?from=0611223344'];
         yield [false, 'somethingElse://authId:authToken@default?from=0611223344'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://authId:authToken@default?from=0611223344'];
         yield ['somethingElse://authId:authToken@default']; // missing "from" option

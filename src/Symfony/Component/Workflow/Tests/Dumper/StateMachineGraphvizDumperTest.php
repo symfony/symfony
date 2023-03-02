@@ -44,7 +44,8 @@ digraph workflow {
   place_84a516841ba77a5b4648de2cd0dfcb30ea46dbb4 [label="c", shape=circle];
   place_3c363836cf4e16666669a25da280a1865c2d2874 [label="d", shape=circle];
   place_86f7e437faa5a7fce15d1ddcb9eaeaea377667b8 -> place_e9d71f5ee7c92d6dc9e92ffdad17b8bd49418f98 [label="t1" style="solid"];
-  place_3c363836cf4e16666669a25da280a1865c2d2874 -> place_e9d71f5ee7c92d6dc9e92ffdad17b8bd49418f98 [label="My custom transition label 3" style="solid" fontcolor="Grey" color="Red"];
+  place_3c363836cf4e16666669a25da280a1865c2d2874 -> place_e9d71f5ee7c92d6dc9e92ffdad17b8bd49418f98 [label="My custom transition
+label 3" style="solid" fontcolor="Grey" color="Red"];
   place_e9d71f5ee7c92d6dc9e92ffdad17b8bd49418f98 -> place_84a516841ba77a5b4648de2cd0dfcb30ea46dbb4 [label="t2" style="solid" color="Blue"];
   place_e9d71f5ee7c92d6dc9e92ffdad17b8bd49418f98 -> place_3c363836cf4e16666669a25da280a1865c2d2874 [label="t3" style="solid"];
 }
@@ -70,7 +71,8 @@ digraph workflow {
   place_84a516841ba77a5b4648de2cd0dfcb30ea46dbb4 [label="c", shape=circle];
   place_3c363836cf4e16666669a25da280a1865c2d2874 [label="d", shape=circle];
   place_86f7e437faa5a7fce15d1ddcb9eaeaea377667b8 -> place_e9d71f5ee7c92d6dc9e92ffdad17b8bd49418f98 [label="t1" style="solid"];
-  place_3c363836cf4e16666669a25da280a1865c2d2874 -> place_e9d71f5ee7c92d6dc9e92ffdad17b8bd49418f98 [label="My custom transition label 3" style="solid" fontcolor="Grey" color="Red"];
+  place_3c363836cf4e16666669a25da280a1865c2d2874 -> place_e9d71f5ee7c92d6dc9e92ffdad17b8bd49418f98 [label="My custom transition
+label 3" style="solid" fontcolor="Grey" color="Red"];
   place_e9d71f5ee7c92d6dc9e92ffdad17b8bd49418f98 -> place_84a516841ba77a5b4648de2cd0dfcb30ea46dbb4 [label="t2" style="solid" color="Blue"];
   place_e9d71f5ee7c92d6dc9e92ffdad17b8bd49418f98 -> place_3c363836cf4e16666669a25da280a1865c2d2874 [label="t3" style="solid"];
 }

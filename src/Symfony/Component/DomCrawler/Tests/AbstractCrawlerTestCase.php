@@ -344,7 +344,7 @@ abstract class AbstractCrawlerTestCase extends TestCase
         $this->assertSame('my value', $this->createTestCrawler(null)->filterXPath('//ol')->text('my value'));
     }
 
-    public function provideInnerTextExamples()
+    public static function provideInnerTextExamples()
     {
         return [
             [
@@ -942,7 +942,7 @@ HTML;
         }
     }
 
-    public function provideMatchTests()
+    public static function provideMatchTests()
     {
         yield ['#foo', true, '#foo'];
         yield ['#foo', true, '.foo'];
@@ -1165,7 +1165,7 @@ HTML;
         $this->assertEquals($expectedUri, $crawler->filterXPath('//a')->link()->getUri(), $description);
     }
 
-    public function getBaseTagData()
+    public static function getBaseTagData()
     {
         return [
             ['http://base.com', 'link', 'http://base.com/link'],
@@ -1185,7 +1185,7 @@ HTML;
         $this->assertEquals($expectedUri, $crawler->filterXPath('//button')->form()->getUri(), $description);
     }
 
-    public function getBaseTagWithFormData()
+    public static function getBaseTagWithFormData()
     {
         return [
             ['https://base.com/', 'link/', 'https://base.com/link/', 'https://base.com/link/', '<base> tag does work with a path and relative form action'],

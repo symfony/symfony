@@ -255,7 +255,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
         $loader->getEntitiesByIds('id.value', [1, '', 2, 3, 'foo']);
     }
 
-    public function provideGuidEntityClasses()
+    public static function provideGuidEntityClasses()
     {
         return [
             ['Symfony\Bridge\Doctrine\Tests\Fixtures\GuidIdEntity'],
@@ -263,7 +263,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
         ];
     }
 
-    public function provideUidEntityClasses()
+    public static function provideUidEntityClasses()
     {
         return [
             ['Symfony\Bridge\Doctrine\Tests\Fixtures\UuidIdEntity'],

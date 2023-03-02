@@ -118,7 +118,7 @@ class FormPassTest extends TestCase
         $this->assertEquals($expectedRegisteredExtensions, $extDefinition->getArgument(1));
     }
 
-    public function addTaggedTypeExtensionsDataProvider()
+    public static function addTaggedTypeExtensionsDataProvider()
     {
         return [
             [
@@ -275,7 +275,7 @@ class FormPassTest extends TestCase
         $assertion($container);
     }
 
-    public function privateTaggedServicesProvider()
+    public static function privateTaggedServicesProvider()
     {
         return [
             [

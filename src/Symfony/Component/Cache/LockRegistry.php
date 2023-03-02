@@ -101,7 +101,6 @@ final class LockRegistry
 
         while (true) {
             try {
-                $locked = false;
                 // race to get the lock in non-blocking mode
                 $locked = flock($lock, \LOCK_EX | \LOCK_NB, $wouldBlock);
 

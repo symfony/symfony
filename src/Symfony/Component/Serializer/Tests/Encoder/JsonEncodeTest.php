@@ -42,7 +42,7 @@ class JsonEncodeTest extends TestCase
         );
     }
 
-    public function encodeProvider()
+    public static function encodeProvider()
     {
         return [
             [[], '[]', []],

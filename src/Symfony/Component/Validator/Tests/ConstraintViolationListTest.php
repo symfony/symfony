@@ -146,7 +146,7 @@ EOF;
         $this->assertCount($violationsCount, $specificErrors);
     }
 
-    public function findByCodesProvider()
+    public static function findByCodesProvider()
     {
         return [
             ['code1', 2],

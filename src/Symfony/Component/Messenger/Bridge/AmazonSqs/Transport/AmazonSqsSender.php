@@ -42,7 +42,6 @@ class AmazonSqsSender implements SenderInterface
 
         $messageGroupId = null;
         $messageDeduplicationId = null;
-        $xrayTraceId = null;
 
         /** @var AmazonSqsFifoStamp|null $amazonSqsFifoStamp */
         $amazonSqsFifoStamp = $envelope->last(AmazonSqsFifoStamp::class);

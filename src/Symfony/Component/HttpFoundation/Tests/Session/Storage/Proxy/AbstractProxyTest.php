@@ -56,6 +56,7 @@ class AbstractProxyTest extends TestCase
 
     /**
      * @runInSeparateProcess
+     *
      * @preserveGlobalState disabled
      */
     public function testIsActive()
@@ -67,6 +68,7 @@ class AbstractProxyTest extends TestCase
 
     /**
      * @runInSeparateProcess
+     *
      * @preserveGlobalState disabled
      */
     public function testName()
@@ -79,6 +81,7 @@ class AbstractProxyTest extends TestCase
 
     /**
      * @runInSeparateProcess
+     *
      * @preserveGlobalState disabled
      */
     public function testNameException()
@@ -90,6 +93,7 @@ class AbstractProxyTest extends TestCase
 
     /**
      * @runInSeparateProcess
+     *
      * @preserveGlobalState disabled
      */
     public function testId()
@@ -102,6 +106,7 @@ class AbstractProxyTest extends TestCase
 
     /**
      * @runInSeparateProcess
+     *
      * @preserveGlobalState disabled
      */
     public function testIdException()

@@ -68,7 +68,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         $this->assertEquals($expectedStamps, $envelope->all(HandledStamp::class));
     }
 
-    public function itAddsHandledStampsProvider(): iterable
+    public static function itAddsHandledStampsProvider(): iterable
     {
         $first = new class() extends HandleMessageMiddlewareTestCallable {
             public function __invoke()
@@ -179,9 +179,9 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
                 return $this->handle($message, $ack);
             }
 
-            private function shouldFlush()
+            private function getBatchSize(): int
             {
-                return 2 <= \count($this->jobs);
+                return 2;
             }
 
             private function process(array $jobs): void

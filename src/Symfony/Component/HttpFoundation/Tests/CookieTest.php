@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Cookie;
  */
 class CookieTest extends TestCase
 {
-    public function namesWithSpecialCharacters()
+    public static function namesWithSpecialCharacters()
     {
         return [
             [',MyName'],

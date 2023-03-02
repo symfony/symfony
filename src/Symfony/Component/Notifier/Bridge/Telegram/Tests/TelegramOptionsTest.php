@@ -38,7 +38,7 @@ final class TelegramOptionsTest extends TestCase
         );
     }
 
-    public function validCacheTimeDataProvider(): iterable
+    public static function validCacheTimeDataProvider(): iterable
     {
         yield 'cache time equals 1' => [1];
         yield 'cache time equals 2' => [2];
@@ -64,7 +64,7 @@ final class TelegramOptionsTest extends TestCase
         );
     }
 
-    public function invalidCacheTimeDataProvider(): iterable
+    public static function invalidCacheTimeDataProvider(): iterable
     {
         yield 'cache time equals 0' => [0];
         yield 'cache time equals -1' => [-1];

@@ -37,7 +37,7 @@ TXT
             , $client->getResponse()->getContent());
     }
 
-    public function getConfigs()
+    public static function getConfigs()
     {
         return [
             [false],

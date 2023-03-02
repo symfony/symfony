@@ -67,7 +67,7 @@ class HttpBasicAuthenticatorTest extends TestCase
         $this->assertFalse($this->authenticator->supports($request));
     }
 
-    public function provideMissingHttpBasicServerParameters()
+    public static function provideMissingHttpBasicServerParameters()
     {
         return [
             [[]],

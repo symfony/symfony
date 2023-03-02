@@ -22,8 +22,10 @@ interface DataMapperInterface
      * The method is responsible for calling {@link FormInterface::setData()}
      * on the children of compound forms, defining their underlying model data.
      *
-     * @param mixed                        $viewData View data of the compound form being initialized
-     * @param FormInterface[]|\Traversable $forms    A list of {@link FormInterface} instances
+     * @param mixed                              $viewData View data of the compound form being initialized
+     * @param \Traversable<mixed, FormInterface> $forms    A list of {@link FormInterface} instances
+     *
+     * @return void
      *
      * @throws Exception\UnexpectedTypeException if the type of the data parameter is not supported
      */
@@ -52,9 +54,11 @@ interface DataMapperInterface
      * The model data can be an array or an object, so this second argument is always passed
      * by reference.
      *
-     * @param FormInterface[]|\Traversable $forms    A list of {@link FormInterface} instances
-     * @param mixed                        $viewData The compound form's view data that get mapped
-     *                                               its children model data
+     * @param \Traversable<mixed, FormInterface> $forms     A list of {@link FormInterface} instances
+     * @param mixed                              &$viewData The compound form's view data that get mapped
+     *                                                      its children model data
+     *
+     * @return void
      *
      * @throws Exception\UnexpectedTypeException if the type of the data parameter is not supported
      */

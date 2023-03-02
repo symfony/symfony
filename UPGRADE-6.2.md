@@ -63,22 +63,28 @@ Mailer
 
  * Deprecate the `OhMySMTP` transport, use `MailPace` instead
 
+Messenger
+--------
+
+ * Deprecate `MessageHandlerInterface` and `MessageSubscriberInterface`, use the `AsMessageHandler` attribute instead
+
 Mime
 ----
 
  * Deprecate `Email::attachPart()`, use `addPart()` instead
  * Deprecate calling `Message::setBody()` without arguments
 
+Notifier
+--------
+
+ * [BC BREAK] The following data providers for `TransportTestCase` are now static: `toStringProvider()`, `supportedMessagesProvider()` and `unsupportedMessagesProvider()`
+ * [BC BREAK] The `TransportTestCase::createTransport()` method is now static
+
 PropertyAccess
 --------------
 
  * Deprecate calling `PropertyAccessorBuilder::setCacheItemPool()` without arguments
  * Implementing the `PropertyPathInterface` without implementing the `isNullSafe()` method is deprecated
-
-Messenger
---------
-
-* Deprecate `MessageHandlerInterface` and `MessageSubscriberInterface`, use the `AsMessageHandler` attribute instead
 
 Security
 --------

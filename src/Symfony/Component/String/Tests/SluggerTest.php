@@ -18,6 +18,7 @@ class SluggerTest extends TestCase
 {
     /**
      * @requires extension intl
+     *
      * @dataProvider provideSlug
      */
     public function testSlug(string $string, string $locale, string $expectedSlug)

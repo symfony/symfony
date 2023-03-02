@@ -58,7 +58,7 @@ class TagAwareAndProxyAdapterIntegrationTest extends TestCase
         $this->assertFalse($cache->getItem('foo')->isHit());
     }
 
-    public function dataProvider(): array
+    public static function dataProvider(): array
     {
         return [
             [new ArrayAdapter()],

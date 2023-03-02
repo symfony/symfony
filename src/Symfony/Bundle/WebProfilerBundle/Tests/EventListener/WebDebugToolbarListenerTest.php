@@ -39,7 +39,7 @@ class WebDebugToolbarListenerTest extends TestCase
         $this->assertEquals($expected, $response->getContent());
     }
 
-    public function getInjectToolbarTests()
+    public static function getInjectToolbarTests()
     {
         return [
             ['<html><head></head><body></body></html>', "<html><head></head><body>\nWDT\n</body></html>"],
@@ -133,6 +133,7 @@ class WebDebugToolbarListenerTest extends TestCase
 
     /**
      * @depends testToolbarIsInjected
+     *
      * @dataProvider provideRedirects
      */
     public function testToolbarIsNotInjectedOnRedirection($statusCode)
@@ -147,7 +148,7 @@ class WebDebugToolbarListenerTest extends TestCase
         $this->assertEquals('<html><head></head><body></body></html>', $response->getContent());
     }
 
-    public function provideRedirects()
+    public static function provideRedirects()
     {
         return [
             [301],

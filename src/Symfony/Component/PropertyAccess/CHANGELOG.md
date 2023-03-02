@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Allow escaping `.` and `[` with `\` in `PropertyPath`
+
 6.2
 ---
 

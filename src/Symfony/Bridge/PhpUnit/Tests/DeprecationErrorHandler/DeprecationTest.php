@@ -97,7 +97,7 @@ class DeprecationTest extends TestCase
         $this->assertSame($muted, $deprecation->isMuted());
     }
 
-    public function mutedProvider()
+    public static function mutedProvider()
     {
         yield 'not from phpunit, and not a whitelisted message' => [
             false,
@@ -147,7 +147,7 @@ class DeprecationTest extends TestCase
         $this->assertTrue($deprecation->isMuted());
     }
 
-    public function providerGetTypeDetectsSelf()
+    public static function providerGetTypeDetectsSelf()
     {
         return [
             'not_from_vendors_file' => [Deprecation::TYPE_SELF, '', 'MyClass1', __FILE__],
@@ -182,7 +182,7 @@ class DeprecationTest extends TestCase
         $this->assertSame($expectedType, $deprecation->getType());
     }
 
-    public function providerGetTypeUsesRightTrace()
+    public static function providerGetTypeUsesRightTrace()
     {
         $vendorDir = self::getVendorDir();
         $fakeTrace = [

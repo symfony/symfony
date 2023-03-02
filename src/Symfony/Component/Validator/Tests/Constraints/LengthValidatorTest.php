@@ -52,7 +52,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate(new \stdClass(), new Length(['value' => 5]));
     }
 
-    public function getThreeOrLessCharacters()
+    public static function getThreeOrLessCharacters()
     {
         return [
             [12],
@@ -66,7 +66,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function getFourCharacters()
+    public static function getFourCharacters()
     {
         return [
             [1234],
@@ -76,7 +76,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function getFiveOrMoreCharacters()
+    public static function getFiveOrMoreCharacters()
     {
         return [
             [12345],
@@ -90,7 +90,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function getOneCharset()
+    public static function getOneCharset()
     {
         return [
             ['é', 'utf8', true],
@@ -100,7 +100,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function getThreeCharactersWithWhitespaces()
+    public static function getThreeCharactersWithWhitespaces()
     {
         return [
             ["\x20ccc"],
@@ -152,6 +152,30 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Length(['min' => 3, 'max' => 3, 'normalizer' => 'trim']);
         $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testValidGraphemesValues()
+    {
+        $constraint = new Length(min: 1, max: 1, countUnit: Length::COUNT_GRAPHEMES);
+        $this->validator->validate("A\u{0300}", $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testValidCodepointsValues()
+    {
+        $constraint = new Length(min: 2, max: 2, countUnit: Length::COUNT_CODEPOINTS);
+        $this->validator->validate("A\u{0300}", $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testValidBytesValues()
+    {
+        $constraint = new Length(min: 3, max: 3, countUnit: Length::COUNT_BYTES);
+        $this->validator->validate("A\u{0300}", $constraint);
 
         $this->assertNoViolation();
     }
@@ -320,5 +344,35 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
                 ->setCode(Length::INVALID_CHARACTERS_ERROR)
                 ->assertRaised();
         }
+    }
+
+    public function testInvalidValuesExactDefaultCountUnitWithGraphemeInput()
+    {
+        $constraint = new Length(min: 1, max: 1, exactMessage: 'myMessage');
+
+        $this->validator->validate("A\u{0300}", $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'."A\u{0300}".'"')
+            ->setParameter('{{ limit }}', 1)
+            ->setInvalidValue("A\u{0300}")
+            ->setPlural(1)
+            ->setCode(Length::NOT_EQUAL_LENGTH_ERROR)
+            ->assertRaised();
+    }
+
+    public function testInvalidValuesExactBytesCountUnitWithGraphemeInput()
+    {
+        $constraint = new Length(min: 1, max: 1, countUnit: Length::COUNT_BYTES, exactMessage: 'myMessage');
+
+        $this->validator->validate("A\u{0300}", $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'."A\u{0300}".'"')
+            ->setParameter('{{ limit }}', 1)
+            ->setInvalidValue("A\u{0300}")
+            ->setPlural(1)
+            ->setCode(Length::NOT_EQUAL_LENGTH_ERROR)
+            ->assertRaised();
     }
 }

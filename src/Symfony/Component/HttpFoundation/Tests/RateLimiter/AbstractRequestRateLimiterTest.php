@@ -33,7 +33,7 @@ class AbstractRequestRateLimiterTest extends TestCase
         $this->assertSame($expected, $rateLimiter->consume(new Request()));
     }
 
-    public function provideRateLimits()
+    public static function provideRateLimits()
     {
         $now = new \DateTimeImmutable();
 

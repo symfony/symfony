@@ -15,6 +15,7 @@ use PHPUnit\Framework\SkippedTestSuiteError;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
+ *
  * @group integration
  */
 class PredisStoreTest extends AbstractRedisStoreTestCase

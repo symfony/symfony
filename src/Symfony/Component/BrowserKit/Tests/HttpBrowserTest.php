@@ -40,7 +40,7 @@ class HttpBrowserTest extends AbstractBrowserTest
         $browser->request(...$requestArguments);
     }
 
-    public function validContentTypes()
+    public static function validContentTypes()
     {
         $defaultHeaders = ['user-agent' => 'Symfony BrowserKit', 'host' => 'example.com'];
         yield 'GET/HEAD' => [
@@ -199,7 +199,7 @@ class HttpBrowserTest extends AbstractBrowserTest
         $browser->request('GET', $requestPath);
     }
 
-    public function forwardSlashesRequestPathProvider()
+    public static function forwardSlashesRequestPathProvider()
     {
         return [
             'one slash' => ['/'],

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Mailer\Bridge\MailPace\Tests\Transport;
 
+use Psr\Log\NullLogger;
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Mailer\Bridge\MailPace\Transport\MailPaceApiTransport;
 use Symfony\Component\Mailer\Bridge\MailPace\Transport\MailPaceSmtpTransport;
 use Symfony\Component\Mailer\Bridge\MailPace\Transport\MailPaceTransportFactory;
@@ -22,10 +24,10 @@ final class MailPaceTransportFactoryTest extends TransportFactoryTestCase
 {
     public function getFactory(): TransportFactoryInterface
     {
-        return new MailPaceTransportFactory($this->getDispatcher(), $this->getClient(), $this->getLogger());
+        return new MailPaceTransportFactory(null, new MockHttpClient(), new NullLogger());
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [
             new Dsn('mailpace+api', 'default'),
@@ -53,38 +55,37 @@ final class MailPaceTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
-        $dispatcher = $this->getDispatcher();
-        $logger = $this->getLogger();
+        $logger = new NullLogger();
 
         yield [
             new Dsn('mailpace+api', 'default', self::USER),
-            new MailPaceApiTransport(self::USER, $this->getClient(), $dispatcher, $logger),
+            new MailPaceApiTransport(self::USER, new MockHttpClient(), null, $logger),
         ];
 
         yield [
             new Dsn('mailpace+api', 'example.com', self::USER, '', 8080),
-            (new MailPaceApiTransport(self::USER, $this->getClient(), $dispatcher, $logger))->setHost('example.com')->setPort(8080),
+            (new MailPaceApiTransport(self::USER, new MockHttpClient(), null, $logger))->setHost('example.com')->setPort(8080),
         ];
 
         yield [
             new Dsn('mailpace', 'default', self::USER),
-            new MailPaceSmtpTransport(self::USER, $dispatcher, $logger),
+            new MailPaceSmtpTransport(self::USER, null, $logger),
         ];
 
         yield [
             new Dsn('mailpace+smtp', 'default', self::USER),
-            new MailPaceSmtpTransport(self::USER, $dispatcher, $logger),
+            new MailPaceSmtpTransport(self::USER, null, $logger),
         ];
 
         yield [
             new Dsn('mailpace+smtps', 'default', self::USER),
-            new MailPaceSmtpTransport(self::USER, $dispatcher, $logger),
+            new MailPaceSmtpTransport(self::USER, null, $logger),
         ];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield [
             new Dsn('mailpace+foo', 'default', self::USER),
@@ -92,7 +93,7 @@ final class MailPaceTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield [new Dsn('mailpace+api', 'default')];
     }

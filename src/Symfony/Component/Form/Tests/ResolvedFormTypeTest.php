@@ -192,7 +192,7 @@ class ResolvedFormTypeTest extends TestCase
         $this->assertSame($blockPrefix, $resolvedType->getBlockPrefix());
     }
 
-    public function provideTypeClassBlockPrefixTuples()
+    public static function provideTypeClassBlockPrefixTuples()
     {
         return [
             [Fixtures\FooType::class, 'foo'],

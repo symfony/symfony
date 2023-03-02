@@ -21,7 +21,7 @@ final class PagerDutyTransportFactoryTest extends TransportFactoryTestCase
         return new PagerDutyTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'pagerduty://subdomain.pagerduty.com',
@@ -30,19 +30,19 @@ final class PagerDutyTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'pagerduty://host'];
         yield [false, 'somethingElse://host'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield 'missing token' => ['pagerduty://@host'];
         yield 'wrong host' => ['pagerduty://token@host.com'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://token@host'];
     }

@@ -56,7 +56,7 @@ class YamlFileLoaderTest extends TestCase
         $loader->load($filePath);
     }
 
-    public function getPathsToInvalidFiles()
+    public static function getPathsToInvalidFiles()
     {
         return [
             ['nonvalid.yml'],
@@ -175,7 +175,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertSame('FrameworkBundle:Template:template', $route->getDefault('_controller'));
     }
 
-    public function provideFilesImportingRoutesWithControllers()
+    public static function provideFilesImportingRoutesWithControllers()
     {
         yield ['import_controller.yml'];
         yield ['import__controller.yml'];
@@ -485,7 +485,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertSame(MyController::class.'::__invoke', $route->getDefault('_controller'));
     }
 
-    public function providePsr4ConfigFiles(): array
+    public static function providePsr4ConfigFiles(): array
     {
         return [
             ['psr4-attributes.yaml'],

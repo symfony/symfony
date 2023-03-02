@@ -52,6 +52,7 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
         unset($defaultOptions['debug']);
         unset($defaultOptions['default_ttl']);
         unset($defaultOptions['private_headers']);
+        unset($defaultOptions['skip_response_headers']);
         unset($defaultOptions['allow_reload']);
         unset($defaultOptions['allow_revalidate']);
         unset($defaultOptions['stale_while_revalidate']);

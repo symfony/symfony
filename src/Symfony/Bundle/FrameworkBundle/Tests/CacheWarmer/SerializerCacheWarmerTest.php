@@ -40,7 +40,7 @@ class SerializerCacheWarmerTest extends TestCase
         $this->assertTrue($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Author')->isHit());
     }
 
-    public function loaderProvider()
+    public static function loaderProvider()
     {
         return [
             [

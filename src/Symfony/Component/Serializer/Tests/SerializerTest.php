@@ -547,7 +547,7 @@ class SerializerTest extends TestCase
         $this->assertSame('{"foo":[],"bar":["notempty"],"baz":{"nested":[]},"a":{"nested":[]},"b":[]}', $serializer->serialize($object, 'json'));
     }
 
-    public function provideObjectOrCollectionTests()
+    public static function provideObjectOrCollectionTests()
     {
         $serializer = new Serializer(
             [
@@ -1228,7 +1228,7 @@ class SerializerTest extends TestCase
         }
     }
 
-    public function provideCollectDenormalizationErrors()
+    public static function provideCollectDenormalizationErrors()
     {
         return [
             [null],

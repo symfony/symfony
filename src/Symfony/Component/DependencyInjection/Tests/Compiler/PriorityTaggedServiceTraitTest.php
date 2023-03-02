@@ -182,7 +182,7 @@ class PriorityTaggedServiceTraitTest extends TestCase
         $priorityTaggedServiceTraitImplementation->test($tag, $container);
     }
 
-    public function provideInvalidDefaultMethods(): iterable
+    public static function provideInvalidDefaultMethods(): iterable
     {
         yield ['getMethodShouldBeStatic', null, sprintf('Method "%s::getMethodShouldBeStatic()" should be static.', FooTaggedForInvalidDefaultMethodClass::class)];
         yield ['getMethodShouldBeStatic', 'foo', sprintf('Either method "%s::getMethodShouldBeStatic()" should be static or tag "my_custom_tag" on service "service1" is missing attribute "foo".', FooTaggedForInvalidDefaultMethodClass::class)];

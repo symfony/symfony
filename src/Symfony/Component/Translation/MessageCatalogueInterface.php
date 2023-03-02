@@ -36,8 +36,6 @@ interface MessageCatalogueInterface
      * Gets the messages within a given domain.
      *
      * If $domain is null, it returns all messages.
-     *
-     * @param string $domain The domain name
      */
     public function all(string $domain = null): array;
 

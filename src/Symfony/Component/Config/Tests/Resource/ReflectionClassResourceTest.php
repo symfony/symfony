@@ -116,7 +116,7 @@ EOPHP;
         }
     }
 
-    public function provideHashedSignature(): iterable
+    public static function provideHashedSignature(): iterable
     {
         yield [false, 0, "// line change\n\n"];
         yield [true, 0, '/** class docblock */'];

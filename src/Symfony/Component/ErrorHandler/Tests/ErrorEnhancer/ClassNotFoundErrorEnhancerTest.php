@@ -72,7 +72,7 @@ class ClassNotFoundErrorEnhancerTest extends TestCase
         $this->assertSame($expectedLine, $error->getLine());
     }
 
-    public function provideClassNotFoundData()
+    public static function provideClassNotFoundData()
     {
         $autoloader = new ComposerClassLoader();
         $autoloader->add('Symfony\Component\ErrorHandler\Error\\', realpath(__DIR__.'/../../Error'));

@@ -249,7 +249,7 @@ class IsGrantedAttributeListenerTest extends TestCase
         }
     }
 
-    public function getAccessDeniedMessageTests()
+    public static function getAccessDeniedMessageTests()
     {
         yield ['ROLE_ADMIN', null, 'admin', 0, 'Access Denied by #[IsGranted("ROLE_ADMIN")] on controller'];
         yield ['ROLE_ADMIN', 'bar', 'withSubject', 2, 'Access Denied by #[IsGranted("ROLE_ADMIN", "arg2Name")] on controller'];

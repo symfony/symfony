@@ -130,8 +130,6 @@ class ProgressIndicator
     /**
      * Finish the indicator with message.
      *
-     * @param $message
-     *
      * @return void
      */
     public function finish(string $message)

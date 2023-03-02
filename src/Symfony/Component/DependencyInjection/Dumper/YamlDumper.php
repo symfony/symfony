@@ -307,7 +307,7 @@ class YamlDumper extends Dumper
         } elseif ($value instanceof AbstractArgument) {
             return new TaggedValue('abstract', $value->getText());
         } elseif (\is_object($value) || \is_resource($value)) {
-            throw new RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');
+            throw new RuntimeException(sprintf('Unable to dump a service container if a parameter is an object or a resource, got "%s".', get_debug_type($value)));
         }
 
         return $value;

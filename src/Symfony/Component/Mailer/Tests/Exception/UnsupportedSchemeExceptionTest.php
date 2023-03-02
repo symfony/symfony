@@ -17,6 +17,7 @@ use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
 use Symfony\Component\Mailer\Bridge\Google\Transport\GmailTransportFactory;
 use Symfony\Component\Mailer\Bridge\Infobip\Transport\InfobipTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillTransportFactory;
+use Symfony\Component\Mailer\Bridge\MailerSend\Transport\MailerSendTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetTransportFactory;
 use Symfony\Component\Mailer\Bridge\OhMySmtp\Transport\OhMySmtpTransportFactory;
@@ -37,6 +38,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         ClassExistsMock::withMockedClasses([
             GmailTransportFactory::class => false,
             InfobipTransportFactory::class => false,
+            MailerSendTransportFactory::class => false,
             MailgunTransportFactory::class => false,
             MailjetTransportFactory::class => false,
             MandrillTransportFactory::class => false,
@@ -61,10 +63,11 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         );
     }
 
-    public function messageWhereSchemeIsPartOfSchemeToPackageMapProvider(): \Generator
+    public static function messageWhereSchemeIsPartOfSchemeToPackageMapProvider(): \Generator
     {
         yield ['gmail', 'symfony/google-mailer'];
         yield ['infobip', 'symfony/infobip-mailer'];
+        yield ['mailersend', 'symfony/mailersend-mailer'];
         yield ['mailgun', 'symfony/mailgun-mailer'];
         yield ['mailjet', 'symfony/mailjet-mailer'];
         yield ['mandrill', 'symfony/mailchimp-mailer'];
@@ -86,7 +89,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         );
     }
 
-    public function messageWhereSchemeIsNotPartOfSchemeToPackageMapProvider(): \Generator
+    public static function messageWhereSchemeIsNotPartOfSchemeToPackageMapProvider(): \Generator
     {
         yield [
             'The "somethingElse" scheme is not supported.',

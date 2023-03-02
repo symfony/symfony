@@ -43,7 +43,7 @@ class StopWorkerOnRestartSignalListenerTest extends TestCase
         $stopOnSignalListener->onWorkerRunning($event);
     }
 
-    public function restartTimeProvider()
+    public static function restartTimeProvider()
     {
         yield [null, false]; // no cached restart time, do not restart
         yield [+10, true]; // 10 seconds after starting, a restart was requested

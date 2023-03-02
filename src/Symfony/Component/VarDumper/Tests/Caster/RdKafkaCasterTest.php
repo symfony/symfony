@@ -20,6 +20,7 @@ use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
 /**
  * @requires extension rdkafka
+ *
  * @group integration
  */
 class RdKafkaCasterTest extends TestCase

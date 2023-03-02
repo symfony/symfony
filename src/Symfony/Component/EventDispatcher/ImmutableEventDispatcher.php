@@ -30,21 +30,33 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
         return $this->dispatcher->dispatch($event, $eventName);
     }
 
+    /**
+     * @return never
+     */
     public function addListener(string $eventName, callable|array $listener, int $priority = 0)
     {
         throw new \BadMethodCallException('Unmodifiable event dispatchers must not be modified.');
     }
 
+    /**
+     * @return never
+     */
     public function addSubscriber(EventSubscriberInterface $subscriber)
     {
         throw new \BadMethodCallException('Unmodifiable event dispatchers must not be modified.');
     }
 
+    /**
+     * @return never
+     */
     public function removeListener(string $eventName, callable|array $listener)
     {
         throw new \BadMethodCallException('Unmodifiable event dispatchers must not be modified.');
     }
 
+    /**
+     * @return never
+     */
     public function removeSubscriber(EventSubscriberInterface $subscriber)
     {
         throw new \BadMethodCallException('Unmodifiable event dispatchers must not be modified.');

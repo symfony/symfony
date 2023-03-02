@@ -24,7 +24,7 @@ class MastodonTransportFactoryTest extends TransportFactoryTestCase
         return new MastodonTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'mastodon://host.test',
@@ -47,18 +47,18 @@ class MastodonTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'mastodon://token@host'];
         yield [false, 'somethingElse://token@host'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield 'missing token' => ['mastodon://host.test'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://token@host'];
     }

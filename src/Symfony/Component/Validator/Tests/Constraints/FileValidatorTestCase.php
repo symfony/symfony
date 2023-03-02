@@ -90,7 +90,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function provideMaxSizeExceededTests()
+    public static function provideMaxSizeExceededTests()
     {
         // We have various interesting limit - size combinations to test.
         // Assume a limit of 1000 bytes (1 kB). Then the following table
@@ -187,7 +187,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function provideMaxSizeNotExceededTests()
+    public static function provideMaxSizeNotExceededTests()
     {
         return [
             // 0 has no effect
@@ -242,7 +242,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
         $this->validator->validate($this->path, $constraint);
     }
 
-    public function provideBinaryFormatTests()
+    public static function provideBinaryFormatTests()
     {
         return [
             [11, 10, null, '11', '10', 'bytes'],
@@ -388,7 +388,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function provideMimeTypeConstraints(): iterable
+    public static function provideMimeTypeConstraints(): iterable
     {
         yield 'Doctrine style' => [new File([
             'mimeTypes' => ['image/png', 'image/jpg'],
@@ -446,7 +446,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function provideDisallowEmptyConstraints(): iterable
+    public static function provideDisallowEmptyConstraints(): iterable
     {
         yield 'Doctrine style' => [new File([
             'disallowEmptyMessage' => 'myMessage',
@@ -476,7 +476,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function uploadedFileErrorProvider()
+    public static function uploadedFileErrorProvider()
     {
         $tests = [
             [(string) \UPLOAD_ERR_FORM_SIZE, 'uploadFormSizeErrorMessage'],
@@ -501,7 +501,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
             ], '1'];
 
             // access FileValidator::factorizeSizes() private method to format max file size
-            $reflection = new \ReflectionClass((new FileValidator()));
+            $reflection = new \ReflectionClass(new FileValidator());
             $method = $reflection->getMethod('factorizeSizes');
             [, $limit, $suffix] = $method->invokeArgs(new FileValidator(), [0, UploadedFile::getMaxFilesize(), false]);
 
@@ -531,7 +531,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
     }
 
     /**
-     * @dataProvider validExtensionProvider
+     * @dataProvider providerValidExtension
      */
     public function testExtensionValid(string $name)
     {
@@ -551,7 +551,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    private function validExtensionProvider(): iterable
+    public static function providerValidExtension(): iterable
     {
         yield ['test.gif'];
         yield ['test.png.gif'];
@@ -560,7 +560,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
     }
 
     /**
-     * @dataProvider invalidExtensionProvider
+     * @dataProvider provideInvalidExtension
      */
     public function testExtensionInvalid(string $name, string $extension)
     {
@@ -582,7 +582,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    private function invalidExtensionProvider(): iterable
+    public static function provideInvalidExtension(): iterable
     {
         yield ['test.gif', 'gif'];
         yield ['test.png.gif', 'gif'];
@@ -654,6 +654,48 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
         $constraint = new File(mimeTypesMessage: 'myMessage', extensions: ['txt']);
 
         $this->validator->validate($file, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider provideFilenameMaxLengthIsTooLong
+     */
+    public function testFilenameMaxLengthIsTooLong(File $constraintFile, string $messageViolation)
+    {
+        file_put_contents($this->path, '1');
+
+        $file = new UploadedFile($this->path, 'myFileWithATooLongOriginalFileName', null, null, true);
+        $this->validator->validate($file, $constraintFile);
+
+        $this->buildViolation($messageViolation)
+            ->setParameters([
+                '{{ filename_max_length }}' => $constraintFile->filenameMaxLength,
+            ])
+            ->setCode(File::FILENAME_TOO_LONG)
+            ->setPlural($constraintFile->filenameMaxLength)
+            ->assertRaised();
+    }
+
+    public static function provideFilenameMaxLengthIsTooLong(): \Generator
+    {
+        yield 'Simple case with only the parameter "filenameMaxLength" ' => [
+            new File(filenameMaxLength: 30),
+            'The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.',
+        ];
+
+        yield 'Case with the parameter "filenameMaxLength" and a custom error message' => [
+            new File(filenameMaxLength: 20, filenameTooLongMessage: 'Your filename is too long. Please use at maximum {{ filename_max_length }} characters'),
+            'Your filename is too long. Please use at maximum {{ filename_max_length }} characters',
+        ];
+    }
+
+    public function testFilenameMaxLength()
+    {
+        file_put_contents($this->path, '1');
+
+        $file = new UploadedFile($this->path, 'tinyOriginalFileName', null, null, true);
+        $this->validator->validate($file, new File(filenameMaxLength: 20));
 
         $this->assertNoViolation();
     }

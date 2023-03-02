@@ -385,7 +385,7 @@ class DateTypeTest extends BaseTypeTestCase
         $this->assertEquals($pattern, $view->vars['date_pattern']);
     }
 
-    public function provideDateFormats()
+    public static function provideDateFormats()
     {
         return [
             ['dMy', '{{ day }}{{ month }}{{ year }}'],
@@ -900,7 +900,7 @@ class DateTypeTest extends BaseTypeTestCase
         $this->assertArrayNotHasKey('type', $view->vars);
     }
 
-    public function provideCompoundWidgets()
+    public static function provideCompoundWidgets()
     {
         return [
             ['text'],
@@ -1054,7 +1054,7 @@ class DateTypeTest extends BaseTypeTestCase
         $this->assertEquals($expectedData, $form->getData());
     }
 
-    public function provideEmptyData()
+    public static function provideEmptyData()
     {
         $expectedData = \DateTime::createFromFormat('Y-m-d H:i:s', '2018-11-11 00:00:00');
         $lazyEmptyData = static fn (FormInterface $form) => $form->getConfig()->getCompound() ? ['year' => '2018', 'month' => '11', 'day' => '11'] : '2018-11-11';

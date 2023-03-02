@@ -79,7 +79,7 @@ class AliasTest extends TestCase
         $def->setDeprecated('package', '1.1', $message);
     }
 
-    public function invalidDeprecationMessageProvider()
+    public static function invalidDeprecationMessageProvider()
     {
         return [
             "With \rs" => ["invalid \r message %alias_id%"],

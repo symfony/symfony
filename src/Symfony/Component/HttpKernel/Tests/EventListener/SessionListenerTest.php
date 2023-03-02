@@ -81,7 +81,7 @@ class SessionListenerTest extends TestCase
         }
     }
 
-    public function provideSessionOptions(): \Generator
+    public static function provideSessionOptions(): \Generator
     {
         yield 'set_samesite_by_php' => [
             'phpSessionOptions' => ['samesite' => Cookie::SAMESITE_STRICT],

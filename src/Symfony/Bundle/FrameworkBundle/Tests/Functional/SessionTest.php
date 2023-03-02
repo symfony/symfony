@@ -144,7 +144,7 @@ class SessionTest extends AbstractWebTestCase
         $this->assertSame('public, s-maxage=100', $response->headers->get('cache-control'));
     }
 
-    public function getConfigs()
+    public static function getConfigs()
     {
         return [
             // configfile, insulate

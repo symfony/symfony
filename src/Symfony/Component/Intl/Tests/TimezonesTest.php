@@ -639,7 +639,7 @@ class TimezonesTest extends ResourceBundleTestCase
         }
     }
 
-    public function provideTimezones(): iterable
+    public static function provideTimezones(): iterable
     {
         return array_map(fn ($timezone) => [$timezone], self::ZONES);
     }
@@ -655,7 +655,7 @@ class TimezonesTest extends ResourceBundleTestCase
         $this->addToAssertionCount(1);
     }
 
-    public function provideCountries(): iterable
+    public static function provideCountries(): iterable
     {
         return array_map(fn ($country) => [$country], Countries::getCountryCodes());
     }

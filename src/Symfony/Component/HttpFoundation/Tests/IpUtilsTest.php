@@ -27,7 +27,7 @@ class IpUtilsTest extends TestCase
         $this->assertSame($matches, IpUtils::checkIp($remoteAddr, $cidr));
     }
 
-    public function getIpv4Data()
+    public static function getIpv4Data()
     {
         return [
             [true, '192.168.1.1', '192.168.1.1'],
@@ -58,7 +58,7 @@ class IpUtilsTest extends TestCase
         $this->assertSame($matches, IpUtils::checkIp($remoteAddr, $cidr));
     }
 
-    public function getIpv6Data()
+    public static function getIpv6Data()
     {
         return [
             [true, '2a01:198:603:0:396e:4789:8e99:890f', '2a01:198:603:0::/65'],
@@ -103,7 +103,7 @@ class IpUtilsTest extends TestCase
         $this->assertFalse(IpUtils::checkIp4($requestIp, $proxyIp));
     }
 
-    public function invalidIpAddressData()
+    public static function invalidIpAddressData()
     {
         return [
             'invalid proxy wildcard' => ['192.168.20.13', '*'],
@@ -120,7 +120,7 @@ class IpUtilsTest extends TestCase
         $this->assertSame($expected, IpUtils::anonymize($ip));
     }
 
-    public function anonymizedIpData()
+    public static function anonymizedIpData()
     {
         return [
             ['192.168.1.1', '192.168.1.0'],
@@ -146,7 +146,7 @@ class IpUtilsTest extends TestCase
         $this->assertSame($matches, IpUtils::checkIp4($remoteAddr, $cidr));
     }
 
-    public function getIp4SubnetMaskZeroData()
+    public static function getIp4SubnetMaskZeroData()
     {
         return [
             [true, '1.2.3.4', '0.0.0.0/0'],

@@ -50,6 +50,19 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('public', $tester->getDisplay());
     }
 
+    public function testNoDumpedXML()
+    {
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true, 'debug.container.dump' => false]);
+
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(['command' => 'debug:container']);
+
+        $this->assertStringContainsString('public', $tester->getDisplay());
+    }
+
     public function testPrivateAlias()
     {
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
@@ -242,7 +255,7 @@ TXT
         $this->assertStringContainsString('[WARNING] The deprecation file does not exist', $tester->getDisplay());
     }
 
-    public function provideIgnoreBackslashWhenFindingService()
+    public static function provideIgnoreBackslashWhenFindingService()
     {
         return [
             [BackslashClass::class],
@@ -270,7 +283,7 @@ TXT
         }
     }
 
-    public function provideCompletionSuggestions()
+    public static function provideCompletionSuggestions()
     {
         $serviceId = 'console.command.container_debug';
         $hiddenServiceId = '.console.command.container_debug.lazy';

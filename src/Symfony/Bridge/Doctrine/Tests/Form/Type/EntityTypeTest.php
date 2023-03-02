@@ -158,7 +158,7 @@ class EntityTypeTest extends BaseTypeTestCase
         }
     }
 
-    public function choiceTranslationDomainProvider()
+    public static function choiceTranslationDomainProvider()
     {
         return [
             [false],

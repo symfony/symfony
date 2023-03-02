@@ -21,7 +21,7 @@ final class TurboSmsTransportFactoryTest extends TransportFactoryTestCase
         return new TurboSmsTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'turbosms://host.test?from=acme',
@@ -34,18 +34,18 @@ final class TurboSmsTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'turbosms://authToken@default?from=acme'];
         yield [false, 'somethingElse://authToken@default?from=acme'];
     }
 
-    public function missingRequiredOptionProvider(): iterable
+    public static function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: from' => ['turbosms://authToken@default'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://authToken@default?from=acme'];
         yield ['somethingElse://authToken@default'];

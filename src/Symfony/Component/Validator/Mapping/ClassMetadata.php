@@ -425,9 +425,9 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
     /**
      * Sets whether a group sequence provider should be used.
      *
-     * @throws GroupDefinitionException
-     *
      * @return void
+     *
+     * @throws GroupDefinitionException
      */
     public function setGroupSequenceProvider(bool $active)
     {

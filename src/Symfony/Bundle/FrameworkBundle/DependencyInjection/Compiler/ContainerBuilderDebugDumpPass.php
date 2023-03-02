@@ -30,6 +30,10 @@ class ContainerBuilderDebugDumpPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
+        if (!$container->getParameter('debug.container.dump')) {
+            return;
+        }
+
         $cache = new ConfigCache($container->getParameter('debug.container.dump'), true);
         if (!$cache->isFresh()) {
             $cache->write((new XmlDumper($container))->dump(), $container->getResources());

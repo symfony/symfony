@@ -140,7 +140,7 @@ final class UlidTypeTest extends TestCase
         $this->assertEquals($expectedDeclaration, $this->type->getSqlDeclaration(['length' => 36], $platform));
     }
 
-    public function provideSqlDeclarations(): array
+    public static function provideSqlDeclarations(): array
     {
         return [
             [new PostgreSQLPlatform(), 'UUID'],

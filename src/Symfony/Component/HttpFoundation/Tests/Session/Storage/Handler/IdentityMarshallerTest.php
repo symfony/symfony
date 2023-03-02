@@ -49,7 +49,7 @@ class IdentityMarshallerTest extends Testcase
         $this->assertEquals('data', $marshaller->unmarshall('data'));
     }
 
-    public function invalidMarshallDataProvider(): iterable
+    public static function invalidMarshallDataProvider(): iterable
     {
         return [
             [['object' => new \stdClass()]],

@@ -53,7 +53,7 @@ class AbstractObjectNormalizerContextBuilderTest extends TestCase
     /**
      * @return iterable<array{0: array<string, mixed>|}>
      */
-    public function withersDataProvider(): iterable
+    public static function withersDataProvider(): iterable
     {
         yield 'With values' => [[
             AbstractObjectNormalizer::ENABLE_MAX_DEPTH => true,
@@ -99,7 +99,7 @@ class AbstractObjectNormalizerContextBuilderTest extends TestCase
     /**
      * @return iterable<array{0: string, 1: bool}>
      */
-    public function validateDepthKeyPatternDataProvider(): iterable
+    public static function validateDepthKeyPatternDataProvider(): iterable
     {
         yield ['depth_%s::%s', false];
         yield ['%%%s %%s %%%%%s', false];

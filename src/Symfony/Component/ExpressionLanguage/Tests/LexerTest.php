@@ -54,7 +54,7 @@ class LexerTest extends TestCase
         $this->lexer->tokenize($expression);
     }
 
-    public function getTokenizeData()
+    public static function getTokenizeData()
     {
         return [
             [

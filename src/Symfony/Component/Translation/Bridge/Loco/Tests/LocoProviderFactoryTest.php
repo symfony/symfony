@@ -17,18 +17,18 @@ use Symfony\Component\Translation\Test\ProviderFactoryTestCase;
 
 class LocoProviderFactoryTest extends ProviderFactoryTestCase
 {
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'loco://API_KEY@default'];
         yield [false, 'somethingElse://API_KEY@default'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://API_KEY@default'];
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'loco://localise.biz',
@@ -36,7 +36,7 @@ class LocoProviderFactoryTest extends ProviderFactoryTestCase
         ];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield ['loco://default'];
     }

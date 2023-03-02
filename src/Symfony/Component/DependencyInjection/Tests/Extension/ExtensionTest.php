@@ -32,7 +32,7 @@ class ExtensionTest extends TestCase
         $this->assertSame($enabled, $extension->isConfigEnabled(new ContainerBuilder(), ['enabled' => $enabled]));
     }
 
-    public function getResolvedEnabledFixtures()
+    public static function getResolvedEnabledFixtures()
     {
         return [
             [true],
@@ -83,7 +83,7 @@ class ExtensionTest extends TestCase
 
 class EnableableExtension extends Extension
 {
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
     }
 

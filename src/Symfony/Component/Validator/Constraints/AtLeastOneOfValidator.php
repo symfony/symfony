@@ -31,7 +31,11 @@ class AtLeastOneOfValidator extends ConstraintValidator
 
         $validator = $this->context->getValidator();
 
-        $messages = [$constraint->message];
+        // Build a first violation to have the base message of the constraint translated
+        $baseMessageContext = clone $this->context;
+        $baseMessageContext->buildViolation($constraint->message)->addViolation();
+        $baseViolations = $baseMessageContext->getViolations();
+        $messages = [(string) $baseViolations->get(\count($baseViolations) - 1)->getMessage()];
 
         foreach ($constraint->constraints as $key => $item) {
             if (!\in_array($this->context->getGroup(), $item->groups, true)) {

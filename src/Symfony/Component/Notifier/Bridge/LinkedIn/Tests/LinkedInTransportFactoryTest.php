@@ -21,7 +21,7 @@ final class LinkedInTransportFactoryTest extends TransportFactoryTestCase
         return new LinkedInTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'linkedin://host.test',
@@ -29,18 +29,18 @@ final class LinkedInTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'linkedin://host'];
         yield [false, 'somethingElse://host'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield 'missing account or user_id' => ['linkedin://AccessTokenOrUserId@default'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://accessToken:UserId@default'];
     }

@@ -27,7 +27,7 @@ class HandleDescriptorTest extends TestCase
         $this->assertStringMatchesFormat($expectedHandlerString, $descriptor->getName());
     }
 
-    public function provideHandlers(): iterable
+    public static function provideHandlers(): iterable
     {
         yield [function () {}, 'Closure'];
         yield ['var_dump', 'var_dump'];

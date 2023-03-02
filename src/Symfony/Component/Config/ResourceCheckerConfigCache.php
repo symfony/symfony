@@ -105,9 +105,9 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
      * @param string              $content  The content to write in the cache
      * @param ResourceInterface[] $metadata An array of metadata
      *
-     * @throws \RuntimeException When cache file can't be written
-     *
      * @return void
+     *
+     * @throws \RuntimeException When cache file can't be written
      */
     public function write(string $content, array $metadata = null)
     {

@@ -165,7 +165,7 @@ HTML
         $this->assertSame('A', $nodeList->item(0)->textContent);
     }
 
-    public function getXpathLiteralTestData()
+    public static function getXpathLiteralTestData()
     {
         return [
             ['foo', "'foo'"],
@@ -175,7 +175,7 @@ HTML
         ];
     }
 
-    public function getCssToXPathTestData()
+    public static function getCssToXPathTestData()
     {
         return [
             ['*', '*'],
@@ -222,7 +222,7 @@ HTML
         ];
     }
 
-    public function getXmlLangTestData()
+    public static function getXmlLangTestData()
     {
         return [
             [':lang("EN")', ['first', 'second', 'third', 'fourth']],
@@ -237,7 +237,7 @@ HTML
         ];
     }
 
-    public function getHtmlIdsTestData()
+    public static function getHtmlIdsTestData()
     {
         return [
             ['div', ['outer-div', 'li-div', 'foobar-div']],
@@ -362,7 +362,7 @@ HTML
         ];
     }
 
-    public function getHtmlShakespearTestData()
+    public static function getHtmlShakespearTestData()
     {
         return [
             ['*', 246],

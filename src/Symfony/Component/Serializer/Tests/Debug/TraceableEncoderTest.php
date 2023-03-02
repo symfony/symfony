@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Serializer\Tests\Debug;
 
-use BadMethodCallException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\DataCollector\SerializerDataCollector;
 use Symfony\Component\Serializer\Debug\TraceableEncoder;
@@ -75,14 +74,14 @@ class TraceableEncoderTest extends TestCase
 
     public function testCannotEncodeIfNotEncoder()
     {
-        $this->expectException(BadMethodCallException::class);
+        $this->expectException(\BadMethodCallException::class);
 
         (new TraceableEncoder($this->createMock(DecoderInterface::class), new SerializerDataCollector()))->encode('data', 'format');
     }
 
     public function testCannotDecodeIfNotDecoder()
     {
-        $this->expectException(BadMethodCallException::class);
+        $this->expectException(\BadMethodCallException::class);
 
         (new TraceableEncoder($this->createMock(EncoderInterface::class), new SerializerDataCollector()))->decode('data', 'format');
     }

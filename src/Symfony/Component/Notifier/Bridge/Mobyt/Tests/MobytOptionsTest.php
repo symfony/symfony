@@ -33,7 +33,7 @@ final class MobytOptionsTest extends TestCase
     /**
      * @return \Generator<array{0: string, 1: string}>
      */
-    public function fromNotificationDataProvider(): \Generator
+    public static function fromNotificationDataProvider(): \Generator
     {
         yield [Notification::IMPORTANCE_URGENT, MobytOptions::MESSAGE_TYPE_QUALITY_HIGH];
         yield [Notification::IMPORTANCE_HIGH, MobytOptions::MESSAGE_TYPE_QUALITY_HIGH];
@@ -85,7 +85,7 @@ final class MobytOptionsTest extends TestCase
         $this->assertSame(['message_type' => $type], $mobytOptions->toArray());
     }
 
-    public function validMessageTypes(): iterable
+    public static function validMessageTypes(): iterable
     {
         yield [MobytOptions::MESSAGE_TYPE_QUALITY_HIGH];
         yield [MobytOptions::MESSAGE_TYPE_QUALITY_MEDIUM];

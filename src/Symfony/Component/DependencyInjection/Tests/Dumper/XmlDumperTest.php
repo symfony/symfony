@@ -63,7 +63,7 @@ class XmlDumperTest extends TestCase
             $this->fail('->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
         } catch (\Exception $e) {
             $this->assertInstanceOf(\RuntimeException::class, $e, '->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
-            $this->assertEquals('Unable to dump a service container if a parameter is an object or a resource.', $e->getMessage(), '->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
+            $this->assertEquals('Unable to dump a service container if a parameter is an object or a resource, got "stdClass".', $e->getMessage(), '->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
         }
     }
 
@@ -115,7 +115,7 @@ class XmlDumperTest extends TestCase
         $this->assertEquals($expectedXmlDump, $dumper->dump());
     }
 
-    public function provideDecoratedServicesData()
+    public static function provideDecoratedServicesData()
     {
         $fixturesPath = realpath(__DIR__.'/../Fixtures/');
 
@@ -161,7 +161,7 @@ class XmlDumperTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function provideCompiledContainerData()
+    public static function provideCompiledContainerData()
     {
         return [
             ['container8'],

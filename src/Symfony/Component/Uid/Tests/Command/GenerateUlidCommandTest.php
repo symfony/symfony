@@ -115,7 +115,7 @@ final class GenerateUlidCommandTest extends TestCase
         $this->assertSame($expectedSuggestions, $suggestions);
     }
 
-    public function provideCompletionSuggestions(): iterable
+    public static function provideCompletionSuggestions(): iterable
     {
         yield 'option --format' => [
             ['--format', ''],

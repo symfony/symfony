@@ -47,7 +47,7 @@ EOT;
     public function testCreateWithNotSupportedScheme()
     {
         $this->expectException(UnsupportedSchemeException::class);
-        $this->expectErrorMessageMatches('#The ".*" scheme is not supported#');
+        $this->expectExceptionMessage('The "sendmail" scheme is not supported');
 
         $sut = new NativeTransportFactory();
         $sut->create(Dsn::fromString('sendmail://default'));
@@ -66,7 +66,7 @@ EOT;
         $sut->create(Dsn::fromString('native://default'));
     }
 
-    public function provideCreateSendmailWithNoHostOrNoPort(): \Generator
+    public static function provideCreateSendmailWithNoHostOrNoPort(): \Generator
     {
         yield ['native://default', '', '', ''];
         yield ['native://default', '', 'localhost', ''];
@@ -95,7 +95,7 @@ EOT;
         $sut->create(Dsn::fromString($dsn));
     }
 
-    public function provideCreate(): \Generator
+    public static function provideCreate(): \Generator
     {
         yield ['native://default', '/usr/sbin/sendmail -t -i', '', '', new SendmailTransport('/usr/sbin/sendmail -t -i')];
 

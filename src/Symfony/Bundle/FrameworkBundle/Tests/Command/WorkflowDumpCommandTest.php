@@ -32,7 +32,7 @@ class WorkflowDumpCommandTest extends TestCase
         $this->assertSame($expectedSuggestions, $suggestions);
     }
 
-    public function provideCompletionSuggestions(): iterable
+    public static function provideCompletionSuggestions(): iterable
     {
         yield 'option --dump-format' => [['--dump-format', ''], ['puml', 'mermaid', 'dot']];
     }

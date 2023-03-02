@@ -159,7 +159,7 @@ class ExprBuilderTest extends TestCase
         $this->assertFinalizedValueIs($expectedValue, $test, ['key' => $configValue]);
     }
 
-    public function castToArrayValues(): iterable
+    public static function castToArrayValues(): iterable
     {
         yield ['value', ['value']];
         yield [-3.14, [-3.14]];

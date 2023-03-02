@@ -40,7 +40,16 @@ security:
             custom_authenticators:
                 - 'Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AuthenticatorBundle\ApiAuthenticator'
             provider: main
+        second:
+            pattern: ^/second
+            form_login:
+                check_path: /second/login/check
+            custom_authenticators:
+                - 'Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AuthenticatorBundle\ApiAuthenticator'
+            provider: main
 
     access_control:
         - { path: '^/main/login/check$', roles: IS_AUTHENTICATED_FULLY }
         - { path: '^/main/logged-in$', roles: IS_AUTHENTICATED_FULLY }
+        - { path: '^/second/login/check$', roles: IS_AUTHENTICATED_FULLY }
+        - { path: '^/second/logged-in$', roles: IS_AUTHENTICATED_FULLY }

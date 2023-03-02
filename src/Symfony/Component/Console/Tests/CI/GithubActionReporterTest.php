@@ -43,7 +43,7 @@ class GithubActionReporterTest extends TestCase
         self::assertSame($expected.\PHP_EOL, $buffer->fetch());
     }
 
-    public function annotationsFormatProvider(): iterable
+    public static function annotationsFormatProvider(): iterable
     {
         yield 'warning' => ['warning', 'A warning', null, null, null, '::warning::A warning'];
         yield 'error' => ['error', 'An error', null, null, null, '::error::An error'];

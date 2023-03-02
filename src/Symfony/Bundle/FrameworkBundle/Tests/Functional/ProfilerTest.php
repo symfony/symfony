@@ -57,7 +57,7 @@ class ProfilerTest extends AbstractWebTestCase
         $this->assertNull($client->getProfile());
     }
 
-    public function getConfigs()
+    public static function getConfigs()
     {
         return [
             [false],

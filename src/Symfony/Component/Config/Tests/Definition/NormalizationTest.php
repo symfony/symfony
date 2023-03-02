@@ -51,7 +51,7 @@ class NormalizationTest extends TestCase
         $this->assertNormalized($tree, $denormalized, $normalized);
     }
 
-    public function getEncoderTests(): array
+    public static function getEncoderTests(): array
     {
         $configs = [];
 
@@ -118,7 +118,7 @@ class NormalizationTest extends TestCase
         $this->assertNormalized($tree, $denormalized, $normalized);
     }
 
-    public function getAnonymousKeysTests(): array
+    public static function getAnonymousKeysTests(): array
     {
         $configs = [];
 
@@ -149,7 +149,7 @@ class NormalizationTest extends TestCase
         $this->assertNormalized($this->getNumericKeysTestTree(), $denormalized, $normalized);
     }
 
-    public function getNumericKeysTests(): array
+    public static function getNumericKeysTests(): array
     {
         $configs = [];
 

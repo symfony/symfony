@@ -66,6 +66,8 @@ interface ExecutionContextInterface
      *
      * @param string|\Stringable $message The error message as a string or a stringable object
      * @param array              $params  The parameters substituted in the error message
+     *
+     * @return void
      */
     public function addViolation(string $message, array $params = []);
 
@@ -125,7 +127,7 @@ interface ExecutionContextInterface
      * @internal Used by the validator engine. Should not be called by user
      *           code.
      */
-    public function setNode(mixed $value, ?object $object, MetadataInterface $metadata = null, string $propertyPath);
+    public function setNode(mixed $value, ?object $object, MetadataInterface $metadata = null, string $propertyPath): void;
 
     /**
      * Sets the currently validated group.
@@ -135,7 +137,7 @@ interface ExecutionContextInterface
      * @internal Used by the validator engine. Should not be called by user
      *           code.
      */
-    public function setGroup(?string $group);
+    public function setGroup(?string $group): void;
 
     /**
      * Sets the currently validated constraint.
@@ -143,7 +145,7 @@ interface ExecutionContextInterface
      * @internal Used by the validator engine. Should not be called by user
      *           code.
      */
-    public function setConstraint(Constraint $constraint);
+    public function setConstraint(Constraint $constraint): void;
 
     /**
      * Marks an object as validated in a specific validation group.
@@ -155,7 +157,7 @@ interface ExecutionContextInterface
      * @internal Used by the validator engine. Should not be called by user
      *           code.
      */
-    public function markGroupAsValidated(string $cacheKey, string $groupHash);
+    public function markGroupAsValidated(string $cacheKey, string $groupHash): void;
 
     /**
      * Returns whether an object was validated in a specific validation group.
@@ -177,7 +179,7 @@ interface ExecutionContextInterface
      * @internal Used by the validator engine. Should not be called by user
      *           code.
      */
-    public function markConstraintAsValidated(string $cacheKey, string $constraintHash);
+    public function markConstraintAsValidated(string $cacheKey, string $constraintHash): void;
 
     /**
      * Returns whether a constraint was validated for an object.
@@ -199,7 +201,7 @@ interface ExecutionContextInterface
      *
      * @see ObjectInitializerInterface
      */
-    public function markObjectAsInitialized(string $cacheKey);
+    public function markObjectAsInitialized(string $cacheKey): void;
 
     /**
      * Returns whether an object was initialized.

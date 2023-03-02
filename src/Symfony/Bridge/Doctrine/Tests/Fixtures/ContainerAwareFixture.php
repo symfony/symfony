@@ -18,14 +18,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ContainerAwareFixture implements FixtureInterface, ContainerAwareInterface
 {
-    public $container;
+    public ?ContainerInterface $container = null;
 
-    public function setContainer(?ContainerInterface $container)
+    public function setContainer(?ContainerInterface $container): void
     {
         $this->container = $container;
     }
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
     }
 }

@@ -28,6 +28,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Infobip\Transport\InfobipTransportFactory::class,
             'package' => 'symfony/infobip-mailer',
         ],
+        'mailersend' => [
+            'class' => Bridge\MailerSend\Transport\MailerSendTransportFactory::class,
+            'package' => 'symfony/mailersend-mailer',
+        ],
         'mailgun' => [
             'class' => Bridge\Mailgun\Transport\MailgunTransportFactory::class,
             'package' => 'symfony/mailgun-mailer',

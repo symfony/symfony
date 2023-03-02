@@ -291,23 +291,17 @@ class AutowirePass extends AbstractRecursivePass
                 continue;
             }
 
-            $type = ProxyHelper::exportType($parameter, true);
-
             if ($checkAttributes) {
-                foreach ($parameter->getAttributes() as $attribute) {
-                    if (\in_array($attribute->getName(), [TaggedIterator::class, TaggedLocator::class, Autowire::class, MapDecorated::class], true)) {
+                foreach ([TaggedIterator::class, TaggedLocator::class, Autowire::class, MapDecorated::class] as $attributeClass) {
+                    foreach ($parameter->getAttributes($attributeClass, Autowire::class === $attributeClass ? \ReflectionAttribute::IS_INSTANCEOF : 0) as $attribute) {
                         $arguments[$index] = $this->processAttribute($attribute->newInstance(), $parameter->allowsNull());
 
-                        break;
+                        continue 3;
                     }
-                }
-
-                if ('' !== ($arguments[$index] ?? '')) {
-                    continue;
                 }
             }
 
-            if (!$type) {
+            if (!$type = ProxyHelper::exportType($parameter, true)) {
                 if (isset($arguments[$index])) {
                     continue;
                 }

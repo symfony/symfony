@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\Notifier\Bridge\Engagespot\Tests;
 
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\Engagespot\EngagespotTransport;
-use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\PushMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
+use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -23,24 +24,24 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class EngagespotTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null): EngagespotTransport
+    public static function createTransport(HttpClientInterface $client = null): EngagespotTransport
     {
-        return new EngagespotTransport('apiKey', 'TEST', $client ?? $this->createMock(HttpClientInterface::class));
+        return new EngagespotTransport('apiKey', 'TEST', $client ?? new MockHttpClient());
     }
 
-    public function toStringProvider(): iterable
+    public static function toStringProvider(): iterable
     {
-        yield ['engagespot://api.engagespot.co/2/campaigns?campaign_name=TEST', $this->createTransport()];
+        yield ['engagespot://api.engagespot.co/2/campaigns?campaign_name=TEST', self::createTransport()];
     }
 
-    public function supportedMessagesProvider(): iterable
+    public static function supportedMessagesProvider(): iterable
     {
         yield [new PushMessage('Hello!', 'Symfony Notifier')];
     }
 
-    public function unsupportedMessagesProvider(): iterable
+    public static function unsupportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0123456789', 'Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [new DummyMessage()];
     }
 }

@@ -16,6 +16,7 @@ use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
+ *
  * @group integration
  */
 class RedisCasterTest extends TestCase
@@ -49,7 +50,7 @@ EODUMP;
         }
 
         $redisHost = explode(':', getenv('REDIS_HOST')) + [1 => 6379];
-        $redis = new $class;
+        $redis = new $class();
         try {
             $redis->connect(...$redisHost);
         } catch (\Exception $e) {

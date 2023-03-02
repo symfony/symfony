@@ -40,7 +40,7 @@ class ContainerTest extends TestCase
         $this->assertEquals($expected, Container::camelize($id), sprintf('Container::camelize("%s")', $id));
     }
 
-    public function dataForTestCamelize()
+    public static function dataForTestCamelize()
     {
         return [
             ['foo_bar', 'FooBar'],
@@ -64,7 +64,7 @@ class ContainerTest extends TestCase
         $this->assertEquals($expected, Container::underscore($id), sprintf('Container::underscore("%s")', $id));
     }
 
-    public function dataForTestUnderscore()
+    public static function dataForTestUnderscore()
     {
         return [
             ['FooBar', 'foo_bar'],

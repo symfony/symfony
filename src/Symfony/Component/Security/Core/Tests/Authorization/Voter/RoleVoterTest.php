@@ -30,7 +30,7 @@ class RoleVoterTest extends TestCase
         $this->assertSame($expected, $voter->vote($this->getTokenWithRoleNames($roles), null, $attributes));
     }
 
-    public function getVoteTests()
+    public static function getVoteTests()
     {
         return [
             [[], [], VoterInterface::ACCESS_ABSTAIN],
@@ -56,7 +56,7 @@ class RoleVoterTest extends TestCase
         $this->assertSame($expected, $voter->supportsAttribute($attribute));
     }
 
-    public function provideAttributes()
+    public static function provideAttributes()
     {
         yield ['ROLE_', 'ROLE_foo', true];
         yield ['ROLE_', 'ROLE_', true];

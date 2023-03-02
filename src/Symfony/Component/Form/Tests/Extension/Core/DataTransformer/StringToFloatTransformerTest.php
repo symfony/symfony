@@ -17,7 +17,7 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\StringToFloatTransform
 
 class StringToFloatTransformerTest extends TestCase
 {
-    public function provideTransformations(): array
+    public static function provideTransformations(): array
     {
         return [
             [null, null],
@@ -52,7 +52,7 @@ class StringToFloatTransformerTest extends TestCase
         $transformer->transform('foobar');
     }
 
-    public function provideReverseTransformations(): array
+    public static function provideReverseTransformations(): array
     {
         return [
             [null, null],

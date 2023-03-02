@@ -76,7 +76,7 @@ class WebProfilerBundleKernel extends Kernel
         return sys_get_temp_dir().'/log-'.spl_object_hash($this);
     }
 
-    protected function build(ContainerBuilder $container)
+    protected function build(ContainerBuilder $container): void
     {
         $container->register('data_collector.dump', DumpDataCollector::class);
         $container->register('logger', NullLogger::class);

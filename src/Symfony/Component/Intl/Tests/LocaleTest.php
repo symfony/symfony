@@ -16,7 +16,7 @@ use Symfony\Component\Intl\Locale;
 
 class LocaleTest extends TestCase
 {
-    public function provideGetFallbackTests()
+    public static function provideGetFallbackTests()
     {
         $tests = [
             ['sl_Latn_IT', 'sl_Latn_IT_nedis'],

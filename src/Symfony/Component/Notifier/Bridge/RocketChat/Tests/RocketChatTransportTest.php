@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\Notifier\Bridge\RocketChat\Tests;
 
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
+use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -23,25 +24,25 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class RocketChatTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null, string $channel = null): RocketChatTransport
+    public static function createTransport(HttpClientInterface $client = null, string $channel = null): RocketChatTransport
     {
-        return new RocketChatTransport('testAccessToken', $channel, $client ?? $this->createMock(HttpClientInterface::class));
+        return new RocketChatTransport('testAccessToken', $channel, $client ?? new MockHttpClient());
     }
 
-    public function toStringProvider(): iterable
+    public static function toStringProvider(): iterable
     {
-        yield ['rocketchat://rocketchat.com', $this->createTransport()];
-        yield ['rocketchat://rocketchat.com?channel=testChannel', $this->createTransport(null, 'testChannel')];
+        yield ['rocketchat://rocketchat.com', self::createTransport()];
+        yield ['rocketchat://rocketchat.com?channel=testChannel', self::createTransport(null, 'testChannel')];
     }
 
-    public function supportedMessagesProvider(): iterable
+    public static function supportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
     }
 
-    public function unsupportedMessagesProvider(): iterable
+    public static function unsupportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [new DummyMessage()];
     }
 }

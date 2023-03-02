@@ -758,7 +758,7 @@ class DebugClassLoader
                 if ('.' !== $f[0]) {
                     $dirFiles[$f] = $f;
                     if ($f === $file) {
-                        $kFile = $k = $file;
+                        $kFile = $file;
                     } elseif ($f !== $k = strtolower($f)) {
                         $dirFiles[$k] = $f;
                     }

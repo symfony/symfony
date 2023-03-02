@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `XmlEncoder::SAVE_OPTIONS` context option
+ * Deprecate `MissingConstructorArgumentsException` in favor of `MissingConstructorArgumentException`
  * Add `CollectionDenormalizer` to write an array of objects inside a single object
 
 6.2

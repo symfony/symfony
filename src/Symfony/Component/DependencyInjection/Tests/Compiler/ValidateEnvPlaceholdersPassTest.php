@@ -389,7 +389,7 @@ class EnvExtension extends Extension
         return $this->configuration;
     }
 
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         if (!array_filter($configs)) {
             return;

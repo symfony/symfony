@@ -5,7 +5,7 @@ use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 
 class ProjectExtension implements ExtensionInterface
 {
-    public function load(array $configs, ContainerBuilder $configuration)
+    public function load(array $configs, ContainerBuilder $configuration): void
     {
         $configuration->setParameter('project.configs', $configs);
         $configs = array_filter($configs);
@@ -21,8 +21,6 @@ class ProjectExtension implements ExtensionInterface
 
         $configuration->register('project.service.foo', 'FooClass')->setPublic(true);
         $configuration->setParameter('project.parameter.foo', $config['foo'] ?? 'foobar');
-
-        return $configuration;
     }
 
     public function getXsdValidationBasePath(): string|false

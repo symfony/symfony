@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\Notifier\Bridge\Gitter\Tests;
 
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\Gitter\GitterTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
+use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -23,24 +24,24 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class GitterTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null): GitterTransport
+    public static function createTransport(HttpClientInterface $client = null): GitterTransport
     {
-        return (new GitterTransport('token', '5539a3ee5etest0d3255bfef', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('api.gitter.im');
+        return (new GitterTransport('token', '5539a3ee5etest0d3255bfef', $client ?? new MockHttpClient()))->setHost('api.gitter.im');
     }
 
-    public function toStringProvider(): iterable
+    public static function toStringProvider(): iterable
     {
-        yield ['gitter://api.gitter.im?room_id=5539a3ee5etest0d3255bfef', $this->createTransport()];
+        yield ['gitter://api.gitter.im?room_id=5539a3ee5etest0d3255bfef', self::createTransport()];
     }
 
-    public function supportedMessagesProvider(): iterable
+    public static function supportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
     }
 
-    public function unsupportedMessagesProvider(): iterable
+    public static function unsupportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [new DummyMessage()];
     }
 }

@@ -31,7 +31,7 @@ class UrlHelperTest extends TestCase
         $this->assertEquals($expected, $helper->getAbsoluteUrl($path));
     }
 
-    public function getGenerateAbsoluteUrlData()
+    public static function getGenerateAbsoluteUrlData()
     {
         return [
             ['http://localhost/foo.png', '/foo.png', '/foo/bar.html'],
@@ -83,7 +83,7 @@ class UrlHelperTest extends TestCase
         $this->assertEquals($path, $helper->getAbsoluteUrl($path));
     }
 
-    public function getGenerateAbsoluteUrlRequestContextData()
+    public static function getGenerateAbsoluteUrlRequestContextData()
     {
         return [
             ['/foo.png', '/foo', 'localhost', 'http', 80, 443, 'http://localhost/foo.png'],
@@ -124,7 +124,7 @@ class UrlHelperTest extends TestCase
         $this->assertEquals($expected, $urlHelper->getRelativePath($path));
     }
 
-    public function getGenerateRelativePathData()
+    public static function getGenerateRelativePathData()
     {
         return [
             ['../foo.png', '/foo.png', '/foo/bar.html'],

@@ -51,8 +51,8 @@ interface SurrogateInterface
     /**
      * Renders a Surrogate tag.
      *
-     * @param string $alt     An alternate URI
-     * @param string $comment A comment to add as an esi:include tag
+     * @param string|null $alt     An alternate URI
+     * @param string      $comment A comment to add as an esi:include tag
      */
     public function renderIncludeTag(string $uri, string $alt = null, bool $ignoreErrors = true, string $comment = ''): string;
 

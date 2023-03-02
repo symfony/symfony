@@ -42,7 +42,7 @@ class PropertyInfoPassTest extends TestCase
         $this->assertEquals($expected, $definition->getArgument($index));
     }
 
-    public function provideTags()
+    public static function provideTags()
     {
         return [
             [0, 'property_info.list_extractor'],

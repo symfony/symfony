@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Tests\Extension\PasswordHasher\Type;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\PasswordHasher\EventListener\PasswordHasherListener;
@@ -78,6 +79,36 @@ class PasswordTypePasswordHasherExtensionTest extends TypeTestCase
 
         $this->assertTrue($form->isValid());
         $this->assertSame($user->getPassword(), $hashedPassword);
+    }
+
+    public function testPasswordHashSkippedWithEmptyPassword()
+    {
+        $oldHashedPassword = 'PreviousHashedPassword';
+
+        $user = new User();
+        $user->setPassword($oldHashedPassword);
+
+        $this->passwordHasher
+            ->expects($this->never())
+            ->method('hashPassword')
+        ;
+
+        $this->assertEquals($user->getPassword(), $oldHashedPassword);
+
+        $form = $this->factory
+            ->createBuilder(FormType::class, $user)
+            ->add('plainPassword', PasswordType::class, [
+                'hash_property_path' => 'password',
+                'mapped' => false,
+                'required' => false,
+            ])
+            ->getForm()
+        ;
+
+        $form->submit(['plainPassword' => '']);
+
+        $this->assertTrue($form->isValid());
+        $this->assertSame($user->getPassword(), $oldHashedPassword);
     }
 
     public function testPasswordHashSuccessWithEmptyData()

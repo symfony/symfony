@@ -65,7 +65,7 @@ class CompiledUrlMatcherDumperTest extends TestCase
         $this->assertStringEqualsFile($basePath.$fixture, $dumper->dump());
     }
 
-    public function getRouteCollections()
+    public static function getRouteCollections()
     {
         /* test case 1 */
 

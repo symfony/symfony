@@ -142,7 +142,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertEquals($responseRange, $response->headers->get('Content-Range'));
     }
 
-    public function provideRanges()
+    public static function provideRanges()
     {
         return [
             ['bytes=1-4', 1, 4, 'bytes 1-4/35'],
@@ -196,7 +196,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    public function provideFullFileRanges()
+    public static function provideFullFileRanges()
     {
         return [
             ['bytes=0-'],
@@ -262,7 +262,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertEquals('bytes */35', $response->headers->get('Content-Range'));
     }
 
-    public function provideInvalidRanges()
+    public static function provideInvalidRanges()
     {
         return [
             ['bytes=-40'],
@@ -288,7 +288,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertStringContainsString('README.md', $response->headers->get('X-Sendfile'));
     }
 
-    public function provideXSendfileFiles()
+    public static function provideXSendfileFiles()
     {
         return [
             [__DIR__.'/../README.md'],
@@ -354,7 +354,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertEquals('foo', $response->headers->get('Accept-Ranges'));
     }
 
-    public function getSampleXAccelMappings()
+    public static function getSampleXAccelMappings()
     {
         return [
             ['/var/www/var/www/files/foo.txt', '/var/www/=/files/', '/files/var/www/files/foo.txt'],

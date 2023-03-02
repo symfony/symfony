@@ -84,7 +84,7 @@ class CurrencyValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidCurrencies()
+    public static function getValidCurrencies()
     {
         return [
             ['EUR'],
@@ -127,7 +127,7 @@ class CurrencyValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidCurrencies()
+    public static function getInvalidCurrencies()
     {
         return [
             ['EN'],

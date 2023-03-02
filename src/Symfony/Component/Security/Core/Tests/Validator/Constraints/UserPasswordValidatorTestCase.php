@@ -18,7 +18,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator;
-use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
@@ -91,7 +90,7 @@ abstract class UserPasswordValidatorTestCase extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function provideConstraints(): iterable
+    public static function provideConstraints(): iterable
     {
         yield 'Doctrine style' => [new UserPassword(['message' => 'myMessage'])];
 
@@ -113,7 +112,7 @@ abstract class UserPasswordValidatorTestCase extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function emptyPasswordData()
+    public static function emptyPasswordData()
     {
         return [
             [null],

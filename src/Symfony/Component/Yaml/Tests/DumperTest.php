@@ -225,7 +225,7 @@ EOF;
         $this->assertSameData($input, $this->parser->parse($expected));
     }
 
-    public function getEscapeSequences()
+    public static function getEscapeSequences()
     {
         return [
             'empty string' => ['', "''"],
@@ -275,7 +275,7 @@ EOF;
         $this->assertSameData($expected, $this->parser->parse($yaml, Yaml::PARSE_OBJECT_FOR_MAP));
     }
 
-    public function objectAsMapProvider()
+    public static function objectAsMapProvider()
     {
         $tests = [];
 
@@ -825,7 +825,7 @@ YAML;
         $this->assertSame($expected, $this->dumper->dump($input, $inline ? 0 : 4, 0, $flags));
     }
 
-    public function getNumericKeyData()
+    public static function getNumericKeyData()
     {
         yield 'Int key with flag inline' => [
             [200 => 'foo'],
@@ -930,7 +930,7 @@ YAML;
         $this->assertSame($expected, rtrim($this->dumper->dump($input, 1)));
     }
 
-    public function getDateTimeData()
+    public static function getDateTimeData()
     {
         yield 'Date without subsecond precision' => [
             ['date' => new \DateTimeImmutable('2023-01-24T01:02:03Z')],

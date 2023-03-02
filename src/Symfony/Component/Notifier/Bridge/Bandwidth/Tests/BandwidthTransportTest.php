@@ -15,17 +15,17 @@ use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\Bandwidth\BandwidthTransport;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
+use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class BandwidthTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null, string $from = 'from'): BandwidthTransport
+    public static function createTransport(HttpClientInterface $client = null, string $from = 'from'): BandwidthTransport
     {
-        return new BandwidthTransport('username', 'password', $from, 'account_id', 'application_id', 'priority', $client ?? $this->createMock(HttpClientInterface::class));
+        return new BandwidthTransport('username', 'password', $from, 'account_id', 'application_id', 'priority', $client ?? new MockHttpClient());
     }
 
     public function invalidFromProvider(): iterable
@@ -34,7 +34,7 @@ final class BandwidthTransportTest extends TransportTestCase
         yield 'phone number too short' => ['+1'];
     }
 
-    public function supportedMessagesProvider(): iterable
+    public static function supportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
     }
@@ -72,18 +72,18 @@ final class BandwidthTransportTest extends TransportTestCase
         self::assertSame('foo', $sentMessage->getMessageId());
     }
 
-    public function toStringProvider(): iterable
+    public static function toStringProvider(): iterable
     {
-        yield ['bandwidth://messaging.bandwidth.com?from=from&account_id=account_id&application_id=application_id&priority=priority', $this->createTransport()];
+        yield ['bandwidth://messaging.bandwidth.com?from=from&account_id=account_id&application_id=application_id&priority=priority', self::createTransport()];
     }
 
-    public function unsupportedMessagesProvider(): iterable
+    public static function unsupportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [new DummyMessage()];
     }
 
-    public function validFromProvider(): iterable
+    public static function validFromProvider(): iterable
     {
         yield ['+11'];
         yield ['+112'];

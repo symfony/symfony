@@ -187,7 +187,7 @@ class EntityValueResolverTest extends TestCase
         $this->assertSame([null], $resolver->resolve($request, $argument));
     }
 
-    public function idsProvider(): iterable
+    public static function idsProvider(): iterable
     {
         yield [1];
         yield [0];

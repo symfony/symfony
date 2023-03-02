@@ -73,7 +73,8 @@ class EarlyExpirationHandler implements MessageHandlerInterface
         $startTime = microtime(true);
         $pool = $message->findPool($this->reverseContainer);
         $callback = $message->findCallback($this->reverseContainer);
-        $value = $callback($item);
+        $save = true;
+        $value = $callback($item, $save);
         $setMetadata($item, $startTime);
         $pool->save($item->set($value));
     }

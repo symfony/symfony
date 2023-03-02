@@ -24,7 +24,7 @@ class UrlSanitizerTest extends TestCase
         $this->assertSame($expected, UrlSanitizer::sanitize($input, $allowedSchemes, $forceHttps, $allowedHosts, $allowRelative));
     }
 
-    public function provideSanitize()
+    public static function provideSanitize()
     {
         // Simple accepted cases
         yield [
@@ -312,7 +312,7 @@ class UrlSanitizerTest extends TestCase
         }
     }
 
-    public function provideParse(): iterable
+    public static function provideParse(): iterable
     {
         $urls = [
             '' => null,

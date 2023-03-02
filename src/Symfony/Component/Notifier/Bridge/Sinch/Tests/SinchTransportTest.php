@@ -11,33 +11,34 @@
 
 namespace Symfony\Component\Notifier\Bridge\Sinch\Tests;
 
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\Sinch\SinchTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
+use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class SinchTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null): SinchTransport
+    public static function createTransport(HttpClientInterface $client = null): SinchTransport
     {
-        return new SinchTransport('accountSid', 'authToken', 'sender', $client ?? $this->createMock(HttpClientInterface::class));
+        return new SinchTransport('accountSid', 'authToken', 'sender', $client ?? new MockHttpClient());
     }
 
-    public function toStringProvider(): iterable
+    public static function toStringProvider(): iterable
     {
-        yield ['sinch://sms.api.sinch.com?from=sender', $this->createTransport()];
+        yield ['sinch://sms.api.sinch.com?from=sender', self::createTransport()];
     }
 
-    public function supportedMessagesProvider(): iterable
+    public static function supportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
     }
 
-    public function unsupportedMessagesProvider(): iterable
+    public static function unsupportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [new DummyMessage()];
     }
 }

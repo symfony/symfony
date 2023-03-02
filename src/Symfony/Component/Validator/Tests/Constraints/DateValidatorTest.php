@@ -53,7 +53,7 @@ class DateValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidDates()
+    public static function getValidDates()
     {
         return [
             ['2010-01-01'],
@@ -91,7 +91,7 @@ class DateValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidDates()
+    public static function getInvalidDates()
     {
         return [
             ['foobar', Date::INVALID_FORMAT_ERROR],

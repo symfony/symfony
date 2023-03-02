@@ -19,6 +19,7 @@ use Symfony\Component\Lock\Store\RedisStore;
  * @author Jérémy Derussé <jeremy@derusse.com>
  *
  * @requires extension redis
+ *
  * @group integration
  */
 class RedisStoreTest extends AbstractRedisStoreTestCase

@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Serializer;
 
 class DeserializeNestedArrayOfObjectsTest extends TestCase
 {
-    public function provider()
+    public static function provider()
     {
         return [
             // from property PhpDoc

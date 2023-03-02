@@ -21,7 +21,7 @@ final class MessageBirdTransportFactoryTest extends TransportFactoryTestCase
         return new MessageBirdTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'messagebird://host.test?from=0611223344',
@@ -29,18 +29,18 @@ final class MessageBirdTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'messagebird://token@default?from=0611223344'];
         yield [false, 'somethingElse://token@default?from=0611223344'];
     }
 
-    public function missingRequiredOptionProvider(): iterable
+    public static function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: from' => ['messagebird://token@default'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://token@default?from=0611223344'];
         yield ['somethingElse://token@default']; // missing "from" option

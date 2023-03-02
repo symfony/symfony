@@ -68,6 +68,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('container.preload', ['class' => TemplateWrapper::class])
 
         ->alias('Twig_Environment', 'twig')
+            ->deprecate('symfony/twig-bundle', '6.3', 'The "%alias_id%" service alias is deprecated, use "'.Environment::class.'" or "twig" instead.')
         ->alias(Environment::class, 'twig')
 
         ->set('twig.app_variable', AppVariable::class)

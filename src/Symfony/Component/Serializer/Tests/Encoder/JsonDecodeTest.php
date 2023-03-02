@@ -43,7 +43,7 @@ class JsonDecodeTest extends TestCase
         );
     }
 
-    public function decodeProvider()
+    public static function decodeProvider()
     {
         $stdClass = new \stdClass();
         $stdClass->foo = 'bar';
@@ -65,7 +65,7 @@ class JsonDecodeTest extends TestCase
         $this->decode->decode($value, JsonEncoder::FORMAT);
     }
 
-    public function decodeProviderException()
+    public static function decodeProviderException()
     {
         return [
             ["{'foo': 'bar'}"],

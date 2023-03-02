@@ -53,7 +53,7 @@ class GeneratedConfigTest extends TestCase
         parent::tearDown();
     }
 
-    public function fixtureNames()
+    public static function fixtureNames()
     {
         $array = [
             'ScalarNormalizedTypes' => 'scalar_normalized_types',

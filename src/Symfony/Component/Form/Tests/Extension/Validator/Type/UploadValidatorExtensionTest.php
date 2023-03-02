@@ -42,7 +42,7 @@ class DummyTranslator implements TranslatorInterface, LocaleAwareInterface
         return 'translated max {{ max }}!';
     }
 
-    public function setLocale($locale)
+    public function setLocale($locale): void
     {
     }
 

@@ -232,7 +232,6 @@ trait LazyGhostTrait
     {
         $propertyScopes = Hydrator::$propertyScopes[$this::class] ??= Hydrator::getPropertyScopes($this::class);
         $scope = null;
-        $state = null;
 
         if ([$class, , $readonlyScope] = $propertyScopes[$name] ?? null) {
             $scope = Registry::getScope($propertyScopes, $class, $name, $readonlyScope);

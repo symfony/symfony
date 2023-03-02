@@ -8,6 +8,7 @@ Configuration examples:
 ```dotenv
 # API
 MAILER_DSN=mailjet+api://$PUBLIC_KEY:$PRIVATE_KEY@default
+MAILER_DSN=mailjet+api://$PUBLIC_KEY:$PRIVATE_KEY@default?sandbox=true
 # SMTP
 MAILER_DSN=mailjet+smtp://$PUBLIC_KEY:$PRIVATE_KEY@default
 ```

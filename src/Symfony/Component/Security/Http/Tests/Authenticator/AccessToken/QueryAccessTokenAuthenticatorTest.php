@@ -88,7 +88,7 @@ class QueryAccessTokenAuthenticatorTest extends TestCase
         $this->authenticator->authenticate($request);
     }
 
-    public function provideInvalidAuthenticateData(): iterable
+    public static function provideInvalidAuthenticateData(): iterable
     {
         $request = new Request();
         yield [$request, 'Invalid credentials.', BadCredentialsException::class];

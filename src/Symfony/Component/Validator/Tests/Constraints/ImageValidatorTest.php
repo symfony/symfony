@@ -86,7 +86,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function provideConstraintsWithNotFoundMessage(): iterable
+    public static function provideConstraintsWithNotFoundMessage(): iterable
     {
         yield 'Doctrine style' => [new Image([
             'notFoundMessage' => 'myMessage',
@@ -124,7 +124,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function provideMinWidthConstraints(): iterable
+    public static function provideMinWidthConstraints(): iterable
     {
         yield 'Doctrine style' => [new Image([
             'minWidth' => 3,
@@ -149,7 +149,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function provideMaxWidthConstraints(): iterable
+    public static function provideMaxWidthConstraints(): iterable
     {
         yield 'Doctrine style' => [new Image([
             'maxWidth' => 1,
@@ -174,7 +174,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function provideMinHeightConstraints(): iterable
+    public static function provideMinHeightConstraints(): iterable
     {
         yield 'Doctrine style' => [new Image([
             'minHeight' => 3,
@@ -199,7 +199,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function provideMaxHeightConstraints(): iterable
+    public static function provideMaxHeightConstraints(): iterable
     {
         yield 'Doctrine style' => [new Image([
             'maxHeight' => 1,
@@ -226,7 +226,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function provideMinPixelsConstraints(): iterable
+    public static function provideMinPixelsConstraints(): iterable
     {
         yield 'Doctrine style' => [new Image([
             'minPixels' => 5,
@@ -253,7 +253,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function provideMaxPixelsConstraints(): iterable
+    public static function provideMaxPixelsConstraints(): iterable
     {
         yield 'Doctrine style' => [new Image([
             'maxPixels' => 3,
@@ -338,7 +338,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function provideMinRatioConstraints(): iterable
+    public static function provideMinRatioConstraints(): iterable
     {
         yield 'Doctrine style' => [new Image([
             'minRatio' => 2,
@@ -363,7 +363,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function provideMaxRatioConstraints(): iterable
+    public static function provideMaxRatioConstraints(): iterable
     {
         yield 'Doctrine style' => [new Image([
             'maxRatio' => 0.5,
@@ -441,7 +441,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function provideAllowSquareConstraints(): iterable
+    public static function provideAllowSquareConstraints(): iterable
     {
         yield 'Doctrine style' => [new Image([
             'allowSquare' => false,
@@ -466,7 +466,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function provideAllowLandscapeConstraints(): iterable
+    public static function provideAllowLandscapeConstraints(): iterable
     {
         yield 'Doctrine style' => [new Image([
             'allowLandscape' => false,
@@ -491,7 +491,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function provideAllowPortraitConstraints(): iterable
+    public static function provideAllowPortraitConstraints(): iterable
     {
         yield 'Doctrine style' => [new Image([
             'allowPortrait' => false,
@@ -537,7 +537,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function provideDetectCorruptedConstraints(): iterable
+    public static function provideDetectCorruptedConstraints(): iterable
     {
         yield 'Doctrine style' => [new Image([
             'detectCorrupted' => true,
@@ -564,7 +564,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function provideInvalidMimeTypeWithNarrowedSet()
+    public static function provideInvalidMimeTypeWithNarrowedSet()
     {
         yield 'Doctrine style' => [new Image([
             'mimeTypes' => [

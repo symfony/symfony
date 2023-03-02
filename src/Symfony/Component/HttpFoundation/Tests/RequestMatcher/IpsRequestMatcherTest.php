@@ -27,7 +27,7 @@ class IpsRequestMatcherTest extends TestCase
         $this->assertSame($expected, $matcher->matches($request));
     }
 
-    public function getData()
+    public static function getData()
     {
         return [
             [[], true],

@@ -211,7 +211,7 @@ class AnnotationLoaderTest extends TestCase
         $this->assertEquals($expected, $metadata);
     }
 
-    public function provideNamespaces(): iterable
+    public static function provideNamespaces(): iterable
     {
         yield 'annotations' => ['Symfony\Component\Validator\Tests\Fixtures\Annotation'];
         yield 'attributes' => ['Symfony\Component\Validator\Tests\Fixtures\Attribute'];

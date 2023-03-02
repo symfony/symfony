@@ -30,7 +30,7 @@ class DepthRangeFilterIteratorTest extends RealIteratorTestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function getAcceptData()
+    public static function getAcceptData()
     {
         $lessThan1 = [
             '.git',

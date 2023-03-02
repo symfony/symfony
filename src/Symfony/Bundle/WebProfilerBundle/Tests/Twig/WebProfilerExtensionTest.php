@@ -42,7 +42,7 @@ class WebProfilerExtensionTest extends TestCase
         self::assertSame($dump2HasHeader, str_contains($dump2, $needle));
     }
 
-    public function provideMessages(): iterable
+    public static function provideMessages(): iterable
     {
         yield ['Some message', ['foo' => 'foo', 'bar' => 'bar'], false, true];
         yield ['Some message {@see some text}', ['foo' => 'foo', 'bar' => 'bar'], false, true];

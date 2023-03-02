@@ -69,7 +69,7 @@ class HttpUtilsTest extends TestCase
         $this->assertTrue($response->isRedirect('http://localhost/'));
     }
 
-    public function badRequestDomainUrls()
+    public static function badRequestDomainUrls()
     {
         return [
             ['http://pirate.net/foo'],
@@ -175,7 +175,7 @@ class HttpUtilsTest extends TestCase
         $this->assertSame('foo', $subRequest->attributes->get($attribute));
     }
 
-    public function provideSecurityRequestAttributes()
+    public static function provideSecurityRequestAttributes()
     {
         return [
             [SecurityRequestAttributes::AUTHENTICATION_ERROR],

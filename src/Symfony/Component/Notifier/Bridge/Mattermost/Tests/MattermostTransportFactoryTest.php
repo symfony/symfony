@@ -24,7 +24,7 @@ final class MattermostTransportFactoryTest extends TransportFactoryTestCase
         return new MattermostTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'mattermost://host.test?channel=testChannel',
@@ -47,23 +47,23 @@ final class MattermostTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'mattermost://token@host?channel=testChannel'];
         yield [false, 'somethingElse://token@host?channel=testChannel'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield 'missing token' => ['mattermost://host.test?channel=testChannel'];
     }
 
-    public function missingRequiredOptionProvider(): iterable
+    public static function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: channel' => ['mattermost://token@host'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://token@host?channel=testChannel'];
         yield ['somethingElse://token@host']; // missing "channel" option

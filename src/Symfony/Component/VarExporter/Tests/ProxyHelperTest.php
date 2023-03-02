@@ -26,7 +26,7 @@ class ProxyHelperTest extends TestCase
         $this->assertSame($expected, ProxyHelper::exportSignature($method));
     }
 
-    public function provideExportSignature()
+    public static function provideExportSignature()
     {
         $methods = (new \ReflectionClass(TestForProxyHelper::class))->getMethods();
         $source = file(__FILE__);

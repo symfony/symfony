@@ -236,10 +236,10 @@ class PdoSessionHandler extends AbstractSessionHandler
      * saved in a BLOB. One could also use a shorter inlined varbinary column
      * if one was sure the data fits into it.
      *
+     * @return void
+     *
      * @throws \PDOException    When the table already exists
      * @throws \DomainException When an unsupported PDO driver is used
-     *
-     * @return void
      */
     public function createTable()
     {

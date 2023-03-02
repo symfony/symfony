@@ -16,6 +16,7 @@ use Symfony\Component\Form\Exception\InvalidArgumentException;
 
 /**
  * @template TTransformedValue
+ *
  * @implements DataTransformerInterface<\DateTimeInterface, TTransformedValue>
  */
 abstract class BaseDateTimeTransformer implements DataTransformerInterface

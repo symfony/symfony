@@ -32,14 +32,12 @@ use Symfony\Component\Security\Http\SecurityRequestAttributes;
  */
 class UserLoginType extends AbstractType
 {
-    private $requestStack;
-
-    public function __construct(RequestStack $requestStack)
-    {
-        $this->requestStack = $requestStack;
+    public function __construct(
+        private readonly RequestStack $requestStack,
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('username', TextType::class)
@@ -71,7 +69,7 @@ class UserLoginType extends AbstractType
         });
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         /* Note: the form's csrf_token_id must correspond to that for the form login
          * listener in order for the CSRF token to validate successfully.

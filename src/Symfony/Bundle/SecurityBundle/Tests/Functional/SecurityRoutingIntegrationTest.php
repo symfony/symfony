@@ -151,7 +151,7 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
         $this->assertEquals(302, $client->getResponse()->getStatusCode());
     }
 
-    public function provideConfigs()
+    public static function provideConfigs()
     {
         yield [['test_case' => 'StandardFormLogin', 'root_config' => 'base_config.yml']];
         yield [['test_case' => 'StandardFormLogin', 'root_config' => 'routes_as_path.yml']];

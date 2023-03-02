@@ -85,7 +85,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidRelativeUrls()
+    public static function getValidRelativeUrls()
     {
         return [
             ['//example.com'],
@@ -95,7 +95,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function getValidUrls()
+    public static function getValidUrls()
     {
         return [
             ['http://a.pl'],
@@ -177,7 +177,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function getValidUrlsWithWhitespaces()
+    public static function getValidUrlsWithWhitespaces()
     {
         return [
             ["\x20http://www.example.com"],
@@ -225,7 +225,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidRelativeUrls()
+    public static function getInvalidRelativeUrls()
     {
         return [
             ['/example.com'],
@@ -245,7 +245,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function getInvalidUrls()
+    public static function getInvalidUrls()
     {
         return [
             ['example.com'],
@@ -303,7 +303,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidCustomUrls()
+    public static function getValidCustomUrls()
     {
         return [
             ['ftp://example.com'],

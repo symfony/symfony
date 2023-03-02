@@ -21,20 +21,20 @@ class AmazonSnsTransportFactoryTest extends TransportFactoryTestCase
         return new AmazonSnsTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield ['sns://host.test?region=us-east-1', 'sns://host.test'];
         yield ['sns://host.test?region=us-east-1', 'sns://accessId:accessKey@host.test'];
         yield ['sns://host.test?region=eu-west-3', 'sns://host.test?region=eu-west-3'];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'sns://default'];
         yield [false, 'somethingElse://default'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://default'];
     }

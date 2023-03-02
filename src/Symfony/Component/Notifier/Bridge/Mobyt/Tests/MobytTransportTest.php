@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Notifier\Bridge\Mobyt\Tests;
 
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\Mobyt\MobytOptions;
 use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
+use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -24,25 +25,25 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class MobytTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null, string $messageType = MobytOptions::MESSAGE_TYPE_QUALITY_LOW): MobytTransport
+    public static function createTransport(HttpClientInterface $client = null, string $messageType = MobytOptions::MESSAGE_TYPE_QUALITY_LOW): MobytTransport
     {
-        return (new MobytTransport('accountSid', 'authToken', 'from', $messageType, $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
+        return (new MobytTransport('accountSid', 'authToken', 'from', $messageType, $client ?? new MockHttpClient()))->setHost('host.test');
     }
 
-    public function toStringProvider(): iterable
+    public static function toStringProvider(): iterable
     {
-        yield ['mobyt://host.test?from=from&type_quality=LL', $this->createTransport()];
-        yield ['mobyt://host.test?from=from&type_quality=N', $this->createTransport(null, MobytOptions::MESSAGE_TYPE_QUALITY_HIGH)];
+        yield ['mobyt://host.test?from=from&type_quality=LL', self::createTransport()];
+        yield ['mobyt://host.test?from=from&type_quality=N', self::createTransport(null, MobytOptions::MESSAGE_TYPE_QUALITY_HIGH)];
     }
 
-    public function supportedMessagesProvider(): iterable
+    public static function supportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
     }
 
-    public function unsupportedMessagesProvider(): iterable
+    public static function unsupportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [new DummyMessage()];
     }
 }

@@ -20,7 +20,7 @@ use Symfony\Component\Messenger\Worker;
 
 class ResetServicesListenerTest extends TestCase
 {
-    public function provideResetServices(): iterable
+    public static function provideResetServices(): iterable
     {
         yield [true];
         yield [false];

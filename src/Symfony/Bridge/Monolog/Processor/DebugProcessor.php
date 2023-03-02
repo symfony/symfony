@@ -35,7 +35,7 @@ class DebugProcessor implements DebugLoggerInterface, ResetInterface
     {
         $key = $this->requestStack && ($request = $this->requestStack->getCurrentRequest()) ? spl_object_id($request) : '';
 
-        $timestamp = $timestampRfc3339 = false;
+        $timestampRfc3339 = false;
         if ($record['datetime'] instanceof \DateTimeInterface) {
             $timestamp = $record['datetime']->getTimestamp();
             $timestampRfc3339 = $record['datetime']->format(\DateTimeInterface::RFC3339_EXTENDED);

@@ -854,25 +854,6 @@ class DefaultChoiceListFactoryTest extends TestCase
         $this->assertFlatViewWithlabelTranslationParameters($view);
     }
 
-    private function assertScalarListWithChoiceValues(ChoiceListInterface $list)
-    {
-        $this->assertSame(['a', 'b', 'c', 'd'], $list->getValues());
-
-        $this->assertSame([
-            'a' => 'a',
-            'b' => 'b',
-            'c' => 'c',
-            'd' => 'd',
-        ], $list->getChoices());
-
-        $this->assertSame([
-            'a' => 'A',
-            'b' => 'B',
-            'c' => 'C',
-            'd' => 'D',
-        ], $list->getOriginalKeys());
-    }
-
     private function assertObjectListWithGeneratedValues(ChoiceListInterface $list)
     {
         $this->assertSame(['0', '1', '2', '3'], $list->getValues());
@@ -889,25 +870,6 @@ class DefaultChoiceListFactoryTest extends TestCase
             1 => 'B',
             2 => 'C',
             3 => 'D',
-        ], $list->getOriginalKeys());
-    }
-
-    private function assertScalarListWithCustomValues(ChoiceListInterface $list)
-    {
-        $this->assertSame(['a', 'b', '1', '2'], $list->getValues());
-
-        $this->assertSame([
-            'a' => 'a',
-            'b' => 'b',
-            1 => 'c',
-            2 => 'd',
-        ], $list->getChoices());
-
-        $this->assertSame([
-            'a' => 'A',
-            'b' => 'B',
-            1 => 'C',
-            2 => 'D',
         ], $list->getOriginalKeys());
     }
 

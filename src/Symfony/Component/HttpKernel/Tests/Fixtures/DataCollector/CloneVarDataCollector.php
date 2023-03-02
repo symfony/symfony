@@ -16,10 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\VarDumper\Cloner\Data;
 
-/**
- * @final since Symfony 6.3
- */
-class CloneVarDataCollector extends DataCollector
+final class CloneVarDataCollector extends DataCollector
 {
     private $varToClone;
 
@@ -28,26 +25,17 @@ class CloneVarDataCollector extends DataCollector
         $this->varToClone = $varToClone;
     }
 
-    /**
-     * @return void
-     */
-    public function collect(Request $request, Response $response, \Throwable $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null): void
     {
         $this->data = $this->cloneVar($this->varToClone);
     }
 
-    /**
-     * @return void
-     */
-    public function reset()
+    public function reset(): void
     {
         $this->data = [];
     }
 
-    /**
-     * @return Data
-     */
-    public function getData()
+    public function getData(): Data
     {
         return $this->data;
     }

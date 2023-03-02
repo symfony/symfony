@@ -280,7 +280,7 @@ class ViolationMapperTest extends TestCase
         $this->assertCount(1, $grandChild->getErrors(), $grandChild->getName().' should have one error');
     }
 
-    public function provideDefaultTests()
+    public static function provideDefaultTests()
     {
         // The mapping must be deterministic! If a child has the property path "[street]",
         // "data[street]" should be mapped, but "data.street" should not!
@@ -838,7 +838,7 @@ class ViolationMapperTest extends TestCase
         }
     }
 
-    public function provideCustomDataErrorTests()
+    public static function provideCustomDataErrorTests()
     {
         return [
             // mapping target, error mapping, child name, its property path, grand child name, its property path, violation path
@@ -1312,7 +1312,7 @@ class ViolationMapperTest extends TestCase
         }
     }
 
-    public function provideCustomFormErrorTests()
+    public static function provideCustomFormErrorTests()
     {
         // This case is different than the data errors, because here the
         // left side of the mapping refers to the property path of the actual
@@ -1503,7 +1503,7 @@ class ViolationMapperTest extends TestCase
         }
     }
 
-    public function provideErrorTestsForFormInheritingParentData()
+    public static function provideErrorTestsForFormInheritingParentData()
     {
         return [
             // mapping target, child name, its property path, grand child name, its property path, violation path

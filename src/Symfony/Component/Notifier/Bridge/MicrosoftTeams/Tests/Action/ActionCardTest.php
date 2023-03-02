@@ -43,7 +43,7 @@ final class ActionCardTest extends TestCase
         $this->assertSame($expected, $action->toArray()['inputs']);
     }
 
-    public function availableInputs(): \Generator
+    public static function availableInputs(): \Generator
     {
         yield [[['@type' => 'DateInput']], new DateInput()];
         yield [[['@type' => 'TextInput']], new TextInput()];
@@ -62,7 +62,7 @@ final class ActionCardTest extends TestCase
         $this->assertSame($expected, $section->toArray()['actions']);
     }
 
-    public function compatibleActions(): \Generator
+    public static function compatibleActions(): \Generator
     {
         yield [[['@type' => 'HttpPOST']], new HttpPostAction()];
         yield [[['@type' => 'OpenUri']], new OpenUriAction()];

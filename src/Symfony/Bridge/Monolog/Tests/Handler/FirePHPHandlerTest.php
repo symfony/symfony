@@ -112,6 +112,22 @@ class FirePHPHandlerTest extends TestCase
         return $handler;
     }
 
+    public function testOnKernelResponseShouldNotTriggerDeprecation()
+    {
+        $handler = $this->createHandler();
+
+        $request = Request::create('/');
+        $request->headers->remove('User-Agent');
+
+        $error = null;
+        set_error_handler(function ($type, $message) use (&$error) { $error = $message; }, \E_DEPRECATED);
+
+        $this->dispatchResponseEvent($handler, $request);
+        restore_error_handler();
+
+        $this->assertNull($error);
+    }
+
     private function dispatchResponseEvent(FirePHPHandler $handler, Request $request): Response
     {
         $dispatcher = new EventDispatcher();

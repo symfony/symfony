@@ -24,7 +24,7 @@ final class ExpoTransportFactoryTest extends TransportFactoryTestCase
         return new ExpoTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'expo://exp.host/--/api/v2/push/send',
@@ -32,13 +32,13 @@ final class ExpoTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'expo://default?accessToken=test'];
         yield [false, 'somethingElse://username:password@default'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://username:password@default'];
     }

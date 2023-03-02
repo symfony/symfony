@@ -80,7 +80,7 @@ class ProjectServiceContainer extends Container
      */
     protected static function getFooService($container)
     {
-        $container->factories['service_container']['foo'] = static function ($container) {
+        $container->factories['service_container']['foo'] = function ($container) {
             return new \stdClass();
         };
 

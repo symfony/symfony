@@ -48,7 +48,7 @@ class ExpressionLanguageProviderTest extends TestCase
         $this->assertSame($expected, $this->expressionLanguage->compile($expression));
     }
 
-    public function compileProvider(): iterable
+    public static function compileProvider(): iterable
     {
         return [
             ['env("APP_ENV")', '($context->getParameter(\'_functions\')->get(\'env\')("APP_ENV"))'],
@@ -65,7 +65,7 @@ class ExpressionLanguageProviderTest extends TestCase
         $this->assertSame($expected, $this->expressionLanguage->evaluate($expression, ['context' => $this->context]));
     }
 
-    public function evaluateProvider(): iterable
+    public static function evaluateProvider(): iterable
     {
         return [
             ['env("APP_ENV")', 'test'],

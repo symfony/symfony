@@ -43,6 +43,15 @@ class SessionStrategyListener implements EventSubscriberInterface
             return;
         }
 
+        if ($previousToken = $event->getPreviousToken()) {
+            $user = $token->getUserIdentifier();
+            $previousUser = $previousToken->getUserIdentifier();
+
+            if ('' !== ($user ?? '') && $user === $previousUser) {
+                return;
+            }
+        }
+
         $this->sessionAuthenticationStrategy->onAuthentication($request, $token);
     }
 

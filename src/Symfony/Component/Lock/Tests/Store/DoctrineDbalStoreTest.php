@@ -80,7 +80,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
         }
     }
 
-    public function provideDsn()
+    public static function provideDsn()
     {
         $dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
         yield ['sqlite://localhost/'.$dbFile.'1', $dbFile.'1'];
@@ -128,7 +128,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
         $store->save($key);
     }
 
-    public function providePlatforms()
+    public static function providePlatforms()
     {
         yield [\Doctrine\DBAL\Platforms\PostgreSQLPlatform::class];
         yield [\Doctrine\DBAL\Platforms\PostgreSQL94Platform::class];

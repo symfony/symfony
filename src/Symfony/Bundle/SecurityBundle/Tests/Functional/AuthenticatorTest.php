@@ -60,7 +60,7 @@ class AuthenticatorTest extends AbstractWebTestCase
         $this->assertJsonStringEqualsJsonString('{"email":"'.$email.'"}', $client->getResponse()->getContent());
     }
 
-    public function provideEmails()
+    public static function provideEmails()
     {
         yield ['jane@example.org', true];
         yield ['john@example.org', false];
@@ -84,7 +84,7 @@ class AuthenticatorTest extends AbstractWebTestCase
         $this->assertEquals('Welcome '.$username.'!', $client->getResponse()->getContent());
     }
 
-    public function provideEmailsWithFirewalls()
+    public static function provideEmailsWithFirewalls()
     {
         yield ['jane@example.org', 'main'];
         yield ['john@example.org', 'custom'];

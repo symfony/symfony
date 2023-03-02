@@ -402,7 +402,7 @@ class ErrorHandlerTest extends TestCase
         }
     }
 
-    public function handleExceptionProvider(): array
+    public static function handleExceptionProvider(): array
     {
         return [
             ['Uncaught Exception: foo', new \Exception('foo')],
@@ -602,7 +602,7 @@ class ErrorHandlerTest extends TestCase
         }
     }
 
-    public function errorHandlerWhenLoggingProvider(): iterable
+    public static function errorHandlerWhenLoggingProvider(): iterable
     {
         foreach ([false, true] as $previousHandlerWasDefined) {
             foreach ([false, true] as $loggerSetsAnotherHandler) {

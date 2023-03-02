@@ -21,7 +21,7 @@ use Symfony\Component\Form\NativeRequestHandler;
  */
 class FormConfigTest extends TestCase
 {
-    public function getHtml4Ids()
+    public static function getHtml4Ids()
     {
         return [
             ['z0'],

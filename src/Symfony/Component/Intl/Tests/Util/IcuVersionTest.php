@@ -19,7 +19,7 @@ use Symfony\Component\Intl\Util\IcuVersion;
  */
 class IcuVersionTest extends TestCase
 {
-    public function normalizeProvider()
+    public static function normalizeProvider()
     {
         return [
             [null, '1', '10'],
@@ -49,7 +49,7 @@ class IcuVersionTest extends TestCase
         $this->assertSame($result, IcuVersion::normalize($version, $precision));
     }
 
-    public function compareProvider()
+    public static function compareProvider()
     {
         return [
             [null, '1', '==', '1', true],

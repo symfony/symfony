@@ -24,7 +24,7 @@ class UriResolverTest extends TestCase
         $this->assertEquals($expected, UriResolver::resolve($uri, $baseUri));
     }
 
-    public function provideResolverTests()
+    public static function provideResolverTests()
     {
         return [
             ['/foo', 'http://localhost/bar/foo/', 'http://localhost/foo'],

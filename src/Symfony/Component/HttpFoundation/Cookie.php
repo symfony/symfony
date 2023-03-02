@@ -83,7 +83,7 @@ class Cookie
      * @param string                        $name     The name of the cookie
      * @param string|null                   $value    The value of the cookie
      * @param int|string|\DateTimeInterface $expire   The time the cookie expires
-     * @param string                        $path     The path on the server in which the cookie will be available on
+     * @param string|null                   $path     The path on the server in which the cookie will be available on
      * @param string|null                   $domain   The domain that the cookie is available to
      * @param bool|null                     $secure   Whether the client should send back the cookie only over HTTPS or null to auto-enable this when the request is already using HTTPS
      * @param bool                          $httpOnly Whether the cookie will be made accessible only through the HTTP protocol

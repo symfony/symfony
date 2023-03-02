@@ -64,7 +64,7 @@ EODUMP;
         $this->assertDumpMatchesFormat($expectedDump, $this->reader);
     }
 
-    public function provideNodes()
+    public static function provideNodes()
     {
         return [
             [0, <<<'EODUMP'

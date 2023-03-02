@@ -95,7 +95,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
         $remaining = $propertyPath;
 
         // first element is evaluated differently - no leading dot for properties
-        $pattern = '/^(([^\.\[]++)|\[([^\]]++)\])(.*)/';
+        $pattern = '/^(((?:[^\\\\.\[]|\\\\.)++)|\[([^\]]++)\])(.*)/';
 
         while (preg_match($pattern, $remaining, $matches)) {
             if ('' !== $matches[2]) {
@@ -114,11 +114,15 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
                 $this->isNullSafe[] = false;
             }
 
+            $element = preg_replace('/\\\([.[])/', '$1', $element);
+            if (str_ends_with($element, '\\\\')) {
+                $element = substr($element, 0, -1);
+            }
             $this->elements[] = $element;
 
             $position += \strlen($matches[1]);
             $remaining = $matches[4];
-            $pattern = '/^(\.([^\.|\[]++)|\[([^\]]++)\])(.*)/';
+            $pattern = '/^(\.((?:[^\\\\.\[]|\\\\.)++)|\[([^\]]++)\])(.*)/';
         }
 
         if ('' !== $remaining) {

@@ -43,7 +43,7 @@ class AppVariableTest extends TestCase
         $this->assertEquals($debugFlag, $this->appVariable->getDebug());
     }
 
-    public function debugDataProvider()
+    public static function debugDataProvider()
     {
         return [
             'debug on' => [true],

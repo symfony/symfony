@@ -34,7 +34,7 @@ class StaticPrefixCollectionTest extends TestCase
         $this->assertEquals($expected, $dumped);
     }
 
-    public function routeProvider()
+    public static function routeProvider()
     {
         return [
             'Simple - not nested' => [

@@ -31,12 +31,12 @@ class TestAppKernel extends Kernel
         return __DIR__.'/test';
     }
 
-    public function registerContainerConfiguration(LoaderInterface $loader)
+    public function registerContainerConfiguration(LoaderInterface $loader): void
     {
         $loader->load(__DIR__.\DIRECTORY_SEPARATOR.'config.yml');
     }
 
-    protected function build(ContainerBuilder $container)
+    protected function build(ContainerBuilder $container): void
     {
         $container->register('logger', NullLogger::class);
     }

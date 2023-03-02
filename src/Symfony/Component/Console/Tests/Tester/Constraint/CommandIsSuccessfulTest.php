@@ -47,7 +47,7 @@ final class CommandIsSuccessfulTest extends TestCase
         $this->fail();
     }
 
-    public function providesUnsuccessful(): iterable
+    public static function providesUnsuccessful(): iterable
     {
         yield 'Failed' => ['Command failed.', Command::FAILURE];
         yield 'Invalid' => ['Command was invalid.', Command::INVALID];

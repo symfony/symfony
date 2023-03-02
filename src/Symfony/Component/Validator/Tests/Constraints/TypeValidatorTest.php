@@ -175,7 +175,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidValuesMultipleTypes()
+    public static function getValidValuesMultipleTypes()
     {
         return [
             ['12345', ['array', 'string']],
@@ -197,7 +197,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function provideConstraintsWithMultipleTypes()
+    public static function provideConstraintsWithMultipleTypes()
     {
         yield 'Doctrine style' => [new Type([
             'type' => ['boolean', 'array'],

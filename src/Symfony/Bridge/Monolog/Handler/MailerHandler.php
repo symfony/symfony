@@ -103,7 +103,6 @@ class MailerHandler extends AbstractProcessingHandler
      */
     protected function buildMessage(string $content, array $records): Email
     {
-        $message = null;
         if ($this->messageTemplate instanceof Email) {
             $message = clone $this->messageTemplate;
         } elseif (\is_callable($this->messageTemplate)) {

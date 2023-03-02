@@ -57,7 +57,7 @@ final class OpenUriActionTest extends TestCase
     /**
      * @return \Generator<string, array{0: string}>
      */
-    public function operatingSystems(): \Generator
+    public static function operatingSystems(): \Generator
     {
         yield 'os-android' => ['android'];
         yield 'os-default' => ['default'];

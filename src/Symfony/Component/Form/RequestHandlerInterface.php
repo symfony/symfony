@@ -20,6 +20,8 @@ interface RequestHandlerInterface
 {
     /**
      * Submits a form if it was submitted.
+     *
+     * @return void
      */
     public function handleRequest(FormInterface $form, mixed $request = null);
 

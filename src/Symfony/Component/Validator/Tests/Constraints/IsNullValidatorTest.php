@@ -61,7 +61,7 @@ class IsNullValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidValues()
+    public static function getInvalidValues()
     {
         return [
             [0, '0'],

@@ -21,7 +21,7 @@ final class TelegramTransportFactoryTest extends TransportFactoryTestCase
         return new TelegramTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'telegram://host.test?channel=testChannel',
@@ -29,19 +29,19 @@ final class TelegramTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'telegram://host?channel=testChannel'];
         yield [false, 'somethingElse://host?channel=testChannel'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield 'missing password' => ['telegram://token@host.test?channel=testChannel'];
         yield 'missing token' => ['telegram://host.test?channel=testChannel'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://user:pwd@host'];
     }

@@ -31,7 +31,7 @@ abstract class AbstractAttributeRoutingTestCase extends AbstractWebTestCase
         $this->assertSame('/annotated/create-transaction', $router->generate('symfony_framework_tests_functional_test_annotated_createtransaction'));
     }
 
-    public function getRoutes(): array
+    public static function getRoutes(): array
     {
         return [
             ['/null_request', Request::class],

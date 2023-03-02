@@ -54,7 +54,13 @@ class LengthValidator extends ConstraintValidator
             $invalidCharset = true;
         }
 
-        if ($invalidCharset) {
+        $length = $invalidCharset ? 0 : match ($constraint->countUnit) {
+            Length::COUNT_BYTES => \strlen($stringValue),
+            Length::COUNT_CODEPOINTS => mb_strlen($stringValue, $constraint->charset),
+            Length::COUNT_GRAPHEMES => grapheme_strlen($stringValue),
+        };
+
+        if ($invalidCharset || false === ($length ?? false)) {
             $this->context->buildViolation($constraint->charsetMessage)
                 ->setParameter('{{ value }}', $this->formatValue($stringValue))
                 ->setParameter('{{ charset }}', $constraint->charset)
@@ -64,8 +70,6 @@ class LengthValidator extends ConstraintValidator
 
             return;
         }
-
-        $length = mb_strlen($stringValue, $constraint->charset);
 
         if (null !== $constraint->max && $length > $constraint->max) {
             $exactlyOptionEnabled = $constraint->min == $constraint->max;

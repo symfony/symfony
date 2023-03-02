@@ -21,7 +21,7 @@ final class InfobipTransportFactoryTest extends TransportFactoryTestCase
         return new InfobipTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'infobip://host.test?from=0611223344',
@@ -29,18 +29,18 @@ final class InfobipTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'infobip://authtoken@default?from=0611223344'];
         yield [false, 'somethingElse://authtoken@default?from=0611223344'];
     }
 
-    public function missingRequiredOptionProvider(): iterable
+    public static function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: from' => ['infobip://authtoken@default'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://authtoken@default?from=FROM'];
         yield ['somethingElse://authtoken@default']; // missing "from" option

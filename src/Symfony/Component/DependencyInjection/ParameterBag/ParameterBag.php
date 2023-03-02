@@ -117,9 +117,9 @@ class ParameterBag implements ParameterBagInterface
     /**
      * Deprecates a service container parameter.
      *
-     * @throws ParameterNotFoundException if the parameter is not defined
-     *
      * @return void
+     *
+     * @throws ParameterNotFoundException if the parameter is not defined
      */
     public function deprecate(string $name, string $package, string $version, string $message = 'The parameter "%s" is deprecated.')
     {

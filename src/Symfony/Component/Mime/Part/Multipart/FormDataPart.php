@@ -94,16 +94,35 @@ final class FormDataPart extends AbstractMultipartPart
 
     private function configurePart(string $name, TextPart $part): TextPart
     {
-        static $r;
-
-        $r ??= new \ReflectionProperty(TextPart::class, 'encoding');
-
         $part->setDisposition('form-data');
         $part->setName($name);
         // HTTP does not support \r\n in header values
         $part->getHeaders()->setMaxLineLength(\PHP_INT_MAX);
-        $r->setValue($part, '8bit');
+        if ($part instanceof DataPart) {
+            // data part may specify base64 encoding
+            $this->configureDataPartEncoding($part);
+        } else {
+            $this->configureTextPartEncoding($part);
+        }
 
         return $part;
+    }
+
+    private function configureDataPartEncoding(DataPart $part)
+    {
+        static $r;
+
+        $r ??= new \ReflectionProperty(DataPart::class, 'formEncoding');
+        $formEncoding = $r->getValue($part);
+
+        $this->configureTextPartEncoding($part, $formEncoding);
+    }
+
+    private function configureTextPartEncoding(TextPart $part, $encoding = '8bit')
+    {
+        static $r;
+
+        $r ??= new \ReflectionProperty(TextPart::class, 'encoding');
+        $r->setValue($part, $encoding);
     }
 }

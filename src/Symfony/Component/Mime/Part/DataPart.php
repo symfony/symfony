@@ -26,6 +26,9 @@ class DataPart extends TextPart
     private $mediaType;
     private $cid;
 
+    /** @internal */
+    private $formEncoding;
+
     /**
      * @param resource|string|File $body Use a File instance to defer loading the file until rendering
      */
@@ -42,6 +45,8 @@ class DataPart extends TextPart
 
         parent::__construct($body, null, $subtype, $encoding);
 
+        $this->formEncoding = $encoding ?? '8bit';
+
         if (null !== $filename) {
             $this->filename = $filename;
             $this->setName($filename);
@@ -49,9 +54,9 @@ class DataPart extends TextPart
         $this->setDisposition('attachment');
     }
 
-    public static function fromPath(string $path, string $name = null, string $contentType = null): self
+    public static function fromPath(string $path, string $name = null, string $contentType = null, string $encoding = null): self
     {
-        return new self(new File($path), $name, $contentType);
+        return new self(new File($path), $name, $contentType, $encoding);
     }
 
     /**

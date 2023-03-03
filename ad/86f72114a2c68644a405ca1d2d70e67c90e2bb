@@ -1,0 +1,96 @@
+---------------------------------------------------------------------------
+
+by lcobucci at 2023-02-24T23:35:51Z
+
+This was the BC-break I referred to when I brought up the initial issue 😅
+
+@lyrixx thanks for your work here, there are indeed many factors to take into account when tweaking signal handling.
+
+For my use case, the solution will work fine. It feels a bit cumbersome to modify the event state buuuut it's fine.
+
+It's really important to document the nuances and what's expected from each different use case 👍
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-02-25T15:05:14Z
+
+Yes, it's not so cool to have to edit the event, but we must do it since we cannot now if the end user will stop / exit / return itself.
+
+So by default we should mimic PHP, and the user can opt-in for managing exit themself.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-02-25T17:00:54Z
+
+@lyrixx You can rebase this one (I've merged up the other 2 PRs).
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-02-25T22:56:30Z
+
+Rebase ✅
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-02-26T13:48:31Z
+
+What bc break are you talking about? The new method in the interface? I should update the upgrade.md too!
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-02-26T14:05:56Z
+
+Yes!
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-02-26T17:00:59Z
+
+Fixed
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-03-02T15:45:42Z
+
+Hmm, I broke something here. The PHPUnit output is truncated 🤔 don't know why !
+```
+>…regoire/dev/github.com/lyrixx/symfony(console-fix-signal-handling *) ./phpunit src/Symfony/Component/Console/Tests/
+PHPUnit 9.6.3 by Sebastian Bergmann and contributors.
+
+Testing /home/gregoire/dev/github.com/lyrixx/symfony/src/Symfony/Component/Console/Tests
+.............................................................   61 / 1238 (  4%)
+.....................................................😊
+  [0] y
+ > ........  122 / 1238 (  9%)
+.............................................................  183 / 1238 ( 14%)
+.............................................................  244 / 1238 ( 19%)
+.............................................................  305 / 1238 ( 24%)
+.............................................................  366 / 1238 ( 29%)
+.............................................................  427 / 1238 ( 34%)
+.............................................................  488 / 1238 ( 39%)
+.............................................................  549 / 1238 ( 44%)
+.............................................................  610 / 1238 ( 49%)
+.............................................................  671 / 1238 ( 54%)
+.............................................................  732 / 1238 ( 59%)
+.............................................................  793 / 1238 ( 64%)
+.............................................................  854 / 1238 ( 68%)
+.............................................................  915 / 1238 ( 73%)
+...............................F.............................  976 / 1238 ( 78%)
+............................................................. 1037 / 1238 ( 83%)
+............................................................. 1098 / 1238 ( 88%)
+..........................................................
+Legacy deprecation notices (2)
+>…regoire/dev/github.com/lyrixx/symfony(console-fix-signal-handling *)
+```
+
+(Note: I edited a test to make it fails)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-03-03T13:42:22Z
+
+Thanks for the review!
+
+I pushed a new version  without the new method on the interface!
+
+The new API is even simpler!

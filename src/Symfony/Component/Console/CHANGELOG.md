@@ -4,7 +4,7 @@ CHANGELOG
 6.3
 ---
 
- * Remove `exit` call in `Application` signal handlers. Commands will no longer be automatically interrupted after receiving signal other than `SIGUSR1` or `SIGUSR2`
+ * Add support for choosing exit code while handling signal, or to not exit at all
  * Add `ProgressBar::setPlaceholderFormatter` to set a placeholder attached to a instance, instead of being global.
  * Add `ReStructuredTextDescriptor`
 

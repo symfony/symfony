@@ -20,6 +20,7 @@ use Symfony\Component\Console\Command\LazyCommand;
 use Symfony\Component\Console\Command\SignalableCommandInterface;
 use Symfony\Component\Console\CommandLoader\CommandLoaderInterface;
 use Symfony\Component\Console\CommandLoader\FactoryCommandLoader;
+use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
@@ -1929,7 +1930,8 @@ class ApplicationTest extends TestCase
 
         $dispatcherCalled = false;
         $dispatcher = new EventDispatcher();
-        $dispatcher->addListener('console.signal', function () use (&$dispatcherCalled) {
+        $dispatcher->addListener('console.signal', function (ConsoleSignalEvent $e) use (&$dispatcherCalled) {
+            $e->abortExit();
             $dispatcherCalled = true;
         });
 
@@ -1976,6 +1978,34 @@ class ApplicationTest extends TestCase
         $this->assertSame(1, $application->run(new ArrayInput(['signal'])));
         $this->assertTrue($subscriber1->signaled);
         $this->assertTrue($subscriber2->signaled);
+    }
+
+    /**
+     * @requires extension pcntl
+     */
+    public function testSignalDispatchWithoutEventToDispatch()
+    {
+        $command = new SignableCommand();
+
+        $application = $this->createSignalableApplication($command, null);
+        $application->setSignalsToDispatchEvent();
+
+        $this->assertSame(1, $application->run(new ArrayInput(['signal'])));
+        $this->assertTrue($command->signaled);
+    }
+
+    /**
+     * @requires extension pcntl
+     */
+    public function testSignalDispatchWithoutEventDispatcher()
+    {
+        $command = new SignableCommand();
+
+        $application = $this->createSignalableApplication($command, null);
+        $application->setSignalsToDispatchEvent(\SIGUSR1);
+
+        $this->assertSame(1, $application->run(new ArrayInput(['signal'])));
+        $this->assertTrue($command->signaled);
     }
 
     /**
@@ -2077,7 +2107,34 @@ class ApplicationTest extends TestCase
         $application->setAutoExit(false);
         $application->setDispatcher($dispatcher);
         $application->add($command);
+
         $this->assertSame(129, $application->run(new ArrayInput(['signal'])));
+    }
+
+    public function testSignalableWithEventCommandDoesNotInterruptedOnTermSignals()
+    {
+        if (!\defined('SIGINT')) {
+            $this->markTestSkipped('SIGINT not available');
+        }
+
+        $command = new TerminatableWithEventCommand();
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber($command);
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setDispatcher($dispatcher);
+        $application->add($command);
+        $tester = new ApplicationTester($application);
+        $this->assertSame(51, $tester->run(['signal']));
+        $expected = <<<EOTXT
+            Still processing...
+            ["handling event",2,0]
+            ["exit code",2,125]
+            Wrapping up, wait a sec...
+
+            EOTXT;
+        $this->assertSame($expected, $tester->getDisplay(true));
     }
 
     /**
@@ -2217,10 +2274,12 @@ class SignableCommand extends BaseSignableCommand implements SignalableCommandIn
         return SignalRegistry::isSupported() ? [\SIGUSR1] : [];
     }
 
-    public function handleSignal(int $signal): void
+    public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
     {
         $this->signaled = true;
         $this->signalHandlers[] = __CLASS__;
+
+        return false;
     }
 }
 
@@ -2232,10 +2291,61 @@ class TerminatableCommand extends BaseSignableCommand implements SignalableComma
         return SignalRegistry::isSupported() ? [\SIGINT] : [];
     }
 
-    public function handleSignal(int $signal): void
+    public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
     {
         $this->signaled = true;
         $this->signalHandlers[] = __CLASS__;
+
+        return false;
+    }
+}
+
+#[AsCommand(name: 'signal')]
+class TerminatableWithEventCommand extends Command implements SignalableCommandInterface, EventSubscriberInterface
+{
+    private bool $shouldContinue = true;
+    private OutputInterface $output;
+
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $this->output = $output;
+
+        for ($i = 0; $i <= 10 && $this->shouldContinue; ++$i) {
+            $output->writeln('Still processing...');
+            posix_kill(posix_getpid(), SIGINT);
+        }
+
+        $output->writeln('Wrapping up, wait a sec...');
+
+        return 51;
+    }
+
+    public function getSubscribedSignals(): array
+    {
+        return [\SIGINT];
+    }
+
+    public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
+    {
+        $this->shouldContinue = false;
+
+        $this->output->writeln(json_encode(['exit code', $signal, $previousExitCode]));
+
+        return false;
+    }
+
+    public function handleSignalEvent(ConsoleSignalEvent $event): void
+    {
+        $this->output->writeln(json_encode(['handling event', $event->getHandlingSignal(), $event->getExitCode()]));
+
+        $event->setExitCode(125);
+    }
+
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            ConsoleEvents::SIGNAL => 'handleSignalEvent',
+        ];
     }
 }
 
@@ -2248,6 +2358,8 @@ class SignalEventSubscriber implements EventSubscriberInterface
         $this->signaled = true;
         $event->getCommand()->signaled = true;
         $event->getCommand()->signalHandlers[] = __CLASS__;
+
+        $event->abortExit();
     }
 
     public static function getSubscribedEvents(): array

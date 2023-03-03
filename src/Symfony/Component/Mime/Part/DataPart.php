@@ -32,7 +32,7 @@ class DataPart extends TextPart
     /**
      * @param resource|string|File $body Use a File instance to defer loading the file until rendering
      */
-    public function __construct($body, string $filename = null, string $contentType = null, string $encoding = null)
+    public function __construct($body, string $filename = null, string $contentType = null, string $encoding = null, string $formEncoding = null)
     {
         unset($this->_parent);
 
@@ -45,7 +45,7 @@ class DataPart extends TextPart
 
         parent::__construct($body, null, $subtype, $encoding);
 
-        $this->formEncoding = $encoding ?? '8bit';
+        $this->formEncoding = $formEncoding ?? '8bit';
 
         if (null !== $filename) {
             $this->filename = $filename;
@@ -56,7 +56,7 @@ class DataPart extends TextPart
 
     public static function fromPath(string $path, string $name = null, string $contentType = null, string $encoding = null): self
     {
-        return new self(new File($path), $name, $contentType, $encoding);
+        return new self(new File($path), $name, $contentType, $encoding, $encoding);
     }
 
     /**

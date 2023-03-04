@@ -101,4 +101,15 @@ class StubCaster
 
         return $a;
     }
+
+    public static function castJson(JsonStub $jsonStub, array $a, Stub $stub): array
+    {
+        $a = [];
+        $stub->class = '';
+
+        $a[Caster::PREFIX_VIRTUAL.'plain'] = (string) $jsonStub;
+        $a[Caster::PREFIX_VIRTUAL.'decoded'] = $jsonStub->value;
+
+        return $a;
+    }
 }

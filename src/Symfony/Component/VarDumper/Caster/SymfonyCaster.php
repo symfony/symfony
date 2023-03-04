@@ -74,6 +74,11 @@ class SymfonyCaster
             $a[Caster::PREFIX_VIRTUAL.$k] = $v;
         }
 
+        $content = $response->getContent();
+        if (json_validate($content)) {
+            $a[Caster::PREFIX_VIRTUAL.'JSON content'] = new JsonStub($content);
+        }
+
         return $a;
     }
 

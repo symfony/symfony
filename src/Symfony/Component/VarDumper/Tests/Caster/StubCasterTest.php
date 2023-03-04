@@ -14,6 +14,7 @@ namespace Symfony\Component\VarDumper\Tests\Caster;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Caster\ArgsStub;
 use Symfony\Component\VarDumper\Caster\ClassStub;
+use Symfony\Component\VarDumper\Caster\JsonStub;
 use Symfony\Component\VarDumper\Caster\LinkStub;
 use Symfony\Component\VarDumper\Caster\ScalarStub;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
@@ -95,6 +96,26 @@ EODUMP;
         $expectedDump = <<<'EODUMP'
 array:1 [
   0 => 🐛
+]
+EODUMP;
+
+        $this->assertDumpMatchesFormat($expectedDump, $args);
+    }
+
+    public function testJsonStub()
+    {
+        $args = [new JsonStub('[{"test": 123}]')];
+
+        $expectedDump = <<<'EODUMP'
+array:1 [
+  0 => {
+    plain: "[{"test":123}]"
+    decoded: array:1 [
+      0 => array:1 [
+        "test" => 123
+      ]
+    ]
+  }
 ]
 EODUMP;
 
@@ -217,7 +238,7 @@ EODUMP;
 
         $expectedDump = <<<'EODUMP'
 <foo></foo><bar><span class=sf-dump-note>array:1</span> [<samp data-depth=1 class=sf-dump-expanded>
-  <span class=sf-dump-index>0</span> => "<a href="%sStubCasterTest.php:209" rel="noopener noreferrer"><span class=sf-dump-str title="19 characters">Exception@anonymous</span></a>"
+  <span class=sf-dump-index>0</span> => "<a href="%sStubCasterTest.php:%d" rel="noopener noreferrer"><span class=sf-dump-str title="19 characters">Exception@anonymous</span></a>"
 </samp>]
 </bar>
 EODUMP;

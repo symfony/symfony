@@ -694,6 +694,17 @@ index 7f48810e50..f85b13d818 100644
 +    public function build(ContainerBuilder $container): void
      {
          parent::build($container);
+diff --git a/src/Symfony/Bundle/FrameworkBundle/Kernel/MicroKernelTrait.php b/src/Symfony/Bundle/FrameworkBundle/Kernel/MicroKernelTrait.php
+index 3ab28a1f81..2ace764149 100644
+--- a/src/Symfony/Bundle/FrameworkBundle/Kernel/MicroKernelTrait.php
++++ b/src/Symfony/Bundle/FrameworkBundle/Kernel/MicroKernelTrait.php
+@@ -132,5 +132,5 @@ trait MicroKernelTrait
+      * @return void
+      */
+-    public function registerContainerConfiguration(LoaderInterface $loader)
++    public function registerContainerConfiguration(LoaderInterface $loader): void
+     {
+         $loader->load(function (ContainerBuilder $container) use ($loader) {
 diff --git a/src/Symfony/Bundle/FrameworkBundle/KernelBrowser.php b/src/Symfony/Bundle/FrameworkBundle/KernelBrowser.php
 index 1f484c1b84..67dba6fc40 100644
 --- a/src/Symfony/Bundle/FrameworkBundle/KernelBrowser.php
@@ -2092,7 +2103,7 @@ index cc024da461..00b79e915f 100644
      {
          $errors = [];
 diff --git a/src/Symfony/Component/Console/Application.php b/src/Symfony/Component/Console/Application.php
-index dd8d29d1d1..07262bf107 100644
+index 28fec5fdec..e8994f2a90 100644
 --- a/src/Symfony/Component/Console/Application.php
 +++ b/src/Symfony/Component/Console/Application.php
 @@ -114,5 +114,5 @@ class Application implements ResetInterface
@@ -7337,6 +7348,24 @@ index ad5a6590a5..cf296c1d6d 100644
 +    public function replace(array $attributes): void
      {
          $this->attributes = [];
+diff --git a/src/Symfony/Component/HttpFoundation/Session/Attribute/AttributeBagInterface.php b/src/Symfony/Component/HttpFoundation/Session/Attribute/AttributeBagInterface.php
+index e8cd0b5a4d..27eca96974 100644
+--- a/src/Symfony/Component/HttpFoundation/Session/Attribute/AttributeBagInterface.php
++++ b/src/Symfony/Component/HttpFoundation/Session/Attribute/AttributeBagInterface.php
+@@ -36,5 +36,5 @@ interface AttributeBagInterface extends SessionBagInterface
+      * @return void
+      */
+-    public function set(string $name, mixed $value);
++    public function set(string $name, mixed $value): void;
+ 
+     /**
+@@ -48,5 +48,5 @@ interface AttributeBagInterface extends SessionBagInterface
+      * @return void
+      */
+-    public function replace(array $attributes);
++    public function replace(array $attributes): void;
+ 
+     /**
 diff --git a/src/Symfony/Component/HttpFoundation/Session/Flash/AutoExpireFlashBag.php b/src/Symfony/Component/HttpFoundation/Session/Flash/AutoExpireFlashBag.php
 index 80bbeda0f8..c4d461cd3a 100644
 --- a/src/Symfony/Component/HttpFoundation/Session/Flash/AutoExpireFlashBag.php
@@ -7415,6 +7444,31 @@ index 659d59d186..3da6888cec 100644
 +    public function setAll(array $messages): void
      {
          $this->flashes = $messages;
+diff --git a/src/Symfony/Component/HttpFoundation/Session/Flash/FlashBagInterface.php b/src/Symfony/Component/HttpFoundation/Session/Flash/FlashBagInterface.php
+index bbcf7f8b7d..6ef5b35e7d 100644
+--- a/src/Symfony/Component/HttpFoundation/Session/Flash/FlashBagInterface.php
++++ b/src/Symfony/Component/HttpFoundation/Session/Flash/FlashBagInterface.php
+@@ -26,5 +26,5 @@ interface FlashBagInterface extends SessionBagInterface
+      * @return void
+      */
+-    public function add(string $type, mixed $message);
++    public function add(string $type, mixed $message): void;
+ 
+     /**
+@@ -33,5 +33,5 @@ interface FlashBagInterface extends SessionBagInterface
+      * @return void
+      */
+-    public function set(string $type, string|array $messages);
++    public function set(string $type, string|array $messages): void;
+ 
+     /**
+@@ -65,5 +65,5 @@ interface FlashBagInterface extends SessionBagInterface
+      * @return void
+      */
+-    public function setAll(array $messages);
++    public function setAll(array $messages): void;
+ 
+     /**
 diff --git a/src/Symfony/Component/HttpFoundation/Session/Session.php b/src/Symfony/Component/HttpFoundation/Session/Session.php
 index b45be2f8c3..ce73fdb85f 100644
 --- a/src/Symfony/Component/HttpFoundation/Session/Session.php
@@ -7468,6 +7522,70 @@ index b45be2f8c3..ce73fdb85f 100644
 +    public function registerBag(SessionBagInterface $bag): void
      {
          $this->storage->registerBag(new SessionBagProxy($bag, $this->data, $this->usageIndex, $this->usageReporter));
+diff --git a/src/Symfony/Component/HttpFoundation/Session/SessionBagInterface.php b/src/Symfony/Component/HttpFoundation/Session/SessionBagInterface.php
+index e1c2505549..d88b64acdd 100644
+--- a/src/Symfony/Component/HttpFoundation/Session/SessionBagInterface.php
++++ b/src/Symfony/Component/HttpFoundation/Session/SessionBagInterface.php
+@@ -29,5 +29,5 @@ interface SessionBagInterface
+      * @return void
+      */
+-    public function initialize(array &$array);
++    public function initialize(array &$array): void;
+ 
+     /**
+diff --git a/src/Symfony/Component/HttpFoundation/Session/SessionInterface.php b/src/Symfony/Component/HttpFoundation/Session/SessionInterface.php
+index 534883d2d2..1240e36f74 100644
+--- a/src/Symfony/Component/HttpFoundation/Session/SessionInterface.php
++++ b/src/Symfony/Component/HttpFoundation/Session/SessionInterface.php
+@@ -38,5 +38,5 @@ interface SessionInterface
+      * @return void
+      */
+-    public function setId(string $id);
++    public function setId(string $id): void;
+ 
+     /**
+@@ -50,5 +50,5 @@ interface SessionInterface
+      * @return void
+      */
+-    public function setName(string $name);
++    public function setName(string $name): void;
+ 
+     /**
+@@ -86,5 +86,5 @@ interface SessionInterface
+      * @return void
+      */
+-    public function save();
++    public function save(): void;
+ 
+     /**
+@@ -103,5 +103,5 @@ interface SessionInterface
+      * @return void
+      */
+-    public function set(string $name, mixed $value);
++    public function set(string $name, mixed $value): void;
+ 
+     /**
+@@ -115,5 +115,5 @@ interface SessionInterface
+      * @return void
+      */
+-    public function replace(array $attributes);
++    public function replace(array $attributes): void;
+ 
+     /**
+@@ -129,5 +129,5 @@ interface SessionInterface
+      * @return void
+      */
+-    public function clear();
++    public function clear(): void;
+ 
+     /**
+@@ -141,5 +141,5 @@ interface SessionInterface
+      * @return void
+      */
+-    public function registerBag(SessionBagInterface $bag);
++    public function registerBag(SessionBagInterface $bag): void;
+ 
+     /**
 diff --git a/src/Symfony/Component/HttpFoundation/Session/Storage/Handler/PdoSessionHandler.php b/src/Symfony/Component/HttpFoundation/Session/Storage/Handler/PdoSessionHandler.php
 index 65452a5207..ce0357e36b 100644
 --- a/src/Symfony/Component/HttpFoundation/Session/Storage/Handler/PdoSessionHandler.php
@@ -7671,6 +7789,45 @@ index 2fcd06b10b..4981f75360 100644
 +    public function setName(string $name): void
      {
          if ($this->isActive()) {
+diff --git a/src/Symfony/Component/HttpFoundation/Session/Storage/SessionStorageInterface.php b/src/Symfony/Component/HttpFoundation/Session/Storage/SessionStorageInterface.php
+index ed2189e4e7..28e90cdcf9 100644
+--- a/src/Symfony/Component/HttpFoundation/Session/Storage/SessionStorageInterface.php
++++ b/src/Symfony/Component/HttpFoundation/Session/Storage/SessionStorageInterface.php
+@@ -44,5 +44,5 @@ interface SessionStorageInterface
+      * @return void
+      */
+-    public function setId(string $id);
++    public function setId(string $id): void;
+ 
+     /**
+@@ -56,5 +56,5 @@ interface SessionStorageInterface
+      * @return void
+      */
+-    public function setName(string $name);
++    public function setName(string $name): void;
+ 
+     /**
+@@ -100,5 +100,5 @@ interface SessionStorageInterface
+      *                           is already closed
+      */
+-    public function save();
++    public function save(): void;
+ 
+     /**
+@@ -107,5 +107,5 @@ interface SessionStorageInterface
+      * @return void
+      */
+-    public function clear();
++    public function clear(): void;
+ 
+     /**
+@@ -121,5 +121,5 @@ interface SessionStorageInterface
+      * @return void
+      */
+-    public function registerBag(SessionBagInterface $bag);
++    public function registerBag(SessionBagInterface $bag): void;
+ 
+     public function getMetadataBag(): MetadataBag;
 diff --git a/src/Symfony/Component/HttpKernel/Bundle/Bundle.php b/src/Symfony/Component/HttpKernel/Bundle/Bundle.php
 index 2ddf55f2cb..52049a92b4 100644
 --- a/src/Symfony/Component/HttpKernel/Bundle/Bundle.php
@@ -7728,6 +7885,16 @@ index 02cb9641db..abe408eb24 100644
 +    public function build(ContainerBuilder $container): void;
  
      /**
+diff --git a/src/Symfony/Component/HttpKernel/CacheClearer/CacheClearerInterface.php b/src/Symfony/Component/HttpKernel/CacheClearer/CacheClearerInterface.php
+index 5ca4265624..1cb3611f8d 100644
+--- a/src/Symfony/Component/HttpKernel/CacheClearer/CacheClearerInterface.php
++++ b/src/Symfony/Component/HttpKernel/CacheClearer/CacheClearerInterface.php
+@@ -24,4 +24,4 @@ interface CacheClearerInterface
+      * @return void
+      */
+-    public function clear(string $cacheDir);
++    public function clear(string $cacheDir): void;
+ }
 diff --git a/src/Symfony/Component/HttpKernel/CacheClearer/Psr6CacheClearer.php b/src/Symfony/Component/HttpKernel/CacheClearer/Psr6CacheClearer.php
 index 3c99b74af3..fdb68feb2c 100644
 --- a/src/Symfony/Component/HttpKernel/CacheClearer/Psr6CacheClearer.php
@@ -8248,6 +8415,23 @@ index 1bdaab148a..7976d00605 100644
 +    public function update(Response $response): void
      {
          // if we have no embedded Response, do nothing
+diff --git a/src/Symfony/Component/HttpKernel/HttpCache/ResponseCacheStrategyInterface.php b/src/Symfony/Component/HttpKernel/HttpCache/ResponseCacheStrategyInterface.php
+index 33c8bd9412..8fe6df2512 100644
+--- a/src/Symfony/Component/HttpKernel/HttpCache/ResponseCacheStrategyInterface.php
++++ b/src/Symfony/Component/HttpKernel/HttpCache/ResponseCacheStrategyInterface.php
+@@ -31,5 +31,5 @@ interface ResponseCacheStrategyInterface
+      * @return void
+      */
+-    public function add(Response $response);
++    public function add(Response $response): void;
+ 
+     /**
+@@ -38,4 +38,4 @@ interface ResponseCacheStrategyInterface
+      * @return void
+      */
+-    public function update(Response $response);
++    public function update(Response $response): void;
+ }
 diff --git a/src/Symfony/Component/HttpKernel/HttpCache/Ssi.php b/src/Symfony/Component/HttpKernel/HttpCache/Ssi.php
 index bde72914a7..c1656f2ac0 100644
 --- a/src/Symfony/Component/HttpKernel/HttpCache/Ssi.php
@@ -8284,6 +8468,41 @@ index f838f1bfb4..4250fd8c49 100644
 +    public function getPath(string $key): string
      {
          return $this->root.\DIRECTORY_SEPARATOR.substr($key, 0, 2).\DIRECTORY_SEPARATOR.substr($key, 2, 2).\DIRECTORY_SEPARATOR.substr($key, 4, 2).\DIRECTORY_SEPARATOR.substr($key, 6);
+diff --git a/src/Symfony/Component/HttpKernel/HttpCache/StoreInterface.php b/src/Symfony/Component/HttpKernel/HttpCache/StoreInterface.php
+index b73cb7a9e6..daecd76c19 100644
+--- a/src/Symfony/Component/HttpKernel/HttpCache/StoreInterface.php
++++ b/src/Symfony/Component/HttpKernel/HttpCache/StoreInterface.php
+@@ -45,5 +45,5 @@ interface StoreInterface
+      * @return void
+      */
+-    public function invalidate(Request $request);
++    public function invalidate(Request $request): void;
+ 
+     /**
+@@ -80,4 +80,4 @@ interface StoreInterface
+      * @return void
+      */
+-    public function cleanup();
++    public function cleanup(): void;
+ }
+diff --git a/src/Symfony/Component/HttpKernel/HttpCache/SurrogateInterface.php b/src/Symfony/Component/HttpKernel/HttpCache/SurrogateInterface.php
+index e444458f73..058a4023f8 100644
+--- a/src/Symfony/Component/HttpKernel/HttpCache/SurrogateInterface.php
++++ b/src/Symfony/Component/HttpKernel/HttpCache/SurrogateInterface.php
+@@ -37,5 +37,5 @@ interface SurrogateInterface
+      * @return void
+      */
+-    public function addSurrogateCapability(Request $request);
++    public function addSurrogateCapability(Request $request): void;
+ 
+     /**
+@@ -46,5 +46,5 @@ interface SurrogateInterface
+      * @return void
+      */
+-    public function addSurrogateControl(Response $response);
++    public function addSurrogateControl(Response $response): void;
+ 
+     /**
 diff --git a/src/Symfony/Component/HttpKernel/HttpKernel.php b/src/Symfony/Component/HttpKernel/HttpKernel.php
 index 794a55dc18..1fb8cbaa5d 100644
 --- a/src/Symfony/Component/HttpKernel/HttpKernel.php
@@ -8394,8 +8613,33 @@ index f9a969b659..e8d115c435 100644
 +    protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, string $class, string $baseClass): void
      {
          // cache the container
+diff --git a/src/Symfony/Component/HttpKernel/KernelInterface.php b/src/Symfony/Component/HttpKernel/KernelInterface.php
+index 14a053ab30..737af1b649 100644
+--- a/src/Symfony/Component/HttpKernel/KernelInterface.php
++++ b/src/Symfony/Component/HttpKernel/KernelInterface.php
+@@ -37,5 +37,5 @@ interface KernelInterface extends HttpKernelInterface
+      * @return void
+      */
+-    public function registerContainerConfiguration(LoaderInterface $loader);
++    public function registerContainerConfiguration(LoaderInterface $loader): void;
+ 
+     /**
+@@ -44,5 +44,5 @@ interface KernelInterface extends HttpKernelInterface
+      * @return void
+      */
+-    public function boot();
++    public function boot(): void;
+ 
+     /**
+@@ -53,5 +53,5 @@ interface KernelInterface extends HttpKernelInterface
+      * @return void
+      */
+-    public function shutdown();
++    public function shutdown(): void;
+ 
+     /**
 diff --git a/src/Symfony/Component/HttpKernel/Log/DebugLoggerInterface.php b/src/Symfony/Component/HttpKernel/Log/DebugLoggerInterface.php
-index 84452ae71f..f70165d25f 100644
+index 1940c80a90..5f28605ada 100644
 --- a/src/Symfony/Component/HttpKernel/Log/DebugLoggerInterface.php
 +++ b/src/Symfony/Component/HttpKernel/Log/DebugLoggerInterface.php
 @@ -34,5 +34,5 @@ interface DebugLoggerInterface
@@ -8412,6 +8656,12 @@ index 84452ae71f..f70165d25f 100644
 +    public function countErrors(Request $request = null): int;
  
      /**
+@@ -48,4 +48,4 @@ interface DebugLoggerInterface
+      * @return void
+      */
+-    public function clear();
++    public function clear(): void;
+ }
 diff --git a/src/Symfony/Component/HttpKernel/Profiler/FileProfilerStorage.php b/src/Symfony/Component/HttpKernel/Profiler/FileProfilerStorage.php
 index 0fdbfc44ba..67ad8c64c1 100644
 --- a/src/Symfony/Component/HttpKernel/Profiler/FileProfilerStorage.php
@@ -8557,6 +8807,36 @@ index 5d6fad8fe3..e723e1e445 100644
 +    public function add(DataCollectorInterface $collector): void
      {
          $this->collectors[$collector->getName()] = $collector;
+diff --git a/src/Symfony/Component/HttpKernel/Profiler/ProfilerStorageInterface.php b/src/Symfony/Component/HttpKernel/Profiler/ProfilerStorageInterface.php
+index 247e51fce9..73d8d4bf43 100644
+--- a/src/Symfony/Component/HttpKernel/Profiler/ProfilerStorageInterface.php
++++ b/src/Symfony/Component/HttpKernel/Profiler/ProfilerStorageInterface.php
+@@ -53,4 +53,4 @@ interface ProfilerStorageInterface
+      * @return void
+      */
+-    public function purge();
++    public function purge(): void;
+ }
+diff --git a/src/Symfony/Component/HttpKernel/RebootableInterface.php b/src/Symfony/Component/HttpKernel/RebootableInterface.php
+index e973f55400..3d39172b25 100644
+--- a/src/Symfony/Component/HttpKernel/RebootableInterface.php
++++ b/src/Symfony/Component/HttpKernel/RebootableInterface.php
+@@ -29,4 +29,4 @@ interface RebootableInterface
+      * @return void
+      */
+-    public function reboot(?string $warmupDir);
++    public function reboot(?string $warmupDir): void;
+ }
+diff --git a/src/Symfony/Component/HttpKernel/TerminableInterface.php b/src/Symfony/Component/HttpKernel/TerminableInterface.php
+index 341ef73c4d..805391d171 100644
+--- a/src/Symfony/Component/HttpKernel/TerminableInterface.php
++++ b/src/Symfony/Component/HttpKernel/TerminableInterface.php
+@@ -31,4 +31,4 @@ interface TerminableInterface
+      * @return void
+      */
+-    public function terminate(Request $request, Response $response);
++    public function terminate(Request $request, Response $response): void;
+ }
 diff --git a/src/Symfony/Component/Intl/Util/IntlTestHelper.php b/src/Symfony/Component/Intl/Util/IntlTestHelper.php
 index d22f2e6953..1dcdcdf4ea 100644
 --- a/src/Symfony/Component/Intl/Util/IntlTestHelper.php

@@ -41,6 +41,8 @@ interface StoreInterface
 
     /**
      * Invalidates all cache entries that match the request.
+     *
+     * @return void
      */
     public function invalidate(Request $request);
 
@@ -74,6 +76,8 @@ interface StoreInterface
 
     /**
      * Cleanups storage.
+     *
+     * @return void
      */
     public function cleanup();
 }

@@ -10,7 +10,7 @@ DependencyInjection
 Form
 ----
 
- * Remove argument `$legacyErrorMessages` from the constructor of `FormTypeValidatorExtension`
+ * Remove argument `$legacyErrorMessages` from the constructor of `FormTypeValidatorExtension` and `ValidatorExtension`
 
 FrameworkBundle
 ---------------

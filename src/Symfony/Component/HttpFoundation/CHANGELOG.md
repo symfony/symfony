@@ -8,6 +8,7 @@ CHANGELOG
  * Create migration for session table when pdo handler is used
  * Add support for Relay PHP extension for Redis
  * The `Response::sendHeaders()` method now takes an optional HTTP status code as parameter, allowing to send informational responses such as Early Hints responses (103 status code)
+ * Use `@final` to make `UrlHelper` mockable
 
 6.2
 ---

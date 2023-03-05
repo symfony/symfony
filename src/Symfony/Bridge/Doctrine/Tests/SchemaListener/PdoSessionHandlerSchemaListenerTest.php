@@ -16,10 +16,10 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\Doctrine\SchemaListener\PdoSessionHandlerSchemaSubscriber;
+use Symfony\Bridge\Doctrine\SchemaListener\PdoSessionHandlerSchemaListener;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler;
 
-class PdoSessionHandlerSchemaSubscriberTest extends TestCase
+class PdoSessionHandlerSchemaListenerTest extends TestCase
 {
     public function testPostGenerateSchemaPdo()
     {
@@ -36,7 +36,7 @@ class PdoSessionHandlerSchemaSubscriberTest extends TestCase
             ->method('configureSchema')
             ->with($schema, fn () => true);
 
-        $subscriber = new PdoSessionHandlerSchemaSubscriber($pdoSessionHandler);
+        $subscriber = new PdoSessionHandlerSchemaListener($pdoSessionHandler);
         $subscriber->postGenerateSchema($event);
     }
 }

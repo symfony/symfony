@@ -11,26 +11,13 @@
 
 namespace Symfony\Bridge\Doctrine\SchemaListener;
 
-use Doctrine\Common\EventSubscriber;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
-use Doctrine\ORM\Tools\ToolEvents;
 
-abstract class AbstractSchemaSubscriber implements EventSubscriber
+abstract class AbstractSchemaListener
 {
     abstract public function postGenerateSchema(GenerateSchemaEventArgs $event): void;
-
-    public function getSubscribedEvents(): array
-    {
-        if (!class_exists(ToolEvents::class)) {
-            return [];
-        }
-
-        return [
-            ToolEvents::postGenerateSchema,
-        ];
-    }
 
     protected function getIsSameDatabaseChecker(Connection $connection): \Closure
     {

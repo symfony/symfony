@@ -14,7 +14,7 @@ namespace Symfony\Bridge\Doctrine\SchemaListener;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler;
 
-final class PdoSessionHandlerSchemaSubscriber extends AbstractSchemaSubscriber
+final class PdoSessionHandlerSchemaListener extends AbstractSchemaListener
 {
     private PdoSessionHandler $sessionHandler;
 
@@ -25,13 +25,12 @@ final class PdoSessionHandlerSchemaSubscriber extends AbstractSchemaSubscriber
         }
     }
 
-    public function getSubscribedEvents(): array
-    {
-        return isset($this->sessionHandler) ? parent::getSubscribedEvents() : [];
-    }
-
     public function postGenerateSchema(GenerateSchemaEventArgs $event): void
     {
+        if (!isset($this->sessionHandler)) {
+            return;
+        }
+
         $connection = $event->getEntityManager()->getConnection();
 
         $this->sessionHandler->configureSchema($event->getSchema(), $this->getIsSameDatabaseChecker($connection));

@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add `AbstractSchemaListener`, `LockStoreSchemaListener` and `PdoSessionHandlerSchemaListener`
+ * Deprecate `DoctrineDbalCacheAdapterSchemaSubscriber` in favor of `DoctrineDbalCacheAdapterSchemaListener`
+ * Deprecate `MessengerTransportDoctrineSchemaSubscriber` in favor of `MessengerTransportDoctrineSchemaListener`
+ * Deprecate `RememberMeTokenProviderDoctrineSchemaSubscriber` in favor of `RememberMeTokenProviderDoctrineSchemaListener`
+
 6.2
 ---
 

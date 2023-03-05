@@ -26,7 +26,6 @@ class DataPart extends TextPart
     private $mediaType;
     private $cid;
 
-    /** @internal */
     private $formEncoding;
 
     /**

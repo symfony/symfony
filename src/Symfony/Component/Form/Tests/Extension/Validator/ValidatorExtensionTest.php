@@ -55,6 +55,46 @@ class ValidatorExtensionTest extends TestCase
         $this->assertCount(0, $metadata->getPropertyMetadata('children'));
     }
 
+    /**
+     * @group legacy
+     */
+    public function testLegacyWithBadFormRendererType()
+    {
+        $metadata = new ClassMetadata(Form::class);
+
+        $metadataFactory = new FakeMetadataFactory();
+        $metadataFactory->addMetadata($metadata);
+
+        $validator = Validation::createValidatorBuilder()
+            ->setMetadataFactory($metadataFactory)
+            ->getValidator();
+
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 2 passed to "Symfony\Component\Form\Extension\Validator\ValidatorExtension::__construct()" must be an instance of "Symfony\Component\Form\FormRendererInterface" or null, "stdClass" given.');
+
+        new ValidatorExtension($validator, new \stdClass());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyWithBadTranslatorType()
+    {
+        $metadata = new ClassMetadata(Form::class);
+
+        $metadataFactory = new FakeMetadataFactory();
+        $metadataFactory->addMetadata($metadata);
+
+        $validator = Validation::createValidatorBuilder()
+            ->setMetadataFactory($metadataFactory)
+            ->getValidator();
+
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 3 passed to "Symfony\Component\Form\Extension\Validator\ValidatorExtension::__construct()" must be an instance of "Symfony\Contracts\Translation\TranslatorInterface" or null, "stdClass" given.');
+
+        new ValidatorExtension($validator, null, new \stdClass());
+    }
+
     public function test2Dot5ValidationApi()
     {
         $metadata = new ClassMetadata(Form::class);

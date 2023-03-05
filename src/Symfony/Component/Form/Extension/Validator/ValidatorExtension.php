@@ -43,6 +43,14 @@ class ValidatorExtension extends AbstractExtension
             $translator = 4 <= \func_num_args() ? func_get_arg(3) : null;
         }
 
+        if (null !== $formRenderer && !$formRenderer instanceof FormRendererInterface) {
+            throw new \TypeError(sprintf('Argument 2 passed to "%s()" must be an instance of "%s" or null, "%s" given.', __METHOD__, FormRendererInterface::class, get_debug_type($formRenderer)));
+        }
+
+        if (null !== $translator && !$translator instanceof TranslatorInterface) {
+            throw new \TypeError(sprintf('Argument 3 passed to "%s()" must be an instance of "%s" or null, "%s" given.', __METHOD__, TranslatorInterface::class, get_debug_type($translator)));
+        }
+
         $metadata = $validator->getMetadataFor(\Symfony\Component\Form\Form::class);
 
         // Register the form constraints in the validator programmatically.

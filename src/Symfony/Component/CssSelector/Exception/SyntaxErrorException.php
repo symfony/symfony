@@ -43,6 +43,11 @@ class SyntaxErrorException extends ParseException
         return new self('Got nested ::not().');
     }
 
+    public static function notAtTheStartOfASelector(string $pseudoElement): self
+    {
+        return new self(sprintf('Got immediate child pseudo-element ":%s" not at the start of a selector', $pseudoElement));
+    }
+
     public static function stringAsFunctionArgument(): self
     {
         return new self('String not allowed as function argument.');

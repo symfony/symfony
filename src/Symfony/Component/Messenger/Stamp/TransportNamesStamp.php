@@ -17,14 +17,14 @@ namespace Symfony\Component\Messenger\Stamp;
 final class TransportNamesStamp implements StampInterface
 {
     /**
-     * @param string[] $transports Transport names to be used for the message
+     * @param string[] $transportNames Transport names to be used for the message
      */
-    public function __construct(private array $transports)
+    public function __construct(private array $transportNames)
     {
     }
 
     public function getTransportNames(): array
     {
-        return $this->transports;
+        return $this->transportNames;
     }
 }

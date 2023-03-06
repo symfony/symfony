@@ -177,15 +177,19 @@ class WorkerTest extends TestCase
 
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
+        $series = [
+            $this->isInstanceOf(WorkerStartedEvent::class),
+            $this->isInstanceOf(WorkerMessageReceivedEvent::class),
+            $this->isInstanceOf(WorkerMessageHandledEvent::class),
+            $this->isInstanceOf(WorkerRunningEvent::class),
+            $this->isInstanceOf(WorkerStoppedEvent::class),
+        ];
+
         $eventDispatcher->expects($this->exactly(5))
             ->method('dispatch')
-            ->withConsecutive(
-                [$this->isInstanceOf(WorkerStartedEvent::class)],
-                [$this->isInstanceOf(WorkerMessageReceivedEvent::class)],
-                [$this->isInstanceOf(WorkerMessageHandledEvent::class)],
-                [$this->isInstanceOf(WorkerRunningEvent::class)],
-                [$this->isInstanceOf(WorkerStoppedEvent::class)]
-            )->willReturnCallback(function ($event) {
+            ->willReturnCallback(function ($event) use (&$series) {
+                array_shift($series)->evaluate($event, '', true);
+
                 if ($event instanceof WorkerRunningEvent) {
                     $event->getWorker()->stop();
                 }
@@ -208,15 +212,19 @@ class WorkerTest extends TestCase
 
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
+        $series = [
+            $this->isInstanceOf(WorkerStartedEvent::class),
+            $this->isInstanceOf(WorkerMessageReceivedEvent::class),
+            $this->isInstanceOf(WorkerMessageFailedEvent::class),
+            $this->isInstanceOf(WorkerRunningEvent::class),
+            $this->isInstanceOf(WorkerStoppedEvent::class),
+        ];
+
         $eventDispatcher->expects($this->exactly(5))
             ->method('dispatch')
-            ->withConsecutive(
-                [$this->isInstanceOf(WorkerStartedEvent::class)],
-                [$this->isInstanceOf(WorkerMessageReceivedEvent::class)],
-                [$this->isInstanceOf(WorkerMessageFailedEvent::class)],
-                [$this->isInstanceOf(WorkerRunningEvent::class)],
-                [$this->isInstanceOf(WorkerStoppedEvent::class)]
-            )->willReturnCallback(function ($event) {
+            ->willReturnCallback(function ($event) use (&$series) {
+                array_shift($series)->evaluate($event, '', true);
+
                 if ($event instanceof WorkerRunningEvent) {
                     $event->getWorker()->stop();
                 }

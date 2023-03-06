@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by StephanMeijer at 2023-03-01T16:49:01Z
+
+Thanks for fixing this. You were just a little quicker than me. Also seen this yesterday.
+
+---------------------------------------------------------------------------
+
+by StephanMeijer at 2023-03-01T16:50:29Z
+
+A suggestion: would it be logical to typehint the getter with `@return string[]` so IDE's know that it returns an array of strings? Might be useful.
+
+---------------------------------------------------------------------------
+
+by tsantos84 at 2023-03-03T13:45:58Z
+
+Hi guys, thanks for this PR. Once this PR gets merged, how long it'll take to release a new version?

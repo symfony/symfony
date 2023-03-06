@@ -11,33 +11,30 @@
 
 namespace Symfony\Bridge\Doctrine\SchemaListener;
 
-use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
+use Doctrine\Common\EventSubscriber;
+use Doctrine\ORM\Tools\ToolEvents;
 use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
+
+trigger_deprecation('symfony/doctrine-bridge', '6.3', 'The "%s" class is deprecated. Use "%s" instead.', DoctrineDbalCacheAdapterSchemaSubscriber::class, DoctrineDbalCacheAdapterSchemaListener::class);
 
 /**
  * Automatically adds the cache table needed for the DoctrineDbalAdapter of
  * the Cache component.
  *
  * @author Ryan Weaver <ryan@symfonycasts.com>
+ *
+ * @deprecated since Symfony 6.3, use {@link DoctrineDbalCacheAdapterSchemaListener} instead
  */
-final class DoctrineDbalCacheAdapterSchemaSubscriber extends AbstractSchemaSubscriber
+final class DoctrineDbalCacheAdapterSchemaSubscriber extends DoctrineDbalCacheAdapterSchemaListener implements EventSubscriber
 {
-    private $dbalAdapters;
-
-    /**
-     * @param iterable<mixed, DoctrineDbalAdapter> $dbalAdapters
-     */
-    public function __construct(iterable $dbalAdapters)
+    public function getSubscribedEvents(): array
     {
-        $this->dbalAdapters = $dbalAdapters;
-    }
-
-    public function postGenerateSchema(GenerateSchemaEventArgs $event): void
-    {
-        $connection = $event->getEntityManager()->getConnection();
-
-        foreach ($this->dbalAdapters as $dbalAdapter) {
-            $dbalAdapter->configureSchema($event->getSchema(), $connection, $this->getIsSameDatabaseChecker($connection));
+        if (!class_exists(ToolEvents::class)) {
+            return [];
         }
+
+        return [
+            ToolEvents::postGenerateSchema,
+        ];
     }
 }

@@ -19,7 +19,7 @@ use Doctrine\DBAL\Schema\Table;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\Doctrine\SchemaListener\MessengerTransportDoctrineSchemaSubscriber;
+use Symfony\Bridge\Doctrine\SchemaListener\MessengerTransportDoctrineSchemaListener;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransport;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 
@@ -43,7 +43,7 @@ class MessengerTransportDoctrineSchemaSubscriberTest extends TestCase
         $otherTransport->expects($this->never())
             ->method($this->anything());
 
-        $subscriber = new MessengerTransportDoctrineSchemaSubscriber([$doctrineTransport, $otherTransport]);
+        $subscriber = new MessengerTransportDoctrineSchemaListener([$doctrineTransport, $otherTransport]);
         $subscriber->postGenerateSchema($event);
     }
 
@@ -69,7 +69,8 @@ class MessengerTransportDoctrineSchemaSubscriberTest extends TestCase
             ->with($table)
             ->willReturn('CREATE TABLE pizza (id integer NOT NULL)');
 
-        $subscriber = new MessengerTransportDoctrineSchemaSubscriber([$otherTransport, $doctrineTransport]);
+        $subscriber = new MessengerTransportDoctrineSchemaListener([$otherTransport, $doctrineTransport]);
+
         $subscriber->onSchemaCreateTable($event);
         $this->assertTrue($event->isDefaultPrevented());
         $this->assertSame([
@@ -92,7 +93,8 @@ class MessengerTransportDoctrineSchemaSubscriberTest extends TestCase
         $platform->expects($this->never())
             ->method('getCreateTableSQL');
 
-        $subscriber = new MessengerTransportDoctrineSchemaSubscriber([$doctrineTransport]);
+        $subscriber = new MessengerTransportDoctrineSchemaListener([$doctrineTransport]);
+
         $subscriber->onSchemaCreateTable($event);
         $this->assertFalse($event->isDefaultPrevented());
     }

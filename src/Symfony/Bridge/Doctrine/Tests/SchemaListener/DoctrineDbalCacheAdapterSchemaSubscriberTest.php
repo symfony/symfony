@@ -16,7 +16,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\Doctrine\SchemaListener\DoctrineDbalCacheAdapterSchemaSubscriber;
+use Symfony\Bridge\Doctrine\SchemaListener\DoctrineDbalCacheAdapterSchemaListener;
 use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
 
 class DoctrineDbalCacheAdapterSchemaSubscriberTest extends TestCase
@@ -37,7 +37,7 @@ class DoctrineDbalCacheAdapterSchemaSubscriberTest extends TestCase
             ->method('configureSchema')
             ->with($schema, $dbalConnection);
 
-        $subscriber = new DoctrineDbalCacheAdapterSchemaSubscriber([$dbalAdapter]);
+        $subscriber = new DoctrineDbalCacheAdapterSchemaListener([$dbalAdapter]);
         $subscriber->postGenerateSchema($event);
     }
 }

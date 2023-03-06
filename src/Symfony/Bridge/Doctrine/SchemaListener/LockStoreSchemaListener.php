@@ -15,7 +15,7 @@ use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\DoctrineDbalStore;
 
-final class LockStoreSchemaSubscriber extends AbstractSchemaSubscriber
+final class LockStoreSchemaListener extends AbstractSchemaListener
 {
     /**
      * @param iterable<mixed, PersistingStoreInterface> $stores

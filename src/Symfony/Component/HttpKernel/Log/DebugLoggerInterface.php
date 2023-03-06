@@ -44,6 +44,8 @@ interface DebugLoggerInterface
 
     /**
      * Removes all log records.
+     *
+     * @return void
      */
     public function clear();
 }

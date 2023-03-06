@@ -58,7 +58,7 @@ class EmptyAppKernel extends Kernel
         return [new TwigBundle()];
     }
 
-    public function registerContainerConfiguration(LoaderInterface $loader)
+    public function registerContainerConfiguration(LoaderInterface $loader): void
     {
         $loader->load(static function (ContainerBuilder $container) {
             $container->register('error_renderer.html', HtmlErrorRenderer::class);

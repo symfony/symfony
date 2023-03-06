@@ -49,6 +49,8 @@ interface ProfilerStorageInterface
 
     /**
      * Purges all data from the database.
+     *
+     * @return void
      */
     public function purge();
 }

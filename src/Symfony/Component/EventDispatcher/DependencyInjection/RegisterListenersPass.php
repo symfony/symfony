@@ -96,7 +96,7 @@ class RegisterListenersPass implements CompilerPassInterface
 
                 $dispatcherDefinition = $globalDispatcherDefinition;
                 if (isset($event['dispatcher'])) {
-                    $dispatcherDefinition = $container->getDefinition($event['dispatcher']);
+                    $dispatcherDefinition = $container->findDefinition($event['dispatcher']);
                 }
 
                 $dispatcherDefinition->addMethodCall('addListener', [$event['event'], [new ServiceClosureArgument(new Reference($id)), $event['method']], $priority]);
@@ -135,7 +135,7 @@ class RegisterListenersPass implements CompilerPassInterface
                     continue;
                 }
 
-                $dispatcherDefinitions[$attributes['dispatcher']] = $container->getDefinition($attributes['dispatcher']);
+                $dispatcherDefinitions[$attributes['dispatcher']] = $container->findDefinition($attributes['dispatcher']);
             }
 
             if (!$dispatcherDefinitions) {

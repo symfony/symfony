@@ -90,6 +90,7 @@ class PhpDumper extends Dumper
     private array $locatedIds = [];
     private string $serviceLocatorTag;
     private array $exportedVariables = [];
+    private array $dynamicParameters = [];
     private string $baseClass;
     private string $class;
     private DumperInterface $proxyDumper;
@@ -135,6 +136,7 @@ class PhpDumper extends Dumper
         $this->targetDirRegex = null;
         $this->inlinedRequires = [];
         $this->exportedVariables = [];
+        $this->dynamicParameters = [];
         $options = array_merge([
             'class' => 'ProjectServiceContainer',
             'base_class' => 'Container',
@@ -232,11 +234,12 @@ class PhpDumper extends Dumper
             $this->preload = array_combine($options['preload_classes'], $options['preload_classes']);
         }
 
+        $code = $this->addDefaultParametersMethod();
         $code =
             $this->startClass($options['class'], $baseClass, $this->inlineFactories && $proxyClasses).
             $this->addServices($services).
             $this->addDeprecatedAliases().
-            $this->addDefaultParametersMethod()
+            $code
         ;
 
         $proxyClasses ??= $this->generateProxyClasses();
@@ -400,6 +403,7 @@ EOF;
         $this->circularReferences = [];
         $this->locatedIds = [];
         $this->exportedVariables = [];
+        $this->dynamicParameters = [];
         $this->preload = [];
 
         $unusedEnvs = [];
@@ -1570,6 +1574,7 @@ EOF;
 
             if ($hasEnum || preg_match("/\\\$container->(?:getEnv\('(?:[-.\w\\\\]*+:)*+\w++'\)|targetDir\.'')/", $export[1])) {
                 $dynamicPhp[$key] = sprintf('%s%s => %s,', $export[0], $this->export($key), $export[1]);
+                $this->dynamicParameters[$key] = true;
             } else {
                 $php[] = sprintf('%s%s => %s,', $export[0], $this->export($key), $export[1]);
             }
@@ -1988,20 +1993,18 @@ EOF;
 
     private function dumpParameter(string $name): string
     {
-        if ($this->container->hasParameter($name)) {
-            $value = $this->container->getParameter($name);
-            $dumpedValue = $this->dumpValue($value, false);
-
-            if (!$value || !\is_array($value)) {
-                return $dumpedValue;
-            }
-
-            if (!preg_match("/\\\$container->(?:getEnv\('(?:[-.\w\\\\]*+:)*+\w++'\)|targetDir\.'')/", $dumpedValue)) {
-                return sprintf('$container->parameters[%s]', $this->doExport($name));
-            }
+        if (!$this->container->hasParameter($name) || ($this->dynamicParameters[$name] ?? false)) {
+            return sprintf('$container->getParameter(%s)', $this->doExport($name));
         }
 
-        return sprintf('$container->getParameter(%s)', $this->doExport($name));
+        $value = $this->container->getParameter($name);
+        $dumpedValue = $this->dumpValue($value, false);
+
+        if (!$value || !\is_array($value)) {
+            return $dumpedValue;
+        }
+
+        return sprintf('$container->parameters[%s]', $this->doExport($name));
     }
 
     private function getServiceCall(string $id, Reference $reference = null): string

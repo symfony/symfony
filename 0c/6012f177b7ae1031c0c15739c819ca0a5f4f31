@@ -1,0 +1,88 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-01-26T17:27:24Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by stof at 2023-01-27T08:36:38Z
+
+The name `isHtml5Parser` is bad. Even when this is true, the HTML5 parser might not be used if the page content being crawled uses HTML4 or XHTML.
+
+---------------------------------------------------------------------------
+
+by victor-prdh at 2023-01-27T15:44:48Z
+
+> The name `isHtml5Parser` is bad. Even when this is true, the HTML5 parser might not be used if the page content being crawled uses HTML4 or XHTML.
+
+Oh yes, didn't think about this case ! What’s about `isHtml5ParserUsable` ?
+
+Thanks for your proofreading.
+
+---------------------------------------------------------------------------
+
+by victor-prdh at 2023-02-14T11:49:14Z
+
+Thanks for the review, i will add the tests ASAP !
+
+---------------------------------------------------------------------------
+
+by victor-prdh at 2023-02-24T15:58:26Z
+
+Hello, I come back to you because I don't know how I can test this :/
+I just searched today but I still have no idea how to test what I added ? It's doesn't change the functioning of `Crawler`, it's just gave to users capabilities to use or not the `HTML5Parser` so i'm bit perplex about wich tests can i add ?
+
+Thanks for your help
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-02-24T16:02:00Z
+
+We should figure out some HTML string that is parsed differently between both parsers I suppose.
+
+---------------------------------------------------------------------------
+
+by victor-prdh at 2023-02-24T16:32:19Z
+
+Hmm i see, so we can take back HTML of this [test](https://github.com/symfony/symfony/blob/6.3/src/Symfony/Component/DomCrawler/Tests/Html5ParserCrawlerTest.php#L21) and put it on 2 `Crawler` , 1 with `HML5Parser`, 1 without and expect a difference about the result !
+
+---------------------------------------------------------------------------
+
+by victor-prdh at 2023-03-01T14:05:30Z
+
+Hello,
+
+just tried to remove the commit `Merge branch 'symfony:6.3' into feature/choose-crawler` as asked by fabbot, i think it's good but i have now some conflicts :/
+
+Not sure about the request review, i didn't ask anythings but thanks for the review if you read this !
+
+Edit --
+
+It's not good :/ not sure about how i'm supposed to rebase this
+
+---------------------------------------------------------------------------
+
+by stof at 2023-03-01T15:43:35Z
+
+`git revert` does not remove the merge commit. It adds a new commit that undo the merge.
+
+See https://symfony.com/doc/current/contributing/code/pull_requests.html#rebase-your-pull-request for the instructions about rebasing your PR.
+
+---------------------------------------------------------------------------
+
+by victor-prdh at 2023-03-01T17:16:37Z
+
+> `git revert` does not remove the merge commit. It adds a new commit that undo the merge.
+>
+> See https://symfony.com/doc/current/contributing/code/pull_requests.html#rebase-your-pull-request for the instructions about rebasing your PR.
+
+Thanks a lot for all your help, i think i'm good now :)

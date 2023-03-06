@@ -1300,6 +1300,17 @@ class RequestTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $req->toArray());
     }
 
+    public function testGetPayload()
+    {
+        $req = new Request([], [], [], [], [], [], json_encode(['foo' => 'bar']));
+        $this->assertSame(['foo' => 'bar'], $req->getPayload()->all());
+        $req->getPayload()->set('new', 'key');
+        $this->assertSame(['foo' => 'bar'], $req->getPayload()->all());
+
+        $req = new Request([], ['foo' => 'bar'], [], [], [], [], json_encode(['baz' => 'qux']));
+        $this->assertSame(['foo' => 'bar'], $req->getPayload()->all());
+    }
+
     /**
      * @dataProvider provideOverloadedMethods
      */

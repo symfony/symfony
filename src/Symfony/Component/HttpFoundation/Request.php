@@ -1505,6 +1505,14 @@ class Request
     }
 
     /**
+     * Gets the decoded form or json request body.
+     */
+    public function getPayload(): InputBag
+    {
+        return $this->request->count() ? clone $this->request : new InputBag($this->toArray());
+    }
+
+    /**
      * Gets the request body decoded as array, typically from a JSON payload.
      *
      * @throws JsonException When the body cannot be decoded to an array

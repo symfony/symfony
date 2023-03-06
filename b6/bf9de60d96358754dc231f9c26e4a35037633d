@@ -1,0 +1,339 @@
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-01-16T14:32:22Z
+
+Thanks for the review!
+
+> Do we want a way to not register a value resolver in the iterator and make it accessible only via explicit attribute?
+
+From what I understood, we only want a way to force a specific resolver to be used for an argument.
+
+> You can register a converter […] by name
+
+Maybe we could do the same? This would require to name existing resolvers.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-01-16T18:19:34Z
+
+Hmm the `ServiceLocatorTagPass` is [sorting services by key](https://github.com/symfony/symfony/blob/1f7bc1098f0b03181095d35b11fa48523864e6f2/src/Symfony/Component/DependencyInjection/Compiler/ServiceLocatorTagPass.php#L84), thus overriding the priority order (from #22175) :thinking:
+
+Is there a way to circumvent this behavior?
+
+> do we want a way to make a value resolver accessible _only_ via the attribute?
+
+I personally never had any use-case for this so I cannot say.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-01-17T11:47:26Z
+
+a ServiceLocator does not guarantee iteration order. To me, this means you should inject 2 different arguments:
+
+- an iterator sorted by priority
+- a service locator keyed by name and used *only* for this ValueResolver argument.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-01-17T12:34:32Z
+
+An alternative way is to make this ValueResolver be processed by a ValueResolver registered first (with a very high priority) and receiving this ServiceLocator instead of making it a special feature of the ArgumentResolver.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-01-17T13:11:58Z
+
+Thanks @stof for the leads :+1:
+
+Is there any incentive for implementing one rather than the other?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-01-17T13:13:58Z
+
+I like @stof's idea! Less low level complexity, each class their use case.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-01-17T13:28:00Z
+
+Okay, going with a dedicated value resolver.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-01-17T14:50:41Z
+
+To fix the low-deps tests, you need to bump the minimum http-kernel version in framework-bundle requirements
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-01-17T15:59:48Z
+
+Thanks for the review @stof :pray:
+
+Would a functional test make sense to ensure `SpecifiedResolverValueResolver` is the only one to resolve arguments bearing the `ValueResolver` attribute?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-01-17T16:07:17Z
+
+@MatTheCat no need for the functional test if you have a unit test ensuring that an exception is thrown when the specified resolver does not return a value.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-01-17T16:18:32Z
+
+There is `SpecifiedResolverValueResolverTest::testDoesNotResolve` so I think we’re good.
+
+Do we agree on a new `name` tag attribute to identify resolvers? That would require a PR in the DoctrineBundle.
+
+As an alternative we could require `name` only when at least two resolvers use the same class, that would be simpler for the vast majority of use-cases.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-01-26T10:06:54Z
+
+> Do we agree on a new name tag attribute to identify resolvers?
+
+I don't know, but you'll need to find another name for that attribute as `name` is reserved already (holds the tag name)
+
+---------------------------------------------------------------------------
+
+by stof at 2023-01-26T10:32:24Z
+
+Generally, we use `alias` for that
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-01-26T10:53:34Z
+
+Damn I didn’t know; okay for `alias` :+1:
+
+Still not sure if it should be mandatory though?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-01-26T14:13:57Z
+
+> that attribute as name is reserved already (holds the tag name)
+
+Not anymore since #36586
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-01-27T08:48:54Z
+
+It occurred to me `ValueResolver`’s job is mostly the same as the `CurrentUser`’s. Would it make sense to deprecate it?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-01-27T09:28:06Z
+
+Deprecating which one ?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-01-27T09:50:15Z
+
+@stof `CurrentUser`. IIUC it could be replaced by `ValueResolver(UserValueResolver::class)`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-01-27T09:52:27Z
+
+UserValueResolver would still look for the CurrentUser attribute. What we could do is make CurrentUser extend ValueResolver. That'd close any priority issue.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-01-27T09:56:42Z
+
+@MatTheCat to me, no. Resolvers are still fine by using an attribute to configure them (for instance, `MapEntity` is not just a marker, it also holds configuration). And `CurrentUser` is much more explicit than `ValueResolver(UserValueResolver::class)`
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-01-27T10:05:45Z
+
+True, let’s keep `CurrentUser`!
+
+@nicolas-grekas making it extend `ValueResolver` would prevent the latter being `final`. Don’t know if it’s a deal breaker.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-01-27T10:09:34Z
+
+Let's make the attribute non-final then. This would unlock similar use cases.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-01-27T10:18:47Z
+
+Not sure I can do the same for `MapEntity` because of its `$disabled` parameter :thinking:
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2023-01-27T14:19:37Z
+
+When I initially introduced the ability for argument resolvers to be trigger by attributes in https://github.com/symfony/symfony/pull/37829, this is actually the feature I had in mind : allow to target a specific resolver to be used on an argument, that's why in the PR I introduced a marker interface and allowed only one such attribute per argument.
+
+So I think of instead of having both features available we should only avec one of them instead of having two ways arguments can influence the argument resolver process (particularly if some attributes like `CurrentUser` works with both systems).
+
+What I propose is :
+ - Add a new system where we can map an attribute to an argument resolver (probably something similar to what this PR is doing, but I would put the mapping in the container tag instead of a property of the attribute since it allows developpers to remap which resolver handler which attribute)
+ - Deprecate `MapEntity::disabled`, since people can target the resolver they specifically want to use they should do that instead of having to disabling the resolver(s) they don't want to use (and they migrate it to the new system).
+ - Maybe deprecate `ArgumentMetadata::getAttributes` and replace it with a `getAttribute` because we recreate a one-one relation between resolvers and attributes ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-01-27T14:44:23Z
+
+Thanks for the feedback @jvasseur.
+This made me realize we might prefer adding a new tag to pin resolvers that can be the target of `#[ValueResolver]`.
+This way we would allow two lists of resolvers: the regular ones, and the pinnable ones. And we would allow a resolver to not be part of the chain while still being pinnable.
+I think that would solve your concern.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-01-30T15:11:40Z
+
+So what’s left to do is
+
+- introduce a new tag (`controller.pinnable_argument_value_resolver`?)
+- rename `SpecifiedResolverValueResolver` to `PinnedResolverValueResolver`
+- only pass pinnable resolvers to `PinnedResolverValueResolver`
+
+This will address @jvasseur first point. I guess the two others could be handled in another PR?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-01-30T15:19:45Z
+
+@MatTheCat :+1:
+
+When using autoconfiguration, implementing ValueResolverInterface will trigger the registration of the class in the resolver chain. Maybe we need an attribute to opt-out from that, and request a pinned resolver instead (or in addition)?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-01-31T14:02:55Z
+
+Sooo it felt weird adding new tags/attributes so I tried another approach: [configure whether a resolver is disabled or pinned through `ValueResolver`](https://github.com/symfony/symfony/pull/48992/commits/452ce6ef63925ed8cbcd812cddb8327f6557470b).
+
+That way both `CurrentUser` and `MapEntity` work as before by default, but you can configure them as well. WDYT?
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2023-01-31T14:06:19Z
+
+This feels wrong and superfluous to have to pass `pin: true` when adding the attribute, when we add the attribute, it fells logical that this resolver should be used and not another one.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-01-31T14:11:50Z
+
+> when we add the attribute, it fells logical that this resolver should be used and not another one.
+
+I thought the same about `MapEntity` but here we are :sweat_smile:
+
+But now that you say it `$pin` default value should indeed be `true`. Would this approach then seem correct to you?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-02-10T12:23:40Z
+
+A test is failing (+ rebase needed)
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-02-16T08:43:22Z
+
+@nicolas-grekas would every resolver in Symfony’s codebase be pinnable?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-02-16T10:36:26Z
+
+Yes they would, since we give them a name.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-02-17T09:48:58Z
+
+Hm if `ValueResolver::$pinned` is removed then wouldn’t using `MapEntity` always pin the `EntityValueResolver`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-02-17T09:59:18Z
+
+> Hm if ValueResolver::$pinned is removed then wouldn’t using MapEntity always pin the EntityValueResolver?
+
+correct, that's expected to me (unless `disable: true` of course)
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-02-22T17:02:25Z
+
+@nicolas-grekas I guess `PinResolver` wouldn’t have  a `$disabled` property?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-02-22T18:49:47Z
+
+> I guess PinResolver wouldn’t have a $disabled property?
+
+It should. But let's keep as is for now and see if others have a preference.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-02-22T21:59:37Z
+
+What would it mean to disable a pinned resolver? 🤔
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-02-22T22:00:27Z
+
+`#[MapEntity(disabled: true)]` is the canonical example
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-02-22T22:11:54Z
+
+But it is not pinned right now, so disabling it means another resolver gets a chance.
+
+The concept of pinned resolvers is to not let another resolve your argument, so if you disable it there is no resolver left?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-02-22T22:18:20Z
+
+If you're talking about my last patch proposal, non-pinned resolvers can still be the target of `#[ValueResolver]`, so EntityValueResolver will still work, either as a regular resolver, or as part of the chain. But when a resolver is explicitly pinned, then it is removed from the regular chain.
+But I may miss your point :thinking:
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-02-23T08:34:03Z
+
+I think I mixed up “named” and “pinned” resolvers :thinking:
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-02-23T13:34:06Z
+
+This was quite the rabbit hole :sweat_smile:
+
+Thanks for all the reviews!
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-02-25T03:04:00Z
+
+I read the whole discussion and I don't really understand all the choices that has been made.
+
+Can someone update the PR description to explain what has been done? (I look at the doc PR but it seems it's not up to date)
+
+Thanks
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-06T11:13:15Z
+
+/cc @symfony/mergers I'd like to merge this to unlock some other PRs. Could you please have a look? :pray:

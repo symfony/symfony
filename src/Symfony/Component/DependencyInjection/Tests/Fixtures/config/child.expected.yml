@@ -4,12 +4,12 @@ services:
         class: Symfony\Component\DependencyInjection\ContainerInterface
         public: true
         synthetic: true
-    foo:
+    bar:
         class: Class2
         public: true
         file: file.php
         lazy: true
         arguments: [!service { class: Class1 }]
-    bar:
-        alias: foo
+    foo:
+        alias: bar
         public: true

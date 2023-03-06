@@ -36,8 +36,8 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
             'baz' => 'getBazService',
             'configured_service' => 'getConfiguredServiceService',
             'configured_service_simple' => 'getConfiguredServiceSimpleService',
+            'decorated' => 'getDecoratedService',
             'decorator_service' => 'getDecoratorServiceService',
-            'decorator_service_with_name' => 'getDecoratorServiceWithNameService',
             'deprecated_service' => 'getDeprecatedServiceService',
             'factory_service' => 'getFactoryServiceService',
             'factory_service_simple' => 'getFactoryServiceSimpleService',
@@ -57,7 +57,7 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
         $this->aliases = [
             'alias_for_alias' => 'foo',
             'alias_for_foo' => 'foo',
-            'decorated' => 'decorator_service_with_name',
+            'decorator_service_with_name' => 'decorated',
         ];
     }
 
@@ -203,6 +203,16 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
     }
 
     /**
+     * Gets the public 'decorated' shared service.
+     *
+     * @return \stdClass
+     */
+    protected static function getDecoratedService($container)
+    {
+        return $container->services['decorated'] = new \stdClass();
+    }
+
+    /**
      * Gets the public 'decorator_service' shared service.
      *
      * @return \stdClass
@@ -210,16 +220,6 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
     protected static function getDecoratorServiceService($container)
     {
         return $container->services['decorator_service'] = new \stdClass();
-    }
-
-    /**
-     * Gets the public 'decorator_service_with_name' shared service.
-     *
-     * @return \stdClass
-     */
-    protected static function getDecoratorServiceWithNameService($container)
-    {
-        return $container->services['decorator_service_with_name'] = new \stdClass();
     }
 
     /**

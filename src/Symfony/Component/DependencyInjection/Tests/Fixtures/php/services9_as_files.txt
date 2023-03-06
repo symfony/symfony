@@ -165,6 +165,21 @@ class getConfiguredServiceSimpleService extends ProjectServiceContainer
     }
 }
 
+    [Container%s/getDecoratedService.php] => <?php
+%A
+class getDecoratedService extends ProjectServiceContainer
+{
+    /**
+     * Gets the public 'decorated' shared service.
+     *
+     * @return \stdClass
+     */
+    public static function do($container, $lazyLoad = true)
+    {
+        return $container->services['decorated'] = new \stdClass();
+    }
+}
+
     [Container%s/getDecoratorServiceService.php] => <?php
 %A
 class getDecoratorServiceService extends ProjectServiceContainer
@@ -177,21 +192,6 @@ class getDecoratorServiceService extends ProjectServiceContainer
     public static function do($container, $lazyLoad = true)
     {
         return $container->services['decorator_service'] = new \stdClass();
-    }
-}
-
-    [Container%s/getDecoratorServiceWithNameService.php] => <?php
-%A
-class getDecoratorServiceWithNameService extends ProjectServiceContainer
-{
-    /**
-     * Gets the public 'decorator_service_with_name' shared service.
-     *
-     * @return \stdClass
-     */
-    public static function do($container, $lazyLoad = true)
-    {
-        return $container->services['decorator_service_with_name'] = new \stdClass();
     }
 }
 
@@ -585,8 +585,8 @@ class ProjectServiceContainer extends Container
             'baz' => 'getBazService',
             'configured_service' => 'getConfiguredServiceService',
             'configured_service_simple' => 'getConfiguredServiceSimpleService',
+            'decorated' => 'getDecoratedService',
             'decorator_service' => 'getDecoratorServiceService',
-            'decorator_service_with_name' => 'getDecoratorServiceWithNameService',
             'deprecated_service' => 'getDeprecatedServiceService',
             'factory_service' => 'getFactoryServiceService',
             'factory_service_simple' => 'getFactoryServiceSimpleService',
@@ -608,7 +608,7 @@ class ProjectServiceContainer extends Container
         $this->aliases = [
             'alias_for_alias' => 'foo',
             'alias_for_foo' => 'foo',
-            'decorated' => 'decorator_service_with_name',
+            'decorator_service_with_name' => 'decorated',
         ];
     }
 
@@ -753,8 +753,8 @@ require __DIR__.'/Container%s/getFoo_BazService.php';
 require __DIR__.'/Container%s/getFooService.php';
 require __DIR__.'/Container%s/getFactoryServiceSimpleService.php';
 require __DIR__.'/Container%s/getFactoryServiceService.php';
-require __DIR__.'/Container%s/getDecoratorServiceWithNameService.php';
 require __DIR__.'/Container%s/getDecoratorServiceService.php';
+require __DIR__.'/Container%s/getDecoratedService.php';
 require __DIR__.'/Container%s/getConfiguredServiceSimpleService.php';
 require __DIR__.'/Container%s/getConfiguredServiceService.php';
 require __DIR__.'/Container%s/getBazService.php';

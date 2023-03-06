@@ -22,11 +22,23 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class ResolveReferencesToAliasesPass extends AbstractRecursivePass
 {
+    public function __construct(
+        private ?DecoratorServicePass $decoratorPass = null,
+    ) {
+    }
+
     /**
      * @return void
      */
     public function process(ContainerBuilder $container)
     {
+        foreach ($this->decoratorPass?->getDecoratedServices() ?? [] as $inner => $id) {
+            $definition = $container->getDefinition($id);
+            $alias = $container->getAlias($inner);
+            $container->setAlias($id, $inner)->setPublic($definition->isPublic());
+            $container->setDefinition($inner, $definition)->setPublic($alias->isPublic());
+        }
+
         parent::process($container);
 
         foreach ($container->getAliases() as $id => $alias) {

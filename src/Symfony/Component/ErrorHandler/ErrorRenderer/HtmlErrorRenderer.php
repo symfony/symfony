@@ -17,6 +17,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
+use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 
 /**
  * @author Yonel Ceruto <yonelceruto@gmail.com>
@@ -145,6 +147,23 @@ class HtmlErrorRenderer implements ErrorRendererInterface
             'logger' => $this->logger instanceof DebugLoggerInterface ? $this->logger : null,
             'currentContent' => \is_string($this->outputBuffer) ? $this->outputBuffer : ($this->outputBuffer)(),
         ]);
+    }
+
+    private function dumpValue(mixed $value): string
+    {
+        $cloner = new VarCloner();
+        $data = $cloner->cloneVar($value);
+
+        $dumper = new HtmlDumper();
+        $dumper->setTheme('light');
+        $dumper->setOutput($output = fopen('php://memory', 'r+'));
+        $dumper->dump($data);
+
+        $dump = stream_get_contents($output, -1, 0);
+        rewind($output);
+        ftruncate($output, 0);
+
+        return $dump;
     }
 
     private function formatArgs(array $args): string

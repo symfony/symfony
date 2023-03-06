@@ -157,7 +157,7 @@ class HttpClientTraitTest extends TestCase
         yield [['http:', null, null, null, null], 'http:'];
         yield [['http:', null, 'bar', null, null], 'http:bar'];
         yield [[null, null, 'bar', '?a=1&c=c', null], 'bar?a=a&b=b', ['b' => null, 'c' => 'c', 'a' => 1]];
-        yield [[null, null, 'bar', '?a=b+c&b=b-._~!$%26/%27()[]*%2B,;%3D:@%25\\^`{|}', null], 'bar?a=b+c', ['b' => 'b-._~!$&/\'()[]*+,;=:@%\\^`{|}']];
+        yield [[null, null, 'bar', '?a=b+c&b=b-._~!$%26/%27()[]*%2B%2C;%3D:@%25\\^`{|}', null], 'bar?a=b+c', ['b' => 'b-._~!$&/\'()[]*+,;=:@%\\^`{|}']];
         yield [[null, null, 'bar', '?a=b%2B%20c', null], 'bar?a=b+c', ['a' => 'b+ c']];
         yield [[null, null, 'bar', '?a[b]=c', null], 'bar', ['a' => ['b' => 'c']]];
         yield [[null, null, 'bar', '?a[b[c]=d', null], 'bar?a[b[c]=d', []];

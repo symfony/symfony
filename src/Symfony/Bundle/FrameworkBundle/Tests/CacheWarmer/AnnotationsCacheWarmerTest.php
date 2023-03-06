@@ -136,7 +136,7 @@ class AnnotationsCacheWarmerTest extends TestCase
         $cacheFile = tempnam($this->cacheDir, __FUNCTION__);
         $warmer = $this->getMockBuilder(AnnotationsCacheWarmer::class)
             ->setConstructorArgs([new AnnotationReader(), $cacheFile])
-            ->setMethods(['doWarmUp'])
+            ->onlyMethods(['doWarmUp'])
             ->getMock();
 
         $warmer->method('doWarmUp')->willReturnCallback(function ($cacheDir, ArrayAdapter $arrayAdapter) {

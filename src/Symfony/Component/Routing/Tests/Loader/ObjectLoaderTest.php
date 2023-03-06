@@ -82,7 +82,7 @@ class ObjectLoaderTest extends TestCase
     {
         $this->expectException(\LogicException::class);
         $service = $this->getMockBuilder(\stdClass::class)
-            ->setMethods(['loadRoutes'])
+            ->addMethods(['loadRoutes'])
             ->getMock();
         $service->expects($this->once())
             ->method('loadRoutes')

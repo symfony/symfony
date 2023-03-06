@@ -58,7 +58,7 @@ class AnonymousAuthenticationProviderTest extends TestCase
 
     protected function getSupportedToken($secret)
     {
-        $token = $this->getMockBuilder(AnonymousToken::class)->setMethods(['getSecret'])->disableOriginalConstructor()->getMock();
+        $token = $this->getMockBuilder(AnonymousToken::class)->onlyMethods(['getSecret'])->disableOriginalConstructor()->getMock();
         $token->expects($this->any())
               ->method('getSecret')
               ->willReturn($secret)

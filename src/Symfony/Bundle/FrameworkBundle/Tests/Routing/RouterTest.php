@@ -609,7 +609,7 @@ class RouterTest extends TestCase
             ->willReturn($routes)
         ;
 
-        $sc = $this->getMockBuilder(Container::class)->setMethods(['get'])->getMock();
+        $sc = $this->getMockBuilder(Container::class)->onlyMethods(['get'])->getMock();
 
         $sc
             ->expects($this->once())

@@ -310,7 +310,7 @@ class DaoAuthenticationProviderTest extends TestCase
 
     protected function getSupportedToken()
     {
-        $mock = $this->getMockBuilder(UsernamePasswordToken::class)->setMethods(['getCredentials', 'getUser', 'getProviderKey'])->disableOriginalConstructor()->getMock();
+        $mock = $this->getMockBuilder(UsernamePasswordToken::class)->onlyMethods(['getCredentials', 'getUser', 'getProviderKey'])->disableOriginalConstructor()->getMock();
         $mock
             ->expects($this->any())
             ->method('getProviderKey')

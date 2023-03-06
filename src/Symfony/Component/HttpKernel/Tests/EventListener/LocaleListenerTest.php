@@ -76,7 +76,7 @@ class LocaleListenerTest extends TestCase
         $context = $this->createMock(RequestContext::class);
         $context->expects($this->once())->method('setParameter')->with('_locale', 'es');
 
-        $router = $this->getMockBuilder(Router::class)->setMethods(['getContext'])->disableOriginalConstructor()->getMock();
+        $router = $this->getMockBuilder(Router::class)->onlyMethods(['getContext'])->disableOriginalConstructor()->getMock();
         $router->expects($this->once())->method('getContext')->willReturn($context);
 
         $request = Request::create('/');
@@ -92,7 +92,7 @@ class LocaleListenerTest extends TestCase
         $context = $this->createMock(RequestContext::class);
         $context->expects($this->once())->method('setParameter')->with('_locale', 'es');
 
-        $router = $this->getMockBuilder(Router::class)->setMethods(['getContext'])->disableOriginalConstructor()->getMock();
+        $router = $this->getMockBuilder(Router::class)->onlyMethods(['getContext'])->disableOriginalConstructor()->getMock();
         $router->expects($this->once())->method('getContext')->willReturn($context);
 
         $parentRequest = Request::create('/');

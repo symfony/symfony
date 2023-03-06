@@ -36,6 +36,28 @@ class OptionsResolverTest extends TestCase
         $this->resolver = new OptionsResolver();
     }
 
+    /**
+     * @dataProvider provideResolveWithIgnoreUndefined
+     */
+    public function testResolveWithIgnoreUndefined(array $defaults, array $options, array $expected)
+    {
+        $this->resolver
+            ->setDefaults($defaults)
+            ->setIgnoreUndefined();
+
+        $this->assertSame($expected, $this->resolver->resolve($options));
+    }
+
+    public static function provideResolveWithIgnoreUndefined(): array
+    {
+        return [
+            'no defaults options, undefined resolves empty' => [[], ['c' => 4, 'd' => 5], []],
+            'empty options resolves defaults' => [['a' => '1', 'b' => '2'], [], ['a' => '1', 'b' => '2']],
+            'undefined options resolves defaults' => [['a' => '1', 'b' => '2'], ['c' => 3, 'd' => 4], ['a' => '1', 'b' => '2']],
+            'resolves defined' => [['a' => '1', 'b' => '2'], ['a' => '10', 'c' => '3'], ['b' => '2', 'a' => '10']],
+        ];
+    }
+
     public function testResolveFailsIfNonExistingOption()
     {
         $this->expectException(UndefinedOptionsException::class);

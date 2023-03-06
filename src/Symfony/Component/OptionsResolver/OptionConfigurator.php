@@ -134,4 +134,16 @@ final class OptionConfigurator
 
         return $this;
     }
+
+    /**
+     * Sets whether ignore undefined options.
+     *
+     * @return $this
+     */
+    public function ignoreUndefined(bool $ignore = true): static
+    {
+        $this->resolver->setIgnoreUndefined($ignore);
+
+        return $this;
+    }
 }

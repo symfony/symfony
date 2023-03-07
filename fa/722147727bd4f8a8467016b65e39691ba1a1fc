@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-06T08:37:58Z
+
+What about wrapping the call to `\Locale::setLocale()` in a `class_exists()` check instead?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-03-06T08:49:00Z
+
+> What about wrapping the call to `\Locale::setLocale()` in a `class_exists()` check instead?
+
+You mean `\Locale::setDefault()`? You're right, if there's no `Locale` class, there's no reason to mutate the default locale here. And the locale switcher would work very well without it.
+
+Let's do that instead.
+
+---------------------------------------------------------------------------
+
+by larowlan at 2023-03-06T20:18:03Z
+
+No worries, will update

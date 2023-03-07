@@ -15,4 +15,6 @@ services:
     decorated:
         class: Symfony\Component\DependencyInjection\Tests\Fixtures\StdClassDecorator
         public: true
+        tags:
+            - container.decorator: { id: decorated }
         arguments: [!service { class: stdClass }]

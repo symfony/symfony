@@ -21,28 +21,11 @@ jobs:
 
     env:
       php-version: '8.1'
-      extensions: json,couchbase,memcached,mongodb,redis,xsl,ldap,dom
     steps:
-      - name: Setup cache environment
-        id: extcache
-        uses: shivammathur/cache-extensions@v1
-        with:
-          php-version: ${{ env.php-version }}
-          extensions: ${{ env.extensions }}
-          key: cache-v1 # can be any string, change to clear the extension cache.
-
-      - name: Cache extensions
-        uses: actions/cache@v3
-        with:
-          path: ${{ steps.extcache.outputs.dir }}
-          key: ${{ steps.extcache.outputs.key }}
-          restore-keys: ${{ steps.extcache.outputs.key }}
-
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ env.php-version }}
-          extensions: ${{ env.extensions }}
           ini-values: "memory_limit=-1"
           coverage: none
 
@@ -60,7 +43,7 @@ jobs:
           ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
           export COMPOSER_ROOT_VERSION=$(grep ' VERSION = ' src/Symfony/Component/HttpKernel/Kernel.php | grep -P -o '[0-9]+\.[0-9]+').x-dev
           composer remove --dev --no-update --no-interaction symfony/phpunit-bridge
-          composer require --no-progress --ansi --no-plugins psalm/phar phpunit/phpunit:^9.5 php-http/discovery psr/event-dispatcher mongodb/mongodb
+          composer require --no-progress --ansi --no-plugins psalm/phar phpunit/phpunit:^9.5 php-http/discovery psr/event-dispatcher mongodb/mongodb jetbrains/phpstorm-stubs
 
       - name: Generate Psalm baseline
         run: |

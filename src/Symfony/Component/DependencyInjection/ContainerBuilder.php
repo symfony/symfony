@@ -1051,9 +1051,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         $parameterBag = $this->getParameterBag();
-        $class = ($parameterBag->resolveValue($definition->getClass()) ?: (['Closure', 'fromCallable'] === $definition->getFactory() ? 'Closure' : null));
+        $class = $parameterBag->resolveValue($definition->getClass()) ?: (['Closure', 'fromCallable'] === $definition->getFactory() ? 'Closure' : null);
 
-        if ('Closure' === $class && $definition->isLazy() && ['Closure', 'fromCallable'] === $definition->getFactory()) {
+        if (['Closure', 'fromCallable'] === $definition->getFactory() && ('Closure' !== $class || $definition->isLazy())) {
             $callable = $parameterBag->unescapeValue($parameterBag->resolveValue($definition->getArgument(0)));
 
             if ($callable instanceof Reference || $callable instanceof Definition) {
@@ -1065,19 +1065,18 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 || $callable[0] instanceof Definition && !isset($inlineServices[spl_object_hash($callable[0])])
             )) {
                 $containerRef = $this->containerRef ??= \WeakReference::create($this);
-                $class = ($callable[0] instanceof Reference ? $this->findDefinition($callable[0]) : $callable[0])->getClass();
                 $initializer = static function () use ($containerRef, $callable, &$inlineServices) {
                     return $containerRef->get()->doResolveServices($callable[0], $inlineServices);
                 };
 
-                $proxy = eval('return '.LazyClosure::getCode('$initializer', $this->getReflectionClass($class), $callable[1], $id).';');
+                $proxy = eval('return '.LazyClosure::getCode('$initializer', $callable, $definition, $this, $id).';');
                 $this->shareService($definition, $proxy, $id, $inlineServices);
 
                 return $proxy;
             }
         }
 
-        if (true === $tryProxy && $definition->isLazy() && 'Closure' !== $class
+        if (true === $tryProxy && $definition->isLazy() && ['Closure', 'fromCallable'] !== $definition->getFactory()
             && !$tryProxy = !($proxy = $this->proxyInstantiator ??= new LazyServiceInstantiator()) || $proxy instanceof RealServiceInstantiator
         ) {
             $containerRef = $this->containerRef ??= \WeakReference::create($this);

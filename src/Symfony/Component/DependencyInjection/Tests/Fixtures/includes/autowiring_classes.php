@@ -536,3 +536,8 @@ class AAndIInterfaceConsumer
     ) {
     }
 }
+
+interface SingleMethodInterface
+{
+    public function theMethod();
+}

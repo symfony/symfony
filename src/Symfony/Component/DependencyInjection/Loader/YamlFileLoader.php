@@ -396,6 +396,22 @@ class YamlFileLoader extends FileLoader
         $definition = isset($service[0]) && $service[0] instanceof Definition ? array_shift($service) : null;
         $return = null === $definition ? $return : true;
 
+        if (isset($service['from_callable'])) {
+            foreach (['alias', 'parent', 'synthetic', 'factory', 'file', 'arguments', 'properties', 'configurator', 'calls'] as $key) {
+                if (isset($service['factory'])) {
+                    throw new InvalidArgumentException(sprintf('The configuration key "%s" is unsupported for the service "%s" when using "from_callable" in "%s".', $key, $id, $file));
+                }
+            }
+
+            if ('Closure' !== $service['class'] ??= 'Closure') {
+                $service['lazy'] = true;
+            }
+
+            $service['factory'] = ['Closure', 'fromCallable'];
+            $service['arguments'] = [$service['from_callable']];
+            unset($service['from_callable']);
+        }
+
         $this->checkDefinition($id, $service, $file);
 
         if (isset($service['alias'])) {

@@ -11,8 +11,11 @@
 
 namespace Symfony\Component\DependencyInjection\Argument;
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\VarExporter\ProxyHelper;
 
 /**
@@ -44,17 +47,43 @@ class LazyClosure
         return $this->service;
     }
 
-    public static function getCode(string $initializer, ?\ReflectionClass $r, string $method, ?string $id): string
+    public static function getCode(string $initializer, array $callable, Definition $definition, ContainerBuilder $container, ?string $id): string
     {
-        if (!$r || !$r->hasMethod($method)) {
+        $method = $callable[1];
+        $asClosure = 'Closure' === ($definition->getClass() ?: 'Closure');
+
+        if ($asClosure) {
+            $class = ($callable[0] instanceof Reference ? $container->findDefinition($callable[0]) : $callable[0])->getClass();
+        } else {
+            $class = $definition->getClass();
+        }
+
+        $r = $container->getReflectionClass($class);
+
+        if (!$asClosure) {
+            if (!$r || !$r->isInterface()) {
+                throw new RuntimeException(sprintf('Cannot create adapter for service "%s" because "%s" is not an interface.', $id, $class));
+            }
+            if (1 !== \count($method = $r->getMethods())) {
+                throw new RuntimeException(sprintf('Cannot create adapter for service "%s" because interface "%s" doesn\'t have exactly one method.', $id, $class));
+            }
+            $method = $method[0]->name;
+        } elseif (!$r || !$r->hasMethod($method)) {
             throw new RuntimeException(sprintf('Cannot create lazy closure for service "%s" because its corresponding callable is invalid.', $id));
         }
 
-        $signature = ProxyHelper::exportSignature($r->getMethod($method));
-        $signature = preg_replace('/: static$/', ': \\'.$r->name, $signature);
+        $code = ProxyHelper::exportSignature($r->getMethod($method));
 
-        return '(new class('.$initializer.') extends \\'.self::class.' { '
-            .$signature.' { return $this->service->'.$method.'(...\func_get_args()); } '
-            .'})->'.$method.'(...)';
+        if ($asClosure) {
+            $code = ' { '.preg_replace('/: static$/', ': \\'.$r->name, $code);
+        } else {
+            $code = ' implements \\'.$r->name.' { '.$code;
+        }
+
+        $code = 'new class('.$initializer.') extends \\'.self::class
+            .$code.' { return $this->service->'.$callable[1].'(...\func_get_args()); } '
+            .'}';
+
+        return $asClosure ? '('.$code.')->'.$method.'(...)' : $code;
     }
 }

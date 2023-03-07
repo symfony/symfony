@@ -20,11 +20,14 @@ use Symfony\Component\DependencyInjection\Reference;
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
 class AutowireCallable extends Autowire
 {
+    /**
+     * @param bool|class-string $lazy Whether to use lazy-loading for this argument
+     */
     public function __construct(
         string|array $callable = null,
         string $service = null,
         string $method = null,
-        bool $lazy = false,
+        bool|string $lazy = false,
     ) {
         if (!(null !== $callable xor null !== $service)) {
             throw new LogicException('#[AutowireCallable] attribute must declare exactly one of $callable or $service.');

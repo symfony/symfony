@@ -159,7 +159,7 @@ jobs:
           echo COMPOSER_ROOT_VERSION=$COMPOSER_ROOT_VERSION >> $GITHUB_ENV
 
           echo "::group::composer update"
-          composer require --dev --no-update mongodb/mongodb:"1.9.1@dev|^1.9.1@stable"
+          composer require --dev --no-update mongodb/mongodb
           composer update --no-progress --ansi
           echo "::endgroup::"
 

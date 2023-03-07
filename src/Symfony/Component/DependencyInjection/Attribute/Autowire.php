@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Attribute;
 
+use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\Expression;
@@ -23,19 +24,19 @@ use Symfony\Component\ExpressionLanguage\Expression;
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
 class Autowire
 {
-    public readonly string|array|Expression|Reference $value;
+    public readonly string|array|Expression|Reference|ArgumentInterface $value;
 
     /**
      * Use only ONE of the following.
      *
-     * @param string|array|null $value      Parameter value (ie "%kernel.project_dir%/some/path")
-     * @param string|null       $service    Service ID (ie "some.service")
-     * @param string|null       $expression Expression (ie 'service("some.service").someMethod()')
-     * @param string|null       $env        Environment variable name (ie 'SOME_ENV_VARIABLE')
-     * @param string|null       $param      Parameter name (ie 'some.parameter.name')
+     * @param string|array|ArgumentInterface|null $value      Value to inject (ie "%kernel.project_dir%/some/path")
+     * @param string|null                         $service    Service ID (ie "some.service")
+     * @param string|null                         $expression Expression (ie 'service("some.service").someMethod()')
+     * @param string|null                         $env        Environment variable name (ie 'SOME_ENV_VARIABLE')
+     * @param string|null                         $param      Parameter name (ie 'some.parameter.name')
      */
     public function __construct(
-        string|array $value = null,
+        string|array|ArgumentInterface $value = null,
         string $service = null,
         string $expression = null,
         string $env = null,

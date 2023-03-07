@@ -15,6 +15,7 @@ CHANGELOG
  * Allow to trim XML service parameters value by using `trim="true"` attribute
  * Allow extending the `Autowire` attribute
  * Add `#[Exclude]` to skip autoregistering a class
+ * Add support for autowiring services as closures using `#[AutowireCallable]` or `#[AutowireServiceClosure]`
 
 6.2
 ---

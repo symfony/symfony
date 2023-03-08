@@ -119,7 +119,12 @@ EOF
             if ($builder->hasAlias($serviceId)) {
                 $hasAlias[$serviceId] = true;
                 $serviceAlias = $builder->getAlias($serviceId);
-                $serviceLine .= ' <fg=cyan>('.$serviceAlias.')</>';
+
+                if ($builder->hasDefinition($serviceAlias) && $decorated = $builder->getDefinition($serviceAlias)->getTag('container.decorator')) {
+                    $serviceLine .= ' <fg=cyan>('.$decorated[0]['id'].')</>';
+                } else {
+                    $serviceLine .= ' <fg=cyan>('.$serviceAlias.')</>';
+                }
 
                 if ($serviceAlias->isDeprecated()) {
                     $serviceLine .= ' - <fg=magenta>deprecated</>';
@@ -127,6 +132,8 @@ EOF
             } elseif (!$all) {
                 ++$serviceIdsNb;
                 continue;
+            } elseif ($builder->getDefinition($serviceId)->isDeprecated()) {
+                $serviceLine .= ' - <fg=magenta>deprecated</>';
             }
             $text[] = $serviceLine;
             $io->text($text);

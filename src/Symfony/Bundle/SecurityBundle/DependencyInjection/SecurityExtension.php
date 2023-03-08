@@ -457,8 +457,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 'logout_path' => $firewall['logout']['path'],
             ]);
 
-            $logoutSuccessListenerId = 'security.logout.listener.default.'.$id;
-            $container->setDefinition($logoutSuccessListenerId, new ChildDefinition('security.logout.listener.default'))
+            $container->setDefinition('security.logout.listener.default.'.$id, new ChildDefinition('security.logout.listener.default'))
                 ->replaceArgument(1, $firewall['logout']['target'])
                 ->addTag('kernel.event_subscriber', ['dispatcher' => $firewallEventDispatcherId]);
 

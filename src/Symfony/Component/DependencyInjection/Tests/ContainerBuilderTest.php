@@ -1985,6 +1985,25 @@ class ContainerBuilderTest extends TestCase
 
         $this->assertSame(1, $e->first);
     }
+
+    public function testLazyClosure()
+    {
+        $container = new ContainerBuilder();
+        $container->register('closure', 'Closure')
+            ->setPublic('true')
+            ->setFactory(['Closure', 'fromCallable'])
+            ->setLazy(true)
+            ->setArguments([[new Reference('foo'), 'cloneFoo']]);
+        $container->register('foo', Foo::class);
+        $container->compile();
+
+        $cloned = Foo::$counter;
+        $this->assertInstanceOf(\Closure::class, $container->get('closure'));
+        $this->assertSame($cloned, Foo::$counter);
+        $this->assertInstanceOf(Foo::class, $container->get('closure')());
+        $this->assertSame(1 + $cloned, Foo::$counter);
+        $this->assertSame(1, (new \ReflectionFunction($container->get('closure')))->getNumberOfParameters());
+    }
 }
 
 class FooClass

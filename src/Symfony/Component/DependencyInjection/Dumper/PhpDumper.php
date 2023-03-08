@@ -15,6 +15,7 @@ use Composer\Autoload\ClassLoader;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\LazyClosure;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocator;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -1179,6 +1180,22 @@ EOTXT
                     throw new RuntimeException(sprintf('Cannot dump definition because of invalid factory method (%s).', $callable[1] ?: 'n/a'));
                 }
 
+                if (['...'] === $arguments && $definition->isLazy() && 'Closure' === ($definition->getClass() ?? 'Closure') && (
+                    $callable[0] instanceof Reference
+                    || ($callable[0] instanceof Definition && !$this->definitionVariables->contains($callable[0]))
+                )) {
+                    $class = ($callable[0] instanceof Reference ? $this->container->findDefinition($callable[0]) : $callable[0])->getClass();
+
+                    if (str_contains($initializer = $this->dumpValue($callable[0]), '$container')) {
+                        $this->addContainerRef = true;
+                        $initializer = sprintf('function () use ($containerRef) { $container = $containerRef; return %s; }', $initializer);
+                    } else {
+                        $initializer = 'fn () => '.$initializer;
+                    }
+
+                    return $return.LazyClosure::getCode($initializer, $this->container->getReflectionClass($class), $callable[1], $id).$tail;
+                }
+
                 if ($callable[0] instanceof Reference
                     || ($callable[0] instanceof Definition && $this->definitionVariables->contains($callable[0]))
                 ) {
@@ -2326,6 +2343,10 @@ EOF;
     private function isProxyCandidate(Definition $definition, ?bool &$asGhostObject, string $id): ?Definition
     {
         $asGhostObject = false;
+
+        if ('Closure' === ($definition->getClass() ?: (['Closure', 'fromCallable'] === $definition->getFactory() ? 'Closure' : null))) {
+            return null;
+        }
 
         if (!$definition->isLazy() || !$this->hasProxyDumper) {
             return null;

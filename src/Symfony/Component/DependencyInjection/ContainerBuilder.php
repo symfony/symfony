@@ -22,6 +22,7 @@ use Symfony\Component\Config\Resource\ReflectionClassResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\LazyClosure;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocator;
@@ -1050,13 +1051,40 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         $parameterBag = $this->getParameterBag();
+        $class = ($parameterBag->resolveValue($definition->getClass()) ?: (['Closure', 'fromCallable'] === $definition->getFactory() ? 'Closure' : null));
 
-        if (true === $tryProxy && $definition->isLazy() && !$tryProxy = !($proxy = $this->proxyInstantiator ??= new LazyServiceInstantiator()) || $proxy instanceof RealServiceInstantiator) {
+        if ('Closure' === $class && $definition->isLazy() && ['Closure', 'fromCallable'] === $definition->getFactory()) {
+            $callable = $parameterBag->unescapeValue($parameterBag->resolveValue($definition->getArgument(0)));
+
+            if ($callable instanceof Reference || $callable instanceof Definition) {
+                $callable = [$callable, '__invoke'];
+            }
+
+            if (\is_array($callable) && (
+                $callable[0] instanceof Reference
+                || $callable[0] instanceof Definition && !isset($inlineServices[spl_object_hash($callable[0])])
+            )) {
+                $containerRef = $this->containerRef ??= \WeakReference::create($this);
+                $class = ($callable[0] instanceof Reference ? $this->findDefinition($callable[0]) : $callable[0])->getClass();
+                $initializer = static function () use ($containerRef, $callable, &$inlineServices) {
+                    return $containerRef->get()->doResolveServices($callable[0], $inlineServices);
+                };
+
+                $proxy = eval('return '.LazyClosure::getCode('$initializer', $this->getReflectionClass($class), $callable[1], $id).';');
+                $this->shareService($definition, $proxy, $id, $inlineServices);
+
+                return $proxy;
+            }
+        }
+
+        if (true === $tryProxy && $definition->isLazy() && 'Closure' !== $class
+            && !$tryProxy = !($proxy = $this->proxyInstantiator ??= new LazyServiceInstantiator()) || $proxy instanceof RealServiceInstantiator
+        ) {
             $containerRef = $this->containerRef ??= \WeakReference::create($this);
             $proxy = $proxy->instantiateProxy(
                 $this,
                 (clone $definition)
-                    ->setClass($parameterBag->resolveValue($definition->getClass()))
+                    ->setClass($class)
                     ->setTags(($definition->hasTag('proxy') ? ['proxy' => $parameterBag->resolveValue($definition->getTag('proxy'))] : []) + $definition->getTags()),
                 $id, static function ($proxy = false) use ($containerRef, $definition, &$inlineServices, $id) {
                     return $containerRef->get()->createService($definition, $inlineServices, true, $id, $proxy);
@@ -1105,7 +1133,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 }
             }
         } else {
-            $r = new \ReflectionClass($parameterBag->resolveValue($definition->getClass()));
+            $r = new \ReflectionClass($class);
 
             if (\is_object($tryProxy)) {
                 if ($r->getConstructor()) {

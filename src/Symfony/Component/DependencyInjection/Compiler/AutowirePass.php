@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireCallable;
+use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
 use Symfony\Component\DependencyInjection\Attribute\MapDecorated;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -83,7 +84,7 @@ class AutowirePass extends AbstractRecursivePass
             return $this->processValue($this->container->getParameterBag()->resolveValue($value->value));
         }
 
-        if ($value instanceof MapDecorated) {
+        if ($value instanceof AutowireDecorated || $value instanceof MapDecorated) {
             $definition = $this->container->getDefinition($this->currentId);
 
             return new Reference($definition->innerServiceId ?? $this->currentId.'.inner', $definition->decorationOnInvalid ?? ContainerInterface::NULL_ON_INVALID_REFERENCE);
@@ -180,6 +181,7 @@ class AutowirePass extends AbstractRecursivePass
                     return new Reference($attribute->value, ContainerInterface::NULL_ON_INVALID_REFERENCE);
                 }
                 // no break
+            case $attribute instanceof AutowireDecorated:
             case $attribute instanceof MapDecorated:
                 return $this->processValue($attribute);
         }
@@ -292,6 +294,12 @@ class AutowirePass extends AbstractRecursivePass
                             ->setLazy($attribute instanceof AutowireCallable && $attribute->lazy);
                     }
                     $arguments[$index] = $value;
+
+                    continue 2;
+                }
+
+                foreach ($parameter->getAttributes(AutowireDecorated::class) as $attribute) {
+                    $arguments[$index] = $this->processAttribute($attribute->newInstance(), $parameter->allowsNull());
 
                     continue 2;
                 }

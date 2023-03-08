@@ -16,6 +16,7 @@ CHANGELOG
  * Allow extending the `Autowire` attribute
  * Add `#[Exclude]` to skip autoregistering a class
  * Add support for autowiring services as closures using `#[AutowireCallable]` or `#[AutowireServiceClosure]`
+ * Deprecate `#[MapDecorated]`, use `#[AutowireDecorated]` instead
 
 6.2
 ---

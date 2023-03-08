@@ -17,10 +17,10 @@ use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 class ValueResolver
 {
     /**
-     * @param class-string<ValueResolverInterface>|string $name
+     * @param class-string<ValueResolverInterface>|string $resolver
      */
     public function __construct(
-        public string $name,
+        public string $resolver,
         public bool $disabled = false,
     ) {
     }

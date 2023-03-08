@@ -40,13 +40,13 @@ class ControllerArgumentValueResolverPass implements CompilerPassInterface
         }
 
         $definitions = $container->getDefinitions();
-        $namedResolvers = $this->findAndSortTaggedServices(new TaggedIteratorArgument('controller.pinned_value_resolver', 'name', needsIndexes: true), $container);
+        $namedResolvers = $this->findAndSortTaggedServices(new TaggedIteratorArgument('controller.targeted_value_resolver', 'name', needsIndexes: true), $container);
         $resolvers = $this->findAndSortTaggedServices(new TaggedIteratorArgument('controller.argument_value_resolver', 'name', needsIndexes: true), $container);
 
         foreach ($resolvers as $name => $resolverReference) {
             $id = (string) $resolverReference;
 
-            if ($definitions[$id]->hasTag('controller.pinned_value_resolver')) {
+            if ($definitions[$id]->hasTag('controller.targeted_value_resolver')) {
                 unset($resolvers[$name]);
             } else {
                 $namedResolvers[$name] ??= clone $resolverReference;

@@ -83,7 +83,7 @@ use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpClient\UriTemplateHttpClient;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
-use Symfony\Component\HttpKernel\Attribute\AsPinnedValueResolver;
+use Symfony\Component\HttpKernel\Attribute\AsTargetedValueResolver;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\BackedEnumValueResolver;
@@ -692,8 +692,8 @@ class FrameworkExtension extends Extension
             $definition->addTag('messenger.message_handler', $tagAttributes);
         });
 
-        $container->registerAttributeForAutoconfiguration(AsPinnedValueResolver::class, static function (ChildDefinition $definition, AsPinnedValueResolver $attribute): void {
-            $definition->addTag('controller.pinned_value_resolver', $attribute->name ? ['name' => $attribute->name] : []);
+        $container->registerAttributeForAutoconfiguration(AsTargetedValueResolver::class, static function (ChildDefinition $definition, AsTargetedValueResolver $attribute): void {
+            $definition->addTag('controller.targeted_value_resolver', $attribute->name ? ['name' => $attribute->name] : []);
         });
 
         if (!$container->getParameter('kernel.debug')) {

@@ -10,7 +10,7 @@ CHANGELOG
  * Use an instance of `Psr\Clock\ClockInterface` to generate the current date time in `DateTimeValueResolver`
  * Add `#[WithLogLevel]` for defining log levels for exceptions
  * Add `skip_response_headers` to the `HttpCache` options
- * Introduce pinnable value resolvers with `#[ValueResolver]` and `#[AsPinnedValueResolver]`
+ * Introduce targeted value resolvers with `#[ValueResolver]` and `#[AsTargetedValueResolver]`
 
 6.2
 ---

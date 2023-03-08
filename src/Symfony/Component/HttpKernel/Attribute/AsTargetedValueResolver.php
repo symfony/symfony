@@ -12,10 +12,10 @@
 namespace Symfony\Component\HttpKernel\Attribute;
 
 /**
- * Service tag to autoconfigure pinned value resolvers.
+ * Service tag to autoconfigure targeted value resolvers.
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
-class AsPinnedValueResolver
+class AsTargetedValueResolver
 {
     public function __construct(
         public readonly ?string $name = null,

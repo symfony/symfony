@@ -46,7 +46,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('argument_metadata_factory'),
                 abstract_arg('argument value resolvers'),
-                abstract_arg('pinned value resolvers'),
+                abstract_arg('targeted value resolvers'),
             ])
 
         ->set('argument_resolver.backed_enum_resolver', BackedEnumValueResolver::class)

@@ -139,12 +139,8 @@ abstract class ConstraintValidatorTestCase extends TestCase
             'validatePropertyValue',
             'getViolations',
         ];
-        // PHPUnit 10 removed MockBuilder::setMethods()
-        if (method_exists($contextualValidatorMockBuilder, 'onlyMethods')) {
-            $contextualValidatorMockBuilder->onlyMethods($contextualValidatorMethods);
-        } else {
-            $contextualValidatorMockBuilder->setMethods($contextualValidatorMethods);
-        }
+
+        $contextualValidatorMockBuilder->onlyMethods($contextualValidatorMethods);
         $contextualValidator = $contextualValidatorMockBuilder->getMock();
         $contextualValidator->expects($this->any())
             ->method('atPath')

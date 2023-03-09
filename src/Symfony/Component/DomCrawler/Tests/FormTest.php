@@ -874,7 +874,7 @@ class FormTest extends TestCase
     {
         $field = $this
             ->getMockBuilder(FormField::class)
-            ->setMethods(['getName', 'getValue', 'setValue', 'initialize'])
+            ->onlyMethods(['getName', 'getValue', 'setValue', 'initialize'])
             ->disableOriginalConstructor()
             ->getMock()
         ;

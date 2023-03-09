@@ -96,7 +96,7 @@ class PreAuthenticatedAuthenticationProviderTest extends TestCase
 
     protected function getSupportedToken($user = false, $credentials = false)
     {
-        $token = $this->getMockBuilder(PreAuthenticatedToken::class)->setMethods(['getUser', 'getCredentials', 'getFirewallName'])->disableOriginalConstructor()->getMock();
+        $token = $this->getMockBuilder(PreAuthenticatedToken::class)->onlyMethods(['getUser', 'getCredentials', 'getFirewallName'])->disableOriginalConstructor()->getMock();
         if (false !== $user) {
             $token->expects($this->once())
                   ->method('getUser')

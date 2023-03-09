@@ -34,7 +34,7 @@ class DoctrineExtensionTest extends TestCase
 
         $this->extension = $this
             ->getMockBuilder(AbstractDoctrineExtension::class)
-            ->setMethods([
+            ->onlyMethods([
                 'getMappingResourceConfigDirectory',
                 'getObjectManagerElementName',
                 'getMappingObjectDefaultName',

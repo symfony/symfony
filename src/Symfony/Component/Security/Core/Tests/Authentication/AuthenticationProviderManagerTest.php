@@ -201,7 +201,7 @@ class AuthenticationProviderManagerTest extends TestCase
         } elseif (null !== $exception) {
             $provider->expects($this->once())
                      ->method('authenticate')
-                     ->willThrowException($this->getMockBuilder($exception)->setMethods(null)->getMock())
+                     ->willThrowException($this->getMockBuilder($exception)->onlyMethods([])->getMock())
             ;
         }
 

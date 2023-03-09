@@ -42,7 +42,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $this->session = $this->createMock(SessionInterface::class);
         $this->request = $this->createMock(Request::class);
         $this->request->expects($this->any())->method('getSession')->willReturn($this->session);
-        $this->exception = $this->getMockBuilder(AuthenticationException::class)->setMethods(['getMessage'])->getMock();
+        $this->exception = $this->getMockBuilder(AuthenticationException::class)->onlyMethods(['getMessage'])->getMock();
     }
 
     public function testForward()

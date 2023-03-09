@@ -716,7 +716,7 @@ class ApplicationTest extends TestCase
 
     public function testFindNamespaceDoesNotFailOnDeepSimilarNamespaces()
     {
-        $application = $this->getMockBuilder(Application::class)->setMethods(['getNamespaces'])->getMock();
+        $application = $this->getMockBuilder(Application::class)->onlyMethods(['getNamespaces'])->getMock();
         $application->expects($this->once())
             ->method('getNamespaces')
             ->willReturn(['foo:sublong', 'bar:sub']);
@@ -876,7 +876,7 @@ class ApplicationTest extends TestCase
 
     public function testRenderExceptionLineBreaks()
     {
-        $application = $this->getMockBuilder(Application::class)->setMethods(['getTerminalWidth'])->getMock();
+        $application = $this->getMockBuilder(Application::class)->addMethods(['getTerminalWidth'])->getMock();
         $application->setAutoExit(false);
         $application->expects($this->any())
             ->method('getTerminalWidth')
@@ -1103,7 +1103,7 @@ class ApplicationTest extends TestCase
     {
         $exception = new \Exception('', 4);
 
-        $application = $this->getMockBuilder(Application::class)->setMethods(['doRun'])->getMock();
+        $application = $this->getMockBuilder(Application::class)->onlyMethods(['doRun'])->getMock();
         $application->setAutoExit(false);
         $application->expects($this->once())
             ->method('doRun')
@@ -1142,7 +1142,7 @@ class ApplicationTest extends TestCase
     {
         $exception = new \Exception('', 0);
 
-        $application = $this->getMockBuilder(Application::class)->setMethods(['doRun'])->getMock();
+        $application = $this->getMockBuilder(Application::class)->onlyMethods(['doRun'])->getMock();
         $application->setAutoExit(false);
         $application->expects($this->once())
             ->method('doRun')
@@ -1185,7 +1185,7 @@ class ApplicationTest extends TestCase
     {
         $exception = new \Exception('', $exceptionCode);
 
-        $application = $this->getMockBuilder(Application::class)->setMethods(['doRun'])->getMock();
+        $application = $this->getMockBuilder(Application::class)->onlyMethods(['doRun'])->getMock();
         $application->setAutoExit(false);
         $application->expects($this->once())
             ->method('doRun')

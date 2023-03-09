@@ -108,7 +108,7 @@ class RememberMeAuthenticationProviderTest extends TestCase
                 ->willReturn([]);
         }
 
-        $token = $this->getMockBuilder(RememberMeToken::class)->setMethods(['getFirewallName'])->setConstructorArgs([$user, 'foo', $secret])->getMock();
+        $token = $this->getMockBuilder(RememberMeToken::class)->onlyMethods(['getFirewallName'])->setConstructorArgs([$user, 'foo', $secret])->getMock();
         $token
             ->expects($this->once())
             ->method('getFirewallName')

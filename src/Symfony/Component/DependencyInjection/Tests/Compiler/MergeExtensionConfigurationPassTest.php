@@ -61,7 +61,7 @@ class MergeExtensionConfigurationPassTest extends TestCase
 
     public function testExtensionLoadGetAMergeExtensionConfigurationContainerBuilderInstance()
     {
-        $extension = $this->getMockBuilder(FooExtension::class)->setMethods(['load'])->getMock();
+        $extension = $this->getMockBuilder(FooExtension::class)->onlyMethods(['load'])->getMock();
         $extension->expects($this->once())
             ->method('load')
             ->with($this->isType('array'), $this->isInstanceOf(MergeExtensionConfigurationContainerBuilder::class))
@@ -77,7 +77,7 @@ class MergeExtensionConfigurationPassTest extends TestCase
 
     public function testExtensionConfigurationIsTrackedByDefault()
     {
-        $extension = $this->getMockBuilder(FooExtension::class)->setMethods(['getConfiguration'])->getMock();
+        $extension = $this->getMockBuilder(FooExtension::class)->onlyMethods(['getConfiguration'])->getMock();
         $extension->expects($this->exactly(2))
             ->method('getConfiguration')
             ->willReturn(new FooConfiguration());

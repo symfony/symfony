@@ -2091,7 +2091,7 @@ class RecursiveValidatorTest extends TestCase
         $validator = $this
             ->getMockBuilder(RecursiveValidator::class)
             ->disableOriginalConstructor()
-            ->setMethods(['startContext'])
+            ->onlyMethods(['startContext'])
             ->getMock();
         $validator
             ->expects($this->once())
@@ -2125,7 +2125,7 @@ class RecursiveValidatorTest extends TestCase
         $validator = $this
             ->getMockBuilder(RecursiveValidator::class)
             ->disableOriginalConstructor()
-            ->setMethods(['startContext'])
+            ->onlyMethods(['startContext'])
             ->getMock();
         $validator
             ->expects($this->once())

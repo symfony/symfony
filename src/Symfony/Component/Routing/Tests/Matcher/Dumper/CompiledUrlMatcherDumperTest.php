@@ -486,7 +486,7 @@ class CompiledUrlMatcherDumperTest extends TestCase
 
         return $this->getMockBuilder(TestCompiledUrlMatcher::class)
             ->setConstructorArgs([$compiledRoutes, new RequestContext()])
-            ->setMethods(['redirect'])
+            ->onlyMethods(['redirect'])
             ->getMock();
     }
 

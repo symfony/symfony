@@ -232,7 +232,7 @@ class UserAuthenticationProviderTest extends TestCase
 
     protected function getSupportedToken()
     {
-        $mock = $this->getMockBuilder(UsernamePasswordToken::class)->setMethods(['getCredentials', 'getFirewallName', 'getRoles'])->disableOriginalConstructor()->getMock();
+        $mock = $this->getMockBuilder(UsernamePasswordToken::class)->onlyMethods(['getCredentials', 'getFirewallName'])->addMethods(['getRoles'])->disableOriginalConstructor()->getMock();
         $mock
             ->expects($this->any())
             ->method('getFirewallName')

@@ -48,7 +48,7 @@ class TraceableEventDispatcherTest extends TestCase
     public function testStopwatchCheckControllerOnRequestEvent()
     {
         $stopwatch = $this->getMockBuilder(Stopwatch::class)
-            ->setMethods(['isStarted'])
+            ->onlyMethods(['isStarted'])
             ->getMock();
         $stopwatch->expects($this->once())
             ->method('isStarted')
@@ -64,7 +64,7 @@ class TraceableEventDispatcherTest extends TestCase
     public function testStopwatchStopControllerOnRequestEvent()
     {
         $stopwatch = $this->getMockBuilder(Stopwatch::class)
-            ->setMethods(['isStarted', 'stop'])
+            ->onlyMethods(['isStarted', 'stop'])
             ->getMock();
         $stopwatch->expects($this->once())
             ->method('isStarted')

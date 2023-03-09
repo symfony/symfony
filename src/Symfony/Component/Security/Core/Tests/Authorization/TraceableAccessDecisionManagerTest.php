@@ -178,17 +178,17 @@ class TraceableAccessDecisionManagerTest extends TestCase
     {
         $voter1 = $this
             ->getMockBuilder(VoterInterface::class)
-            ->setMethods(['vote'])
+            ->onlyMethods(['vote'])
             ->getMock();
 
         $voter2 = $this
             ->getMockBuilder(VoterInterface::class)
-            ->setMethods(['vote'])
+            ->onlyMethods(['vote'])
             ->getMock();
 
         $voter3 = $this
             ->getMockBuilder(VoterInterface::class)
-            ->setMethods(['vote'])
+            ->onlyMethods(['vote'])
             ->getMock();
 
         $sut = new TraceableAccessDecisionManager(new AccessDecisionManager([$voter1, $voter2, $voter3]));

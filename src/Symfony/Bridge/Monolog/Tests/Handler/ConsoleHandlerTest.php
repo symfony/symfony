@@ -65,7 +65,7 @@ class ConsoleHandlerTest extends TestCase
         $levelName = Logger::getLevelName($level);
         $levelName = sprintf('%-9s', $levelName);
 
-        $realOutput = $this->getMockBuilder(Output::class)->setMethods(['doWrite'])->getMock();
+        $realOutput = $this->getMockBuilder(Output::class)->onlyMethods(['doWrite'])->getMock();
         $realOutput->setVerbosity($verbosity);
         if ($realOutput->isDebug()) {
             $log = "16:21:54 $levelName [app] My info message\n";

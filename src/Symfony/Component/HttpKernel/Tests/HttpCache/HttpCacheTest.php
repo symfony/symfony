@@ -45,7 +45,7 @@ class HttpCacheTest extends HttpCacheTestCase
         // implements TerminableInterface
         $kernelMock = $this->getMockBuilder(Kernel::class)
             ->disableOriginalConstructor()
-            ->setMethods(['terminate', 'registerBundles', 'registerContainerConfiguration'])
+            ->onlyMethods(['terminate', 'registerBundles', 'registerContainerConfiguration'])
             ->getMock();
 
         $kernelMock->expects($this->once())

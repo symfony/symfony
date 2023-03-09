@@ -148,7 +148,7 @@ class KernelTest extends TestCase
 
     public function testClassCacheIsNotLoadedByDefault()
     {
-        $kernel = $this->getKernel(['initializeBundles', 'doLoadClassCache']);
+        $kernel = $this->getKernel(['initializeBundles'], [], false, ['doLoadClassCache']);
         $kernel->expects($this->never())
             ->method('doLoadClassCache');
 
@@ -449,7 +449,7 @@ EOF
         // implements TerminableInterface
         $httpKernelMock = $this->getMockBuilder(HttpKernel::class)
             ->disableOriginalConstructor()
-            ->setMethods(['terminate'])
+            ->onlyMethods(['terminate'])
             ->getMock();
 
         $httpKernelMock
@@ -627,7 +627,7 @@ EOF
     {
         $bundle = $this
             ->getMockBuilder(BundleInterface::class)
-            ->setMethods(['getPath', 'getName'])
+            ->onlyMethods(['getPath', 'getName'])
             ->disableOriginalConstructor()
         ;
 
@@ -658,16 +658,21 @@ EOF
      * @param array $methods Additional methods to mock (besides the abstract ones)
      * @param array $bundles Bundles to register
      */
-    protected function getKernel(array $methods = [], array $bundles = [], bool $debug = false): Kernel
+    protected function getKernel(array $methods = [], array $bundles = [], bool $debug = false, array $methodsToAdd = []): Kernel
     {
         $methods[] = 'registerBundles';
 
-        $kernel = $this
+        $kernelMockBuilder = $this
             ->getMockBuilder(KernelForTest::class)
-            ->setMethods($methods)
+            ->onlyMethods($methods)
             ->setConstructorArgs(['test', $debug])
-            ->getMock()
         ;
+
+        if (0 !== \count($methodsToAdd)) {
+            $kernelMockBuilder->addMethods($methodsToAdd);
+        }
+
+        $kernel = $kernelMockBuilder->getMock();
         $kernel->expects($this->any())
             ->method('registerBundles')
             ->willReturn($bundles)

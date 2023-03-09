@@ -58,11 +58,11 @@ final class ArgumentResolver implements ArgumentResolverInterface
                 $resolverName = null;
                 foreach ($attributes as $attribute) {
                     if ($attribute->disabled) {
-                        $disabledResolvers[$attribute->name] = true;
+                        $disabledResolvers[$attribute->resolver] = true;
                     } elseif ($resolverName) {
                         throw new \LogicException(sprintf('You can only pin one resolver per argument, but argument "$%s" of "%s()" has more.', $metadata->getName(), $this->getPrettyName($controller)));
                     } else {
-                        $resolverName = $attribute->name;
+                        $resolverName = $attribute->resolver;
                     }
                 }
 

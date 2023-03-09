@@ -285,13 +285,13 @@ class ArgumentResolverTest extends TestCase
         self::getResolver()->getArguments($request, $controller);
     }
 
-    public function testPinnedResolver()
+    public function testTargetedResolver()
     {
         $resolver = self::getResolver([], [DefaultValueResolver::class => new DefaultValueResolver()]);
 
         $request = Request::create('/');
         $request->attributes->set('foo', 'bar');
-        $controller = $this->controllerPinningResolver(...);
+        $controller = $this->controllerTargetingResolver(...);
 
         $this->assertSame([1], $resolver->getArguments($request, $controller));
     }
@@ -307,23 +307,23 @@ class ArgumentResolverTest extends TestCase
         $this->assertSame([1], $resolver->getArguments($request, $controller));
     }
 
-    public function testManyPinnedResolvers()
+    public function testManyTargetedResolvers()
     {
         $resolver = self::getResolver(namedResolvers: []);
 
         $request = Request::create('/');
-        $controller = $this->controllerPinningManyResolvers(...);
+        $controller = $this->controllerTargetingManyResolvers(...);
 
         $this->expectException(\LogicException::class);
         $resolver->getArguments($request, $controller);
     }
 
-    public function testUnknownPinnedResolver()
+    public function testUnknownTargetedResolver()
     {
         $resolver = self::getResolver(namedResolvers: []);
 
         $request = Request::create('/');
-        $controller = $this->controllerPinningUnknownResolver(...);
+        $controller = $this->controllerTargetingUnknownResolver(...);
 
         $this->expectException(ResolverNotFoundException::class);
         $resolver->getArguments($request, $controller);
@@ -369,7 +369,7 @@ class ArgumentResolverTest extends TestCase
     {
     }
 
-    public function controllerPinningResolver(#[ValueResolver(DefaultValueResolver::class)] int $foo = 1)
+    public function controllerTargetingResolver(#[ValueResolver(DefaultValueResolver::class)] int $foo = 1)
     {
     }
 
@@ -377,14 +377,14 @@ class ArgumentResolverTest extends TestCase
     {
     }
 
-    public function controllerPinningManyResolvers(
+    public function controllerTargetingManyResolvers(
         #[ValueResolver(RequestAttributeValueResolver::class)]
         #[ValueResolver(DefaultValueResolver::class)]
         int $foo
     ) {
     }
 
-    public function controllerPinningUnknownResolver(
+    public function controllerTargetingUnknownResolver(
         #[ValueResolver('foo')]
         int $bar
     ) {

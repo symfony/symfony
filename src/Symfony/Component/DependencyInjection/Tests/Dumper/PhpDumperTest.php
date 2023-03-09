@@ -21,6 +21,9 @@ use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocator as ArgumentServiceLocator;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\AutowireCallable;
+use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Container;
@@ -1651,6 +1654,38 @@ PHP
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/closure.php', $dumper->dump());
     }
+
+    public function testAutowireClosure()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', Foo::class)
+            ->setPublic('true');
+        $container->register('baz', \Closure::class)
+            ->setFactory(['Closure', 'fromCallable'])
+            ->setArguments(['var_dump'])
+            ->setPublic('true');
+        $container->register('bar', LazyConsumer::class)
+            ->setPublic('true')
+            ->setAutowired(true);
+        $container->compile();
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/autowire_closure.php', $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Autowire_Closure']));
+
+        require self::$fixturesPath.'/php/autowire_closure.php';
+
+        $container = new \Symfony_DI_PhpDumper_Test_Autowire_Closure();
+
+        $this->assertInstanceOf(Foo::class, $container->get('foo'));
+        $this->assertInstanceOf(LazyConsumer::class, $bar = $container->get('bar'));
+        $this->assertInstanceOf(\Closure::class, $bar->foo);
+        $this->assertInstanceOf(\Closure::class, $bar->baz);
+        $this->assertInstanceOf(\Closure::class, $bar->buz);
+        $this->assertSame($container->get('foo'), ($bar->foo)());
+        $this->assertSame($container->get('baz'), $bar->baz);
+        $this->assertInstanceOf(Foo::class, $fooClone = ($bar->buz)());
+        $this->assertNotSame($container->get('foo'), $fooClone);
+    }
 }
 
 class Rot13EnvVarProcessor implements EnvVarProcessorInterface
@@ -1674,5 +1709,18 @@ class FooForDeepGraph
     {
         // clone to verify that $b has been fully initialized before
         $this->bClone = clone $b;
+    }
+}
+
+class LazyConsumer
+{
+    public function __construct(
+        #[AutowireServiceClosure('foo')]
+        public \Closure $foo,
+        #[Autowire(service: 'baz')]
+        public \Closure $baz,
+        #[AutowireCallable(service: 'foo', method: 'cloneFoo')]
+        public \Closure $buz,
+    ) {
     }
 }

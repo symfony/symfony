@@ -12,12 +12,9 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\Config\Resource\ClassExistenceResource;
-use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
-use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\AutowireCallable;
 use Symfony\Component\DependencyInjection\Attribute\MapDecorated;
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
-use Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -84,14 +81,6 @@ class AutowirePass extends AbstractRecursivePass
     {
         if ($value instanceof Autowire) {
             return $this->processValue($this->container->getParameterBag()->resolveValue($value->value));
-        }
-
-        if ($value instanceof TaggedIterator) {
-            return new TaggedIteratorArgument($value->tag, $value->indexAttribute, $value->defaultIndexMethod, false, $value->defaultPriorityMethod, (array) $value->exclude, $value->excludeSelf);
-        }
-
-        if ($value instanceof TaggedLocator) {
-            return new ServiceLocatorArgument(new TaggedIteratorArgument($value->tag, $value->indexAttribute, $value->defaultIndexMethod, true, $value->defaultPriorityMethod, (array) $value->exclude, $value->excludeSelf));
         }
 
         if ($value instanceof MapDecorated) {
@@ -191,8 +180,6 @@ class AutowirePass extends AbstractRecursivePass
                     return new Reference($attribute->value, ContainerInterface::NULL_ON_INVALID_REFERENCE);
                 }
                 // no break
-            case $attribute instanceof TaggedIterator:
-            case $attribute instanceof TaggedLocator:
             case $attribute instanceof MapDecorated:
                 return $this->processValue($attribute);
         }
@@ -291,17 +278,32 @@ class AutowirePass extends AbstractRecursivePass
                 continue;
             }
 
-            if ($checkAttributes) {
-                foreach ([TaggedIterator::class, TaggedLocator::class, Autowire::class, MapDecorated::class] as $attributeClass) {
-                    foreach ($parameter->getAttributes($attributeClass, Autowire::class === $attributeClass ? \ReflectionAttribute::IS_INSTANCEOF : 0) as $attribute) {
-                        $arguments[$index] = $this->processAttribute($attribute->newInstance(), $parameter->allowsNull());
+            $type = ProxyHelper::exportType($parameter, true);
 
-                        continue 3;
+            if ($checkAttributes) {
+                foreach ($parameter->getAttributes(Autowire::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+                    $attribute = $attribute->newInstance();
+                    $value = $this->processAttribute($attribute, $parameter->allowsNull());
+
+                    if ($attribute instanceof AutowireCallable || 'Closure' === $type && \is_array($value)) {
+                        $value = (new Definition('Closure'))
+                            ->setFactory(['Closure', 'fromCallable'])
+                            ->setArguments([$value + [1 => '__invoke']])
+                            ->setLazy($attribute instanceof AutowireCallable && $attribute->lazy);
                     }
+                    $arguments[$index] = $value;
+
+                    continue 2;
+                }
+
+                foreach ($parameter->getAttributes(MapDecorated::class) as $attribute) {
+                    $arguments[$index] = $this->processAttribute($attribute->newInstance(), $parameter->allowsNull());
+
+                    continue 2;
                 }
             }
 
-            if (!$type = ProxyHelper::exportType($parameter, true)) {
+            if (!$type) {
                 if (isset($arguments[$index])) {
                     continue;
                 }

@@ -111,7 +111,7 @@ class FakeCustomToken implements TokenInterface
         return new InMemoryUser('wouter', '', ['ROLE_USER']);
     }
 
-    public function setUser($user)
+    public function setUser($user): void
     {
     }
 
@@ -123,7 +123,7 @@ class FakeCustomToken implements TokenInterface
     {
     }
 
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
     }
 
@@ -131,7 +131,7 @@ class FakeCustomToken implements TokenInterface
     {
     }
 
-    public function setAttributes(array $attributes)
+    public function setAttributes(array $attributes): void
     {
     }
 
@@ -143,7 +143,7 @@ class FakeCustomToken implements TokenInterface
     {
     }
 
-    public function setAttribute(string $name, $value)
+    public function setAttribute(string $name, $value): void
     {
     }
 }

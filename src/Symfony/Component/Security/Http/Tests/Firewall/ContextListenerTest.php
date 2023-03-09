@@ -548,7 +548,7 @@ class CustomToken implements TokenInterface
         return $this->user;
     }
 
-    public function setUser($user)
+    public function setUser($user): void
     {
         $this->user = $user;
     }
@@ -572,7 +572,7 @@ class CustomToken implements TokenInterface
     {
     }
 
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
     }
 
@@ -581,7 +581,7 @@ class CustomToken implements TokenInterface
         return [];
     }
 
-    public function setAttributes(array $attributes)
+    public function setAttributes(array $attributes): void
     {
     }
 
@@ -595,7 +595,7 @@ class CustomToken implements TokenInterface
         return null;
     }
 
-    public function setAttribute(string $name, $value)
+    public function setAttribute(string $name, $value): void
     {
     }
 }

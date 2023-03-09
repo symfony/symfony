@@ -280,17 +280,11 @@ class QueryMock extends AbstractQuery
     {
     }
 
-    /**
-     * @return array|string
-     */
-    public function getSQL()
+    public function getSQL(): array|string
     {
     }
 
-    /**
-     * @return Result|int
-     */
-    protected function _doExecute()
+    protected function _doExecute(): Result|int
     {
     }
 }

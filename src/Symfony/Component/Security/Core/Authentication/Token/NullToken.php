@@ -33,6 +33,9 @@ class NullToken implements TokenInterface
         return null;
     }
 
+    /**
+     * @return never
+     */
     public function setUser(UserInterface $user)
     {
         throw new \BadMethodCallException('Cannot set user on a NullToken.');
@@ -55,6 +58,9 @@ class NullToken implements TokenInterface
         return [];
     }
 
+    /**
+     * @return never
+     */
     public function setAttributes(array $attributes)
     {
         throw new \BadMethodCallException('Cannot set attributes of NullToken.');
@@ -70,6 +76,9 @@ class NullToken implements TokenInterface
         return null;
     }
 
+    /**
+     * @return never
+     */
     public function setAttribute(string $name, mixed $value)
     {
         throw new \BadMethodCallException('Cannot add attribute to NullToken.');

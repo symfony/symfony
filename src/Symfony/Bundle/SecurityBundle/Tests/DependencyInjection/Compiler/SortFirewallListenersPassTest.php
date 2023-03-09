@@ -65,7 +65,7 @@ class FirewallListenerPriorityMinus1 implements FirewallListenerInterface
     {
     }
 
-    public function authenticate(RequestEvent $event)
+    public function authenticate(RequestEvent $event): void
     {
     }
 
@@ -81,7 +81,7 @@ class FirewallListenerPriority1 implements FirewallListenerInterface
     {
     }
 
-    public function authenticate(RequestEvent $event)
+    public function authenticate(RequestEvent $event): void
     {
     }
 
@@ -97,7 +97,7 @@ class FirewallListenerPriority2 implements FirewallListenerInterface
     {
     }
 
-    public function authenticate(RequestEvent $event)
+    public function authenticate(RequestEvent $event): void
     {
     }
 

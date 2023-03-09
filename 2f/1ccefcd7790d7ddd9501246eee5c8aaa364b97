@@ -1,0 +1,66 @@
+---------------------------------------------------------------------------
+
+by Neirda24 at 2023-03-07T21:49:59Z
+
+Would this also be supported through yaml auto wiring ?
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-03-07T21:59:21Z
+
+Do we really need the verbosity of instancing `new Reference`? I wish the same config could be expressed with simple arguments.
+
+```diff
+public function __construct(
+-    #[Autowire([new Reference('foo'), 'someMethod'])]
++    #[Autowire(service: 'foo', method: 'someMethod')]
+    \Closure $foo, // generates a closure that calls "foo"::someMethod()
+)
+```
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-03-07T22:31:16Z
+
+I agree with @GromNaN, using `Reference` here does not feel right.
+
+What also concerns me is that the container has to know the class of the referenced service in order to know if `#[Autowire(service: 'foo')] Closure $foo` should be wired directly or through a service closure. That feels brittle.
+
+I'd be in favor of a solution where we only look at the attribute and the parameter type. That means we need to be explicit about wiring a service closure.
+
+```php
+#[Autowire(serviceClosure: 'foo')] // Wires a closure that returns service "foo"
+#[Autowire(service: 'foo', method: 'someMethod')] // Wires $container->get('foo')->someMethod(...)
+#[Autowire(service: 'foo')] // Wires the service foo. If the parameter type is "Closure",
+                            // $container->get('foo')(...) is wired instead.
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-08T16:57:00Z
+
+Thanks for the feedback. PR (and description) updated with two new attributes: `#[AutowireCallable]` and `#[AutowireServiceClosure]`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-08T17:26:54Z
+
+> Would this also be supported through yaml auto wiring ?
+
+@Neirda24 this is already supported, see eg #41176 and #45878 which introduced `!service_closure` and `!closure` YAML tags respectively.
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2023-03-08T18:12:51Z
+
+> > Would this also be supported through yaml auto wiring ?
+>
+> @Neirda24 this is already supported, see eg #41176 and #45878 which introduced `!service_closure` and `!closure` YAML tags respectively.
+
+Missed it ! Thanks 👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-09T16:02:13Z
+
+Merging as this blocks other PRs right now, but feel free to review after merge of course!

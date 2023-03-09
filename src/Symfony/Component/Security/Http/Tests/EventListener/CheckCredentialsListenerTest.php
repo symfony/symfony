@@ -134,7 +134,7 @@ class CheckCredentialsListenerTest extends TestCase
         $this->hasherFactory->expects($this->any())->method('getPasswordHasher')->with($this->identicalTo($this->user))->willReturn($hasher);
 
         $passport = $this->getMockBuilder(Passport::class)
-            ->setMethods(['addBadge'])
+            ->onlyMethods(['addBadge'])
             ->setConstructorArgs([new UserBadge('wouter', fn () => $this->user), new PasswordCredentials('ThePa$$word'), [new PasswordUpgradeBadge('ThePa$$word')]])
             ->getMock();
 
@@ -151,7 +151,7 @@ class CheckCredentialsListenerTest extends TestCase
         $this->hasherFactory->expects($this->any())->method('getPasswordHasher')->with($this->identicalTo($this->user))->willReturn($hasher);
 
         $passport = $this->getMockBuilder(Passport::class)
-            ->setMethods(['addBadge'])
+            ->onlyMethods(['addBadge'])
             ->setConstructorArgs([new UserBadge('wouter', fn () => $this->user), new PasswordCredentials('ThePa$$word'), [new PasswordUpgradeBadge('ThePa$$word')]])
             ->getMock();
 

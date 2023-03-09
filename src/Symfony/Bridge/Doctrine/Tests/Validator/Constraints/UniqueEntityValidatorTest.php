@@ -96,7 +96,8 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
     protected function createRepositoryMock()
     {
         $repository = $this->getMockBuilder(ObjectRepository::class)
-            ->setMethods(['findByCustom', 'find', 'findAll', 'findOneBy', 'findBy', 'getClassName'])
+            ->onlyMethods(['find', 'findAll', 'findOneBy', 'findBy', 'getClassName'])
+            ->addMethods(['findByCustom'])
             ->getMock()
         ;
 

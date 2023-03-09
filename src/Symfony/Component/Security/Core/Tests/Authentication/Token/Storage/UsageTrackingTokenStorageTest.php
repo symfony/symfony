@@ -31,7 +31,7 @@ class UsageTrackingTokenStorageTest extends TestCase
 
             $request = new Request();
             $request->setSession($session);
-            $requestStack = $this->getMockBuilder(RequestStack::class)->setMethods(['getSession'])->getMock();
+            $requestStack = $this->getMockBuilder(RequestStack::class)->onlyMethods(['getSession'])->getMock();
             $requestStack->push($request);
             $requestStack->expects($this->any())->method('getSession')->willReturnCallback(function () use ($session, &$sessionAccess) {
                 ++$sessionAccess;

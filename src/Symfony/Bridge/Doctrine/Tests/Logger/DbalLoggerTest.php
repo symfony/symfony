@@ -30,7 +30,7 @@ class DbalLoggerTest extends TestCase
         $dbalLogger = $this
             ->getMockBuilder(DbalLogger::class)
             ->setConstructorArgs([$logger, null])
-            ->setMethods(['log'])
+            ->onlyMethods(['log'])
             ->getMock()
         ;
 
@@ -62,7 +62,7 @@ class DbalLoggerTest extends TestCase
         $dbalLogger = $this
             ->getMockBuilder(DbalLogger::class)
             ->setConstructorArgs([$logger, null])
-            ->setMethods(['log'])
+            ->onlyMethods(['log'])
             ->getMock()
         ;
 
@@ -85,7 +85,7 @@ class DbalLoggerTest extends TestCase
         $dbalLogger = $this
             ->getMockBuilder(DbalLogger::class)
             ->setConstructorArgs([$logger, null])
-            ->setMethods(['log'])
+            ->onlyMethods(['log'])
             ->getMock()
         ;
 
@@ -116,7 +116,7 @@ class DbalLoggerTest extends TestCase
         $dbalLogger = $this
             ->getMockBuilder(DbalLogger::class)
             ->setConstructorArgs([$logger, null])
-            ->setMethods(['log'])
+            ->onlyMethods(['log'])
             ->getMock()
         ;
 
@@ -144,7 +144,7 @@ class DbalLoggerTest extends TestCase
         $dbalLogger = $this
             ->getMockBuilder(DbalLogger::class)
             ->setConstructorArgs([$logger, null])
-            ->setMethods(['log'])
+            ->onlyMethods(['log'])
             ->getMock()
         ;
 

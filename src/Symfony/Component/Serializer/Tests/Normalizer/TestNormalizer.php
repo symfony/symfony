@@ -25,9 +25,9 @@ class TestNormalizer implements NormalizerInterface
         return null;
     }
 
-    public function getSupportedTypes(?string $format): ?array
+    public function getSupportedTypes(?string $format): array
     {
-        return null;
+        return ['*' => false];
     }
 
     public function supportsNormalization($data, string $format = null, array $context = []): bool

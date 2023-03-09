@@ -44,12 +44,14 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
 
     public function getSupportedTypes(?string $format): array
     {
+        $isCacheable = __CLASS__ === static::class || $this->hasCacheableSupportsMethod();
+
         return [
-            Message::class => true,
-            Headers::class => true,
-            HeaderInterface::class => true,
-            Address::class => true,
-            AbstractPart::class => true,
+            Message::class => $isCacheable,
+            Headers::class => $isCacheable,
+            HeaderInterface::class => $isCacheable,
+            Address::class => $isCacheable,
+            AbstractPart::class => $isCacheable,
         ];
     }
 

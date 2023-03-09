@@ -33,13 +33,16 @@ class TraceableNormalizer implements NormalizerInterface, DenormalizerInterface,
         private NormalizerInterface|DenormalizerInterface $normalizer,
         private SerializerDataCollector $dataCollector,
     ) {
+        if (!method_exists($normalizer, 'getSupportedTypes')) {
+            trigger_deprecation('symfony/serializer', '6.3', 'Not implementing the "NormalizerInterface::getSupportedTypes()" in "%s" is deprecated.', get_debug_type($normalizer));
+        }
     }
 
-    public function getSupportedTypes(?string $format): ?array
+    public function getSupportedTypes(?string $format): array
     {
         // @deprecated remove condition in 7.0
         if (!method_exists($this->normalizer, 'getSupportedTypes')) {
-            return null;
+            return ['*' => $this->normalizer instanceof CacheableSupportsMethodInterface && $this->normalizer->hasCacheableSupportsMethod()];
         }
 
         return $this->normalizer->getSupportedTypes($format);

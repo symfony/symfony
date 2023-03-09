@@ -227,9 +227,9 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
         return $normalizer->denormalize($data, $type, $format, $context);
     }
 
-    public function getSupportedTypes(?string $format): ?array
+    public function getSupportedTypes(?string $format): array
     {
-        return null;
+        return ['*' => false];
     }
 
     public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
@@ -274,22 +274,28 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
                     continue;
                 }
 
-                if (null === $supportedTypes = $normalizer->getSupportedTypes($format)) {
-                    $this->normalizerCache[$format][$type][$k] = false;
-                    continue;
-                }
+                $supportedTypes = $normalizer->getSupportedTypes($format);
 
                 foreach ($supportedTypes as $supportedType => $isCacheable) {
-                    if ($type !== $supportedType && !is_subclass_of($type, $supportedType, true)) {
+                    if ('*' === $supportedType || $type !== $supportedType && !is_subclass_of($type, $supportedType, true)) {
                         continue;
                     }
 
-                    if ($isCacheable && $normalizer->supportsNormalization($data, $format, $context)) {
-                        $this->normalizerCache[$format][$type][$k] = true;
+                    if (null === $isCacheable) {
+                        unset($supportedTypes['*']);
+                    } elseif ($this->normalizerCache[$format][$type][$k] = $isCacheable && $normalizer->supportsNormalization($data, $format, $context)) {
                         break 2;
                     }
 
-                    $this->normalizerCache[$format][$type][$k] = false;
+                    break;
+                }
+
+                if (null === $isCacheable = $supportedTypes['*'] ?? null) {
+                    continue;
+                }
+
+                if ($this->normalizerCache[$format][$type][$k] ??= $isCacheable && $normalizer->supportsNormalization($data, $format, $context)) {
+                    break;
                 }
             }
         }
@@ -335,22 +341,28 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
                     continue;
                 }
 
-                if (null === $supportedTypes = $normalizer->getSupportedTypes($format)) {
-                    $this->denormalizerCache[$format][$class][$k] = false;
-                    continue;
-                }
+                $supportedTypes = $normalizer->getSupportedTypes($format);
 
                 foreach ($supportedTypes as $supportedType => $isCacheable) {
-                    if ($class !== $supportedType && !is_subclass_of($class, $supportedType, true)) {
+                    if ('*' === $supportedType || $class !== $supportedType && !is_subclass_of($class, $supportedType, true)) {
                         continue;
                     }
 
-                    if ($isCacheable && $normalizer->supportsDenormalization(null, $class, $format, $context)) {
-                        $this->denormalizerCache[$format][$class][$k] = true;
-                        break;
+                    if (null === $isCacheable) {
+                        unset($supportedTypes['*']);
+                    } elseif ($this->denormalizerCache[$format][$class][$k] = $isCacheable && $normalizer->supportsDenormalization(null, $class, $format, $context)) {
+                        break 2;
                     }
 
-                    $this->denormalizerCache[$format][$class][$k] = false;
+                    break;
+                }
+
+                if (null === $isCacheable = $supportedTypes['*'] ?? null) {
+                    continue;
+                }
+
+                if ($this->denormalizerCache[$format][$class][$k] ??= $isCacheable && $normalizer->supportsDenormalization(null, $class, $format, $context)) {
+                    break;
                 }
             }
         }

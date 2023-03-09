@@ -25,7 +25,7 @@ class DateTimeZoneNormalizer implements NormalizerInterface, DenormalizerInterfa
     public function getSupportedTypes(?string $format): array
     {
         return [
-            \DateTimeZone::class => __CLASS__ === static::class,
+            \DateTimeZone::class => __CLASS__ === static::class || $this->hasCacheableSupportsMethod(),
         ];
     }
 

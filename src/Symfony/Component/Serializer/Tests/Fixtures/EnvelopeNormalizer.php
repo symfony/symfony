@@ -31,7 +31,7 @@ class EnvelopeNormalizer implements NormalizerInterface
         ];
     }
 
-    public function getSupportedTypes(?string $format): ?array
+    public function getSupportedTypes(?string $format): array
     {
         return [
             EnvelopeObject::class => true,

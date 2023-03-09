@@ -36,7 +36,7 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
     public function getSupportedTypes(?string $format): array
     {
         return [
-            \DateInterval::class => __CLASS__ === static::class,
+            \DateInterval::class => __CLASS__ === static::class || $this->hasCacheableSupportsMethod(),
         ];
     }
 

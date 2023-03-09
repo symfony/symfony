@@ -41,7 +41,7 @@ class JsonSerializableNormalizer extends AbstractNormalizer
     public function getSupportedTypes(?string $format): array
     {
         return [
-            \JsonSerializable::class => __CLASS__ === static::class,
+            \JsonSerializable::class => __CLASS__ === static::class || $this->hasCacheableSupportsMethod(),
         ];
     }
 

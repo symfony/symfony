@@ -546,9 +546,9 @@ class AbstractObjectNormalizerTest extends TestCase
 
 class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
 {
-    public function getSupportedTypes(?string $format): ?array
+    public function getSupportedTypes(?string $format): array
     {
-        return null;
+        return ['*' => false];
     }
 
     protected function extractAttributes(object $object, string $format = null, array $context = []): array
@@ -656,9 +656,9 @@ class AbstractObjectNormalizerWithMetadata extends AbstractObjectNormalizer
         parent::__construct($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
     }
 
-    public function getSupportedTypes(?string $format): ?array
+    public function getSupportedTypes(?string $format): array
     {
-        return null;
+        return ['*' => false];
     }
 
     protected function extractAttributes(object $object, string $format = null, array $context = []): array
@@ -762,9 +762,9 @@ class SerializerCollectionDummy implements SerializerInterface, DenormalizerInte
         return null;
     }
 
-    public function getSupportedTypes(?string $format): ?array
+    public function getSupportedTypes(?string $format): array
     {
-        return null;
+        return ['*' => false];
     }
 
     public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
@@ -775,9 +775,9 @@ class SerializerCollectionDummy implements SerializerInterface, DenormalizerInte
 
 class AbstractObjectNormalizerCollectionDummy extends AbstractObjectNormalizer
 {
-    public function getSupportedTypes(?string $format): ?array
+    public function getSupportedTypes(?string $format): array
     {
-        return null;
+        return ['*' => false];
     }
 
     protected function extractAttributes(object $object, string $format = null, array $context = []): array
@@ -834,7 +834,7 @@ class ArrayDenormalizerDummy implements DenormalizerInterface, SerializerAwareIn
         return $data;
     }
 
-    public function getSupportedTypes(?string $format): ?array
+    public function getSupportedTypes(?string $format): array
     {
         return $this->serializer->getSupportedTypes($format);
     }

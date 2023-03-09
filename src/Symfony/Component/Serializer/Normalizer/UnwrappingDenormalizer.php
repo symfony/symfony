@@ -32,9 +32,9 @@ final class UnwrappingDenormalizer implements DenormalizerInterface, SerializerA
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
     }
 
-    public function getSupportedTypes(?string $format): ?array
+    public function getSupportedTypes(?string $format): array
     {
-        return null;
+        return ['*' => false];
     }
 
     public function denormalize(mixed $data, string $class, string $format = null, array $context = []): mixed

@@ -145,9 +145,9 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
         return 'normalized';
     }
 
-    public function getSupportedTypes(?string $format): ?array
+    public function getSupportedTypes(?string $format): array
     {
-        return null;
+        return ['*' => false];
     }
 
     public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool

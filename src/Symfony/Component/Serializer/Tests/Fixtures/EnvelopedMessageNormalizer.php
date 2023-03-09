@@ -25,7 +25,7 @@ class EnvelopedMessageNormalizer implements NormalizerInterface
         ];
     }
 
-    public function getSupportedTypes(?string $format): ?array
+    public function getSupportedTypes(?string $format): array
     {
         return [
             EnvelopedMessage::class => true,

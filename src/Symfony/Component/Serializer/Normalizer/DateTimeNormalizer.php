@@ -49,10 +49,12 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
 
     public function getSupportedTypes(?string $format): array
     {
+        $isCacheable = __CLASS__ === static::class || $this->hasCacheableSupportsMethod();
+
         return [
-            \DateTimeInterface::class => __CLASS__ === static::class,
-            \DateTimeImmutable::class => __CLASS__ === static::class,
-            \DateTime::class => __CLASS__ === static::class,
+            \DateTimeInterface::class => $isCacheable,
+            \DateTimeImmutable::class => $isCacheable,
+            \DateTime::class => $isCacheable,
         ];
     }
 

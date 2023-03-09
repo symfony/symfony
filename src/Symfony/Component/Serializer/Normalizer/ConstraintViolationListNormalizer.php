@@ -39,10 +39,10 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
         $this->nameConverter = $nameConverter;
     }
 
-    public function getSupportedTypes(?string $format): ?array
+    public function getSupportedTypes(?string $format): array
     {
         return [
-            ConstraintViolationListInterface::class => __CLASS__ === static::class,
+            ConstraintViolationListInterface::class => __CLASS__ === static::class || $this->hasCacheableSupportsMethod(),
         ];
     }
 

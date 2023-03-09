@@ -25,7 +25,7 @@ class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, Se
     public function getSupportedTypes(?string $format): array
     {
         return [
-            NormalizableInterface::class => __CLASS__ === static::class,
+            NormalizableInterface::class => __CLASS__ === static::class || $this->hasCacheableSupportsMethod(),
         ];
     }
 

@@ -24,9 +24,9 @@ class TestDenormalizer implements DenormalizerInterface
     {
     }
 
-    public function getSupportedTypes(?string $format): ?array
+    public function getSupportedTypes(?string $format): array
     {
-        return null;
+        return ['*' => false];
     }
 
     public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool

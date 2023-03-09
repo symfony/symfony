@@ -47,10 +47,12 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
 
     public function getSupportedTypes(?string $format): array
     {
+        $isCacheable = __CLASS__ === static::class || $this->hasCacheableSupportsMethod();
+
         return [
-            \SplFileInfo::class => __CLASS__ === static::class,
-            \SplFileObject::class => __CLASS__ === static::class,
-            File::class => __CLASS__ === static::class,
+            \SplFileInfo::class => $isCacheable,
+            \SplFileObject::class => $isCacheable,
+            File::class => $isCacheable,
         ];
     }
 

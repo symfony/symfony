@@ -36,9 +36,9 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
 {
     private static $setterAccessibleCache = [];
 
-    public function getSupportedTypes(?string $format): ?array
+    public function getSupportedTypes(?string $format): array
     {
-        return null;
+        return ['*' => __CLASS__ === static::class || $this->hasCacheableSupportsMethod()];
     }
 
     /**

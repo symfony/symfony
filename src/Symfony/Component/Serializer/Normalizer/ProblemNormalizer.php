@@ -43,7 +43,7 @@ class ProblemNormalizer implements NormalizerInterface, CacheableSupportsMethodI
     public function getSupportedTypes(?string $format): array
     {
         return [
-            FlattenException::class => __CLASS__ === self::class,
+            FlattenException::class => __CLASS__ === self::class || $this->hasCacheableSupportsMethod(),
         ];
     }
 

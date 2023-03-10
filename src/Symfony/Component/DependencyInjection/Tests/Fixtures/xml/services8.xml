@@ -18,8 +18,10 @@
       <parameter type="string">false</parameter>
       <parameter type="string">null</parameter>
     </parameter>
+    <parameter key="utf-8 valid string">&#x21B;&#x1B56;	test</parameter>
     <parameter key="binary" type="binary">8PDw8A==</parameter>
     <parameter key="binary-control-char" type="binary">VGhpcyBpcyBhIEJlbGwgY2hhciAH</parameter>
+    <parameter key="console banner" type="binary">G1szNzs0NG0jU3RhbmRXaXRoG1szMDs0M21Va3JhaW5lG1swbQ==</parameter>
     <parameter key="null string" type="string">null</parameter>
     <parameter key="string of digits" type="string">123</parameter>
     <parameter key="string of digits prefixed with minus character" type="string">-123</parameter>

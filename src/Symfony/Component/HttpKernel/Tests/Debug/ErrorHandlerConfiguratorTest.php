@@ -47,21 +47,24 @@ class ErrorHandlerConfiguratorTest extends TestCase
         if ($hasDeprecationLogger) {
             $deprecationLogger = $this->createMock(LoggerInterface::class);
             if (null !== $expectedDeprecationLoggerLevels) {
-                $expectedCalls[] = [$deprecationLogger, $expectedDeprecationLoggerLevels];
+                $expectedCalls[] = [$deprecationLogger, $expectedDeprecationLoggerLevels, false];
             }
         }
 
         if ($hasLogger) {
             $logger = $this->createMock(LoggerInterface::class);
             if (null !== $expectedLoggerLevels) {
-                $expectedCalls[] = [$logger, $expectedLoggerLevels];
+                $expectedCalls[] = [$logger, $expectedLoggerLevels, false];
             }
         }
 
         $handler
             ->expects($this->exactly(\count($expectedCalls)))
             ->method('setDefaultLogger')
-            ->withConsecutive(...$expectedCalls);
+            ->willReturnCallback(function (...$args) use (&$expectedCalls) {
+                $this->assertSame(array_shift($expectedCalls), $args);
+            })
+        ;
 
         $configurator = new ErrorHandlerConfigurator($logger, $levels, null, true, true, $deprecationLogger);
 

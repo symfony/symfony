@@ -154,14 +154,15 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
         $conn->expects($this->atLeast(2))
             ->method('executeStatement')
             ->willReturnCallback(function ($sql) use (&$series) {
-                [$constraint, $return] = array_shift($series);
-                $constraint->evaluate($sql);
+                if ([$constraint, $return] = array_shift($series)) {
+                    $constraint->evaluate($sql);
+                }
 
                 if ($return instanceof \Exception) {
                     throw $return;
                 }
 
-                return $return;
+                return $return ?? 1;
             })
         ;
 
@@ -195,14 +196,15 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
         $conn->expects($this->atLeast(3))
             ->method('executeStatement')
             ->willReturnCallback(function ($sql) use (&$series) {
-                [$constraint, $return] = array_shift($series);
-                $constraint->evaluate($sql);
+                if ([$constraint, $return] = array_shift($series)) {
+                    $constraint->evaluate($sql);
+                }
 
                 if ($return instanceof \Exception) {
                     throw $return;
                 }
 
-                return $return;
+                return $return ?? 1;
             })
         ;
 

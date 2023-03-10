@@ -38,6 +38,13 @@ final class FormErrorNormalizer implements NormalizerInterface, CacheableSupport
         return $data;
     }
 
+    public function getSupportedTypes(?string $format): array
+    {
+        return [
+            FormInterface::class => false,
+        ];
+    }
+
     public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return $data instanceof FormInterface && $data->isSubmitted() && !$data->isValid();
@@ -76,8 +83,13 @@ final class FormErrorNormalizer implements NormalizerInterface, CacheableSupport
         return $children;
     }
 
+    /**
+     * @deprecated since Symfony 6.3, use "getSupportedTypes()" instead
+     */
     public function hasCacheableSupportsMethod(): bool
     {
+        trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
+
         return __CLASS__ === static::class;
     }
 }

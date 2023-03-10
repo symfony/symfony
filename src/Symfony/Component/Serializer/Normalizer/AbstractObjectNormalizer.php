@@ -300,7 +300,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */)
     {
-        return class_exists($type) || (interface_exists($type, false) && $this->classDiscriminatorResolver && null !== $this->classDiscriminatorResolver->getMappingForClass($type));
+        return class_exists($type) || (interface_exists($type, false) && null !== $this->classDiscriminatorResolver?->getMappingForClass($type));
     }
 
     public function denormalize(mixed $data, string $type, string $format = null, array $context = [])

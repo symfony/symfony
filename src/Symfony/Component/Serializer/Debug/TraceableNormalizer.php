@@ -33,6 +33,19 @@ class TraceableNormalizer implements NormalizerInterface, DenormalizerInterface,
         private NormalizerInterface|DenormalizerInterface $normalizer,
         private SerializerDataCollector $dataCollector,
     ) {
+        if (!method_exists($normalizer, 'getSupportedTypes')) {
+            trigger_deprecation('symfony/serializer', '6.3', 'Not implementing the "NormalizerInterface::getSupportedTypes()" in "%s" is deprecated.', get_debug_type($normalizer));
+        }
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        // @deprecated remove condition in 7.0
+        if (!method_exists($this->normalizer, 'getSupportedTypes')) {
+            return ['*' => $this->normalizer instanceof CacheableSupportsMethodInterface && $this->normalizer->hasCacheableSupportsMethod()];
+        }
+
+        return $this->normalizer->getSupportedTypes($format);
     }
 
     public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
@@ -114,8 +127,13 @@ class TraceableNormalizer implements NormalizerInterface, DenormalizerInterface,
         $this->normalizer->setDenormalizer($denormalizer);
     }
 
+    /**
+     * @deprecated since Symfony 6.3, use "getSupportedTypes()" instead
+     */
     public function hasCacheableSupportsMethod(): bool
     {
+        trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
+
         return $this->normalizer instanceof CacheableSupportsMethodInterface && $this->normalizer->hasCacheableSupportsMethod();
     }
 

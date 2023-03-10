@@ -47,6 +47,17 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
+    public function getSupportedTypes(?string $format): array
+    {
+        $isCacheable = __CLASS__ === static::class || $this->hasCacheableSupportsMethod();
+
+        return [
+            \DateTimeInterface::class => $isCacheable,
+            \DateTimeImmutable::class => $isCacheable,
+            \DateTime::class => $isCacheable,
+        ];
+    }
+
     /**
      * @throws InvalidArgumentException
      */
@@ -124,8 +135,13 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
         return isset(self::SUPPORTED_TYPES[$type]);
     }
 
+    /**
+     * @deprecated since Symfony 6.3, use "getSupportedTypes()" instead
+     */
     public function hasCacheableSupportsMethod(): bool
     {
+        trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
+
         return __CLASS__ === static::class;
     }
 

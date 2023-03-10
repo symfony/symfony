@@ -1087,6 +1087,11 @@ class Application implements ResetInterface
         return [new HelpCommand(), new ListCommand(), new CompleteCommand(), new DumpCompletionCommand()];
     }
 
+    protected function getDispatcher()
+    {
+        return $this->dispatcher;
+    }
+
     /**
      * Gets the default helper set with the helpers that should always be available.
      */

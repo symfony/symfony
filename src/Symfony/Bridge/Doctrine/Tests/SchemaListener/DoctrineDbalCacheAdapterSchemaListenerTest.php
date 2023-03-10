@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\SchemaListener\DoctrineDbalCacheAdapterSchemaListener;
 use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
 
-class DoctrineDbalCacheAdapterSchemaSubscriberTest extends TestCase
+class DoctrineDbalCacheAdapterSchemaListenerTest extends TestCase
 {
     public function testPostGenerateSchema()
     {

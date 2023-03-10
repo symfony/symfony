@@ -1,0 +1,5 @@
+services:
+    invalid_service:
+        class: FooBarClass
+        factory: 'create'
+        constructor: 'create'

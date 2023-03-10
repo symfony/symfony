@@ -24,6 +24,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Reference;
@@ -312,6 +313,14 @@ class XmlFileLoader extends FileLoader
 
                 $definition->setFactory([$class, $factory->getAttribute('method') ?: '__invoke']);
             }
+        }
+
+        if ($constructor = $service->getAttribute('constructor')) {
+            if (null !== $definition->getFactory()) {
+                throw new LogicException(sprintf('The "%s" service cannot declare a factory as well as a constructor.', $service->getAttribute('id')));
+            }
+
+            $definition->setFactory([null, $constructor]);
         }
 
         if ($configurators = $this->getChildren($service, 'configurator')) {

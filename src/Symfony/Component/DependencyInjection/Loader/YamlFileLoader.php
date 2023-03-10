@@ -23,6 +23,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Reference;
@@ -63,6 +64,7 @@ class YamlFileLoader extends FileLoader
         'autowire' => 'autowire',
         'autoconfigure' => 'autoconfigure',
         'bind' => 'bind',
+        'constructor' => 'constructor',
     ];
 
     private const PROTOTYPE_KEYWORDS = [
@@ -84,6 +86,7 @@ class YamlFileLoader extends FileLoader
         'autowire' => 'autowire',
         'autoconfigure' => 'autoconfigure',
         'bind' => 'bind',
+        'constructor' => 'constructor',
     ];
 
     private const INSTANCEOF_KEYWORDS = [
@@ -96,6 +99,7 @@ class YamlFileLoader extends FileLoader
         'tags' => 'tags',
         'autowire' => 'autowire',
         'bind' => 'bind',
+        'constructor' => 'constructor',
     ];
 
     private const DEFAULTS_KEYWORDS = [
@@ -515,6 +519,14 @@ class YamlFileLoader extends FileLoader
 
         if (isset($service['factory'])) {
             $definition->setFactory($this->parseCallable($service['factory'], 'factory', $id, $file));
+        }
+
+        if (isset($service['constructor'])) {
+            if (null !== $definition->getFactory()) {
+                throw new LogicException(sprintf('The "%s" service cannot declare a factory as well as a constructor.', $id));
+            }
+
+            $definition->setFactory([null, $service['constructor']]);
         }
 
         if (isset($service['file'])) {

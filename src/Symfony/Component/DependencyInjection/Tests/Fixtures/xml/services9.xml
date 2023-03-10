@@ -7,7 +7,7 @@
   </parameters>
   <services>
     <service id="service_container" class="Symfony\Component\DependencyInjection\ContainerInterface" public="true" synthetic="true"/>
-    <service id="foo" class="Bar\FooClass" public="true">
+    <service id="foo" class="Bar\FooClass" public="true" constructor="getInstance">
       <tag name="foo" foo="foo"/>
       <tag name="foo" bar="bar" baz="baz"/>
       <tag name="bar" baz="baz">foo</tag>
@@ -30,11 +30,9 @@
         <argument type="service" id="bar"/>
       </call>
       <call method="initialize"/>
-      <factory class="Bar\FooClass" method="getInstance"/>
       <configurator function="sc_configure"/>
     </service>
-    <service id="foo.baz" class="%baz_class%" public="true">
-      <factory class="%baz_class%" method="getInstance"/>
+    <service id="foo.baz" class="%baz_class%" public="true" constructor="getInstance">
       <configurator class="%baz_class%" method="configureStatic1"/>
     </service>
     <service id="bar" class="Bar\FooClass" public="true">
@@ -111,9 +109,7 @@
       <property name="foo">bar</property>
       <factory service="new_factory" method="getInstance"/>
     </service>
-    <service id="service_from_static_method" class="Bar\FooClass" public="true">
-      <factory class="Bar\FooClass" method="getInstance"/>
-    </service>
+    <service id="service_from_static_method" class="Bar\FooClass" public="true" constructor="getInstance"/>
     <service id="factory_simple" class="SimpleFactoryClass">
       <argument>foo</argument>
       <deprecated package="vendor/package" version="1.1">The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.</deprecated>

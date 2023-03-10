@@ -21,12 +21,12 @@ services:
             - [setBar, ['@bar']]
             - [initialize, {  }]
 
-        factory: [Bar\FooClass, getInstance]
+        constructor: getInstance
         configurator: sc_configure
         public: true
     foo.baz:
         class: '%baz_class%'
-        factory: ['%baz_class%', getInstance]
+        constructor: getInstance
         configurator: ['%baz_class%', configureStatic1]
         public: true
     bar:
@@ -121,7 +121,7 @@ services:
         public: true
     service_from_static_method:
         class: Bar\FooClass
-        factory: [Bar\FooClass, getInstance]
+        constructor: getInstance
         public: true
     factory_simple:
         class: SimpleFactoryClass

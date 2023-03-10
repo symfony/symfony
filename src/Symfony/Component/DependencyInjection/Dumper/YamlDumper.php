@@ -151,7 +151,11 @@ class YamlDumper extends Dumper
         }
 
         if ($callable = $definition->getFactory()) {
-            $code .= sprintf("        factory: %s\n", $this->dumper->dump($this->dumpCallable($callable), 0));
+            if (\is_array($callable) && ['Closure', 'fromCallable'] !== $callable && $definition->getClass() === $callable[0]) {
+                $code .= sprintf("        constructor: %s\n", $callable[1]);
+            } else {
+                $code .= sprintf("        factory: %s\n", $this->dumper->dump($this->dumpCallable($callable), 0));
+            }
         }
 
         if ($callable = $definition->getConfigurator()) {

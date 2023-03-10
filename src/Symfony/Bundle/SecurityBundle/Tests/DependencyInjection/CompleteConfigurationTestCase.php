@@ -181,6 +181,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
                     'invalidate_session' => true,
                     'delete_cookies' => [],
                     'enable_csrf' => null,
+                    'clear_site_data' => [],
                 ],
             ],
             [
@@ -706,6 +707,13 @@ abstract class CompleteConfigurationTestCase extends TestCase
     {
         $this->getContainer('listener_provider');
         $this->addToAssertionCount(1);
+    }
+
+    public function testFirewallLogoutClearSiteData()
+    {
+        $container = $this->getContainer('logout_clear_site_data');
+        $ClearSiteDataConfig = $container->getDefinition('security.firewall.map.config.main')->getArgument(12)['clear_site_data'];
+        $this->assertSame(['cookies', 'executionContexts'], $ClearSiteDataConfig);
     }
 
     protected function getContainer($file)

@@ -171,9 +171,10 @@
     </xsd:complexType>
 
     <xsd:complexType name="logout">
-        <xsd:sequence>
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="delete-cookie" type="delete_cookie" minOccurs="0" maxOccurs="unbounded" />
-        </xsd:sequence>
+            <xsd:element name="clear-site-data" type="clear_site_data" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:choice>
         <xsd:attribute name="csrf-parameter" type="xsd:string" />
         <xsd:attribute name="csrf-token-generator" type="xsd:string" />
         <xsd:attribute name="csrf-token-id" type="xsd:string" />
@@ -406,5 +407,15 @@
             </xsd:extension>
         </xsd:simpleContent>
     </xsd:complexType>
+
+    <xsd:simpleType name="clear_site_data">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="*" />
+            <xsd:enumeration value="cache" />
+            <xsd:enumeration value="cookies" />
+            <xsd:enumeration value="storage" />
+            <xsd:enumeration value="executionContexts" />
+        </xsd:restriction>
+    </xsd:simpleType>
 
 </xsd:schema>

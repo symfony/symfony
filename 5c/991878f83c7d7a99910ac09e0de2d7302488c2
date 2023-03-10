@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by maxbeckers at 2023-02-13T08:19:45Z
+
+Thanks for your reviews @stof and @nicolas-grekas,
+yes i missed the xsd file. now i've added as well some tests do verify the new settings. I hope i have now considered all the relevant points.

@@ -13,7 +13,6 @@ namespace Symfony\Bridge\Doctrine\SchemaListener;
 
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Tools\ToolEvents;
-use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
 
 trigger_deprecation('symfony/doctrine-bridge', '6.3', 'The "%s" class is deprecated. Use "%s" instead.', DoctrineDbalCacheAdapterSchemaSubscriber::class, DoctrineDbalCacheAdapterSchemaListener::class);
 

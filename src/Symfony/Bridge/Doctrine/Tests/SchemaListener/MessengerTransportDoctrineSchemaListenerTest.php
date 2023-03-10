@@ -23,7 +23,7 @@ use Symfony\Bridge\Doctrine\SchemaListener\MessengerTransportDoctrineSchemaListe
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransport;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 
-class MessengerTransportDoctrineSchemaSubscriberTest extends TestCase
+class MessengerTransportDoctrineSchemaListenerTest extends TestCase
 {
     public function testPostGenerateSchema()
     {

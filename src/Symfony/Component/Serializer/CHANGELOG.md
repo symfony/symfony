@@ -7,6 +7,7 @@ CHANGELOG
  * Add `XmlEncoder::SAVE_OPTIONS` context option
  * Add `BackedEnumNormalizer::ALLOW_INVALID_VALUES` context option
  * Deprecate `MissingConstructorArgumentsException` in favor of `MissingConstructorArgumentException`
+ * Add `CollectionDenormalizer` to write an array of objects inside a single object
 
 6.2
 ---

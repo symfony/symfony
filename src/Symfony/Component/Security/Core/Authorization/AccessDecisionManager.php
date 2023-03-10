@@ -35,6 +35,9 @@ final class AccessDecisionManager implements AccessDecisionManagerInterface
     private iterable $voters;
     private array $votersCacheAttributes = [];
     private array $votersCacheObject = [];
+    private array $nonCachableVoters = [];
+    private array $cachedVoters = [];
+
     private AccessDecisionStrategyInterface $strategy;
 
     /**
@@ -87,13 +90,27 @@ final class AccessDecisionManager implements AccessDecisionManagerInterface
         }
         // use `get_class` to handle anonymous classes
         $keyObject = \is_object($object) ? $object::class : get_debug_type($object);
+
+        foreach ($keyAttributes as $keyAttribute) {
+            if (isset($this->cachedVoters[$keyAttribute][$keyObject])) {
+                $voters = $this->nonCachableVoters + $this->cachedVoters[$keyAttribute][$keyObject];
+                ksort($voters);
+
+                yield from $voters;
+
+                return;
+            }
+        }
+
         foreach ($this->voters as $key => $voter) {
             if (!$voter instanceof CacheableVoterInterface) {
+                $this->nonCachableVoters[$key] = $voter;
                 yield $voter;
                 continue;
             }
 
             $supports = true;
+            $supportedAttribute = null;
             // The voter supports the attributes if it supports at least one attribute of the list
             foreach ($keyAttributes as $keyAttribute) {
                 if (null === $keyAttribute) {
@@ -104,6 +121,7 @@ final class AccessDecisionManager implements AccessDecisionManagerInterface
                     $supports = $this->votersCacheAttributes[$keyAttribute][$key];
                 }
                 if ($supports) {
+                    $supportedAttribute = $keyAttribute;
                     break;
                 }
             }
@@ -119,6 +137,8 @@ final class AccessDecisionManager implements AccessDecisionManagerInterface
             if (!$supports) {
                 continue;
             }
+
+            $this->cachedVoters[$supportedAttribute][$keyObject][$key] = $voter;
             yield $voter;
         }
     }

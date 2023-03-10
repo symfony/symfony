@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-03-07T21:42:59Z
+
+ℹ️ Initializing some properties outside the series like in ArrayDenormalizerTest.php is required by older PHP versions and can't be done in the series declaration directly.

@@ -67,7 +67,7 @@ final class Dotenv
 
     /**
      * @param bool $usePutenv If `putenv()` should be used to define environment variables or not.
-     *                        Beware that `putenv()` is not thread safe, that's why this setting defaults to false
+     *                        Beware that `putenv()` is not thread safe, that's why it's not enabled by default
      *
      * @return $this
      */

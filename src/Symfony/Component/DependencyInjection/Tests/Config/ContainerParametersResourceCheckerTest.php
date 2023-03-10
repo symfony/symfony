@@ -64,14 +64,17 @@ class ContainerParametersResourceCheckerTest extends TestCase
         yield 'fresh on every identical parameters' => [function (MockObject $container) {
             $container->expects(self::exactly(2))->method('hasParameter')->willReturn(true);
             $container->expects(self::exactly(2))->method('getParameter')
-                ->withConsecutive(
-                    [self::equalTo('locales')],
-                    [self::equalTo('default_locale')]
-                )
-                ->willReturnMap([
-                    ['locales', ['fr', 'en']],
-                    ['default_locale', 'fr'],
-                ])
+                ->willReturnCallback(function (...$args) {
+                    static $series = [
+                        [['locales'], ['fr', 'en']],
+                        [['default_locale'], 'fr'],
+                    ];
+
+                    [$expectedArgs, $return] = array_shift($series);
+                    self::assertSame($expectedArgs, $args);
+
+                    return $return;
+                })
             ;
         }, true];
     }

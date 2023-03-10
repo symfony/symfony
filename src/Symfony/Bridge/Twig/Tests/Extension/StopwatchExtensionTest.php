@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Twig\Tests\Extension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\StopwatchExtension;
 use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Component\Stopwatch\StopwatchEvent;
 use Twig\Environment;
 use Twig\Error\RuntimeError;
 use Twig\Loader\ArrayLoader;
@@ -67,12 +68,29 @@ class StopwatchExtensionTest extends TestCase
             $expectedStopCalls[] = [$this->equalTo($eventName)];
         }
 
-        $startInvocationMocker = $stopwatch->expects($this->exactly($expectedCalls))
-            ->method('start');
-        \call_user_func_array([$startInvocationMocker, 'withConsecutive'], $expectedStartCalls);
-        $stopInvocationMocker = $stopwatch->expects($this->exactly($expectedCalls))
-            ->method('stop');
-        \call_user_func_array([$stopInvocationMocker, 'withConsecutive'], $expectedStopCalls);
+        $stopwatch
+            ->expects($this->exactly($expectedCalls))
+            ->method('start')
+            ->willReturnCallback(function (string $name, string $category) use (&$expectedStartCalls) {
+                [$expectedName, $expectedCategory] = array_shift($expectedStartCalls);
+
+                $expectedName->evaluate($name);
+                $this->assertSame($expectedCategory, $category);
+
+                return $this->createMock(StopwatchEvent::class);
+            })
+        ;
+
+        $stopwatch
+            ->expects($this->exactly($expectedCalls))
+            ->method('stop')
+            ->willReturnCallback(function (string $name) use (&$expectedStopCalls) {
+                [$expectedName] = array_shift($expectedStopCalls);
+                $expectedName->evaluate($name);
+
+                return $this->createMock(StopwatchEvent::class);
+            })
+        ;
 
         return $stopwatch;
     }

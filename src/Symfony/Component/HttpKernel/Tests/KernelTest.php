@@ -182,10 +182,12 @@ class KernelTest extends TestCase
         $bundle = $this->createMock(Bundle::class);
         $bundle->expects($this->exactly(2))
             ->method('setContainer')
-            ->withConsecutive(
-                [$this->isInstanceOf(ContainerInterface::class)],
-                [null]
-            );
+            ->willReturnCallback(function ($container) {
+                if (null !== $container) {
+                    $this->assertInstanceOf(ContainerInterface::class, $container);
+                }
+            })
+        ;
 
         $kernel = $this->getKernel(['getBundles']);
         $kernel->expects($this->any())

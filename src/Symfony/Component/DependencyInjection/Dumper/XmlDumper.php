@@ -349,7 +349,7 @@ class XmlDumper extends Dumper
                 $element->setAttribute('type', 'expression');
                 $text = $this->document->createTextNode(self::phpToXml((string) $value));
                 $element->appendChild($text);
-            } elseif (\is_string($value) && !preg_match('/^[^\x00-\x08\x0B\x0E-\x1A\x1C-\x1F\x7F]*+$/u', $value)) {
+            } elseif (\is_string($value) && !preg_match('/^[^\x00-\x08\x0B\x0C\x0E-\x1F\x7F]*+$/u', $value)) {
                 $element->setAttribute('type', 'binary');
                 $text = $this->document->createTextNode(self::phpToXml(base64_encode($value)));
                 $element->appendChild($text);

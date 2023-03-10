@@ -37,16 +37,20 @@ class ArrayDenormalizerTest extends TestCase
 
     public function testDenormalize()
     {
+        $series = [
+            [[['foo' => 'one', 'bar' => 'two']], new ArrayDummy('one', 'two')],
+            [[['foo' => 'three', 'bar' => 'four']], new ArrayDummy('three', 'four')],
+        ];
+
         $this->serializer->expects($this->exactly(2))
             ->method('denormalize')
-            ->withConsecutive(
-                [['foo' => 'one', 'bar' => 'two']],
-                [['foo' => 'three', 'bar' => 'four']]
-            )
-            ->willReturnOnConsecutiveCalls(
-                new ArrayDummy('one', 'two'),
-                new ArrayDummy('three', 'four')
-            );
+            ->willReturnCallback(function ($data) use (&$series) {
+                [$expectedArgs, $return] = array_shift($series);
+                $this->assertSame($expectedArgs, [$data]);
+
+                return $return;
+            })
+        ;
 
         $result = $this->denormalizer->denormalize(
             [

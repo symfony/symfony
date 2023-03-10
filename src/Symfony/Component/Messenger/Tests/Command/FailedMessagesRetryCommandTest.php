@@ -26,8 +26,21 @@ class FailedMessagesRetryCommandTest extends TestCase
 {
     public function testBasicRunWithServiceLocator()
     {
+        $series = [
+            [[10], new Envelope(new \stdClass())],
+            [[12], new Envelope(new \stdClass())],
+        ];
+
         $receiver = $this->createMock(ListableReceiverInterface::class);
-        $receiver->expects($this->exactly(2))->method('find')->withConsecutive([10], [12])->willReturn(new Envelope(new \stdClass()));
+        $receiver->expects($this->exactly(2))->method('find')
+            ->willReturnCallback(function (...$args) use (&$series) {
+                [$expectedArgs, $return] = array_shift($series);
+                $this->assertSame($expectedArgs, $args);
+
+                return $return;
+            })
+        ;
+
         // message will eventually be ack'ed in Worker
         $receiver->expects($this->exactly(2))->method('ack');
 
@@ -91,8 +104,21 @@ EOF;
 
     public function testBasicRunWithServiceLocatorWithSpecificFailureTransport()
     {
+        $series = [
+            [[10], new Envelope(new \stdClass())],
+            [[12], new Envelope(new \stdClass())],
+        ];
+
         $receiver = $this->createMock(ListableReceiverInterface::class);
-        $receiver->expects($this->exactly(2))->method('find')->withConsecutive([10], [12])->willReturn(new Envelope(new \stdClass()));
+        $receiver->expects($this->exactly(2))->method('find')
+            ->willReturnCallback(function (...$args) use (&$series) {
+                [$expectedArgs, $return] = array_shift($series);
+                $this->assertSame($expectedArgs, $args);
+
+                return $return;
+            })
+        ;
+
         // message will eventually be ack'ed in Worker
         $receiver->expects($this->exactly(2))->method('ack');
 

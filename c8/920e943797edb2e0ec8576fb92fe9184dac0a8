@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2023-01-16T12:47:33Z
+
+Thanks for the reviews! Suggestions have been proceeded.
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2023-01-18T00:25:16Z
+
+I tried to improve the deprecation by showing the source of the deprecation, and fixed a bug that reported a deprecation when using `#[Required]`.
+
+Hopefully I fixed the tests, I duplicated some of them, in order to test `@required` and `#[Required]`, but I kept since the PR was growing quickly. Do we need to cover each of these scenarios?
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2023-01-19T16:18:32Z
+
+I didn't know how to decide if only one test with `@required` was enough, so I duplicated tests to use `@required` annotation or `#[Required]`attribute. This should prevent BC breaks for 6.3 and the future 6.4.
+
+But please let me know if some cases can be dropped.
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2023-01-30T10:47:07Z
+
+@nicolas-grekas thanks for the detailed report! I applied these suggestions.
+
+In the first code block of your last comment (in `…/Compiler/AutowireRequiredMethodsPass.php`), we add a `trigger_deprecation` after the 2 checks on `@required` and `@inheritdoc` have been performed. It looks like it will show a false positive? The deprecation will be triggered even if `@required` wasn't found.
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2023-02-13T15:51:23Z
+
+Status: Needs Review

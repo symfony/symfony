@@ -22,7 +22,7 @@ use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 return static function (ContainerConfigurator $container) {
     $container->services()
         ->set('annotations.reader', AnnotationReader::class)
-            ->call('addGlobalIgnoredName', ['required'])
+            ->call('addGlobalIgnoredName', ['required']) // @deprecated since Symfony 6.3
 
         ->set('annotations.cached_reader', PsrCachedReader::class)
             ->args([

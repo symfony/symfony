@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by HypeMC at 2023-02-22T19:39:33Z
+
+> Thanks. Can you please let me know if `#[Autowire(new TaggedLocator(...))]` (or `#[Autowire(new ServiceLocatorArgument())]` I don't remember) works?
+
+@nicolas-grekas No, neither work. As far as I can tell, the `#[Autowire]` attribute is not designed to work like that.
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2023-02-22T19:44:44Z
+
+Funny thing, this does seem to work:
+
+```php
+#[Autowire([new ServiceLocatorArgument(new TaggedIteratorArgument(...)), new TaggedIteratorArgument(...)])]
+```
+
+In this case, the argument is an array with a service locator and an iterator.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-09T17:52:04Z
+
+Can you please try #49628? It might have fixed the issue. If not, the PR will still need to be updated to account for the changes in #49628.
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2023-03-09T22:19:36Z
+
+> Can you please try #49628? It might have fixed the issue. If not, the PR will still need to be updated to account for the changes in #49628.
+
+@nicolas-grekas Yep, #49628 fixed the problem. I've removed all my changes except the test cases as this particular functionality isn't covered anywhere.

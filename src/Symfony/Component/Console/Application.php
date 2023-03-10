@@ -1097,6 +1097,14 @@ class Application implements ResetInterface
     }
 
     /**
+     * Gets the event dispatcher.
+     */
+    protected function getDispatcher(): EventDispatcherInterface
+    {
+        return $this->dispatcher;
+    }
+
+    /**
      * Gets the default helper set with the helpers that should always be available.
      */
     protected function getDefaultHelperSet(): HelperSet

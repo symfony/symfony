@@ -178,9 +178,15 @@ class CheckLdapCredentialsListenerTest extends TestCase
 
         $this->ldap
             ->method('bind')
-            ->withConsecutive(
-                ['elsa', 'test1234A$']
-            );
+            ->willReturnCallback(function (...$args) {
+                static $series = [
+                    ['elsa', 'test1234A$'],
+                    ['', 's3cr3t'],
+                ];
+
+                $this->assertSame(array_shift($series), $args);
+            })
+        ;
         $this->ldap->expects($this->any())->method('escape')->with('Wouter', '', LdapInterface::ESCAPE_FILTER)->willReturn('wouter');
         $this->ldap->expects($this->once())->method('query')->with('{user_identifier}', 'wouter_test')->willReturn($query);
 
@@ -200,9 +206,15 @@ class CheckLdapCredentialsListenerTest extends TestCase
 
         $this->ldap
             ->method('bind')
-            ->withConsecutive(
-                ['elsa', 'test1234A$']
-            );
+            ->willReturnCallback(function (...$args) {
+                static $series = [
+                    ['elsa', 'test1234A$'],
+                    ['', 's3cr3t'],
+                ];
+
+                $this->assertSame(array_shift($series), $args);
+            })
+        ;
         $this->ldap->method('escape')->willReturnArgument(0);
         $this->ldap->expects($this->once())->method('query')->willReturn($query);
 

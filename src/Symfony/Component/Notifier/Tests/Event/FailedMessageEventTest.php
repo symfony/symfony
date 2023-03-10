@@ -82,12 +82,18 @@ class FailedMessageEventTest extends TestCase
 
         $message = new DummyMessage();
 
+        $series = [
+            new MessageEvent($message),
+            new FailedMessageEvent($message, $transport->exception),
+        ];
+
         $eventDispatcherMock->expects($this->exactly(2))
             ->method('dispatch')
-            ->withConsecutive(
-                [new MessageEvent($message)],
-                [new FailedMessageEvent($message, $transport->exception)]
-            );
+            ->willReturnCallback(function (object $event) use (&$series) {
+                $this->assertEquals(array_shift($series), $event);
+
+                return $event;
+            });
         try {
             $transport->send($message);
         } catch (NullTransportException $exception) {

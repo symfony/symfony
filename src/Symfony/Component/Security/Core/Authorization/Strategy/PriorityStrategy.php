@@ -59,7 +59,7 @@ final class PriorityStrategy implements AccessDecisionStrategyInterface, \String
 
     public function decide(\Traversable $results): bool
     {
-        trigger_deprecation('symfony/security-core', '6.2', 'Method "%s::decide()" has been deprecated, use "%s::getDecision()" instead.', __CLASS__, __CLASS__);
+        trigger_deprecation('symfony/security-core', '6.3', 'Method "%s::decide()" has been deprecated, use "%s::getDecision()" instead.', __CLASS__, __CLASS__);
 
         foreach ($results as $result) {
             if (VoterInterface::ACCESS_GRANTED === $result) {

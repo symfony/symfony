@@ -22,20 +22,12 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
  */
 final class AccessDecision
 {
-    /** @var int One of the VoterInterface::ACCESS_* constants */
-    private int $access;
-
-    /** @var Vote[] */
-    private array $votes = [];
-
     /**
      * @param int    $access One of the VoterInterface::ACCESS_* constants
      * @param Vote[] $votes
      */
-    private function __construct(int $access, array $votes = [])
+    private function __construct(private readonly int $access, private readonly array $votes = [])
     {
-        $this->access = $access;
-        $this->votes = $votes;
     }
 
     public function getAccess(): int
@@ -111,8 +103,6 @@ final class AccessDecision
      */
     private function getVotesByAccess(int $access): array
     {
-        return array_filter($this->votes, static function (Vote $vote) use ($access): bool {
-            return $vote->getAccess() === $access;
-        });
+        return array_filter($this->votes, static fn (Vote $vote): bool => $vote->getAccess() === $access);
     }
 }

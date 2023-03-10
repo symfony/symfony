@@ -65,7 +65,7 @@ class AuthenticatedVoterTest extends TestCase
     {
         $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
 
-        $this->expectDeprecation('Since symfony/security-core 6.2: Method "%s::vote()" has been deprecated, use "%s::getVote()" instead.');
+        $this->expectDeprecation('Since symfony/security-core 6.3: Method "%s::vote()" has been deprecated, use "%s::getVote()" instead.');
         $this->assertSame($expected, $voter->vote($this->getToken($authenticated), null, $attributes));
     }
 

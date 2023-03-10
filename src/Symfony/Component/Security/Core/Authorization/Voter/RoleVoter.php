@@ -50,7 +50,7 @@ class RoleVoter implements CacheableVoterInterface
 
     public function vote(TokenInterface $token, mixed $subject, array $attributes): int
     {
-        trigger_deprecation('symfony/security-core', '6.2', 'Method "%s::vote()" has been deprecated, use "%s::getVote()" instead.', __CLASS__, __CLASS__);
+        trigger_deprecation('symfony/security-core', '6.3', 'Method "%s::vote()" has been deprecated, use "%s::getVote()" instead.', __CLASS__, __CLASS__);
 
         return $this->getVote($token, $subject, $attributes)->getAccess();
     }

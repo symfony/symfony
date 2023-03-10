@@ -118,7 +118,8 @@ class AccessDecisionManagerTest extends TestCase
         $token = $this->createMock(TokenInterface::class);
         $voter = $this
             ->getMockBuilder(CacheableVoterInterface::class)
-            ->setMethods(['getVote', 'supportsAttribute', 'supportsType', 'vote'])
+            ->onlyMethods(['supportsAttribute', 'supportsType', 'vote'])
+            ->addMethods(['getVote'])
             ->getMock();
         $voter
             ->expects($this->once())
@@ -152,7 +153,8 @@ class AccessDecisionManagerTest extends TestCase
         $token = $this->createMock(TokenInterface::class);
         $voter = $this
             ->getMockBuilder(CacheableVoterInterface::class)
-            ->setMethods(['getVote', 'supportsAttribute', 'supportsType', 'vote'])
+            ->onlyMethods(['supportsAttribute', 'supportsType', 'vote'])
+            ->addMethods(['getVote'])
             ->getMock();
         $voter
             ->expects($this->once())
@@ -179,7 +181,8 @@ class AccessDecisionManagerTest extends TestCase
         $token = $this->createMock(TokenInterface::class);
         $voter = $this
             ->getMockBuilder(CacheableVoterInterface::class)
-            ->setMethods(['getVote', 'supportsAttribute', 'supportsType', 'vote'])
+            ->onlyMethods(['supportsAttribute', 'supportsType', 'vote'])
+            ->addMethods(['getVote'])
             ->getMock();
         $voter
             ->expects($this->never())
@@ -204,7 +207,8 @@ class AccessDecisionManagerTest extends TestCase
         $token = $this->createMock(TokenInterface::class);
         $voter = $this
             ->getMockBuilder(CacheableVoterInterface::class)
-            ->setMethods(['getVote', 'supportsAttribute', 'supportsType', 'vote'])
+            ->onlyMethods(['supportsAttribute', 'supportsType', 'vote'])
+            ->addMethods(['getVote'])
             ->getMock();
         $voter
             ->expects($this->exactly(2))
@@ -240,7 +244,8 @@ class AccessDecisionManagerTest extends TestCase
         $token = $this->createMock(TokenInterface::class);
         $voter = $this
             ->getMockBuilder(CacheableVoterInterface::class)
-            ->setMethods(['getVote', 'supportsAttribute', 'supportsType', 'vote'])
+            ->onlyMethods(['supportsAttribute', 'supportsType', 'vote'])
+            ->addMethods(['getVote'])
             ->getMock();
         $voter
             ->expects($this->never())
@@ -265,7 +270,8 @@ class AccessDecisionManagerTest extends TestCase
         $token = $this->createMock(TokenInterface::class);
         $voter = $this
             ->getMockBuilder(CacheableVoterInterface::class)
-            ->setMethods(['getVote', 'supportsAttribute', 'supportsType', 'vote'])
+            ->onlyMethods(['supportsAttribute', 'supportsType', 'vote'])
+            ->addMethods(['getVote'])
             ->getMock();
         $voter
             ->expects($this->once())
@@ -293,7 +299,8 @@ class AccessDecisionManagerTest extends TestCase
         $token = $this->createMock(TokenInterface::class);
         $voter = $this
             ->getMockBuilder(CacheableVoterInterface::class)
-            ->setMethods(['getVote', 'supportsAttribute', 'supportsType', 'vote'])
+            ->onlyMethods(['supportsAttribute', 'supportsType', 'vote'])
+            ->addMethods(['getVote'])
             ->getMock();
         $voter
             ->expects($this->once())
@@ -316,7 +323,8 @@ class AccessDecisionManagerTest extends TestCase
         $token = $this->createMock(TokenInterface::class);
         $voter = $this
             ->getMockBuilder(CacheableVoterInterface::class)
-            ->setMethods(['getVote', 'supportsAttribute', 'supportsType', 'vote'])
+            ->onlyMethods(['supportsAttribute', 'supportsType', 'vote'])
+            ->addMethods(['getVote'])
             ->getMock();
         $voter
             ->expects($this->once())
@@ -343,7 +351,8 @@ class AccessDecisionManagerTest extends TestCase
     {
         $voter = $this
             ->getMockBuilder(VoterInterface::class)
-            ->setMethods(['getVote', 'vote'])
+            ->onlyMethods(['vote'])
+            ->addMethods(['getVote'])
             ->getMock();
         $voter->expects($this->once())
             ->method('getVote')

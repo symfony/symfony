@@ -49,7 +49,7 @@ abstract class Voter implements VoterInterface, CacheableVoterInterface
 
             $decision = $this->voteOnAttribute($attribute, $subject, $token);
             if (\is_bool($decision)) {
-                trigger_deprecation('symfony/security-core', '6.2', 'Returning a boolean in "%s::voteOnAttribute()" is deprecated, return an instance of "%s" instead.', static::class, Vote::class);
+                trigger_deprecation('symfony/security-core', '6.3', 'Returning a boolean in "%s::voteOnAttribute()" is deprecated, return an instance of "%s" instead.', static::class, Vote::class);
                 $decision = $decision ? $this->grant() : $this->deny();
             }
 
@@ -58,8 +58,8 @@ abstract class Voter implements VoterInterface, CacheableVoterInterface
                 return $decision;
             }
 
-            if ('' !== $decision->getMessage()) {
-                $vote->addMessage($decision->getMessage());
+            if ('' !== $decisionMessage = $decision->getMessage()) {
+                $vote->addMessage($decisionMessage);
             }
         }
 
@@ -68,7 +68,7 @@ abstract class Voter implements VoterInterface, CacheableVoterInterface
 
     public function vote(TokenInterface $token, mixed $subject, array $attributes): int
     {
-        trigger_deprecation('symfony/security-core', '6.2', 'Method "%s::vote()" has been deprecated, use "%s::getVote()" instead.', __CLASS__, __CLASS__);
+        trigger_deprecation('symfony/security-core', '6.3', 'Method "%s::vote()" has been deprecated, use "%s::getVote()" instead.', __CLASS__, __CLASS__);
 
         return $this->getVote($token, $subject, $attributes)->getAccess();
     }
@@ -140,7 +140,7 @@ abstract class Voter implements VoterInterface, CacheableVoterInterface
      * @param TAttribute $attribute
      * @param TSubject   $subject
      *
-     * @return Vote|bool Returning a boolean is deprecated since Symfony 6.2. Return a Vote object instead.
+     * @return Vote|bool Returning a boolean is deprecated since Symfony 6.3. Return a Vote object instead.
      */
     abstract protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): Vote|bool;
 }

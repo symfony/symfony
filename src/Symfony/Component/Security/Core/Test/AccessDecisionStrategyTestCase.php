@@ -41,6 +41,7 @@ abstract class AccessDecisionStrategyTestCase extends TestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider provideStrategyTests
      *
      * @param VoterInterface[] $voters
@@ -90,6 +91,11 @@ abstract class AccessDecisionStrategyTestCase extends TestCase
             public function vote(TokenInterface $token, $subject, array $attributes): int
             {
                 return $this->vote;
+            }
+
+            public function getVote(TokenInterface $token, mixed $subject, array $attributes): Vote
+            {
+                return new Vote($this->vote);
             }
         };
     }

@@ -25,7 +25,7 @@ interface AccessDecisionStrategyInterface
     /**
      * @param \Traversable<int> $results
      *
-     * @deprecated since Symfony 6.2, use {@see getDecision()} instead.
+     * @deprecated since Symfony 6.3, use {@see getDecision()} instead.
      */
     public function decide(\Traversable $results): bool;
 }

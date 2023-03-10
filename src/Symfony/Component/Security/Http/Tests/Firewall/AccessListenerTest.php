@@ -59,7 +59,8 @@ class AccessListenerTest extends TestCase
 
         $accessDecisionManager = $this
             ->getMockBuilder(AccessDecisionManagerInterface::class)
-            ->setMethods(['getDecision', 'decide'])
+            ->onlyMethods(['decide'])
+            ->addMethods(['getDecision'])
             ->getMock();
         $accessDecisionManager
             ->expects($this->once())
@@ -194,7 +195,8 @@ class AccessListenerTest extends TestCase
 
         $accessDecisionManager = $this
             ->getMockBuilder(AccessDecisionManagerInterface::class)
-            ->setMethods(['getDecision', 'decide'])
+            ->onlyMethods(['decide'])
+            ->addMethods(['getDecision'])
             ->getMock();
         $accessDecisionManager->expects($this->once())
             ->method('getDecision')
@@ -225,7 +227,8 @@ class AccessListenerTest extends TestCase
 
         $accessDecisionManager = $this
             ->getMockBuilder(AccessDecisionManagerInterface::class)
-            ->setMethods(['getDecision', 'decide'])
+            ->onlyMethods(['decide'])
+            ->addMethods(['getDecision'])
             ->getMock();
         $accessDecisionManager->expects($this->once())
             ->method('getDecision')
@@ -258,7 +261,8 @@ class AccessListenerTest extends TestCase
 
         $accessDecisionManager = $this
             ->getMockBuilder(AccessDecisionManagerInterface::class)
-            ->setMethods(['getDecision', 'decide'])
+            ->onlyMethods(['decide'])
+            ->addMethods(['getDecision'])
             ->getMock();
         $accessDecisionManager->expects($this->once())
             ->method('getDecision')
@@ -294,7 +298,8 @@ class AccessListenerTest extends TestCase
 
         $accessDecisionManager = $this
             ->getMockBuilder(AccessDecisionManagerInterface::class)
-            ->setMethods(['getDecision', 'decide'])
+            ->onlyMethods(['decide'])
+            ->addMethods(['getDecision'])
             ->getMock();
         $accessDecisionManager
             ->expects($this->once())

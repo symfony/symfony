@@ -51,7 +51,7 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
         }
 
         if (!method_exists($this->accessDecisionManager, 'getDecision')) {
-            trigger_deprecation('symfony/security-core', '6.2', 'Not implementing "%s::getDecision()" method is deprecated, and would be required in 7.0.', \get_class($this->accessDecisionManager));
+            trigger_deprecation('symfony/security-core', '6.3', 'Not implementing "%s::getDecision()" method is deprecated, and would be required in 7.0.', \get_class($this->accessDecisionManager));
 
             return $this->accessDecisionManager->decide($token, [$attribute], $subject) ? AccessDecision::createGranted() : AccessDecision::createDenied();
         }

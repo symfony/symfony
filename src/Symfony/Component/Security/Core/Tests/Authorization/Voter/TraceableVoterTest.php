@@ -37,7 +37,8 @@ class TraceableVoterTest extends TestCase
     {
         $voter = $this
             ->getMockBuilder(VoterInterface::class)
-            ->setMethods(['getVote', 'vote'])
+            ->onlyMethods(['vote'])
+            ->addMethods(['getVote'])
             ->getMock();
 
         $eventDispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMockForAbstractClass();
@@ -85,7 +86,7 @@ class TraceableVoterTest extends TestCase
 
         $sut = new TraceableVoter($voter, $eventDispatcher);
 
-        $this->expectDeprecation('Since symfony/security-core 6.2: Method "%s::vote()" has been deprecated, use "%s::getVote()" instead.');
+        $this->expectDeprecation('Since symfony/security-core 6.3: Method "%s::vote()" has been deprecated, use "%s::getVote()" instead.');
         $result = $sut->vote($token, 'anysubject', ['attr1']);
 
         $this->assertSame(VoterInterface::ACCESS_DENIED, $result);

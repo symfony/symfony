@@ -25,7 +25,7 @@ class AccessDeniedException extends RuntimeException
 {
     private array $attributes = [];
     private mixed $subject = null;
-    private ?AccessDecision $accessDecision;
+    private ?AccessDecision $accessDecision = null;
 
     public function __construct(string $message = 'Access Denied.', \Throwable $previous = null, int $code = 403)
     {
@@ -60,22 +60,18 @@ class AccessDeniedException extends RuntimeException
 
     /**
      * Sets an access decision and appends the denied reasons to the exception message.
-     *
-     * @return void
      */
-    public function setAccessDecision(AccessDecision $accessDecision)
+    public function setAccessDecision(AccessDecision $accessDecision): void
     {
         $this->accessDecision = $accessDecision;
-        if (!$accessDecision->getDeniedVotes()) {
+        if (!$deniedVotes = $accessDecision->getDeniedVotes()) {
             return;
         }
 
-        $messages = array_map(static function (Vote $vote) {
-            return $vote->getMessage();
-        }, $accessDecision->getDeniedVotes());
+        $messages = array_map(static fn (Vote $vote): string => sprintf('"%s"', $vote->getMessage()), $deniedVotes);
 
         if ($messages) {
-            $this->message .= ' '.implode(' ', $messages);
+            $this->message .= sprintf(' Decision message%s %s', \count($messages) > 1 ? 's are' : ' is', implode(' and ', $messages));
         }
     }
 

@@ -37,7 +37,7 @@ final class AccessDeniedExceptionTest extends TestCase
                 Vote::createDenied('bar'),
                 Vote::createDenied('baz'),
             ]),
-            'Access Denied. foo bar baz',
+            'Access Denied. Decision messages are "foo" and "bar" and "baz"',
         ];
 
         yield [
@@ -51,14 +51,22 @@ final class AccessDeniedExceptionTest extends TestCase
                 Vote::createDenied('bar'),
                 Vote::createAbstain('baz'),
             ]),
-            'Access Denied. bar',
+            'Access Denied. Decision message is "bar"',
         ];
 
         yield [
             AccessDecision::createGranted([
                 Vote::createDenied('foo'),
             ]),
-            'Access Denied. foo',
+            'Access Denied. Decision message is "foo"',
+        ];
+
+        yield [
+            AccessDecision::createGranted([
+                Vote::createDenied(['foo', 'bar']),
+                Vote::createDenied(['baz', 'qux']),
+            ]),
+            'Access Denied. Decision messages are "foo, bar" and "baz, qux"',
         ];
     }
 }

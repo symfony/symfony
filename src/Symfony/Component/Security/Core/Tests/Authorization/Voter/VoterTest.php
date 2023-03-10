@@ -45,7 +45,7 @@ class VoterTest extends TestCase
 
             [$voter, ['DELETE'], Vote::createAbstain(), new \stdClass(), 'ACCESS_ABSTAIN if no attribute is supported'],
 
-            [$voter, ['EDIT'], Vote::createAbstain(), $this, 'ACCESS_ABSTAIN if class is not supported'],
+            [$voter, ['EDIT'], Vote::createAbstain(), new class() {}, 'ACCESS_ABSTAIN if class is not supported'],
 
             [$voter, ['EDIT'], Vote::createAbstain(), null, 'ACCESS_ABSTAIN if object is null'],
 
@@ -103,7 +103,7 @@ class VoterTest extends TestCase
      */
     public function testVoteLegacy(VoterInterface $voter, array $attributes, $expectedVote, $object, $message)
     {
-        $this->expectDeprecation('Since symfony/security-core 6.2: Method "%s::vote()" has been deprecated, use "%s::getVote()" instead.');
+        $this->expectDeprecation('Since symfony/security-core 6.3: Method "%s::vote()" has been deprecated, use "%s::getVote()" instead.');
         $this->assertEquals($expectedVote, $voter->vote($this->token, $object, $attributes), $message);
     }
 
@@ -132,7 +132,7 @@ class VoterTest extends TestCase
 
 class VoterTest_Voter extends Voter
 {
-    protected function voteOnAttribute(string $attribute, $object, TokenInterface $token): Vote
+    protected function voteOnAttribute(string $attribute, mixed $object, TokenInterface $token): Vote
     {
         return 'EDIT' === $attribute ? Vote::createGranted() : Vote::createDenied();
     }

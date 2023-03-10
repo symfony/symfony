@@ -136,6 +136,16 @@ Security
  * [BC break] `UserValueResolver` no longer implements `ArgumentValueResolverInterface`
  * [BC break] Make `PersistentToken` immutable
  * Deprecate accepting only `DateTime` for `TokenProviderInterface::updateToken()`, use `DateTimeInterface` instead
+ * Add method `getDecision()` to `AccessDecisionStrategyInterface`
+ * Deprecate `AccessDecisionStrategyInterface::decide()` in favor of `AccessDecisionStrategyInterface::getDecision()`
+ * Add method `getVote()` to `VoterInterface`
+ * Deprecate `VoterInterface::vote()` in favor of `AccessDecisionStrategyInterface::getVote()`
+ * Deprecate returning `bool` from `Voter::voteOnAttribute()` (it must return a `Vote`)
+ * Add method `getDecision()` to `AccessDecisionManagerInterface`
+ * Deprecate `AccessDecisionManagerInterface::decide()` in favor of `AccessDecisionManagerInterface::getDecision()`
+ * Add method `getDecision()` to `AuthorizationCheckerInterface`
+ * Add methods `setAccessDecision()` and `getAccessDecision()` to `AccessDeniedException`
+ * Add method `getDecision()` to `Security`
 
 SecurityBundle
 --------------

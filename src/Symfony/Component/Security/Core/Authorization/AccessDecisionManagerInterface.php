@@ -28,7 +28,7 @@ interface AccessDecisionManagerInterface
      * @param array $attributes An array of attributes associated with the method being invoked
      * @param mixed $object     The object to secure
      *
-     * @deprecated since Symfony 6.2, use {@see getDecision()} instead.
+     * @deprecated since Symfony 6.3, use {@see getDecision()} instead.
      */
     public function decide(TokenInterface $token, array $attributes, mixed $object = null): bool;
 }

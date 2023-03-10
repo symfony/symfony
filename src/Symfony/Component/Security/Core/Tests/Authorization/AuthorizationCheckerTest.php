@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authorization;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
@@ -41,7 +42,8 @@ class AuthorizationCheckerTest extends TestCase
     {
         $accessDecisionManager = $this
             ->getMockBuilder(AccessDecisionManagerInterface::class)
-            ->setMethods(['getDecision', 'decide'])
+            ->onlyMethods(['decide'])
+            ->addMethods(['getDecision'])
             ->getMock();
         $accessDecisionManager
             ->expects($this->once())
@@ -66,7 +68,7 @@ class AuthorizationCheckerTest extends TestCase
 
         $this->accessDecisionManager->expects($this->once())->method('decide')->with($this->isInstanceOf(NullToken::class))->willReturn(false);
 
-        $this->expectDeprecation('Since symfony/security-core 6.2: Not implementing "%s::getDecision()" method is deprecated, and would be required in 7.0.');
+        $this->expectDeprecation('Since symfony/security-core 6.3: Not implementing "%s::getDecision()" method is deprecated, and would be required in 7.0.');
         $authorizationChecker->isGranted('ROLE_FOO');
     }
 
@@ -80,7 +82,8 @@ class AuthorizationCheckerTest extends TestCase
 
         $accessDecisionManager = $this
             ->getMockBuilder(AccessDecisionManagerInterface::class)
-            ->setMethods(['getDecision', 'decide'])
+            ->onlyMethods(['decide'])
+            ->addMethods(['getDecision'])
             ->getMock();
         $accessDecisionManager
             ->expects($this->once())
@@ -111,7 +114,7 @@ class AuthorizationCheckerTest extends TestCase
             ->willReturn($decide);
         $this->tokenStorage->setToken($token);
 
-        $this->expectDeprecation('Since symfony/security-core 6.2: Not implementing "%s::getDecision()" method is deprecated, and would be required in 7.0.');
+        $this->expectDeprecation('Since symfony/security-core 6.3: Not implementing "%s::getDecision()" method is deprecated, and would be required in 7.0.');
         $this->assertSame($decide, $this->authorizationChecker->isGranted('ROLE_FOO'));
     }
 
@@ -128,7 +131,8 @@ class AuthorizationCheckerTest extends TestCase
 
         $accessDecisionManager = $this
             ->getMockBuilder(AccessDecisionManagerInterface::class)
-            ->setMethods(['getDecision', 'decide'])
+            ->onlyMethods(['decide'])
+            ->addMethods(['getDecision'])
             ->getMock();
         $accessDecisionManager
             ->expects($this->once())
@@ -161,7 +165,7 @@ class AuthorizationCheckerTest extends TestCase
             ->willReturn(true);
         $this->tokenStorage->setToken($token);
 
-        $this->expectDeprecation('Since symfony/security-core 6.2: Not implementing "%s::getDecision()" method is deprecated, and would be required in 7.0.');
+        $this->expectDeprecation('Since symfony/security-core 6.3: Not implementing "%s::getDecision()" method is deprecated, and would be required in 7.0.');
         $this->assertTrue($this->authorizationChecker->isGranted($attribute));
     }
 }

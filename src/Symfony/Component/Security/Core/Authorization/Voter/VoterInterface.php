@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 /**
  * VoterInterface is the interface implemented by all voters.
  *
- * @author Fabien Potencier <fabien@symfony.com>*
+ * @author Fabien Potencier <fabien@symfony.com>
  *
  * @method Vote getVote(TokenInterface $token, mixed $subject, array $attributes)
  */
@@ -39,7 +39,7 @@ interface VoterInterface
      *
      * @psalm-return self::ACCESS_* must be transformed into @return on Symfony 7
      *
-     * @deprecated since Symfony 6.2, use {@see getVote()} instead.
+     * @deprecated since Symfony 6.3, use {@see getVote()} instead.
      */
     public function vote(TokenInterface $token, mixed $subject, array $attributes);
 }

@@ -50,7 +50,7 @@ class VoteListenerTest extends TestCase
         $traceableAccessDecisionManager = $this
             ->getMockBuilder(TraceableAccessDecisionManager::class)
             ->disableOriginalConstructor()
-            ->setMethods(['addVoterVote'])
+            ->onlyMethods(['addVoterVote'])
             ->getMock();
 
         $traceableAccessDecisionManager

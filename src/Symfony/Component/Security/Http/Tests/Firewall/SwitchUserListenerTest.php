@@ -48,7 +48,8 @@ class SwitchUserListenerTest extends TestCase
         $this->userChecker = $this->createMock(UserCheckerInterface::class);
         $this->accessDecisionManager = $this
             ->getMockBuilder(AccessDecisionManagerInterface::class)
-            ->setMethods(['getDecision', 'decide'])
+            ->onlyMethods(['decide'])
+            ->addMethods(['getDecision'])
             ->getMock();
         $this->request = new Request();
         $this->event = new RequestEvent($this->createMock(HttpKernelInterface::class), $this->request, HttpKernelInterface::MAIN_REQUEST);

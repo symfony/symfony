@@ -64,7 +64,7 @@ final class UnanimousStrategy implements AccessDecisionStrategyInterface, \Strin
 
     public function decide(\Traversable $results): bool
     {
-        trigger_deprecation('symfony/security-core', '6.2', 'Method "%s::decide()" has been deprecated, use "%s::getDecision()" instead.', __CLASS__, __CLASS__);
+        trigger_deprecation('symfony/security-core', '6.3', 'Method "%s::decide()" has been deprecated, use "%s::getDecision()" instead.', __CLASS__, __CLASS__);
 
         $grant = 0;
         foreach ($results as $result) {

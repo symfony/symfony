@@ -351,6 +351,20 @@ class ClassMetadataTest extends TestCase
             'children',
         ], $metadata->getConstrainedProperties());
     }
+
+    public function testCascadeConstraintWithExcludedProperties()
+    {
+        $metadata = new ClassMetadata(CascadingEntity::class);
+
+        $metadata->addConstraint(new Cascade(exclude: ['requiredChild', 'optionalChild']));
+
+        $this->assertSame(CascadingStrategy::CASCADE, $metadata->getCascadingStrategy());
+        $this->assertCount(2, $metadata->properties);
+        $this->assertSame([
+            'staticChild',
+            'children',
+        ], $metadata->getConstrainedProperties());
+    }
 }
 
 class ClassCompositeConstraint extends Composite

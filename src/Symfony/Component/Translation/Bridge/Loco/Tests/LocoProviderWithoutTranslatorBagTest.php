@@ -61,10 +61,16 @@ class LocoProviderWithoutTranslatorBagTest extends LocoProviderTest
         }
 
         $loader = $this->getLoader();
-        $loader->expects($this->exactly(\count($consecutiveLoadArguments) * 2))
+        $consecutiveLoadArguments = array_merge($consecutiveLoadArguments, $consecutiveLoadArguments);
+        $consecutiveLoadReturns = array_merge($consecutiveLoadReturns, $consecutiveLoadReturns);
+
+        $loader->expects($this->exactly(\count($consecutiveLoadArguments)))
             ->method('load')
-            ->withConsecutive(...$consecutiveLoadArguments, ...$consecutiveLoadArguments)
-            ->willReturnOnConsecutiveCalls(...$consecutiveLoadReturns, ...$consecutiveLoadReturns);
+            ->willReturnCallback(function (...$args) use (&$consecutiveLoadArguments, &$consecutiveLoadReturns) {
+                $this->assertSame(array_shift($consecutiveLoadArguments), $args);
+
+                return array_shift($consecutiveLoadReturns);
+            });
 
         $provider = $this->createProvider(
             new MockHttpClient($responses, 'https://localise.biz/api/'),

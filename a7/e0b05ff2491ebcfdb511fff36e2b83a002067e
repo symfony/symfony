@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-03-09T08:18:40Z
+
+> We could also rename #[TaggedLocator] and #[TaggedIterator] but I feel like the need is less obvious and the cost more important.
+
+I would keep them as explained 👍

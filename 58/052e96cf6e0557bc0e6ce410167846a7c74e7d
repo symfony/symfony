@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by stof at 2023-02-08T11:50:06Z
+
+the new interface needs to be implemented in the TraceableNormalizer, so that the benefits of this caching are not lost (and hidden from devs) in dev environments when the profiler is enabled.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2023-02-08T22:54:50Z
+
+This looks very promising! +1 on my side for the general approach as well as for making `supportsNormalization()` optional.
+
+---------------------------------------------------------------------------
+
+by tucksaun at 2023-02-18T01:02:10Z
+
+@nicolas-grekas PR has been updated to move `getSupportedTypes` to `NormalizerInterface` and `DenormalizerInterface`
+
+---------------------------------------------------------------------------
+
+by tucksaun at 2023-02-24T15:37:44Z
+
+> About the // @deprecated return true in 7.0, do we want to move the return true to a base class?
+
+I don't know.
+Would the idea be to have a small class (or trait) only including `supportsNormalization` or `supportsDenormalization` so that one only has to define supported classes and implements the normalization/denormalization process?
+
+---------------------------------------------------------------------------
+
+by bastnic at 2023-02-26T20:56:58Z
+
+:heart_eyes: @tucksaun. Very fan of any improvement on serializer performances. Thanks !
+
+---------------------------------------------------------------------------
+
+by tucksaun at 2023-02-27T13:42:04Z
+
+@nicolas-grekas regarding the "return true in a base class" I might have an idea (that we can discuss on the side) but I think we can do it in another PR so this one should be ready for another round of review from you 🙂

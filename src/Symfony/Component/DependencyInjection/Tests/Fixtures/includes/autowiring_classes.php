@@ -3,6 +3,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 require __DIR__.'/uniontype_classes.php';
 require __DIR__.'/autowiring_classes_80.php';
@@ -11,11 +12,21 @@ if (\PHP_VERSION_ID >= 80200) {
     require __DIR__.'/compositetype_classes.php';
 }
 
-class Foo
+// @deprecated since Symfony 6.3, to be removed in 7.0
+class FooAnnotation
 {
     /**
      * @required
      */
+    public function cloneFoo(): static
+    {
+        return clone $this;
+    }
+}
+
+class Foo
+{
+    #[Required]
     public function cloneFoo(): static
     {
         return clone $this;
@@ -225,7 +236,8 @@ class ClassChangedConstructorArgs extends ClassForResource
     }
 }
 
-class SetterInjectionCollision
+// @deprecated since Symfony 6.3, to be removed in 7.0
+class SetterInjectionCollisionAnnotation
 {
     /**
      * @required
@@ -238,11 +250,45 @@ class SetterInjectionCollision
     }
 }
 
-class SetterInjection extends SetterInjectionParent
+class SetterInjectionCollision
 {
+    #[Required]
+    public function setMultipleInstancesForOneArg(CollisionInterface $collision)
+    {
+        // The CollisionInterface cannot be autowired - there are multiple
+
+        // should throw an exception
+    }
+}
+
+// @deprecated since Symfony 6.3, to be removed in 7.0
+class SetterInjectionAnnotation extends SetterInjectionParentAnnotation
+{
+
     /**
      * @required
      */
+    public function setFoo(Foo $foo)
+    {
+        // should be called
+    }
+
+    public function notASetter(A $a)
+    {
+        // should be called only when explicitly specified
+    }
+
+    /**
+     * @required*/
+    public function setChildMethodWithoutDocBlock(A $a)
+    {
+    }
+}
+
+// @deprecated since Symfony 6.3, to be removed in 7.0
+class SetterInjection extends SetterInjectionParent
+{
+    #[Required]
     public function setFoo(Foo $foo)
     {
         // should be called
@@ -264,29 +310,24 @@ class SetterInjection extends SetterInjectionParent
     {
         // should be called only when explicitly specified
     }
-
-    /**
-     * @required*/
-    public function setChildMethodWithoutDocBlock(A $a)
-    {
-    }
 }
 
-class Wither
+// @deprecated since Symfony 6.3, to be removed in 7.0
+class WitherAnnotation
 {
     public $foo;
 
     /**
      * @required
      */
-    public function setFoo(Foo $foo)
+    public function setFoo(FooAnnotation $foo)
     {
     }
 
     /**
      * @required
      */
-    public function withFoo1(Foo $foo): static
+    public function withFoo1(FooAnnotation $foo): static
     {
         return $this->withFoo2($foo);
     }
@@ -294,6 +335,31 @@ class Wither
     /**
      * @required
      */
+    public function withFoo2(FooAnnotation $foo): static
+    {
+        $new = clone $this;
+        $new->foo = $foo;
+
+        return $new;
+    }
+}
+
+class Wither
+{
+    public $foo;
+
+    #[Required]
+    public function setFoo(Foo $foo)
+    {
+    }
+
+    #[Required]
+    public function withFoo1(Foo $foo): static
+    {
+        return $this->withFoo2($foo);
+    }
+
+    #[Required]
     public function withFoo2(Foo $foo): static
     {
         $new = clone $this;
@@ -303,7 +369,8 @@ class Wither
     }
 }
 
-class SetterInjectionParent
+// @deprecated since Symfony 6.3, to be removed in 7.0
+class SetterInjectionParentAnnotation
 {
     /** @required*/
     public function setDependencies(Foo $foo, A $a)
@@ -322,6 +389,30 @@ class SetterInjectionParent
     }
 
     /** @required */
+    public function setChildMethodWithoutDocBlock(A $a)
+    {
+    }
+}
+
+class SetterInjectionParent
+{
+    #[Required]
+    public function setDependencies(Foo $foo, A $a)
+    {
+        // should be called
+    }
+
+    public function notASetter(A $a)
+    {
+        // #[Required] should be ignored when the child does not add @inheritdoc
+    }
+
+    #[Required]
+    public function setWithCallsConfigured(A $a)
+    {
+    }
+
+    #[Required]
     public function setChildMethodWithoutDocBlock(A $a)
     {
     }
@@ -357,7 +448,7 @@ class NotWireable
     {
     }
 
-    /** @required */
+    #[Required]
     protected function setProtectedMethod(A $a)
     {
     }
@@ -370,11 +461,20 @@ class PrivateConstructor
     }
 }
 
-class ScalarSetter
+// @deprecated since Symfony 6.3, to be removed in 7.0
+class ScalarSetterAnnotation
 {
     /**
      * @required
      */
+    public function setDefaultLocale($defaultLocale)
+    {
+    }
+}
+
+class ScalarSetter
+{
+    #[Required]
     public function setDefaultLocale($defaultLocale)
     {
     }

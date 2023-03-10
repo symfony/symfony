@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Bridge\PhpUnit\ClassExistsMock;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -41,6 +42,8 @@ require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
 
 class AutowirePassTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public static function setUpBeforeClass(): void
     {
         ClassExistsMock::register(AutowirePass::class);
@@ -695,8 +698,15 @@ class AutowirePassTest extends TestCase
         );
     }
 
-    public function testSetterInjection()
+    /**
+     * @group legacy
+     */
+    public function testSetterInjectionAnnotation()
     {
+        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Compiler\SetterInjectionAnnotation::setFoo()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
+        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Compiler\SetterInjectionAnnotation::setChildMethodWithoutDocBlock()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
+        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Compiler\SetterInjectionParentAnnotation::setDependencies()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
+
         $container = new ContainerBuilder();
         $container->register(Foo::class);
         $container->register(A::class);
@@ -705,7 +715,7 @@ class AutowirePassTest extends TestCase
 
         // manually configure *one* call, to override autowiring
         $container
-            ->register('setter_injection', SetterInjection::class)
+            ->register('setter_injection', SetterInjectionAnnotation::class)
             ->setAutowired(true)
             ->addMethodCall('setWithCallsConfigured', ['manual_arg1', 'manual_arg2'])
         ;
@@ -717,7 +727,7 @@ class AutowirePassTest extends TestCase
         $methodCalls = $container->getDefinition('setter_injection')->getMethodCalls();
 
         $this->assertEquals(
-            ['setWithCallsConfigured', 'setFoo', 'setDependencies', 'setChildMethodWithoutDocBlock'],
+            ['setWithCallsConfigured', 'setFoo', 'setChildMethodWithoutDocBlock', 'setDependencies'],
             array_column($methodCalls, 0)
         );
 
@@ -766,7 +776,7 @@ class AutowirePassTest extends TestCase
         (new AutowirePass())->process($container);
     }
 
-    public function testExplicitMethodInjection()
+    public function testExplicitMethodInjectionAttribute()
     {
         $container = new ContainerBuilder();
         $container->register(Foo::class);
@@ -821,7 +831,33 @@ class AutowirePassTest extends TestCase
         $this->assertTrue($container->hasDefinition('bar'));
     }
 
-    public function testSetterInjectionCollisionThrowsException()
+    /**
+     * @group legacy
+     */
+    public function testSetterInjectionFromAnnotationCollisionThrowsException()
+    {
+        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Compiler\SetterInjectionCollisionAnnotation::setMultipleInstancesForOneArg()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
+
+        $container = new ContainerBuilder();
+
+        $container->register('c1', CollisionA::class);
+        $container->register('c2', CollisionB::class);
+        $aDefinition = $container->register('setter_injection_collision', SetterInjectionCollisionAnnotation::class);
+        $aDefinition->setAutowired(true);
+
+        (new AutowireRequiredMethodsPass())->process($container);
+
+        $pass = new AutowirePass();
+
+        try {
+            $pass->process($container);
+            $this->fail('AutowirePass should have thrown an exception');
+        } catch (AutowiringFailedException $e) {
+            $this->assertSame('Cannot autowire service "setter_injection_collision": argument "$collision" of method "Symfony\Component\DependencyInjection\Tests\Compiler\SetterInjectionCollisionAnnotation::setMultipleInstancesForOneArg()" references interface "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" but no such service exists. You should maybe alias this interface to one of these existing services: "c1", "c2".', (string) $e->getMessage());
+        }
+    }
+
+    public function testSetterInjectionFromAttributeCollisionThrowsException()
     {
         $container = new ContainerBuilder();
 
@@ -1127,6 +1163,36 @@ class AutowirePassTest extends TestCase
         (new AutowirePass())->process($container);
 
         $this->assertSame(['Cannot autowire service "some_locator": it has type "Symfony\Component\DependencyInjection\Tests\Compiler\MissingClass" but this class was not found.'], $container->getDefinition('.errored.some_locator.'.MissingClass::class)->getErrors());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testNamedArgumentAliasResolveCollisionsAnnotation()
+    {
+        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Compiler\SetterInjectionCollisionAnnotation::setMultipleInstancesForOneArg()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
+
+        $container = new ContainerBuilder();
+
+        $container->register('c1', CollisionA::class);
+        $container->register('c2', CollisionB::class);
+        $container->setAlias(CollisionInterface::class.' $collision', 'c2');
+        $aDefinition = $container->register('setter_injection_collision', SetterInjectionCollisionAnnotation::class);
+        $aDefinition->setAutowired(true);
+
+        (new AutowireRequiredMethodsPass())->process($container);
+
+        $pass = new AutowirePass();
+
+        $pass->process($container);
+
+        $expected = [
+            [
+                'setMultipleInstancesForOneArg',
+                [new TypedReference(CollisionInterface::class.' $collision', CollisionInterface::class)],
+            ],
+        ];
+        $this->assertEquals($expected, $container->getDefinition('setter_injection_collision')->getMethodCalls());
     }
 
     public function testNamedArgumentAliasResolveCollisions()

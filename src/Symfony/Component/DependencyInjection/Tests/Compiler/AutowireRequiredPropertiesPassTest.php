@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredPropertiesPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -21,8 +22,15 @@ require_once __DIR__.'/../Fixtures/includes/autowiring_classes_74.php';
 
 class AutowireRequiredPropertiesPassTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
+    /**
+     * @group legacy
+     */
     public function testInjection()
     {
+        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Using the "@required" annotation on property "Symfony\Component\DependencyInjection\Tests\Compiler\PropertiesInjection::$plop" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
+
         $container = new ContainerBuilder();
         $container->register(Bar::class);
         $container->register(A::class);

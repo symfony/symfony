@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Contracts\Service\Attribute\Required;
 
 /**
- * Looks for definitions with autowiring enabled and registers their corresponding "@required" methods as setters.
+ * Looks for definitions with autowiring enabled and registers their corresponding "#[Required]" methods as setters.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
@@ -57,6 +57,8 @@ class AutowireRequiredMethodsPass extends AbstractRecursivePass
                 }
                 if (false !== $doc = $r->getDocComment()) {
                     if (false !== stripos($doc, '@required') && preg_match('#(?:^/\*\*|\n\s*+\*)\s*+@required(?:\s|\*/$)#i', $doc)) {
+                        trigger_deprecation('symfony/dependency-injection', '6.3', 'Relying on the "@required" annotation on method "%s::%s()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.', $reflectionMethod->class, $reflectionMethod->name);
+
                         if ($this->isWither($reflectionMethod, $doc)) {
                             $withers[] = [$reflectionMethod->name, [], true];
                         } else {

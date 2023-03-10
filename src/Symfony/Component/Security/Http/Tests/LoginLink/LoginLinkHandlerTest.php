@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\LoginLink;
 
+use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemPoolInterface;
@@ -80,9 +81,22 @@ class LoginLinkHandlerTest extends TestCase
                 ->method('getContext')
                 ->willReturn($currentRequestContext = new RequestContext());
 
+            $series = [
+                $this->equalTo((new RequestContext())->fromRequest($request)->setParameter('_locale', $request->getLocale())),
+                $currentRequestContext,
+            ];
+
             $this->router->expects($this->exactly(2))
                 ->method('setContext')
-                ->withConsecutive([$this->equalTo((new RequestContext())->fromRequest($request)->setParameter('_locale', $request->getLocale()))], [$currentRequestContext]);
+                ->willReturnCallback(function (RequestContext $context) use (&$series) {
+                    $expectedContext = array_shift($series);
+
+                    if ($expectedContext instanceof Constraint) {
+                        $expectedContext->evaluate($context);
+                    } else {
+                        $this->assertSame($expectedContext, $context);
+                    }
+                });
         }
 
         $loginLink = $this->createLinker([], array_keys($extraProperties))->createLoginLink($user, $request);

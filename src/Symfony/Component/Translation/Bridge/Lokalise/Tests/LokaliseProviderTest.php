@@ -627,8 +627,11 @@ class LokaliseProviderTest extends ProviderTestCase
         $loader = $this->getLoader();
         $loader->expects($this->exactly(\count($consecutiveLoadArguments)))
             ->method('load')
-            ->withConsecutive(...$consecutiveLoadArguments)
-            ->willReturnOnConsecutiveCalls(...$consecutiveLoadReturns);
+            ->willReturnCallback(function (...$args) use (&$consecutiveLoadArguments, &$consecutiveLoadReturns) {
+                $this->assertSame(array_shift($consecutiveLoadArguments), $args);
+
+                return array_shift($consecutiveLoadReturns);
+            });
 
         $provider = self::createProvider((new MockHttpClient($response))->withOptions([
             'base_uri' => 'https://api.lokalise.com/api2/projects/PROJECT_ID/',

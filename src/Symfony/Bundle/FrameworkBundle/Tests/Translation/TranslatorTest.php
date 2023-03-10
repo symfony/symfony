@@ -148,18 +148,21 @@ class TranslatorTest extends TestCase
 
         $loader = $this->createMock(LoaderInterface::class);
 
+        $series = [
+            /* The "messages.some_locale.loader" is passed via the resource_file option and shall be loaded first */
+            [['messages.some_locale.loader', 'some_locale', 'messages'], $someCatalogue],
+            /* This resource is added by an addResource() call and shall be loaded after the resource_files */
+            [['second_resource.some_locale.loader', 'some_locale', 'messages'], $someCatalogue],
+        ];
+
         $loader->expects($this->exactly(2))
             ->method('load')
-            ->withConsecutive(
-                /* The "messages.some_locale.loader" is passed via the resource_file option and shall be loaded first */
-                ['messages.some_locale.loader', 'some_locale', 'messages'],
-                /* This resource is added by an addResource() call and shall be loaded after the resource_files */
-                ['second_resource.some_locale.loader', 'some_locale', 'messages']
-            )
-            ->willReturnOnConsecutiveCalls(
-                $someCatalogue,
-                $someCatalogue
-            );
+            ->willReturnCallback(function (...$args) use (&$series) {
+                [$expectedArgs, $return] = array_shift($series);
+                $this->assertSame($expectedArgs, $args);
+
+                return $return;
+            });
 
         $options = [
             'resource_files' => ['some_locale' => ['messages.some_locale.loader']],

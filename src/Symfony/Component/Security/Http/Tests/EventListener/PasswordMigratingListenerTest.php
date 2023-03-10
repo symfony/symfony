@@ -85,7 +85,19 @@ class PasswordMigratingListenerTest extends TestCase
         // A custom Passport, without an UserBadge
         $passport = $this->createMock(UserPassportInterface::class);
         $passport->method('getUser')->willReturn($this->user);
-        $passport->method('hasBadge')->withConsecutive([PasswordUpgradeBadge::class], [UserBadge::class])->willReturnOnConsecutiveCalls(true, false);
+        $passport->method('hasBadge')
+            ->willReturnCallback(function (...$args) {
+                static $series = [
+                    [[PasswordUpgradeBadge::class], true],
+                    [[UserBadge::class], false],
+                ];
+
+                [$expectedArgs, $return] = array_shift($series);
+                $this->assertSame($expectedArgs, $args);
+
+                return $return;
+            })
+        ;
         $passport->expects($this->once())->method('getBadge')->with(PasswordUpgradeBadge::class)->willReturn(new PasswordUpgradeBadge('pa$$word'));
         // We should never "getBadge" for "UserBadge::class"
 

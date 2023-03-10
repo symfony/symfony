@@ -229,8 +229,17 @@ class AccessDecisionManagerTest extends TestCase
         $voter
             ->expects($this->exactly(2))
             ->method('supportsAttribute')
-            ->withConsecutive(['foo'], ['bar'])
-            ->willReturnOnConsecutiveCalls(false, true);
+            ->willReturnCallback(function (...$args) {
+                static $series = [
+                    [['foo'], false],
+                    [['bar'], true],
+                ];
+
+                [$expectedArgs, $return] = array_shift($series);
+                $this->assertSame($expectedArgs, $args);
+
+                return $return;
+            });
         $voter
             ->expects($this->once())
             ->method('supportsType')

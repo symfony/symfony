@@ -210,36 +210,36 @@ class ConnectionTest extends TestCase
             ->method('getQueueUrl')
             ->with(['QueueName' => 'queue', 'QueueOwnerAWSAccountId' => 123])
             ->willReturn(ResultMockFactory::create(GetQueueUrlResult::class, ['QueueUrl' => 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue']));
+
+        $firstResult = ResultMockFactory::create(ReceiveMessageResult::class, ['Messages' => [
+            new Message(['MessageId' => 1, 'Body' => 'this is a test']),
+            new Message(['MessageId' => 2, 'Body' => 'this is a test']),
+            new Message(['MessageId' => 3, 'Body' => 'this is a test']),
+        ]]);
+        $secondResult = ResultMockFactory::create(ReceiveMessageResult::class, ['Messages' => []]);
+
+        $series = [
+            [[['QueueUrl' => 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue',
+                'VisibilityTimeout' => null,
+                'MaxNumberOfMessages' => 9,
+                'MessageAttributeNames' => ['All'],
+                'WaitTimeSeconds' => 20]], $firstResult],
+            [[['QueueUrl' => 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue',
+                'VisibilityTimeout' => null,
+                'MaxNumberOfMessages' => 9,
+                'MessageAttributeNames' => ['All'],
+                'WaitTimeSeconds' => 20]], $secondResult],
+        ];
+
         $client->expects($this->exactly(2))
             ->method('receiveMessage')
-            ->withConsecutive(
-                [
-                    [
-                        'QueueUrl' => 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue',
-                        'MaxNumberOfMessages' => 9,
-                        'WaitTimeSeconds' => 20,
-                        'MessageAttributeNames' => ['All'],
-                        'VisibilityTimeout' => null,
-                    ],
-                ],
-                [
-                    [
-                        'QueueUrl' => 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue',
-                        'MaxNumberOfMessages' => 9,
-                        'WaitTimeSeconds' => 20,
-                        'MessageAttributeNames' => ['All'],
-                        'VisibilityTimeout' => null,
-                    ],
-                ]
-            )
-            ->willReturnOnConsecutiveCalls(
-                ResultMockFactory::create(ReceiveMessageResult::class, ['Messages' => [
-                    new Message(['MessageId' => 1, 'Body' => 'this is a test']),
-                    new Message(['MessageId' => 2, 'Body' => 'this is a test']),
-                    new Message(['MessageId' => 3, 'Body' => 'this is a test']),
-                ]]),
-                ResultMockFactory::create(ReceiveMessageResult::class, ['Messages' => []])
-            );
+            ->willReturnCallback(function (...$args) use (&$series) {
+                [$expectedArgs, $return] = array_shift($series);
+                $this->assertSame($expectedArgs, $args);
+
+                return $return;
+            })
+        ;
 
         $connection = new Connection(['queue_name' => 'queue', 'account' => 123, 'auto_setup' => false], $client);
         $this->assertNotNull($connection->get());

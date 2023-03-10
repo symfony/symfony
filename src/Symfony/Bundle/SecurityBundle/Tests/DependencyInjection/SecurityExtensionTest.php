@@ -923,11 +923,11 @@ class TestAuthenticator implements AuthenticatorInterface
 
 class TestUserChecker implements UserCheckerInterface
 {
-    public function checkPreAuth(UserInterface $user)
+    public function checkPreAuth(UserInterface $user): void
     {
     }
 
-    public function checkPostAuth(UserInterface $user)
+    public function checkPostAuth(UserInterface $user): void
     {
     }
 }

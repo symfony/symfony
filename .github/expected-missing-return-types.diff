@@ -659,17 +659,17 @@ index bda9ca9515..c0d1f91339 100644
      {
          if (!$container->hasParameter('workflow.has_guard_listeners')) {
 diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
-index 618cefb128..a8bedab1ef 100644
+index 131e9e8c2c..5a3ff18f22 100644
 --- a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
-@@ -273,5 +273,5 @@ class FrameworkExtension extends Extension
+@@ -274,5 +274,5 @@ class FrameworkExtension extends Extension
       * @throws LogicException
       */
 -    public function load(array $configs, ContainerBuilder $container)
 +    public function load(array $configs, ContainerBuilder $container): void
      {
          $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));
-@@ -2741,5 +2741,5 @@ class FrameworkExtension extends Extension
+@@ -2746,5 +2746,5 @@ class FrameworkExtension extends Extension
       * @return void
       */
 -    public static function registerRateLimiter(ContainerBuilder $container, string $name, array $limiterConfig)
@@ -988,7 +988,7 @@ index a2c5815e4b..1c9721ccc6 100644
 +    public function addConfiguration(NodeDefinition $builder): void;
  }
 diff --git a/src/Symfony/Bundle/SecurityBundle/DependencyInjection/SecurityExtension.php b/src/Symfony/Bundle/SecurityBundle/DependencyInjection/SecurityExtension.php
-index 8fb375255c..610be84431 100644
+index 41d807d8c0..1d8d25b59d 100644
 --- a/src/Symfony/Bundle/SecurityBundle/DependencyInjection/SecurityExtension.php
 +++ b/src/Symfony/Bundle/SecurityBundle/DependencyInjection/SecurityExtension.php
 @@ -82,5 +82,5 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
@@ -1184,80 +1184,80 @@ index cffea43c49..0645fbd756 100644
      {
          $this->packages[$name] = $package;
 diff --git a/src/Symfony/Component/BrowserKit/AbstractBrowser.php b/src/Symfony/Component/BrowserKit/AbstractBrowser.php
-index f69beb5da9..c86558e269 100644
+index bf5ff90e5d..fe656cac5c 100644
 --- a/src/Symfony/Component/BrowserKit/AbstractBrowser.php
 +++ b/src/Symfony/Component/BrowserKit/AbstractBrowser.php
-@@ -63,5 +63,5 @@ abstract class AbstractBrowser
+@@ -64,5 +64,5 @@ abstract class AbstractBrowser
       * @return void
       */
 -    public function followRedirects(bool $followRedirects = true)
 +    public function followRedirects(bool $followRedirects = true): void
      {
          $this->followRedirects = $followRedirects;
-@@ -73,5 +73,5 @@ abstract class AbstractBrowser
+@@ -74,5 +74,5 @@ abstract class AbstractBrowser
       * @return void
       */
 -    public function followMetaRefresh(bool $followMetaRefresh = true)
 +    public function followMetaRefresh(bool $followMetaRefresh = true): void
      {
          $this->followMetaRefresh = $followMetaRefresh;
-@@ -91,5 +91,5 @@ abstract class AbstractBrowser
+@@ -92,5 +92,5 @@ abstract class AbstractBrowser
       * @return void
       */
 -    public function setMaxRedirects(int $maxRedirects)
 +    public function setMaxRedirects(int $maxRedirects): void
      {
          $this->maxRedirects = $maxRedirects < 0 ? -1 : $maxRedirects;
-@@ -112,5 +112,5 @@ abstract class AbstractBrowser
+@@ -113,5 +113,5 @@ abstract class AbstractBrowser
       * @throws \RuntimeException When Symfony Process Component is not installed
       */
 -    public function insulate(bool $insulated = true)
 +    public function insulate(bool $insulated = true): void
      {
          if ($insulated && !class_exists(\Symfony\Component\Process\Process::class)) {
-@@ -126,5 +126,5 @@ abstract class AbstractBrowser
+@@ -127,5 +127,5 @@ abstract class AbstractBrowser
       * @return void
       */
 -    public function setServerParameters(array $server)
 +    public function setServerParameters(array $server): void
      {
          $this->server = array_merge([
-@@ -138,5 +138,5 @@ abstract class AbstractBrowser
+@@ -139,5 +139,5 @@ abstract class AbstractBrowser
       * @return void
       */
 -    public function setServerParameter(string $key, string $value)
 +    public function setServerParameter(string $key, string $value): void
      {
          $this->server[$key] = $value;
-@@ -420,5 +420,5 @@ abstract class AbstractBrowser
+@@ -433,5 +433,5 @@ abstract class AbstractBrowser
       * @throws \RuntimeException When processing returns exit code
       */
 -    protected function doRequestInProcess(object $request)
 +    protected function doRequestInProcess(object $request): object
      {
          $deprecationsFile = tempnam(sys_get_temp_dir(), 'deprec');
-@@ -453,5 +453,5 @@ abstract class AbstractBrowser
+@@ -466,5 +466,5 @@ abstract class AbstractBrowser
       * @return object
       */
 -    abstract protected function doRequest(object $request);
 +    abstract protected function doRequest(object $request): object;
  
      /**
-@@ -472,5 +472,5 @@ abstract class AbstractBrowser
+@@ -485,5 +485,5 @@ abstract class AbstractBrowser
       * @return object
       */
 -    protected function filterRequest(Request $request)
 +    protected function filterRequest(Request $request): object
      {
          return $request;
-@@ -482,5 +482,5 @@ abstract class AbstractBrowser
+@@ -495,5 +495,5 @@ abstract class AbstractBrowser
       * @return Response
       */
 -    protected function filterResponse(object $response)
 +    protected function filterResponse(object $response): Response
      {
          return $response;
-@@ -607,5 +607,5 @@ abstract class AbstractBrowser
+@@ -620,5 +620,5 @@ abstract class AbstractBrowser
       * @return void
       */
 -    public function restart()
@@ -3564,10 +3564,10 @@ index 3f070dcc0c..aa0e5186bf 100644
      {
          foreach ($container->findTaggedServiceIds('auto_alias') as $serviceId => $tags) {
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php b/src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php
-index 3bcaa812cf..e1ca4cd038 100644
+index 48cacd7877..651b72c818 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php
-@@ -64,5 +64,5 @@ class AutowirePass extends AbstractRecursivePass
+@@ -61,5 +61,5 @@ class AutowirePass extends AbstractRecursivePass
       * @return void
       */
 -    public function process(ContainerBuilder $container)
@@ -3643,7 +3643,7 @@ index 2ad4a048ba..719267be1e 100644
 +    public function process(ContainerBuilder $container): void;
  }
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/DecoratorServicePass.php b/src/Symfony/Component/DependencyInjection/Compiler/DecoratorServicePass.php
-index 9c1d7e218e..61415b6ade 100644
+index c38bfa7744..10d999f093 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/DecoratorServicePass.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/DecoratorServicePass.php
 @@ -31,5 +31,5 @@ class DecoratorServicePass extends AbstractRecursivePass
@@ -4553,80 +4553,80 @@ index 9b431cd65b..5fdb0643cd 100644
      {
          return $this->type;
 diff --git a/src/Symfony/Component/DomCrawler/Crawler.php b/src/Symfony/Component/DomCrawler/Crawler.php
-index 8176fee4e6..b33de6c377 100644
+index 59eec3068c..b750e80938 100644
 --- a/src/Symfony/Component/DomCrawler/Crawler.php
 +++ b/src/Symfony/Component/DomCrawler/Crawler.php
-@@ -95,5 +95,5 @@ class Crawler implements \Countable, \IteratorAggregate
+@@ -96,5 +96,5 @@ class Crawler implements \Countable, \IteratorAggregate
       * @return void
       */
 -    public function clear()
 +    public function clear(): void
      {
          $this->nodes = [];
-@@ -114,5 +114,5 @@ class Crawler implements \Countable, \IteratorAggregate
+@@ -115,5 +115,5 @@ class Crawler implements \Countable, \IteratorAggregate
       * @throws \InvalidArgumentException when node is not the expected type
       */
 -    public function add(\DOMNodeList|\DOMNode|array|string|null $node)
 +    public function add(\DOMNodeList|\DOMNode|array|string|null $node): void
      {
          if ($node instanceof \DOMNodeList) {
-@@ -138,5 +138,5 @@ class Crawler implements \Countable, \IteratorAggregate
+@@ -139,5 +139,5 @@ class Crawler implements \Countable, \IteratorAggregate
       * @return void
       */
 -    public function addContent(string $content, string $type = null)
 +    public function addContent(string $content, string $type = null): void
      {
          if (empty($type)) {
-@@ -180,5 +180,5 @@ class Crawler implements \Countable, \IteratorAggregate
+@@ -181,5 +181,5 @@ class Crawler implements \Countable, \IteratorAggregate
       * @return void
       */
 -    public function addHtmlContent(string $content, string $charset = 'UTF-8')
 +    public function addHtmlContent(string $content, string $charset = 'UTF-8'): void
      {
          $dom = $this->parseHtmlString($content, $charset);
-@@ -216,5 +216,5 @@ class Crawler implements \Countable, \IteratorAggregate
+@@ -217,5 +217,5 @@ class Crawler implements \Countable, \IteratorAggregate
       * @return void
       */
 -    public function addXmlContent(string $content, string $charset = 'UTF-8', int $options = \LIBXML_NONET)
 +    public function addXmlContent(string $content, string $charset = 'UTF-8', int $options = \LIBXML_NONET): void
      {
          // remove the default namespace if it's the only namespace to make XPath expressions simpler
-@@ -246,5 +246,5 @@ class Crawler implements \Countable, \IteratorAggregate
+@@ -247,5 +247,5 @@ class Crawler implements \Countable, \IteratorAggregate
       * @return void
       */
 -    public function addDocument(\DOMDocument $dom)
 +    public function addDocument(\DOMDocument $dom): void
      {
          if ($dom->documentElement) {
-@@ -260,5 +260,5 @@ class Crawler implements \Countable, \IteratorAggregate
+@@ -261,5 +261,5 @@ class Crawler implements \Countable, \IteratorAggregate
       * @return void
       */
 -    public function addNodeList(\DOMNodeList $nodes)
 +    public function addNodeList(\DOMNodeList $nodes): void
      {
          foreach ($nodes as $node) {
-@@ -276,5 +276,5 @@ class Crawler implements \Countable, \IteratorAggregate
+@@ -277,5 +277,5 @@ class Crawler implements \Countable, \IteratorAggregate
       * @return void
       */
 -    public function addNodes(array $nodes)
 +    public function addNodes(array $nodes): void
      {
          foreach ($nodes as $node) {
-@@ -290,5 +290,5 @@ class Crawler implements \Countable, \IteratorAggregate
+@@ -291,5 +291,5 @@ class Crawler implements \Countable, \IteratorAggregate
       * @return void
       */
 -    public function addNode(\DOMNode $node)
 +    public function addNode(\DOMNode $node): void
      {
          if ($node instanceof \DOMDocument) {
-@@ -884,5 +884,5 @@ class Crawler implements \Countable, \IteratorAggregate
+@@ -885,5 +885,5 @@ class Crawler implements \Countable, \IteratorAggregate
       * @return void
       */
 -    public function setDefaultNamespacePrefix(string $prefix)
 +    public function setDefaultNamespacePrefix(string $prefix): void
      {
          $this->defaultNamespacePrefix = $prefix;
-@@ -892,5 +892,5 @@ class Crawler implements \Countable, \IteratorAggregate
+@@ -893,5 +893,5 @@ class Crawler implements \Countable, \IteratorAggregate
       * @return void
       */
 -    public function registerNamespace(string $prefix, string $namespace)
@@ -4845,7 +4845,7 @@ index f1b982315c..ed8ad1fab4 100644
      {
      }
 diff --git a/src/Symfony/Component/EventDispatcher/DependencyInjection/RegisterListenersPass.php b/src/Symfony/Component/EventDispatcher/DependencyInjection/RegisterListenersPass.php
-index cbfe7e416d..bf72a91ce8 100644
+index c86f438d41..3bfb39db57 100644
 --- a/src/Symfony/Component/EventDispatcher/DependencyInjection/RegisterListenersPass.php
 +++ b/src/Symfony/Component/EventDispatcher/DependencyInjection/RegisterListenersPass.php
 @@ -52,5 +52,5 @@ class RegisterListenersPass implements CompilerPassInterface
@@ -6926,7 +6926,7 @@ index 472437e465..1dfe39146b 100644
      {
          if ($this->client instanceof ResetInterface) {
 diff --git a/src/Symfony/Component/HttpClient/HttpClientTrait.php b/src/Symfony/Component/HttpClient/HttpClientTrait.php
-index 767893bf4b..512ff2daf6 100644
+index de24e3b7fd..0aff3bbc60 100644
 --- a/src/Symfony/Component/HttpClient/HttpClientTrait.php
 +++ b/src/Symfony/Component/HttpClient/HttpClientTrait.php
 @@ -562,5 +562,5 @@ trait HttpClientTrait
@@ -8129,10 +8129,10 @@ index 1924b1ddb0..62c58c8e8b 100644
      {
          $annotatedClasses = [];
 diff --git a/src/Symfony/Component/HttpKernel/DependencyInjection/ControllerArgumentValueResolverPass.php b/src/Symfony/Component/HttpKernel/DependencyInjection/ControllerArgumentValueResolverPass.php
-index 5bb801c8cd..7426ca9430 100644
+index dff3e248ae..381db9aa8f 100644
 --- a/src/Symfony/Component/HttpKernel/DependencyInjection/ControllerArgumentValueResolverPass.php
 +++ b/src/Symfony/Component/HttpKernel/DependencyInjection/ControllerArgumentValueResolverPass.php
-@@ -32,5 +32,5 @@ class ControllerArgumentValueResolverPass implements CompilerPassInterface
+@@ -34,5 +34,5 @@ class ControllerArgumentValueResolverPass implements CompilerPassInterface
       * @return void
       */
 -    public function process(ContainerBuilder $container)
@@ -10493,7 +10493,7 @@ index 341883f3c5..d508e0ce1e 100644
      {
          $this->tokens[$token->getSeries()] = $token;
 diff --git a/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php b/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php
-index 9b32fdce31..fbbd65d8b7 100644
+index cf41e0c507..61f7397734 100644
 --- a/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php
 +++ b/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php
 @@ -28,5 +28,5 @@ interface TokenProviderInterface
@@ -10503,6 +10503,26 @@ index 9b32fdce31..fbbd65d8b7 100644
 +    public function loadTokenBySeries(string $series): PersistentTokenInterface;
  
      /**
+@@ -35,5 +35,5 @@ interface TokenProviderInterface
+      * @return void
+      */
+-    public function deleteTokenBySeries(string $series);
++    public function deleteTokenBySeries(string $series): void;
+ 
+     /**
+@@ -44,5 +44,5 @@ interface TokenProviderInterface
+      * @throws TokenNotFoundException if the token is not found
+      */
+-    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed);
++    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed): void;
+ 
+     /**
+@@ -51,4 +51,4 @@ interface TokenProviderInterface
+      * @return void
+      */
+-    public function createNewToken(PersistentTokenInterface $token);
++    public function createNewToken(PersistentTokenInterface $token): void;
+ }
 diff --git a/src/Symfony/Component/Security/Core/Authentication/Token/AbstractToken.php b/src/Symfony/Component/Security/Core/Authentication/Token/AbstractToken.php
 index 4416cda616..0fcf4303e0 100644
 --- a/src/Symfony/Component/Security/Core/Authentication/Token/AbstractToken.php
@@ -10536,16 +10556,37 @@ index 4416cda616..0fcf4303e0 100644
      {
          $this->attributes[$name] = $value;
 diff --git a/src/Symfony/Component/Security/Core/Authentication/Token/NullToken.php b/src/Symfony/Component/Security/Core/Authentication/Token/NullToken.php
-index 3df95e527d..ec72b91986 100644
+index eabfe17bba..5a41823338 100644
 --- a/src/Symfony/Component/Security/Core/Authentication/Token/NullToken.php
 +++ b/src/Symfony/Component/Security/Core/Authentication/Token/NullToken.php
-@@ -47,5 +47,5 @@ class NullToken implements TokenInterface
+@@ -37,5 +37,5 @@ class NullToken implements TokenInterface
+      * @return never
+      */
+-    public function setUser(UserInterface $user)
++    public function setUser(UserInterface $user): never
+     {
+         throw new \BadMethodCallException('Cannot set user on a NullToken.');
+@@ -50,5 +50,5 @@ class NullToken implements TokenInterface
       * @return void
       */
 -    public function eraseCredentials()
 +    public function eraseCredentials(): void
      {
      }
+@@ -62,5 +62,5 @@ class NullToken implements TokenInterface
+      * @return never
+      */
+-    public function setAttributes(array $attributes)
++    public function setAttributes(array $attributes): never
+     {
+         throw new \BadMethodCallException('Cannot set attributes of NullToken.');
+@@ -80,5 +80,5 @@ class NullToken implements TokenInterface
+      * @return never
+      */
+-    public function setAttribute(string $name, mixed $value)
++    public function setAttribute(string $name, mixed $value): never
+     {
+         throw new \BadMethodCallException('Cannot add attribute to NullToken.');
 diff --git a/src/Symfony/Component/Security/Core/Authentication/Token/Storage/TokenStorage.php b/src/Symfony/Component/Security/Core/Authentication/Token/Storage/TokenStorage.php
 index 0ec6b1cfb9..2e235a6069 100644
 --- a/src/Symfony/Component/Security/Core/Authentication/Token/Storage/TokenStorage.php
@@ -10564,6 +10605,48 @@ index 0ec6b1cfb9..2e235a6069 100644
 +    public function reset(): void
      {
          $this->setToken(null);
+diff --git a/src/Symfony/Component/Security/Core/Authentication/Token/Storage/TokenStorageInterface.php b/src/Symfony/Component/Security/Core/Authentication/Token/Storage/TokenStorageInterface.php
+index 5fdfa4e9ff..e9c2081934 100644
+--- a/src/Symfony/Component/Security/Core/Authentication/Token/Storage/TokenStorageInterface.php
++++ b/src/Symfony/Component/Security/Core/Authentication/Token/Storage/TokenStorageInterface.php
+@@ -33,4 +33,4 @@ interface TokenStorageInterface
+      * @return void
+      */
+-    public function setToken(?TokenInterface $token);
++    public function setToken(?TokenInterface $token): void;
+ }
+diff --git a/src/Symfony/Component/Security/Core/Authentication/Token/TokenInterface.php b/src/Symfony/Component/Security/Core/Authentication/Token/TokenInterface.php
+index d9b80ae1eb..caf0cfc28c 100644
+--- a/src/Symfony/Component/Security/Core/Authentication/Token/TokenInterface.php
++++ b/src/Symfony/Component/Security/Core/Authentication/Token/TokenInterface.php
+@@ -55,5 +55,5 @@ interface TokenInterface
+      * @throws \InvalidArgumentException
+      */
+-    public function setUser(UserInterface $user);
++    public function setUser(UserInterface $user): void;
+ 
+     /**
+@@ -62,5 +62,5 @@ interface TokenInterface
+      * @return void
+      */
+-    public function eraseCredentials();
++    public function eraseCredentials(): void;
+ 
+     public function getAttributes(): array;
+@@ -71,5 +71,5 @@ interface TokenInterface
+      * @return void
+      */
+-    public function setAttributes(array $attributes);
++    public function setAttributes(array $attributes): void;
+ 
+     public function hasAttribute(string $name): bool;
+@@ -83,5 +83,5 @@ interface TokenInterface
+      * @return void
+      */
+-    public function setAttribute(string $name, mixed $value);
++    public function setAttribute(string $name, mixed $value): void;
+ 
+     /**
 diff --git a/src/Symfony/Component/Security/Core/Authorization/Voter/RoleHierarchyVoter.php b/src/Symfony/Component/Security/Core/Authorization/Voter/RoleHierarchyVoter.php
 index c8db1485e0..34bf5a5763 100644
 --- a/src/Symfony/Component/Security/Core/Authorization/Voter/RoleHierarchyVoter.php
@@ -10716,6 +10799,34 @@ index ed6c2d8b38..7b61505fd5 100644
 +    private function getUser(string $username): InMemoryUser
      {
          if (!isset($this->users[strtolower($username)])) {
+diff --git a/src/Symfony/Component/Security/Core/User/UserCheckerInterface.php b/src/Symfony/Component/Security/Core/User/UserCheckerInterface.php
+index 91f21c71d0..95e818392e 100644
+--- a/src/Symfony/Component/Security/Core/User/UserCheckerInterface.php
++++ b/src/Symfony/Component/Security/Core/User/UserCheckerInterface.php
+@@ -31,5 +31,5 @@ interface UserCheckerInterface
+      * @throws AccountStatusException
+      */
+-    public function checkPreAuth(UserInterface $user);
++    public function checkPreAuth(UserInterface $user): void;
+ 
+     /**
+@@ -40,4 +40,4 @@ interface UserCheckerInterface
+      * @throws AccountStatusException
+      */
+-    public function checkPostAuth(UserInterface $user);
++    public function checkPostAuth(UserInterface $user): void;
+ }
+diff --git a/src/Symfony/Component/Security/Core/User/UserInterface.php b/src/Symfony/Component/Security/Core/User/UserInterface.php
+index ef22340a63..d0b1589d97 100644
+--- a/src/Symfony/Component/Security/Core/User/UserInterface.php
++++ b/src/Symfony/Component/Security/Core/User/UserInterface.php
+@@ -55,5 +55,5 @@ interface UserInterface
+      * @return void
+      */
+-    public function eraseCredentials();
++    public function eraseCredentials(): void;
+ 
+     /**
 diff --git a/src/Symfony/Component/Security/Core/User/UserProviderInterface.php b/src/Symfony/Component/Security/Core/User/UserProviderInterface.php
 index ec90d413fa..9f1401aa91 100644
 --- a/src/Symfony/Component/Security/Core/User/UserProviderInterface.php
@@ -10745,6 +10856,16 @@ index 8fd2205a9d..5d5a72ac41 100644
 +    public function validate(mixed $password, Constraint $constraint): void
      {
          if (!$constraint instanceof UserPassword) {
+diff --git a/src/Symfony/Component/Security/Csrf/TokenStorage/ClearableTokenStorageInterface.php b/src/Symfony/Component/Security/Csrf/TokenStorage/ClearableTokenStorageInterface.php
+index 185c4a7e33..4d343f24c5 100644
+--- a/src/Symfony/Component/Security/Csrf/TokenStorage/ClearableTokenStorageInterface.php
++++ b/src/Symfony/Component/Security/Csrf/TokenStorage/ClearableTokenStorageInterface.php
+@@ -22,4 +22,4 @@ interface ClearableTokenStorageInterface extends TokenStorageInterface
+      * @return void
+      */
+-    public function clear();
++    public function clear(): void;
+ }
 diff --git a/src/Symfony/Component/Security/Csrf/TokenStorage/NativeSessionTokenStorage.php b/src/Symfony/Component/Security/Csrf/TokenStorage/NativeSessionTokenStorage.php
 index 7de8b52969..97e61d84da 100644
 --- a/src/Symfony/Component/Security/Csrf/TokenStorage/NativeSessionTokenStorage.php
@@ -10781,6 +10902,17 @@ index 4b3c3e56a5..7937512868 100644
 +    public function clear(): void
      {
          $session = $this->getSession();
+diff --git a/src/Symfony/Component/Security/Csrf/TokenStorage/TokenStorageInterface.php b/src/Symfony/Component/Security/Csrf/TokenStorage/TokenStorageInterface.php
+index 32c71921bd..060a2505d8 100644
+--- a/src/Symfony/Component/Security/Csrf/TokenStorage/TokenStorageInterface.php
++++ b/src/Symfony/Component/Security/Csrf/TokenStorage/TokenStorageInterface.php
+@@ -31,5 +31,5 @@ interface TokenStorageInterface
+      * @return void
+      */
+-    public function setToken(string $tokenId, #[\SensitiveParameter] string $token);
++    public function setToken(string $tokenId, #[\SensitiveParameter] string $token): void;
+ 
+     /**
 diff --git a/src/Symfony/Component/Security/Http/AccessMap.php b/src/Symfony/Component/Security/Http/AccessMap.php
 index 6c05dffa21..4b60abcb25 100644
 --- a/src/Symfony/Component/Security/Http/AccessMap.php
@@ -10900,6 +11032,28 @@ index fc56733efa..8538f5f821 100644
 +    protected function callListeners(RequestEvent $event, iterable $listeners): void
      {
          foreach ($listeners as $listener) {
+diff --git a/src/Symfony/Component/Security/Http/Firewall/AccessListener.php b/src/Symfony/Component/Security/Http/Firewall/AccessListener.php
+index ad343ef085..9a1a2563c4 100644
+--- a/src/Symfony/Component/Security/Http/Firewall/AccessListener.php
++++ b/src/Symfony/Component/Security/Http/Firewall/AccessListener.php
+@@ -65,5 +65,5 @@ class AccessListener extends AbstractListener
+      * @throws AccessDeniedException
+      */
+-    public function authenticate(RequestEvent $event)
++    public function authenticate(RequestEvent $event): void
+     {
+         $request = $event->getRequest();
+diff --git a/src/Symfony/Component/Security/Http/Firewall/FirewallListenerInterface.php b/src/Symfony/Component/Security/Http/Firewall/FirewallListenerInterface.php
+index be200c0d12..69483f8f1d 100644
+--- a/src/Symfony/Component/Security/Http/Firewall/FirewallListenerInterface.php
++++ b/src/Symfony/Component/Security/Http/Firewall/FirewallListenerInterface.php
+@@ -36,5 +36,5 @@ interface FirewallListenerInterface
+      * @return void
+      */
+-    public function authenticate(RequestEvent $event);
++    public function authenticate(RequestEvent $event): void;
+ 
+     /**
 diff --git a/src/Symfony/Component/Security/Http/FirewallMap.php b/src/Symfony/Component/Security/Http/FirewallMap.php
 index 36c8c67e38..32a83871e5 100644
 --- a/src/Symfony/Component/Security/Http/FirewallMap.php
@@ -10961,6 +11115,16 @@ index 63ede6193a..a26912201b 100644
 +    public function onAuthentication(Request $request, TokenInterface $token): void
      {
          switch ($this->strategy) {
+diff --git a/src/Symfony/Component/Security/Http/Session/SessionAuthenticationStrategyInterface.php b/src/Symfony/Component/Security/Http/Session/SessionAuthenticationStrategyInterface.php
+index 880a4eaa22..dd3da4ca7b 100644
+--- a/src/Symfony/Component/Security/Http/Session/SessionAuthenticationStrategyInterface.php
++++ b/src/Symfony/Component/Security/Http/Session/SessionAuthenticationStrategyInterface.php
+@@ -33,4 +33,4 @@ interface SessionAuthenticationStrategyInterface
+      * @return void
+      */
+-    public function onAuthentication(Request $request, TokenInterface $token);
++    public function onAuthentication(Request $request, TokenInterface $token): void;
+ }
 diff --git a/src/Symfony/Component/Semaphore/Store/RedisStore.php b/src/Symfony/Component/Semaphore/Store/RedisStore.php
 index 0e0f551876..1ab8bc9577 100644
 --- a/src/Symfony/Component/Semaphore/Store/RedisStore.php
@@ -11536,10 +11700,10 @@ index 9d4418d639..d1959f433d 100644
      {
          if (!$container->hasDefinition('translator.default')) {
 diff --git a/src/Symfony/Component/Translation/DependencyInjection/TranslatorPathsPass.php b/src/Symfony/Component/Translation/DependencyInjection/TranslatorPathsPass.php
-index ac83f0e26d..654d076323 100644
+index f7f954eea1..b93248a69a 100644
 --- a/src/Symfony/Component/Translation/DependencyInjection/TranslatorPathsPass.php
 +++ b/src/Symfony/Component/Translation/DependencyInjection/TranslatorPathsPass.php
-@@ -43,5 +43,5 @@ class TranslatorPathsPass extends AbstractRecursivePass
+@@ -44,5 +44,5 @@ class TranslatorPathsPass extends AbstractRecursivePass
       * @return void
       */
 -    public function process(ContainerBuilder $container)
@@ -12586,10 +12750,10 @@ index e7389f7b8e..3c07cdc9f7 100644
      {
          return $this->class;
 diff --git a/src/Symfony/Component/Validator/Test/ConstraintValidatorTestCase.php b/src/Symfony/Component/Validator/Test/ConstraintValidatorTestCase.php
-index 1b2457707f..5811aa8106 100644
+index 9712d35ac1..2a0b248897 100644
 --- a/src/Symfony/Component/Validator/Test/ConstraintValidatorTestCase.php
 +++ b/src/Symfony/Component/Validator/Test/ConstraintValidatorTestCase.php
-@@ -295,5 +295,5 @@ abstract class ConstraintValidatorTestCase extends TestCase
+@@ -291,5 +291,5 @@ abstract class ConstraintValidatorTestCase extends TestCase
       * @psalm-return T
       */
 -    abstract protected function createValidator();

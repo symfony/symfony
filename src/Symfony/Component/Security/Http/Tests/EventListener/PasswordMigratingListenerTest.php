@@ -170,7 +170,7 @@ class DummyTestPasswordAuthenticatedUser extends TestPasswordAuthenticatedUser
         return [];
     }
 
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
     }
 

@@ -31,11 +31,15 @@ interface TokenProviderInterface
 
     /**
      * Deletes all tokens belonging to series.
+     *
+     * @return void
      */
     public function deleteTokenBySeries(string $series);
 
     /**
      * Updates the token according to this data.
+     *
+     * @return void
      *
      * @throws TokenNotFoundException if the token is not found
      */
@@ -43,6 +47,8 @@ interface TokenProviderInterface
 
     /**
      * Creates a new token.
+     *
+     * @return void
      */
     public function createNewToken(PersistentTokenInterface $token);
 }

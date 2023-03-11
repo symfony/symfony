@@ -26,11 +26,10 @@ final class ImportMapManager
     public function __construct(
         private readonly string      $path,
         private ?HttpClientInterface $httpClient = null,
-        private ?Filesystem          $filesystem = null,
+        private readonly Filesystem  $filesystem = new Filesystem(),
     )
     {
         $this->httpClient ??= HttpClient::createForBaseUri('https://api.jspm.io');
-        $this->filesystem ??= new Filesystem();
     }
 
     private function loadImportMap(): void

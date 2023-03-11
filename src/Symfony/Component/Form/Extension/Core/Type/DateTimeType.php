@@ -248,7 +248,12 @@ class DateTimeType extends AbstractType
             'view_timezone' => null,
             'format' => self::HTML5_FORMAT,
             'date_format' => null,
-            'widget' => null,
+            'widget' => function (Options $options) {
+                trigger_deprecation('symfony/form', '6.3', 'Not configuring the "widget" option is deprecated. It will default to "single_text" in Symfony 7.0.');
+
+                return null;
+                // return 'single_text';
+            },
             'date_widget' => $dateWidget,
             'time_widget' => $timeWidget,
             'with_minutes' => true,

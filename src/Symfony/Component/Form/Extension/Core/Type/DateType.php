@@ -260,7 +260,12 @@ class DateType extends AbstractType
             'years' => range((int) date('Y') - 5, (int) date('Y') + 5),
             'months' => range(1, 12),
             'days' => range(1, 31),
-            'widget' => 'choice',
+            'widget' => function (Options $options) {
+                trigger_deprecation('symfony/form', '6.3', 'Not configuring the "widget" option explicitly is deprecated, its default value will change to "single_text" in 7.0.');
+
+                return 'choice';
+                // return 'single_text';
+            },
             'input' => 'datetime',
             'format' => $format,
             'model_timezone' => null,

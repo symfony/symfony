@@ -102,15 +102,16 @@ final class AccessDecisionManager implements AccessDecisionManagerInterface
             }
         }
 
+        $voters = [];
         foreach ($this->voters as $key => $voter) {
             if (!$voter instanceof CacheableVoterInterface) {
                 $this->nonCachableVoters[$key] = $voter;
-                yield $voter;
+                $voters[] = $voter;
                 continue;
             }
 
             $supports = true;
-            $supportedAttribute = null;
+            $supportedAttributes = [];
             // The voter supports the attributes if it supports at least one attribute of the list
             foreach ($keyAttributes as $keyAttribute) {
                 if (null === $keyAttribute) {
@@ -121,11 +122,10 @@ final class AccessDecisionManager implements AccessDecisionManagerInterface
                     $supports = $this->votersCacheAttributes[$keyAttribute][$key];
                 }
                 if ($supports) {
-                    $supportedAttribute = $keyAttribute;
-                    break;
+                    $supportedAttributes[] = $keyAttribute;
                 }
             }
-            if (!$supports) {
+            if (!$supports && [] === $supportedAttributes) {
                 continue;
             }
 
@@ -138,8 +138,13 @@ final class AccessDecisionManager implements AccessDecisionManagerInterface
                 continue;
             }
 
-            $this->cachedVoters[$supportedAttribute][$keyObject][$key] = $voter;
-            yield $voter;
+            foreach ($supportedAttributes as $supportedAttribute) {
+                $this->cachedVoters[$supportedAttribute][$keyObject][$key] = $voter;
+            }
+
+            $voters[] = $voter;
         }
+
+        yield from $voters;
     }
 }

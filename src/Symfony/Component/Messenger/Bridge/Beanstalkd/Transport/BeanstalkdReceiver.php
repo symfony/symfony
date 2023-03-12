@@ -48,7 +48,7 @@ class BeanstalkdReceiver implements ReceiverInterface, MessageCountAwareInterfac
                 'headers' => $beanstalkdEnvelope['headers'],
             ]);
         } catch (MessageDecodingFailedException $exception) {
-            $this->connection->reject($beanstalkdEnvelope['id']);
+            $this->connection->reject($beanstalkdEnvelope['id'], $this->connection->getMessagePriority($beanstalkdEnvelope['id']));
 
             throw $exception;
         }
@@ -65,6 +65,7 @@ class BeanstalkdReceiver implements ReceiverInterface, MessageCountAwareInterfac
     {
         $this->connection->reject(
             $this->findBeanstalkdReceivedStamp($envelope)->getId(),
+            $envelope->last(BeanstalkdPriorityStamp::class)?->priority,
             $envelope->last(SentForRetryStamp::class)?->isSent ?? false,
         );
     }

@@ -32,6 +32,7 @@ class Connection
         'tube_name' => PheanstalkInterface::DEFAULT_TUBE,
         'timeout' => 0,
         'ttr' => 90,
+        'bury_on_reject' => false,
     ];
 
     /**
@@ -40,12 +41,14 @@ class Connection
      * * tube_name: name of the tube
      * * timeout: message reservation timeout (in seconds)
      * * ttr: the message time to run before it is put back in the ready queue (in seconds)
+     * * bury_on_reject: bury rejected messages instead of deleting them
      */
     private array $configuration;
     private PheanstalkInterface $client;
     private string $tube;
     private int $timeout;
     private int $ttr;
+    private bool $buryOnReject;
 
     public function __construct(array $configuration, PheanstalkInterface $client)
     {
@@ -54,6 +57,7 @@ class Connection
         $this->tube = $this->configuration['tube_name'];
         $this->timeout = $this->configuration['timeout'];
         $this->ttr = $this->configuration['ttr'];
+        $this->buryOnReject = $this->configuration['bury_on_reject'];
     }
 
     public static function fromDsn(#[\SensitiveParameter] string $dsn, array $options = []): self
@@ -73,7 +77,15 @@ class Connection
         }
 
         $configuration = [];
-        $configuration += $options + $query + self::DEFAULT_OPTIONS;
+        foreach (self::DEFAULT_OPTIONS as $k => $v) {
+            $value = $options[$k] ?? $query[$k] ?? $v;
+
+            $configuration[$k] = match (\gettype($v)) {
+                'integer' => filter_var($value, \FILTER_VALIDATE_INT),
+                'boolean' => filter_var($value, \FILTER_VALIDATE_BOOL),
+                default => $value,
+            };
+        }
 
         // check for extra keys in options
         $optionsExtraKeys = array_diff(array_keys($options), array_keys(self::DEFAULT_OPTIONS));
@@ -170,10 +182,14 @@ class Connection
         }
     }
 
-    public function reject(string $id): void
+    public function reject(string $id, bool $forceDelete = false): void
     {
         try {
-            $this->client->useTube($this->tube)->delete(new JobId((int) $id));
+            if (!$forceDelete && $this->buryOnReject) {
+                $this->client->useTube($this->tube)->bury(new JobId((int) $id));
+            } else {
+                $this->client->useTube($this->tube)->delete(new JobId((int) $id));
+            }
         } catch (Exception $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }

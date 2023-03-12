@@ -229,7 +229,7 @@ final class ConnectionTest extends TestCase
 
         $connection = new Connection(['tube_name' => $tube, 'bury_on_reject' => $buryOnReject], $client);
 
-        $connection->reject((string) $id, $forceDelete);
+        $connection->reject((string) $id, null, $forceDelete);
     }
 
     public function testRejectWithBury()
@@ -240,11 +240,27 @@ final class ConnectionTest extends TestCase
 
         $client = $this->createMock(PheanstalkInterface::class);
         $client->expects($this->once())->method('useTube')->with($tube)->willReturn($client);
-        $client->expects($this->once())->method('bury')->with($this->callback(fn (JobId $jobId): bool => $jobId->getId() === $id));
+        $client->expects($this->once())->method('bury')->with($this->callback(fn (JobId $jobId): bool => $jobId->getId() === $id), 1024);
 
         $connection = new Connection(['tube_name' => $tube, 'bury_on_reject' => true], $client);
 
         $connection->reject((string) $id);
+    }
+
+    public function testRejectWithBuryAndPriority()
+    {
+        $id = 123456;
+        $priority = 2;
+
+        $tube = 'baz';
+
+        $client = $this->createMock(PheanstalkInterface::class);
+        $client->expects($this->once())->method('useTube')->with($tube)->willReturn($client);
+        $client->expects($this->once())->method('bury')->with($this->callback(fn (JobId $jobId): bool => $jobId->getId() === $id), $priority);
+
+        $connection = new Connection(['tube_name' => $tube, 'bury_on_reject' => true], $client);
+
+        $connection->reject((string) $id, $priority);
     }
 
     public function testRejectWhenABeanstalkdExceptionOccurs()
@@ -296,6 +312,40 @@ final class ConnectionTest extends TestCase
         $connection->getMessageCount();
     }
 
+    public function testMessagePriority()
+    {
+        $id = 123456;
+        $priority = 51;
+
+        $tube = 'baz';
+
+        $response = new ArrayResponse('OK', ['pri' => $priority]);
+
+        $client = $this->createMock(PheanstalkInterface::class);
+        $client->expects($this->once())->method('statsJob')->with($this->callback(fn (JobId $jobId): bool => $jobId->getId() === $id))->willReturn($response);
+
+        $connection = new Connection(['tube_name' => $tube], $client);
+
+        $this->assertSame($priority, $connection->getMessagePriority((string) $id));
+    }
+
+    public function testMessagePriorityWhenABeanstalkdExceptionOccurs()
+    {
+        $id = 123456;
+
+        $tube = 'baz1234';
+
+        $exception = new ClientException('foobar error');
+
+        $client = $this->createMock(PheanstalkInterface::class);
+        $client->expects($this->once())->method('statsJob')->with($this->callback(fn (JobId $jobId): bool => $jobId->getId() === $id))->willThrowException($exception);
+
+        $connection = new Connection(['tube_name' => $tube], $client);
+
+        $this->expectExceptionObject(new TransportException($exception->getMessage(), 0, $exception));
+        $connection->getMessagePriority((string) $id);
+    }
+
     public function testSend()
     {
         $tube = 'xyz';
@@ -326,6 +376,41 @@ final class ConnectionTest extends TestCase
         $connection = new Connection(['tube_name' => $tube], $client);
 
         $returnedId = $connection->send($body, $headers, $delay);
+
+        $this->assertSame($id, (int) $returnedId);
+    }
+
+    public function testSendWithPriority()
+    {
+        $tube = 'xyz';
+
+        $body = 'foo';
+        $headers = ['test' => 'bar'];
+        $delay = 1000;
+        $priority = 2;
+        $expectedDelay = $delay / 1000;
+
+        $id = 110;
+
+        $client = $this->createMock(PheanstalkInterface::class);
+        $client->expects($this->once())->method('useTube')->with($tube)->willReturn($client);
+        $client->expects($this->once())->method('put')->with(
+            $this->callback(function (string $data) use ($body, $headers): bool {
+                $expectedMessage = json_encode([
+                    'body' => $body,
+                    'headers' => $headers,
+                ]);
+
+                return $expectedMessage === $data;
+            }),
+            $priority,
+            $expectedDelay,
+            90
+        )->willReturn(new Job($id, 'foobar'));
+
+        $connection = new Connection(['tube_name' => $tube], $client);
+
+        $returnedId = $connection->send($body, $headers, $delay, $priority);
 
         $this->assertSame($id, (int) $returnedId);
     }

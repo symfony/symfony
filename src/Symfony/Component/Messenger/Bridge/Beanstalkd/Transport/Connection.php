@@ -117,11 +117,12 @@ class Connection
     }
 
     /**
-     * @param int $delay The delay in milliseconds
+     * @param int  $delay    The delay in milliseconds
+     * @param ?int $priority The priority by which the message will be reserved
      *
      * @return string The inserted id
      */
-    public function send(string $body, array $headers, int $delay = 0): string
+    public function send(string $body, array $headers, int $delay = 0, ?int $priority = null): string
     {
         $message = json_encode([
             'body' => $body,
@@ -135,7 +136,7 @@ class Connection
         try {
             $job = $this->client->useTube($this->tube)->put(
                 $message,
-                PheanstalkInterface::DEFAULT_PRIORITY,
+                $priority ?? PheanstalkInterface::DEFAULT_PRIORITY,
                 $delay / 1000,
                 $this->ttr
             );
@@ -183,11 +184,11 @@ class Connection
         }
     }
 
-    public function reject(string $id, bool $forceDelete = false): void
+    public function reject(string $id, ?int $priority = null, bool $forceDelete = false): void
     {
         try {
             if (!$forceDelete && $this->buryOnReject) {
-                $this->client->useTube($this->tube)->bury(new JobId((int) $id));
+                $this->client->useTube($this->tube)->bury(new JobId((int) $id), $priority ?? PheanstalkInterface::DEFAULT_PRIORITY);
             } else {
                 $this->client->useTube($this->tube)->delete(new JobId((int) $id));
             }
@@ -206,5 +207,16 @@ class Connection
         }
 
         return (int) $tubeStats['current-jobs-ready'];
+    }
+
+    public function getMessagePriority(string $id): int
+    {
+        try {
+            $jobStats = $this->client->statsJob(new JobId((int) $id));
+        } catch (Exception $exception) {
+            throw new TransportException($exception->getMessage(), 0, $exception);
+        }
+
+        return (int) $jobStats['pri'];
     }
 }

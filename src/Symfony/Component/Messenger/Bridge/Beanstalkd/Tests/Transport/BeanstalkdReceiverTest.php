@@ -16,7 +16,9 @@ use Symfony\Component\Messenger\Bridge\Beanstalkd\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdReceivedStamp;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdReceiver;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\Connection;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Stamp\SentForRetryStamp;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Serializer as SerializerComponent;
@@ -76,6 +78,34 @@ final class BeanstalkdReceiverTest extends TestCase
 
         $receiver = new BeanstalkdReceiver($connection, $serializer);
         $receiver->get();
+    }
+
+    /**
+     * @dataProvider provideRejectCases
+     */
+    public function testReject(array $stamps, bool $forceDelete)
+    {
+        $serializer = $this->createSerializer();
+
+        $id = 'some id';
+
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('reject')->with($id, $forceDelete);
+
+        $envelope = (new Envelope(new DummyMessage('Oy')))->with(new BeanstalkdReceivedStamp($id, 'foo bar'));
+        foreach ($stamps as $stamp) {
+            $envelope = $envelope->with($stamp);
+        }
+
+        $receiver = new BeanstalkdReceiver($connection, $serializer);
+        $receiver->reject($envelope);
+    }
+
+    public static function provideRejectCases(): iterable
+    {
+        yield 'No stamp' => [[], false];
+        yield 'With sent for retry true' => [[new SentForRetryStamp(true)], true];
+        yield 'With sent for retry false' => [[new SentForRetryStamp(false)], false];
     }
 
     private function createBeanstalkdEnvelope(): array

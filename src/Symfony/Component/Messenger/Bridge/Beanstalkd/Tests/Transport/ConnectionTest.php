@@ -47,6 +47,7 @@ final class ConnectionTest extends TestCase
         $this->assertSame('default', $configuration['tube_name']);
         $this->assertSame(0, $configuration['timeout']);
         $this->assertSame(90, $configuration['ttr']);
+        $this->assertFalse($configuration['bury_on_reject']);
 
         $this->assertEquals(
             $connection = new Connection([], Pheanstalk::create('foobar', 15555)),
@@ -58,22 +59,32 @@ final class ConnectionTest extends TestCase
         $this->assertSame('default', $configuration['tube_name']);
         $this->assertSame(0, $configuration['timeout']);
         $this->assertSame(90, $configuration['ttr']);
+        $this->assertFalse($configuration['bury_on_reject']);
         $this->assertSame('default', $connection->getTube());
     }
 
     public function testFromDsnWithOptions()
     {
         $this->assertEquals(
-            $connection = Connection::fromDsn('beanstalkd://localhost', ['tube_name' => 'foo', 'timeout' => 10, 'ttr' => 5000]),
-            Connection::fromDsn('beanstalkd://localhost?tube_name=foo&timeout=10&ttr=5000')
+            $connectionWithOptions = Connection::fromDsn('beanstalkd://localhost', ['tube_name' => 'foo', 'timeout' => 10, 'ttr' => 5000, 'bury_on_reject' => true]),
+            $connectionWithQuery = Connection::fromDsn('beanstalkd://localhost?tube_name=foo&timeout=10&ttr=5000&bury_on_reject=true')
         );
 
-        $configuration = $connection->getConfiguration();
+        $configuration = $connectionWithOptions->getConfiguration();
 
         $this->assertSame('foo', $configuration['tube_name']);
         $this->assertSame(10, $configuration['timeout']);
         $this->assertSame(5000, $configuration['ttr']);
-        $this->assertSame('foo', $connection->getTube());
+        $this->assertTrue($configuration['bury_on_reject']);
+        $this->assertSame('foo', $connectionWithOptions->getTube());
+
+        $configuration = $connectionWithQuery->getConfiguration();
+
+        $this->assertSame('foo', $configuration['tube_name']);
+        $this->assertSame(10, $configuration['timeout']);
+        $this->assertSame(5000, $configuration['ttr']);
+        $this->assertTrue($configuration['bury_on_reject']);
+        $this->assertSame('foo', $connectionWithOptions->getTube());
     }
 
     public function testFromDsnOptionsArrayWinsOverOptionsFromDsn()
@@ -82,11 +93,12 @@ final class ConnectionTest extends TestCase
             'tube_name' => 'bar',
             'timeout' => 20,
             'ttr' => 6000,
+            'bury_on_reject' => false,
         ];
 
         $this->assertEquals(
             $connection = new Connection($options, Pheanstalk::create('localhost', 11333)),
-            Connection::fromDsn('beanstalkd://localhost:11333?tube_name=foo&timeout=10&ttr=5000', $options)
+            Connection::fromDsn('beanstalkd://localhost:11333?tube_name=foo&timeout=10&ttr=5000&bury_on_reject=true', $options)
         );
 
         $configuration = $connection->getConfiguration();
@@ -94,6 +106,7 @@ final class ConnectionTest extends TestCase
         $this->assertSame($options['tube_name'], $configuration['tube_name']);
         $this->assertSame($options['timeout'], $configuration['timeout']);
         $this->assertSame($options['ttr'], $configuration['ttr']);
+        $this->assertSame($options['bury_on_reject'], $configuration['bury_on_reject']);
         $this->assertSame($options['tube_name'], $connection->getTube());
     }
 
@@ -199,7 +212,12 @@ final class ConnectionTest extends TestCase
         $connection->ack((string) $id);
     }
 
-    public function testReject()
+    /**
+     * @testWith [false, false]
+     *           [false, true]
+     *           [true, true]
+     */
+    public function testReject(bool $buryOnReject, bool $forceDelete)
     {
         $id = 123456;
 
@@ -209,7 +227,22 @@ final class ConnectionTest extends TestCase
         $client->expects($this->once())->method('useTube')->with($tube)->willReturn($client);
         $client->expects($this->once())->method('delete')->with($this->callback(fn (JobId $jobId): bool => $jobId->getId() === $id));
 
-        $connection = new Connection(['tube_name' => $tube], $client);
+        $connection = new Connection(['tube_name' => $tube, 'bury_on_reject' => $buryOnReject], $client);
+
+        $connection->reject((string) $id, $forceDelete);
+    }
+
+    public function testRejectWithBury()
+    {
+        $id = 123456;
+
+        $tube = 'baz';
+
+        $client = $this->createMock(PheanstalkInterface::class);
+        $client->expects($this->once())->method('useTube')->with($tube)->willReturn($client);
+        $client->expects($this->once())->method('bury')->with($this->callback(fn (JobId $jobId): bool => $jobId->getId() === $id));
+
+        $connection = new Connection(['tube_name' => $tube, 'bury_on_reject' => true], $client);
 
         $connection->reject((string) $id);
     }

@@ -7,6 +7,7 @@ CHANGELOG
  * `WrappedExceptionsInterface` now extends PHP's `Throwable` interface
  * Add `#[AsMessage]` attribute with `$transport` parameter for message routing
  * Add `--format` option to the `messenger:stats` command
+ * Add `SentForRetryStamp` that identifies whether a failed message was sent for retry
 
 7.1
 ---

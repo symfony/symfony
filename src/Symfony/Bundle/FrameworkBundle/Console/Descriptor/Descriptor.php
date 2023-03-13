@@ -296,9 +296,12 @@ abstract class Descriptor implements DescriptorInterface
             return [];
         }
 
-        $file = file_get_contents($container->getParameter('debug.container.dump'));
-        preg_match_all('{%env\(((?:\w++:)*+\w++)\)%}', $file, $envVars);
-        $envVars = array_unique($envVars[1]);
+        $envVarsFromContainer = [];
+        $containerFile = file_get_contents($container->getParameter('debug.container.dump'));
+        preg_match_all('{%env\(((?:\w++:)*+\w++)\)%}', $containerFile, $envVarsFromContainer);
+        $envVarsFromContainer = array_unique($envVarsFromContainer[1]);
+
+        $allEnvVars = array_unique(array_merge($envVarsFromContainer, $this->getAvailableVars()));
 
         $bag = $container->getParameterBag();
         $getDefaultParameter = fn (string $name) => parent::get($name);
@@ -308,7 +311,7 @@ abstract class Descriptor implements DescriptorInterface
 
         $envs = [];
 
-        foreach ($envVars as $env) {
+        foreach ($allEnvVars as $env) {
             $processor = 'string';
             if (false !== $i = strrpos($name = $env, ':')) {
                 $name = substr($env, $i + 1);
@@ -319,6 +322,10 @@ abstract class Descriptor implements DescriptorInterface
                 $runtimeValue = null;
             }
             $processedValue = ($hasRuntime = null !== $runtimeValue) || $hasDefault ? $getEnvReflection->invoke($container, $env) : null;
+
+            preg_match_all('/'.preg_quote($env).'/', $containerFile, $matches);
+            $usageCounter = \count($matches[0]);
+
             $envs["$name$processor"] = [
                 'name' => $name,
                 'processor' => $processor,
@@ -327,6 +334,7 @@ abstract class Descriptor implements DescriptorInterface
                 'runtime_available' => $hasRuntime,
                 'runtime_value' => $runtimeValue,
                 'processed_value' => $processedValue,
+                'usage_count' => $usageCounter,
             ];
         }
         ksort($envs);
@@ -341,5 +349,13 @@ abstract class Descriptor implements DescriptorInterface
         } catch (InvalidArgumentException $exception) {
             return [];
         }
+    }
+
+    private function getAvailableVars(): array
+    {
+        $vars = explode(',', $_SERVER['SYMFONY_DOTENV_VARS'] ?? '');
+        sort($vars);
+
+        return $vars;
     }
 }

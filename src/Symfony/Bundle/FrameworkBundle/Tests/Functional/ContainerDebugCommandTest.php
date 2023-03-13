@@ -137,7 +137,12 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
 
     public function testDescribeEnvVars()
     {
+        $_SERVER['SYMFONY_DOTENV_VARS'] = 'APP_FOO,APP_BAR,APP_BAZ';
         putenv('REAL=value');
+        putenv('APP_FOO=foo');
+        putenv('APP_BAR=bar');
+        putenv('APP_BAZ=baz');
+
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
 
         $application = new Application(static::$kernel);
@@ -153,13 +158,16 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
 Symfony Container Environment Variables
 =======================================
 
- --------- ----------------- ------------%w
-  Name      Default value     Real value%w
- --------- ----------------- ------------%w
-  JSON      "[1, "2.5", 3]"   n/a%w
-  REAL      n/a               "value"%w
-  UNKNOWN   n/a               n/a%w
- --------- ----------------- ------------%w
+ --------- ----------------- ------------ -------------%w
+  Name      Default value     Real value   Usage count%w
+ --------- ----------------- ------------ -------------%w
+  APP_BAR   n/a               "bar"        0%w
+  APP_BAZ   n/a               "baz"        1%w
+  APP_FOO   "foo"             "foo"        1%w
+  JSON      "[1, "2.5", 3]"   n/a          2%w
+  REAL      n/a               "value"      3%w
+  UNKNOWN   n/a               n/a          1%w
+ --------- ----------------- ------------ -------------%w
 
  // Note real values might be different between web and CLI.%w
 
@@ -171,6 +179,9 @@ TXT
             , $tester->getDisplay(true));
 
         putenv('REAL');
+        putenv('APP_FOO');
+        putenv('APP_BAR');
+        putenv('APP_BAZ');
     }
 
     public function testDescribeEnvVar()
@@ -185,7 +196,7 @@ TXT
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:container', '--env-var' => 'js'], ['decorated' => false]);
 
-        $this->assertStringContainsString(file_get_contents(__DIR__.'/Fixtures/describe_env_vars.txt'), $tester->getDisplay(true));
+        $this->assertStringEqualsFile(__DIR__.'/Fixtures/describe_env_vars.txt', $tester->getDisplay(true));
     }
 
     public function testGetDeprecation()

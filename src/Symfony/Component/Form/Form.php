@@ -646,7 +646,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     public function isValid(): bool
     {
         if (!$this->submitted) {
-            throw new LogicException('Cannot check if an unsubmitted form is valid. Call Form::isSubmitted() before Form::isValid().');
+            throw new LogicException('Cannot check if an unsubmitted form is valid. Call Form::isSubmitted() and ensure that it\'s true before calling Form::isValid().');
         }
 
         if ($this->isDisabled()) {

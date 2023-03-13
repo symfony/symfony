@@ -60,6 +60,24 @@ class Html5ParserCrawlerTest extends AbstractCrawlerTestCase
         $this->assertNotEquals($nativeCrawler->filterXPath('//h1')->text(), $html5Crawler->filterXPath('//h1')->text(), 'Native parser and Html5 parser must be different');
     }
 
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testHasHtml5Parser(bool $useHtml5Parser)
+    {
+        $crawler = $this->createCrawler(null, null, null, $useHtml5Parser);
+
+        $r = new \ReflectionProperty($crawler::class, 'html5Parser');
+        $html5Parser = $r->getValue($crawler);
+
+        if ($useHtml5Parser) {
+            $this->assertInstanceOf(\Masterminds\HTML5::class, $html5Parser, 'Html5Parser must be a Masterminds\HTML5 instance');
+        } else {
+            $this->assertNull($html5Parser, 'Html5Parser must be null');
+        }
+    }
+
     public static function validHtml5Provider(): iterable
     {
         $html = self::getDoctype().'<html><body><h1><p>Foo</p></h1></body></html>';

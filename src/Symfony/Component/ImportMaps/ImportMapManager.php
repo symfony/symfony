@@ -1,6 +1,13 @@
 <?php
 
-declare(strict_types=1);
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Symfony\Component\ImportMaps;
 
@@ -24,11 +31,10 @@ final class ImportMapManager
     private ?array $importMap = null;
 
     public function __construct(
-        private readonly string      $path,
+        private readonly string $path,
         private ?HttpClientInterface $httpClient = null,
-        private readonly Filesystem  $filesystem = new Filesystem(),
-    )
-    {
+        private readonly Filesystem $filesystem = new Filesystem(),
+    ) {
         $this->httpClient ??= HttpClient::createForBaseUri('https://api.jspm.io');
     }
 
@@ -46,7 +52,7 @@ final class ImportMapManager
         $this->loadImportMap();
 
         // Use JSON_UNESCAPED_SLASHES | JSON_HEX_TAG to prevent XSS
-        return json_encode($this->importMap, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG);
+        return json_encode($this->importMap, \JSON_THROW_ON_ERROR | \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_HEX_TAG);
     }
 
     /**
@@ -71,8 +77,6 @@ final class ImportMapManager
 
     /**
      * Updates all existing packages to the latest version.
-     *
-     * @param string[] $packages
      */
     public function update(Env $env = Env::Production, Provider $provider = Provider::Jspm): void
     {

@@ -1,0 +1,161 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-11-06T20:52:41Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.2" but it seems your PR description refers to branch "6.3".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-11-07T16:56:51Z
+
+Hey!
+
+I think @pascalwoerde has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-11-08T12:20:35Z
+
+As many Symfony devs don't know about the `sendHeaders()` method and concept, I think it would make sense to expose a  more high-level API for this, e.g `Response::sendInformationalResponse(STATUS)` or even `Response::sendEarlyHints(Link[] $links)` or similar. WDYT?
+
+~~Also, is it relevant to send preload link headers with both the informational and main response?~~ (Yes, it is)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-11-08T12:39:45Z
+
+Is that deprecation necessary? Calling `sendHeaders()` without any arguments should remain a valid call imho.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2022-11-12T14:20:09Z
+
+@chalasr What would be the benefit of doing that? My proposal is very similar to how it's implemented in Go for instance. IMHO the current API is good enough and there is no need to make it more complex.
+
+@derrabus the plan is to force passing `null` in Symfony 7 to be able to make this attribute optional again in Symfony 8. Is there another way to add an optional parameter without introducing a breaking change?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-11-13T11:08:18Z
+
+> @derrabus the plan is to force passing `null` in Symfony 7 to be able to make this attribute optional again in Symfony 8.
+
+And why don't we make it optional right from the start?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-11-13T16:00:05Z
+
+> @chalasr What would be the benefit of doing that? My proposal is very similar to how it's implemented in Go for instance. IMHO the current API is good enough and there is no need to make it more complex.
+
+It's not obvious that `sendHeaders()` is about sending a response, hence I think the proposed API is more complex. I think we'd better have something crystal clear than being consistent with Golang's low-level api IMHO
+
+---------------------------------------------------------------------------
+
+by dunglas at 2022-11-13T16:52:48Z
+
+Informational responses are special: they can only be composed of headers, by the spec:
+
+> A 1xx response is terminated by the end of the header section; it cannot contain content or trailers.
+
+https://httpwg.org/specs/rfc9110.html#status.1xx
+
+So basically, sending 1XX responses mean sending headers ahead of time. Adding a new method would just add more confusion IMHO.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-11-13T17:12:21Z
+
+> So basically basically, sending 1XX responses mean sending headers ahead of time
+
+Yes, that's something I personally know but:
+- use cases for informational responses other than 103 are rare in the web area, I consider the concept to be quite new for Symfony at least.
+- nobody calls `sendHeaders()` currently
+- exposing this new use case via a `status` parameter in `sendHeaders()` does not feel future-proof. A dedicated API (maybe even experimental as this is not widely supported yet?) would provide us with more flexibility.
+
+But maybe it's just me 🤷  hope others opinions will come.
+
+> Is there another way to add an optional parameter without introducing a breaking change?
+
+A virtual parameter (`@param`) should be enough: no added noise for callers, only a deprecation notice for eventual children (triggered by DebugClassLoader)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2022-11-14T10:59:56Z
+
+@chalasr I hope that I've found an acceptable compromise:
+
+1. the low-level API (in HttpFoundation) stays as-is, and still allows to do advancing things such as sending WebDav's 102 Processing status code
+2. I added a higher-level, object-oriented helper in `AbstractController` dedicated to Early Hints:
+
+```php
+<?php
+
+namespace App\Controller;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\WebLink\Link;
+
+class HomepageController extends AbstractController
+{
+    #[Route("/", name: "homepage")]
+    public function index(Request $request): Response
+    {
+        $response = $this->sendEarlyHints([
+            (new Link(href: '/style.css'))->withAttribute('as', 'stylesheet'),
+            (new Link(href: '/script.js'))->withAttribute('as', 'script'),
+        ]);
+
+        // Do something slow...
+
+        return $this->render('homepage/index.html.twig', response: $response);
+    }
+}
+```
+
+So we have the best of both worlds. WDYT?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-11-14T11:46:26Z
+
+Looks great! Thanks
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-12-09T12:56:57Z
+
+> ```php
+> $response = $this->sendEarlyHints([
+>     (new Link(href: '/style.css'))->withAttribute('as', 'stylesheet'),
+>     (new Link(href: '/script.js'))->withAttribute('as', 'script'),
+> ]);
+> ```
+
+This sends the headers immediately to the client, right? How can I test a controller that makes use of that feature?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2022-12-09T17:34:33Z
+
+Indeed. You can test using FrakenPHP and `curl --no-buffer`.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-12-09T17:46:04Z
+
+It would be nice to make sure that functional testing utilities are ready for this, and to patch them otherwise. Maybe even setup FrankenPHP in one of our GHA workflows?

@@ -748,7 +748,7 @@
         <xsd:attribute name="lock-factory" type="xsd:string" />
         <xsd:attribute name="storage-service" type="xsd:string" />
         <xsd:attribute name="cache-pool" type="xsd:string" />
-        <xsd:attribute name="strategy" type="xsd:string" />
+        <xsd:attribute name="policy" type="xsd:string" />
         <xsd:attribute name="limit" type="xsd:int" />
         <xsd:attribute name="interval" type="xsd:string" />
     </xsd:complexType>

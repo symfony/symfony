@@ -1,0 +1,64 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-02-14T16:48:45Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.3" but it seems your PR description refers to branch "5.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by neclimdul at 2023-02-14T16:49:38Z
+
+Wasn't quite sure how the Changelog/Deprecation documentation was suppose to work so that is missing but should otherwise be good to go.
+
+---------------------------------------------------------------------------
+
+by neclimdul at 2023-02-14T21:40:38Z
+
+@stof Fixed the relevant fabbot changes.
+
+```
+@@ -1463,6 +1463,7 @@
+      * @param bool $asResource If true, a resource will be returned
+      *
+      * @return string|resource
++     *
+      * @psalm-return ($asResource is true ? resource : string)
+      */
+     public function getContent(bool $asResource = false)
+```
+Didn't touch this code so maybe should be handled else where?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-02-14T22:46:59Z
+
+> Didn't touch this code so maybe should be handled else where?
+
+Yes, that one you can ignore. But the `trigger_deprecation()` line fabbot complains about is your code. 🙂
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-02-14T22:47:38Z
+
+Also, the failing tests appear to be related.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-02-15T09:46:14Z
+
+the test failure is because you forogt to update the assertion in the test when fixing the text of the deprecation message.
+
+---------------------------------------------------------------------------
+
+by neclimdul at 2023-02-15T16:43:33Z
+
+Fixed the test and that stray space that snuck in.
+
+Somehow the tests are worse... There's a ton of fatal errors and failures that seem unrelated so hoping something changed elsewhere...

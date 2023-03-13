@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-03-10T12:02:27Z
+
+The class is not final, are we sure we want to change the type here as a bugfix? I think it should target 6.3.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-10T16:55:11Z
+
+I think this is fine for 5.4: this is an obvious mistake, let's prevent ppl from building on it (I doubt anyone overrides this method anyway).
+
+---------------------------------------------------------------------------
+
+by Aliance at 2023-03-10T17:16:38Z
+
+Do you know the reason why CI fails for 8.1, high-deps? Do I need to change smth?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-10T17:23:02Z
+
+No need, it's unrelated.

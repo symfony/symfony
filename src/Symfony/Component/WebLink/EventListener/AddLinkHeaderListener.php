@@ -29,11 +29,9 @@ class_exists(HttpHeaderSerializer::class);
  */
 class AddLinkHeaderListener implements EventSubscriberInterface
 {
-    private HttpHeaderSerializer $serializer;
-
-    public function __construct()
-    {
-        $this->serializer = new HttpHeaderSerializer();
+    public function __construct(
+        private readonly HttpHeaderSerializer $serializer = new HttpHeaderSerializer(),
+    ) {
     }
 
     public function onKernelResponse(ResponseEvent $event): void

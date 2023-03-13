@@ -124,4 +124,15 @@ class StreamedResponseTest extends TestCase
         $string = ob_get_clean();
         $this->assertEmpty($string);
     }
+
+    public function testSendInformationalResponse()
+    {
+        $response = new StreamedResponse();
+        $response->sendHeaders(103);
+
+        // Informational responses must not override the main status code
+        $this->assertSame(200, $response->getStatusCode());
+
+        $response->sendHeaders();
+    }
 }

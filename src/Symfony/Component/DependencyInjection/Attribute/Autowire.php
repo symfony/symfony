@@ -24,7 +24,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
 class Autowire
 {
-    public readonly string|array|Expression|Reference|ArgumentInterface $value;
+    public readonly string|array|Expression|Reference|ArgumentInterface|null $value;
 
     /**
      * Use only ONE of the following.
@@ -41,8 +41,12 @@ class Autowire
         string $expression = null,
         string $env = null,
         string $param = null,
+        public bool $lazy = false,
     ) {
-        if (!(null !== $value xor null !== $service xor null !== $expression xor null !== $env xor null !== $param)) {
+        if ($lazy && null !== ($expression ?? $env ?? $param)) {
+            throw new LogicException('#[Autowire] attribute cannot be $lazy and use $env, $param, or $value.');
+        }
+        if (!$lazy && !(null !== $value xor null !== $service xor null !== $expression xor null !== $env xor null !== $param)) {
             throw new LogicException('#[Autowire] attribute must declare exactly one of $service, $expression, $env, $param or $value.');
         }
 
@@ -59,7 +63,7 @@ class Autowire
             null !== $expression => class_exists(Expression::class) ? new Expression($expression) : throw new LogicException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed. Try running "composer require symfony/expression-language".'),
             null !== $env => "%env($env)%",
             null !== $param => "%$param%",
-            null !== $value => $value,
+            default => $value,
         };
     }
 }

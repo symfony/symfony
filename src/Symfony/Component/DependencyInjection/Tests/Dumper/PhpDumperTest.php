@@ -59,6 +59,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\WitherStaticReturnType;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\VarExporter\LazyObjectInterface;
 
 require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
 require_once __DIR__.'/../Fixtures/includes/classes.php';
@@ -1697,7 +1698,7 @@ PHP
             ->setFactory(['Closure', 'fromCallable'])
             ->setArguments(['var_dump'])
             ->setPublic('true');
-        $container->register('bar', LazyConsumer::class)
+        $container->register('bar', LazyClosureConsumer::class)
             ->setPublic('true')
             ->setAutowired(true);
         $container->compile();
@@ -1710,7 +1711,7 @@ PHP
         $container = new \Symfony_DI_PhpDumper_Test_Autowire_Closure();
 
         $this->assertInstanceOf(Foo::class, $container->get('foo'));
-        $this->assertInstanceOf(LazyConsumer::class, $bar = $container->get('bar'));
+        $this->assertInstanceOf(LazyClosureConsumer::class, $bar = $container->get('bar'));
         $this->assertInstanceOf(\Closure::class, $bar->foo);
         $this->assertInstanceOf(\Closure::class, $bar->baz);
         $this->assertInstanceOf(\Closure::class, $bar->buz);
@@ -1745,6 +1746,29 @@ PHP
         $this->assertSame(1 + $cloned, Foo::$counter);
         $this->assertSame(1, (new \ReflectionFunction($container->get('closure')))->getNumberOfParameters());
     }
+
+    public function testLazyAutowireAttribute()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', Foo::class)
+            ->setPublic('true');
+        $container->setAlias(Foo::class, 'foo');
+        $container->register('bar', LazyServiceConsumer::class)
+            ->setPublic('true')
+            ->setAutowired(true);
+        $container->compile();
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/lazy_autowire_attribute.php', $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Lazy_Autowire_Attribute']));
+
+        require self::$fixturesPath.'/php/lazy_autowire_attribute.php';
+
+        $container = new \Symfony_DI_PhpDumper_Test_Lazy_Autowire_Attribute();
+
+        $this->assertInstanceOf(Foo::class, $container->get('bar')->foo);
+        $this->assertInstanceOf(LazyObjectInterface::class, $container->get('bar')->foo);
+        $this->assertSame($container->get('foo'), $container->get('bar')->foo->initializeLazyObject());
+    }
 }
 
 class Rot13EnvVarProcessor implements EnvVarProcessorInterface
@@ -1771,7 +1795,7 @@ class FooForDeepGraph
     }
 }
 
-class LazyConsumer
+class LazyClosureConsumer
 {
     public function __construct(
         #[AutowireServiceClosure('foo')]
@@ -1780,6 +1804,15 @@ class LazyConsumer
         public \Closure $baz,
         #[AutowireCallable(service: 'foo', method: 'cloneFoo')]
         public \Closure $buz,
+    ) {
+    }
+}
+
+class LazyServiceConsumer
+{
+    public function __construct(
+        #[Autowire(lazy: true)]
+        public Foo $foo,
     ) {
     }
 }

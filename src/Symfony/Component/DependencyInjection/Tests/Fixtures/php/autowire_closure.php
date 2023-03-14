@@ -43,13 +43,13 @@ class Symfony_DI_PhpDumper_Test_Autowire_Closure extends Container
     /**
      * Gets the public 'bar' shared autowired service.
      *
-     * @return \Symfony\Component\DependencyInjection\Tests\Dumper\LazyConsumer
+     * @return \Symfony\Component\DependencyInjection\Tests\Dumper\LazyClosureConsumer
      */
     protected static function getBarService($container)
     {
         $containerRef = $container->ref;
 
-        return $container->services['bar'] = new \Symfony\Component\DependencyInjection\Tests\Dumper\LazyConsumer(#[\Closure(name: 'foo', class: 'Symfony\\Component\\DependencyInjection\\Tests\\Compiler\\Foo')] function () use ($containerRef) {
+        return $container->services['bar'] = new \Symfony\Component\DependencyInjection\Tests\Dumper\LazyClosureConsumer(#[\Closure(name: 'foo', class: 'Symfony\\Component\\DependencyInjection\\Tests\\Compiler\\Foo')] function () use ($containerRef) {
             $container = $containerRef->get();
 
             return ($container->services['foo'] ??= new \Symfony\Component\DependencyInjection\Tests\Compiler\Foo());

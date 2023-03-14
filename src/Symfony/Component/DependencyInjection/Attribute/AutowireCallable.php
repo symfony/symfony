@@ -24,7 +24,7 @@ class AutowireCallable extends Autowire
         string|array $callable = null,
         string $service = null,
         string $method = null,
-        public bool $lazy = false,
+        bool $lazy = false,
     ) {
         if (!(null !== $callable xor null !== $service)) {
             throw new LogicException('#[AutowireCallable] attribute must declare exactly one of $callable or $service.');
@@ -33,6 +33,6 @@ class AutowireCallable extends Autowire
             throw new LogicException('#[AutowireCallable] attribute must declare one of $callable or $method.');
         }
 
-        parent::__construct($callable ?? [new Reference($service), $method ?? '__invoke']);
+        parent::__construct($callable ?? [new Reference($service), $method ?? '__invoke'], lazy: $lazy);
     }
 }

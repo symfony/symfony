@@ -18,8 +18,7 @@ enum Provider: string
 {
     case Jspm = 'jspm';
     case JspmSystem = 'jspm.system';
-    case Skypack = 'spypack';
-
+    case Skypack = 'skypack';
     case JsDelivr = 'jsdelivr';
     case Unpkg = 'unpkg';
 }

@@ -37,6 +37,7 @@ final class RequireCommand extends AbstractCommand
         $this->importMapManager->require(
             $input->getArgument('packages'),
             Env::from($input->getOption('js-env')),
+            Provider::from($input->getOption('provider')),
         );
 
         return Command::SUCCESS;

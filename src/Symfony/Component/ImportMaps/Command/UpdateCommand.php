@@ -28,6 +28,7 @@ final class UpdateCommand extends AbstractCommand
     {
         $this->importMapManager->update(
             Env::from($input->getOption('js-env')),
+            Provider::from($input->getOption('provider')),
         );
 
         return Command::SUCCESS;

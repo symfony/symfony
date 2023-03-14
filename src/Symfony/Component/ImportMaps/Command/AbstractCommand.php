@@ -31,7 +31,23 @@ abstract class AbstractCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addOption('js-env', 'je', InputOption::VALUE_OPTIONAL, '"development" or "production"', Env::Production->value)
+            ->addOption('js-env', 'je', InputOption::VALUE_OPTIONAL, $this->listFromEnumCases(Env::cases()), Env::Production->value)
+            ->addOption('provider', 'p', InputOption::VALUE_OPTIONAL, $this->listFromEnumCases(Provider::cases()), Provider::Jspm->value)
         ;
+    }
+
+    /**
+     * @param \UnitEnum[] $cases
+     * @return string
+     */
+    private function listFromEnumCases(array $cases): string
+    {
+        $values = [];
+        foreach ($cases as $case) {
+            $values[] = sprintf('"%s"', $case->value);
+        }
+        $lastValue = array_pop($values);
+
+        return sprintf('%s or %s', implode(', ', $values), $lastValue);
     }
 }

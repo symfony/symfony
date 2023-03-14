@@ -64,9 +64,9 @@ final class ImportMapManager
      *
      * @param string[] $packages
      */
-    public function require(array $packages, Env $env = Env::Production): void
+    public function require(array $packages, Env $env = Env::Production, ?Provider $provider = null): void
     {
-        $this->createImportMap($env, false, $packages, []);
+        $this->createImportMap($env, $provider, false, $packages, []);
     }
 
     /**
@@ -74,20 +74,20 @@ final class ImportMapManager
      *
      * @param string[] $packages
      */
-    public function remove(array $packages, Env $env = Env::Production): void
+    public function remove(array $packages, Env $env = Env::Production, ?Provider $provider = null): void
     {
-        $this->createImportMap($env, false, [], $packages);
+        $this->createImportMap($env, $provider, false, [], $packages);
     }
 
     /**
      * Updates all existing packages to the latest version.
      */
-    public function update(Env $env = Env::Production): void
+    public function update(Env $env = Env::Production, ?Provider $provider = null): void
     {
-        $this->createImportMap($env, true, [], []);
+        $this->createImportMap($env, $provider, true, [], []);
     }
 
-    private function createImportMap(Env $env, bool $update, array $require, array $remove): void
+    private function createImportMap(Env $env, ?Provider $provider, bool $update, array $require, array $remove): void
     {
         $this->loadImportMap();
 
@@ -119,7 +119,7 @@ final class ImportMapManager
         $json = [
             'install' => array_values($install),
             'flattenScope' => true,
-            'provider' => $this->provider->value,
+            'provider' => $provider?->value ?? $this->provider->value,
         ];
 
         $json['env'] = ['browser', 'module', $env->value];

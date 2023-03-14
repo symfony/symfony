@@ -2,6 +2,7 @@
     "name": "symfony/runtime",
     "type": "composer-plugin",
     "description": "Enables decoupling PHP applications from global state",
+    "keywords": ["runtime"],
     "homepage": "https://symfony.com",
     "license" : "MIT",
     "authors": [

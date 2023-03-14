@@ -179,9 +179,5 @@ return static function (ContainerConfigurator $container) {
             ->args([service('twig')])
             ->tag('kernel.event_subscriber')
 
-        ->set('twig.extension.import_maps', ImportMapsExtension::class)
-            ->args([service(ImportMapManager::class)])
-            ->tag('twig.extension')
-
     ;
 };

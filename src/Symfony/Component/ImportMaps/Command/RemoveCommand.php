@@ -37,7 +37,6 @@ final class RemoveCommand extends AbstractCommand
         $this->importMapManager->remove(
             $input->getArgument('packages'),
             Env::from($input->getOption('js-env')),
-            Provider::from($input->getOption('provider')),
         );
 
         return Command::SUCCESS;

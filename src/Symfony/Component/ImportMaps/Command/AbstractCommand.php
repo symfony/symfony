@@ -32,7 +32,6 @@ abstract class AbstractCommand extends Command
     {
         $this
             ->addOption('js-env', 'je', InputOption::VALUE_OPTIONAL, '"development" or "production"', Env::Production->value)
-            ->addOption('provider', 'p', InputOption::VALUE_OPTIONAL, '"jspm", "jspm.system", "skypack", "jsdelivr" or "unpkg"', Provider::Jspm->value)
         ;
     }
 }

@@ -50,6 +50,7 @@ class Configuration implements ConfigurationInterface
         $this->addTwigOptions($rootNode);
         $this->addTwigFormatOptions($rootNode);
         $this->addMailerSection($rootNode);
+        $this->addImportMapsSection($rootNode);
 
         return $treeBuilder;
     }
@@ -222,6 +223,24 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->scalarNode('html_to_text_converter')
                             ->info(sprintf('A service implementing the "%s"', HtmlToTextConverterInterface::class))
+                            ->defaultNull()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addImportMapsSection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('importmap')
+                    ->info('Import Maps configuration')
+                    ->fixXmlConfig('import_map')
+                    ->children()
+                        ->scalarNode('polyfill')
+                            ->info('URL of the ES Module Polyfill to use.')
                             ->defaultNull()
                         ->end()
                     ->end()

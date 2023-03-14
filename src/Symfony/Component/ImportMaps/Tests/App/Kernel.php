@@ -47,11 +47,22 @@ class Kernel extends BaseKernel
             'profiler' => [
                 'only_exceptions' => false,
             ],
+            'importmap' => [
+                'enabled' => true,
+                'provider' => 'unpkg',
+                //'api' => 'https://notfound.example.com',
+            ],
         ]);
 
         $container->extension('web_profiler', [
             'toolbar' => true,
             'intercept_redirects' => false,
+        ]);
+
+        $container->extension('twig', [
+            'importmap' => [
+                'polyfill' => 'https://ga.jspm.io/npm:es-module-shims@1.6.2/dist/es-module-shims.js'
+            ],
         ]);
     }
 

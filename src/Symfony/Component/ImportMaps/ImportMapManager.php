@@ -21,6 +21,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class ImportMapManager
 {
+    public const POLYFILL_URL = 'https://ga.jspm.io/npm:es-module-shims@1.7.0/dist/es-module-shims.js';
+
     /**
      * @see https://regex101.com/r/2cR9Rh/1
      *
@@ -32,10 +34,12 @@ final class ImportMapManager
 
     public function __construct(
         private readonly string $path,
+        private readonly Provider $provider = Provider::Jspm,
         private ?HttpClientInterface $httpClient = null,
+        private readonly string $api = 'https://api.jspm.io',
         private readonly Filesystem $filesystem = new Filesystem(),
     ) {
-        $this->httpClient ??= HttpClient::createForBaseUri('https://api.jspm.io');
+        $this->httpClient ??= HttpClient::createForBaseUri($this->api);
     }
 
     private function loadImportMap(): void
@@ -60,9 +64,9 @@ final class ImportMapManager
      *
      * @param string[] $packages
      */
-    public function require(array $packages, Env $env = Env::Production, Provider $provider = Provider::Jspm): void
+    public function require(array $packages, Env $env = Env::Production): void
     {
-        $this->createImportMap($env, $provider, false, $packages, []);
+        $this->createImportMap($env, false, $packages, []);
     }
 
     /**
@@ -70,20 +74,20 @@ final class ImportMapManager
      *
      * @param string[] $packages
      */
-    public function remove(array $packages, Env $env = Env::Production, Provider $provider = Provider::Jspm): void
+    public function remove(array $packages, Env $env = Env::Production): void
     {
-        $this->createImportMap($env, $provider, false, [], $packages);
+        $this->createImportMap($env, false, [], $packages);
     }
 
     /**
      * Updates all existing packages to the latest version.
      */
-    public function update(Env $env = Env::Production, Provider $provider = Provider::Jspm): void
+    public function update(Env $env = Env::Production): void
     {
-        $this->createImportMap($env, $provider, true, [], []);
+        $this->createImportMap($env, true, [], []);
     }
 
-    private function createImportMap(Env $env, Provider $provider, bool $update, array $require, array $remove): void
+    private function createImportMap(Env $env, bool $update, array $require, array $remove): void
     {
         $this->loadImportMap();
 
@@ -115,7 +119,7 @@ final class ImportMapManager
         $json = [
             'install' => array_values($install),
             'flattenScope' => true,
-            'provider' => $provider->value,
+            'provider' => $this->provider->value,
         ];
 
         $json['env'] = ['browser', 'module', $env->value];

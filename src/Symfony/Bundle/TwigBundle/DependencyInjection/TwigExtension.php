@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Form\AbstractRendererEngine;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\ImportMaps\ImportMapManager;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Translation\Translator;
 use Symfony\Contracts\Service\ResetInterface;
@@ -83,6 +84,14 @@ class TwigExtension extends Extension
 
             if ($htmlToTextConverter = $config['mailer']['html_to_text_converter'] ?? null) {
                 $container->getDefinition('twig.mime_body_renderer')->setArgument('$converter', new Reference($htmlToTextConverter));
+            }
+        }
+
+        if ($container::willBeAvailable('symfony/import-maps', ImportMapManager::class, ['symfony/import-maps'])) {
+            $loader->load('import_maps.php');
+
+            if ($config['importmap']['polyfill'] ?? false) {
+                $container->getDefinition('twig.extension.import_maps')->addArgument($config['importmap']['polyfill']);
             }
         }
 

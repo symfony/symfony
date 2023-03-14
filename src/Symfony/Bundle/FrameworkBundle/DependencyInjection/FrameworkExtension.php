@@ -94,6 +94,7 @@ use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\ImportMaps\ImportMapManager;
+use Symfony\Component\ImportMaps\Provider;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\PersistingStoreInterface;
@@ -534,6 +535,14 @@ class FrameworkExtension extends Extension
             $this->registerHtmlSanitizerConfiguration($config['html_sanitizer'], $container, $loader);
         }
 
+        if ($this->readConfigEnabled('importmap', $container, $config['importmap'])) {
+            if (!class_exists(ImportMapManager::class)) {
+                throw new LogicException('Import Maps support cannot be enabled as the ImportMaps component is not installed. Try running "composer require symfony/import-maps".');
+            }
+
+            $this->registerImportMapsConfiguration($config['importmap'], $container, $loader);
+        }
+
         $this->addAnnotatedClassesToCompile([
             '**\\Controller\\',
             '**\\Entity\\',
@@ -544,10 +553,6 @@ class FrameworkExtension extends Extension
 
         if (ContainerBuilder::willBeAvailable('symfony/mime', MimeTypes::class, ['symfony/framework-bundle'])) {
             $loader->load('mime_type.php');
-        }
-
-        if (ContainerBuilder::willBeAvailable('symfony/import-maps', ImportMapManager::class, ['symfony/framework-bundle'])) {
-            $loader->load('import_maps.php');
         }
 
         $container->registerForAutoconfiguration(PackageInterface::class)
@@ -2940,6 +2945,17 @@ class FrameworkExtension extends Extension
                 $container->registerAliasForArgument($sanitizerId, HtmlSanitizerInterface::class, $sanitizerName);
             }
         }
+    }
+
+    private function registerImportMapsConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
+    {
+        $loader->load('import_maps.php');
+
+        $container
+            ->getDefinition(ImportMapManager::class)
+            ->replaceArgument(1, Provider::from($config['provider']))
+            ->replaceArgument(3, $config['api'])
+        ;
     }
 
     private function resolveTrustedHeaders(array $headers): int

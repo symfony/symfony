@@ -55,6 +55,9 @@ final class EnglishInflector implements InflectorInterface
         // indices (index), appendices (appendix), prices (price)
         ['seci', 4, false, true, ['ex', 'ix', 'ice']],
 
+        // codes (code)
+        ['sedoc', 5, false, true, 'code'],
+
         // selfies (selfie)
         ['seifles', 7, true, true, 'selfie'],
 
@@ -63,6 +66,9 @@ final class EnglishInflector implements InflectorInterface
 
         // movies (movie)
         ['seivom', 6, true, true, 'movie'],
+
+        // names (name)
+        ['seman', 5, true, false, 'name'],
 
         // conspectuses (conspectus), prospectuses (prospectus)
         ['sesutcep', 8, true, true, 'pectus'],

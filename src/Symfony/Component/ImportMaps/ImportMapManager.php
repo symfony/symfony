@@ -13,6 +13,7 @@ namespace Symfony\Component\ImportMaps;
 
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\VarExporter\VarExporter;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -39,7 +40,7 @@ final class ImportMapManager
         private readonly string $api = 'https://api.jspm.io',
         private readonly Filesystem $filesystem = new Filesystem(),
     ) {
-        $this->httpClient ??= HttpClient::createForBaseUri($this->api);
+        $this->httpClient ??= ScopingHttpClient::forBaseUri($httpClient ?? HttpClient::create(), $this->api);
     }
 
     private function loadImportMap(): void

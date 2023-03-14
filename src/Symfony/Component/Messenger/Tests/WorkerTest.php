@@ -206,7 +206,7 @@ class WorkerTest extends TestCase
         $eventDispatcher->expects($this->exactly(5))
             ->method('dispatch')
             ->willReturnCallback(function ($event) use (&$series) {
-                array_shift($series)->evaluate($event, '', true);
+                array_shift($series)->evaluate($event);
 
                 if ($event instanceof WorkerRunningEvent) {
                     $event->getWorker()->stop();
@@ -260,7 +260,7 @@ class WorkerTest extends TestCase
         $eventDispatcher->expects($this->exactly(5))
             ->method('dispatch')
             ->willReturnCallback(function ($event) use (&$series) {
-                array_shift($series)->evaluate($event, '', true);
+                array_shift($series)->evaluate($event);
 
                 if ($event instanceof WorkerRunningEvent) {
                     $event->getWorker()->stop();

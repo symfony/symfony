@@ -2,7 +2,7 @@
     "name": "symfony/property-access",
     "type": "library",
     "description": "Provides functions to read and write from/to an object or array using a simple string notation",
-    "keywords": ["property", "index", "access", "object", "array", "extraction", "injection", "reflection", "property path"],
+    "keywords": ["property", "index", "access", "object", "array", "extraction", "injection", "reflection", "property-path"],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [

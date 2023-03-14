@@ -20,6 +20,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Compiler\AutowireAsDecoratorPass;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
@@ -1302,16 +1303,16 @@ class AutowirePassTest extends TestCase
         $definition = $container->getDefinition(AutowireAttribute::class);
 
         $this->assertCount(10, $definition->getArguments());
-        $this->assertEquals(new Reference('some.id'), $definition->getArgument(0));
+        $this->assertEquals(new TypedReference('some.id', 'stdClass', attributes: [new Autowire(service: 'some.id')]), $definition->getArgument(0));
         $this->assertEquals(new Expression("parameter('some.parameter')"), $definition->getArgument(1));
         $this->assertSame('foo/bar', $definition->getArgument(2));
         $this->assertNull($definition->getArgument(3));
-        $this->assertEquals(new Reference('some.id'), $definition->getArgument(4));
+        $this->assertEquals(new TypedReference('some.id', 'stdClass', attributes: [new Autowire(service: 'some.id')]), $definition->getArgument(4));
         $this->assertEquals(new Expression("parameter('some.parameter')"), $definition->getArgument(5));
         $this->assertSame('bar', $definition->getArgument(6));
         $this->assertSame('@bar', $definition->getArgument(7));
         $this->assertSame('foo', $definition->getArgument(8));
-        $this->assertEquals(new Reference('invalid.id', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(9));
+        $this->assertEquals(new TypedReference('invalid.id', 'stdClass', ContainerInterface::NULL_ON_INVALID_REFERENCE, attributes: [new Autowire(service: 'invalid.id')]), $definition->getArgument(9));
 
         $container->compile();
 

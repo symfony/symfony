@@ -184,6 +184,9 @@ class CliDumper extends AbstractDumper
         }
         if ('' === $str) {
             $this->line .= '""';
+            if ($cut) {
+                $this->line .= '…'.$cut;
+            }
             $this->endValue($cursor);
         } else {
             $attr += [

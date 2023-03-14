@@ -12,6 +12,7 @@
 namespace Symfony\Component\VarDumper\Tests\Dumper;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\VarDumper\Caster\CutStub;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\AbstractDumper;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
@@ -36,6 +37,11 @@ class CliDumperTest extends TestCase
         $cloner->addCasters([
             ':stream' => function ($res, $a) {
                 unset($a['uri'], $a['wrapper_data']);
+
+                return $a;
+            },
+            'Symfony\Component\VarDumper\Tests\Fixture\DumbFoo' => function ($foo, $a) {
+                $a['foo'] = new CutStub($a['foo']);
 
                 return $a;
             },
@@ -76,7 +82,7 @@ array:24 [
 %A  options: []
   }
   "obj" => Symfony\Component\VarDumper\Tests\Fixture\DumbFoo {#%d
-    +foo: "foo"
+    +foo: ""…3
     +"bar": "bar"
   }
   "closure" => Closure(\$a, PDO &\$b = null) {#%d

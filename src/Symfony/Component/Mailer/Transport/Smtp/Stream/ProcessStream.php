@@ -35,7 +35,7 @@ final class ProcessStream extends AbstractStream
         $descriptorSpec = [
             0 => ['pipe', 'r'],
             1 => ['pipe', 'w'],
-            2 => ['pipe', 'w'],
+            2 => ['pipe', '\\' === \DIRECTORY_SEPARATOR ? 'a' : 'w'],
         ];
         $pipes = [];
         $this->stream = proc_open($this->command, $descriptorSpec, $pipes);

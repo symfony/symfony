@@ -94,6 +94,7 @@
         "symfony/property-info": "self.version",
         "symfony/proxy-manager-bridge": "self.version",
         "symfony/rate-limiter": "self.version",
+        "symfony/remote-event": "self.version",
         "symfony/routing": "self.version",
         "symfony/security-bundle": "self.version",
         "symfony/security-core": "self.version",
@@ -113,6 +114,7 @@
         "symfony/var-exporter": "self.version",
         "symfony/web-link": "self.version",
         "symfony/web-profiler-bundle": "self.version",
+        "symfony/webhook": "self.version",
         "symfony/workflow": "self.version",
         "symfony/yaml": "self.version"
     },

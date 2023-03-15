@@ -36,11 +36,13 @@ use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
+use Symfony\Component\RemoteEvent\RemoteEvent;
 use Symfony\Component\Semaphore\Semaphore;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Uid\Factory\UuidFactory;
 use Symfony\Component\Validator\Validation;
+use Symfony\Component\Webhook\Controller\WebhookController;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
 use Symfony\Component\Workflow\WorkflowEvents;
 
@@ -179,6 +181,8 @@ class Configuration implements ConfigurationInterface
         $this->addRateLimiterSection($rootNode, $enableIfStandalone);
         $this->addUidSection($rootNode, $enableIfStandalone);
         $this->addHtmlSanitizerSection($rootNode, $enableIfStandalone);
+        $this->addWebhookSection($rootNode, $enableIfStandalone);
+        $this->addRemoteEventSection($rootNode, $enableIfStandalone);
 
         return $treeBuilder;
     }
@@ -2065,6 +2069,47 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                     ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addWebhookSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('webhook')
+                    ->info('Webhook configuration')
+                    ->{$enableIfStandalone('symfony/webhook', WebhookController::class)}()
+                    ->children()
+                        ->scalarNode('message_bus')->defaultValue('messenger.default_bus')->info('The message bus to use.')->end()
+                        ->arrayNode('routing')
+                            ->normalizeKeys(false)
+                            ->useAttributeAsKey('type')
+                            ->prototype('array')
+                                ->children()
+                                ->scalarNode('service')
+                                    ->isRequired()
+                                    ->cannotBeEmpty()
+                                ->end()
+                                ->scalarNode('secret')
+                                    ->defaultValue('')
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addRemoteEventSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('remote-event')
+                    ->info('RemoteEvent configuration')
+                    ->{$enableIfStandalone('symfony/remote-event', RemoteEvent::class)}()
                 ->end()
             ->end()
         ;

@@ -20,7 +20,11 @@
         "symfony/mailer": "^5.4.21|^6.2.7"
     },
     "require-dev": {
-        "symfony/http-client": "^5.4|^6.0"
+        "symfony/http-client": "^5.4|^6.0",
+        "symfony/webhook": "^6.3"
+    },
+    "conflict": {
+        "symfony/http-foundation": "<6.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Mailer\\Bridge\\Mailgun\\": "" },

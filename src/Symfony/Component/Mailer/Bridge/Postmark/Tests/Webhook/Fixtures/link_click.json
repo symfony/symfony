@@ -1,0 +1,36 @@
+{
+    "Metadata": {
+      "example": "value",
+      "example_2": "value"
+    },
+    "RecordType": "Click",
+    "ClickLocation": "HTML",
+    "Client": {
+      "Name": "Chrome 35.0.1916.153",
+      "Company": "Google",
+      "Family": "Chrome"
+    },
+    "OS": {
+      "Name": "OS X 10.7 Lion",
+      "Company": "Apple Computer, Inc.",
+      "Family": "OS X 10"
+    },
+    "Platform": "Desktop",
+    "UserAgent": "Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/35.0.1916.153 Safari\/537.36",
+    "OriginalLink": "https://example.com",
+    "Geo": {
+      "CountryISOCode": "RS",
+      "Country": "Serbia",
+      "RegionISOCode": "VO",
+      "Region": "Autonomna Pokrajina Vojvodina",
+      "City": "Novi Sad",
+      "Zip": "21000",
+      "Coords": "45.2517,19.8369",
+      "IP": "188.2.95.4"
+    },
+    "MessageID": "00000000-0000-0000-0000-000000000000",
+    "MessageStream": "outbound",
+    "ReceivedAt": "2022-09-02T14:31:09Z",
+    "Tag": "welcome-email",
+    "Recipient": "john@example.com"
+}

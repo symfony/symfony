@@ -688,6 +688,14 @@ class ConfigurationTest extends TestCase
                 'sanitizers' => [],
             ],
             'exceptions' => [],
+            'webhook' => [
+                'enabled' => false,
+                'routing' => [],
+                'message_bus' => 'messenger.default_bus',
+            ],
+            'remote-event' => [
+                'enabled' => false,
+            ],
         ];
     }
 }

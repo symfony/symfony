@@ -566,6 +566,21 @@ CSV
             , 'csv'));
     }
 
+    public function testDecodeWithDisabledNestedArrays()
+    {
+        $expected = [
+            ['foo' => 'a', 'bar.baz.bat' => 'b'],
+            ['foo' => 'c', 'bar.baz.bat' => 'd'],
+        ];
+
+        $this->assertEquals($expected, $this->encoder->decode(<<<'CSV'
+foo,bar.baz.bat
+a,b
+c,d
+CSV
+            , 'csv', [CsvEncoder::KEY_SEPARATOR_KEY => false]));
+    }
+
     public function testDecodeCustomSettings()
     {
         $this->encoder = new CsvEncoder([

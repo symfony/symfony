@@ -102,14 +102,12 @@ final class OhMySmtpApiTransportTest extends TestCase
 
     public function testSendThrowsForErrorResponse()
     {
-        $client = new MockHttpClient(static function (string $method, string $url, array $options): ResponseInterface {
-            return new MockResponse(json_encode(['error' => 'i\'m a teapot']), [
-                'http_code' => 418,
-                'response_headers' => [
-                    'content-type' => 'application/json',
-                ],
-            ]);
-        });
+        $client = new MockHttpClient(static fn (string $method, string $url, array $options): ResponseInterface => new MockResponse(json_encode(['error' => 'i\'m a teapot']), [
+            'http_code' => 418,
+            'response_headers' => [
+                'content-type' => 'application/json',
+            ],
+        ]));
         $transport = new OhMySmtpApiTransport('KEY', $client);
         $transport->setPort(8984);
 
@@ -126,14 +124,12 @@ final class OhMySmtpApiTransportTest extends TestCase
 
     public function testSendThrowsForMultipleErrorResponses()
     {
-        $client = new MockHttpClient(static function (string $method, string $url, array $options): ResponseInterface {
-            return new MockResponse(json_encode(['errors' => ['to' => 'undefined field']]), [
-                'http_code' => 418,
-                'response_headers' => [
-                    'content-type' => 'application/json',
-                ],
-            ]);
-        });
+        $client = new MockHttpClient(static fn (string $method, string $url, array $options): ResponseInterface => new MockResponse(json_encode(['errors' => ['to' => 'undefined field']]), [
+            'http_code' => 418,
+            'response_headers' => [
+                'content-type' => 'application/json',
+            ],
+        ]));
         $transport = new OhMySmtpApiTransport('KEY', $client);
         $transport->setPort(8984);
 

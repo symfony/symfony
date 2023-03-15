@@ -1,0 +1,33 @@
+{
+    "name": "symfony/mastodon-notifier",
+    "type": "symfony-notifier-bridge",
+    "description": "Symfony Mastodon Notifier Bridge",
+    "keywords": ["mastodon", "notifier"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Quentin Dequippe",
+            "email": "quentin@dequippe.tech"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "symfony/http-client": "^5.4|^6.0",
+        "symfony/notifier": "^6.2.7"
+    },
+    "require-dev": {
+        "symfony/mime": "^6.2"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Mastodon\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

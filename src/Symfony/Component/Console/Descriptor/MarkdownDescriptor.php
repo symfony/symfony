@@ -28,7 +28,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class MarkdownDescriptor extends Descriptor
 {
-    public function describe(OutputInterface $output, object $object, array $options = [])
+    public function describe(OutputInterface $output, object $object, array $options = []): void
     {
         $decorated = $output->isDecorated();
         $output->setDecorated(false);
@@ -38,12 +38,12 @@ class MarkdownDescriptor extends Descriptor
         $output->setDecorated($decorated);
     }
 
-    protected function write(string $content, bool $decorated = true)
+    protected function write(string $content, bool $decorated = true): void
     {
         parent::write($content, $decorated);
     }
 
-    protected function describeInputArgument(InputArgument $argument, array $options = [])
+    protected function describeInputArgument(InputArgument $argument, array $options = []): void
     {
         $this->write(
             '#### `'.($argument->getName() ?: '<none>')."`\n\n"
@@ -54,7 +54,7 @@ class MarkdownDescriptor extends Descriptor
         );
     }
 
-    protected function describeInputOption(InputOption $option, array $options = [])
+    protected function describeInputOption(InputOption $option, array $options = []): void
     {
         $name = '--'.$option->getName();
         if ($option->isNegatable()) {
@@ -75,15 +75,13 @@ class MarkdownDescriptor extends Descriptor
         );
     }
 
-    protected function describeInputDefinition(InputDefinition $definition, array $options = [])
+    protected function describeInputDefinition(InputDefinition $definition, array $options = []): void
     {
         if ($showArguments = \count($definition->getArguments()) > 0) {
             $this->write('### Arguments');
             foreach ($definition->getArguments() as $argument) {
                 $this->write("\n\n");
-                if (null !== $describeInputArgument = $this->describeInputArgument($argument)) {
-                    $this->write($describeInputArgument);
-                }
+                $this->describeInputArgument($argument);
             }
         }
 
@@ -95,14 +93,12 @@ class MarkdownDescriptor extends Descriptor
             $this->write('### Options');
             foreach ($definition->getOptions() as $option) {
                 $this->write("\n\n");
-                if (null !== $describeInputOption = $this->describeInputOption($option)) {
-                    $this->write($describeInputOption);
-                }
+                $this->describeInputOption($option);
             }
         }
     }
 
-    protected function describeCommand(Command $command, array $options = [])
+    protected function describeCommand(Command $command, array $options = []): void
     {
         if ($options['short'] ?? false) {
             $this->write(
@@ -110,9 +106,7 @@ class MarkdownDescriptor extends Descriptor
                 .str_repeat('-', Helper::width($command->getName()) + 2)."\n\n"
                 .($command->getDescription() ? $command->getDescription()."\n\n" : '')
                 .'### Usage'."\n\n"
-                .array_reduce($command->getAliases(), function ($carry, $usage) {
-                    return $carry.'* `'.$usage.'`'."\n";
-                })
+                .array_reduce($command->getAliases(), fn ($carry, $usage) => $carry.'* `'.$usage.'`'."\n")
             );
 
             return;
@@ -125,9 +119,7 @@ class MarkdownDescriptor extends Descriptor
             .str_repeat('-', Helper::width($command->getName()) + 2)."\n\n"
             .($command->getDescription() ? $command->getDescription()."\n\n" : '')
             .'### Usage'."\n\n"
-            .array_reduce(array_merge([$command->getSynopsis()], $command->getAliases(), $command->getUsages()), function ($carry, $usage) {
-                return $carry.'* `'.$usage.'`'."\n";
-            })
+            .array_reduce(array_merge([$command->getSynopsis()], $command->getAliases(), $command->getUsages()), fn ($carry, $usage) => $carry.'* `'.$usage.'`'."\n")
         );
 
         if ($help = $command->getProcessedHelp()) {
@@ -142,7 +134,7 @@ class MarkdownDescriptor extends Descriptor
         }
     }
 
-    protected function describeApplication(Application $application, array $options = [])
+    protected function describeApplication(Application $application, array $options = []): void
     {
         $describedNamespace = $options['namespace'] ?? null;
         $description = new ApplicationDescription($application, $describedNamespace);
@@ -157,16 +149,12 @@ class MarkdownDescriptor extends Descriptor
             }
 
             $this->write("\n\n");
-            $this->write(implode("\n", array_map(function ($commandName) use ($description) {
-                return sprintf('* [`%s`](#%s)', $commandName, str_replace(':', '', $description->getCommand($commandName)->getName()));
-            }, $namespace['commands'])));
+            $this->write(implode("\n", array_map(fn ($commandName) => sprintf('* [`%s`](#%s)', $commandName, str_replace(':', '', $description->getCommand($commandName)->getName())), $namespace['commands'])));
         }
 
         foreach ($description->getCommands() as $command) {
             $this->write("\n\n");
-            if (null !== $describeCommand = $this->describeCommand($command, $options)) {
-                $this->write($describeCommand);
-            }
+            $this->describeCommand($command, $options);
         }
     }
 

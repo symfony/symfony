@@ -21,6 +21,9 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class ProxyManagerCaster
 {
+    /**
+     * @return array
+     */
     public static function castProxy(ProxyInterface $c, array $a, Stub $stub, bool $isNested)
     {
         if ($parent = get_parent_class($c)) {

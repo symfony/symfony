@@ -39,7 +39,7 @@ final class DumpCompletionCommand extends Command
 
     private array $supportedShells;
 
-    protected function configure()
+    protected function configure(): void
     {
         $fullCommand = $_SERVER['PHP_SELF'];
         $commandName = basename($fullCommand);
@@ -141,8 +141,6 @@ EOH
      */
     private function getSupportedShells(): array
     {
-        return $this->supportedShells ??= array_map(function ($f) {
-            return pathinfo($f, \PATHINFO_EXTENSION);
-        }, glob(__DIR__.'/../Resources/completion.*'));
+        return $this->supportedShells ??= array_map(fn ($f) => pathinfo($f, \PATHINFO_EXTENSION), glob(__DIR__.'/../Resources/completion.*'));
     }
 }

@@ -36,8 +36,8 @@ class CustomFilterIteratorTest extends IteratorTestCase
     public static function getAcceptData()
     {
         return [
-            [[function (\SplFileInfo $fileinfo) { return false; }], []],
-            [[function (\SplFileInfo $fileinfo) { return str_starts_with($fileinfo, 'test'); }], ['test.php', 'test.py']],
+            [[fn (\SplFileInfo $fileinfo) => false], []],
+            [[fn (\SplFileInfo $fileinfo) => str_starts_with($fileinfo, 'test')], ['test.php', 'test.py']],
             [['is_dir'], []],
         ];
     }

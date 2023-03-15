@@ -56,9 +56,7 @@ final class FirebaseTransportTest extends TransportTestCase
     {
         $this->expectException(TransportException::class);
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
         $options = new class('recipient-id', []) extends FirebaseOptions {};
 
         $transport = self::createTransport($client);

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Semaphore\Tests\Store;
 
+use Relay\Relay;
 use Symfony\Component\Semaphore\PersistingStoreInterface;
 use Symfony\Component\Semaphore\Store\RedisStore;
 
@@ -19,7 +20,7 @@ use Symfony\Component\Semaphore\Store\RedisStore;
  */
 abstract class AbstractRedisStoreTestCase extends AbstractStoreTestCase
 {
-    abstract protected function getRedisConnection(): \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface;
+    abstract protected function getRedisConnection(): \Redis|Relay|\RedisArray|\RedisCluster|\Predis\ClientInterface;
 
     public function getStore(): PersistingStoreInterface
     {

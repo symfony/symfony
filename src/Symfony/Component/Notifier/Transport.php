@@ -13,6 +13,7 @@ namespace Symfony\Component\Notifier;
 
 use Symfony\Component\Notifier\Bridge\AllMySms\AllMySmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\AmazonSns\AmazonSnsTransportFactory;
+use Symfony\Component\Notifier\Bridge\Bandwidth\BandwidthTransportFactory;
 use Symfony\Component\Notifier\Bridge\Chatwork\ChatworkTransportFactory;
 use Symfony\Component\Notifier\Bridge\Clickatell\ClickatellTransportFactory;
 use Symfony\Component\Notifier\Bridge\ContactEveryone\ContactEveryoneTransportFactory;
@@ -27,8 +28,10 @@ use Symfony\Component\Notifier\Bridge\GatewayApi\GatewayApiTransportFactory;
 use Symfony\Component\Notifier\Bridge\Gitter\GitterTransportFactory;
 use Symfony\Component\Notifier\Bridge\Infobip\InfobipTransportFactory;
 use Symfony\Component\Notifier\Bridge\Iqsms\IqsmsTransportFactory;
+use Symfony\Component\Notifier\Bridge\Isendpro\IsendproTransportFactory;
 use Symfony\Component\Notifier\Bridge\LightSms\LightSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mailjet\MailjetTransportFactory;
+use Symfony\Component\Notifier\Bridge\Mastodon\MastodonTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
 use Symfony\Component\Notifier\Bridge\MessageBird\MessageBirdTransportFactory;
 use Symfony\Component\Notifier\Bridge\MessageMedia\MessageMediaTransportFactory;
@@ -37,6 +40,10 @@ use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
 use Symfony\Component\Notifier\Bridge\Octopush\OctopushTransportFactory;
 use Symfony\Component\Notifier\Bridge\OrangeSms\OrangeSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
+use Symfony\Component\Notifier\Bridge\PagerDuty\PagerDutyTransportFactory;
+use Symfony\Component\Notifier\Bridge\Plivo\PlivoTransportFactory;
+use Symfony\Component\Notifier\Bridge\Pushover\PushoverTransportFactory;
+use Symfony\Component\Notifier\Bridge\RingCentral\RingCentralTransportFactory;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sendberry\SendberryTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransportFactory;
@@ -49,8 +56,10 @@ use Symfony\Component\Notifier\Bridge\Smsc\SmscTransportFactory;
 use Symfony\Component\Notifier\Bridge\SmsFactor\SmsFactorTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telnyx\TelnyxTransportFactory;
+use Symfony\Component\Notifier\Bridge\Termii\TermiiTransportFactory;
 use Symfony\Component\Notifier\Bridge\TurboSms\TurboSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
+use Symfony\Component\Notifier\Bridge\Twitter\TwitterTransportFactory;
 use Symfony\Component\Notifier\Bridge\Vonage\VonageTransportFactory;
 use Symfony\Component\Notifier\Bridge\Yunpian\YunpianTransportFactory;
 use Symfony\Component\Notifier\Bridge\Zendesk\ZendeskTransportFactory;
@@ -74,6 +83,7 @@ final class Transport
     private const FACTORY_CLASSES = [
         AllMySmsTransportFactory::class,
         AmazonSnsTransportFactory::class,
+        BandwidthTransportFactory::class,
         ChatworkTransportFactory::class,
         ClickatellTransportFactory::class,
         ContactEveryoneTransportFactory::class,
@@ -88,8 +98,10 @@ final class Transport
         GitterTransportFactory::class,
         InfobipTransportFactory::class,
         IqsmsTransportFactory::class,
+        IsendproTransportFactory::class,
         LightSmsTransportFactory::class,
         MailjetTransportFactory::class,
+        MastodonTransportFactory::class,
         MattermostTransportFactory::class,
         MessageBirdTransportFactory::class,
         MessageMediaTransportFactory::class,
@@ -98,6 +110,10 @@ final class Transport
         OctopushTransportFactory::class,
         OrangeSmsTransportFactory::class,
         OvhCloudTransportFactory::class,
+        PagerDutyTransportFactory::class,
+        PlivoTransportFactory::class,
+        PushoverTransportFactory::class,
+        RingCentralTransportFactory::class,
         RocketChatTransportFactory::class,
         SendberryTransportFactory::class,
         SendinblueTransportFactory::class,
@@ -110,8 +126,10 @@ final class Transport
         SmsFactorTransportFactory::class,
         TelegramTransportFactory::class,
         TelnyxTransportFactory::class,
+        TermiiTransportFactory::class,
         TurboSmsTransportFactory::class,
         TwilioTransportFactory::class,
+        TwitterTransportFactory::class,
         VonageTransportFactory::class,
         YunpianTransportFactory::class,
         ZendeskTransportFactory::class,
@@ -120,14 +138,14 @@ final class Transport
 
     private iterable $factories;
 
-    public static function fromDsn(string $dsn, EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null): TransportInterface
+    public static function fromDsn(#[\SensitiveParameter] string $dsn, EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null): TransportInterface
     {
         $factory = new self(self::getDefaultFactories($dispatcher, $client));
 
         return $factory->fromString($dsn);
     }
 
-    public static function fromDsns(array $dsns, EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null): TransportInterface
+    public static function fromDsns(#[\SensitiveParameter] array $dsns, EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null): TransportInterface
     {
         $factory = new self(iterator_to_array(self::getDefaultFactories($dispatcher, $client)));
 
@@ -142,7 +160,7 @@ final class Transport
         $this->factories = $factories;
     }
 
-    public function fromStrings(array $dsns): Transports
+    public function fromStrings(#[\SensitiveParameter] array $dsns): Transports
     {
         $transports = [];
         foreach ($dsns as $name => $dsn) {
@@ -152,7 +170,7 @@ final class Transport
         return new Transports($transports);
     }
 
-    public function fromString(string $dsn): TransportInterface
+    public function fromString(#[\SensitiveParameter] string $dsn): TransportInterface
     {
         $dsns = preg_split('/\s++\|\|\s++/', $dsn);
         if (\count($dsns) > 1) {
@@ -181,7 +199,7 @@ final class Transport
     /**
      * @return TransportInterface[]
      */
-    private function createFromDsns(array $dsns): array
+    private function createFromDsns(#[\SensitiveParameter] array $dsns): array
     {
         $transports = [];
         foreach ($dsns as $dsn) {

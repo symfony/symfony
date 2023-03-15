@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Deprecate the `Twig_Environment` autowiring alias, use `Twig\Environment` instead
+
 6.2
 ---
 

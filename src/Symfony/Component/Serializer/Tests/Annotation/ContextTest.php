@@ -76,7 +76,7 @@ class ContextTest extends TestCase
     public static function provideValidInputs(): iterable
     {
         yield 'named arguments: with context option' => [
-            function () { return new Context(context: ['foo' => 'bar']); },
+            fn () => new Context(context: ['foo' => 'bar']),
             <<<DUMP
 Symfony\Component\Serializer\Annotation\Context {
   -groups: []
@@ -90,7 +90,7 @@ DUMP
         ];
 
         yield 'named arguments: with normalization context option' => [
-            function () { return new Context(normalizationContext: ['foo' => 'bar']); },
+            fn () => new Context(normalizationContext: ['foo' => 'bar']),
             <<<DUMP
 Symfony\Component\Serializer\Annotation\Context {
   -groups: []
@@ -104,7 +104,7 @@ DUMP
         ];
 
         yield 'named arguments: with denormalization context option' => [
-            function () { return new Context(denormalizationContext: ['foo' => 'bar']); },
+            fn () => new Context(denormalizationContext: ['foo' => 'bar']),
             <<<DUMP
 Symfony\Component\Serializer\Annotation\Context {
   -groups: []
@@ -118,7 +118,7 @@ DUMP
         ];
 
         yield 'named arguments: with groups option as string' => [
-            function () { return new Context(context: ['foo' => 'bar'], groups: 'a'); },
+            fn () => new Context(context: ['foo' => 'bar'], groups: 'a'),
             <<<DUMP
 Symfony\Component\Serializer\Annotation\Context {
   -groups: [
@@ -134,7 +134,7 @@ DUMP
         ];
 
         yield 'named arguemnts: with groups option as array' => [
-            function () { return new Context(context: ['foo' => 'bar'], groups: ['a', 'b']); },
+            fn () => new Context(context: ['foo' => 'bar'], groups: ['a', 'b']),
             <<<DUMP
 Symfony\Component\Serializer\Annotation\Context {
   -groups: [

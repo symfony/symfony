@@ -30,7 +30,7 @@ class AbstractAuthenticatorTest extends TestCase
         $authenticator = new ConcreteAuthenticator();
         $this->assertInstanceOf(
             PostAuthenticationToken::class,
-            $authenticator->createToken(new SelfValidatingPassport(new UserBadge('dummy', function () { return new InMemoryUser('robin', 'hood'); })), 'dummy')
+            $authenticator->createToken(new SelfValidatingPassport(new UserBadge('dummy', fn () => new InMemoryUser('robin', 'hood'))), 'dummy')
         );
     }
 }

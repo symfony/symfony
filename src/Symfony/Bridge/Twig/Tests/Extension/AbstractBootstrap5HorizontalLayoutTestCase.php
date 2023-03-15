@@ -28,9 +28,9 @@ abstract class AbstractBootstrap5HorizontalLayoutTestCase extends AbstractBootst
 {
     public function testRow()
     {
-        $form = $this->factory->createNamed('name', TextType::class);
-        $form->addError(new FormError('[trans]Error![/trans]'));
-        $html = $this->renderRow($form->createView());
+        $form = $this->factory->createNamed('')->add('name', TextType::class);
+        $form->get('name')->addError(new FormError('[trans]Error![/trans]'));
+        $html = $this->renderRow($form->get('name')->createView());
 
         $this->assertMatchesXpath($html,
             '/div
@@ -55,9 +55,9 @@ abstract class AbstractBootstrap5HorizontalLayoutTestCase extends AbstractBootst
 
     public function testRowWithCustomClass()
     {
-        $form = $this->factory->createNamed('name', TextType::class);
-        $form->addError(new FormError('[trans]Error![/trans]'));
-        $html = $this->renderRow($form->createView(), [
+        $form = $this->factory->createNamed('')->add('name', TextType::class);
+        $form->get('name')->addError(new FormError('[trans]Error![/trans]'));
+        $html = $this->renderRow($form->get('name')->createView(), [
             'row_attr' => [
                 'class' => 'mb-5',
             ],

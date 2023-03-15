@@ -159,9 +159,7 @@ final class MercureTransportTest extends TransportTestCase
     {
         $messageId = 'urn:uuid:a7045be0-a75d-4d40-8bd2-29fa4e5dd10b';
 
-        $hub = new MockHub('https://foo.com/.well-known/mercure', new StaticTokenProvider('foo'), function (Update $update) use ($messageId): string {
-            return $messageId;
-        });
+        $hub = new MockHub('https://foo.com/.well-known/mercure', new StaticTokenProvider('foo'), fn (Update $update): string => $messageId);
 
         $sentMessage = self::createTransport(null, $hub)->send(new ChatMessage('subject'));
         $this->assertSame($messageId, $sentMessage->getMessageId());

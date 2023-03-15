@@ -76,11 +76,11 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
     /**
      * Does nothing. The data is collected during the form event listeners.
      */
-    public function collect(Request $request, Response $response, \Throwable $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null): void
     {
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->data = [
             'forms' => [],
@@ -89,12 +89,12 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
         ];
     }
 
-    public function associateFormWithView(FormInterface $form, FormView $view)
+    public function associateFormWithView(FormInterface $form, FormView $view): void
     {
         $this->formsByView[spl_object_hash($view)] = spl_object_hash($form);
     }
 
-    public function collectConfiguration(FormInterface $form)
+    public function collectConfiguration(FormInterface $form): void
     {
         $hash = spl_object_hash($form);
 
@@ -112,7 +112,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
         }
     }
 
-    public function collectDefaultData(FormInterface $form)
+    public function collectDefaultData(FormInterface $form): void
     {
         $hash = spl_object_hash($form);
 
@@ -131,7 +131,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
         }
     }
 
-    public function collectSubmittedData(FormInterface $form)
+    public function collectSubmittedData(FormInterface $form): void
     {
         $hash = spl_object_hash($form);
 
@@ -162,7 +162,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
         }
     }
 
-    public function collectViewVariables(FormView $view)
+    public function collectViewVariables(FormView $view): void
     {
         $hash = spl_object_hash($view);
 
@@ -180,12 +180,12 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
         }
     }
 
-    public function buildPreliminaryFormTree(FormInterface $form)
+    public function buildPreliminaryFormTree(FormInterface $form): void
     {
         $this->data['forms'][$form->getName()] = &$this->recursiveBuildPreliminaryFormTree($form, $this->data['forms_by_hash']);
     }
 
-    public function buildFinalFormTree(FormInterface $form, FormView $view)
+    public function buildFinalFormTree(FormInterface $form, FormView $view): void
     {
         $this->data['forms'][$form->getName()] = &$this->recursiveBuildFinalFormTree($form, $view, $this->data['forms_by_hash']);
     }
@@ -229,20 +229,16 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
 
                 return $a;
             },
-            FormInterface::class => function (FormInterface $f, array $a) {
-                return [
-                    Caster::PREFIX_VIRTUAL.'name' => $f->getName(),
-                    Caster::PREFIX_VIRTUAL.'type_class' => new ClassStub(\get_class($f->getConfig()->getType()->getInnerType())),
-                ];
-            },
+            FormInterface::class => fn (FormInterface $f, array $a) => [
+                Caster::PREFIX_VIRTUAL.'name' => $f->getName(),
+                Caster::PREFIX_VIRTUAL.'type_class' => new ClassStub($f->getConfig()->getType()->getInnerType()::class),
+            ],
             FormView::class => StubCaster::cutInternals(...),
-            ConstraintViolationInterface::class => function (ConstraintViolationInterface $v, array $a) {
-                return [
-                    Caster::PREFIX_VIRTUAL.'root' => $v->getRoot(),
-                    Caster::PREFIX_VIRTUAL.'path' => $v->getPropertyPath(),
-                    Caster::PREFIX_VIRTUAL.'value' => $v->getInvalidValue(),
-                ];
-            },
+            ConstraintViolationInterface::class => fn (ConstraintViolationInterface $v, array $a) => [
+                Caster::PREFIX_VIRTUAL.'root' => $v->getRoot(),
+                Caster::PREFIX_VIRTUAL.'path' => $v->getPropertyPath(),
+                Caster::PREFIX_VIRTUAL.'value' => $v->getInvalidValue(),
+            ],
         ];
     }
 

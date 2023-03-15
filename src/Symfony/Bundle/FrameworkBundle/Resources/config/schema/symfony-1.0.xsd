@@ -42,6 +42,8 @@
             <xsd:element name="notifier" type="notifier" minOccurs="0" maxOccurs="1" />
             <xsd:element name="html-sanitizer" type="html-sanitizer" minOccurs="0" maxOccurs="1" />
             <xsd:element name="enabled-locale" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="webhook" type="webhook" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="remote-event" type="remote-event" minOccurs="0" maxOccurs="1" />
         </xsd:choice>
 
         <xsd:attribute name="http-method-override" type="xsd:boolean" />
@@ -620,6 +622,7 @@
             <xsd:element name="header" type="http_header" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="peer-fingerprint" type="fingerprint" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="retry-failed" type="http_client_retry_failed" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="extra" type="xsd:anyType" minOccurs="0" maxOccurs="unbounded" />
         </xsd:choice>
         <xsd:attribute name="max-redirects" type="xsd:integer" />
         <xsd:attribute name="http-version" type="xsd:string" />
@@ -645,6 +648,7 @@
             <xsd:element name="header" type="http_header" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="peer-fingerprint" type="fingerprint" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="retry-failed" type="http_client_retry_failed" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="extra" type="xsd:anyType" minOccurs="0" maxOccurs="unbounded" />
         </xsd:choice>
         <xsd:attribute name="name" type="xsd:string" />
         <xsd:attribute name="scope" type="xsd:string" />
@@ -776,7 +780,7 @@
         <xsd:attribute name="lock-factory" type="xsd:string" />
         <xsd:attribute name="storage-service" type="xsd:string" />
         <xsd:attribute name="cache-pool" type="xsd:string" />
-        <xsd:attribute name="strategy" type="xsd:string" />
+        <xsd:attribute name="policy" type="xsd:string" />
         <xsd:attribute name="limit" type="xsd:int" />
         <xsd:attribute name="interval" type="xsd:string" />
     </xsd:complexType>
@@ -913,5 +917,24 @@
             </xsd:element>
         </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" use="required" />
+    </xsd:complexType>
+
+    <xsd:complexType name="webhook">
+        <xsd:sequence>
+            <xsd:element name="routing" type="webhook_routing" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="enabled" type="xsd:boolean" />
+        <xsd:attribute name="message-bus" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="webhook_routing" mixed="true">
+        <xsd:sequence>
+            <xsd:element name="service" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="secret" type="xsd:string" minOccurs="0" maxOccurs="1" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="remote-event">
+        <xsd:attribute name="enabled" type="xsd:boolean" />
     </xsd:complexType>
 </xsd:schema>

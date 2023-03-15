@@ -83,7 +83,7 @@ class SessionStrategyListenerTest extends TestCase
 
     private function createEvent($firewallName)
     {
-        return new LoginSuccessEvent($this->createMock(AuthenticatorInterface::class), new SelfValidatingPassport(new UserBadge('test', function ($username) { return new InMemoryUser($username, null); })), $this->token, $this->request, null, $firewallName);
+        return new LoginSuccessEvent($this->createMock(AuthenticatorInterface::class), new SelfValidatingPassport(new UserBadge('test', fn ($username) => new InMemoryUser($username, null))), $this->token, $this->request, null, $firewallName);
     }
 
     private function configurePreviousSession()

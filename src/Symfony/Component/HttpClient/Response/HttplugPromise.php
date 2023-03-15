@@ -68,8 +68,6 @@ final class HttplugPromise implements HttplugPromiseInterface
             return null;
         }
 
-        return static function ($value) use ($callback) {
-            return Create::promiseFor($callback($value));
-        };
+        return static fn ($value) => Create::promiseFor($callback($value));
     }
 }

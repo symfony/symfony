@@ -56,7 +56,7 @@ class XmlDumper extends Dumper
         return $this->container->resolveEnvPlaceholders($xml);
     }
 
-    private function addParameters(\DOMElement $parent)
+    private function addParameters(\DOMElement $parent): void
     {
         $data = $this->container->getParameterBag()->all();
         if (!$data) {
@@ -72,7 +72,7 @@ class XmlDumper extends Dumper
         $this->convertParameters($data, 'parameter', $parameters);
     }
 
-    private function addMethodCalls(array $methodcalls, \DOMElement $parent)
+    private function addMethodCalls(array $methodcalls, \DOMElement $parent): void
     {
         foreach ($methodcalls as $methodcall) {
             $call = $this->document->createElement('call');
@@ -87,7 +87,7 @@ class XmlDumper extends Dumper
         }
     }
 
-    private function addService(Definition $definition, ?string $id, \DOMElement $parent)
+    private function addService(Definition $definition, ?string $id, \DOMElement $parent): void
     {
         $service = $this->document->createElement('service');
         if (null !== $id) {
@@ -223,7 +223,7 @@ class XmlDumper extends Dumper
         $parent->appendChild($service);
     }
 
-    private function addServiceAlias(string $alias, Alias $id, \DOMElement $parent)
+    private function addServiceAlias(string $alias, Alias $id, \DOMElement $parent): void
     {
         $service = $this->document->createElement('service');
         $service->setAttribute('id', $alias);
@@ -245,7 +245,7 @@ class XmlDumper extends Dumper
         $parent->appendChild($service);
     }
 
-    private function addServices(\DOMElement $parent)
+    private function addServices(\DOMElement $parent): void
     {
         $definitions = $this->container->getDefinitions();
         if (!$definitions) {
@@ -267,7 +267,7 @@ class XmlDumper extends Dumper
         $parent->appendChild($services);
     }
 
-    private function addTagRecursiveAttributes(\DOMElement $parent, array $attributes)
+    private function addTagRecursiveAttributes(\DOMElement $parent, array $attributes): void
     {
         foreach ($attributes as $name => $value) {
             $attribute = $this->document->createElement('attribute');
@@ -283,7 +283,7 @@ class XmlDumper extends Dumper
         }
     }
 
-    private function convertParameters(array $parameters, string $type, \DOMElement $parent, string $keyAttribute = 'key')
+    private function convertParameters(array $parameters, string $type, \DOMElement $parent, string $keyAttribute = 'key'): void
     {
         $withKeys = !array_is_list($parameters);
         foreach ($parameters as $key => $value) {
@@ -349,7 +349,7 @@ class XmlDumper extends Dumper
                 $element->setAttribute('type', 'expression');
                 $text = $this->document->createTextNode(self::phpToXml((string) $value));
                 $element->appendChild($text);
-            } elseif (\is_string($value) && !preg_match('/^[^\x00-\x08\x0B\x0E-\x1A\x1C-\x1F\x7F]*+$/u', $value)) {
+            } elseif (\is_string($value) && !preg_match('/^[^\x00-\x08\x0B\x0C\x0E-\x1F\x7F]*+$/u', $value)) {
                 $element->setAttribute('type', 'binary');
                 $text = $this->document->createTextNode(self::phpToXml(base64_encode($value)));
                 $element->appendChild($text);
@@ -414,7 +414,7 @@ class XmlDumper extends Dumper
             case $value instanceof \UnitEnum:
                 return sprintf('%s::%s', $value::class, $value->name);
             case \is_object($value) || \is_resource($value):
-                throw new RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');
+                throw new RuntimeException(sprintf('Unable to dump a service container if a parameter is an object or a resource, got "%s".', get_debug_type($value)));
             default:
                 return (string) $value;
         }

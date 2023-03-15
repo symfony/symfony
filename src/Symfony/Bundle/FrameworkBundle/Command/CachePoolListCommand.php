@@ -37,7 +37,7 @@ final class CachePoolListCommand extends Command
         $this->poolNames = $poolNames;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setHelp(<<<'EOF'
@@ -51,9 +51,7 @@ EOF
     {
         $io = new SymfonyStyle($input, $output);
 
-        $io->table(['Pool name'], array_map(function ($pool) {
-            return [$pool];
-        }, $this->poolNames));
+        $io->table(['Pool name'], array_map(fn ($pool) => [$pool], $this->poolNames));
 
         return 0;
     }

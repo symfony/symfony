@@ -245,6 +245,8 @@ class Form extends Link implements \ArrayAccess
 
     /**
      * Removes a field from the form.
+     *
+     * @return void
      */
     public function remove(string $name)
     {
@@ -265,6 +267,8 @@ class Form extends Link implements \ArrayAccess
 
     /**
      * Sets a named field.
+     *
+     * @return void
      */
     public function set(FormField $field)
     {
@@ -349,6 +353,8 @@ class Form extends Link implements \ArrayAccess
      *
      * Expects a 'submit' button \DOMElement and finds the corresponding form element, or the form element itself.
      *
+     * @return void
+     *
      * @throws \LogicException If given node is not a button or input or does not have a form ancestor
      */
     protected function setNode(\DOMElement $node)
@@ -386,7 +392,7 @@ class Form extends Link implements \ArrayAccess
      * the form node or the entire document depending on whether we need
      * to find non-descendant elements through HTML5 'form' attribute.
      */
-    private function initialize()
+    private function initialize(): void
     {
         $this->fields = new FormFieldRegistry();
 
@@ -436,7 +442,7 @@ class Form extends Link implements \ArrayAccess
         }
     }
 
-    private function addField(\DOMElement $node)
+    private function addField(\DOMElement $node): void
     {
         if (!$node->hasAttribute('name') || !$node->getAttribute('name')) {
             return;

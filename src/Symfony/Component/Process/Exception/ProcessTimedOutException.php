@@ -43,11 +43,17 @@ class ProcessTimedOutException extends RuntimeException
         return $this->process;
     }
 
+    /**
+     * @return bool
+     */
     public function isGeneralTimeout()
     {
         return self::TYPE_GENERAL === $this->timeoutType;
     }
 
+    /**
+     * @return bool
+     */
     public function isIdleTimeout()
     {
         return self::TYPE_IDLE === $this->timeoutType;

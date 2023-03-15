@@ -76,16 +76,25 @@ class Route
         }
     }
 
+    /**
+     * @return void
+     */
     public function setPath(string $path)
     {
         $this->path = $path;
     }
 
+    /**
+     * @return string|null
+     */
     public function getPath()
     {
         return $this->path;
     }
 
+    /**
+     * @return void
+     */
     public function setLocalizedPaths(array $localizedPaths)
     {
         $this->localizedPaths = $localizedPaths;
@@ -96,81 +105,129 @@ class Route
         return $this->localizedPaths;
     }
 
+    /**
+     * @return void
+     */
     public function setHost(string $pattern)
     {
         $this->host = $pattern;
     }
 
+    /**
+     * @return string|null
+     */
     public function getHost()
     {
         return $this->host;
     }
 
+    /**
+     * @return void
+     */
     public function setName(string $name)
     {
         $this->name = $name;
     }
 
+    /**
+     * @return string|null
+     */
     public function getName()
     {
         return $this->name;
     }
 
+    /**
+     * @return void
+     */
     public function setRequirements(array $requirements)
     {
         $this->requirements = $requirements;
     }
 
+    /**
+     * @return array
+     */
     public function getRequirements()
     {
         return $this->requirements;
     }
 
+    /**
+     * @return void
+     */
     public function setOptions(array $options)
     {
         $this->options = $options;
     }
 
+    /**
+     * @return array
+     */
     public function getOptions()
     {
         return $this->options;
     }
 
+    /**
+     * @return void
+     */
     public function setDefaults(array $defaults)
     {
         $this->defaults = $defaults;
     }
 
+    /**
+     * @return array
+     */
     public function getDefaults()
     {
         return $this->defaults;
     }
 
+    /**
+     * @return void
+     */
     public function setSchemes(array|string $schemes)
     {
         $this->schemes = (array) $schemes;
     }
 
+    /**
+     * @return array
+     */
     public function getSchemes()
     {
         return $this->schemes;
     }
 
+    /**
+     * @return void
+     */
     public function setMethods(array|string $methods)
     {
         $this->methods = (array) $methods;
     }
 
+    /**
+     * @return array
+     */
     public function getMethods()
     {
         return $this->methods;
     }
 
+    /**
+     * @return void
+     */
     public function setCondition(?string $condition)
     {
         $this->condition = $condition;
     }
 
+    /**
+     * @return string|null
+     */
     public function getCondition()
     {
         return $this->condition;

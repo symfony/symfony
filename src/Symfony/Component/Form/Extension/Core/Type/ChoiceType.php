@@ -144,11 +144,10 @@ class ChoiceType extends AbstractType
                         }
                     }
                 } else {
-                    foreach ($data as $value) {
-                        if ($choiceList->getChoicesForValues([$value])) {
-                            $knownValues[] = $value;
-                            unset($unknownValues[$value]);
-                        }
+                    foreach ($choiceList->getChoicesForValues($data) as $index => $choice) {
+                        $value = $data[$index];
+                        $knownValues[] = $value;
+                        unset($unknownValues[$value]);
                     }
                 }
 
@@ -246,13 +245,9 @@ class ChoiceType extends AbstractType
         // closure here that is optimized for the value of the form, to
         // avoid making the type check inside the closure.
         if ($options['multiple']) {
-            $view->vars['is_selected'] = function ($choice, array $values) {
-                return \in_array($choice, $values, true);
-            };
+            $view->vars['is_selected'] = fn ($choice, array $values) => \in_array($choice, $values, true);
         } else {
-            $view->vars['is_selected'] = function ($choice, $value) {
-                return $choice === $value;
-            };
+            $view->vars['is_selected'] = fn ($choice, $value) => $choice === $value;
         }
 
         // Check if the choices already contain the empty value
@@ -302,9 +297,7 @@ class ChoiceType extends AbstractType
             return '';
         };
 
-        $placeholderDefault = function (Options $options) {
-            return $options['required'] ? null : '';
-        };
+        $placeholderDefault = fn (Options $options) => $options['required'] ? null : '';
 
         $placeholderNormalizer = function (Options $options, $placeholder) {
             if ($options['multiple']) {
@@ -325,9 +318,7 @@ class ChoiceType extends AbstractType
             return $placeholder;
         };
 
-        $compound = function (Options $options) {
-            return $options['expanded'];
-        };
+        $compound = fn (Options $options) => $options['expanded'];
 
         $choiceTranslationDomainNormalizer = function (Options $options, $choiceTranslationDomain) {
             if (true === $choiceTranslationDomain) {
@@ -429,7 +420,7 @@ class ChoiceType extends AbstractType
         $builder->add($name, $choiceType, $choiceOpts);
     }
 
-    private function createChoiceList(array $options)
+    private function createChoiceList(array $options): ChoiceListInterface
     {
         if (null !== $options['choice_loader']) {
             return $this->choiceListFactory->createListFromLoader(
@@ -449,7 +440,7 @@ class ChoiceType extends AbstractType
         );
     }
 
-    private function createChoiceListView(ChoiceListInterface $choiceList, array $options)
+    private function createChoiceListView(ChoiceListInterface $choiceList, array $options): ChoiceListView
     {
         return $this->choiceListFactory->createView(
             $choiceList,

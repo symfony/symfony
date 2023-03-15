@@ -20,6 +20,9 @@ use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
  */
 class BooleanNode extends ScalarNode
 {
+    /**
+     * @return void
+     */
     protected function validateType(mixed $value)
     {
         if (!\is_bool($value)) {

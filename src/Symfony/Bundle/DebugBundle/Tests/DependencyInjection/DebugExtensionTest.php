@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\DebugBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\DebugBundle\DebugBundle;
 use Symfony\Bundle\DebugBundle\DependencyInjection\DebugExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -114,7 +115,7 @@ class DebugExtensionTest extends TestCase
             'kernel.charset' => 'UTF-8',
             'kernel.debug' => true,
             'kernel.project_dir' => __DIR__,
-            'kernel.bundles' => ['DebugBundle' => 'Symfony\\Bundle\\DebugBundle\\DebugBundle'],
+            'kernel.bundles' => ['DebugBundle' => DebugBundle::class],
         ]));
 
         return $container;

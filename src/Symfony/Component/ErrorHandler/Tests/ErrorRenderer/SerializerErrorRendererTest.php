@@ -31,7 +31,7 @@ class SerializerErrorRendererTest extends TestCase
         $exception = new \RuntimeException('Foo');
         $errorRenderer = new SerializerErrorRenderer(
             new Serializer([new ProblemNormalizer()], [new JsonEncoder()]),
-            function () { return 'json'; }
+            fn () => 'json'
         );
 
         $this->assertSame('{"type":"https:\/\/tools.ietf.org\/html\/rfc2616#section-10","title":"An error occurred","status":500,"detail":"Internal Server Error"}', $errorRenderer->render($exception)->getAsString());

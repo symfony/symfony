@@ -48,7 +48,7 @@ class CacheClearCommand extends Command
         $this->filesystem = $filesystem ?? new Filesystem();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDefinition([
@@ -132,7 +132,7 @@ EOF
                 $warmer = $kernel->getContainer()->get('cache_warmer');
                 // non optional warmers already ran during container compilation
                 $warmer->enableOnlyOptionalWarmers();
-                $preload = (array) $warmer->warmUp($realCacheDir);
+                $preload = (array) $warmer->warmUp($realCacheDir, $io);
 
                 if ($preload && file_exists($preloadFile = $realCacheDir.'/'.$kernel->getContainer()->getParameter('kernel.container_class').'.preload.php')) {
                     Preloader::append($preloadFile, $preload);
@@ -145,7 +145,7 @@ EOF
                 if ($output->isVerbose()) {
                     $io->comment('Warming up cache...');
                 }
-                $this->warmup($warmupDir, $realCacheDir, !$input->getOption('no-optional-warmers'));
+                $this->warmup($io, $warmupDir, $realCacheDir, !$input->getOption('no-optional-warmers'));
             }
 
             if (!$fs->exists($warmupDir.'/'.$containerDir)) {
@@ -219,7 +219,7 @@ EOF
         return false;
     }
 
-    private function warmup(string $warmupDir, string $realBuildDir, bool $enableOptionalWarmers = true)
+    private function warmup(SymfonyStyle $io, string $warmupDir, string $realBuildDir, bool $enableOptionalWarmers = true): void
     {
         // create a temporary kernel
         $kernel = $this->getApplication()->getKernel();
@@ -233,7 +233,7 @@ EOF
             $warmer = $kernel->getContainer()->get('cache_warmer');
             // non optional warmers already ran during container compilation
             $warmer->enableOnlyOptionalWarmers();
-            $preload = (array) $warmer->warmUp($warmupDir);
+            $preload = (array) $warmer->warmUp($warmupDir, $io);
 
             if ($preload && file_exists($preloadFile = $warmupDir.'/'.$kernel->getContainer()->getParameter('kernel.container_class').'.preload.php')) {
                 Preloader::append($preloadFile, $preload);

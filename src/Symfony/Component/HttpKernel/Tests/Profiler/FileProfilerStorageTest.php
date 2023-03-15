@@ -344,6 +344,57 @@ class FileProfilerStorageTest extends TestCase
         $this->assertFalse(fgetcsv($handle));
     }
 
+    /**
+     * @dataProvider provideExpiredProfiles
+     */
+    public function testRemoveExpiredProfiles(string $index, string $expectedOffset)
+    {
+        $file = $this->tmpDir.'/index.csv';
+        file_put_contents($file, $index);
+
+        $r = new \ReflectionMethod($this->storage, 'removeExpiredProfiles');
+        $r->invoke($this->storage);
+
+        $this->assertSame($expectedOffset, file_get_contents($this->tmpDir.'/index.csv.offset'));
+    }
+
+    public static function provideExpiredProfiles()
+    {
+        $oneHourAgo = new \DateTimeImmutable('-1 hour');
+
+        yield 'One unexpired profile' => [
+            <<<CSV
+            token0,127.0.0.0,,http://foo.bar/0,{$oneHourAgo->getTimestamp()},,
+
+            CSV,
+            '0',
+        ];
+
+        $threeDaysAgo = new \DateTimeImmutable('-3 days');
+
+        yield 'One expired profile' => [
+            <<<CSV
+            token0,127.0.0.0,,http://foo.bar/0,{$threeDaysAgo->getTimestamp()},,
+
+            CSV,
+            '48',
+        ];
+
+        $fourDaysAgo = new \DateTimeImmutable('-4 days');
+        $threeDaysAgo = new \DateTimeImmutable('-3 days');
+        $oneHourAgo = new \DateTimeImmutable('-1 hour');
+
+        yield 'Multiple expired profiles' => [
+            <<<CSV
+            token0,127.0.0.0,,http://foo.bar/0,{$fourDaysAgo->getTimestamp()},,
+            token1,127.0.0.1,,http://foo.bar/1,{$threeDaysAgo->getTimestamp()},,
+            token2,127.0.0.2,,http://foo.bar/2,{$oneHourAgo->getTimestamp()},,
+
+            CSV,
+            '96',
+        ];
+    }
+
     public function testReadLineFromFile()
     {
         $r = new \ReflectionMethod($this->storage, 'readLineFromFile');

@@ -22,19 +22,16 @@ use Symfony\Component\Workflow\Exception\RuntimeException;
  */
 class ExpressionLanguage extends BaseExpressionLanguage
 {
+    /**
+     * @return void
+     */
     protected function registerFunctions()
     {
         parent::registerFunctions();
 
-        $this->register('is_granted', function ($attributes, $object = 'null') {
-            return sprintf('$auth_checker->isGranted(%s, %s)', $attributes, $object);
-        }, function (array $variables, $attributes, $object = null) {
-            return $variables['auth_checker']->isGranted($attributes, $object);
-        });
+        $this->register('is_granted', fn ($attributes, $object = 'null') => sprintf('$auth_checker->isGranted(%s, %s)', $attributes, $object), fn (array $variables, $attributes, $object = null) => $variables['auth_checker']->isGranted($attributes, $object));
 
-        $this->register('is_valid', function ($object = 'null', $groups = 'null') {
-            return sprintf('0 === count($validator->validate(%s, null, %s))', $object, $groups);
-        }, function (array $variables, $object = null, $groups = null) {
+        $this->register('is_valid', fn ($object = 'null', $groups = 'null') => sprintf('0 === count($validator->validate(%s, null, %s))', $object, $groups), function (array $variables, $object = null, $groups = null) {
             if (!$variables['validator'] instanceof ValidatorInterface) {
                 throw new RuntimeException('"is_valid" cannot be used as the Validator component is not installed.');
             }

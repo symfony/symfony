@@ -97,9 +97,7 @@ final class OneSignalTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn(json_encode(['errors' => ['Message Notifications must have English language content']]));
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = self::createTransport($client, 'ea345989-d273-4f21-a33b-0c006efc5edb');
 
@@ -119,9 +117,7 @@ final class OneSignalTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn(json_encode(['id' => '', 'recipients' => 0, 'errors' => ['All included players are not subscribed']]));
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = self::createTransport($client, 'ea345989-d273-4f21-a33b-0c006efc5edb');
 

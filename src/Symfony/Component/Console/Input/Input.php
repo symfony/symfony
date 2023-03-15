@@ -43,6 +43,9 @@ abstract class Input implements InputInterface, StreamableInputInterface
         }
     }
 
+    /**
+     * @return void
+     */
     public function bind(InputDefinition $definition)
     {
         $this->arguments = [];
@@ -57,14 +60,15 @@ abstract class Input implements InputInterface, StreamableInputInterface
      */
     abstract protected function parse();
 
+    /**
+     * @return void
+     */
     public function validate()
     {
         $definition = $this->definition;
         $givenArguments = $this->arguments;
 
-        $missingArguments = array_filter(array_keys($definition->getArguments()), function ($argument) use ($definition, $givenArguments) {
-            return !\array_key_exists($argument, $givenArguments) && $definition->getArgument($argument)->isRequired();
-        });
+        $missingArguments = array_filter(array_keys($definition->getArguments()), fn ($argument) => !\array_key_exists($argument, $givenArguments) && $definition->getArgument($argument)->isRequired());
 
         if (\count($missingArguments) > 0) {
             throw new RuntimeException(sprintf('Not enough arguments (missing: "%s").', implode(', ', $missingArguments)));
@@ -76,6 +80,9 @@ abstract class Input implements InputInterface, StreamableInputInterface
         return $this->interactive;
     }
 
+    /**
+     * @return void
+     */
     public function setInteractive(bool $interactive)
     {
         $this->interactive = $interactive;
@@ -95,6 +102,9 @@ abstract class Input implements InputInterface, StreamableInputInterface
         return $this->arguments[$name] ?? $this->definition->getArgument($name)->getDefault();
     }
 
+    /**
+     * @return void
+     */
     public function setArgument(string $name, mixed $value)
     {
         if (!$this->definition->hasArgument($name)) {
@@ -131,6 +141,9 @@ abstract class Input implements InputInterface, StreamableInputInterface
         return \array_key_exists($name, $this->options) ? $this->options[$name] : $this->definition->getOption($name)->getDefault();
     }
 
+    /**
+     * @return void
+     */
     public function setOption(string $name, mixed $value)
     {
         if ($this->definition->hasNegation($name)) {
@@ -157,6 +170,9 @@ abstract class Input implements InputInterface, StreamableInputInterface
         return preg_match('{^[\w-]+$}', $token) ? $token : escapeshellarg($token);
     }
 
+    /**
+     * @return void
+     */
     public function setStream($stream)
     {
         $this->stream = $stream;

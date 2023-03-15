@@ -191,10 +191,8 @@ class RegisterGlobalSecurityEventListenersPassTest extends TestCase
             $actualListeners[] = $arguments;
         }
 
-        $foundListeners = array_uintersect($expectedListeners, $actualListeners, function (array $a, array $b) {
-            // PHP internally sorts all the arrays first, so returning proper 1 / -1 values is crucial
-            return $a <=> $b;
-        });
+        // PHP internally sorts all the arrays first, so returning proper 1 / -1 values is crucial
+        $foundListeners = array_uintersect($expectedListeners, $actualListeners, fn (array $a, array $b) => $a <=> $b);
 
         $this->assertEquals($expectedListeners, $foundListeners);
     }

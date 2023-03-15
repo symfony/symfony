@@ -36,11 +36,17 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
         return $this->name;
     }
 
+    /**
+     * @return void
+     */
     public function setName(string $name)
     {
         $this->name = $name;
     }
 
+    /**
+     * @return void
+     */
     public function initialize(array &$attributes)
     {
         $this->attributes = &$attributes;
@@ -61,6 +67,9 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
         return \array_key_exists($name, $this->attributes) ? $this->attributes[$name] : $default;
     }
 
+    /**
+     * @return void
+     */
     public function set(string $name, mixed $value)
     {
         $this->attributes[$name] = $value;
@@ -71,6 +80,9 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
         return $this->attributes;
     }
 
+    /**
+     * @return void
+     */
     public function replace(array $attributes)
     {
         $this->attributes = [];

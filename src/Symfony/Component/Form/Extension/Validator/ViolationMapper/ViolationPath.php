@@ -193,7 +193,7 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
     /**
      * Builds the string representation from the elements.
      */
-    private function buildString()
+    private function buildString(): void
     {
         $this->pathAsString = '';
         $data = false;

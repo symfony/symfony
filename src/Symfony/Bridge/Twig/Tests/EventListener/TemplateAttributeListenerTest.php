@@ -29,12 +29,18 @@ class TemplateAttributeListenerTest extends TestCase
         $twig = $this->createMock(Environment::class);
         $twig->expects($this->exactly(3))
             ->method('render')
-            ->withConsecutive(
-                ['templates/foo.html.twig', ['foo' => 'bar']],
-                ['templates/foo.html.twig', ['bar' => 'Bar', 'buz' => 'def']],
-                ['templates/foo.html.twig', []],
-            )
-            ->willReturn('Bar');
+            ->willReturnCallback(function (...$args) {
+                static $series = [
+                    ['templates/foo.html.twig', ['foo' => 'bar']],
+                    ['templates/foo.html.twig', ['bar' => 'Bar', 'buz' => 'def']],
+                    ['templates/foo.html.twig', []],
+                ];
+
+                $this->assertSame(array_shift($series), $args);
+
+                return 'Bar';
+            })
+        ;
 
         $request = new Request();
         $kernel = $this->createMock(HttpKernelInterface::class);

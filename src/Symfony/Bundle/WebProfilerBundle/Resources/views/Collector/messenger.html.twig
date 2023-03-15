@@ -1,6 +1,42 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
-{% import _self as helper %}
+{% block head %}
+    {{ parent() }}
+
+    <style>
+        .message-item thead th { position: relative; cursor: pointer; user-select: none; padding-right: 35px; }
+        .message-item tbody tr td:first-child { width: 170px; }
+
+        .message-item .label { float: right; padding: 1px 5px; opacity: .75; margin-left: 5px; }
+        .message-item .toggle-button { position: absolute; right: 6px; top: 6px; opacity: .5; pointer-events: none }
+        .message-item .icon svg { height: 24px; width: 24px; }
+
+        .message-item .sf-toggle-off .icon-close, .sf-toggle-on .icon-open { display: none; }
+        .message-item .sf-toggle-off .icon-open, .sf-toggle-on .icon-close { display: block; }
+
+        .message-bus .badge.status-some-errors { line-height: 16px; border-bottom: 2px solid #B0413E; }
+
+        .message-item tbody.sf-toggle-content.sf-toggle-visible { display: table-row-group; }
+
+        #collector-content .message-bus .trace {
+            border: var(--border);
+            background: var(--base-0);
+            padding: 10px;
+            margin: 0.5em 0;
+            overflow: auto;
+        }
+        #collector-content .message-bus .trace {
+            font-size: 12px;
+        }
+        #collector-content .message-bus .trace li {
+            margin-bottom: 0;
+            padding: 0;
+        }
+        #collector-content .message-bus .trace li.selected {
+            background: var(--highlight-selected-line);
+        }
+    </style>
+{% endblock %}
 
 {% block toolbar %}
     {% if collector.messages|length > 0 %}
@@ -41,28 +77,7 @@
     </span>
 {% endblock %}
 
-{% block head %}
-    {{ parent() }}
-    <style>
-        .message-item thead th { position: relative; cursor: pointer; user-select: none; padding-right: 35px; }
-        .message-item tbody tr td:first-child { width: 170px; }
-
-        .message-item .label { float: right; padding: 1px 5px; opacity: .75; margin-left: 5px; }
-        .message-item .toggle-button { position: absolute; right: 6px; top: 6px; opacity: .5; pointer-events: none }
-        .message-item .icon svg { height: 24px; width: 24px; }
-
-        .message-item .sf-toggle-off .icon-close, .sf-toggle-on .icon-open { display: none; }
-        .message-item .sf-toggle-off .icon-open, .sf-toggle-on .icon-close { display: block; }
-
-        .message-bus .badge.status-some-errors { line-height: 16px; border-bottom: 2px solid #B0413E; }
-
-        .message-item tbody.sf-toggle-content.sf-toggle-visible { display: table-row-group; }
-    </style>
-{% endblock %}
-
 {% block panel %}
-    {% import _self as helper %}
-
     <h2>Messages</h2>
 
     {% if collector.messages is empty %}
@@ -71,7 +86,7 @@
         </div>
     {% elseif 1 == collector.buses|length %}
         <p class="text-muted">Ordered list of dispatched messages across all your buses</p>
-        {{ helper.render_bus_messages(collector.messages, true) }}
+        {{ _self.render_bus_messages(collector.messages, true) }}
     {% else %}
         <div class="sf-tabs message-bus">
             <div class="tab">
@@ -81,7 +96,7 @@
 
                 <div class="tab-content">
                     <p class="text-muted">Ordered list of dispatched messages across all your buses</p>
-                    {{ helper.render_bus_messages(messages, true) }}
+                    {{ _self.render_bus_messages(messages, true) }}
                 </div>
             </div>
 
@@ -93,7 +108,7 @@
 
                     <div class="tab-content">
                         <p class="text-muted">Ordered list of messages dispatched on the <code>{{ bus }}</code> bus</p>
-                        {{ helper.render_bus_messages(messages) }}
+                        {{ _self.render_bus_messages(messages) }}
                     </div>
                 </div>
             {% endfor %}

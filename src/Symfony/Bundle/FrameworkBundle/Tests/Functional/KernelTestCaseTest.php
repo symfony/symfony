@@ -17,6 +17,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestServic
 use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestServiceContainer\PublicService;
 use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestServiceContainer\UnusedPrivateService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 class KernelTestCaseTest extends AbstractWebTestCase
 {
@@ -40,5 +41,21 @@ class KernelTestCaseTest extends AbstractWebTestCase
         $this->assertTrue($container->has(PrivateService::class));
         $this->assertTrue($container->has('private_service'));
         $this->assertFalse($container->has(UnusedPrivateService::class));
+    }
+
+    public function testThatPrivateServicesCanBeSetIfTestConfigIsEnabled()
+    {
+        static::bootKernel(['test_case' => 'TestServiceContainer']);
+
+        $container = static::getContainer();
+
+        $service = new \stdClass();
+
+        $container->set('private_service', $service);
+        $this->assertSame($service, $container->get('private_service'));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "private_service" service is already initialized, you cannot replace it.');
+        $container->set('private_service', new \stdClass());
     }
 }

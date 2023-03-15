@@ -18,6 +18,9 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  *
  * @author Roman Marintšenko <inoryy@gmail.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ *
+ * @template TAttribute of string
+ * @template TSubject of mixed
  */
 abstract class Voter implements VoterInterface, CacheableVoterInterface
 {
@@ -74,13 +77,19 @@ abstract class Voter implements VoterInterface, CacheableVoterInterface
     /**
      * Determines if the attribute and subject are supported by this voter.
      *
-     * @param $subject The subject to secure, e.g. an object the user wants to access or any other PHP type
+     * @param mixed $subject The subject to secure, e.g. an object the user wants to access or any other PHP type
+     *
+     * @psalm-assert-if-true TSubject $subject
+     * @psalm-assert-if-true TAttribute $attribute
      */
     abstract protected function supports(string $attribute, mixed $subject): bool;
 
     /**
      * Perform a single access check operation on a given attribute, subject and token.
      * It is safe to assume that $attribute and $subject already passed the "supports()" method check.
+     *
+     * @param TAttribute $attribute
+     * @param TSubject   $subject
      */
     abstract protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool;
 }

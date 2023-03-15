@@ -30,13 +30,13 @@
         "symfony/rate-limiter": "^5.4|^6.0",
         "symfony/routing": "^5.4|^6.0",
         "symfony/serializer": "^5.4|^6.0",
-        "symfony/service-contracts": "^1.1|^2|^3",
+        "symfony/service-contracts": "^2.5|^3",
         "symfony/stopwatch": "^5.4|^6.0",
         "symfony/validator": "^5.4|^6.0"
     },
     "conflict": {
         "symfony/event-dispatcher": "<5.4",
-        "symfony/event-dispatcher-contracts": "<2",
+        "symfony/event-dispatcher-contracts": "<2.5",
         "symfony/framework-bundle": "<5.4",
         "symfony/http-kernel": "<5.4",
         "symfony/serializer": "<5.4"

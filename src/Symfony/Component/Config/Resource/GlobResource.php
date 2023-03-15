@@ -144,9 +144,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
                 $files = iterator_to_array(new \RecursiveIteratorIterator(
                     new \RecursiveCallbackFilterIterator(
                         new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS),
-                        function (\SplFileInfo $file, $path) {
-                            return !isset($this->excludedPrefixes[str_replace('\\', '/', $path)]) && '.' !== $file->getBasename()[0];
-                        }
+                        fn (\SplFileInfo $file, $path) => !isset($this->excludedPrefixes[str_replace('\\', '/', $path)]) && '.' !== $file->getBasename()[0]
                     ),
                     \RecursiveIteratorIterator::LEAVES_ONLY
                 ));
@@ -202,7 +200,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
 
     private function computeHash(): string
     {
-        $hash = hash_init('md5');
+        $hash = hash_init('xxh128');
 
         foreach ($this->getIterator() as $path => $info) {
             hash_update($hash, $path."\n");

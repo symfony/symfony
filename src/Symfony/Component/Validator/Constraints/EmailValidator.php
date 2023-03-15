@@ -16,6 +16,7 @@ use Egulias\EmailValidator\Validation\EmailValidation;
 use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\LogicException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
@@ -40,7 +41,7 @@ class EmailValidator extends ConstraintValidator
     public function __construct(string $defaultMode = Email::VALIDATION_MODE_LOOSE)
     {
         if (!\in_array($defaultMode, Email::VALIDATION_MODES, true)) {
-            throw new \InvalidArgumentException('The "defaultMode" parameter value is not valid.');
+            throw new InvalidArgumentException('The "defaultMode" parameter value is not valid.');
         }
 
         if (Email::VALIDATION_MODE_LOOSE === $defaultMode) {
@@ -50,6 +51,9 @@ class EmailValidator extends ConstraintValidator
         $this->defaultMode = $defaultMode;
     }
 
+    /**
+     * @return void
+     */
     public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Email) {
@@ -82,7 +86,7 @@ class EmailValidator extends ConstraintValidator
         }
 
         if (!\in_array($constraint->mode, Email::VALIDATION_MODES, true)) {
-            throw new \InvalidArgumentException(sprintf('The "%s::$mode" parameter value is not valid.', get_debug_type($constraint)));
+            throw new InvalidArgumentException(sprintf('The "%s::$mode" parameter value is not valid.', get_debug_type($constraint)));
         }
 
         if (Email::VALIDATION_MODE_STRICT === $constraint->mode) {

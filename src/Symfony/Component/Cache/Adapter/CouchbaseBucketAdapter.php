@@ -54,7 +54,7 @@ class CouchbaseBucketAdapter extends AbstractAdapter
         $this->marshaller = $marshaller ?? new DefaultMarshaller();
     }
 
-    public static function createConnection(array|string $servers, array $options = []): \CouchbaseBucket
+    public static function createConnection(#[\SensitiveParameter] array|string $servers, array $options = []): \CouchbaseBucket
     {
         if (\is_string($servers)) {
             $servers = [$servers];
@@ -78,7 +78,7 @@ class CouchbaseBucketAdapter extends AbstractAdapter
 
             foreach ($servers as $dsn) {
                 if (!str_starts_with($dsn, 'couchbase:')) {
-                    throw new InvalidArgumentException(sprintf('Invalid Couchbase DSN: "%s" does not start with "couchbase:".', $dsn));
+                    throw new InvalidArgumentException('Invalid Couchbase DSN: it does not start with "couchbase:".');
                 }
 
                 preg_match($dsnPattern, $dsn, $matches);

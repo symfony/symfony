@@ -21,9 +21,9 @@ abstract class AbstractCrawlerTestCase extends TestCase
 {
     abstract public static function getDoctype(): string;
 
-    protected function createCrawler($node = null, string $uri = null, string $baseHref = null)
+    protected function createCrawler($node = null, string $uri = null, string $baseHref = null, bool $useHtml5Parser = true)
     {
-        return new Crawler($node, $uri, $baseHref);
+        return new Crawler($node, $uri, $baseHref, $useHtml5Parser);
     }
 
     public function testConstructor()
@@ -262,9 +262,7 @@ abstract class AbstractCrawlerTestCase extends TestCase
 
     public function testEach()
     {
-        $data = $this->createTestCrawler()->filterXPath('//ul[1]/li')->each(function ($node, $i) {
-            return $i.'-'.$node->text();
-        });
+        $data = $this->createTestCrawler()->filterXPath('//ul[1]/li')->each(fn ($node, $i) => $i.'-'.$node->text());
 
         $this->assertEquals(['0-One', '1-Two', '2-Three'], $data, '->each() executes an anonymous function on each node of the list');
     }
@@ -290,9 +288,7 @@ abstract class AbstractCrawlerTestCase extends TestCase
     public function testReduce()
     {
         $crawler = $this->createTestCrawler()->filterXPath('//ul[1]/li');
-        $nodes = $crawler->reduce(function ($node, $i) {
-            return 1 !== $i;
-        });
+        $nodes = $crawler->reduce(fn ($node, $i) => 1 !== $i);
         $this->assertNotSame($nodes, $crawler, '->reduce() returns a new instance of a crawler');
         $this->assertInstanceOf(Crawler::class, $nodes, '->reduce() returns a new instance of a crawler');
 
@@ -348,12 +344,56 @@ abstract class AbstractCrawlerTestCase extends TestCase
         $this->assertSame('my value', $this->createTestCrawler(null)->filterXPath('//ol')->text('my value'));
     }
 
-    public function testInnerText()
+    public static function provideInnerTextExamples()
     {
-        self::assertCount(1, $crawler = $this->createTestCrawler()->filterXPath('//*[@id="complex-element"]'));
+        return [
+            [
+                '//*[@id="complex-elements"]/*[@class="one"]',     // XPath query
+                'Parent text Child text',                       // Result of Crawler::text()
+                'Parent text',                                  // Result of Crawler::innerText()
+                ' Parent text ',                                // Result of Crawler::innerText(false)
+            ],
+            [
+                '//*[@id="complex-elements"]/*[@class="two"]',
+                'Child text Parent text',
+                'Parent text',
+                ' ',
+            ],
+            [
+                '//*[@id="complex-elements"]/*[@class="three"]',
+                'Parent text Child text Parent text',
+                'Parent text',
+                ' Parent text ',
+            ],
+            [
+                '//*[@id="complex-elements"]/*[@class="four"]',
+                'Child text',
+                '',
+                '  ',
+            ],
+            [
+                '//*[@id="complex-elements"]/*[@class="five"]',
+                'Child text Another child',
+                '',
+                '  ',
+            ],
+        ];
+    }
 
-        self::assertSame('Parent text Child text', $crawler->text());
-        self::assertSame('Parent text', $crawler->innerText());
+    /**
+     * @dataProvider provideInnerTextExamples
+     */
+    public function testInnerText(
+        string $xPathQuery,
+        string $expectedText,
+        string $expectedInnerText,
+        string $expectedInnerTextNormalizeWhitespaceFalse,
+    ) {
+        self::assertCount(1, $crawler = $this->createTestCrawler()->filterXPath($xPathQuery));
+
+        self::assertSame($expectedText, $crawler->text());
+        self::assertSame($expectedInnerText, $crawler->innerText());
+        self::assertSame($expectedInnerTextNormalizeWhitespaceFalse, $crawler->innerText(false));
     }
 
     public function testHtml()
@@ -1265,9 +1305,12 @@ HTML;
                         <div id="child2" xmlns:foo="http://example.com"></div>
                     </div>
                     <div id="sibling"><img /></div>
-                    <div id="complex-element">
-                        Parent text
-                        <span>Child text</span>
+                    <div id="complex-elements">
+                        <div class="one"> Parent text <span>Child text</span> </div>
+                        <div class="two"> <span>Child text</span> Parent text </div>
+                        <div class="three"> Parent text <span>Child text</span> Parent text </div>
+                        <div class="four">  <span>Child text</span>  </div>
+                        <div class="five"><span>Child text</span>  <span>Another child</span></div>
                     </div>
                 </body>
             </html>

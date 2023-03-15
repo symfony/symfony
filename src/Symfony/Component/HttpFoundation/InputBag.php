@@ -43,7 +43,7 @@ final class InputBag extends ParameterBag
     /**
      * Replaces the current input values by a new set.
      */
-    public function replace(array $inputs = [])
+    public function replace(array $inputs = []): void
     {
         $this->parameters = [];
         $this->add($inputs);
@@ -52,7 +52,7 @@ final class InputBag extends ParameterBag
     /**
      * Adds input values.
      */
-    public function add(array $inputs = [])
+    public function add(array $inputs = []): void
     {
         foreach ($inputs as $input => $value) {
             $this->set($input, $value);
@@ -64,13 +64,32 @@ final class InputBag extends ParameterBag
      *
      * @param string|int|float|bool|array|null $value
      */
-    public function set(string $key, mixed $value)
+    public function set(string $key, mixed $value): void
     {
         if (null !== $value && !\is_scalar($value) && !\is_array($value) && !$value instanceof \Stringable) {
             throw new \InvalidArgumentException(sprintf('Expected a scalar, or an array as a 2nd argument to "%s()", "%s" given.', __METHOD__, get_debug_type($value)));
         }
 
         $this->parameters[$key] = $value;
+    }
+
+    /**
+     * Returns the parameter value converted to an enum.
+     *
+     * @template T of \BackedEnum
+     *
+     * @param class-string<T> $class
+     * @param ?T              $default
+     *
+     * @return ?T
+     */
+    public function getEnum(string $key, string $class, \BackedEnum $default = null): ?\BackedEnum
+    {
+        try {
+            return parent::getEnum($key, $class, $default);
+        } catch (\UnexpectedValueException $e) {
+            throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
+        }
     }
 
     public function filter(string $key, mixed $default = null, int $filter = \FILTER_DEFAULT, mixed $options = []): mixed

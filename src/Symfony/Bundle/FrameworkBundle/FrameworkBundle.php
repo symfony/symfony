@@ -89,9 +89,13 @@ class_exists(Registry::class);
  */
 class FrameworkBundle extends Bundle
 {
+    /**
+     * @return void
+     */
     public function boot()
     {
-        ErrorHandler::register(null, false)->throwAt($this->container->getParameter('debug.error_handler.throw_at'), true);
+        $handler = ErrorHandler::register(null, false);
+        $this->container->get('debug.error_handler_configurator')->configure($handler);
 
         if ($this->container->getParameter('kernel.http_method_override')) {
             Request::enableHttpMethodParameterOverride();
@@ -102,6 +106,9 @@ class FrameworkBundle extends Bundle
         }
     }
 
+    /**
+     * @return void
+     */
     public function build(ContainerBuilder $container)
     {
         parent::build($container);
@@ -174,7 +181,7 @@ class FrameworkBundle extends Bundle
         }
     }
 
-    private function addCompilerPassIfExists(ContainerBuilder $container, string $class, string $type = PassConfig::TYPE_BEFORE_OPTIMIZATION, int $priority = 0)
+    private function addCompilerPassIfExists(ContainerBuilder $container, string $class, string $type = PassConfig::TYPE_BEFORE_OPTIMIZATION, int $priority = 0): void
     {
         $container->addResource(new ClassExistenceResource($class));
 

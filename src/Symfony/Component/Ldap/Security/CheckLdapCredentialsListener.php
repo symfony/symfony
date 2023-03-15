@@ -36,6 +36,9 @@ class CheckLdapCredentialsListener implements EventSubscriberInterface
         $this->ldapLocator = $ldapLocator;
     }
 
+    /**
+     * @return void
+     */
     public function onCheckPassport(CheckPassportEvent $event)
     {
         $passport = $event->getPassport();
@@ -50,7 +53,7 @@ class CheckLdapCredentialsListener implements EventSubscriberInterface
         }
 
         if (!$passport->hasBadge(PasswordCredentials::class)) {
-            throw new \LogicException(sprintf('LDAP authentication requires a passport containing password credentials, authenticator "%s" does not fulfill these requirements.', \get_class($event->getAuthenticator())));
+            throw new \LogicException(sprintf('LDAP authentication requires a passport containing password credentials, authenticator "%s" does not fulfill these requirements.', $event->getAuthenticator()::class));
         }
 
         /** @var PasswordCredentials $passwordCredentials */

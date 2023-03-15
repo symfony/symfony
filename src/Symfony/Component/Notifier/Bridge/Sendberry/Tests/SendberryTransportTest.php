@@ -28,7 +28,7 @@ final class SendberryTransportTest extends TransportTestCase
 
     public static function toStringProvider(): iterable
     {
-        yield ['sendberry://username:password@api.sendberry.com?auth_key=auth_key&from=from', self::createTransport()];
+        yield ['sendberry://api.sendberry.com?from=from', self::createTransport()];
     }
 
     public static function supportedMessagesProvider(): iterable

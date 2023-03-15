@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add `$useHtml5Parser` argument to `Crawler`
+ * Add `CrawlerSelectorCount` test constraint
+ * Add argument `$normalizeWhitespace` to `Crawler::innerText()`
+ * Make `Crawler::innerText()` return the first non-empty text
+
 6.0
 ---
 

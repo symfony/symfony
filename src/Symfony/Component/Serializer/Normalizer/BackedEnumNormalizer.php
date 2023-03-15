@@ -22,6 +22,18 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
  */
 final class BackedEnumNormalizer implements NormalizerInterface, DenormalizerInterface, CacheableSupportsMethodInterface
 {
+    /**
+     * If true, will denormalize any invalid value into null.
+     */
+    public const ALLOW_INVALID_VALUES = 'allow_invalid_values';
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [
+           \BackedEnum::class => true,
+        ];
+    }
+
     public function normalize(mixed $object, string $format = null, array $context = []): int|string
     {
         if (!$object instanceof \BackedEnum) {
@@ -45,6 +57,18 @@ final class BackedEnumNormalizer implements NormalizerInterface, DenormalizerInt
             throw new InvalidArgumentException('The data must belong to a backed enumeration.');
         }
 
+        if ($context[self::ALLOW_INVALID_VALUES] ?? false) {
+            if (null === $data || (!\is_int($data) && !\is_string($data))) {
+                return null;
+            }
+
+            try {
+                return $type::tryFrom($data);
+            } catch (\TypeError) {
+                return null;
+            }
+        }
+
         if (!\is_int($data) && !\is_string($data)) {
             throw NotNormalizableValueException::createForUnexpectedDataType('The data is neither an integer nor a string, you should pass an integer or a string that can be parsed as an enumeration case of type '.$type.'.', $data, [Type::BUILTIN_TYPE_INT, Type::BUILTIN_TYPE_STRING], $context['deserialization_path'] ?? null, true);
         }
@@ -61,8 +85,13 @@ final class BackedEnumNormalizer implements NormalizerInterface, DenormalizerInt
         return is_subclass_of($type, \BackedEnum::class);
     }
 
+    /**
+     * @deprecated since Symfony 6.3, use "getSupportedTypes()" instead
+     */
     public function hasCacheableSupportsMethod(): bool
     {
+        trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
+
         return true;
     }
 }

@@ -34,7 +34,7 @@ class CacheTraitTest extends TestCase
             ->with('computed data');
 
         $cache = $this->getMockBuilder(TestPool::class)
-            ->setMethods(['getItem', 'save'])
+            ->onlyMethods(['getItem', 'save'])
             ->getMock();
         $cache->expects($this->once())
             ->method('getItem')
@@ -60,7 +60,7 @@ class CacheTraitTest extends TestCase
             ->method('set');
 
         $cache = $this->getMockBuilder(TestPool::class)
-            ->setMethods(['getItem', 'save'])
+            ->onlyMethods(['getItem', 'save'])
             ->getMock();
 
         $cache->expects($this->once())
@@ -91,7 +91,7 @@ class CacheTraitTest extends TestCase
             ->with('computed data');
 
         $cache = $this->getMockBuilder(TestPool::class)
-            ->setMethods(['getItem', 'save'])
+            ->onlyMethods(['getItem', 'save'])
             ->getMock();
 
         $cache->expects($this->once())
@@ -111,7 +111,7 @@ class CacheTraitTest extends TestCase
     public function testExceptionOnNegativeBeta()
     {
         $cache = $this->getMockBuilder(TestPool::class)
-            ->setMethods(['getItem', 'save'])
+            ->onlyMethods(['getItem', 'save'])
             ->getMock();
 
         $callback = function (CacheItemInterface $item) {

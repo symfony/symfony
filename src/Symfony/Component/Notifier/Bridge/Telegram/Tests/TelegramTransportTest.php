@@ -59,9 +59,7 @@ final class TelegramTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn(json_encode(['description' => 'testDescription', 'error_code' => 400]));
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = self::createTransport($client, 'testChannel');
 
@@ -81,9 +79,7 @@ final class TelegramTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn(json_encode(['description' => 'testDescription', 'error_code' => 404]));
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = $this->createTransport($client, 'testChannel');
 
@@ -189,6 +185,37 @@ JSON;
 
         $transport = $this->createTransport($client, 'testChannel');
         $options = (new TelegramOptions())->edit(123);
+
+        $transport->send(new ChatMessage('testMessage', $options));
+    }
+
+    public function testSendWithOptionToAnswerCallbackQuery()
+    {
+        $response = $this->createMock(ResponseInterface::class);
+        $response->expects($this->exactly(2))
+            ->method('getStatusCode')
+            ->willReturn(200);
+
+        $content = <<<JSON
+            {
+                "ok": true,
+                "result": true
+            }
+JSON;
+
+        $response->expects($this->once())
+            ->method('getContent')
+            ->willReturn($content)
+        ;
+
+        $client = new MockHttpClient(function (string $method, string $url) use ($response): ResponseInterface {
+            $this->assertStringEndsWith('/answerCallbackQuery', $url);
+
+            return $response;
+        });
+
+        $transport = $this->createTransport($client, 'testChannel');
+        $options = (new TelegramOptions())->answerCallbackQuery('123', true, 1);
 
         $transport->send(new ChatMessage('testMessage', $options));
     }

@@ -66,12 +66,15 @@ class DoctrineDbalStore implements PersistingStoreInterface
             $this->conn = $connOrUrl;
         } else {
             if (!class_exists(DriverManager::class)) {
-                throw new InvalidArgumentException(sprintf('Failed to parse the DSN "%s". Try running "composer require doctrine/dbal".', $connOrUrl));
+                throw new InvalidArgumentException('Failed to parse the DSN. Try running "composer require doctrine/dbal".');
             }
             $this->conn = DriverManager::getConnection(['url' => $connOrUrl]);
         }
     }
 
+    /**
+     * @return void
+     */
     public function save(Key $key)
     {
         $key->reduceLifetime($this->initialTtl);
@@ -111,6 +114,9 @@ class DoctrineDbalStore implements PersistingStoreInterface
         $this->checkNotExpired($key);
     }
 
+    /**
+     * @return void
+     */
     public function putOffExpiration(Key $key, $ttl)
     {
         if ($ttl < 1) {
@@ -142,6 +148,9 @@ class DoctrineDbalStore implements PersistingStoreInterface
         $this->checkNotExpired($key);
     }
 
+    /**
+     * @return void
+     */
     public function delete(Key $key)
     {
         $this->conn->delete($this->table, [
@@ -181,10 +190,18 @@ class DoctrineDbalStore implements PersistingStoreInterface
 
     /**
      * Adds the Table to the Schema if it doesn't exist.
+     *
+     * @param \Closure $isSameDatabase
      */
-    public function configureSchema(Schema $schema): void
+    public function configureSchema(Schema $schema/* , \Closure $isSameDatabase */): void
     {
         if ($schema->hasTable($this->table)) {
+            return;
+        }
+
+        $isSameDatabase = 1 < \func_num_args() ? func_get_arg(1) : static fn () => true;
+
+        if (!$isSameDatabase($this->conn->executeStatement(...))) {
             return;
         }
 

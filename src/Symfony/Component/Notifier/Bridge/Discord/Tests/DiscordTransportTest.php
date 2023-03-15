@@ -65,9 +65,7 @@ final class DiscordTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn(json_encode(['message' => 'testDescription', 'code' => 'testErrorCode']));
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = self::createTransport($client);
 

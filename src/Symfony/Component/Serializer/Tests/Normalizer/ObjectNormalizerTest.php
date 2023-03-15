@@ -736,10 +736,10 @@ class ObjectNormalizerTest extends TestCase
         $normalizer = new ObjectNormalizer(null, null, null, $extractor);
         $serializer = new Serializer([new ArrayDenormalizer(), new DateTimeNormalizer(), $normalizer]);
 
-        $this->assertSame('bar', $serializer->denormalize(['foo' => 'bar'], \get_class(new class() {
+        $this->assertSame('bar', $serializer->denormalize(['foo' => 'bar'], (new class() {
             /** @var self::*|null */
             public $foo;
-        }))->foo);
+        })::class)->foo);
     }
 
     public function testExtractAttributesRespectsFormat()
@@ -826,9 +826,7 @@ class ObjectNormalizerTest extends TestCase
 
     public function testObjectClassResolver()
     {
-        $classResolver = function ($object) {
-            return ObjectDummy::class;
-        };
+        $classResolver = fn ($object) => ObjectDummy::class;
 
         $normalizer = new ObjectNormalizer(null, null, null, null, null, $classResolver);
 

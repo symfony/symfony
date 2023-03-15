@@ -18,8 +18,6 @@ namespace Symfony\Component\HtmlSanitizer;
  * ({@see https://wicg.github.io/sanitizer-api/}).
  *
  * @author Titouan Galopin <galopintitouan@gmail.com>
- *
- * @experimental
  */
 interface HtmlSanitizerInterface
 {

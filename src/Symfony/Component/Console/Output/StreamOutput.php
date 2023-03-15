@@ -62,6 +62,9 @@ class StreamOutput extends Output
         return $this->stream;
     }
 
+    /**
+     * @return void
+     */
     protected function doWrite(string $message, bool $newline)
     {
         if ($newline) {

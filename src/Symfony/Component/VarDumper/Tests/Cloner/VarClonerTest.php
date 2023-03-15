@@ -399,9 +399,7 @@ EOTXT;
     public function testCaster()
     {
         $cloner = new VarCloner([
-            '*' => function ($obj, $array) {
-                return ['foo' => 123];
-            },
+            '*' => fn ($obj, $array) => ['foo' => 123],
             __CLASS__ => function ($obj, $array) {
                 ++$array['foo'];
 

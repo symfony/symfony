@@ -646,7 +646,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     public function isValid(): bool
     {
         if (!$this->submitted) {
-            throw new LogicException('Cannot check if an unsubmitted form is valid. Call Form::isSubmitted() before Form::isValid().');
+            throw new LogicException('Cannot check if an unsubmitted form is valid. Call Form::isSubmitted() and ensure that it\'s true before calling Form::isValid().');
         }
 
         if ($this->isDisabled()) {
@@ -930,9 +930,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             return;
         }
 
-        uksort($children, static function ($a, $b) use ($c): int {
-            return [$c[$b]['p'], $c[$a]['i']] <=> [$c[$a]['p'], $c[$b]['i']];
-        });
+        uksort($children, static fn ($a, $b): int => [$c[$b]['p'], $c[$a]['i']] <=> [$c[$a]['p'], $c[$b]['i']]);
     }
 
     /**

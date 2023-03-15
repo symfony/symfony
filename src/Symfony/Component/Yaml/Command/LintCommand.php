@@ -50,6 +50,9 @@ class LintCommand extends Command
         $this->isReadableProvider = null === $isReadableProvider ? null : $isReadableProvider(...);
     }
 
+    /**
+     * @return void
+     */
     protected function configure()
     {
         $this
@@ -91,10 +94,6 @@ EOF
         $this->format = $input->getOption('format');
         $flags = $input->getOption('parse-tags');
 
-        if ('github' === $this->format && !class_exists(GithubActionReporter::class)) {
-            throw new \InvalidArgumentException('The "github" format is only available since "symfony/console" >= 5.3.');
-        }
-
         if (null === $this->format) {
             // Autodetect format according to CI environment
             $this->format = class_exists(GithubActionReporter::class) && GithubActionReporter::isGithubActionEnvironment() ? 'github' : 'txt';
@@ -128,7 +127,7 @@ EOF
         return $this->display($io, $filesInfo);
     }
 
-    private function validate(string $content, int $flags, string $file = null)
+    private function validate(string $content, int $flags, string $file = null): array
     {
         $prevErrorHandler = set_error_handler(function ($level, $message, $file, $line) use (&$prevErrorHandler) {
             if (\E_USER_DEPRECATED === $level) {
@@ -240,12 +239,10 @@ EOF
 
     private function getDirectoryIterator(string $directory): iterable
     {
-        $default = function ($directory) {
-            return new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator($directory, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS),
-                \RecursiveIteratorIterator::LEAVES_ONLY
-            );
-        };
+        $default = fn ($directory) => new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($directory, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS),
+            \RecursiveIteratorIterator::LEAVES_ONLY
+        );
 
         if (null !== $this->directoryIteratorProvider) {
             return ($this->directoryIteratorProvider)($directory, $default);
@@ -256,9 +253,7 @@ EOF
 
     private function isReadable(string $fileOrDirectory): bool
     {
-        $default = function ($fileOrDirectory) {
-            return is_readable($fileOrDirectory);
-        };
+        $default = is_readable(...);
 
         if (null !== $this->isReadableProvider) {
             return ($this->isReadableProvider)($fileOrDirectory, $default);

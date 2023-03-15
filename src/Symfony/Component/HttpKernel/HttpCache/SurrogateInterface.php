@@ -33,6 +33,8 @@ interface SurrogateInterface
 
     /**
      * Adds Surrogate-capability to the given Request.
+     *
+     * @return void
      */
     public function addSurrogateCapability(Request $request);
 
@@ -40,6 +42,8 @@ interface SurrogateInterface
      * Adds HTTP headers to specify that the Response needs to be parsed for Surrogate.
      *
      * This method only adds an Surrogate HTTP header if the Response has some Surrogate tags.
+     *
+     * @return void
      */
     public function addSurrogateControl(Response $response);
 

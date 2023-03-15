@@ -82,7 +82,7 @@ class ArrayConverter
         return $elem;
     }
 
-    private static function cancelExpand(array &$tree, string $prefix, array $node)
+    private static function cancelExpand(array &$tree, string $prefix, array $node): void
     {
         $prefix .= '.';
 

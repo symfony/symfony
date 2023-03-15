@@ -30,6 +30,7 @@ use Symfony\Component\PasswordHasher\Hasher\PlaintextPasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Strategy\AffirmativeStrategy;
+use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticatorManager;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
@@ -92,7 +93,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
     {
         $container = $this->getContainer('container1');
 
-        $providers = array_values(array_filter($container->getServiceIds(), function ($key) { return str_starts_with($key, 'security.user.provider.concrete'); }));
+        $providers = array_values(array_filter($container->getServiceIds(), fn ($key) => str_starts_with($key, 'security.user.provider.concrete')));
 
         $expectedProviders = [
             'security.user.provider.concrete.default',
@@ -180,6 +181,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
                     'invalidate_session' => true,
                     'delete_cookies' => [],
                     'enable_csrf' => null,
+                    'clear_site_data' => [],
                 ],
             ],
             [
@@ -240,7 +242,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
             ],
         ], $listeners);
 
-        $this->assertFalse($container->hasAlias('Symfony\Component\Security\Core\User\UserCheckerInterface', 'No user checker alias is registered when custom user checker services are registered'));
+        $this->assertFalse($container->hasAlias(UserCheckerInterface::class, 'No user checker alias is registered when custom user checker services are registered'));
     }
 
     public function testFirewallRequestMatchers()
@@ -280,8 +282,8 @@ abstract class CompleteConfigurationTestCase extends TestCase
     {
         $container = $this->getContainer('no_custom_user_checker');
 
-        $this->assertTrue($container->hasAlias('Symfony\Component\Security\Core\User\UserCheckerInterface', 'Alias for user checker is registered when no custom user checker service is registered'));
-        $this->assertFalse($container->getAlias('Symfony\Component\Security\Core\User\UserCheckerInterface')->isPublic());
+        $this->assertTrue($container->hasAlias(UserCheckerInterface::class, 'Alias for user checker is registered when no custom user checker service is registered'));
+        $this->assertFalse($container->getAlias(UserCheckerInterface::class)->isPublic());
     }
 
     public function testAccess()
@@ -705,6 +707,13 @@ abstract class CompleteConfigurationTestCase extends TestCase
     {
         $this->getContainer('listener_provider');
         $this->addToAssertionCount(1);
+    }
+
+    public function testFirewallLogoutClearSiteData()
+    {
+        $container = $this->getContainer('logout_clear_site_data');
+        $ClearSiteDataConfig = $container->getDefinition('security.firewall.map.config.main')->getArgument(12)['clear_site_data'];
+        $this->assertSame(['cookies', 'executionContexts'], $ClearSiteDataConfig);
     }
 
     protected function getContainer($file)

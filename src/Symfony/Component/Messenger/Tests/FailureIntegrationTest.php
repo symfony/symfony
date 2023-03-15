@@ -46,12 +46,8 @@ class FailureIntegrationTest extends TestCase
         $transport2 = new DummyFailureTestSenderAndReceiver();
         $failureTransport = new DummyFailureTestSenderAndReceiver();
         $sendersLocatorFailureTransport = new ServiceLocator([
-            'transport1' => function () use ($failureTransport) {
-                return $failureTransport;
-            },
-            'transport2' => function () use ($failureTransport) {
-                return $failureTransport;
-            },
+            'transport1' => fn () => $failureTransport,
+            'transport2' => fn () => $failureTransport,
         ]);
 
         $transports = [
@@ -66,9 +62,7 @@ class FailureIntegrationTest extends TestCase
             ->willReturn(true);
         $locator->expects($this->any())
             ->method('get')
-            ->willReturnCallback(function ($transportName) use ($transports) {
-                return $transports[$transportName];
-            });
+            ->willReturnCallback(fn ($transportName) => $transports[$transportName]);
         $senderLocator = new SendersLocator(
             [DummyMessage::class => ['transport1', 'transport2']],
             $locator
@@ -237,12 +231,8 @@ class FailureIntegrationTest extends TestCase
         $failureTransport2 = new DummyFailureTestSenderAndReceiver();
 
         $sendersLocatorFailureTransport = new ServiceLocator([
-            'transport1' => function () use ($failureTransport1) {
-                return $failureTransport1;
-            },
-            'transport2' => function () use ($failureTransport2) {
-                return $failureTransport2;
-            },
+            'transport1' => fn () => $failureTransport1,
+            'transport2' => fn () => $failureTransport2,
         ]);
 
         $transports = [
@@ -258,9 +248,7 @@ class FailureIntegrationTest extends TestCase
             ->willReturn(true);
         $locator->expects($this->any())
             ->method('get')
-            ->willReturnCallback(function ($transportName) use ($transports) {
-                return $transports[$transportName];
-            });
+            ->willReturnCallback(fn ($transportName) => $transports[$transportName]);
         $senderLocator = new SendersLocator(
             [DummyMessage::class => ['transport1', 'transport2']],
             $locator

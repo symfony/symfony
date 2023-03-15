@@ -20,6 +20,9 @@
             <framework:routing message-class="*">
                 <framework:sender service="amqp" />
             </framework:routing>
+            <framework:routing message-class="Symfony\*">
+                <framework:sender service="amqp" />
+            </framework:routing>
             <framework:transport name="amqp" dsn="amqp://localhost/%2f/messages" />
             <framework:transport name="audit" dsn="null://" />
         </framework:messenger>

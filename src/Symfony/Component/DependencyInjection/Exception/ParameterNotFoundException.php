@@ -47,12 +47,17 @@ class ParameterNotFoundException extends InvalidArgumentException implements Not
         $this->updateRepr();
     }
 
+    /**
+     * @return void
+     */
     public function updateRepr()
     {
         if (null !== $this->sourceId) {
             $this->message = sprintf('The service "%s" has a dependency on a non-existent parameter "%s".', $this->sourceId, $this->key);
         } elseif (null !== $this->sourceKey) {
             $this->message = sprintf('The parameter "%s" has a dependency on a non-existent parameter "%s".', $this->sourceKey, $this->key);
+        } elseif ('.' === ($this->key[0] ?? '')) {
+            $this->message = sprintf('Parameter "%s" not found. It was probably deleted during the compilation of the container.', $this->key);
         } else {
             $this->message = sprintf('You have requested a non-existent parameter "%s".', $this->key);
         }
@@ -69,21 +74,33 @@ class ParameterNotFoundException extends InvalidArgumentException implements Not
         }
     }
 
+    /**
+     * @return string
+     */
     public function getKey()
     {
         return $this->key;
     }
 
+    /**
+     * @return string|null
+     */
     public function getSourceId()
     {
         return $this->sourceId;
     }
 
+    /**
+     * @return string|null
+     */
     public function getSourceKey()
     {
         return $this->sourceKey;
     }
 
+    /**
+     * @return void
+     */
     public function setSourceId(?string $sourceId)
     {
         $this->sourceId = $sourceId;
@@ -91,6 +108,9 @@ class ParameterNotFoundException extends InvalidArgumentException implements Not
         $this->updateRepr();
     }
 
+    /**
+     * @return void
+     */
     public function setSourceKey(?string $sourceKey)
     {
         $this->sourceKey = $sourceKey;

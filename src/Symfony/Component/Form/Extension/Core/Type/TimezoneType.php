@@ -25,6 +25,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TimezoneType extends AbstractType
 {
+    /**
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if ('datetimezone' === $options['input']) {
@@ -34,6 +37,9 @@ class TimezoneType extends AbstractType
         }
     }
 
+    /**
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -48,14 +54,10 @@ class TimezoneType extends AbstractType
 
                     $choiceTranslationLocale = $options['choice_translation_locale'];
 
-                    return ChoiceList::loader($this, new IntlCallbackChoiceLoader(function () use ($input, $choiceTranslationLocale) {
-                        return self::getIntlTimezones($input, $choiceTranslationLocale);
-                    }), [$input, $choiceTranslationLocale]);
+                    return ChoiceList::loader($this, new IntlCallbackChoiceLoader(fn () => self::getIntlTimezones($input, $choiceTranslationLocale)), [$input, $choiceTranslationLocale]);
                 }
 
-                return ChoiceList::lazy($this, function () use ($input) {
-                    return self::getPhpTimezones($input);
-                }, $input);
+                return ChoiceList::lazy($this, fn () => self::getPhpTimezones($input), $input);
             },
             'choice_translation_domain' => false,
             'choice_translation_locale' => null,

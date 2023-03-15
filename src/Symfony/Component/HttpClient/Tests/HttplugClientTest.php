@@ -204,7 +204,7 @@ class HttplugClientTest extends TestCase
                 return $response;
             }, function (\Exception $exception) use (&$failureCallableCalled, $client) {
                 $this->assertSame(NetworkException::class, $exception::class);
-                $this->assertSame(TransportException::class, \get_class($exception->getPrevious()));
+                $this->assertSame(TransportException::class, $exception->getPrevious()::class);
                 $failureCallableCalled = true;
 
                 return $client->sendAsyncRequest($client->createRequest('GET', 'http://localhost:8057'));
@@ -251,11 +251,7 @@ class HttplugClientTest extends TestCase
                     $failureCallableCalled = true;
 
                     // Ensure arbitrary levels of promises work.
-                    return (new FulfilledPromise(null))->then(function () use ($client, $request) {
-                        return (new GuzzleFulfilledPromise(null))->then(function () use ($client, $request) {
-                            return $client->sendAsyncRequest($request);
-                        });
-                    });
+                    return (new FulfilledPromise(null))->then(fn () => (new GuzzleFulfilledPromise(null))->then(fn () => $client->sendAsyncRequest($request)));
                 }
             )
         ;

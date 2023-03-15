@@ -174,6 +174,9 @@ class Parser
         return $this->parsePrimaryExpression();
     }
 
+    /**
+     * @return Node\Node
+     */
     protected function parseConditionalExpression(Node\Node $expr)
     {
         while ($this->stream->current->test(Token::PUNCTUATION_TYPE, '??')) {
@@ -205,6 +208,9 @@ class Parser
         return $expr;
     }
 
+    /**
+     * @return Node\Node
+     */
     public function parsePrimaryExpression()
     {
         $token = $this->stream->current;
@@ -270,6 +276,9 @@ class Parser
         return $this->parsePostfixExpression($node);
     }
 
+    /**
+     * @return Node\ArrayNode
+     */
     public function parseArrayExpression()
     {
         $this->stream->expect(Token::PUNCTUATION_TYPE, '[', 'An array element was expected');
@@ -294,6 +303,9 @@ class Parser
         return $node;
     }
 
+    /**
+     * @return Node\ArrayNode
+     */
     public function parseHashExpression()
     {
         $this->stream->expect(Token::PUNCTUATION_TYPE, '{', 'A hash element was expected');
@@ -338,6 +350,9 @@ class Parser
         return $node;
     }
 
+    /**
+     * @return Node\GetAttrNode|Node\Node
+     */
     public function parsePostfixExpression(Node\Node $node)
     {
         $token = $this->stream->current;
@@ -398,6 +413,8 @@ class Parser
 
     /**
      * Parses arguments.
+     *
+     * @return Node\Node
      */
     public function parseArguments()
     {

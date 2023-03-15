@@ -80,7 +80,7 @@ final class TraceableHttpClient implements HttpClientInterface, ResetInterface, 
         return $this->tracedRequests->getArrayCopy();
     }
 
-    public function reset()
+    public function reset(): void
     {
         if ($this->client instanceof ResetInterface) {
             $this->client->reset();

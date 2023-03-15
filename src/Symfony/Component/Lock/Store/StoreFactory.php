@@ -12,6 +12,7 @@
 namespace Symfony\Component\Lock\Store;
 
 use Doctrine\DBAL\Connection;
+use Relay\Relay;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\PersistingStoreInterface;
@@ -23,10 +24,11 @@ use Symfony\Component\Lock\PersistingStoreInterface;
  */
 class StoreFactory
 {
-    public static function createStore(object|string $connection): PersistingStoreInterface
+    public static function createStore(#[\SensitiveParameter] object|string $connection): PersistingStoreInterface
     {
         switch (true) {
             case $connection instanceof \Redis:
+            case $connection instanceof Relay:
             case $connection instanceof \RedisArray:
             case $connection instanceof \RedisCluster:
             case $connection instanceof \Predis\ClientInterface:
@@ -62,7 +64,7 @@ class StoreFactory
             case str_starts_with($connection, 'rediss:'):
             case str_starts_with($connection, 'memcached:'):
                 if (!class_exists(AbstractAdapter::class)) {
-                    throw new InvalidArgumentException(sprintf('Unsupported DSN "%s". Try running "composer require symfony/cache".', $connection));
+                    throw new InvalidArgumentException('Unsupported Redis or Memcached DSN. Try running "composer require symfony/cache".');
                 }
                 $storeClass = str_starts_with($connection, 'memcached:') ? MemcachedStore::class : RedisStore::class;
                 $connection = AbstractAdapter::createConnection($connection, ['lazy' => true]);

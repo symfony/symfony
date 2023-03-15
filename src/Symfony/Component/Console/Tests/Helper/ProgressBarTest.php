@@ -864,11 +864,30 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
 
     public function testAddingPlaceholderFormatter()
     {
-        ProgressBar::setPlaceholderFormatterDefinition('remaining_steps', function (ProgressBar $bar) {
-            return $bar->getMaxSteps() - $bar->getProgress();
-        });
+        ProgressBar::setPlaceholderFormatterDefinition('remaining_steps', fn (ProgressBar $bar) => $bar->getMaxSteps() - $bar->getProgress());
         $bar = new ProgressBar($output = $this->getOutputStream(), 3, 0);
         $bar->setFormat(' %remaining_steps% [%bar%]');
+
+        $bar->start();
+        $bar->advance();
+        $bar->finish();
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            ' 3 [>---------------------------]'.
+            $this->generateOutput(' 2 [=========>------------------]').
+            $this->generateOutput(' 0 [============================]'),
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testAddingInstancePlaceholderFormatter()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 3, 0);
+        $bar->setFormat(' %countdown% [%bar%]');
+        $bar->setPlaceholderFormatter('countdown', $function = fn (ProgressBar $bar) => $bar->getMaxSteps() - $bar->getProgress());
+
+        $this->assertSame($function, $bar->getPlaceholderFormatter('countdown'));
 
         $bar->start();
         $bar->advance();

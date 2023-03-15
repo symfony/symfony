@@ -44,9 +44,7 @@ END'],
 
     public function testAsciiClosureRule()
     {
-        $rule = function ($c) {
-            return str_replace('ö', 'OE', $c);
-        };
+        $rule = fn ($c) => str_replace('ö', 'OE', $c);
 
         $s = static::createFromString('Dieser Wert sollte größer oder gleich');
         $this->assertSame('Dieser Wert sollte grOEsser oder gleich', (string) $s->ascii([$rule]));

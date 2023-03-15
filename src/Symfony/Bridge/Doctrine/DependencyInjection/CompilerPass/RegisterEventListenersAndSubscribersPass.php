@@ -124,7 +124,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
         return $listenerRefs;
     }
 
-    private function getEventManagerDef(ContainerBuilder $container, string $name)
+    private function getEventManagerDef(ContainerBuilder $container, string $name): Definition
     {
         if (!isset($this->eventManagers[$name])) {
             $this->eventManagers[$name] = $container->getDefinition(sprintf($this->managerTemplate, $name));

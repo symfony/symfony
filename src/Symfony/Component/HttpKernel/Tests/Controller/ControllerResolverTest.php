@@ -116,9 +116,7 @@ class ControllerResolverTest extends TestCase
     {
         $resolver = $this->createControllerResolver();
 
-        $closure = function () {
-            return 'test';
-        };
+        $closure = fn () => 'test';
 
         $request = Request::create('/');
         $request->attributes->set('_controller', $closure);

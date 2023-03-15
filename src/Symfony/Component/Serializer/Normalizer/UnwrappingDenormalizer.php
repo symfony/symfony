@@ -32,6 +32,11 @@ final class UnwrappingDenormalizer implements DenormalizerInterface, SerializerA
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
     }
 
+    public function getSupportedTypes(?string $format): array
+    {
+        return ['*' => false];
+    }
+
     public function denormalize(mixed $data, string $class, string $format = null, array $context = []): mixed
     {
         $propertyPath = $context[self::UNWRAP_PATH];
@@ -53,8 +58,13 @@ final class UnwrappingDenormalizer implements DenormalizerInterface, SerializerA
         return \array_key_exists(self::UNWRAP_PATH, $context) && !isset($context['unwrapped']);
     }
 
+    /**
+     * @deprecated since Symfony 6.3, use "getSupportedTypes()" instead
+     */
     public function hasCacheableSupportsMethod(): bool
     {
+        trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
+
         return $this->serializer instanceof CacheableSupportsMethodInterface && $this->serializer->hasCacheableSupportsMethod();
     }
 }

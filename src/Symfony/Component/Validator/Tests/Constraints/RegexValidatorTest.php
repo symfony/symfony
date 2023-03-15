@@ -118,6 +118,7 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$value.'"')
+            ->setParameter('{{ pattern }}', '/^[0-9]+$/')
             ->setCode(Regex::REGEX_FAILED_ERROR)
             ->assertRaised();
     }
@@ -133,6 +134,7 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$value.'"')
+            ->setParameter('{{ pattern }}', '/^[0-9]+$/')
             ->setCode(Regex::REGEX_FAILED_ERROR)
             ->assertRaised();
     }

@@ -57,9 +57,7 @@ final class LinkedInTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn('[]');
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = self::createTransport($client);
 
@@ -82,9 +80,7 @@ final class LinkedInTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn('testErrorCode');
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = self::createTransport($client);
 
@@ -187,9 +183,7 @@ final class LinkedInTransportTest extends TransportTestCase
     {
         $this->expectException(LogicException::class);
 
-        $client = new MockHttpClient(function (string $method, string $url, array $options = []): ResponseInterface {
-            return $this->createMock(ResponseInterface::class);
-        });
+        $client = new MockHttpClient(fn (string $method, string $url, array $options = []): ResponseInterface => $this->createMock(ResponseInterface::class));
 
         $transport = self::createTransport($client);
 

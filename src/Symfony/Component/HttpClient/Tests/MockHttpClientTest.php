@@ -45,9 +45,7 @@ class MockHttpClientTest extends HttpClientTestCase
     public static function mockingProvider(): iterable
     {
         yield 'callable' => [
-            static function (string $method, string $url, array $options = []) {
-                return new MockResponse($method.': '.$url.' (body='.$options['body'].')');
-            },
+            static fn (string $method, string $url, array $options = []) => new MockResponse($method.': '.$url.' (body='.$options['body'].')'),
             [
                 'POST: https://example.com/foo (body=payload)',
                 'POST: https://example.com/bar (body=payload)',
@@ -56,12 +54,8 @@ class MockHttpClientTest extends HttpClientTestCase
 
         yield 'array of callable' => [
             [
-                static function (string $method, string $url, array $options = []) {
-                    return new MockResponse($method.': '.$url.' (body='.$options['body'].') [1]');
-                },
-                static function (string $method, string $url, array $options = []) {
-                    return new MockResponse($method.': '.$url.' (body='.$options['body'].') [2]');
-                },
+                static fn (string $method, string $url, array $options = []) => new MockResponse($method.': '.$url.' (body='.$options['body'].') [1]'),
+                static fn (string $method, string $url, array $options = []) => new MockResponse($method.': '.$url.' (body='.$options['body'].') [2]'),
             ],
             [
                 'POST: https://example.com/foo (body=payload) [1]',
@@ -115,7 +109,7 @@ class MockHttpClientTest extends HttpClientTestCase
     public static function validResponseFactoryProvider()
     {
         return [
-            [static function (): MockResponse { return new MockResponse(); }],
+            [static fn (): MockResponse => new MockResponse()],
             [new MockResponse()],
             [[new MockResponse()]],
             [new \ArrayIterator([new MockResponse()])],
@@ -142,12 +136,8 @@ class MockHttpClientTest extends HttpClientTestCase
     {
         yield 'array of callable' => [
             [
-                static function (string $method, string $url, array $options = []) {
-                    return new MockResponse();
-                },
-                static function (string $method, string $url, array $options = []) {
-                    return new MockResponse();
-                },
+                static fn (string $method, string $url, array $options = []) => new MockResponse(),
+                static fn (string $method, string $url, array $options = []) => new MockResponse(),
             ],
         ];
 
@@ -183,7 +173,7 @@ class MockHttpClientTest extends HttpClientTestCase
     {
         return [
             [static function (): \Generator { yield new MockResponse(); }, 'The response factory passed to MockHttpClient must return/yield an instance of ResponseInterface, "Generator" given.'],
-            [static function (): array { return [new MockResponse()]; }, 'The response factory passed to MockHttpClient must return/yield an instance of ResponseInterface, "array" given.'],
+            [static fn (): array => [new MockResponse()], 'The response factory passed to MockHttpClient must return/yield an instance of ResponseInterface, "array" given.'],
             [(static function (): \Generator { yield 'ccc'; })(), 'The response factory passed to MockHttpClient must return/yield an instance of ResponseInterface, "string" given.'],
         ];
     }

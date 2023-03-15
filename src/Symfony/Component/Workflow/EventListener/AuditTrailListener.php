@@ -27,22 +27,31 @@ class AuditTrailListener implements EventSubscriberInterface
         $this->logger = $logger;
     }
 
+    /**
+     * @return void
+     */
     public function onLeave(Event $event)
     {
         foreach ($event->getTransition()->getFroms() as $place) {
-            $this->logger->info(sprintf('Leaving "%s" for subject of class "%s" in workflow "%s".', $place, \get_class($event->getSubject()), $event->getWorkflowName()));
+            $this->logger->info(sprintf('Leaving "%s" for subject of class "%s" in workflow "%s".', $place, $event->getSubject()::class, $event->getWorkflowName()));
         }
     }
 
+    /**
+     * @return void
+     */
     public function onTransition(Event $event)
     {
-        $this->logger->info(sprintf('Transition "%s" for subject of class "%s" in workflow "%s".', $event->getTransition()->getName(), \get_class($event->getSubject()), $event->getWorkflowName()));
+        $this->logger->info(sprintf('Transition "%s" for subject of class "%s" in workflow "%s".', $event->getTransition()->getName(), $event->getSubject()::class, $event->getWorkflowName()));
     }
 
+    /**
+     * @return void
+     */
     public function onEnter(Event $event)
     {
         foreach ($event->getTransition()->getTos() as $place) {
-            $this->logger->info(sprintf('Entering "%s" for subject of class "%s" in workflow "%s".', $place, \get_class($event->getSubject()), $event->getWorkflowName()));
+            $this->logger->info(sprintf('Entering "%s" for subject of class "%s" in workflow "%s".', $place, $event->getSubject()::class, $event->getWorkflowName()));
         }
     }
 

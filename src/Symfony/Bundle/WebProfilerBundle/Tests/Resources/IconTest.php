@@ -34,6 +34,6 @@ class IconTest extends TestCase
 
     public static function provideIconFilePaths()
     {
-        return array_map(function ($filePath) { return (array) $filePath; }, glob(__DIR__.'/../../Resources/views/Icon/*.svg'));
+        return array_map(fn ($filePath) => (array) $filePath, glob(__DIR__.'/../../Resources/views/Icon/*.svg'));
     }
 }

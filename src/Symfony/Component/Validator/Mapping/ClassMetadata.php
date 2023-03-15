@@ -194,6 +194,10 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
             $this->cascadingStrategy = CascadingStrategy::CASCADE;
 
             foreach ($this->getReflectionClass()->getProperties() as $property) {
+                if (isset($constraint->exclude[$property->getName()])) {
+                    continue;
+                }
+
                 if ($property->hasType() && (('array' === $type = $property->getType()->getName()) || class_exists($type))) {
                     $this->addPropertyConstraint($property->getName(), new Valid());
                 }
@@ -317,6 +321,8 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
 
     /**
      * Merges the constraints of the given metadata into this object.
+     *
+     * @return void
      */
     public function mergeConstraints(self $source)
     {
@@ -423,6 +429,8 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
     /**
      * Sets whether a group sequence provider should be used.
      *
+     * @return void
+     *
      * @throws GroupDefinitionException
      */
     public function setGroupSequenceProvider(bool $active)
@@ -448,14 +456,14 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
         return $this->cascadingStrategy;
     }
 
-    private function addPropertyMetadata(PropertyMetadataInterface $metadata)
+    private function addPropertyMetadata(PropertyMetadataInterface $metadata): void
     {
         $property = $metadata->getPropertyName();
 
         $this->members[$property][] = $metadata;
     }
 
-    private function checkConstraint(Constraint $constraint)
+    private function checkConstraint(Constraint $constraint): void
     {
         if (!\in_array(Constraint::CLASS_CONSTRAINT, (array) $constraint->getTargets(), true)) {
             throw new ConstraintDefinitionException(sprintf('The constraint "%s" cannot be put on classes.', get_debug_type($constraint)));

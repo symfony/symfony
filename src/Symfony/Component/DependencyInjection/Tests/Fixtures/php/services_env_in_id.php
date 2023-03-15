@@ -15,9 +15,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class ProjectServiceContainer extends Container
 {
     protected $parameters = [];
+    protected readonly \WeakReference $ref;
 
     public function __construct()
     {
+        $this->ref = \WeakReference::create($this);
         $this->parameters = $this->getDefaultParameters();
 
         $this->services = $this->privates = [];
@@ -52,9 +54,9 @@ class ProjectServiceContainer extends Container
      *
      * @return \stdClass
      */
-    protected function getBarService()
+    protected static function getBarService($container)
     {
-        return $this->services['bar'] = new \stdClass(($this->privates['bar_%env(BAR)%'] ??= new \stdClass()));
+        return $container->services['bar'] = new \stdClass(($container->privates['bar_%env(BAR)%'] ??= new \stdClass()));
     }
 
     /**
@@ -62,9 +64,9 @@ class ProjectServiceContainer extends Container
      *
      * @return \stdClass
      */
-    protected function getFooService()
+    protected static function getFooService($container)
     {
-        return $this->services['foo'] = new \stdClass(($this->privates['bar_%env(BAR)%'] ??= new \stdClass()), ['baz_'.$this->getEnv('string:BAR') => new \stdClass()]);
+        return $container->services['foo'] = new \stdClass(($container->privates['bar_%env(BAR)%'] ??= new \stdClass()), ['baz_'.$container->getEnv('string:BAR') => new \stdClass()]);
     }
 
     public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null

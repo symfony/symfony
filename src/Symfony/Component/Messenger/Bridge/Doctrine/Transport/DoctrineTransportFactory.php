@@ -30,7 +30,7 @@ class DoctrineTransportFactory implements TransportFactoryInterface
         $this->registry = $registry;
     }
 
-    public function createTransport(string $dsn, array $options, SerializerInterface $serializer): TransportInterface
+    public function createTransport(#[\SensitiveParameter] string $dsn, array $options, SerializerInterface $serializer): TransportInterface
     {
         $useNotify = ($options['use_notify'] ?? true);
         unset($options['transport_name'], $options['use_notify']);
@@ -40,7 +40,7 @@ class DoctrineTransportFactory implements TransportFactoryInterface
         try {
             $driverConnection = $this->registry->getConnection($configuration['connection']);
         } catch (\InvalidArgumentException $e) {
-            throw new TransportException(sprintf('Could not find Doctrine connection from Messenger DSN "%s".', $dsn), 0, $e);
+            throw new TransportException('Could not find Doctrine connection from Messenger DSN.', 0, $e);
         }
 
         if ($useNotify && $driverConnection->getDatabasePlatform() instanceof PostgreSQLPlatform) {
@@ -52,7 +52,7 @@ class DoctrineTransportFactory implements TransportFactoryInterface
         return new DoctrineTransport($connection, $serializer);
     }
 
-    public function supports(string $dsn, array $options): bool
+    public function supports(#[\SensitiveParameter] string $dsn, array $options): bool
     {
         return str_starts_with($dsn, 'doctrine://');
     }

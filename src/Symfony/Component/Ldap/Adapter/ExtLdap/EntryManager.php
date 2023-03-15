@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Ldap\Adapter\ExtLdap;
 
+use LDAP\Connection as LDAPConnection;
 use Symfony\Component\Ldap\Adapter\EntryManagerInterface;
 use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Ldap\Exception\LdapException;
@@ -30,6 +31,9 @@ class EntryManager implements EntryManagerInterface
         $this->connection = $connection;
     }
 
+    /**
+     * @return $this
+     */
     public function add(Entry $entry)
     {
         $con = $this->getConnectionResource();
@@ -41,6 +45,9 @@ class EntryManager implements EntryManagerInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function update(Entry $entry)
     {
         $con = $this->getConnectionResource();
@@ -48,8 +55,13 @@ class EntryManager implements EntryManagerInterface
         if (!@ldap_modify($con, $entry->getDn(), $entry->getAttributes())) {
             throw new LdapException(sprintf('Could not update entry "%s": ', $entry->getDn()).ldap_error($con), ldap_errno($con));
         }
+
+        return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function remove(Entry $entry)
     {
         $con = $this->getConnectionResource();
@@ -57,10 +69,14 @@ class EntryManager implements EntryManagerInterface
         if (!@ldap_delete($con, $entry->getDn())) {
             throw new LdapException(sprintf('Could not remove entry "%s": ', $entry->getDn()).ldap_error($con), ldap_errno($con));
         }
+
+        return $this;
     }
 
     /**
      * Adds values to an entry's multi-valued attribute from the LDAP server.
+     *
+     * @return $this
      *
      * @throws NotBoundException
      * @throws LdapException
@@ -72,10 +88,14 @@ class EntryManager implements EntryManagerInterface
         if (!@ldap_mod_add($con, $entry->getDn(), [$attribute => $values])) {
             throw new LdapException(sprintf('Could not add values to entry "%s", attribute "%s": ', $entry->getDn(), $attribute).ldap_error($con), ldap_errno($con));
         }
+
+        return $this;
     }
 
     /**
      * Removes values from an entry's multi-valued attribute from the LDAP server.
+     *
+     * @return $this
      *
      * @throws NotBoundException
      * @throws LdapException
@@ -87,8 +107,13 @@ class EntryManager implements EntryManagerInterface
         if (!@ldap_mod_del($con, $entry->getDn(), [$attribute => $values])) {
             throw new LdapException(sprintf('Could not remove values from entry "%s", attribute "%s": ', $entry->getDn(), $attribute).ldap_error($con), ldap_errno($con));
         }
+
+        return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function rename(Entry $entry, string $newRdn, bool $removeOldRdn = true)
     {
         $con = $this->getConnectionResource();
@@ -96,10 +121,14 @@ class EntryManager implements EntryManagerInterface
         if (!@ldap_rename($con, $entry->getDn(), $newRdn, '', $removeOldRdn)) {
             throw new LdapException(sprintf('Could not rename entry "%s" to "%s": ', $entry->getDn(), $newRdn).ldap_error($con), ldap_errno($con));
         }
+
+        return $this;
     }
 
     /**
      * Moves an entry on the Ldap server.
+     *
+     * @return $this
      *
      * @throws NotBoundException if the connection has not been previously bound
      * @throws LdapException     if an error is thrown during the rename operation
@@ -112,10 +141,14 @@ class EntryManager implements EntryManagerInterface
         if (!@ldap_rename($con, $entry->getDn(), $rdn, $newParent, true)) {
             throw new LdapException(sprintf('Could not move entry "%s" to "%s": ', $entry->getDn(), $newParent).ldap_error($con), ldap_errno($con));
         }
+
+        return $this;
     }
 
     /**
      * Get the connection resource, but first check if the connection is bound.
+     *
+     * @return resource|LDAPConnection
      */
     private function getConnectionResource()
     {
@@ -130,9 +163,11 @@ class EntryManager implements EntryManagerInterface
     /**
      * @param iterable<int, UpdateOperation> $operations An array or iterable of UpdateOperation instances
      *
+     * @return $this
+     *
      * @throws UpdateOperationException in case of an error
      */
-    public function applyOperations(string $dn, iterable $operations): void
+    public function applyOperations(string $dn, iterable $operations)
     {
         $operationsMapped = [];
         foreach ($operations as $modification) {
@@ -143,6 +178,8 @@ class EntryManager implements EntryManagerInterface
         if (!@ldap_modify_batch($con, $dn, $operationsMapped)) {
             throw new UpdateOperationException(sprintf('Error executing UpdateOperation on "%s": ', $dn).ldap_error($con), ldap_errno($con));
         }
+
+        return $this;
     }
 
     private function parseRdnFromEntry(Entry $entry): string

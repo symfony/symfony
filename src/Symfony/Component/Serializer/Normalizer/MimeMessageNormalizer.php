@@ -42,7 +42,20 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
         $this->headersProperty = new \ReflectionProperty(Headers::class, 'headers');
     }
 
-    public function setSerializer(SerializerInterface $serializer)
+    public function getSupportedTypes(?string $format): array
+    {
+        $isCacheable = __CLASS__ === static::class || $this->hasCacheableSupportsMethod();
+
+        return [
+            Message::class => $isCacheable,
+            Headers::class => $isCacheable,
+            HeaderInterface::class => $isCacheable,
+            Address::class => $isCacheable,
+            AbstractPart::class => $isCacheable,
+        ];
+    }
+
+    public function setSerializer(SerializerInterface $serializer): void
     {
         $this->serializer = $serializer;
         $this->normalizer->setSerializer($serializer);
@@ -101,8 +114,13 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
         return is_a($type, Message::class, true) || Headers::class === $type || AbstractPart::class === $type;
     }
 
+    /**
+     * @deprecated since Symfony 6.3, use "getSupportedTypes()" instead
+     */
     public function hasCacheableSupportsMethod(): bool
     {
+        trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
+
         return __CLASS__ === static::class;
     }
 }

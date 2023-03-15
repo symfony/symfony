@@ -48,7 +48,7 @@ class TraceableEventDispatcherTest extends TestCase
     public function testStopwatchCheckControllerOnRequestEvent()
     {
         $stopwatch = $this->getMockBuilder(Stopwatch::class)
-            ->setMethods(['isStarted'])
+            ->onlyMethods(['isStarted'])
             ->getMock();
         $stopwatch->expects($this->once())
             ->method('isStarted')
@@ -64,7 +64,7 @@ class TraceableEventDispatcherTest extends TestCase
     public function testStopwatchStopControllerOnRequestEvent()
     {
         $stopwatch = $this->getMockBuilder(Stopwatch::class)
-            ->setMethods(['isStarted', 'stop'])
+            ->onlyMethods(['isStarted', 'stop'])
             ->getMock();
         $stopwatch->expects($this->once())
             ->method('isStarted')
@@ -113,9 +113,7 @@ class TraceableEventDispatcherTest extends TestCase
     protected function getHttpKernel($dispatcher)
     {
         $controllerResolver = $this->createMock(ControllerResolverInterface::class);
-        $controllerResolver->expects($this->once())->method('getController')->willReturn(function () {
-            return new Response();
-        });
+        $controllerResolver->expects($this->once())->method('getController')->willReturn(fn () => new Response());
         $argumentResolver = $this->createMock(ArgumentResolverInterface::class);
         $argumentResolver->expects($this->once())->method('getArguments')->willReturn([]);
 

@@ -69,6 +69,8 @@ class RequestMatcher implements RequestMatcherInterface
      * Adds a check for the HTTP scheme.
      *
      * @param string|string[]|null $scheme An HTTP scheme or an array of HTTP schemes
+     *
+     * @return void
      */
     public function matchScheme(string|array|null $scheme)
     {
@@ -77,6 +79,8 @@ class RequestMatcher implements RequestMatcherInterface
 
     /**
      * Adds a check for the URL host name.
+     *
+     * @return void
      */
     public function matchHost(?string $regexp)
     {
@@ -87,6 +91,8 @@ class RequestMatcher implements RequestMatcherInterface
      * Adds a check for the the URL port.
      *
      * @param int|null $port The port number to connect to
+     *
+     * @return void
      */
     public function matchPort(?int $port)
     {
@@ -95,6 +101,8 @@ class RequestMatcher implements RequestMatcherInterface
 
     /**
      * Adds a check for the URL path info.
+     *
+     * @return void
      */
     public function matchPath(?string $regexp)
     {
@@ -105,6 +113,8 @@ class RequestMatcher implements RequestMatcherInterface
      * Adds a check for the client IP.
      *
      * @param string $ip A specific IP address or a range specified using IP/netmask like 192.168.1.0/24
+     *
+     * @return void
      */
     public function matchIp(string $ip)
     {
@@ -115,20 +125,22 @@ class RequestMatcher implements RequestMatcherInterface
      * Adds a check for the client IP.
      *
      * @param string|string[]|null $ips A specific IP address or a range specified using IP/netmask like 192.168.1.0/24
+     *
+     * @return void
      */
     public function matchIps(string|array|null $ips)
     {
         $ips = null !== $ips ? (array) $ips : [];
 
-        $this->ips = array_reduce($ips, static function (array $ips, string $ip) {
-            return array_merge($ips, preg_split('/\s*,\s*/', $ip));
-        }, []);
+        $this->ips = array_reduce($ips, static fn (array $ips, string $ip) => array_merge($ips, preg_split('/\s*,\s*/', $ip)), []);
     }
 
     /**
      * Adds a check for the HTTP method.
      *
      * @param string|string[]|null $method An HTTP method or an array of HTTP methods
+     *
+     * @return void
      */
     public function matchMethod(string|array|null $method)
     {
@@ -137,6 +149,8 @@ class RequestMatcher implements RequestMatcherInterface
 
     /**
      * Adds a check for request attribute.
+     *
+     * @return void
      */
     public function matchAttribute(string $key, string $regexp)
     {

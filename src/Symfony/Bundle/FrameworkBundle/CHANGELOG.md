@@ -1,6 +1,24 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add `extra` option for `http_client.default_options` and `http_client.scoped_client`
+ * Add `DomCrawlerAssertionsTrait::assertSelectorCount(int $count, string $selector)`
+ * Allow to avoid `limit` definition in a RateLimiter configuration when using the `no_limit` policy
+ * Add `--format` option to the `debug:config` command
+ * Add support to pass namespace wildcard in `framework.messenger.routing`
+ * Deprecate `framework:exceptions` tag, unwrap it and replace `framework:exception` tags' `name` attribute by `class`
+ * Deprecate the `notifier.logger_notification_listener` service, use the `notifier.notification_logger_listener` service instead
+ * Allow setting private services with the test container
+ * Register alias for argument for workflow services with workflow name only
+ * Configure the `ErrorHandler` on `FrameworkBundle::boot()`
+ * Allow setting `debug.container.dump` to `false` to disable dumping the container to XML
+ * Add `framework.http_cache.skip_response_headers` option
+ * Display warmers duration on debug verbosity for `cache:clear` command
+ * Add `AbstractController::sendEarlyHints()` to send HTTP Early Hints
+
 6.2
 ---
 

@@ -580,9 +580,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
     {
         $form = $this->factory->createNamed('name', ChoiceType::class, '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
-            'choice_label' => function () {
-                return false;
-            },
+            'choice_label' => fn () => false,
             'multiple' => false,
             'expanded' => true,
         ]);
@@ -901,9 +899,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
     {
         $form = $this->factory->createNamed('name', ChoiceType::class, ['&a'], [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
-            'choice_label' => function () {
-                return false;
-            },
+            'choice_label' => fn () => false,
             'multiple' => true,
             'expanded' => true,
         ]);

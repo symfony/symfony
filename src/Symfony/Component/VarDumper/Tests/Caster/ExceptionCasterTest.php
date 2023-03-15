@@ -12,6 +12,7 @@
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\ErrorHandler\Exception\SilencedErrorContext;
 use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Caster\ExceptionCaster;
 use Symfony\Component\VarDumper\Caster\FrameStub;
@@ -27,6 +28,21 @@ class ExceptionCasterTest extends TestCase
     private function getTestException($msg, &$ref = null)
     {
         return new \Exception(''.$msg);
+    }
+
+    private function getTestError($msg): \Error
+    {
+        return new \Error(''.$msg);
+    }
+
+    private function getTestErrorException($msg): \ErrorException
+    {
+        return new \ErrorException(''.$msg);
+    }
+
+    private function getTestSilencedErrorContext(): SilencedErrorContext
+    {
+        return new SilencedErrorContext(\E_ERROR, __FILE__, __LINE__);
     }
 
     protected function tearDown(): void
@@ -59,6 +75,79 @@ EODUMP;
 
         $this->assertDumpMatchesFormat($expectedDump, $e);
         $this->assertSame(['foo'], $ref);
+    }
+
+    public function testDefaultSettingsOnError()
+    {
+        $e = $this->getTestError('foo');
+
+        $expectedDump = <<<'EODUMP'
+Error {
+  #message: "foo"
+  #code: 0
+  #file: "%sExceptionCasterTest.php"
+  #line: %d
+  trace: {
+    %s%eTests%eCaster%eExceptionCasterTest.php:%d {
+      Symfony\Component\VarDumper\Tests\Caster\ExceptionCasterTest->getTestError($msg): Error
+      › {
+      ›     return new \Error(''.$msg);
+      › }
+    }
+    %s%eTests%eCaster%eExceptionCasterTest.php:%d { …}
+%A
+EODUMP;
+
+        $this->assertDumpMatchesFormat($expectedDump, $e);
+    }
+
+    public function testDefaultSettingsOnErrorException()
+    {
+        $e = $this->getTestErrorException('foo');
+
+        $expectedDump = <<<'EODUMP'
+ErrorException {
+  #message: "foo"
+  #code: 0
+  #file: "%sExceptionCasterTest.php"
+  #line: %d
+  #severity: E_ERROR
+  trace: {
+    %s%eTests%eCaster%eExceptionCasterTest.php:%d {
+      Symfony\Component\VarDumper\Tests\Caster\ExceptionCasterTest->getTestErrorException($msg): ErrorException
+      › {
+      ›     return new \ErrorException(''.$msg);
+      › }
+    }
+    %s%eTests%eCaster%eExceptionCasterTest.php:%d { …}
+%A
+EODUMP;
+
+        $this->assertDumpMatchesFormat($expectedDump, $e);
+    }
+
+    /**
+     * @requires function \Symfony\Component\ErrorHandler\Exception\SilencedErrorContext::__construct
+     */
+    public function testCastSilencedErrorContext()
+    {
+        $e = $this->getTestSilencedErrorContext();
+
+        $expectedDump = <<<'EODUMP'
+Symfony\Component\ErrorHandler\Exception\SilencedErrorContext {
+  +count: 1
+  -severity: E_ERROR
+  trace: {
+    %s%eTests%eCaster%eExceptionCasterTest.php:%d {
+      › {
+      ›     return new SilencedErrorContext(\E_ERROR, __FILE__, __LINE__);
+      › }
+    }
+  }
+}
+EODUMP;
+
+        $this->assertDumpMatchesFormat($expectedDump, $e);
     }
 
     public function testSeek()
@@ -251,8 +340,8 @@ EODUMP;
 
     public function testAnonymous()
     {
-        $e = new \Exception(sprintf('Boo "%s" ba.', \get_class(new class('Foo') extends \Exception {
-        })));
+        $e = new \Exception(sprintf('Boo "%s" ba.', (new class('Foo') extends \Exception {
+        })::class));
 
         $expectedDump = <<<'EODUMP'
 Exception {

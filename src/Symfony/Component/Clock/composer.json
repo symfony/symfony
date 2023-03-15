@@ -23,6 +23,7 @@
         "psr/clock": "^1.0"
     },
     "autoload": {
+        "files": [ "Resources/now.php" ],
         "psr-4": { "Symfony\\Component\\Clock\\": "" },
         "exclude-from-classmap": [
             "/Tests/"

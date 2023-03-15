@@ -727,7 +727,7 @@ class Table
     /**
      * fill cells for a row that contains colspan > 1.
      */
-    private function fillCells(iterable $row)
+    private function fillCells(iterable $row): iterable
     {
         $newRow = [];
 

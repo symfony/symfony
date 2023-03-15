@@ -232,7 +232,7 @@ class EsiTest extends TestCase
 
     protected function getCache($request, $response)
     {
-        $cache = $this->getMockBuilder(HttpCache::class)->setMethods(['getRequest', 'handle'])->disableOriginalConstructor()->getMock();
+        $cache = $this->getMockBuilder(HttpCache::class)->onlyMethods(['getRequest', 'handle'])->disableOriginalConstructor()->getMock();
         $cache->expects($this->any())
               ->method('getRequest')
               ->willReturn($request)

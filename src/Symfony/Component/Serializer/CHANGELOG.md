@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add `XmlEncoder::SAVE_OPTIONS` context option
+ * Add `BackedEnumNormalizer::ALLOW_INVALID_VALUES` context option
+ * Add method `getSupportedTypes(?string $format)` to `NormalizerInterface` and `DenormalizerInterface`
+ * Deprecate `MissingConstructorArgumentsException` in favor of `MissingConstructorArgumentException`
+ * Deprecate `CacheableSupportsMethodInterface` in favor of the new `getSupportedTypes(?string $format)` methods
+
 6.2
 ---
 

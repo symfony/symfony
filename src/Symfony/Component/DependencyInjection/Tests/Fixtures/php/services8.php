@@ -15,9 +15,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class ProjectServiceContainer extends Container
 {
     protected $parameters = [];
+    protected readonly \WeakReference $ref;
 
     public function __construct()
     {
+        $this->ref = \WeakReference::create($this);
         $this->parameters = $this->getDefaultParameters();
 
         $this->services = $this->privates = [];
@@ -95,8 +97,10 @@ class ProjectServiceContainer extends Container
                 6 => 'false',
                 7 => 'null',
             ],
+            'utf-8 valid string' => 'ָ›ב­–	test',
             'binary' => 'ננננ',
             'binary-control-char' => 'This is a Bell char ',
+            'console banner' => '[37;44m#StandWith[30;43mUkraine[0m',
             'null string' => 'null',
             'string of digits' => '123',
             'string of digits prefixed with minus character' => '-123',

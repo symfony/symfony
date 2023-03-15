@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\Debug\TraceableAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -52,7 +53,7 @@ class LoginFailureEvent extends Event
 
     public function getAuthenticator(): AuthenticatorInterface
     {
-        return $this->authenticator;
+        return $this->authenticator instanceof TraceableAuthenticator ? $this->authenticator->getAuthenticator() : $this->authenticator;
     }
 
     public function getFirewallName(): string
@@ -65,6 +66,9 @@ class LoginFailureEvent extends Event
         return $this->request;
     }
 
+    /**
+     * @return void
+     */
     public function setResponse(?Response $response)
     {
         $this->response = $response;

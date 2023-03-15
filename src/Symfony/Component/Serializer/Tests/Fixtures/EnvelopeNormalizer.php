@@ -31,6 +31,13 @@ class EnvelopeNormalizer implements NormalizerInterface
         ];
     }
 
+    public function getSupportedTypes(?string $format): array
+    {
+        return [
+            EnvelopeObject::class => true,
+        ];
+    }
+
     public function supportsNormalization($data, string $format = null, array $context = []): bool
     {
         return $data instanceof EnvelopeObject;

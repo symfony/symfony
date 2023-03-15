@@ -44,17 +44,17 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
         return $this->handler->close();
     }
 
-    public function read(string $sessionId): string|false
+    public function read(#[\SensitiveParameter] string $sessionId): string|false
     {
         return $this->handler->read($sessionId);
     }
 
-    public function write(string $sessionId, string $data): bool
+    public function write(#[\SensitiveParameter] string $sessionId, string $data): bool
     {
         return $this->handler->write($sessionId, $data);
     }
 
-    public function destroy(string $sessionId): bool
+    public function destroy(#[\SensitiveParameter] string $sessionId): bool
     {
         return $this->handler->destroy($sessionId);
     }
@@ -64,12 +64,12 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
         return $this->handler->gc($maxlifetime);
     }
 
-    public function validateId(string $sessionId): bool
+    public function validateId(#[\SensitiveParameter] string $sessionId): bool
     {
         return !$this->handler instanceof \SessionUpdateTimestampHandlerInterface || $this->handler->validateId($sessionId);
     }
 
-    public function updateTimestamp(string $sessionId, string $data): bool
+    public function updateTimestamp(#[\SensitiveParameter] string $sessionId, string $data): bool
     {
         return $this->handler instanceof \SessionUpdateTimestampHandlerInterface ? $this->handler->updateTimestamp($sessionId, $data) : $this->write($sessionId, $data);
     }

@@ -94,6 +94,9 @@ class AttributeMetadata implements AttributeMetadataInterface
         return $this->name;
     }
 
+    /**
+     * @return void
+     */
     public function addGroup(string $group)
     {
         if (!\in_array($group, $this->groups)) {
@@ -106,6 +109,9 @@ class AttributeMetadata implements AttributeMetadataInterface
         return $this->groups;
     }
 
+    /**
+     * @return void
+     */
     public function setMaxDepth(?int $maxDepth)
     {
         $this->maxDepth = $maxDepth;
@@ -116,6 +122,9 @@ class AttributeMetadata implements AttributeMetadataInterface
         return $this->maxDepth;
     }
 
+    /**
+     * @return void
+     */
     public function setSerializedName(string $serializedName = null)
     {
         if (1 > \func_num_args()) {
@@ -140,6 +149,9 @@ class AttributeMetadata implements AttributeMetadataInterface
         return $this->serializedPath;
     }
 
+    /**
+     * @return void
+     */
     public function setIgnore(bool $ignore)
     {
         $this->ignore = $ignore;
@@ -202,6 +214,9 @@ class AttributeMetadata implements AttributeMetadataInterface
         }
     }
 
+    /**
+     * @return void
+     */
     public function merge(AttributeMetadataInterface $attributeMetadata)
     {
         foreach ($attributeMetadata->getGroups() as $group) {

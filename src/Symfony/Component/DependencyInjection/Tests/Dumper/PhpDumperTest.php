@@ -21,6 +21,9 @@ use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocator as ArgumentServiceLocator;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\AutowireCallable;
+use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Container;
@@ -41,7 +44,9 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Foo;
+use Symfony\Component\DependencyInjection\Tests\Compiler\FooAnnotation;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Wither;
+use Symfony\Component\DependencyInjection\Tests\Compiler\WitherAnnotation;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
@@ -203,7 +208,7 @@ class PhpDumperTest extends TestCase
             $this->fail('->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
         } catch (\Exception $e) {
             $this->assertInstanceOf(RuntimeException::class, $e, '->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
-            $this->assertEquals('Unable to dump a service container if a parameter is an object or a resource.', $e->getMessage(), '->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
+            $this->assertEquals('Unable to dump a service container if a parameter is an object or a resource, got "stdClass".', $e->getMessage(), '->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
         }
     }
 
@@ -222,7 +227,7 @@ class PhpDumperTest extends TestCase
             ->addError('No-no-no-no');
         $container->compile();
         $dumper = new PhpDumper($container);
-        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false]), true);
+        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'inline_factories' => false, 'inline_class_loader' => false]), true);
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
         }
@@ -241,7 +246,7 @@ class PhpDumperTest extends TestCase
             ->setPublic(true);
         $container->compile();
         $dumper = new PhpDumper($container);
-        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false]), true);
+        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'inline_factories' => false, 'inline_class_loader' => false]), true);
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
         }
@@ -252,8 +257,6 @@ class PhpDumperTest extends TestCase
     public function testDumpAsFilesWithFactoriesInlined()
     {
         $container = include self::$fixturesPath.'/containers/container9.php';
-        $container->setParameter('container.dumper.inline_factories', true);
-        $container->setParameter('container.dumper.inline_class_loader', true);
 
         $container->getDefinition('bar')->addTag('hot');
         $container->register('non_shared_foo', \Bar\FooClass::class)
@@ -268,7 +271,7 @@ class PhpDumperTest extends TestCase
         $container->compile();
 
         $dumper = new PhpDumper($container);
-        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'build_time' => 1563381341]), true);
+        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'build_time' => 1563381341, 'inline_factories' => true, 'inline_class_loader' => true]), true);
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
@@ -279,6 +282,7 @@ class PhpDumperTest extends TestCase
     public function testDumpAsFilesWithLazyFactoriesInlined()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('lazy_foo_class', \Bar\FooClass::class);
         $container->setParameter('container.dumper.inline_factories', true);
         $container->setParameter('container.dumper.inline_class_loader', true);
 
@@ -291,7 +295,7 @@ class PhpDumperTest extends TestCase
         $container->compile();
 
         $dumper = new PhpDumper($container);
-        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'build_time' => 1563381341]), true);
+        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'build_time' => 1563381341, 'inline_factories' => true, 'inline_class_loader' => true]), true);
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
@@ -309,7 +313,7 @@ class PhpDumperTest extends TestCase
             ->setLazy(true);
         $container->compile();
         $dumper = new PhpDumper($container);
-        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false]), true);
+        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'inline_factories' => false, 'inline_class_loader' => false]), true);
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
@@ -452,6 +456,41 @@ class PhpDumperTest extends TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services24.php', $dumper->dump());
     }
 
+    /**
+     * The test should be kept in the group as it always expects a deprecation.
+     *
+     * @group legacy
+     */
+    public function testDeprecatedParameters()
+    {
+        $container = include self::$fixturesPath.'/containers/container_deprecated_parameters.php';
+
+        $this->expectDeprecation('Since symfony/test 6.3: The parameter "foo_class" is deprecated.');
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_deprecated_parameters.php', $dumper->dump());
+    }
+
+    /**
+     * The test should be kept in the group as it always expects a deprecation.
+     *
+     * @group legacy
+     */
+    public function testDeprecatedParametersAsFiles()
+    {
+        $container = include self::$fixturesPath.'/containers/container_deprecated_parameters.php';
+
+        $this->expectDeprecation('Since symfony/test 6.3: The parameter "foo_class" is deprecated.');
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false]), true);
+
+        $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/services_deprecated_parameters_as_files.txt', $dump);
+    }
+
     public function testEnvInId()
     {
         $container = include self::$fixturesPath.'/containers/container_env_in_id.php';
@@ -472,7 +511,7 @@ class PhpDumperTest extends TestCase
         $container->compile();
         $dumper = new PhpDumper($container);
 
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services26.php', $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_EnvParameters', 'file' => self::$fixturesPath.'/php/services26.php', 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false]));
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services26.php', $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_EnvParameters', 'file' => self::$fixturesPath.'/php/services26.php', 'inline_factories' => false, 'inline_class_loader' => false]));
 
         require self::$fixturesPath.'/php/services26.php';
         $container = new \Symfony_DI_PhpDumper_Test_EnvParameters();
@@ -925,7 +964,7 @@ class PhpDumperTest extends TestCase
         $container->register(TestDefinition1::class, TestDefinition1::class)->setPublic(true);
 
         $container->addCompilerPass(new class() implements CompilerPassInterface {
-            public function process(ContainerBuilder $container)
+            public function process(ContainerBuilder $container): void
             {
                 $container->setDefinition('late_alias', new Definition(TestDefinition1::class))->setPublic(true);
                 $container->setAlias(TestDefinition1::class, 'late_alias')->setPublic(true);
@@ -987,7 +1026,7 @@ class PhpDumperTest extends TestCase
 
         $dumper = new PhpDumper($container);
 
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_array_params.php', str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dumper->dump(['file' => self::$fixturesPath.'/php/services_array_params.php', 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false])));
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_array_params.php', str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dumper->dump(['file' => self::$fixturesPath.'/php/services_array_params.php', 'inline_factories' => false, 'inline_class_loader' => false])));
     }
 
     public function testExpressionReferencingPrivateService()
@@ -1155,11 +1194,10 @@ class PhpDumperTest extends TestCase
     public function testHotPathOptimizations()
     {
         $container = include self::$fixturesPath.'/containers/container_inline_requires.php';
-        $container->setParameter('inline_requires', true);
         $container->compile();
         $dumper = new PhpDumper($container);
 
-        $dump = $dumper->dump(['hot_path_tag' => 'container.hot_path', 'inline_class_loader_parameter' => 'inline_requires', 'file' => self::$fixturesPath.'/php/services_inline_requires.php']);
+        $dump = $dumper->dump(['hot_path_tag' => 'container.hot_path', 'inline_class_loader' => true, 'file' => self::$fixturesPath.'/php/services_inline_requires.php']);
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
         }
@@ -1192,13 +1230,12 @@ class PhpDumperTest extends TestCase
             new Reference('foo'),
         ]))->setPublic(true);
 
-        $container->setParameter('inline_requires', true);
         $container->compile();
 
         $dumper = new PhpDumper($container);
         eval('?>'.$dumper->dump([
             'class' => 'Symfony_DI_PhpDumper_Test_Object_Class_Name',
-            'inline_class_loader_parameter' => 'inline_requires',
+            'inline_class_loader' => true,
         ]));
 
         $container = new \Symfony_DI_PhpDumper_Test_Object_Class_Name();
@@ -1228,6 +1265,11 @@ class PhpDumperTest extends TestCase
             ->register('foo', FooClassWithEnumAttribute::class)
             ->setPublic(true)
             ->addArgument(FooUnitEnum::BAR);
+        $container
+            ->register('bar', \stdClass::class)
+            ->setPublic(true)
+            ->addArgument('%unit_enum%')
+            ->addArgument('%enum_array%');
 
         $container->setParameter('unit_enum', FooUnitEnum::BAR);
         $container->setParameter('enum_array', [FooUnitEnum::BAR, FooUnitEnum::FOO]);
@@ -1246,8 +1288,14 @@ class PhpDumperTest extends TestCase
         $this->assertSame([FooUnitEnum::BAR, FooUnitEnum::FOO], $container->getParameter('enum_array'));
         $this->assertStringMatchesFormat(<<<'PHP'
 %A
+    protected static function getBarService($container)
+    {
+        return $container->services['bar'] = new \stdClass(\Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::BAR, $container->getParameter('enum_array'));
+    }
+%A
     private function getDynamicParameter(string $name)
     {
+        $container = $this;
         $value = match ($name) {
             'unit_enum' => \Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::BAR,
             'enum_array' => [
@@ -1274,7 +1322,6 @@ PHP
         $dumper = new PhpDumper($container);
         eval('?>'.$dumper->dump([
             'class' => 'Symfony_DI_PhpDumper_Test_UninitializedSyntheticReference',
-            'inline_class_loader_parameter' => 'inline_requires',
         ]));
 
         $container = new \Symfony_DI_PhpDumper_Test_UninitializedSyntheticReference();
@@ -1402,7 +1449,38 @@ PHP
         $this->assertContains('bar', $service_ids);
     }
 
-    public function testWither()
+    /**
+     * @group legacy
+     */
+    public function testWitherAnnotation()
+    {
+        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Compiler\FooAnnotation::cloneFoo()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
+        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Compiler\WitherAnnotation::setFoo()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
+        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Compiler\WitherAnnotation::withFoo1()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
+        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Compiler\WitherAnnotation::withFoo2()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
+
+        $container = new ContainerBuilder();
+        $container->register(FooAnnotation::class)
+            ->setAutowired(true);
+
+        $container
+            ->register('wither', WitherAnnotation::class)
+            ->setPublic(true)
+            ->setAutowired(true);
+
+        $container->compile();
+        $dumper = new PhpDumper($container);
+        $dump = $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Service_Wither_Annotation']);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_wither_annotation.php', $dump);
+        eval('?>'.$dump);
+
+        $container = new \Symfony_DI_PhpDumper_Service_Wither_Annotation();
+
+        $wither = $container->get('wither');
+        $this->assertInstanceOf(FooAnnotation::class, $wither->foo);
+    }
+
+    public function testWitherAttribute()
     {
         $container = new ContainerBuilder();
         $container->register(Foo::class)
@@ -1469,6 +1547,36 @@ PHP
 
         $wither = $container->get('wither');
         $this->assertInstanceOf(Foo::class, $wither->foo);
+    }
+
+    public function testCurrentFactoryInlining()
+    {
+        $container = new ContainerBuilder();
+        $container->register(Foo::class);
+
+        $container
+            ->register('inlined_current', Foo::class)
+            ->setFactory('current')
+            ->setPublic(true)
+            ->setArguments([[new Reference(Foo::class)]]);
+
+        $container
+            ->register('not_inlined_current', Foo::class)
+            ->setFactory('current')
+            ->setPublic(true)
+            ->setArguments([[new Reference(Foo::class), 123]]);
+
+        $container->compile();
+        $dumper = new PhpDumper($container);
+        $dump = $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Service_CurrentFactoryInlining']);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_current_factory_inlining.php', $dump);
+        eval('?>'.$dump);
+
+        $container = new \Symfony_DI_PhpDumper_Service_CurrentFactoryInlining();
+
+        $foo = $container->get('inlined_current');
+        $this->assertInstanceOf(Foo::class, $foo);
+        $this->assertSame($foo, $container->get('not_inlined_current'));
     }
 
     public function testDumpServiceWithAbstractArgument()
@@ -1569,10 +1677,47 @@ PHP
             ->setFactory(['Closure', 'fromCallable'])
             ->setArguments([new Reference('bar')]);
         $container->register('bar', 'stdClass');
+        $container->register('closure_of_service_closure', 'Closure')
+            ->setPublic('true')
+            ->setFactory(['Closure', 'fromCallable'])
+            ->setArguments([new ServiceClosureArgument(new Reference('bar2'))]);
+        $container->register('bar2', 'stdClass');
         $container->compile();
         $dumper = new PhpDumper($container);
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/closure.php', $dumper->dump());
+    }
+
+    public function testAutowireClosure()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', Foo::class)
+            ->setPublic('true');
+        $container->register('baz', \Closure::class)
+            ->setFactory(['Closure', 'fromCallable'])
+            ->setArguments(['var_dump'])
+            ->setPublic('true');
+        $container->register('bar', LazyConsumer::class)
+            ->setPublic('true')
+            ->setAutowired(true);
+        $container->compile();
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/autowire_closure.php', $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Autowire_Closure']));
+
+        require self::$fixturesPath.'/php/autowire_closure.php';
+
+        $container = new \Symfony_DI_PhpDumper_Test_Autowire_Closure();
+
+        $this->assertInstanceOf(Foo::class, $container->get('foo'));
+        $this->assertInstanceOf(LazyConsumer::class, $bar = $container->get('bar'));
+        $this->assertInstanceOf(\Closure::class, $bar->foo);
+        $this->assertInstanceOf(\Closure::class, $bar->baz);
+        $this->assertInstanceOf(\Closure::class, $bar->buz);
+        $this->assertSame($container->get('foo'), ($bar->foo)());
+        $this->assertSame($container->get('baz'), $bar->baz);
+        $this->assertInstanceOf(Foo::class, $fooClone = ($bar->buz)());
+        $this->assertNotSame($container->get('foo'), $fooClone);
     }
 }
 
@@ -1597,5 +1742,18 @@ class FooForDeepGraph
     {
         // clone to verify that $b has been fully initialized before
         $this->bClone = clone $b;
+    }
+}
+
+class LazyConsumer
+{
+    public function __construct(
+        #[AutowireServiceClosure('foo')]
+        public \Closure $foo,
+        #[Autowire(service: 'baz')]
+        public \Closure $baz,
+        #[AutowireCallable(service: 'foo', method: 'cloneFoo')]
+        public \Closure $buz,
+    ) {
     }
 }

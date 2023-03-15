@@ -102,14 +102,12 @@ class PostmarkApiTransportTest extends TestCase
 
     public function testSendThrowsForErrorResponse()
     {
-        $client = new MockHttpClient(static function (string $method, string $url, array $options): ResponseInterface {
-            return new MockResponse(json_encode(['Message' => 'i\'m a teapot', 'ErrorCode' => 418]), [
-                'http_code' => 418,
-                'response_headers' => [
-                    'content-type' => 'application/json',
-                ],
-            ]);
-        });
+        $client = new MockHttpClient(static fn (string $method, string $url, array $options): ResponseInterface => new MockResponse(json_encode(['Message' => 'i\'m a teapot', 'ErrorCode' => 418]), [
+            'http_code' => 418,
+            'response_headers' => [
+                'content-type' => 'application/json',
+            ],
+        ]));
         $transport = new PostmarkApiTransport('KEY', $client);
         $transport->setPort(8984);
 

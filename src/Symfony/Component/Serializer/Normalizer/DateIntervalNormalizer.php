@@ -33,6 +33,13 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
+    public function getSupportedTypes(?string $format): array
+    {
+        return [
+            \DateInterval::class => __CLASS__ === static::class || $this->hasCacheableSupportsMethod(),
+        ];
+    }
+
     /**
      * @throws InvalidArgumentException
      */
@@ -53,8 +60,13 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
         return $data instanceof \DateInterval;
     }
 
+    /**
+     * @deprecated since Symfony 6.3, use "getSupportedTypes()" instead
+     */
     public function hasCacheableSupportsMethod(): bool
     {
+        trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
+
         return __CLASS__ === static::class;
     }
 

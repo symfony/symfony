@@ -145,15 +145,13 @@ class ConfigurationTest extends TestCase
     public static function provideInvalidAssetConfigurationTests()
     {
         // helper to turn config into embedded package config
-        $createPackageConfig = function (array $packageConfig) {
-            return [
-                'base_urls' => '//example.com',
-                'version' => 1,
-                'packages' => [
-                    'foo' => $packageConfig,
-                ],
-            ];
-        };
+        $createPackageConfig = fn (array $packageConfig) => [
+            'base_urls' => '//example.com',
+            'version' => 1,
+            'packages' => [
+                'foo' => $packageConfig,
+            ],
+        ];
 
         $config = [
             'version' => 1,
@@ -655,6 +653,7 @@ class ConfigurationTest extends TestCase
             ],
             'notifier' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(Notifier::class),
+                'message_bus' => null,
                 'chatter_transports' => [],
                 'texter_transports' => [],
                 'channel_policy' => [],
@@ -672,6 +671,7 @@ class ConfigurationTest extends TestCase
                 'enabled' => false,
                 'debug' => '%kernel.debug%',
                 'private_headers' => [],
+                'skip_response_headers' => [],
             ],
             'rate_limiter' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(TokenBucketLimiter::class),
@@ -688,6 +688,14 @@ class ConfigurationTest extends TestCase
                 'sanitizers' => [],
             ],
             'exceptions' => [],
+            'webhook' => [
+                'enabled' => false,
+                'routing' => [],
+                'message_bus' => 'messenger.default_bus',
+            ],
+            'remote-event' => [
+                'enabled' => false,
+            ],
         ];
     }
 }

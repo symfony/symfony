@@ -141,12 +141,17 @@ class Command
      * Ignores validation errors.
      *
      * This is mainly useful for the help command.
+     *
+     * @return void
      */
     public function ignoreValidationErrors()
     {
         $this->ignoreValidationErrors = true;
     }
 
+    /**
+     * @return void
+     */
     public function setApplication(Application $application = null)
     {
         if (1 > \func_num_args()) {
@@ -162,6 +167,9 @@ class Command
         $this->fullDefinition = null;
     }
 
+    /**
+     * @return void
+     */
     public function setHelperSet(HelperSet $helperSet)
     {
         $this->helperSet = $helperSet;
@@ -198,6 +206,8 @@ class Command
 
     /**
      * Configures the current command.
+     *
+     * @return void
      */
     protected function configure()
     {
@@ -228,6 +238,8 @@ class Command
      * This method is executed before the InputDefinition is validated.
      * This means that this is the only place where the command can
      * interactively ask for values of missing required arguments.
+     *
+     * @return void
      */
     protected function interact(InputInterface $input, OutputInterface $output)
     {
@@ -242,6 +254,8 @@ class Command
      *
      * @see InputInterface::bind()
      * @see InputInterface::validate()
+     *
+     * @return void
      */
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
@@ -378,7 +392,7 @@ class Command
      *
      * @internal
      */
-    public function mergeApplicationDefinition(bool $mergeArgs = true)
+    public function mergeApplicationDefinition(bool $mergeArgs = true): void
     {
         if (null === $this->application) {
             return;
@@ -702,7 +716,7 @@ class Command
      *
      * @throws InvalidArgumentException When the name is invalid
      */
-    private function validateName(string $name)
+    private function validateName(string $name): void
     {
         if (!preg_match('/^[^\:]++(\:[^\:]++)*$/', $name)) {
             throw new InvalidArgumentException(sprintf('Command name "%s" is invalid.', $name));

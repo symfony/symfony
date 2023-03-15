@@ -40,9 +40,9 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
 {
     public function testRow()
     {
-        $form = $this->factory->createNamed('name', TextType::class);
-        $form->addError(new FormError('[trans]Error![/trans]'));
-        $html = $this->renderRow($form->createView());
+        $form = $this->factory->createNamed('')->add('name', TextType::class);
+        $form->get('name')->addError(new FormError('[trans]Error![/trans]'));
+        $html = $this->renderRow($form->get('name')->createView());
 
         $this->assertMatchesXpath($html,
             '/div
@@ -61,9 +61,9 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
 
     public function testRowWithCustomClass()
     {
-        $form = $this->factory->createNamed('name', TextType::class);
-        $form->addError(new FormError('[trans]Error![/trans]'));
-        $html = $this->renderRow($form->createView(), [
+        $form = $this->factory->createNamed('')->add('name', TextType::class);
+        $form->get('name')->addError(new FormError('[trans]Error![/trans]'));
+        $html = $this->renderRow($form->get('name')->createView(), [
             'row_attr' => [
                 'class' => 'mb-5',
             ],
@@ -309,10 +309,33 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
 
     public function testErrors()
     {
-        $form = $this->factory->createNamed('name', TextType::class);
+        self::markTestSkipped('This method has been split into testRootErrors() and testRowErrors().');
+    }
+
+    public function testRootErrors()
+    {
+        $form = $this->factory->createNamed('');
         $form->addError(new FormError('[trans]Error 1[/trans]'));
         $form->addError(new FormError('[trans]Error 2[/trans]'));
         $html = $this->renderErrors($form->createView());
+
+        $this->assertMatchesXpath($html,
+            '/div
+    [@class="alert alert-danger d-block"]
+    [.="[trans]Error 1[/trans]"]
+    /following-sibling::div
+    [@class="alert alert-danger d-block"]
+    [.="[trans]Error 2[/trans]"]
+'
+        );
+    }
+
+    public function testRowErrors()
+    {
+        $form = $this->factory->createNamed('')->add('name', TextType::class);
+        $form->get('name')->addError(new FormError('[trans]Error 1[/trans]'));
+        $form->get('name')->addError(new FormError('[trans]Error 2[/trans]'));
+        $html = $this->renderErrors($form->get('name')->createView());
 
         $this->assertMatchesXpath($html,
             '/div

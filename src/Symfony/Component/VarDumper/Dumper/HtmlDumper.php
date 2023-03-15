@@ -862,7 +862,6 @@ EOHTML
         } elseif ('private' === $style) {
             $style .= sprintf(' title="Private property defined in class:&#10;`%s`"', esc($this->utf8Encode($attr['class'])));
         }
-        $map = static::$controlCharsMap;
 
         if (isset($attr['ellipsis'])) {
             $class = 'sf-dump-ellipsis';
@@ -881,6 +880,7 @@ EOHTML
             }
         }
 
+        $map = static::$controlCharsMap;
         $v = "<span class=sf-dump-{$style}>".preg_replace_callback(static::$controlCharsRx, function ($c) use ($map) {
             $s = $b = '<span class="sf-dump-default';
             $c = $c[$i = 0];
@@ -902,6 +902,12 @@ EOHTML
 
             return $s.'</span>';
         }, $v).'</span>';
+
+        if (!($attr['binary'] ?? false)) {
+            $v = preg_replace_callback(static::$unicodeCharsRx, function ($c) {
+                return '<span class="sf-dump-default>\u{'.strtoupper(dechex(mb_ord($c[0]))).'}</span>';
+            }, $v);
+        }
 
         if (isset($attr['file']) && $href = $this->getSourceLink($attr['file'], $attr['line'] ?? 0)) {
             $attr['href'] = $href;
@@ -956,7 +962,7 @@ EOHTML
     }
 }
 
-function esc(string $str)
+function esc(string $str): string
 {
     return htmlspecialchars($str, \ENT_QUOTES, 'UTF-8');
 }

@@ -84,7 +84,7 @@ EOF
         return 0;
     }
 
-    private function listMessages(?string $failedTransportName, SymfonyStyle $io, int $max, string $classFilter = null)
+    private function listMessages(?string $failedTransportName, SymfonyStyle $io, int $max, string $classFilter = null): void
     {
         /** @var ListableReceiverInterface $receiver */
         $receiver = $this->getReceiver($failedTransportName);
@@ -99,7 +99,7 @@ EOF
         $this->phpSerializer?->acceptPhpIncompleteClass();
         try {
             foreach ($envelopes as $envelope) {
-                $currentClassName = \get_class($envelope->getMessage());
+                $currentClassName = $envelope->getMessage()::class;
 
                 if ($classFilter && $classFilter !== $currentClassName) {
                     continue;
@@ -140,7 +140,7 @@ EOF
         $io->comment(sprintf('Run <comment>messenger:failed:show {id} --transport=%s -vv</comment> to see message details.', $failedTransportName));
     }
 
-    private function listMessagesPerClass(?string $failedTransportName, SymfonyStyle $io, int $max)
+    private function listMessagesPerClass(?string $failedTransportName, SymfonyStyle $io, int $max): void
     {
         /** @var ListableReceiverInterface $receiver */
         $receiver = $this->getReceiver($failedTransportName);
@@ -151,7 +151,7 @@ EOF
         $this->phpSerializer?->acceptPhpIncompleteClass();
         try {
             foreach ($envelopes as $envelope) {
-                $c = \get_class($envelope->getMessage());
+                $c = $envelope->getMessage()::class;
 
                 if (!isset($countPerClass[$c])) {
                     $countPerClass[$c] = [$c, 0];
@@ -172,7 +172,7 @@ EOF
         $io->table(['Class', 'Count'], $countPerClass);
     }
 
-    private function showMessage(?string $failedTransportName, string $id, SymfonyStyle $io)
+    private function showMessage(?string $failedTransportName, string $id, SymfonyStyle $io): void
     {
         /** @var ListableReceiverInterface $receiver */
         $receiver = $this->getReceiver($failedTransportName);

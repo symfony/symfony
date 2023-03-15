@@ -17,6 +17,7 @@ use Symfony\Component\Security\Http\Authentication\CustomAuthenticationFailureHa
 use Symfony\Component\Security\Http\Authentication\CustomAuthenticationSuccessHandler;
 use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationFailureHandler;
 use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessHandler;
+use Symfony\Component\Security\Http\EventListener\ClearSiteDataLogoutListener;
 use Symfony\Component\Security\Http\EventListener\CookieClearingLogoutListener;
 use Symfony\Component\Security\Http\EventListener\DefaultLogoutListener;
 use Symfony\Component\Security\Http\EventListener\SessionLogoutListener;
@@ -62,6 +63,9 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->set('security.logout.listener.session', SessionLogoutListener::class)
+            ->abstract()
+
+        ->set('security.logout.listener.clear_site_data', ClearSiteDataLogoutListener::class)
             ->abstract()
 
         ->set('security.logout.listener.cookie_clearing', CookieClearingLogoutListener::class)

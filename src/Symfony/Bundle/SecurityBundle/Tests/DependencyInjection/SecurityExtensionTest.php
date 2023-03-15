@@ -848,6 +848,64 @@ class SecurityExtensionTest extends TestCase
         $this->assertContains('custom_firewall_listener_id', $firewallListeners);
     }
 
+    public function testClearSiteDataLogoutListenerEnabled()
+    {
+        $container = $this->getRawContainer();
+
+        $firewallId = 'logout_firewall';
+        $container->loadFromExtension('security', [
+            'firewalls' => [
+                $firewallId => [
+                    'logout' => [
+                        'clear_site_data' => ['*'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $this->assertTrue($container->has('security.logout.listener.clear_site_data.'.$firewallId));
+        $listenerArgument = $container->getDefinition('security.logout.listener.clear_site_data.'.$firewallId)->getArgument(0);
+        $this->assertSame(['*'], $listenerArgument);
+    }
+
+    public function testClearSiteDataLogoutListenerDisabled()
+    {
+        $container = $this->getRawContainer();
+
+        $firewallId = 'logout_firewall';
+        $container->loadFromExtension('security', [
+            'firewalls' => [
+                $firewallId => [
+                    'logout' => [
+                        'clear_site_data' => [],
+                    ],
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $this->assertFalse($container->has('security.logout.listener.clear_site_data.'.$firewallId));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testNothingDoneWithEmptyConfiguration()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security');
+
+        $this->expectDeprecation('Since symfony/security-bundle 6.3: Enabling bundle "Symfony\Bundle\SecurityBundle\SecurityBundle" and not configuring it is deprecated.');
+
+        $container->compile();
+
+        $this->assertFalse($container->has('security.authorization_checker'));
+    }
+
     protected function getRawContainer()
     {
         $container = new ContainerBuilder();
@@ -907,11 +965,11 @@ class TestAuthenticator implements AuthenticatorInterface
 
 class TestUserChecker implements UserCheckerInterface
 {
-    public function checkPreAuth(UserInterface $user)
+    public function checkPreAuth(UserInterface $user): void
     {
     }
 
-    public function checkPostAuth(UserInterface $user)
+    public function checkPostAuth(UserInterface $user): void
     {
     }
 }
@@ -940,7 +998,7 @@ class TestFirewallListenerFactory implements AuthenticatorFactoryInterface, Fire
         return 'custom_listener';
     }
 
-    public function addConfiguration(NodeDefinition $builder)
+    public function addConfiguration(NodeDefinition $builder): void
     {
     }
 }

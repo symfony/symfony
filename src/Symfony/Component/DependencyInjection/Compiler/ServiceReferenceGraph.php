@@ -63,7 +63,7 @@ class ServiceReferenceGraph
     /**
      * Clears all nodes.
      */
-    public function clear()
+    public function clear(): void
     {
         foreach ($this->nodes as $node) {
             $node->clear();
@@ -74,7 +74,7 @@ class ServiceReferenceGraph
     /**
      * Connects 2 nodes together in the Graph.
      */
-    public function connect(?string $sourceId, mixed $sourceValue, ?string $destId, mixed $destValue = null, Reference $reference = null, bool $lazy = false, bool $weak = false, bool $byConstructor = false)
+    public function connect(?string $sourceId, mixed $sourceValue, ?string $destId, mixed $destValue = null, Reference $reference = null, bool $lazy = false, bool $weak = false, bool $byConstructor = false): void
     {
         if (null === $sourceId || null === $destId) {
             return;

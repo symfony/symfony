@@ -91,8 +91,8 @@ trait NotificationAssertionsTrait
     public static function getNotificationEvents(): NotificationEvents
     {
         $container = static::getContainer();
-        if ($container->has('notifier.logger_notification_listener')) {
-            return $container->get('notifier.logger_notification_listener')->getEvents();
+        if ($container->has('notifier.notification_logger_listener')) {
+            return $container->get('notifier.notification_logger_listener')->getEvents();
         }
 
         static::fail('A client must have Notifier enabled to make notifications assertions. Did you forget to require symfony/notifier?');

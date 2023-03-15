@@ -563,9 +563,10 @@ class InlineTest extends TestCase
     /**
      * @dataProvider getTimestampTests
      */
-    public function testParseTimestampAsUnixTimestampByDefault(string $yaml, int $year, int $month, int $day, int $hour, int $minute, int $second)
+    public function testParseTimestampAsUnixTimestampByDefault(string $yaml, int $year, int $month, int $day, int $hour, int $minute, int $second, int $microsecond)
     {
-        $this->assertSame(gmmktime($hour, $minute, $second, $month, $day, $year), Inline::parse($yaml));
+        $expectedDate = (new \DateTimeImmutable($yaml, new \DateTimeZone('UTC')))->format('U');
+        $this->assertSame($microsecond ? (float) "$expectedDate.$microsecond" : (int) $expectedDate, Inline::parse($yaml));
     }
 
     /**
@@ -615,6 +616,98 @@ class InlineTest extends TestCase
     public function testDumpDateTime($dateTime, $expected)
     {
         $this->assertSame($expected, Inline::dump($dateTime));
+    }
+
+    /**
+     * @dataProvider getNumericKeyData
+     */
+    public function testDumpNumericKeyAsString(array|int $input, int $flags, string $expected)
+    {
+        $this->assertSame($expected, Inline::dump($input, $flags));
+    }
+
+    public static function getNumericKeyData()
+    {
+        yield 'Int with flag' => [
+            200,
+            Yaml::DUMP_NUMERIC_KEY_AS_STRING,
+            '200',
+        ];
+
+        yield 'Int key with flag' => [
+            [200 => 'foo'],
+            Yaml::DUMP_NUMERIC_KEY_AS_STRING,
+            "{ '200': foo }",
+        ];
+
+        yield 'Int value with flag' => [
+            [200 => 200],
+            Yaml::DUMP_NUMERIC_KEY_AS_STRING,
+            "{ '200': 200 }",
+        ];
+
+        yield 'String key with flag' => [
+            ['200' => 'foo'],
+            Yaml::DUMP_NUMERIC_KEY_AS_STRING,
+            "{ '200': foo }",
+        ];
+
+        yield 'Mixed with flag' => [
+            [42 => 'a', 'b' => 'c', 'd' => 43],
+            Yaml::DUMP_NUMERIC_KEY_AS_STRING,
+            "{ '42': a, b: c, d: 43 }",
+        ];
+
+        yield 'Auto-index with flag' => [
+            ['a', 'b', 42],
+            Yaml::DUMP_NUMERIC_KEY_AS_STRING,
+            '[a, b, 42]',
+        ];
+
+        yield 'Complex mixed array with flag' => [
+            [
+                42 => [
+                    'foo' => 43,
+                    44 => 'bar',
+                ],
+                45 => 'baz',
+                46,
+            ],
+            Yaml::DUMP_NUMERIC_KEY_AS_STRING,
+            "{ '42': { foo: 43, '44': bar }, '45': baz, '46': 46 }",
+        ];
+
+        yield 'Int tagged value with flag' => [
+            [
+                'count' => new TaggedValue('number', 5),
+            ],
+            Yaml::DUMP_NUMERIC_KEY_AS_STRING,
+            '{ count: !number 5 }',
+        ];
+
+        yield 'Array tagged value with flag' => [
+            [
+                'user' => new TaggedValue('metadata', [
+                    'john',
+                    42,
+                ]),
+            ],
+            Yaml::DUMP_NUMERIC_KEY_AS_STRING,
+            '{ user: !metadata [john, 42] }',
+        ];
+
+        $arrayObject = new \ArrayObject();
+        $arrayObject['foo'] = 'bar';
+        $arrayObject[42] = 'baz';
+        $arrayObject['baz'] = 43;
+
+        yield 'Object value with flag' => [
+            [
+                'user' => $arrayObject,
+            ],
+            Yaml::DUMP_NUMERIC_KEY_AS_STRING | Yaml::DUMP_OBJECT_AS_MAP,
+            "{ user: { foo: bar, '42': baz, baz: 43 } }",
+        ];
     }
 
     public function testDumpUnitEnum()

@@ -245,9 +245,7 @@ class LazyGhostTraitTest extends TestCase
 
     public function testPartialInitializationWithReset()
     {
-        $initializer = static function (ChildTestClass $instance, string $property, ?string $scope, mixed $default) {
-            return 234;
-        };
+        $initializer = static fn (ChildTestClass $instance, string $property, ?string $scope, mixed $default) => 234;
         $instance = ChildTestClass::createLazyGhost([
             'public' => $initializer,
             'publicReadonly' => $initializer,
@@ -279,9 +277,7 @@ class LazyGhostTraitTest extends TestCase
 
     public function testPartialInitializationWithNastyPassByRef()
     {
-        $instance = ChildTestClass::createLazyGhost(['public' => function (ChildTestClass $instance, string &$property, ?string &$scope, mixed $default) {
-            return $property = $scope = 123;
-        }]);
+        $instance = ChildTestClass::createLazyGhost(['public' => fn (ChildTestClass $instance, string &$property, ?string &$scope, mixed $default) => $property = $scope = 123]);
 
         $this->assertSame(123, $instance->public);
     }
@@ -314,9 +310,7 @@ class LazyGhostTraitTest extends TestCase
     public function testFullPartialInitialization()
     {
         $counter = 0;
-        $initializer = static function (ChildTestClass $instance, string $property, ?string $scope, mixed $default) use (&$counter) {
-            return 234;
-        };
+        $initializer = static fn (ChildTestClass $instance, string $property, ?string $scope, mixed $default) => 234;
         $instance = ChildTestClass::createLazyGhost([
             'public' => $initializer,
             'publicReadonly' => $initializer,

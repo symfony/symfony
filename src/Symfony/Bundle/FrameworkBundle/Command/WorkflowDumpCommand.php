@@ -66,7 +66,7 @@ class WorkflowDumpCommand extends Command
         }
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDefinition([
@@ -90,8 +90,6 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $workflowName = $input->getArgument('name');
-
-        $workflow = null;
 
         if (isset($this->workflows)) {
             if (!$this->workflows->has($workflowName)) {

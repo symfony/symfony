@@ -39,6 +39,13 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
         $this->nameConverter = $nameConverter;
     }
 
+    public function getSupportedTypes(?string $format): array
+    {
+        return [
+            ConstraintViolationListInterface::class => __CLASS__ === static::class || $this->hasCacheableSupportsMethod(),
+        ];
+    }
+
     public function normalize(mixed $object, string $format = null, array $context = []): array
     {
         if (\array_key_exists(self::PAYLOAD_FIELDS, $context)) {
@@ -109,8 +116,13 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
         return $data instanceof ConstraintViolationListInterface;
     }
 
+    /**
+     * @deprecated since Symfony 6.3, use "getSupportedTypes()" instead
+     */
     public function hasCacheableSupportsMethod(): bool
     {
+        trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
+
         return __CLASS__ === static::class;
     }
 }

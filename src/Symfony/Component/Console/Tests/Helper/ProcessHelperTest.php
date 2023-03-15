@@ -99,7 +99,7 @@ EOT;
         $args = new Process(['php', '-r', 'echo 42;']);
         $args = $args->getCommandLine();
         $successOutputProcessDebug = str_replace("'php' '-r' 'echo 42;'", $args, $successOutputProcessDebug);
-        $fromShellCommandline = method_exists(Process::class, 'fromShellCommandline') ? [Process::class, 'fromShellCommandline'] : function ($cmd) { return new Process($cmd); };
+        $fromShellCommandline = method_exists(Process::class, 'fromShellCommandline') ? [Process::class, 'fromShellCommandline'] : fn ($cmd) => new Process($cmd);
 
         return [
             ['', 'php -r "echo 42;"', StreamOutput::VERBOSITY_VERBOSE, null],

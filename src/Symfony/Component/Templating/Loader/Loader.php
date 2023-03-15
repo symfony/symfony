@@ -27,6 +27,8 @@ abstract class Loader implements LoaderInterface
 
     /**
      * Sets the debug logger to use for this loader.
+     *
+     * @return void
      */
     public function setLogger(LoggerInterface $logger)
     {

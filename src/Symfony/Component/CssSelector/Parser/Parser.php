@@ -57,9 +57,7 @@ class Parser implements ParserInterface
             }
         }
 
-        $joined = trim(implode('', array_map(function (Token $token) {
-            return $token->getValue();
-        }, $tokens)));
+        $joined = trim(implode('', array_map(fn (Token $token) => $token->getValue(), $tokens)));
 
         $int = function ($string) {
             if (!is_numeric($string)) {

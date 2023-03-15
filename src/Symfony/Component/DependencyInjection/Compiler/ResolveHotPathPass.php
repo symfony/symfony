@@ -25,6 +25,9 @@ class ResolveHotPathPass extends AbstractRecursivePass
 {
     private array $resolvedIds = [];
 
+    /**
+     * @return void
+     */
     public function process(ContainerBuilder $container)
     {
         try {

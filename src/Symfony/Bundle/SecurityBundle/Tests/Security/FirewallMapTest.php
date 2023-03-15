@@ -54,6 +54,7 @@ class FirewallMapTest extends TestCase
         $this->assertEquals([[], null, null], $firewallMap->getListeners($request));
         $this->assertNull($firewallMap->getFirewallConfig($request));
         $this->assertFalse($request->attributes->has(self::ATTRIBUTE_FIREWALL_CONTEXT));
+        $this->assertFalse($request->attributes->has('_stateless'));
     }
 
     public function testGetListeners()
@@ -62,8 +63,8 @@ class FirewallMapTest extends TestCase
 
         $firewallContext = $this->createMock(FirewallContext::class);
 
-        $firewallConfig = new FirewallConfig('main', 'user_checker');
-        $firewallContext->expects($this->once())->method('getConfig')->willReturn($firewallConfig);
+        $firewallConfig = new FirewallConfig('main', 'user_checker', null, true, true);
+        $firewallContext->expects($this->exactly(2))->method('getConfig')->willReturn($firewallConfig);
 
         $listener = function () {};
         $firewallContext->expects($this->once())->method('getListeners')->willReturn([$listener]);
@@ -88,5 +89,6 @@ class FirewallMapTest extends TestCase
         $this->assertEquals([[$listener], $exceptionListener, $logoutListener], $firewallMap->getListeners($request));
         $this->assertEquals($firewallConfig, $firewallMap->getFirewallConfig($request));
         $this->assertEquals('security.firewall.map.context.foo', $request->attributes->get(self::ATTRIBUTE_FIREWALL_CONTEXT));
+        $this->assertTrue($request->attributes->get('_stateless'));
     }
 }

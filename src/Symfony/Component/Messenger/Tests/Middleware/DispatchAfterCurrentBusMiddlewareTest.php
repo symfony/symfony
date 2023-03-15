@@ -52,17 +52,21 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
             $handlingMiddleware,
         ]);
 
+        $series = [
+            // Third event is dispatch within main dispatch, but before its handling:
+            $thirdEvent,
+            // Then expect main dispatched message to be handled first:
+            $message,
+            // Then, expect events in new transaction to be handled next, in dispatched order:
+            $firstEvent,
+            $secondEvent,
+        ];
+
         $handlingMiddleware->expects($this->exactly(4))
             ->method('handle')
-            ->withConsecutive(
-                // Third event is dispatch within main dispatch, but before its handling:
-                [$this->expectHandledMessage($thirdEvent)],
-                // Then expect main dispatched message to be handled first:
-                [$this->expectHandledMessage($message)],
-                // Then, expect events in new transaction to be handled next, in dispatched order:
-                [$this->expectHandledMessage($firstEvent)],
-                [$this->expectHandledMessage($secondEvent)]
-            )
+            ->with($this->callback(function (Envelope $envelope) use (&$series) {
+                return $envelope->getMessage() === array_shift($series);
+            }))
             ->willReturnOnConsecutiveCalls(
                 $this->willHandleMessage(),
                 $this->willHandleMessage(),
@@ -97,16 +101,20 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
             $handlingMiddleware,
         ]);
 
+        $series = [
+            // Expect main dispatched message to be handled first:
+            $message,
+            // Then, expect events in new transaction to be handled next, in dispatched order:
+            $firstEvent,
+            // Next event is still handled despite the previous exception:
+            $secondEvent,
+        ];
+
         $handlingMiddleware->expects($this->exactly(3))
             ->method('handle')
-            ->withConsecutive(
-                // Expect main dispatched message to be handled first:
-                [$this->expectHandledMessage($message)],
-                // Then, expect events in new transaction to be handled next, in dispatched order:
-                [$this->expectHandledMessage($firstEvent)],
-                // Next event is still handled despite the previous exception:
-                [$this->expectHandledMessage($secondEvent)]
-            )
+            ->with($this->callback(function (Envelope $envelope) use (&$series) {
+                return $envelope->getMessage() === array_shift($series);
+            }))
             ->willReturnOnConsecutiveCalls(
                 $this->willHandleMessage(),
                 $this->throwException(new \RuntimeException('Some exception while handling first event')),
@@ -153,22 +161,26 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
         ]);
 
         // Handling $eventL1b will dispatch 2 more events
+        $series = [
+            // Expect main dispatched message to be handled first:
+            $command,
+            $eventL1a,
+            $eventL1b,
+            $eventL1c,
+            // Handle $eventL2a will dispatch event and throw exception
+            $eventL2a,
+            // Make sure $eventL2b is handled, since it was dispatched from $eventL1b
+            $eventL2b,
+            // We don't handle exception L3a since L2a threw an exception.
+            $eventL3b,
+            // Note: $eventL3a should not be handled.
+        ];
+
         $handlingMiddleware->expects($this->exactly(7))
             ->method('handle')
-            ->withConsecutive(
-                // Expect main dispatched message to be handled first:
-                [$this->expectHandledMessage($command)],
-                [$this->expectHandledMessage($eventL1a)],
-                [$this->expectHandledMessage($eventL1b)],
-                [$this->expectHandledMessage($eventL1c)],
-                // Handle $eventL2a will dispatch event and throw exception
-                [$this->expectHandledMessage($eventL2a)],
-                // Make sure $eventL2b is handled, since it was dispatched from $eventL1b
-                [$this->expectHandledMessage($eventL2b)],
-                // We dont handle exception L3a since L2a threw an exception.
-                [$this->expectHandledMessage($eventL3b)]
-                // Note: $eventL3a should not be handled.
-            )
+            ->with($this->callback(function (Envelope $envelope) use (&$series) {
+                return $envelope->getMessage() === array_shift($series);
+            }))
             ->willReturnOnConsecutiveCalls(
                 $this->willHandleMessage(),
                 $this->willHandleMessage(),
@@ -244,15 +256,11 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
         $commandHandlingMiddleware->expects($this->once())
             ->method('handle')
             ->with($this->expectHandledMessage($message))
-            ->willReturnCallback(function ($envelope, StackInterface $stack) {
-                return $stack->next()->handle($envelope, $stack);
-            });
+            ->willReturnCallback(fn ($envelope, StackInterface $stack) => $stack->next()->handle($envelope, $stack));
         $eventHandlingMiddleware->expects($this->once())
             ->method('handle')
             ->with($this->expectHandledMessage($event))
-            ->willReturnCallback(function ($envelope, StackInterface $stack) {
-                return $stack->next()->handle($envelope, $stack);
-            });
+            ->willReturnCallback(fn ($envelope, StackInterface $stack) => $stack->next()->handle($envelope, $stack));
         $messageBus->dispatch($message);
     }
 
@@ -280,16 +288,12 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
 
     private function expectHandledMessage($message): Callback
     {
-        return $this->callback(function (Envelope $envelope) use ($message) {
-            return $envelope->getMessage() === $message;
-        });
+        return $this->callback(fn (Envelope $envelope) => $envelope->getMessage() === $message);
     }
 
     private function willHandleMessage(): ReturnCallback
     {
-        return $this->returnCallback(function ($envelope, StackInterface $stack) {
-            return $stack->next()->handle($envelope, $stack);
-        });
+        return $this->returnCallback(fn ($envelope, StackInterface $stack) => $stack->next()->handle($envelope, $stack));
     }
 }
 

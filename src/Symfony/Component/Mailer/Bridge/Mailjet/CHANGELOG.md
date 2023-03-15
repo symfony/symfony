@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add sandbox option
+
 5.2.0
 -----
 

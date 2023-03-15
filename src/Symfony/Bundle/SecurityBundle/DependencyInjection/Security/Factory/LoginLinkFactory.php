@@ -28,7 +28,7 @@ class LoginLinkFactory extends AbstractFactory
 {
     public const PRIORITY = -20;
 
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(NodeDefinition $node): void
     {
         /** @var NodeBuilder $builder */
         $builder = $node->fixXmlConfig('signature_property', 'signature_properties')->children();

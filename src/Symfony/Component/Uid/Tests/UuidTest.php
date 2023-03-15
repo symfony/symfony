@@ -259,9 +259,7 @@ class UuidTest extends TestCase
 
         $this->assertNotSame([$a, $b, $c, $d], $uuids);
 
-        usort($uuids, static function (Uuid $a, Uuid $b): int {
-            return $a->compare($b);
-        });
+        usort($uuids, static fn (Uuid $a, Uuid $b): int => $a->compare($b));
 
         $this->assertSame([$a, $b, $c, $d], $uuids);
     }

@@ -1057,9 +1057,7 @@ class DateTypeTest extends BaseTypeTestCase
     public static function provideEmptyData()
     {
         $expectedData = \DateTime::createFromFormat('Y-m-d H:i:s', '2018-11-11 00:00:00');
-        $lazyEmptyData = static function (FormInterface $form) {
-            return $form->getConfig()->getCompound() ? ['year' => '2018', 'month' => '11', 'day' => '11'] : '2018-11-11';
-        };
+        $lazyEmptyData = static fn (FormInterface $form) => $form->getConfig()->getCompound() ? ['year' => '2018', 'month' => '11', 'day' => '11'] : '2018-11-11';
 
         return [
             'Simple field' => ['single_text', '2018-11-11', $expectedData],

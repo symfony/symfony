@@ -39,7 +39,7 @@ use Symfony\Component\Yaml\Yaml;
 #[AsCommand(name: 'config:dump-reference', description: 'Dump the default configuration for an extension')]
 class ConfigDumpReferenceCommand extends AbstractConfigCommand
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDefinition([

@@ -114,4 +114,19 @@ class BackedEnumNormalizerTest extends TestCase
     {
         $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
     }
+
+    public function testItUsesTryFromIfContextIsPassed()
+    {
+        $this->assertNull($this->normalizer->denormalize(1, IntegerBackedEnumDummy::class, null, [BackedEnumNormalizer::ALLOW_INVALID_VALUES => true]));
+        $this->assertNull($this->normalizer->denormalize('', IntegerBackedEnumDummy::class, null, [BackedEnumNormalizer::ALLOW_INVALID_VALUES => true]));
+        $this->assertNull($this->normalizer->denormalize(null, IntegerBackedEnumDummy::class, null, [BackedEnumNormalizer::ALLOW_INVALID_VALUES => true]));
+
+        $this->assertSame(IntegerBackedEnumDummy::SUCCESS, $this->normalizer->denormalize(200, IntegerBackedEnumDummy::class, null, [BackedEnumNormalizer::ALLOW_INVALID_VALUES => true]));
+
+        $this->assertNull($this->normalizer->denormalize(1, StringBackedEnumDummy::class, null, [BackedEnumNormalizer::ALLOW_INVALID_VALUES => true]));
+        $this->assertNull($this->normalizer->denormalize('foo', StringBackedEnumDummy::class, null, [BackedEnumNormalizer::ALLOW_INVALID_VALUES => true]));
+        $this->assertNull($this->normalizer->denormalize(null, StringBackedEnumDummy::class, null, [BackedEnumNormalizer::ALLOW_INVALID_VALUES => true]));
+
+        $this->assertSame(StringBackedEnumDummy::GET, $this->normalizer->denormalize('GET', StringBackedEnumDummy::class, null, [BackedEnumNormalizer::ALLOW_INVALID_VALUES => true]));
+    }
 }

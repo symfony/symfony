@@ -408,8 +408,8 @@ class ErrorHandlerTest extends TestCase
             ['Uncaught Exception: foo', new \Exception('foo')],
             ['Uncaught Exception: foo', new class('foo') extends \RuntimeException {
             }],
-            ['Uncaught Exception: foo stdClass@anonymous bar', new \RuntimeException('foo '.\get_class(new class() extends \stdClass {
-            }).' bar')],
+            ['Uncaught Exception: foo stdClass@anonymous bar', new \RuntimeException('foo '.(new class() extends \stdClass {
+            })::class.' bar')],
             ['Uncaught Error: bar', new \Error('bar')],
             ['Uncaught ccc', new \ErrorException('ccc')],
         ];

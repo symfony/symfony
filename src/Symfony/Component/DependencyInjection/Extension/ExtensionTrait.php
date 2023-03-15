@@ -40,7 +40,7 @@ trait ExtensionTrait
             throw new \LogicException('Unable to create the ContainerConfigurator.');
         }
         $bundleLoader->setCurrentDir(\dirname($file));
-        $instanceof = &\Closure::bind(function &() { return $this->instanceof; }, $bundleLoader, $bundleLoader)();
+        $instanceof = &\Closure::bind(fn &() => $this->instanceof, $bundleLoader, $bundleLoader)();
 
         try {
             $callback(new ContainerConfigurator($container, $bundleLoader, $instanceof, $file, $file, $env));

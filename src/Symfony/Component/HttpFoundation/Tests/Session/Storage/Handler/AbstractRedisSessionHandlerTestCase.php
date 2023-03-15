@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
 use PHPUnit\Framework\TestCase;
+use Relay\Relay;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler;
 
 /**
@@ -33,7 +34,7 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
      */
     protected $redisClient;
 
-    abstract protected function createRedisClient(string $host): \Redis|\RedisArray|\RedisCluster|\Predis\Client;
+    abstract protected function createRedisClient(string $host): \Redis|Relay|\RedisArray|\RedisCluster|\Predis\Client;
 
     protected function setUp(): void
     {

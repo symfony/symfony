@@ -26,9 +26,12 @@ class ValidationFailedException extends RuntimeException
         $this->violatingMessage = $violatingMessage;
         $this->violations = $violations;
 
-        parent::__construct(sprintf('Message of type "%s" failed validation.', \get_class($this->violatingMessage)));
+        parent::__construct(sprintf('Message of type "%s" failed validation.', $this->violatingMessage::class));
     }
 
+    /**
+     * @return object
+     */
     public function getViolatingMessage()
     {
         return $this->violatingMessage;

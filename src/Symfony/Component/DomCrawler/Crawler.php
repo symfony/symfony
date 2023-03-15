@@ -58,16 +58,17 @@ class Crawler implements \Countable, \IteratorAggregate
      */
     private bool $isHtml = true;
 
-    private HTML5 $html5Parser;
+
+    private ?HTML5 $html5Parser = null;
 
     /**
      * @param \DOMNodeList|\DOMNode|\DOMNode[]|string|null $node A Node to use as the base for the crawling
      */
-    public function __construct(\DOMNodeList|\DOMNode|array|string $node = null, string $uri = null, string $baseHref = null)
+    public function __construct(\DOMNodeList|\DOMNode|array|string $node = null, string $uri = null, string $baseHref = null, bool $useHtml5Parser = true)
     {
         $this->uri = $uri;
         $this->baseHref = $baseHref ?: $uri;
-        $this->html5Parser = new HTML5(['disable_html_ns' => true]);
+        $this->html5Parser = $useHtml5Parser ? new HTML5(['disable_html_ns' => true]) : null;
         $this->cachedNamespaces = new \ArrayObject();
 
         $this->add($node);
@@ -91,6 +92,8 @@ class Crawler implements \Countable, \IteratorAggregate
 
     /**
      * Removes all the nodes.
+     *
+     * @return void
      */
     public function clear()
     {
@@ -106,6 +109,8 @@ class Crawler implements \Countable, \IteratorAggregate
      * on the type of the argument.
      *
      * @param \DOMNodeList|\DOMNode|\DOMNode[]|string|null $node A node
+     *
+     * @return void
      *
      * @throws \InvalidArgumentException when node is not the expected type
      */
@@ -130,6 +135,8 @@ class Crawler implements \Countable, \IteratorAggregate
      * If the charset is not set via the content type, it is assumed to be UTF-8,
      * or ISO-8859-1 as a fallback, which is the default charset defined by the
      * HTTP 1.1 specification.
+     *
+     * @return void
      */
     public function addContent(string $content, string $type = null)
     {
@@ -170,6 +177,8 @@ class Crawler implements \Countable, \IteratorAggregate
      * internal errors via libxml_use_internal_errors(true)
      * and then, get the errors via libxml_get_errors(). Be
      * sure to clear errors with libxml_clear_errors() afterward.
+     *
+     * @return void
      */
     public function addHtmlContent(string $content, string $charset = 'UTF-8')
     {
@@ -204,6 +213,8 @@ class Crawler implements \Countable, \IteratorAggregate
      * @param int $options Bitwise OR of the libxml option constants
      *                     LIBXML_PARSEHUGE is dangerous, see
      *                     http://symfony.com/blog/security-release-symfony-2-0-17-released
+     *
+     * @return void
      */
     public function addXmlContent(string $content, string $charset = 'UTF-8', int $options = \LIBXML_NONET)
     {
@@ -232,6 +243,8 @@ class Crawler implements \Countable, \IteratorAggregate
      * Adds a \DOMDocument to the list of nodes.
      *
      * @param \DOMDocument $dom A \DOMDocument instance
+     *
+     * @return void
      */
     public function addDocument(\DOMDocument $dom)
     {
@@ -244,6 +257,8 @@ class Crawler implements \Countable, \IteratorAggregate
      * Adds a \DOMNodeList to the list of nodes.
      *
      * @param \DOMNodeList $nodes A \DOMNodeList instance
+     *
+     * @return void
      */
     public function addNodeList(\DOMNodeList $nodes)
     {
@@ -258,6 +273,8 @@ class Crawler implements \Countable, \IteratorAggregate
      * Adds an array of \DOMNode instances to the list of nodes.
      *
      * @param \DOMNode[] $nodes An array of \DOMNode instances
+     *
+     * @return void
      */
     public function addNodes(array $nodes)
     {
@@ -270,6 +287,8 @@ class Crawler implements \Countable, \IteratorAggregate
      * Adds a \DOMNode instance to the list of nodes.
      *
      * @param \DOMNode $node A \DOMNode instance
+     *
+     * @return void
      */
     public function addNode(\DOMNode $node)
     {
@@ -553,7 +572,7 @@ class Crawler implements \Countable, \IteratorAggregate
         $text = $this->getNode(0)->nodeValue;
 
         if ($normalizeWhitespace) {
-            return trim(preg_replace("/(?:[ \n\r\t\x0C]{2,}+|[\n\r\t\x0C])/", ' ', $text), " \n\r\t\x0C");
+            return $this->normalizeWhitespace($text);
         }
 
         return $text;
@@ -561,10 +580,26 @@ class Crawler implements \Countable, \IteratorAggregate
 
     /**
      * Returns only the inner text that is the direct descendent of the current node, excluding any child nodes.
+     *
+     * @param bool $normalizeWhitespace Whether whitespaces should be trimmed and normalized to single spaces
      */
-    public function innerText(): string
+    public function innerText(/* bool $normalizeWhitespace = true */): string
     {
-        return $this->filterXPath('.//text()')->text();
+        $normalizeWhitespace = 1 <= \func_num_args() ? func_get_arg(0) : true;
+
+        foreach ($this->getNode(0)->childNodes as $childNode) {
+            if (\XML_TEXT_NODE !== $childNode->nodeType) {
+                continue;
+            }
+            if (!$normalizeWhitespace) {
+                return $childNode->nodeValue;
+            }
+            if ('' !== trim($childNode->nodeValue)) {
+                return $this->normalizeWhitespace($childNode->nodeValue);
+            }
+        }
+
+        return '';
     }
 
     /**
@@ -587,7 +622,7 @@ class Crawler implements \Countable, \IteratorAggregate
         $node = $this->getNode(0);
         $owner = $node->ownerDocument;
 
-        if ('<!DOCTYPE html>' === $owner->saveXML($owner->childNodes[0])) {
+        if ($this->html5Parser && '<!DOCTYPE html>' === $owner->saveXML($owner->childNodes[0])) {
             $owner = $this->html5Parser;
         }
 
@@ -608,7 +643,7 @@ class Crawler implements \Countable, \IteratorAggregate
         $node = $this->getNode(0);
         $owner = $node->ownerDocument;
 
-        if ('<!DOCTYPE html>' === $owner->saveXML($owner->childNodes[0])) {
+        if ($this->html5Parser && '<!DOCTYPE html>' === $owner->saveXML($owner->childNodes[0])) {
             $owner = $this->html5Parser;
         }
 
@@ -846,12 +881,17 @@ class Crawler implements \Countable, \IteratorAggregate
 
     /**
      * Overloads a default namespace prefix to be used with XPath and CSS expressions.
+     *
+     * @return void
      */
     public function setDefaultNamespacePrefix(string $prefix)
     {
         $this->defaultNamespacePrefix = $prefix;
     }
 
+    /**
+     * @return void
+     */
     public function registerNamespace(string $prefix, string $namespace)
     {
         $this->namespaces[$prefix] = $namespace;
@@ -1176,6 +1216,10 @@ class Crawler implements \Countable, \IteratorAggregate
 
     private function canParseHtml5String(string $content): bool
     {
+        if (!$this->html5Parser) {
+            return false;
+        }
+
         if (false === ($pos = stripos($content, '<!doctype html>'))) {
             return false;
         }
@@ -1188,5 +1232,10 @@ class Crawler implements \Countable, \IteratorAggregate
     private function isValidHtml5Heading(string $heading): bool
     {
         return 1 === preg_match('/^\x{FEFF}?\s*(<!--[^>]*?-->\s*)*$/u', $heading);
+    }
+
+    private function normalizeWhitespace(string $string): string
+    {
+        return trim(preg_replace("/(?:[ \n\r\t\x0C]{2,}+|[\n\r\t\x0C])/", ' ', $string), " \n\r\t\x0C");
     }
 }

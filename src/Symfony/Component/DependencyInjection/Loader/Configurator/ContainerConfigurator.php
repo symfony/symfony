@@ -48,17 +48,17 @@ class ContainerConfigurator extends AbstractConfigurator
         $this->env = $env;
     }
 
-    final public function extension(string $namespace, array $config)
+    final public function extension(string $namespace, array $config): void
     {
         if (!$this->container->hasExtension($namespace)) {
-            $extensions = array_filter(array_map(function (ExtensionInterface $ext) { return $ext->getAlias(); }, $this->container->getExtensions()));
+            $extensions = array_filter(array_map(fn (ExtensionInterface $ext) => $ext->getAlias(), $this->container->getExtensions()));
             throw new InvalidArgumentException(sprintf('There is no extension able to load the configuration for "%s" (in "%s"). Looked for namespace "%s", found "%s".', $namespace, $this->file, $namespace, $extensions ? implode('", "', $extensions) : 'none'));
         }
 
         $this->container->loadFromExtension($namespace, static::processValue($config));
     }
 
-    final public function import(string $resource, string $type = null, bool|string $ignoreErrors = false)
+    final public function import(string $resource, string $type = null, bool|string $ignoreErrors = false): void
     {
         $this->loader->setCurrentDir(\dirname($this->path));
         $this->loader->import($resource, $type, $ignoreErrors, $this->file);
@@ -123,7 +123,13 @@ function inline_service(string $class = null): InlineServiceConfigurator
  */
 function service_locator(array $values): ServiceLocatorArgument
 {
-    return new ServiceLocatorArgument(AbstractConfigurator::processValue($values, true));
+    $values = AbstractConfigurator::processValue($values, true);
+
+    if (isset($values[0])) {
+        trigger_deprecation('symfony/dependency-injection', '6.3', 'Using integers as keys in a "service_locator()" argument is deprecated. The keys will default to the IDs of the original services in 7.0.');
+    }
+
+    return new ServiceLocatorArgument($values);
 }
 
 /**

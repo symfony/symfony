@@ -79,7 +79,7 @@ class ContextListener extends AbstractListener
     /**
      * Reads the Security Token from the session.
      */
-    public function authenticate(RequestEvent $event)
+    public function authenticate(RequestEvent $event): void
     {
         if (!$this->registered && null !== $this->dispatcher && $event->isMainRequest()) {
             $this->dispatcher->addListener(KernelEvents::RESPONSE, $this->onKernelResponse(...));
@@ -147,7 +147,7 @@ class ContextListener extends AbstractListener
     /**
      * Writes the security token into the session.
      */
-    public function onKernelResponse(ResponseEvent $event)
+    public function onKernelResponse(ResponseEvent $event): void
     {
         if (!$event->isMainRequest()) {
             return;

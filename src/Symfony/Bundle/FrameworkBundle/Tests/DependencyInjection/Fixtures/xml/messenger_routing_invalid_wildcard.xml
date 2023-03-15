@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:framework="http://symfony.com/schema/dic/symfony"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd
+        http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+
+    <framework:config http-method-override="false">
+        <framework:serializer enabled="true" />
+        <framework:messenger>
+            <framework:serializer default-serializer="messenger.transport.symfony_serializer" />
+            <framework:routing message-class="Symfony\*\DummyMessage">
+                <framework:sender service="audit" />
+            </framework:routing>
+            <framework:transport name="audit" dsn="null://" />
+        </framework:messenger>
+    </framework:config>
+</container>

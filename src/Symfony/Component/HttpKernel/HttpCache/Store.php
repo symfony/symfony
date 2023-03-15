@@ -55,6 +55,8 @@ class Store implements StoreInterface
 
     /**
      * Cleanups storage.
+     *
+     * @return void
      */
     public function cleanup()
     {
@@ -247,6 +249,8 @@ class Store implements StoreInterface
     /**
      * Invalidates all cache entries that match the request.
      *
+     * @return void
+     *
      * @throws \RuntimeException
      */
     public function invalidate(Request $request)
@@ -413,6 +417,9 @@ class Store implements StoreInterface
         return true;
     }
 
+    /**
+     * @return string
+     */
     public function getPath(string $key)
     {
         return $this->root.\DIRECTORY_SEPARATOR.substr($key, 0, 2).\DIRECTORY_SEPARATOR.substr($key, 2, 2).\DIRECTORY_SEPARATOR.substr($key, 4, 2).\DIRECTORY_SEPARATOR.substr($key, 6);

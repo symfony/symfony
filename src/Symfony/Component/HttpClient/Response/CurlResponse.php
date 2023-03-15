@@ -168,7 +168,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         });
 
         $this->initializer = static function (self $response) {
-            $waitFor = curl_getinfo($ch = $response->handle, \CURLINFO_PRIVATE);
+            $waitFor = curl_getinfo($response->handle, \CURLINFO_PRIVATE);
 
             return 'H' === $waitFor[0];
         };
@@ -267,7 +267,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
             $runningResponses[$i] = [$response->multi, [$response->id => $response]];
         }
 
-        if ('_0' === curl_getinfo($ch = $response->handle, \CURLINFO_PRIVATE)) {
+        if ('_0' === curl_getinfo($response->handle, \CURLINFO_PRIVATE)) {
             // Response already completed
             $response->multi->handlesActivity[$response->id][] = null;
             $response->multi->handlesActivity[$response->id][] = null !== $response->info['error'] ? new TransportException($response->info['error']) : null;

@@ -14,7 +14,7 @@ namespace Symfony\Component\Serializer\Normalizer;
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
-use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
+use Symfony\Component\Serializer\Exception\MissingConstructorArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
@@ -150,8 +150,13 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
         }
     }
 
+    /**
+     * @deprecated since Symfony 6.3, use "getSupportedTypes()" instead
+     */
     public function hasCacheableSupportsMethod(): bool
     {
+        trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
+
         return false;
     }
 
@@ -308,7 +313,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * @return object
      *
      * @throws RuntimeException
-     * @throws MissingConstructorArgumentsException
+     * @throws MissingConstructorArgumentException
      */
     protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null)
     {
@@ -381,7 +386,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                     $params[] = null;
                 } else {
                     if (!isset($context['not_normalizable_value_exceptions'])) {
-                        throw new MissingConstructorArgumentsException(sprintf('Cannot create an instance of "%s" from serialized data because its constructor requires parameter "%s" to be present.', $class, $constructorParameter->name), 0, null, [$constructorParameter->name]);
+                        throw new MissingConstructorArgumentException($class, $constructorParameter->name);
                     }
 
                     $exception = NotNormalizableValueException::createForUnexpectedDataType(
@@ -425,7 +430,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
             }
         } catch (\ReflectionException $e) {
             throw new RuntimeException(sprintf('Could not determine the class of the parameter "%s".', $parameterName), 0, $e);
-        } catch (MissingConstructorArgumentsException $e) {
+        } catch (MissingConstructorArgumentException $e) {
             if (!$parameter->getType()->allowsNull()) {
                 throw $e;
             }

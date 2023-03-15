@@ -73,6 +73,9 @@ class MockFileSessionStorage extends MockArraySessionStorage
         return parent::regenerate($destroy, $lifetime);
     }
 
+    /**
+     * @return void
+     */
     public function save()
     {
         if (!$this->started) {

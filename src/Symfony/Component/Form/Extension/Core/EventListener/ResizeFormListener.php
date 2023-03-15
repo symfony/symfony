@@ -50,6 +50,9 @@ class ResizeFormListener implements EventSubscriberInterface
         ];
     }
 
+    /**
+     * @return void
+     */
     public function preSetData(FormEvent $event)
     {
         $form = $event->getForm();
@@ -72,6 +75,9 @@ class ResizeFormListener implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @return void
+     */
     public function preSubmit(FormEvent $event)
     {
         $form = $event->getForm();
@@ -102,6 +108,9 @@ class ResizeFormListener implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @return void
+     */
     public function onSubmit(FormEvent $event)
     {
         $form = $event->getForm();

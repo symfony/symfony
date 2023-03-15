@@ -22,7 +22,7 @@
         "psr/log": "^1|^2|^3",
         "symfony/event-dispatcher": "^5.4|^6.0",
         "symfony/mime": "^6.2",
-        "symfony/service-contracts": "^1.1|^2|^3"
+        "symfony/service-contracts": "^2.5|^3"
     },
     "require-dev": {
         "symfony/console": "^5.4|^6.0",
@@ -31,6 +31,7 @@
         "symfony/twig-bridge": "^6.2"
     },
     "conflict": {
+        "symfony/http-client-contracts": "<2.5",
         "symfony/http-kernel": "<5.4",
         "symfony/messenger": "<6.2",
         "symfony/mime": "<6.2",

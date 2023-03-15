@@ -123,7 +123,7 @@ EOF
         return 0;
     }
 
-    private function runInteractive(string $failureTransportName, SymfonyStyle $io, bool $shouldForce)
+    private function runInteractive(string $failureTransportName, SymfonyStyle $io, bool $shouldForce): void
     {
         $receiver = $this->failureTransports->get($failureTransportName);
         $count = 0;
@@ -176,7 +176,7 @@ EOF
                 throw new \RuntimeException(sprintf('The message with id "%s" could not decoded, it can only be shown or removed.', $this->getMessageId($envelope) ?? '?'));
             }
 
-            $shouldHandle = $shouldForce || $io->confirm('Do you want to retry (yes) or delete this message (no)?');
+            $shouldHandle = $shouldForce || 'retry' === $io->choice('Please select an action', ['retry', 'delete'], 'retry');
 
             if ($shouldHandle) {
                 return;
@@ -203,7 +203,7 @@ EOF
         return $count;
     }
 
-    private function retrySpecificIds(string $failureTransportName, array $ids, SymfonyStyle $io, bool $shouldForce)
+    private function retrySpecificIds(string $failureTransportName, array $ids, SymfonyStyle $io, bool $shouldForce): void
     {
         $receiver = $this->getReceiver($failureTransportName);
 
@@ -227,7 +227,7 @@ EOF
         }
     }
 
-    private function retrySpecificEnvelopes(array $envelopes, string $failureTransportName, SymfonyStyle $io, bool $shouldForce)
+    private function retrySpecificEnvelopes(array $envelopes, string $failureTransportName, SymfonyStyle $io, bool $shouldForce): void
     {
         $receiver = $this->getReceiver($failureTransportName);
 

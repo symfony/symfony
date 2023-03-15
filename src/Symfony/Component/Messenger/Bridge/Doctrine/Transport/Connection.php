@@ -74,7 +74,7 @@ class Connection implements ResetInterface
         $this->autoSetup = $this->configuration['auto_setup'];
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->queueEmptiedAt = null;
     }
@@ -84,10 +84,10 @@ class Connection implements ResetInterface
         return $this->configuration;
     }
 
-    public static function buildConfiguration(string $dsn, array $options = []): array
+    public static function buildConfiguration(#[\SensitiveParameter] string $dsn, array $options = []): array
     {
         if (false === $components = parse_url($dsn)) {
-            throw new InvalidArgumentException(sprintf('The given Doctrine Messenger DSN "%s" is invalid.', $dsn));
+            throw new InvalidArgumentException('The given Doctrine Messenger DSN is invalid.');
         }
 
         $query = [];
@@ -305,9 +305,7 @@ class Connection implements ResetInterface
         $stmt = $this->executeQuery($queryBuilder->getSQL(), $queryBuilder->getParameters(), $queryBuilder->getParameterTypes());
         $data = $stmt instanceof Result || $stmt instanceof DriverResult ? $stmt->fetchAllAssociative() : $stmt->fetchAll();
 
-        return array_map(function ($doctrineEnvelope) {
-            return $this->decodeEnvelopeHeaders($doctrineEnvelope);
-        }, $data);
+        return array_map(fn ($doctrineEnvelope) => $this->decodeEnvelopeHeaders($doctrineEnvelope), $data);
     }
 
     public function find(mixed $id): ?array
@@ -324,14 +322,13 @@ class Connection implements ResetInterface
     /**
      * @internal
      */
-    public function configureSchema(Schema $schema, DBALConnection $forConnection): void
+    public function configureSchema(Schema $schema, DBALConnection $forConnection, \Closure $isSameDatabase): void
     {
-        // only update the schema for this connection
-        if ($forConnection !== $this->driverConnection) {
+        if ($schema->hasTable($this->configuration['table_name'])) {
             return;
         }
 
-        if ($schema->hasTable($this->configuration['table_name'])) {
+        if ($forConnection !== $this->driverConnection && !$isSameDatabase($this->executeStatement(...))) {
             return;
         }
 

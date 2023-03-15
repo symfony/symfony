@@ -1112,12 +1112,12 @@ class SimpleFormTest extends TestCase
     {
         $config = new FormConfigBuilder('foo', null, new EventDispatcher());
 
-        $config->setIsEmptyCallback(function ($modelData): bool { return 'ccc' === $modelData; });
+        $config->setIsEmptyCallback(fn ($modelData): bool => 'ccc' === $modelData);
         $form = new Form($config);
         $form->setData('ccc');
         $this->assertTrue($form->isEmpty());
 
-        $config->setIsEmptyCallback(function (): bool { return false; });
+        $config->setIsEmptyCallback(fn (): bool => false);
         $form = new Form($config);
         $form->setData(null);
         $this->assertFalse($form->isEmpty());

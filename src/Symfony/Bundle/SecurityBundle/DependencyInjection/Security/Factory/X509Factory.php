@@ -36,6 +36,7 @@ class X509Factory implements AuthenticatorFactoryInterface
             ->replaceArgument(2, $firewallName)
             ->replaceArgument(3, $config['user'])
             ->replaceArgument(4, $config['credentials'])
+            ->replaceArgument(6, $config['user_identifier'])
         ;
 
         return $authenticatorId;
@@ -51,13 +52,14 @@ class X509Factory implements AuthenticatorFactoryInterface
         return 'x509';
     }
 
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(NodeDefinition $node): void
     {
         $node
             ->children()
                 ->scalarNode('provider')->end()
                 ->scalarNode('user')->defaultValue('SSL_CLIENT_S_DN_Email')->end()
                 ->scalarNode('credentials')->defaultValue('SSL_CLIENT_S_DN')->end()
+                ->scalarNode('user_identifier')->defaultValue('emailAddress')->end()
             ->end()
         ;
     }

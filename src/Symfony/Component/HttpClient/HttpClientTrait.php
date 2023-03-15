@@ -245,6 +245,10 @@ trait HttpClientTrait
                 throw new InvalidArgumentException(sprintf('Option "auth_ntlm" is not supported by "%s", '.$msg, __CLASS__, CurlHttpClient::class));
             }
 
+            if ('vars' === $name) {
+                throw new InvalidArgumentException(sprintf('Option "vars" is not supported by "%s", try using "%s" instead.', __CLASS__, UriTemplateHttpClient::class));
+            }
+
             $alternatives = [];
 
             foreach ($defaultOptions as $k => $v) {
@@ -330,19 +334,17 @@ trait HttpClientTrait
             return $body;
         }
 
-        $generatorToCallable = static function (\Generator $body): \Closure {
-            return static function () use ($body) {
-                while ($body->valid()) {
-                    $chunk = $body->current();
-                    $body->next();
+        $generatorToCallable = static fn (\Generator $body): \Closure => static function () use ($body) {
+            while ($body->valid()) {
+                $chunk = $body->current();
+                $body->next();
 
-                    if ('' !== $chunk) {
-                        return $chunk;
-                    }
+                if ('' !== $chunk) {
+                    return $chunk;
                 }
+            }
 
-                return '';
-            };
+            return '';
         };
 
         if ($body instanceof \Generator) {
@@ -536,11 +538,11 @@ trait HttpClientTrait
 
             if (str_contains($parts[$part], '%')) {
                 // https://tools.ietf.org/html/rfc3986#section-2.3
-                $parts[$part] = preg_replace_callback('/%(?:2[DE]|3[0-9]|[46][1-9A-F]|5F|[57][0-9A]|7E)++/i', function ($m) { return rawurldecode($m[0]); }, $parts[$part]);
+                $parts[$part] = preg_replace_callback('/%(?:2[DE]|3[0-9]|[46][1-9A-F]|5F|[57][0-9A]|7E)++/i', fn ($m) => rawurldecode($m[0]), $parts[$part]);
             }
 
             // https://tools.ietf.org/html/rfc3986#section-3.3
-            $parts[$part] = preg_replace_callback("#[^-A-Za-z0-9._~!$&/'()[\]*+,;=:@\\\\^`{|}%]++#", function ($m) { return rawurlencode($m[0]); }, $parts[$part]);
+            $parts[$part] = preg_replace_callback("#[^-A-Za-z0-9._~!$&/'()[\]*+,;=:@\\\\^`{|}%]++#", fn ($m) => rawurlencode($m[0]), $parts[$part]);
         }
 
         return [
@@ -556,6 +558,8 @@ trait HttpClientTrait
      * Removes dot-segments from a path.
      *
      * @see https://tools.ietf.org/html/rfc3986#section-5.2.4
+     *
+     * @return string
      */
     private static function removeDotSegments(string $path)
     {
@@ -622,8 +626,6 @@ trait HttpClientTrait
                     '%28' => '(',
                     '%29' => ')',
                     '%2A' => '*',
-                    '%2B' => '+',
-                    '%2C' => ',',
                     '%2F' => '/',
                     '%3A' => ':',
                     '%3B' => ';',

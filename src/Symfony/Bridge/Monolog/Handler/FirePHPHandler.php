@@ -30,7 +30,7 @@ class FirePHPHandler extends BaseFirePHPHandler
     /**
      * Adds the headers to the response once it's created.
      */
-    public function onKernelResponse(ResponseEvent $event)
+    public function onKernelResponse(ResponseEvent $event): void
     {
         if (!$event->isMainRequest()) {
             return;

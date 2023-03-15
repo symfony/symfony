@@ -24,6 +24,9 @@ class GetAttrNode extends Node
     public const METHOD_CALL = 2;
     public const ARRAY_CALL = 3;
 
+    /**
+     * @param self::* $type
+     */
     public function __construct(Node $node, Node $attribute, ArrayNode $arguments, int $type)
     {
         parent::__construct(
@@ -32,7 +35,7 @@ class GetAttrNode extends Node
         );
     }
 
-    public function compile(Compiler $compiler)
+    public function compile(Compiler $compiler): void
     {
         $nullSafe = $this->nodes['attribute'] instanceof ConstantNode && $this->nodes['attribute']->isNullSafe;
         switch ($this->attributes['type']) {
@@ -65,7 +68,7 @@ class GetAttrNode extends Node
         }
     }
 
-    public function evaluate(array $functions, array $values)
+    public function evaluate(array $functions, array $values): mixed
     {
         switch ($this->attributes['type']) {
             case self::PROPERTY_CALL:
@@ -136,7 +139,7 @@ class GetAttrNode extends Node
         return $this->attributes['is_short_circuited'] || ($this->nodes['node'] instanceof self && $this->nodes['node']->isShortCircuited());
     }
 
-    public function toArray()
+    public function toArray(): array
     {
         switch ($this->attributes['type']) {
             case self::PROPERTY_CALL:

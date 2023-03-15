@@ -35,18 +35,18 @@ final class Dsn
         $this->options = $options;
     }
 
-    public static function fromString(string $dsn): self
+    public static function fromString(#[\SensitiveParameter] string $dsn): self
     {
         if (false === $parsedDsn = parse_url($dsn)) {
-            throw new InvalidArgumentException(sprintf('The "%s" mailer DSN is invalid.', $dsn));
+            throw new InvalidArgumentException('The mailer DSN is invalid.');
         }
 
         if (!isset($parsedDsn['scheme'])) {
-            throw new InvalidArgumentException(sprintf('The "%s" mailer DSN must contain a scheme.', $dsn));
+            throw new InvalidArgumentException('The mailer DSN must contain a scheme.');
         }
 
         if (!isset($parsedDsn['host'])) {
-            throw new InvalidArgumentException(sprintf('The "%s" mailer DSN must contain a host (use "default" by default).', $dsn));
+            throw new InvalidArgumentException('The mailer DSN must contain a host (use "default" by default).');
         }
 
         $user = '' !== ($parsedDsn['user'] ?? '') ? urldecode($parsedDsn['user']) : null;

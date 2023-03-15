@@ -20,6 +20,11 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
  */
 class AbstractNormalizerDummy extends AbstractNormalizer
 {
+    public function getSupportedTypes(?string $format): array
+    {
+        return ['*' => false];
+    }
+
     public function getAllowedAttributes(string|object $classOrObject, array $context, bool $attributesAsString = false): array|bool
     {
         return parent::getAllowedAttributes($classOrObject, $context, $attributesAsString);

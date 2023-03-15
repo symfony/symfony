@@ -17,7 +17,6 @@ use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
-use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
@@ -63,7 +62,7 @@ final class SlackTransport extends AbstractTransport
     /**
      * @see https://api.slack.com/methods/chat.postMessage
      */
-    protected function doSend(MessageInterface $message): SentMessage
+    protected function doSend(MessageInterface $message): SlackSentMessage
     {
         if (!$message instanceof ChatMessage) {
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
@@ -82,7 +81,9 @@ final class SlackTransport extends AbstractTransport
             $options['channel'] = $message->getRecipientId() ?: $this->chatChannel;
         }
         $options['text'] = $message->getSubject();
-        $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/api/chat.postMessage', [
+
+        $apiMethod = $opts instanceof UpdateMessageSlackOptions ? 'chat.update' : 'chat.postMessage';
+        $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/api/'.$apiMethod, [
             'json' => array_filter($options),
             'auth_bearer' => $this->accessToken,
             'headers' => [
@@ -107,9 +108,6 @@ final class SlackTransport extends AbstractTransport
             throw new TransportException(sprintf('Unable to post the Slack message: "%s"%s.', $result['error'], $errors), $response);
         }
 
-        $sentMessage = new SentMessage($message, (string) $this);
-        $sentMessage->setMessageId($result['ts']);
-
-        return $sentMessage;
+        return new SlackSentMessage($message, (string) $this, $result['channel'], $result['ts']);
     }
 }

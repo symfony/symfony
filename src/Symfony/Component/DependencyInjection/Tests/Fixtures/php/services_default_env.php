@@ -15,9 +15,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class Symfony_DI_PhpDumper_Test_DefaultParameters extends Container
 {
     protected $parameters = [];
+    protected readonly \WeakReference $ref;
 
     public function __construct()
     {
+        $this->ref = \WeakReference::create($this);
         $this->parameters = $this->getDefaultParameters();
 
         $this->services = $this->privates = [];
@@ -79,10 +81,11 @@ class Symfony_DI_PhpDumper_Test_DefaultParameters extends Container
 
     private function getDynamicParameter(string $name)
     {
+        $container = $this;
         $value = match ($name) {
-            'fallback_env' => $this->getEnv('foobar'),
-            'hello' => $this->getEnv('default:fallback_param:bar'),
-            'hello-bar' => $this->getEnv('default:fallback_env:key:baz:json:foo'),
+            'fallback_env' => $container->getEnv('foobar'),
+            'hello' => $container->getEnv('default:fallback_param:bar'),
+            'hello-bar' => $container->getEnv('default:fallback_env:key:baz:json:foo'),
             default => throw new ParameterNotFoundException($name),
         };
         $this->loadedDynamicParameters[$name] = true;

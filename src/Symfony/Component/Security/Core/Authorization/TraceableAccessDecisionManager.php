@@ -72,7 +72,7 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
      * @param array $attributes attributes used for the vote
      * @param int   $vote       vote of the voter
      */
-    public function addVoterVote(VoterInterface $voter, array $attributes, int $vote)
+    public function addVoterVote(VoterInterface $voter, array $attributes, int $vote): void
     {
         $currentLogIndex = \count($this->currentLog) - 1;
         $this->currentLog[$currentLogIndex]['voterDetails'][] = [

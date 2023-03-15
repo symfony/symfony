@@ -40,13 +40,9 @@ class ServiceValueResolverTest extends TestCase
     public function testExistingController()
     {
         $resolver = new ServiceValueResolver(new ServiceLocator([
-            'App\\Controller\\Mine::method' => function () {
-                return new ServiceLocator([
-                    'dummy' => function () {
-                        return new DummyService();
-                    },
-                ]);
-            },
+            'App\\Controller\\Mine::method' => fn () => new ServiceLocator([
+                'dummy' => fn () => new DummyService(),
+            ]),
         ]));
 
         $request = $this->requestWithAttributes(['_controller' => 'App\\Controller\\Mine::method']);
@@ -58,13 +54,9 @@ class ServiceValueResolverTest extends TestCase
     public function testExistingControllerWithATrailingBackSlash()
     {
         $resolver = new ServiceValueResolver(new ServiceLocator([
-            'App\\Controller\\Mine::method' => function () {
-                return new ServiceLocator([
-                    'dummy' => function () {
-                        return new DummyService();
-                    },
-                ]);
-            },
+            'App\\Controller\\Mine::method' => fn () => new ServiceLocator([
+                'dummy' => fn () => new DummyService(),
+            ]),
         ]));
 
         $request = $this->requestWithAttributes(['_controller' => '\\App\\Controller\\Mine::method']);
@@ -76,13 +68,9 @@ class ServiceValueResolverTest extends TestCase
     public function testExistingControllerWithMethodNameStartUppercase()
     {
         $resolver = new ServiceValueResolver(new ServiceLocator([
-            'App\\Controller\\Mine::method' => function () {
-                return new ServiceLocator([
-                    'dummy' => function () {
-                        return new DummyService();
-                    },
-                ]);
-            },
+            'App\\Controller\\Mine::method' => fn () => new ServiceLocator([
+                'dummy' => fn () => new DummyService(),
+            ]),
         ]));
         $request = $this->requestWithAttributes(['_controller' => 'App\\Controller\\Mine::Method']);
         $argument = new ArgumentMetadata('dummy', DummyService::class, false, false, null);
@@ -93,13 +81,9 @@ class ServiceValueResolverTest extends TestCase
     public function testControllerNameIsAnArray()
     {
         $resolver = new ServiceValueResolver(new ServiceLocator([
-            'App\\Controller\\Mine::method' => function () {
-                return new ServiceLocator([
-                    'dummy' => function () {
-                        return new DummyService();
-                    },
-                ]);
-            },
+            'App\\Controller\\Mine::method' => fn () => new ServiceLocator([
+                'dummy' => fn () => new DummyService(),
+            ]),
         ]));
 
         $request = $this->requestWithAttributes(['_controller' => ['App\\Controller\\Mine', 'method']]);

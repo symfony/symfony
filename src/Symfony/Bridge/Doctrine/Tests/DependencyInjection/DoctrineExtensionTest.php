@@ -34,7 +34,7 @@ class DoctrineExtensionTest extends TestCase
 
         $this->extension = $this
             ->getMockBuilder(AbstractDoctrineExtension::class)
-            ->setMethods([
+            ->onlyMethods([
                 'getMappingResourceConfigDirectory',
                 'getObjectManagerElementName',
                 'getMappingObjectDefaultName',
@@ -47,9 +47,7 @@ class DoctrineExtensionTest extends TestCase
 
         $this->extension->expects($this->any())
             ->method('getObjectManagerElementName')
-            ->willReturnCallback(function ($name) {
-                return 'doctrine.orm.'.$name;
-            });
+            ->willReturnCallback(fn ($name) => 'doctrine.orm.'.$name);
 
         $this->extension
             ->method('getMappingObjectDefaultName')
@@ -77,7 +75,7 @@ class DoctrineExtensionTest extends TestCase
             'SecondBundle' => 'My\SecondBundle',
         ];
 
-        $reflection = new \ReflectionClass(\get_class($this->extension));
+        $reflection = new \ReflectionClass($this->extension);
         $method = $reflection->getMethod('fixManagersAutoMappings');
 
         $method->invoke($this->extension, $emConfigs, $bundles);
@@ -165,7 +163,7 @@ class DoctrineExtensionTest extends TestCase
             'SecondBundle' => 'My\SecondBundle',
         ];
 
-        $reflection = new \ReflectionClass(\get_class($this->extension));
+        $reflection = new \ReflectionClass($this->extension);
         $method = $reflection->getMethod('fixManagersAutoMappings');
 
         $newEmConfigs = $method->invoke($this->extension, $emConfigs, $bundles);
@@ -182,7 +180,7 @@ class DoctrineExtensionTest extends TestCase
     {
         $container = $this->createContainer();
 
-        $reflection = new \ReflectionClass(\get_class($this->extension));
+        $reflection = new \ReflectionClass($this->extension);
         $method = $reflection->getMethod('detectMappingType');
 
         // The ordinary fixtures contain annotation
@@ -327,7 +325,7 @@ class DoctrineExtensionTest extends TestCase
 
         $container = $this->createContainer([], [$bundle => $bundleClassName]);
 
-        $reflection = new \ReflectionClass(\get_class($this->extension));
+        $reflection = new \ReflectionClass($this->extension);
         $method = $reflection->getMethod('getMappingDriverBundleConfigDefaults');
 
         $this->assertSame(

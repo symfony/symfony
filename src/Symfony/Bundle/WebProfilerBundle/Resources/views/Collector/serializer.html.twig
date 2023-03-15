@@ -1,6 +1,32 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
-{% import _self as helper %}
+{% block head %}
+    {{ parent() }}
+
+    <style>
+        #collector-content .sf-serializer {
+            margin-bottom: 2em;
+        }
+
+        #collector-content .sf-serializer .trace {
+            border: var(--border);
+            background: var(--page-background);
+            padding: 10px;
+            margin: 0.5em 0;
+            overflow: auto;
+        }
+        #collector-content .sf-serializer .trace {
+            font-size: 12px;
+        }
+        #collector-content .sf-serializer .trace li {
+            margin-bottom: 0;
+            padding: 0;
+        }
+        #collector-content .sf-serializer .trace li.selected {
+            background: var(--highlight-selected-line);
+        }
+    </style>
+{% endblock %}
 
 {% block toolbar %}
     {% if collector.handledCount > 0 %}
@@ -89,14 +115,14 @@
             </div>
 
             <div class="sf-tabs">
-                {{ helper.render_serialize_tab(collector.data, true) }}
-                {{ helper.render_serialize_tab(collector.data, false) }}
+                {{ _self.render_serialize_tab(collector.data, true) }}
+                {{ _self.render_serialize_tab(collector.data, false) }}
 
-                {{ helper.render_normalize_tab(collector.data, true) }}
-                {{ helper.render_normalize_tab(collector.data, false) }}
+                {{ _self.render_normalize_tab(collector.data, true) }}
+                {{ _self.render_normalize_tab(collector.data, false) }}
 
-                {{ helper.render_encode_tab(collector.data, true) }}
-                {{ helper.render_encode_tab(collector.data, false) }}
+                {{ _self.render_encode_tab(collector.data, true) }}
+                {{ _self.render_encode_tab(collector.data, false) }}
             </div>
         {% endif %}
     </div>

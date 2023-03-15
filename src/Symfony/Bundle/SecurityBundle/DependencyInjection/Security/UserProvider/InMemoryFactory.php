@@ -24,6 +24,9 @@ use Symfony\Component\DependencyInjection\Parameter;
  */
 class InMemoryFactory implements UserProviderFactoryInterface
 {
+    /**
+     * @return void
+     */
     public function create(ContainerBuilder $container, string $id, array $config)
     {
         $definition = $container->setDefinition($id, new ChildDefinition('security.user.provider.in_memory'));
@@ -37,11 +40,17 @@ class InMemoryFactory implements UserProviderFactoryInterface
         $definition->addArgument($users);
     }
 
+    /**
+     * @return string
+     */
     public function getKey()
     {
         return 'memory';
     }
 
+    /**
+     * @return void
+     */
     public function addConfiguration(NodeDefinition $node)
     {
         $node
@@ -54,7 +63,7 @@ class InMemoryFactory implements UserProviderFactoryInterface
                         ->children()
                             ->scalarNode('password')->defaultNull()->end()
                             ->arrayNode('roles')
-                                ->beforeNormalization()->ifString()->then(function ($v) { return preg_split('/\s*,\s*/', $v); })->end()
+                                ->beforeNormalization()->ifString()->then(fn ($v) => preg_split('/\s*,\s*/', $v))->end()
                                 ->prototype('scalar')->end()
                             ->end()
                         ->end()

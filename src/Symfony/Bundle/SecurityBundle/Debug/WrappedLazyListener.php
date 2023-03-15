@@ -38,12 +38,12 @@ final class WrappedLazyListener extends AbstractListener
         return $this->listener->supports($request);
     }
 
-    public function authenticate(RequestEvent $event)
+    public function authenticate(RequestEvent $event): void
     {
         $startTime = microtime(true);
 
         try {
-            $ret = $this->listener->authenticate($event);
+            $this->listener->authenticate($event);
         } catch (LazyResponseException $e) {
             $this->response = $e->getResponse();
 
@@ -53,7 +53,5 @@ final class WrappedLazyListener extends AbstractListener
         }
 
         $this->response = $event->getResponse();
-
-        return $ret;
     }
 }

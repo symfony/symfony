@@ -12,6 +12,7 @@
 namespace Symfony\Component\Lock\Store;
 
 use Predis\Response\ServerException;
+use Relay\Relay;
 use Symfony\Component\Lock\Exception\InvalidTtlException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\LockStorageException;
@@ -35,7 +36,7 @@ class RedisStore implements SharedLockStoreInterface
      * @param float $initialTtl The expiration delay of locks in seconds
      */
     public function __construct(
-        private \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface $redis,
+        private \Redis|Relay|\RedisArray|\RedisCluster|\Predis\ClientInterface $redis,
         private float $initialTtl = 300.0,
     ) {
         if ($initialTtl <= 0) {
@@ -43,6 +44,9 @@ class RedisStore implements SharedLockStoreInterface
         }
     }
 
+    /**
+     * @return void
+     */
     public function save(Key $key)
     {
         $script = '
@@ -88,6 +92,9 @@ class RedisStore implements SharedLockStoreInterface
         $this->checkNotExpired($key);
     }
 
+    /**
+     * @return void
+     */
     public function saveRead(Key $key)
     {
         $script = '
@@ -128,6 +135,9 @@ class RedisStore implements SharedLockStoreInterface
         $this->checkNotExpired($key);
     }
 
+    /**
+     * @return void
+     */
     public function putOffExpiration(Key $key, float $ttl)
     {
         $script = '
@@ -168,6 +178,9 @@ class RedisStore implements SharedLockStoreInterface
         $this->checkNotExpired($key);
     }
 
+    /**
+     * @return void
+     */
     public function delete(Key $key)
     {
         $script = '
@@ -226,7 +239,7 @@ class RedisStore implements SharedLockStoreInterface
 
     private function evaluate(string $script, string $resource, array $args): mixed
     {
-        if ($this->redis instanceof \Redis || $this->redis instanceof \RedisCluster) {
+        if ($this->redis instanceof \Redis || $this->redis instanceof Relay || $this->redis instanceof \RedisCluster) {
             $this->redis->clearLastError();
             $result = $this->redis->eval($script, array_merge([$resource], $args), 1);
             if (null !== $err = $this->redis->getLastError()) {

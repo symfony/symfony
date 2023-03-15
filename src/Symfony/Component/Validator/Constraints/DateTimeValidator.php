@@ -21,6 +21,9 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class DateTimeValidator extends DateValidator
 {
+    /**
+     * @return void
+     */
     public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof DateTime) {
@@ -51,9 +54,7 @@ class DateTimeValidator extends DateValidator
         }
 
         if (str_ends_with($constraint->format, '+')) {
-            $errors['warnings'] = array_filter($errors['warnings'], function ($warning) {
-                return 'Trailing data' !== $warning;
-            });
+            $errors['warnings'] = array_filter($errors['warnings'], fn ($warning) => 'Trailing data' !== $warning);
         }
 
         foreach ($errors['warnings'] as $warning) {

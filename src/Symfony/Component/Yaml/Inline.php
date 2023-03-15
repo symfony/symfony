@@ -34,7 +34,7 @@ class Inline
     private static bool $objectForMap = false;
     private static bool $constantSupport = false;
 
-    public static function initialize(int $flags, int $parsedLineNumber = null, string $parsedFilename = null)
+    public static function initialize(int $flags, int $parsedLineNumber = null, string $parsedFilename = null): void
     {
         self::$exceptionOnInvalidType = (bool) (Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE & $flags);
         self::$objectSupport = (bool) (Yaml::PARSE_OBJECT & $flags);
@@ -110,7 +110,11 @@ class Inline
 
                 return self::dumpNull($flags);
             case $value instanceof \DateTimeInterface:
-                return $value->format('c');
+                return $value->format(match (true) {
+                    !$length = \strlen(rtrim($value->format('u'), '0')) => 'c',
+                    $length < 4 => 'Y-m-d\TH:i:s.vP',
+                    default => 'Y-m-d\TH:i:s.uP',
+                });
             case $value instanceof \UnitEnum:
                 return sprintf('!php/const %s::%s', $value::class, $value->name);
             case \is_object($value):
@@ -239,6 +243,10 @@ class Inline
     {
         $output = [];
         foreach ($value as $key => $val) {
+            if (\is_int($key) && Yaml::DUMP_NUMERIC_KEY_AS_STRING & $flags) {
+                $key = (string) $key;
+            }
+
             $output[] = sprintf('%s: %s', self::dump($key, $flags), self::dump($val, $flags));
         }
 
@@ -706,6 +714,10 @@ class Inline
 
                         if (Yaml::PARSE_DATETIME & $flags) {
                             return $time;
+                        }
+
+                        if ('' !== rtrim($time->format('u'), '0')) {
+                            return (float) $time->format('U.u');
                         }
 
                         try {

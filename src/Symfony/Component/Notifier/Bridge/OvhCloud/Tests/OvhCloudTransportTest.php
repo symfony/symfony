@@ -30,9 +30,9 @@ final class OvhCloudTransportTest extends TransportTestCase
 
     public static function toStringProvider(): iterable
     {
-        yield ['ovhcloud://eu.api.ovh.com?consumer_key=consumerKey&service_name=serviceName&no_stop_clause=0', self::createTransport()];
-        yield ['ovhcloud://eu.api.ovh.com?consumer_key=consumerKey&service_name=serviceName&no_stop_clause=1', self::createTransport(null, null, true)];
-        yield ['ovhcloud://eu.api.ovh.com?consumer_key=consumerKey&service_name=serviceName&sender=sender&no_stop_clause=0', self::createTransport(null, 'sender')];
+        yield ['ovhcloud://eu.api.ovh.com?service_name=serviceName', self::createTransport()];
+        yield ['ovhcloud://eu.api.ovh.com?service_name=serviceName', self::createTransport(null, null, true)];
+        yield ['ovhcloud://eu.api.ovh.com?service_name=serviceName&sender=sender', self::createTransport(null, 'sender')];
     }
 
     public static function supportedMessagesProvider(): iterable

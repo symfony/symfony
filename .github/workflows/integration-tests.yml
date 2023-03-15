@@ -135,7 +135,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           coverage: "none"
-          extensions: "json,couchbase-3.2.2,memcached,mongodb-1.12.0,redis,rdkafka,xsl,ldap"
+          extensions: "json,couchbase-3.2.2,memcached,mongodb-1.12.0,redis,rdkafka,xsl,ldap,relay"
           ini-values: date.timezone=UTC,memory_limit=-1,default_socket_timeout=10,session.gc_probability=0,apc.enable_cli=1,zend.assertions=1
           php-version: "${{ matrix.php }}"
           tools: pecl
@@ -159,7 +159,7 @@ jobs:
           echo COMPOSER_ROOT_VERSION=$COMPOSER_ROOT_VERSION >> $GITHUB_ENV
 
           echo "::group::composer update"
-          composer require --dev --no-update mongodb/mongodb:"^1.11"
+          composer require --dev --no-update mongodb/mongodb
           composer update --no-progress --ansi
           echo "::endgroup::"
 

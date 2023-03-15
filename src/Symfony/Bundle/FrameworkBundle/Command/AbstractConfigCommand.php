@@ -35,9 +35,7 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
         $rows = [];
 
         $bundles = $this->getApplication()->getKernel()->getBundles();
-        usort($bundles, function ($bundleA, $bundleB) {
-            return strcmp($bundleA->getName(), $bundleB->getName());
-        });
+        usort($bundles, fn ($bundleA, $bundleB) => strcmp($bundleA->getName(), $bundleB->getName()));
 
         foreach ($bundles as $bundle) {
             $extension = $bundle->getContainerExtension();
@@ -131,7 +129,7 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
         }
     }
 
-    private function initializeBundles()
+    private function initializeBundles(): array
     {
         // Re-build bundle manually to initialize DI extensions that can be extended by other bundles in their build() method
         // as this method is not called when the container is loaded from the cache.

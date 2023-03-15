@@ -21,15 +21,23 @@ class MaxIdLengthAdapterTest extends TestCase
     {
         $cache = $this->getMockBuilder(MaxIdLengthAdapter::class)
             ->setConstructorArgs([str_repeat('-', 10)])
-            ->setMethods(['doHave', 'doFetch', 'doDelete', 'doSave', 'doClear'])
+            ->onlyMethods(['doHave', 'doFetch', 'doDelete', 'doSave', 'doClear'])
             ->getMock();
 
         $cache->expects($this->exactly(2))
             ->method('doHave')
-            ->withConsecutive(
-                [$this->equalTo('----------:nWfzGiCgLczv3SSUzXL3kg:')],
-                [$this->equalTo('----------:---------------------------------------')]
-            )->willReturn(false);
+            ->willReturnCallback(function (...$args) {
+                static $series = [
+                    ['----------:z5XrNUPebf0nPxQwjc6C1A:'],
+                    ['----------:---------------------------------------'],
+                ];
+
+                $expectedArgs = array_shift($series);
+                $this->assertSame($expectedArgs, $args);
+
+                return false;
+            })
+        ;
 
         $cache->hasItem(str_repeat('-', 40));
         $cache->hasItem(str_repeat('-', 39));

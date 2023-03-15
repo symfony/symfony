@@ -50,9 +50,7 @@ class MandrillHttpTransport extends AbstractHttpTransport
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/api/1.0/messages/send-raw.json', [
             'json' => [
                 'key' => $this->key,
-                'to' => array_map(function (Address $recipient): string {
-                    return $recipient->getAddress();
-                }, $envelope->getRecipients()),
+                'to' => array_map(fn (Address $recipient): string => $recipient->getAddress(), $envelope->getRecipients()),
                 'from_email' => $envelope->getSender()->getAddress(),
                 'from_name' => $envelope->getSender()->getName(),
                 'raw_message' => $message->toString(),

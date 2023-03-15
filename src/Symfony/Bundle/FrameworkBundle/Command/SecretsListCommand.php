@@ -42,7 +42,7 @@ final class SecretsListCommand extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addOption('reveal', 'r', InputOption::VALUE_NONE, 'Display decrypted values alongside names')
@@ -75,9 +75,7 @@ EOF
         $rows = [];
 
         $dump = new Dumper($output);
-        $dump = static function (?string $v) use ($dump) {
-            return null === $v ? '******' : $dump($v);
-        };
+        $dump = static fn (?string $v) => null === $v ? '******' : $dump($v);
 
         foreach ($secrets as $name => $value) {
             $rows[$name] = [$name, $dump($value)];

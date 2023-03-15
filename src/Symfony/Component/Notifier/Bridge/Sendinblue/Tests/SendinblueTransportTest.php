@@ -54,9 +54,7 @@ final class SendinblueTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn(json_encode(['code' => 400, 'message' => 'bad request']));
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = self::createTransport($client);
 

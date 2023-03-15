@@ -120,7 +120,7 @@ class DebugClassLoaderTest extends TestCase
      */
     public function testDeprecatedSuper(string $class, string $super, string $type)
     {
-        set_error_handler(function () { return false; });
+        set_error_handler(fn () => false);
         $e = error_reporting(0);
         trigger_error('', E_USER_DEPRECATED);
 
@@ -150,7 +150,7 @@ class DebugClassLoaderTest extends TestCase
 
     public function testInterfaceExtendsDeprecatedInterface()
     {
-        set_error_handler(function () { return false; });
+        set_error_handler(fn () => false);
         $e = error_reporting(0);
         trigger_error('', E_USER_NOTICE);
 
@@ -172,7 +172,7 @@ class DebugClassLoaderTest extends TestCase
 
     public function testDeprecatedSuperInSameNamespace()
     {
-        set_error_handler(function () { return false; });
+        set_error_handler(fn () => false);
         $e = error_reporting(0);
         trigger_error('', E_USER_NOTICE);
 
@@ -242,7 +242,7 @@ class DebugClassLoaderTest extends TestCase
 
     public function testExtendedDeprecatedMethodDoesntTriggerAnyNotice()
     {
-        set_error_handler(function () { return false; });
+        set_error_handler(fn () => false);
         $e = error_reporting(0);
         trigger_error('', E_USER_NOTICE);
 

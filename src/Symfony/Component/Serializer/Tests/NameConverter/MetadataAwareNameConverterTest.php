@@ -58,9 +58,7 @@ final class MetadataAwareNameConverterTest extends TestCase
         $fallback = $this->createMock(NameConverterInterface::class);
         $fallback
             ->method('normalize')
-            ->willReturnCallback(function ($propertyName) {
-                return strtoupper($propertyName);
-            })
+            ->willReturnCallback(fn ($propertyName) => strtoupper($propertyName))
         ;
 
         $nameConverter = new MetadataAwareNameConverter($classMetadataFactory, $fallback);
@@ -90,9 +88,7 @@ final class MetadataAwareNameConverterTest extends TestCase
         $fallback = $this->createMock(NameConverterInterface::class);
         $fallback
             ->method('denormalize')
-            ->willReturnCallback(function ($propertyName) {
-                return strtolower($propertyName);
-            })
+            ->willReturnCallback(fn ($propertyName) => strtolower($propertyName))
         ;
 
         $nameConverter = new MetadataAwareNameConverter($classMetadataFactory, $fallback);

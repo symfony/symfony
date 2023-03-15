@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Command\ConfigDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
@@ -48,6 +49,19 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
 
         $this->assertSame(0, $ret, 'Returns 0 in case of success');
         $this->assertStringContainsString('foo', $tester->getDisplay());
+    }
+
+    public function testDumpWithUnsupportedFormat()
+    {
+        $tester = $this->createCommandTester();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Supported formats are "yaml", "json"');
+
+        $tester->execute([
+            'name' => 'test',
+            '--format' => 'xml',
+        ]);
     }
 
     public function testParametersValuesAreResolved()
@@ -157,6 +171,8 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
         yield 'name (started CamelCase)' => [['Fra'], ['DefaultConfigTestBundle', 'ExtensionWithoutConfigTestBundle', 'FrameworkBundle', 'TestBundle']];
 
         yield 'name with existing path' => [['framework', ''], ['secret', 'router.resource', 'router.utf8', 'router.enabled', 'validation.enabled', 'default_locale']];
+
+        yield 'option --format' => [['--format', ''], ['yaml', 'json']];
     }
 
     private function createCommandTester(): CommandTester

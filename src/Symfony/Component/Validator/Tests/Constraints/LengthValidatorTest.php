@@ -156,6 +156,30 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    public function testValidGraphemesValues()
+    {
+        $constraint = new Length(min: 1, max: 1, countUnit: Length::COUNT_GRAPHEMES);
+        $this->validator->validate("A\u{0300}", $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testValidCodepointsValues()
+    {
+        $constraint = new Length(min: 2, max: 2, countUnit: Length::COUNT_CODEPOINTS);
+        $this->validator->validate("A\u{0300}", $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testValidBytesValues()
+    {
+        $constraint = new Length(min: 3, max: 3, countUnit: Length::COUNT_BYTES);
+        $this->validator->validate("A\u{0300}", $constraint);
+
+        $this->assertNoViolation();
+    }
+
     /**
      * @dataProvider getThreeOrLessCharacters
      */
@@ -320,5 +344,35 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
                 ->setCode(Length::INVALID_CHARACTERS_ERROR)
                 ->assertRaised();
         }
+    }
+
+    public function testInvalidValuesExactDefaultCountUnitWithGraphemeInput()
+    {
+        $constraint = new Length(min: 1, max: 1, exactMessage: 'myMessage');
+
+        $this->validator->validate("A\u{0300}", $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'."A\u{0300}".'"')
+            ->setParameter('{{ limit }}', 1)
+            ->setInvalidValue("A\u{0300}")
+            ->setPlural(1)
+            ->setCode(Length::NOT_EQUAL_LENGTH_ERROR)
+            ->assertRaised();
+    }
+
+    public function testInvalidValuesExactBytesCountUnitWithGraphemeInput()
+    {
+        $constraint = new Length(min: 1, max: 1, countUnit: Length::COUNT_BYTES, exactMessage: 'myMessage');
+
+        $this->validator->validate("A\u{0300}", $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'."A\u{0300}".'"')
+            ->setParameter('{{ limit }}', 1)
+            ->setInvalidValue("A\u{0300}")
+            ->setPlural(1)
+            ->setCode(Length::NOT_EQUAL_LENGTH_ERROR)
+            ->assertRaised();
     }
 }

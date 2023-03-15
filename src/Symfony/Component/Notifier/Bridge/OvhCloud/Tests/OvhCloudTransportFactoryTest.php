@@ -24,27 +24,27 @@ final class OvhCloudTransportFactoryTest extends TransportFactoryTestCase
     public static function createProvider(): iterable
     {
         yield [
-            'ovhcloud://host.test?consumer_key=consumerKey&service_name=serviceName&no_stop_clause=0',
+            'ovhcloud://host.test?service_name=serviceName',
             'ovhcloud://key:secret@host.test?consumer_key=consumerKey&service_name=serviceName',
         ];
 
         yield [
-            'ovhcloud://host.test?consumer_key=consumerKey&service_name=serviceName&sender=sender&no_stop_clause=0',
+            'ovhcloud://host.test?service_name=serviceName&sender=sender',
             'ovhcloud://key:secret@host.test?consumer_key=consumerKey&service_name=serviceName&sender=sender',
         ];
 
         yield [
-            'ovhcloud://host.test?consumer_key=consumerKey&service_name=serviceName&no_stop_clause=0',
+            'ovhcloud://host.test?service_name=serviceName',
             'ovhcloud://key:secret@host.test?consumer_key=consumerKey&service_name=serviceName&no_stop_clause=0',
         ];
 
         yield [
-            'ovhcloud://host.test?consumer_key=consumerKey&service_name=serviceName&no_stop_clause=1',
+            'ovhcloud://host.test?service_name=serviceName',
             'ovhcloud://key:secret@host.test?consumer_key=consumerKey&service_name=serviceName&no_stop_clause=1',
         ];
 
         yield [
-            'ovhcloud://host.test?consumer_key=consumerKey&service_name=serviceName&no_stop_clause=1',
+            'ovhcloud://host.test?service_name=serviceName',
             'ovhcloud://key:secret@host.test?consumer_key=consumerKey&service_name=serviceName&no_stop_clause=true',
         ];
     }

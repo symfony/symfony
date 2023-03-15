@@ -12,8 +12,10 @@
 namespace Symfony\Bridge\Doctrine\Tests\Form\ChoiceList;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Types\GuidType;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\AbstractQuery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\ORMQueryBuilderLoader;
 use Symfony\Bridge\Doctrine\Tests\DoctrineTestHelper;
@@ -45,8 +47,8 @@ class ORMQueryBuilderLoaderTest extends TestCase
     {
         $em = DoctrineTestHelper::createTestEntityManager();
 
-        $query = $this->getMockBuilder(\QueryMock::class)
-            ->setMethods(['setParameter', 'getResult', 'getSql', '_doExecute'])
+        $query = $this->getMockBuilder(QueryMock::class)
+            ->onlyMethods(['setParameter', 'getResult', 'getSql', '_doExecute'])
             ->getMock();
 
         $query
@@ -60,7 +62,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
 
         $qb = $this->getMockBuilder(\Doctrine\ORM\QueryBuilder::class)
             ->setConstructorArgs([$em])
-            ->setMethods(['getQuery'])
+            ->onlyMethods(['getQuery'])
             ->getMock();
 
         $qb->expects($this->once())
@@ -78,8 +80,8 @@ class ORMQueryBuilderLoaderTest extends TestCase
     {
         $em = DoctrineTestHelper::createTestEntityManager();
 
-        $query = $this->getMockBuilder(\QueryMock::class)
-            ->setMethods(['setParameter', 'getResult', 'getSql', '_doExecute'])
+        $query = $this->getMockBuilder(QueryMock::class)
+            ->onlyMethods(['setParameter', 'getResult', 'getSql', '_doExecute'])
             ->getMock();
 
         $query
@@ -93,7 +95,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
 
         $qb = $this->getMockBuilder(\Doctrine\ORM\QueryBuilder::class)
             ->setConstructorArgs([$em])
-            ->setMethods(['getQuery'])
+            ->onlyMethods(['getQuery'])
             ->getMock();
 
         $qb->expects($this->once())
@@ -114,8 +116,8 @@ class ORMQueryBuilderLoaderTest extends TestCase
     {
         $em = DoctrineTestHelper::createTestEntityManager();
 
-        $query = $this->getMockBuilder(\QueryMock::class)
-            ->setMethods(['setParameter', 'getResult', 'getSql', '_doExecute'])
+        $query = $this->getMockBuilder(QueryMock::class)
+            ->onlyMethods(['setParameter', 'getResult', 'getSql', '_doExecute'])
             ->getMock();
 
         $query
@@ -129,7 +131,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
 
         $qb = $this->getMockBuilder(\Doctrine\ORM\QueryBuilder::class)
             ->setConstructorArgs([$em])
-            ->setMethods(['getQuery'])
+            ->onlyMethods(['getQuery'])
             ->getMock();
 
         $qb->expects($this->once())
@@ -159,8 +161,8 @@ class ORMQueryBuilderLoaderTest extends TestCase
 
         $em = DoctrineTestHelper::createTestEntityManager();
 
-        $query = $this->getMockBuilder(\QueryMock::class)
-            ->setMethods(['setParameter', 'getResult', 'getSql', '_doExecute'])
+        $query = $this->getMockBuilder(QueryMock::class)
+            ->onlyMethods(['setParameter', 'getResult', 'getSql', '_doExecute'])
             ->getMock();
 
         $query
@@ -174,7 +176,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
 
         $qb = $this->getMockBuilder(\Doctrine\ORM\QueryBuilder::class)
             ->setConstructorArgs([$em])
-            ->setMethods(['getQuery'])
+            ->onlyMethods(['getQuery'])
             ->getMock();
 
         $qb->expects($this->once())
@@ -206,7 +208,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
 
         $qb = $this->getMockBuilder(\Doctrine\ORM\QueryBuilder::class)
             ->setConstructorArgs([$em])
-            ->setMethods(['getQuery'])
+            ->onlyMethods(['getQuery'])
             ->getMock();
 
         $qb->expects($this->never())
@@ -227,8 +229,8 @@ class ORMQueryBuilderLoaderTest extends TestCase
     {
         $em = DoctrineTestHelper::createTestEntityManager();
 
-        $query = $this->getMockBuilder(\QueryMock::class)
-            ->setMethods(['setParameter', 'getResult', 'getSql', '_doExecute'])
+        $query = $this->getMockBuilder(QueryMock::class)
+            ->onlyMethods(['setParameter', 'getResult', 'getSql', '_doExecute'])
             ->getMock();
 
         $query
@@ -242,7 +244,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
 
         $qb = $this->getMockBuilder(\Doctrine\ORM\QueryBuilder::class)
             ->setConstructorArgs([$em])
-            ->setMethods(['getQuery'])
+            ->onlyMethods(['getQuery'])
             ->getMock();
         $qb->expects($this->once())
             ->method('getQuery')
@@ -269,5 +271,20 @@ class ORMQueryBuilderLoaderTest extends TestCase
             ['Symfony\Bridge\Doctrine\Tests\Fixtures\UuidIdEntity'],
             ['Symfony\Bridge\Doctrine\Tests\Fixtures\UlidIdEntity'],
         ];
+    }
+}
+
+class QueryMock extends AbstractQuery
+{
+    public function __construct()
+    {
+    }
+
+    public function getSQL(): array|string
+    {
+    }
+
+    protected function _doExecute(): Result|int
+    {
     }
 }

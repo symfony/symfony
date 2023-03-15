@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @internal
  */
-final class AccessTokenFactory extends AbstractFactory
+final class AccessTokenFactory extends AbstractFactory implements StatelessAuthenticatorFactoryInterface
 {
     private const PRIORITY = -40;
 
@@ -46,7 +46,7 @@ final class AccessTokenFactory extends AbstractFactory
                 ->fixXmlConfig('token_extractors')
                 ->beforeNormalization()
                     ->ifString()
-                    ->then(static function (string $v): array { return [$v]; })
+                    ->then(static fn (string $v): array => [$v])
                 ->end()
                 ->cannotBeEmpty()
                 ->defaultValue([
@@ -67,7 +67,7 @@ final class AccessTokenFactory extends AbstractFactory
         return 'access_token';
     }
 
-    public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string
+    public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, ?string $userProviderId): string
     {
         $successHandler = isset($config['success_handler']) ? new Reference($this->createAuthenticationSuccessHandler($container, $firewallName, $config)) : null;
         $failureHandler = isset($config['failure_handler']) ? new Reference($this->createAuthenticationFailureHandler($container, $firewallName, $config)) : null;
@@ -78,7 +78,7 @@ final class AccessTokenFactory extends AbstractFactory
             ->setDefinition($authenticatorId, new ChildDefinition('security.authenticator.access_token'))
             ->replaceArgument(0, new Reference($config['token_handler']))
             ->replaceArgument(1, new Reference($extractorId))
-            ->replaceArgument(2, new Reference($userProviderId))
+            ->replaceArgument(2, $userProviderId ? new Reference($userProviderId) : null)
             ->replaceArgument(3, $successHandler)
             ->replaceArgument(4, $failureHandler)
             ->replaceArgument(5, $config['realm'])
@@ -97,9 +97,7 @@ final class AccessTokenFactory extends AbstractFactory
             'request_body' => 'security.access_token_extractor.request_body',
             'header' => 'security.access_token_extractor.header',
         ];
-        $extractors = array_map(static function (string $extractor) use ($aliases): string {
-            return $aliases[$extractor] ?? $extractor;
-        }, $extractors);
+        $extractors = array_map(static fn (string $extractor): string => $aliases[$extractor] ?? $extractor, $extractors);
 
         if (1 === \count($extractors)) {
             return current($extractors);
@@ -107,7 +105,7 @@ final class AccessTokenFactory extends AbstractFactory
         $extractorId = sprintf('security.authenticator.access_token.chain_extractor.%s', $firewallName);
         $container
             ->setDefinition($extractorId, new ChildDefinition('security.authenticator.access_token.chain_extractor'))
-            ->replaceArgument(0, array_map(function (string $extractorId): Reference {return new Reference($extractorId); }, $extractors))
+            ->replaceArgument(0, array_map(fn (string $extractorId): Reference => new Reference($extractorId), $extractors))
         ;
 
         return $extractorId;

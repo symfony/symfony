@@ -60,10 +60,10 @@ class PasswordMigratingListenerTest extends TestCase
     public static function provideUnsupportedEvents()
     {
         // no password upgrade badge
-        yield [self::createEvent(new SelfValidatingPassport(new UserBadge('test', function () { return new DummyTestPasswordAuthenticatedUser(); })))];
+        yield [self::createEvent(new SelfValidatingPassport(new UserBadge('test', fn () => new DummyTestPasswordAuthenticatedUser())))];
 
         // blank password
-        yield [self::createEvent(new SelfValidatingPassport(new UserBadge('test', function () { return new DummyTestPasswordAuthenticatedUser(); }), [new PasswordUpgradeBadge('', self::createPasswordUpgrader())]))];
+        yield [self::createEvent(new SelfValidatingPassport(new UserBadge('test', fn () => new DummyTestPasswordAuthenticatedUser()), [new PasswordUpgradeBadge('', self::createPasswordUpgrader())]))];
     }
 
     public function testUpgradeWithUpgrader()
@@ -74,7 +74,7 @@ class PasswordMigratingListenerTest extends TestCase
             ->with($this->user, 'new-hash')
         ;
 
-        $event = $this->createEvent(new SelfValidatingPassport(new UserBadge('test', function () { return $this->user; }), [new PasswordUpgradeBadge('pa$$word', $passwordUpgrader)]));
+        $event = $this->createEvent(new SelfValidatingPassport(new UserBadge('test', fn () => $this->user), [new PasswordUpgradeBadge('pa$$word', $passwordUpgrader)]));
         $this->listener->onLoginSuccess($event);
     }
 
@@ -101,7 +101,7 @@ class PasswordMigratingListenerTest extends TestCase
 
         $this->hasherFactory->expects($this->never())->method('getPasswordHasher');
 
-        $event = $this->createEvent(new SelfValidatingPassport(new UserBadge('test', function () { return $this->user; }), [new PasswordUpgradeBadge('pa$$word')]));
+        $event = $this->createEvent(new SelfValidatingPassport(new UserBadge('test', fn () => $this->user), [new PasswordUpgradeBadge('pa$$word')]));
         $this->listener->onLoginSuccess($event);
     }
 
@@ -170,7 +170,7 @@ class DummyTestPasswordAuthenticatedUser extends TestPasswordAuthenticatedUser
         return [];
     }
 
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
     }
 

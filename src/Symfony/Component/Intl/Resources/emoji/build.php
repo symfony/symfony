@@ -21,6 +21,7 @@ $emojisCodePoints = Builder::getEmojisCodePoints();
 Builder::saveRules(Builder::buildRules($emojisCodePoints));
 Builder::saveRules(Builder::buildGitHubRules($emojisCodePoints));
 Builder::saveRules(Builder::buildSlackRules($emojisCodePoints));
+Builder::saveRules(Builder::buildStripRules($emojisCodePoints));
 
 final class Builder
 {
@@ -166,6 +167,18 @@ final class Builder
         }
 
         return ['emoji-slack' => self::createRules($emojiSlackMaps), 'slack-emoji' => self::createRules($slackEmojiMaps)];
+    }
+
+    public static function buildStripRules(array $emojisCodePoints): iterable
+    {
+        $maps = [];
+        foreach ($emojisCodePoints as $emoji) {
+            self::testEmoji($emoji, 'strip');
+            $codePointsCount = mb_strlen($emoji);
+            $maps[$codePointsCount][$emoji] = '';
+        }
+
+        return ['strip' => self::createRules($maps)];
     }
 
     public static function cleanTarget(): void

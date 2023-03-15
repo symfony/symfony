@@ -1,7 +1,5 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
-{% import _self as helper %}
-
 {% block menu %}
 <span class="label">
     <span class="icon">{{ source('@WebProfiler/Icon/event.svg') }}</span>
@@ -22,7 +20,7 @@
                 <h3 class="tab-title">Called Listeners <span class="badge">{{ collector.calledlisteners|length }}</span></h3>
 
                 <div class="tab-content">
-                    {{ helper.render_table(collector.calledlisteners) }}
+                    {{ _self.render_table(collector.calledlisteners) }}
                 </div>
             </div>
 
@@ -41,7 +39,7 @@
                             </p>
                         </div>
                     {% else %}
-                        {{ helper.render_table(collector.notcalledlisteners) }}
+                        {{ _self.render_table(collector.notcalledlisteners) }}
                     {% endif %}
                 </div>
             </div>

@@ -267,7 +267,7 @@ class SortableIteratorTest extends RealIteratorTestCase
             [SortableIterator::SORT_BY_CHANGED_TIME, self::toAbsolute($sortByChangedTime)],
             [SortableIterator::SORT_BY_MODIFIED_TIME, self::toAbsolute($sortByModifiedTime)],
             [SortableIterator::SORT_BY_NAME_NATURAL, self::toAbsolute($sortByNameNatural)],
-            [function (\SplFileInfo $a, \SplFileInfo $b) { return strcmp($a->getRealPath(), $b->getRealPath()); }, self::toAbsolute($customComparison)],
+            [fn (\SplFileInfo $a, \SplFileInfo $b) => strcmp($a->getRealPath(), $b->getRealPath()), self::toAbsolute($customComparison)],
         ];
     }
 }

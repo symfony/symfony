@@ -263,4 +263,37 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
             ->setCode(Uuid::INVALID_CHARACTERS_ERROR)
             ->assertRaised();
     }
+
+    /**
+     * @dataProvider getUuidForTimeBasedAssertions
+     */
+    public function testTimeBasedUuid(string $uid, bool $expectedTimeBased)
+    {
+        $constraint = new Uuid([
+            'versions' => Uuid::TIME_BASED_VERSIONS,
+        ]);
+
+        $this->validator->validate($uid, $constraint);
+
+        if ($expectedTimeBased) {
+            $this->assertNoViolation();
+        } else {
+            $this->buildViolation('This is not a valid UUID.')
+                ->setParameter('{{ value }}', '"'.$uid.'"')
+                ->setCode(Uuid::INVALID_TIME_BASED_VERSION_ERROR)
+                ->assertRaised();
+        }
+    }
+
+    public static function getUuidForTimeBasedAssertions(): \Generator
+    {
+        yield Uuid::V1_MAC => ['95ab107e-6fc2-11ed-9d6b-01bfd6e71dbd', true];
+        yield Uuid::V2_DCE => ['216fff40-98d9-21e3-a5e2-0800200c9a66', false];
+        yield Uuid::V3_MD5 => ['5d5b5ae1-5857-3531-9431-e8ac73c3e61d', false];
+        yield Uuid::V4_RANDOM => ['ba6479dd-a5ea-403c-96ae-5964d0582e81', false];
+        yield Uuid::V5_SHA1 => ['fc1cc19d-cb3c-5f6a-a0f6-706424f68e3a', false];
+        yield Uuid::V6_SORTABLE => ['1ed6fc29-5ab1-6b6e-8aad-cfa821180d14', true];
+        yield Uuid::V7_MONOTONIC => ['0184c292-b133-7e10-a3b4-d49c1ab49b2a', true];
+        yield Uuid::V8_CUSTOM => ['00112233-4455-8677-8899-aabbccddeeff', false];
+    }
 }

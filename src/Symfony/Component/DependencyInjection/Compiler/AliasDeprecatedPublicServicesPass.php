@@ -28,7 +28,7 @@ final class AliasDeprecatedPublicServicesPass extends AbstractRecursivePass
         return parent::processValue($value, $isRoot);
     }
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         foreach ($container->findTaggedServiceIds('container.private') as $id => $tags) {
             if (null === $package = $tags[0]['package'] ?? null) {

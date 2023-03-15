@@ -15,8 +15,6 @@ use Masterminds\HTML5;
 
 /**
  * @author Titouan Galopin <galopintitouan@gmail.com>
- *
- * @experimental
  */
 final class MastermindsParser implements ParserInterface
 {

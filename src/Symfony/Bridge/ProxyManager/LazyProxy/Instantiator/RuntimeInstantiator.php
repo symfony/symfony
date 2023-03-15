@@ -21,10 +21,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\InstantiatorInterface;
 
+trigger_deprecation('symfony/proxy-manager-bridge', '6.3', 'The "symfony/proxy-manager-bridge" package is deprecated and can be removed from your dependencies.');
+
 /**
  * Runtime lazy loading proxy generator.
  *
  * @author Marco Pivetta <ocramius@gmail.com>
+ *
+ * @deprecated since Symfony 6.3
  */
 class RuntimeInstantiator implements InstantiatorInterface
 {

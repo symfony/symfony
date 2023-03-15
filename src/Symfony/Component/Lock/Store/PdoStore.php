@@ -64,7 +64,7 @@ class PdoStore implements PersistingStoreInterface
      * @throws InvalidArgumentException When PDO error mode is not PDO::ERRMODE_EXCEPTION
      * @throws InvalidArgumentException When the initial ttl is not valid
      */
-    public function __construct(\PDO|string $connOrDsn, array $options = [], float $gcProbability = 0.01, int $initialTtl = 300)
+    public function __construct(#[\SensitiveParameter] \PDO|string $connOrDsn, #[\SensitiveParameter] array $options = [], float $gcProbability = 0.01, int $initialTtl = 300)
     {
         $this->init($options, $gcProbability, $initialTtl);
 
@@ -83,6 +83,9 @@ class PdoStore implements PersistingStoreInterface
         $this->connectionOptions = $options['db_connection_options'] ?? $this->connectionOptions;
     }
 
+    /**
+     * @return void
+     */
     public function save(Key $key)
     {
         $key->reduceLifetime($this->initialTtl);
@@ -112,6 +115,9 @@ class PdoStore implements PersistingStoreInterface
         $this->checkNotExpired($key);
     }
 
+    /**
+     * @return void
+     */
     public function putOffExpiration(Key $key, float $ttl)
     {
         if ($ttl < 1) {
@@ -137,6 +143,9 @@ class PdoStore implements PersistingStoreInterface
         $this->checkNotExpired($key);
     }
 
+    /**
+     * @return void
+     */
     public function delete(Key $key)
     {
         $sql = "DELETE FROM $this->table WHERE $this->idCol = :id AND $this->tokenCol = :token";

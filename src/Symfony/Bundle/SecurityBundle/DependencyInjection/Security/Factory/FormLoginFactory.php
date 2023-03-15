@@ -50,7 +50,7 @@ class FormLoginFactory extends AbstractFactory
         return 'form-login';
     }
 
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(NodeDefinition $node): void
     {
         parent::addConfiguration($node);
 

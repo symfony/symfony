@@ -73,6 +73,8 @@ class KernelBrowser extends HttpKernelBrowser
      * Enables the profiler for the very next request.
      *
      * If the profiler is not enabled, the call to this method does nothing.
+     *
+     * @return void
      */
     public function enableProfiler()
     {
@@ -86,6 +88,8 @@ class KernelBrowser extends HttpKernelBrowser
      *
      * By default, the Client reboots the Kernel for each request. This method
      * allows to keep the same kernel across requests.
+     *
+     * @return void
      */
     public function disableReboot()
     {
@@ -94,6 +98,8 @@ class KernelBrowser extends HttpKernelBrowser
 
     /**
      * Enables kernel reboot between requests.
+     *
+     * @return void
      */
     public function enableReboot()
     {
@@ -132,9 +138,7 @@ class KernelBrowser extends HttpKernelBrowser
         $session->set('_security_'.$firewallContext, serialize($token));
         $session->save();
 
-        $domains = array_unique(array_map(function (Cookie $cookie) use ($session) {
-            return $cookie->getName() === $session->getName() ? $cookie->getDomain() : '';
-        }, $this->getCookieJar()->all())) ?: [''];
+        $domains = array_unique(array_map(fn (Cookie $cookie) => $cookie->getName() === $session->getName() ? $cookie->getDomain() : '', $this->getCookieJar()->all())) ?: [''];
         foreach ($domains as $domain) {
             $cookie = new Cookie($session->getName(), $session->getId(), null, null, $domain);
             $this->getCookieJar()->set($cookie);

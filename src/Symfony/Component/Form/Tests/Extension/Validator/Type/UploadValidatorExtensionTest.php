@@ -26,11 +26,7 @@ class UploadValidatorExtensionTest extends TypeTestCase
 
         $resolver = new OptionsResolver();
         $resolver->setDefault('post_max_size_message', 'old max {{ max }}!');
-        $resolver->setDefault('upload_max_size_message', function (Options $options) {
-            return function () use ($options) {
-                return $options['post_max_size_message'];
-            };
-        });
+        $resolver->setDefault('upload_max_size_message', fn (Options $options) => fn () => $options['post_max_size_message']);
 
         $extension->configureOptions($resolver);
         $options = $resolver->resolve();
@@ -46,7 +42,7 @@ class DummyTranslator implements TranslatorInterface, LocaleAwareInterface
         return 'translated max {{ max }}!';
     }
 
-    public function setLocale($locale)
+    public function setLocale($locale): void
     {
     }
 

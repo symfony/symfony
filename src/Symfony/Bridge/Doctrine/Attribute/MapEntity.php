@@ -11,11 +11,14 @@
 
 namespace Symfony\Bridge\Doctrine\Attribute;
 
+use Symfony\Bridge\Doctrine\ArgumentResolver\EntityValueResolver;
+use Symfony\Component\HttpKernel\Attribute\ValueResolver;
+
 /**
  * Indicates that a controller argument should receive an Entity.
  */
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
-class MapEntity
+class MapEntity extends ValueResolver
 {
     public function __construct(
         public ?string $class = null,
@@ -26,8 +29,10 @@ class MapEntity
         public ?bool $stripNull = null,
         public array|string|null $id = null,
         public ?bool $evictCache = null,
-        public bool $disabled = false,
+        bool $disabled = false,
+        string $resolver = EntityValueResolver::class,
     ) {
+        parent::__construct($resolver, $disabled);
     }
 
     public function withDefaults(self $defaults, ?string $class): static

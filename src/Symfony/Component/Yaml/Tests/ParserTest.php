@@ -1541,6 +1541,15 @@ EOT
         ];
     }
 
+    public function testParseDateWithSubseconds()
+    {
+        $yaml = <<<'EOT'
+date: 2002-12-14T01:23:45.670000Z
+EOT;
+
+        $this->assertSameData(['date' => 1039829025.67], $this->parser->parse($yaml));
+    }
+
     public function testParseDateAsMappingValue()
     {
         $yaml = <<<'EOT'

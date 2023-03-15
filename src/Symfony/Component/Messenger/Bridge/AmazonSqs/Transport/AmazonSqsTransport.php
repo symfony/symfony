@@ -78,6 +78,9 @@ class AmazonSqsTransport implements TransportInterface, SetupableTransportInterf
         }
     }
 
+    /**
+     * @return void
+     */
     public function reset()
     {
         try {

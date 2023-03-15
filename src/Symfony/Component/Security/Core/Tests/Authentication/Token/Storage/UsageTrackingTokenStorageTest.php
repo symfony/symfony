@@ -31,7 +31,7 @@ class UsageTrackingTokenStorageTest extends TestCase
 
             $request = new Request();
             $request->setSession($session);
-            $requestStack = $this->getMockBuilder(RequestStack::class)->setMethods(['getSession'])->getMock();
+            $requestStack = $this->getMockBuilder(RequestStack::class)->onlyMethods(['getSession'])->getMock();
             $requestStack->push($request);
             $requestStack->expects($this->any())->method('getSession')->willReturnCallback(function () use ($session, &$sessionAccess) {
                 ++$sessionAccess;
@@ -68,9 +68,7 @@ class UsageTrackingTokenStorageTest extends TestCase
 
     public function testWithoutMainRequest()
     {
-        $locator = new class(['request_stack' => function () {
-            return new RequestStack();
-        }]) implements ContainerInterface {
+        $locator = new class(['request_stack' => fn () => new RequestStack()]) implements ContainerInterface {
             use ServiceLocatorTrait;
         };
         $tokenStorage = new TokenStorage();

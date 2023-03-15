@@ -1113,9 +1113,7 @@ class TimeTypeTest extends BaseTypeTestCase
     public static function provideEmptyData()
     {
         $expectedData = \DateTime::createFromFormat('Y-m-d H:i', '1970-01-01 21:23');
-        $lazyEmptyData = static function (FormInterface $form) {
-            return $form->getConfig()->getCompound() ? ['hour' => '21', 'minute' => '23'] : '21:23';
-        };
+        $lazyEmptyData = static fn (FormInterface $form) => $form->getConfig()->getCompound() ? ['hour' => '21', 'minute' => '23'] : '21:23';
 
         return [
             'Simple field' => ['single_text', '21:23', $expectedData],

@@ -155,7 +155,7 @@ class ProcessTest extends TestCase
     {
         $p = $this->getProcess('echo foo');
         $p->start();
-        $this->assertFalse($p->waitUntil(function () { return false; }));
+        $this->assertFalse($p->waitUntil(fn () => false));
     }
 
     public function testAllOutputIsActuallyReadOnTermination()
@@ -1536,11 +1536,7 @@ class ProcessTest extends TestCase
         }
     }
 
-    /**
-     * @param string|array $commandline
-     * @param mixed        $input
-     */
-    private function getProcess($commandline, string $cwd = null, array $env = null, $input = null, ?int $timeout = 60): Process
+    private function getProcess(string|array $commandline, string $cwd = null, array $env = null, mixed $input = null, ?int $timeout = 60): Process
     {
         if (\is_string($commandline)) {
             $process = Process::fromShellCommandline($commandline, $cwd, $env, $input, $timeout);

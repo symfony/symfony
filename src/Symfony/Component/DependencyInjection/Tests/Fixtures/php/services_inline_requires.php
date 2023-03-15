@@ -15,11 +15,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class ProjectServiceContainer extends Container
 {
     protected $parameters = [];
+    protected readonly \WeakReference $ref;
 
     public function __construct()
     {
-        $this->parameters = $this->getDefaultParameters();
-
+        $this->ref = \WeakReference::create($this);
         $this->services = $this->privates = [];
         $this->methodMap = [
             'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\ParentNotExists' => 'getParentNotExistsService',
@@ -29,7 +29,7 @@ class ProjectServiceContainer extends Container
 
         $this->aliases = [];
 
-        $this->privates['service_container'] = function () {
+        $this->privates['service_container'] = static function ($container) {
             include_once \dirname(__DIR__, 1).'/includes/HotPath/I1.php';
             include_once \dirname(__DIR__, 1).'/includes/HotPath/P1.php';
             include_once \dirname(__DIR__, 1).'/includes/HotPath/T1.php';
@@ -59,9 +59,9 @@ class ProjectServiceContainer extends Container
      *
      * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists
      */
-    protected function getParentNotExistsService()
+    protected static function getParentNotExistsService($container)
     {
-        return $this->services['Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\ParentNotExists'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists();
+        return $container->services['Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\ParentNotExists'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists();
     }
 
     /**
@@ -69,9 +69,9 @@ class ProjectServiceContainer extends Container
      *
      * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C1
      */
-    protected function getC1Service()
+    protected static function getC1Service($container)
     {
-        return $this->services['Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\includes\\HotPath\\C1'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C1();
+        return $container->services['Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\includes\\HotPath\\C1'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C1();
     }
 
     /**
@@ -79,61 +79,11 @@ class ProjectServiceContainer extends Container
      *
      * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C2
      */
-    protected function getC2Service()
+    protected static function getC2Service($container)
     {
         include_once \dirname(__DIR__, 1).'/includes/HotPath/C2.php';
         include_once \dirname(__DIR__, 1).'/includes/HotPath/C3.php';
 
-        return $this->services['Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\includes\\HotPath\\C2'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C2(new \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C3());
-    }
-
-    public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null
-    {
-        if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || \array_key_exists($name, $this->parameters))) {
-            throw new ParameterNotFoundException($name);
-        }
-        if (isset($this->loadedDynamicParameters[$name])) {
-            return $this->loadedDynamicParameters[$name] ? $this->dynamicParameters[$name] : $this->getDynamicParameter($name);
-        }
-
-        return $this->parameters[$name];
-    }
-
-    public function hasParameter(string $name): bool
-    {
-        return isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || \array_key_exists($name, $this->parameters);
-    }
-
-    public function setParameter(string $name, $value): void
-    {
-        throw new LogicException('Impossible to call set() on a frozen ParameterBag.');
-    }
-
-    public function getParameterBag(): ParameterBagInterface
-    {
-        if (null === $this->parameterBag) {
-            $parameters = $this->parameters;
-            foreach ($this->loadedDynamicParameters as $name => $loaded) {
-                $parameters[$name] = $loaded ? $this->dynamicParameters[$name] : $this->getDynamicParameter($name);
-            }
-            $this->parameterBag = new FrozenParameterBag($parameters);
-        }
-
-        return $this->parameterBag;
-    }
-
-    private $loadedDynamicParameters = [];
-    private $dynamicParameters = [];
-
-    private function getDynamicParameter(string $name)
-    {
-        throw new ParameterNotFoundException($name);
-    }
-
-    protected function getDefaultParameters(): array
-    {
-        return [
-            'inline_requires' => true,
-        ];
+        return $container->services['Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\includes\\HotPath\\C2'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C2(new \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C3());
     }
 }

@@ -1,5 +1,42 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
+{% block head %}
+    {{ parent() }}
+
+    <style>
+        #twig-dump pre {
+            font-size: var(--font-size-monospace);
+            line-height: 1.7;
+            background-color: var(--page-background);
+            border: var(--border);
+            border-radius: 6px;
+            padding: 15px;
+            box-shadow: 0 0 1px rgba(128, 128, 128, .2);
+        }
+        #twig-dump span {
+            border-radius: 2px;
+            padding: 1px 2px;
+        }
+        #twig-dump .status-error { background: transparent; color: var(--color-error); }
+        #twig-dump .status-warning { background: rgba(240, 181, 24, 0.3); }
+        #twig-dump .status-success { background: rgba(100, 189, 99, 0.2); }
+        #twig-dump .status-info { background: var(--info-background); }
+        .theme-dark #twig-dump .status-warning { color: var(--yellow-200); }
+        .theme-dark #twig-dump .status-success { color: var(--green-200); }
+
+        #twig-table tbody td {
+            position: relative;
+        }
+        #twig-table tbody td div {
+            margin: 0;
+        }
+        #twig-table .template-file-path {
+            color: var(--color-muted);
+            display: block;
+        }
+    </style>
+{% endblock %}
+
 {% block toolbar %}
     {% set time = collector.templatecount ? '%0.0f'|format(collector.time) : 'n/a' %}
     {% set icon %}

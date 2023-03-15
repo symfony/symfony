@@ -51,16 +51,25 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
         $this->requestStack = $requestStack;
     }
 
+    /**
+     * @return void
+     */
     public function addListener(string $eventName, callable|array $listener, int $priority = 0)
     {
         $this->dispatcher->addListener($eventName, $listener, $priority);
     }
 
+    /**
+     * @return void
+     */
     public function addSubscriber(EventSubscriberInterface $subscriber)
     {
         $this->dispatcher->addSubscriber($subscriber);
     }
 
+    /**
+     * @return void
+     */
     public function removeListener(string $eventName, callable|array $listener)
     {
         if (isset($this->wrappedListeners[$eventName])) {
@@ -73,12 +82,15 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
             }
         }
 
-        return $this->dispatcher->removeListener($eventName, $listener);
+        $this->dispatcher->removeListener($eventName, $listener);
     }
 
+    /**
+     * @return void
+     */
     public function removeSubscriber(EventSubscriberInterface $subscriber)
     {
-        return $this->dispatcher->removeSubscriber($subscriber);
+        $this->dispatcher->removeSubscriber($subscriber);
     }
 
     public function getListeners(string $eventName = null): array
@@ -214,6 +226,9 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
         return array_merge(...array_values($this->orphanedEvents));
     }
 
+    /**
+     * @return void
+     */
     public function reset()
     {
         $this->callStack = null;
@@ -234,6 +249,8 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
 
     /**
      * Called before dispatching the event.
+     *
+     * @return void
      */
     protected function beforeDispatch(string $eventName, object $event)
     {
@@ -241,6 +258,8 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
 
     /**
      * Called after dispatching the event.
+     *
+     * @return void
      */
     protected function afterDispatch(string $eventName, object $event)
     {

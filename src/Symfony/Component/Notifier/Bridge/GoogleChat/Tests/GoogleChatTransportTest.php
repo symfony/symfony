@@ -63,9 +63,7 @@ final class GoogleChatTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn('[]');
 
-        $client = new MockHttpClient(function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(fn (): ResponseInterface => $response);
 
         $transport = self::createTransport($client);
 
@@ -87,9 +85,7 @@ final class GoogleChatTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn('{"error":{"code":400,"message":"API key not valid. Please pass a valid API key.","status":"INVALID_ARGUMENT"}}');
 
-        $client = new MockHttpClient(function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(fn (): ResponseInterface => $response);
 
         $transport = self::createTransport($client);
 
@@ -166,9 +162,7 @@ final class GoogleChatTransportTest extends TransportTestCase
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The "'.GoogleChatTransport::class.'" transport only supports instances of "'.GoogleChatOptions::class.'" for options.');
 
-        $client = new MockHttpClient(function (string $method, string $url, array $options = []): ResponseInterface {
-            return $this->createMock(ResponseInterface::class);
-        });
+        $client = new MockHttpClient(fn (string $method, string $url, array $options = []): ResponseInterface => $this->createMock(ResponseInterface::class));
 
         $transport = self::createTransport($client);
 

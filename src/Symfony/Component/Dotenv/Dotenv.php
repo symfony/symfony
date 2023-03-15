@@ -58,7 +58,7 @@ final class Dotenv
 
     /**
      * @param bool $usePutenv If `putenv()` should be used to define environment variables or not.
-     *                        Beware that `putenv()` is not thread safe, that's why this setting defaults to false
+     *                        Beware that `putenv()` is not thread safe, that's why it's not enabled by default
      *
      * @return $this
      */
@@ -410,7 +410,7 @@ final class Dotenv
         return $value;
     }
 
-    private function skipEmptyLines()
+    private function skipEmptyLines(): void
     {
         if (preg_match('/(?:\s*+(?:#[^\n]*+)?+)++/A', $this->data, $match, 0, $this->cursor)) {
             $this->moveCursor($match[0]);
@@ -534,7 +534,7 @@ final class Dotenv
         return $value;
     }
 
-    private function moveCursor(string $text)
+    private function moveCursor(string $text): void
     {
         $this->cursor += \strlen($text);
         $this->lineno += substr_count($text, "\n");

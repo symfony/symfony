@@ -89,27 +89,23 @@ class LazyObjectRegistry
 
     public static function getClassAccessors($class)
     {
-        return \Closure::bind(static function () {
-            return [
-                'get' => static function &($instance, $name, $readonly) {
-                    if (!$readonly) {
-                        return $instance->$name;
-                    }
-                    $value = $instance->$name;
+        return \Closure::bind(static fn () => [
+            'get' => static function &($instance, $name, $readonly) {
+                if (!$readonly) {
+                    return $instance->$name;
+                }
+                $value = $instance->$name;
 
-                    return $value;
-                },
-                'set' => static function ($instance, $name, $value) {
-                    $instance->$name = $value;
-                },
-                'isset' => static function ($instance, $name) {
-                    return isset($instance->$name);
-                },
-                'unset' => static function ($instance, $name) {
-                    unset($instance->$name);
-                },
-            ];
-        }, null, \Closure::class === $class ? null : $class)();
+                return $value;
+            },
+            'set' => static function ($instance, $name, $value) {
+                $instance->$name = $value;
+            },
+            'isset' => static fn ($instance, $name) => isset($instance->$name),
+            'unset' => static function ($instance, $name) {
+                unset($instance->$name);
+            },
+        ], null, \Closure::class === $class ? null : $class)();
     }
 
     public static function getParentMethods($class)

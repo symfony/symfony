@@ -12,6 +12,8 @@
 namespace Symfony\Component\HttpKernel\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -28,16 +30,33 @@ class ControllerArgumentValueResolverPass implements CompilerPassInterface
 {
     use PriorityTaggedServiceTrait;
 
+    /**
+     * @return void
+     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition('argument_resolver')) {
             return;
         }
 
-        $resolvers = $this->findAndSortTaggedServices('controller.argument_value_resolver', $container);
+        $definitions = $container->getDefinitions();
+        $namedResolvers = $this->findAndSortTaggedServices(new TaggedIteratorArgument('controller.targeted_value_resolver', 'name', needsIndexes: true), $container);
+        $resolvers = $this->findAndSortTaggedServices(new TaggedIteratorArgument('controller.argument_value_resolver', 'name', needsIndexes: true), $container);
+
+        foreach ($resolvers as $name => $resolverReference) {
+            $id = (string) $resolverReference;
+
+            if ($definitions[$id]->hasTag('controller.targeted_value_resolver')) {
+                unset($resolvers[$name]);
+            } else {
+                $namedResolvers[$name] ??= clone $resolverReference;
+            }
+        }
+
+        $resolvers = array_values($resolvers);
 
         if ($container->getParameter('kernel.debug') && class_exists(Stopwatch::class) && $container->has('debug.stopwatch')) {
-            foreach ($resolvers as $resolverReference) {
+            foreach ($resolvers + $namedResolvers as $resolverReference) {
                 $id = (string) $resolverReference;
                 $container->register("debug.$id", TraceableValueResolver::class)
                     ->setDecoratedService($id)
@@ -48,6 +67,7 @@ class ControllerArgumentValueResolverPass implements CompilerPassInterface
         $container
             ->getDefinition('argument_resolver')
             ->replaceArgument(1, new IteratorArgument($resolvers))
+            ->setArgument(2, new ServiceLocatorArgument($namedResolvers))
         ;
     }
 }

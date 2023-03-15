@@ -33,6 +33,9 @@ abstract class Loader implements LoaderInterface
         return $this->resolver;
     }
 
+    /**
+     * @return void
+     */
     public function setResolver(LoaderResolverInterface $resolver)
     {
         $this->resolver = $resolver;

@@ -64,7 +64,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
             $this->conn = $connOrDsn;
         } else {
             if (!class_exists(DriverManager::class)) {
-                throw new InvalidArgumentException(sprintf('Failed to parse the DSN "%s". Try running "composer require doctrine/dbal".', $connOrDsn));
+                throw new InvalidArgumentException('Failed to parse DSN. Try running "composer require doctrine/dbal".');
             }
             $this->conn = DriverManager::getConnection(['url' => $connOrDsn]);
         }
@@ -98,14 +98,18 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
         }
     }
 
-    public function configureSchema(Schema $schema, Connection $forConnection): void
+    /**
+     * @param \Closure $isSameDatabase
+     */
+    public function configureSchema(Schema $schema, Connection $forConnection/* , \Closure $isSameDatabase */): void
     {
-        // only update the schema for this connection
-        if ($forConnection !== $this->conn) {
+        if ($schema->hasTable($this->table)) {
             return;
         }
 
-        if ($schema->hasTable($this->table)) {
+        $isSameDatabase = 2 < \func_num_args() ? func_get_arg(2) : static fn () => false;
+
+        if ($forConnection !== $this->conn && !$isSameDatabase($this->conn->executeStatement(...))) {
             return;
         }
 

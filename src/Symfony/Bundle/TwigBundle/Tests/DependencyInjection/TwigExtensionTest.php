@@ -24,7 +24,10 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
+use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Stopwatch\Stopwatch;
+use Twig\Environment;
 
 class TwigExtensionTest extends TestCase
 {
@@ -35,7 +38,7 @@ class TwigExtensionTest extends TestCase
         $container->loadFromExtension('twig');
         $this->compileContainer($container);
 
-        $this->assertEquals('Twig\Environment', $container->getDefinition('twig')->getClass(), '->load() loads the twig.xml file');
+        $this->assertEquals(Environment::class, $container->getDefinition('twig')->getClass(), '->load() loads the twig.xml file');
 
         $this->assertContains('form_div_layout.html.twig', $container->getParameter('twig.form.resources'), '->load() includes default template for form resources');
 
@@ -60,7 +63,7 @@ class TwigExtensionTest extends TestCase
         $this->loadFromFile($container, 'full', $format);
         $this->compileContainer($container);
 
-        $this->assertEquals('Twig\Environment', $container->getDefinition('twig')->getClass(), '->load() loads the twig.xml file');
+        $this->assertEquals(Environment::class, $container->getDefinition('twig')->getClass(), '->load() loads the twig.xml file');
 
         // Form resources
         $resources = $container->getParameter('twig.form.resources');
@@ -221,7 +224,7 @@ class TwigExtensionTest extends TestCase
         $container = $this->createContainer();
         $container->setParameter('kernel.debug', $debug);
         if ($stopwatchEnabled) {
-            $container->register('debug.stopwatch', 'Symfony\Component\Stopwatch\Stopwatch');
+            $container->register('debug.stopwatch', Stopwatch::class);
         }
         $container->registerExtension(new TwigExtension());
         $container->loadFromExtension('twig');
@@ -262,9 +265,9 @@ class TwigExtensionTest extends TestCase
 
         $loader = $container->getDefinition('twig.runtime_loader');
         $args = $container->getDefinition((string) $loader->getArgument(0))->getArgument(0);
-        $this->assertArrayHasKey('Symfony\Component\Form\FormRenderer', $args);
+        $this->assertArrayHasKey(FormRenderer::class, $args);
         $this->assertArrayHasKey('FooClass', $args);
-        $this->assertEquals('twig.form.renderer', $args['Symfony\Component\Form\FormRenderer']->getValues()[0]);
+        $this->assertEquals('twig.form.renderer', $args[FormRenderer::class]->getValues()[0]);
         $this->assertEquals('foo', $args['FooClass']->getValues()[0]);
     }
 

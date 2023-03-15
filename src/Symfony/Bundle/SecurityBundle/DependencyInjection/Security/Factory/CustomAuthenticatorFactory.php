@@ -35,7 +35,7 @@ class CustomAuthenticatorFactory implements AuthenticatorFactoryInterface
     /**
      * @param ArrayNodeDefinition $builder
      */
-    public function addConfiguration(NodeDefinition $builder)
+    public function addConfiguration(NodeDefinition $builder): void
     {
         $builder
             ->info('An array of service ids for all of your "authenticators"')
@@ -47,7 +47,7 @@ class CustomAuthenticatorFactory implements AuthenticatorFactoryInterface
         $factoryRootNode
             ->fixXmlConfig('custom_authenticator')
             ->validate()
-                ->ifTrue(function ($v) { return isset($v['custom_authenticators']) && empty($v['custom_authenticators']); })
+                ->ifTrue(fn ($v) => isset($v['custom_authenticators']) && empty($v['custom_authenticators']))
                 ->then(function ($v) {
                     unset($v['custom_authenticators']);
 

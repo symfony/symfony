@@ -12,7 +12,13 @@
 namespace Symfony\Component\Messenger\Tests\Stamp;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
+use Symfony\Component\Messenger\Transport\Serialization\Serializer;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer as SymfonySerializer;
 
 class TransportNamesStampTest extends TestCase
 {
@@ -26,5 +32,31 @@ class TransportNamesStampTest extends TestCase
         foreach ($configuredSenders as $key => $sender) {
             $this->assertSame($sender, $stampSenders[$key]);
         }
+    }
+
+    public function testDeserialization()
+    {
+        $stamp = new TransportNamesStamp(['foo']);
+        $serializer = new Serializer(
+            new SymfonySerializer([
+                new ArrayDenormalizer(),
+                new ObjectNormalizer(),
+            ], [new JsonEncoder()])
+        );
+
+        $deserializedEnvelope = $serializer->decode($serializer->encode(new Envelope(new \stdClass(), [$stamp])));
+
+        $deserializedStamp = $deserializedEnvelope->last(TransportNamesStamp::class);
+        $this->assertInstanceOf(TransportNamesStamp::class, $deserializedStamp);
+        $this->assertEquals($stamp, $deserializedStamp);
+    }
+
+    public function testGetIndividualSender()
+    {
+        $stamp = new TransportNamesStamp('first_transport');
+        $stampSenders = $stamp->getTransportNames();
+
+        $this->assertCount(1, $stampSenders);
+        $this->assertSame('first_transport', $stampSenders[0]);
     }
 }

@@ -1,0 +1,61 @@
+{
+    "signature": {
+        "token": "d1931d9645b65e60f6fddf94448e982ff8db9256144a7fcb15",
+        "timestamp": "1661621787",
+        "signature": "1aed11dcc25700d6b75f9a6d568343ea02ecdd3fc89cc3209e2883a19e5cdd50"
+    },
+    "event-data": {
+        "id": "CPgfbmQMTCKtHW6uIWtuVe",
+        "timestamp": 1521472262.908181,
+        "log-level": "info",
+        "event": "delivered",
+        "delivery-status": {
+            "tls": true,
+            "mx-host": "smtp-in.example.com",
+            "code": 250,
+            "description": "",
+            "session-seconds": 0.4331989288330078,
+            "utf8": true,
+            "attempt-no": 1,
+            "message": "OK",
+            "certificate-verified": true
+        },
+        "flags": {
+            "is-routed": false,
+            "is-authenticated": true,
+            "is-system-test": false,
+            "is-test-mode": false
+        },
+        "envelope": {
+            "transport": "smtp",
+            "sender": "bob@app.symfony.com",
+            "sending-ip": "209.61.154.250",
+            "targets": "alice@example.com"
+        },
+        "message": {
+            "headers": {
+                "to": "Alice <alice@example.com>",
+                "message-id": "20130503182626.18666.16540@app.symfony.com",
+                "from": "Bob <bob@app.symfony.com>",
+                "subject": "Test delivered webhook"
+            },
+            "attachments": [],
+            "size": 111
+        },
+        "recipient": "alice@example.com",
+        "recipient-domain": "example.com",
+        "storage": {
+            "url": "https://se.api.mailgun.net/v3/domains/app.symfony.com/messages/message_key",
+            "key": "message_key"
+        },
+        "campaigns": [],
+        "tags": [
+            "my_tag_1",
+            "my_tag_2"
+        ],
+        "user-variables": {
+            "my_var_1": "Mailgun Variable #1",
+            "my-var-2": "awesome"
+        }
+    }
+}

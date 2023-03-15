@@ -45,7 +45,7 @@ class HttpCacheTest extends HttpCacheTestCase
         // implements TerminableInterface
         $kernelMock = $this->getMockBuilder(Kernel::class)
             ->disableOriginalConstructor()
-            ->setMethods(['terminate', 'registerBundles', 'registerContainerConfiguration'])
+            ->onlyMethods(['terminate', 'registerBundles', 'registerContainerConfiguration'])
             ->getMock();
 
         $kernelMock->expects($this->once())
@@ -1738,6 +1738,43 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->request('GET', '/'); // hit backend error
 
         $this->assertEquals(500, $this->response->getStatusCode());
+    }
+
+    public function testSkipsConfiguredResponseHeadersForStore()
+    {
+        $storeMock = $this->createMock(StoreInterface::class);
+        $storeMock
+            ->expects($this->once())
+            ->method('write')
+            ->with(
+                $this->isInstanceOf(Request::class),
+                $this->callback(function (Response $response) {
+                    $this->assertFalse($response->headers->has('Set-Cookie'));
+                    $this->assertFalse($response->headers->has('Another-One-To-Skip'));
+                    $this->assertTrue($response->headers->has('Cache-Control'));
+                    $this->assertTrue($response->headers->has('Another-One-To-Keep'));
+
+                    return true;
+                })
+            );
+
+        $this->setNextResponse(200, [
+            'Cache-Control' => 'public, s-maxage=20',
+            'Set-Cookie' => 'foobar=value; path=/',
+            'Another-One-To-Skip' => 'foobar',
+            'Another-One-To-Keep' => 'foobar',
+        ]);
+
+        $httpCache = new HttpCache($this->kernel, $storeMock, null, [
+            'skip_response_headers' => ['Set-Cookie', 'Another-One-To-Skip', 'I-do-Not-Exist'],
+        ]);
+
+        $response = $httpCache->handle(Request::create('/'));
+
+        $this->assertSame('foobar=value; path=/', $response->headers->get('Set-Cookie'));
+        $this->assertSame('foobar', $response->headers->get('Another-One-To-Skip'));
+        $this->assertSame('foobar', $response->headers->get('Another-One-To-Keep'));
+        $this->assertFalse($response->headers->has('I-do-Not-Exist'));
     }
 
     public static function getResponseDataThatMustNotBeServedStaleIfError()

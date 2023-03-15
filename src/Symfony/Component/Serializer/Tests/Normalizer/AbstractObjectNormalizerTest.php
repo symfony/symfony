@@ -546,6 +546,11 @@ class AbstractObjectNormalizerTest extends TestCase
 
 class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
 {
+    public function getSupportedTypes(?string $format): array
+    {
+        return ['*' => false];
+    }
+
     protected function extractAttributes(object $object, string $format = null, array $context = []): array
     {
         return [];
@@ -651,6 +656,11 @@ class AbstractObjectNormalizerWithMetadata extends AbstractObjectNormalizer
         parent::__construct($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
     }
 
+    public function getSupportedTypes(?string $format): array
+    {
+        return ['*' => false];
+    }
+
     protected function extractAttributes(object $object, string $format = null, array $context = []): array
     {
     }
@@ -752,6 +762,11 @@ class SerializerCollectionDummy implements SerializerInterface, DenormalizerInte
         return null;
     }
 
+    public function getSupportedTypes(?string $format): array
+    {
+        return ['*' => false];
+    }
+
     public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
     {
         return true;
@@ -760,6 +775,11 @@ class SerializerCollectionDummy implements SerializerInterface, DenormalizerInte
 
 class AbstractObjectNormalizerCollectionDummy extends AbstractObjectNormalizer
 {
+    public function getSupportedTypes(?string $format): array
+    {
+        return ['*' => false];
+    }
+
     protected function extractAttributes(object $object, string $format = null, array $context = []): array
     {
     }
@@ -812,6 +832,11 @@ class ArrayDenormalizerDummy implements DenormalizerInterface, SerializerAwareIn
         }
 
         return $data;
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return $this->serializer->getSupportedTypes($format);
     }
 
     public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool

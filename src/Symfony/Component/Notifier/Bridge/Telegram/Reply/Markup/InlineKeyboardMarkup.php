@@ -32,9 +32,7 @@ final class InlineKeyboardMarkup extends AbstractTelegramReplyMarkup
      */
     public function inlineKeyboard(array $buttons): static
     {
-        $buttons = array_map(static function (InlineKeyboardButton $button) {
-            return $button->toArray();
-        }, $buttons);
+        $buttons = array_map(static fn (InlineKeyboardButton $button) => $button->toArray(), $buttons);
 
         $this->options['inline_keyboard'][] = $buttons;
 

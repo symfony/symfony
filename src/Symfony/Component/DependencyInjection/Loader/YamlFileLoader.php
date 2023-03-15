@@ -146,7 +146,7 @@ class YamlFileLoader extends FileLoader
         return null;
     }
 
-    private function loadContent(array $content, string $path)
+    private function loadContent(array $content, string $path): void
     {
         // imports
         $this->parseImports($content, $path);
@@ -190,7 +190,7 @@ class YamlFileLoader extends FileLoader
         return \in_array($type, ['yaml', 'yml'], true);
     }
 
-    private function parseImports(array $content, string $file)
+    private function parseImports(array $content, string $file): void
     {
         if (!isset($content['imports'])) {
             return;
@@ -214,7 +214,7 @@ class YamlFileLoader extends FileLoader
         }
     }
 
-    private function parseDefinitions(array $content, string $file, bool $trackBindings = true)
+    private function parseDefinitions(array $content, string $file, bool $trackBindings = true): void
     {
         if (!isset($content['services'])) {
             return;
@@ -774,7 +774,7 @@ class YamlFileLoader extends FileLoader
             }
 
             if (!$this->container->hasExtension($namespace)) {
-                $extensionNamespaces = array_filter(array_map(function (ExtensionInterface $ext) { return $ext->getAlias(); }, $this->container->getExtensions()));
+                $extensionNamespaces = array_filter(array_map(fn (ExtensionInterface $ext) => $ext->getAlias(), $this->container->getExtensions()));
                 throw new InvalidArgumentException(sprintf('There is no extension able to load the configuration for "%s" (in "%s"). Looked for namespace "%s", found "%s".', $namespace, $file, $namespace, $extensionNamespaces ? sprintf('"%s"', implode('", "', $extensionNamespaces)) : 'none'));
             }
         }
@@ -814,17 +814,21 @@ class YamlFileLoader extends FileLoader
 
                 $argument = $this->resolveServices($argument, $file, $isParameter);
 
+                if (isset($argument[0])) {
+                    trigger_deprecation('symfony/dependency-injection', '6.3', 'Using integers as keys in a "!service_locator" tag is deprecated. The keys will default to the IDs of the original services in 7.0.');
+                }
+
                 return new ServiceLocatorArgument($argument);
             }
             if (\in_array($value->getTag(), ['tagged', 'tagged_iterator', 'tagged_locator'], true)) {
                 $forLocator = 'tagged_locator' === $value->getTag();
 
                 if (\is_array($argument) && isset($argument['tag']) && $argument['tag']) {
-                    if ($diff = array_diff(array_keys($argument), $supportedKeys = ['tag', 'index_by', 'default_index_method', 'default_priority_method', 'exclude'])) {
+                    if ($diff = array_diff(array_keys($argument), $supportedKeys = ['tag', 'index_by', 'default_index_method', 'default_priority_method', 'exclude', 'exclude_self'])) {
                         throw new InvalidArgumentException(sprintf('"!%s" tag contains unsupported key "%s"; supported ones are "%s".', $value->getTag(), implode('", "', $diff), implode('", "', $supportedKeys)));
                     }
 
-                    $argument = new TaggedIteratorArgument($argument['tag'], $argument['index_by'] ?? null, $argument['default_index_method'] ?? null, $forLocator, $argument['default_priority_method'] ?? null, (array) ($argument['exclude'] ?? null));
+                    $argument = new TaggedIteratorArgument($argument['tag'], $argument['index_by'] ?? null, $argument['default_index_method'] ?? null, $forLocator, $argument['default_priority_method'] ?? null, (array) ($argument['exclude'] ?? null), $argument['exclude_self'] ?? true);
                 } elseif (\is_string($argument) && $argument) {
                     $argument = new TaggedIteratorArgument($argument, null, null, $forLocator);
                 } else {
@@ -905,7 +909,7 @@ class YamlFileLoader extends FileLoader
         return $value;
     }
 
-    private function loadFromExtensions(array $content)
+    private function loadFromExtensions(array $content): void
     {
         foreach ($content as $namespace => $values) {
             if (\in_array($namespace, ['imports', 'parameters', 'services']) || str_starts_with($namespace, 'when@')) {
@@ -920,7 +924,7 @@ class YamlFileLoader extends FileLoader
         }
     }
 
-    private function checkDefinition(string $id, array $definition, string $file)
+    private function checkDefinition(string $id, array $definition, string $file): void
     {
         if ($this->isLoadingInstanceof) {
             $keywords = self::INSTANCEOF_KEYWORDS;

@@ -81,12 +81,10 @@ class DateType extends AbstractType
             $emptyData = $builder->getEmptyData() ?: [];
 
             if ($emptyData instanceof \Closure) {
-                $lazyEmptyData = static function ($option) use ($emptyData) {
-                    return static function (FormInterface $form) use ($emptyData, $option) {
-                        $emptyData = $emptyData($form->getParent());
+                $lazyEmptyData = static fn ($option) => static function (FormInterface $form) use ($emptyData, $option) {
+                    $emptyData = $emptyData($form->getParent());
 
-                        return $emptyData[$option] ?? '';
-                    };
+                    return $emptyData[$option] ?? '';
                 };
 
                 $yearOptions['empty_data'] = $lazyEmptyData('year');
@@ -218,13 +216,9 @@ class DateType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver)
     {
-        $compound = function (Options $options) {
-            return 'single_text' !== $options['widget'];
-        };
+        $compound = fn (Options $options) => 'single_text' !== $options['widget'];
 
-        $placeholderDefault = function (Options $options) {
-            return $options['required'] ? null : '';
-        };
+        $placeholderDefault = fn (Options $options) => $options['required'] ? null : '';
 
         $placeholderNormalizer = function (Options $options, $placeholder) use ($placeholderDefault) {
             if (\is_array($placeholder)) {
@@ -260,9 +254,7 @@ class DateType extends AbstractType
             ];
         };
 
-        $format = function (Options $options) {
-            return 'single_text' === $options['widget'] ? self::HTML5_FORMAT : self::DEFAULT_FORMAT;
-        };
+        $format = fn (Options $options) => 'single_text' === $options['widget'] ? self::HTML5_FORMAT : self::DEFAULT_FORMAT;
 
         $resolver->setDefaults([
             'years' => range((int) date('Y') - 5, (int) date('Y') + 5),
@@ -285,9 +277,7 @@ class DateType extends AbstractType
             // this option.
             'data_class' => null,
             'compound' => $compound,
-            'empty_data' => function (Options $options) {
-                return $options['compound'] ? [] : '';
-            },
+            'empty_data' => fn (Options $options) => $options['compound'] ? [] : '',
             'choice_translation_domain' => false,
             'input_format' => 'Y-m-d',
             'invalid_message' => 'Please enter a valid date.',
@@ -329,7 +319,7 @@ class DateType extends AbstractType
         return 'date';
     }
 
-    private function formatTimestamps(\IntlDateFormatter $formatter, string $regex, array $timestamps)
+    private function formatTimestamps(\IntlDateFormatter $formatter, string $regex, array $timestamps): array
     {
         $pattern = $formatter->getPattern();
         $timezone = $formatter->getTimeZoneId();
@@ -354,7 +344,7 @@ class DateType extends AbstractType
         return $formattedTimestamps;
     }
 
-    private function listYears(array $years)
+    private function listYears(array $years): array
     {
         $result = [];
 
@@ -365,7 +355,7 @@ class DateType extends AbstractType
         return $result;
     }
 
-    private function listMonths(array $months)
+    private function listMonths(array $months): array
     {
         $result = [];
 
@@ -376,7 +366,7 @@ class DateType extends AbstractType
         return $result;
     }
 
-    private function listDays(array $days)
+    private function listDays(array $days): array
     {
         $result = [];
 

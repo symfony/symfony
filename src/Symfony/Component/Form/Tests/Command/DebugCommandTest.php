@@ -265,7 +265,7 @@ TXT
         $coreExtension = new CoreExtension();
         $loadTypesRefMethod = (new \ReflectionObject($coreExtension))->getMethod('loadTypes');
         $coreTypes = $loadTypesRefMethod->invoke($coreExtension);
-        $coreTypes = array_map(function (FormTypeInterface $type) { return $type::class; }, $coreTypes);
+        $coreTypes = array_map(fn (FormTypeInterface $type) => $type::class, $coreTypes);
         sort($coreTypes);
 
         return $coreTypes;
@@ -284,7 +284,7 @@ TXT
 
 class FooType extends AbstractType
 {
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired('foo');
         $resolver->setDefined('bar');
@@ -292,15 +292,11 @@ class FooType extends AbstractType
         $resolver->setDefault('empty_data', function (Options $options) {
             $foo = $options['foo'];
 
-            return function (FormInterface $form) use ($foo) {
-                return $form->getConfig()->getCompound() ? [$foo] : $foo;
-            };
+            return fn (FormInterface $form) => $form->getConfig()->getCompound() ? [$foo] : $foo;
         });
         $resolver->setAllowedTypes('foo', 'string');
         $resolver->setAllowedValues('foo', ['bar', 'baz']);
-        $resolver->setNormalizer('foo', function (Options $options, $value) {
-            return (string) $value;
-        });
+        $resolver->setNormalizer('foo', fn (Options $options, $value) => (string) $value);
         $resolver->setInfo('foo', 'Info');
     }
 }

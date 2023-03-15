@@ -307,7 +307,7 @@ class ContextListenerTest extends TestCase
 
     public function testSessionIsNotReported()
     {
-        $usageReporter = $this->getMockBuilder(\stdClass::class)->setMethods(['__invoke'])->getMock();
+        $usageReporter = $this->getMockBuilder(\stdClass::class)->addMethods(['__invoke'])->getMock();
         $usageReporter->expects($this->never())->method('__invoke');
 
         $session = new Session(new MockArraySessionStorage(), null, null, $usageReporter);
@@ -359,7 +359,7 @@ class ContextListenerTest extends TestCase
             $session->set('_security_session', $original);
         }
 
-        $factories = ['request_stack' => function () use ($requestStack) { return $requestStack; }];
+        $factories = ['request_stack' => fn () => $requestStack];
         $tokenStorage = new UsageTrackingTokenStorage(new TokenStorage(), new class($factories) implements ContainerInterface {
             use ServiceLocatorTrait;
         });
@@ -405,7 +405,7 @@ class ContextListenerTest extends TestCase
         $tokenStorage = new TokenStorage();
         $usageIndex = $session->getUsageIndex();
 
-        $factories = ['request_stack' => function () use ($requestStack) { return $requestStack; }];
+        $factories = ['request_stack' => fn () => $requestStack];
         $tokenStorage = new UsageTrackingTokenStorage($tokenStorage, new class($factories) implements ContainerInterface {
             use ServiceLocatorTrait;
         });
@@ -548,7 +548,7 @@ class CustomToken implements TokenInterface
         return $this->user;
     }
 
-    public function setUser($user)
+    public function setUser($user): void
     {
         $this->user = $user;
     }
@@ -572,7 +572,7 @@ class CustomToken implements TokenInterface
     {
     }
 
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
     }
 
@@ -581,7 +581,7 @@ class CustomToken implements TokenInterface
         return [];
     }
 
-    public function setAttributes(array $attributes)
+    public function setAttributes(array $attributes): void
     {
     }
 
@@ -595,7 +595,7 @@ class CustomToken implements TokenInterface
         return null;
     }
 
-    public function setAttribute(string $name, $value)
+    public function setAttribute(string $name, $value): void
     {
     }
 }

@@ -45,6 +45,13 @@ final class FlattenExceptionNormalizer implements DenormalizerInterface, Context
         return $normalized;
     }
 
+    public function getSupportedTypes(?string $format): array
+    {
+        return [
+            FlattenException::class => false,
+        ];
+    }
+
     public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return $data instanceof FlattenException && ($context[Serializer::MESSENGER_SERIALIZATION_CONTEXT] ?? false);

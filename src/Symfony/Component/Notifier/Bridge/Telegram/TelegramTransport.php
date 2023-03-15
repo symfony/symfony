@@ -84,8 +84,7 @@ final class TelegramTransport extends AbstractTransport
             $options['text'] = preg_replace('/([_*\[\]()~`>#+\-=|{}.!])/', '\\\\$1', $message->getSubject());
         }
 
-        $path = isset($options['message_id']) ? 'editMessageText' : 'sendMessage';
-        $endpoint = sprintf('https://%s/bot%s/%s', $this->getEndpoint(), $this->token, $path);
+        $endpoint = sprintf('https://%s/bot%s/%s', $this->getEndpoint(), $this->token, $this->getPath($options));
 
         $response = $this->client->request('POST', $endpoint, [
             'json' => array_filter($options),
@@ -100,14 +99,34 @@ final class TelegramTransport extends AbstractTransport
         if (200 !== $statusCode) {
             $result = $response->toArray(false);
 
-            throw new TransportException('Unable to '.(isset($options['message_id']) ? 'edit' : 'post').' the Telegram message: '.$result['description'].sprintf(' (code %d).', $result['error_code']), $response);
+            throw new TransportException('Unable to '.$this->getAction($options).' the Telegram message: '.$result['description'].sprintf(' (code %d).', $result['error_code']), $response);
         }
 
         $success = $response->toArray(false);
 
         $sentMessage = new SentMessage($message, (string) $this);
-        $sentMessage->setMessageId($success['result']['message_id']);
+        if (isset($success['result']['message_id'])) {
+            $sentMessage->setMessageId($success['result']['message_id']);
+        }
 
         return $sentMessage;
+    }
+
+    private function getPath(array $options): string
+    {
+        return match (true) {
+            isset($options['message_id']) => 'editMessageText',
+            isset($options['callback_query_id']) => 'answerCallbackQuery',
+            default => 'sendMessage',
+        };
+    }
+
+    private function getAction(array $options): string
+    {
+        return match (true) {
+            isset($options['message_id']) => 'edit',
+            isset($options['callback_query_id']) => 'answer callback query',
+            default => 'post',
+        };
     }
 }

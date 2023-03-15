@@ -160,7 +160,7 @@ class Query extends AbstractQuery
     /**
      * Resets pagination on the current connection.
      */
-    private function resetPagination()
+    private function resetPagination(): void
     {
         $con = $this->connection->getResource();
         $this->controlPagedResult(0, false, '');

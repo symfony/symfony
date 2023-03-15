@@ -64,7 +64,7 @@ class KernelBrowserTest extends AbstractWebTestCase
     private function getKernelMock()
     {
         $mock = $this->getMockBuilder($this->getKernelClass())
-            ->setMethods(['shutdown', 'boot', 'handle', 'getContainer'])
+            ->onlyMethods(['shutdown', 'boot', 'handle', 'getContainer'])
             ->disableOriginalConstructor()
             ->getMock();
 

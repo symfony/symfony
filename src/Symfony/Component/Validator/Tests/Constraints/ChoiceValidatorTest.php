@@ -106,9 +106,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
     {
         yield 'doctrine style, namespaced function' => [new Choice(['callback' => __NAMESPACE__.'\choice_callback'])];
         yield 'doctrine style, closure' => [new Choice([
-            'callback' => function () {
-                return ['foo', 'bar'];
-            },
+            'callback' => fn () => ['foo', 'bar'],
         ])];
         yield 'doctrine style, static method' => [new Choice(['callback' => [__CLASS__, 'staticCallback']])];
         yield 'named arguments, namespaced function' => [new Choice(callback: __NAMESPACE__.'\choice_callback')];

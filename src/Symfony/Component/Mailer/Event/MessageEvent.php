@@ -28,6 +28,7 @@ final class MessageEvent extends Event
     private Envelope $envelope;
     private string $transport;
     private bool $queued;
+    private bool $rejected = false;
 
     /** @var StampInterface[] */
     private array $stamps = [];
@@ -70,10 +71,21 @@ final class MessageEvent extends Event
         return $this->queued;
     }
 
+    public function isRejected(): bool
+    {
+        return $this->rejected;
+    }
+
+    public function reject(): void
+    {
+        $this->rejected = true;
+        $this->stopPropagation();
+    }
+
     public function addStamp(StampInterface $stamp): void
     {
         if (!$this->queued) {
-            throw new LogicException(sprintf('Cannot call "%s()" on a message that is not meant to be queued', __METHOD__));
+            throw new LogicException(sprintf('Cannot call "%s()" on a message that is not meant to be queued.', __METHOD__));
         }
 
         $this->stamps[] = $stamp;

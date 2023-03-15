@@ -96,6 +96,8 @@ class Entry
 
     /**
      * Sets a value for the given attribute.
+     *
+     * @return void
      */
     public function setAttribute(string $name, array $value)
     {
@@ -105,6 +107,8 @@ class Entry
 
     /**
      * Removes a given attribute.
+     *
+     * @return void
      */
     public function removeAttribute(string $name)
     {

@@ -24,6 +24,9 @@ class Registry
 {
     private array $workflows = [];
 
+    /**
+     * @return void
+     */
     public function addWorkflow(WorkflowInterface $workflow, WorkflowSupportStrategyInterface $supportStrategy)
     {
         $this->workflows[] = [$workflow, $supportStrategy];
@@ -55,9 +58,7 @@ class Registry
         }
 
         if (2 <= \count($matched)) {
-            $names = array_map(static function (WorkflowInterface $workflow): string {
-                return $workflow->getName();
-            }, $matched);
+            $names = array_map(static fn (WorkflowInterface $workflow): string => $workflow->getName(), $matched);
 
             throw new InvalidArgumentException(sprintf('Too many workflows (%s) match this subject (%s); set a different name on each and use the second (name) argument of this method.', implode(', ', $names), get_debug_type($subject)));
         }

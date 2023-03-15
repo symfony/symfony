@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\TraceableValueResolver;
 
 /**
  * @author Yonel Ceruto <yonelceruto@gmail.com>
@@ -39,6 +40,9 @@ class TranslatorPathsPass extends AbstractRecursivePass
      */
     private array $controllers = [];
 
+    /**
+     * @return void
+     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition('translator')) {
@@ -120,28 +124,20 @@ class TranslatorPathsPass extends AbstractRecursivePass
 
     private function findControllerArguments(ContainerBuilder $container): array
     {
-        if ($container->hasDefinition('argument_resolver.service')) {
-            $argument = $container->getDefinition('argument_resolver.service')->getArgument(0);
-            if ($argument instanceof Reference) {
-                $argument = $container->getDefinition($argument);
-            }
+        if (!$container->has('argument_resolver.service')) {
+            return [];
+        }
+        $resolverDef = $container->findDefinition('argument_resolver.service');
 
-            return $argument->getArgument(0);
+        if (TraceableValueResolver::class === $resolverDef->getClass()) {
+            $resolverDef = $container->getDefinition($resolverDef->getArgument(0));
         }
 
-        if ($container->hasDefinition('debug.'.'argument_resolver.service')) {
-            $argument = $container->getDefinition('debug.'.'argument_resolver.service')->getArgument(0);
-            if ($argument instanceof Reference) {
-                $argument = $container->getDefinition($argument);
-            }
-            $argument = $argument->getArgument(0);
-            if ($argument instanceof Reference) {
-                $argument = $container->getDefinition($argument);
-            }
-
-            return $argument->getArgument(0);
+        $argument = $resolverDef->getArgument(0);
+        if ($argument instanceof Reference) {
+            $argument = $container->getDefinition($argument);
         }
 
-        return [];
+        return $argument->getArgument(0);
     }
 }

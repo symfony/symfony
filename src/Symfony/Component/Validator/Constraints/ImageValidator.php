@@ -25,6 +25,9 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class ImageValidator extends FileValidator
 {
+    /**
+     * @return void
+     */
     public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Image) {

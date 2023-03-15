@@ -190,6 +190,16 @@ class WebTestCaseTest extends TestCase
         $this->getCrawlerTester(new Crawler('<html><body><h1>'))->assertSelectorNotExists('body > h1');
     }
 
+    public function testAssertSelectorCount()
+    {
+        $this->getCrawlerTester(new Crawler('<html><body><p>Hello</p></body></html>'))->assertSelectorCount(1, 'p');
+        $this->getCrawlerTester(new Crawler('<html><body><p>Hello</p><p>Foo</p></body></html>'))->assertSelectorCount(2, 'p');
+        $this->getCrawlerTester(new Crawler('<html><body><h1>This is not a paragraph.</h1></body></html>'))->assertSelectorCount(0, 'p');
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that the Crawler selector "p" was expected to be found 0 time(s) but was found 1 time(s).');
+        $this->getCrawlerTester(new Crawler('<html><body><p>Hello</p></body></html>'))->assertSelectorCount(0, 'p');
+    }
+
     public function testAssertSelectorTextNotContains()
     {
         $this->getCrawlerTester(new Crawler('<html><body><h1>Foo'))->assertSelectorTextNotContains('body > h1', 'Bar');

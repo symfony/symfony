@@ -160,12 +160,12 @@ class Connection
      *     * verify: Enable or disable peer verification. If peer verification is enabled then the common name in the
      *       server certificate must match the server name. Peer verification is enabled by default.
      */
-    public static function fromDsn(string $dsn, array $options = [], AmqpFactory $amqpFactory = null): self
+    public static function fromDsn(#[\SensitiveParameter] string $dsn, array $options = [], AmqpFactory $amqpFactory = null): self
     {
         if (false === $parsedUrl = parse_url($dsn)) {
             // this is a valid URI that parse_url cannot handle when you want to pass all parameters as options
             if (!\in_array($dsn, ['amqp://', 'amqps://'])) {
-                throw new InvalidArgumentException(sprintf('The given AMQP DSN "%s" is invalid.', $dsn));
+                throw new InvalidArgumentException('The given AMQP DSN is invalid.');
             }
 
             $parsedUrl = [];
@@ -306,15 +306,13 @@ class Connection
      */
     public function countMessagesInQueues(): int
     {
-        return array_sum(array_map(function ($queueName) {
-            return $this->queue($queueName)->declareQueue();
-        }, $this->getQueueNames()));
+        return array_sum(array_map(fn ($queueName) => $this->queue($queueName)->declareQueue(), $this->getQueueNames()));
     }
 
     /**
      * @throws \AMQPException
      */
-    private function publishWithDelay(string $body, array $headers, int $delay, AmqpStamp $amqpStamp = null)
+    private function publishWithDelay(string $body, array $headers, int $delay, AmqpStamp $amqpStamp = null): void
     {
         $routingKey = $this->getRoutingKeyForMessage($amqpStamp);
         $isRetryAttempt = $amqpStamp ? $amqpStamp->isRetryAttempt() : false;
@@ -330,7 +328,7 @@ class Connection
         );
     }
 
-    private function publishOnExchange(\AMQPExchange $exchange, string $body, string $routingKey = null, array $headers = [], AmqpStamp $amqpStamp = null)
+    private function publishOnExchange(\AMQPExchange $exchange, string $body, string $routingKey = null, array $headers = [], AmqpStamp $amqpStamp = null): void
     {
         $attributes = $amqpStamp ? $amqpStamp->getAttributes() : [];
         $attributes['headers'] = array_merge($attributes['headers'] ?? [], $headers);
@@ -351,7 +349,7 @@ class Connection
         }
     }
 
-    private function setupDelay(int $delay, ?string $routingKey, bool $isRetryAttempt)
+    private function setupDelay(int $delay, ?string $routingKey, bool $isRetryAttempt): void
     {
         if ($this->autoSetupDelayExchange) {
             $this->setupDelayExchange();
@@ -494,12 +492,8 @@ class Connection
             if ('' !== ($this->connectionOptions['confirm_timeout'] ?? '')) {
                 $this->amqpChannel->confirmSelect();
                 $this->amqpChannel->setConfirmCallback(
-                    static function (): bool {
-                        return false;
-                    },
-                    static function (): bool {
-                        return false;
-                    }
+                    static fn (): bool => false,
+                    static fn (): bool => false
                 );
             }
 
@@ -560,7 +554,7 @@ class Connection
         return $this->exchangeOptions['default_publish_routing_key'] ?? null;
     }
 
-    public function purgeQueues()
+    public function purgeQueues(): void
     {
         foreach ($this->getQueueNames() as $queueName) {
             $this->queue($queueName)->purge();

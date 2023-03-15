@@ -50,6 +50,9 @@ class TraceableMessageBus implements MessageBusInterface
         return $this->dispatchedMessages;
     }
 
+    /**
+     * @return void
+     */
     public function reset()
     {
         $this->dispatchedMessages = [];

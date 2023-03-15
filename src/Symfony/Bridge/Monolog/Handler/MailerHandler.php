@@ -77,6 +77,8 @@ class MailerHandler extends AbstractProcessingHandler
      *
      * @param string $content formatted email body to be sent
      * @param array  $records the array of log records that formed this content
+     *
+     * @return void
      */
     protected function send(string $content, array $records)
     {
@@ -101,7 +103,6 @@ class MailerHandler extends AbstractProcessingHandler
      */
     protected function buildMessage(string $content, array $records): Email
     {
-        $message = null;
         if ($this->messageTemplate instanceof Email) {
             $message = clone $this->messageTemplate;
         } elseif (\is_callable($this->messageTemplate)) {

@@ -27,7 +27,7 @@ class Logger implements LoggerInterface
         return false === $level ? $this->logs : $this->logs[$level];
     }
 
-    public function clear()
+    public function clear(): void
     {
         $this->logs = [
             'emergency' => [],

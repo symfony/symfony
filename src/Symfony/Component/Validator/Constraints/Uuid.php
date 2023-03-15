@@ -28,6 +28,7 @@ class Uuid extends Constraint
     public const INVALID_CHARACTERS_ERROR = '51120b12-a2bc-41bf-aa53-cd73daf330d0';
     public const INVALID_HYPHEN_PLACEMENT_ERROR = '98469c83-0309-4f5d-bf95-a496dcaa869c';
     public const INVALID_VERSION_ERROR = '21ba13b4-b185-4882-ac6f-d147355987eb';
+    public const INVALID_TIME_BASED_VERSION_ERROR = '484081ca-6fbd-11ed-ade8-a3bdfd0fcf2f';
     public const INVALID_VARIANT_ERROR = '164ef693-2b9d-46de-ad7f-836201f0c2db';
 
     protected const ERROR_NAMES = [
@@ -63,6 +64,12 @@ class Uuid extends Constraint
         self::V6_SORTABLE,
         self::V7_MONOTONIC,
         self::V8_CUSTOM,
+    ];
+
+    public const TIME_BASED_VERSIONS = [
+        self::V1_MAC,
+        self::V6_SORTABLE,
+        self::V7_MONOTONIC,
     ];
 
     /**

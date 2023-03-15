@@ -47,7 +47,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
             static function ($key, $value, $isHit) {
                 $item = new CacheItem();
                 $item->key = $key;
-                $item->value = $v = $value;
+                $item->value = $value;
                 $item->isHit = $isHit;
                 $item->unpack();
 
@@ -110,7 +110,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
         return new ChainAdapter([$apcu, $opcache]);
     }
 
-    public static function createConnection(string $dsn, array $options = [])
+    public static function createConnection(#[\SensitiveParameter] string $dsn, array $options = []): mixed
     {
         if (str_starts_with($dsn, 'redis:') || str_starts_with($dsn, 'rediss:')) {
             return RedisAdapter::createConnection($dsn, $options);
@@ -126,7 +126,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
             return CouchbaseCollectionAdapter::createConnection($dsn, $options);
         }
 
-        throw new InvalidArgumentException(sprintf('Unsupported DSN: "%s".', $dsn));
+        throw new InvalidArgumentException('Unsupported DSN: it does not start with "redis[s]:", "memcached:" nor "couchbase:".');
     }
 
     public function commit(): bool

@@ -72,7 +72,7 @@ class TraceableValidatorTest extends TestCase
         $originalValidator = $this->createMock(ValidatorInterface::class);
         $validator = new TraceableValidator($originalValidator);
 
-        $expects = function ($method) use ($originalValidator) { return $originalValidator->expects($this->once())->method($method); };
+        $expects = fn ($method) => $originalValidator->expects($this->once())->method($method);
 
         $expects('getMetadataFor')->willReturn($expected = $this->createMock(MetadataInterface::class));
         $this->assertSame($expected, $validator->getMetadataFor('value'), 'returns original validator getMetadataFor() result');

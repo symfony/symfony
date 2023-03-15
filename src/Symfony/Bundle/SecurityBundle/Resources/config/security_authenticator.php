@@ -149,6 +149,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('user key'),
                 abstract_arg('credentials key'),
                 service('logger')->nullOnInvalid(),
+                abstract_arg('credentials user identifier'),
             ])
             ->tag('monolog.logger', ['channel' => 'security'])
 

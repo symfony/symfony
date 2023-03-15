@@ -2,7 +2,7 @@
     "name": "symfony/ldap",
     "type": "library",
     "description": "Provides a LDAP client for PHP on top of PHP's ldap extension",
-    "keywords": ["ldap", "active directory"],
+    "keywords": ["ldap", "active-directory"],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
@@ -18,7 +18,7 @@
     "require": {
         "php": ">=8.1",
         "ext-ldap": "*",
-        "symfony/deprecation-contracts": "^2.1|^3",
+        "symfony/deprecation-contracts": "^2.5|^3",
         "symfony/options-resolver": "^5.4|^6.0"
     },
     "require-dev": {

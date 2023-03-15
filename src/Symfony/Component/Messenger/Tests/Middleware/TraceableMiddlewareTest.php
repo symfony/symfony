@@ -19,6 +19,7 @@ use Symfony\Component\Messenger\Middleware\TraceableMiddleware;
 use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Component\Stopwatch\StopwatchEvent;
 
 /**
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
@@ -43,19 +44,35 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
 
         $stopwatch = $this->createMock(Stopwatch::class);
         $stopwatch->expects($this->exactly(2))->method('isStarted')->willReturn(true);
+
+        $series = [
+            [$this->matches('"%sMiddlewareInterface%s" on "command_bus"'), 'messenger.middleware'],
+            [$this->identicalTo('Tail on "command_bus"'), 'messenger.middleware'],
+        ];
+
         $stopwatch->expects($this->exactly(2))
             ->method('start')
-            ->withConsecutive(
-                [$this->matches('"%sMiddlewareInterface%s" on "command_bus"'), 'messenger.middleware'],
-                ['Tail on "command_bus"', 'messenger.middleware']
-            )
+            ->willReturnCallback(function (string $name, string $category = null) use (&$series) {
+                [$constraint, $expectedCategory] = array_shift($series);
+
+                $constraint->evaluate($name);
+                $this->assertSame($expectedCategory, $category);
+
+                return $this->createMock(StopwatchEvent::class);
+            })
         ;
         $stopwatch->expects($this->exactly(2))
             ->method('stop')
-            ->withConsecutive(
-                ['"Symfony\Component\Messenger\Middleware\MiddlewareInterface@anonymous" on "command_bus"'],
-                ['Tail on "command_bus"']
-            )
+            ->willReturnCallback(function (string $name) {
+                static $stopSeries = [
+                    '"Symfony\Component\Messenger\Middleware\MiddlewareInterface@anonymous" on "command_bus"',
+                    'Tail on "command_bus"',
+                ];
+
+                $this->assertSame(array_shift($stopSeries), $name);
+
+                return $this->createMock(StopwatchEvent::class);
+            })
         ;
 
         $traced = new TraceableMiddleware($stopwatch, $busId);

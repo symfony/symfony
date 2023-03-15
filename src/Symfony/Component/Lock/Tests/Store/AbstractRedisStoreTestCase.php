@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use Relay\Relay;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
@@ -29,7 +30,7 @@ abstract class AbstractRedisStoreTestCase extends AbstractStoreTestCase
         return 250000;
     }
 
-    abstract protected function getRedisConnection(): \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface;
+    abstract protected function getRedisConnection(): \Redis|Relay|\RedisArray|\RedisCluster|\Predis\ClientInterface;
 
     public function getStore(): PersistingStoreInterface
     {
@@ -85,7 +86,7 @@ class Symfony51Store
 
     private function evaluate(string $script, string $resource, array $args)
     {
-        if ($this->redis instanceof \Redis || $this->redis instanceof \RedisCluster) {
+        if ($this->redis instanceof \Redis || $this->redis instanceof Relay || $this->redis instanceof \RedisCluster) {
             return $this->redis->eval($script, array_merge([$resource], $args), 1);
         }
 
@@ -97,7 +98,7 @@ class Symfony51Store
             return $this->redis->eval(...array_merge([$script, 1, $resource], $args));
         }
 
-        throw new InvalidArgumentException(sprintf('"%s()" expects being initialized with a Redis, RedisArray, RedisCluster or Predis\ClientInterface, "%s" given.', __METHOD__, get_debug_type($this->redis)));
+        throw new InvalidArgumentException(sprintf('"%s()" expects being initialized with a Redis, Relay, RedisArray, RedisCluster or Predis\ClientInterface, "%s" given.', __METHOD__, get_debug_type($this->redis)));
     }
 
     private function getUniqueToken(Key $key): string

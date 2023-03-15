@@ -30,6 +30,9 @@ abstract class AbstractConnection implements ConnectionInterface
         $this->config = $resolver->resolve($config);
     }
 
+    /**
+     * @return void
+     */
     protected function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -40,13 +43,9 @@ abstract class AbstractConnection implements ConnectionInterface
             'options' => [],
         ]);
 
-        $resolver->setDefault('port', function (Options $options) {
-            return 'ssl' === $options['encryption'] ? 636 : 389;
-        });
+        $resolver->setDefault('port', fn (Options $options) => 'ssl' === $options['encryption'] ? 636 : 389);
 
-        $resolver->setDefault('connection_string', function (Options $options) {
-            return sprintf('ldap%s://%s:%s', 'ssl' === $options['encryption'] ? 's' : '', $options['host'], $options['port']);
-        });
+        $resolver->setDefault('connection_string', fn (Options $options) => sprintf('ldap%s://%s:%s', 'ssl' === $options['encryption'] ? 's' : '', $options['host'], $options['port']));
 
         $resolver->setAllowedTypes('host', 'string');
         $resolver->setAllowedTypes('port', 'numeric');

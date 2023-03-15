@@ -26,6 +26,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
@@ -80,7 +81,12 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
     public function authenticate(Request $request): Passport
     {
         try {
-            $credentials = $this->getCredentials($request);
+            $data = json_decode($request->getContent());
+            if (!$data instanceof \stdClass) {
+                throw new BadRequestHttpException('Invalid JSON.');
+            }
+
+            $credentials = $this->getCredentials($data);
         } catch (BadRequestHttpException $e) {
             $request->setRequestFormat('json');
 
@@ -88,7 +94,7 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
         }
 
         $userBadge = new UserBadge($credentials['username'], $this->userProvider->loadUserByIdentifier(...));
-        $passport = new Passport($userBadge, new PasswordCredentials($credentials['password']));
+        $passport = new Passport($userBadge, new PasswordCredentials($credentials['password']), [new RememberMeBadge((array) $data)]);
 
         if ($this->userProvider instanceof PasswordUpgraderInterface) {
             $passport->addBadge(new PasswordUpgradeBadge($credentials['password'], $this->userProvider));
@@ -136,13 +142,8 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
         $this->translator = $translator;
     }
 
-    private function getCredentials(Request $request)
+    private function getCredentials(\stdClass $data): array
     {
-        $data = json_decode($request->getContent());
-        if (!$data instanceof \stdClass) {
-            throw new BadRequestHttpException('Invalid JSON.');
-        }
-
         $credentials = [];
         try {
             $credentials['username'] = $this->propertyAccessor->getValue($data, $this->options['username_path']);
@@ -156,6 +157,7 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
 
         try {
             $credentials['password'] = $this->propertyAccessor->getValue($data, $this->options['password_path']);
+            $this->propertyAccessor->setValue($data, $this->options['password_path'], null);
 
             if (!\is_string($credentials['password'])) {
                 throw new BadRequestHttpException(sprintf('The key "%s" must be a string.', $this->options['password_path']));

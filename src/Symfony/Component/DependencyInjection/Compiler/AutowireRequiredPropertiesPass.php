@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Contracts\Service\Attribute\Required;
 
 /**
- * Looks for definitions with autowiring enabled and registers their corresponding "@required" properties.
+ * Looks for definitions with autowiring enabled and registers their corresponding "#[Required]" properties.
  *
  * @author Sebastien Morel (Plopix) <morel.seb@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
@@ -40,10 +40,14 @@ class AutowireRequiredPropertiesPass extends AbstractRecursivePass
             if (!($type = $reflectionProperty->getType()) instanceof \ReflectionNamedType) {
                 continue;
             }
+            $doc = false;
             if (!$reflectionProperty->getAttributes(Required::class)
                 && ((false === $doc = $reflectionProperty->getDocComment()) || false === stripos($doc, '@required') || !preg_match('#(?:^/\*\*|\n\s*+\*)\s*+@required(?:\s|\*/$)#i', $doc))
             ) {
                 continue;
+            }
+            if ($doc) {
+                trigger_deprecation('symfony/dependency-injection', '6.3', 'Using the "@required" annotation on property "%s::$%s" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.', $reflectionProperty->class, $reflectionProperty->name);
             }
             if (\array_key_exists($name = $reflectionProperty->getName(), $properties)) {
                 continue;

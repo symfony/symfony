@@ -17,6 +17,7 @@ use Psr\Log\LoggerAwareInterface;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddAnnotationsCachedReaderPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
+use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FullStack;
@@ -70,6 +71,7 @@ use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\FormErrorNormalizer;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Translation\LocaleSwitcher;
@@ -539,9 +541,9 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         $container = $this->createContainerFromFile('php_errors_enabled');
 
-        $definition = $container->getDefinition('debug.debug_handlers_listener');
-        $this->assertEquals(new Reference('monolog.logger.php', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(1));
-        $this->assertNull($definition->getArgument(2));
+        $definition = $container->getDefinition('debug.error_handler_configurator');
+        $this->assertEquals(new Reference('monolog.logger.php', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(0));
+        $this->assertNull($definition->getArgument(1));
         $this->assertSame(-1, $container->getParameter('debug.error_handler.throw_at'));
     }
 
@@ -549,9 +551,9 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         $container = $this->createContainerFromFile('php_errors_disabled');
 
-        $definition = $container->getDefinition('debug.debug_handlers_listener');
+        $definition = $container->getDefinition('debug.error_handler_configurator');
+        $this->assertNull($definition->getArgument(0));
         $this->assertNull($definition->getArgument(1));
-        $this->assertNull($definition->getArgument(2));
         $this->assertSame(0, $container->getParameter('debug.error_handler.throw_at'));
     }
 
@@ -559,21 +561,21 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         $container = $this->createContainerFromFile('php_errors_log_level');
 
-        $definition = $container->getDefinition('debug.debug_handlers_listener');
-        $this->assertEquals(new Reference('monolog.logger.php', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(1));
-        $this->assertSame(8, $definition->getArgument(2));
+        $definition = $container->getDefinition('debug.error_handler_configurator');
+        $this->assertEquals(new Reference('monolog.logger.php', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(0));
+        $this->assertSame(8, $definition->getArgument(1));
     }
 
     public function testPhpErrorsWithLogLevels()
     {
         $container = $this->createContainerFromFile('php_errors_log_levels');
 
-        $definition = $container->getDefinition('debug.debug_handlers_listener');
-        $this->assertEquals(new Reference('monolog.logger.php', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(1));
+        $definition = $container->getDefinition('debug.error_handler_configurator');
+        $this->assertEquals(new Reference('monolog.logger.php', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(0));
         $this->assertSame([
             \E_NOTICE => \Psr\Log\LogLevel::ERROR,
             \E_WARNING => \Psr\Log\LogLevel::ERROR,
-        ], $definition->getArgument(2));
+        ], $definition->getArgument(1));
     }
 
     public function testExceptionsConfig()
@@ -1059,6 +1061,13 @@ abstract class FrameworkExtensionTestCase extends TestCase
     public function testMessengerInvalidTransportRouting()
     {
         $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Invalid Messenger routing configuration: invalid namespace "Symfony\*\DummyMessage" wildcard.');
+        $this->createContainerFromFile('messenger_routing_invalid_wildcard');
+    }
+
+    public function testMessengerInvalidWildcardRouting()
+    {
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Invalid Messenger routing configuration: the "Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage" class is being routed to a sender called "invalid". This is not a valid transport or service id.');
         $this->createContainerFromFile('messenger_routing_invalid_transport');
     }
@@ -1137,9 +1146,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $nonExistingDirectories = array_filter(
             $options['scanned_directories'],
-            function ($directory) {
-                return !file_exists($directory);
-            }
+            fn ($directory) => !file_exists($directory)
         );
 
         $this->assertNotEmpty($nonExistingDirectories, 'FrameworkBundle should pass non existing directories to Translator');
@@ -1409,7 +1416,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $argument = $container->getDefinition('serializer.mapping.chain_loader')->getArgument(0);
 
         $this->assertCount(2, $argument);
-        $this->assertEquals('Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader', $argument[0]->getClass());
+        $this->assertEquals(AnnotationLoader::class, $argument[0]->getClass());
         $this->assertEquals(new Reference('serializer.name_converter.camel_case_to_snake_case'), $container->getDefinition('serializer.name_converter.metadata_aware')->getArgument(1));
         $this->assertEquals(new Reference('property_info', ContainerBuilder::IGNORE_ON_INVALID_REFERENCE), $container->getDefinition('serializer.normalizer.object')->getArgument(3));
         $this->assertArrayHasKey('circular_reference_handler', $container->getDefinition('serializer.normalizer.object')->getArgument(6));
@@ -1491,7 +1498,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $definition = $container->getDefinition('serializer.normalizer.object');
         $tag = $definition->getTag('serializer.normalizer');
 
-        $this->assertEquals('Symfony\Component\Serializer\Normalizer\ObjectNormalizer', $definition->getClass());
+        $this->assertEquals(ObjectNormalizer::class, $definition->getClass());
         $this->assertEquals(-1000, $tag[0]['priority']);
     }
 
@@ -1838,13 +1845,14 @@ abstract class FrameworkExtensionTestCase extends TestCase
     public function testHttpClientDefaultOptions()
     {
         $container = $this->createContainerFromFile('http_client_default_options');
-        $this->assertTrue($container->hasDefinition('http_client'), '->registerHttpClientConfiguration() loads http_client.xml');
+        $this->assertTrue($container->hasDefinition('http_client.transport'), '->registerHttpClientConfiguration() loads http_client.xml');
 
         $defaultOptions = [
             'headers' => [],
             'resolve' => [],
+            'extra' => [],
         ];
-        $this->assertSame([$defaultOptions, 4], $container->getDefinition('http_client')->getArguments());
+        $this->assertSame([$defaultOptions, 4], $container->getDefinition('http_client.transport')->getArguments());
 
         $this->assertTrue($container->hasDefinition('foo'), 'should have the "foo" service.');
         $this->assertSame(ScopingHttpClient::class, $container->getDefinition('foo')->getClass());
@@ -1862,18 +1870,22 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         $container = $this->createContainerFromFile('http_client_override_default_options');
 
-        $this->assertSame(['foo' => 'bar'], $container->getDefinition('http_client')->getArgument(0)['headers']);
-        $this->assertSame(4, $container->getDefinition('http_client')->getArgument(1));
+        $this->assertSame(['foo' => 'bar'], $container->getDefinition('http_client.transport')->getArgument(0)['headers']);
+        $this->assertSame(['foo' => 'bar'], $container->getDefinition('http_client.transport')->getArgument(0)['extra']);
+        $this->assertSame(4, $container->getDefinition('http_client.transport')->getArgument(1));
         $this->assertSame('http://example.com', $container->getDefinition('foo')->getArgument(1));
 
         $expected = [
             'headers' => [
                 'bar' => 'baz',
             ],
+            'extra' => [
+                'bar' => 'baz',
+            ],
             'query' => [],
             'resolve' => [],
         ];
-        $this->assertSame($expected, $container->getDefinition('foo')->getArgument(2));
+        $this->assertEquals($expected, $container->getDefinition('foo')->getArgument(2));
     }
 
     public function testHttpClientRetry()
@@ -1913,7 +1925,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         $container = $this->createContainerFromFile('http_client_full_default_options');
 
-        $defaultOptions = $container->getDefinition('http_client')->getArgument(0);
+        $defaultOptions = $container->getDefinition('http_client.transport')->getArgument(0);
 
         $this->assertSame(['X-powered' => 'PHP'], $defaultOptions['headers']);
         $this->assertSame(2, $defaultOptions['max_redirects']);
@@ -1935,6 +1947,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
             'pin-sha256' => ['14s5erg62v1v8471g2revg48r7==', 'jsda84hjtyd4821bgfesd215bsfg5412='],
             'md5' => 'sdhtb481248721thbr=',
         ], $defaultOptions['peer_fingerprint']);
+        $this->assertSame(['foo' => ['bar' => 'baz']], $defaultOptions['extra']);
     }
 
     public static function provideMailer(): array
@@ -1998,7 +2011,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $argument = $definition->getArgument(0);
 
         $this->assertInstanceOf(Reference::class, $argument);
-        $this->assertSame('http_client', current($definition->getDecoratedService()));
+        $this->assertSame('http_client.transport', current($definition->getDecoratedService()));
         $this->assertSame('my_response_factory', (string) $argument);
     }
 
@@ -2192,10 +2205,32 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame('html_sanitizer', (string) $container->getAlias(HtmlSanitizerInterface::class));
     }
 
+    public function testNotifierWithDisabledMessageBus()
+    {
+        $container = $this->createContainerFromFile('notifier_with_disabled_message_bus');
+
+        $this->assertNull($container->getDefinition('chatter')->getArgument(1));
+        $this->assertNull($container->getDefinition('texter')->getArgument(1));
+        $this->assertNull($container->getDefinition('notifier.channel.chat')->getArgument(1));
+        $this->assertNull($container->getDefinition('notifier.channel.email')->getArgument(1));
+        $this->assertNull($container->getDefinition('notifier.channel.sms')->getArgument(1));
+    }
+
+    public function testNotifierWithSpecificMessageBus()
+    {
+        $container = $this->createContainerFromFile('notifier_with_specific_message_bus');
+
+        $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('chatter')->getArgument(1));
+        $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('texter')->getArgument(1));
+        $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('notifier.channel.chat')->getArgument(1));
+        $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('notifier.channel.email')->getArgument(1));
+        $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('notifier.channel.sms')->getArgument(1));
+    }
+
     protected function createContainer(array $data = [])
     {
         return new ContainerBuilder(new EnvPlaceholderParameterBag(array_merge([
-            'kernel.bundles' => ['FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'],
+            'kernel.bundles' => ['FrameworkBundle' => FrameworkBundle::class],
             'kernel.bundles_metadata' => ['FrameworkBundle' => ['namespace' => 'Symfony\\Bundle\\FrameworkBundle', 'path' => __DIR__.'/../..']],
             'kernel.cache_dir' => __DIR__,
             'kernel.build_dir' => __DIR__,
@@ -2315,7 +2350,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
  */
 class TestAnnotationsPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $container->setDefinition('annotation_reader', $container->getDefinition('annotations.cached_reader'));
         $container->removeDefinition('annotations.cached_reader');

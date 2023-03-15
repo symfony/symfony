@@ -15,14 +15,15 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\DataCollector\SerializerDataCollector;
 use Symfony\Component\Serializer\Debug\TraceableNormalizer;
 use Symfony\Component\Serializer\Debug\TraceableSerializer;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Tests\Fixtures\UpcomingDenormalizerInterface as DenormalizerInterface;
+use Symfony\Component\Serializer\Tests\Fixtures\UpcomingNormalizerInterface as NormalizerInterface;
 
 class TraceableNormalizerTest extends TestCase
 {
     public function testForwardsToNormalizer()
     {
         $normalizer = $this->createMock(NormalizerInterface::class);
+        $normalizer->method('getSupportedTypes')->willReturn(['*' => false]);
         $normalizer
             ->expects($this->once())
             ->method('normalize')
@@ -30,6 +31,7 @@ class TraceableNormalizerTest extends TestCase
             ->willReturn('normalized');
 
         $denormalizer = $this->createMock(DenormalizerInterface::class);
+        $denormalizer->method('getSupportedTypes')->willReturn(['*' => false]);
         $denormalizer
             ->expects($this->once())
             ->method('denormalize')
@@ -43,7 +45,9 @@ class TraceableNormalizerTest extends TestCase
     public function testCollectNormalizationData()
     {
         $normalizer = $this->createMock(NormalizerInterface::class);
+        $normalizer->method('getSupportedTypes')->willReturn(['*' => false]);
         $denormalizer = $this->createMock(DenormalizerInterface::class);
+        $denormalizer->method('getSupportedTypes')->willReturn(['*' => false]);
 
         $dataCollector = $this->createMock(SerializerDataCollector::class);
         $dataCollector
@@ -62,7 +66,9 @@ class TraceableNormalizerTest extends TestCase
     public function testNotCollectNormalizationDataIfNoDebugTraceId()
     {
         $normalizer = $this->createMock(NormalizerInterface::class);
+        $normalizer->method('getSupportedTypes')->willReturn(['*' => false]);
         $denormalizer = $this->createMock(DenormalizerInterface::class);
+        $denormalizer->method('getSupportedTypes')->willReturn(['*' => false]);
 
         $dataCollector = $this->createMock(SerializerDataCollector::class);
         $dataCollector->expects($this->never())->method('collectNormalization');
@@ -89,9 +95,11 @@ class TraceableNormalizerTest extends TestCase
     public function testSupports()
     {
         $normalizer = $this->createMock(NormalizerInterface::class);
+        $normalizer->method('getSupportedTypes')->willReturn(['*' => false]);
         $normalizer->method('supportsNormalization')->willReturn(true);
 
         $denormalizer = $this->createMock(DenormalizerInterface::class);
+        $denormalizer->method('getSupportedTypes')->willReturn(['*' => false]);
         $denormalizer->method('supportsDenormalization')->willReturn(true);
 
         $traceableNormalizer = new TraceableNormalizer($normalizer, new SerializerDataCollector());

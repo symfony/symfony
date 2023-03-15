@@ -258,6 +258,7 @@
     <xsd:attribute name="id" type="xsd:string" />
     <xsd:attribute name="key" type="xsd:string" />
     <xsd:attribute name="on-invalid" type="invalid_sequence" />
+    <xsd:attribute name="trim" type="xsd:boolean" />
   </xsd:complexType>
 
   <xsd:complexType name="property" mixed="true">
@@ -302,6 +303,7 @@
     <xsd:attribute name="default-index-method" type="xsd:string" />
     <xsd:attribute name="default-priority-method" type="xsd:string" />
     <xsd:attribute name="exclude" type="xsd:string" />
+    <xsd:attribute name="exclude-self" type="xsd:boolean" />
   </xsd:complexType>
 
   <xsd:complexType name="call">

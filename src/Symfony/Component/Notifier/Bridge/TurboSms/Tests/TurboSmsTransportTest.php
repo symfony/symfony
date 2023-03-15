@@ -71,9 +71,7 @@ final class TurboSmsTransportTest extends TransportTestCase
             ]))
         ;
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $message = new SmsMessage('380931234567', 'Тест/Test');
 
@@ -102,9 +100,7 @@ final class TurboSmsTransportTest extends TransportTestCase
             ]))
         ;
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $message = new SmsMessage('380931234567', 'Тест/Test');
 

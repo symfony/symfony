@@ -79,9 +79,9 @@ class ServiceLocatorTagPassTest extends TestCase
         /** @var ServiceLocator $locator */
         $locator = $container->get('foo');
 
-        $this->assertSame(CustomDefinition::class, \get_class($locator('bar')));
-        $this->assertSame(CustomDefinition::class, \get_class($locator('baz')));
-        $this->assertSame(CustomDefinition::class, \get_class($locator('some.service')));
+        $this->assertSame(CustomDefinition::class, $locator('bar')::class);
+        $this->assertSame(CustomDefinition::class, $locator('baz')::class);
+        $this->assertSame(CustomDefinition::class, $locator('some.service')::class);
     }
 
     public function testServiceWithKeyOverwritesPreviousInheritedKey()
@@ -104,7 +104,7 @@ class ServiceLocatorTagPassTest extends TestCase
         /** @var ServiceLocator $locator */
         $locator = $container->get('foo');
 
-        $this->assertSame(TestDefinition2::class, \get_class($locator('bar')));
+        $this->assertSame(TestDefinition2::class, $locator('bar')::class);
     }
 
     public function testInheritedKeyOverwritesPreviousServiceWithKey()
@@ -128,8 +128,8 @@ class ServiceLocatorTagPassTest extends TestCase
         /** @var ServiceLocator $locator */
         $locator = $container->get('foo');
 
-        $this->assertSame(TestDefinition1::class, \get_class($locator('bar')));
-        $this->assertSame(TestDefinition2::class, \get_class($locator(16)));
+        $this->assertSame(TestDefinition1::class, $locator('bar')::class);
+        $this->assertSame(TestDefinition2::class, $locator(16)::class);
     }
 
     public function testBindingsAreCopied()
@@ -164,8 +164,8 @@ class ServiceLocatorTagPassTest extends TestCase
         /** @var ServiceLocator $locator */
         $locator = $container->get('foo');
 
-        $this->assertSame(TestDefinition1::class, \get_class($locator('bar')));
-        $this->assertSame(TestDefinition2::class, \get_class($locator('baz')));
+        $this->assertSame(TestDefinition1::class, $locator('bar')::class);
+        $this->assertSame(TestDefinition2::class, $locator('baz')::class);
     }
 
     public function testIndexedByServiceIdWithDecoration()

@@ -91,6 +91,8 @@ class InputArgument
     /**
      * Sets the default value.
      *
+     * @return void
+     *
      * @throws LogicException When incorrect default value is given
      */
     public function setDefault(string|bool|int|float|array $default = null)

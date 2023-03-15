@@ -30,7 +30,7 @@ final class ConnectionTest extends TestCase
     public function testFromInvalidDsn()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The given Beanstalkd DSN "beanstalkd://" is invalid.');
+        $this->expectExceptionMessage('The given Beanstalkd DSN is invalid.');
 
         Connection::fromDsn('beanstalkd://');
     }
@@ -174,9 +174,7 @@ final class ConnectionTest extends TestCase
 
         $client = $this->createMock(PheanstalkInterface::class);
         $client->expects($this->once())->method('useTube')->with($tube)->willReturn($client);
-        $client->expects($this->once())->method('delete')->with($this->callback(function (JobId $jobId) use ($id): bool {
-            return $jobId->getId() === $id;
-        }));
+        $client->expects($this->once())->method('delete')->with($this->callback(fn (JobId $jobId): bool => $jobId->getId() === $id));
 
         $connection = new Connection(['tube_name' => $tube], $client);
 
@@ -193,9 +191,7 @@ final class ConnectionTest extends TestCase
 
         $client = $this->createMock(PheanstalkInterface::class);
         $client->expects($this->once())->method('useTube')->with($tube)->willReturn($client);
-        $client->expects($this->once())->method('delete')->with($this->callback(function (JobId $jobId) use ($id): bool {
-            return $jobId->getId() === $id;
-        }))->willThrowException($exception);
+        $client->expects($this->once())->method('delete')->with($this->callback(fn (JobId $jobId): bool => $jobId->getId() === $id))->willThrowException($exception);
 
         $connection = new Connection(['tube_name' => $tube], $client);
 
@@ -211,9 +207,7 @@ final class ConnectionTest extends TestCase
 
         $client = $this->createMock(PheanstalkInterface::class);
         $client->expects($this->once())->method('useTube')->with($tube)->willReturn($client);
-        $client->expects($this->once())->method('delete')->with($this->callback(function (JobId $jobId) use ($id): bool {
-            return $jobId->getId() === $id;
-        }));
+        $client->expects($this->once())->method('delete')->with($this->callback(fn (JobId $jobId): bool => $jobId->getId() === $id));
 
         $connection = new Connection(['tube_name' => $tube], $client);
 
@@ -230,9 +224,7 @@ final class ConnectionTest extends TestCase
 
         $client = $this->createMock(PheanstalkInterface::class);
         $client->expects($this->once())->method('useTube')->with($tube)->willReturn($client);
-        $client->expects($this->once())->method('delete')->with($this->callback(function (JobId $jobId) use ($id): bool {
-            return $jobId->getId() === $id;
-        }))->willThrowException($exception);
+        $client->expects($this->once())->method('delete')->with($this->callback(fn (JobId $jobId): bool => $jobId->getId() === $id))->willThrowException($exception);
 
         $connection = new Connection(['tube_name' => $tube], $client);
 

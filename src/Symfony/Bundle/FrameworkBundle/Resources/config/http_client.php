@@ -18,11 +18,12 @@ use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\HttplugClient;
 use Symfony\Component\HttpClient\Psr18Client;
 use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
+use Symfony\Component\HttpClient\UriTemplateHttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
-        ->set('http_client', HttpClientInterface::class)
+        ->set('http_client.transport', HttpClientInterface::class)
             ->factory([HttpClient::class, 'create'])
             ->args([
                 [], // default options
@@ -31,6 +32,10 @@ return static function (ContainerConfigurator $container) {
             ->call('setLogger', [service('logger')->ignoreOnInvalid()])
             ->tag('monolog.logger', ['channel' => 'http_client'])
             ->tag('kernel.reset', ['method' => 'reset', 'on_invalid' => 'ignore'])
+
+        ->set('http_client', HttpClientInterface::class)
+            ->factory('current')
+            ->args([[service('http_client.transport')]])
             ->tag('http_client.client')
 
         ->alias(HttpClientInterface::class, 'http_client')
@@ -59,6 +64,26 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('multiplier'),
                 abstract_arg('max delay ms'),
                 abstract_arg('jitter'),
+            ])
+
+        ->set('http_client.uri_template', UriTemplateHttpClient::class)
+            ->decorate('http_client', null, 7) // Between TraceableHttpClient (5) and RetryableHttpClient (10)
+            ->args([
+                service('.inner'),
+                service('http_client.uri_template_expander')->nullOnInvalid(),
+                abstract_arg('default vars'),
+            ])
+
+        ->set('http_client.uri_template_expander.guzzle', \Closure::class)
+            ->factory([\Closure::class, 'fromCallable'])
+            ->args([
+                [\GuzzleHttp\UriTemplate\UriTemplate::class, 'expand'],
+            ])
+
+        ->set('http_client.uri_template_expander.rize', \Closure::class)
+            ->factory([\Closure::class, 'fromCallable'])
+            ->args([
+                [inline_service(\Rize\UriTemplate::class), 'expand'],
             ])
     ;
 };

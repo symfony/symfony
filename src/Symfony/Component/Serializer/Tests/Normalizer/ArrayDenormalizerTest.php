@@ -14,39 +14,36 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
-use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
+use Symfony\Component\Serializer\Tests\Fixtures\UpcomingDenormalizerInterface as DenormalizerInterface;
 
 class ArrayDenormalizerTest extends TestCase
 {
-    /**
-     * @var ArrayDenormalizer
-     */
-    private $denormalizer;
-
-    /**
-     * @var MockObject&ContextAwareDenormalizerInterface
-     */
-    private $serializer;
+    private ArrayDenormalizer $denormalizer;
+    private MockObject&DenormalizerInterface $serializer;
 
     protected function setUp(): void
     {
-        $this->serializer = $this->createMock(ContextAwareDenormalizerInterface::class);
+        $this->serializer = $this->createMock(DenormalizerInterface::class);
         $this->denormalizer = new ArrayDenormalizer();
         $this->denormalizer->setDenormalizer($this->serializer);
     }
 
     public function testDenormalize()
     {
+        $series = [
+            [[['foo' => 'one', 'bar' => 'two']], new ArrayDummy('one', 'two')],
+            [[['foo' => 'three', 'bar' => 'four']], new ArrayDummy('three', 'four')],
+        ];
+
         $this->serializer->expects($this->exactly(2))
             ->method('denormalize')
-            ->withConsecutive(
-                [['foo' => 'one', 'bar' => 'two']],
-                [['foo' => 'three', 'bar' => 'four']]
-            )
-            ->willReturnOnConsecutiveCalls(
-                new ArrayDummy('one', 'two'),
-                new ArrayDummy('three', 'four')
-            );
+            ->willReturnCallback(function ($data) use (&$series) {
+                [$expectedArgs, $return] = array_shift($series);
+                $this->assertSame($expectedArgs, [$data]);
+
+                return $return;
+            })
+        ;
 
         $result = $this->denormalizer->denormalize(
             [

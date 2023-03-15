@@ -33,6 +33,7 @@ class File extends Constraint
     public const TOO_LARGE_ERROR = 'df8637af-d466-48c6-a59d-e7126250a654';
     public const INVALID_MIME_TYPE_ERROR = '744f00bc-4389-4c74-92de-9a43cde55534';
     public const INVALID_EXTENSION_ERROR = 'c8c7315c-6186-4719-8b71-5659e16bdcb7';
+    public const FILENAME_TOO_LONG = 'e5706483-91a8-49d8-9a59-5e81a3c634a8';
 
     protected const ERROR_NAMES = [
         self::NOT_FOUND_ERROR => 'NOT_FOUND_ERROR',
@@ -40,6 +41,7 @@ class File extends Constraint
         self::EMPTY_ERROR => 'EMPTY_ERROR',
         self::TOO_LARGE_ERROR => 'TOO_LARGE_ERROR',
         self::INVALID_MIME_TYPE_ERROR => 'INVALID_MIME_TYPE_ERROR',
+        self::FILENAME_TOO_LONG => 'FILENAME_TOO_LONG',
     ];
 
     /**
@@ -49,6 +51,7 @@ class File extends Constraint
 
     public $binaryFormat;
     public $mimeTypes = [];
+    public ?int $filenameMaxLength = null;
     public array|string|null $extensions = [];
     public $notFoundMessage = 'The file could not be found.';
     public $notReadableMessage = 'The file is not readable.';
@@ -56,6 +59,7 @@ class File extends Constraint
     public $mimeTypesMessage = 'The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.';
     public string $extensionsMessage = 'The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.';
     public $disallowEmptyMessage = 'An empty file is not allowed.';
+    public $filenameTooLongMessage = 'The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.';
 
     public $uploadIniSizeErrorMessage = 'The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.';
     public $uploadFormSizeErrorMessage = 'The file is too large.';
@@ -76,11 +80,13 @@ class File extends Constraint
         int|string $maxSize = null,
         bool $binaryFormat = null,
         array|string $mimeTypes = null,
+        int $filenameMaxLength = null,
         string $notFoundMessage = null,
         string $notReadableMessage = null,
         string $maxSizeMessage = null,
         string $mimeTypesMessage = null,
         string $disallowEmptyMessage = null,
+        string $filenameTooLongMessage = null,
 
         string $uploadIniSizeErrorMessage = null,
         string $uploadFormSizeErrorMessage = null,
@@ -101,6 +107,7 @@ class File extends Constraint
         $this->maxSize = $maxSize ?? $this->maxSize;
         $this->binaryFormat = $binaryFormat ?? $this->binaryFormat;
         $this->mimeTypes = $mimeTypes ?? $this->mimeTypes;
+        $this->filenameMaxLength = $filenameMaxLength ?? $this->filenameMaxLength;
         $this->extensions = $extensions ?? $this->extensions;
         $this->notFoundMessage = $notFoundMessage ?? $this->notFoundMessage;
         $this->notReadableMessage = $notReadableMessage ?? $this->notReadableMessage;
@@ -108,6 +115,7 @@ class File extends Constraint
         $this->mimeTypesMessage = $mimeTypesMessage ?? $this->mimeTypesMessage;
         $this->extensionsMessage = $extensionsMessage ?? $this->extensionsMessage;
         $this->disallowEmptyMessage = $disallowEmptyMessage ?? $this->disallowEmptyMessage;
+        $this->filenameTooLongMessage = $filenameTooLongMessage ?? $this->filenameTooLongMessage;
         $this->uploadIniSizeErrorMessage = $uploadIniSizeErrorMessage ?? $this->uploadIniSizeErrorMessage;
         $this->uploadFormSizeErrorMessage = $uploadFormSizeErrorMessage ?? $this->uploadFormSizeErrorMessage;
         $this->uploadPartialErrorMessage = $uploadPartialErrorMessage ?? $this->uploadPartialErrorMessage;
@@ -151,7 +159,7 @@ class File extends Constraint
         return parent::__isset($option);
     }
 
-    private function normalizeBinaryFormat(int|string $maxSize)
+    private function normalizeBinaryFormat(int|string $maxSize): void
     {
         $factors = [
             'k' => 1000,

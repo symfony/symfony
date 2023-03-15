@@ -194,6 +194,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * Adds some helpers.
      *
      * @param HelperInterface[] $helpers An array of helper
+     *
+     * @return void
      */
     public function addHelpers(array $helpers)
     {
@@ -206,6 +208,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * Sets the helpers.
      *
      * @param HelperInterface[] $helpers An array of helper
+     *
+     * @return void
      */
     public function setHelpers(array $helpers)
     {
@@ -213,6 +217,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
         $this->addHelpers($helpers);
     }
 
+    /**
+     * @return void
+     */
     public function set(HelperInterface $helper, string $alias = null)
     {
         $this->helpers[$helper->getName()] = $helper;
@@ -247,6 +254,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Decorates the current template with another one.
+     *
+     * @return void
      */
     public function extend(string $template)
     {
@@ -277,6 +286,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Sets the charset to use.
+     *
+     * @return void
      */
     public function setCharset(string $charset)
     {
@@ -300,6 +311,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Adds an escaper for the given context.
+     *
+     * @return void
      */
     public function setEscaper(string $context, callable $escaper)
     {
@@ -321,6 +334,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
         return $this->escapers[$context];
     }
 
+    /**
+     * @return void
+     */
     public function addGlobal(string $name, mixed $value)
     {
         $this->globals[$name] = $value;
@@ -350,6 +366,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * For each function there is a define to avoid problems with strings being
      * incorrectly specified.
+     *
+     * @return void
      */
     protected function initializeEscapers()
     {
@@ -364,11 +382,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                  *
                  * @return string
                  */
-                function ($value) use ($flags) {
-                    // Numbers and Boolean values get turned into strings which can cause problems
-                    // with type comparisons (e.g. === or is_int() etc).
-                    return \is_string($value) ? htmlspecialchars($value, $flags, $this->getCharset(), false) : $value;
-                },
+                fn ($value) => // Numbers and Boolean values get turned into strings which can cause problems
+// with type comparisons (e.g. === or is_int() etc).
+\is_string($value) ? htmlspecialchars($value, $flags, $this->getCharset(), false) : $value,
 
             'js' =>
                 /**

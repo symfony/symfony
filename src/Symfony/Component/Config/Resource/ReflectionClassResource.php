@@ -73,7 +73,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
         return ['files', 'className', 'hash'];
     }
 
-    private function loadFiles(\ReflectionClass $class)
+    private function loadFiles(\ReflectionClass $class): void
     {
         foreach ($class->getInterfaces() as $v) {
             $this->loadFiles($v);
@@ -105,7 +105,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
             // the class does not exist anymore
             return false;
         }
-        $hash = hash_init('md5');
+        $hash = hash_init('xxh128');
 
         foreach ($this->generateSignature($this->classReflector) as $info) {
             hash_update($hash, $info);
@@ -153,8 +153,6 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
                 yield print_r(isset($defaults[$p->name]) && !\is_object($defaults[$p->name]) ? $defaults[$p->name] : null, true);
             }
         }
-
-        $defined = \Closure::bind(static function ($c) { return \defined($c); }, null, $class->name);
 
         foreach ($class->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) as $m) {
             foreach ($m->getAttributes() as $a) {

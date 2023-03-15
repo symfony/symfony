@@ -45,12 +45,12 @@ class RouteProcessor implements EventSubscriberInterface, ResetInterface
         return $record;
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->routeData = [];
     }
 
-    public function addRouteData(RequestEvent $event)
+    public function addRouteData(RequestEvent $event): void
     {
         if ($event->isMainRequest()) {
             $this->reset();
@@ -73,7 +73,7 @@ class RouteProcessor implements EventSubscriberInterface, ResetInterface
         $this->routeData[spl_object_id($request)] = $currentRequestData;
     }
 
-    public function removeRouteData(FinishRequestEvent $event)
+    public function removeRouteData(FinishRequestEvent $event): void
     {
         $requestId = spl_object_id($event->getRequest());
         unset($this->routeData[$requestId]);

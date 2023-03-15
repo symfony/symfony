@@ -121,7 +121,7 @@ class ExecutionContext implements ExecutionContextInterface
         $this->cachedObjectsRefs = new \SplObjectStorage();
     }
 
-    public function setNode(mixed $value, ?object $object, MetadataInterface $metadata = null, string $propertyPath)
+    public function setNode(mixed $value, ?object $object, MetadataInterface $metadata = null, string $propertyPath): void
     {
         $this->value = $value;
         $this->object = $object;
@@ -129,17 +129,17 @@ class ExecutionContext implements ExecutionContextInterface
         $this->propertyPath = $propertyPath;
     }
 
-    public function setGroup(?string $group)
+    public function setGroup(?string $group): void
     {
         $this->group = $group;
     }
 
-    public function setConstraint(Constraint $constraint)
+    public function setConstraint(Constraint $constraint): void
     {
         $this->constraint = $constraint;
     }
 
-    public function addViolation(string $message, array $parameters = [])
+    public function addViolation(string $message, array $parameters = []): void
     {
         $this->violations->add(new ConstraintViolation(
             $this->translator->trans($message, $parameters, $this->translationDomain),
@@ -228,7 +228,7 @@ class ExecutionContext implements ExecutionContextInterface
         return PropertyPath::append($this->propertyPath, $subPath);
     }
 
-    public function markGroupAsValidated(string $cacheKey, string $groupHash)
+    public function markGroupAsValidated(string $cacheKey, string $groupHash): void
     {
         if (!isset($this->validatedObjects[$cacheKey])) {
             $this->validatedObjects[$cacheKey] = [];
@@ -242,7 +242,7 @@ class ExecutionContext implements ExecutionContextInterface
         return isset($this->validatedObjects[$cacheKey][$groupHash]);
     }
 
-    public function markConstraintAsValidated(string $cacheKey, string $constraintHash)
+    public function markConstraintAsValidated(string $cacheKey, string $constraintHash): void
     {
         $this->validatedConstraints[$cacheKey.':'.$constraintHash] = true;
     }
@@ -252,7 +252,7 @@ class ExecutionContext implements ExecutionContextInterface
         return isset($this->validatedConstraints[$cacheKey.':'.$constraintHash]);
     }
 
-    public function markObjectAsInitialized(string $cacheKey)
+    public function markObjectAsInitialized(string $cacheKey): void
     {
         $this->initializedObjects[$cacheKey] = true;
     }

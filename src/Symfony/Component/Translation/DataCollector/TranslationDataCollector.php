@@ -32,7 +32,7 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
         $this->translator = $translator;
     }
 
-    public function lateCollect()
+    public function lateCollect(): void
     {
         $messages = $this->sanitizeCollectedMessages($this->translator->getCollectedMessages());
 
@@ -42,13 +42,13 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
         $this->data = $this->cloneVar($this->data);
     }
 
-    public function collect(Request $request, Response $response, \Throwable $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null): void
     {
         $this->data['locale'] = $this->translator->getLocale();
         $this->data['fallback_locales'] = $this->translator->getFallbackLocales();
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->data = [];
     }
@@ -91,7 +91,7 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
         return 'translation';
     }
 
-    private function sanitizeCollectedMessages(array $messages)
+    private function sanitizeCollectedMessages(array $messages): array
     {
         $result = [];
         foreach ($messages as $key => $message) {
@@ -116,7 +116,7 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
         return $result;
     }
 
-    private function computeCount(array $messages)
+    private function computeCount(array $messages): array
     {
         $count = [
             DataCollectorTranslator::MESSAGE_DEFINED => 0,
@@ -131,7 +131,7 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
         return $count;
     }
 
-    private function sanitizeString(string $string, int $length = 80)
+    private function sanitizeString(string $string, int $length = 80): string
     {
         $string = trim(preg_replace('/\s+/', ' ', $string));
 

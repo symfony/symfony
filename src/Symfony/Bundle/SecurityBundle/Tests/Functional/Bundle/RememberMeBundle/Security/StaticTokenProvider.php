@@ -39,12 +39,12 @@ class StaticTokenProvider implements TokenProviderInterface
         return $token;
     }
 
-    public function deleteTokenBySeries(string $series)
+    public function deleteTokenBySeries(string $series): void
     {
         unset(self::$db[$series]);
     }
 
-    public function updateToken(string $series, string $tokenValue, \DateTime $lastUsed)
+    public function updateToken(string $series, string $tokenValue, \DateTime $lastUsed): void
     {
         $token = $this->loadTokenBySeries($series);
         $refl = new \ReflectionClass($token);
@@ -57,7 +57,7 @@ class StaticTokenProvider implements TokenProviderInterface
         self::$db[$series] = $token;
     }
 
-    public function createNewToken(PersistentTokenInterface $token)
+    public function createNewToken(PersistentTokenInterface $token): void
     {
         self::$db[$token->getSeries()] = $token;
     }

@@ -24,6 +24,8 @@ class InputFormField extends FormField
     /**
      * Initializes the form field.
      *
+     * @return void
+     *
      * @throws \LogicException When node type is incorrect
      */
     protected function initialize()

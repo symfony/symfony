@@ -29,7 +29,7 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class MarkdownDescriptor extends Descriptor
 {
-    protected function describeRouteCollection(RouteCollection $routes, array $options = [])
+    protected function describeRouteCollection(RouteCollection $routes, array $options = []): void
     {
         $first = true;
         foreach ($routes->all() as $name => $route) {
@@ -43,7 +43,7 @@ class MarkdownDescriptor extends Descriptor
         $this->write("\n");
     }
 
-    protected function describeRoute(Route $route, array $options = [])
+    protected function describeRoute(Route $route, array $options = []): void
     {
         $output = '- Path: '.$route->getPath()
             ."\n".'- Path Regex: '.$route->compile()->getRegex()
@@ -66,7 +66,7 @@ class MarkdownDescriptor extends Descriptor
         $this->write("\n");
     }
 
-    protected function describeContainerParameters(ParameterBag $parameters, array $options = [])
+    protected function describeContainerParameters(ParameterBag $parameters, array $options = []): void
     {
         $this->write("Container parameters\n====================\n");
         foreach ($this->sortParameters($parameters) as $key => $value) {
@@ -74,7 +74,7 @@ class MarkdownDescriptor extends Descriptor
         }
     }
 
-    protected function describeContainerTags(ContainerBuilder $builder, array $options = [])
+    protected function describeContainerTags(ContainerBuilder $builder, array $options = []): void
     {
         $showHidden = isset($options['show_hidden']) && $options['show_hidden'];
         $this->write("Container tags\n==============");
@@ -88,7 +88,7 @@ class MarkdownDescriptor extends Descriptor
         }
     }
 
-    protected function describeContainerService(object $service, array $options = [], ContainerBuilder $builder = null)
+    protected function describeContainerService(object $service, array $options = [], ContainerBuilder $builder = null): void
     {
         if (!isset($options['id'])) {
             throw new \InvalidArgumentException('An "id" option must be provided.');
@@ -132,7 +132,7 @@ class MarkdownDescriptor extends Descriptor
         }
     }
 
-    protected function describeContainerServices(ContainerBuilder $builder, array $options = [])
+    protected function describeContainerServices(ContainerBuilder $builder, array $options = []): void
     {
         $showHidden = isset($options['show_hidden']) && $options['show_hidden'];
 
@@ -193,7 +193,7 @@ class MarkdownDescriptor extends Descriptor
         }
     }
 
-    protected function describeContainerDefinition(Definition $definition, array $options = [], ContainerBuilder $builder = null)
+    protected function describeContainerDefinition(Definition $definition, array $options = [], ContainerBuilder $builder = null): void
     {
         $output = '';
 
@@ -263,7 +263,7 @@ class MarkdownDescriptor extends Descriptor
         $this->write(isset($options['id']) ? sprintf("### %s\n\n%s\n", $options['id'], $output) : $output);
     }
 
-    protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $builder = null)
+    protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $builder = null): void
     {
         $output = '- Service: `'.$alias.'`'
             ."\n".'- Public: '.($alias->isPublic() && !$alias->isPrivate() ? 'yes' : 'no');
@@ -284,17 +284,17 @@ class MarkdownDescriptor extends Descriptor
         $this->describeContainerDefinition($builder->getDefinition((string) $alias), array_merge($options, ['id' => (string) $alias]), $builder);
     }
 
-    protected function describeContainerParameter(mixed $parameter, array $options = [])
+    protected function describeContainerParameter(mixed $parameter, array $options = []): void
     {
         $this->write(isset($options['parameter']) ? sprintf("%s\n%s\n\n%s", $options['parameter'], str_repeat('=', \strlen($options['parameter'])), $this->formatParameter($parameter)) : $parameter);
     }
 
-    protected function describeContainerEnvVars(array $envs, array $options = [])
+    protected function describeContainerEnvVars(array $envs, array $options = []): void
     {
         throw new LogicException('Using the markdown format to debug environment variables is not supported.');
     }
 
-    protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = [])
+    protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = []): void
     {
         $event = $options['event'] ?? null;
         $dispatcherServiceName = $options['dispatcher_service_name'] ?? null;
@@ -310,7 +310,7 @@ class MarkdownDescriptor extends Descriptor
             $registeredListeners = $eventDispatcher->getListeners($event);
         } else {
             // Try to see if "events" exists
-            $registeredListeners = \array_key_exists('events', $options) ? array_combine($options['events'], array_map(function ($event) use ($eventDispatcher) { return $eventDispatcher->getListeners($event); }, $options['events'])) : $eventDispatcher->getListeners();
+            $registeredListeners = \array_key_exists('events', $options) ? array_combine($options['events'], array_map(fn ($event) => $eventDispatcher->getListeners($event), $options['events'])) : $eventDispatcher->getListeners();
         }
 
         $this->write(sprintf('# %s', $title)."\n");
@@ -345,7 +345,7 @@ class MarkdownDescriptor extends Descriptor
 
             if (\is_object($callable[0])) {
                 $string .= "\n".sprintf('- Name: `%s`', $callable[1]);
-                $string .= "\n".sprintf('- Class: `%s`', \get_class($callable[0]));
+                $string .= "\n".sprintf('- Class: `%s`', $callable[0]::class);
             } else {
                 if (!str_starts_with($callable[1], 'parent::')) {
                     $string .= "\n".sprintf('- Name: `%s`', $callable[1]);

@@ -31,7 +31,7 @@ class FileLinkFormatterTest extends TestCase
         $_ENV['SYMFONY_IDE'] = $_SERVER['SYMFONY_IDE'] = null;
         $sut = unserialize(serialize(new FileLinkFormatter()));
 
-        $this->assertFalse($sut->format('/kernel/root/src/my/very/best/file.php', 3));
+        $this->assertSame('file:///kernel/root/src/my/very/best/file.php#L3', $sut->format('/kernel/root/src/my/very/best/file.php', 3));
 
         if (null === $ide) {
             unset($_ENV['SYMFONY_IDE'], $_SERVER['SYMFONY_IDE']);

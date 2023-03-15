@@ -60,6 +60,8 @@ class ConsoleSectionOutput extends StreamOutput
      * Clears previous output for this section.
      *
      * @param int $lines Number of lines to clear. If null, then the entire output of this section is cleared
+     *
+     * @return void
      */
     public function clear(int $lines = null)
     {
@@ -81,6 +83,8 @@ class ConsoleSectionOutput extends StreamOutput
 
     /**
      * Overwrites the previous output with a new message.
+     *
+     * @return void
      */
     public function overwrite(string|iterable $message)
     {
@@ -153,12 +157,15 @@ class ConsoleSectionOutput extends StreamOutput
     /**
      * @internal
      */
-    public function addNewLineOfInputSubmit()
+    public function addNewLineOfInputSubmit(): void
     {
         $this->content[] = \PHP_EOL;
         ++$this->lines;
     }
 
+    /**
+     * @return void
+     */
     protected function doWrite(string $message, bool $newline)
     {
         if (!$this->isDecorated()) {

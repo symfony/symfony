@@ -18,6 +18,8 @@ interface ClearableTokenStorageInterface extends TokenStorageInterface
 {
     /**
      * Removes all CSRF tokens.
+     *
+     * @return void
      */
     public function clear();
 }

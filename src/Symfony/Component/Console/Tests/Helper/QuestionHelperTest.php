@@ -286,9 +286,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
             $suggestionBase = $inputWords ? implode(' ', $inputWords).' ' : '';
 
             return array_map(
-                function ($word) use ($suggestionBase) {
-                    return $suggestionBase.$word.' ';
-                },
+                fn ($word) => $suggestionBase.$word.' ',
                 $knownWords
             );
         };

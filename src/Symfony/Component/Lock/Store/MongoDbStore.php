@@ -64,7 +64,7 @@ class MongoDbStore implements PersistingStoreInterface
      * @throws InvalidTtlException      When the initial ttl is not valid
      *
      * Options:
-     *      gcProbablity:  Should a TTL Index be created expressed as a probability from 0.0 to 1.0 [default: 0.001]
+     *      gcProbability: Should a TTL Index be created expressed as a probability from 0.0 to 1.0 [default: 0.001]
      *      database:      The name of the database [required when $mongo is a Client]
      *      collection:    The name of the collection [required when $mongo is a Client]
      *      uriOptions:    Array of uri options. [used when $mongo is a URI]
@@ -78,9 +78,9 @@ class MongoDbStore implements PersistingStoreInterface
      *
      * @see https://docs.mongodb.com/php-library/current/reference/method/MongoDBClient__construct/
      *
-     * If gcProbablity is set to a value greater than 0.0 there is a chance
+     * If gcProbability is set to a value greater than 0.0 there is a chance
      * this store will attempt to create a TTL index on self::save().
-     * If you prefer to create your TTL Index manually you can set gcProbablity
+     * If you prefer to create your TTL Index manually you can set gcProbability
      * to 0.0 and optionally leverage
      * self::createTtlIndex(int $expireAfterSeconds = 0).
      *
@@ -90,8 +90,15 @@ class MongoDbStore implements PersistingStoreInterface
      */
     public function __construct(Collection|Client|string $mongo, array $options = [], float $initialTtl = 300.0)
     {
+        if (isset($options['gcProbablity'])) {
+            trigger_deprecation('symfony/lock', '6.3', 'The "gcProbablity" option (notice the typo in its name) is deprecated in "%s"; use the "gcProbability" option instead.', __CLASS__);
+
+            $options['gcProbability'] = $options['gcProbablity'];
+            unset($options['gcProbablity']);
+        }
+
         $this->options = array_merge([
-            'gcProbablity' => 0.001,
+            'gcProbability' => 0.001,
             'database' => null,
             'collection' => null,
             'uriOptions' => [],
@@ -117,8 +124,8 @@ class MongoDbStore implements PersistingStoreInterface
             }
         }
 
-        if ($this->options['gcProbablity'] < 0.0 || $this->options['gcProbablity'] > 1.0) {
-            throw new InvalidArgumentException(sprintf('"%s()" gcProbablity must be a float from 0.0 to 1.0, "%f" given.', __METHOD__, $this->options['gcProbablity']));
+        if ($this->options['gcProbability'] < 0.0 || $this->options['gcProbability'] > 1.0) {
+            throw new InvalidArgumentException(sprintf('"%s()" gcProbability must be a float from 0.0 to 1.0, "%f" given.', __METHOD__, $this->options['gcProbability']));
         }
 
         if ($this->initialTtl <= 0) {
@@ -159,7 +166,7 @@ class MongoDbStore implements PersistingStoreInterface
     /**
      * Creates a TTL index to automatically remove expired locks.
      *
-     * If the gcProbablity option is set higher than 0.0 (defaults to 0.001);
+     * If the gcProbability option is set higher than 0.0 (defaults to 0.001);
      * there is a chance this will be called on self::save().
      *
      * Otherwise; this should be called once manually during database setup.
@@ -180,6 +187,8 @@ class MongoDbStore implements PersistingStoreInterface
      *
      * @see http://docs.mongodb.org/manual/tutorial/expire-data/
      *
+     * @return void
+     *
      * @throws UnsupportedException          if options are not supported by the selected server
      * @throws MongoInvalidArgumentException for parameter/option parsing errors
      * @throws DriverRuntimeException        for other driver errors (e.g. connection errors)
@@ -197,6 +206,8 @@ class MongoDbStore implements PersistingStoreInterface
     }
 
     /**
+     * @return void
+     *
      * @throws LockExpiredException when save is called on an expired lock
      */
     public function save(Key $key)
@@ -212,7 +223,7 @@ class MongoDbStore implements PersistingStoreInterface
             throw new LockAcquiringException('Failed to acquire lock.', 0, $e);
         }
 
-        if ($this->options['gcProbablity'] > 0.0 && (1.0 === $this->options['gcProbablity'] || (random_int(0, \PHP_INT_MAX) / \PHP_INT_MAX) <= $this->options['gcProbablity'])) {
+        if ($this->options['gcProbability'] > 0.0 && (1.0 === $this->options['gcProbability'] || (random_int(0, \PHP_INT_MAX) / \PHP_INT_MAX) <= $this->options['gcProbability'])) {
             $this->createTtlIndex();
         }
 
@@ -220,6 +231,8 @@ class MongoDbStore implements PersistingStoreInterface
     }
 
     /**
+     * @return void
+     *
      * @throws LockStorageException
      * @throws LockExpiredException
      */
@@ -239,6 +252,9 @@ class MongoDbStore implements PersistingStoreInterface
         $this->checkNotExpired($key);
     }
 
+    /**
+     * @return void
+     */
     public function delete(Key $key)
     {
         $this->getCollection()->deleteOne([ // filter
@@ -265,7 +281,7 @@ class MongoDbStore implements PersistingStoreInterface
      *
      * @param float $ttl Expiry in seconds from now
      */
-    private function upsert(Key $key, float $ttl)
+    private function upsert(Key $key, float $ttl): void
     {
         $now = microtime(true);
         $token = $this->getUniqueToken($key);

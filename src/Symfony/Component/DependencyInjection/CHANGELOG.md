@@ -1,6 +1,24 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add options `inline_factories` and `inline_class_loader` to `PhpDumper::dump()`
+ * Deprecate `PhpDumper` options `inline_factories_parameter` and `inline_class_loader_parameter`
+ * Add `RemoveBuildParametersPass`, which removes parameters starting with a dot during compilation
+ * Add support for nesting autowiring-related attributes into `#[Autowire(...)]`
+ * Deprecate undefined and numeric keys with `service_locator` config
+ * Fail if Target attribute does not exist during compilation
+ * Enable deprecating parameters with `ContainerBuilder::deprecateParameter()`
+ * Add `#[AsAlias]` attribute to tell under which alias a service should be registered or to use the implemented interface if no parameter is given
+ * Allow to trim XML service parameters value by using `trim="true"` attribute
+ * Allow extending the `Autowire` attribute
+ * Add `#[Exclude]` to skip autoregistering a class
+ * Add support for autowiring services as closures using `#[AutowireCallable]` or `#[AutowireServiceClosure]`
+ * Deprecate `#[MapDecorated]`, use `#[AutowireDecorated]` instead
+ * Deprecate the `@required` annotation, use the `Symfony\Contracts\Service\Attribute\Required` attribute instead
+
 6.2
 ---
 
@@ -14,6 +32,8 @@ CHANGELOG
  * Deprecate using numeric parameter names
  * Add support for tagged iterators/locators `exclude` option to the xml and yaml loaders/dumpers
  * Allow injecting `string $env` into php config closures
+ * Add `excludeSelf` parameter to `TaggedIteratorArgument` with default value to `true`
+   to control whether the referencing service should be automatically excluded from the iterator
 
 6.1
 ---

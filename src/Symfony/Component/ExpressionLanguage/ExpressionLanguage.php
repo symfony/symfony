@@ -110,6 +110,8 @@ class ExpressionLanguage
      * @param callable $compiler  A callable able to compile the function
      * @param callable $evaluator A callable able to evaluate the function
      *
+     * @return void
+     *
      * @throws \LogicException when registering a function after calling evaluate(), compile() or parse()
      *
      * @see ExpressionFunction
@@ -123,11 +125,17 @@ class ExpressionLanguage
         $this->functions[$name] = ['compiler' => $compiler, 'evaluator' => $evaluator];
     }
 
+    /**
+     * @return void
+     */
     public function addFunction(ExpressionFunction $function)
     {
         $this->register($function->getName(), $function->getCompiler(), $function->getEvaluator());
     }
 
+    /**
+     * @return void
+     */
     public function registerProvider(ExpressionFunctionProviderInterface $provider)
     {
         foreach ($provider->getFunctions() as $function) {
@@ -135,9 +143,25 @@ class ExpressionLanguage
         }
     }
 
+    /**
+     * @return void
+     */
     protected function registerFunctions()
     {
         $this->addFunction(ExpressionFunction::fromPhp('constant'));
+
+        $this->addFunction(new ExpressionFunction('enum',
+            static fn ($str): string => sprintf("(\constant(\$v = (%s))) instanceof \UnitEnum ? \constant(\$v) : throw new \TypeError(\sprintf('The string \"%%s\" is not the name of a valid enum case.', \$v))", $str),
+            static function ($arguments, $str): \UnitEnum {
+                $value = \constant($str);
+
+                if (!$value instanceof \UnitEnum) {
+                    throw new \TypeError(sprintf('The string "%s" is not the name of a valid enum case.', $str));
+                }
+
+                return $value;
+            }
+        ));
     }
 
     private function getLexer(): Lexer

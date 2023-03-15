@@ -46,9 +46,7 @@ trait HandleTrait
         }
 
         if (\count($handledStamps) > 1) {
-            $handlers = implode(', ', array_map(function (HandledStamp $stamp): string {
-                return sprintf('"%s"', $stamp->getHandlerName());
-            }, $handledStamps));
+            $handlers = implode(', ', array_map(fn (HandledStamp $stamp): string => sprintf('"%s"', $stamp->getHandlerName()), $handledStamps));
 
             throw new LogicException(sprintf('Message of type "%s" was handled multiple times. Only one handler is expected when using "%s::%s()", got %d: %s.', get_debug_type($envelope->getMessage()), static::class, __FUNCTION__, \count($handledStamps), $handlers));
         }

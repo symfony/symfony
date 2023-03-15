@@ -185,9 +185,7 @@ class LoggerTest extends TestCase
 
     public function testFormatter()
     {
-        $this->logger = new Logger(LogLevel::DEBUG, $this->tmpFile, function ($level, $message, $context) {
-            return json_encode(['level' => $level, 'message' => $message, 'context' => $context]);
-        });
+        $this->logger = new Logger(LogLevel::DEBUG, $this->tmpFile, fn ($level, $message, $context) => json_encode(['level' => $level, 'message' => $message, 'context' => $context]));
 
         $this->logger->error('An error', ['foo' => 'bar']);
         $this->logger->warning('A warning', ['baz' => 'bar']);

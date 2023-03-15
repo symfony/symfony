@@ -18,7 +18,6 @@ use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
-use Symfony\Component\Uid\Uuid;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -52,9 +51,7 @@ final class EsendexTransportTest extends TransportTestCase
             ->method('getStatusCode')
             ->willReturn(500);
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = self::createTransport($client);
 
@@ -74,9 +71,7 @@ final class EsendexTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn(json_encode(['errors' => [['code' => 'accountreference_invalid', 'description' => 'Invalid Account Reference EX0000000']]]));
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = self::createTransport($client);
 
@@ -88,7 +83,7 @@ final class EsendexTransportTest extends TransportTestCase
 
     public function testSendWithSuccessfulResponseDispatchesMessageEvent()
     {
-        $messageId = Uuid::v4()->toRfc4122();
+        $messageId = bin2hex(random_bytes(7));
         $response = $this->createMock(ResponseInterface::class);
         $response->expects($this->exactly(2))
             ->method('getStatusCode')
@@ -97,9 +92,7 @@ final class EsendexTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn(json_encode(['batch' => ['messageheaders' => [['id' => $messageId]]]]));
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = self::createTransport($client);
 

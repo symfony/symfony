@@ -112,8 +112,6 @@ class AnnotationDirectoryLoaderTest extends AbstractAnnotationLoaderTestCase
     {
         $this->reader->expects($this->exactly(\count($classes)))
             ->method('getClassAnnotation')
-            ->with($this->callback(function (\ReflectionClass $class) use ($classes) {
-                return \in_array($class->getName(), $classes);
-            }));
+            ->with($this->callback(fn (\ReflectionClass $class) => \in_array($class->getName(), $classes)));
     }
 }

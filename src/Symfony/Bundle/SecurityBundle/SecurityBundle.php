@@ -15,6 +15,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddExpressionLang
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddSecurityVotersPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddSessionDomainConstraintPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\CleanRememberMeVerifierPass;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\MakeFirewallsEventDispatcherTraceablePass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterCsrfFeaturesPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterEntryPointPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterGlobalSecurityEventListenersPass;
@@ -52,6 +53,9 @@ use Symfony\Component\Security\Http\SecurityEvents;
  */
 class SecurityBundle extends Bundle
 {
+    /**
+     * @return void
+     */
     public function build(ContainerBuilder $container)
     {
         parent::build($container);
@@ -92,5 +96,8 @@ class SecurityBundle extends Bundle
             AuthenticationEvents::ALIASES,
             SecurityEvents::ALIASES
         )));
+
+        // must be registered before DecoratorServicePass
+        $container->addCompilerPass(new MakeFirewallsEventDispatcherTraceablePass(), PassConfig::TYPE_OPTIMIZE, 10);
     }
 }

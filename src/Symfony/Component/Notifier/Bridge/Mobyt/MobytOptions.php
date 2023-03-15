@@ -61,7 +61,7 @@ final class MobytOptions implements MessageOptionsInterface
         return $this->options['recipient'] ?? null;
     }
 
-    public function messageType(string $type)
+    public function messageType(string $type): void
     {
         self::validateMessageType($type);
 

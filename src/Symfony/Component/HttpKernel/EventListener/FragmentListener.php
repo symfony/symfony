@@ -50,7 +50,7 @@ class FragmentListener implements EventSubscriberInterface
      *
      * @throws AccessDeniedHttpException if the request does not come from a trusted IP
      */
-    public function onKernelRequest(RequestEvent $event)
+    public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
 
@@ -75,7 +75,7 @@ class FragmentListener implements EventSubscriberInterface
         $request->query->remove('_path');
     }
 
-    protected function validateRequest(Request $request)
+    protected function validateRequest(Request $request): void
     {
         // is the Request safe?
         if (!$request->isMethodSafe()) {

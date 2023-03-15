@@ -37,6 +37,7 @@ abstract class AbstractBrowser
     protected $internalResponse;
     protected $response;
     protected $crawler;
+    protected bool $useHtml5Parser = true;
     protected $insulated = false;
     protected $redirect;
     protected $followRedirects = true;
@@ -59,6 +60,8 @@ abstract class AbstractBrowser
 
     /**
      * Sets whether to automatically follow redirects or not.
+     *
+     * @return void
      */
     public function followRedirects(bool $followRedirects = true)
     {
@@ -67,6 +70,8 @@ abstract class AbstractBrowser
 
     /**
      * Sets whether to automatically follow meta refresh redirects or not.
+     *
+     * @return void
      */
     public function followMetaRefresh(bool $followMetaRefresh = true)
     {
@@ -83,6 +88,8 @@ abstract class AbstractBrowser
 
     /**
      * Sets the maximum number of redirects that crawler can follow.
+     *
+     * @return void
      */
     public function setMaxRedirects(int $maxRedirects)
     {
@@ -101,6 +108,8 @@ abstract class AbstractBrowser
     /**
      * Sets the insulated flag.
      *
+     * @return void
+     *
      * @throws \RuntimeException When Symfony Process Component is not installed
      */
     public function insulate(bool $insulated = true)
@@ -114,6 +123,8 @@ abstract class AbstractBrowser
 
     /**
      * Sets server parameters.
+     *
+     * @return void
      */
     public function setServerParameters(array $server)
     {
@@ -124,6 +135,8 @@ abstract class AbstractBrowser
 
     /**
      * Sets single server parameter.
+     *
+     * @return void
      */
     public function setServerParameter(string $key, string $value)
     {
@@ -193,6 +206,18 @@ abstract class AbstractBrowser
         }
 
         return $this->crawler;
+    }
+
+    /**
+     * Sets whether parsing should be done using "masterminds/html5".
+     *
+     * @return $this
+     */
+    public function useHtml5Parser(bool $useHtml5Parser): static
+    {
+        $this->useHtml5Parser = $useHtml5Parser;
+
+        return $this;
     }
 
     /**
@@ -485,7 +510,7 @@ abstract class AbstractBrowser
             return null;
         }
 
-        $crawler = new Crawler(null, $uri);
+        $crawler = new Crawler(null, $uri, null, $this->useHtml5Parser);
         $crawler->addContent($content, $type);
 
         return $crawler;
@@ -591,6 +616,8 @@ abstract class AbstractBrowser
      * Restarts the client.
      *
      * It flushes history and all cookies.
+     *
+     * @return void
      */
     public function restart()
     {

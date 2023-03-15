@@ -75,7 +75,7 @@ class TranslationUpdateCommand extends Command
         $this->enabledLocales = $enabledLocales;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDefinition([
@@ -145,7 +145,7 @@ EOF
         $format = $input->getOption('format');
         $xliffVersion = '1.2';
 
-        if (\in_array($format, array_keys(self::FORMATS), true)) {
+        if (\array_key_exists($format, self::FORMATS)) {
             [$format, $xliffVersion] = self::FORMATS[$format];
         }
 
@@ -233,12 +233,8 @@ EOF
 
                 $list = array_merge(
                     array_diff($allKeys, $newKeys),
-                    array_map(function ($id) {
-                        return sprintf('<fg=green>%s</>', $id);
-                    }, $newKeys),
-                    array_map(function ($id) {
-                        return sprintf('<fg=red>%s</>', $id);
-                    }, array_keys($operation->getObsoleteMessages($domain)))
+                    array_map(fn ($id) => sprintf('<fg=green>%s</>', $id), $newKeys),
+                    array_map(fn ($id) => sprintf('<fg=red>%s</>', $id), array_keys($operation->getObsoleteMessages($domain)))
                 );
 
                 $domainMessagesCount = \count($list);

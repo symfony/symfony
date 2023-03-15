@@ -1039,9 +1039,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
-            'choice_label' => function () {
-                return false;
-            },
+            'choice_label' => fn () => false,
             'multiple' => false,
             'expanded' => true,
         ]);
@@ -1404,9 +1402,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', ['&a'], [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
-            'choice_label' => function () {
-                return false;
-            },
+            'choice_label' => fn () => false,
             'multiple' => true,
             'expanded' => true,
         ]);

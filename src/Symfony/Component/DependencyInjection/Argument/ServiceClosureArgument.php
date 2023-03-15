@@ -32,6 +32,9 @@ class ServiceClosureArgument implements ArgumentInterface
         return $this->values;
     }
 
+    /**
+     * @return void
+     */
     public function setValues(array $values)
     {
         if ([0] !== array_keys($values)) {

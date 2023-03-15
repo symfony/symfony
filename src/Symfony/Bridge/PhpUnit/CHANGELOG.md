@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add support for mocking the `enum_exists` function
+
 6.2
 ---
 

@@ -31,6 +31,9 @@ class MergeExtensionConfigurationPass extends BaseMergeExtensionConfigurationPas
         $this->extensions = $extensions;
     }
 
+    /**
+     * @return void
+     */
     public function process(ContainerBuilder $container)
     {
         foreach ($this->extensions as $extension) {

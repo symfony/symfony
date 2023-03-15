@@ -65,7 +65,7 @@ class ProfilerPassTest extends TestCase
     public static function provideValidCollectorWithTemplateUsingAutoconfigure(): \Generator
     {
         yield [new class() implements TemplateAwareDataCollectorInterface {
-            public function collect(Request $request, Response $response, \Throwable $exception = null)
+            public function collect(Request $request, Response $response, \Throwable $exception = null): void
             {
             }
 
@@ -74,7 +74,7 @@ class ProfilerPassTest extends TestCase
                 return static::class;
             }
 
-            public function reset()
+            public function reset(): void
             {
             }
 
@@ -85,7 +85,7 @@ class ProfilerPassTest extends TestCase
         }];
 
         yield [new class() extends AbstractDataCollector {
-            public function collect(Request $request, Response $response, \Throwable $exception = null)
+            public function collect(Request $request, Response $response, \Throwable $exception = null): void
             {
             }
 

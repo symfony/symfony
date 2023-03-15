@@ -132,6 +132,8 @@ class TwigRendererEngine extends AbstractRendererEngine
      *                     to initialize the theme first. Any changes made to
      *                     this variable will be kept and be available upon
      *                     further calls to this method using the same theme.
+     *
+     * @return void
      */
     protected function loadResourcesFromTheme(string $cacheKey, mixed &$theme)
     {

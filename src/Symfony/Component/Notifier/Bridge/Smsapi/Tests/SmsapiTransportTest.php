@@ -23,17 +23,21 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class SmsapiTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null, bool $fast = false, bool $test = false): SmsapiTransport
+    public static function createTransport(HttpClientInterface $client = null, string $from = '', bool $fast = false, bool $test = false): SmsapiTransport
     {
-        return (new SmsapiTransport('testToken', 'testFrom', $client ?? new MockHttpClient()))->setHost('test.host')->setFast($fast)->setTest($test);
+        return (new SmsapiTransport('testToken', $from, $client ?? new MockHttpClient()))->setHost('test.host')->setFast($fast)->setTest($test);
     }
 
     public static function toStringProvider(): iterable
     {
-        yield ['smsapi://test.host?from=testFrom', self::createTransport()];
-        yield ['smsapi://test.host?from=testFrom&fast=1', self::createTransport(null, true)];
-        yield ['smsapi://test.host?from=testFrom&test=1', self::createTransport(null, false, true)];
-        yield ['smsapi://test.host?from=testFrom&fast=1&test=1', self::createTransport(null, true, true)];
+        yield ['smsapi://test.host', self::createTransport()];
+        yield ['smsapi://test.host?fast=1', self::createTransport(null, '', true)];
+        yield ['smsapi://test.host?test=1', self::createTransport(null, '', false, true)];
+        yield ['smsapi://test.host?fast=1&test=1', self::createTransport(null, '', true, true)];
+        yield ['smsapi://test.host?from=testFrom', self::createTransport(null, 'testFrom')];
+        yield ['smsapi://test.host?from=testFrom&fast=1', self::createTransport(null, 'testFrom', true)];
+        yield ['smsapi://test.host?from=testFrom&test=1', self::createTransport(null, 'testFrom', false, true)];
+        yield ['smsapi://test.host?from=testFrom&fast=1&test=1', self::createTransport(null, 'testFrom', true, true)];
     }
 
     public static function supportedMessagesProvider(): iterable

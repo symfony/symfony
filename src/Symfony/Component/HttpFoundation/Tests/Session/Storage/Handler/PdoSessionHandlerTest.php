@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
+use Doctrine\DBAL\Schema\Schema;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler;
 
@@ -156,9 +157,7 @@ class PdoSessionHandlerTest extends TestCase
         $selectStmt = $this->createMock(\PDOStatement::class);
         $insertStmt = $this->createMock(\PDOStatement::class);
 
-        $pdo->prepareResult = function ($statement) use ($selectStmt, $insertStmt) {
-            return str_starts_with($statement, 'INSERT') ? $insertStmt : $selectStmt;
-        };
+        $pdo->prepareResult = fn ($statement) => str_starts_with($statement, 'INSERT') ? $insertStmt : $selectStmt;
 
         $content = 'foobar';
         $stream = $this->createStream($content);
@@ -325,6 +324,35 @@ class PdoSessionHandlerTest extends TestCase
             $property = $reflection->getProperty($property);
             $this->assertSame($expectedValue, $property->getValue($storage));
         }
+    }
+
+    public function testConfigureSchemaDifferentDatabase()
+    {
+        $schema = new Schema();
+
+        $pdoSessionHandler = new PdoSessionHandler($this->getMemorySqlitePdo());
+        $pdoSessionHandler->configureSchema($schema, fn () => false);
+        $this->assertFalse($schema->hasTable('sessions'));
+    }
+
+    public function testConfigureSchemaSameDatabase()
+    {
+        $schema = new Schema();
+
+        $pdoSessionHandler = new PdoSessionHandler($this->getMemorySqlitePdo());
+        $pdoSessionHandler->configureSchema($schema, fn () => true);
+        $this->assertTrue($schema->hasTable('sessions'));
+    }
+
+    public function testConfigureSchemaTableExistsPdo()
+    {
+        $schema = new Schema();
+        $schema->createTable('sessions');
+
+        $pdoSessionHandler = new PdoSessionHandler($this->getMemorySqlitePdo());
+        $pdoSessionHandler->configureSchema($schema, fn () => true);
+        $table = $schema->getTable('sessions');
+        $this->assertEmpty($table->getColumns(), 'The table was not overwritten');
     }
 
     public static function provideUrlDsnPairs()

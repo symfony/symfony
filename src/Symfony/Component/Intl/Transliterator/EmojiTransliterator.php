@@ -110,7 +110,7 @@ if (!class_exists(\Transliterator::class)) {
             static $cookie;
             static $transliterator;
 
-            $cookie ??= md5(random_bytes(8));
+            $cookie ??= hash('xxh128', random_bytes(8));
             $this->transliterator ??= clone $transliterator ??= \Transliterator::createFromRules('[:any:]* > '.$cookie);
 
             if (false === $result = $this->transliterator->transliterate($string, $start, $end)) {

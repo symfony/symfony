@@ -40,13 +40,9 @@ class NotTaggedControllerValueResolverTest extends TestCase
     public function testDoNotSupportWhenControllerExists()
     {
         $resolver = new NotTaggedControllerValueResolver(new ServiceLocator([
-            'App\\Controller\\Mine::method' => function () {
-                return new ServiceLocator([
-                    'dummy' => function () {
-                        return new \stdClass();
-                    },
-                ]);
-            },
+            'App\\Controller\\Mine::method' => fn () => new ServiceLocator([
+                'dummy' => fn () => new \stdClass(),
+            ]),
         ]));
         $argument = new ArgumentMetadata('dummy', \stdClass::class, false, false, null);
         $request = $this->requestWithAttributes(['_controller' => 'App\\Controller\\Mine::method']);

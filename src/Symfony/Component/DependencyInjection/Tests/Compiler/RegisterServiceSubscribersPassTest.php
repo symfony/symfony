@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\DependencyInjection\Attribute\MapDecorated;
+use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
 use Symfony\Component\DependencyInjection\Attribute\Target;
@@ -426,7 +426,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
                     new SubscribedService('autowired', 'stdClass', attributes: new Autowire(service: 'service.id')),
                     new SubscribedService('autowired.nullable', 'stdClass', nullable: true, attributes: new Autowire(service: 'service.id')),
                     new SubscribedService('autowired.parameter', 'string', attributes: new Autowire('%parameter.1%')),
-                    new SubscribedService('map.decorated', \stdClass::class, attributes: new MapDecorated()),
+                    new SubscribedService('autowire.decorated', \stdClass::class, attributes: new AutowireDecorated()),
                     new SubscribedService('target', \stdClass::class, attributes: new Target('someTarget')),
                 ];
             }
@@ -449,7 +449,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
             'autowired' => new ServiceClosureArgument(new TypedReference('stdClass', 'stdClass', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'autowired', [new Autowire(service: 'service.id')])),
             'autowired.nullable' => new ServiceClosureArgument(new TypedReference('stdClass', 'stdClass', ContainerInterface::IGNORE_ON_INVALID_REFERENCE, 'autowired.nullable', [new Autowire(service: 'service.id')])),
             'autowired.parameter' => new ServiceClosureArgument(new TypedReference('string', 'string', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'autowired.parameter', [new Autowire(service: '%parameter.1%')])),
-            'map.decorated' => new ServiceClosureArgument(new TypedReference('stdClass', 'stdClass', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'map.decorated', [new MapDecorated()])),
+            'autowire.decorated' => new ServiceClosureArgument(new TypedReference('stdClass', 'stdClass', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'autowire.decorated', [new AutowireDecorated()])),
             'target' => new ServiceClosureArgument(new TypedReference('stdClass', 'stdClass', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'target', [new Target('someTarget')])),
         ];
         $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
@@ -459,11 +459,11 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $expected = [
             'tagged.iterator' => new ServiceClosureArgument(new TaggedIteratorArgument('tag')),
             'tagged.locator' => new ServiceClosureArgument(new ServiceLocatorArgument(new TaggedIteratorArgument('tag', 'tag', needsIndexes: true))),
-            'autowired' => new ServiceClosureArgument(new Reference('service.id')),
-            'autowired.nullable' => new ServiceClosureArgument(new Reference('service.id', ContainerInterface::NULL_ON_INVALID_REFERENCE)),
+            'autowired' => new ServiceClosureArgument(new TypedReference('service.id', 'stdClass', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'autowired', [new Autowire(service: 'service.id')])),
+            'autowired.nullable' => new ServiceClosureArgument(new TypedReference('service.id', 'stdClass', ContainerInterface::IGNORE_ON_INVALID_REFERENCE, 'autowired.nullable', [new Autowire(service: 'service.id')])),
             'autowired.parameter' => new ServiceClosureArgument('foobar'),
-            'map.decorated' => new ServiceClosureArgument(new Reference('.service_locator.oZHAdom.inner', ContainerInterface::NULL_ON_INVALID_REFERENCE)),
-            'target' => new ServiceClosureArgument(new TypedReference('stdClass', 'stdClass', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'someTarget')),
+            'autowire.decorated' => new ServiceClosureArgument(new Reference('.service_locator.QVDPERh.inner', ContainerInterface::NULL_ON_INVALID_REFERENCE)),
+            'target' => new ServiceClosureArgument(new TypedReference('stdClass', 'stdClass', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'target', [new Target('someTarget')])),
         ];
         $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
     }

@@ -9,40 +9,52 @@
  * file that was distributed with this source code.
  */
 
+use Symfony\Component\VarDumper\Caster\ScalarStub;
 use Symfony\Component\VarDumper\VarDumper;
 
 if (!function_exists('dump')) {
     /**
      * @author Nicolas Grekas <p@tchwork.com>
+     * @author Alexandre Daubois <alex.daubois@gmail.com>
      */
-    function dump(mixed $var, mixed ...$moreVars): mixed
+    function dump(mixed ...$vars): mixed
     {
-        VarDumper::dump($var);
+        if (!$vars) {
+            VarDumper::dump(new ScalarStub('🐛'));
 
-        foreach ($moreVars as $v) {
-            VarDumper::dump($v);
+            return null;
         }
 
-        if (1 < func_num_args()) {
-            return func_get_args();
+        if (isset($vars[0]) && 1 === count($vars)) {
+            VarDumper::dump($vars[0]);
+            $k = 0;
+        } else {
+            foreach ($vars as $k => $v) {
+                VarDumper::dump($v, is_int($k) ? 1 + $k : $k);
+            }
         }
 
-        return $var;
+        if (1 < count($vars)) {
+            return $vars;
+        }
+
+        return $vars[$k];
     }
 }
 
 if (!function_exists('dd')) {
-    /**
-     * @return never
-     */
-    function dd(...$vars): void
+    function dd(mixed ...$vars): never
     {
         if (!in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) && !headers_sent()) {
             header('HTTP/1.1 500 Internal Server Error');
         }
 
-        foreach ($vars as $v) {
-            VarDumper::dump($v);
+        if (isset($vars[0]) && 1 === count($vars)) {
+            VarDumper::dump($vars[0]);
+        } else {
+            foreach ($vars as $k => $v) {
+                VarDumper::dump($v, is_int($k) ? 1 + $k : $k);
+            }
         }
 
         exit(1);

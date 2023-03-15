@@ -409,6 +409,24 @@ class EmailTest extends TestCase
         $this->assertStringContainsString('cid:'.$parts[1]->getContentId(), $generatedHtml->getBody());
     }
 
+    public function testGenerateBodyWithTextAndHtmlAndAttachedFileAndAttachedImageReferencedViaCidAndContentId()
+    {
+        [$text, $html, $filePart, $file, $imagePart, $image] = $this->generateSomeParts();
+        $e = (new Email())->from('me@example.com')->to('you@example.com');
+        $e->text('text content');
+        $e->addPart(new DataPart($file));
+        $img = new DataPart($image, 'test.gif');
+        $e->addPart($img);
+        $e->html($content = 'html content <img src="cid:'.$img->getContentId().'">');
+        $body = $e->getBody();
+        $this->assertInstanceOf(MixedPart::class, $body);
+        $this->assertCount(2, $related = $body->getParts());
+        $this->assertInstanceOf(RelatedPart::class, $related[0]);
+        $this->assertEquals($filePart, $related[1]);
+        $this->assertCount(2, $parts = $related[0]->getParts());
+        $this->assertInstanceOf(AlternativePart::class, $parts[0]);
+    }
+
     public function testGenerateBodyWithHtmlAndInlinedImageTwiceReferencedViaCid()
     {
         // inline image (twice) referenced in the HTML content
@@ -465,8 +483,8 @@ class EmailTest extends TestCase
         $e = new Email();
         $e->addPart(new DataPart(new File($name)));
         $e->addPart((new DataPart(new File($name)))->asInline());
-        $this->assertEquals([$att->bodyToString(), $inline->bodyToString()], array_map(function (DataPart $a) { return $a->bodyToString(); }, $e->getAttachments()));
-        $this->assertEquals([$att->getPreparedHeaders(), $inline->getPreparedHeaders()], array_map(function (DataPart $a) { return $a->getPreparedHeaders(); }, $e->getAttachments()));
+        $this->assertEquals([$att->bodyToString(), $inline->bodyToString()], array_map(fn (DataPart $a) => $a->bodyToString(), $e->getAttachments()));
+        $this->assertEquals([$att->getPreparedHeaders(), $inline->getPreparedHeaders()], array_map(fn (DataPart $a) => $a->getPreparedHeaders(), $e->getAttachments()));
     }
 
     public function testSerialize()

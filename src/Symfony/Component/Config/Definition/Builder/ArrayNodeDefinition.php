@@ -45,6 +45,9 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         $this->trueEquivalent = [];
     }
 
+    /**
+     * @return void
+     */
     public function setBuilder(NodeBuilder $builder)
     {
         $this->nodeBuilder = $builder;
@@ -422,6 +425,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     /**
      * Validate the configuration of a concrete node.
      *
+     * @return void
+     *
      * @throws InvalidDefinitionException
      */
     protected function validateConcreteNode(ArrayNode $node)
@@ -451,6 +456,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
     /**
      * Validate the configuration of a prototype node.
+     *
+     * @return void
      *
      * @throws InvalidDefinitionException
      */

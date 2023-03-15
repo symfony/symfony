@@ -358,9 +358,7 @@ class ConnectionTest extends TestCase
     {
         $driverConnection = $this->createMock(DBALConnection::class);
         $driverConnection->method('getDatabasePlatform')->willReturn($platform);
-        $driverConnection->method('createQueryBuilder')->willReturnCallback(function () use ($driverConnection) {
-            return new QueryBuilder($driverConnection);
-        });
+        $driverConnection->method('createQueryBuilder')->willReturnCallback(fn () => new QueryBuilder($driverConnection));
 
         if (interface_exists(DriverResult::class)) {
             $result = $this->createMock(DriverResult::class);
@@ -411,7 +409,7 @@ class ConnectionTest extends TestCase
         $schema = new Schema();
 
         $connection = new Connection(['table_name' => 'queue_table'], $driverConnection);
-        $connection->configureSchema($schema, $driverConnection);
+        $connection->configureSchema($schema, $driverConnection, fn () => true);
         $this->assertTrue($schema->hasTable('queue_table'));
     }
 
@@ -422,7 +420,7 @@ class ConnectionTest extends TestCase
         $schema = new Schema();
 
         $connection = new Connection([], $driverConnection);
-        $connection->configureSchema($schema, $driverConnection2);
+        $connection->configureSchema($schema, $driverConnection2, fn () => false);
         $this->assertFalse($schema->hasTable('messenger_messages'));
     }
 
@@ -433,7 +431,7 @@ class ConnectionTest extends TestCase
         $schema->createTable('messenger_messages');
 
         $connection = new Connection([], $driverConnection);
-        $connection->configureSchema($schema, $driverConnection);
+        $connection->configureSchema($schema, $driverConnection, fn () => true);
         $table = $schema->getTable('messenger_messages');
         $this->assertEmpty($table->getColumns(), 'The table was not overwritten');
     }

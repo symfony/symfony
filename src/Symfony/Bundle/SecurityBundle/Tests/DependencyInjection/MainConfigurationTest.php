@@ -71,7 +71,7 @@ class MainConfigurationTest extends TestCase
             'firewalls' => [
                 'stub' => [
                     'logout' => [
-                        'csrf_token_generator' => 'a_token_generator',
+                        'csrf_token_manager' => 'a_token_manager',
                         'csrf_token_id' => 'a_token_id',
                     ],
                 ],
@@ -82,8 +82,8 @@ class MainConfigurationTest extends TestCase
         $processor = new Processor();
         $configuration = new MainConfiguration([], []);
         $processedConfig = $processor->processConfiguration($configuration, [$config]);
-        $this->assertArrayHasKey('csrf_token_generator', $processedConfig['firewalls']['stub']['logout']);
-        $this->assertEquals('a_token_generator', $processedConfig['firewalls']['stub']['logout']['csrf_token_generator']);
+        $this->assertArrayHasKey('csrf_token_manager', $processedConfig['firewalls']['stub']['logout']);
+        $this->assertEquals('a_token_manager', $processedConfig['firewalls']['stub']['logout']['csrf_token_manager']);
         $this->assertArrayHasKey('csrf_token_id', $processedConfig['firewalls']['stub']['logout']);
         $this->assertEquals('a_token_id', $processedConfig['firewalls']['stub']['logout']['csrf_token_id']);
     }
@@ -92,13 +92,13 @@ class MainConfigurationTest extends TestCase
     {
         $config = [
             'firewalls' => [
-                'custom_token_generator' => [
+                'custom_token_manager' => [
                     'logout' => [
-                        'csrf_token_generator' => 'a_token_generator',
+                        'csrf_token_manager' => 'a_token_manager',
                         'csrf_token_id' => 'a_token_id',
                     ],
                 ],
-                'default_token_generator' => [
+                'default_token_manager' => [
                     'logout' => [
                         'enable_csrf' => true,
                         'csrf_token_id' => 'a_token_id',
@@ -121,18 +121,18 @@ class MainConfigurationTest extends TestCase
         $processedConfig = $processor->processConfiguration($configuration, [$config]);
 
         $assertions = [
-            'custom_token_generator' => [true, 'a_token_generator'],
-            'default_token_generator' => [true, 'security.csrf.token_manager'],
+            'custom_token_manager' => [true, 'a_token_manager'],
+            'default_token_manager' => [true, 'security.csrf.token_manager'],
             'disabled_csrf' => [false, null],
             'empty' => [false, null],
         ];
-        foreach ($assertions as $firewallName => [$enabled, $tokenGenerator]) {
+        foreach ($assertions as $firewallName => [$enabled, $tokenManager]) {
             $this->assertEquals($enabled, $processedConfig['firewalls'][$firewallName]['logout']['enable_csrf']);
-            if ($tokenGenerator) {
-                $this->assertEquals($tokenGenerator, $processedConfig['firewalls'][$firewallName]['logout']['csrf_token_generator']);
+            if ($tokenManager) {
+                $this->assertEquals($tokenManager, $processedConfig['firewalls'][$firewallName]['logout']['csrf_token_manager']);
                 $this->assertEquals('a_token_id', $processedConfig['firewalls'][$firewallName]['logout']['csrf_token_id']);
             } else {
-                $this->assertArrayNotHasKey('csrf_token_generator', $processedConfig['firewalls'][$firewallName]['logout']);
+                $this->assertArrayNotHasKey('csrf_token_manager', $processedConfig['firewalls'][$firewallName]['logout']);
             }
         }
     }

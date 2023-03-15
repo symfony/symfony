@@ -102,7 +102,7 @@ class AuthenticatorManagerTest extends TestCase
 
         $authenticators[($matchingAuthenticatorIndex + 1) % 2]->expects($this->never())->method('authenticate');
 
-        $matchingAuthenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter', function () { return $this->user; })));
+        $matchingAuthenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter', fn () => $this->user)));
 
         $listenerCalled = false;
         $this->eventDispatcher->addListener(CheckPassportEvent::class, function (CheckPassportEvent $event) use (&$listenerCalled, $matchingAuthenticator) {
@@ -130,7 +130,7 @@ class AuthenticatorManagerTest extends TestCase
         $authenticator = $this->createAuthenticator();
         $this->request->attributes->set('_security_authenticators', [$authenticator]);
 
-        $authenticator->expects($this->any())->method('authenticate')->willReturn(new Passport(new UserBadge('wouter', function () { return $this->user; }), new PasswordCredentials('pass')));
+        $authenticator->expects($this->any())->method('authenticate')->willReturn(new Passport(new UserBadge('wouter', fn () => $this->user), new PasswordCredentials('pass')));
 
         $authenticator->expects($this->once())
             ->method('onAuthenticationFailure')
@@ -147,9 +147,7 @@ class AuthenticatorManagerTest extends TestCase
 
         $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter')));
 
-        $authenticator->expects($this->once())->method('onAuthenticationFailure')->with($this->anything(), $this->callback(function ($exception) {
-            return 'Authentication failed; Some badges marked as required by the firewall config are not available on the passport: "'.CsrfTokenBadge::class.'".' === $exception->getMessage();
-        }));
+        $authenticator->expects($this->once())->method('onAuthenticationFailure')->with($this->anything(), $this->callback(fn ($exception) => 'Authentication failed; Some badges marked as required by the firewall config are not available on the passport: "'.CsrfTokenBadge::class.'".' === $exception->getMessage()));
 
         $manager = $this->createManager([$authenticator], 'main', true, [CsrfTokenBadge::class]);
         $manager->authenticateRequest($this->request);
@@ -179,7 +177,7 @@ class AuthenticatorManagerTest extends TestCase
         $authenticator = $this->createAuthenticator();
         $this->request->attributes->set('_security_authenticators', [$authenticator]);
 
-        $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter', function () { return $this->user; })));
+        $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter', fn () => $this->user)));
 
         $authenticator->expects($this->any())->method('createToken')->willReturn($this->token);
 
@@ -200,7 +198,7 @@ class AuthenticatorManagerTest extends TestCase
         $authenticator = $this->createAuthenticator();
         $this->request->attributes->set('_security_authenticators', [$authenticator]);
 
-        $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter', function () { return $this->user; })));
+        $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter', fn () => $this->user)));
 
         $authenticator->expects($this->any())->method('createToken')->willReturn($this->token);
 
@@ -258,7 +256,7 @@ class AuthenticatorManagerTest extends TestCase
         $authenticator->expects($this->any())->method('isInteractive')->willReturn(true);
         $this->request->attributes->set('_security_authenticators', [$authenticator]);
 
-        $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter', function () { return $this->user; })));
+        $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter', fn () => $this->user)));
         $authenticator->expects($this->any())->method('createToken')->willReturn($this->token);
 
         $this->tokenStorage->expects($this->once())->method('setToken')->with($this->token);
@@ -279,7 +277,7 @@ class AuthenticatorManagerTest extends TestCase
         $authenticator->expects($this->any())->method('isInteractive')->willReturn(true);
         $this->request->attributes->set('_security_authenticators', [$authenticator]);
 
-        $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter', function () { return $this->user; })));
+        $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter', fn () => $this->user)));
         $authenticator->expects($this->any())->method('createToken')->willReturn($this->token);
 
         $this->tokenStorage->expects($this->once())->method('setToken')->with($this->token);
@@ -304,9 +302,7 @@ class AuthenticatorManagerTest extends TestCase
 
         $authenticator->expects($this->any())
             ->method('onAuthenticationFailure')
-            ->with($this->equalTo($this->request), $this->callback(function ($e) use ($invalidUserException) {
-                return $e instanceof BadCredentialsException && $invalidUserException === $e->getPrevious();
-            }))
+            ->with($this->equalTo($this->request), $this->callback(fn ($e) => $e instanceof BadCredentialsException && $invalidUserException === $e->getPrevious()))
             ->willReturn($this->response);
 
         $manager = $this->createManager([$authenticator]);
@@ -320,7 +316,7 @@ class AuthenticatorManagerTest extends TestCase
         $authenticator->expects($this->any())->method('isInteractive')->willReturn(true);
         $this->request->attributes->set('_security_authenticators', [new TraceableAuthenticator($authenticator)]);
 
-        $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter', function () { return $this->user; })));
+        $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter', fn () => $this->user)));
         $authenticator->expects($this->any())->method('createToken')->willReturn($this->token);
 
         $this->tokenStorage->expects($this->once())->method('setToken')->with($this->token);

@@ -54,9 +54,7 @@ trait ContractsTrait
         }
 
         $previousWrapper = $this->callbackWrapper;
-        $this->callbackWrapper = $callbackWrapper ?? static function (callable $callback, ItemInterface $item, bool &$save, CacheInterface $pool, \Closure $setMetadata, ?LoggerInterface $logger) {
-            return $callback($item, $save);
-        };
+        $this->callbackWrapper = $callbackWrapper ?? static fn (callable $callback, ItemInterface $item, bool &$save, CacheInterface $pool, \Closure $setMetadata, ?LoggerInterface $logger) => $callback($item, $save);
 
         return $previousWrapper;
     }

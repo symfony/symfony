@@ -47,6 +47,9 @@ class DateTimeType extends AbstractType
         \IntlDateFormatter::SHORT,
     ];
 
+    /**
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $parts = ['year', 'month', 'day', 'hour'];
@@ -107,12 +110,10 @@ class DateTimeType extends AbstractType
             ]));
 
             if ($emptyData instanceof \Closure) {
-                $lazyEmptyData = static function ($option) use ($emptyData) {
-                    return static function (FormInterface $form) use ($emptyData, $option) {
-                        $emptyData = $emptyData($form->getParent());
+                $lazyEmptyData = static fn ($option) => static function (FormInterface $form) use ($emptyData, $option) {
+                    $emptyData = $emptyData($form->getParent());
 
-                        return $emptyData[$option] ?? '';
-                    };
+                    return $emptyData[$option] ?? '';
                 };
 
                 $dateOptions['empty_data'] = $lazyEmptyData('date');
@@ -199,6 +200,9 @@ class DateTimeType extends AbstractType
         }
     }
 
+    /**
+     * @return void
+     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['widget'] = $options['widget'];
@@ -220,21 +224,18 @@ class DateTimeType extends AbstractType
         }
     }
 
+    /**
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $compound = function (Options $options) {
-            return 'single_text' !== $options['widget'];
-        };
+        $compound = fn (Options $options) => 'single_text' !== $options['widget'];
 
         // Defaults to the value of "widget"
-        $dateWidget = function (Options $options) {
-            return 'single_text' === $options['widget'] ? null : $options['widget'];
-        };
+        $dateWidget = fn (Options $options) => 'single_text' === $options['widget'] ? null : $options['widget'];
 
         // Defaults to the value of "widget"
-        $timeWidget = function (Options $options) {
-            return 'single_text' === $options['widget'] ? null : $options['widget'];
-        };
+        $timeWidget = fn (Options $options) => 'single_text' === $options['widget'] ? null : $options['widget'];
 
         $resolver->setDefaults([
             'input' => 'datetime',
@@ -260,9 +261,7 @@ class DateTimeType extends AbstractType
             'compound' => $compound,
             'date_label' => null,
             'time_label' => null,
-            'empty_data' => function (Options $options) {
-                return $options['compound'] ? [] : '';
-            },
+            'empty_data' => fn (Options $options) => $options['compound'] ? [] : '',
             'input_format' => 'Y-m-d H:i:s',
             'invalid_message' => 'Please enter a valid date and time.',
         ]);

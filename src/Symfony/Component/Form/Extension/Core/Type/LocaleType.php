@@ -22,6 +22,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LocaleType extends AbstractType
 {
+    /**
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -32,9 +35,7 @@ class LocaleType extends AbstractType
 
                 $choiceTranslationLocale = $options['choice_translation_locale'];
 
-                return ChoiceList::loader($this, new IntlCallbackChoiceLoader(function () use ($choiceTranslationLocale) {
-                    return array_flip(Locales::getNames($choiceTranslationLocale));
-                }), $choiceTranslationLocale);
+                return ChoiceList::loader($this, new IntlCallbackChoiceLoader(fn () => array_flip(Locales::getNames($choiceTranslationLocale))), $choiceTranslationLocale);
             },
             'choice_translation_domain' => false,
             'choice_translation_locale' => null,

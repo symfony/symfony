@@ -31,6 +31,9 @@ class HostnameValidator extends ConstraintValidator
         'test',
     ];
 
+    /**
+     * @return void
+     */
     public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Hostname) {

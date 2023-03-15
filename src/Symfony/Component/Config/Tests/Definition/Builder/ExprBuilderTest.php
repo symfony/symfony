@@ -37,13 +37,13 @@ class ExprBuilderTest extends TestCase
         $this->assertFinalizedValueIs('new_value', $test, ['key' => true]);
 
         $test = $this->getTestBuilder()
-            ->ifTrue(function () { return true; })
+            ->ifTrue(fn () => true)
             ->then($this->returnClosure('new_value'))
         ->end();
         $this->assertFinalizedValueIs('new_value', $test);
 
         $test = $this->getTestBuilder()
-            ->ifTrue(function () { return false; })
+            ->ifTrue(fn () => false)
             ->then($this->returnClosure('new_value'))
         ->end();
         $this->assertFinalizedValueIs('value', $test);
@@ -241,9 +241,7 @@ class ExprBuilderTest extends TestCase
      */
     protected function returnClosure($val): \Closure
     {
-        return function () use ($val) {
-            return $val;
-        };
+        return fn () => $val;
     }
 
     /**

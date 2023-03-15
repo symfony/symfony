@@ -15,9 +15,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class Symfony_DI_PhpDumper_Test_Unsupported_Characters extends Container
 {
     protected $parameters = [];
+    protected readonly \WeakReference $ref;
 
     public function __construct()
     {
+        $this->ref = \WeakReference::create($this);
         $this->parameters = $this->getDefaultParameters();
 
         $this->services = $this->privates = [];
@@ -45,9 +47,9 @@ class Symfony_DI_PhpDumper_Test_Unsupported_Characters extends Container
      *
      * @return \FooClass
      */
-    protected function getBarService()
+    protected static function getBarService($container)
     {
-        return $this->services['bar$'] = new \FooClass();
+        return $container->services['bar$'] = new \FooClass();
     }
 
     /**
@@ -55,9 +57,9 @@ class Symfony_DI_PhpDumper_Test_Unsupported_Characters extends Container
      *
      * @return \FooClass
      */
-    protected function getBar2Service()
+    protected static function getBar2Service($container)
     {
-        return $this->services['bar$!'] = new \FooClass();
+        return $container->services['bar$!'] = new \FooClass();
     }
 
     /**
@@ -65,9 +67,9 @@ class Symfony_DI_PhpDumper_Test_Unsupported_Characters extends Container
      *
      * @return \FooClass
      */
-    protected function getFooohnoService()
+    protected static function getFooohnoService($container)
     {
-        return $this->services['foo*/oh-no'] = new \FooClass();
+        return $container->services['foo*/oh-no'] = new \FooClass();
     }
 
     public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null

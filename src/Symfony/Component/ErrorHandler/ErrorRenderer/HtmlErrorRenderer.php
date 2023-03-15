@@ -17,6 +17,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
+use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 
 /**
  * @author Yonel Ceruto <yonelceruto@gmail.com>
@@ -147,6 +149,23 @@ class HtmlErrorRenderer implements ErrorRendererInterface
         ]);
     }
 
+    private function dumpValue(mixed $value): string
+    {
+        $cloner = new VarCloner();
+        $data = $cloner->cloneVar($value);
+
+        $dumper = new HtmlDumper();
+        $dumper->setTheme('light');
+        $dumper->setOutput($output = fopen('php://memory', 'r+'));
+        $dumper->dump($data);
+
+        $dump = stream_get_contents($output, -1, 0);
+        rewind($output);
+        ftruncate($output, 0);
+
+        return $dump;
+    }
+
     private function formatArgs(array $args): string
     {
         $result = [];
@@ -171,7 +190,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
         return implode(', ', $result);
     }
 
-    private function formatArgsAsText(array $args)
+    private function formatArgsAsText(array $args): string
     {
         return strip_tags($this->formatArgs($args));
     }
@@ -255,9 +274,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
             // remove main code/span tags
             $code = preg_replace('#^<code.*?>\s*<span.*?>(.*)</span>\s*</code>#s', '\\1', $code);
             // split multiline spans
-            $code = preg_replace_callback('#<span ([^>]++)>((?:[^<]*+<br \/>)++[^<]*+)</span>#', function ($m) {
-                return "<span $m[1]>".str_replace('<br />', "</span><br /><span $m[1]>", $m[2]).'</span>';
-            }, $code);
+            $code = preg_replace_callback('#<span ([^>]++)>((?:[^<]*+<br \/>)++[^<]*+)</span>#', fn ($m) => "<span $m[1]>".str_replace('<br />', "</span><br /><span $m[1]>", $m[2]).'</span>', $code);
             $content = explode('<br />', $code);
 
             $lines = [];
@@ -275,7 +292,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
         return '';
     }
 
-    private function fixCodeMarkup(string $line)
+    private function fixCodeMarkup(string $line): string
     {
         // </span> ending tag from previous line
         $opening = strpos($line, '<span');
@@ -294,14 +311,12 @@ class HtmlErrorRenderer implements ErrorRendererInterface
         return trim($line);
     }
 
-    private function formatFileFromText(string $text)
+    private function formatFileFromText(string $text): string
     {
-        return preg_replace_callback('/in ("|&quot;)?(.+?)\1(?: +(?:on|at))? +line (\d+)/s', function ($match) {
-            return 'in '.$this->formatFile($match[2], $match[3]);
-        }, $text);
+        return preg_replace_callback('/in ("|&quot;)?(.+?)\1(?: +(?:on|at))? +line (\d+)/s', fn ($match) => 'in '.$this->formatFile($match[2], $match[3]), $text);
     }
 
-    private function formatLogMessage(string $message, array $context)
+    private function formatLogMessage(string $message, array $context): string
     {
         if ($context && str_contains($message, '{')) {
             $replacements = [];

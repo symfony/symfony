@@ -62,6 +62,9 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
         $this->context = $context;
     }
 
+    /**
+     * @return void
+     */
     public function setContext(RequestContext $context)
     {
         $this->context = $context;
@@ -98,6 +101,9 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
         return $ret;
     }
 
+    /**
+     * @return void
+     */
     public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider)
     {
         $this->expressionLanguageProviders[] = $provider;

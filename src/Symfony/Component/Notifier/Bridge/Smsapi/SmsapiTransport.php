@@ -30,11 +30,11 @@ final class SmsapiTransport extends AbstractTransport
     protected const HOST = 'api.smsapi.pl';
 
     private string $authToken;
-    private string $from;
+    private string $from = '';
     private bool $fast = false;
     private bool $test = false;
 
-    public function __construct(#[\SensitiveParameter] string $authToken, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(#[\SensitiveParameter] string $authToken, string $from = '', HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->authToken = $authToken;
         $this->from = $from;
@@ -64,14 +64,25 @@ final class SmsapiTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        $dsn = sprintf('smsapi://%s?from=%s', $this->getEndpoint(), $this->from);
+        $dsn = sprintf('smsapi://%s', $this->getEndpoint());
+        $params = [];
+
+        if ('' !== $this->from) {
+            $params['from'] = $this->from;
+        }
 
         if ($this->fast) {
-            $dsn .= sprintf('&fast=%d', (int) $this->fast);
+            $params['fast'] = (int) $this->fast;
         }
 
         if ($this->test) {
-            $dsn .= sprintf('&test=%d', (int) $this->test);
+            $params['test'] = (int) $this->test;
+        }
+
+        $query = http_build_query($params, '', '&');
+
+        if ('' !== $query) {
+            $dsn .= sprintf('?%s', $query);
         }
 
         return $dsn;
@@ -88,20 +99,27 @@ final class SmsapiTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        // default request body
+        $body = [
+            'to' => $message->getPhone(),
+            'message' => $message->getSubject(),
+            'fast' => $this->fast,
+            'format' => 'json',
+            'encoding' => 'utf-8',
+            'test' => $this->test,
+        ];
+
         $from = $message->getFrom() ?: $this->from;
+
+        // if from is not empty add it to request body
+        if ('' !== $from) {
+            $body['from'] = $from;
+        }
 
         $endpoint = sprintf('https://%s/sms.do', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->authToken,
-            'body' => [
-                'from' => $from,
-                'to' => $message->getPhone(),
-                'message' => $message->getSubject(),
-                'fast' => $this->fast,
-                'format' => 'json',
-                'encoding' => 'utf-8',
-                'test' => $this->test,
-            ],
+            'body' => $body,
         ]);
 
         try {

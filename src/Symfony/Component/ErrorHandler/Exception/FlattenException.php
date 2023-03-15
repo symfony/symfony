@@ -36,6 +36,7 @@ class FlattenException
     private string $file;
     private int $line;
     private ?string $asString = null;
+    private array $properties = [];
 
     public static function create(\Exception $exception, int $statusCode = null, array $headers = []): static
     {
@@ -77,6 +78,13 @@ class FlattenException
             $e->setPrevious(static::createFromThrowable($previous));
         }
 
+        if ((new \ReflectionClass($exception::class))->isUserDefined()) {
+            $getProperties = \Closure::bind(fn (\Throwable $e) => get_object_vars($e), null, $exception::class);
+            $properties = $getProperties($exception);
+            unset($properties['message'], $properties['code'], $properties['file'], $properties['line']);
+            $e->properties = $properties;
+        }
+
         return $e;
     }
 
@@ -88,6 +96,7 @@ class FlattenException
                 'message' => $exception->getMessage(),
                 'class' => $exception->getClass(),
                 'trace' => $exception->getTrace(),
+                'properties' => $exception->getProperties(),
             ];
         }
 
@@ -195,9 +204,7 @@ class FlattenException
     public function setMessage(string $message): static
     {
         if (str_contains($message, "@anonymous\0")) {
-            $message = preg_replace_callback('/[a-zA-Z_\x7f-\xff][\\\\a-zA-Z0-9_\x7f-\xff]*+@anonymous\x00.*?\.php(?:0x?|:[0-9]++\$)[0-9a-fA-F]++/', function ($m) {
-                return class_exists($m[0], false) ? (get_parent_class($m[0]) ?: key(class_implements($m[0])) ?: 'class').'@anonymous' : $m[0];
-            }, $message);
+            $message = preg_replace_callback('/[a-zA-Z_\x7f-\xff][\\\\a-zA-Z0-9_\x7f-\xff]*+@anonymous\x00.*?\.php(?:0x?|:[0-9]++\$)[0-9a-fA-F]++/', fn ($m) => class_exists($m[0], false) ? (get_parent_class($m[0]) ?: key(class_implements($m[0])) ?: 'class').'@anonymous' : $m[0], $message);
         }
 
         $this->message = $message;
@@ -221,6 +228,11 @@ class FlattenException
         $this->code = $code;
 
         return $this;
+    }
+
+    public function getProperties(): array
+    {
+        return $this->properties;
     }
 
     public function getPrevious(): ?self

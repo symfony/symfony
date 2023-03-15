@@ -58,9 +58,7 @@ final class GatewayApiTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn(json_encode(['ids' => [42]]));
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $message = new SmsMessage('3333333333', 'Hello!');
 

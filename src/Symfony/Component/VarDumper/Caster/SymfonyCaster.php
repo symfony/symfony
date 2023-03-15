@@ -31,6 +31,9 @@ class SymfonyCaster
         'format' => 'getRequestFormat',
     ];
 
+    /**
+     * @return array
+     */
     public static function castRequest(Request $request, array $a, Stub $stub, bool $isNested)
     {
         $clone = null;
@@ -46,6 +49,9 @@ class SymfonyCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castHttpClient($client, array $a, Stub $stub, bool $isNested)
     {
         $multiKey = sprintf("\0%s\0multi", $client::class);
@@ -56,6 +62,9 @@ class SymfonyCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castHttpClientResponse($response, array $a, Stub $stub, bool $isNested)
     {
         $stub->cut += \count($a);
@@ -68,6 +77,9 @@ class SymfonyCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castLazyObjectState($state, array $a, Stub $stub, bool $isNested)
     {
         if (!$isNested) {
@@ -93,6 +105,9 @@ class SymfonyCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castUuid(Uuid $uuid, array $a, Stub $stub, bool $isNested)
     {
         $a[Caster::PREFIX_VIRTUAL.'toBase58'] = $uuid->toBase58();
@@ -106,6 +121,9 @@ class SymfonyCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castUlid(Ulid $ulid, array $a, Stub $stub, bool $isNested)
     {
         $a[Caster::PREFIX_VIRTUAL.'toBase58'] = $ulid->toBase58();

@@ -30,6 +30,9 @@ interface AuthenticatorFactoryInterface
      */
     public function getKey(): string;
 
+    /**
+     * @return void
+     */
     public function addConfiguration(NodeDefinition $builder);
 
     /**

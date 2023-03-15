@@ -2362,7 +2362,7 @@ final class TestConstraintHashesDoNotCollide extends Constraint
 
 final class TestConstraintHashesDoNotCollideValidator extends ConstraintValidator
 {
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         if (!$value instanceof Entity) {
             throw new \LogicException();

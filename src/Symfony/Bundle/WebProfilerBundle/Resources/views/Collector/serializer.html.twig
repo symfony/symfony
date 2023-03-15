@@ -154,12 +154,12 @@
                     <tbody>
                         {% for item in data %}
                             <tr>
-                                <td>{{ helper.render_data_cell(item, loop.index, cellPrefix) }}</td>
-                                <td>{{ helper.render_context_cell(item, loop.index, cellPrefix) }}</td>
-                                <td>{{ helper.render_normalizer_cell(item, loop.index, cellPrefix) }}</td>
-                                <td>{{ helper.render_encoder_cell(item, loop.index, cellPrefix) }}</td>
-                                <td>{{ helper.render_time_cell(item) }}</td>
-                                <td>{{ helper.render_caller_cell(item, loop.index, cellPrefix) }}</td>
+                                <td>{{ _self.render_data_cell(item, loop.index, cellPrefix) }}</td>
+                                <td>{{ _self.render_context_cell(item, loop.index, cellPrefix) }}</td>
+                                <td>{{ _self.render_normalizer_cell(item, loop.index, cellPrefix) }}</td>
+                                <td>{{ _self.render_encoder_cell(item, loop.index, cellPrefix) }}</td>
+                                <td>{{ _self.render_time_cell(item) }}</td>
+                                <td>{{ _self.render_caller_cell(item, loop.index, cellPrefix) }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -224,11 +224,11 @@
                     <tbody>
                         {% for item in data %}
                             <tr>
-                                <td>{{ helper.render_data_cell(item, loop.index, cellPrefix) }}</td>
-                                <td>{{ helper.render_context_cell(item, loop.index, cellPrefix) }}</td>
-                                <td>{{ helper.render_normalizer_cell(item, loop.index, cellPrefix) }}</td>
-                                <td>{{ helper.render_time_cell(item) }}</td>
-                                <td>{{ helper.render_caller_cell(item, loop.index, cellPrefix) }}</td>
+                                <td>{{ _self.render_data_cell(item, loop.index, cellPrefix) }}</td>
+                                <td>{{ _self.render_context_cell(item, loop.index, cellPrefix) }}</td>
+                                <td>{{ _self.render_normalizer_cell(item, loop.index, cellPrefix) }}</td>
+                                <td>{{ _self.render_time_cell(item) }}</td>
+                                <td>{{ _self.render_caller_cell(item, loop.index, cellPrefix) }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -263,11 +263,11 @@
                     <tbody>
                         {% for item in data %}
                             <tr>
-                                <td>{{ helper.render_data_cell(item, loop.index, cellPrefix) }}</td>
-                                <td>{{ helper.render_context_cell(item, loop.index, cellPrefix) }}</td>
-                                <td>{{ helper.render_encoder_cell(item, loop.index, cellPrefix) }}</td>
-                                <td>{{ helper.render_time_cell(item) }}</td>
-                                <td>{{ helper.render_caller_cell(item, loop.index, cellPrefix) }}</td>
+                                <td>{{ _self.render_data_cell(item, loop.index, cellPrefix) }}</td>
+                                <td>{{ _self.render_context_cell(item, loop.index, cellPrefix) }}</td>
+                                <td>{{ _self.render_encoder_cell(item, loop.index, cellPrefix) }}</td>
+                                <td>{{ _self.render_time_cell(item) }}</td>
+                                <td>{{ _self.render_caller_cell(item, loop.index, cellPrefix) }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>

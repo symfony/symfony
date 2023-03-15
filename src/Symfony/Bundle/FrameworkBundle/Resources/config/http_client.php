@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Http\Client\HttpAsyncClient;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
@@ -49,12 +50,16 @@ return static function (ContainerConfigurator $container) {
 
         ->alias(ClientInterface::class, 'psr18.http_client')
 
-        ->set(\Http\Client\HttpClient::class, HttplugClient::class)
+        ->set('httplug.http_client', HttplugClient::class)
             ->args([
                 service('http_client'),
                 service(ResponseFactoryInterface::class)->ignoreOnInvalid(),
                 service(StreamFactoryInterface::class)->ignoreOnInvalid(),
             ])
+
+        ->alias(HttpAsyncClient::class, 'httplug.http_client')
+        ->alias(\Http\Client\HttpClient::class, 'httplug.http_client')
+            ->deprecate('symfony/framework-bundle', '6.3', 'The "%alias_id%" service is deprecated, use "'.ClientInterface::class.'" instead.')
 
         ->set('http_client.abstract_retry_strategy', GenericRetryStrategy::class)
             ->abstract()

@@ -125,6 +125,30 @@ final class PushoverOptions implements MessageOptionsInterface
     }
 
     /**
+     * @see https://pushover.net/api#priority
+     *
+     * @return $this
+     */
+    public function expire(int $seconds): static
+    {
+        $this->options['expire'] = $seconds;
+
+        return $this;
+    }
+
+    /**
+     * @see https://pushover.net/api#priority
+     *
+     * @return $this
+     */
+    public function retry(int $seconds): static
+    {
+        $this->options['retry'] = $seconds;
+
+        return $this;
+    }
+
+    /**
      * @see https://pushover.net/api#sounds
      *
      * @return $this

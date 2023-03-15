@@ -17,7 +17,15 @@ return static function (ContainerConfigurator $container): void {
     $container->services()
 
         ->set(ImportMapManager::class)
-            ->args([param('kernel.project_dir').'/importmap.php', abstract_arg('provider'), null, abstract_arg('JSPM API URL'), service('filesystem')])
+            ->args([
+                abstract_arg('importmap.php path'),
+                abstract_arg('vendor directory'),
+                abstract_arg('vendor URL'),
+                abstract_arg('provider'),
+                service('http_client')->nullOnInvalid(),
+                abstract_arg('JSPM API URL'),
+                service('filesystem'),
+            ])
 
         ->set(AbstractCommand::class)
             ->abstract()

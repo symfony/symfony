@@ -32,7 +32,7 @@ abstract class AbstractCommand extends Command
     {
         $this
             ->addOption('js-env', 'je', InputOption::VALUE_OPTIONAL, $this->listFromEnumCases(Env::cases()), Env::Production->value)
-            ->addOption('provider', 'p', InputOption::VALUE_OPTIONAL, $this->listFromEnumCases(Provider::cases()), Provider::Jspm->value)
+            ->addOption('provider', 'pr', InputOption::VALUE_OPTIONAL, $this->listFromEnumCases(Provider::cases()), Provider::Jspm->value)
         ;
     }
 

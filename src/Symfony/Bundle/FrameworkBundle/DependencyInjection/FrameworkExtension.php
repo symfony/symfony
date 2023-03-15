@@ -2953,8 +2953,11 @@ class FrameworkExtension extends Extension
 
         $container
             ->getDefinition(ImportMapManager::class)
-            ->replaceArgument(1, Provider::from($config['provider']))
-            ->replaceArgument(3, $config['api'])
+            ->replaceArgument(0, $config['path'])
+            ->replaceArgument(1, $config['vendor_dir'])
+            ->replaceArgument(2, $config['vendor_url'])
+            ->replaceArgument(3, Provider::from($config['provider']))
+            ->replaceArgument(5, $config['api'])
         ;
     }
 

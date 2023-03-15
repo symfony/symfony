@@ -31,16 +31,20 @@ final class ImportMapManager
      */
     private const PACKAGE_PATTERN = '/^(?:https?:\/\/[\w\.-]+\/)?(?:(?<registry>\w+):)?(?<package>(?:@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*)(?:@(?<version>[\w\._-]+))?(?:(?<subpath>\/.*))?$/';
 
+    private HttpClientInterface $apiHttpClient;
     private ?array $importMap = null;
 
     public function __construct(
-        private readonly string $path,
+        private readonly string $path = 'importmap.php',
+        private readonly string $vendorDir = 'public/vendor/',
+        private readonly string $vendorUrl = '/vendor/',
         private readonly Provider $provider = Provider::Jspm,
         private ?HttpClientInterface $httpClient = null,
         private readonly string $api = 'https://api.jspm.io',
         private readonly Filesystem $filesystem = new Filesystem(),
     ) {
-        $this->httpClient ??= ScopingHttpClient::forBaseUri($httpClient ?? HttpClient::create(), $this->api);
+        $this->httpClient ??= HttpClient::create();
+        $this->apiHttpClient = ScopingHttpClient::forBaseUri($this->httpClient, $this->api);
     }
 
     private function loadImportMap(): void
@@ -56,14 +60,18 @@ final class ImportMapManager
     {
         $this->loadImportMap();
 
+        foreach ($this->importMap as $package => $data) {
+            $importmap['imports'][$package] = isset($data['local']) ? $this->vendorUrl.$data['local'] : $data['url'];
+        }
+
         // Use JSON_UNESCAPED_SLASHES | JSON_HEX_TAG to prevent XSS
-        return json_encode($this->importMap, \JSON_THROW_ON_ERROR | \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_HEX_TAG);
+        return json_encode($importmap, \JSON_THROW_ON_ERROR | \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_HEX_TAG);
     }
 
     /**
      * Adds or updates packages.
      *
-     * @param string[] $packages
+     * @param array<string, PackageOptions> $packages
      */
     public function require(array $packages, Env $env = Env::Production, ?Provider $provider = null): void
     {
@@ -88,13 +96,34 @@ final class ImportMapManager
         $this->createImportMap($env, $provider, true, [], []);
     }
 
+    /**
+     * @param array<string, PackageOptions> $require
+     * @param string[] $remove
+     */
     private function createImportMap(Env $env, ?Provider $provider, bool $update, array $require, array $remove): void
     {
         $this->loadImportMap();
 
         $install = [];
-        foreach ($this->importMap['imports'] ?? [] as $url) {
-            if (preg_match(self::PACKAGE_PATTERN, $url, $matches)) {
+
+        foreach ($remove as $packageName) {
+            if (!isset($this->importMap[$packageName])) {
+                continue;
+            }
+
+            $localPath = $this->vendorDir.$this->importMap[$packageName]['local'];
+            if ($this->filesystem->exists($localPath)) {
+                $this->filesystem->remove($localPath);
+            }
+
+            unset($this->importMap[$packageName]);
+        }
+
+        $packages = [];
+        foreach ($this->importMap ?? [] as $name => $data) {
+            $packages[$name] = new PackageOptions((bool) ($data['local'] ?? false), $data['preload'] ?? false);
+
+            if (preg_match(self::PACKAGE_PATTERN, $data['url'], $matches)) {
                 $constraint = ($matches['registry'] ?? null) ? "{$matches['registry']}:{$matches['package']}" : $matches['package'];
 
                 if (!$update && ($matches['version'] ?? null)) {
@@ -105,32 +134,55 @@ final class ImportMapManager
             }
         }
 
-        foreach ($remove as $package) {
-            if (preg_match(self::PACKAGE_PATTERN, $package, $matches)) {
-                unset($install[$package]);
+        foreach ($require as $packageName => $packageOptions) {
+            if (preg_match(self::PACKAGE_PATTERN, $packageName, $matches)) {
+                $install[$matches['package']] = $packageName;
+                $packages[$matches['package']] = $packageOptions;
             }
         }
 
-        foreach ($require as $package) {
-            if (preg_match(self::PACKAGE_PATTERN, $package, $matches)) {
-                $install[$matches['package']] = $package;
+        if ($install) {
+            $json = [
+                'install' => array_values($install),
+                'flattenScope' => true,
+                'provider' => $provider?->value ?? $this->provider->value,
+            ];
+
+            $json['env'] = ['browser', 'module', $env->value];
+
+            $response = $this->apiHttpClient->request('POST', '/generate', [
+                'json' => $json,
+            ]);
+
+            $this->filesystem->mkdir($this->vendorDir);
+            foreach ($response->toArray()['map']['imports'] as $packageName => $url) {
+                $previousPackageData = $this->importMap[$packageName] ?? null;
+                $this->importMap[$packageName] = ['url' => $url];
+
+                if ($packages[$packageName]->download) {
+                    $this->importMap[$packageName]['local'] = sprintf('%s-%s.js', rawurlencode($packageName), hash('xxh128', $url));
+
+                    if (!isset($previousPackageData['local']) || $this->importMap[$packageName]['local'] !== $previousPackageData['local']) {
+                        if (isset($previousPackageData['local']) && $this->filesystem->exists($this->vendorDir.$previousPackageData['local'])) {
+                            $this->filesystem->remove($this->vendorDir.$previousPackageData['local']);
+                        }
+
+                        $this->filesystem->dumpFile(
+                            $this->vendorDir.$this->importMap[$packageName]['local'],
+                            $this->httpClient->request('GET', $url)->getContent()
+                        );
+                    }
+                }
+
+                if ($packages[$packageName]->preload) {
+                    $this->importMap[$packageName]['preload'] = true;
+                }
             }
         }
 
-        $json = [
-            'install' => array_values($install),
-            'flattenScope' => true,
-            'provider' => $provider?->value ?? $this->provider->value,
-        ];
-
-        $json['env'] = ['browser', 'module', $env->value];
-
-        $response = $this->httpClient->request('POST', '/generate', [
-            'json' => $json,
-        ]);
-
-        $this->importMap = $response->toArray()['map'];
-
-        file_put_contents($this->path, sprintf("<?php\n\nreturn %s;\n", VarExporter::export($this->importMap)));
+        $this->filesystem->dumpFile(
+            $this->path,
+            sprintf("<?php\n\nreturn %s;\n", VarExporter::export($this->importMap))
+        );
     }
 }

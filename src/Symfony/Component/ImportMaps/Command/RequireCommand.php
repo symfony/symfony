@@ -15,8 +15,10 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\ImportMaps\Env;
+use Symfony\Component\ImportMaps\PackageOptions;
 use Symfony\Component\ImportMaps\Provider;
 
 /**
@@ -30,12 +32,24 @@ final class RequireCommand extends AbstractCommand
         parent::configure();
 
         $this->addArgument('packages', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'The packages to add');
+        $this->addOption('download', 'd', InputOption::VALUE_NONE, 'Download packages locally');
+        $this->addOption('preload', 'p', InputOption::VALUE_NONE, 'Preload packages');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $packageOptions = new PackageOptions(
+            $input->getOption('download'),
+            $input->getOption('preload')
+        );
+
+        $packages = [];
+        foreach ($input->getArgument('packages') as $package) {
+            $packages[$package] = $packageOptions;
+        }
+
         $this->importMapManager->require(
-            $input->getArgument('packages'),
+            $packages,
             Env::from($input->getOption('js-env')),
             Provider::from($input->getOption('provider')),
         );

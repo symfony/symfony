@@ -42,6 +42,11 @@ final class IsGranted
          * If null, Security\Core's AccessDeniedException will be used.
          */
         public ?int $statusCode = null,
+
+        /**
+         * If set, will add the exception code to thrown exception.
+         */
+        public ?int $exceptionCode = null,
     ) {
     }
 }

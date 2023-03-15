@@ -384,4 +384,50 @@ class IsGrantedAttributeListenerTest extends TestCase
         $listener = new IsGrantedAttributeListener($authChecker, new ExpressionLanguage());
         $listener->onKernelControllerArguments($event);
     }
+
+    public function testHttpExceptionWithExceptionCode()
+    {
+        $this->expectException(HttpException::class);
+        $this->expectExceptionMessage('Exception Code');
+        $this->expectExceptionCode(10010);
+
+        $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $authChecker->expects($this->any())
+            ->method('isGranted')
+            ->willReturn(false);
+
+        $event = new ControllerArgumentsEvent(
+            $this->createMock(HttpKernelInterface::class),
+            [new IsGrantedAttributeMethodsController(), 'exceptionCodeInHttpException'],
+            [],
+            new Request(),
+            null
+        );
+
+        $listener = new IsGrantedAttributeListener($authChecker);
+        $listener->onKernelControllerArguments($event);
+    }
+
+    public function testAccessDeniedExceptionWithExceptionCode()
+    {
+        $this->expectException(AccessDeniedException::class);
+        $this->expectExceptionMessage('Exception Code');
+        $this->expectExceptionCode(10010);
+
+        $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $authChecker->expects($this->any())
+            ->method('isGranted')
+            ->willReturn(false);
+
+        $event = new ControllerArgumentsEvent(
+            $this->createMock(HttpKernelInterface::class),
+            [new IsGrantedAttributeMethodsController(), 'exceptionCodeInAccessDeniedException'],
+            [],
+            new Request(),
+            null
+        );
+
+        $listener = new IsGrantedAttributeListener($authChecker);
+        $listener->onKernelControllerArguments($event);
+    }
 }

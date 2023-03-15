@@ -66,10 +66,10 @@ class IsGrantedAttributeListener implements EventSubscriberInterface
                 $message = $attribute->message ?: sprintf('Access Denied by #[IsGranted(%s)] on controller', $this->getIsGrantedString($attribute));
 
                 if ($statusCode = $attribute->statusCode) {
-                    throw new HttpException($statusCode, $message);
+                    throw new HttpException($statusCode, $message, code: $attribute->exceptionCode ?? 0);
                 }
 
-                $accessDeniedException = new AccessDeniedException($message);
+                $accessDeniedException = new AccessDeniedException($message, code: $attribute->exceptionCode ?? 403);
                 $accessDeniedException->setAttributes($attribute->attribute);
                 $accessDeniedException->setSubject($subject);
 

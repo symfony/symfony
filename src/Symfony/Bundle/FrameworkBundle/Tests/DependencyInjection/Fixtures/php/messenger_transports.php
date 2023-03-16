@@ -25,6 +25,7 @@ $container->loadFromExtension('framework', [
             'failed' => 'in-memory:///',
             'redis' => 'redis://127.0.0.1:6379/messages',
             'beanstalkd' => 'beanstalkd://127.0.0.1:11300',
+            'schedule' => 'schedule://default',
         ],
     ],
 ]);

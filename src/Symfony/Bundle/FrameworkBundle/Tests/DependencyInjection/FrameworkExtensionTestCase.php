@@ -769,6 +769,13 @@ abstract class FrameworkExtensionTestCase extends TestCase
     public function testMessengerServicesRemovedWhenDisabled()
     {
         $container = $this->createContainerFromFile('messenger_disabled');
+        $messengerDefinitions = array_filter(
+            $container->getDefinitions(),
+            static fn ($name) => str_starts_with($name, 'messenger.'),
+            \ARRAY_FILTER_USE_KEY
+        );
+
+        $this->assertEmpty($messengerDefinitions);
         $this->assertFalse($container->hasDefinition('console.command.messenger_consume_messages'));
         $this->assertFalse($container->hasDefinition('console.command.messenger_debug'));
         $this->assertFalse($container->hasDefinition('console.command.messenger_stop_workers'));
@@ -801,14 +808,28 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     public function testMessenger()
     {
-        $container = $this->createContainerFromFile('messenger');
+        $container = $this->createContainerFromFile('messenger', [], true, false);
+        $container->addCompilerPass(new ResolveTaggedIteratorArgumentPass());
+        $container->compile();
+
+        $expectedFactories = [
+            new Reference('scheduler.messenger_transport_factory'),
+            new Reference('messenger.transport.amqp.factory'),
+            new Reference('messenger.transport.redis.factory'),
+            new Reference('messenger.transport.sync.factory'),
+            new Reference('messenger.transport.in_memory.factory'),
+            new Reference('messenger.transport.sqs.factory'),
+            new Reference('messenger.transport.beanstalkd.factory'),
+        ];
+
+        $this->assertTrue($container->hasDefinition('messenger.receiver_locator'));
         $this->assertTrue($container->hasDefinition('console.command.messenger_consume_messages'));
         $this->assertTrue($container->hasAlias('messenger.default_bus'));
         $this->assertTrue($container->getAlias('messenger.default_bus')->isPublic());
-        $this->assertTrue($container->hasDefinition('messenger.transport.amqp.factory'));
-        $this->assertTrue($container->hasDefinition('messenger.transport.redis.factory'));
         $this->assertTrue($container->hasDefinition('messenger.transport_factory'));
         $this->assertSame(TransportFactory::class, $container->getDefinition('messenger.transport_factory')->getClass());
+        $this->assertInstanceOf(TaggedIteratorArgument::class, $container->getDefinition('messenger.transport_factory')->getArgument(0));
+        $this->assertEquals($expectedFactories, $container->getDefinition('messenger.transport_factory')->getArgument(0)->getValues());
         $this->assertTrue($container->hasDefinition('messenger.listener.reset_services'));
         $this->assertSame('messenger.listener.reset_services', (string) $container->getDefinition('console.command.messenger_consume_messages')->getArgument(5));
     }
@@ -825,10 +846,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertFalse($container->hasDefinition('console.command.messenger_consume_messages'));
         $this->assertTrue($container->hasAlias('messenger.default_bus'));
         $this->assertTrue($container->getAlias('messenger.default_bus')->isPublic());
-        $this->assertTrue($container->hasDefinition('messenger.transport.amqp.factory'));
-        $this->assertTrue($container->hasDefinition('messenger.transport.redis.factory'));
         $this->assertTrue($container->hasDefinition('messenger.transport_factory'));
-        $this->assertSame(TransportFactory::class, $container->getDefinition('messenger.transport_factory')->getClass());
         $this->assertFalse($container->hasDefinition('messenger.listener.reset_services'));
     }
 
@@ -953,6 +971,14 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $this->assertTrue($container->hasDefinition('messenger.transport.beanstalkd.factory'));
 
+        $this->assertTrue($container->hasDefinition('messenger.transport.schedule'));
+        $transportFactory = $container->getDefinition('messenger.transport.schedule')->getFactory();
+        $transportArguments = $container->getDefinition('messenger.transport.schedule')->getArguments();
+
+        $this->assertEquals([new Reference('messenger.transport_factory'), 'createTransport'], $transportFactory);
+        $this->assertCount(3, $transportArguments);
+        $this->assertSame('schedule://default', $transportArguments[0]);
+
         $this->assertSame(10, $container->getDefinition('messenger.retry.multiplier_retry_strategy.customised')->getArgument(0));
         $this->assertSame(7, $container->getDefinition('messenger.retry.multiplier_retry_strategy.customised')->getArgument(1));
         $this->assertSame(3, $container->getDefinition('messenger.retry.multiplier_retry_strategy.customised')->getArgument(2));
@@ -966,6 +992,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
             'default' => new Reference('messenger.transport.failed'),
             'failed' => new Reference('messenger.transport.failed'),
             'redis' => new Reference('messenger.transport.failed'),
+            'schedule' => new Reference('messenger.transport.failed'),
         ];
 
         $failureTransportsReferences = array_map(function (ServiceClosureArgument $serviceClosureArgument) {

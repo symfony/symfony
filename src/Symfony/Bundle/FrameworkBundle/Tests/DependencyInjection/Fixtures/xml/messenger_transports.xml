@@ -21,6 +21,7 @@
             <framework:transport name="failed" dsn="in-memory:///" />
             <framework:transport name="redis" dsn="redis://127.0.0.1:6379/messages" />
             <framework:transport name="beanstalkd" dsn="beanstalkd://127.0.0.1:11300" />
+            <framework:transport name="schedule" dsn="schedule://default" />
         </framework:messenger>
     </framework:config>
 </container>

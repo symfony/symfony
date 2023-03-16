@@ -19,6 +19,8 @@ use Symfony\Component\ImportMaps\Env;
 use Symfony\Component\ImportMaps\Provider;
 
 /**
+ * @experimental
+ *
  * @author Kévin Dunglas <kevin@dunglas.dev>
  */
 #[AsCommand(name: 'importmap:update', description: 'Updates all JavaScript packages to their latest versions')]

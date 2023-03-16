@@ -18,6 +18,8 @@ use Symfony\Component\VarExporter\VarExporter;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
+ * @experimental
+ *
  * @author Kévin Dunglas <kevin@dunglas.dev>
  */
 final class ImportMapManager
@@ -60,8 +62,9 @@ final class ImportMapManager
     {
         $this->loadImportMap();
 
+        $importmap = ['imports' => []];
         foreach ($this->importMap as $package => $data) {
-            $importmap['imports'][$package] = isset($data['local']) ? $this->vendorUrl.$data['local'] : $data['url'];
+            $importmap['imports'][$package] = isset($data['digest']) ? $this->vendorUrl.$data['digest'] : $data['url'];
         }
 
         // Use JSON_UNESCAPED_SLASHES | JSON_HEX_TAG to prevent XSS
@@ -103,25 +106,12 @@ final class ImportMapManager
     private function createImportMap(Env $env, ?Provider $provider, bool $update, array $require, array $remove): void
     {
         $this->loadImportMap();
+        $this->removeFromImportMap($remove);
 
         $install = [];
-
-        foreach ($remove as $packageName) {
-            if (!isset($this->importMap[$packageName])) {
-                continue;
-            }
-
-            $localPath = $this->vendorDir.$this->importMap[$packageName]['local'];
-            if ($this->filesystem->exists($localPath)) {
-                $this->filesystem->remove($localPath);
-            }
-
-            unset($this->importMap[$packageName]);
-        }
-
         $packages = [];
         foreach ($this->importMap ?? [] as $name => $data) {
-            $packages[$name] = new PackageOptions((bool) ($data['local'] ?? false), $data['preload'] ?? false);
+            $packages[$name] = new PackageOptions((bool) ($data['digest'] ?? false), $data['preload'] ?? false);
 
             if (preg_match(self::PACKAGE_PATTERN, $data['url'], $matches)) {
                 $constraint = ($matches['registry'] ?? null) ? "{$matches['registry']}:{$matches['package']}" : $matches['package'];
@@ -141,48 +131,79 @@ final class ImportMapManager
             }
         }
 
-        if ($install) {
-            $json = [
-                'install' => array_values($install),
-                'flattenScope' => true,
-                'provider' => $provider?->value ?? $this->provider->value,
-            ];
-
-            $json['env'] = ['browser', 'module', $env->value];
-
-            $response = $this->apiHttpClient->request('POST', '/generate', [
-                'json' => $json,
-            ]);
-
-            $this->filesystem->mkdir($this->vendorDir);
-            foreach ($response->toArray()['map']['imports'] as $packageName => $url) {
-                $previousPackageData = $this->importMap[$packageName] ?? null;
-                $this->importMap[$packageName] = ['url' => $url];
-
-                if ($packages[$packageName]->download) {
-                    $this->importMap[$packageName]['local'] = sprintf('%s-%s.js', rawurlencode($packageName), hash('xxh128', $url));
-
-                    if (!isset($previousPackageData['local']) || $this->importMap[$packageName]['local'] !== $previousPackageData['local']) {
-                        if (isset($previousPackageData['local']) && $this->filesystem->exists($this->vendorDir.$previousPackageData['local'])) {
-                            $this->filesystem->remove($this->vendorDir.$previousPackageData['local']);
-                        }
-
-                        $this->filesystem->dumpFile(
-                            $this->vendorDir.$this->importMap[$packageName]['local'],
-                            $this->httpClient->request('GET', $url)->getContent()
-                        );
-                    }
-                }
-
-                if ($packages[$packageName]->preload) {
-                    $this->importMap[$packageName]['preload'] = true;
-                }
-            }
-        }
+        $this->jspmGenerate($env, $provider, $install, $packages);
 
         $this->filesystem->dumpFile(
             $this->path,
             sprintf("<?php\n\nreturn %s;\n", VarExporter::export($this->importMap))
         );
+    }
+
+    /**
+     * @param string[] $remove
+     */
+    private function removeFromImportMap(array $remove): void {
+        foreach ($remove as $packageName) {
+            if (!isset($this->importMap[$packageName])) {
+                continue;
+            }
+
+            $this->removeIfExists($this->vendorDir.$this->importMap[$packageName]['digest']);
+            unset($this->importMap[$packageName]);
+        }
+    }
+
+    private function jspmGenerate(Env $env, ?Provider $provider, array $install, array $packages): void
+    {
+        if (!$install) {
+            return;
+        }
+
+        $json = [
+            'install' => array_values($install),
+            'flattenScope' => true,
+            'provider' => $provider?->value ?? $this->provider->value,
+        ];
+
+        $json['env'] = ['browser', 'module', $env->value];
+
+        $response = $this->apiHttpClient->request('POST', '/generate', [
+            'json' => $json,
+        ]);
+
+        $this->filesystem->mkdir($this->vendorDir);
+        foreach ($response->toArray()['map']['imports'] as $packageName => $url) {
+            $previousPackageData = $this->importMap[$packageName] ?? null;
+            $this->importMap[$packageName] = ['url' => $url];
+
+            if ($packages[$packageName]->preload) {
+                $this->importMap[$packageName]['preload'] = true;
+            }
+
+            if (!$packages[$packageName]->download) {
+                continue;
+            }
+
+            $this->importMap[$packageName]['digest'] = sprintf('%s-%s.js', $packageName, hash('xxh128', $url));
+            if ($this->importMap[$packageName]['digest'] === ($previousPackageData['digest'] ?? null)) {
+                continue;
+            }
+
+            if (isset($previousPackageData['digest'])) {
+                $this->removeIfExists($this->vendorDir.$previousPackageData['digest']);
+            }
+
+            $this->filesystem->dumpFile(
+                $this->vendorDir.$this->importMap[$packageName]['digest'],
+                $this->httpClient->request('GET', $url)->getContent(),
+            );
+        }
+    }
+
+    private function removeIfExists(string $path): void
+    {
+        if ($this->filesystem->exists($path)) {
+            $this->filesystem->remove($path);
+        }
     }
 }

@@ -12,6 +12,8 @@
 namespace Symfony\Component\ImportMaps;
 
 /**
+ * @experimental
+ *
  * @author Kévin Dunglas <kevin@dunglas.dev>
  */
 final class PackageOptions

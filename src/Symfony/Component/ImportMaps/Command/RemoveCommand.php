@@ -20,6 +20,8 @@ use Symfony\Component\ImportMaps\Env;
 use Symfony\Component\ImportMaps\Provider;
 
 /**
+ * @experimental
+ *
  * @author Kévin Dunglas <kevin@dunglas.dev>
  */
 #[AsCommand(name: 'importmap:remove', description: 'Removes JavaScript packages')]

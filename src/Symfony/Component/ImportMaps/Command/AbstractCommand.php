@@ -18,6 +18,8 @@ use Symfony\Component\ImportMaps\ImportMapManager;
 use Symfony\Component\ImportMaps\Provider;
 
 /**
+ * @experimental
+ *
  * @author Kévin Dunglas <kevin@dunglas.dev>
  */
 abstract class AbstractCommand extends Command

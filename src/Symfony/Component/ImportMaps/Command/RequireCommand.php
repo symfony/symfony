@@ -22,6 +22,8 @@ use Symfony\Component\ImportMaps\PackageOptions;
 use Symfony\Component\ImportMaps\Provider;
 
 /**
+ * @experimental
+ *
  * @author Kévin Dunglas <kevin@dunglas.dev>
  */
 #[AsCommand(name: 'importmap:require', description: 'Requires JavaScript packages')]

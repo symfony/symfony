@@ -40,6 +40,9 @@ final class ImportMapManager
         private readonly string $path = 'importmap.php',
         private readonly string $vendorDir = 'public/vendor/',
         private readonly string $vendorUrl = '/vendor/',
+        private readonly string $javascriptDir = 'javascript/',
+        private readonly string $publicJavascriptDir = 'public/javascript/',
+        private readonly string $javascriptUrl = '/javascript/',
         private readonly Provider $provider = Provider::Jspm,
         private ?HttpClientInterface $httpClient = null,
         private readonly string $api = 'https://api.jspm.io',
@@ -64,11 +67,27 @@ final class ImportMapManager
 
         $importmap = ['imports' => []];
         foreach ($this->importMap as $package => $data) {
-            $importmap['imports'][$package] = isset($data['digest']) ? $this->vendorUrl.$data['digest'] : $data['url'];
+            if (isset($data['url'])) {
+                $importmap['imports'][$package] = isset($data['digest']) ? $this->vendorUrl.$data['digest'] : $data['url'];
+
+                continue;
+            }
+
+            if (isset($data['path'])) {
+                $importmap['imports'][$package] = $this->javascriptUrl.$this->digestName($package, $data['path']);
+            }
         }
 
         // Use JSON_UNESCAPED_SLASHES | JSON_HEX_TAG to prevent XSS
         return json_encode($importmap, \JSON_THROW_ON_ERROR | \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_HEX_TAG);
+    }
+
+    // TODO: find a better name
+    public function getImportMapArray(): array
+    {
+        $this->loadImportMap();
+
+        return $this->importMap;
     }
 
     /**
@@ -111,6 +130,17 @@ final class ImportMapManager
         $install = [];
         $packages = [];
         foreach ($this->importMap ?? [] as $name => $data) {
+            if (isset($data['path'])) {
+                $this->filesystem->mkdir($this->publicJavascriptDir);
+                $this->filesystem->copy($this->javascriptDir.$data['path'], $this->publicJavascriptDir.$this->digestName($name, $data['path']));
+
+                continue;
+            }
+
+            if (!$data['url']) {
+                continue;
+            }
+
             $packages[$name] = new PackageOptions((bool) ($data['digest'] ?? false), $data['preload'] ?? false);
 
             if (preg_match(self::PACKAGE_PATTERN, $data['url'], $matches)) {
@@ -184,7 +214,7 @@ final class ImportMapManager
                 continue;
             }
 
-            $this->importMap[$packageName]['digest'] = sprintf('%s-%s.js', $packageName, hash('xxh128', $url));
+            $this->importMap[$packageName]['digest'] = sprintf('%s.%s.js', $packageName, hash('xxh128', $url));
             if ($this->importMap[$packageName]['digest'] === ($previousPackageData['digest'] ?? null)) {
                 continue;
             }
@@ -205,5 +235,10 @@ final class ImportMapManager
         if ($this->filesystem->exists($path)) {
             $this->filesystem->remove($path);
         }
+    }
+
+    private function digestName(string $package, string $path): string
+    {
+        return sprintf('%s.%s.js', $package, hash('xxh128', file_get_contents($this->javascriptDir.$path)));
     }
 }

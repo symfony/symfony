@@ -11,16 +11,28 @@ use Symfony\Component\ImportMaps\Command\ExportCommand;
 use Symfony\Component\ImportMaps\Command\RemoveCommand;
 use Symfony\Component\ImportMaps\Command\RequireCommand;
 use Symfony\Component\ImportMaps\Command\UpdateCommand;
+use Symfony\Component\ImportMaps\Controller\ImportmapController;
 use Symfony\Component\ImportMaps\ImportMapManager;
 
 return static function (ContainerConfigurator $container): void {
     $container->services()
+
+        ->set(ImportmapController::class)
+            ->args([
+                abstract_arg('javascript directory'),
+                service(ImportMapManager::class),
+                service('filesystem'),
+            ])
+            ->public()
 
         ->set(ImportMapManager::class)
             ->args([
                 abstract_arg('importmap.php path'),
                 abstract_arg('vendor directory'),
                 abstract_arg('vendor URL'),
+                abstract_arg('javascript directory'),
+                abstract_arg('public javascript directory'),
+                abstract_arg('javascript URL'),
                 abstract_arg('provider'),
                 service('http_client')->nullOnInvalid(),
                 abstract_arg('JSPM API URL'),

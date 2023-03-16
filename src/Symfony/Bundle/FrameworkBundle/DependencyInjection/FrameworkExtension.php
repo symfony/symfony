@@ -93,6 +93,7 @@ use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\ImportMaps\Controller\ImportmapController;
 use Symfony\Component\ImportMaps\ImportMapManager;
 use Symfony\Component\ImportMaps\Provider;
 use Symfony\Component\Lock\LockFactory;
@@ -2952,12 +2953,19 @@ class FrameworkExtension extends Extension
         $loader->load('import_maps.php');
 
         $container
+            ->getDefinition(ImportmapController::class)
+            ->replaceArgument(0, $config['javascript_dir']);
+
+        $container
             ->getDefinition(ImportMapManager::class)
             ->replaceArgument(0, $config['path'])
             ->replaceArgument(1, $config['vendor_dir'])
             ->replaceArgument(2, $config['vendor_url'])
-            ->replaceArgument(3, Provider::from($config['provider']))
-            ->replaceArgument(5, $config['api'])
+            ->replaceArgument(3, $config['javascript_dir'])
+            ->replaceArgument(4, $config['public_javascript_dir'])
+            ->replaceArgument(5, $config['javascript_url'])
+            ->replaceArgument(6, Provider::from($config['provider']))
+            ->replaceArgument(8, $config['api'])
         ;
     }
 

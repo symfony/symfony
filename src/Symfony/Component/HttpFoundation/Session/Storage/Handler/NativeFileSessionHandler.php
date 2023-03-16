@@ -45,7 +45,12 @@ class NativeFileSessionHandler extends \SessionHandler
             throw new \RuntimeException(sprintf('Session Storage was not able to create directory "%s".', $baseDir));
         }
 
-        ini_set('session.save_path', $savePath);
-        ini_set('session.save_handler', 'files');
+        if (ini_get('session.save_path') !== $savePath) {
+            ini_set('session.save_path', $savePath);
+        }
+
+        if (ini_get('session.save_handler') !== 'files') {
+            ini_set('session.save_handler', 'files');
+        }
     }
 }

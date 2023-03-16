@@ -369,6 +369,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         $sql = "SELECT $this->idCol, CASE WHEN $this->lifetimeCol IS NULL OR $this->lifetimeCol + $this->timeCol > ? THEN $this->dataCol ELSE NULL END FROM $this->table WHERE $this->idCol IN ($sql)";
         $stmt = $connection->prepare($sql);
         $stmt->bindValue($i = 1, $now, \PDO::PARAM_INT);
+        $ids = $this->encodeIds($ids);
         foreach ($ids as $id) {
             $stmt->bindValue(++$i, $id);
         }
@@ -385,7 +386,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
             if (null === $row[1]) {
                 $expired[] = $row[0];
             } else {
-                yield $row[0] => $this->marshaller->unmarshall(\is_resource($row[1]) ? stream_get_contents($row[1]) : $row[1]);
+                yield $this->decodeIds($row[0]) => $this->marshaller->unmarshall(\is_resource($row[1]) ? stream_get_contents($row[1]) : $row[1]);
             }
         }
 
@@ -411,7 +412,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         $sql = "SELECT 1 FROM $this->table WHERE $this->idCol = :id AND ($this->lifetimeCol IS NULL OR $this->lifetimeCol + $this->timeCol > :time)";
         $stmt = $connection->prepare($sql);
 
-        $stmt->bindValue(':id', $id);
+        $stmt->bindValue(':id', $this->encodeIds($id));
         $stmt->bindValue(':time', time(), \PDO::PARAM_INT);
         $stmt->execute();
 
@@ -452,7 +453,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         $sql = "DELETE FROM $this->table WHERE $this->idCol IN ($sql)";
         try {
             $stmt = $this->getConnection()->prepare($sql);
-            $stmt->execute(array_values($ids));
+            $stmt->execute($this->encodeIds(array_values($ids)));
         } catch (\PDOException $e) {
         }
 
@@ -539,6 +540,8 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         }
 
         foreach ($values as $id => $data) {
+            $id = $this->encodeIds($id);
+
             try {
                 $stmt->execute();
             } catch (\PDOException $e) {
@@ -579,5 +582,15 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         }
 
         return $this->serverVersion;
+    }
+
+    private function encodeIds($ids)
+    {
+        return str_replace("\0tags\0", '0tags0', $ids);
+    }
+
+    private function decodeIds($ids)
+    {
+        return str_replace('0tags0', "\0tags\0", $ids);
     }
 }

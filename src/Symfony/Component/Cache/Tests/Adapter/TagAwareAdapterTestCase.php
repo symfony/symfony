@@ -1,0 +1,310 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Cache\Tests\Adapter;
+
+use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Cache\Adapter\AbstractAdapter;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\Cache\Adapter\TagAwareAdapter;
+use Symfony\Component\Cache\PruneableInterface;
+use Symfony\Component\Cache\Tests\Adapter\AdapterTestCase;
+use Symfony\Component\Cache\Tests\Adapter\TagAwareTestTrait;
+use Symfony\Component\Cache\Tests\Fixtures\PrunableAdapter;
+
+abstract class TagAwareAdapterTestCase extends AdapterTestCase
+{
+    use TagAwareTestTrait;
+
+    abstract protected function createCacheAdapter(): AbstractAdapter;
+
+    public function testPrune()
+    {
+        $cache = new TagAwareAdapter($this->getPruneableMock());
+        $this->assertTrue($cache->prune());
+
+        $cache = new TagAwareAdapter($this->getNonPruneableMock());
+        $this->assertFalse($cache->prune());
+
+        $cache = new TagAwareAdapter($this->getFailingPruneableMock());
+        $this->assertFalse($cache->prune());
+    }
+
+    public function testKnownTagVersionsTtl()
+    {
+        $itemsPool = new FilesystemAdapter('', 10);
+        $tagsPool = new ArrayAdapter();
+
+        $pool = new TagAwareAdapter($itemsPool, $tagsPool, 10);
+
+        $item = $pool->getItem('foo');
+        $item->tag(['baz']);
+        $item->expiresAfter(100);
+
+        $tag = $tagsPool->getItem('baz'.TagAwareAdapter::TAGS_PREFIX);
+        $tagsPool->save($tag->set(10));
+
+        $pool->save($item);
+        $this->assertTrue($pool->getItem('foo')->isHit());
+        $this->assertTrue($pool->getItem('foo')->isHit());
+
+        sleep(20);
+
+        $this->assertTrue($pool->getItem('foo')->isHit());
+
+        sleep(5);
+
+        $this->assertTrue($pool->getItem('foo')->isHit());
+    }
+
+    public function testTagEntryIsCreatedForItemWithoutTags()
+    {
+        $pool = $this->createCachePool();
+
+        $itemKey = 'foo';
+        $item = $pool->getItem($itemKey);
+        $pool->save($item);
+
+        $adapter = $this->createCacheAdapter();
+        $this->assertTrue($adapter->hasItem(TagAwareAdapter::TAGS_PREFIX.$itemKey));
+    }
+
+    public function testHasItemReturnsFalseWhenPoolDoesNotHaveItemTags()
+    {
+        $pool = $this->createCachePool();
+
+        $itemKey = 'foo';
+        $item = $pool->getItem($itemKey);
+        $pool->save($item);
+
+        $anotherPool = $this->createCachePool();
+
+        $adapter = $this->createCacheAdapter();
+        $adapter->deleteItem(TagAwareAdapter::TAGS_PREFIX.$itemKey); // simulate item losing tags pair
+
+        $this->assertFalse($anotherPool->hasItem($itemKey));
+    }
+
+    public function testGetItemReturnsCacheMissWhenPoolDoesNotHaveItemTags()
+    {
+        $pool = $this->createCachePool();
+
+        $itemKey = 'foo';
+        $item = $pool->getItem($itemKey);
+        $pool->save($item);
+
+        $anotherPool = $this->createCachePool();
+
+        $adapter = $this->createCacheAdapter();
+        $adapter->deleteItem(TagAwareAdapter::TAGS_PREFIX.$itemKey); // simulate item losing tags pair
+
+        $item = $anotherPool->getItem($itemKey);
+        $this->assertFalse($item->isHit());
+    }
+
+    public function testHasItemReturnsFalseWhenPoolDoesNotHaveItemAndOnlyHasTags()
+    {
+        $pool = $this->createCachePool();
+
+        $itemKey = 'foo';
+        $item = $pool->getItem($itemKey);
+        $pool->save($item);
+
+        $anotherPool = $this->createCachePool();
+
+        $adapter = $this->createCacheAdapter();
+        $adapter->deleteItem($itemKey); // simulate losing item but keeping tags
+
+        $this->assertFalse($anotherPool->hasItem($itemKey));
+    }
+
+    public function testInvalidateTagsWithArrayAdapter()
+    {
+        $adapter = new TagAwareAdapter(new ArrayAdapter());
+
+        $item = $adapter->getItem('foo');
+
+        $this->assertFalse($item->isHit());
+
+        $item->tag('bar');
+        $item->expiresAfter(100);
+        $adapter->save($item);
+
+        $this->assertTrue($adapter->getItem('foo')->isHit());
+
+        $adapter->invalidateTags(['bar']);
+
+        $this->assertFalse($adapter->getItem('foo')->isHit());
+    }
+
+    public function testGetItemReturnsCacheMissWhenPoolDoesNotHaveItemAndOnlyHasTags()
+    {
+        $pool = $this->createCachePool();
+
+        $itemKey = 'foo';
+        $item = $pool->getItem($itemKey);
+        $pool->save($item);
+
+        $anotherPool = $this->createCachePool();
+
+        $adapter = $this->createCacheAdapter();
+        $adapter->deleteItem($itemKey); // simulate losing item but keeping tags
+
+        $item = $anotherPool->getItem($itemKey);
+        $this->assertFalse($item->isHit());
+    }
+
+    /**
+     * @return PruneableInterface&MockObject
+     */
+    private function getPruneableMock(): PruneableInterface
+    {
+        $pruneable = $this->createMock(PrunableAdapter::class);
+
+        $pruneable
+            ->expects($this->atLeastOnce())
+            ->method('prune')
+            ->willReturn(true);
+
+        return $pruneable;
+    }
+
+    /**
+     * @return PruneableInterface&MockObject
+     */
+    private function getFailingPruneableMock(): PruneableInterface
+    {
+        $pruneable = $this->createMock(PrunableAdapter::class);
+
+        $pruneable
+            ->expects($this->atLeastOnce())
+            ->method('prune')
+            ->willReturn(false);
+
+        return $pruneable;
+    }
+
+    /**
+     * @return AdapterInterface&MockObject
+     */
+    private function getNonPruneableMock(): AdapterInterface
+    {
+        return $this->createMock(AdapterInterface::class);
+    }
+
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testToleranceForStringsAsTagVersionsCase1()
+    {
+        $pool = $this->createCachePool();
+        $adapter = $this->createCacheAdapter();
+
+        $itemKey = 'foo';
+        $tag = $adapter->getItem('bar'.TagAwareAdapter::TAGS_PREFIX);
+        $adapter->save($tag->set("\x00abc\xff"));
+        $item = $pool->getItem($itemKey);
+        $pool->save($item->tag('bar'));
+        $pool->hasItem($itemKey);
+        $pool->getItem($itemKey);
+    }
+
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testToleranceForStringsAsTagVersionsCase2()
+    {
+        $pool = $this->createCachePool();
+        $adapter = $this->createCacheAdapter();
+
+        $itemKey = 'foo';
+        $tag = $adapter->getItem('bar'.TagAwareAdapter::TAGS_PREFIX);
+        $adapter->save($tag->set("\x00abc\xff"));
+        $item = $pool->getItem($itemKey);
+        $pool->save($item->tag('bar'));
+        sleep(100);
+        $pool->getItem($itemKey);
+        $pool->hasItem($itemKey);
+    }
+
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testToleranceForStringsAsTagVersionsCase3()
+    {
+        $pool = $this->createCachePool();
+        $adapter = $this->createCacheAdapter();
+
+        $itemKey = 'foo';
+        $adapter->deleteItem('bar'.TagAwareAdapter::TAGS_PREFIX);
+        $item = $pool->getItem($itemKey);
+        $pool->save($item->tag('bar'));
+        $pool->getItem($itemKey);
+
+        $tag = $adapter->getItem('bar'.TagAwareAdapter::TAGS_PREFIX);
+        $adapter->save($tag->set("\x00abc\xff"));
+
+        $pool->hasItem($itemKey);
+        $pool->getItem($itemKey);
+        sleep(100);
+        $pool->getItem($itemKey);
+        $pool->hasItem($itemKey);
+    }
+
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testToleranceForStringsAsTagVersionsCase4()
+    {
+        $pool = $this->createCachePool();
+        $adapter = $this->createCacheAdapter();
+
+        $itemKey = 'foo';
+        $tag = $adapter->getItem('bar'.TagAwareAdapter::TAGS_PREFIX);
+        $adapter->save($tag->set('abcABC'));
+
+        $item = $pool->getItem($itemKey);
+        $pool->save($item->tag('bar'));
+
+        $tag = $adapter->getItem('bar'.TagAwareAdapter::TAGS_PREFIX);
+        $adapter->save($tag->set('001122'));
+
+        $pool->invalidateTags(['bar']);
+        $pool->getItem($itemKey);
+    }
+
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testToleranceForStringsAsTagVersionsCase5()
+    {
+        $pool = $this->createCachePool();
+        $pool2 = $this->createCachePool();
+        $adapter = $this->createCacheAdapter();
+
+        $itemKey1 = 'foo';
+        $item = $pool->getItem($itemKey1);
+        $pool->save($item->tag('bar'));
+
+        $tag = $adapter->getItem('bar'.TagAwareAdapter::TAGS_PREFIX);
+        $adapter->save($tag->set('abcABC'));
+
+        $itemKey2 = 'baz';
+        $item = $pool2->getItem($itemKey2);
+        $pool2->save($item->tag('bar'));
+        foreach ($pool->getItems([$itemKey1, $itemKey2]) as $item) {
+            // run generator
+        }
+    }
+}

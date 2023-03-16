@@ -153,7 +153,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
         $sql = "SELECT $this->idCol, CASE WHEN $this->lifetimeCol IS NULL OR $this->lifetimeCol + $this->timeCol > ? THEN $this->dataCol ELSE NULL END FROM $this->table WHERE $this->idCol IN (?)";
         $result = $this->conn->executeQuery($sql, [
             $now,
-            $ids,
+            $this->encodeIds($ids),
         ], [
             ParameterType::INTEGER,
             Connection::PARAM_STR_ARRAY,
@@ -163,7 +163,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
             if (null === $row[1]) {
                 $expired[] = $row[0];
             } else {
-                yield $row[0] => $this->marshaller->unmarshall(\is_resource($row[1]) ? stream_get_contents($row[1]) : $row[1]);
+                yield $this->decodeIds($row[0]) => $this->marshaller->unmarshall(\is_resource($row[1]) ? stream_get_contents($row[1]) : $row[1]);
             }
         }
 
@@ -186,7 +186,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
     {
         $sql = "SELECT 1 FROM $this->table WHERE $this->idCol = ? AND ($this->lifetimeCol IS NULL OR $this->lifetimeCol + $this->timeCol > ?)";
         $result = $this->conn->executeQuery($sql, [
-            $id,
+            $this->encodeIds($id),
             time(),
         ], [
             ParameterType::STRING,
@@ -226,7 +226,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
     {
         $sql = "DELETE FROM $this->table WHERE $this->idCol IN (?)";
         try {
-            $this->conn->executeStatement($sql, [array_values($ids)], [Connection::PARAM_STR_ARRAY]);
+            $this->conn->executeStatement($sql, [$this->encodeIds(array_values($ids))], [Connection::PARAM_STR_ARRAY]);
         } catch (TableNotFoundException $e) {
         }
 
@@ -314,6 +314,8 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
         }
 
         foreach ($values as $id => $data) {
+            $id = $this->encodeIds($id);
+
             try {
                 $rowCount = $stmt->executeStatement();
             } catch (TableNotFoundException $e) {
@@ -382,16 +384,21 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
 
     private function addTableToSchema(Schema $schema): void
     {
-        $types = [
-            'mysql' => 'binary',
-            'sqlite' => 'text',
-        ];
-
         $table = $schema->createTable($this->table);
-        $table->addColumn($this->idCol, $types[$this->getPlatformName()] ?? 'string', ['length' => 255]);
+        $table->addColumn($this->idCol, 'string', ['length' => 255]);
         $table->addColumn($this->dataCol, 'blob', ['length' => 16777215]);
         $table->addColumn($this->lifetimeCol, 'integer', ['unsigned' => true, 'notnull' => false]);
         $table->addColumn($this->timeCol, 'integer', ['unsigned' => true]);
         $table->setPrimaryKey([$this->idCol]);
+    }
+
+    private function encodeIds($ids)
+    {
+        return str_replace("\0tags\0", '0tags0', $ids);
+    }
+
+    private function decodeIds($ids)
+    {
+        return str_replace('0tags0', "\0tags\0", $ids);
     }
 }

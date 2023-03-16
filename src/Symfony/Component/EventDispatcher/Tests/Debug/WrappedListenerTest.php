@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\Debug\WrappedListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Component\Stopwatch\StopwatchEvent;
 
 class WrappedListenerTest extends TestCase
 {
@@ -41,6 +42,25 @@ class WrappedListenerTest extends TestCase
             [\Closure::fromCallable(['Symfony\Component\EventDispatcher\Tests\Debug\FooListener', 'listenStatic']), 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listenStatic'],
             [\Closure::fromCallable(function () {}), 'closure'],
         ];
+    }
+
+    public function testStopwatchEventIsStoppedWhenListenerThrows()
+    {
+        $stopwatchEvent = $this->createMock(StopwatchEvent::class);
+        $stopwatchEvent->expects(self::once())->method('isStarted')->willReturn(true);
+        $stopwatchEvent->expects(self::once())->method('stop');
+
+        $stopwatch = $this->createStub(Stopwatch::class);
+        $stopwatch->method('start')->willReturn($stopwatchEvent);
+
+        $dispatcher = $this->createStub(EventDispatcherInterface::class);
+
+        $wrappedListener = new WrappedListener(function () { throw new \Exception(); }, null, $stopwatch, $dispatcher);
+
+        try {
+            $wrappedListener(new \stdClass(), 'foo', $dispatcher);
+        } catch (\Exception $ex) {
+        }
     }
 }
 

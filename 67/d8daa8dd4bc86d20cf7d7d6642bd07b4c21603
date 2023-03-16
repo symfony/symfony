@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-15T13:30:23Z
+
+Thanks for working on this.
+I wouldn't deprecate the method (deprecating the auto wiring alias is great)
+
+---------------------------------------------------------------------------
+
+by simonberger at 2023-03-15T13:41:49Z
+
+It was my last iteration step as well. My thought process was, if I deprecate the service meant to use this method I kinda deprecate its right to exist as well and should make that official.
+Maybe an argument to leave it in place is that the method does not hurt enough to compensate the deprecation hassle and removal of the HttpClient interface of this class with the 7.0 release.
+
+My idea is to move the `HttplugClient` away from its superseded psr18 client use to its valuable promise response feature until there is maybe a psr replacement for it (which currently does not look like it will ever happen) or a better semi official implementation.
+I like to change the documentation in this regard as well.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-15T14:54:37Z
+
+> there should be also no HttpClient service deprecation then as this would actually disable injecting httplug with this use case anyway
+
+That's two very different things to me. Removing an autowiring alias just sends a message saying that in the context of symfony apps (where we have some authority), we're discouraging using this interface. On the broader php ecosystem, we don't, and thus we can't.
+
+---------------------------------------------------------------------------
+
+by simonberger at 2023-03-15T14:57:41Z
+
+> > there should be also no HttpClient service deprecation then as this would actually disable injecting httplug with this use case anyway
+>
+> That's two very different things to me. Removing an autowiring alias just sends a message saying that in the context of symfony apps (where we have some authority), we're discouraging using this interface. On the broader php ecosystem, we don't, and thus we can't.
+
+Ok got it, I have to see the remaining use outside of a symfony bundle integration. 👍

@@ -1,0 +1,861 @@
+---------------------------------------------------------------------------
+
+by Guikingone at 2022-07-29T16:40:20Z
+
+Hi 👋🏻
+
+As `SchedulerBundle` and the related PR has been linked, some informations about the related "solutions" and some assertions that you made:
+
+> The existing solutions (https://github.com/symfony/symfony/issues/39719, [2](https://github.com/Cron/Symfony-Bundle), more?) depend on additional software like crond.
+
+Regarding `SchedulerBundle` (and as the PR is just the discussion that trigger the creation of the bundle), it DOES NOT rely on `crond`, `crond` is A way to launch / consume tasks but the main logic behind SchedulerBundle is to be able to consume tasks no matter how you need to, it could be an HTTP call, using the command or just by calling the worker.
+
+> They doesn't allow to set time with precision in seconds.
+
+Actually, it depends, talking about `SchedulerBundle`, you can set an expression via a custom `ExpressionFactory`, if precision like `MonotonicClock` is required, it could be extended when needed, the interface is autoconfigured.
+
+> They require difficult tricks to set not linear periods (like on sunset in Tokyo). They are inefficient with frequent tasks because resources are needed on every run (e.g. Kubernetes [CronJob](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/) runs an entire container).
+
+In the end, running the task via the worker of `Messenger` or via a dedicated worker is quite the same, a ressource is always consumed when you consume a task 🙂
+
+---------------------------------------------------------------------------
+
+by upyx at 2022-07-30T05:12:14Z
+
+Nice to meet you, @Guikingone :wave:
+
+I've mentioned `SchedulerBundle` because it's an awesome tool for cron like schedules, and it's a good for requests&tasks based applications (which are the most widespread... perhaps :slightly_smiling_face: )
+
+> Regarding SchedulerBundle (...), it DOES NOT rely on crond, crond is A way to launch / consume tasks ...
+
+But it **[requires](https://github.com/zenstruck/schedule-bundle/blob/master/doc/run-schedule.md) a way** to launch tasks! Without running `ScheduleRunner::__invoke()` it won't work. This PR introduces yet another way to do that with Messenger. It's absolutely legal to use them together :slightly_smiling_face:
+
+e.g.
+
+```php
+class ScheduleFactory {
+    public static function createSchedule(ClockInterface $clock){
+        return new \Symfony\Component\Messenger\Bridge\Scheduler\Transport\Schedule(
+            $clock,
+            PeriodicalJob::infinite('00:00:00', 'PT1M', new EveryMinuteJob()),
+        );
+    }
+}
+```
+
+```php
+#[AsMessageHandler]
+class EveryMinuteHandler {
+    public function __construct(private readonly ScheduleRunner $scheduleRunner) {
+    }
+
+    public function __invoke(EveryMinuteJob $job){
+        ($this->scheduleRunner)();
+    }
+}
+```
+
+> In the end, running the task via the worker of Messenger or via a dedicated worker is quite the same, a ressource is always consumed when you consume a task :slightly_smiling_face:
+
+Yes, it's possible to write some custom worker with `while` loop. But it isn't necessary. The `Messenger`'s `Worker` does a loop, and does it very well (with count and memory limits and other nice features).
+
+**UPDATE**
+I linked wrong bundle. https://github.com/Guikingone/SchedulerBundle already has a necessary command.
+
+---------------------------------------------------------------------------
+
+by upyx at 2022-07-30T05:12:27Z
+
+Nevertheless, there is a **nuance**... Hm... there are few ones :grin:
+
+Why is some Schedule/Cron/Jobs/Tasks/Etc bundle is needed when the crond/cronspec/CronJob/cronetc is already exists? Why do not configure a crontab/CloudSpec/Helm/Etc to run tasks?
+
+The answer is: because it is necessary to control the application's tasks in the application itself, not by infrastructure.
+
+The first nuance is the Messenger is in the application already (no needs to launch anything dependent on time).
+The second one is the `ScheduleTransport` does the most of the ALotOfBundles features by less than 500 lines of code.
+
+---------------------------------------------------------------------------
+
+by ChrisRiddell at 2022-08-02T09:46:08Z
+
+I like this idea, been able to keep the application code together, having all "Schedule/Queue" tasks together helps with maintainability and without needing crond would be a very nice touch to have in some container setups.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-08-03T06:33:41Z
+
+@upyx I like it a lot :)
+
+---------------------------------------------------------------------------
+
+by upyx at 2022-08-03T15:37:14Z
+
+@Guikingone I was cofused with zenstruck's bundle and yours, sorry for that. A broken link in the issue (#39719) supports doing mistakes like that.
+[Guikingone/SchedulerBundle](https://github.com/Guikingone/SchedulerBundle) has the `--wait` option on the `scheduler:consume` command that can be used without any `crond` or so on. However, the other values are still valid.
+
+@fabpot I'll prepare PR for review in few days.
+
+---------------------------------------------------------------------------
+
+by Guikingone at 2022-08-03T15:43:58Z
+
+> @Guikingone I was cofused with zenstruck's bundle and yours, sorry for that. A broken link in the issue (https://github.com/symfony/symfony/issues/39719) supports doing mistakes like that.
+[Guikingone/SchedulerBundle](https://github.com/Guikingone/SchedulerBundle) has the --wait option on the scheduler:consume command that can be used without any crond or so on. However, the other values are still valid.
+
+No problem 😅
+
+I tend to have a pretty different vision of why a scheduler worker is different from a message queue one (in particular when it comes to consuming tasks, handling failure, transports, limits, middleware and so on), in the end, the way the linux scheduler handles tasks is not the same as RabbitMQ or even Kafka but that's a complete separate topic from the current one 🙂
+
+---------------------------------------------------------------------------
+
+by upyx at 2022-08-04T18:15:41Z
+
+Ready for feedback :writing_hand:
+
+Few questions:
+
+ - ~The Bridge directory is not the best place for the component. Where to place it?~
+ - Where to place the `testMessengerScheduler`?
+ - ~I can't choose how to implement configuration of schedules: interfaces, attributes, factories?~
+ - Should I "fix" psalm warnings or can suppress them?
+ - Is it possible to teach fabbot the word "kaz-info-teh"? :rofl:
+
+---------------------------------------------------------------------------
+
+by upyx at 2022-08-04T18:58:50Z
+
+@Guikingone
+
+> I tend to have a pretty different vision of why a scheduler worker is different from a message queue one ...
+
+I understand what you are saying about. Despite much in common, message processing and task scheduling are completely different things. It matters when we design an application that deals with realtime signals like a shooter game or an audio editor. It matters when we plan a distributed application like Telegram. When the only thing that is needed is to create a new table partition every week, I tend to save a few key presses and some space in the vendor directory.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-08-05T05:45:57Z
+
+@upyx Bridges are only helpful when a feature depends on a third-party service/prodiver. Here, that's not the case, so I would move the code to the "core" of the component instead.
+
+---------------------------------------------------------------------------
+
+by upyx at 2022-08-12T13:40:32Z
+
+I have used the new Clock component. How to properly add a dependency of that? `"symfony/clock": "^6.2"`?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-08-12T14:31:07Z
+
+> I have used the new Clock component. How to properly add a dependency of that? `"symfony/clock": "^6.2"`?
+
+You should add it as a `require-dev` dep in the Messenger `composer.json` file.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2022-08-12T14:55:11Z
+
+I didn't fully read the code but I have some concerns if I understand correctly
+
+So there is a message generator that are triggered when wanted
+
+So what does happen when the worker is down while a message should have been dispatched ?
+
+And what does happen when you have N server where the worker is installed? N messages are sent?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-08-12T14:59:07Z
+
+> I didn't fully read the code but I have some concerns if I understand correctly
+>
+> So there is a message generator that are triggered when wanted
+>
+> So what does happen when the worker is down while a message should have been dispatched ?
+>
+> And what does happen when you have N server where the worker is installed? N messages are sent?
+
+I have the same concerns and then some more. All of them would be the same with a new Scheduler/Cron/... component. They do exist and we will address them.
+
+Some thoughts about your 2 concerns:
+
+ * If the server is down, the messages cannot be dispatched, but the same goes for crons (or any other scheduler that you can use that runs on a server).
+ * For the N servers issue, we can use locks (and then, you don't have the down issue anymore).
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2022-08-12T15:01:51Z
+
+It would be nice to have built in lock support to get HA out of the box. I imagine a simple configuration option where you put the lock provider id.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-08-12T15:02:09Z
+
+I'm preparing some changes on top of this PR to make it possible to add more features (like locks, multi-server support, ...).
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2022-08-12T15:03:35Z
+
+👍🏼 awesome
+
+I like this feature!
+
+---------------------------------------------------------------------------
+
+by upyx at 2022-08-12T15:22:35Z
+
+> So what does happen when the worker is down while a message should have been dispatched ?
+
+The message won't be dispatched in that case. At first, I did a cache for `$lastTick` to dispatch "skipped" messages, but then removed it. It more close to cron-like logic.
+
+>
+> And what does happen when you have N server where the worker is installed? N messages are sent?
+
+Yes, N messaages are sent. They works separatelly.
+
+---------------------------------------------------------------------------
+
+by upyx at 2022-08-12T15:26:57Z
+
+> I'm preparing some changes on top of this PR to make it possible to add more features (like locks, multi-server support, ...).
+
+OMG I'm too :) I have hoped to do it bit by bit.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-08-12T15:34:03Z
+
+> > I'm preparing some changes on top of this PR to make it possible to add more features (like locks, multi-server support, ...).
+>
+> OMG I'm too :) I have hoped to do it bit by bit.
+
+Ok, I will stop for now. Here are 2 commits that I think should be included: https://github.com/upyx/symfony/compare/messenger-scheduler-transport...fabpot:symfony:messenger-scheduler-transport?expand=1
+
+The first one allows controlling if the message should be handled immediately or resent to the bus so that it can be handled like any other message. That allows having one consumer that only does the scheduling and is not slowed down by the actual message handling (which can be done by another consumer).
+
+The second commit introduces a TriggerInterface and kills the `ScheduledMessageInterface` interface in favor of a `ScheduledMessage`. That gives more flexibility on configuration (think locks for instance).
+
+---------------------------------------------------------------------------
+
+by upyx at 2022-08-12T15:43:43Z
+
+@fabpot
+Would you like to make one PR with all the things?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-08-12T15:49:36Z
+
+> @fabpot Would you like to make one PR with all the things?
+
+Feel free to steal my code :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-08-29T06:40:45Z
+
+@upyx Are you still working on this? No pressure of course but I'd like to get this feature in 6.2 if possible. For your information, code freeze is 3/4 weeks away, and as we will need quite a few rounds of reviews, we should probably move forward in the coming couple of weeks. Tell me if you need help.
+
+---------------------------------------------------------------------------
+
+by upyx at 2022-08-29T12:19:00Z
+
+@fabpot Yes, I'm in progress. I'll do my best.
+
+---------------------------------------------------------------------------
+
+by upyx at 2022-09-16T14:24:14Z
+
+@fabpot I'm sorry for the delay. The things that look simple at first become challenging when trying to cover edge cases. I'm afraid I've stepped in the wrong direction. The main benefit of the component was simplicity, but... you can see.
+
+UPD
+I simplified it as much as I could. So the Design block is changed.
+I realised that making a composition of schedules was a bad idea.
+
+### The Challenge
+
+- Save progress between restarts.
+- Share progress between servers.
+- Avoid race between workers.
+- Keep configuration simple.
+- Make extension simple and flexible.
+- Still cheerful :)
+
+I've changed many things in an attempt to achieve all of them. And it is not finished yet.
+
+### Design
+
+- The `ScheduleConfig` - a simple class to let users provide their schedules' configuration.
+- The `ScheduleLocatorInterface` - the interface that users should implement to provide their schedules' configs. It extends the PSR's container, so it is easy to combine with DI. When many locators are provided, the `ChainScheduleLocator` composes them together.
+- The `ProgressInterface` and the `Progress` - uses `Clock`, `Lock` and `Cache` to keep progress and do HA magic. It is created by the `ProgressFactory` with options from a Messenger's config. If basic flexibility is not enough, users could create their own implementations of `ProgressInterface` and `ProgressFactoryInterface`.
+- The `Schedule` and `ScheduleInterface` - a main part that provides scheduled messages. It is not intended to be changed by users.
+- The `TriggerInterface` - triggers contain logic when messages should be emit.
+
+### Design (_OUTDATED_ for history and ideas)
+
+`Schedule` was split into three parts: a new `Schedule`, `Progress`, and `Scheduler`.
+
+- The new `ScheduleInterface` - a "passive" one, that returns the next record for the given "moment" of the timeline. The `ScheduleRecord` has time, priority and a message. Users are free to use predefined implementations of the `ScheduleInterface` or create their own ones as many times as they need.
+- The `CompositeSchedule` - the key implementation that composes scheduled messages. Internally, it utilizes the `SplHeap` to keep implementation simple and performant.
+- The `ScheduleLocatorInterface` - the interface that users should implement to provide their schedules. It extends the PSR's container, so it is easy to combine with DI. When many locators are provided, the `ChainScheduleLocator` composes them together.
+- The `ProgressInterface` and the `Progress` - uses `Clock`, `Lock` and `Cache` to keep progress and do HA magic. It is created by the `ProgressFactory` with options from a Messenger's config. If basic flexibility is not enough, users could create their own implementations of `ProgressInterface` and `ProgressFactoryInterface`.
+- The `Scheduler` - an "active" part of transport that keeps `Progress` and calls a `Schedule`. It is not intended to be changed by users.
+
+### Usage
+
+Updated the PR description.
+
+### Questions
+
+~There are two options: to use triggers and a single schedule or to use composite schedules. I tend to the second one. However, I haven't converted triggers to schedules yet. What is your opinion?~
+
+~What is the best way to provide caches and locks to `ProgressFactory`?~
+
+~I have replaced `ScheduledMessageWrapperHandler` with `RedispatchScheduledMessageMiddleware` because it is closer to the original Messenger's design. Nonetheless, it looks useless. I'd rather create different schedules and run them separately instead of transferring messages from one place to another. Shall we remove it?~
+
+I removed the `ScheduledMessageWrapperHandler`. After a few months of production use, we realized that deferring long-running jobs makes things even worse. It's easy to create a couple of schedules and run them independently to prevent blocking jobs.
+
+I feel the names of classes are not clear. Have you any ideas on how to improve them?
+
+It started to look complicated. What do you think about deleting a few features?
+
+---------------------------------------------------------------------------
+
+by upyx at 2022-09-16T14:53:43Z
+
+@lyrixx
+> It would be nice to have built in lock support to get HA out of the box. I imagine a simple configuration option where you put the lock provider id.
+
+Well. I did something like that.
+
+```yaml
+framework:
+  cache:
+    default_redis_provider: '%env(REDIS_DSN)%'
+  lock:
+    redis: '%env(REDIS_DSN)%'
+  messenger:
+    transports:
+      cron:
+        dsn: 'schedule://default'
+        options:
+          cache: 'cache.redis'
+          lock: 'redis'
+```
+
+Is that what you meant?
+
+---------------------------------------------------------------------------
+
+by upyx at 2022-09-19T18:30:40Z
+
+@fabpot It works.
+
+Waiting for feedback.
+
+I will add more tests with parallel workers later.
+
+---------------------------------------------------------------------------
+
+by upyx at 2023-01-04T09:21:19Z
+
+@fabpot it's ready for feedback. I hope it will be merged to 6.3.
+
+---------------------------------------------------------------------------
+
+by upyx at 2023-01-05T22:39:54Z
+
+> Now that the implementation is composed of many classes, I'm wondering if we should create a new Scheduler component that would depend on Messenger? We could have shorter namespaces, Lock/Clock/... as "real" dependencies, and better discoverability. That would also avoid "polluting" the Transport sub-namespace as most classes are not about the transport itself. WDYT?
+
+Agreed. At first, I did it like a bridge, but it should be a separate component. What about names? `Schedule` vs `Scheduler`?
+
+https://www.askdifference.com/schedule-vs-scheduler/
+
+However, I'm wondering about development strategy. The first benefits of PR were tiny size and simplicity... but I loved to write code :smile: With the HA feature, it became complicated and... well featured. With a [cron rules parser](https://github.com/dragonmantank/cron-expression) it would cover almost all use cases which I can imagine.
+
+And there is a good full-featured bundle already: https://github.com/Guikingone/SchedulerBundle Do we still need a component like that in-house?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-01-06T13:08:16Z
+
+> > Now that the implementation is composed of many classes, I'm wondering if we should create a new Scheduler component that would depend on Messenger? We could have shorter namespaces, Lock/Clock/... as "real" dependencies, and better discoverability. That would also avoid "polluting" the Transport sub-namespace as most classes are not about the transport itself. WDYT?
+>
+> Agreed. At first, I did it like a bridge, but it should be a separate component. What about names? `Schedule` vs `Scheduler`?
+>
+> https://www.askdifference.com/schedule-vs-scheduler/
+>
+
+I'd use Scheduler.
+
+> However, I'm wondering about development strategy. The first benefits of PR were tiny size and simplicity... but I loved to write code smile With the HA feature, it became complicated and... well featured. With a [cron rules parser](https://github.com/dragonmantank/cron-expression) it would cover almost all use cases which I can imagine.
+>
+> And there is a good full-featured bundle already: https://github.com/Guikingone/SchedulerBundle Do we still need a component like that in-house?
+
+Having more than one choice is always good. Here, the approach is very different from what already exists, and as such, I think it deserves to be its own component. Maybe we will add more features over time, maybe not. We will see how it goes.
+
+---------------------------------------------------------------------------
+
+by upyx at 2023-01-07T06:25:07Z
+
+>... We will see how it goes.
+
+:+1:
+It's my favorite strategy :smile:
+
+I've extracted a component. It isn't a standalone component but provides a `Transport` for the Messenger Component. Hence, it configures in the `transport` section of the `messenger`. I doubt that I did the integration with the Messenger Component and the Framework Bundle correctly.
+
+---------------------------------------------------------------------------
+
+by upyx at 2023-01-07T23:53:31Z
+
+> I like the new SimpleProgress class that can be decorated. If you think this is the right direction, can you finish the transition? I suppose that SimpleProgress will become the new main Progress class.
+
+Yep, decorators are beautiful and shiny. However, they have issues too:
+
+- performance, the `Progress` is used in quite a hot loop,
+- order, think how a scheduler should work with a lock but without shared state (in cache)?
+
+As a compromise, I restricted the `LockProgressDecorator` to work over base progress only. Another variant is not using decorators.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-01-21T20:09:58Z
+
+@upyx I've just pushed 2 commits: one that leverage attributes (like done elsewhere in the framework). The second one renames one class/interface to avoid confusion. Please tell me what you think about these changes. I will have more changes. But let's first wait for your validation here.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-01-22T10:27:19Z
+
+The last commit introduces `ScheduledMessage` to get rid of the `[Trigger, object]` convention.
+It also renames some classes to make things hopefully clearer (some names are probably going to change again, naming is hard).
+
+---------------------------------------------------------------------------
+
+by upyx at 2023-01-23T11:03:50Z
+
+> @upyx I've just pushed 2 commits: one that leverage attributes (like done elsewhere in the framework). The second one renames one class/interface to avoid confusion. Please tell me what you think about these changes. I will have more changes. But let's first wait for your validation here.
+
+Thanks! I think renaming `Schedule` to `MessageGenerator` is good idea. Shall we rename the `ScheduleTransport` to `SchedulerTransport` (with "r")? There is still a confusion between "schedule" and "schedule config". Can we use only one of them?
+
+We have deleted [ScheduledMessage](https://github.com/symfony/symfony/pull/47112/commits/13bafd5e9a5ae35eafed8710d92e9be142572a18#diff-eba543b40939cfdbc47f1cdbff5ca96c9c39ba000456b1dd792f7d4d06a9ea2b
+) structure and [AsSchedule](https://github.com/symfony/symfony/pull/47112/commits/0f10d31736429269cf2da6f146aa0d56b65d1b54#diff-0fded5c297533675d26fc84355c84b66fcc4b8684e4a131c022c58daf22fb120
+) attribute by a reason. But actually... I don't remember what the reason it was :rofl:
+
+I understand why you reverted locator to attributes. Nevertheless, I'd prefer to use a locator _internally_ to make using the Scheduler outside the Symfony Framework easier. Simple iterators make the factory iterate over all schedules, even unused. It can be costly, because schedules can be provided by anything, even API calls.
+
+Schedules with the same names should not be merged but forbidden, because it's easy to make a mistake.
+
+Personally, I don't like `ScheduledMessage`. It doesn't help, because it is always wrapped by an iterator, hence it's better to use an iterator type like `ScheduleConfig`. The `ScheduledMessage` adds boilerplate code (`new ScheduledMessage(...)`) to a configuration. And what is the "name" field used for?
+
+For comparison. Example of configuration with `ScheduledMessage`:
+
+```php
+use Symfony\Component\Scheduler\Attribute\AsSchedule;
+use Symfony\Component\Scheduler\Trigger\PeriodicalTrigger as T;
+
+#[AsSchedule('default')]
+class ScheduledMessageProvider implements ScheduledMessageProviderInterface
+{
+    public function getScheduledMessages(): iterable
+    {
+        // Name is empty, I haven't found where it is used.
+        $sm = fn($t, $m) => new ScheduledMessage('', $t, $m);
+
+        yield $sm(T::create('PT1H', '00:00'), new Job());
+        yield $sm(T::create('PT1H', '00:05'), new Job());
+        yield $sm(T::create('PT1H', '00:15'), new Job());
+    }
+}
+```
+
+It returns the `iterable` type. It makes to create every `ScheduledMessage` or some "local" factory.
+
+Example with typed iterator `ScheduleConfig`:
+
+```php
+use Symfony\Component\Scheduler\Attribute\AsSchedule;
+use Symfony\Component\Scheduler\Trigger\PeriodicalTrigger as T;
+
+#[AsSchedule('default')]
+class DefaultScheduleConfig implements ScheduleConfigProviderInterface
+{
+    public function getSchedule(): ScheduleConfig
+    {
+        return (new ScheduleConfig())
+            ->add(T::create('PT1H', '00:00'), new Job())
+            ->add(T::create('PT1H', '00:05'), new Job())
+            ->add(T::create('PT1H', '00:15'), new Job())
+        ;
+    }
+}
+```
+
+It returns the specific `ScheduleConfig` type. It uses simple chain calls.
+
+IMO, the second example is better. It might be even better after renaming `ScheduleConfig` to `Schedule` or `AsSchedule` to `AsScheduleConfig` for uniformity.
+
+We can use `ScheduledMessage`s internally in the `ScheduleConfig`, but it seems useless.
+
+> naming is hard
+
+Sure. The hardest part of developing :slightly_smiling_face:  Thank you for helping with it!
+
+---------------------------------------------------------------------------
+
+by upyx at 2023-01-31T12:50:18Z
+
+@fabpot hi :wave:
+Are you still in progress? Could you describe what changes you are making? Maybe I can help?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-02-18T15:35:06Z
+
+I have difficulty finding time to move forward here, but I've pushed another big chunk of changes.
+
+The biggest change is the addition of a `scheduler.yaml` where one can configure the scheduler. I'm now automatically adding the messenger transports, so all configuration is done in this new file and the fact that we're using Messenger is now an implementation detail (people still need to understand that they need to use messenger:consume to run the scheduler, but that's all). That makes things easier to understand and decouples things a bit more, allowing for greater future configuration extensibility.
+
+The other big change is simplifying the wiring by using the built-in DI features more (the compiler pass, for instance, is no longer needed).
+
+I've also merged all State classes back into one class (as done before) as I agree with you that having decorators that can only be used in one way is suboptimal. I've done it also because I've made Lock and Cache hard dependencies of the component. I think it makes sense to require them, especially as we have good defaults for all platforms out there.
+
+I will try to do the next iteration soon.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-02-18T15:42:44Z
+
+Here is a configuration example:
+
+```yaml
+framework:
+    scheduler:
+        schedulers:
+            default: ~
+
+            dynamic-schedule:
+                cache: 'cache.app' # this is the cache pool name
+                lock:
+                    resource: 'default' # This is the lock factory name
+                    ttl: 60
+                    auto_release: true
+```
+
+---------------------------------------------------------------------------
+
+by upyx at 2023-02-18T17:24:55Z
+
+> I have difficulty finding time to move forward here
+
+Let me help you :slightly_smiling_face:
+
+> The biggest change is the addition of a scheduler.yaml where one can configure the scheduler.
+
+You did it! And I :+1:  it a lot. I'm sure it will pay off in the long run.
+
+> they need to use messenger:consume to run the scheduler
+
+It's possible to configure a different bus that won't conflict with the default one. Then we can create a special command to run schedules.
+
+> I've made Lock and Cache hard dependencies
+
+Are you sure it's a good idea? There are many use cases where mutex or even saving progress between restarts aren't necessary. I'd rather add two implementations of State: with and without dependencies.
+
+> I will try to do the next iteration soon.
+
+:heart:
+
+FYI
+Previously, I wondered a lot about separate configurations. The short term benefits of using it as "just transport" are:
+
+1. Simple customization of dispatching.
+2. Reusing handlers to run them sync and async by Messenger's routes
+3. Simple extention by decorators.
+
+However, hiding the Messenger as an implementation detail has much more profit.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-02-24T08:44:15Z
+
+I've renamed `ScheduledMessage` to `RecurringMessage` which is more accurate. That made me realize that `OnceTrigger` should not exist (as we cannot guarantee that a single trigger will be triggered -- the consumer might be down just when the trigger would have happened; this is a use case better suited for Messenger itself).
+
+---------------------------------------------------------------------------
+
+by upyx at 2023-02-24T15:21:35Z
+
+> OnceTrigger should not exist
+
+So let's delete it. It is not very useful. I've added it to provide some simple example of the `TriggerInterface` implementation.
+
+> we cannot guarantee that a single trigger will be triggered
+
+Actually can. Trigger implements the logical points where messages are sent, not recieved. Handler recieved the messages that were sent since previous run. The point of previous run can be saved in memory (and lost on restarts) or in some external storage. So all the messages which were scheduled will be handler, sooner or later. For example, 3 messages are handled:
+
+```mermaid
+%%{init: { 'gitGraph': {'mainBranchName': 'timeline'}} }%%
+gitGraph
+  commit id: "previous run" type: HIGHLIGHT
+  commit id: "once trigger time"
+  commit id: "recurring trigger time1"
+  commit id: "recurring trigger time2"
+  commit id: "current run" type: HIGHLIGHT
+```
+
+To make the messages are recieved as frequently as sent, the Messenger Bus must be processed not less often then "sending" messages are scheduled, and the "previous run" point must not be saved in external storage. It's default behavior of Messenger.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-02-24T16:59:36Z
+
+I've added a `CronExpressionTrigger` and some shortcuts on `RecurringMessage` (many more can be added of course). So, you can do:
+
+```php
+yield (new RecurringMessage('every-minute', new SomeJob()))->everyMinute();
+```
+
+I've also tweaked the transport to use `yield Envelope::wrap($message, [new ScheduledStamp()])` to allow yielding envelopes instead of pure objects:
+
+```php
+$e = new Envelope(new SomeJob(), [
+    new BusNameStamp('somewhere'),
+    new HandlerArgumentsStamp(['foo', 'bar']),
+]);
+
+yield new RecurringMessage('every-second', $e, ...);
+```
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-02-25T17:14:50Z
+
+@upyx Regarding the `OnceTrigger` trigger, I was more thinking about when the consumer is down when the date of the trigger happens.
+So, you run the consumer for a while, you shut it down, the trigger date happens, then you run the consumer again. The message will never be sent, right? We don't "rewind" the clock to catch up with the "lost" messages.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-02-25T17:34:30Z
+
+Actually, if I understand the code correctly, it DOES catch up with the old messages. but I think it should be optional. If we want to be similar to cron, the default would be to not catch up.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-02-25T17:58:41Z
+
+I've removed the name for `RecurringMessage`.
+
+---------------------------------------------------------------------------
+
+by upyx at 2023-02-26T12:42:02Z
+
+> Actually, if I understand the code correctly, it DOES catch up with the old messages. but I think it should be optional. If we want to be similar to cron, the default would be to not catch up.
+
+Yes, it's optional and disabled by default. The `cache` option can be used to enable it, and it's the only thing a cache is used for.
+
+It should be a way to use `Scheduler` with `Lock` but without `Cache`.
+
+> If we want to be similar to cron...
+
+Do we want?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-03-05T10:23:18Z
+
+My last iteration:
+
+ * I've renamed `TriggerInterface::nextTo()` tp `TriggerInterface::getNextRunDate()`, which is what CronExpression uses.
+ * I've introduced a `Schedule` class that wraps `RecurringMessage` instances to ease usage without the full-stack framework and gives an entry point for more configuration (see next)
+ * I've removed the configuration in `scheduler.yaml`. Now, we can configure everything in a Schedule, which makes it easy to use the Scheduler without Symfony full stack.
+ * `State` instances (now `Checkpoint`) are now created internally to avoid leaking how things work internally
+ * Cache is now an optional dependency and not used by default
+ * I've added a generic `CallbackTrigger` class
+ * I've re-introduced a generic (in Messenger) `RedispatchMessage` class with its handler. I think this is crucial when dealing with "tasks" that take a lot of time (we don't want the scheduler to be waiting and allow the tasks to be handled via another transport/worker).
+
+Here is a usage example that does not use Messenger at all:
+
+```php
+<?php
+
+$cache = new FilesystemAdapter('scheduler', 3600, __DIR__.'/scheduler-cache');
+$lockFactory = new LockFactory(new InMemoryStore());
+
+$message = new SomeJob('every second simple');
+$recurringMessage = (new RecurringMessage($message))
+    ->every('1 second')
+;
+$schedule = (new Schedule())
+    ->add($recurringMessage)
+    ->lock($lockFactory->createLock('simple-schedule', 600, true))
+    ->stateful($cache)
+;
+
+$messageGenerator = new MessageGenerator('simple', $schedule);
+
+$handler = new SomeHandler();
+while (true) {
+    $ran = false;
+    foreach ($messageGenerator->getMessages() as $message) {
+        $handler($message);
+        $ran = true;
+    }
+
+    if (!$ran) {
+        sleep(1);
+    }
+}
+```
+
+If using Messenger, you can define the transport to avoid the message being handled synchronously when triggered:
+
+```php
+#[AsSchedule(name: 'some-schedule')]
+class ScheduleProvider implements ScheduleableInterface
+{
+    public function __construct(
+        private CacheInterface $cache,
+        private LockFactory $lockFactory,
+    ) {
+    }
+
+    public function getSchedule(): Schedule
+    {
+        $message = new SomeJob('every second simple');
+
+        // Message can be a Messenger Envelope if needed
+        $envelope = new Envelope($message, [
+            new HandlerArgumentsStamp(['foo', 'bar']),
+        ]);
+
+        $recurringMessage = (new RecurringMessage($envelope))
+            ->every('1 second')
+            // send the message to the async transport instead of handling it synchronously
+            ->transport('async')
+        ;
+
+        return (new Schedule())
+            ->add($recurringMessage)
+            // avoid having more than one concurrent worker running this schedule
+            ->lock($this->lockFactory->createLock('simple-schedule', 600, true))
+            // catch up if the consumer if down for some time
+            ->stateful($this->cache)
+        ;
+    }
+}
+```
+
+I think I'm done for now.
+
+---------------------------------------------------------------------------
+
+by upyx at 2023-03-10T18:17:04Z
+
+There are many things were broken...
+
+---------------------------------------------------------------------------
+
+by upyx at 2023-03-10T19:56:17Z
+
+@fabpot I've taken a look at your code.
+
+> * I've introduced a `Schedule` class that wraps `RecurringMessage` instances to ease usage without the full-stack framework and gives an entry point for more configuration (see next)
+
+Yes! You got the point :+1:
+
+> * `State` instances (now `Checkpoint`) are now created internally to avoid leaking how things work internally
+
+I like a new name. `CheckpointInterface` is a good extension point that can help to implement different locking/caching strategies. It's an advanced topic. If you'd like to restrict it, the "internal" mark can be used. There is no need to sacrifice a design for hiding how things work. An object's composition should be created in a factory rather than in objects' constructors.
+
+> * Cache is now an optional dependency and not used by default
+
+But Lock? The `Checkpoint` class is the only place where it is optionally needed. I have been using a "message generator transport" in production without locking for two years. It works well.
+
+There was a commit (I can restore it from history) where both cache and lock are optional.
+
+> * I've re-introduced a generic (in Messenger) `RedispatchMessage` class with its handler. I think this is crucial when dealing with "tasks" that take a lot of time (we don't want the scheduler to be waiting and allow the tasks to be handled via another transport/worker).
+
+Have I said that I have a bitter experience with it? My team did it at once. We thought that it was a good idea too. But asynchronous processing of messages doesn't work faster (but a bit slower). So if it is "too long", a queue grows and gets stuck. First, we added more workers which process the queue in parallel. But then we realised that we could just run more workers to process the "schedule" directly!
+
+Generated messages are already "received" from some "chrono queue". To process messages in parallel, you just need to run workers (schedule workers) in parallel.
+
+And "redispatching" is useless, because Messenger's worker dispatches all messages through a bus, and the `NonSendableStampInterface` prevents them from being sent to a queue. We can just remove the mark to have the same effect.
+
+>
+> Here is a usage example that does not use Messenger at all:
+>
+> ```
+> <?php
+>
+> $cache = new FilesystemAdapter('scheduler', 3600, __DIR__.'/scheduler-cache');
+> $lockFactory = new LockFactory(new InMemoryStore());
+>
+> $message = new SomeJob('every second simple');
+> $recurringMessage = (new RecurringMessage($message))
+>     ->every('1 second')
+> ;
+> $schedule = (new Schedule())
+>     ->add($recurringMessage)
+>     ->lock($lockFactory->createLock('simple-schedule', 600, true))
+>     ->stateful($cache)
+> ;
+>
+> $messageGenerator = new MessageGenerator('simple', $schedule);
+>
+> $handler = new SomeHandler();
+> while (true) {
+>     $ran = false;
+>     foreach ($messageGenerator->getMessages() as $message) {
+>         $handler($message);
+>         $ran = true;
+>     }
+>
+>     if (!$ran) {
+>         sleep(1);
+>     }
+> }
+> ```
+>
+
+Almost perfect!
+
+The only exception are `RecurringMessage`'s helpers. I'd rather make `RecurringMessage` immutable with static factories, because it's hardly possible to call `everyMinute` and `everyHour` on the same object... and if I do it, how would it work? It confuses.
+
+And about `CronExpressionTrigger`... It is not better than `PeriodicalTrigger`, so helpers should use an internal trigger and not rely on external dependencies.
+
+> If using Messenger, you can define the transport to avoid the message being handled synchronously when triggered:
+
+Yes, it's possible to handle generated messages asynchronously. But it is pointless... Believe me, please.
+
+> I think I'm done for now.
+
+Would you like me to make the changes I described?
+
+---------------------------------------------------------------------------
+
+by upyx at 2023-03-10T19:57:36Z
+
+Just for example https://github.com/upyx/symfony/commit/a534c2d26037655fd519cc0d4349816bb664fc8d
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-03-15T12:55:12Z
+
+I've taken everything into account.
+I propose to merge as is to give us plenty of time to get feedback from the community.
+We will still have a few months to change things before removing the experimental flag.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-03-15T13:24:25Z
+
+Let's go 👍🏼
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-03-15T14:06:23Z
+
+Still one issue we need to fix... WIP

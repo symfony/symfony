@@ -41,7 +41,7 @@ class GlobResourceTest extends TestCase
 
         $paths = iterator_to_array($resource);
 
-        $file = $dir.\DIRECTORY_SEPARATOR.'Resource'.\DIRECTORY_SEPARATOR.'ConditionalClass.php';
+        $file = $dir.'/Resource'.\DIRECTORY_SEPARATOR.'ConditionalClass.php';
         $this->assertEquals([$file => $file], $paths);
         $this->assertInstanceOf(\SplFileInfo::class, current($paths));
         $this->assertSame($dir, $resource->getPrefix());

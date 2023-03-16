@@ -56,6 +56,7 @@ FrameworkBundle
 ---------------
 
  * Deprecate the `notifier.logger_notification_listener` service, use the `notifier.notification_logger_listener` service instead
+ * Deprecate the `Http\Client\HttpClient` service, use `Psr\Http\Client\ClientInterface` instead
 
 HttpFoundation
 --------------

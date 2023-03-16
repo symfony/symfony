@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Composer\InstalledVersions;
 use Doctrine\Common\Annotations\Reader;
+use Http\Client\HttpAsyncClient;
 use Http\Client\HttpClient;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use phpDocumentor\Reflection\Types\ContextFactory;
@@ -2369,8 +2370,10 @@ class FrameworkExtension extends Extension
             $container->removeAlias(ClientInterface::class);
         }
 
-        if (!ContainerBuilder::willBeAvailable('php-http/httplug', HttpClient::class, ['symfony/framework-bundle', 'symfony/http-client'])) {
-            $container->removeDefinition(HttpClient::class);
+        if (!$hasHttplug = ContainerBuilder::willBeAvailable('php-http/httplug', HttpAsyncClient::class, ['symfony/framework-bundle', 'symfony/http-client'])) {
+            $container->removeDefinition('httplug.http_client');
+            $container->removeAlias(HttpAsyncClient::class);
+            $container->removeAlias(HttpClient::class);
         }
 
         if ($this->readConfigEnabled('http_client.retry_failed', $container, $retryOptions)) {
@@ -2439,6 +2442,13 @@ class FrameworkExtension extends Extension
                     ->replaceArgument(0, new Reference($name));
 
                 $container->registerAliasForArgument('psr18.'.$name, ClientInterface::class, $name);
+            }
+
+            if ($hasHttplug) {
+                $container->setDefinition('httplug.'.$name, new ChildDefinition('httplug.http_client'))
+                    ->replaceArgument(0, new Reference($name));
+
+                $container->registerAliasForArgument('httplug.'.$name, HttpAsyncClient::class, $name);
             }
         }
 

@@ -18,6 +18,8 @@ CHANGELOG
  * Add `framework.http_cache.skip_response_headers` option
  * Display warmers duration on debug verbosity for `cache:clear` command
  * Add `AbstractController::sendEarlyHints()` to send HTTP Early Hints
+ * Add autowiring aliases for `Http\Client\HttpAsyncClient`
+ * Deprecate the `Http\Client\HttpClient` service, use `Psr\Http\Client\ClientInterface` instead
 
 6.2
 ---

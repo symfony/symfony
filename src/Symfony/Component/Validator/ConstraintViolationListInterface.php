@@ -25,11 +25,15 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
 {
     /**
      * Adds a constraint violation to this list.
+     *
+     * @return void
      */
     public function add(ConstraintViolationInterface $violation);
 
     /**
      * Merges an existing violation list into this list.
+     *
+     * @return void
      */
     public function addAll(self $otherList);
 
@@ -53,6 +57,8 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
      * Sets a violation at a given offset.
      *
      * @param int $offset The violation offset
+     *
+     * @return void
      */
     public function set(int $offset, ConstraintViolationInterface $violation);
 
@@ -60,6 +66,8 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
      * Removes a violation at a given offset.
      *
      * @param int $offset The offset to remove
+     *
+     * @return void
      */
     public function remove(int $offset);
 }

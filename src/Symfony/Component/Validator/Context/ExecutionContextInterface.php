@@ -29,7 +29,7 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
  * When you make another call to the validator, while the validation is in
  * progress, the violations will be isolated from each other:
  *
- *     public function validate(mixed $value, Constraint $constraint)
+ *     public function validate(mixed $value, Constraint $constraint): void
  *     {
  *         $validator = $this->context->getValidator();
  *
@@ -40,7 +40,7 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
  * However, if you want to add the violations to the current context, use the
  * {@link ValidatorInterface::inContext()} method:
  *
- *     public function validate(mixed $value, Constraint $constraint)
+ *     public function validate(mixed $value, Constraint $constraint): void
  *     {
  *         $validator = $this->context->getValidator();
  *
@@ -93,7 +93,7 @@ interface ExecutionContextInterface
      *
      * Useful if you want to validate additional constraints:
      *
-     *     public function validate(mixed $value, Constraint $constraint)
+     *     public function validate(mixed $value, Constraint $constraint): void
      *     {
      *         $validator = $this->context->getValidator();
      *

@@ -56,6 +56,9 @@ class NoSuspiciousCharactersValidator extends ConstraintValidator
     {
     }
 
+    /**
+     * @return void
+     */
     public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof NoSuspiciousCharacters) {

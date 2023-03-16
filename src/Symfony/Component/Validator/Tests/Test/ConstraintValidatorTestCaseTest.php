@@ -55,7 +55,7 @@ class ConstraintValidatorTestCaseTest extends ConstraintValidatorTestCase
 
 class TestCustomValidator extends ConstraintValidator
 {
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         $validator = $this->context
             ->getValidator()

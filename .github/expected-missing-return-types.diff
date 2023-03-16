@@ -255,6 +255,17 @@ index 9d61be61bd..e89985de26 100644
 +    public function createNewToken(PersistentTokenInterface $token): void
      {
          $sql = 'INSERT INTO rememberme_token (class, username, series, value, lastUsed) VALUES (:class, :username, :series, :value, :lastUsed)';
+diff --git a/src/Symfony/Bridge/Doctrine/Validator/Constraints/UniqueEntityValidator.php b/src/Symfony/Bridge/Doctrine/Validator/Constraints/UniqueEntityValidator.php
+index 67575134b6..09a3926120 100644
+--- a/src/Symfony/Bridge/Doctrine/Validator/Constraints/UniqueEntityValidator.php
++++ b/src/Symfony/Bridge/Doctrine/Validator/Constraints/UniqueEntityValidator.php
+@@ -43,5 +43,5 @@ class UniqueEntityValidator extends ConstraintValidator
+      * @throws ConstraintDefinitionException
+      */
+-    public function validate(mixed $entity, Constraint $constraint)
++    public function validate(mixed $entity, Constraint $constraint): void
+     {
+         if (!$constraint instanceof UniqueEntity) {
 diff --git a/src/Symfony/Bridge/Doctrine/Validator/DoctrineInitializer.php b/src/Symfony/Bridge/Doctrine/Validator/DoctrineInitializer.php
 index bf8a5feb9f..e346c8b17c 100644
 --- a/src/Symfony/Bridge/Doctrine/Validator/DoctrineInitializer.php
@@ -637,10 +648,10 @@ index 6e7669a710..27517d34ae 100644
      {
          if (!$container->hasDefinition('test.private_services_locator')) {
 diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/UnusedTagsPass.php b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/UnusedTagsPass.php
-index 169a1c0a69..57f5d7bf3c 100644
+index d846bc6882..21ee26b1f3 100644
 --- a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/UnusedTagsPass.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/UnusedTagsPass.php
-@@ -105,5 +105,5 @@ class UnusedTagsPass implements CompilerPassInterface
+@@ -106,5 +106,5 @@ class UnusedTagsPass implements CompilerPassInterface
       * @return void
       */
 -    public function process(ContainerBuilder $container)
@@ -659,17 +670,17 @@ index bda9ca9515..c0d1f91339 100644
      {
          if (!$container->hasParameter('workflow.has_guard_listeners')) {
 diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
-index 131e9e8c2c..5a3ff18f22 100644
+index 8cb557fb7d..7a7830c7df 100644
 --- a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
-@@ -274,5 +274,5 @@ class FrameworkExtension extends Extension
+@@ -279,5 +279,5 @@ class FrameworkExtension extends Extension
       * @throws LogicException
       */
 -    public function load(array $configs, ContainerBuilder $container)
 +    public function load(array $configs, ContainerBuilder $container): void
      {
          $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));
-@@ -2746,5 +2746,5 @@ class FrameworkExtension extends Extension
+@@ -2812,5 +2812,5 @@ class FrameworkExtension extends Extension
       * @return void
       */
 -    public static function registerRateLimiter(ContainerBuilder $container, string $name, array $limiterConfig)
@@ -988,7 +999,7 @@ index a2c5815e4b..1c9721ccc6 100644
 +    public function addConfiguration(NodeDefinition $builder): void;
  }
 diff --git a/src/Symfony/Bundle/SecurityBundle/DependencyInjection/SecurityExtension.php b/src/Symfony/Bundle/SecurityBundle/DependencyInjection/SecurityExtension.php
-index 41d807d8c0..1d8d25b59d 100644
+index 37978b285f..ca1f5ae517 100644
 --- a/src/Symfony/Bundle/SecurityBundle/DependencyInjection/SecurityExtension.php
 +++ b/src/Symfony/Bundle/SecurityBundle/DependencyInjection/SecurityExtension.php
 @@ -82,5 +82,5 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
@@ -3564,7 +3575,7 @@ index 3f070dcc0c..aa0e5186bf 100644
      {
          foreach ($container->findTaggedServiceIds('auto_alias') as $serviceId => $tags) {
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php b/src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php
-index 48cacd7877..651b72c818 100644
+index 6cb09ccdfe..85380018ce 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php
 @@ -61,5 +61,5 @@ class AutowirePass extends AbstractRecursivePass
@@ -4025,101 +4036,101 @@ index ac67b468c5..bc1e395810 100644
      {
          if (1 > \func_num_args()) {
 diff --git a/src/Symfony/Component/DependencyInjection/ContainerBuilder.php b/src/Symfony/Component/DependencyInjection/ContainerBuilder.php
-index adeba8cfe3..6dc444bd08 100644
+index e920980b28..83a3221b97 100644
 --- a/src/Symfony/Component/DependencyInjection/ContainerBuilder.php
 +++ b/src/Symfony/Component/DependencyInjection/ContainerBuilder.php
-@@ -176,5 +176,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
+@@ -178,5 +178,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
       * @return void
       */
 -    public function setResourceTracking(bool $track)
 +    public function setResourceTracking(bool $track): void
      {
          $this->trackResources = $track;
-@@ -194,5 +194,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
+@@ -196,5 +196,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
       * @return void
       */
 -    public function setProxyInstantiator(InstantiatorInterface $proxyInstantiator)
 +    public function setProxyInstantiator(InstantiatorInterface $proxyInstantiator): void
      {
          $this->proxyInstantiator = $proxyInstantiator;
-@@ -202,5 +202,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
+@@ -204,5 +204,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
       * @return void
       */
 -    public function registerExtension(ExtensionInterface $extension)
 +    public function registerExtension(ExtensionInterface $extension): void
      {
          $this->extensions[$extension->getAlias()] = $extension;
-@@ -484,5 +484,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
+@@ -486,5 +486,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
       * @throws BadMethodCallException When this ContainerBuilder is compiled
       */
 -    public function set(string $id, ?object $service)
 +    public function set(string $id, ?object $service): void
      {
          if ($this->isCompiled() && (isset($this->definitions[$id]) && !$this->definitions[$id]->isSynthetic())) {
-@@ -501,5 +501,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
+@@ -503,5 +503,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
       * @return void
       */
 -    public function removeDefinition(string $id)
 +    public function removeDefinition(string $id): void
      {
          if (isset($this->definitions[$id])) {
-@@ -613,5 +613,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
+@@ -615,5 +615,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
       * @throws BadMethodCallException When this ContainerBuilder is compiled
       */
 -    public function merge(self $container)
 +    public function merge(self $container): void
      {
          if ($this->isCompiled()) {
-@@ -705,5 +705,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
+@@ -707,5 +707,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
       * @return void
       */
 -    public function prependExtensionConfig(string $name, array $config)
 +    public function prependExtensionConfig(string $name, array $config): void
      {
          if (!isset($this->extensionConfigs[$name])) {
-@@ -749,5 +749,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
+@@ -751,5 +751,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
       * @return void
       */
 -    public function compile(bool $resolveEnvPlaceholders = false)
 +    public function compile(bool $resolveEnvPlaceholders = false): void
      {
          $compiler = $this->getCompiler();
-@@ -813,5 +813,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
+@@ -815,5 +815,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
       * @return void
       */
 -    public function addAliases(array $aliases)
 +    public function addAliases(array $aliases): void
      {
          foreach ($aliases as $alias => $id) {
-@@ -827,5 +827,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
+@@ -829,5 +829,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
       * @return void
       */
 -    public function setAliases(array $aliases)
 +    public function setAliases(array $aliases): void
      {
          $this->aliasDefinitions = [];
-@@ -861,5 +861,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
+@@ -863,5 +863,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
       * @return void
       */
 -    public function removeAlias(string $alias)
 +    public function removeAlias(string $alias): void
      {
          if (isset($this->aliasDefinitions[$alias])) {
-@@ -923,5 +923,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
+@@ -925,5 +925,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
       * @return void
       */
 -    public function addDefinitions(array $definitions)
 +    public function addDefinitions(array $definitions): void
      {
          foreach ($definitions as $id => $definition) {
-@@ -937,5 +937,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
+@@ -939,5 +939,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
       * @return void
       */
 -    public function setDefinitions(array $definitions)
 +    public function setDefinitions(array $definitions): void
      {
          $this->definitions = [];
-@@ -1304,5 +1304,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
+@@ -1311,5 +1311,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
       * @return void
       */
 -    public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider)
@@ -7091,7 +7102,7 @@ index 44d8d96d28..43124c0ea0 100644
      {
          unset($this->parameters[$key]);
 diff --git a/src/Symfony/Component/HttpFoundation/Request.php b/src/Symfony/Component/HttpFoundation/Request.php
-index ec2402f221..09703104ea 100644
+index 17eb95829c..9d234147b5 100644
 --- a/src/Symfony/Component/HttpFoundation/Request.php
 +++ b/src/Symfony/Component/HttpFoundation/Request.php
 @@ -267,5 +267,5 @@ class Request
@@ -7101,84 +7112,84 @@ index ec2402f221..09703104ea 100644
 +    public function initialize(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null): void
      {
          $this->request = new InputBag($request);
-@@ -423,5 +423,5 @@ class Request
+@@ -427,5 +427,5 @@ class Request
       * @return void
       */
 -    public static function setFactory(?callable $callable)
 +    public static function setFactory(?callable $callable): void
      {
          self::$requestFactory = $callable;
-@@ -529,5 +529,5 @@ class Request
+@@ -533,5 +533,5 @@ class Request
       * @return void
       */
 -    public function overrideGlobals()
 +    public function overrideGlobals(): void
      {
          $this->server->set('QUERY_STRING', static::normalizeQueryString(http_build_query($this->query->all(), '', '&')));
-@@ -571,5 +571,5 @@ class Request
+@@ -575,5 +575,5 @@ class Request
       * @return void
       */
 -    public static function setTrustedProxies(array $proxies, int $trustedHeaderSet)
 +    public static function setTrustedProxies(array $proxies, int $trustedHeaderSet): void
      {
          self::$trustedProxies = array_reduce($proxies, function ($proxies, $proxy) {
-@@ -614,5 +614,5 @@ class Request
+@@ -618,5 +618,5 @@ class Request
       * @return void
       */
 -    public static function setTrustedHosts(array $hostPatterns)
 +    public static function setTrustedHosts(array $hostPatterns): void
      {
          self::$trustedHostPatterns = array_map(fn ($hostPattern) => sprintf('{%s}i', $hostPattern), $hostPatterns);
-@@ -662,5 +662,5 @@ class Request
+@@ -666,5 +666,5 @@ class Request
       * @return void
       */
 -    public static function enableHttpMethodParameterOverride()
 +    public static function enableHttpMethodParameterOverride(): void
      {
          self::$httpMethodParameterOverride = true;
-@@ -749,5 +749,5 @@ class Request
+@@ -753,5 +753,5 @@ class Request
       * @return void
       */
 -    public function setSession(SessionInterface $session)
 +    public function setSession(SessionInterface $session): void
      {
          $this->session = $session;
-@@ -1172,5 +1172,5 @@ class Request
+@@ -1176,5 +1176,5 @@ class Request
       * @return void
       */
 -    public function setMethod(string $method)
 +    public function setMethod(string $method): void
      {
          $this->method = null;
-@@ -1295,5 +1295,5 @@ class Request
+@@ -1299,5 +1299,5 @@ class Request
       * @return void
       */
 -    public function setFormat(?string $format, string|array $mimeTypes)
 +    public function setFormat(?string $format, string|array $mimeTypes): void
      {
          if (null === static::$formats) {
-@@ -1327,5 +1327,5 @@ class Request
+@@ -1331,5 +1331,5 @@ class Request
       * @return void
       */
 -    public function setRequestFormat(?string $format)
 +    public function setRequestFormat(?string $format): void
      {
          $this->format = $format;
-@@ -1359,5 +1359,5 @@ class Request
+@@ -1363,5 +1363,5 @@ class Request
       * @return void
       */
 -    public function setDefaultLocale(string $locale)
 +    public function setDefaultLocale(string $locale): void
      {
          $this->defaultLocale = $locale;
-@@ -1381,5 +1381,5 @@ class Request
+@@ -1385,5 +1385,5 @@ class Request
       * @return void
       */
 -    public function setLocale(string $locale)
 +    public function setLocale(string $locale): void
      {
          $this->setPhpDefaultLocale($this->locale = $locale);
-@@ -1888,5 +1888,5 @@ class Request
+@@ -1892,5 +1892,5 @@ class Request
       * @return void
       */
 -    protected static function initializeFormats()
@@ -8130,7 +8141,6 @@ index 1924b1ddb0..62c58c8e8b 100644
          $annotatedClasses = [];
 diff --git a/src/Symfony/Component/HttpKernel/DependencyInjection/ControllerArgumentValueResolverPass.php b/src/Symfony/Component/HttpKernel/DependencyInjection/ControllerArgumentValueResolverPass.php
 index dff3e248ae..381db9aa8f 100644
-index 6e00840c7e..8e69c81c23 100644
 --- a/src/Symfony/Component/HttpKernel/DependencyInjection/ControllerArgumentValueResolverPass.php
 +++ b/src/Symfony/Component/HttpKernel/DependencyInjection/ControllerArgumentValueResolverPass.php
 @@ -34,5 +34,5 @@ class ControllerArgumentValueResolverPass implements CompilerPassInterface
@@ -8763,7 +8773,7 @@ index 8de1468ac6..858ef75b57 100644
      {
          $this->collectors[$collector->getName()] = $collector;
 diff --git a/src/Symfony/Component/HttpKernel/Profiler/Profiler.php b/src/Symfony/Component/HttpKernel/Profiler/Profiler.php
-index 5d6fad8fe3..e723e1e445 100644
+index 58508e5b48..2c7f3c06da 100644
 --- a/src/Symfony/Component/HttpKernel/Profiler/Profiler.php
 +++ b/src/Symfony/Component/HttpKernel/Profiler/Profiler.php
 @@ -50,5 +50,5 @@ class Profiler implements ResetInterface
@@ -12032,6 +12042,23 @@ index 3a3da8da82..db923387a5 100644
 +    public function initialize(ExecutionContextInterface $context): void
      {
          $this->context = $context;
+diff --git a/src/Symfony/Component/Validator/ConstraintValidatorInterface.php b/src/Symfony/Component/Validator/ConstraintValidatorInterface.php
+index fe7da2e8f7..61d3632e2a 100644
+--- a/src/Symfony/Component/Validator/ConstraintValidatorInterface.php
++++ b/src/Symfony/Component/Validator/ConstraintValidatorInterface.php
+@@ -24,5 +24,5 @@ interface ConstraintValidatorInterface
+      * @return void
+      */
+-    public function initialize(ExecutionContextInterface $context);
++    public function initialize(ExecutionContextInterface $context): void;
+ 
+     /**
+@@ -31,4 +31,4 @@ interface ConstraintValidatorInterface
+      * @return void
+      */
+-    public function validate(mixed $value, Constraint $constraint);
++    public function validate(mixed $value, Constraint $constraint): void;
+ }
 diff --git a/src/Symfony/Component/Validator/ConstraintViolationList.php b/src/Symfony/Component/Validator/ConstraintViolationList.php
 index 0b98624509..4367f247fc 100644
 --- a/src/Symfony/Component/Validator/ConstraintViolationList.php
@@ -12064,6 +12091,37 @@ index 0b98624509..4367f247fc 100644
 +    public function remove(int $offset): void
      {
          unset($this->violations[$offset]);
+diff --git a/src/Symfony/Component/Validator/ConstraintViolationListInterface.php b/src/Symfony/Component/Validator/ConstraintViolationListInterface.php
+index c6d2f0c306..a3a61916bb 100644
+--- a/src/Symfony/Component/Validator/ConstraintViolationListInterface.php
++++ b/src/Symfony/Component/Validator/ConstraintViolationListInterface.php
+@@ -29,5 +29,5 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
+      * @return void
+      */
+-    public function add(ConstraintViolationInterface $violation);
++    public function add(ConstraintViolationInterface $violation): void;
+ 
+     /**
+@@ -36,5 +36,5 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
+      * @return void
+      */
+-    public function addAll(self $otherList);
++    public function addAll(self $otherList): void;
+ 
+     /**
+@@ -61,5 +61,5 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
+      * @return void
+      */
+-    public function set(int $offset, ConstraintViolationInterface $violation);
++    public function set(int $offset, ConstraintViolationInterface $violation): void;
+ 
+     /**
+@@ -70,4 +70,4 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
+      * @return void
+      */
+-    public function remove(int $offset);
++    public function remove(int $offset): void;
+ }
 diff --git a/src/Symfony/Component/Validator/Constraints/AbstractComparisonValidator.php b/src/Symfony/Component/Validator/Constraints/AbstractComparisonValidator.php
 index 29fd4daa8a..c358e6cc6f 100644
 --- a/src/Symfony/Component/Validator/Constraints/AbstractComparisonValidator.php
@@ -12470,6 +12528,17 @@ index a3f871e339..c6064e8b30 100644
 +    public function validate(mixed $value, Constraint $constraint): void
      {
          if (!$constraint instanceof Luhn) {
+diff --git a/src/Symfony/Component/Validator/Constraints/NoSuspiciousCharactersValidator.php b/src/Symfony/Component/Validator/Constraints/NoSuspiciousCharactersValidator.php
+index 659de93f9e..44b23e1205 100644
+--- a/src/Symfony/Component/Validator/Constraints/NoSuspiciousCharactersValidator.php
++++ b/src/Symfony/Component/Validator/Constraints/NoSuspiciousCharactersValidator.php
+@@ -60,5 +60,5 @@ class NoSuspiciousCharactersValidator extends ConstraintValidator
+      * @return void
+      */
+-    public function validate(mixed $value, Constraint $constraint)
++    public function validate(mixed $value, Constraint $constraint): void
+     {
+         if (!$constraint instanceof NoSuspiciousCharacters) {
 diff --git a/src/Symfony/Component/Validator/Constraints/NotBlankValidator.php b/src/Symfony/Component/Validator/Constraints/NotBlankValidator.php
 index fa6c794c02..f46f38845e 100644
 --- a/src/Symfony/Component/Validator/Constraints/NotBlankValidator.php
@@ -12636,7 +12705,7 @@ index 7c960ffee1..3952a146b0 100644
      {
          if (!$constraint instanceof Valid) {
 diff --git a/src/Symfony/Component/Validator/Context/ExecutionContextInterface.php b/src/Symfony/Component/Validator/Context/ExecutionContextInterface.php
-index 365e0dd05c..81c2698665 100644
+index 305a597665..3b14b2d078 100644
 --- a/src/Symfony/Component/Validator/Context/ExecutionContextInterface.php
 +++ b/src/Symfony/Component/Validator/Context/ExecutionContextInterface.php
 @@ -70,5 +70,5 @@ interface ExecutionContextInterface
@@ -12702,17 +12771,17 @@ index a7eda1457d..28630f205f 100644
      {
          return $this->options;
 diff --git a/src/Symfony/Component/Validator/Mapping/ClassMetadata.php b/src/Symfony/Component/Validator/Mapping/ClassMetadata.php
-index 7909020b4d..51d0c2dd14 100644
+index f5f084f2ed..b0f6545ab0 100644
 --- a/src/Symfony/Component/Validator/Mapping/ClassMetadata.php
 +++ b/src/Symfony/Component/Validator/Mapping/ClassMetadata.php
-@@ -321,5 +321,5 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
+@@ -325,5 +325,5 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
       * @return void
       */
 -    public function mergeConstraints(self $source)
 +    public function mergeConstraints(self $source): void
      {
          if ($source->isGroupSequenceProvider()) {
-@@ -430,5 +430,5 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
+@@ -434,5 +434,5 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
       * @throws GroupDefinitionException
       */
 -    public function setGroupSequenceProvider(bool $active)
@@ -12741,6 +12810,16 @@ index e7389f7b8e..3c07cdc9f7 100644
 +    public function getClassName(): string
      {
          return $this->class;
+diff --git a/src/Symfony/Component/Validator/ObjectInitializerInterface.php b/src/Symfony/Component/Validator/ObjectInitializerInterface.php
+index 629a214a04..10e60dafac 100644
+--- a/src/Symfony/Component/Validator/ObjectInitializerInterface.php
++++ b/src/Symfony/Component/Validator/ObjectInitializerInterface.php
+@@ -26,4 +26,4 @@ interface ObjectInitializerInterface
+      * @return void
+      */
+-    public function initialize(object $object);
++    public function initialize(object $object): void;
+ }
 diff --git a/src/Symfony/Component/Validator/Test/ConstraintValidatorTestCase.php b/src/Symfony/Component/Validator/Test/ConstraintValidatorTestCase.php
 index 9712d35ac1..2a0b248897 100644
 --- a/src/Symfony/Component/Validator/Test/ConstraintValidatorTestCase.php
@@ -12763,6 +12842,16 @@ index 241ce901b5..bde6394ec3 100644
 +    public function reset(): void
      {
          $this->collectedData = [];
+diff --git a/src/Symfony/Component/Validator/Violation/ConstraintViolationBuilderInterface.php b/src/Symfony/Component/Validator/Violation/ConstraintViolationBuilderInterface.php
+index 2c1fa7e306..d116d14556 100644
+--- a/src/Symfony/Component/Validator/Violation/ConstraintViolationBuilderInterface.php
++++ b/src/Symfony/Component/Validator/Violation/ConstraintViolationBuilderInterface.php
+@@ -111,4 +111,4 @@ interface ConstraintViolationBuilderInterface
+      * @return void
+      */
+-    public function addViolation();
++    public function addViolation(): void;
+ }
 diff --git a/src/Symfony/Component/VarDumper/Caster/AmqpCaster.php b/src/Symfony/Component/VarDumper/Caster/AmqpCaster.php
 index 22026f46a7..52b1ef696b 100644
 --- a/src/Symfony/Component/VarDumper/Caster/AmqpCaster.php
@@ -13633,7 +13722,7 @@ index 053a90972b..5876b02373 100644
      {
          if (-1 !== $depth) {
 diff --git a/src/Symfony/Component/VarDumper/Dumper/CliDumper.php b/src/Symfony/Component/VarDumper/Dumper/CliDumper.php
-index f5780a87ed..285e5e5377 100644
+index c3d848ec17..ba28ebcb11 100644
 --- a/src/Symfony/Component/VarDumper/Dumper/CliDumper.php
 +++ b/src/Symfony/Component/VarDumper/Dumper/CliDumper.php
 @@ -90,5 +90,5 @@ class CliDumper extends AbstractDumper
@@ -13678,42 +13767,42 @@ index f5780a87ed..285e5e5377 100644
 +    public function dumpString(Cursor $cursor, string $str, bool $bin, int $cut): void
      {
          $this->dumpKey($cursor);
-@@ -278,5 +278,5 @@ class CliDumper extends AbstractDumper
+@@ -281,5 +281,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    public function enterHash(Cursor $cursor, int $type, string|int|null $class, bool $hasChild)
 +    public function enterHash(Cursor $cursor, int $type, string|int|null $class, bool $hasChild): void
      {
          $this->colors ??= $this->supportsColors();
-@@ -317,5 +317,5 @@ class CliDumper extends AbstractDumper
+@@ -320,5 +320,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    public function leaveHash(Cursor $cursor, int $type, string|int|null $class, bool $hasChild, int $cut)
 +    public function leaveHash(Cursor $cursor, int $type, string|int|null $class, bool $hasChild, int $cut): void
      {
          if (empty($cursor->attr['cut_hash'])) {
-@@ -335,5 +335,5 @@ class CliDumper extends AbstractDumper
+@@ -338,5 +338,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    protected function dumpEllipsis(Cursor $cursor, bool $hasChild, int $cut)
 +    protected function dumpEllipsis(Cursor $cursor, bool $hasChild, int $cut): void
      {
          if ($cut) {
-@@ -353,5 +353,5 @@ class CliDumper extends AbstractDumper
+@@ -356,5 +356,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    protected function dumpKey(Cursor $cursor)
 +    protected function dumpKey(Cursor $cursor): void
      {
          if (null !== $key = $cursor->hashKey) {
-@@ -558,5 +558,5 @@ class CliDumper extends AbstractDumper
+@@ -561,5 +561,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    protected function dumpLine(int $depth, bool $endOfValue = false)
 +    protected function dumpLine(int $depth, bool $endOfValue = false): void
      {
          if ($this->colors) {
-@@ -569,5 +569,5 @@ class CliDumper extends AbstractDumper
+@@ -572,5 +572,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    protected function endValue(Cursor $cursor)

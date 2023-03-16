@@ -2527,16 +2527,18 @@ class FrameworkExtension extends Extension
             }
         }
 
-        $webhookRequestParsers = [
-            MailgunRequestParser::class => 'mailer.webhook.request_parser.mailgun',
-            PostmarkRequestParser::class => 'mailer.webhook.request_parser.postmark',
-        ];
+        if ($webhookEnabled) {
+            $webhookRequestParsers = [
+                MailgunRequestParser::class => 'mailer.webhook.request_parser.mailgun',
+                PostmarkRequestParser::class => 'mailer.webhook.request_parser.postmark',
+            ];
 
-        foreach ($webhookRequestParsers as $class => $service) {
-            $package = substr($service, \strlen('mailer.transport_factory.'));
+            foreach ($webhookRequestParsers as $class => $service) {
+                $package = substr($service, \strlen('mailer.transport_factory.'));
 
-            if (!ContainerBuilder::willBeAvailable(sprintf('symfony/%s-mailer', 'gmail' === $package ? 'google' : $package), $class, ['symfony/framework-bundle', 'symfony/mailer'])) {
-                $container->removeDefinition($service);
+                if (!ContainerBuilder::willBeAvailable(sprintf('symfony/%s-mailer', 'gmail' === $package ? 'google' : $package), $class, ['symfony/framework-bundle', 'symfony/mailer'])) {
+                    $container->removeDefinition($service);
+                }
             }
         }
 

@@ -44,8 +44,7 @@ class AddScheduleMessengerPass implements CompilerPassInterface
                 ->setArguments(['schedule://'.$name, ['transport_name' => $transportName], new Reference('messenger.default_serializer')])
                 ->addTag('messenger.receiver', ['alias' => $transportName])
             ;
-            $container->setDefinition($transportId = 'messenger.transport.'.$transportName, $transportDefinition);
-            $senderAliases[$transportName] = $transportId;
+            $container->setDefinition('messenger.transport.'.$transportName, $transportDefinition);
         }
     }
 }

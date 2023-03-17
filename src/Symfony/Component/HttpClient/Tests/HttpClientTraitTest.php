@@ -70,6 +70,8 @@ class HttpClientTraitTest extends TestCase
             [self::RFC3986_BASE, '/g',            'http://a/g'],
             [self::RFC3986_BASE, '//g',           'http://g/'],
             [self::RFC3986_BASE, '?y',            'http://a/b/c/d;p?y'],
+            [self::RFC3986_BASE, '?y={"f":1}',    'http://a/b/c/d;p?y={%22f%22:1}'],
+            [self::RFC3986_BASE, 'g{oof}y',       'http://a/b/c/g{oof}y'],
             [self::RFC3986_BASE, 'g?y',           'http://a/b/c/g?y'],
             [self::RFC3986_BASE, '#s',            'http://a/b/c/d;p?q#s'],
             [self::RFC3986_BASE, 'g#s',           'http://a/b/c/g#s'],
@@ -154,10 +156,11 @@ class HttpClientTraitTest extends TestCase
         yield [['https:', '//xn--dj-kia8a.example.com:8000', '/', null, null], 'https://DÉjà.Example.com:8000/'];
         yield [[null, null, '/f%20o.o', '?a=b', '#c'], '/f o%2Eo?a=b#c'];
         yield [[null, '//a:b@foo', '/bar', null, null], '//a:b@foo/bar'];
+        yield [[null, '//a:b@foo', '/b{}', null, null], '//a:b@foo/b{}'];
         yield [['http:', null, null, null, null], 'http:'];
         yield [['http:', null, 'bar', null, null], 'http:bar'];
         yield [[null, null, 'bar', '?a=1&c=c', null], 'bar?a=a&b=b', ['b' => null, 'c' => 'c', 'a' => 1]];
-        yield [[null, null, 'bar', '?a=b+c&b=b-._~!$%26/%27()[]*%2B%2C;%3D:@%25\\^`{|}', null], 'bar?a=b+c', ['b' => 'b-._~!$&/\'()[]*+,;=:@%\\^`{|}']];
+        yield [[null, null, 'bar', '?a=b+c&b=b-._~!$%26/%27()[]*%2B%2C;%3D:@%25\\^`%7B|%7D', null], 'bar?a=b+c', ['b' => 'b-._~!$&/\'()[]*+,;=:@%\\^`{|}']];
         yield [[null, null, 'bar', '?a=b%2B%20c', null], 'bar?a=b+c', ['a' => 'b+ c']];
         yield [[null, null, 'bar', '?a[b]=c', null], 'bar', ['a' => ['b' => 'c']]];
         yield [[null, null, 'bar', '?a[b[c]=d', null], 'bar?a[b[c]=d', []];

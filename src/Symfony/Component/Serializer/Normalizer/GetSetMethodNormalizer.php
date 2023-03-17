@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\Serializer\Annotation\Ignore;
+
 /**
  * Converts between objects with getter and setter methods and arrays.
  *
@@ -81,17 +83,12 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
      */
     private function isGetMethod(\ReflectionMethod $method): bool
     {
-        $methodLength = \strlen($method->name);
-
-        return
-            !$method->isStatic() &&
-            (
-                ((str_starts_with($method->name, 'get') && 3 < $methodLength) ||
-                (str_starts_with($method->name, 'is') && 2 < $methodLength) ||
-                (str_starts_with($method->name, 'has') && 3 < $methodLength)) &&
-                0 === $method->getNumberOfRequiredParameters()
-            )
-        ;
+        return !$method->isStatic()
+            && (\PHP_VERSION_ID < 80000 || !$method->getAttributes(Ignore::class))
+            && !$method->getNumberOfRequiredParameters()
+            && ((2 < ($methodLength = \strlen($method->name)) && str_starts_with($method->name, 'is'))
+                || (3 < $methodLength && (str_starts_with($method->name, 'has') || str_starts_with($method->name, 'get')))
+            );
     }
 
     /**

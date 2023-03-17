@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
+use Symfony\Component\Serializer\Annotation\Ignore;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
@@ -430,6 +431,11 @@ class GetSetMethodNormalizerTest extends TestCase
         $this->assertFalse($this->normalizer->supportsNormalization(new ObjectWithJustStaticSetterDummy()));
     }
 
+    public function testNotIgnoredMethodSupport()
+    {
+        $this->assertFalse($this->normalizer->supportsNormalization(new ClassWithIgnoreAttribute()));
+    }
+
     public function testPrivateSetter()
     {
         $obj = $this->normalizer->denormalize(['foo' => 'foobar'], ObjectWithPrivateSetterDummy::class);
@@ -751,5 +757,16 @@ class ObjectWithMagicMethod
     public function __call($key, $value)
     {
         throw new \RuntimeException('__call should not be called. Called with: '.$key);
+    }
+}
+
+class ClassWithIgnoreAttribute
+{
+    public string $foo;
+
+    #[Ignore]
+    public function isSomeIgnoredMethod(): bool
+    {
+        return true;
     }
 }

@@ -52,6 +52,9 @@ final class MessageGenerator implements MessageGeneratorInterface
 
         while (!$heap->isEmpty() && $heap->top()[0] <= $now) {
             /** @var TriggerInterface $trigger */
+            /** @var int $index */
+            /** @var \DateTimeImmutable $time */
+            /** @var object $message */
             [$time, $index, $trigger, $message] = $heap->extract();
             $yield = true;
 

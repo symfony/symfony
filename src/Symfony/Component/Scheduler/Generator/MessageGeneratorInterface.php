@@ -16,5 +16,8 @@ namespace Symfony\Component\Scheduler\Generator;
  */
 interface MessageGeneratorInterface
 {
+    /**
+     * @return iterable<object>
+     */
     public function getMessages(): iterable;
 }

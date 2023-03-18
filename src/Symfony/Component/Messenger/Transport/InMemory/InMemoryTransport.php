@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Messenger\Transport\InMemory;
 
+use Psr\Clock\ClockInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
@@ -46,16 +48,25 @@ class InMemoryTransport implements TransportInterface, ResetInterface
     private array $queue = [];
 
     private int $nextId = 1;
-    private ?SerializerInterface $serializer;
+    private array $availableAt = [];
 
-    public function __construct(SerializerInterface $serializer = null)
-    {
-        $this->serializer = $serializer;
+    public function __construct(
+        private ?SerializerInterface $serializer = null,
+        private ?ClockInterface $clock = null,
+    ) {
     }
 
     public function get(): iterable
     {
-        return array_values($this->decode($this->queue));
+        $envelopes = [];
+        $now = $this->clock?->now() ?? new \DateTimeImmutable();
+        foreach ($this->decode($this->queue) as $id => $envelope) {
+            if (!isset($this->availableAt[$id]) || $now > $this->availableAt[$id]) {
+                $envelopes[] = $envelope;
+            }
+        }
+
+        return $envelopes;
     }
 
     public function ack(Envelope $envelope): void
@@ -66,7 +77,7 @@ class InMemoryTransport implements TransportInterface, ResetInterface
             throw new LogicException('No TransportMessageIdStamp found on the Envelope.');
         }
 
-        unset($this->queue[$transportMessageIdStamp->getId()]);
+        unset($this->queue[$id = $transportMessageIdStamp->getId()], $this->availableAt[$id]);
     }
 
     public function reject(Envelope $envelope): void
@@ -77,7 +88,7 @@ class InMemoryTransport implements TransportInterface, ResetInterface
             throw new LogicException('No TransportMessageIdStamp found on the Envelope.');
         }
 
-        unset($this->queue[$transportMessageIdStamp->getId()]);
+        unset($this->queue[$id = $transportMessageIdStamp->getId()], $this->availableAt[$id]);
     }
 
     public function send(Envelope $envelope): Envelope
@@ -87,6 +98,12 @@ class InMemoryTransport implements TransportInterface, ResetInterface
         $encodedEnvelope = $this->encode($envelope);
         $this->sent[] = $encodedEnvelope;
         $this->queue[$id] = $encodedEnvelope;
+
+        /** @var DelayStamp|null $delayStamp */
+        if ($delayStamp = $envelope->last(DelayStamp::class)) {
+            $now = $this->clock?->now() ?? new \DateTimeImmutable();
+            $this->availableAt[$id] = $now->modify(sprintf('+%d seconds', $delayStamp->getDelay() / 1000));
+        }
 
         return $envelope;
     }

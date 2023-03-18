@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Tests\Transport\InMemory;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\AnEnvelopeStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
@@ -82,6 +83,15 @@ class InMemoryTransportTest extends TestCase
         $this->assertSame([$envelope2], $this->transport->get());
         $this->transport->reject($envelope2);
         $this->assertSame([], $this->transport->get());
+    }
+
+    public function testQueueWithDelay()
+    {
+        $envelope1 = new Envelope(new \stdClass());
+        $envelope1 = $this->transport->send($envelope1);
+        $envelope2 = (new Envelope(new \stdClass()))->with(new DelayStamp(10_000));
+        $envelope2 = $this->transport->send($envelope2);
+        $this->assertSame([$envelope1], $this->transport->get());
     }
 
     public function testQueueWithSerialization()

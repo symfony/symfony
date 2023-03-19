@@ -19,15 +19,15 @@ final class ExcludeTimeTrigger implements TriggerInterface
     public function __construct(
         private readonly TriggerInterface $inner,
         private readonly \DateTimeImmutable $from,
-        private readonly \DateTimeImmutable $to,
+        private readonly \DateTimeImmutable $until,
     ) {
     }
 
     public function getNextRunDate(\DateTimeImmutable $run): ?\DateTimeImmutable
     {
         $nextRun = $this->inner->getNextRunDate($run);
-        if ($nextRun >= $this->from && $nextRun <= $this->to) {
-            return $this->inner->getNextRunDate($this->to);
+        if ($nextRun >= $this->from && $nextRun <= $this->until) {
+            return $this->inner->getNextRunDate($this->until);
         }
 
         return $nextRun;

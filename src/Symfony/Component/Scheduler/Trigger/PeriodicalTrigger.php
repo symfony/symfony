@@ -20,8 +20,8 @@ final class PeriodicalTrigger implements TriggerInterface
 {
     public function __construct(
         private readonly int $intervalInSeconds,
-        private readonly \DateTimeImmutable $firstRun = new \DateTimeImmutable(),
-        private readonly \DateTimeImmutable $priorTo = new \DateTimeImmutable('3000-01-01'),
+        private readonly \DateTimeImmutable $from = new \DateTimeImmutable(),
+        private readonly \DateTimeImmutable $until = new \DateTimeImmutable('3000-01-01'),
     ) {
         if (0 >= $this->intervalInSeconds) {
             throw new InvalidArgumentException('The "$intervalInSeconds" argument must be greater then zero.');
@@ -30,14 +30,14 @@ final class PeriodicalTrigger implements TriggerInterface
 
     public static function create(
         string|int|\DateInterval $interval,
-        string|\DateTimeImmutable $firstRun = new \DateTimeImmutable(),
-        string|\DateTimeImmutable $priorTo = new \DateTimeImmutable('3000-01-01'),
+        string|\DateTimeImmutable $from = new \DateTimeImmutable(),
+        string|\DateTimeImmutable $until = new \DateTimeImmutable('3000-01-01'),
     ): self {
-        if (\is_string($firstRun)) {
-            $firstRun = new \DateTimeImmutable($firstRun);
+        if (\is_string($from)) {
+            $from = new \DateTimeImmutable($from);
         }
-        if (\is_string($priorTo)) {
-            $priorTo = new \DateTimeImmutable($priorTo);
+        if (\is_string($until)) {
+            $until = new \DateTimeImmutable($until);
         }
         if (\is_string($interval)) {
             if ('P' === $interval[0]) {
@@ -50,42 +50,42 @@ final class PeriodicalTrigger implements TriggerInterface
             }
         }
         if (!\is_int($interval)) {
-            $interval = self::calcInterval($firstRun, $firstRun->add($interval));
+            $interval = self::calcInterval($from, $from->add($interval));
         }
 
-        return new self($interval, $firstRun, $priorTo);
+        return new self($interval, $from, $until);
     }
 
     public static function fromPeriod(\DatePeriod $period): self
     {
         $startDate = \DateTimeImmutable::createFromInterface($period->getStartDate());
         $nextDate = $startDate->add($period->getDateInterval());
-        $firstRun = $period->include_start_date ? $startDate : $nextDate;
+        $from = $period->include_start_date ? $startDate : $nextDate;
         $interval = self::calcInterval($startDate, $nextDate);
 
-        $priorTo = $period->getEndDate()
+        $until = $period->getEndDate()
             ? \DateTimeImmutable::createFromInterface($period->getEndDate())
             : $startDate->modify($period->getRecurrences() * $interval.' seconds');
 
-        return new self($interval, $firstRun, $priorTo);
+        return new self($interval, $from, $until);
     }
 
     public function getNextRunDate(\DateTimeImmutable $run): ?\DateTimeImmutable
     {
-        if ($this->firstRun > $run) {
-            return $this->firstRun;
+        if ($this->from > $run) {
+            return $this->from;
         }
-        if ($this->priorTo <= $run) {
+        if ($this->until <= $run) {
             return null;
         }
 
-        $delta = $run->format('U.u') - $this->firstRun->format('U.u');
+        $delta = $run->format('U.u') - $this->from->format('U.u');
         $recurrencesPassed = (int) ($delta / $this->intervalInSeconds);
-        $nextRunTimestamp = ($recurrencesPassed + 1) * $this->intervalInSeconds + $this->firstRun->getTimestamp();
+        $nextRunTimestamp = ($recurrencesPassed + 1) * $this->intervalInSeconds + $this->from->getTimestamp();
         /** @var \DateTimeImmutable $nextRun */
-        $nextRun = \DateTimeImmutable::createFromFormat('U.u', $nextRunTimestamp.$this->firstRun->format('.u'));
+        $nextRun = \DateTimeImmutable::createFromFormat('U.u', $nextRunTimestamp.$this->from->format('.u'));
 
-        return $this->priorTo > $nextRun ? $nextRun : null;
+        return $this->until > $nextRun ? $nextRun : null;
     }
 
     private static function calcInterval(\DateTimeImmutable $from, \DateTimeImmutable $to): int
@@ -105,7 +105,7 @@ final class PeriodicalTrigger implements TriggerInterface
     private static function ensureIntervalSize(string|float $interval): void
     {
         if ($interval > \PHP_INT_MAX) {
-            throw new InvalidArgumentException('The interval for a periodical message is too big. If you need to run it once, use "$priorTo" argument.');
+            throw new InvalidArgumentException('The interval for a periodical message is too big. If you need to run it once, use "$until" argument.');
         }
     }
 }

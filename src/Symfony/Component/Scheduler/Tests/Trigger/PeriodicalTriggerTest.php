@@ -89,22 +89,22 @@ class PeriodicalTriggerTest extends TestCase
 
     public function testConstructors()
     {
-        $firstRun = new \DateTimeImmutable($now = '2222-02-22');
-        $priorTo = new \DateTimeImmutable($farFuture = '3000-01-01');
+        $from = new \DateTimeImmutable($now = '2222-02-22');
+        $until = new \DateTimeImmutable($farFuture = '3000-01-01');
         $day = new \DateInterval('P1D');
 
-        $message = new PeriodicalTrigger(86400, $firstRun, $priorTo);
+        $message = new PeriodicalTrigger(86400, $from, $until);
 
-        $this->assertEquals($message, PeriodicalTrigger::create(86400, $firstRun, $priorTo));
-        $this->assertEquals($message, PeriodicalTrigger::create('86400', $firstRun, $priorTo));
-        $this->assertEquals($message, PeriodicalTrigger::create('P1D', $firstRun, $priorTo));
+        $this->assertEquals($message, PeriodicalTrigger::create(86400, $from, $until));
+        $this->assertEquals($message, PeriodicalTrigger::create('86400', $from, $until));
+        $this->assertEquals($message, PeriodicalTrigger::create('P1D', $from, $until));
         $this->assertEquals($message, PeriodicalTrigger::create($day, $now, $farFuture));
         $this->assertEquals($message, PeriodicalTrigger::create($day, $now));
 
-        $this->assertEquals($message, PeriodicalTrigger::fromPeriod(new \DatePeriod($firstRun, $day, $priorTo)));
-        $this->assertEquals($message, PeriodicalTrigger::fromPeriod(new \DatePeriod($firstRun->sub($day), $day, $priorTo, \DatePeriod::EXCLUDE_START_DATE)));
-        $this->assertEquals($message, PeriodicalTrigger::fromPeriod(new \DatePeriod($firstRun, $day, 284107)));
-        $this->assertEquals($message, PeriodicalTrigger::fromPeriod(new \DatePeriod($firstRun->sub($day), $day, 284108, \DatePeriod::EXCLUDE_START_DATE)));
+        $this->assertEquals($message, PeriodicalTrigger::fromPeriod(new \DatePeriod($from, $day, $until)));
+        $this->assertEquals($message, PeriodicalTrigger::fromPeriod(new \DatePeriod($from->sub($day), $day, $until, \DatePeriod::EXCLUDE_START_DATE)));
+        $this->assertEquals($message, PeriodicalTrigger::fromPeriod(new \DatePeriod($from, $day, 284107)));
+        $this->assertEquals($message, PeriodicalTrigger::fromPeriod(new \DatePeriod($from->sub($day), $day, 284108, \DatePeriod::EXCLUDE_START_DATE)));
     }
 
     public function testTooBigInterval()

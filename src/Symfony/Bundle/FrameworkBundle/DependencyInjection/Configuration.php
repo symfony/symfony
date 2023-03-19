@@ -37,7 +37,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
 use Symfony\Component\RemoteEvent\RemoteEvent;
-use Symfony\Component\Scheduler\Messenger\SchedulerTransportFactory;
+use Symfony\Component\Scheduler\Schedule;
 use Symfony\Component\Semaphore\Semaphore;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
@@ -1614,7 +1614,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('scheduler')
                     ->info('Scheduler configuration')
-                    ->{$enableIfStandalone('symfony/scheduler', SchedulerTransportFactory::class)}()
+                    ->{$enableIfStandalone('symfony/scheduler', Schedule::class)}()
                 ->end()
             ->end()
         ;

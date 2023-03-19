@@ -2015,10 +2015,6 @@ class FrameworkExtension extends Extension
             throw new LogicException('Scheduler support cannot be enabled as the Scheduler component is not installed. Try running "composer require symfony/scheduler".');
         }
 
-        if (!interface_exists(MessageBusInterface::class)) {
-            throw new LogicException('Scheduler support cannot be enabled as the Messenger component is not installed. Try running "composer require symfony/messenger".');
-        }
-
         $loader->load('scheduler.php');
     }
 

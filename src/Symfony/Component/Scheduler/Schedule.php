@@ -12,7 +12,6 @@
 namespace Symfony\Component\Scheduler;
 
 use Symfony\Component\Lock\LockInterface;
-use Symfony\Component\Lock\NoLock;
 use Symfony\Contracts\Cache\CacheInterface;
 
 /**
@@ -46,9 +45,9 @@ final class Schedule implements ScheduleProviderInterface
         return $this;
     }
 
-    public function getLock(): LockInterface
+    public function getLock(): ?LockInterface
     {
-        return $this->lock ?? new NoLock();
+        return $this->lock;
     }
 
     /**

@@ -403,4 +403,22 @@ class FlattenException
 
         return rtrim($message);
     }
+
+    public function __sleep(): array
+    {
+        return [
+            'message',
+            'code',
+            'previous',
+            'trace',
+            'traceAsString',
+            'class',
+            'statusCode',
+            'statusText',
+            'headers',
+            'file',
+            'line',
+            'asString',
+        ];
+    }
 }

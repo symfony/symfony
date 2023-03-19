@@ -24,6 +24,7 @@ use Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTranspor
 use Symfony\Component\Messenger\EventListener\StopWorkerOnCustomStopExceptionListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnRestartSignalListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnSignalsListener;
+use Symfony\Component\Messenger\Handler\RedispatchMessageHandler;
 use Symfony\Component\Messenger\Middleware\AddBusNameStampMiddleware;
 use Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware;
 use Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware;
@@ -219,5 +220,11 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('message bus locator'),
                 service('messenger.default_bus'),
             ])
+
+        ->set('messenger.redispatch_message_handler', RedispatchMessageHandler::class)
+            ->args([
+                service('messenger.default_bus'),
+            ])
+            ->tag('messenger.message_handler')
     ;
 };

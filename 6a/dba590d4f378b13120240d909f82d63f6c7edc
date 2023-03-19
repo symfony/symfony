@@ -1,0 +1,139 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-12-22T16:26:22Z
+
+> I don't really like the extra argument to handle the BC layer because it means we're going to have to deprecate it in 7.1 + remove it in 8.0. Looks like a costly change. But I don't have a better idea other than just changing the behavior on 6.3 without this layer...
+
+I'll take care of this process 😃.
+
+But I am also tempted to change the behavior directly in 6.3. The modification to keep the current behavior is to replace `$parameters->getInt('page')` by `(int) $parameters->get('page')`. This change in user code is compatible with all previous version of Symfony and could be applied as a bugfix in all existing codebase that want to fallback to `0` in case of invalid value.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-10T18:19:35Z
+
+> But I am also tempted to change the behavior directly in 6.3.
+
+I vote for this also. `getInt()` is for ints and the BC layer looks quite costly to me. I'd prefer getting rid of it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-11T09:31:41Z
+
+Dunno it it's a good idea but we could plan the BC break for 7.0 and announce the change with the following:
+
+```php
+try {
+    trigger_deprecation(...);
+    trigger_error('Blahblah');
+} catch (\ErrorException $e) {
+    throw new BadRequestException(...);
+}
+```
+
+By first a deprecation we announce this using the existing channel.
+The trigger_error would then turn into an exception in dev, and a regular non-blocking in prod.
+We would preserve the current behavior in 6.3+ and turn that into a real exception in 7.0.
+
+WDYT?
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-03-11T16:38:02Z
+
+That's very clever. I'll try to implement this solution.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-03-11T17:12:59Z
+
+After reflection by testing the implementation, as a user of this functions I prefer adding a 3rd argument to `getInt` instead of wrapping the  method call with try-catch in order to convert the error (which we are not used to deal with) into the expected exception.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-11T17:14:09Z
+
+Why would you wrap the call?
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-03-11T17:27:12Z
+
+I'm not sure to understand your proposition. Here is code samples from user/developer view.
+
+Currently (<=6.2):
+```php
+$inputs->getInt('invalid'); // returns 0
+```
+
+With deprecation (6.3)
+```php
+$inputs->getInt('invalid'); // returns 0
+// and trigger deprecation + error
+```
+
+Handling deprecation with try-catch (6.3)
+(my understanding of @nicolas-grekas proposition)
+```php
+try {
+    $inputs->getInt('invalid');
+} catch (\ErrorException $e) {
+    throw new BadRequestException($e->getMessage());
+}
+// throw an exception, the developer have to know which one.
+// the deprecation notice is still triggered.
+```
+
+Handling deprecation with 3rd arg (6.3)
+(my first proposition)
+```php
+$inputs->getInt('invalid', 0, true);
+// throw an exception
+```
+
+Target in 7.0
+```php
+$inputs->getInt('invalid', 0);
+// throw an exception
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-11T17:32:30Z
+
+I meant to put the try/catch inside getInt, not outside!
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-03-15T09:39:46Z
+
+Hum, something like this?
+```php
+    public function getInt(string $key, int $default = 0): int
+    {
+        try {
+            return $this->filter(/* ... */);
+        } catch (\UnexpectedValueException|BadRequestException  $e) {
+            trigger_deprecation('symfony/http-foundation', '6.3', '...');
+            trigger_error($e->getMessage());
+
+            return 0;
+        }
+    }
+```
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-03-16T10:54:16Z
+
+Updated. I'm not sure about the `trigger_error`: this introduces a very different behavior on dev vs prod. And I don't know how to test it since `expectError` is deprecated.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-03-16T17:09:09Z
+
+> or better: we (plan to) throw _unless_ FILTER_NULL_ON_FAILURE is explicitly set, and we drop the error_on_failure option
+
+This is a brilliant idea, let me explain it for the readers.
+Historically, `filter_var` returns `false` in case of invalid data. But this is a design problem because you can't tell a false from `FILTER_VALIDATE_BOOLEAN` from a `false` from an invalid value. So `FILTER_NULL_ON_FAILURE` was introduced in PHP 5.2 to allow differentiating errors. So we should always use this flag.
+We will use the absence of this flag to define our default behavior in Symfony 7.0: throw an exception in case of invalid data.

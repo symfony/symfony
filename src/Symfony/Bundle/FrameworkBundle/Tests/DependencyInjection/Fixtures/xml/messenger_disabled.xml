@@ -7,5 +7,6 @@
 
     <framework:config http-method-override="false">
         <framework:messenger enabled="false" />
+        <framework:scheduler enabled="false" />
     </framework:config>
 </container>

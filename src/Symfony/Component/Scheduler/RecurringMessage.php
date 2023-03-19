@@ -13,7 +13,7 @@ namespace Symfony\Component\Scheduler;
 
 use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
 use Symfony\Component\Scheduler\Trigger\CronExpressionTrigger;
-use Symfony\Component\Scheduler\Trigger\PeriodicalTrigger;
+use Symfony\Component\Scheduler\Trigger\DateIntervalTrigger;
 use Symfony\Component\Scheduler\Trigger\TriggerInterface;
 
 /**
@@ -32,13 +32,13 @@ final class RecurringMessage
      *
      * @see https://php.net/datetime.formats.relative
      */
-    public static function every(string $frequency, object $message, \DateTimeImmutable $from = new \DateTimeImmutable(), \DateTimeImmutable $until = new \DateTimeImmutable('3000-01-01')): self
+    public static function every(string $frequency, object $message, string|\DateTimeImmutable $from = new \DateTimeImmutable(), string|\DateTimeImmutable $until = new \DateTimeImmutable('3000-01-01')): self
     {
         if (false === $interval = \DateInterval::createFromDateString($frequency)) {
             throw new InvalidArgumentException(sprintf('Frequency "%s" cannot be parsed.', $frequency));
         }
 
-        return new self(PeriodicalTrigger::create($interval, $from, $until), $message);
+        return new self(new DateIntervalTrigger($interval, $from, $until), $message);
     }
 
     public static function cron(string $expression, object $message): self

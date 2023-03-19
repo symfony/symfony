@@ -28,11 +28,9 @@ return static function (ContainerConfigurator $container): void {
         ->set(ImportMapManager::class)
             ->args([
                 abstract_arg('importmap.php path'),
-                abstract_arg('vendor directory'),
-                abstract_arg('vendor URL'),
-                abstract_arg('javascript directory'),
-                abstract_arg('public javascript directory'),
-                abstract_arg('javascript URL'),
+                abstract_arg('assets directory'),
+                abstract_arg('public assets directory'),
+                abstract_arg('assets URL'),
                 abstract_arg('provider'),
                 service('http_client')->nullOnInvalid(),
                 abstract_arg('JSPM API URL'),

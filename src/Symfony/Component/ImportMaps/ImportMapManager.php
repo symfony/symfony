@@ -38,11 +38,9 @@ final class ImportMapManager
 
     public function __construct(
         private readonly string $path = 'importmap.php',
-        private readonly string $vendorDir = 'public/vendor/',
-        private readonly string $vendorUrl = '/vendor/',
-        private readonly string $javascriptDir = 'javascript/',
-        private readonly string $publicJavascriptDir = 'public/javascript/',
-        private readonly string $javascriptUrl = '/javascript/',
+        private readonly string $assetsDir = 'assets/',
+        private readonly string $publicAssetsDir = 'public/assets/',
+        private readonly string $assetsUrl = '/assets/',
         private readonly Provider $provider = Provider::Jspm,
         private ?HttpClientInterface $httpClient = null,
         private readonly string $api = 'https://api.jspm.io',
@@ -66,15 +64,21 @@ final class ImportMapManager
         $this->loadImportMap();
 
         $importmap = ['imports' => []];
-        foreach ($this->importMap as $package => $data) {
+        foreach ($this->importMap as $packageName => $data) {
             if (isset($data['url'])) {
-                $importmap['imports'][$package] = isset($data['digest']) ? $this->vendorUrl.$data['digest'] : $data['url'];
+                if ($data['download'] ?? false) {
+                    $importmap['imports'][$packageName] = $this->vendorUrl($packageName);
+
+                    continue;
+                }
+
+                $importmap['imports'][$packageName] = $data['url'];
 
                 continue;
             }
 
             if (isset($data['path'])) {
-                $importmap['imports'][$package] = $this->javascriptUrl.$this->digestName($package, $data['path']);
+                $importmap['imports'][$packageName] = $this->assetsUrl.$this->digestName($packageName, $data['path']);
             }
         }
 
@@ -131,8 +135,8 @@ final class ImportMapManager
         $packages = [];
         foreach ($this->importMap ?? [] as $name => $data) {
             if (isset($data['path'])) {
-                $this->filesystem->mkdir($this->publicJavascriptDir);
-                $this->filesystem->copy($this->javascriptDir.$data['path'], $this->publicJavascriptDir.$this->digestName($name, $data['path']));
+                $this->filesystem->mkdir($this->publicAssetsDir);
+                $this->filesystem->copy($this->assetsDir.$data['path'], $this->publicAssetsDir.$this->digestName($name, $data['path']));
 
                 continue;
             }
@@ -141,7 +145,7 @@ final class ImportMapManager
                 continue;
             }
 
-            $packages[$name] = new PackageOptions((bool) ($data['digest'] ?? false), $data['preload'] ?? false);
+            $packages[$name] = new PackageOptions((bool) ($data['download'] ?? false), $data['preload'] ?? false);
 
             if (preg_match(self::PACKAGE_PATTERN, $data['url'], $matches)) {
                 $constraint = ($matches['registry'] ?? null) ? "{$matches['registry']}:{$matches['package']}" : $matches['package'];
@@ -178,7 +182,7 @@ final class ImportMapManager
                 continue;
             }
 
-            $this->removeIfExists($this->vendorDir.$this->importMap[$packageName]['digest']);
+            $this->removeIfExists($this->assetsDir.$this->importMap[$packageName]['digest']);
             unset($this->importMap[$packageName]);
         }
     }
@@ -192,8 +196,11 @@ final class ImportMapManager
         $json = [
             'install' => array_values($install),
             'flattenScope' => true,
-            'provider' => $provider?->value ?? $this->provider->value,
         ];
+        $provider = $provider?->value ?? $this->provider->value;
+        if ($provider !== Provider::Jspm) {
+            $json['env'] = $provider;
+        }
 
         $json['env'] = ['browser', 'module', $env->value];
 
@@ -201,32 +208,47 @@ final class ImportMapManager
             'json' => $json,
         ]);
 
-        $this->filesystem->mkdir($this->vendorDir);
-        foreach ($response->toArray()['map']['imports'] as $packageName => $url) {
-            $previousPackageData = $this->importMap[$packageName] ?? null;
-            $this->importMap[$packageName] = ['url' => $url];
+        if ($response->getStatusCode() !== 200) {
+            $data = $response->toArray((false));
 
+            if ($data['error']) {
+                throw new \RuntimeException($data['error']);
+            }
+
+            $response->getHeaders();
+        }
+
+        $this->filesystem->mkdir($this->assetsDir.'vendor/');
+        foreach ($response->toArray()['map']['imports'] as $packageName => $url) {
             if ($packages[$packageName]->preload) {
                 $this->importMap[$packageName]['preload'] = true;
+            } else {
+                unset($this->importMap[$packageName]['preload']);
             }
 
+            $relativePath = 'vendor/'.$packageName.'.js';
             if (!$packages[$packageName]->download) {
+                if ($this->importMap[$packageName]['download'] ?? false) {
+                    $this->removeIfExists($this->assetsDir.$relativePath);
+                    // todo: remove parent dir if empty
+                }
+                unset($this->importMap[$packageName]['download']);
+
                 continue;
             }
 
-            $this->importMap[$packageName]['digest'] = sprintf('%s.%s.js', $packageName, hash('xxh128', $url));
-            if ($this->importMap[$packageName]['digest'] === ($previousPackageData['digest'] ?? null)) {
+            $this->importMap[$packageName]['download'] = true;
+            if ($previousPackageData['url'] ?? null === $url) {
                 continue;
             }
 
-            if (isset($previousPackageData['digest'])) {
-                $this->removeIfExists($this->vendorDir.$previousPackageData['digest']);
-            }
-
+            $this->importMap[$packageName]['url'] = $url;
             $this->filesystem->dumpFile(
-                $this->vendorDir.$this->importMap[$packageName]['digest'],
+                $this->assetsDir.$relativePath,
                 $this->httpClient->request('GET', $url)->getContent(),
             );
+            $this->filesystem->mkdir($this->publicAssetsDir);
+            $this->filesystem->copy($this->assetsDir.$relativePath, $this->publicAssetsDir.'vendor/'.$this->digestName($packageName, $relativePath).'.js');
         }
     }
 
@@ -237,8 +259,18 @@ final class ImportMapManager
         }
     }
 
-    private function digestName(string $package, string $path): string
+    private function digestName(string $packageName, string $path): string
     {
-        return sprintf('%s.%s.js', $package, hash('xxh128', file_get_contents($this->javascriptDir.$path)));
+        return sprintf('%s.%s.js', $packageName, hash('xxh128', file_get_contents($this->assetsDir.$path)));
+    }
+
+    private function vendorPath(string $packageName): string
+    {
+        return $this->assetsUrl.'vendor/'.$packageName.'.js';
+    }
+
+    private function vendorUrl(string $packageName): string
+    {
+        return $this->publicAssetsDir.'vendor/'.$this->digestName($packageName, $this->vendorPath($packageName));
     }
 }

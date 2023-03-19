@@ -2954,18 +2954,16 @@ class FrameworkExtension extends Extension
 
         $container
             ->getDefinition(ImportmapController::class)
-            ->replaceArgument(0, $config['javascript_dir']);
+            ->replaceArgument(0, $config['assets_dir']);
 
         $container
             ->getDefinition(ImportMapManager::class)
             ->replaceArgument(0, $config['path'])
-            ->replaceArgument(1, $config['vendor_dir'])
-            ->replaceArgument(2, $config['vendor_url'])
-            ->replaceArgument(3, $config['javascript_dir'])
-            ->replaceArgument(4, $config['public_javascript_dir'])
-            ->replaceArgument(5, $config['javascript_url'])
-            ->replaceArgument(6, Provider::from($config['provider']))
-            ->replaceArgument(8, $config['api'])
+            ->replaceArgument(1, $config['assets_dir'])
+            ->replaceArgument(2, $config['public_assets_dir'])
+            ->replaceArgument(3, $config['assets_url'])
+            ->replaceArgument(4, Provider::from($config['provider']))
+            ->replaceArgument(6, $config['api'])
         ;
     }
 

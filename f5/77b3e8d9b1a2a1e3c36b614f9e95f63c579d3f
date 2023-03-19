@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by stof at 2023-03-14T17:08:43Z
+
+Generating a closure with a variadic argument will not produce the same behavior than the previous code though. `Closure::fromCallable()` or first-class callables are producing a callable that exposes the original signature when using Reflection.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-14T17:14:20Z
+
+@stof that's right. We could generate a signature from the proxied method when it's known, but that'd work only with PhpDumper, not with ContainerBuilder. But in most cases, the exact signature of a closure doesn't matter, as long at it behaves as expected when being called.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-03-14T17:19:53Z
+
+@nicolas-grekas then this requires an explicit documentation of this limitation, to avoid issues for cases where the callable signature matters (for instance if you try to use such callable in a controller resolver, as argument resolvers rely on the signature of the controller callable)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-14T18:41:16Z
+
+OK, so you triggered me :) Here is an implementation that respects the target signature (using eval() for ContainerBuilder, as already done for lazy services.)

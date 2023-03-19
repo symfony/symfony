@@ -26,9 +26,13 @@ class FooAnnotation
 
 class Foo
 {
+    public static int $counter = 0;
+
     #[Required]
-    public function cloneFoo(): static
+    public function cloneFoo(\stdClass $bar = null): static
     {
+        ++self::$counter;
+
         return clone $this;
     }
 }

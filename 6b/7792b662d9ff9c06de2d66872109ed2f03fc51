@@ -1,0 +1,82 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-10-06T06:50:20Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.2 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by dunglas at 2022-10-11T13:20:55Z
+
+In this case, we should add all standard relations: https://www.iana.org/assignments/link-relations/link-relations.xhtml
+
+---------------------------------------------------------------------------
+
+by Oipnet at 2022-10-12T10:51:02Z
+
+Good idea, I'll look into it.
+
+The use of an enum could be justified. The impact doesn't seem too great to me.
+What do you think about it?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2022-10-12T12:07:07Z
+
+IIRC we already have code in Symfony to parse XML files published by the IANA.
+
+---------------------------------------------------------------------------
+
+by Oipnet at 2022-10-13T08:54:24Z
+
+@dunglas I didn't use an xml parser, I didn't find what you were talking about. If you can tell me more, no worries, I'll go in that direction.
+
+I tried to avoid the BC, to my knowledge there is one, we can not create a link with a rel that does not exist in the enum (case not treated)
+How would you handle the case?
+
+---------------------------------------------------------------------------
+
+by Oipnet at 2022-10-13T09:35:03Z
+
+Thanks for the comment about standards.
+I'll look into this in more detail for next time.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-10-22T10:30:49Z
+
+I agree with Stof, let's keep it simple and open by dropping the enum and adding more constants.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-12-02T11:59:51Z
+
+@Oipnet Can you finish this PR?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-12-09T08:06:28Z
+
+Closing for now as it cannot be merged as is.
+@Oipnet Feel free to reopen it wen you've time. Thank you.

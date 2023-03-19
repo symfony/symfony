@@ -31,6 +31,8 @@ use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\RateLimiter\LimiterInterface;
+use Symfony\Component\Messenger\WorkerExecution\WorkerExecutionStrategyContext;
+use Symfony\Component\Messenger\WorkerExecution\WorkerExecutionStrategyInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
@@ -49,11 +51,12 @@ class Worker
     private array $acks = [];
     private \SplObjectStorage $unacks;
     private ?array $rateLimiters;
+    private WorkerExecutionStrategyInterface $executionStrategy;
 
     /**
      * @param ReceiverInterface[] $receivers Where the key is the transport name
      */
-    public function __construct(array $receivers, MessageBusInterface $bus, EventDispatcherInterface $eventDispatcher = null, LoggerInterface $logger = null, array $rateLimiters = null)
+    public function __construct(array $receivers, MessageBusInterface $bus, EventDispatcherInterface $eventDispatcher = null, LoggerInterface $logger = null, array $rateLimiters = null, WorkerExecutionStrategyInterface $executionStrategy)
     {
         $this->receivers = $receivers;
         $this->bus = $bus;
@@ -64,6 +67,7 @@ class Worker
         ]);
         $this->unacks = new \SplObjectStorage();
         $this->rateLimiters = $rateLimiters;
+        $this->executionStrategy = $executionStrategy;
     }
 
     /**
@@ -93,35 +97,13 @@ class Worker
             }
         }
 
+        $workerExecutionContext = new WorkerExecutionStrategyContext($this, $queueNames ?: []);
+
         while (!$this->shouldStop) {
-            $envelopeHandled = false;
             $envelopeHandledStart = microtime(true);
-            foreach ($this->receivers as $transportName => $receiver) {
-                if ($queueNames) {
-                    $envelopes = $receiver->getFromQueues($queueNames);
-                } else {
-                    $envelopes = $receiver->get();
-                }
 
-                foreach ($envelopes as $envelope) {
-                    $envelopeHandled = true;
-
-                    $this->rateLimit($transportName);
-                    $this->handleMessage($envelope, $transportName);
-                    $this->eventDispatcher?->dispatch(new WorkerRunningEvent($this, false));
-
-                    if ($this->shouldStop) {
-                        break 2;
-                    }
-                }
-
-                // after handling a single receiver, quit and start the loop again
-                // this should prevent multiple lower priority receivers from
-                // blocking too long before the higher priority are checked
-                if ($envelopeHandled) {
-                    break;
-                }
-            }
+            $result = $this->executionStrategy->processQueueTasks($workerExecutionContext);
+            $envelopeHandled = $result->wereEnvelopesHandled;
 
             if (!$envelopeHandled && $this->flush(false)) {
                 continue;
@@ -140,7 +122,10 @@ class Worker
         $this->eventDispatcher?->dispatch(new WorkerStoppedEvent($this));
     }
 
-    private function handleMessage(Envelope $envelope, string $transportName): void
+    /**
+     * @internal
+     */
+    public function handleMessage(Envelope $envelope, string $transportName): void
     {
         $event = new WorkerMessageReceivedEvent($envelope, $transportName);
         $this->eventDispatcher?->dispatch($event);
@@ -222,7 +207,10 @@ class Worker
         return (bool) $acks;
     }
 
-    private function rateLimit(string $transportName): void
+    /**
+     * @internal
+     */
+    public function rateLimit(string $transportName): void
     {
         if (!$this->rateLimiters) {
             return;
@@ -278,5 +266,23 @@ class Worker
     public function getMetadata(): WorkerMetadata
     {
         return $this->metadata;
+    }
+
+    public function getEventDispatcher(): ?EventDispatcherInterface
+    {
+        return $this->eventDispatcher;
+    }
+
+    public function getShouldStop(): bool
+    {
+        return $this->shouldStop;
+    }
+
+    /**
+     * @return ReceiverInterface[]
+     */
+    public function getReceivers(): array
+    {
+        return $this->receivers;
     }
 }

@@ -14,6 +14,7 @@ CHANGELOG
  * Add `#[MapRequestPayload]` to map and validate request payload from `Request::getContent()` or `Request::$request->all()` to typed objects
  * Add `#[MapQueryString]` to map and validate request query string from `Request::$query->all()` to typed objects
  * Add `#[MapQueryParameter]` to map and validate individual query parameters to controller arguments
+ * Collect data from every event dispatcher
 
 6.2
 ---

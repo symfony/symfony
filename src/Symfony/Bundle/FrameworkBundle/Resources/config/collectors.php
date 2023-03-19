@@ -47,7 +47,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('data_collector.events', EventDataCollector::class)
             ->args([
-                service('debug.event_dispatcher')->ignoreOnInvalid(),
+                tagged_iterator('event_dispatcher.dispatcher', 'name'),
                 service('request_stack')->ignoreOnInvalid(),
             ])
             ->tag('data_collector', ['template' => '@WebProfiler/Collector/events.html.twig', 'id' => 'events', 'priority' => 290])

@@ -16,7 +16,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
-use Symfony\Component\Serializer\Annotation\Ignore;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
@@ -30,6 +29,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\ClassWithIgnoreAttribute;
 use Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\SiblingHolder;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\CacheableObjectAttributesTestTrait;
@@ -431,6 +431,9 @@ class GetSetMethodNormalizerTest extends TestCase
         $this->assertFalse($this->normalizer->supportsNormalization(new ObjectWithJustStaticSetterDummy()));
     }
 
+    /**
+     * @requires PHP 8
+     */
     public function testNotIgnoredMethodSupport()
     {
         $this->assertFalse($this->normalizer->supportsNormalization(new ClassWithIgnoreAttribute()));
@@ -757,16 +760,5 @@ class ObjectWithMagicMethod
     public function __call($key, $value)
     {
         throw new \RuntimeException('__call should not be called. Called with: '.$key);
-    }
-}
-
-class ClassWithIgnoreAttribute
-{
-    public string $foo;
-
-    #[Ignore]
-    public function isSomeIgnoredMethod(): bool
-    {
-        return true;
     }
 }

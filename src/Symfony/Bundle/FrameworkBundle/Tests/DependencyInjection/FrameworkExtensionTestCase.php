@@ -57,6 +57,10 @@ use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\HttpKernel\Fragment\FragmentUriGeneratorInterface;
+use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory;
+use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
+use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportFactory;
+use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
 use Symfony\Component\Messenger\Transport\TransportFactory;
 use Symfony\Component\Notifier\ChatterInterface;
 use Symfony\Component\Notifier\TexterInterface;
@@ -814,13 +818,26 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $expectedFactories = [
             new Reference('scheduler.messenger_transport_factory'),
-            new Reference('messenger.transport.amqp.factory'),
-            new Reference('messenger.transport.redis.factory'),
-            new Reference('messenger.transport.sync.factory'),
-            new Reference('messenger.transport.in_memory.factory'),
-            new Reference('messenger.transport.sqs.factory'),
-            new Reference('messenger.transport.beanstalkd.factory'),
         ];
+
+        if (class_exists(AmqpTransportFactory::class)) {
+            $expectedFactories[] = 'messenger.transport.amqp.factory';
+        }
+
+        if (class_exists(RedisTransportFactory::class)) {
+            $expectedFactories[] = 'messenger.transport.redis.factory';
+        }
+
+        $expectedFactories[] = 'messenger.transport.sync.factory';
+        $expectedFactories[] = 'messenger.transport.in_memory.factory';
+
+        if (class_exists(AmazonSqsTransportFactory::class)) {
+            $expectedFactories[] = 'messenger.transport.sqs.factory';
+        }
+
+        if (class_exists(BeanstalkdTransportFactory::class)) {
+            $expectedFactories[] = 'messenger.transport.beanstalkd.factory';
+        }
 
         $this->assertTrue($container->hasDefinition('messenger.receiver_locator'));
         $this->assertTrue($container->hasDefinition('console.command.messenger_consume_messages'));

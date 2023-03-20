@@ -28,4 +28,5 @@ $container->loadFromExtension('framework', [
             ['email' => 'test@test.de', 'phone' => '+490815',],
         ]
     ],
+    'scheduler' => false,
 ]);

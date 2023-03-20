@@ -19,9 +19,9 @@ namespace Symfony\Component\RemoteEvent;
 class RemoteEvent
 {
     public function __construct(
-        private string $name,
-        private string $id,
-        private array $payload,
+        private readonly string $name,
+        private readonly string $id,
+        private readonly array $payload,
     ) {
     }
 

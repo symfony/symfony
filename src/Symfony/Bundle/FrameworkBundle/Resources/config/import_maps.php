@@ -19,9 +19,8 @@ return static function (ContainerConfigurator $container): void {
 
         ->set(ImportmapController::class)
             ->args([
-                abstract_arg('javascript directory'),
+                abstract_arg('assets directory'),
                 service(ImportMapManager::class),
-                service('filesystem'),
             ])
             ->public()
 
@@ -34,7 +33,6 @@ return static function (ContainerConfigurator $container): void {
                 abstract_arg('provider'),
                 service('http_client')->nullOnInvalid(),
                 abstract_arg('JSPM API URL'),
-                service('filesystem'),
             ])
 
         ->set(AbstractCommand::class)

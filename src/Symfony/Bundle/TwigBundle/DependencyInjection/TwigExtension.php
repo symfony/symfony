@@ -90,8 +90,8 @@ class TwigExtension extends Extension
         if ($container::willBeAvailable('symfony/import-maps', ImportMapManager::class, ['symfony/import-maps'])) {
             $loader->load('import_maps.php');
 
-            if ($config['importmap']['polyfill'] ?? false) {
-                $container->getDefinition('twig.extension.import_maps')->addArgument($config['importmap']['polyfill']);
+            if (isset($config['importmap']['polyfill'])) {
+                $container->getDefinition('twig.extension.import_maps')->addArgument($config['importmap']['polyfill'] ?: null);
             }
         }
 

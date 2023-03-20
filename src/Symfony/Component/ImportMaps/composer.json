@@ -29,8 +29,8 @@
     "require": {
         "php": ">=8.1",
         "symfony/console": "^6.1",
-        "symfony/filesystem": "^6.1",
         "symfony/http-client": "^6.1",
+        "symfony/mime": "^6.1",
         "symfony/var-exporter": "^6.1"
     },
     "require-dev": {

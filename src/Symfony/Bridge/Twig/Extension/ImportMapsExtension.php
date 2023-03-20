@@ -22,7 +22,7 @@ final class ImportMapsExtension extends AbstractExtension
 {
     public function __construct(
         private readonly ImportMapManager $importMapManager,
-        private readonly string $polyfillUrl = ImportMapManager::POLYFILL_URL,
+        private readonly ?string $polyfillUrl = ImportMapManager::POLYFILL_URL,
     ) {
     }
 
@@ -33,7 +33,7 @@ final class ImportMapsExtension extends AbstractExtension
         ];
     }
 
-    public function importmap(bool $polyfill = true): string
+    public function importmap(): string
     {
         $json = $this->importMapManager->getImportMap();
 
@@ -43,11 +43,13 @@ $json
 </script>
 HTML;
 
-        if ($polyfill) {
+        if ($this->polyfillUrl) {
+            $url = htmlspecialchars($this->polyfillUrl);
+
             $output .= <<<HTML
 
 <!-- ES Module Shims: Import maps polyfill for modules browsers without import maps support -->
-<script async src="$this->polyfillUrl" crossorigin="anonymous"></script>
+<script async src="{$url}" crossorigin="anonymous"></script>
 HTML;
         }
 

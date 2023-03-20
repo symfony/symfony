@@ -240,7 +240,7 @@ class Configuration implements ConfigurationInterface
                     ->fixXmlConfig('import_map')
                     ->children()
                         ->scalarNode('polyfill')
-                            ->info('URL of the ES Module Polyfill to use.')
+                            ->info('URL of the ES Module Polyfill to use, false to disable.')
                             ->defaultNull()
                         ->end()
                     ->end()

@@ -17,6 +17,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\ImportMaps\ImportMapManager;
+use Symfony\Component\Mime\MimeTypeGuesserInterface;
+use Symfony\Component\Mime\MimeTypes;
+use Symfony\Component\Mime\MimeTypesInterface;
 
 /**
  * Controller to use only in development mode.
@@ -26,29 +29,42 @@ use Symfony\Component\ImportMaps\ImportMapManager;
 final class ImportmapController
 {
     public function __construct(
-        private readonly string $javascriptsDir,
+        private readonly string $assetsDir,
         private readonly ImportMapManager $importMapManager,
-        private readonly Filesystem $filesystem = new Filesystem(),
+        private readonly MimeTypesInterface $mimeTypes = new MimeTypes(),
     ) {
     }
 
     public function handle(string $path): Response
     {
         if (
-            // prevent path traversing attacks
-            !preg_match('/^([a-zA-Z0-9_@\/].*)\.(\w+)\.js$/', $path, $matches) ||
-            !($mappedPath = $this->importMapManager->getImportMapArray()[$matches[1]]['path'] ?? null)
+            // todo: fix this to prevent path traversing attacks
+            !preg_match('/^([a-zA-Z0-9_@\/].*)\.(\w+)\.(.*)$/', $path, $matches)
         ) {
             throw new NotFoundHttpException();
         }
 
+        $localPath = $this->assetsDir.$matches[1].'.'.$matches[3];
+
         if (
-            !$this->filesystem->exists($localPath = $this->javascriptsDir.$mappedPath)
+            !file_exists($localPath)
             || $matches[2] !== hash('xxh128', file_get_contents($localPath))
         ) {
             throw new NotFoundHttpException();
         }
 
-        return new BinaryFileResponse($localPath, headers: ['Content-Type' => 'text/javascript']);
+        $contentType = $this->mimeTypes->guessMimeType($localPath);
+        if ($contentType === 'text/plain') {
+            $contentType = match ($matches[3]) {
+                'js' => 'application/javascript',
+                'css' => 'text/css',
+                default => $matches[3],
+            };
+        }
+
+        return new BinaryFileResponse(
+            $localPath,
+            headers: ['Content-Type' => $contentType],
+        );
     }
 }

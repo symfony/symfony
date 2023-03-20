@@ -20,6 +20,7 @@ CHANGELOG
  * Add `AbstractController::sendEarlyHints()` to send HTTP Early Hints
  * Add autowiring aliases for `Http\Client\HttpAsyncClient`
  * Deprecate the `Http\Client\HttpClient` service, use `Psr\Http\Client\ClientInterface` instead
+ * Add `stop_worker_on_signals` configuration option to `messenger` to define signals which would stop a worker
 
 6.2
 ---

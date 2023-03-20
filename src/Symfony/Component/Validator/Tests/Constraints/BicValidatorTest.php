@@ -288,6 +288,8 @@ class BicValidatorTest extends ConstraintValidatorTestCase
         yield ['BNPAYTGX', 'FR14 2004 1010 0505 0001 3M02 606'];
         yield ['BNPANCGX', 'FR14 2004 1010 0505 0001 3M02 606'];
         yield ['BNPAREGX', 'FR14 2004 1010 0505 0001 3M02 606'];
+        yield ['BNPABLGX', 'FR14 2004 1010 0505 0001 3M02 606'];
+        yield ['BNPAMFGX', 'FR14 2004 1010 0505 0001 3M02 606'];
         yield ['BNPAPMGX', 'FR14 2004 1010 0505 0001 3M02 606'];
         yield ['BNPAWFGX', 'FR14 2004 1010 0505 0001 3M02 606'];
 
@@ -296,6 +298,13 @@ class BicValidatorTest extends ConstraintValidatorTestCase
         yield ['BARCIMSA', 'GB12 CPBK 0892 9965 0449 911'];
         yield ['BARCGGSA', 'GB12 CPBK 0892 9965 0449 911'];
         yield ['BARCVGSA', 'GB12 CPBK 0892 9965 0449 911'];
+
+        // FI related special cases
+        yield ['NDEAAXHH', 'FI14 1009 3000 1234 58'];
+
+        // ES related special cases
+        yield ['CAIXICBBXXX', 'ES79 2100 0813 6101 2345 6789'];
+        yield ['CAIXEABBXXX', 'ES79 2100 0813 6101 2345 6789'];
     }
 }
 

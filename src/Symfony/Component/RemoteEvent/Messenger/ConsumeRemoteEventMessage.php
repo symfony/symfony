@@ -21,8 +21,8 @@ use Symfony\Component\RemoteEvent\RemoteEvent;
 class ConsumeRemoteEventMessage
 {
     public function __construct(
-        private string $type,
-        private RemoteEvent $event,
+        private readonly string $type,
+        private readonly RemoteEvent $event,
     ) {
     }
 

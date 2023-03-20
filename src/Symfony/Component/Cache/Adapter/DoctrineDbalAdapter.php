@@ -150,32 +150,33 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
         $now = time();
         $expired = [];
 
-        $sql = "SELECT $this->idCol, CASE WHEN $this->lifetimeCol IS NULL OR $this->lifetimeCol + $this->timeCol > ? THEN $this->dataCol ELSE NULL END FROM $this->table WHERE $this->idCol IN (?)";
-        $result = $this->conn->executeQuery($sql, [
-            $now,
-            $ids,
-        ], [
-            ParameterType::INTEGER,
-            Connection::PARAM_STR_ARRAY,
-        ])->iterateNumeric();
+        $sql = str_pad('', (\count($ids) << 1) - 1, '?,');
+        $sql = "SELECT $this->idCol, CASE WHEN $this->lifetimeCol IS NULL OR $this->lifetimeCol + $this->timeCol > ? THEN $this->dataCol ELSE NULL END FROM $this->table WHERE $this->idCol IN ($sql)";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindValue($i = 1, $now, ParameterType::INTEGER);
+        foreach ($ids as $id) {
+            $stmt->bindValue(++$i, $id, $this->getIdColumnType());
+        }
+        $result = $stmt->executeQuery()->iterateNumeric();
 
         foreach ($result as $row) {
+            $id = \is_resource($row[0]) ? stream_get_contents($row[0]) : $row[0];
             if (null === $row[1]) {
-                $expired[] = $row[0];
+                $expired[] = $id;
             } else {
-                yield $row[0] => $this->marshaller->unmarshall(\is_resource($row[1]) ? stream_get_contents($row[1]) : $row[1]);
+                yield $id => $this->marshaller->unmarshall(\is_resource($row[1]) ? stream_get_contents($row[1]) : $row[1]);
             }
         }
 
         if ($expired) {
-            $sql = "DELETE FROM $this->table WHERE $this->lifetimeCol + $this->timeCol <= ? AND $this->idCol IN (?)";
-            $this->conn->executeStatement($sql, [
-                $now,
-                $expired,
-            ], [
-                ParameterType::INTEGER,
-                Connection::PARAM_STR_ARRAY,
-            ]);
+            $sql = str_pad('', (\count($expired) << 1) - 1, '?,');
+            $sql = "DELETE FROM $this->table WHERE $this->lifetimeCol + $this->timeCol <= ? AND $this->idCol IN ($sql)";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindValue($i = 1, $now, ParameterType::INTEGER);
+            foreach ($expired as $id) {
+                $stmt->bindValue(++$i, $id, $this->getIdColumnType());
+            }
+            $stmt->executeQuery();
         }
     }
 
@@ -189,7 +190,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
             $id,
             time(),
         ], [
-            ParameterType::STRING,
+            $this->getIdColumnType(),
             ParameterType::INTEGER,
         ]);
 
@@ -224,9 +225,16 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
      */
     protected function doDelete(array $ids): bool
     {
-        $sql = "DELETE FROM $this->table WHERE $this->idCol IN (?)";
+        $ids = array_values($ids);
+        $sql = str_pad('', (\count($ids) << 1) - 1, '?,');
+        $sql = "DELETE FROM $this->table WHERE $this->idCol IN ($sql)";
         try {
-            $this->conn->executeStatement($sql, [array_values($ids)], [Connection::PARAM_STR_ARRAY]);
+            $stmt = $this->conn->prepare($sql);
+            $i = 0;
+            foreach ($ids as $id) {
+                $stmt->bindValue(++$i, $id, $this->getIdColumnType());
+            }
+            $stmt->executeQuery();
         } catch (TableNotFoundException $e) {
         }
 
@@ -296,7 +304,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
             $stmt->bindValue(7, $lifetime, ParameterType::INTEGER);
             $stmt->bindValue(8, $now, ParameterType::INTEGER);
         } elseif (null !== $platformName) {
-            $stmt->bindParam(1, $id);
+            $stmt->bindParam(1, $id, $this->getIdColumnType());
             $stmt->bindParam(2, $data, ParameterType::LARGE_OBJECT);
             $stmt->bindValue(3, $lifetime, ParameterType::INTEGER);
             $stmt->bindValue(4, $now, ParameterType::INTEGER);
@@ -384,6 +392,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
     {
         $types = [
             'mysql' => 'binary',
+            'pgsql' => 'binary',
             'sqlite' => 'text',
         ];
 
@@ -393,5 +402,10 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
         $table->addColumn($this->lifetimeCol, 'integer', ['unsigned' => true, 'notnull' => false]);
         $table->addColumn($this->timeCol, 'integer', ['unsigned' => true]);
         $table->setPrimaryKey([$this->idCol]);
+    }
+
+    private function getIdColumnType(): int
+    {
+        return $this->getPlatformName() === 'pgsql' ? ParameterType::BINARY : ParameterType::STRING;
     }
 }

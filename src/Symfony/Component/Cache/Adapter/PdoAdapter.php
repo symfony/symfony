@@ -294,7 +294,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
                 $sql = "CREATE TABLE $this->table ($this->idCol TEXT NOT NULL PRIMARY KEY, $this->dataCol BLOB NOT NULL, $this->lifetimeCol INTEGER, $this->timeCol INTEGER NOT NULL)";
                 break;
             case 'pgsql':
-                $sql = "CREATE TABLE $this->table ($this->idCol VARCHAR(255) NOT NULL PRIMARY KEY, $this->dataCol BYTEA NOT NULL, $this->lifetimeCol INTEGER, $this->timeCol INTEGER NOT NULL)";
+                $sql = "CREATE TABLE $this->table ($this->idCol BYTEA NOT NULL PRIMARY KEY, $this->dataCol BYTEA NOT NULL, $this->lifetimeCol INTEGER, $this->timeCol INTEGER NOT NULL)";
                 break;
             case 'oci':
                 $sql = "CREATE TABLE $this->table ($this->idCol VARCHAR2(255) NOT NULL PRIMARY KEY, $this->dataCol BLOB NOT NULL, $this->lifetimeCol INTEGER, $this->timeCol INTEGER NOT NULL)";
@@ -370,7 +370,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         $stmt = $connection->prepare($sql);
         $stmt->bindValue($i = 1, $now, \PDO::PARAM_INT);
         foreach ($ids as $id) {
-            $stmt->bindValue(++$i, $id);
+            $stmt->bindValue(++$i, $id, $this->getIdColumnType());
         }
         $result = $stmt->execute();
 
@@ -382,10 +382,11 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         }
 
         foreach ($result as $row) {
+            $id = \is_resource($row[0]) ? stream_get_contents($row[0]) : $row[0];
             if (null === $row[1]) {
-                $expired[] = $row[0];
+                $expired[] = $id;
             } else {
-                yield $row[0] => $this->marshaller->unmarshall(\is_resource($row[1]) ? stream_get_contents($row[1]) : $row[1]);
+                yield $id => $this->marshaller->unmarshall(\is_resource($row[1]) ? stream_get_contents($row[1]) : $row[1]);
             }
         }
 
@@ -395,7 +396,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
             $stmt = $connection->prepare($sql);
             $stmt->bindValue($i = 1, $now, \PDO::PARAM_INT);
             foreach ($expired as $id) {
-                $stmt->bindValue(++$i, $id);
+                $stmt->bindValue(++$i, $id, $this->getIdColumnType());
             }
             $stmt->execute();
         }
@@ -411,7 +412,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         $sql = "SELECT 1 FROM $this->table WHERE $this->idCol = :id AND ($this->lifetimeCol IS NULL OR $this->lifetimeCol + $this->timeCol > :time)";
         $stmt = $connection->prepare($sql);
 
-        $stmt->bindValue(':id', $id);
+        $stmt->bindValue(':id', $id, $this->getIdColumnType());
         $stmt->bindValue(':time', time(), \PDO::PARAM_INT);
         $stmt->execute();
 
@@ -452,7 +453,11 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         $sql = "DELETE FROM $this->table WHERE $this->idCol IN ($sql)";
         try {
             $stmt = $this->getConnection()->prepare($sql);
-            $stmt->execute(array_values($ids));
+            $i = 0;
+            foreach (array_values($ids) as $id) {
+                $stmt->bindValue(++$i, $id, $this->getIdColumnType());
+            }
+            $stmt->execute();
         } catch (\PDOException $e) {
         }
 
@@ -524,7 +529,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
             $stmt->bindValue(7, $lifetime, \PDO::PARAM_INT);
             $stmt->bindValue(8, $now, \PDO::PARAM_INT);
         } else {
-            $stmt->bindParam(':id', $id);
+            $stmt->bindParam(':id', $id, $this->getIdColumnType());
             $stmt->bindParam(':data', $data, \PDO::PARAM_LOB);
             $stmt->bindValue(':lifetime', $lifetime, \PDO::PARAM_INT);
             $stmt->bindValue(':time', $now, \PDO::PARAM_INT);
@@ -579,5 +584,10 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         }
 
         return $this->serverVersion;
+    }
+
+    private function getIdColumnType(): int
+    {
+        return $this->driver === 'pgsql' ? \PDO::PARAM_LOB : \PDO::PARAM_STR;
     }
 }

@@ -92,7 +92,7 @@ final class StringTypeResolver implements TypeResolverInterface
         }
 
         if ($node instanceof ArrayTypeNode) {
-            return Type::array($this->getTypeFromNode($node->type, $typeContext));
+            return Type::list($this->getTypeFromNode($node->type, $typeContext));
         }
 
         if ($node instanceof ArrayShapeNode) {
@@ -186,6 +186,7 @@ final class StringTypeResolver implements TypeResolverInterface
             $variableTypes = array_map(fn (TypeNode $t): Type => $this->getTypeFromNode($t, $typeContext), $node->genericTypes);
 
             if ($type instanceof CollectionType) {
+                $asList = $type->isList();
                 $keyType = $type->getCollectionKeyType();
 
                 $type = $type->getType();
@@ -194,9 +195,9 @@ final class StringTypeResolver implements TypeResolverInterface
                 }
 
                 if (1 === \count($variableTypes)) {
-                    return Type::collection($type, $variableTypes[0], $keyType);
+                    return new CollectionType(Type::generic($type, $keyType, $variableTypes[0]), $asList);
                 } elseif (2 === \count($variableTypes)) {
-                    return Type::collection($type, $variableTypes[1], $variableTypes[0]);
+                    return Type::collection($type, $variableTypes[1], $variableTypes[0], $asList);
                 }
             }
 

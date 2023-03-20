@@ -24,9 +24,9 @@ class AccessDeniedException extends RuntimeException
     private array $attributes = [];
     private mixed $subject = null;
 
-    public function __construct(string $message = 'Access Denied.', \Throwable $previous = null)
+    public function __construct(string $message = 'Access Denied.', \Throwable $previous = null, int $code = 403)
     {
-        parent::__construct($message, 403, $previous);
+        parent::__construct($message, $code, $previous);
     }
 
     public function getAttributes(): array

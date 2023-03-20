@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `RememberMeBadge` to `JsonLoginAuthenticator` and enable reading parameter in JSON request body
+ * Add argument `$exceptionCode` to `#[IsGranted]`
 
 6.2
 ---

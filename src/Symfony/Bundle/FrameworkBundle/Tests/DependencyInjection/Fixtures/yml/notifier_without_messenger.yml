@@ -16,3 +16,4 @@ framework:
             high: ['slack', 'twilio']
         admin_recipients:
             - { email: 'test@test.de', phone: '+490815' }
+    scheduler: false

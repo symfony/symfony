@@ -17,5 +17,6 @@
                 <framework:admin-recipient email="test@test.de" phone="+490815" />
             </framework:admin-recipients>
         </framework:notifier>
+        <framework:scheduler enabled="false" />
     </framework:config>
 </container>

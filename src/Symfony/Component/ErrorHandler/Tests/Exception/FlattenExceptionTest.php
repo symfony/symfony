@@ -209,7 +209,7 @@ class FlattenExceptionTest extends TestCase
                     'namespace' => '', 'short_class' => '', 'class' => '', 'type' => '', 'function' => '', 'file' => 'foo.php', 'line' => 123,
                     'args' => [],
                 ]],
-                'properties' => [],
+                'data' => null,
             ],
         ], $flattened->toArray());
     }

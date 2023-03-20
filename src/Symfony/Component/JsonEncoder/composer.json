@@ -1,0 +1,36 @@
+{
+    "name": "symfony/json-encoder",
+    "type": "library",
+    "description": "Provides powerful methods to encode/decode data structures into/from JSON.",
+    "keywords": ["encoding", "decoding", "json"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mathias Arlaud",
+            "email": "mathias.arlaud@gmail.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "nikic/php-parser": "^5.3",
+        "php": ">=8.2",
+        "psr/container": "^1.1|^2.0",
+        "psr/log": "^1|^2|^3",
+        "symfony/filesystem": "^7.2",
+        "symfony/type-info": "^7.2",
+        "symfony/var-exporter": "^7.2"
+    },
+    "require-dev": {
+        "phpstan/phpdoc-parser": "^1.0",
+        "symfony/http-kernel": "^7.2"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\JsonEncoder\\": "" },
+        "exclude-from-classmap": [ "Tests/" ]
+    },
+    "minimum-stability": "dev"
+}

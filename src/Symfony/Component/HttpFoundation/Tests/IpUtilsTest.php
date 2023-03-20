@@ -154,4 +154,35 @@ class IpUtilsTest extends TestCase
             [false, '1.2.3.4', '256.256.256/0'], // invalid CIDR notation
         ];
     }
+
+    /**
+     * @dataProvider getIsPrivateIpData
+     */
+    public function testIsPrivateIp(string $ip, bool $matches)
+    {
+        $this->assertSame($matches, IpUtils::isPrivateIp($ip));
+    }
+
+    public static function getIsPrivateIpData(): array
+    {
+        return [
+            // private
+            ['127.0.0.1',       true],
+            ['10.0.0.1',        true],
+            ['192.168.0.1',     true],
+            ['172.16.0.1',      true],
+            ['169.254.0.1',     true],
+            ['0.0.0.1',         true],
+            ['240.0.0.1',       true],
+            ['::1',             true],
+            ['fc00::1',         true],
+            ['fe80::1',         true],
+            ['::ffff:0:1',      true],
+            ['fd00::1',         true],
+
+            // public
+            ['104.26.14.6',             false],
+            ['2606:4700:20::681a:e06',  false],
+        ];
+    }
 }

@@ -42,6 +42,9 @@
         "symfony/process": "^5.4|^6.0",
         "symfony/stopwatch": "^5.4|^6.0"
     },
+    "conflict": {
+        "symfony/http-foundation": "<6.3"
+    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\HttpClient\\": "" },
         "exclude-from-classmap": [

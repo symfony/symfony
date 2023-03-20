@@ -269,17 +269,38 @@ class AutowirePass extends AbstractRecursivePass
             $name = Target::parseName($parameter, $target);
             $target = $target ? [$target] : [];
 
+            $getValue = function () use ($type, $parameter, $class, $method, $name, $target) {
+                if (!$value = $this->getAutowiredReference($ref = new TypedReference($type, $type, ContainerBuilder::EXCEPTION_ON_INVALID_REFERENCE, $name, $target), false)) {
+                    $failureMessage = $this->createTypeNotFoundMessageCallback($ref, sprintf('argument "$%s" of method "%s()"', $parameter->name, $class !== $this->currentId ? $class.'::'.$method : $method));
+
+                    if ($parameter->isDefaultValueAvailable()) {
+                        $value = clone $this->defaultArgument;
+                        $value->value = $parameter->getDefaultValue();
+                    } elseif (!$parameter->allowsNull()) {
+                        throw new AutowiringFailedException($this->currentId, $failureMessage);
+                    }
+                }
+
+                return $value;
+            };
+
             if ($checkAttributes) {
                 foreach ($parameter->getAttributes(Autowire::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
                     $attribute = $attribute->newInstance();
                     $invalidBehavior = $parameter->allowsNull() ? ContainerInterface::NULL_ON_INVALID_REFERENCE : ContainerBuilder::EXCEPTION_ON_INVALID_REFERENCE;
                     $value = $this->processValue(new TypedReference($type ?: '?', $type ?: 'mixed', $invalidBehavior, $name, [$attribute, ...$target]));
 
-                    if ($attribute instanceof AutowireCallable || 'Closure' === $type && \is_array($value)) {
+                    if ($attribute instanceof AutowireCallable) {
                         $value = (new Definition('Closure'))
                             ->setFactory(['Closure', 'fromCallable'])
                             ->setArguments([$value + [1 => '__invoke']])
-                            ->setLazy($attribute instanceof AutowireCallable && $attribute->lazy);
+                            ->setLazy($attribute->lazy);
+                    } elseif ($attribute->lazy && ($value instanceof Reference ? !$this->container->has($value) || !$this->container->findDefinition($value)->isLazy() : null === $attribute->value && $type)) {
+                        $this->container->register('.lazy.'.$value ??= $getValue(), $type)
+                            ->setFactory('current')
+                            ->setArguments([[$value]])
+                            ->setLazy(true);
+                        $value = new Reference('.lazy.'.$value);
                     }
                     $arguments[$index] = $value;
 
@@ -325,21 +346,6 @@ class AutowirePass extends AbstractRecursivePass
 
                 continue;
             }
-
-            $getValue = function () use ($type, $parameter, $class, $method, $name, $target) {
-                if (!$value = $this->getAutowiredReference($ref = new TypedReference($type, $type, ContainerBuilder::EXCEPTION_ON_INVALID_REFERENCE, $name, $target), false)) {
-                    $failureMessage = $this->createTypeNotFoundMessageCallback($ref, sprintf('argument "$%s" of method "%s()"', $parameter->name, $class !== $this->currentId ? $class.'::'.$method : $method));
-
-                    if ($parameter->isDefaultValueAvailable()) {
-                        $value = clone $this->defaultArgument;
-                        $value->value = $parameter->getDefaultValue();
-                    } elseif (!$parameter->allowsNull()) {
-                        throw new AutowiringFailedException($this->currentId, $failureMessage);
-                    }
-                }
-
-                return $value;
-            };
 
             if ($this->decoratedClass && is_a($this->decoratedClass, $type, true)) {
                 if ($this->getPreviousValue) {

@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2023-03-19T20:42:19Z
+
+> Is it worth keep PeriodicalTrigger then? Can't we create one using the new trigger?
+
+Maybe not.
+@upyx Can you chime in here?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-03-20T07:11:23Z
+
+I've removed `PeriodicalTrigger` and ported some missing features in `DateIntervalTrigger`, so it supports the same scope.

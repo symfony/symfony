@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
-use Symfony\Component\VarDumper\Cloner\VarCloner;
+use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 
 /**
@@ -69,7 +69,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
             $headers['X-Debug-Exception-File'] = rawurlencode($exception->getFile()).':'.$exception->getLine();
         }
 
-        $exception = FlattenException::createFromThrowable($exception, null, $headers);
+        $exception = FlattenException::createWithDataRepresentation($exception, null, $headers);
 
         return $exception->setAsString($this->renderException($exception));
     }
@@ -149,21 +149,12 @@ class HtmlErrorRenderer implements ErrorRendererInterface
         ]);
     }
 
-    private function dumpValue(mixed $value): string
+    private function dumpValue(Data $value): string
     {
-        $cloner = new VarCloner();
-        $data = $cloner->cloneVar($value);
-
         $dumper = new HtmlDumper();
         $dumper->setTheme('light');
-        $dumper->setOutput($output = fopen('php://memory', 'r+'));
-        $dumper->dump($data);
 
-        $dump = stream_get_contents($output, -1, 0);
-        rewind($output);
-        ftruncate($output, 0);
-
-        return $dump;
+        return $dumper->dump($value, true);
     }
 
     private function formatArgs(array $args): string

@@ -26,7 +26,7 @@ class ExceptionDataCollector extends DataCollector
     {
         if (null !== $exception) {
             $this->data = [
-                'exception' => FlattenException::createFromThrowable($exception),
+                'exception' => FlattenException::createWithDataRepresentation($exception),
             ];
         }
     }

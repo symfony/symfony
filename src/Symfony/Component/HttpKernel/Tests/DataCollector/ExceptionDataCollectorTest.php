@@ -23,7 +23,7 @@ class ExceptionDataCollectorTest extends TestCase
     {
         $e = new \Exception('foo', 500);
         $c = new ExceptionDataCollector();
-        $flattened = FlattenException::createFromThrowable($e);
+        $flattened = FlattenException::createWithDataRepresentation($e);
         $trace = $flattened->getTrace();
 
         $this->assertFalse($c->hasException());

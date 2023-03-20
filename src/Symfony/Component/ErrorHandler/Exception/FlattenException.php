@@ -14,6 +14,10 @@ namespace Symfony\Component\ErrorHandler\Exception;
 use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\VarDumper\Caster\Caster;
+use Symfony\Component\VarDumper\Cloner\Data;
+use Symfony\Component\VarDumper\Cloner\Stub;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 /**
  * FlattenException wraps a PHP Error or Exception to be able to serialize it.
@@ -36,7 +40,7 @@ class FlattenException
     private string $file;
     private int $line;
     private ?string $asString = null;
-    private array $properties = [];
+    private Data $dataRepresentation;
 
     public static function create(\Exception $exception, int $statusCode = null, array $headers = []): static
     {
@@ -78,14 +82,34 @@ class FlattenException
             $e->setPrevious(static::createFromThrowable($previous));
         }
 
-        if ((new \ReflectionClass($exception::class))->isUserDefined()) {
-            $getProperties = \Closure::bind(fn (\Throwable $e) => get_object_vars($e), null, $exception::class);
-            $properties = $getProperties($exception);
-            unset($properties['message'], $properties['code'], $properties['file'], $properties['line']);
-            $e->properties = $properties;
+        return $e;
+    }
+
+    public static function createWithDataRepresentation(\Throwable $throwable, int $statusCode = null, array $headers = [], VarCloner $cloner = null): static
+    {
+        $e = static::createFromThrowable($throwable, $statusCode, $headers);
+
+        static $defaultCloner;
+
+        if (!$cloner ??= $defaultCloner) {
+            $cloner = $defaultCloner = new VarCloner();
+            $cloner->addCasters([
+                \Throwable::class => function (\Throwable $e, array $a, Stub $s, bool $isNested): array {
+                    if (!$isNested) {
+                        unset($a[Caster::PREFIX_PROTECTED.'message']);
+                        unset($a[Caster::PREFIX_PROTECTED.'code']);
+                        unset($a[Caster::PREFIX_PROTECTED.'file']);
+                        unset($a[Caster::PREFIX_PROTECTED.'line']);
+                        unset($a["\0Error\0trace"], $a["\0Exception\0trace"]);
+                        unset($a["\0Error\0previous"], $a["\0Exception\0previous"]);
+                    }
+
+                    return $a;
+                },
+            ]);
         }
 
-        return $e;
+        return $e->setDataRepresentation($cloner->cloneVar($throwable));
     }
 
     public function toArray(): array
@@ -96,7 +120,7 @@ class FlattenException
                 'message' => $exception->getMessage(),
                 'class' => $exception->getClass(),
                 'trace' => $exception->getTrace(),
-                'properties' => $exception->getProperties(),
+                'data' => $exception->getDataRepresentation(),
             ];
         }
 
@@ -230,11 +254,6 @@ class FlattenException
         return $this;
     }
 
-    public function getProperties(): array
-    {
-        return $this->properties;
-    }
-
     public function getPrevious(): ?self
     {
         return $this->previous;
@@ -315,6 +334,21 @@ class FlattenException
                 'args' => isset($entry['args']) ? $this->flattenArgs($entry['args']) : [],
             ];
         }
+
+        return $this;
+    }
+
+    public function getDataRepresentation(): ?Data
+    {
+        return $this->dataRepresentation ?? null;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setDataRepresentation(Data $data): static
+    {
+        $this->dataRepresentation = $data;
 
         return $this;
     }

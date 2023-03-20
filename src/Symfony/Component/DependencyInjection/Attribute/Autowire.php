@@ -43,10 +43,14 @@ class Autowire
         string $param = null,
         public bool $lazy = false,
     ) {
-        if ($lazy && null !== ($expression ?? $env ?? $param)) {
-            throw new LogicException('#[Autowire] attribute cannot be $lazy and use $env, $param, or $value.');
-        }
-        if (!$lazy && !(null !== $value xor null !== $service xor null !== $expression xor null !== $env xor null !== $param)) {
+        if ($lazy) {
+            if (null !== ($expression ?? $env ?? $param)) {
+                throw new LogicException('#[Autowire] attribute cannot be $lazy and use $expression, $env, or $param.');
+            }
+            if (null !== $value && null !== $service) {
+                throw new LogicException('#[Autowire] attribute cannot declare $value and $service at the same time.');
+            }
+        } elseif (!(null !== $value xor null !== $service xor null !== $expression xor null !== $env xor null !== $param)) {
             throw new LogicException('#[Autowire] attribute must declare exactly one of $service, $expression, $env, $param or $value.');
         }
 

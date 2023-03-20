@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by danielburger1337 at 2023-03-18T21:36:00Z
+
+> I wonder if we shouldn't add a new public method instead: it would be more intuitive for users. This would allow for more logic in the future if needed and prevent potential confusion. Developers who are not familiar with network ranges may not understand the purpose of the constant or how it should be used, which could lead to security errors in their code.
+
+Something along the lines of the following could be added:
+
+```php
+IpUtils::isPrivateIp(string $requestIp)
+```
+
+If we can agree that the method should be added, I will add it to the PR. I don't know too much about network ranges but I should be able to reuse the tests from the `NoPrivateNetworkHttpClient` where this logic originates.

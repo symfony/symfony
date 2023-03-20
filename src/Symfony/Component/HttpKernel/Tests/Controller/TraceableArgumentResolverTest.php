@@ -29,7 +29,7 @@ class TraceableArgumentResolverTest extends TestCase
         $stopwatch->method('start')->willReturn($stopwatchEvent);
 
         $resolver = new class() implements ArgumentResolverInterface {
-            public function getArguments(Request $request, callable $controller)
+            public function getArguments(Request $request, callable $controller): array
             {
                 throw new \Exception();
             }

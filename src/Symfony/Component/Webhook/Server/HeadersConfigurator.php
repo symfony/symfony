@@ -22,8 +22,8 @@ use Symfony\Component\RemoteEvent\RemoteEvent;
 final class HeadersConfigurator implements RequestConfiguratorInterface
 {
     public function __construct(
-        private string $eventHeaderName = 'Webhook-Event',
-        private string $idHeaderName = 'Webhook-Id',
+        private readonly string $eventHeaderName = 'Webhook-Event',
+        private readonly string $idHeaderName = 'Webhook-Id',
     ) {
     }
 

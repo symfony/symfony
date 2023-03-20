@@ -30,8 +30,8 @@ final class WebhookController
 {
     public function __construct(
         /** @var array<string, array{parser: RequestParserInterface, secret: string}> $parsers */
-        private array $parsers,
-        private MessageBusInterface $bus,
+        private readonly array $parsers,
+        private readonly MessageBusInterface $bus,
     ) {
     }
 

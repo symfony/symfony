@@ -14,8 +14,8 @@ namespace Symfony\Component\Webhook;
 class Subscriber
 {
     public function __construct(
-        private string $url,
-        #[\SensitiveParameter] private string $secret,
+        private readonly string $url,
+        #[\SensitiveParameter] private readonly string $secret,
     ) {
     }
 

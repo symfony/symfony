@@ -23,6 +23,26 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class ImportMapManager
 {
+    public const ENV_PRODUCTION = 'production';
+    public const ENV_DEVELOPMENT = 'development';
+    public const ENVS = [
+        self::ENV_PRODUCTION,
+        self::ENV_DEVELOPMENT,
+    ];
+
+    public const PROVIDER_JSPM = 'jspm';
+    public const PROVIDER_JSPM_SYSTEM = 'jspm.system';
+    public const PROVIDER_SKYPACK = 'skypack';
+    public const PROVIDER_JSDELIVR = 'jsdelivr';
+    public const PROVIDER_UNPKG = 'unpkg';
+    public const PROVIDERS = [
+        self::PROVIDER_JSPM,
+        self::PROVIDER_JSPM_SYSTEM,
+        self::PROVIDER_SKYPACK,
+        self::PROVIDER_JSDELIVR,
+        self::PROVIDER_UNPKG,
+    ];
+
     public const POLYFILL_URL = 'https://ga.jspm.io/npm:es-module-shims@1.7.0/dist/es-module-shims.js';
 
     /**
@@ -40,7 +60,8 @@ final class ImportMapManager
         private readonly string $assetsDir = 'assets/',
         private readonly string $publicAssetsDir = 'public/assets/',
         private readonly string $assetsUrl = '/assets/',
-        private readonly Provider $provider = Provider::Jspm,
+        private readonly string $provider = self::PROVIDER_JSPM,
+        private readonly string $env = self::ENV_PRODUCTION,
         private ?HttpClientInterface $httpClient = null,
         private readonly string $api = 'https://api.jspm.io',
     ) {
@@ -97,9 +118,9 @@ final class ImportMapManager
      *
      * @param array<string, PackageOptions> $packages
      */
-    public function require(array $packages, Env $env = Env::Production, ?Provider $provider = null): void
+    public function require(array $packages): void
     {
-        $this->createImportMap($env, $provider, false, $packages, []);
+        $this->createImportMap(false, $packages, []);
     }
 
     /**
@@ -107,24 +128,24 @@ final class ImportMapManager
      *
      * @param string[] $packages
      */
-    public function remove(array $packages, Env $env = Env::Production, ?Provider $provider = null): void
+    public function remove(array $packages): void
     {
-        $this->createImportMap($env, $provider, false, [], $packages);
+        $this->createImportMap(false, [], $packages);
     }
 
     /**
      * Updates all existing packages to the latest version.
      */
-    public function update(Env $env = Env::Production, ?Provider $provider = null): void
+    public function update(): void
     {
-        $this->createImportMap($env, $provider, true, [], []);
+        $this->createImportMap(true, [], []);
     }
 
     /**
      * @param array<string, PackageOptions> $require
      * @param string[] $remove
      */
-    private function createImportMap(Env $env, ?Provider $provider, bool $update, array $require, array $remove): void
+    private function createImportMap(bool $update, array $require, array $remove): void
     {
         $this->loadImportMap();
 
@@ -153,13 +174,8 @@ final class ImportMapManager
                 continue;
             }
 
-            if (!$data['url']) {
-                continue;
-            }
-
             $packages[$packageName] = new PackageOptions($data['download'] ?? false, $data['preload'] ?? false);
-
-            if (preg_match(self::PACKAGE_PATTERN, $data['url'], $matches)) {
+            if (preg_match(self::PACKAGE_PATTERN, $data['url'] ?? $packageName, $matches)) {
                 $constraint = ($matches['registry'] ?? null) ? "{$matches['registry']}:{$matches['package']}" : $matches['package'];
 
                 if (!$update && ($matches['version'] ?? null)) {
@@ -177,7 +193,7 @@ final class ImportMapManager
             }
         }
 
-        $this->jspmGenerate($env, $provider, $install, $packages);
+        $this->jspmGenerate($install, $packages);
 
         file_put_contents(
             $this->path,
@@ -185,7 +201,7 @@ final class ImportMapManager
         );
     }
 
-    private function jspmGenerate(Env $env, ?Provider $provider, array $install, array $packages): void
+    private function jspmGenerate(array $install, array $packages): void
     {
         if (!$install) {
             return;
@@ -195,12 +211,11 @@ final class ImportMapManager
             'install' => array_values($install),
             'flattenScope' => true,
         ];
-        $provider = $provider ?? $this->provider;
-        if ($provider !== Provider::Jspm) {
-            $json['provider'] = $provider->value;
+        if ($this->provider !== self::PROVIDER_JSPM) {
+            $json['provider'] = $this->provider;
         }
 
-        $json['env'] = ['browser', 'module', $env->value];
+        $json['env'] = ['browser', 'module', $this->env];
 
         $response = $this->apiHttpClient->request('POST', '/generate', [
             'json' => $json,
@@ -247,7 +262,7 @@ final class ImportMapManager
             @mkdir(dirname($localPath), 0777, true);
             file_put_contents($localPath, $this->httpClient->request('GET', $url)->getContent());
 
-            $publicPath = $this->publicAssetsDir.'vendor/'.$this->digestName($packageName, $relativePath).'.js';
+            $publicPath = $this->publicAssetsDir.'vendor/'.$this->digestName($packageName, $relativePath);
             @mkdir(dirname($publicPath), 0777, true);
             copy($localPath, $publicPath);
         }
@@ -262,7 +277,7 @@ final class ImportMapManager
                 return;
             }
 
-            $publicAssetPath = $this->publicAssetsDir.'vendor/'.$this->digestName($packageName, $assetPath);
+            $publicAssetPath = $this->publicAssetsDir.'vendor/'.$this->digestName($packageName, 'vendor/'.$packageName.'.js');
 
             @unlink($assetPath);
             if ($cleanEmptyDirectories) {
@@ -286,7 +301,7 @@ final class ImportMapManager
             return;
         }
 
-        $publicAssetPath = $this->publicAssetsDir.$this->digestName($packageName, $assetPath);
+        $publicAssetPath = $this->publicAssetsDir.$this->digestName($packageName, $importMap[$packageName]['path']);
 
         @unlink($publicAssetPath);
         if ($cleanEmptyDirectories) {
@@ -297,11 +312,6 @@ final class ImportMapManager
     private function digestName(string $packageName, string $path): string
     {
         return sprintf('%s.%s.js', $packageName, hash('xxh128', file_get_contents($this->assetsDir.$path)));
-    }
-
-    private function vendorPath(string $packageName): string
-    {
-        return $this->assetsDir.'vendor/'.$packageName.'.js';
     }
 
     private function vendorUrl(string $packageName): string

@@ -31,6 +31,7 @@ return static function (ContainerConfigurator $container): void {
                 abstract_arg('public assets directory'),
                 abstract_arg('assets URL'),
                 abstract_arg('provider'),
+                abstract_arg('env'),
                 service('http_client')->nullOnInvalid(),
                 abstract_arg('JSPM API URL'),
             ])

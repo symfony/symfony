@@ -95,7 +95,6 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\ImportMaps\Controller\ImportmapController;
 use Symfony\Component\ImportMaps\ImportMapManager;
-use Symfony\Component\ImportMaps\Provider;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\PersistingStoreInterface;
@@ -2962,8 +2961,9 @@ class FrameworkExtension extends Extension
             ->replaceArgument(1, $config['assets_dir'])
             ->replaceArgument(2, $config['public_assets_dir'])
             ->replaceArgument(3, $config['assets_url'])
-            ->replaceArgument(4, Provider::from($config['provider']))
-            ->replaceArgument(6, $config['api'])
+            ->replaceArgument(4, $config['provider'])
+            ->replaceArgument(5, $container->getParameter('kernel.debug') ? ImportMapManager::ENV_DEVELOPMENT : ImportMapManager::ENV_PRODUCTION)
+            ->replaceArgument(7, $config['api'])
         ;
     }
 

@@ -17,9 +17,10 @@
     ],
     "require": {
         "php": ">=8.1",
-        "monolog/monolog": "^1.25.1|^2|^3",
+        "monolog/monolog": "dev-remove-handlers-processors",
         "symfony/service-contracts": "^2.5|^3",
-        "symfony/http-kernel": "^5.4|^6.0"
+        "symfony/http-kernel": "^5.4|^6.0",
+        "psr/log": "^2.0 || ^3.0"
     },
     "require-dev": {
         "symfony/console": "^5.4|^6.0",
@@ -46,5 +47,11 @@
             "/Tests/"
         ]
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git@github.com:joaojacome/monolog"
+        }
+    ]
 }

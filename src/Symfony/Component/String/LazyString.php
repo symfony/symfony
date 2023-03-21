@@ -30,7 +30,9 @@ class LazyString implements \Stringable, \JsonSerializable
         }
 
         $lazyString = new static();
-        $lazyString->value = static function () use (&$callback, &$arguments, &$value): string {
+        $lazyString->value = static function () use (&$callback, &$arguments): string {
+            static $value;
+
             if (null !== $arguments) {
                 if (!\is_callable($callback)) {
                     $callback[0] = $callback[0]();

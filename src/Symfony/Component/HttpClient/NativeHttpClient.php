@@ -132,10 +132,8 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
         ];
 
         if ($onProgress = $options['on_progress']) {
-            // Memoize the last progress to ease calling the callback periodically when no network transfer happens
-            $lastProgress = [0, 0];
             $maxDuration = 0 < $options['max_duration'] ? $options['max_duration'] : \INF;
-            $onProgress = static function (...$progress) use ($onProgress, &$lastProgress, &$info, $maxDuration) {
+            $onProgress = static function (...$progress) use ($onProgress, &$info, $maxDuration) {
                 if ($info['total_time'] >= $maxDuration) {
                     throw new TransportException(sprintf('Max duration was reached for "%s".', implode('', $info['url'])));
                 }
@@ -143,6 +141,9 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
                 $progressInfo = $info;
                 $progressInfo['url'] = implode('', $info['url']);
                 unset($progressInfo['size_body']);
+
+                // Memoize the last progress to ease calling the callback periodically when no network transfer happens
+                static $lastProgress = [0, 0];
 
                 if ($progress && -1 === $progress[0]) {
                     // Response completed

@@ -72,8 +72,9 @@ class ArrayChoiceList implements ChoiceListInterface
             $this->valueCallback = $value;
         } else {
             // Otherwise generate incrementing integers as values
-            $i = 0;
-            $value = function () use (&$i) {
+            $value = function () {
+                static $i = 0;
+
                 return $i++;
             };
         }

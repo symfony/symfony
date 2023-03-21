@@ -235,8 +235,8 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
 
     public function testRetryTimeout()
     {
-        $cpt = 0;
-        $client = $this->getHttpClient(__FUNCTION__, function (ChunkInterface $chunk, AsyncContext $context) use (&$cpt) {
+        $client = $this->getHttpClient(__FUNCTION__, function (ChunkInterface $chunk, AsyncContext $context) {
+            static $cpt = 0;
             try {
                 $this->assertTrue($chunk->isTimeout());
                 yield $chunk;
@@ -301,8 +301,8 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
 
     public function testMultipleYieldInInitializer()
     {
-        $first = null;
-        $client = $this->getHttpClient(__FUNCTION__, function (ChunkInterface $chunk, AsyncContext $context) use (&$first) {
+        $client = $this->getHttpClient(__FUNCTION__, function (ChunkInterface $chunk, AsyncContext $context) {
+            static $first;
             if ($chunk->isFirst()) {
                 $first = $chunk;
 
@@ -343,8 +343,8 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
 
     public function testMaxDuration()
     {
-        $sawFirst = false;
-        $client = $this->getHttpClient(__FUNCTION__, function (ChunkInterface $chunk, AsyncContext $context) use (&$sawFirst) {
+        $client = $this->getHttpClient(__FUNCTION__, function (ChunkInterface $chunk, AsyncContext $context) {
+            static $sawFirst = false;
             try {
                 if (!$chunk->isFirst() || !$sawFirst) {
                     $sawFirst = $sawFirst || $chunk->isFirst();

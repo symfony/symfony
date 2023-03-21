@@ -224,9 +224,10 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             if (\is_resource($body)) {
                 $curlopts[\CURLOPT_INFILE] = $body;
             } else {
-                $eof = false;
-                $buffer = '';
-                $curlopts[\CURLOPT_READFUNCTION] = static function ($ch, $fd, $length) use ($body, &$buffer, &$eof) {
+                $curlopts[\CURLOPT_READFUNCTION] = static function ($ch, $fd, $length) use ($body) {
+                    static $eof = false;
+                    static $buffer = '';
+
                     return self::readRequestBody($length, $body, $buffer, $eof);
                 };
             }

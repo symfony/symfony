@@ -48,6 +48,6 @@ class TagAwareAdapterAndPdoAdapterTest extends TagAwareAdapterTestCase
 
     protected function createCacheAdapter(): AbstractAdapter
     {
-        return new PdoAdapter('sqlite:'.self::$dbFile);
+        return new PdoAdapter('sqlite:'.self::$dbFile, '', 0);
     }
 }

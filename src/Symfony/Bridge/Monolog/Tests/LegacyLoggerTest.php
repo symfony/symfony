@@ -18,7 +18,7 @@ use Symfony\Bridge\Monolog\Logger;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Component\HttpFoundation\Request;
 
-class LoggerTest extends TestCase
+class LegacyLoggerTest extends TestCase
 {
     public function testGetLogsWithoutDebugProcessor()
     {

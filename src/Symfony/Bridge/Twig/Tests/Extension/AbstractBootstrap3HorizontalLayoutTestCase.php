@@ -11,11 +11,17 @@
 
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+
 abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootstrap3LayoutTestCase
 {
     public function testLabelOnForm()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateType');
+        $form = $this->factory->createNamed('name', DateType::class);
         $view = $form->createView();
         $this->renderWidget($view, ['label' => 'foo']);
         $html = $this->renderLabel($view);
@@ -30,7 +36,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootst
 
     public function testLabelDoesNotRenderFieldAttributes()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $form = $this->factory->createNamed('name', TextType::class);
         $html = $this->renderLabel($form->createView(), null, [
             'attr' => [
                 'class' => 'my&class',
@@ -47,7 +53,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootst
 
     public function testLabelWithCustomAttributesPassedDirectly()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $form = $this->factory->createNamed('name', TextType::class);
         $html = $this->renderLabel($form->createView(), null, [
             'label_attr' => [
                 'class' => 'my&class',
@@ -64,7 +70,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootst
 
     public function testLabelWithCustomTextAndCustomAttributesPassedDirectly()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $form = $this->factory->createNamed('name', TextType::class);
         $html = $this->renderLabel($form->createView(), 'Custom label', [
             'label_attr' => [
                 'class' => 'my&class',
@@ -82,7 +88,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootst
 
     public function testLabelWithCustomTextAsOptionAndCustomAttributesPassedDirectly()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+        $form = $this->factory->createNamed('name', TextType::class, null, [
             'label' => 'Custom label',
         ]);
         $html = $this->renderLabel($form->createView(), null, [
@@ -102,7 +108,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootst
 
     public function testLabelHtmlDefaultIsFalse()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+        $form = $this->factory->createNamed('name', TextType::class, null, [
             'label' => '<b>Bolded label</b>',
         ]);
 
@@ -118,7 +124,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootst
 
     public function testLabelHtmlIsTrue()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+        $form = $this->factory->createNamed('name', TextType::class, null, [
             'label' => '<b>Bolded label</b>',
             'label_html' => true,
         ]);
@@ -135,7 +141,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootst
 
     public function testStartTag()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
+        $form = $this->factory->create(FormType::class, null, [
             'method' => 'get',
             'action' => 'http://example.com/directory',
         ]);
@@ -147,7 +153,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootst
 
     public function testStartTagWithOverriddenVars()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
+        $form = $this->factory->create(FormType::class, null, [
             'method' => 'put',
             'action' => 'http://example.com/directory',
         ]);
@@ -162,11 +168,11 @@ abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootst
 
     public function testStartTagForMultipartForm()
     {
-        $form = $this->factory->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
+        $form = $this->factory->createBuilder(FormType::class, null, [
                 'method' => 'get',
                 'action' => 'http://example.com/directory',
             ])
-            ->add('file', 'Symfony\Component\Form\Extension\Core\Type\FileType')
+            ->add('file', FileType::class)
             ->getForm();
 
         $html = $this->renderStart($form->createView());
@@ -176,7 +182,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootst
 
     public function testStartTagWithExtraAttributes()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
+        $form = $this->factory->create(FormType::class, null, [
             'method' => 'get',
             'action' => 'http://example.com/directory',
         ]);
@@ -190,7 +196,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootst
 
     public function testCheckboxRow()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType');
+        $form = $this->factory->createNamed('name', CheckboxType::class);
         $view = $form->createView();
         $html = $this->renderRow($view, ['label' => 'foo']);
 
@@ -199,7 +205,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootst
 
     public function testCheckboxRowWithHelp()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType');
+        $form = $this->factory->createNamed('name', CheckboxType::class);
         $html = $this->renderRow($form->createView(), ['label' => 'foo', 'help' => 'really helpful text']);
 
         $this->assertMatchesXpath($html,

@@ -18,6 +18,7 @@ use Symfony\Component\Form\Extension\Core\DataAccessor\PropertyPathAccessor;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler;
@@ -141,7 +142,7 @@ class CompoundFormTest extends TestCase
         $factory = Forms::createFormFactoryBuilder()
             ->getFormFactory();
 
-        $child = $factory->createNamed('file', 'Symfony\Component\Form\Extension\Core\Type\FileType', null, ['auto_initialize' => false]);
+        $child = $factory->createNamed('file', FileType::class, null, ['auto_initialize' => false]);
 
         $this->form->add($child);
         $this->form->submit(['file' => null], false);

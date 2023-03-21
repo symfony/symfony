@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class UrlTypeTest extends TextTypeTest
 {
-    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\UrlType';
+    public const TESTED_TYPE = UrlType::class;
 
     public function testSubmitAddsDefaultProtocolIfNoneIsIncluded()
     {

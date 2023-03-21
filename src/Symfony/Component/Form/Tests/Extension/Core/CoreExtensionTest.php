@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\CoreExtension;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\FormFactoryBuilder;
 
 class CoreExtensionTest extends TestCase
@@ -24,7 +25,7 @@ class CoreExtensionTest extends TestCase
             ->getFormFactory();
 
         $form = $formFactory->createBuilder()
-            ->add('foo', 'Symfony\Component\Form\Extension\Core\Type\DateType')
+            ->add('foo', DateType::class)
             ->getForm();
         $form->submit('foo');
 

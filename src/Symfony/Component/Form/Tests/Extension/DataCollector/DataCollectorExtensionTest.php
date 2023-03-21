@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\DataCollector;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\DataCollector\DataCollectorExtension;
 use Symfony\Component\Form\Extension\DataCollector\FormDataCollector;
 use Symfony\Component\Form\Extension\DataCollector\FormDataExtractor;
@@ -31,7 +32,7 @@ class DataCollectorExtensionTest extends TestCase
 
     public function testLoadTypeExtensions()
     {
-        $typeExtensions = $this->extension->getTypeExtensions('Symfony\Component\Form\Extension\Core\Type\FormType');
+        $typeExtensions = $this->extension->getTypeExtensions(FormType::class);
 
         $this->assertIsArray($typeExtensions);
         $this->assertCount(1, $typeExtensions);

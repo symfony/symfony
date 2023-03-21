@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
@@ -65,7 +66,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
         $this->request = null;
     }
 
-    public static function methodExceptGetProvider()
+    public static function methodExceptGetProvider(): array
     {
         return [
             ['POST'],
@@ -75,7 +76,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
         ];
     }
 
-    public static function methodProvider()
+    public static function methodProvider(): array
     {
         return array_merge([
             ['GET'],
@@ -331,7 +332,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
         $this->serverParams->postMaxSize = $iniMax;
 
         $options = ['post_max_size_message' => 'Max {{ max }}!'];
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, $options);
+        $form = $this->factory->createNamed('name', TextType::class, null, $options);
         $this->setRequestData('POST', [], []);
 
         $this->requestHandler->handleRequest($form, $this->request);
@@ -348,7 +349,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
         }
     }
 
-    public static function getPostMaxSizeFixtures()
+    public static function getPostMaxSizeFixtures(): array
     {
         return [
             [1024 ** 3 + 1, '1G', true, ['{{ max }}' => '1G']],
@@ -381,7 +382,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
         $this->assertSame($expectedErrorCode, $this->requestHandler->getUploadFileError($this->getFailedUploadedFile($errorCode)));
     }
 
-    public static function uploadFileErrorCodes()
+    public static function uploadFileErrorCodes(): array
     {
         return [
             'no error' => [\UPLOAD_ERR_OK, null],
@@ -405,7 +406,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
 
     abstract protected function getFailedUploadedFile($errorCode);
 
-    protected function createForm($name, $method = null, $compound = false)
+    protected function createForm($name, $method = null, $compound = false): Form
     {
         $config = $this->createBuilder($name, $compound);
 
@@ -416,7 +417,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
         return new Form($config);
     }
 
-    protected function createBuilder($name, $compound = false, array $options = [])
+    protected function createBuilder($name, $compound = false, array $options = []): FormBuilder
     {
         $builder = new FormBuilder($name, null, new EventDispatcher(), new FormFactory(new FormRegistry([], new ResolvedFormTypeFactory())), $options);
         $builder->setCompound($compound);

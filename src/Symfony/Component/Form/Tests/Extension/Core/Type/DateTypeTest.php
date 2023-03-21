@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Intl\Util\IntlTestHelper;
@@ -19,7 +20,7 @@ use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class DateTypeTest extends BaseTypeTestCase
 {
-    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\DateType';
+    public const TESTED_TYPE = DateType::class;
 
     private $defaultTimezone;
     private $defaultLocale;

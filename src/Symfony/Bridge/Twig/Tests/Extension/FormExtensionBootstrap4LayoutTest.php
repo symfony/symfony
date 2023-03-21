@@ -15,6 +15,8 @@ use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
@@ -57,7 +59,7 @@ class FormExtensionBootstrap4LayoutTest extends AbstractBootstrap4LayoutTestCase
 
     public function testStartTagHasNoActionAttributeWhenActionIsEmpty()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
+        $form = $this->factory->create(FormType::class, null, [
             'method' => 'get',
             'action' => '',
         ]);
@@ -69,7 +71,7 @@ class FormExtensionBootstrap4LayoutTest extends AbstractBootstrap4LayoutTestCase
 
     public function testStartTagHasActionAttributeWhenActionIsZero()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
+        $form = $this->factory->create(FormType::class, null, [
             'method' => 'get',
             'action' => '0',
         ]);
@@ -97,7 +99,7 @@ class FormExtensionBootstrap4LayoutTest extends AbstractBootstrap4LayoutTestCase
         $this->registerTwigRuntimeLoader($environment, $this->renderer);
 
         $view = $this->factory
-            ->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\MoneyType')
+            ->createNamed('name', MoneyType::class)
             ->createView()
         ;
 
@@ -109,12 +111,12 @@ HTML
             , trim($this->renderWidget($view)));
     }
 
-    protected function renderForm(FormView $view, array $vars = [])
+    protected function renderForm(FormView $view, array $vars = []): string
     {
         return $this->renderer->renderBlock($view, 'form', $vars);
     }
 
-    protected function renderLabel(FormView $view, $label = null, array $vars = [])
+    protected function renderLabel(FormView $view, $label = null, array $vars = []): string
     {
         if (null !== $label) {
             $vars += ['label' => $label];
@@ -128,32 +130,32 @@ HTML
         return $this->renderer->searchAndRenderBlock($view, 'help');
     }
 
-    protected function renderErrors(FormView $view)
+    protected function renderErrors(FormView $view): string
     {
         return $this->renderer->searchAndRenderBlock($view, 'errors');
     }
 
-    protected function renderWidget(FormView $view, array $vars = [])
+    protected function renderWidget(FormView $view, array $vars = []): string
     {
         return $this->renderer->searchAndRenderBlock($view, 'widget', $vars);
     }
 
-    protected function renderRow(FormView $view, array $vars = [])
+    protected function renderRow(FormView $view, array $vars = []): string
     {
         return $this->renderer->searchAndRenderBlock($view, 'row', $vars);
     }
 
-    protected function renderRest(FormView $view, array $vars = [])
+    protected function renderRest(FormView $view, array $vars = []): string
     {
         return $this->renderer->searchAndRenderBlock($view, 'rest', $vars);
     }
 
-    protected function renderStart(FormView $view, array $vars = [])
+    protected function renderStart(FormView $view, array $vars = []): string
     {
         return $this->renderer->renderBlock($view, 'form_start', $vars);
     }
 
-    protected function renderEnd(FormView $view, array $vars = [])
+    protected function renderEnd(FormView $view, array $vars = []): string
     {
         return $this->renderer->renderBlock($view, 'form_end', $vars);
     }

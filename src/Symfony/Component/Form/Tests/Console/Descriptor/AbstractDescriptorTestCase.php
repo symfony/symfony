@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Console\Descriptor;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -19,6 +20,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Csrf\Type\FormTypeCsrfExtension;
+use Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\ResolvedFormType;
 use Symfony\Component\Form\ResolvedFormTypeInterface;
@@ -82,10 +84,10 @@ abstract class AbstractDescriptorTestCase extends TestCase
 
     public static function getDescribeDefaultsTestData()
     {
-        $options['core_types'] = ['Symfony\Component\Form\Extension\Core\Type\FormType'];
-        $options['service_types'] = ['Symfony\Bridge\Doctrine\Form\Type\EntityType'];
-        $options['extensions'] = ['Symfony\Component\Form\Extension\Csrf\Type\FormTypeCsrfExtension'];
-        $options['guessers'] = ['Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser'];
+        $options['core_types'] = [FormType::class];
+        $options['service_types'] = [EntityType::class];
+        $options['extensions'] = [FormTypeCsrfExtension::class];
+        $options['guessers'] = [ValidatorTypeGuesser::class];
         $options['decorated'] = false;
         $options['show_deprecated'] = false;
         yield [null, $options, 'defaults_1'];

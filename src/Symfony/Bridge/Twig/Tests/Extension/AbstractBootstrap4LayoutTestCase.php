@@ -144,7 +144,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
 
     public function testLabelHtmlDefaultIsFalse()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+        $form = $this->factory->createNamed('name', TextType::class, null, [
             'label' => '<b>Bolded label</b>',
         ]);
 
@@ -160,7 +160,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
 
     public function testLabelHtmlIsTrue()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+        $form = $this->factory->createNamed('name', TextType::class, null, [
             'label' => '<b>Bolded label</b>',
             'label_html' => true,
         ]);
@@ -213,7 +213,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
 
     public function testHelpAttr()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+        $form = $this->factory->createNamed('name', TextType::class, null, [
             'help' => 'Help text test!',
             'help_attr' => [
                 'class' => 'class-test',
@@ -233,7 +233,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
 
     public function testHelpHtmlDefaultIsFalse()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+        $form = $this->factory->createNamed('name', TextType::class, null, [
             'help' => 'Help <b>text</b> test!',
         ]);
 
@@ -260,7 +260,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
 
     public function testHelpHtmlIsFalse()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+        $form = $this->factory->createNamed('name', TextType::class, null, [
             'help' => 'Help <b>text</b> test!',
             'help_html' => false,
         ]);
@@ -288,7 +288,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
 
     public function testHelpHtmlIsTrue()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+        $form = $this->factory->createNamed('name', TextType::class, null, [
             'help' => 'Help <b>text</b> test!',
             'help_html' => true,
         ]);
@@ -458,7 +458,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
 
     public function testCheckboxRowWithHelp()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType');
+        $form = $this->factory->createNamed('name', CheckboxType::class);
         $html = $this->renderRow($form->createView(), ['label' => 'foo', 'help' => 'really helpful text']);
 
         $this->assertMatchesXpath($html,
@@ -1078,7 +1078,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
 
     public function testRadioRowWithHelp()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\RadioType', false);
+        $form = $this->factory->createNamed('name', RadioType::class, false);
         $html = $this->renderRow($form->createView(), ['label' => 'foo', 'help' => 'really helpful text']);
 
         $this->assertMatchesXpath($html,

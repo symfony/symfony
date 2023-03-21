@@ -11,6 +11,11 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use Symfony\Component\Form\Extension\Core\Type\BirthdayType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Test\FormPerformanceTestCase;
 
 /**
@@ -28,16 +33,16 @@ class CompoundFormPerformanceTest extends FormPerformanceTestCase
         $this->setMaxRunningTime(1);
 
         for ($i = 0; $i < 40; ++$i) {
-            $form = $this->factory->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType')
-                ->add('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType')
-                ->add('lastName', 'Symfony\Component\Form\Extension\Core\Type\TextType')
-                ->add('color', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', [
+            $form = $this->factory->createBuilder(FormType::class)
+                ->add('firstName', TextType::class)
+                ->add('lastName', TextType::class)
+                ->add('color', ChoiceType::class, [
                     'choices' => ['red' => 'Red', 'blue' => 'Blue'],
                     'required' => false,
                 ])
-                ->add('age', 'Symfony\Component\Form\Extension\Core\Type\NumberType')
-                ->add('birthDate', 'Symfony\Component\Form\Extension\Core\Type\BirthdayType')
-                ->add('city', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', [
+                ->add('age', NumberType::class)
+                ->add('birthDate', BirthdayType::class)
+                ->add('city', ChoiceType::class, [
                     // simulate 300 different cities
                     'choices' => range(1, 300),
                 ])

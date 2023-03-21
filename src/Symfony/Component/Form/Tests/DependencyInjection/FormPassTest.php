@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Command\DebugCommand;
 use Symfony\Component\Form\DependencyInjection\FormPass;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormRegistry;
 
 /**
@@ -302,11 +303,11 @@ class FormPassTest extends TestCase
                 'form.type_extension',
                 function (ContainerBuilder $container) {
                     self::assertEquals(
-                        ['Symfony\Component\Form\Extension\Core\Type\FormType' => new IteratorArgument([new Reference('my.type_extension')])],
+                        [FormType::class => new IteratorArgument([new Reference('my.type_extension')])],
                         $container->getDefinition('form.extension')->getArgument(1)
                     );
                 },
-                ['extended_type' => 'Symfony\Component\Form\Extension\Core\Type\FormType'],
+                ['extended_type' => FormType::class],
             ],
             ['my.guesser', 'stdClass', 'form.type_guesser', function (ContainerBuilder $container) {
                 self::assertEquals(new IteratorArgument([new Reference('my.guesser')]), $container->getDefinition('form.extension')->getArgument(2));

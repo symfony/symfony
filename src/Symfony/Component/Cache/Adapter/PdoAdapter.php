@@ -588,6 +588,6 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
 
     private function getIdColumnType(): int
     {
-        return $this->driver === 'pgsql' ? \PDO::PARAM_LOB : \PDO::PARAM_STR;
+        return 'pgsql' === $this->driver ? \PDO::PARAM_LOB : \PDO::PARAM_STR;
     }
 }

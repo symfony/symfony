@@ -12,15 +12,12 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use PHPUnit\Framework\MockObject\MockObject;
-use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\PruneableInterface;
-use Symfony\Component\Cache\Tests\Adapter\AdapterTestCase;
-use Symfony\Component\Cache\Tests\Adapter\TagAwareTestTrait;
 use Symfony\Component\Cache\Tests\Fixtures\PrunableAdapter;
 
 abstract class TagAwareAdapterTestCase extends AdapterTestCase

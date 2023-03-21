@@ -406,6 +406,6 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
 
     private function getIdColumnType(): int
     {
-        return $this->getPlatformName() === 'pgsql' ? ParameterType::BINARY : ParameterType::STRING;
+        return 'pgsql' === $this->getPlatformName() ? ParameterType::BINARY : ParameterType::STRING;
     }
 }

@@ -11,14 +11,11 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
-use Doctrine\DBAL\DriverManager;
 use PHPUnit\Framework\SkippedTestSuiteError;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
-use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
 use Symfony\Component\Cache\Adapter\PdoAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
-use Symfony\Component\Cache\Tests\Adapter\TagAwareAdapterTestCase;
 
 /**
  * @group time-sensitive

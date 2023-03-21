@@ -62,6 +62,19 @@
             <b>Macro Calls</b>
             <span class="sf-toolbar-status">{{ collector.macrocount }}</span>
         </div>
+        {% if collector.templates|keys %}
+            <div class="sf-toolbar-info-piece">
+                <b>Current rendered template</b>
+                {%- set template = collector.templates|keys|first -%}
+                {%- set file = collector.templatePaths[template]|default(false) -%}
+                {%- set link = file ? file|file_link(1) : false -%}
+                {% if link %}
+                    <a href="{{ link }}" title="{{ file }}">{{ template }}</a>
+                {% else %}
+                    {{ template }}
+                {% endif %}
+            </div>
+        {% endif %}
     {% endset %}
 
     {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url }) }}

@@ -6,6 +6,8 @@ CHANGELOG
 
  * Add a "role=img" and an explicit title in the .svg file used by the web debug toolbar
    to improve accessibility with screen readers for blind users
+ * Add a link of the current rendered template on the twig tab of the web debug toolbar
+   to improve user experience and make the debug easier
 
 6.1
 ---

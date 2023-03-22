@@ -45,6 +45,8 @@ final class ImportMapManager
     private const PACKAGE_PATTERN = '/^(?:https?:\/\/[\w\.-]+\/)?(?:(?<registry>\w+):)?(?<package>(?:@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*)(?:@(?<version>[\w\._-]+))?(?:(?<subpath>\/.*))?$/';
 
     private ?array $importMap = null;
+    private ?array $modulesToPreload = null;
+    private ?string $json = null;
 
     public function __construct(
         private readonly string $path,
@@ -58,31 +60,18 @@ final class ImportMapManager
         $this->httpClient = $httpClient ?? HttpClient::create(['base_uri' => 'https://api.jspm.io/']);
     }
 
+    public function getModulesToPreload(): array
+    {
+        $this->buildImportMap();
+
+        return $this->modulesToPreload;
+    }
+
     public function getImportMap(): string
     {
-        $this->loadImportMap();
+        $this->buildImportMap();
 
-        $importmap = ['imports' => []];
-        foreach ($this->importMap as $packageName => $data) {
-            if (isset($data['url'])) {
-                if ($data['download'] ?? false) {
-                    $importmap['imports'][$packageName] = $this->vendorUrl($packageName);
-
-                    continue;
-                }
-
-                $importmap['imports'][$packageName] = $data['url'];
-
-                continue;
-            }
-
-            if (isset($data['path'])) {
-                $importmap['imports'][$packageName] = $this->assetsUrl.$this->digestName($packageName, $data['path']);
-            }
-        }
-
-        // Use JSON_UNESCAPED_SLASHES | JSON_HEX_TAG to prevent XSS
-        return json_encode($importmap, \JSON_THROW_ON_ERROR | \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_HEX_TAG);
+        return $this->json;
     }
 
     /**
@@ -117,6 +106,31 @@ final class ImportMapManager
     {
         $this->importMap ??= file_exists($this->path) ? include $this->path : [];
     }
+
+    private function buildImportMap(): void
+    {
+        $this->loadImportMap();
+        $this->modulesToPreload = [];
+
+        $importmap = ['imports' => []];
+        foreach ($this->importMap as $packageName => $data) {
+            if (isset($data['url'])) {
+                $importmap['imports'][$packageName] = ($data['download'] ?? false) ? $this->vendorUrl($packageName) : $data['url'];
+            } elseif (isset($data['path'])) {
+                $importmap['imports'][$packageName] = $this->assetsUrl.$this->digestName($packageName, $data['path']);
+            } else {
+                continue;
+            }
+
+            if ($data['preload'] ?? false) {
+                $this->modulesToPreload[] = $importmap['imports'][$packageName];
+            }
+        }
+
+        // Use JSON_UNESCAPED_SLASHES | JSON_HEX_TAG to prevent XSS
+        $this->json = json_encode($importmap, \JSON_THROW_ON_ERROR | \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_HEX_TAG);
+    }
+
 
     /**
      * @param array<string, PackageOptions> $require

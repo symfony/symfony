@@ -701,6 +701,15 @@ class ConfigurationTest extends TestCase
             'remote-event' => [
                 'enabled' => false,
             ],
+            'importmaps' => [
+                'enabled' => false,
+                'path' => '%kernel.project_dir%/importmap.php',
+                'polyfill' => null,
+                'assets_dir' => '%kernel.project_dir%/assets/',
+                'public_assets_dir' => '%kernel.project_dir%/public/assets/',
+                'assets_url' => '/assets/',
+                'provider' => 'jspm',
+            ],
         ];
     }
 }

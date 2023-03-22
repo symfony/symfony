@@ -35,11 +35,9 @@ final class ImportMapsExtension extends AbstractExtension
 
     public function importmap(): string
     {
-        $json = $this->importMapManager->getImportMap();
-
         $output = <<<HTML
 <script type="importmap">
-$json
+{$this->importMapManager->getImportMap()}
 </script>
 HTML;
 
@@ -51,6 +49,10 @@ HTML;
 <!-- ES Module Shims: Import maps polyfill for modules browsers without import maps support -->
 <script async src="{$url}" crossorigin="anonymous"></script>
 HTML;
+        }
+
+        foreach ($this->importMapManager->getModulesToPreload() as $url) {
+            $output .= "<link rel=\"modulepreload\" href=\"{$url}\">\n";
         }
 
         return $output;

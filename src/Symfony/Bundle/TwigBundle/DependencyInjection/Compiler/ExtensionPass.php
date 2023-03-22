@@ -135,7 +135,7 @@ class ExtensionPass implements CompilerPassInterface
         }
 
         if (!$container->has(ImportMapManager::class)) {
-            $container->removeDefinition('twig.extension.import_maps');
+            $container->removeDefinition('twig.extension.importmaps');
         }
     }
 }

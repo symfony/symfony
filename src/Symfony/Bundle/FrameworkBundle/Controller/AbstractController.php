@@ -32,6 +32,7 @@ use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\ImportMaps\ImportMapManager;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -44,6 +45,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\WebLink\EventListener\AddLinkHeaderListener;
 use Symfony\Component\WebLink\GenericLinkProvider;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
+use Symfony\Component\WebLink\Link;
 use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Environment;
@@ -95,6 +97,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
             'security.csrf.token_manager' => '?'.CsrfTokenManagerInterface::class,
             'parameter_bag' => '?'.ContainerBagInterface::class,
             'web_link.http_header_serializer' => '?'.HttpHeaderSerializer::class,
+            'importmaps.manager' => '?'.ImportMapManager::class,
         ];
     }
 
@@ -409,7 +412,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     /**
      * @param LinkInterface[] $links
      */
-    protected function sendEarlyHints(iterable $links, Response $response = null): Response
+    protected function sendEarlyHints(iterable $links = [], Response $response = null, bool $preloadJavaScriptModules = false): Response
     {
         if (!$this->container->has('web_link.http_header_serializer')) {
             throw new \LogicException('You cannot use the "sendEarlyHints" method if the WebLink component is not available. Try running "composer require symfony/web-link".');
@@ -418,6 +421,17 @@ abstract class AbstractController implements ServiceSubscriberInterface
         $response ??= new Response();
 
         $populatedLinks = [];
+
+        if ($preloadJavaScriptModules) {
+            if (!$this->container->has('importmaps.manager')) {
+                throw new \LogicException('You cannot use the JavaScript modules method if the ImportMaps component is not available. Try running "composer require symfony/import-maps".');
+            }
+
+            foreach ($this->container->get('importmaps.manager')->getModulesToPreload() as $url) {
+                $populatedLinks[] = new Link('modulepreload', $url);
+            }
+        }
+
         foreach ($links as $link) {
             if ($link instanceof EvolvableLinkInterface && !$link->getRels()) {
                 $link = $link->withRel('preload');

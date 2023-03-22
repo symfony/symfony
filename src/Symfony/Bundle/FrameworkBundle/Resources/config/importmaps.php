@@ -38,6 +38,7 @@ return static function (ContainerConfigurator $container): void {
                 abstract_arg('provider'),
                 abstract_arg('debug'),
             ])
+        ->alias(ImportMapManager::class, 'importmaps.manager')
 
         ->set('importmaps.command.require', RequireCommand::class)
             ->args([service('importmaps.manager')])

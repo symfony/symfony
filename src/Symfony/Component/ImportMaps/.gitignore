@@ -1,12 +1,5 @@
-/.php_cs.cache
-/.php_cs
-/.phpunit.result.cache
-/composer.phar
-/composer.lock
-/phpunit.xml
-/vendor/
+vendor/
+composer.lock
+phpunit.xml
 /Tests/App/var
 /Tests/App/public/build/
-node_modules/
-package-lock.json
-yarn.lock

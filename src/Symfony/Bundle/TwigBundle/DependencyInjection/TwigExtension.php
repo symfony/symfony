@@ -88,11 +88,7 @@ class TwigExtension extends Extension
         }
 
         if ($container::willBeAvailable('symfony/import-maps', ImportMapManager::class, ['symfony/import-maps'])) {
-            $loader->load('import_maps.php');
-
-            if (isset($config['importmap']['polyfill'])) {
-                $container->getDefinition('twig.extension.import_maps')->addArgument($config['importmap']['polyfill'] ?: null);
-            }
+            $loader->load('importmaps.php');
         }
 
         $container->setParameter('twig.form.resources', $config['form_themes']);

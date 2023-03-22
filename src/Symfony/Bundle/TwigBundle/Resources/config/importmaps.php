@@ -17,8 +17,11 @@ use Symfony\Component\ImportMaps\ImportMapManager;
 return static function (ContainerConfigurator $container) {
     $container->services()
 
-        ->set('twig.extension.import_maps', ImportMapsExtension::class)
-            ->args([service(ImportMapManager::class)])
+        ->set('twig.extension.importmaps', ImportMapsExtension::class)
+            ->args([
+                service('importmaps.manager'),
+                param('importmaps.polyfill'),
+            ])
             ->tag('twig.extension')
 
     ;

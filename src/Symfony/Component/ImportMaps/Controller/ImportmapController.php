@@ -35,17 +35,17 @@ final class ImportmapController
     public function handle(string $path): Response
     {
         if (
-            // todo: fix this to prevent path traversing attacks
-            !preg_match('/^([a-zA-Z0-9_@\/].*)\.(\w+)\.(.*)$/', $path, $matches)
+            !preg_match('/^(.*)\.(\w+)\.(.*)$/', $path, $matches)
         ) {
             throw new NotFoundHttpException();
         }
 
-        $localPath = $this->assetsDir.$matches[1].'.'.$matches[3];
-
+        $localPath = realpath($this->assetsDir.$matches[1].'.'.$matches[3]);
         if (
-            !file_exists($localPath)
-            || $matches[2] !== hash('xxh128', file_get_contents($localPath))
+            // prevents path traversal attacks
+            !str_starts_with($localPath, $this->assetsDir) ||
+            !file_exists($localPath) ||
+            $matches[2] !== hash('xxh128', file_get_contents($localPath))
         ) {
             throw new NotFoundHttpException();
         }

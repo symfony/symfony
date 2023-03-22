@@ -47,10 +47,10 @@ class Kernel extends BaseKernel
             'profiler' => [
                 'only_exceptions' => false,
             ],
-            'importmap' => [
+            'importmaps' => [
                 'enabled' => true,
+                'polyfill' => 'https://ga.jspm.io/npm:es-module-shims@1.6.2/dist/es-module-shims.js',
                 'provider' => 'unpkg',
-                //'api' => 'https://notfound.example.com',
             ],
         ]);
 
@@ -58,17 +58,11 @@ class Kernel extends BaseKernel
             'toolbar' => true,
             'intercept_redirects' => false,
         ]);
-
-        $container->extension('twig', [
-            'importmap' => [
-                'polyfill' => 'https://ga.jspm.io/npm:es-module-shims@1.6.2/dist/es-module-shims.js'
-            ],
-        ]);
     }
 
     protected function configureRoutes(RoutingConfigurator $routes): void
     {
-        $routes->import('@FrameworkBundle/Resources/config/routing/importmap.xml');
+        $routes->import('@FrameworkBundle/Resources/config/routing/importmaps.xml');
         $routes->import('@WebProfilerBundle/Resources/config/routing/wdt.xml')->prefix('/_wdt');
         $routes->import('@WebProfilerBundle/Resources/config/routing/profiler.xml')->prefix('/_profiler');
 

@@ -535,12 +535,12 @@ class FrameworkExtension extends Extension
             $this->registerHtmlSanitizerConfiguration($config['html_sanitizer'], $container, $loader);
         }
 
-        if ($this->readConfigEnabled('importmap', $container, $config['importmap'])) {
+        if ($this->readConfigEnabled('importmaps', $container, $config['importmaps'])) {
             if (!class_exists(ImportMapManager::class)) {
                 throw new LogicException('Import Maps support cannot be enabled as the ImportMaps component is not installed. Try running "composer require symfony/import-maps".');
             }
 
-            $this->registerImportMapsConfiguration($config['importmap'], $container, $loader);
+            $this->registerImportMapsConfiguration($config['importmaps'], $container, $loader);
         }
 
         $this->addAnnotatedClassesToCompile([
@@ -2949,21 +2949,22 @@ class FrameworkExtension extends Extension
 
     private function registerImportMapsConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
-        $loader->load('import_maps.php');
+        $loader->load('importmaps.php');
+
+        $container->setParameter('importmaps.polyfill', $config['polyfill']);
 
         $container
-            ->getDefinition(ImportmapController::class)
+            ->getDefinition('importmaps.controller')
             ->replaceArgument(0, $config['assets_dir']);
 
         $container
-            ->getDefinition(ImportMapManager::class)
+            ->getDefinition('importmaps.manager')
             ->replaceArgument(0, $config['path'])
             ->replaceArgument(1, $config['assets_dir'])
             ->replaceArgument(2, $config['public_assets_dir'])
             ->replaceArgument(3, $config['assets_url'])
             ->replaceArgument(4, $config['provider'])
-            ->replaceArgument(5, $container->getParameter('kernel.debug') ? ImportMapManager::ENV_DEVELOPMENT : ImportMapManager::ENV_PRODUCTION)
-            ->replaceArgument(7, $config['api'])
+            ->replaceArgument(5, $container->getParameter('kernel.debug'))
         ;
     }
 

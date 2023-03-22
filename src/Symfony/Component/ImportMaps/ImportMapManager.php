@@ -12,7 +12,6 @@
 namespace Symfony\Component\ImportMaps;
 
 use Symfony\Component\HttpClient\HttpClient;
-use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\VarExporter\VarExporter;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -23,13 +22,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class ImportMapManager
 {
-    public const ENV_PRODUCTION = 'production';
-    public const ENV_DEVELOPMENT = 'development';
-    public const ENVS = [
-        self::ENV_PRODUCTION,
-        self::ENV_DEVELOPMENT,
-    ];
-
     public const PROVIDER_JSPM = 'jspm';
     public const PROVIDER_JSPM_SYSTEM = 'jspm.system';
     public const PROVIDER_SKYPACK = 'skypack';
@@ -52,30 +44,18 @@ final class ImportMapManager
      */
     private const PACKAGE_PATTERN = '/^(?:https?:\/\/[\w\.-]+\/)?(?:(?<registry>\w+):)?(?<package>(?:@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*)(?:@(?<version>[\w\._-]+))?(?:(?<subpath>\/.*))?$/';
 
-    private HttpClientInterface $apiHttpClient;
     private ?array $importMap = null;
 
     public function __construct(
-        private readonly string $path = 'importmap.php',
+        private readonly string $path,
         private readonly string $assetsDir = 'assets/',
         private readonly string $publicAssetsDir = 'public/assets/',
         private readonly string $assetsUrl = '/assets/',
         private readonly string $provider = self::PROVIDER_JSPM,
-        private readonly string $env = self::ENV_PRODUCTION,
+        private readonly bool $debug = false,
         private ?HttpClientInterface $httpClient = null,
-        private readonly string $api = 'https://api.jspm.io',
     ) {
-        $this->httpClient ??= HttpClient::create();
-        $this->apiHttpClient = ScopingHttpClient::forBaseUri($this->httpClient, $this->api);
-    }
-
-    private function loadImportMap(): void
-    {
-        if (null !== $this->importMap) {
-            return;
-        }
-
-        $this->importMap = file_exists($this->path) ? include $this->path : [];
+        $this->httpClient = $httpClient ?? HttpClient::create(['base_uri' => 'https://api.jspm.io/']);
     }
 
     public function getImportMap(): string
@@ -103,14 +83,6 @@ final class ImportMapManager
 
         // Use JSON_UNESCAPED_SLASHES | JSON_HEX_TAG to prevent XSS
         return json_encode($importmap, \JSON_THROW_ON_ERROR | \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_HEX_TAG);
-    }
-
-    // TODO: find a better name
-    public function getImportMapArray(): array
-    {
-        $this->loadImportMap();
-
-        return $this->importMap;
     }
 
     /**
@@ -141,9 +113,14 @@ final class ImportMapManager
         $this->createImportMap(true, [], []);
     }
 
+    private function loadImportMap(): void
+    {
+        $this->importMap ??= file_exists($this->path) ? include $this->path : [];
+    }
+
     /**
      * @param array<string, PackageOptions> $require
-     * @param string[] $remove
+     * @param string[]                      $remove
      */
     private function createImportMap(bool $update, array $require, array $remove): void
     {
@@ -210,14 +187,13 @@ final class ImportMapManager
         $json = [
             'install' => array_values($install),
             'flattenScope' => true,
+            'env' => ['browser', 'module', $this->debug ? 'development' : 'production'],
         ];
         if ($this->provider !== self::PROVIDER_JSPM) {
             $json['provider'] = $this->provider;
         }
 
-        $json['env'] = ['browser', 'module', $this->env];
-
-        $response = $this->apiHttpClient->request('POST', '/generate', [
+        $response = $this->httpClient->request('POST', '/generate', [
             'json' => $json,
         ]);
 
@@ -228,6 +204,7 @@ final class ImportMapManager
                 throw new \RuntimeException($data['error']);
             }
 
+            // Throws the original HttpClient exception
             $response->getHeaders();
         }
 

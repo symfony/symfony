@@ -39,7 +39,7 @@ final class MailgunTransportFactory extends AbstractTransportFactory
         }
 
         if ('mailgun+smtp' === $scheme || 'mailgun+smtps' === $scheme) {
-            return new MailgunSmtpTransport($user, $password, $region, $this->dispatcher, $this->logger);
+            return new MailgunSmtpTransport($user, $password, $region, $port, $this->dispatcher, $this->logger);
         }
 
         throw new UnsupportedSchemeException($dsn, 'mailgun', $this->getSupportedSchemes());

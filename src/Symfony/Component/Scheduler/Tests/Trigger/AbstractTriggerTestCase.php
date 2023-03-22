@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Scheduler\Trigger\DatePeriodTrigger;
 use Symfony\Component\Scheduler\Trigger\TriggerInterface;
 
-abstract class AbstractTriggerTest extends TestCase
+abstract class AbstractTriggerTestCase extends TestCase
 {
     /**
      * @dataProvider providerGetNextRunDate

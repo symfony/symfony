@@ -20,9 +20,9 @@ abstract class AbstractTriggerTestCase extends TestCase
     /**
      * @dataProvider providerGetNextRunDate
      */
-    public function testGetNextRunDate(TriggerInterface $trigger, array $expected)
+    public function testGetNextRunDate(\DateTimeImmutable $from, TriggerInterface $trigger, array $expected)
     {
-        $this->assertEquals($expected, $this->getNextRunDates($trigger));
+        $this->assertEquals($expected, $this->getNextRunDates($from, $trigger));
     }
 
     abstract public static function providerGetNextRunDate(): iterable;
@@ -34,11 +34,11 @@ abstract class AbstractTriggerTestCase extends TestCase
         );
     }
 
-    private function getNextRunDates(TriggerInterface $trigger): array
+    private function getNextRunDates(\DateTimeImmutable $from, TriggerInterface $trigger): array
     {
         $dates = [];
         $i = 0;
-        $next = new \DateTimeImmutable();
+        $next = $from;
         while ($i++ < 20) {
             $next = $trigger->getNextRunDate($next);
             if (!$next) {

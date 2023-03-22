@@ -74,7 +74,7 @@ class PropertyPathAccessor implements DataAccessorInterface
         return null !== $form->getPropertyPath();
     }
 
-    public function isWritable(object|array $data, FormInterface $form): bool
+    public function isWritable(object|array $viewData, FormInterface $form): bool
     {
         return null !== $form->getPropertyPath();
     }

@@ -13,7 +13,7 @@ namespace Symfony\Component\Scheduler\Tests\Trigger;
 
 use Symfony\Component\Scheduler\Trigger\DatePeriodTrigger;
 
-class DatePeriodTriggerTest extends AbstractTriggerTest
+class DatePeriodTriggerTest extends AbstractTriggerTestCase
 {
     public static function providerGetNextRunDate(): iterable
     {

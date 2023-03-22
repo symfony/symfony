@@ -11,13 +11,14 @@
 
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\ImportMaps\Tests\App\Kernel;
 
-if (file_exists(__DIR__.'/../../../../../../../vendor/autoload.php')) {
-    require __DIR__.'/../../../../../../../vendor/autoload.php';
+if (file_exists(__DIR__.'/../../../../../../../../vendor/autoload.php')) {
+    require __DIR__.'/../../../../../../../../vendor/autoload.php';
 } else {
-    require __DIR__.'/../../../vendor/autoload.php';
+    require __DIR__.'/../../../../vendor/autoload.php';
 }
+
+require __DIR__.'/../Kernel.php';
 
 $app = new Kernel($_SERVER['APP_ENV'] ?? 'dev', $_SERVER['APP_DEBUG'] ?? true);
 

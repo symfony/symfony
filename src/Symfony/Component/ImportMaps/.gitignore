@@ -1,5 +1,3 @@
 vendor/
 composer.lock
 phpunit.xml
-/Tests/App/var
-/Tests/App/public/build/

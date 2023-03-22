@@ -9,6 +9,6 @@ return [
     ],
     '@hotwired/stimulus' => [
         'download' => true,
-        'url' => 'https://unpkg.com/@hotwired/stimulus@3.2.0/dist/stimulus.js',
+        'url' => 'https://unpkg.com/@hotwired/stimulus@3.2.1/dist/stimulus.js',
     ],
 ];

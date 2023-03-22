@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ImportMaps\Tests\App;
-
 use Symfony\Bundle\DebugBundle\DebugBundle;
 use Symfony\Bundle\FrameworkBundle\Controller\TemplateController;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;

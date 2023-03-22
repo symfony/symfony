@@ -1,3 +1,4 @@
 vendor/
 composer.lock
 phpunit.xml
+Tests/Fixtures/micro-app/var/

@@ -93,7 +93,6 @@ use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\ImportMaps\Controller\ImportmapController;
 use Symfony\Component\ImportMaps\ImportMapManager;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;

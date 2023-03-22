@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Symfony\Component\ImportMaps\Command\AbstractCommand;
 use Symfony\Component\ImportMaps\Command\ExportCommand;
 use Symfony\Component\ImportMaps\Command\RemoveCommand;
 use Symfony\Component\ImportMaps\Command\RequireCommand;

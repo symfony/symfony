@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Bridge\Twig\Extension\ImportMapsExtension;
-use Symfony\Component\ImportMaps\ImportMapManager;
 
 return static function (ContainerConfigurator $container) {
     $container->services()

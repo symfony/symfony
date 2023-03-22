@@ -74,7 +74,7 @@ class AbstractControllerTest extends TestCase
             'security.token_storage' => '?Symfony\\Component\\Security\\Core\\Authentication\\Token\\Storage\\TokenStorageInterface',
             'security.csrf.token_manager' => '?Symfony\\Component\\Security\\Csrf\\CsrfTokenManagerInterface',
             'web_link.http_header_serializer' => '?Symfony\\Component\\WebLink\\HttpHeaderSerializer',
-            'importmaps.manager' => '?Symfony\\Component\\ImportMaps\\ImportMapManager'
+            'importmaps.manager' => '?Symfony\\Component\\ImportMaps\\ImportMapManager',
         ];
 
         $this->assertEquals($expectedServices, $subscribed, 'Subscribed core services in AbstractController have changed');

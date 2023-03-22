@@ -131,7 +131,6 @@ final class ImportMapManager
         $this->json = json_encode($importmap, \JSON_THROW_ON_ERROR | \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_HEX_TAG);
     }
 
-
     /**
      * @param array<string, PackageOptions> $require
      * @param string[]                      $remove
@@ -203,7 +202,7 @@ final class ImportMapManager
             'flattenScope' => true,
             'env' => ['browser', 'module', $this->debug ? 'development' : 'production'],
         ];
-        if ($this->provider !== self::PROVIDER_JSPM) {
+        if (self::PROVIDER_JSPM !== $this->provider) {
             $json['provider'] = $this->provider;
         }
 
@@ -211,7 +210,7 @@ final class ImportMapManager
             'json' => $json,
         ]);
 
-        if ($response->getStatusCode() !== 200) {
+        if (200 !== $response->getStatusCode()) {
             $data = $response->toArray(false);
 
             if (isset($data['error'])) {
@@ -250,11 +249,11 @@ final class ImportMapManager
 
             $this->importMap[$packageName]['url'] = $url;
 
-            @mkdir(dirname($localPath), 0777, true);
+            @mkdir(\dirname($localPath), 0777, true);
             file_put_contents($localPath, $this->httpClient->request('GET', $url)->getContent());
 
             $publicPath = $this->publicAssetsDir.'vendor/'.$this->digestName($packageName, $relativePath);
-            @mkdir(dirname($publicPath), 0777, true);
+            @mkdir(\dirname($publicPath), 0777, true);
             copy($localPath, $publicPath);
         }
     }
@@ -272,12 +271,12 @@ final class ImportMapManager
 
             @unlink($assetPath);
             if ($cleanEmptyDirectories) {
-                @rmdir(dirname($assetPath));
+                @rmdir(\dirname($assetPath));
             }
 
             @unlink($publicAssetPath);
             if ($cleanEmptyDirectories) {
-                @rmdir(dirname($publicAssetPath));
+                @rmdir(\dirname($publicAssetPath));
             }
 
             return;
@@ -296,7 +295,7 @@ final class ImportMapManager
 
         @unlink($publicAssetPath);
         if ($cleanEmptyDirectories) {
-            @rmdir(dirname($publicAssetPath));
+            @rmdir(\dirname($publicAssetPath));
         }
     }
 

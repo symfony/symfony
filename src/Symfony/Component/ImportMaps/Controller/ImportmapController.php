@@ -51,7 +51,7 @@ final class ImportmapController
         }
 
         $contentType = $this->mimeTypes->guessMimeType($localPath);
-        if ($contentType === 'text/plain') {
+        if ('text/plain' === $contentType) {
             $contentType = match ($matches[3]) {
                 'js' => 'application/javascript',
                 'css' => 'text/css',

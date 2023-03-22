@@ -98,12 +98,12 @@ class MailgunTransportFactoryTest extends TransportFactoryTestCase
 
         yield [
             new Dsn('mailgun+smtp', 'default', self::USER, self::PASSWORD),
-            new MailgunSmtpTransport(self::USER, self::PASSWORD, null, null, $logger),
+            new MailgunSmtpTransport(self::USER, self::PASSWORD, null, null,null, $logger),
         ];
 
         yield [
             new Dsn('mailgun+smtps', 'default', self::USER, self::PASSWORD),
-            new MailgunSmtpTransport(self::USER, self::PASSWORD, null, null, $logger),
+            new MailgunSmtpTransport(self::USER, self::PASSWORD, null, null,null, $logger),
         ];
     }
 

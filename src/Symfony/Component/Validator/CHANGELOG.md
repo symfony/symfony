@@ -8,6 +8,7 @@ CHANGELOG
  * Add `Uuid::TIME_BASED_VERSIONS` to match that a UUID being validated embeds a timestamp
  * Add the `pattern` parameter in violations of the `Regex` constraint
  * Add a `NoSuspiciousCharacters` constraint to validate a string is not a spoofing attempt
+ * Add a `PasswordStrength` constraint to check the strength of a password (requires `bjeavons/zxcvbn-php` library)
  * Add the `countUnit` option to the `Length` constraint to allow counting the string length either by code points (like before, now the default setting `Length::COUNT_CODEPOINTS`), bytes (`Length::COUNT_BYTES`) or graphemes (`Length::COUNT_GRAPHEMES`)
  * Add the `filenameMaxLength` option to the `File` constraint
  * Add the `exclude` option to the `Cascade` constraint

@@ -18,6 +18,7 @@ class DatePeriodTriggerTest extends AbstractTriggerTestCase
     public static function providerGetNextRunDate(): iterable
     {
         yield [
+            new \DateTimeImmutable('2023-03-19 13:45'),
             self::createTrigger('next tuesday'),
             [
                 new \DateTimeImmutable('2023-03-21 13:45:00'),
@@ -37,6 +38,7 @@ class DatePeriodTriggerTest extends AbstractTriggerTestCase
         ];
 
         yield [
+            new \DateTimeImmutable('2023-03-19 13:45'),
             self::createTrigger('last day of next month'),
             [
                 new \DateTimeImmutable('2023-04-30 13:45:00'),
@@ -45,6 +47,7 @@ class DatePeriodTriggerTest extends AbstractTriggerTestCase
         ];
 
         yield [
+            new \DateTimeImmutable('2023-03-19 13:45'),
             self::createTrigger('first monday of next month'),
             [
                 new \DateTimeImmutable('2023-04-03 13:45:00'),

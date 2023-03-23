@@ -15,6 +15,8 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Validator\Constraint;
 
 class TranslatorPass implements CompilerPassInterface
 {
@@ -51,17 +53,7 @@ class TranslatorPass implements CompilerPassInterface
 
         if ($container->hasDefinition('validator') && $container->hasDefinition('translation.extractor.visitor.constraint')) {
             $constraintVisitorDefinition = $container->getDefinition('translation.extractor.visitor.constraint');
-            $constraintClassNames = [];
-
-            foreach ($container->findTaggedServiceIds('validator.constraint_validator', true) as $id => $attributes) {
-                $serviceDefinition = $container->getDefinition($id);
-                // Resolve constraint validator FQCN even if defined as %foo.validator.class% parameter
-                $className = $container->getParameterBag()->resolveValue($serviceDefinition->getClass());
-                // Extraction of the constraint class name from the Constraint Validator FQCN
-                $constraintClassNames[] = str_replace('Validator', '', substr(strrchr($className, '\\'), 1));
-            }
-
-            $constraintVisitorDefinition->setArgument(0, $constraintClassNames);
+            $constraintVisitorDefinition->setArgument(0, $this->extractConstraintClassNames());
         }
 
         if (!$container->hasParameter('twig.default_path')) {
@@ -85,5 +77,41 @@ class TranslatorPass implements CompilerPassInterface
                 $definition->replaceArgument(7, $paths);
             }
         }
+    }
+
+    /**
+     * @return array An array of all contraints class names
+     *               contained in Validator Component
+     */
+    private function extractConstraintClassNames(): array
+    {
+        $directory = __DIR__.'/../../Validator/Constraints';
+
+        $finder = new Finder();
+        $finder->files()->in($directory)->name('*.php');
+        $classes = [];
+
+        foreach ($finder as $file) {
+            $filePath = $file->getRealPath();
+            $fileContents = file_get_contents($filePath);
+
+            preg_match('/namespace\s+([^\s;]+).*class\s+(\w+)/s', $fileContents, $matches);
+            if (3 !== \count($matches)) {
+                continue;
+            }
+
+            $namespace = $matches[1];
+            $className = $matches[2];
+            $fqcn = $namespace.'\\'.$className;
+
+            if (
+                true === class_exists($fqcn) &&
+                true === is_subclass_of($fqcn, Constraint::class)
+            ) {
+                $classes[] = $className;
+            }
+        }
+
+        return $classes;
     }
 }

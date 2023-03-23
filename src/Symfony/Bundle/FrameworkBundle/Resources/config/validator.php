@@ -29,7 +29,6 @@ use Symfony\Component\Validator\Constraints\DateValidator;
 use Symfony\Component\Validator\Constraints\DivisibleByValidator;
 use Symfony\Component\Validator\Constraints\EmailValidator;
 use Symfony\Component\Validator\Constraints\EqualToValidator;
-use Symfony\Component\Validator\Constraints\ExpressionLanguageSyntaxValidator;
 use Symfony\Component\Validator\Constraints\ExpressionSyntaxValidator;
 use Symfony\Component\Validator\Constraints\ExpressionValidator;
 use Symfony\Component\Validator\Constraints\FileValidator;
@@ -229,12 +228,6 @@ return static function (ContainerConfigurator $container) {
         ->set('validator.equal_to', EqualToValidator::class)
             ->tag('validator.constraint_validator', [
                 'alias' => EqualToValidator::class,
-            ])
-
-        ->set('validator.expression_language_syntax', ExpressionLanguageSyntaxValidator::class)
-            ->args([service('validator.expression_language')->nullOnInvalid()])
-            ->tag('validator.constraint_validator', [
-                'alias' => ExpressionLanguageSyntaxValidator::class,
             ])
 
         ->set('validator.expression_syntax', ExpressionSyntaxValidator::class)

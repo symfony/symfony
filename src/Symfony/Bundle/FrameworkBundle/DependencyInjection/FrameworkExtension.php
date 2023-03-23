@@ -227,7 +227,6 @@ use Symfony\Component\Translation\PseudoLocalizationTranslator;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Uid\Factory\UuidFactory;
 use Symfony\Component\Uid\UuidV4;
-use Symfony\Component\Validator\Constraints\ExpressionLanguageSyntaxValidator;
 use Symfony\Component\Validator\Constraints\ExpressionSyntaxValidator;
 use Symfony\Component\Validator\Constraints\WhenValidator;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
@@ -1560,10 +1559,6 @@ class FrameworkExtension extends Extension
 
         if (!class_exists(ExpressionSyntaxValidator::class)) {
             $container->removeDefinition('validator.expression_syntax');
-        }
-
-        if (!class_exists(ExpressionLanguageSyntaxValidator::class)) {
-            $container->removeDefinition('validator.expression_language_syntax');
         }
 
         if (!class_exists(WhenValidator::class)) {

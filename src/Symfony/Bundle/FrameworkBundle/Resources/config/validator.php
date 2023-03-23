@@ -166,6 +166,7 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->set('validator.bic', BicValidator::class)
+            ->args([service('property_accessor')->nullOnInvalid()])
             ->tag('validator.constraint_validator', [
                 'alias' => BicValidator::class,
             ])
@@ -231,11 +232,13 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->set('validator.expression_language_syntax', ExpressionLanguageSyntaxValidator::class)
+            ->args([service('validator.expression_language')->nullOnInvalid()])
             ->tag('validator.constraint_validator', [
                 'alias' => ExpressionLanguageSyntaxValidator::class,
             ])
 
         ->set('validator.expression_syntax', ExpressionSyntaxValidator::class)
+            ->args([service('validator.expression_language')->nullOnInvalid()])
             ->tag('validator.constraint_validator', [
                 'alias' => ExpressionSyntaxValidator::class,
             ])
@@ -366,6 +369,7 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->set('validator.range', RangeValidator::class)
+            ->args([service('property_accessor')->nullOnInvalid()])
             ->tag('validator.constraint_validator', [
                 'alias' => RangeValidator::class,
             ])

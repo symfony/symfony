@@ -126,6 +126,7 @@ abstract class FileLoader extends BaseFileLoader
             if (null === $errorMessage && $autoconfigureAttributes) {
                 $r = $this->container->getReflectionClass($class);
                 if ($r->getAttributes(Exclude::class)[0] ?? null) {
+                    $this->addContainerExcludedTag($class, $source);
                     continue;
                 }
                 if ($this->env) {
@@ -137,6 +138,7 @@ abstract class FileLoader extends BaseFileLoader
                         }
                     }
                     if (null !== $attribute) {
+                        $this->addContainerExcludedTag($class, $source);
                         continue;
                     }
                 }
@@ -291,18 +293,29 @@ abstract class FileLoader extends BaseFileLoader
         }
 
         if (null !== $prefixLen) {
-            $attributes = null !== $source ? ['source' => sprintf('in "%s/%s"', basename(\dirname($source)), basename($source))] : [];
-
             foreach ($excludePaths as $path => $_) {
                 $class = $namespace.ltrim(str_replace('/', '\\', substr($path, $prefixLen, str_ends_with($path, '.php') ? -4 : null)), '\\');
-                if (!$this->container->has($class)) {
-                    $this->container->register($class)
-                        ->setAbstract(true)
-                        ->addTag('container.excluded', $attributes);
-                }
+                $this->addContainerExcludedTag($class, $source);
             }
         }
 
         return $classes;
+    }
+
+    private function addContainerExcludedTag(string $class, ?string $source): void
+    {
+        if ($this->container->has($class)) {
+            return;
+        }
+
+        static $attributes = [];
+
+        if (null !== $source && !isset($attributes[$source])) {
+            $attributes[$source] = ['source' => sprintf('in "%s/%s"', basename(\dirname($source)), basename($source))];
+        }
+
+        $this->container->register($class)
+            ->setAbstract(true)
+            ->addTag('container.excluded', null !== $source ? $attributes[$source] : []);
     }
 }

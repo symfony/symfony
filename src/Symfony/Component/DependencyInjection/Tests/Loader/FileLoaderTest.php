@@ -161,7 +161,7 @@ class FileLoaderTest extends TestCase
             'Utils/*',
         );
 
-        $this->assertSame(!$autoconfigure, $container->hasDefinition(NotAService::class));
+        $this->assertSame($autoconfigure, $container->getDefinition(NotAService::class)->hasTag('container.excluded'));
     }
 
     public function testRegisterClassesWithExcludeAsArray()
@@ -284,10 +284,10 @@ class FileLoaderTest extends TestCase
     }
 
     /**
-     * @testWith ["prod", true]
-     *           ["dev", true]
-     *           ["bar", false]
-     *           [null, true]
+     * @testWith ["prod", false]
+     *           ["dev", false]
+     *           ["bar", true]
+     *           [null, false]
      */
     public function testRegisterClassesWithWhenEnv(?string $env, bool $expected)
     {
@@ -299,7 +299,7 @@ class FileLoaderTest extends TestCase
             'Prototype/{Foo.php}'
         );
 
-        $this->assertSame($expected, $container->has(Foo::class));
+        $this->assertSame($expected, $container->getDefinition(Foo::class)->hasTag('container.excluded'));
     }
 
     /**

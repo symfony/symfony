@@ -1,0 +1,11 @@
+imports:
+    - { resource: ../config/default.yml }
+
+framework:
+    lock: ~
+    scheduler: ~
+    messenger: ~
+
+services:
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DefaultSchedule:
+        autoconfigure: true

@@ -138,7 +138,7 @@
         "php-http/httplug": "^1.0|^2.0",
         "php-http/message-factory": "^1.0",
         "phpstan/phpdoc-parser": "^1.0",
-        "predis/predis": "~1.1",
+        "predis/predis": "^1.1|^2.0",
         "psr/http-client": "^1.0",
         "psr/simple-cache": "^1.0|^2.0",
         "egulias/email-validator": "^2.1.10|^3.1|^4",

@@ -31,9 +31,9 @@ final class Scheduler
      * @param iterable<Schedule> $schedules
      */
     public function __construct(
-        private array $handlers,
+        private readonly array $handlers,
         array $schedules,
-        private ClockInterface $clock = new Clock(),
+        private readonly ClockInterface $clock = new Clock(),
     ) {
         foreach ($schedules as $schedule) {
             $this->addSchedule($schedule);

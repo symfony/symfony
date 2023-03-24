@@ -105,7 +105,7 @@ class CheckpointTest extends TestCase
     {
         $checkpoint = new Checkpoint('cache', new NoLock(), $cache = new ArrayAdapter());
         $now = new \DateTimeImmutable('2020-02-20 20:20:20Z');
-        $checkpoint->acquire($n = $now->modify('-1 hour'));
+        $checkpoint->acquire($now->modify('-1 hour'));
         $checkpoint->save($now, 3);
 
         $this->assertSame($now, $checkpoint->time());

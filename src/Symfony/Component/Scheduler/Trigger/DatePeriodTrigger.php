@@ -17,7 +17,7 @@ namespace Symfony\Component\Scheduler\Trigger;
 class DatePeriodTrigger implements TriggerInterface
 {
     public function __construct(
-        private \DatePeriod $period,
+        private readonly \DatePeriod $period,
     ) {
     }
 

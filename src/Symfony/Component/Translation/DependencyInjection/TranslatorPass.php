@@ -105,8 +105,8 @@ class TranslatorPass implements CompilerPassInterface
             $fqcn = $namespace.'\\'.$className;
 
             if (
-                true === class_exists($fqcn) &&
-                true === is_subclass_of($fqcn, Constraint::class)
+                class_exists($fqcn) &&
+                is_subclass_of($fqcn, Constraint::class)
             ) {
                 $classes[] = $className;
             }

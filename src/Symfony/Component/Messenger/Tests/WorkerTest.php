@@ -314,10 +314,10 @@ class WorkerTest extends TestCase
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(5));
 
-        $clock = new MockClock('2023-03-19 14:00:00');
+        $clock = new MockClock('2023-03-19 14:00:00+00:00');
         $worker = new Worker([$receiver], $bus, $dispatcher, clock: $clock);
         $worker->run(['sleep' => 1000000]);
-        $this->assertEquals(new \DateTimeImmutable('2023-03-19 14:00:03'), $clock->now());
+        $this->assertEquals(new \DateTimeImmutable('2023-03-19 14:00:03+00:00'), $clock->now());
     }
 
     public function testWorkerWithMultipleReceivers()

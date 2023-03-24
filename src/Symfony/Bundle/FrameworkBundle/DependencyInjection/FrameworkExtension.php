@@ -2016,6 +2016,10 @@ class FrameworkExtension extends Extension
         }
 
         $loader->load('scheduler.php');
+
+        if (!$this->hasConsole()) {
+            $container->removeDefinition('console.command.scheduler_debug');
+        }
     }
 
     private function registerMessengerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, bool $validationEnabled): void

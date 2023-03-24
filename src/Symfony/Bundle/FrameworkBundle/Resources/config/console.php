@@ -42,13 +42,14 @@ use Symfony\Bundle\FrameworkBundle\EventListener\SuggestMissingPackageSubscriber
 use Symfony\Component\Console\EventListener\ErrorListener;
 use Symfony\Component\Dotenv\Command\DebugCommand as DotenvDebugCommand;
 use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
-use Symfony\Component\Messenger\Command\DebugCommand;
+use Symfony\Component\Messenger\Command\DebugCommand as MessengerDebugCommand;
 use Symfony\Component\Messenger\Command\FailedMessagesRemoveCommand;
 use Symfony\Component\Messenger\Command\FailedMessagesRetryCommand;
 use Symfony\Component\Messenger\Command\FailedMessagesShowCommand;
 use Symfony\Component\Messenger\Command\SetupTransportsCommand;
 use Symfony\Component\Messenger\Command\StatsCommand;
 use Symfony\Component\Messenger\Command\StopWorkersCommand;
+use Symfony\Component\Scheduler\Command\DebugCommand as SchedulerDebugCommand;
 use Symfony\Component\Translation\Command\TranslationPullCommand;
 use Symfony\Component\Translation\Command\TranslationPushCommand;
 use Symfony\Component\Translation\Command\XliffLintCommand;
@@ -172,7 +173,7 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('console.command')
 
-        ->set('console.command.messenger_debug', DebugCommand::class)
+        ->set('console.command.messenger_debug', MessengerDebugCommand::class)
             ->args([
                 [], // Message to handlers mapping
             ])
@@ -215,6 +216,12 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('messenger.receiver_locator'),
                 abstract_arg('Receivers names'),
+            ])
+            ->tag('console.command')
+
+        ->set('console.command.scheduler_debug', SchedulerDebugCommand::class)
+            ->args([
+                tagged_locator('scheduler.schedule_provider', 'name'),
             ])
             ->tag('console.command')
 

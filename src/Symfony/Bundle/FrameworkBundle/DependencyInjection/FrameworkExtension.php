@@ -129,6 +129,7 @@ use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\Notifier\Recipient\Recipient;
 use Symfony\Component\Notifier\TexterInterface;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface as NotifierTransportFactoryInterface;
+use Symfony\Component\Process\Messenger\RunProcessMessageHandler;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
@@ -239,6 +240,12 @@ class FrameworkExtension extends Extension
         }
 
         $container->registerAliasForArgument('parameter_bag', PsrContainerInterface::class);
+
+        $loader->load('process.php');
+
+        if (!class_exists(RunProcessMessageHandler::class)) {
+            $container->removeDefinition('process.messenger.process_message_handler');
+        }
 
         if ($this->hasConsole()) {
             $loader->load('console.php');

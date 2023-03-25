@@ -1,0 +1,64 @@
+---------------------------------------------------------------------------
+
+by WebMamba at 2023-03-23T23:36:19Z
+
+I think this PR could also be a good place to resolve this issue: #49397
+
+---------------------------------------------------------------------------
+
+by nfragnet at 2023-03-24T08:24:14Z
+
+> I think this PR could also be a good place to resolve this issue: #49397
+
+The fix to this issue should be applied on 6.2 branch
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-03-24T08:53:53Z
+
+> > I think this PR could also be a good place to resolve this issue: #49397
+>
+> The fix to this issue should be applied on 6.2 branch
+
+Performance improvements are always merged into the main branch.
+
+---------------------------------------------------------------------------
+
+by nfragnet at 2023-03-24T09:17:33Z
+
+> > > I think this PR could also be a good place to resolve this issue: #49397
+> >
+> >
+> > The fix to this issue should be applied on 6.2 branch
+>
+> Performance improvements are always merged into the main branch.
+
+This PR is a performance improvement.
+
+The related ticket of the comment is a bug, and it addresses another topic, that's why I suggested it to be fixed on 6.2
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2023-03-24T10:04:41Z
+
+> > > > I think this PR could also be a good place to resolve this issue: #49397
+> > >
+> > >
+> > > The fix to this issue should be applied on 6.2 branch
+> >
+> >
+> > Performance improvements are always merged into the main branch.
+>
+> This PR is a performance improvement.
+>
+> The related ticket of the comment is a bug, and it addresses another topic, that's why I suggested it to be fixed on 6.2
+
+The related PR was tagged as bug, but it's not. Message extraction works well, but slowly on some very large projects.
+
+We must fix #49397 in a dedicated PR, targeting 6.2
+
+---------------------------------------------------------------------------
+
+by WebMamba at 2023-03-24T10:49:58Z
+
+Ok good to know thanks @welcoMattic!

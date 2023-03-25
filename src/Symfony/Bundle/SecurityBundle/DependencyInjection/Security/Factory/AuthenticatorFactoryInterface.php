@@ -38,6 +38,8 @@ interface AuthenticatorFactoryInterface
     /**
      * Creates the authenticator service(s) for the provided configuration.
      *
+     * @param array<string, mixed> $config
+     *
      * @return string|string[] The authenticator service ID(s) to be used by the firewall
      */
     public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string|array;

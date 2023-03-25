@@ -27,6 +27,8 @@ use function Symfony\Component\Clock\now;
  * Command to list/debug schedules.
  *
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @experimental
  */
 #[AsCommand(name: 'debug:scheduler', description: 'List schedules and their recurring messages')]
 final class DebugCommand extends Command
@@ -63,16 +65,25 @@ final class DebugCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->title('Scheduler');
 
-        $names = $input->getArgument('schedule') ?: $this->scheduleNames;
+        if (!$names = $input->getArgument('schedule') ?: $this->scheduleNames) {
+            $io->error('No schedules found.');
+
+            return self::FAILURE;
+        }
 
         foreach ($names as $name) {
+            $io->section($name);
+
             /** @var ScheduleProviderInterface $schedule */
             $schedule = $this->schedules->get($name);
+            if (!$messages = $schedule->getSchedule()->getRecurringMessages()) {
+                $io->warning(sprintf('No recurring messages found for schedule "%s".', $name));
 
-            $io->section($name);
+                continue;
+            }
             $io->table(
                 ['Message', 'Trigger', 'Next Run'],
-                array_map(self::renderRecurringMessage(...), $schedule->getSchedule()->getRecurringMessages())
+                array_map(self::renderRecurringMessage(...), $messages),
             );
         }
 

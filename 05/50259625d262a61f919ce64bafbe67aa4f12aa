@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2023-02-07T23:35:56Z
+
+> Unit tests are missing, because it cannot be tested in simple ways.
+
+Can we use something like this? https://github.com/symfony/symfony/blob/bc5fea4e2190f00a207871115a83dd7df03d7637/src/Symfony/Component/Console/Tests/Formatter/OutputFormatterTest.php#L250
+
+---------------------------------------------------------------------------
+
+by SerafimArts at 2023-02-08T00:36:56Z
+
+@alexislefebvre Thanks, added. This allowed me to find another problem that I corrected.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-02-08T15:34:37Z
+
+Isn't the `JetBrains-JediTerm` ternminal emulator already covering the case of the IntelliJ platform ?
+
+---------------------------------------------------------------------------
+
+by SerafimArts at 2023-02-08T15:46:05Z
+
+@stof nope. Perhaps this variable is available only on the Linux, because on Windows it is not available.
+
+I don't have x11 on my system at the moment to test this behavior from under wsl.
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2023-02-10T12:23:56Z
+
+I had the same issue with Symfony 4.4 (:see_no_evil:) and this PR helped me, thank you.
+
+I defined this environment variable when running the tests:
+
+> ![image](https://user-images.githubusercontent.com/2071331/218091572-b15b871d-f738-4dae-a42d-5f0d1a65d252.png)

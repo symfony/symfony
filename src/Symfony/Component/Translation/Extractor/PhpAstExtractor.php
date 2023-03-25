@@ -64,7 +64,9 @@ final class PhpAstExtractor extends AbstractFileExtractor implements ExtractorIn
 
     protected function canBeExtracted(string $file): bool
     {
-        return 'php' === pathinfo($file, \PATHINFO_EXTENSION) && $this->isFile($file);
+        return 'php' === pathinfo($file, \PATHINFO_EXTENSION)
+            && $this->isFile($file)
+            && preg_match('/\bt\(|->trans\(|TranslatableMessage|Symfony\\\\Component\\\\Validator\\\\Constraints/i', file_get_contents($file));
     }
 
     protected function extractFromDirectory(array|string $resource): iterable|Finder

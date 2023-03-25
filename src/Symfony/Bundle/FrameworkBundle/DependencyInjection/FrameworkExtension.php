@@ -53,6 +53,7 @@ use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\ResourceCheckerInterface;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Messenger\RunCommandMessageHandler;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -252,6 +253,11 @@ class FrameworkExtension extends Extension
 
             if (!class_exists(DebugCommand::class)) {
                 $container->removeDefinition('console.command.dotenv_debug');
+            }
+
+            if (!class_exists(RunCommandMessageHandler::class)) {
+                $container->removeDefinition('console.messenger.application');
+                $container->removeDefinition('console.messenger.execute_command_handler');
             }
         }
 

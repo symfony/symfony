@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-03-21T20:25:58Z
+
+Thanks for working on this topic. It would be nice if we can have the same feature for fish and zsh.
+
+I'll use a [demo app](https://github.com/GromNaN/symfony-console-demo) to test.
+
+---------------------------------------------------------------------------
+
+by Chi-teck at 2023-03-22T04:58:29Z
+
+@GromNaN I have no experience with ZSH or Fish. So added subtasks to the parent ticket.

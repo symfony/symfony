@@ -245,8 +245,14 @@ class OutputFormatterTest extends TestCase
     /**
      * @dataProvider provideDecoratedAndNonDecoratedOutput
      */
-    public function testNotDecoratedFormatter(string $input, string $expectedNonDecoratedOutput, string $expectedDecoratedOutput, string $terminalEmulator = 'foo')
-    {
+    public function testNotDecoratedFormatterOnJediTermEmulator(
+        string $input,
+        string $expectedNonDecoratedOutput,
+        string $expectedDecoratedOutput,
+        bool $shouldBeJediTerm = false
+    ) {
+        $terminalEmulator = $shouldBeJediTerm ? 'JetBrains-JediTerm' : 'Unknown';
+
         $prevTerminalEmulator = getenv('TERMINAL_EMULATOR');
         putenv('TERMINAL_EMULATOR='.$terminalEmulator);
 
@@ -255,6 +261,39 @@ class OutputFormatterTest extends TestCase
             $this->assertEquals($expectedNonDecoratedOutput, (new OutputFormatter(false))->format($input));
         } finally {
             putenv('TERMINAL_EMULATOR'.($prevTerminalEmulator ? "=$prevTerminalEmulator" : ''));
+        }
+    }
+
+    /**
+     * @dataProvider provideDecoratedAndNonDecoratedOutput
+     */
+    public function testNotDecoratedFormatterOnIDEALikeEnvironment(
+        string $input,
+        string $expectedNonDecoratedOutput,
+        string $expectedDecoratedOutput,
+        bool $expectsIDEALikeTerminal = false
+    ) {
+        // Backup previous env variable
+        $previousValue = $_SERVER['IDEA_INITIAL_DIRECTORY'] ?? null;
+        $hasPreviousValue = \array_key_exists('IDEA_INITIAL_DIRECTORY', $_SERVER);
+
+        if ($expectsIDEALikeTerminal) {
+            $_SERVER['IDEA_INITIAL_DIRECTORY'] = __DIR__;
+        } elseif ($hasPreviousValue) {
+            // Forcibly remove the variable because the test runner may contain it
+            unset($_SERVER['IDEA_INITIAL_DIRECTORY']);
+        }
+
+        try {
+            $this->assertEquals($expectedDecoratedOutput, (new OutputFormatter(true))->format($input));
+            $this->assertEquals($expectedNonDecoratedOutput, (new OutputFormatter(false))->format($input));
+        } finally {
+            // Rollback previous env state
+            if ($hasPreviousValue) {
+                $_SERVER['IDEA_INITIAL_DIRECTORY'] = $previousValue;
+            } else {
+                unset($_SERVER['IDEA_INITIAL_DIRECTORY']);
+            }
         }
     }
 
@@ -268,7 +307,7 @@ class OutputFormatterTest extends TestCase
             ['<fg=red>some text with inline style</>', 'some text with inline style', "\033[31msome text with inline style\033[39m"],
             ['<href=idea://open/?file=/path/SomeFile.php&line=12>some URL</>', 'some URL', "\033]8;;idea://open/?file=/path/SomeFile.php&line=12\033\\some URL\033]8;;\033\\"],
             ['<href=https://example.com/\<woohoo\>>some URL with \<woohoo\></>', 'some URL with <woohoo>', "\033]8;;https://example.com/<woohoo>\033\\some URL with <woohoo>\033]8;;\033\\"],
-            ['<href=idea://open/?file=/path/SomeFile.php&line=12>some URL</>', 'some URL', 'some URL', 'JetBrains-JediTerm'],
+            ['<href=idea://open/?file=/path/SomeFile.php&line=12>some URL</>', 'some URL', 'some URL', true],
         ];
     }
 

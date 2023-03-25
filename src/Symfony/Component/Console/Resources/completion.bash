@@ -6,6 +6,16 @@
 # https://symfony.com/doc/current/contributing/code/license.html
 
 _sf_{{ COMMAND_NAME }}() {
+
+    # Use the default completion for shell redirect operators.
+    for w in '>' '>>' '&>' '<'; do
+        if [[ $w = "${COMP_WORDS[COMP_CWORD-1]}" ]]; then
+            compopt -o filenames
+            COMPREPLY=($(compgen -f -- "${COMP_WORDS[COMP_CWORD]}"))
+            return 0
+        fi
+    done
+
     # Use newline as only separator to allow space in completion values
     IFS=$'\n'
     local sf_cmd="${COMP_WORDS[0]}"

@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by WebMamba at 2023-03-24T15:03:17Z
+
+So fast! And you was even not there during the symfony live! 😁
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-03-25T00:15:06Z
+
+> Other debug commands support various output formats. You can add json, xml or md if you want, or just stick with txt and leave the other formats for later.
+
+Interesting, I didn't know that. I modelled this command after debug:messenger which does not have this feature. I'd prefer that to be done in a followup PR.

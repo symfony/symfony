@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by k0d3r1s at 2023-03-16T15:06:02Z
+
+quick reminder that new features require PR in symfony/symfony-docs as well ;)
+
+---------------------------------------------------------------------------
+
+by bobvandevijver at 2023-03-16T15:14:06Z
+
+> quick reminder that new features require PR in symfony/symfony-docs as well ;)
+
+You're absolutely right, I should have mentioned I will make that addition when I at least know this is going to be accepted in some form. The issue I link might indicate that already, but as it was quite old I find it best to have confirmation first :)
+
+Test errors look to be unrelated by the way.

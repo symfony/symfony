@@ -26,9 +26,9 @@ final class MessageGenerator implements MessageGeneratorInterface
     private CheckpointInterface $checkpoint;
 
     public function __construct(
-        private Schedule $schedule,
+        private readonly Schedule $schedule,
         string|CheckpointInterface $checkpoint,
-        private ClockInterface $clock = new Clock(),
+        private readonly ClockInterface $clock = new Clock(),
     ) {
         $this->waitUntil = new \DateTimeImmutable('@0');
         if (\is_string($checkpoint)) {

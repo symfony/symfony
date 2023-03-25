@@ -105,7 +105,7 @@ class SchedulerTransportFactoryTest extends TestCase
 class SomeScheduleProvider implements ScheduleProviderInterface
 {
     public function __construct(
-        private array $messages,
+        private readonly array $messages,
     ) {
     }
 

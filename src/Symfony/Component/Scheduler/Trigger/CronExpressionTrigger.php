@@ -30,7 +30,7 @@ final class CronExpressionTrigger implements TriggerInterface, \Stringable
 
     public function __toString(): string
     {
-        return "cron: {$this->expression->getExpression()}";
+        return $this->expression->getExpression();
     }
 
     public static function fromSpec(string $expression = '* * * * *'): self

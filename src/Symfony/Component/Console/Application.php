@@ -28,6 +28,7 @@ use Symfony\Component\Console\Event\ConsoleSignalEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Exception\ExceptionInterface;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Exception\NamespaceNotFoundException;
 use Symfony\Component\Console\Exception\RuntimeException;
@@ -1004,6 +1005,12 @@ class Application implements ResetInterface
         if ($commandSignals || $this->dispatcher && $this->signalsToDispatchEvent) {
             if (!$this->signalRegistry) {
                 throw new RuntimeException('Unable to subscribe to signal events. Make sure that the `pcntl` extension is installed and that "pcntl_*" functions are not disabled by your php.ini\'s "disable_functions" directive.');
+            }
+
+            foreach (array_merge($commandSignals, $this->signalsToDispatchEvent) as $signal) {
+                if (!SignalRegistry::isValidSignal($signal)) {
+                    throw new InvalidArgumentException(sprintf('Signal "%d" is not valid, make sure to use one of the "SIG*" constants as defined by the "pcntl" extension.', $signal));
+                }
             }
 
             if (Terminal::hasSttyAvailable()) {

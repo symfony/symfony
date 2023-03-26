@@ -131,4 +131,19 @@ class SignalRegistryTest extends TestCase
         $this->assertTrue($isHandled1);
         $this->assertTrue($isHandled2);
     }
+
+    public function testIsValidSignalWithPcntlConstantButValueIsTooHigh()
+    {
+        $this->assertFalse(SignalRegistry::isValidSignal(\PCNTL_ENAMETOOLONG));
+    }
+
+    public function testIsValidSignalWithInvalidSignalCode()
+    {
+        $this->assertFalse(SignalRegistry::isValidSignal(-12));
+    }
+
+    public function testIsValidSignal()
+    {
+        $this->assertTrue(SignalRegistry::isValidSignal(\SIGINT));
+    }
 }

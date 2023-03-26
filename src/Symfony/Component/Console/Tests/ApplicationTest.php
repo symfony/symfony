@@ -27,6 +27,7 @@ use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Symfony\Component\Console\Event\ConsoleSignalEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\NamespaceNotFoundException;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\HelperSet;
@@ -2138,6 +2139,37 @@ class ApplicationTest extends TestCase
     }
 
     /**
+     * @requires extension pcntl
+     */
+    public function testSignalIsNotAvailableInPcntlExtension()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Signal "40" is not valid, make sure to use one of the "SIG*" constants as defined by the "pcntl" extension.');
+
+        $command = new InvalidSignalableCommand();
+        $application = $this->createSignalableApplication($command, null);
+        $application->setCatchExceptions(false);
+
+        $application->run(new ArrayInput(['signal']));
+    }
+
+    /**
+     * @requires extension pcntl
+     */
+    public function testSignalToDispatchIsNotAvailableInPcntlExtension()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Signal "40" is not valid, make sure to use one of the "SIG*" constants as defined by the "pcntl" extension.');
+
+        $command = new SignableCommand();
+        $application = $this->createSignalableApplication($command, null);
+        $application->setSignalsToDispatchEvent(40);
+        $application->setCatchExceptions(false);
+
+        $application->run(new ArrayInput(['signal']));
+    }
+
+    /**
      * @group tty
      */
     public function testSignalableRestoresStty()
@@ -2272,6 +2304,23 @@ class SignableCommand extends BaseSignableCommand implements SignalableCommandIn
     public function getSubscribedSignals(): array
     {
         return SignalRegistry::isSupported() ? [\SIGUSR1] : [];
+    }
+
+    public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
+    {
+        $this->signaled = true;
+        $this->signalHandlers[] = __CLASS__;
+
+        return false;
+    }
+}
+
+#[AsCommand(name: 'signal')]
+class InvalidSignalableCommand extends BaseSignableCommand implements SignalableCommandInterface
+{
+    public function getSubscribedSignals(): array
+    {
+        return [40];
     }
 
     public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false

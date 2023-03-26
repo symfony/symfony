@@ -15,6 +15,8 @@ final class SignalRegistry
 {
     private array $signalHandlers = [];
 
+    private static array $availableSignals;
+
     public function __construct()
     {
         if (\function_exists('pcntl_async_signals')) {
@@ -40,6 +42,13 @@ final class SignalRegistry
     public static function isSupported(): bool
     {
         return \function_exists('pcntl_signal');
+    }
+
+    public static function isValidSignal(int $signal): bool
+    {
+        static::$availableSignals ??= get_defined_constants(true)['pcntl'] ?? [];
+
+        return $signal < 32 && \in_array($signal, static::$availableSignals, true);
     }
 
     /**

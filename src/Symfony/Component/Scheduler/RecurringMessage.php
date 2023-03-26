@@ -41,9 +41,9 @@ final class RecurringMessage
         return new self(new DateIntervalTrigger($interval, $from, $until), $message);
     }
 
-    public static function cron(string $expression, object $message): self
+    public static function cron(string $expression, object $message, int $randomDelay = 0): self
     {
-        return new self(CronExpressionTrigger::fromSpec($expression), $message);
+        return new self(CronExpressionTrigger::fromSpec($expression, $randomDelay), $message);
     }
 
     public static function trigger(TriggerInterface $trigger, object $message): self

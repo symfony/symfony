@@ -25,6 +25,7 @@ final class CronExpressionTrigger implements TriggerInterface, \Stringable
 {
     public function __construct(
         private readonly CronExpression $expression = new CronExpression('* * * * *'),
+        private readonly int $randomDelay = 0
     ) {
     }
 
@@ -33,17 +34,22 @@ final class CronExpressionTrigger implements TriggerInterface, \Stringable
         return "cron: {$this->expression->getExpression()}";
     }
 
-    public static function fromSpec(string $expression = '* * * * *'): self
+    public static function fromSpec(string $expression = '* * * * *', int $randomDelay = 0): self
     {
         if (!class_exists(CronExpression::class)) {
             throw new LogicException(sprintf('You cannot use "%s" as the "cron expression" package is not installed; try running "composer require dragonmantank/cron-expression".', __CLASS__));
         }
 
-        return new self(new CronExpression($expression));
+        return new self(new CronExpression($expression), $randomDelay);
     }
 
     public function getNextRunDate(\DateTimeImmutable $run): ?\DateTimeImmutable
     {
-        return \DateTimeImmutable::createFromMutable($this->expression->getNextRunDate($run));
+        $nextRun = $this->expression->getNextRunDate($run);
+        if ($this->randomDelay > 0) {
+            $nextRun->add(new \DateInterval('PT'.random_int(0, $this->randomDelay).'S'));
+        }
+
+        return \DateTimeImmutable::createFromMutable($nextRun);
     }
 }

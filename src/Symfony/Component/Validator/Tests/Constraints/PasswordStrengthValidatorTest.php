@@ -1,0 +1,81 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Validator\Tests\Constraints;
+
+use Symfony\Component\Validator\Constraints\PasswordStrength;
+use Symfony\Component\Validator\Constraints\PasswordStrengthValidator;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
+
+class PasswordStrengthValidatorTest extends ConstraintValidatorTestCase
+{
+    protected function createValidator(): PasswordStrengthValidator
+    {
+        return new PasswordStrengthValidator();
+    }
+
+    /**
+     * @dataProvider getValidValues
+     */
+    public function testValidValues(string $value)
+    {
+        $this->validator->validate($value, new PasswordStrength());
+
+        $this->assertNoViolation();
+    }
+
+    public static function getValidValues(): iterable
+    {
+        yield ['This 1s a very g00d Pa55word! ;-)'];
+    }
+
+    /**
+     * @dataProvider provideInvalidConstraints
+     */
+    public function testThePasswordIsWeak(PasswordStrength $constraint, string $password, string $expectedMessage, string $expectedCode, array $parameters = [])
+    {
+        $this->validator->validate($password, $constraint);
+
+        $this->buildViolation($expectedMessage)
+            ->setCode($expectedCode)
+            ->setParameters($parameters)
+            ->assertRaised();
+    }
+
+    public static function provideInvalidConstraints(): iterable
+    {
+        yield [
+            new PasswordStrength(),
+            'password',
+            'The password strength is too low. Please use a stronger password.',
+            PasswordStrength::PASSWORD_STRENGTH_ERROR,
+        ];
+        yield [
+            new PasswordStrength([
+                'minScore' => 4,
+            ]),
+            'Good password?',
+            'The password strength is too low. Please use a stronger password.',
+            PasswordStrength::PASSWORD_STRENGTH_ERROR,
+        ];
+        yield [
+            new PasswordStrength([
+                'restrictedData' => ['symfony'],
+            ]),
+            'SyMfONY-framework-john',
+            'The password contains the following restricted data: {{ wordList }}.',
+            PasswordStrength::RESTRICTED_USER_INPUT_ERROR,
+            [
+                '{{ wordList }}' => 'SyMfONY',
+            ],
+        ];
+    }
+}

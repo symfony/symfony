@@ -95,6 +95,16 @@ class TextPart extends AbstractPart
 
         return $this;
     }
+    
+    /**
+     * Gets the current content disposition
+     *
+     * @return string Current content disposition
+     */
+    public function getDisposition(): string
+    {
+        return $this->disposition;
+    }
 
     /**
      * Sets the name of the file (used by FormDataPart).

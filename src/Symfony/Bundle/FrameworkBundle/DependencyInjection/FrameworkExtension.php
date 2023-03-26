@@ -536,6 +536,8 @@ class FrameworkExtension extends Extension
                 throw new LogicException('Scheduler support cannot be enabled as the Messenger component is not '.(interface_exists(MessageBusInterface::class) ? 'enabled.' : 'installed. Try running "composer require symfony/messenger".'));
             }
             $this->registerSchedulerConfiguration($config['scheduler'], $container, $loader);
+        } else {
+            $container->removeDefinition('console.command.scheduler_debug');
         }
 
         // messenger depends on validation being registered

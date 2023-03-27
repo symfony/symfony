@@ -13,8 +13,8 @@ namespace Symfony\Component\Scheduler\Generator;
 
 use Psr\Clock\ClockInterface;
 use Symfony\Component\Clock\Clock;
+use Symfony\Component\Scheduler\RecurringMessage;
 use Symfony\Component\Scheduler\Schedule;
-use Symfony\Component\Scheduler\Trigger\TriggerInterface;
 
 /**
  * @experimental
@@ -49,11 +49,13 @@ final class MessageGenerator implements MessageGeneratorInterface
         $heap = $this->heap($lastTime);
 
         while (!$heap->isEmpty() && $heap->top()[0] <= $now) {
-            /** @var TriggerInterface $trigger */
-            /** @var int $index */
             /** @var \DateTimeImmutable $time */
-            /** @var object $message */
-            [$time, $index, $trigger, $message] = $heap->extract();
+            /** @var int $index */
+            /** @var RecurringMessage $recurringMessage */
+            [$time, $index, $recurringMessage] = $heap->extract();
+            $id = $recurringMessage->getId();
+            $message = $recurringMessage->getMessage();
+            $trigger = $recurringMessage->getTrigger();
             $yield = true;
 
             if ($time < $lastTime) {
@@ -64,11 +66,11 @@ final class MessageGenerator implements MessageGeneratorInterface
             }
 
             if ($nextTime = $trigger->getNextRunDate($time)) {
-                $heap->insert([$nextTime, $index, $trigger, $message]);
+                $heap->insert([$nextTime, $index, $recurringMessage]);
             }
 
             if ($yield) {
-                yield (new MessageContext($this->name, $trigger, $time, $nextTime)) => $message;
+                yield (new MessageContext($this->name, $id, $trigger, $time, $nextTime)) => $message;
                 $this->checkpoint->save($time, $index);
             }
         }
@@ -91,7 +93,7 @@ final class MessageGenerator implements MessageGeneratorInterface
                 continue;
             }
 
-            $heap->insert([$nextTime, $index, $recurringMessage->getTrigger(), $recurringMessage->getMessage()]);
+            $heap->insert([$nextTime, $index, $recurringMessage]);
         }
 
         return $this->triggerHeap = $heap;

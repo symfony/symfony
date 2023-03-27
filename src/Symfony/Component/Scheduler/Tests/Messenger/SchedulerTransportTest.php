@@ -34,16 +34,17 @@ class SchedulerTransportTest extends TestCase
         $generator->method('getMessages')->willReturnCallback(function () use ($messages): \Generator {
             $trigger = $this->createMock(TriggerInterface::class);
             $triggerAt = new \DateTimeImmutable('2020-02-20T02:00:00', new \DateTimeZone('UTC'));
-            yield (new MessageContext('default', $trigger, $triggerAt)) => $messages[0];
-            yield (new MessageContext('default', $trigger, $triggerAt)) => $messages[1];
+            yield (new MessageContext('default', 'id1', $trigger, $triggerAt)) => $messages[0];
+            yield (new MessageContext('default', 'id2', $trigger, $triggerAt)) => $messages[1];
         });
         $transport = new SchedulerTransport($generator);
 
-        foreach ($transport->get() as $envelope) {
+        foreach ($transport->get() as $i => $envelope) {
             $this->assertInstanceOf(Envelope::class, $envelope);
             $this->assertNotNull($stamp = $envelope->last(ScheduledStamp::class));
             $this->assertSame(array_shift($messages), $envelope->getMessage());
             $this->assertSame('default', $stamp->messageContext->name);
+            $this->assertSame('id'.$i + 1, $stamp->messageContext->id);
         }
 
         $this->assertEmpty($messages);

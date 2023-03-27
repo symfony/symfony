@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Scheduler\Generator;
 
-use Symfony\Component\Scheduler\Trigger\TriggerInterface;
+use Symfony\Component\Scheduler\RecurringMessage;
 
 /**
  * @internal
  *
- * @extends \SplHeap<array{\DateTimeImmutable, int, TriggerInterface, object}>
+ * @extends \SplHeap<array{\DateTimeImmutable, int, RecurringMessage}>
  *
  * @experimental
  */
@@ -28,8 +28,8 @@ final class TriggerHeap extends \SplHeap
     }
 
     /**
-     * @param array{\DateTimeImmutable, int, TriggerInterface, object} $value1
-     * @param array{\DateTimeImmutable, int, TriggerInterface, object} $value2
+     * @param array{\DateTimeImmutable, int, RecurringMessage} $value1
+     * @param array{\DateTimeImmutable, int, RecurringMessage} $value2
      */
     protected function compare(mixed $value1, mixed $value2): int
     {

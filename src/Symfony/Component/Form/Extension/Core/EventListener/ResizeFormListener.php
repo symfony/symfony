@@ -25,18 +25,20 @@ use Symfony\Component\Form\FormInterface;
 class ResizeFormListener implements EventSubscriberInterface
 {
     protected $type;
-    protected $options;
+    protected $entryOptions;
+    protected $prototypeOptions;
     protected $allowAdd;
     protected $allowDelete;
 
     private \Closure|bool $deleteEmpty;
 
-    public function __construct(string $type, array $options = [], bool $allowAdd = false, bool $allowDelete = false, bool|callable $deleteEmpty = false)
+    public function __construct(string $type, array $entryOptions = [], array $prototypeOptions = [], bool $allowAdd = false, bool $allowDelete = false, bool|callable $deleteEmpty = false)
     {
         $this->type = $type;
         $this->allowAdd = $allowAdd;
         $this->allowDelete = $allowDelete;
-        $this->options = $options;
+        $this->entryOptions = $entryOptions;
+        $this->prototypeOptions = $prototypeOptions;
         $this->deleteEmpty = \is_bool($deleteEmpty) ? $deleteEmpty : $deleteEmpty(...);
     }
 
@@ -68,7 +70,7 @@ class ResizeFormListener implements EventSubscriberInterface
         foreach ($data as $name => $value) {
             $form->add($name, $this->type, array_replace([
                 'property_path' => '['.$name.']',
-            ], $this->options));
+            ], $this->entryOptions));
         }
     }
 
@@ -96,7 +98,7 @@ class ResizeFormListener implements EventSubscriberInterface
                 if (!$form->has($name)) {
                     $form->add($name, $this->type, array_replace([
                         'property_path' => '['.$name.']',
-                    ], $this->options));
+                    ], $this->prototypeOptions));
                 }
             }
         }

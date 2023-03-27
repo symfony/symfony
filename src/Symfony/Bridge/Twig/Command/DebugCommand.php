@@ -68,7 +68,7 @@ class DebugCommand extends Command
             ->setDefinition([
                 new InputArgument('name', InputArgument::OPTIONAL, 'The template name'),
                 new InputOption('filter', null, InputOption::VALUE_REQUIRED, 'Show details for all entries matching this filter'),
-                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (text or json)', 'text'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'text'),
             ])
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command outputs a list of twig functions,
@@ -107,7 +107,7 @@ EOF
         match ($input->getOption('format')) {
             'text' => $name ? $this->displayPathsText($io, $name) : $this->displayGeneralText($io, $filter),
             'json' => $name ? $this->displayPathsJson($io, $name) : $this->displayGeneralJson($io, $filter),
-            default => throw new InvalidArgumentException(sprintf('The format "%s" is not supported.', $input->getOption('format'))),
+            default => throw new InvalidArgumentException(sprintf('Supported formats are "%s".', implode('", "', $this->getAvailableFormatOptions()))),
         };
 
         return 0;
@@ -120,7 +120,7 @@ EOF
         }
 
         if ($input->mustSuggestOptionValuesFor('format')) {
-            $suggestions->suggestValues(['text', 'json']);
+            $suggestions->suggestValues($this->getAvailableFormatOptions());
         }
     }
 
@@ -595,5 +595,10 @@ EOF
         }
 
         return (string) $this->fileLinkFormatter->format($absolutePath, 1);
+    }
+
+    private function getAvailableFormatOptions(): array
+    {
+        return ['text', 'json'];
     }
 }

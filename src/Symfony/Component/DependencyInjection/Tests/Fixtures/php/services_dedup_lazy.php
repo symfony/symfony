@@ -56,7 +56,7 @@ class ProjectServiceContainer extends Container
         $containerRef = $container->ref;
 
         if (true === $lazyLoad) {
-            return $container->services['bar'] = $container->createProxy('stdClassGhost5a8a5eb', static fn () => \stdClassGhost5a8a5eb::createLazyGhost(static fn ($proxy) => self::getBarService($containerRef->get(), $proxy)));
+            return $container->services['bar'] = $container->createProxy('stdClassGhost2fc7938', static fn () => \stdClassGhost2fc7938::createLazyGhost(static fn ($proxy) => self::getBarService($containerRef->get(), $proxy)));
         }
 
         return $lazyLoad;
@@ -72,7 +72,7 @@ class ProjectServiceContainer extends Container
         $containerRef = $container->ref;
 
         if (true === $lazyLoad) {
-            return $container->services['baz'] = $container->createProxy('stdClassProxy5a8a5eb', static fn () => \stdClassProxy5a8a5eb::createLazyProxy(static fn () => self::getBazService($containerRef->get(), false)));
+            return $container->services['baz'] = $container->createProxy('stdClassProxy2fc7938', static fn () => \stdClassProxy2fc7938::createLazyProxy(static fn () => self::getBazService($containerRef->get(), false)));
         }
 
         return \foo_bar();
@@ -88,7 +88,7 @@ class ProjectServiceContainer extends Container
         $containerRef = $container->ref;
 
         if (true === $lazyLoad) {
-            return $container->services['buz'] = $container->createProxy('stdClassProxy5a8a5eb', static fn () => \stdClassProxy5a8a5eb::createLazyProxy(static fn () => self::getBuzService($containerRef->get(), false)));
+            return $container->services['buz'] = $container->createProxy('stdClassProxy2fc7938', static fn () => \stdClassProxy2fc7938::createLazyProxy(static fn () => self::getBuzService($containerRef->get(), false)));
         }
 
         return \foo_bar();
@@ -104,14 +104,14 @@ class ProjectServiceContainer extends Container
         $containerRef = $container->ref;
 
         if (true === $lazyLoad) {
-            return $container->services['foo'] = $container->createProxy('stdClassGhost5a8a5eb', static fn () => \stdClassGhost5a8a5eb::createLazyGhost(static fn ($proxy) => self::getFooService($containerRef->get(), $proxy)));
+            return $container->services['foo'] = $container->createProxy('stdClassGhost2fc7938', static fn () => \stdClassGhost2fc7938::createLazyGhost(static fn ($proxy) => self::getFooService($containerRef->get(), $proxy)));
         }
 
         return $lazyLoad;
     }
 }
 
-class stdClassGhost5a8a5eb extends \stdClass implements \Symfony\Component\VarExporter\LazyObjectInterface
+class stdClassGhost2fc7938 extends \stdClass implements \Symfony\Component\VarExporter\LazyObjectInterface
 {
     use \Symfony\Component\VarExporter\LazyGhostTrait;
 
@@ -123,7 +123,7 @@ class_exists(\Symfony\Component\VarExporter\Internal\Hydrator::class);
 class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectRegistry::class);
 class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectState::class);
 
-class stdClassProxy5a8a5eb extends \stdClass implements \Symfony\Component\VarExporter\LazyObjectInterface
+class stdClassProxy2fc7938 extends \stdClass implements \Symfony\Component\VarExporter\LazyObjectInterface
 {
     use \Symfony\Component\VarExporter\LazyProxyTrait;
 

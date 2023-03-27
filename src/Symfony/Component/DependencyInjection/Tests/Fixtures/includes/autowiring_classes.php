@@ -3,6 +3,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\Service\Attribute\Required;
 
 require __DIR__.'/uniontype_classes.php';
@@ -524,5 +525,14 @@ final class ElsaAction
 {
     public function __construct(NotExisting $notExisting)
     {
+    }
+}
+
+class AAndIInterfaceConsumer
+{
+    public function __construct(
+        #[Autowire(service: 'foo', lazy: true)]
+        AInterface&IInterface $logger,
+    ) {
     }
 }

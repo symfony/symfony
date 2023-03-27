@@ -43,8 +43,11 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\DependencyInjection\Tests\Compiler\AAndIInterfaceConsumer;
+use Symfony\Component\DependencyInjection\Tests\Compiler\AInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Foo;
 use Symfony\Component\DependencyInjection\Tests\Compiler\FooAnnotation;
+use Symfony\Component\DependencyInjection\Tests\Compiler\IInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Wither;
 use Symfony\Component\DependencyInjection\Tests\Compiler\WitherAnnotation;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
@@ -1768,6 +1771,29 @@ PHP
         $this->assertInstanceOf(Foo::class, $container->get('bar')->foo);
         $this->assertInstanceOf(LazyObjectInterface::class, $container->get('bar')->foo);
         $this->assertSame($container->get('foo'), $container->get('bar')->foo->initializeLazyObject());
+    }
+
+    public function testLazyAutowireAttributeWithIntersection()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', AAndIInterfaceConsumer::class)
+            ->setPublic('true')
+            ->setAutowired(true);
+
+        $container->compile();
+
+        $lazyId = \array_slice(array_keys($container->getDefinitions()), -1)[0];
+        $this->assertStringStartsWith('.lazy.foo.', $lazyId);
+        $definition = $container->getDefinition($lazyId);
+        $this->assertSame('object', $definition->getClass());
+        $this->assertSame([
+            ['interface' => AInterface::class],
+            ['interface' => IInterface::class],
+        ], $definition->getTag('proxy'));
+
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/lazy_autowire_attribute_with_intersection.php', $dumper->dump());
     }
 }
 

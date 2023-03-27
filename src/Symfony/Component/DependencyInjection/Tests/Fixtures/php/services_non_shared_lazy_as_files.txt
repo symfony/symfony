@@ -24,7 +24,7 @@ class getNonSharedFooService extends ProjectServiceContainer
         $container->factories['non_shared_foo'] ??= self::do(...);
 
         if (true === $lazyLoad) {
-            return $container->createProxy('FooLazyClassGhostF814e3a', static fn () => \FooLazyClassGhostF814e3a::createLazyGhost(static fn ($proxy) => self::do($containerRef->get(), $proxy)));
+            return $container->createProxy('FooLazyClassGhost0fc418d', static fn () => \FooLazyClassGhost0fc418d::createLazyGhost(static fn ($proxy) => self::do($containerRef->get(), $proxy)));
         }
 
         static $include = true;
@@ -39,11 +39,11 @@ class getNonSharedFooService extends ProjectServiceContainer
     }
 }
 
-    [Container%s/FooLazyClassGhostF814e3a.php] => <?php
+    [Container%s/FooLazyClassGhost0fc418d.php] => <?php
 
 namespace Container%s;
 
-class FooLazyClassGhostF814e3a extends \Bar\FooLazyClass implements \Symfony\Component\VarExporter\LazyObjectInterface
+class FooLazyClassGhost0fc418d extends \Bar\FooLazyClass implements \Symfony\Component\VarExporter\LazyObjectInterface
 {
     use \Symfony\Component\VarExporter\LazyGhostTrait;
 
@@ -55,8 +55,8 @@ class_exists(\Symfony\Component\VarExporter\Internal\Hydrator::class);
 class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectRegistry::class);
 class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectState::class);
 
-if (!\class_exists('FooLazyClassGhostF814e3a', false)) {
-    \class_alias(__NAMESPACE__.'\\FooLazyClassGhostF814e3a', 'FooLazyClassGhostF814e3a', false);
+if (!\class_exists('FooLazyClassGhost0fc418d', false)) {
+    \class_alias(__NAMESPACE__.'\\FooLazyClassGhost0fc418d', 'FooLazyClassGhost0fc418d', false);
 }
 
     [Container%s/ProjectServiceContainer.php] => <?php
@@ -141,7 +141,7 @@ if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
 
 require dirname(__DIR__, %d).'%svendor/autoload.php';
 (require __DIR__.'/ProjectServiceContainer.php')->set(\Container%s\ProjectServiceContainer::class, null);
-require __DIR__.'/Container%s/FooLazyClassGhostF814e3a.php';
+require __DIR__.'/Container%s/FooLazyClassGhost0fc418d.php';
 require __DIR__.'/Container%s/getNonSharedFooService.php';
 
 $classes = [];

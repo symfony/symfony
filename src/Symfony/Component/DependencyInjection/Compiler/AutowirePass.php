@@ -295,12 +295,33 @@ class AutowirePass extends AbstractRecursivePass
                             ->setFactory(['Closure', 'fromCallable'])
                             ->setArguments([$value + [1 => '__invoke']])
                             ->setLazy($attribute->lazy);
-                    } elseif ($attribute->lazy && ($value instanceof Reference ? !$this->container->has($value) || !$this->container->findDefinition($value)->isLazy() : null === $attribute->value && $type)) {
-                        $this->container->register('.lazy.'.$value ??= $getValue(), $type)
+                    } elseif ($lazy = $attribute->lazy) {
+                        $definition = (new Definition($type))
                             ->setFactory('current')
-                            ->setArguments([[$value]])
+                            ->setArguments([[$value ??= $getValue()]])
                             ->setLazy(true);
-                        $value = new Reference('.lazy.'.$value);
+
+                        if (!\is_array($lazy)) {
+                            if (str_contains($type, '|')) {
+                                throw new AutowiringFailedException($this->currentId, sprintf('Cannot use #[Autowire] with option "lazy: true" on union types for service "%s"; set the option to the interface(s) that should be proxied instead.', $this->currentId));
+                            }
+                            $lazy = str_contains($type, '&') ? explode('&', $type) : [];
+                        }
+
+                        if ($lazy) {
+                            if (!class_exists($type) && !interface_exists($type, false)) {
+                                $definition->setClass('object');
+                            }
+                            foreach ($lazy as $v) {
+                                $definition->addTag('proxy', ['interface' => $v]);
+                            }
+                        }
+
+                        if ($definition->getClass() !== (string) $value || $definition->getTag('proxy')) {
+                            $value .= '.'.$this->container->hash([$definition->getClass(), $definition->getTag('proxy')]);
+                        }
+                        $this->container->setDefinition($value = '.lazy.'.$value, $definition);
+                        $value = new Reference($value);
                     }
                     $arguments[$index] = $value;
 

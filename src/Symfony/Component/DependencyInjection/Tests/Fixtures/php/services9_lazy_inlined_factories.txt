@@ -6,11 +6,11 @@ namespace Container%s;
 
 include_once $container->targetDir.''.'/Fixtures/includes/foo.php';
 
-class FooClassGhost2b16075 extends \Bar\FooClass implements \Symfony\Component\VarExporter\LazyObjectInterface
+class FooClassGhostEe53b95 extends \Bar\FooClass implements \Symfony\Component\VarExporter\LazyObjectInterface
 %A
 
-if (!\class_exists('FooClassGhost2b16075', false)) {
-    \class_alias(__NAMESPACE__.'\\FooClassGhost2b16075', 'FooClassGhost2b16075', false);
+if (!\class_exists('FooClassGhostEe53b95', false)) {
+    \class_alias(__NAMESPACE__.'\\FooClassGhostEe53b95', 'FooClassGhostEe53b95', false);
 }
 
     [Container%s/ProjectServiceContainer.php] => <?php
@@ -78,7 +78,7 @@ class ProjectServiceContainer extends Container
         $containerRef = $container->ref;
 
         if (true === $lazyLoad) {
-            return $container->services['lazy_foo'] = $container->createProxy('FooClassGhost2b16075', static fn () => \FooClassGhost2b16075::createLazyGhost(static fn ($proxy) => self::getLazyFooService($containerRef->get(), $proxy)));
+            return $container->services['lazy_foo'] = $container->createProxy('FooClassGhostEe53b95', static fn () => \FooClassGhostEe53b95::createLazyGhost(static fn ($proxy) => self::getLazyFooService($containerRef->get(), $proxy)));
         }
 
         include_once $container->targetDir.''.'/Fixtures/includes/foo_lazy.php';

@@ -146,7 +146,7 @@ class MermaidDumperTest extends TestCase
         ];
     }
 
-    public static function provideWorkflowWithReservedWords()
+    public static function provideWorkflowWithReservedWords(): array
     {
         $builder = new DefinitionBuilder();
 

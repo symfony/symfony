@@ -22,12 +22,12 @@ final class Subject
         $this->context = [];
     }
 
-    public function getMarking()
+    public function getMarking(): string|array|null
     {
         return $this->marking;
     }
 
-    public function setMarking($marking, array $context = [])
+    public function setMarking($marking, array $context = []): void
     {
         $this->marking = $marking;
         $this->context = $context;

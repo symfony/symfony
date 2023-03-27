@@ -36,7 +36,7 @@ class PlantUmlDumperTest extends TestCase
         $this->assertStringEqualsFile($file, $dump);
     }
 
-    public static function provideWorkflowDefinitionWithoutMarking()
+    public static function provideWorkflowDefinitionWithoutMarking(): \Generator
     {
         yield [self::createSimpleWorkflowDefinition(), null, 'simple-workflow-nomarking', 'SimpleDiagram'];
         yield [self::createComplexWorkflowDefinition(), null, 'complex-workflow-nomarking', 'ComplexDiagram'];
@@ -59,7 +59,7 @@ class PlantUmlDumperTest extends TestCase
         $this->assertStringEqualsFile($file, $dump);
     }
 
-    public static function provideStateMachineDefinitionWithoutMarking()
+    public static function provideStateMachineDefinitionWithoutMarking(): \Generator
     {
         yield [static::createComplexStateMachineDefinition(), null, 'complex-state-machine-nomarking', 'SimpleDiagram'];
         $marking = new Marking(['c' => 1, 'e' => 1]);
@@ -94,7 +94,7 @@ class PlantUmlDumperTest extends TestCase
         $this->assertStringEqualsFile($file, $dump);
     }
 
-    private function getFixturePath($name, $transitionType)
+    private function getFixturePath($name, $transitionType): string
     {
         return __DIR__.'/../fixtures/puml/'.$transitionType.'/'.$name.'.puml';
     }

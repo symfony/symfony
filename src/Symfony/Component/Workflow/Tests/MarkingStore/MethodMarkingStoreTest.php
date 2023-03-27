@@ -111,7 +111,7 @@ class MethodMarkingStoreTest extends TestCase
         $markingStore->getMarking($subject);
     }
 
-    private function createValueObject(string $markingValue)
+    private function createValueObject(string $markingValue): object
     {
         return new class($markingValue) {
             /** @var string */

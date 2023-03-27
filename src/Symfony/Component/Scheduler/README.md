@@ -11,7 +11,7 @@ are not covered by Symfony's
 Resources
 ---------
 
-* [Documentation](https://symfony.com/doc/current/scheduler.html)
+* [Documentation](https://symfony.com/components/Scheduler)
 * [Contributing](https://symfony.com/doc/current/contributing/index.html)
 * [Report issues](https://github.com/symfony/symfony/issues) and
   [send Pull Requests](https://github.com/symfony/symfony/pulls)

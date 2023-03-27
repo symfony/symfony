@@ -70,16 +70,7 @@ class CsvEncoderContextBuilderTest extends TestCase
         ]];
 
         yield 'With false key separator' => [[
-            CsvEncoder::DELIMITER_KEY => ';',
-            CsvEncoder::ENCLOSURE_KEY => '"',
-            CsvEncoder::ESCAPE_CHAR_KEY => '\\',
             CsvEncoder::KEY_SEPARATOR_KEY => false,
-            CsvEncoder::HEADERS_KEY => ['h1', 'h2'],
-            CsvEncoder::ESCAPE_FORMULAS_KEY => true,
-            CsvEncoder::AS_COLLECTION_KEY => true,
-            CsvEncoder::NO_HEADERS_KEY => false,
-            CsvEncoder::END_OF_LINE => 'EOL',
-            CsvEncoder::OUTPUT_UTF8_BOM_KEY => false,
         ]];
 
         yield 'With null values' => [[

@@ -133,7 +133,6 @@ Validator
 Serializer
 ----------
 
- * Deprecate `MissingConstructorArgumentsException` in favor of `MissingConstructorArgumentException`
  * Deprecate `CacheableSupportsMethodInterface` in favor of the new `getSupportedTypes(?string $format)` methods
  * The following Normalizer classes will become final in 7.0:
    * `ConstraintViolationListNormalizer`

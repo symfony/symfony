@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer\Features;
 
-use Symfony\Component\Serializer\Exception\MissingConstructorArgumentException;
+use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\NotSerializedConstructorArgumentDummy;
 
@@ -62,14 +62,13 @@ trait ConstructorArgumentsTestTrait
         ];
 
         $normalizer = $this->getDenormalizerForConstructArguments();
-
         try {
             $normalizer->denormalize($data, ConstructorArgumentsObject::class);
-            self::fail(sprintf('Failed asserting that exception of type "%s" is thrown.', MissingConstructorArgumentException::class));
-        } catch (MissingConstructorArgumentException $e) {
-            self::assertSame(sprintf('Cannot create an instance of "%s" from serialized data because its constructor requires parameter "bar" to be present.', ConstructorArgumentsObject::class), $e->getMessage());
+            self::fail(sprintf('Failed asserting that exception of type "%s" is thrown.', MissingConstructorArgumentsException::class));
+        } catch (MissingConstructorArgumentsException $e) {
+            self::assertSame(sprintf('Cannot create an instance of "%s" from serialized data because its constructor requires the following parameters to be present : "$bar", "$baz".', ConstructorArgumentsObject::class), $e->getMessage());
             self::assertSame(ConstructorArgumentsObject::class, $e->getClass());
-            self::assertSame('bar', $e->getMissingArgument());
+            self::assertSame(['bar', 'baz'], $e->getMissingConstructorArguments());
         }
     }
 }

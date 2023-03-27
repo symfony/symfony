@@ -447,6 +447,29 @@ class CollectionTypeTest extends BaseTypeTestCase
         $this->assertSame('foo', $form->createView()->vars['prototype']->vars['help']);
     }
 
+    public function testPrototypeOptionsAppliedToNewFields()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, ['first'], [
+            'allow_add' => true,
+            'prototype' => true,
+            'entry_type' => TextTypeTest::TESTED_TYPE,
+            'entry_options' => [
+                'disabled' => true,
+            ],
+            'prototype_options' => [
+                'disabled' => false,
+            ],
+        ]);
+
+        $form->submit(['first_changed', 'second']);
+
+        $this->assertTrue($form->has('0'));
+        $this->assertTrue($form->has('1'));
+        $this->assertSame('first', $form[0]->getData());
+        $this->assertSame('second', $form[1]->getData());
+        $this->assertSame(['first', 'second'], $form->getData());
+    }
+
     public function testEntriesBlockPrefixes()
     {
         $collectionView = $this->factory->createNamed('fields', static::TESTED_TYPE, [''], [

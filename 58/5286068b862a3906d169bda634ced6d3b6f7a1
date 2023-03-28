@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by tucksaun at 2023-03-20T23:57:52Z
+
+Bench results: no overall changes, still ~80% gain on `getNormalizer` and 15% gain on the main WT

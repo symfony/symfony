@@ -97,7 +97,7 @@ class ChoiceType extends AbstractType
         if ($options['expanded'] || $options['multiple']) {
             // Make sure that scalar, submitted values are converted to arrays
             // which can be submitted to the checkboxes/radio buttons
-            $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use ($choiceList, $options, &$unknownValues) {
+            $builder->addEventListener(FormEvents::PRE_SUBMIT, static function (FormEvent $event) use ($choiceList, $options, &$unknownValues) {
                 $form = $event->getForm();
                 $data = $event->getData();
 
@@ -166,16 +166,17 @@ class ChoiceType extends AbstractType
 
         if ($options['multiple']) {
             $messageTemplate = $options['invalid_message'] ?? 'The value {{ value }} is not valid.';
+            $translator = $this->translator;
 
-            $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) use (&$unknownValues, $messageTemplate) {
+            $builder->addEventListener(FormEvents::POST_SUBMIT, static function (FormEvent $event) use (&$unknownValues, $messageTemplate, $translator) {
                 // Throw exception if unknown values were submitted
                 if (\count($unknownValues) > 0) {
                     $form = $event->getForm();
 
                     $clientDataAsString = \is_scalar($form->getViewData()) ? (string) $form->getViewData() : (\is_array($form->getViewData()) ? implode('", "', array_keys($unknownValues)) : \gettype($form->getViewData()));
 
-                    if (null !== $this->translator) {
-                        $message = $this->translator->trans($messageTemplate, ['{{ value }}' => $clientDataAsString], 'validators');
+                    if ($translator) {
+                        $message = $translator->trans($messageTemplate, ['{{ value }}' => $clientDataAsString], 'validators');
                     } else {
                         $message = strtr($messageTemplate, ['{{ value }}' => $clientDataAsString]);
                     }
@@ -199,7 +200,7 @@ class ChoiceType extends AbstractType
 
         // To avoid issues when the submitted choices are arrays (i.e. array to string conversions),
         // we have to ensure that all elements of the submitted choice data are NULL, strings or ints.
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, static function (FormEvent $event) {
             $data = $event->getData();
 
             if (!\is_array($data)) {
@@ -245,9 +246,9 @@ class ChoiceType extends AbstractType
         // closure here that is optimized for the value of the form, to
         // avoid making the type check inside the closure.
         if ($options['multiple']) {
-            $view->vars['is_selected'] = fn ($choice, array $values) => \in_array($choice, $values, true);
+            $view->vars['is_selected'] = static fn ($choice, array $values) => \in_array($choice, $values, true);
         } else {
-            $view->vars['is_selected'] = fn ($choice, $value) => $choice === $value;
+            $view->vars['is_selected'] = static fn ($choice, $value) => $choice === $value;
         }
 
         // Check if the choices already contain the empty value
@@ -285,7 +286,7 @@ class ChoiceType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver)
     {
-        $emptyData = function (Options $options) {
+        $emptyData = static function (Options $options) {
             if ($options['expanded'] && !$options['multiple']) {
                 return null;
             }
@@ -297,9 +298,9 @@ class ChoiceType extends AbstractType
             return '';
         };
 
-        $placeholderDefault = fn (Options $options) => $options['required'] ? null : '';
+        $placeholderDefault = static fn (Options $options) => $options['required'] ? null : '';
 
-        $placeholderNormalizer = function (Options $options, $placeholder) {
+        $placeholderNormalizer = static function (Options $options, $placeholder) {
             if ($options['multiple']) {
                 // never use an empty value for this case
                 return null;
@@ -318,9 +319,9 @@ class ChoiceType extends AbstractType
             return $placeholder;
         };
 
-        $compound = fn (Options $options) => $options['expanded'];
+        $compound = static fn (Options $options) => $options['expanded'];
 
-        $choiceTranslationDomainNormalizer = function (Options $options, $choiceTranslationDomain) {
+        $choiceTranslationDomainNormalizer = static function (Options $options, $choiceTranslationDomain) {
             if (true === $choiceTranslationDomain) {
                 return $options['translation_domain'];
             }

@@ -207,7 +207,7 @@ EOF
         $coreExtension = new CoreExtension();
         $loadTypesRefMethod = (new \ReflectionObject($coreExtension))->getMethod('loadTypes');
         $coreTypes = $loadTypesRefMethod->invoke($coreExtension);
-        $coreTypes = array_map(fn (FormTypeInterface $type) => $type::class, $coreTypes);
+        $coreTypes = array_map(static fn (FormTypeInterface $type) => $type::class, $coreTypes);
         sort($coreTypes);
 
         return $coreTypes;
@@ -240,7 +240,7 @@ EOF
         }
 
         $threshold = 1e3;
-        $alternatives = array_filter($alternatives, fn ($lev) => $lev < 2 * $threshold);
+        $alternatives = array_filter($alternatives, static fn ($lev) => $lev < 2 * $threshold);
         ksort($alternatives, \SORT_NATURAL | \SORT_FLAG_CASE);
 
         return array_keys($alternatives);

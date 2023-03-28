@@ -53,7 +53,7 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
         parent::configureOptions($resolver);
 
         // Constraint should always be converted to an array
-        $constraintsNormalizer = fn (Options $options, $constraints) => \is_object($constraints) ? [$constraints] : (array) $constraints;
+        $constraintsNormalizer = static fn (Options $options, $constraints) => \is_object($constraints) ? [$constraints] : (array) $constraints;
 
         $resolver->setDefaults([
             'error_mapping' => [],

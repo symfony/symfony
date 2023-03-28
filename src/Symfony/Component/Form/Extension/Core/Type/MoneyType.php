@@ -84,7 +84,7 @@ class MoneyType extends AbstractType
 
         $resolver->setAllowedTypes('html5', 'bool');
 
-        $resolver->setNormalizer('grouping', function (Options $options, $value) {
+        $resolver->setNormalizer('grouping', static function (Options $options, $value) {
             if ($value && $options['html5']) {
                 throw new LogicException('Cannot use the "grouping" option when the "html5" option is enabled.');
             }

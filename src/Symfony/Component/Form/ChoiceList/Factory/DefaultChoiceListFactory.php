@@ -35,8 +35,9 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         if ($filter) {
             // filter the choice list lazily
             return $this->createListFromLoader(new FilterChoiceLoaderDecorator(
-                new CallbackChoiceLoader(static fn () => $choices
-                ), $filter), $value);
+                new CallbackChoiceLoader(static fn () => $choices),
+                $filter
+            ), $value);
         }
 
         return new ArrayChoiceList($choices, $value);
@@ -133,9 +134,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
             );
         }
 
-        uksort($preferredViews, static fn ($a, $b): int => isset($preferredViewsOrder[$a], $preferredViewsOrder[$b])
-            ? $preferredViewsOrder[$a] <=> $preferredViewsOrder[$b]
-            : 0);
+        uksort($preferredViews, static fn ($a, $b) => isset($preferredViewsOrder[$a], $preferredViewsOrder[$b]) ? $preferredViewsOrder[$a] <=> $preferredViewsOrder[$b] : 0);
 
         return new ChoiceListView($otherViews, $preferredViews);
     }

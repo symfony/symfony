@@ -36,7 +36,7 @@ class CountryType extends AbstractType
                 $choiceTranslationLocale = $options['choice_translation_locale'];
                 $alpha3 = $options['alpha3'];
 
-                return ChoiceList::loader($this, new IntlCallbackChoiceLoader(fn () => array_flip($alpha3 ? Countries::getAlpha3Names($choiceTranslationLocale) : Countries::getNames($choiceTranslationLocale))), [$choiceTranslationLocale, $alpha3]);
+                return ChoiceList::loader($this, new IntlCallbackChoiceLoader(static fn () => array_flip($alpha3 ? Countries::getAlpha3Names($choiceTranslationLocale) : Countries::getNames($choiceTranslationLocale))), [$choiceTranslationLocale, $alpha3]);
             },
             'choice_translation_domain' => false,
             'choice_translation_locale' => null,

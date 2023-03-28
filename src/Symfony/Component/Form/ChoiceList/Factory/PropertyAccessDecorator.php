@@ -67,7 +67,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
             // when such values are passed to
             // ChoiceListInterface::getValuesForChoices(). Handle this case
             // so that the call to getValue() doesn't break.
-            $value = fn ($choice) => \is_object($choice) || \is_array($choice) ? $accessor->getValue($choice, $value) : null;
+            $value = static fn ($choice) => \is_object($choice) || \is_array($choice) ? $accessor->getValue($choice, $value) : null;
         }
 
         if (\is_string($filter)) {
@@ -94,7 +94,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
             // when such values are passed to
             // ChoiceListInterface::getValuesForChoices(). Handle this case
             // so that the call to getValue() doesn't break.
-            $value = fn ($choice) => \is_object($choice) || \is_array($choice) ? $accessor->getValue($choice, $value) : null;
+            $value = static fn ($choice) => \is_object($choice) || \is_array($choice) ? $accessor->getValue($choice, $value) : null;
         }
 
         if (\is_string($filter)) {
@@ -118,7 +118,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
         }
 
         if ($label instanceof PropertyPathInterface) {
-            $label = fn ($choice) => $accessor->getValue($choice, $label);
+            $label = static fn ($choice) => $accessor->getValue($choice, $label);
         }
 
         if (\is_string($preferredChoices)) {
@@ -126,7 +126,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
         }
 
         if ($preferredChoices instanceof PropertyPathInterface) {
-            $preferredChoices = function ($choice) use ($accessor, $preferredChoices) {
+            $preferredChoices = static function ($choice) use ($accessor, $preferredChoices) {
                 try {
                     return $accessor->getValue($choice, $preferredChoices);
                 } catch (UnexpectedTypeException) {
@@ -141,7 +141,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
         }
 
         if ($index instanceof PropertyPathInterface) {
-            $index = fn ($choice) => $accessor->getValue($choice, $index);
+            $index = static fn ($choice) => $accessor->getValue($choice, $index);
         }
 
         if (\is_string($groupBy)) {
@@ -149,7 +149,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
         }
 
         if ($groupBy instanceof PropertyPathInterface) {
-            $groupBy = function ($choice) use ($accessor, $groupBy) {
+            $groupBy = static function ($choice) use ($accessor, $groupBy) {
                 try {
                     return $accessor->getValue($choice, $groupBy);
                 } catch (UnexpectedTypeException) {
@@ -164,7 +164,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
         }
 
         if ($attr instanceof PropertyPathInterface) {
-            $attr = fn ($choice) => $accessor->getValue($choice, $attr);
+            $attr = static fn ($choice) => $accessor->getValue($choice, $attr);
         }
 
         if (\is_string($labelTranslationParameters)) {

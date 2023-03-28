@@ -149,7 +149,7 @@ abstract class Descriptor implements DescriptorInterface
             }
         }
 
-        $filterByDeprecated = function (array $options) use ($deprecatedOptions) {
+        $filterByDeprecated = static function (array $options) use ($deprecatedOptions) {
             foreach ($options as $class => $opts) {
                 if ($deprecated = array_intersect($deprecatedOptions, $opts)) {
                     $options[$class] = $deprecated;

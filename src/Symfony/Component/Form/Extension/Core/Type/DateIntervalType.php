@@ -168,12 +168,12 @@ class DateIntervalType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $compound = fn (Options $options) => 'single_text' !== $options['widget'];
-        $emptyData = fn (Options $options) => 'single_text' === $options['widget'] ? '' : [];
+        $compound = static fn (Options $options) => 'single_text' !== $options['widget'];
+        $emptyData = static fn (Options $options) => 'single_text' === $options['widget'] ? '' : [];
 
-        $placeholderDefault = fn (Options $options) => $options['required'] ? null : '';
+        $placeholderDefault = static fn (Options $options) => $options['required'] ? null : '';
 
-        $placeholderNormalizer = function (Options $options, $placeholder) use ($placeholderDefault) {
+        $placeholderNormalizer = static function (Options $options, $placeholder) use ($placeholderDefault) {
             if (\is_array($placeholder)) {
                 $default = $placeholderDefault($options);
 
@@ -183,7 +183,7 @@ class DateIntervalType extends AbstractType
             return array_fill_keys(self::TIME_PARTS, $placeholder);
         };
 
-        $labelsNormalizer = fn (Options $options, array $labels) => array_replace([
+        $labelsNormalizer = static fn (Options $options, array $labels) => array_replace([
             'years' => null,
             'months' => null,
             'days' => null,
@@ -192,7 +192,7 @@ class DateIntervalType extends AbstractType
             'minutes' => null,
             'seconds' => null,
             'invert' => 'Negative interval',
-        ], array_filter($labels, fn ($label) => null !== $label));
+        ], array_filter($labels, static fn ($label) => null !== $label));
 
         $resolver->setDefaults([
             'with_years' => true,

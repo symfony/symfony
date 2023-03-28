@@ -106,7 +106,7 @@ class CollectionType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $entryOptionsNormalizer = function (Options $options, $value) {
+        $entryOptionsNormalizer = static function (Options $options, $value) {
             $value['block_name'] = 'entry';
 
             return $value;

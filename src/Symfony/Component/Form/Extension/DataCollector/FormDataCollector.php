@@ -219,7 +219,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
     protected function getCasters(): array
     {
         return parent::getCasters() + [
-            \Exception::class => function (\Exception $e, array $a, Stub $s) {
+            \Exception::class => static function (\Exception $e, array $a, Stub $s) {
                 foreach (["\0Exception\0previous", "\0Exception\0trace"] as $k) {
                     if (isset($a[$k])) {
                         unset($a[$k]);
@@ -229,12 +229,12 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
 
                 return $a;
             },
-            FormInterface::class => fn (FormInterface $f, array $a) => [
+            FormInterface::class => static fn (FormInterface $f, array $a) => [
                 Caster::PREFIX_VIRTUAL.'name' => $f->getName(),
                 Caster::PREFIX_VIRTUAL.'type_class' => new ClassStub($f->getConfig()->getType()->getInnerType()::class),
             ],
             FormView::class => StubCaster::cutInternals(...),
-            ConstraintViolationInterface::class => fn (ConstraintViolationInterface $v, array $a) => [
+            ConstraintViolationInterface::class => static fn (ConstraintViolationInterface $v, array $a) => [
                 Caster::PREFIX_VIRTUAL.'root' => $v->getRoot(),
                 Caster::PREFIX_VIRTUAL.'path' => $v->getPropertyPath(),
                 Caster::PREFIX_VIRTUAL.'value' => $v->getInvalidValue(),

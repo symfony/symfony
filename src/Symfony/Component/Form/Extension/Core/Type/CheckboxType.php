@@ -51,7 +51,7 @@ class CheckboxType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $emptyData = fn (FormInterface $form, $viewData) => $viewData;
+        $emptyData = static fn (FormInterface $form, $viewData) => $viewData;
 
         $resolver->setDefaults([
             'value' => '1',

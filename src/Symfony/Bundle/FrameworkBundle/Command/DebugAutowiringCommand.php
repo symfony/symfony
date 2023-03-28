@@ -100,6 +100,9 @@ EOF
         $previousId = '-';
         $serviceIdsNb = 0;
         foreach ($serviceIds as $serviceId) {
+            if ($builder->hasDefinition($serviceId) && $builder->getDefinition($serviceId)->hasTag('container.excluded')) {
+                continue;
+            }
             $text = [];
             $resolvedServiceId = $serviceId;
             if (!str_starts_with($serviceId, $previousId)) {

@@ -40,7 +40,7 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
 
     public function getSupportedTypes(?string $format): array
     {
-        return ['*' => __CLASS__ === static::class || $this->hasCacheableSupportsMethod()];
+        return ['object' => __CLASS__ === static::class || $this->hasCacheableSupportsMethod()];
     }
 
     /**

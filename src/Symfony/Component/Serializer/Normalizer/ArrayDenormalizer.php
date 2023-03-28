@@ -38,12 +38,7 @@ class ArrayDenormalizer implements ContextAwareDenormalizerInterface, Denormaliz
 
     public function getSupportedTypes(?string $format): array
     {
-        // @deprecated remove condition in 7.0
-        if (!method_exists($this->denormalizer, 'getSupportedTypes')) {
-            return ['*' => $this->denormalizer instanceof CacheableSupportsMethodInterface && $this->denormalizer->hasCacheableSupportsMethod()];
-        }
-
-        return $this->denormalizer->getSupportedTypes($format);
+        return ['object' => null, '*' => false];
     }
 
     /**

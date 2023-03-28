@@ -22,7 +22,7 @@ class ProjectServiceContainer extends Container
         $this->ref = \WeakReference::create($this);
         $this->services = $this->privates = [];
         $this->methodMap = [
-            'bar' => 'getBarService',
+            'foo' => 'getFooService',
         ];
 
         $this->aliases = [];
@@ -41,7 +41,7 @@ class ProjectServiceContainer extends Container
     public function getRemovedIds(): array
     {
         return [
-            'foo' => true,
+            '.lazy.foo.gDmfket' => true,
         ];
     }
 
@@ -51,39 +51,52 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the public 'bar' shared service.
+     * Gets the public 'foo' shared autowired service.
      *
-     * @return \stdClass
+     * @return \Symfony\Component\DependencyInjection\Tests\Compiler\AAndIInterfaceConsumer
      */
-    protected static function getBarService($container)
+    protected static function getFooService($container)
     {
-        return $container->services['bar'] = new \stdClass((isset($container->factories['service_container']['foo']) ? $container->factories['service_container']['foo']($container) : self::getFooService($container)));
+        $a = ($container->privates['.lazy.foo.gDmfket'] ?? self::get_Lazy_Foo_GDmfketService($container));
+
+        if (isset($container->services['foo'])) {
+            return $container->services['foo'];
+        }
+
+        return $container->services['foo'] = new \Symfony\Component\DependencyInjection\Tests\Compiler\AAndIInterfaceConsumer($a);
     }
 
     /**
-     * Gets the private 'foo' service.
+     * Gets the private '.lazy.foo.gDmfket' shared service.
      *
-     * @return \stdClass
+     * @return \object
      */
-    protected static function getFooService($container, $lazyLoad = true)
+    protected static function get_Lazy_Foo_GDmfketService($container, $lazyLoad = true)
     {
         $containerRef = $container->ref;
 
-        $container->factories['service_container']['foo'] ??= self::getFooService(...);
-
         if (true === $lazyLoad) {
-            return $container->createProxy('stdClassGhost2fc7938', static fn () => \stdClassGhost2fc7938::createLazyGhost(static fn ($proxy) => self::getFooService($containerRef->get(), $proxy)));
+            return $container->privates['.lazy.foo.gDmfket'] = $container->createProxy('objectProxy8ac8e9a', static fn () => \objectProxy8ac8e9a::createLazyProxy(static fn () => self::get_Lazy_Foo_GDmfketService($containerRef->get(), false)));
         }
 
-        return $lazyLoad;
+        return ($container->services['foo'] ?? self::getFooService($container));
     }
 }
 
-class stdClassGhost2fc7938 extends \stdClass implements \Symfony\Component\VarExporter\LazyObjectInterface
+class objectProxy8ac8e9a implements \Symfony\Component\DependencyInjection\Tests\Compiler\AInterface, \Symfony\Component\DependencyInjection\Tests\Compiler\IInterface, \Symfony\Component\VarExporter\LazyObjectInterface
 {
-    use \Symfony\Component\VarExporter\LazyGhostTrait;
+    use \Symfony\Component\VarExporter\LazyProxyTrait;
 
     private const LAZY_OBJECT_PROPERTY_SCOPES = [];
+
+    public function initializeLazyObject(): \Symfony\Component\DependencyInjection\Tests\Compiler\AInterface&\Symfony\Component\DependencyInjection\Tests\Compiler\IInterface
+    {
+        if ($state = $this->lazyObjectState ?? null) {
+            return $state->realInstance ??= ($state->initializer)();
+        }
+
+        return $this;
+    }
 }
 
 // Help opcache.preload discover always-needed symbols

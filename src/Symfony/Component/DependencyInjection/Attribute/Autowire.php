@@ -25,6 +25,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
 class Autowire
 {
     public readonly string|array|Expression|Reference|ArgumentInterface|null $value;
+    public readonly bool|array $lazy;
 
     /**
      * Use only ONE of the following.
@@ -34,6 +35,7 @@ class Autowire
      * @param string|null                         $expression Expression (ie 'service("some.service").someMethod()')
      * @param string|null                         $env        Environment variable name (ie 'SOME_ENV_VARIABLE')
      * @param string|null                         $param      Parameter name (ie 'some.parameter.name')
+     * @param bool|class-string|class-string[]    $lazy       Whether to use lazy-loading for this argument
      */
     public function __construct(
         string|array|ArgumentInterface $value = null,
@@ -41,9 +43,9 @@ class Autowire
         string $expression = null,
         string $env = null,
         string $param = null,
-        public bool $lazy = false,
+        bool|string|array $lazy = false,
     ) {
-        if ($lazy) {
+        if ($this->lazy = \is_string($lazy) ? [$lazy] : $lazy) {
             if (null !== ($expression ?? $env ?? $param)) {
                 throw new LogicException('#[Autowire] attribute cannot be $lazy and use $expression, $env, or $param.');
             }

@@ -32,7 +32,7 @@ trait MonologApiTrait
      * @see BaseLogger::$name
      * @deprecated This has been copied over from \Monolog\Logger for compatibility reasons, and might be removed eventually.
      */
-    protected string $name;
+    protected $name;
 
     /**
      * @see BaseLogger::$handlers
@@ -40,7 +40,7 @@ trait MonologApiTrait
      *
      * @var list<HandlerInterface>
      */
-    protected array $handlers;
+    protected $handlers;
 
     /**
      * @see BaseLogger::$processors
@@ -48,34 +48,35 @@ trait MonologApiTrait
      *
      * @var array<(callable(LogRecord): LogRecord)|ProcessorInterface>
      */
-    protected array $processors;
+    protected $processors;
 
     /**
      * @see BaseLogger::$microsecondTimestamps
      * @deprecated This has been copied over from \Monolog\Logger for compatibility reasons, and might be removed eventually.
      */
-    protected bool $microsecondTimestamps = true;
+    protected $microsecondTimestamps = true;
 
     /**
      * @see BaseLogger::$timezone
      * @deprecated This has been copied over from \Monolog\Logger for compatibility reasons, and might be removed eventually.
      */
-    protected DateTimeZone $timezone;
+    protected $timezone;
 
     /**
      * @see BaseLogger::$exceptionHandler
      * @deprecated This has been copied over from \Monolog\Logger for compatibility reasons, and might be removed eventually.
      */
-    protected Closure|null $exceptionHandler = null;
+    protected $exceptionHandler = null;
 
     /**
      * @see BaseLogger::__construct
-     * @deprecated This has been copied over from \Monolog\Logger for compatibility reasons, and might be removed eventually.
+     * @deprecated Creating an instance of Monolog\Logger through this method is deprecated. Please use ::setLogger
      */
     public function __construct() // string $name, array $handlers = [], array $processors = [], DateTimeZone|null $timezone = null
     {
         $args = \func_get_args();
         if ([] !== $args) {
+            trigger_deprecation('symfony/monolog-bridge', '6.3', 'The "%s" class extending "%s" is deprecated. In the future, this class will stop extending it.', self::class, BaseLogger::class);
             $this->logger = new BaseLogger(...$args);
         }
     }
@@ -125,9 +126,9 @@ trait MonologApiTrait
      * @see BaseLogger::removeHandler
      * @deprecated This has been copied over from \Monolog\Logger for compatibility reasons, and might be removed eventually.
      */
-    public function removeHandler(int $handlerIndex): void
+    public function removeHandler(callable $callback): void
     {
-        $this->logger->removeHandler($handlerIndex);
+        $this->logger->removeHandler($callback);
     }
 
     /**
@@ -174,9 +175,9 @@ trait MonologApiTrait
      * @see BaseLogger::removeProcessor
      * @deprecated This has been copied over from \Monolog\Logger for compatibility reasons, and might be removed eventually.
      */
-    public function removeProcessor(int $processorIndex): void
+    public function removeProcessor(callable $callback): void
     {
-        $this->logger->removeProcessor($processorIndex);
+        $this->logger->removeProcessor($callback);
     }
 
     /**
@@ -241,7 +242,7 @@ trait MonologApiTrait
      * @see BaseLogger::toMonologLevel
      * @deprecated This has been copied over from \Monolog\Logger for compatibility reasons, and might be removed eventually.
      */
-    public static function toMonologLevel(string|int|Level $level): Level
+    public static function toMonologLevel($level): int
     {
         return BaseLogger::toMonologLevel($level);
     }
@@ -259,7 +260,7 @@ trait MonologApiTrait
      * @see BaseLogger::setExceptionHandler
      * @deprecated This has been copied over from \Monolog\Logger for compatibility reasons, and might be removed eventually.
      */
-    public function setExceptionHandler(Closure|null $callback): self
+    public function setExceptionHandler(?callable $callback): self
     {
         $this->logger->setExceptionHandler($callback);
 
@@ -270,7 +271,7 @@ trait MonologApiTrait
      * @see BaseLogger::getExceptionHandler
      * @deprecated This has been copied over from \Monolog\Logger for compatibility reasons, and might be removed eventually.
      */
-    public function getExceptionHandler(): Closure|null
+    public function getExceptionHandler(): ?callable
     {
         return $this->logger->getExceptionHandler();
     }
@@ -299,7 +300,7 @@ trait MonologApiTrait
      * @see BaseLogger::handleException
      * @deprecated This has been copied over from \Monolog\Logger for compatibility reasons, and might be removed eventually.
      */
-    protected function handleException(Throwable $e, LogRecord $record): void
+    protected function handleException(Throwable $e, array $record): void
     {
         $this->logger->handleException($e, $record);
     }

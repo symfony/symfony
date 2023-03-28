@@ -20,7 +20,8 @@
         "monolog/monolog": "dev-remove-handlers-processors",
         "symfony/service-contracts": "^2.5|^3",
         "symfony/http-kernel": "^5.4|^6.0",
-        "psr/log": "^2.0 || ^3.0"
+        "psr/log": "^2.0 || ^3.0",
+        "symfony/deprecation-contracts": "^2.5|^3"
     },
     "require-dev": {
         "symfony/console": "^5.4|^6.0",

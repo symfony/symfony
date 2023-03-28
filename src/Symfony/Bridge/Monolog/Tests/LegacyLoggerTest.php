@@ -16,10 +16,22 @@ use Monolog\ResettableInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Logger;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * @group legacy
+ */
 class LegacyLoggerTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
+    public function testConstructWillTriggerDeprecation()
+    {
+        $this->expectDeprecation('Since symfony/monolog-bridge 6.3: The "Symfony\Bridge\Monolog\Logger" class extending "Monolog\Logger" is deprecated. In the future, this class will stop extending it.');
+        new Logger(__METHOD__);
+    }
+
     public function testGetLogsWithoutDebugProcessor()
     {
         $handler = new TestHandler();

@@ -648,9 +648,8 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container = $this->createContainerFromFile('session');
 
         $this->assertTrue($container->hasAlias(SessionInterface::class), '->registerSessionConfiguration() loads session.xml');
-        $this->assertNull($container->getDefinition('session.storage.factory.native')->getArgument(1));
-        $this->assertNull($container->getDefinition('session.storage.factory.php_bridge')->getArgument(0));
-        $this->assertSame('session.handler.native_file', (string) $container->getAlias('session.handler'));
+        $this->assertNull($container->getParameter('session.save_path'));
+        $this->assertSame('session.handler.native', (string) $container->getAlias('session.handler'));
 
         $expected = ['session_factory', 'session', 'initialized_session', 'logger', 'session_collector'];
         $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
@@ -667,9 +666,8 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container = $this->createContainerFromFile('session_legacy');
 
         $this->assertTrue($container->hasAlias(SessionInterface::class), '->registerSessionConfiguration() loads session.xml');
-        $this->assertNull($container->getDefinition('session.storage.native')->getArgument(1));
-        $this->assertNull($container->getDefinition('session.storage.php_bridge')->getArgument(0));
-        $this->assertSame('session.handler.native_file', (string) $container->getAlias('session.handler'));
+        $this->assertNull($container->getParameter('session.save_path'));
+        $this->assertSame('session.handler.native', (string) $container->getAlias('session.handler'));
 
         $expected = ['session_factory', 'session', 'initialized_session', 'logger', 'session_collector'];
         $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));

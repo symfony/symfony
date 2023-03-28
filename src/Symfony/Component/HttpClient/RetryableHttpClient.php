@@ -53,11 +53,11 @@ class RetryableHttpClient implements HttpClientInterface, ResetInterface
             return new AsyncResponse($this->client, $method, $url, $options);
         }
 
-        $retryCount = 0;
-        $content = '';
-        $firstChunk = null;
+        return new AsyncResponse($this->client, $method, $url, $options, function (ChunkInterface $chunk, AsyncContext $context) use ($method, $url, $options) {
+            static $retryCount = 0;
+            static $content = '';
+            static $firstChunk;
 
-        return new AsyncResponse($this->client, $method, $url, $options, function (ChunkInterface $chunk, AsyncContext $context) use ($method, $url, $options, &$retryCount, &$content, &$firstChunk) {
             $exception = null;
             try {
                 if ($context->getInfo('canceled') || $chunk->isTimeout() || null !== $chunk->getInformationalStatus()) {

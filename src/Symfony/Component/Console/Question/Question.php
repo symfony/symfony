@@ -148,8 +148,9 @@ class Question
 
             $callback = static fn () => $values;
         } elseif ($values instanceof \Traversable) {
-            $valueCache = null;
-            $callback = static function () use ($values, &$valueCache) {
+            $callback = static function () use ($values) {
+                static $valueCache;
+
                 return $valueCache ??= iterator_to_array($values, false);
             };
         } else {

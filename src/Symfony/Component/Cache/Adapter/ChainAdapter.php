@@ -98,9 +98,9 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
             return $value;
         };
 
-        $lastItem = null;
-        $i = 0;
-        $wrap = function (CacheItem $item = null, bool &$save = true) use ($key, $callback, $beta, &$wrap, &$i, &$doSave, &$lastItem, &$metadata) {
+        $wrap = function (CacheItem $item = null, bool &$save = true) use ($key, $callback, $beta, &$wrap, &$doSave, &$metadata) {
+            static $lastItem;
+            static $i = 0;
             $adapter = $this->adapters[$i];
             if (isset($this->adapters[++$i])) {
                 $callback = $wrap;

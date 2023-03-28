@@ -46,11 +46,10 @@ class AcceptHeader
      */
     public static function fromString(?string $headerValue): self
     {
-        $index = 0;
-
         $parts = HeaderUtils::split($headerValue ?? '', ',;=');
 
-        return new self(array_map(function ($subParts) use (&$index) {
+        return new self(array_map(function ($subParts) {
+            static $index = 0;
             $part = array_shift($subParts);
             $attributes = HeaderUtils::combine($subParts);
 

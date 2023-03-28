@@ -1480,8 +1480,6 @@ class Process implements \IteratorAggregate
     private function prepareWindowsCommandLine(string $cmd, array &$env): string
     {
         $uid = uniqid('', true);
-        $varCount = 0;
-        $varCache = [];
         $cmd = preg_replace_callback(
             '/"(?:(
                 [^"%!^]*+
@@ -1490,7 +1488,9 @@ class Process implements \IteratorAggregate
                     [^"%!^]*+
                 )++
             ) | [^"]*+ )"/x',
-            function ($m) use (&$env, &$varCache, &$varCount, $uid) {
+            function ($m) use (&$env, $uid) {
+                static $varCount = 0;
+                static $varCache = [];
                 if (!isset($m[1])) {
                     return $m[0];
                 }

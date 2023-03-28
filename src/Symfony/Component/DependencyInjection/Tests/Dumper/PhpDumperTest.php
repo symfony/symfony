@@ -48,6 +48,7 @@ use Symfony\Component\DependencyInjection\Tests\Compiler\AInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Foo;
 use Symfony\Component\DependencyInjection\Tests\Compiler\FooAnnotation;
 use Symfony\Component\DependencyInjection\Tests\Compiler\IInterface;
+use Symfony\Component\DependencyInjection\Tests\Compiler\SingleMethodInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Wither;
 use Symfony\Component\DependencyInjection\Tests\Compiler\WitherAnnotation;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
@@ -1673,6 +1674,28 @@ PHP
         $this->assertSame(247, $container->get('foo')->bar);
     }
 
+    public function testClosureProxy()
+    {
+        $container = new ContainerBuilder();
+        $container->register('closure_proxy', SingleMethodInterface::class)
+            ->setPublic('true')
+            ->setFactory(['Closure', 'fromCallable'])
+            ->setArguments([[new Reference('foo'), 'cloneFoo']])
+            ->setLazy(true);
+        $container->register('foo', Foo::class);
+        $container->compile();
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/closure_proxy.php', $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Closure_Proxy']));
+
+        require self::$fixturesPath.'/php/closure_proxy.php';
+
+        $container = new \Symfony_DI_PhpDumper_Test_Closure_Proxy();
+
+        $this->assertInstanceOf(SingleMethodInterface::class, $container->get('closure_proxy'));
+        $this->assertInstanceOf(Foo::class, $container->get('closure_proxy')->theMethod());
+    }
+
     public function testClosure()
     {
         $container = new ContainerBuilder();
@@ -1795,6 +1818,26 @@ PHP
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/lazy_autowire_attribute_with_intersection.php', $dumper->dump());
     }
+
+    public function testCallableAdapterConsumer()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', Foo::class);
+        $container->register('bar', CallableAdapterConsumer::class)
+            ->setPublic('true')
+            ->setAutowired(true);
+        $container->compile();
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/callable_adapter_consumer.php', $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Callable_Adapter_Consumer']));
+
+        require self::$fixturesPath.'/php/callable_adapter_consumer.php';
+
+        $container = new \Symfony_DI_PhpDumper_Test_Callable_Adapter_Consumer();
+
+        $this->assertInstanceOf(SingleMethodInterface::class, $container->get('bar')->foo);
+        $this->assertInstanceOf(Foo::class, $container->get('bar')->foo->theMethod());
+    }
 }
 
 class Rot13EnvVarProcessor implements EnvVarProcessorInterface
@@ -1839,6 +1882,15 @@ class LazyServiceConsumer
     public function __construct(
         #[Autowire(lazy: true)]
         public Foo $foo,
+    ) {
+    }
+}
+
+class CallableAdapterConsumer
+{
+    public function __construct(
+        #[AutowireCallable(service: 'foo', method: 'cloneFoo')]
+        public SingleMethodInterface $foo,
     ) {
     }
 }

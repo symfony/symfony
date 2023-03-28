@@ -1162,7 +1162,8 @@ EOTXT
             if ('current' === $callable && [0] === array_keys($definition->getArguments()) && \is_array($value) && [0] === array_keys($value)) {
                 return $return.$this->dumpValue($value[0]).$tail;
             }
-            if (['Closure', 'fromCallable'] === $callable && [0] === array_keys($definition->getArguments())) {
+
+            if (['Closure', 'fromCallable'] === $callable) {
                 $callable = $definition->getArgument(0);
                 if ($callable instanceof ServiceClosureArgument) {
                     return $return.$this->dumpValue($callable).$tail;
@@ -1175,50 +1176,6 @@ EOTXT
                 }
             }
 
-            if (\is_array($callable)) {
-                if (!preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $callable[1])) {
-                    throw new RuntimeException(sprintf('Cannot dump definition because of invalid factory method (%s).', $callable[1] ?: 'n/a'));
-                }
-
-                if (['...'] === $arguments && $definition->isLazy() && 'Closure' === ($definition->getClass() ?? 'Closure') && (
-                    $callable[0] instanceof Reference
-                    || ($callable[0] instanceof Definition && !$this->definitionVariables->contains($callable[0]))
-                )) {
-                    $class = ($callable[0] instanceof Reference ? $this->container->findDefinition($callable[0]) : $callable[0])->getClass();
-
-                    if (str_contains($initializer = $this->dumpValue($callable[0]), '$container')) {
-                        $this->addContainerRef = true;
-                        $initializer = sprintf('function () use ($containerRef) { $container = $containerRef; return %s; }', $initializer);
-                    } else {
-                        $initializer = 'fn () => '.$initializer;
-                    }
-
-                    return $return.LazyClosure::getCode($initializer, $this->container->getReflectionClass($class), $callable[1], $id).$tail;
-                }
-
-                if ($callable[0] instanceof Reference
-                    || ($callable[0] instanceof Definition && $this->definitionVariables->contains($callable[0]))
-                ) {
-                    return $return.sprintf('%s->%s(%s)', $this->dumpValue($callable[0]), $callable[1], $arguments ? implode(', ', $arguments) : '').$tail;
-                }
-
-                $class = $this->dumpValue($callable[0]);
-                // If the class is a string we can optimize away
-                if (str_starts_with($class, "'") && !str_contains($class, '$')) {
-                    if ("''" === $class) {
-                        throw new RuntimeException(sprintf('Cannot dump definition: "%s" service is defined to be created by a factory but is missing the service reference, did you forget to define the factory service id or class?', $id ? 'The "'.$id.'"' : 'inline'));
-                    }
-
-                    return $return.sprintf('%s::%s(%s)', $this->dumpLiteralClass($class), $callable[1], $arguments ? implode(', ', $arguments) : '').$tail;
-                }
-
-                if (str_starts_with($class, 'new ')) {
-                    return $return.sprintf('(%s)->%s(%s)', $class, $callable[1], $arguments ? implode(', ', $arguments) : '').$tail;
-                }
-
-                return $return.sprintf("[%s, '%s'](%s)", $class, $callable[1], $arguments ? implode(', ', $arguments) : '').$tail;
-            }
-
             if (\is_string($callable) && str_starts_with($callable, '@=')) {
                 return $return.sprintf('(($args = %s) ? (%s) : null)',
                     $this->dumpValue(new ServiceLocatorArgument($definition->getArguments())),
@@ -1226,7 +1183,49 @@ EOTXT
                 ).$tail;
             }
 
-            return $return.sprintf('%s(%s)', $this->dumpLiteralClass($this->dumpValue($callable)), $arguments ? implode(', ', $arguments) : '').$tail;
+            if (!\is_array($callable)) {
+                return $return.sprintf('%s(%s)', $this->dumpLiteralClass($this->dumpValue($callable)), $arguments ? implode(', ', $arguments) : '').$tail;
+            }
+
+            if (!preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $callable[1])) {
+                throw new RuntimeException(sprintf('Cannot dump definition because of invalid factory method (%s).', $callable[1] ?: 'n/a'));
+            }
+
+            if (['...'] === $arguments && ($definition->isLazy() || 'Closure' !== ($definition->getClass() ?? 'Closure')) && (
+                $callable[0] instanceof Reference
+                || ($callable[0] instanceof Definition && !$this->definitionVariables->contains($callable[0]))
+            )) {
+                if (str_contains($initializer = $this->dumpValue($callable[0]), '$container')) {
+                    $this->addContainerRef = true;
+                    $initializer = sprintf('function () use ($containerRef) { $container = $containerRef->get(); return %s; }', $initializer);
+                } else {
+                    $initializer = 'fn () => '.$initializer;
+                }
+
+                return $return.LazyClosure::getCode($initializer, $callable, $definition, $this->container, $id).$tail;
+            }
+
+            if ($callable[0] instanceof Reference
+                || ($callable[0] instanceof Definition && $this->definitionVariables->contains($callable[0]))
+            ) {
+                return $return.sprintf('%s->%s(%s)', $this->dumpValue($callable[0]), $callable[1], $arguments ? implode(', ', $arguments) : '').$tail;
+            }
+
+            $class = $this->dumpValue($callable[0]);
+            // If the class is a string we can optimize away
+            if (str_starts_with($class, "'") && !str_contains($class, '$')) {
+                if ("''" === $class) {
+                    throw new RuntimeException(sprintf('Cannot dump definition: "%s" service is defined to be created by a factory but is missing the service reference, did you forget to define the factory service id or class?', $id ? 'The "'.$id.'"' : 'inline'));
+                }
+
+                return $return.sprintf('%s::%s(%s)', $this->dumpLiteralClass($class), $callable[1], $arguments ? implode(', ', $arguments) : '').$tail;
+            }
+
+            if (str_starts_with($class, 'new ')) {
+                return $return.sprintf('(%s)->%s(%s)', $class, $callable[1], $arguments ? implode(', ', $arguments) : '').$tail;
+            }
+
+            return $return.sprintf("[%s, '%s'](%s)", $class, $callable[1], $arguments ? implode(', ', $arguments) : '').$tail;
         }
 
         if (null === $class = $definition->getClass()) {
@@ -2344,7 +2343,7 @@ EOF;
     {
         $asGhostObject = false;
 
-        if ('Closure' === ($definition->getClass() ?: (['Closure', 'fromCallable'] === $definition->getFactory() ? 'Closure' : null))) {
+        if (['Closure', 'fromCallable'] === $definition->getFactory()) {
             return null;
         }
 

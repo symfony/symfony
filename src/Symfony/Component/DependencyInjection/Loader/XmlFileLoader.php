@@ -389,6 +389,52 @@ class XmlFileLoader extends FileLoader
             $definition->setDecoratedService($decorates, $renameId, $priority, $invalidBehavior);
         }
 
+        if ($callable = $this->getChildren($service, 'from-callable')) {
+            if ($definition instanceof ChildDefinition) {
+                throw new InvalidArgumentException(sprintf('Attribute "parent" is unsupported when using "<from-callable>" on service "%s".', (string) $service->getAttribute('id')));
+            }
+
+            foreach ([
+                'Attribute "synthetic"' => 'isSynthetic',
+                'Attribute "file"' => 'getFile',
+                'Tag "<factory>"' => 'getFactory',
+                'Tag "<argument>"' => 'getArguments',
+                'Tag "<property>"' => 'getProperties',
+                'Tag "<configurator>"' => 'getConfigurator',
+                'Tag "<call>"' => 'getMethodCalls',
+            ] as $key => $method) {
+                if ($definition->$method()) {
+                    throw new InvalidArgumentException($key.sprintf(' is unsupported when using "<from-callable>" on service "%s".', (string) $service->getAttribute('id')));
+                }
+            }
+
+            $definition->setFactory(['Closure', 'fromCallable']);
+
+            if ('Closure' !== ($definition->getClass() ?? 'Closure')) {
+                $definition->setLazy(true);
+            } else {
+                $definition->setClass('Closure');
+            }
+
+            $callable = $callable[0];
+            if ($function = $callable->getAttribute('function')) {
+                $definition->setArguments([$function]);
+            } elseif ($expression = $callable->getAttribute('expression')) {
+                if (!class_exists(Expression::class)) {
+                    throw new \LogicException('The "expression" attribute cannot be used without the ExpressionLanguage component. Try running "composer require symfony/expression-language".');
+                }
+                $definition->setArguments(['@='.$expression]);
+            } else {
+                if ($childService = $callable->getAttribute('service')) {
+                    $class = new Reference($childService, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
+                } else {
+                    $class = $callable->hasAttribute('class') ? $callable->getAttribute('class') : null;
+                }
+
+                $definition->setArguments([[$class, $callable->getAttribute('method') ?: '__invoke']]);
+            }
+        }
+
         return $definition;
     }
 

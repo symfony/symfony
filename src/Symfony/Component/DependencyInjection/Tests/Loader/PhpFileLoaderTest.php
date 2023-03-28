@@ -106,6 +106,7 @@ class PhpFileLoaderTest extends TestCase
         yield ['config_builder'];
         yield ['expression_factory'];
         yield ['closure'];
+        yield ['from_callable'];
         yield ['env_param'];
     }
 
@@ -199,6 +200,8 @@ class PhpFileLoaderTest extends TestCase
 
     public function testWhenEnv()
     {
+        $this->expectNotToPerformAssertions();
+
         $fixtures = realpath(__DIR__.'/../Fixtures');
         $container = new ContainerBuilder();
         $loader = new PhpFileLoader($container, new FileLocator(), 'dev', new ConfigBuilderGenerator(sys_get_temp_dir()));

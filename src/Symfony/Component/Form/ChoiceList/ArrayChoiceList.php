@@ -64,7 +64,7 @@ class ArrayChoiceList implements ChoiceListInterface
         }
 
         if (null === $value && $this->castableToString($choices)) {
-            $value = fn ($choice) => false === $choice ? '0' : (string) $choice;
+            $value = static fn ($choice) => false === $choice ? '0' : (string) $choice;
         }
 
         if (null !== $value) {
@@ -72,7 +72,7 @@ class ArrayChoiceList implements ChoiceListInterface
             $this->valueCallback = $value;
         } else {
             // Otherwise generate incrementing integers as values
-            $value = function () {
+            $value = static function () {
                 static $i = 0;
 
                 return $i++;

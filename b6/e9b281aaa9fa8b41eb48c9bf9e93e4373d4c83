@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by Neirda24 at 2023-03-07T21:47:18Z
+
+Doesn't this reduce the evolutivity of the interface? If I understand this correctly then adding a second method to the interface would break your wrapping. I don't see the real benefits at the moment. Could you share real world usage cases ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-08T08:36:15Z
+
+@Neirda24 adding a method to an interface is a BC break so this shouldn't come unplanned. Also the segregation principle tells us that interfaces should have less methods, not more, so that the natural path for them is to shrink, not grow. Of course nothing enforces this, but this still helps answer you argument. I don't have a better real world usage than the one I posted in the description.
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2023-03-08T10:02:11Z
+
+@nicolas-grekas : agreed on the principles. I simply fear that it adds a lot of complexity both to maintain in symfony and to read in real world apps without gaining much from it. Maybe there is something I am not seeing ATM. Using the factory we usually expect that the class or type is the one from the method itself, here it is automatically cast as what Interface was provided on the service definition. AFAIK only this factory would do this. Am I wrong ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-08T11:17:38Z
+
+PR updated to make it easy to configure. This should alleviate your concerns @Neirda24. About the complexity for maintainers, this was pretty straightforward to implement actually so it's not an issue to me.
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2023-03-08T11:32:54Z
+
+Indeed easier to read. And less confusing for new developers. Gotta make sure the "cast" keyword is kept out of the documentation because even though it could be affiliated to a cast it is more a decorator to me. Thanks @nicolas-grekas !
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-03-13T14:12:29Z
+
+rebase needed
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-13T14:14:31Z
+
+done
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-20T15:58:48Z
+
+(rebased)

@@ -17,6 +17,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Scheduler\RecurringMessage;
 use Symfony\Component\Scheduler\ScheduleProviderInterface;
 use Symfony\Contracts\Service\ServiceProviderInterface;
@@ -98,9 +99,24 @@ final class DebugCommand extends Command
         $message = $recurringMessage->getMessage();
         $trigger = $recurringMessage->getTrigger();
 
+        if ($message instanceof Envelope) {
+            $message = $message->getMessage();
+        }
+
+        $messageName = (new \ReflectionClass($message))->getShortName();
+        $triggerName = (new \ReflectionClass($trigger))->getShortName();
+
+        if ($message instanceof \Stringable) {
+            $messageName .= ": {$message}";
+        }
+
+        if ($trigger instanceof \Stringable) {
+            $triggerName .= ": {$trigger}";
+        }
+
         return [
-            $message instanceof \Stringable ? (string) $message : (new \ReflectionClass($message))->getShortName(),
-            $trigger instanceof \Stringable ? (string) $trigger : (new \ReflectionClass($trigger))->getShortName(),
+            $messageName,
+            $triggerName,
             $recurringMessage->getTrigger()->getNextRunDate(now())->format(\DateTimeInterface::ATOM),
         ];
     }

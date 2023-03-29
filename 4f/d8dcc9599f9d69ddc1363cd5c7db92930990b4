@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2023-03-28T14:53:08Z
+
+DBAL 2 is still more popular than we'd like it to be, despite being officially EOL for almost a year now. My plan was to drop support in Symfony 7. I didn't want apps to be locked on a non-LTS release because they haven't upgraded to DBAL 3 yet (for whatever reason).
+
+I won't block the change, it's just that I think we should've talked about that. 🙂
+
+---------------------------------------------------------------------------
+
+by stof at 2023-03-28T15:27:47Z
+
+For `Connection::PARAM_STR_ARRAY` vs `ArrayParameterType::STRING`, we could do conditional usages of those constants, as we did in the past for the migration to `ParameterType` when we still wanted to support older versions of DBAL without it.
+Or we could just ignore them for now (`Connection::PARAM_STR_ARRAY` will only be removed in DBAL 4.0, which is not a thing yet)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-28T17:24:36Z
+
+This makes the code a bit ugly but OK, updated.

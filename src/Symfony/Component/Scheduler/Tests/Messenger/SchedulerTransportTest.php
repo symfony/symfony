@@ -29,11 +29,11 @@ class SchedulerTransportTest extends TestCase
         $generator = $this->createConfiguredMock(MessageGeneratorInterface::class, [
             'getMessages' => $messages,
         ]);
-        $transport = new SchedulerTransport($generator);
+        $transport = new SchedulerTransport($generator, 'default');
 
         foreach ($transport->get() as $envelope) {
             $this->assertInstanceOf(Envelope::class, $envelope);
-            $this->assertNotNull($envelope->last(ScheduledStamp::class));
+            $this->assertSame('default', $envelope->last(ScheduledStamp::class)->scheduleName);
             $this->assertSame(array_shift($messages), $envelope->getMessage());
         }
 
@@ -42,7 +42,7 @@ class SchedulerTransportTest extends TestCase
 
     public function testAckIgnored()
     {
-        $transport = new SchedulerTransport($this->createMock(MessageGeneratorInterface::class));
+        $transport = new SchedulerTransport($this->createMock(MessageGeneratorInterface::class), 'default');
 
         $this->expectNotToPerformAssertions();
         $transport->ack(new Envelope(new \stdClass()));
@@ -50,7 +50,7 @@ class SchedulerTransportTest extends TestCase
 
     public function testRejectException()
     {
-        $transport = new SchedulerTransport($this->createMock(MessageGeneratorInterface::class));
+        $transport = new SchedulerTransport($this->createMock(MessageGeneratorInterface::class), 'default');
 
         $this->expectException(LogicException::class);
         $transport->reject(new Envelope(new \stdClass()));
@@ -58,7 +58,7 @@ class SchedulerTransportTest extends TestCase
 
     public function testSendException()
     {
-        $transport = new SchedulerTransport($this->createMock(MessageGeneratorInterface::class));
+        $transport = new SchedulerTransport($this->createMock(MessageGeneratorInterface::class), 'default');
 
         $this->expectException(LogicException::class);
         $transport->send(new Envelope(new \stdClass()));

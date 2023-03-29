@@ -23,13 +23,14 @@ class SchedulerTransport implements TransportInterface
 {
     public function __construct(
         private readonly MessageGeneratorInterface $messageGenerator,
+        private readonly string $name,
     ) {
     }
 
     public function get(): iterable
     {
         foreach ($this->messageGenerator->getMessages() as $message) {
-            yield Envelope::wrap($message, [new ScheduledStamp()]);
+            yield Envelope::wrap($message, [new ScheduledStamp($this->name)]);
         }
     }
 

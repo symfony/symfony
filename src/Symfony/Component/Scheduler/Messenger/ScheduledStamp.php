@@ -18,4 +18,7 @@ use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
  */
 final class ScheduledStamp implements NonSendableStampInterface
 {
+    public function __construct(public readonly string $scheduleName)
+    {
+    }
 }

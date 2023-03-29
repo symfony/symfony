@@ -176,6 +176,7 @@ use Symfony\Component\Notifier\Bridge\RingCentral\RingCentralTransportFactory;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sendberry\SendberryTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransportFactory as SendinblueNotifierTransportFactory;
+use Symfony\Component\Notifier\Bridge\SimpleTextin\SimpleTextinTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sinch\SinchTransportFactory;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sms77\Sms77TransportFactory;
@@ -2719,6 +2720,7 @@ class FrameworkExtension extends Extension
             RingCentralTransportFactory::class => 'notifier.transport_factory.ring-central',
             RocketChatTransportFactory::class => 'notifier.transport_factory.rocket-chat',
             SendberryTransportFactory::class => 'notifier.transport_factory.sendberry',
+            SimpleTextinTransportFactory::class => 'notifier.transport_factory.simple-textin',
             SendinblueNotifierTransportFactory::class => 'notifier.transport_factory.sendinblue',
             SinchTransportFactory::class => 'notifier.transport_factory.sinch',
             SlackTransportFactory::class => 'notifier.transport_factory.slack',

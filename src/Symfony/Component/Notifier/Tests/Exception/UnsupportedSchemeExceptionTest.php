@@ -51,6 +51,7 @@ use Symfony\Component\Notifier\Bridge\RingCentral\RingCentralTransportFactory;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sendberry\SendberryTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransportFactory;
+use Symfony\Component\Notifier\Bridge\SimpleTextin\SimpleTextinTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sinch\SinchTransportFactory;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sms77\Sms77TransportFactory;
@@ -120,6 +121,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             SendberryTransportFactory::class => false,
             SendinblueTransportFactory::class => false,
             SinchTransportFactory::class => false,
+            SimpleTextinTransportFactory::class => false,
             SlackTransportFactory::class => false,
             Sms77TransportFactory::class => false,
             SmsapiTransportFactory::class => false,
@@ -191,6 +193,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['rocketchat', 'symfony/rocket-chat-notifier'];
         yield ['sendberry', 'symfony/sendberry-notifier'];
         yield ['sendinblue', 'symfony/sendinblue-notifier'];
+        yield ['simpletextin', 'symfony/simple-textin-notifier'];
         yield ['sinch', 'symfony/sinch-notifier'];
         yield ['slack', 'symfony/slack-notifier'];
         yield ['sms77', 'symfony/sms77-notifier'];

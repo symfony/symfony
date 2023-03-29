@@ -15,12 +15,17 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
-use ZxcvbnPhp\Matchers\DictionaryMatch;
-use ZxcvbnPhp\Matchers\MatchInterface;
-use ZxcvbnPhp\Zxcvbn;
 
 final class PasswordStrengthValidator extends ConstraintValidator
 {
+    /**
+     * @param (\Closure(string):PasswordStrength::STRENGTH_*)|null $passwordStrengthEstimator
+     */
+    public function __construct(
+        private readonly ?\Closure $passwordStrengthEstimator = null,
+    ) {
+    }
+
     public function validate(#[\SensitiveParameter] mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof PasswordStrength) {
@@ -34,43 +39,33 @@ final class PasswordStrengthValidator extends ConstraintValidator
         if (!\is_string($value)) {
             throw new UnexpectedValueException($value, 'string');
         }
+        $passwordStrengthEstimator = $this->passwordStrengthEstimator ?? self::estimateStrength(...);
+        $strength = $passwordStrengthEstimator($value);
 
-        $zxcvbn = new Zxcvbn();
-        $strength = $zxcvbn->passwordStrength($value, $constraint->restrictedData);
-
-        if ($strength['score'] < $constraint->minScore) {
-            $this->context->buildViolation($constraint->lowStrengthMessage)
+        if ($strength < $constraint->minScore) {
+            $this->context->buildViolation($constraint->message)
                 ->setCode(PasswordStrength::PASSWORD_STRENGTH_ERROR)
-                ->addViolation();
-        }
-        $wordList = $this->findRestrictedUserInputs($strength['sequence'] ?? []);
-        if (0 !== \count($wordList)) {
-            $this->context->buildViolation($constraint->restrictedDataMessage, [
-                '{{ wordList }}' => implode(', ', $wordList),
-            ])
-                ->setCode(PasswordStrength::RESTRICTED_USER_INPUT_ERROR)
                 ->addViolation();
         }
     }
 
     /**
-     * @param array<MatchInterface> $sequence
+     * Returns the estimated strength of a password.
      *
-     * @return array<string>
+     * The higher the value, the stronger the password.
+     *
+     * @return PasswordStrength::STRENGTH_*
      */
-    private function findRestrictedUserInputs(array $sequence): array
+    private static function estimateStrength(#[\SensitiveParameter] string $password): int
     {
-        $found = [];
+        $entropy = log(\strlen(count_chars($password, 3)) ** \strlen($password), 2);
 
-        foreach ($sequence as $item) {
-            if (!$item instanceof DictionaryMatch) {
-                continue;
-            }
-            if ('user_inputs' === $item->dictionaryName) {
-                $found[] = $item->token;
-            }
-        }
-
-        return $found;
+        return match (true) {
+            $entropy >= 120 => PasswordStrength::STRENGTH_VERY_STRONG,
+            $entropy >= 100 => PasswordStrength::STRENGTH_STRONG,
+            $entropy >= 80 => PasswordStrength::STRENGTH_REASONABLE,
+            $entropy >= 60 => PasswordStrength::STRENGTH_WEAK,
+            default => PasswordStrength::STRENGTH_VERY_WEAK,
+        };
     }
 }

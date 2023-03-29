@@ -25,16 +25,19 @@ class PasswordStrengthValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getValidValues
      */
-    public function testValidValues(string $value)
+    public function testValidValues(string $value, int $expectedStrength)
     {
-        $this->validator->validate($value, new PasswordStrength());
+        $this->validator->validate($value, new PasswordStrength(minScore: $expectedStrength));
 
         $this->assertNoViolation();
     }
 
     public static function getValidValues(): iterable
     {
-        yield ['This 1s a very g00d Pa55word! ;-)'];
+        yield ['How-is this 🤔?!', PasswordStrength::STRENGTH_WEAK];
+        yield ['Reasonable-pwd-❤️', PasswordStrength::STRENGTH_REASONABLE];
+        yield ['This 1s a very g00d Pa55word! ;-)', PasswordStrength::STRENGTH_VERY_STRONG];
+        yield ['pudding-smack-👌🏼-fox-😎', PasswordStrength::STRENGTH_VERY_STRONG];
     }
 
     /**
@@ -59,23 +62,10 @@ class PasswordStrengthValidatorTest extends ConstraintValidatorTestCase
             PasswordStrength::PASSWORD_STRENGTH_ERROR,
         ];
         yield [
-            new PasswordStrength([
-                'minScore' => 4,
-            ]),
+            new PasswordStrength(minScore: PasswordStrength::STRENGTH_VERY_STRONG),
             'Good password?',
             'The password strength is too low. Please use a stronger password.',
             PasswordStrength::PASSWORD_STRENGTH_ERROR,
-        ];
-        yield [
-            new PasswordStrength([
-                'restrictedData' => ['symfony'],
-            ]),
-            'SyMfONY-framework-john',
-            'The password contains the following restricted data: {{ wordList }}.',
-            PasswordStrength::RESTRICTED_USER_INPUT_ERROR,
-            [
-                '{{ wordList }}' => 'SyMfONY',
-            ],
         ];
     }
 }

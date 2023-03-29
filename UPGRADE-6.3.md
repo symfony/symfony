@@ -21,6 +21,11 @@ DoctrineBridge
  * Deprecate `MessengerTransportDoctrineSchemaSubscriber` in favor of `MessengerTransportDoctrineSchemaListener`
  * Deprecate `RememberMeTokenProviderDoctrineSchemaSubscriber` in favor of `RememberMeTokenProviderDoctrineSchemaListener`
 
+Form
+----
+
+ * Remove argument `$legacyErrorMessages` from the constructor of `FormTypeValidatorExtension` and `ValidatorExtension`
+
 FrameworkBundle
 ---------------
 

@@ -76,7 +76,7 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
     public function testGroupSequenceWithConstraintsOption()
     {
         $form = Forms::createFormFactoryBuilder()
-            ->addExtension(new ValidatorExtension(Validation::createValidator(), false))
+            ->addExtension(new ValidatorExtension(Validation::createValidator()))
             ->getFormFactory()
             ->create(FormTypeTest::TESTED_TYPE, null, ['validation_groups' => new GroupSequence(['First', 'Second'])])
             ->add('field', TextTypeTest::TESTED_TYPE, [

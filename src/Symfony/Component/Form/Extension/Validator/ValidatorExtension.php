@@ -30,11 +30,26 @@ class ValidatorExtension extends AbstractExtension
     private ValidatorInterface $validator;
     private ?FormRendererInterface $formRenderer;
     private ?TranslatorInterface $translator;
-    private bool $legacyErrorMessages;
 
-    public function __construct(ValidatorInterface $validator, bool $legacyErrorMessages = true, FormRendererInterface $formRenderer = null, TranslatorInterface $translator = null)
+    /**
+     * @param FormRendererInterface|null $formRenderer
+     * @param TranslatorInterface|null   $translator
+     */
+    public function __construct(ValidatorInterface $validator, /* FormRendererInterface */ $formRenderer = null, /* TranslatorInterface */ $translator = null)
     {
-        $this->legacyErrorMessages = $legacyErrorMessages;
+        if (\is_bool($formRenderer)) {
+            trigger_deprecation('symfony/form', '6.3', 'The signature of "%s" constructor requires 3 arguments: "ValidatorInterface $validator, FormRendererInterface $formRenderer = null, TranslatorInterface $translator = null". Passing argument $legacyErrorMessages is deprecated.', __CLASS__);
+            $formRenderer = $translator;
+            $translator = 4 <= \func_num_args() ? func_get_arg(3) : null;
+        }
+
+        if (null !== $formRenderer && !$formRenderer instanceof FormRendererInterface) {
+            throw new \TypeError(sprintf('Argument 2 passed to "%s()" must be an instance of "%s" or null, "%s" given.', __METHOD__, FormRendererInterface::class, get_debug_type($formRenderer)));
+        }
+
+        if (null !== $translator && !$translator instanceof TranslatorInterface) {
+            throw new \TypeError(sprintf('Argument 3 passed to "%s()" must be an instance of "%s" or null, "%s" given.', __METHOD__, TranslatorInterface::class, get_debug_type($translator)));
+        }
 
         $metadata = $validator->getMetadataFor(\Symfony\Component\Form\Form::class);
 
@@ -60,7 +75,7 @@ class ValidatorExtension extends AbstractExtension
     protected function loadTypeExtensions(): array
     {
         return [
-            new Type\FormTypeValidatorExtension($this->validator, $this->legacyErrorMessages, $this->formRenderer, $this->translator),
+            new Type\FormTypeValidatorExtension($this->validator, $this->formRenderer, $this->translator),
             new Type\RepeatedTypeValidatorExtension(),
             new Type\SubmitTypeValidatorExtension(),
         ];

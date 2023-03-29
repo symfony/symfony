@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Remove argument `$legacyErrorMessages` from the constructor of `FormTypeValidatorExtension` and `ValidatorExtension`
+
 6.2
 ---
 

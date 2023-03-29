@@ -2,7 +2,7 @@
     "name": "symfony/all-my-sms-notifier",
     "type": "symfony-notifier-bridge",
     "description": "Symfony AllMySms Notifier Bridge",
-    "keywords": ["sms", "allMySms", "notifier"],
+    "keywords": ["sms", "all-my-sms", "notifier"],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [

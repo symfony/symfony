@@ -2,7 +2,7 @@
     "name": "symfony/ovh-cloud-notifier",
     "type": "symfony-notifier-bridge",
     "description": "Symfony OvhCloud Notifier Bridge",
-    "keywords": ["sms", "OvhCloud", "notifier"],
+    "keywords": ["sms", "ovh-cloud", "notifier"],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [

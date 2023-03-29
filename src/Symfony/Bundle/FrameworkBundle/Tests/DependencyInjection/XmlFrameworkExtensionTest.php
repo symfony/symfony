@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\RateLimiter\Policy\SlidingWindowLimiter;
 
 class XmlFrameworkExtensionTest extends FrameworkExtensionTestCase
 {
@@ -65,5 +66,12 @@ class XmlFrameworkExtensionTest extends FrameworkExtensionTestCase
             'log_level' => null,
             'status_code' => 500,
         ], $configuration[\Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException::class]);
+    }
+
+    public function testRateLimiter()
+    {
+        $container = $this->createContainerFromFile('rate_limiter');
+
+        $this->assertTrue($container->hasDefinition('limiter.sliding_window'));
     }
 }

@@ -29,6 +29,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\ClassWithIgnoreAttribute;
 use Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\SiblingHolder;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\CacheableObjectAttributesTestTrait;
@@ -428,6 +429,11 @@ class GetSetMethodNormalizerTest extends TestCase
     public function testNoStaticGetSetSupport()
     {
         $this->assertFalse($this->normalizer->supportsNormalization(new ObjectWithJustStaticSetterDummy()));
+    }
+
+    public function testNotIgnoredMethodSupport()
+    {
+        $this->assertFalse($this->normalizer->supportsNormalization(new ClassWithIgnoreAttribute()));
     }
 
     public function testPrivateSetter()

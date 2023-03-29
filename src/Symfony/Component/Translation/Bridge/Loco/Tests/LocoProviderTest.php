@@ -747,8 +747,11 @@ class LocoProviderTest extends ProviderTestCase
         $loader = $this->getLoader();
         $loader->expects($this->exactly(\count($consecutiveLoadArguments)))
             ->method('load')
-            ->withConsecutive(...$consecutiveLoadArguments)
-            ->willReturnOnConsecutiveCalls(...$consecutiveLoadReturns);
+            ->willReturnCallback(function (...$args) use (&$consecutiveLoadArguments, &$consecutiveLoadReturns) {
+                $this->assertSame(array_shift($consecutiveLoadArguments), $args);
+
+                return array_shift($consecutiveLoadReturns);
+            });
 
         $this->getTranslatorBag()->expects($this->any())
             ->method('getCatalogue')
@@ -782,7 +785,7 @@ class LocoProviderTest extends ProviderTestCase
             foreach ($domains as $domain) {
                 $responses[] = function (string $method, string $url, array $options = []) use ($responseContents, $lastModifieds, $locale, $domain): ResponseInterface {
                     $this->assertSame('GET', $method);
-                    $this->assertSame('https://localise.biz/api/export/locale/'.$locale.'.xlf?filter='.$domain.'&status=translated,blank-translation', $url);
+                    $this->assertSame('https://localise.biz/api/export/locale/'.$locale.'.xlf?filter='.rawurlencode($domain).'&status=translated%2Cblank-translation', $url);
                     $this->assertSame(['filter' => $domain, 'status' => 'translated,blank-translation'], $options['query']);
                     $this->assertSame(['Accept: */*'], $options['headers']);
 
@@ -800,8 +803,11 @@ class LocoProviderTest extends ProviderTestCase
         $loader = $this->getLoader();
         $loader->expects($this->exactly(\count($consecutiveLoadArguments)))
             ->method('load')
-            ->withConsecutive(...$consecutiveLoadArguments)
-            ->willReturnOnConsecutiveCalls(...$consecutiveLoadReturns);
+            ->willReturnCallback(function (...$args) use (&$consecutiveLoadArguments, &$consecutiveLoadReturns) {
+                $this->assertSame(array_shift($consecutiveLoadArguments), $args);
+
+                return array_shift($consecutiveLoadReturns);
+            });
 
         $provider = self::createProvider(
             new MockHttpClient($responses, 'https://localise.biz/api/'),
@@ -819,7 +825,7 @@ class LocoProviderTest extends ProviderTestCase
             foreach ($domains as $domain) {
                 $responses[] = function (string $method, string $url, array $options = []) use ($responseContents, $lastModifieds, $locale, $domain): ResponseInterface {
                     $this->assertSame('GET', $method);
-                    $this->assertSame('https://localise.biz/api/export/locale/'.$locale.'.xlf?filter='.$domain.'&status=translated,blank-translation', $url);
+                    $this->assertSame('https://localise.biz/api/export/locale/'.$locale.'.xlf?filter='.rawurlencode($domain).'&status=translated%2Cblank-translation', $url);
                     $this->assertSame(['filter' => $domain, 'status' => 'translated,blank-translation'], $options['query']);
                     $this->assertSame(['If-Modified-Since: '.$lastModifieds[$locale], 'Accept: */*'], $options['headers']);
 

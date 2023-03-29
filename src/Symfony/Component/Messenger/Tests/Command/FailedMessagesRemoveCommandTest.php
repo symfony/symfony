@@ -110,11 +110,21 @@ class FailedMessagesRemoveCommandTest extends TestCase
     {
         $globalFailureReceiverName = 'failure_receiver';
         $receiver = $this->createMock(ListableReceiverInterface::class);
-        $receiver->expects($this->exactly(3))->method('find')->withConsecutive([20], [30], [40])->willReturnOnConsecutiveCalls(
-            new Envelope(new \stdClass()),
-            null,
-            new Envelope(new \stdClass())
-        );
+
+        $series = [
+            [[20], new Envelope(new \stdClass())],
+            [[30], null],
+            [[40], new Envelope(new \stdClass())],
+        ];
+
+        $receiver->expects($this->exactly(3))->method('find')
+            ->willReturnCallback(function (...$args) use (&$series) {
+                [$expectedArgs, $return] = array_shift($series);
+                $this->assertSame($expectedArgs, $args);
+
+                return $return;
+            })
+        ;
 
         $serviceLocator = $this->createMock(ServiceLocator::class);
         $serviceLocator->expects($this->once())->method('has')->with($globalFailureReceiverName)->willReturn(true);
@@ -138,10 +148,20 @@ class FailedMessagesRemoveCommandTest extends TestCase
     {
         $globalFailureReceiverName = 'failure_receiver';
         $receiver = $this->createMock(ListableReceiverInterface::class);
-        $receiver->expects($this->exactly(2))->method('find')->withConsecutive([20], [30])->willReturnOnConsecutiveCalls(
-            new Envelope(new \stdClass()),
-            new Envelope(new \stdClass())
-        );
+
+        $series = [
+            [[20], new Envelope(new \stdClass())],
+            [[30], new Envelope(new \stdClass())],
+        ];
+
+        $receiver->expects($this->exactly(2))->method('find')
+            ->willReturnCallback(function (...$args) use (&$series) {
+                [$expectedArgs, $return] = array_shift($series);
+                $this->assertSame($expectedArgs, $args);
+
+                return $return;
+            })
+        ;
 
         $serviceLocator = $this->createMock(ServiceLocator::class);
         $serviceLocator->expects($this->once())->method('has')->with($globalFailureReceiverName)->willReturn(true);

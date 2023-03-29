@@ -153,7 +153,8 @@ class HttpKernelBrowserTest extends TestCase
         $file = $this
             ->getMockBuilder(UploadedFile::class)
             ->setConstructorArgs([$source, 'original', 'mime/original', \UPLOAD_ERR_OK, true])
-            ->setMethods(['getSize', 'getClientSize'])
+            ->onlyMethods(['getSize'])
+            ->addMethods(['getClientSize'])
             ->getMock()
         ;
         /* should be modified when the getClientSize will be removed */

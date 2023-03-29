@@ -258,14 +258,31 @@ class ApplicationTest extends TestCase
         $container
             ->expects($this->exactly(2))
             ->method('hasParameter')
-            ->withConsecutive(['console.command.ids'], ['console.lazy_command.ids'])
-            ->willReturnOnConsecutiveCalls(true, true)
+            ->willReturnCallback(function (...$args) {
+                static $series = [
+                    ['console.command.ids'],
+                    ['console.lazy_command.ids'],
+                ];
+
+                $this->assertSame(array_shift($series), $args);
+
+                return true;
+            })
         ;
+
         $container
             ->expects($this->exactly(2))
             ->method('getParameter')
-            ->withConsecutive(['console.lazy_command.ids'], ['console.command.ids'])
-            ->willReturnOnConsecutiveCalls([], [])
+            ->willReturnCallback(function (...$args) {
+                static $series = [
+                    ['console.lazy_command.ids'],
+                    ['console.command.ids'],
+                ];
+
+                $this->assertSame(array_shift($series), $args);
+
+                return [];
+            })
         ;
 
         $kernel = $this->createMock(KernelInterface::class);

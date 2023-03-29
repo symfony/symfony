@@ -47,7 +47,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $this->session = $this->createMock(SessionInterface::class);
         $this->request = $this->createMock(Request::class);
         $this->request->expects($this->any())->method('getSession')->willReturn($this->session);
-        $this->exception = $this->getMockBuilder(AuthenticationException::class)->setMethods(['getMessage'])->getMock();
+        $this->exception = $this->getMockBuilder(AuthenticationException::class)->onlyMethods(['getMessage'])->getMock();
     }
 
     public function testForward()
@@ -197,10 +197,15 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
 
         $this->logger->expects($this->exactly(2))
             ->method('debug')
-            ->withConsecutive(
-                ['Ignoring query parameter "_my_failure_path": not a valid URL.'],
-                ['Authentication failure, redirect triggered.', ['failure_path' => '/login']]
-            );
+            ->willReturnCallback(function (...$args) {
+                static $series = [
+                    ['Ignoring query parameter "_my_failure_path": not a valid URL.', []],
+                    ['Authentication failure, redirect triggered.', ['failure_path' => '/login']],
+                ];
+
+                $expectedArgs = array_shift($series);
+                $this->assertSame($expectedArgs, $args);
+            });
 
         $handler = new DefaultAuthenticationFailureHandler($this->httpKernel, $this->httpUtils, $options, $this->logger);
 

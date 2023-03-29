@@ -46,16 +46,18 @@ class LocaleAwareListenerTest extends TestCase
 
     public function testDefaultLocaleIsUsedOnExceptionsInOnKernelRequest()
     {
+        $matcher = $this->exactly(2);
         $this->localeAwareService
-            ->expects($this->exactly(2))
+            ->expects($matcher)
             ->method('setLocale')
-            ->withConsecutive(
-                [$this->anything()],
-                ['en']
-            )
-            ->willReturnOnConsecutiveCalls(
-                $this->throwException(new \InvalidArgumentException())
-            );
+            ->willReturnCallback(function (string $locale) use ($matcher) {
+                if (1 === $matcher->getInvocationCount()) {
+                    throw new \InvalidArgumentException();
+                }
+
+                $this->assertSame('en', $locale);
+            })
+        ;
 
         $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $this->createRequest('fr'), HttpKernelInterface::MAIN_REQUEST);
         $this->listener->onKernelRequest($event);
@@ -90,16 +92,18 @@ class LocaleAwareListenerTest extends TestCase
 
     public function testDefaultLocaleIsUsedOnExceptionsInOnKernelFinishRequest()
     {
+        $matcher = $this->exactly(2);
         $this->localeAwareService
-            ->expects($this->exactly(2))
+            ->expects($matcher)
             ->method('setLocale')
-            ->withConsecutive(
-                [$this->anything()],
-                ['en']
-            )
-            ->willReturnOnConsecutiveCalls(
-                $this->throwException(new \InvalidArgumentException())
-            );
+            ->willReturnCallback(function (string $locale) use ($matcher) {
+                if (1 === $matcher->getInvocationCount()) {
+                    throw new \InvalidArgumentException();
+                }
+
+                $this->assertSame('en', $locale);
+            })
+        ;
 
         $this->requestStack->push($this->createRequest('fr'));
         $this->requestStack->push($subRequest = $this->createRequest('de'));

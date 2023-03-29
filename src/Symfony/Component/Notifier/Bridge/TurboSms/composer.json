@@ -2,7 +2,7 @@
     "name": "symfony/turbo-sms-notifier",
     "type": "symfony-notifier-bridge",
     "description": "Symfony TurboSms Notifier Bridge",
-    "keywords": ["sms", "TurboSms", "notifier"],
+    "keywords": ["sms", "turbo-sms", "notifier"],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [

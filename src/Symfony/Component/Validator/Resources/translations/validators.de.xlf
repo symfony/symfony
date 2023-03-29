@@ -402,6 +402,10 @@
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
                 <target>Der Wert der Subnetzmaske sollte zwischen {{ min }} und {{ max }} liegen.</target>
             </trans-unit>
+            <trans-unit id="104">
+                <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
+                <target>Der Dateiname ist zu lang. Er sollte nicht länger als {{ filename_max_length }} Zeichen sein.|Der Dateiname ist zu lang. Er sollte nicht länger als {{ filename_max_length }} Zeichen sein.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

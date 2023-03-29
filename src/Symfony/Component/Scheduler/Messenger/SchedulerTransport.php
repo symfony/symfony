@@ -15,6 +15,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Scheduler\Exception\LogicException;
 use Symfony\Component\Scheduler\Generator\MessageGeneratorInterface;
+use Symfony\Component\Scheduler\RecurringMessage;
 
 /**
  * @experimental
@@ -29,7 +30,11 @@ class SchedulerTransport implements TransportInterface
     public function get(): iterable
     {
         foreach ($this->messageGenerator->getMessages() as $message) {
-            yield Envelope::wrap($message, [new ScheduledStamp()]);
+            if (!$message instanceof RecurringMessage) {
+                throw new LogicException(sprintf('Messages from "%s" must be instances of "%s". Got "%s".', __CLASS__, RecurringMessage::class, get_debug_type($message)));
+            }
+
+            yield Envelope::wrap($message->getMessage(), [new ScheduledStamp($message)]);
         }
     }
 

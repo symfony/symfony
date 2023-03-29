@@ -11,13 +11,15 @@
 
 namespace Symfony\Component\Scheduler\Generator;
 
+use Symfony\Component\Scheduler\RecurringMessage;
+
 /**
  * @experimental
  */
 interface MessageGeneratorInterface
 {
     /**
-     * @return iterable<object>
+     * @return iterable<object|RecurringMessage>
      */
     public function getMessages(): iterable;
 }

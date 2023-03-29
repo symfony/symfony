@@ -66,6 +66,10 @@ final class Scheduler
             $ran = false;
             foreach ($this->generators as $generator) {
                 foreach ($generator->getMessages() as $message) {
+                    if ($message instanceof RecurringMessage) {
+                        $message = $message->getMessage();
+                    }
+
                     $this->handlers[$message::class]($message);
                     $ran = true;
                 }

@@ -47,7 +47,8 @@ class MessageGeneratorTest extends TestCase
 
         foreach ($runs as $time => $expected) {
             $now = self::makeDateTime($time);
-            $this->assertSame($expected, iterator_to_array($scheduler->getMessages()));
+            $messages = array_map(fn (RecurringMessage $m) => $m->getMessage(), iterator_to_array($scheduler->getMessages()));
+            $this->assertSame($expected, $messages);
         }
     }
 

@@ -12,10 +12,14 @@
 namespace Symfony\Component\Scheduler\Messenger;
 
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
+use Symfony\Component\Scheduler\RecurringMessage;
 
 /**
  * @experimental
  */
 final class ScheduledStamp implements NonSendableStampInterface
 {
+    public function __construct(public readonly RecurringMessage $recurringMessage)
+    {
+    }
 }

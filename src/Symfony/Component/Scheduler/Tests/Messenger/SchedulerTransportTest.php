@@ -17,14 +17,15 @@ use Symfony\Component\Scheduler\Exception\LogicException;
 use Symfony\Component\Scheduler\Generator\MessageGeneratorInterface;
 use Symfony\Component\Scheduler\Messenger\ScheduledStamp;
 use Symfony\Component\Scheduler\Messenger\SchedulerTransport;
+use Symfony\Component\Scheduler\RecurringMessage;
 
 class SchedulerTransportTest extends TestCase
 {
     public function testGetFromIterator()
     {
         $messages = [
-            (object) ['id' => 'first'],
-            (object) ['id' => 'second'],
+            RecurringMessage::cron('* * * * *', (object) ['id' => 'first']),
+            RecurringMessage::cron('* * * * *', (object) ['id' => 'second']),
         ];
         $generator = $this->createConfiguredMock(MessageGeneratorInterface::class, [
             'getMessages' => $messages,
@@ -32,9 +33,12 @@ class SchedulerTransportTest extends TestCase
         $transport = new SchedulerTransport($generator);
 
         foreach ($transport->get() as $envelope) {
+            $message = array_shift($messages);
+
             $this->assertInstanceOf(Envelope::class, $envelope);
-            $this->assertNotNull($envelope->last(ScheduledStamp::class));
-            $this->assertSame(array_shift($messages), $envelope->getMessage());
+            $this->assertEquals($message, $envelope->last(ScheduledStamp::class)?->recurringMessage);
+            $this->assertSame($message->getMessage(), $envelope->getMessage());
+            $this->assertSame($message->getMessage(), $envelope->getMessage());
         }
 
         $this->assertEmpty($messages);

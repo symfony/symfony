@@ -13,6 +13,7 @@ namespace Symfony\Component\Scheduler\Generator;
 
 use Psr\Clock\ClockInterface;
 use Symfony\Component\Clock\Clock;
+use Symfony\Component\Scheduler\RecurringMessage;
 use Symfony\Component\Scheduler\Schedule;
 use Symfony\Component\Scheduler\Trigger\TriggerInterface;
 
@@ -37,6 +38,9 @@ final class MessageGenerator implements MessageGeneratorInterface
         $this->checkpoint = $checkpoint;
     }
 
+    /**
+     * @return \Generator<RecurringMessage>
+     */
     public function getMessages(): \Generator
     {
         if (!$this->waitUntil
@@ -54,8 +58,8 @@ final class MessageGenerator implements MessageGeneratorInterface
             /** @var TriggerInterface $trigger */
             /** @var int $index */
             /** @var \DateTimeImmutable $time */
-            /** @var object $message */
-            [$time, $index, $trigger, $message] = $heap->extract();
+            /** @var object $recurringMessage */
+            [$time, $index, $trigger, $recurringMessage] = $heap->extract();
             $yield = true;
 
             if ($time < $lastTime) {
@@ -66,11 +70,11 @@ final class MessageGenerator implements MessageGeneratorInterface
             }
 
             if ($nextTime = $trigger->getNextRunDate($time)) {
-                $heap->insert([$nextTime, $index, $trigger, $message]);
+                $heap->insert([$nextTime, $index, $trigger, $recurringMessage]);
             }
 
             if ($yield) {
-                yield $message;
+                yield $recurringMessage;
                 $this->checkpoint->save($time, $index);
             }
         }
@@ -93,7 +97,7 @@ final class MessageGenerator implements MessageGeneratorInterface
                 continue;
             }
 
-            $heap->insert([$nextTime, $index, $recurringMessage->getTrigger(), $recurringMessage->getMessage()]);
+            $heap->insert([$nextTime, $index, $recurringMessage->getTrigger(), $recurringMessage]);
         }
 
         return $this->triggerHeap = $heap;

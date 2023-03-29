@@ -135,6 +135,11 @@ class MessageGeneratorTest extends TestCase
             ],
             'schedule' => [
                 RecurringMessage::trigger(new class() implements TriggerInterface {
+                    public function __toString(): string
+                    {
+                        return 'foo';
+                    }
+
                     public function getNextRunDate(\DateTimeImmutable $run): ?\DateTimeImmutable
                     {
                         return null;

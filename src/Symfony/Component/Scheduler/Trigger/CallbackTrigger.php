@@ -25,6 +25,11 @@ final class CallbackTrigger implements TriggerInterface
         $this->callback = $callback(...);
     }
 
+    public function __toString(): string
+    {
+        return spl_object_hash($this->callback);
+    }
+
     public function getNextRunDate(\DateTimeImmutable $run): ?\DateTimeImmutable
     {
         return ($this->callback)($run);

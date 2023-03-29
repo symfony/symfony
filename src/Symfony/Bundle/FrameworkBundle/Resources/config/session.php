@@ -69,6 +69,11 @@ return static function (ContainerConfigurator $container) {
 
         ->alias(\SessionHandlerInterface::class, 'session.handler')
 
+        ->set('session.handler.native', StrictSessionHandler::class)
+            ->args([
+                inline_service(\SessionHandler::class),
+            ])
+
         ->set('session.handler.native_file', StrictSessionHandler::class)
             ->args([
                 inline_service(NativeFileSessionHandler::class)

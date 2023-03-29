@@ -59,7 +59,7 @@ class IpUtils
      */
     public static function checkIp4(string $requestIp, string $ip): bool
     {
-        $cacheKey = $requestIp.'-'.$ip;
+        $cacheKey = $requestIp.'-'.$ip.'-v4';
         if (isset(self::$checkedIps[$cacheKey])) {
             return self::$checkedIps[$cacheKey];
         }
@@ -104,7 +104,7 @@ class IpUtils
      */
     public static function checkIp6(string $requestIp, string $ip): bool
     {
-        $cacheKey = $requestIp.'-'.$ip;
+        $cacheKey = $requestIp.'-'.$ip.'-v6';
         if (isset(self::$checkedIps[$cacheKey])) {
             return self::$checkedIps[$cacheKey];
         }

@@ -12,6 +12,7 @@ CHANGELOG
  * Change the signature of `ClassMetadataInterface::setClassDiscriminatorMapping()` to `setClassDiscriminatorMapping(?ClassDiscriminatorMapping)`
  * Add option YamlEncoder::YAML_INDENTATION to YamlEncoder constructor options to configure additional indentation for each level of nesting. This allows configuring indentation in the service configuration.
  * Add `SerializedPath` annotation to flatten nested attributes
+ * Change >=1.7.0 version constraint to >=1.8.0 for package phpdocumentor/type-resolver, as it now has a stable 1.7.* release.
 
 6.1
 ---

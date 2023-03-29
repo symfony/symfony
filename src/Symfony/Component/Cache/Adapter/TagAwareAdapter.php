@@ -38,7 +38,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
     use ContractsTrait;
     use LoggerAwareTrait;
 
-    public const TAGS_PREFIX = "\0tags\0";
+    public const TAGS_PREFIX = "\1tags\1";
 
     private array $deferred = [];
     private AdapterInterface $pool;

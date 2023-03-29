@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by kbond at 2023-03-25T18:05:05Z
+
+Currently, when outputting the message, if it's `\Stringable`, we use that. This might not be desired...
+
+Do you think there would be value in a `DescribableMessageInterface` in messenger that provides a `getMessageDescription()` method? There could be other usages, like using as the context in #49792.
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-03-27T16:51:09Z
+
+> Do you think there would be value in a DescribableMessageInterface in messenger that provides a getMessageDescription() method? There could be other usages, like using as the context in https://github.com/symfony/symfony/pull/49792.
+
+Another, perhaps more palatable idea: https://github.com/symfony/symfony/pull/49792#discussion_r1149536924

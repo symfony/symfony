@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by mtarld at 2023-03-28T16:41:52Z
+
+Indeed, it could be great to use this pattern for internal stuff that doesn't need to be manipulated by the container such as form types, or even to load user land stuff like entities, serializable items, API resources, etc...
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-03-29T09:46:40Z
+
+See https://github.com/symfony/symfony/pull/49785#issuecomment-1487144869
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-29T13:42:40Z
+
+PR updated to target 6.2
+
+> A solution for the edge case UniqueEntity? As it's in the doctrine bridge and the validator is not a service, this one does not get extraction.
+
+To me, the corresponding validator [*is* a service](https://github.com/doctrine/DoctrineBundle/blob/2.9.x/Resources/config/orm.xml#L118), so there is nothing to do.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-03-29T14:32:55Z
+
+Reading this PR makes me realize that `findTaggedServiceIds` does not filter out definitions tagged as being excluded. This means that our change that creates excluded definition instead of skipping the definition of services is actually a BC break for all bundles that collect tagged services to inject them somewhere (the primary usage of this method) as it would make them inject excluded services into their dependencies while they were not injected before.
+
+Including excluded services should be opt-in IMO.
+
+And btw, we should keep throwing in case of non-excluded abstract services being tagged as constraint validators, to provide a better DX (which is why the check was used in the first place). Removing this check in your PR in favor of silently skipping them decreases DX.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-30T07:33:16Z
+
+PR updated, needs #49867

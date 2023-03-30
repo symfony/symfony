@@ -1233,11 +1233,8 @@ class FrameworkExtension extends Extension
 
         // session handler (the internal callback registered with PHP session management)
         if (null === $config['handler_id']) {
-            // Set the handler class to be null
-            $container->getDefinition('session.storage.factory.native')->replaceArgument(1, null);
-            $container->getDefinition('session.storage.factory.php_bridge')->replaceArgument(0, null);
-
-            $container->setAlias('session.handler', 'session.handler.native_file');
+            $config['save_path'] = null;
+            $container->setAlias('session.handler', 'session.handler.native');
         } else {
             $container->resolveEnvPlaceholders($config['handler_id'], null, $usedEnvs);
 

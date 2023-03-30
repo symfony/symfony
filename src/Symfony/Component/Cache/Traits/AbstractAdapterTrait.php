@@ -317,7 +317,10 @@ trait AbstractAdapterTrait
         }
     }
 
-    private function getId(mixed $key): string
+    /**
+     * @internal
+     */
+    protected function getId(mixed $key): string
     {
         if ($this->versioningIsEnabled && '' === $this->namespaceVersion) {
             $this->ids = [];

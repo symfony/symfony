@@ -87,7 +87,7 @@ class TranslationUpdateCommand extends Command
                 new InputOption('force', null, InputOption::VALUE_NONE, 'Should the extract be done'),
                 new InputOption('clean', null, InputOption::VALUE_NONE, 'Should clean not found messages'),
                 new InputOption('domain', null, InputOption::VALUE_OPTIONAL, 'Specify the domain to extract'),
-                new InputOption('sort', null, InputOption::VALUE_OPTIONAL, 'Return list of messages sorted alphabetically', 'asc'),
+                new InputOption('sort', null, InputOption::VALUE_OPTIONAL, 'Return list of messages sorted alphabetically (only works with --dump-messages)', 'asc'),
                 new InputOption('as-tree', null, InputOption::VALUE_OPTIONAL, 'Dump the messages as a tree-like structure: The given value defines the level where to switch to inline YAML'),
             ])
             ->setHelp(<<<'EOF'
@@ -116,7 +116,6 @@ You can sort the output with the <comment>--sort</> flag:
 You can dump a tree-like structure using the yaml format with <comment>--as-tree</> flag:
 
     <info>php %command.full_name% --force --format=yaml --as-tree=3 en AcmeBundle</info>
-    <info>php %command.full_name% --force --format=yaml --sort=asc --as-tree=3 fr</info>
 
 EOF
             )

@@ -19,6 +19,21 @@ class IpUtilsTest extends TestCase
 {
     use ExpectDeprecationTrait;
 
+    public function testSeparateCachesPerProtocol()
+    {
+        $ip = '192.168.52.1';
+        $subnet = '192.168.0.0/16';
+
+        $this->assertFalse(IpUtils::checkIp6($ip, $subnet));
+        $this->assertTrue(IpUtils::checkIp4($ip, $subnet));
+
+        $ip = '2a01:198:603:0:396e:4789:8e99:890f';
+        $subnet = '2a01:198:603:0::/65';
+
+        $this->assertFalse(IpUtils::checkIp4($ip, $subnet));
+        $this->assertTrue(IpUtils::checkIp6($ip, $subnet));
+    }
+
     /**
      * @dataProvider getIpv4Data
      */

@@ -52,8 +52,8 @@ interface HttpClientInterface
         'resolve' => [],        // string[] - a map of host to IP address that SHOULD replace DNS resolution
         'proxy' => null,        // string - by default, the proxy-related env vars handled by curl SHOULD be honored
         'no_proxy' => null,     // string - a comma separated list of hosts that do not require a proxy to be reached
-        'timeout' => null,      // float - the idle timeout - defaults to ini_get('default_socket_timeout')
-        'max_duration' => 0,    // float - the maximum execution time for the request+response as a whole;
+        'timeout' => null,      // float - the idle timeout (in seconds) - defaults to ini_get('default_socket_timeout')
+        'max_duration' => 0,    // float - the maximum execution time (in seconds) for the request+response as a whole;
                                 //   a value lower than or equal to 0 means it is unlimited
         'bindto' => '0',        // string - the interface or the local socket to bind to
         'verify_peer' => true,  // see https://php.net/context.ssl for the following options

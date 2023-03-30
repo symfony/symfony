@@ -341,7 +341,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
      */
     protected function getId($key)
     {
-        if ('pgsql' !== $this->driver ?? ($this->getConnection() ? $this->driver : null)) {
+        if ('pgsql' !== $this->driver ??= ($this->getConnection() ? $this->driver : null)) {
             return parent::getId($key);
         }
 

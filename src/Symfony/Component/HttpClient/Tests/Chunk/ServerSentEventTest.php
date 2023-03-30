@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpClient\Tests\Chunk;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\Chunk\ServerSentEvent;
+use Symfony\Component\HttpClient\Exception\JsonException;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
@@ -75,5 +76,46 @@ data: </tag>
 STR;
         $sse = new ServerSentEvent($rawData);
         $this->assertSame("<tag>\n\n  <foo />\n\n\n</tag>", $sse->getData());
+    }
+
+    public function testGetArrayData()
+    {
+        $this->assertSame(['foo' => 'bar'], (new ServerSentEvent(<<<STR
+id: 33
+data: {"foo": "bar"}
+STR
+        ))->getArrayData());
+    }
+
+    public function testGetArrayDataWithNoContent()
+    {
+        $this->expectException(JsonException::class);
+        $this->expectExceptionMessage('Server-Sent Event data is empty.');
+
+        (new ServerSentEvent(''))->getArrayData();
+    }
+
+    public function testGetArrayDataWithInvalidJson()
+    {
+        $this->expectException(JsonException::class);
+        $this->expectExceptionMessage('Decoding Server-Sent Event "33" failed: Syntax error');
+
+        (new ServerSentEvent(<<<STR
+id: 33
+data: foobarccc
+STR
+        ))->getArrayData();
+    }
+
+    public function testGetArrayDataWithNonArrayJson()
+    {
+        $this->expectException(JsonException::class);
+        $this->expectExceptionMessage('JSON content was expected to decode to an array, "string" returned in Server-Sent Event "33".');
+
+        (new ServerSentEvent(<<<STR
+id: 33
+data: "ccc"
+STR
+        ))->getArrayData();
     }
 }

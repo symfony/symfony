@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `UriTemplateHttpClient` to use URI templates as specified in the RFC 6570
+ * Add `ServerSentEvent::getArrayData()` to get the Server-Sent Event's data decoded as an array when it's a JSON payload
 
 6.2
 ---

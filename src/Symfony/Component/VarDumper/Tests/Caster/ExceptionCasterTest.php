@@ -12,6 +12,7 @@
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\ErrorHandler\Exception\SilencedErrorContext;
 use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Caster\ExceptionCaster;
@@ -353,5 +354,34 @@ Exception {
 EODUMP;
 
         $this->assertDumpMatchesFormat($expectedDump, $e, Caster::EXCLUDE_VERBOSE);
+    }
+
+    /**
+     * @requires function \Symfony\Component\ErrorHandler\Exception\FlattenException::create
+     */
+    public function testFlattenException()
+    {
+        $f = FlattenException::createFromThrowable(new \Exception('Hello'));
+
+        $expectedDump = <<<'EODUMP'
+array:1 [
+  0 => Symfony\Component\ErrorHandler\Exception\FlattenException {
+    -message: "Hello"
+    -code: 0
+    -previous: null
+    -trace: array:13 %a
+    -traceAsString: ""…%d
+    -class: "Exception"
+    -statusCode: 500
+    -statusText: "Internal Server Error"
+    -headers: []
+    -file: "%s/src/Symfony/Component/VarDumper/Tests/Caster/ExceptionCasterTest.php"
+    -line: %d
+    -asString: null
+  }
+]
+EODUMP;
+
+        $this->assertDumpMatchesFormat($expectedDump, [$f], Caster::EXCLUDE_VERBOSE);
     }
 }

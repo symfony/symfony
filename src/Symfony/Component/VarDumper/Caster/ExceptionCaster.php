@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\VarDumper\Caster;
 
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\ErrorHandler\Exception\SilencedErrorContext;
 use Symfony\Component\VarDumper\Cloner\Stub;
 use Symfony\Component\VarDumper\Exception\ThrowingCasterException;
@@ -283,6 +284,16 @@ class ExceptionCaster
         }
         if ($frame->keepArgs && !empty($f['args'])) {
             $a[$prefix.'arguments'] = new ArgsStub($f['args'], $f['function'], $f['class']);
+        }
+
+        return $a;
+    }
+
+    public static function castFlattenException(FlattenException $e, array $a, Stub $stub, bool $isNested)
+    {
+        if ($isNested) {
+            $k = sprintf(Caster::PATTERN_PRIVATE, FlattenException::class, 'traceAsString');
+            $a[$k] = new CutStub($a[$k]);
         }
 
         return $a;

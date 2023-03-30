@@ -121,6 +121,16 @@ class MockResponse implements ResponseInterface, StreamableInterface
     public static function fromRequest(string $method, string $url, array $options, ResponseInterface $mock): self
     {
         $response = new self([]);
+        if ($mock instanceof self) {
+            $r = $response;
+            $response = $mock;
+            $mock = clone $mock;
+            $response->body = $r->body;
+            $response->info = $r->info;
+            $response->requestMethod = $method;
+            $response->requestUrl = $url;
+        }
+
         $response->requestOptions = $options;
         $response->id = ++self::$idSequence;
         $response->shouldBuffer = $options['buffer'] ?? true;
@@ -135,12 +145,6 @@ class MockResponse implements ResponseInterface, StreamableInterface
         $response->info['max_duration'] = $options['max_duration'] ?? null;
         $response->info['url'] = $url;
         $response->info['original_url'] = $url;
-
-        if ($mock instanceof self) {
-            $mock->requestOptions = $response->requestOptions;
-            $mock->requestMethod = $method;
-            $mock->requestUrl = $url;
-        }
 
         self::writeRequest($response, $options, $mock);
         $response->body[] = [$options, $mock];

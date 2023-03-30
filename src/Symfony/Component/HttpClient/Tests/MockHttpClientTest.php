@@ -533,4 +533,10 @@ class MockHttpClientTest extends HttpClientTestCase
         $client->reset();
         $this->assertSame(0, $client->getRequestsCount());
     }
+
+    public function testMockResponseReferenceIsPreserved()
+    {
+        $client = new MockHttpClient($mockResponse = new MockResponse());
+        $this->assertSame($mockResponse, $client->request('GET', 'https://example.com'));
+    }
 }

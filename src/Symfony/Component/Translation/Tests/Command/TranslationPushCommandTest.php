@@ -89,6 +89,52 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
         $this->assertStringContainsString('[OK] New local translations has been sent to "null" (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
     }
 
+    public function testPushNewIntlIcuMessages()
+    {
+        $arrayLoader = new ArrayLoader();
+        $xliffLoader = new XliffFileLoader();
+        $locales = ['en', 'fr'];
+        $domains = ['messages'];
+
+        // Simulate existing messages on Provider
+        $providerReadTranslatorBag = new TranslatorBag();
+        $providerReadTranslatorBag->addCatalogue($arrayLoader->load(['note' => 'NOTE'], 'en'));
+        $providerReadTranslatorBag->addCatalogue($arrayLoader->load(['note' => 'NOTE'], 'fr'));
+
+        $provider = $this->createMock(ProviderInterface::class);
+        $provider->expects($this->once())
+            ->method('read')
+            ->with($domains, $locales)
+            ->willReturn($providerReadTranslatorBag);
+
+        // Create local files, with a new message
+        $filenameEn = $this->createFile([
+            'note' => 'NOTE',
+            'new.foo' => 'newFooIntlIcu',
+        ], 'en', 'messages+intl-icu.%locale%.xlf');
+        $filenameFr = $this->createFile([
+            'note' => 'NOTE',
+            'new.foo' => 'nouveauFooIntlIcu',
+        ], 'fr', 'messages+intl-icu.%locale%.xlf');
+        $localTranslatorBag = new TranslatorBag();
+        $localTranslatorBag->addCatalogue($xliffLoader->load($filenameEn, 'en'));
+        $localTranslatorBag->addCatalogue($xliffLoader->load($filenameFr, 'fr'));
+
+        $provider->expects($this->once())
+            ->method('write')
+            ->with($localTranslatorBag->diff($providerReadTranslatorBag));
+
+        $provider->expects($this->once())
+            ->method('__toString')
+            ->willReturn('null://default');
+
+        $tester = $this->createCommandTester($provider, $locales, $domains);
+
+        $tester->execute(['--locales' => ['en', 'fr'], '--domains' => ['messages']]);
+
+        $this->assertStringContainsString('[OK] New local translations has been sent to "null" (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
+    }
+
     public function testPushForceMessages()
     {
         $xliffLoader = new XliffFileLoader();

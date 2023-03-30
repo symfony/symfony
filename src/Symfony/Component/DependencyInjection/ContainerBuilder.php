@@ -1212,7 +1212,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $this->usedTags[] = $name;
         $tags = [];
         foreach ($this->getDefinitions() as $id => $definition) {
-            if ($definition->hasTag($name)) {
+            if ($definition->hasTag($name) && !$definition->hasTag('container.excluded')) {
                 if ($throwOnAbstract && $definition->isAbstract()) {
                     throw new InvalidArgumentException(sprintf('The service "%s" tagged "%s" must not be abstract.', $id, $name));
                 }

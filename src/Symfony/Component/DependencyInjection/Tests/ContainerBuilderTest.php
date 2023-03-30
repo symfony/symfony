@@ -928,6 +928,11 @@ class ContainerBuilderTest extends TestCase
             ->addTag('bar', ['bar' => 'bar'])
             ->addTag('foo', ['foofoo' => 'foofoo'])
         ;
+        $builder
+            ->register('bar', 'Bar\FooClass')
+            ->addTag('foo')
+            ->addTag('container.excluded')
+        ;
         $this->assertEquals([
             'foo' => [
                 ['foo' => 'foo'],

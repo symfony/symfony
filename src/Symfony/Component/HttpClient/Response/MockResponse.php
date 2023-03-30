@@ -110,6 +110,10 @@ class MockResponse implements ResponseInterface, StreamableInterface
         } catch (TransportException $e) {
             // ignore errors when canceling
         }
+
+        $onProgress = $this->requestOptions['on_progress'] ?? static function () {};
+        $dlSize = isset($this->headers['content-encoding']) || 'HEAD' === $this->info['http_method'] || \in_array($this->info['http_code'], [204, 304], true) ? 0 : (int) ($this->headers['content-length'][0] ?? 0);
+        $onProgress($this->offset, $dlSize, $this->info);
     }
 
     /**

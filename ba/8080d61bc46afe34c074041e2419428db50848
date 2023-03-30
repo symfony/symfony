@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-28T15:43:56Z
+
+Is the callback called when a real response is canceled?
+What about the "info" of the reponse? Don't they give the needed clue?
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2023-03-28T15:56:15Z
+
+> Is the callback called when a real response is canceled?
+
+Yes.
+
+>  What about the "info" of the response? Don't they give the needed clue?
+
+No, since the original mock response reference is lost, we can't access it and get the info from it.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2023-03-29T10:10:52Z
+
+After retesting, it works with `CurlHttpClient` and not with `NativeHttpClient`... So it might not be the best solution.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-03-29T16:42:25Z
+
+> No, since the original mock response reference is lost, we can't access it and get the info from it.
+
+Can you check what happens when you get the info on the MockResponse being returned by `$client->request()` ?
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2023-03-30T08:06:01Z
+
+The info on the `MockResponse` returned by `$client->request()` is good but I don't have access to it.
+
+Here's a simplified gist that highlights the problem: https://gist.github.com/fancyweb/0a54ae6293eaf02c3823e9b921cada5a

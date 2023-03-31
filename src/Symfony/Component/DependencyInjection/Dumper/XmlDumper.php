@@ -167,20 +167,24 @@ class XmlDumper extends Dumper
         $this->addMethodCalls($definition->getMethodCalls(), $service);
 
         if ($callable = $definition->getFactory()) {
-            $factory = $this->document->createElement('factory');
-
-            if (\is_array($callable) && $callable[0] instanceof Definition) {
-                $this->addService($callable[0], null, $factory);
-                $factory->setAttribute('method', $callable[1]);
-            } elseif (\is_array($callable)) {
-                if (null !== $callable[0]) {
-                    $factory->setAttribute($callable[0] instanceof Reference ? 'service' : 'class', $callable[0]);
-                }
-                $factory->setAttribute('method', $callable[1]);
+            if (\is_array($callable) && ['Closure', 'fromCallable'] !== $callable && $definition->getClass() === $callable[0]) {
+                $service->setAttribute('constructor', $callable[1]);
             } else {
-                $factory->setAttribute('function', $callable);
+                $factory = $this->document->createElement('factory');
+
+                if (\is_array($callable) && $callable[0] instanceof Definition) {
+                    $this->addService($callable[0], null, $factory);
+                    $factory->setAttribute('method', $callable[1]);
+                } elseif (\is_array($callable)) {
+                    if (null !== $callable[0]) {
+                        $factory->setAttribute($callable[0] instanceof Reference ? 'service' : 'class', $callable[0]);
+                    }
+                    $factory->setAttribute('method', $callable[1]);
+                } else {
+                    $factory->setAttribute('function', $callable);
+                }
+                $service->appendChild($factory);
             }
-            $service->appendChild($factory);
         }
 
         if ($definition->isDeprecated()) {

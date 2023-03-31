@@ -21,6 +21,7 @@ CHANGELOG
  * Make it possible to cast callables into single-method interfaces
  * Deprecate `#[MapDecorated]`, use `#[AutowireDecorated]` instead
  * Deprecate the `@required` annotation, use the `Symfony\Contracts\Service\Attribute\Required` attribute instead
+ * Add `constructor` option to services declaration and to `#[Autoconfigure]`
 
 6.2
 ---

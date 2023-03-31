@@ -123,7 +123,7 @@ class FileLoaderTest extends TestCase
             'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\\',
             'Prototype/*',
             // load everything, except OtherDir/AnotherSub & Foo.php
-            'Prototype/{%other_dir%/AnotherSub,Foo.php}'
+            'Prototype/{%other_dir%/AnotherSub,Foo.php,StaticConstructor}'
         );
 
         $this->assertFalse($container->getDefinition(Bar::class)->isAbstract());
@@ -191,7 +191,7 @@ class FileLoaderTest extends TestCase
         $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
 
         $prototype = (new Definition())->setAutoconfigured(true);
-        $loader->registerClasses($prototype, 'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\\', 'Prototype/*');
+        $loader->registerClasses($prototype, 'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\\', 'Prototype/*', 'Prototype/{StaticConstructor}');
 
         $this->assertTrue($container->has(Bar::class));
         $this->assertTrue($container->has(Baz::class));

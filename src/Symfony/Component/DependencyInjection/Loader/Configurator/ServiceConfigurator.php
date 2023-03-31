@@ -27,6 +27,7 @@ class ServiceConfigurator extends AbstractServiceConfigurator
     use Traits\CallTrait;
     use Traits\ClassTrait;
     use Traits\ConfiguratorTrait;
+    use Traits\ConstructorTrait;
     use Traits\DecorateTrait;
     use Traits\DeprecateTrait;
     use Traits\FactoryTrait;

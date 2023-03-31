@@ -16,17 +16,17 @@ use Symfony\Component\Notifier\Bridge\SimpleTextin\SimpleTextinOptions;
 use Symfony\Component\Notifier\Bridge\SimpleTextin\SimpleTextinTransport;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
+use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class SimpleTextinTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null, string $from = 'test_from'): SimpleTextinTransport
+    public static function createTransport(HttpClientInterface $client = null, string $from = 'test_from'): SimpleTextinTransport
     {
-        return new SimpleTextinTransport('test_api_key', $from, $client ?? $this->createMock(HttpClientInterface::class));
+        return new SimpleTextinTransport('test_api_key', $from, $client ?? new MockHttpClient());
     }
 
     public function invalidFromProvider(): iterable
@@ -35,7 +35,7 @@ final class SimpleTextinTransportTest extends TransportTestCase
         yield 'phone number too short' => ['+1'];
     }
 
-    public function supportedMessagesProvider(): iterable
+    public static function supportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
         yield [new SmsMessage('0611223344', 'Hello!', 'from', new SimpleTextinOptions(['from' => 'from_new']))];
@@ -78,15 +78,15 @@ final class SimpleTextinTransportTest extends TransportTestCase
         self::assertSame('foo', $sentMessage->getMessageId());
     }
 
-    public function toStringProvider(): iterable
+    public static function toStringProvider(): iterable
     {
-        yield ['simpletextin://api-app2.simpletexting.com?from=test_from', $this->createTransport()];
+        yield ['simpletextin://api-app2.simpletexting.com?from=test_from', self::createTransport()];
     }
 
-    public function unsupportedMessagesProvider(): iterable
+    public static function unsupportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [new DummyMessage()];
     }
 
     public function validFromProvider(): iterable

@@ -20,39 +20,27 @@ class PasswordStrengthTest extends TestCase
     public function testConstructor()
     {
         $constraint = new PasswordStrength();
-        $this->assertEquals(2, $constraint->minScore);
-        $this->assertEquals([], $constraint->restrictedData);
+        $this->assertSame(2, $constraint->minScore);
     }
 
     public function testConstructorWithParameters()
     {
-        $constraint = new PasswordStrength([
-            'minScore' => 3,
-            'restrictedData' => ['foo', 'bar'],
-        ]);
+        $constraint = new PasswordStrength(minScore: PasswordStrength::STRENGTH_STRONG);
 
-        $this->assertEquals(3, $constraint->minScore);
-        $this->assertEquals(['foo', 'bar'], $constraint->restrictedData);
+        $this->assertSame(PasswordStrength::STRENGTH_STRONG, $constraint->minScore);
     }
 
     public function testInvalidScoreOfZero()
     {
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('The parameter "minScore" of the "Symfony\Component\Validator\Constraints\PasswordStrength" constraint must be an integer between 1 and 4.');
-        new PasswordStrength(['minScore' => 0]);
+        new PasswordStrength(minScore: PasswordStrength::STRENGTH_VERY_WEAK);
     }
 
     public function testInvalidScoreOfFive()
     {
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('The parameter "minScore" of the "Symfony\Component\Validator\Constraints\PasswordStrength" constraint must be an integer between 1 and 4.');
-        new PasswordStrength(['minScore' => 5]);
-    }
-
-    public function testInvalidRestrictedData()
-    {
-        $this->expectException(ConstraintDefinitionException::class);
-        $this->expectExceptionMessage('The parameter "restrictedData" of the "Symfony\Component\Validator\Constraints\PasswordStrength" constraint must be a list of strings.');
-        new PasswordStrength(['restrictedData' => [123]]);
+        new PasswordStrength(minScore: 5);
     }
 }

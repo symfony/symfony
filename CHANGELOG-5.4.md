@@ -7,6 +7,34 @@ in 5.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.4.0...v5.4.1
 
+* 5.4.22 (2023-03-31)
+
+ * bug #49618 [Serializer] Preserve array keys while denormalize variadic parameters (melya)
+ * bug #49401 [TwigBridge] Fix raw content rendering in HTML notification emails (1ed)
+ * bug #49679 [FrameworkBundle] enable metadata cache when annotation is disabled (bastnic)
+ * bug #49796 [HttpClient] Fix not calling the on progress callback when canceling a MockResponse (fancyweb)
+ * bug #49833 [Translation] TranslatorBag::diff now iterates over catalogue domains instead of operation domains (welcoMattic)
+ * bug #49848 [Cache] Fix storing binary keys when using pgsql (nicolas-grekas)
+ * bug #49843 [FrameworkBundle] Add missing monolog channel tag for messenger services (rmikalkenas)
+ * bug #49745 [FrameworkBundle] Fix wiring session.handler when handler_id is null (nicolas-grekas)
+ * bug #49189 [FrameworkBundle] Improve documentation about translation:extract --sort option (marien-probesys)
+ * bug #49274 [VarDumper] Disable links for IntelliJ platform (SerafimArts)
+ * bug #49682 [FrameworkBundle] Workflow - Fix LogicException about a wrong configuration of "enabled" node (adpauly)
+ * bug #49758 [HttpFoundation] Use separate caches for IpUtils checkIp4 and checkIp6 (danielburger1337)
+ * bug #49722 [HttpClient] Encode and decode curly brackets {} (pbowyer)
+ * bug #49720 [Serializer] GetSetMethodNormalizer::supportss should not check ignored methods (nikophil)
+ * bug #49681 [String] Correct inflection of 'codes' and 'names' (GwendolenLynch)
+ * bug #49697 [Validator] Update BIC validator IBAN mappings (maxbeckers)
+ * bug #49706 Stop stopwatch events in case of exception (MatTheCat)
+ * bug #49657 [HttpKernel] Change limit argument from string to integer for Profiler (Aliance)
+ * bug #49674 [FrameworkBundle] Rename limiter’s `strategy` to `policy` in XSD (MatTheCat)
+ * bug #49673 [VarDumper] Fixed dumping of CutStub (lyrixx)
+ * bug #49604 [Mailer] STDOUT blocks infinitely under Windows when STDERR is filled (TemaYud)
+ * bug #49651 [DependencyInjection] Fix support binary values in parameters. (vtsykun)
+ * bug #49580 [HttpClient] Fix encoding "+" in URLs (nicolas-grekas)
+ * bug #49541 [Security] Remove ``@internal`` tag on `TraceableAuthenticator::getAuthenticator()` (florentdestremau)
+ * bug #49578 [DependencyInjection] Fix dumping array of enums parameters (fancyweb)
+
 * 5.4.21 (2023-02-28)
 
  * bug #49526 [Security] Migrate the session on login only when the user changes (nicolas-grekas)

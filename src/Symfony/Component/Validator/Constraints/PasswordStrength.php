@@ -40,12 +40,16 @@ final class PasswordStrength extends Constraint
 
     public int $minScore;
 
-    public function __construct(int $minScore = self::STRENGTH_REASONABLE, mixed $options = null, array $groups = null, mixed $payload = null)
+    public function __construct(array $options = null, int $minScore = null, array $groups = null, mixed $payload = null)
     {
-        if (isset($minScore) && (!\is_int($minScore) || $minScore < 1 || $minScore > 4)) {
-            throw new ConstraintDefinitionException(sprintf('The parameter "minScore" of the "%s" constraint must be an integer between 1 and 4.', static::class));
-        }
-        $options['minScore'] = $minScore;
+        $options['minScore'] ??= self::STRENGTH_REASONABLE;
+
         parent::__construct($options, $groups, $payload);
+
+        $this->minScore = $minScore ?? $this->minScore;
+
+        if ($this->minScore < 1 || 4 < $this->minScore) {
+            throw new ConstraintDefinitionException(sprintf('The parameter "minScore" of the "%s" constraint must be an integer between 1 and 4.', self::class));
+        }
     }
 }

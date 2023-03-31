@@ -21,24 +21,24 @@ final class SimpleTextinTransportFactoryTest extends TransportFactoryTestCase
         return new SimpleTextinTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield ['simpletextin://host.test', 'simpletextin://ApiKey@host.test'];
         yield ['simpletextin://host.test?from=15556667777', 'simpletextin://ApiKey@host.test?from=15556667777'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield 'missing API key' => ['simpletextin://@default'];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'simpletextin://apiKey@default'];
         yield [false, 'somethingElse://apiKey@default'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://apiKey@default'];
     }

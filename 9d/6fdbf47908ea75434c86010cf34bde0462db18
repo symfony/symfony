@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by bastnic at 2023-03-14T09:59:25Z
+
+> This means the serializer cache is not auto-invalidated when using yaml/xml. That was the case before, and is an acceptable tradeoff given the perf drop of parsing all files in every requests (in dev).
+
+No no, it is!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-16T10:17:49Z
+
+(please check test failures, they look related)
+
+---------------------------------------------------------------------------
+
+by bastnic at 2023-03-25T21:24:24Z
+
+@nicolas-grekas tests are fixed now.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-28T15:05:03Z
+
+In standalone mode, tests still fail, can you have a look? (aka when running them from inside the FWB directory.)

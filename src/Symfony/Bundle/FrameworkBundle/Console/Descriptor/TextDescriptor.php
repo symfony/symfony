@@ -361,7 +361,7 @@ class TextDescriptor extends Descriptor
         }
 
         $inEdges = null !== $builder && isset($options['id']) ? $this->getServiceEdges($builder, $options['id']) : [];
-        $tableRows[] = ['Usages', $inEdges ? implode(', ', $inEdges) : 'none'];
+        $tableRows[] = ['Usages', $inEdges ? implode(\PHP_EOL, $inEdges) : 'none'];
 
         $options['output']->table($tableHeaders, $tableRows);
     }

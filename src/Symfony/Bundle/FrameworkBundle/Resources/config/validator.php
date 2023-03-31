@@ -28,7 +28,7 @@ return static function (ContainerConfigurator $container) {
     $container->parameters()
         ->set('validator.mapping.cache.file', param('kernel.cache_dir').'/validation.php');
 
-    $validatorsDir = \dirname((new \ReflectionClass(WhenValidator::class))->getFileName());
+    $validatorsDir = \dirname((new \ReflectionClass(EmailValidator::class))->getFileName());
 
     $container->services()
         ->set('validator', ValidatorInterface::class)

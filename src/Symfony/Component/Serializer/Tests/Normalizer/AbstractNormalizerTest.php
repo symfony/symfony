@@ -201,6 +201,36 @@ class AbstractNormalizerTest extends TestCase
         }
     }
 
+    /**
+     * @dataProvider getNormalizer
+     */
+    public function testVariadicSerializationWithPreservingKeys(AbstractNormalizer $normalizer)
+    {
+        $d1 = new Dummy();
+        $d1->foo = 'Foo';
+        $d1->bar = 'Bar';
+        $d1->baz = 'Baz';
+        $d1->qux = 'Quz';
+        $d2 = new Dummy();
+        $d2->foo = 'FOO';
+        $d2->bar = 'BAR';
+        $d2->baz = 'BAZ';
+        $d2->qux = 'QUZ';
+        $arr = ['d1' => $d1, 'd2' => $d2];
+        $obj = new VariadicConstructorTypedArgsDummy(...$arr);
+
+        $serializer = new Serializer([$normalizer], [new JsonEncoder()]);
+        $normalizer->setSerializer($serializer);
+        $this->assertEquals(
+            '{"foo":{"d1":{"foo":"Foo","bar":"Bar","baz":"Baz","qux":"Quz"},"d2":{"foo":"FOO","bar":"BAR","baz":"BAZ","qux":"QUZ"}}}',
+            $data = $serializer->serialize($obj, 'json')
+        );
+
+        $dummy = $normalizer->denormalize(json_decode($data, true), VariadicConstructorTypedArgsDummy::class);
+        $this->assertInstanceOf(VariadicConstructorTypedArgsDummy::class, $dummy);
+        $this->assertEquals($arr, $dummy->getFoo());
+    }
+
     public static function getNormalizer()
     {
         $extractor = new PhpDocExtractor();

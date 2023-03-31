@@ -1,0 +1,98 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-03-11T22:49:38Z
+
+It would be very nice to have an even shorter syntax when the factory is a static function of the current class.
+
+@weaverryan [proposed](https://twitter.com/weaverryan/status/1634266827105746944)
+```php
+#[Factory('create', ['$foo' => 'foo'])]
+class FactoryAttributeService
+{
+```
+
+The attribute could also be on the factory function (we will have to deal with duplicate).
+```php
+class FactoryAttributeService
+{
+    #[Factory(['$foo' => 'foo'])]
+    public static function create(string $foo): static
+```
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-03-12T18:08:16Z
+
+Thanks for the feedback @GromNaN! I implemented the first idea, but for the second one, I'm not sure.
+
+I mean, this is indeed a great idea, but it seems it needs a lot of rework in `src/Symfony/Component/DependencyInjection/Compiler/RegisterAutoconfigureAttributesPass.php`. The pass loops through class attributes which makes it more complex to deal with the `#[Factory]` attribute on methods.
+
+But maybe my approach is not the right one and there's something I don't see?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-03-12T18:57:53Z
+
+Do we need this `$bind` argument ? Can't we rely on autowiring on the factory signature ?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-03-12T19:59:35Z
+
+I don't know if it's a necessity, but being able to configure the specific bindings of the factory directly in the attribute seems to me a good idea, because it allows to have all the information "centralized in the same place" in some way. What do you think?
+
+---------------------------------------------------------------------------
+
+by donquixote at 2023-03-13T21:14:04Z
+
+I am not sure what is the goal here, I could see two:
+- Discover services based on attributes, extending the `resource:` mechanism so it also works for factories.
+- Provide additional information for services that are already being declared somewhere.
+
+I am most interested in the first point.
+For that, it would be most natural to have the attribute on a static method, and use the return type as the service id (unless a custom id is provided).
+When doing this, I would name the attribute class `Service`, not `Factory`, because the fact it is a factory is already obvious.
+A class can contain more than one factory, each returning a different service.
+
+```php
+class C {
+  #[Service]
+  static function createA(): A {..}
+  #[Service]
+  static function createB(): B {..}
+}
+```
+
+To avoid duplicates, the attribute can have a custom id, or a suffix that will be appended to the class name.
+
+```php
+class C {
+  #[Service]
+  static function createA(): A {..}
+  #[Service(id: 'a.other')]
+  static function createOtherA(): A {..}
+  #[Service]
+  static function createB(): B {..}
+  #[Service(suffix: '.other')]
+  static function createOtherB(): B {..}
+}
+```
+
+The `#[Service]` attribute could also be added on class level to explicitly register a class as a service.
+I think right now this is not needed because `resource:` already registers all the classes. But perhaps there could be a different mode where this does not happen, and where only classes with `#[Service]` attribute are registered as services.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-03-14T20:34:58Z
+
+Thank you for your feedback @nicolas-grekas! I completely reworked the PR. It now allows a `constructor` option on Autoconfigure. Also, this PR makes available `constructor` in PHP-DSL, YAML and XML.
+
+When using `constructor`, `factory` cannot be used for obvious reasons.
+
+@donquixote I think it would worth it to discuss this in an issue to gather feedback, as this PR's initial goal changed a bit 😄
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-03-28T15:30:11Z
+
+That's rebased :+1: !

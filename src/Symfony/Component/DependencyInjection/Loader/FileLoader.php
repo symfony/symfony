@@ -297,15 +297,7 @@ abstract class FileLoader extends BaseFileLoader
         if (null !== $prefixLen) {
             foreach ($excludePaths as $path => $_) {
                 $class = $namespace.ltrim(str_replace('/', '\\', substr($path, $prefixLen, str_ends_with($path, '.php') ? -4 : null)), '\\');
-<<<<<<< HEAD
                 $this->addContainerExcludedTag($class, $source);
-=======
-                if (!$this->container->has($class)) {
-                    $this->container->register($class, $class)
-                        ->setAbstract(true)
-                        ->addTag('container.excluded', $attributes);
-                }
->>>>>>> 6.2
             }
         }
 
@@ -324,7 +316,7 @@ abstract class FileLoader extends BaseFileLoader
             $attributes[$source] = ['source' => sprintf('in "%s/%s"', basename(\dirname($source)), basename($source))];
         }
 
-        $this->container->register($class)
+        $this->container->register($class, $class)
             ->setAbstract(true)
             ->addTag('container.excluded', null !== $source ? $attributes[$source] : []);
     }

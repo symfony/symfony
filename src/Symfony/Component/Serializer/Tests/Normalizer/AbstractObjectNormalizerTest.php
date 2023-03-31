@@ -542,6 +542,21 @@ class AbstractObjectNormalizerTest extends TestCase
 
         $this->assertSame($obj->propertyWithSerializedName->format('Y-m-d'), $obj->propertyWithoutSerializedName->format('Y-m-d'));
     }
+
+    public function testNormalizeUsesContextAttributeForPropertiesInConstructorWithSerializedPath()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+
+        $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
+        $normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory), null, $extractor);
+        $serializer = new Serializer([new DateTimeNormalizer([DateTimeNormalizer::FORMAT_KEY => 'd-m-Y']), $normalizer]);
+
+        $obj = new ObjectDummyWithContextAttributeAndSerializedPath(new \DateTimeImmutable('22-02-2023'));
+
+        $data = $serializer->normalize($obj);
+
+        $this->assertSame(['property' => ['with_path' => '22-02-2023']], $data);
+    }
 }
 
 class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
@@ -646,6 +661,16 @@ class DuplicateKeyNestedDummy
      * @SerializedName("quux")
      */
     public $notquux;
+}
+
+class ObjectDummyWithContextAttributeAndSerializedPath
+{
+    public function __construct(
+        #[Context([DateTimeNormalizer::FORMAT_KEY => 'm-d-Y'])]
+        #[SerializedPath('[property][with_path]')]
+        public \DateTimeImmutable $propertyWithPath,
+    ) {
+    }
 }
 
 class AbstractObjectNormalizerWithMetadata extends AbstractObjectNormalizer

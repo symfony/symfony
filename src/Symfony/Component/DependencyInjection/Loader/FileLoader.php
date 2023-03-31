@@ -153,6 +153,8 @@ abstract class FileLoader extends BaseFileLoader
 
                     continue;
                 }
+                $definition->setClass($class);
+
                 $interfaces = [];
                 foreach (class_implements($class, false) as $interface) {
                     $this->singlyImplemented[$interface] = ($this->singlyImplemented[$interface] ?? $class) !== $class ? false : $class;
@@ -295,7 +297,15 @@ abstract class FileLoader extends BaseFileLoader
         if (null !== $prefixLen) {
             foreach ($excludePaths as $path => $_) {
                 $class = $namespace.ltrim(str_replace('/', '\\', substr($path, $prefixLen, str_ends_with($path, '.php') ? -4 : null)), '\\');
+<<<<<<< HEAD
                 $this->addContainerExcludedTag($class, $source);
+=======
+                if (!$this->container->has($class)) {
+                    $this->container->register($class, $class)
+                        ->setAbstract(true)
+                        ->addTag('container.excluded', $attributes);
+                }
+>>>>>>> 6.2
             }
         }
 

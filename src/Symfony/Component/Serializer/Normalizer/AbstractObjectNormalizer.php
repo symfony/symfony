@@ -198,14 +198,15 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
             $attributeValue = $this->applyCallbacks($attributeValue, $object, $attribute, $format, $attributeContext);
 
-            if (null !== $attributeValue && !\is_scalar($attributeValue)) {
-                $stack[$attribute] = $attributeValue;
-            }
-
-            $data = $this->updateData($data, $attribute, $attributeValue, $class, $format, $attributeContext, $attributesMetadata, $classMetadata);
+            $stack[$attribute] = $attributeValue;
         }
 
         foreach ($stack as $attribute => $attributeValue) {
+            if (null === $attributeValue || \is_scalar($attributeValue)) {
+                $data = $this->updateData($data, $attribute, $attributeValue, $class, $format, $context, $attributesMetadata, $classMetadata);
+                continue;
+            }
+
             if (!$this->serializer instanceof NormalizerInterface) {
                 throw new LogicException(sprintf('Cannot normalize attribute "%s" because the injected serializer is not a normalizer.', $attribute));
             }

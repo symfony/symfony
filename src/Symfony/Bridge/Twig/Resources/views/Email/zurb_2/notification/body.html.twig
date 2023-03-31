@@ -26,7 +26,7 @@
                     {% if markdown %}
                         {{ include('@email/zurb_2/notification/content_markdown.html.twig') }}
                     {% else %}
-                        {{ (raw ? content|raw : content)|nl2br }}
+                        {{ raw ? content|raw : content|nl2br }}
                     {% endif %}
                 {% endblock %}
 

@@ -29,6 +29,8 @@ return static function (ContainerConfigurator $container) {
     $container->parameters()
         ->set('validator.mapping.cache.file', param('kernel.cache_dir').'/validation.php');
 
+    $validatorsDir = \dirname((new \ReflectionClass(EmailValidator::class))->getFileName());
+
     $container->services()
         ->set('validator', ValidatorInterface::class)
             ->factory([service('validator.builder'), 'getValidator'])
@@ -66,11 +68,15 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('Constraint validators locator'),
             ])
 
+        ->load('Symfony\Component\Validator\Constraints\\', $validatorsDir.'/*Validator.php')
+            ->exclude($validatorsDir.'/ExpressionLanguageSyntaxValidator.php')
+            ->abstract()
+            ->tag('container.excluded')
+            ->tag('validator.constraint_validator')
+
         ->set('validator.expression', ExpressionValidator::class)
             ->args([service('validator.expression_language')->nullOnInvalid()])
-            ->tag('validator.constraint_validator', [
-                'alias' => 'validator.expression',
-            ])
+            ->tag('validator.constraint_validator')
 
         ->set('validator.expression_language', ExpressionLanguage::class)
             ->args([service('cache.validator_expression_language')->nullOnInvalid()])
@@ -83,9 +89,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 abstract_arg('Default mode'),
             ])
-            ->tag('validator.constraint_validator', [
-                'alias' => EmailValidator::class,
-            ])
+            ->tag('validator.constraint_validator')
 
         ->set('validator.not_compromised_password', NotCompromisedPasswordValidator::class)
             ->args([
@@ -93,15 +97,11 @@ return static function (ContainerConfigurator $container) {
                 param('kernel.charset'),
                 false,
             ])
-            ->tag('validator.constraint_validator', [
-                'alias' => NotCompromisedPasswordValidator::class,
-            ])
+            ->tag('validator.constraint_validator')
 
         ->set('validator.when', WhenValidator::class)
             ->args([service('validator.expression_language')->nullOnInvalid()])
-            ->tag('validator.constraint_validator', [
-                'alias' => WhenValidator::class,
-            ])
+            ->tag('validator.constraint_validator')
 
         ->set('validator.no_suspicious_characters', NoSuspiciousCharactersValidator::class)
             ->args([param('kernel.enabled_locales')])

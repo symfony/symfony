@@ -202,6 +202,8 @@ class AbstractNormalizerTest extends TestCase
     }
 
     /**
+     * @requires PHP 8
+     *
      * @dataProvider getNormalizer
      */
     public function testVariadicSerializationWithPreservingKeys(AbstractNormalizer $normalizer)

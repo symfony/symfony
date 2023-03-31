@@ -1,0 +1,54 @@
+---------------------------------------------------------------------------
+
+by melya at 2023-03-06T21:49:44Z
+
+Also, next scenario could be taken into consideration as well. 🤔
+*Numeric array-keys unpacked into normally indexed array
+
+```php
+$dummies = ["345" => new Dummy("d1 value"), "321" => new Dummy("d2 value")];
+$object  = new DummyWithVariadic(...$dummies);
+var_dump($object);
+/* Output:
+class DummyWithVariadic#310 (1) {
+  public $dummies =>
+  array(2) {
+    0 =>
+    class Dummy#308 (1) {
+      public readonly string $i =>
+      string(8) "d1 value"
+    }
+    1 =>
+    class Dummy#309 (1) {
+      public readonly string $i =>
+      string(8) "d2 value"
+    }
+  }
+}
+*/
+```
+
+```php
+$dummies = ["345" => new Dummy("d1 value"), "d1" => new Dummy("d2 value")];
+$object  = new DummyWithVariadic(...$dummies);
+var_dump($object);
+/* Output:
+class DummyWithVariadic#310 (1) {
+  public $dummies =>
+  array(2) {
+    0 =>
+    class Dummy#308 (1) {
+      public readonly string $i =>
+      string(8) "d1 value"
+    }
+    'd1' =>
+    class Dummy#309 (1) {
+      public readonly string $i =>
+      string(8) "d2 value"
+    }
+  }
+}
+*/
+```
+
+**UPDATE**: Most likely, symfony can't do nothing about this scenario as this is how PHP unpacks array 🤷‍♂️

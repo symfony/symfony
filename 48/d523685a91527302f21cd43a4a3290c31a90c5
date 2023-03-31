@@ -1,0 +1,134 @@
+---------------------------------------------------------------------------
+
+by Spomky at 2023-03-29T13:18:00Z
+
+Hi all,
+
+Here is my proposal for a builtin password strength estimator. It is based on the entropy as showed in the illustration here below and that I used in the wrokshops last week.
+
+**Note that this not a bullet proof method and any improvments or suggestions are welcome.**
+
+The estimator does 2 things:
+* First, it spots forbidden words such as username, family name, given name application name or any other words. These words are then removed from the passwords for the next step
+* Next, it counts the number of unique chars and computes the entropy
+
+Compared to `zxcvbn`-like libraries, it lacks in a few things such as ~L33T detection,~ dictionnary mapping or adjancy graphs. However gives good results in most situations.
+
+The score is given depending on the entropy. A good password should be above 80 bits (from several sources including [this one](https://auth0.com/blog/creating-great-passwords/)).
+
+![Password entropy](https://user-images.githubusercontent.com/1091072/228541474-0dd691f2-ec63-4a62-b2db-aff8431e3771.png)
+
+Ping @chalasr, @WebMamba, @nicolas-grekas, @weaverryan, @javiereguiluz, @jdreesen, @fabpot
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-03-29T15:44:17Z
+
+Here is a late reaction to this validation constraint. If we can't explain to the end user why their "password strength is too low," that's bad for UX. The more complex the algorithm, the more users will get lost.
+
+The UI will have to explain that the username/first name/application name is forbidden.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2023-03-29T15:50:21Z
+
+Hi @GromNaN,
+
+This is what the [constraint validator does](https://github.com/symfony/symfony/blob/6.3/src/Symfony/Component/Validator/Constraints/PasswordStrengthValidator.php#L47-L53). But it only returns matches in the analyzed password and not the whole list of restricted data for privacy purpose.
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-03-29T18:57:56Z
+
+Feels like a common requirement would be to use fields on your user object as restricted words. Any way we can make that easier?
+
+---------------------------------------------------------------------------
+
+by Spomky at 2023-03-29T19:22:56Z
+
+> Feels like a common requirement would be to use fields on your user object as restricted words. Any way we can make that easier?
+
+Yes is it. I usually have it in a form where the list is passed through an option. But when it is set as an attribute, I do not see how to refer to the user fields.
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-03-29T19:58:13Z
+
+> But when it is set as an attribute, I do not see how to refer to the user fields.
+
+What about if we allow it as a class-level attribute? Something like:
+
+```php
+#PasswordStrength(field: 'password', restrictedFields: ['username', 'email', 'lastName', 'firstName'])]
+class User {}
+```
+
+But... Let's save for a possible future enhancement, using in the form type directly works well enough.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-03-30T07:44:08Z
+
+Maybe the banned words and the strength computation should indeed be 2 separate constraints, allowing more flexibility.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2023-03-30T07:53:11Z
+
+Many thanks for your advices. I will split it in two constraints and include the comments from the other reviewers.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-30T14:48:48Z
+
+To compute the entropy, WDYT of this?
+
+```php
+
+    $length = \strlen($password);
+
+    // Define character groups
+    $groups = [
+        'lowercase' => 'abcdefghijklmnopqrstuvwxyz',
+        'uppercase' => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+        'digits' => '0123456789',
+        'special' => '\\ !@#$%^&*()-_=+[]{}|;:<>,.?/`~\'"',
+    ];
+
+    // Count the occurrences of each character group
+    $groupCounts = [];
+    $extraCharsCount = 256;
+    foreach ($groups as $group => $chars) {
+        $password = preg_replace('/['.preg_quote($chars, '/').']/', '', $password, -1, $groupCounts[$group]);
+        $extraCharsCount -= \strlen($chars);
+    }
+
+    // Create an extra group for characters not explicitly listed
+    $groupCounts['extra'] = \strlen($password);
+    $groups['extra'] = str_repeat('-', $extraCharsCount);
+
+    // Calculate size of the symbol pool
+    $symbolPool = 0;
+    foreach ($groupCounts as $group => $count) {
+        if ($count) {
+            $symbolPool += \strlen($groups[$group]);
+        }
+    }
+
+    return $length * log($symbolPool, 2);
+
+```
+
+Or alternatively for the last part:
+
+```php
+// Calculate the entropy of each character group
+$entropy = 0;
+foreach ($groupCounts as $group => $count) {
+    if ($count) {
+        $entropy += $count * log(\strlen($groups[$group]), 2);
+    }
+}
+
+return $entropy;
+```

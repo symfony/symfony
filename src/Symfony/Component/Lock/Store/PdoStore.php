@@ -22,7 +22,7 @@ use Symfony\Component\Lock\PersistingStoreInterface;
  *
  * Lock metadata are stored in a table. You can use createTable() to initialize
  * a correctly defined table.
-
+ *
  * CAUTION: This store relies on all client and server nodes to have
  * synchronized clocks for lock expiry to occur at the correct time.
  * To ensure locks don't expire prematurely; the TTLs should be set with enough

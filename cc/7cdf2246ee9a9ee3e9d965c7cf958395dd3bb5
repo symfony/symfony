@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by Spomky at 2023-03-31T16:32:47Z
+
+Hello @nicolas-grekas,
+
+I played with this new calculation method and it gives an entropy that is approx +40% compare to the one I proposed.
+I have no remark to be honest.
+* A 8-chars password with [a-zA-Z0-9]+symbols has almost always a strength of 2, which is fine.
+* A 10-chars ones gives 3
+* With 12-chars or more I have 4
+Looks good to me 👌🏼.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2023-03-31T16:37:21Z
+
+Also, as noted by @stof in this https://github.com/symfony/symfony/pull/49868#discussion_r1154638964, the named argument of [constriant](https://github.com/symfony/symfony/blob/7c459424b703e9b820b300a14194f701fb5bbb19/src/Symfony/Component/Validator/Constraints/PasswordStrength.php#L43) should be at the end.
+We could take the opportunity of this PR to move the argument `$minScore`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-31T18:23:26Z
+
+>  We could take the opportunity of this PR to move the argument $minScore.
+
+Right, updated!
+
+> it gives an entropy that is approx +40%
+
+Thanks for checking. I think the new logic better accounts for things like mixing character case, symbols, and other and also duplicate chars.

@@ -30,12 +30,22 @@ class PasswordStrengthValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($value, new PasswordStrength(minScore: $expectedStrength));
 
         $this->assertNoViolation();
+
+        if (PasswordStrength::STRENGTH_VERY_STRONG === $expectedStrength) {
+            return;
+        }
+
+        $this->validator->validate($value, new PasswordStrength(minScore: $expectedStrength + 1));
+
+        $this->buildViolation('The password strength is too low. Please use a stronger password.')
+            ->setCode(PasswordStrength::PASSWORD_STRENGTH_ERROR)
+            ->assertRaised();
     }
 
     public static function getValidValues(): iterable
     {
-        yield ['How-is this 🤔?!', PasswordStrength::STRENGTH_WEAK];
-        yield ['Reasonable-pwd-❤️', PasswordStrength::STRENGTH_REASONABLE];
+        yield ['How-is-this', PasswordStrength::STRENGTH_WEAK];
+        yield ['Reasonable-pwd', PasswordStrength::STRENGTH_REASONABLE];
         yield ['This 1s a very g00d Pa55word! ;-)', PasswordStrength::STRENGTH_VERY_STRONG];
         yield ['pudding-smack-👌🏼-fox-😎', PasswordStrength::STRENGTH_VERY_STRONG];
     }

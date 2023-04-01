@@ -58,7 +58,26 @@ final class PasswordStrengthValidator extends ConstraintValidator
      */
     private static function estimateStrength(#[\SensitiveParameter] string $password): int
     {
-        $entropy = log(\strlen(count_chars($password, 3)) ** \strlen($password), 2);
+        if (!$length = \strlen($password)) {
+            return PasswordStrength::STRENGTH_VERY_WEAK;
+        }
+        $password = count_chars($password, 1);
+        $chars = \count($password);
+
+        $control = $digit = $upper = $lower = $symbol = $other = 0;
+        foreach ($password as $chr => $count) {
+            match (true) {
+                $chr < 32 || 127 === $chr => $control = 33,
+                48 <= $chr && $chr <= 57 => $digit = 10,
+                65 <= $chr && $chr <= 90 => $upper = 26,
+                97 <= $chr && $chr <= 122 => $lower = 26,
+                128 <= $chr => $other = 128,
+                default => $symbol = 33,
+            };
+        }
+
+        $pool = $lower + $upper + $digit + $symbol + $control + $other;
+        $entropy = $chars * log($pool, 2) + ($length - $chars) * log($chars, 2);
 
         return match (true) {
             $entropy >= 120 => PasswordStrength::STRENGTH_VERY_STRONG,

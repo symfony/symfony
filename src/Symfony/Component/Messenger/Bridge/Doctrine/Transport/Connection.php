@@ -173,9 +173,9 @@ class Connection implements ResetInterface
 
             // Append pessimistic write lock to FROM clause if db platform supports it
             $sql = $query->getSQL();
-            if (($fromPart = $query->getQueryPart('from')) &&
-                ($table = $fromPart[0]['table'] ?? null) &&
-                ($alias = $fromPart[0]['alias'] ?? null)
+            if (($fromPart = $query->getQueryPart('from'))
+                && ($table = $fromPart[0]['table'] ?? null)
+                && ($alias = $fromPart[0]['alias'] ?? null)
             ) {
                 $fromClause = sprintf('%s %s', $table, $alias);
                 $sql = str_replace(

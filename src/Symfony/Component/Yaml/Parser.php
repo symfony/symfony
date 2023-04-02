@@ -844,8 +844,8 @@ class Parser
 
             while (
                 $notEOF && (
-                    $isCurrentLineBlank ||
-                    self::preg_match($pattern, $this->currentLine, $matches)
+                    $isCurrentLineBlank
+                    || self::preg_match($pattern, $this->currentLine, $matches)
                 )
             ) {
                 if ($isCurrentLineBlank && \strlen($this->currentLine) > $indentation) {

@@ -678,9 +678,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     {
         $enableMaxDepth = $context[self::ENABLE_MAX_DEPTH] ?? $this->defaultContext[self::ENABLE_MAX_DEPTH] ?? false;
         if (
-            !$enableMaxDepth ||
-            !isset($attributesMetadata[$attribute]) ||
-            null === $maxDepth = $attributesMetadata[$attribute]->getMaxDepth()
+            !$enableMaxDepth
+            || !isset($attributesMetadata[$attribute])
+            || null === $maxDepth = $attributesMetadata[$attribute]->getMaxDepth()
         ) {
             return false;
         }

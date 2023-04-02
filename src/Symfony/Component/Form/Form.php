@@ -636,11 +636,11 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             return $isEmptyCallback($this->modelData);
         }
 
-        return FormUtil::isEmpty($this->modelData) ||
+        return FormUtil::isEmpty($this->modelData)
             // arrays, countables
-            (is_countable($this->modelData) && 0 === \count($this->modelData)) ||
+            || (is_countable($this->modelData) && 0 === \count($this->modelData))
             // traversables that are not countable
-            ($this->modelData instanceof \Traversable && 0 === iterator_count($this->modelData));
+            || ($this->modelData instanceof \Traversable && 0 === iterator_count($this->modelData));
     }
 
     public function isValid(): bool

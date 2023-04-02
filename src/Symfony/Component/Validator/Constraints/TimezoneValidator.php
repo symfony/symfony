@@ -55,8 +55,8 @@ class TimezoneValidator extends ConstraintValidator
         }
 
         if (
-            \in_array($value, self::getPhpTimezones($constraint->zone, $constraint->countryCode), true) ||
-            \in_array($value, self::getIntlTimezones($constraint->zone, $constraint->countryCode), true)
+            \in_array($value, self::getPhpTimezones($constraint->zone, $constraint->countryCode), true)
+            || \in_array($value, self::getIntlTimezones($constraint->zone, $constraint->countryCode), true)
         ) {
             return;
         }

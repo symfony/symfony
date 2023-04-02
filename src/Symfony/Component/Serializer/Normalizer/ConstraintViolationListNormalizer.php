@@ -76,11 +76,11 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
 
             $constraint = $violation->getConstraint();
             if (
-                [] !== $payloadFieldsToSerialize &&
-                $constraint &&
-                $constraint->payload &&
+                [] !== $payloadFieldsToSerialize
+                && $constraint
+                && $constraint->payload
                 // If some or all payload fields are whitelisted, add them
-                $payloadFields = null === $payloadFieldsToSerialize || true === $payloadFieldsToSerialize ? $constraint->payload : array_intersect_key($constraint->payload, $payloadFieldsToSerialize)
+                && $payloadFields = null === $payloadFieldsToSerialize || true === $payloadFieldsToSerialize ? $constraint->payload : array_intersect_key($constraint->payload, $payloadFieldsToSerialize)
             ) {
                 $violationEntry['payload'] = $payloadFields;
             }

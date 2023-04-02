@@ -13,6 +13,9 @@ namespace Symfony\Component\HttpClient;
 
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\TransportException;
+use Symfony\Component\HttpClient\Response\StreamableInterface;
+use Symfony\Component\HttpClient\Response\StreamWrapper;
+use Symfony\Component\Mime\MimeTypes;
 
 /**
  * Provides the common logic from writing HttpClientInterface implementations.
@@ -94,11 +97,7 @@ trait HttpClientTrait
         }
 
         if (isset($options['body'])) {
-            if (\is_array($options['body']) && (!isset($options['normalized_headers']['content-type'][0]) || !str_contains($options['normalized_headers']['content-type'][0], 'application/x-www-form-urlencoded'))) {
-                $options['normalized_headers']['content-type'] = ['Content-Type: application/x-www-form-urlencoded'];
-            }
-
-            $options['body'] = self::normalizeBody($options['body']);
+            $options['body'] = self::normalizeBody($options['body'], $options['normalized_headers']);
 
             if (\is_string($options['body'])
                 && (string) \strlen($options['body']) !== substr($h = $options['normalized_headers']['content-length'][0] ?? '', 16)
@@ -313,21 +312,129 @@ trait HttpClientTrait
      *
      * @throws InvalidArgumentException When an invalid body is passed
      */
-    private static function normalizeBody($body)
+    private static function normalizeBody($body, array &$normalizedHeaders = [])
     {
         if (\is_array($body)) {
-            array_walk_recursive($body, $caster = static function (&$v) use (&$caster) {
-                if (\is_object($v)) {
+            static $cookie;
+
+            $streams = [];
+            array_walk_recursive($body, $caster = static function (&$v) use (&$caster, &$streams, &$cookie) {
+                if (\is_resource($v) || $v instanceof StreamableInterface) {
+                    $cookie = hash('xxh128', $cookie ??= random_bytes(8), true);
+                    $k = substr(strtr(base64_encode($cookie), '+/', '-_'), 0, -2);
+                    $streams[$k] = $v instanceof StreamableInterface ? $v->toStream(false) : $v;
+                    $v = $k;
+                } elseif (\is_object($v)) {
                     if ($vars = get_object_vars($v)) {
                         array_walk_recursive($vars, $caster);
                         $v = $vars;
-                    } elseif (method_exists($v, '__toString')) {
+                    } elseif ($v instanceof \Stringable) {
                         $v = (string) $v;
                     }
                 }
             });
 
-            return http_build_query($body, '', '&');
+            $body = http_build_query($body, '', '&');
+
+            if ('' === $body || !$streams && !str_contains($normalizedHeaders['content-type'][0] ?? '', 'multipart/form-data')) {
+                if (!str_contains($normalizedHeaders['content-type'][0] ?? '', 'application/x-www-form-urlencoded')) {
+                    $normalizedHeaders['content-type'] = ['Content-Type: application/x-www-form-urlencoded'];
+                }
+
+                return $body;
+            }
+
+            if (preg_match('{multipart/form-data; boundary=(?|"([^"\r\n]++)"|([-!#$%&\'*+.^_`|~_A-Za-z0-9]++))}', $normalizedHeaders['content-type'][0] ?? '', $boundary)) {
+                $boundary = $boundary[1];
+            } else {
+                $boundary = substr(strtr(base64_encode($cookie ??= random_bytes(8)), '+/', '-_'), 0, -2);
+                $normalizedHeaders['content-type'] = ['Content-Type: multipart/form-data; boundary='.$boundary];
+            }
+
+            $body = explode('&', $body);
+            $contentLength = 0;
+
+            foreach ($body as $i => $part) {
+                [$k, $v] = explode('=', $part, 2);
+                $part = ($i ? "\r\n" : '')."--{$boundary}\r\n";
+                $k = str_replace(['"', "\r", "\n"], ['%22', '%0D', '%0A'], urldecode($k)); // see WHATWG HTML living standard
+
+                if (!isset($streams[$v])) {
+                    $part .= "Content-Disposition: form-data; name=\"{$k}\"\r\n\r\n".urldecode($v);
+                    $contentLength += 0 <= $contentLength ? \strlen($part) : 0;
+                    $body[$i] = [$k, $part, null];
+                    continue;
+                }
+                $v = $streams[$v];
+
+                if (!\is_array($m = @stream_get_meta_data($v))) {
+                    throw new TransportException(sprintf('Invalid "%s" resource found in body part "%s".', get_resource_type($v), $k));
+                }
+                if (feof($v)) {
+                    throw new TransportException(sprintf('Uploaded stream ended for body part "%s".', $k));
+                }
+
+                $m += stream_context_get_options($v)['http'] ?? [];
+                $filename = basename($m['filename'] ?? $m['uri'] ?? 'unknown');
+                $filename = str_replace(['"', "\r", "\n"], ['%22', '%0D', '%0A'], $filename);
+                $contentType = $m['content_type'] ?? null;
+
+                if (($headers = $m['wrapper_data'] ?? []) instanceof StreamWrapper) {
+                    $hasContentLength = false;
+                    $headers = $headers->getResponse()->getInfo('response_headers');
+                } elseif ($hasContentLength = 0 < $h = fstat($v)['size'] ?? 0) {
+                    $contentLength += 0 <= $contentLength ? $h : 0;
+                }
+
+                foreach (\is_array($headers) ? $headers : [] as $h) {
+                    if (\is_string($h) && 0 === stripos($h, 'Content-Type: ')) {
+                        $contentType ??= substr($h, 14);
+                    } elseif (!$hasContentLength && \is_string($h) && 0 === stripos($h, 'Content-Length: ')) {
+                        $hasContentLength = true;
+                        $contentLength += 0 <= $contentLength ? substr($h, 16) : 0;
+                    } elseif (\is_string($h) && 0 === stripos($h, 'Content-Encoding: ')) {
+                        $contentLength = -1;
+                    }
+                }
+
+                if (!$hasContentLength) {
+                    $contentLength = -1;
+                }
+                if (null === $contentType && 'plainfile' === ($m['wrapper_type'] ?? null) && isset($m['uri'])) {
+                    $mimeTypes = class_exists(MimeTypes::class) ? MimeTypes::getDefault() : false;
+                    $contentType = $mimeTypes ? $mimeTypes->guessMimeType($m['uri']) : null;
+                }
+                $contentType ??= 'application/octet-stream';
+
+                $part .= "Content-Disposition: form-data; name=\"{$k}\"; filename=\"{$filename}\"\r\n";
+                $part .= "Content-Type: {$contentType}\r\n\r\n";
+
+                $contentLength += 0 <= $contentLength ? \strlen($part) : 0;
+                $body[$i] = [$k, $part, $v];
+            }
+
+            $body[++$i] = ['', "\r\n--{$boundary}--\r\n", null];
+
+            if (0 < $contentLength) {
+                $normalizedHeaders['content-length'] = ['Content-Length: '.($contentLength += \strlen($body[$i][1]))];
+            }
+
+            $body = static function ($size) use ($body) {
+                foreach ($body as $i => [$k, $part, $h]) {
+                    unset($body[$i]);
+
+                    yield $part;
+
+                    while (null !== $h && !feof($h)) {
+                        if (false === $part = fread($h, $size)) {
+                            throw new TransportException(sprintf('Error while reading uploaded stream for body part "%s".', $k));
+                        }
+
+                        yield $part;
+                    }
+                }
+                $h = null;
+            };
         }
 
         if (\is_string($body)) {

@@ -21,7 +21,7 @@ use Symfony\Component\String\UnicodeString;
  */
 abstract class Helper implements HelperInterface
 {
-    protected $helperSet = null;
+    protected $helperSet;
 
     /**
      * @return void

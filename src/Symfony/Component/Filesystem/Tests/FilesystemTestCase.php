@@ -23,22 +23,22 @@ class FilesystemTestCase extends TestCase
     /**
      * @var Filesystem
      */
-    protected $filesystem = null;
+    protected $filesystem;
 
     /**
      * @var string
      */
-    protected $workspace = null;
+    protected $workspace;
 
     /**
      * @var bool|null Flag for hard links on Windows
      */
-    private static $linkOnWindows = null;
+    private static $linkOnWindows;
 
     /**
      * @var bool|null Flag for symbolic links on Windows
      */
-    private static $symlinkOnWindows = null;
+    private static $symlinkOnWindows;
 
     public static function setUpBeforeClass(): void
     {

@@ -20,8 +20,8 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 
 class TestHttpClient extends HttpBrowser
 {
-    protected $nextResponse = null;
-    protected $nextScript = null;
+    protected $nextResponse;
+    protected $nextScript;
 
     public function __construct(array $server = [], History $history = null, CookieJar $cookieJar = null)
     {

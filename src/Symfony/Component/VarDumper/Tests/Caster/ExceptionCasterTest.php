@@ -369,7 +369,7 @@ array:1 [
     -message: "Hello"
     -code: 0
     -previous: null
-    -trace: array:13 %a
+    -trace: array:%d %a
     -traceAsString: ""…%d
     -class: "Exception"
     -statusCode: 500

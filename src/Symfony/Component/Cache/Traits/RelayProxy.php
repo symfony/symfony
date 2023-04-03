@@ -327,9 +327,9 @@ class RelayProxy extends Relay implements ResetInterface, LazyObjectInterface
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->lastsave();
     }
 
-    public function bgsave(): \Relay\Relay|bool
+    public function bgsave($schedule = false): \Relay\Relay|bool
     {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->bgsave();
+        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->bgsave($schedule);
     }
 
     public function save(): \Relay\Relay|bool
@@ -1157,14 +1157,14 @@ class RelayProxy extends Relay implements ResetInterface, LazyObjectInterface
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->zrevrangebylex($key, $max, $min, $offset, $count);
     }
 
-    public function zrank($key, $rank): \Relay\Relay|false|int
+    public function zrank($key, $rank, $withscore = false): \Relay\Relay|array|false|int
     {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->zrank($key, $rank);
+        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->zrank($key, $rank, $withscore);
     }
 
-    public function zrevrank($key, $rank): \Relay\Relay|false|int
+    public function zrevrank($key, $rank, $withscore = false): \Relay\Relay|array|false|int
     {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->zrevrank($key, $rank);
+        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->zrevrank($key, $rank, $withscore);
     }
 
     public function zrem($key, ...$args): \Relay\Relay|false|int

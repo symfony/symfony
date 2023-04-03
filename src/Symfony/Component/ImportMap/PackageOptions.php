@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ImportMaps;
+namespace Symfony\Component\ImportMap;
 
 /**
  * @internal

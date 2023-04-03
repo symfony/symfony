@@ -9,37 +9,31 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ImportMaps\Command;
+namespace Symfony\Component\ImportMap\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\ImportMaps\ImportMapManager;
+use Symfony\Component\ImportMap\ImportMapManager;
 
 /**
  * @experimental
  *
  * @author Kévin Dunglas <kevin@dunglas.dev>
  */
-#[AsCommand(name: 'importmap:remove', description: 'Removes JavaScript packages')]
-final class RemoveCommand extends Command
+#[AsCommand(name: 'importmap:export', description: 'Exports the importmap JSON')]
+final class ExportCommand extends Command
 {
     public function __construct(
-        protected readonly ImportMapManager $importMapManager,
+        private readonly ImportMapManager $importMapManager,
     ) {
         parent::__construct();
     }
 
-    protected function configure(): void
-    {
-        $this->addArgument('packages', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'The packages to remove');
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->importMapManager->remove($input->getArgument('packages'));
+        $output->writeln($this->importMapManager->getImportMap());
 
         return Command::SUCCESS;
     }

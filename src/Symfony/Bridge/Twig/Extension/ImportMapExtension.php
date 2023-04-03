@@ -11,14 +11,14 @@
 
 namespace Symfony\Bridge\Twig\Extension;
 
-use Symfony\Component\ImportMaps\ImportMapManager;
+use Symfony\Component\ImportMap\ImportMapManager;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 /**
  * @author Kévin Dunglas <kevin@dunglas.dev>
  */
-final class ImportMapsExtension extends AbstractExtension
+final class ImportMapExtension extends AbstractExtension
 {
     public function __construct(
         private readonly ImportMapManager $importMapManager,

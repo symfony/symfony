@@ -701,7 +701,7 @@ class ConfigurationTest extends TestCase
             'remote-event' => [
                 'enabled' => false,
             ],
-            'importmaps' => [
+            'importmap' => [
                 'enabled' => false,
                 'path' => '%kernel.project_dir%/importmap.php',
                 'polyfill' => null,

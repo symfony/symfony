@@ -93,7 +93,7 @@ use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\ImportMaps\ImportMapManager;
+use Symfony\Component\ImportMap\ImportMapManager;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\PersistingStoreInterface;
@@ -534,12 +534,12 @@ class FrameworkExtension extends Extension
             $this->registerHtmlSanitizerConfiguration($config['html_sanitizer'], $container, $loader);
         }
 
-        if ($this->readConfigEnabled('importmaps', $container, $config['importmaps'])) {
+        if ($this->readConfigEnabled('importmap', $container, $config['importmap'])) {
             if (!class_exists(ImportMapManager::class)) {
-                throw new LogicException('Import Maps support cannot be enabled as the ImportMaps component is not installed. Try running "composer require symfony/import-maps".');
+                throw new LogicException('Import Map support cannot be enabled as the ImportMap component is not installed. Try running "composer require symfony/import-map".');
             }
 
-            $this->registerImportMapsConfiguration($config['importmaps'], $container, $loader);
+            $this->registerImportMapConfiguration($config['importmap'], $container, $loader);
         }
 
         $this->addAnnotatedClassesToCompile([
@@ -2946,18 +2946,18 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerImportMapsConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
+    private function registerImportMapConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
-        $loader->load('importmaps.php');
+        $loader->load('importmap.php');
 
-        $container->setParameter('importmaps.polyfill', $config['polyfill']);
+        $container->setParameter('importmap.polyfill', $config['polyfill']);
 
         $container
-            ->getDefinition('importmaps.controller')
+            ->getDefinition('importmap.controller')
             ->replaceArgument(0, $config['assets_dir']);
 
         $container
-            ->getDefinition('importmaps.manager')
+            ->getDefinition('importmap.manager')
             ->replaceArgument(0, $config['path'])
             ->replaceArgument(1, $config['assets_dir'])
             ->replaceArgument(2, $config['public_assets_dir'])

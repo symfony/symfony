@@ -1,4 +1,4 @@
-# ImportMaps Component
+# ImportMap Component
 
 The ImportMap component provides an implementation of
 the [JavaScript Import Maps specification](https://github.com/WICG/import-maps).

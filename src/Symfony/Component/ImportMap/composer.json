@@ -1,5 +1,5 @@
 {
-    "name": "symfony/import-maps",
+    "name": "symfony/import-map",
     "type": "library",
     "description": "How to control the behavior of JavaScript imports",
     "keywords": [
@@ -21,24 +21,19 @@
         }
     ],
     "autoload": {
-        "psr-4": { "Symfony\\Component\\ImportMaps\\": "" },
+        "psr-4": { "Symfony\\Component\\ImportMap\\": "" },
         "exclude-from-classmap": [
             "/Tests/"
         ]
     },
     "require": {
         "php": ">=8.1",
-        "symfony/console": "^6.1",
-        "symfony/http-client": "^6.1",
-        "symfony/mime": "^6.1",
-        "symfony/var-exporter": "^6.1"
+        "symfony/http-client": "^6.1"
     },
     "require-dev": {
-        "symfony/framework-bundle": "^6.1",
+        "symfony/mime": "^6.1",
         "symfony/twig-bundle": "^6.1",
-        "symfony/web-profiler-bundle": "^6.1",
-        "symfony/debug-bundle": "^6.1",
-        "symfony/asset": "^6.1"
+        "symfony/var-exporter": "^6.1"
     },
     "minimum-stability": "dev"
 }

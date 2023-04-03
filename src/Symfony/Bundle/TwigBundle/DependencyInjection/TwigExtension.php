@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Form\AbstractRendererEngine;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\ImportMaps\ImportMapManager;
+use Symfony\Component\ImportMap\ImportMapManager;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Translation\Translator;
 use Symfony\Contracts\Service\ResetInterface;
@@ -87,8 +87,8 @@ class TwigExtension extends Extension
             }
         }
 
-        if ($container::willBeAvailable('symfony/import-maps', ImportMapManager::class, ['symfony/import-maps'])) {
-            $loader->load('importmaps.php');
+        if ($container::willBeAvailable('symfony/import-map', ImportMapManager::class, ['symfony/import-map'])) {
+            $loader->load('importmap.php');
         }
 
         $container->setParameter('twig.form.resources', $config['form_themes']);

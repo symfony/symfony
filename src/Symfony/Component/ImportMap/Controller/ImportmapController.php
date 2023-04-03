@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ImportMaps\Controller;
+namespace Symfony\Component\ImportMap\Controller;
 
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\ImportMaps\ImportMapManager;
+use Symfony\Component\ImportMap\ImportMapManager;
 use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\Mime\MimeTypesInterface;
 
@@ -28,8 +28,15 @@ final class ImportmapController
     public function __construct(
         private readonly string $assetsDir,
         private readonly ImportMapManager $importMapManager,
-        private readonly MimeTypesInterface $mimeTypes = new MimeTypes(),
+        private readonly array $extensionsMap = [
+            'js' => 'application/javascript',
+            'css' => 'text/css',
+        ],
+        private ?MimeTypesInterface $mimeTypes = null,
     ) {
+        if (null === $this->mimeTypes && class_exists(MimeTypes::class)) {
+            $this->mimeTypes = new MimeTypes();
+        }
     }
 
     public function handle(string $path): Response
@@ -44,24 +51,27 @@ final class ImportmapController
         if (
             // prevents path traversal attacks
             !str_starts_with($localPath, $this->assetsDir) ||
-            !file_exists($localPath) ||
-            $matches[2] !== hash('xxh128', file_get_contents($localPath))
+            $matches[2] !== @hash_file('xxh128', $localPath)
         ) {
             throw new NotFoundHttpException();
         }
 
-        $contentType = $this->mimeTypes->guessMimeType($localPath);
-        if ('text/plain' === $contentType) {
-            $contentType = match ($matches[3]) {
-                'js' => 'application/javascript',
-                'css' => 'text/css',
-                default => $matches[3],
-            };
+        $contentType = null;
+        if (isset($this->mimeTypes[$matches[3]])) {
+            $contentType = $this->mimeTypes[$matches[3]];
+        } elseif (null !== $this->mimeTypes) {
+            $contentType = $this->mimeTypes->guessMimeType($localPath);
         }
 
-        return new BinaryFileResponse(
+        return (new BinaryFileResponse(
             $localPath,
-            headers: ['Content-Type' => $contentType],
-        );
+            headers: $contentType ? ['Content-Type' => $contentType] : [],
+            public: true,
+        ))
+            ->setMaxAge(604800)
+            ->setImmutable()
+            ->setVary('Accept-Encoding')
+            ->setEtag($matches[2])
+        ;
     }
 }

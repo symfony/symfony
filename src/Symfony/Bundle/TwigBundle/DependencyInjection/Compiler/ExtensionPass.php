@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\ExpressionLanguage\Expression;
-use Symfony\Component\ImportMaps\ImportMapManager;
+use Symfony\Component\ImportMap\ImportMapManager;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Workflow\Workflow;
 use Symfony\Component\Yaml\Yaml;
@@ -135,7 +135,7 @@ class ExtensionPass implements CompilerPassInterface
         }
 
         if (!$container->has(ImportMapManager::class)) {
-            $container->removeDefinition('twig.extension.importmaps');
+            $container->removeDefinition('twig.extension.importmap');
         }
     }
 }

@@ -32,7 +32,7 @@ use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\ImportMaps\ImportMapManager;
+use Symfony\Component\ImportMap\ImportMapManager;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -97,7 +97,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
             'security.csrf.token_manager' => '?'.CsrfTokenManagerInterface::class,
             'parameter_bag' => '?'.ContainerBagInterface::class,
             'web_link.http_header_serializer' => '?'.HttpHeaderSerializer::class,
-            'importmaps.manager' => '?'.ImportMapManager::class,
+            'importmap.manager' => '?'.ImportMapManager::class,
         ];
     }
 
@@ -423,11 +423,11 @@ abstract class AbstractController implements ServiceSubscriberInterface
         $populatedLinks = [];
 
         if ($preloadJavaScriptModules) {
-            if (!$this->container->has('importmaps.manager')) {
-                throw new \LogicException('You cannot use the JavaScript modules method if the ImportMaps component is not available. Try running "composer require symfony/import-maps".');
+            if (!$this->container->has('importmap.manager')) {
+                throw new \LogicException('You cannot use the JavaScript modules method if the ImportMap component is not available. Try running "composer require symfony/import-map".');
             }
 
-            foreach ($this->container->get('importmaps.manager')->getModulesToPreload() as $url) {
+            foreach ($this->container->get('importmap.manager')->getModulesToPreload() as $url) {
                 $populatedLinks[] = new Link('modulepreload', $url);
             }
         }

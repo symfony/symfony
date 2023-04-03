@@ -11,15 +11,15 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Symfony\Bridge\Twig\Extension\ImportMapsExtension;
+use Symfony\Bridge\Twig\Extension\ImportMapExtension;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
 
-        ->set('twig.extension.importmaps', ImportMapsExtension::class)
+        ->set('twig.extension.importmap', ImportMapExtension::class)
             ->args([
-                service('importmaps.manager'),
-                param('importmaps.polyfill'),
+                service('importmap.manager'),
+                param('importmap.polyfill'),
             ])
             ->tag('twig.extension')
 

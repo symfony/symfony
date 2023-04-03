@@ -14,7 +14,6 @@ namespace Symfony\Bridge\Twig\Mime;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\Email;
 use Twig\TemplateWrapper;
-use function is_array;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -30,8 +29,8 @@ class TemplatedEmail extends Email
      */
     public function textTemplate(null|string|TemplateWrapper|array $template): static
     {
-        if (is_array($template) && !isset($template['templateName'])) {
-            throw new InvalidArgumentException('Array parameter is only allowed as json serialized version of a TemplateWrapper');
+        if (\is_array($template) && !isset($template['templateName'])) {
+            throw new InvalidArgumentException('Array parameter is only allowed as json serialized version of a TemplateWrapper.');
         }
 
         $this->textTemplate = $template;
@@ -44,8 +43,8 @@ class TemplatedEmail extends Email
      */
     public function htmlTemplate(null|string|TemplateWrapper|array $template): static
     {
-        if (is_array($template) && !isset($template['templateName'])) {
-            throw new InvalidArgumentException('Array parameter is only allowed as json serialized version of a TemplateWrapper');
+        if (\is_array($template) && !isset($template['templateName'])) {
+            throw new InvalidArgumentException('Array parameter is only allowed as json serialized version of a TemplateWrapper.');
         }
 
         $this->htmlTemplate = $template;
@@ -55,7 +54,7 @@ class TemplatedEmail extends Email
 
     public function getTextTemplate(): null|string|TemplateWrapper|array
     {
-        if (is_array($this->textTemplate)) {
+        if (\is_array($this->textTemplate)) {
             return $this->textTemplate['templateName'];
         }
 
@@ -64,7 +63,7 @@ class TemplatedEmail extends Email
 
     public function getHtmlTemplate(): null|string|TemplateWrapper|array
     {
-        if (is_array($this->htmlTemplate)) {
+        if (\is_array($this->htmlTemplate)) {
             return $this->htmlTemplate['templateName'];
         }
 

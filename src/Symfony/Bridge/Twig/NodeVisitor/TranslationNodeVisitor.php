@@ -56,9 +56,9 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
         }
 
         if (
-            $node instanceof FilterExpression &&
-            'trans' === $node->getNode('filter')->getAttribute('value') &&
-            $node->getNode('node') instanceof ConstantExpression
+            $node instanceof FilterExpression
+            && 'trans' === $node->getNode('filter')->getAttribute('value')
+            && $node->getNode('node') instanceof ConstantExpression
         ) {
             // extract constant nodes with a trans filter
             $this->messages[] = [
@@ -66,8 +66,8 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
                 $this->getReadDomainFromArguments($node->getNode('arguments'), 1),
             ];
         } elseif (
-            $node instanceof FunctionExpression &&
-            't' === $node->getAttribute('name')
+            $node instanceof FunctionExpression
+            && 't' === $node->getAttribute('name')
         ) {
             $nodeArguments = $node->getNode('arguments');
 
@@ -84,10 +84,10 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
                 $node->hasNode('domain') ? $this->getReadDomainFromNode($node->getNode('domain')) : null,
             ];
         } elseif (
-            $node instanceof FilterExpression &&
-            'trans' === $node->getNode('filter')->getAttribute('value') &&
-            $node->getNode('node') instanceof ConcatBinary &&
-            $message = $this->getConcatValueFromNode($node->getNode('node'), null)
+            $node instanceof FilterExpression
+            && 'trans' === $node->getNode('filter')->getAttribute('value')
+            && $node->getNode('node') instanceof ConcatBinary
+            && $message = $this->getConcatValueFromNode($node->getNode('node'), null)
         ) {
             $this->messages[] = [
                 $message,

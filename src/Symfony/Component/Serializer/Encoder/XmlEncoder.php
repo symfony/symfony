@@ -227,9 +227,9 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
      */
     final protected function isElementNameValid(string $name): bool
     {
-        return $name &&
-            !str_contains($name, ' ') &&
-            preg_match('#^[\pL_][\pL0-9._:-]*$#ui', $name);
+        return $name
+            && !str_contains($name, ' ')
+            && preg_match('#^[\pL_][\pL0-9._:-]*$#ui', $name);
     }
 
     /**

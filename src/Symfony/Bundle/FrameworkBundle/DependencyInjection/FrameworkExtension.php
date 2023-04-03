@@ -1622,8 +1622,8 @@ class FrameworkExtension extends Extension
             $configDir = is_dir($bundle['path'].'/Resources/config') ? $bundle['path'].'/Resources/config' : $bundle['path'].'/config';
 
             if (
-                $container->fileExists($file = $configDir.'/validation.yaml', false) ||
-                $container->fileExists($file = $configDir.'/validation.yml', false)
+                $container->fileExists($file = $configDir.'/validation.yaml', false)
+                || $container->fileExists($file = $configDir.'/validation.yml', false)
             ) {
                 $fileRecorder('yml', $file);
             }
@@ -1859,8 +1859,8 @@ class FrameworkExtension extends Extension
             }
 
             if (
-                $container->fileExists($file = $configDir.'/serialization.yaml', false) ||
-                $container->fileExists($file = $configDir.'/serialization.yml', false)
+                $container->fileExists($file = $configDir.'/serialization.yaml', false)
+                || $container->fileExists($file = $configDir.'/serialization.yml', false)
             ) {
                 $fileRecorder('yml', $file);
             }

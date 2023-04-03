@@ -89,8 +89,8 @@ class IniFileLoader extends FileLoader
             'off' === $lowercaseValue,
             'none' === $lowercaseValue => false,
             isset($value[1]) && (
-                ("'" === $value[0] && "'" === $value[\strlen($value) - 1]) ||
-                ('"' === $value[0] && '"' === $value[\strlen($value) - 1])
+                ("'" === $value[0] && "'" === $value[\strlen($value) - 1])
+                || ('"' === $value[0] && '"' === $value[\strlen($value) - 1])
             ) => substr($value, 1, -1), // quoted string
             default => XmlUtils::phpize($value),
         };

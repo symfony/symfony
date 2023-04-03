@@ -80,8 +80,8 @@ abstract class Guess
      */
     public function __construct(int $confidence)
     {
-        if (self::VERY_HIGH_CONFIDENCE !== $confidence && self::HIGH_CONFIDENCE !== $confidence &&
-            self::MEDIUM_CONFIDENCE !== $confidence && self::LOW_CONFIDENCE !== $confidence) {
+        if (self::VERY_HIGH_CONFIDENCE !== $confidence && self::HIGH_CONFIDENCE !== $confidence
+            && self::MEDIUM_CONFIDENCE !== $confidence && self::LOW_CONFIDENCE !== $confidence) {
             throw new InvalidArgumentException('The confidence should be one of the constants defined in Guess.');
         }
 

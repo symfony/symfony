@@ -62,7 +62,7 @@ class TemplatedEmailTest extends TestCase
             ->context($context = ['a' => 'b'])
         ;
 
-        $email = \unserialize(\serialize($email));
+        $email = unserialize(serialize($email));
         $this->assertEquals('text.txt.twig', $email->getTextTemplate());
         $this->assertEquals('text.html.twig', $email->getHtmlTemplate());
         $this->assertEquals($context, $email->getContext());
@@ -79,7 +79,7 @@ class TemplatedEmailTest extends TestCase
             ->context($context = ['a' => 'b'])
         ;
 
-        $email = \unserialize(\serialize($email));
+        $email = unserialize(serialize($email));
         $this->assertEquals($twigTemplate, $email->getTextTemplate());
         $this->assertEquals($twigTemplate, $email->getHtmlTemplate());
         $this->assertEquals($context, $email->getContext());
@@ -146,11 +146,11 @@ EOF;
         ], [new JsonEncoder()]);
 
         $serialized = $serializer->serialize($e, 'json', [ObjectNormalizer::IGNORED_ATTRIBUTES => ['cachedBody']]);
-        $this->assertStringMatchesFormat($expectedJson, \json_encode(\json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
+        $this->assertStringMatchesFormat($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
 
         $n = $serializer->deserialize($serialized, TemplatedEmail::class, 'json');
         $serialized = $serializer->serialize($e, 'json', [ObjectNormalizer::IGNORED_ATTRIBUTES => ['cachedBody']]);
-        $this->assertStringMatchesFormat($expectedJson, \json_encode(\json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
+        $this->assertStringMatchesFormat($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
 
         $n->from('fabien@symfony.com');
         $expected->from('fabien@symfony.com');
@@ -236,11 +236,11 @@ EOF;
         ], [new JsonEncoder()]);
 
         $serialized = $serializer->serialize($e, 'json', [ObjectNormalizer::IGNORED_ATTRIBUTES => ['cachedBody']]);
-        $this->assertStringMatchesFormat($expectedJson, \json_encode(\json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
+        $this->assertStringMatchesFormat($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
 
         $n = $serializer->deserialize($serialized, TemplatedEmail::class, 'json');
         $serialized = $serializer->serialize($e, 'json', [ObjectNormalizer::IGNORED_ATTRIBUTES => ['cachedBody']]);
-        $this->assertStringMatchesFormat($expectedJson, \json_encode(\json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
+        $this->assertStringMatchesFormat($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
 
         $n->from('fabien@symfony.com');
         $expected->from('fabien@symfony.com');

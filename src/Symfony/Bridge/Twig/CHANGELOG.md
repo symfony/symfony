@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+* Add support for `TemplateWrapper` as parameter in `TemplatedEmail`
+
 6.2
 ---
 

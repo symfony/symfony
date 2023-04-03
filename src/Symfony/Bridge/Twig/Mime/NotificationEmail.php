@@ -18,6 +18,7 @@ use Symfony\Component\Mime\Part\DataPart;
 use Twig\Extra\CssInliner\CssInlinerExtension;
 use Twig\Extra\Inky\InkyExtension;
 use Twig\Extra\Markdown\MarkdownExtension;
+use Twig\TemplateWrapper;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -156,7 +157,7 @@ class NotificationEmail extends TemplatedEmail
         return $this;
     }
 
-    public function getTextTemplate(): ?string
+    public function getTextTemplate(): null|string|TemplateWrapper
     {
         if ($template = parent::getTextTemplate()) {
             return $template;
@@ -165,7 +166,7 @@ class NotificationEmail extends TemplatedEmail
         return '@email/'.$this->theme.'/notification/body.txt.twig';
     }
 
-    public function getHtmlTemplate(): ?string
+    public function getHtmlTemplate(): null|string|TemplateWrapper
     {
         if ($template = parent::getHtmlTemplate()) {
             return $template;

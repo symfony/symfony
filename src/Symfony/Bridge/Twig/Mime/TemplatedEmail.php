@@ -52,7 +52,7 @@ class TemplatedEmail extends Email
         return $this;
     }
 
-    public function getTextTemplate(): null|string|TemplateWrapper|array
+    public function getTextTemplate(): null|string|TemplateWrapper
     {
         if (\is_array($this->textTemplate)) {
             return $this->textTemplate['templateName'];
@@ -61,7 +61,7 @@ class TemplatedEmail extends Email
         return $this->textTemplate;
     }
 
-    public function getHtmlTemplate(): null|string|TemplateWrapper|array
+    public function getHtmlTemplate(): null|string|TemplateWrapper
     {
         if (\is_array($this->htmlTemplate)) {
             return $this->htmlTemplate['templateName'];

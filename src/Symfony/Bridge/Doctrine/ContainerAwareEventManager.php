@@ -29,19 +29,18 @@ class ContainerAwareEventManager extends EventManager
      * <event> => <listeners>
      */
     private array $listeners = [];
-    private array $subscribers;
     private array $initialized = [];
     private bool $initializedSubscribers = false;
     private array $methods = [];
     private ContainerInterface $container;
 
     /**
-     * @param list<string|EventSubscriber|array{string[], string|object}> $subscriberIds List of subscribers, subscriber ids, or [events, listener] tuples
+     * @param list<array{string[], string|object}> $listeners List of [events, listener] tuples
      */
-    public function __construct(ContainerInterface $container, array $subscriberIds = [])
+    public function __construct(ContainerInterface $container, array $listeners = [])
     {
         $this->container = $container;
-        $this->subscribers = $subscriberIds;
+        $this->listeners = $listeners;
     }
 
     public function dispatchEvent($eventName, EventArgs $eventArgs = null): void
@@ -182,17 +181,20 @@ class ContainerAwareEventManager extends EventManager
     private function initializeSubscribers(): void
     {
         $this->initializedSubscribers = true;
-        foreach ($this->subscribers as $subscriber) {
-            if (\is_array($subscriber)) {
-                $this->addEventListener(...$subscriber);
+        $listeners = $this->listeners;
+        $this->listeners = [];
+        foreach ($listeners as $listener) {
+            if (\is_array($listener)) {
+                $this->addEventListener(...$listener);
                 continue;
             }
-            if (\is_string($subscriber)) {
-                $subscriber = $this->container->get($subscriber);
+            if (\is_string($listener)) {
+                $listener = $this->container->get($listener);
             }
-            parent::addEventSubscriber($subscriber);
+            // throw new \InvalidArgumentException(sprintf('Using Doctrine subscriber "%s" is not allowed, declare it as a listener instead.', \is_object($listener) ? $listener::class : $listener));
+            trigger_deprecation('symfony/doctrine-bridge', '6.3', 'Using Doctrine subscribers as services is deprecated, declare listeners instead');
+            parent::addEventSubscriber($listener);
         }
-        $this->subscribers = [];
     }
 
     private function getHash(string|object $listener): string

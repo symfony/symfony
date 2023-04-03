@@ -34,7 +34,7 @@ final class CompletionInput extends ArgvInput
     private $tokens;
     private $currentIndex;
     private $completionType;
-    private $completionName = null;
+    private $completionName;
     private $completionValue = '';
 
     /**

@@ -25,9 +25,9 @@ use Symfony\Component\Routing\Router;
 
 class RouterTest extends TestCase
 {
-    private $router = null;
+    private $router;
 
-    private $loader = null;
+    private $loader;
 
     private $cacheDir;
 

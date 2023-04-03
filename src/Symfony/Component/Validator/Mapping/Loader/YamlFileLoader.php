@@ -29,7 +29,7 @@ class YamlFileLoader extends FileLoader
      *
      * @var array
      */
-    protected $classes = null;
+    protected $classes;
 
     public function __construct(string $file)
     {

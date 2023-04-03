@@ -119,7 +119,7 @@ abstract class AbstractStaticLoader
 
 class StaticLoaderEntity
 {
-    public static $invokedWith = null;
+    public static $invokedWith;
 
     public static function loadMetadata(ClassMetadata $metadata)
     {

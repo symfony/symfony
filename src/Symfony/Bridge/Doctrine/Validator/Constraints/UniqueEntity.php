@@ -32,11 +32,11 @@ class UniqueEntity extends Constraint
 
     public $message = 'This value is already used.';
     public $service = 'doctrine.orm.validator.unique';
-    public $em = null;
-    public $entityClass = null;
+    public $em;
+    public $entityClass;
     public $repositoryMethod = 'findBy';
     public $fields = [];
-    public $errorPath = null;
+    public $errorPath;
     public $ignoreNull = true;
 
     /**

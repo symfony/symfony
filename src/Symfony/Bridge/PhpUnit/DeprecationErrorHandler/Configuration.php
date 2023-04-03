@@ -59,7 +59,7 @@ class Configuration
     /**
      * @var string|null
      */
-    private $logFile = null;
+    private $logFile;
 
     /**
      * @param int[]       $thresholds       A hash associating groups to thresholds

@@ -20,7 +20,7 @@ use Symfony\Component\Mime\RawMessage;
  */
 class DummyMailer implements MailerInterface
 {
-    private $sentMessage = null;
+    private $sentMessage;
 
     public function send(RawMessage $message, Envelope $envelope = null): void
     {

@@ -22,7 +22,7 @@ final class ImportMapExtension extends AbstractExtension
 {
     public function __construct(
         private readonly ImportMapManager $importMapManager,
-        private readonly ?string $polyfillUrl = ImportMapManager::POLYFILL_URL,
+        private readonly string|false $polyfillUrl = ImportMapManager::POLYFILL_URL,
     ) {
     }
 
@@ -36,19 +36,19 @@ final class ImportMapExtension extends AbstractExtension
     public function importmap(): string
     {
         $output = <<<HTML
-<script type="importmap">
-{$this->importMapManager->getImportMap()}
-</script>
-HTML;
+        <script type="importmap">
+        {$this->importMapManager->getImportMap()}
+        </script>
+        HTML;
 
         if ($this->polyfillUrl) {
             $url = htmlspecialchars($this->polyfillUrl);
 
             $output .= <<<HTML
 
-<!-- ES Module Shims: Import maps polyfill for modules browsers without import maps support -->
-<script async src="{$url}" crossorigin="anonymous"></script>
-HTML;
+            <!-- ES Module Shims: Import maps polyfill for modules browsers without import maps support -->
+            <script async src="{$url}" crossorigin="anonymous"></script>
+            HTML;
         }
 
         foreach ($this->importMapManager->getModulesToPreload() as $url) {

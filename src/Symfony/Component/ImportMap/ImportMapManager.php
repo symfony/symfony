@@ -44,9 +44,9 @@ final class ImportMapManager
      */
     private const PACKAGE_PATTERN = '/^(?:https?:\/\/[\w\.-]+\/)?(?:(?<registry>\w+):)?(?<package>(?:@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*)(?:@(?<version>[\w\._-]+))?(?:(?<subpath>\/.*))?$/';
 
-    private ?array $importMap = null;
-    private ?array $modulesToPreload = null;
-    private ?string $json = null;
+    private array $importMap;
+    private array $modulesToPreload;
+    private string $json;
 
     public function __construct(
         private readonly string $path,
@@ -104,13 +104,17 @@ final class ImportMapManager
 
     private function loadImportMap(): void
     {
+        if (isset($this->importMap)) {
+            return;
+        }
+
         $path = $this->path;
-        $this->importMap ??= file_exists($path) ? (static fn () => include $path)() : [];
+        $this->importMap = is_file($path) ? (static fn () => include $path)() : [];
     }
 
     private function buildImportMap(): void
     {
-        if (null !== $this->json) {
+        if (isset($this->json)) {
             return;
         }
 
@@ -158,7 +162,7 @@ final class ImportMapManager
         foreach ($this->importMap['require'] ?? [] as $packageName => $data) {
             if (isset($data['path'])) {
                 $publicPath = $this->publicAssetsDir.$this->digestName($packageName, $data['path']);
-                if (file_exists($publicPath)) {
+                if (is_file($publicPath)) {
                     continue;
                 }
 
@@ -269,7 +273,7 @@ final class ImportMapManager
         if ($importMap[$packageName]['download'] ?? false) {
             $assetPath = $this->assetsDir.'vendor/'.$packageName.'.js';
 
-            if (!file_exists($assetPath)) {
+            if (!is_file($assetPath)) {
                 return;
             }
 
@@ -293,7 +297,7 @@ final class ImportMapManager
         }
 
         $assetPath = $this->assetsDir.$importMap[$packageName]['path'];
-        if (!file_exists($assetPath)) {
+        if (!is_file($assetPath)) {
             return;
         }
 

@@ -54,7 +54,7 @@ final class ImportmapController
             throw new NotFoundHttpException();
         }
 
-        $contentType = $this->mimeTypes[$matches[3]] ?? $this->mimeTypes?->guessMimeType($localPath) ?? null;
+        $contentType = $this->extensionsMap[$matches[3]] ?? $this->mimeTypes?->guessMimeType($localPath) ?? null;
 
         return (new BinaryFileResponse(
             $localPath,

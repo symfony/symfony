@@ -17,10 +17,7 @@ return static function (ContainerConfigurator $container) {
     $container->services()
 
         ->set('twig.extension.importmap', ImportMapExtension::class)
-            ->args([
-                service('importmap.manager'),
-                param('importmap.polyfill'),
-            ])
+            ->args([service('importmap.manager')])
             ->tag('twig.extension')
 
     ;

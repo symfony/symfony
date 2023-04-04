@@ -116,4 +116,12 @@ class MockResponseTest extends TestCase
             'error' => 'ccc error',
         ]))->getStatusCode();
     }
+
+    public function testCancelingAMockResponseNotIssuedByMockHttpClient()
+    {
+        $mockResponse = new MockResponse();
+        $mockResponse->cancel();
+
+        $this->assertTrue($mockResponse->getInfo('canceled'));
+    }
 }

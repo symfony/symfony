@@ -1,7 +1,7 @@
 {
     "name": "symfony/import-map",
     "type": "library",
-    "description": "How to control the behavior of JavaScript imports",
+    "description": "Use ESM with importmap to manage modern JavaScript without transpiling or bundling",
     "keywords": [
         "import-maps",
         "javascript",

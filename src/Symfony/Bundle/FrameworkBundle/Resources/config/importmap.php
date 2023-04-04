@@ -25,6 +25,7 @@ return static function (ContainerConfigurator $container): void {
             ->args([
                 abstract_arg('assets directory'),
                 service('importmap.manager'),
+                service('mime_types')->nullOnInvalid(),
             ])
             ->public()
 

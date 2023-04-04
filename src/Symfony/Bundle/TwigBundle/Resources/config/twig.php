@@ -176,6 +176,5 @@ return static function (ContainerConfigurator $container) {
         ->set('controller.template_attribute_listener', TemplateAttributeListener::class)
             ->args([service('twig')])
             ->tag('kernel.event_subscriber')
-
     ;
 };

@@ -104,11 +104,16 @@ final class ImportMapManager
 
     private function loadImportMap(): void
     {
-        $this->importMap ??= file_exists($this->path) ? include $this->path : [];
+        $path = $this->path;
+        $this->importMap ??= file_exists($path) ? (static fn () => include $path)() : [];
     }
 
     private function buildImportMap(): void
     {
+        if (null !== $this->json) {
+            return;
+        }
+
         $this->loadImportMap();
         $this->modulesToPreload = [];
 
@@ -206,7 +211,7 @@ final class ImportMapManager
             $json['provider'] = $this->provider;
         }
 
-        $response = $this->httpClient->request('POST', '/generate', [
+        $response = $this->httpClient->request('POST', 'generate', [
             'json' => $json,
         ]);
 

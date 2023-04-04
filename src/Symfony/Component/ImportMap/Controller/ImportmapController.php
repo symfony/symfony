@@ -25,43 +25,36 @@ use Symfony\Component\Mime\MimeTypesInterface;
  */
 final class ImportmapController
 {
+    private const EXTENSIONS_MAP = [
+        'js' => 'application/javascript',
+        'css' => 'text/css',
+    ];
+
     public function __construct(
         private readonly string $assetsDir,
         private readonly ImportMapManager $importMapManager,
-        private readonly array $extensionsMap = [
-            'js' => 'application/javascript',
-            'css' => 'text/css',
-        ],
         private ?MimeTypesInterface $mimeTypes = null,
+        private readonly array $extensionsMap = self::EXTENSIONS_MAP,
     ) {
-        if (null === $this->mimeTypes && class_exists(MimeTypes::class)) {
-            $this->mimeTypes = new MimeTypes();
-        }
+        $this->mimeTypes ??= class_exists(MimeTypes::class) ? new MimeTypes() : null;
     }
 
     public function handle(string $path): Response
     {
-        if (
-            !preg_match('/^(.*)\.(\w+)\.(.*)$/', $path, $matches)
-        ) {
+        if (!preg_match('/^(.*)\.(\w+)\.(.*)$/', $path, $matches)) {
             throw new NotFoundHttpException();
         }
 
         $localPath = realpath($this->assetsDir.$matches[1].'.'.$matches[3]);
         if (
             // prevents path traversal attacks
-            !str_starts_with($localPath, $this->assetsDir) ||
-            $matches[2] !== @hash_file('xxh128', $localPath)
+            !str_starts_with($localPath, $this->assetsDir)
+            || $matches[2] !== @hash_file('xxh128', $localPath)
         ) {
             throw new NotFoundHttpException();
         }
 
-        $contentType = null;
-        if (isset($this->mimeTypes[$matches[3]])) {
-            $contentType = $this->mimeTypes[$matches[3]];
-        } elseif (null !== $this->mimeTypes) {
-            $contentType = $this->mimeTypes->guessMimeType($localPath);
-        }
+        $contentType = $this->mimeTypes[$matches[3]] ?? $this->mimeTypes?->guessMimeType($localPath) ?? null;
 
         return (new BinaryFileResponse(
             $localPath,

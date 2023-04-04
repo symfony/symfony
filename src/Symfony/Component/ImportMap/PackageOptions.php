@@ -12,7 +12,7 @@
 namespace Symfony\Component\ImportMap;
 
 /**
- * @internal
+ * @experimental
  *
  * @author Kévin Dunglas <kevin@dunglas.dev>
  */

@@ -28,6 +28,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Bandwidth\BandwidthTransportFactory::class,
             'package' => 'symfony/bandwidth-notifier',
         ],
+        'chatwork' => [
+            'class' => Bridge\Chatwork\ChatworkTransportFactory::class,
+            'package' => 'symfony/chatwork-notifier',
+        ],
         'clickatell' => [
             'class' => Bridge\Clickatell\ClickatellTransportFactory::class,
             'package' => 'symfony/clickatell-notifier',
@@ -95,6 +99,10 @@ class UnsupportedSchemeException extends LogicException
         'isendpro' => [
             'class' => Bridge\Isendpro\IsendproTransportFactory::class,
             'package' => 'symfony/isendpro-notifier',
+        ],
+        'kaz-info-teh' => [
+            'class' => Bridge\KazInfoTeh\KazInfoTehTransportFactory::class,
+            'package' => 'symfony/symfony/kaz-info-teh-notifier',
         ],
         'lightsms' => [
             'class' => Bridge\LightSms\LightSmsTransportFactory::class,

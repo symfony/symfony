@@ -3,10 +3,18 @@ name: Intl data
 on:
   push:
     paths:
+      - 'src/Symfony/Component/Intl/*.php'
+      - 'src/Symfony/Component/Intl/Util/GitRepository.php'
       - 'src/Symfony/Component/Intl/Resources/data/**'
+      - 'src/Symfony/Component/Intl/Tests/*Test.php'
+      - 'src/Symfony/Component/Intl/Tests/Util/GitRepositoryTest.php'
   pull_request:
     paths:
+      - 'src/Symfony/Component/Intl/*.php'
+      - 'src/Symfony/Component/Intl/Util/GitRepository.php'
       - 'src/Symfony/Component/Intl/Resources/data/**'
+      - 'src/Symfony/Component/Intl/Tests/*Test.php'
+      - 'src/Symfony/Component/Intl/Tests/Util/GitRepositoryTest.php'
 
 defaults:
   run:

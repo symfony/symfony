@@ -106,6 +106,6 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface,
     {
         trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
 
-        return __CLASS__ === static::class;
+        return true;
     }
 }

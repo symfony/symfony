@@ -44,7 +44,8 @@ final class Connection extends AbstractConnectionMiddleware
             parent::prepare($sql),
             $this->debugDataHolder,
             $this->connectionName,
-            $sql
+            $sql,
+            $this->stopwatch,
         );
     }
 

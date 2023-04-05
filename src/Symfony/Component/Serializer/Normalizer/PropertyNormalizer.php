@@ -33,6 +33,8 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @final since Symfony 6.3
  */
 class PropertyNormalizer extends AbstractObjectNormalizer
 {

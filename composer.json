@@ -69,6 +69,7 @@
         "symfony/doctrine-bridge": "self.version",
         "symfony/dom-crawler": "self.version",
         "symfony/dotenv": "self.version",
+        "symfony/emoji-transliterator": "self.version",
         "symfony/error-handler": "self.version",
         "symfony/event-dispatcher": "self.version",
         "symfony/expression-language": "self.version",

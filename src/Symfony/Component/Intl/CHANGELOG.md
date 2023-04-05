@@ -4,7 +4,7 @@ CHANGELOG
 6.3
 ---
 
- * Add the special `strip` locale to `EmojiTransliterator` to strip all emojis from a string
+ * Deprecate `EmojiTransliterator` in favor of `Symfony\Component\EmojiTransliterator\EmojiTransliterator`
 
 6.2
 ---

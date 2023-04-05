@@ -50,6 +50,7 @@ return (new PhpCsFixer\Config())
                 'Symfony/Bundle/FrameworkBundle/Resources/views/Form',
                 // explicit trigger_error tests
                 'Symfony/Bridge/PhpUnit/Tests/DeprecationErrorHandler/',
+                'Symfony/Component/EmojiTransliterator/Resources/data/',
                 'Symfony/Component/Intl/Resources/data/',
             ])
             // Support for older PHPunit version

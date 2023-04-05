@@ -14,7 +14,7 @@
             <directory name="src/Symfony/*/*/Tests" />
             <directory name="src/Symfony/*/*/*/Tests" />
             <directory name="src/Symfony/*/*/*/*/Tests" />
-            <directory name="src/Symfony/Component/Intl/Resources/emoji/" />
+            <directory name="src/Symfony/Component/EmojiTransliterator/Resources/emoji/" />
             <directory name="vendor" />
         </ignoreFiles>
     </projectFiles>

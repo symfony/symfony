@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\String\Slugger;
 
-use Symfony\Component\Intl\Transliterator\EmojiTransliterator;
+use Symfony\Component\EmojiTransliterator\EmojiTransliterator;
 use Symfony\Component\String\AbstractUnicodeString;
 use Symfony\Component\String\UnicodeString;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
@@ -95,7 +95,7 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
     public function withEmoji(bool|string $emoji = true): static
     {
         if (false !== $emoji && !class_exists(EmojiTransliterator::class)) {
-            throw new \LogicException(sprintf('You cannot use the "%s()" method as the "symfony/intl" package is not installed. Try running "composer require symfony/intl".', __METHOD__));
+            throw new \LogicException(sprintf('You cannot use the "%s()" method as the "symfony/emoji-transliterator" package is not installed. Try running "composer require symfony/emoji-transliterator".', __METHOD__));
         }
 
         $new = clone $this;

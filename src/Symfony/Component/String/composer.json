@@ -24,12 +24,13 @@
     },
     "require-dev": {
         "symfony/error-handler": "^5.4|^6.0",
-        "symfony/intl": "^6.2",
+        "symfony/emoji-transliterator": "^6.3",
         "symfony/http-client": "^5.4|^6.0",
         "symfony/translation-contracts": "^2.5|^3.0",
         "symfony/var-exporter": "^5.4|^6.0"
     },
     "conflict": {
+        "symfony/intl": "6.2.*",
         "symfony/translation-contracts": "<2.5"
     },
     "autoload": {

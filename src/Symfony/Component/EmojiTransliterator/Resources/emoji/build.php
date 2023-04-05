@@ -25,7 +25,7 @@ Builder::saveRules(Builder::buildStripRules($emojisCodePoints));
 
 final class Builder
 {
-    private const TARGET_DIR = __DIR__.'/../data/transliterator/emoji/';
+    private const TARGET_DIR = __DIR__.'/../data/';
 
     public static function getEmojisCodePoints(): array
     {

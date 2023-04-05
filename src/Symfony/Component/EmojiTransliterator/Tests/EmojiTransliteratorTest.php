@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Intl\Tests\Transliterator;
+namespace Symfony\Component\EmojiTransliterator\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Intl\Transliterator\EmojiTransliterator;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\EmojiTransliterator\EmojiTransliterator;
 
 /**
- * @group legacy
  * @requires extension intl
  */
 class EmojiTransliteratorTest extends TestCase
@@ -26,8 +26,6 @@ class EmojiTransliteratorTest extends TestCase
     public function testTransliterate(string $locale, string $input, string $expected)
     {
         $tr = EmojiTransliterator::create('emoji-'.$locale);
-
-        $this->assertInstanceOf(EmojiTransliterator::class, $tr);
 
         $this->assertSame($expected, $tr->transliterate($input));
     }
@@ -82,6 +80,31 @@ class EmojiTransliteratorTest extends TestCase
             $specialArrowInput,
             ' - ',
         ];
+    }
+
+    /**
+     * @dataProvider provideLocaleTest
+     */
+    public function testAllTransliterator(string $locale)
+    {
+        $tr = EmojiTransliterator::create($locale);
+
+        $this->assertInstanceOf(EmojiTransliterator::class, $tr);
+        $this->assertNotEmpty($tr->transliterate('😀'));
+    }
+
+    public static function provideLocaleTest(): iterable
+    {
+        $file = (new Finder())
+            ->in(__DIR__.'/../Resources/data')
+            ->name('*.php')
+            ->notName('emoji-strip.php')
+            ->files()
+        ;
+
+        foreach ($file as $file) {
+            yield [$file->getBasename('.php')];
+        }
     }
 
     public function testTransliterateWithInvalidLocale()

@@ -156,7 +156,7 @@ trait BrowserKitAssertionsTrait
         self::assertThat(self::getClient(), $constraint, $message);
     }
 
-    private static function getClient(AbstractBrowser $newClient = null): ?AbstractBrowser
+    protected static function getClient(AbstractBrowser $newClient = null): ?AbstractBrowser
     {
         static $client;
 
@@ -171,7 +171,7 @@ trait BrowserKitAssertionsTrait
         return $client;
     }
 
-    private static function getResponse(): Response
+    protected static function getResponse(): Response
     {
         if (!$response = self::getClient()->getResponse()) {
             static::fail('A client must have an HTTP Response to make assertions. Did you forget to make an HTTP request?');
@@ -180,7 +180,7 @@ trait BrowserKitAssertionsTrait
         return $response;
     }
 
-    private static function getRequest(): Request
+    protected static function getRequest(): Request
     {
         if (!$request = self::getClient()->getRequest()) {
             static::fail('A client must have an HTTP Request to make assertions. Did you forget to make an HTTP request?');

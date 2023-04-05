@@ -375,7 +375,7 @@ array:1 [
     -statusCode: 500
     -statusText: "Internal Server Error"
     -headers: []
-    -file: "%s/src/Symfony/Component/VarDumper/Tests/Caster/ExceptionCasterTest.php"
+    -file: "%sExceptionCasterTest.php"
     -line: %d
     -asString: null
   }

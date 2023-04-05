@@ -97,29 +97,13 @@ use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\StoreFactory;
-use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
-use Symfony\Component\Mailer\Bridge\Google\Transport\GmailTransportFactory;
-use Symfony\Component\Mailer\Bridge\Infobip\Transport\InfobipTransportFactory as InfobipMailerTransportFactory;
-use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillTransportFactory;
-use Symfony\Component\Mailer\Bridge\MailerSend\Transport\MailerSendTransportFactory;
-use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
-use Symfony\Component\Mailer\Bridge\Mailgun\Webhook\MailgunRequestParser;
-use Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetTransportFactory;
-use Symfony\Component\Mailer\Bridge\MailPace\Transport\MailPaceTransportFactory;
-use Symfony\Component\Mailer\Bridge\OhMySmtp\Transport\OhMySmtpTransportFactory;
-use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
-use Symfony\Component\Mailer\Bridge\Postmark\Webhook\PostmarkRequestParser;
-use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
-use Symfony\Component\Mailer\Bridge\Sendinblue\Transport\SendinblueTransportFactory;
+use Symfony\Component\Mailer\Bridge as MailerBridge;
 use Symfony\Component\Mailer\Command\MailerTestCommand;
 use Symfony\Component\Mailer\EventListener\MessengerTransportListener;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory;
-use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
-use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportFactory;
-use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
+use Symfony\Component\Messenger\Bridge as MessengerBridge;
 use Symfony\Component\Messenger\Command\StatsCommand;
 use Symfony\Component\Messenger\Handler\BatchHandlerInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
@@ -127,74 +111,12 @@ use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Middleware\RouterContextMiddleware;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
-use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
+use Symfony\Component\Messenger\Transport\TransportFactoryInterface as MessengerTransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\MimeTypeGuesserInterface;
 use Symfony\Component\Mime\MimeTypes;
-use Symfony\Component\Notifier\Bridge\AllMySms\AllMySmsTransportFactory;
-use Symfony\Component\Notifier\Bridge\AmazonSns\AmazonSnsTransportFactory;
-use Symfony\Component\Notifier\Bridge\Bandwidth\BandwidthTransportFactory;
-use Symfony\Component\Notifier\Bridge\Chatwork\ChatworkTransportFactory;
-use Symfony\Component\Notifier\Bridge\Clickatell\ClickatellTransportFactory;
-use Symfony\Component\Notifier\Bridge\ContactEveryone\ContactEveryoneTransportFactory;
-use Symfony\Component\Notifier\Bridge\Discord\DiscordTransportFactory;
-use Symfony\Component\Notifier\Bridge\Engagespot\EngagespotTransportFactory;
-use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
-use Symfony\Component\Notifier\Bridge\Expo\ExpoTransportFactory;
-use Symfony\Component\Notifier\Bridge\FakeChat\FakeChatTransportFactory;
-use Symfony\Component\Notifier\Bridge\FakeSms\FakeSmsTransportFactory;
-use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
-use Symfony\Component\Notifier\Bridge\FortySixElks\FortySixElksTransportFactory;
-use Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransportFactory;
-use Symfony\Component\Notifier\Bridge\GatewayApi\GatewayApiTransportFactory;
-use Symfony\Component\Notifier\Bridge\Gitter\GitterTransportFactory;
-use Symfony\Component\Notifier\Bridge\GoogleChat\GoogleChatTransportFactory;
-use Symfony\Component\Notifier\Bridge\Infobip\InfobipTransportFactory;
-use Symfony\Component\Notifier\Bridge\Iqsms\IqsmsTransportFactory;
-use Symfony\Component\Notifier\Bridge\Isendpro\IsendproTransportFactory;
-use Symfony\Component\Notifier\Bridge\KazInfoTeh\KazInfoTehTransportFactory;
-use Symfony\Component\Notifier\Bridge\LightSms\LightSmsTransportFactory;
-use Symfony\Component\Notifier\Bridge\LineNotify\LineNotifyTransportFactory;
-use Symfony\Component\Notifier\Bridge\LinkedIn\LinkedInTransportFactory;
-use Symfony\Component\Notifier\Bridge\Mailjet\MailjetTransportFactory as MailjetNotifierTransportFactory;
-use Symfony\Component\Notifier\Bridge\Mastodon\MastodonTransportFactory;
-use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
-use Symfony\Component\Notifier\Bridge\Mercure\MercureTransportFactory;
-use Symfony\Component\Notifier\Bridge\MessageBird\MessageBirdTransport;
-use Symfony\Component\Notifier\Bridge\MessageMedia\MessageMediaTransportFactory;
-use Symfony\Component\Notifier\Bridge\MicrosoftTeams\MicrosoftTeamsTransportFactory;
-use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
-use Symfony\Component\Notifier\Bridge\Octopush\OctopushTransportFactory;
-use Symfony\Component\Notifier\Bridge\OneSignal\OneSignalTransportFactory;
-use Symfony\Component\Notifier\Bridge\OrangeSms\OrangeSmsTransportFactory;
-use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
-use Symfony\Component\Notifier\Bridge\PagerDuty\PagerDutyTransportFactory;
-use Symfony\Component\Notifier\Bridge\Plivo\PlivoTransportFactory;
-use Symfony\Component\Notifier\Bridge\Pushover\PushoverTransportFactory;
-use Symfony\Component\Notifier\Bridge\RingCentral\RingCentralTransportFactory;
-use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
-use Symfony\Component\Notifier\Bridge\Sendberry\SendberryTransportFactory;
-use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransportFactory as SendinblueNotifierTransportFactory;
-use Symfony\Component\Notifier\Bridge\SimpleTextin\SimpleTextinTransportFactory;
-use Symfony\Component\Notifier\Bridge\Sinch\SinchTransportFactory;
-use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
-use Symfony\Component\Notifier\Bridge\Sms77\Sms77TransportFactory;
-use Symfony\Component\Notifier\Bridge\Smsapi\SmsapiTransportFactory;
-use Symfony\Component\Notifier\Bridge\SmsBiuras\SmsBiurasTransportFactory;
-use Symfony\Component\Notifier\Bridge\Smsc\SmscTransportFactory;
-use Symfony\Component\Notifier\Bridge\SmsFactor\SmsFactorTransportFactory;
-use Symfony\Component\Notifier\Bridge\SpotHit\SpotHitTransportFactory;
-use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
-use Symfony\Component\Notifier\Bridge\Telnyx\TelnyxTransportFactory;
-use Symfony\Component\Notifier\Bridge\Termii\TermiiTransportFactory;
-use Symfony\Component\Notifier\Bridge\TurboSms\TurboSmsTransport;
-use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
-use Symfony\Component\Notifier\Bridge\Twitter\TwitterTransportFactory;
-use Symfony\Component\Notifier\Bridge\Vonage\VonageTransportFactory;
-use Symfony\Component\Notifier\Bridge\Yunpian\YunpianTransportFactory;
-use Symfony\Component\Notifier\Bridge\Zendesk\ZendeskTransportFactory;
-use Symfony\Component\Notifier\Bridge\Zulip\ZulipTransportFactory;
+use Symfony\Component\Notifier\Bridge as NotifierBridge;
 use Symfony\Component\Notifier\ChatterInterface;
 use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\Notifier\Recipient\Recipient;
@@ -237,9 +159,7 @@ use Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\String\LazyString;
 use Symfony\Component\String\Slugger\SluggerInterface;
-use Symfony\Component\Translation\Bridge\Crowdin\CrowdinProviderFactory;
-use Symfony\Component\Translation\Bridge\Loco\LocoProviderFactory;
-use Symfony\Component\Translation\Bridge\Lokalise\LokaliseProviderFactory;
+use Symfony\Component\Translation\Bridge as TranslationBridge;
 use Symfony\Component\Translation\Command\XliffLintCommand as BaseXliffLintCommand;
 use Symfony\Component\Translation\Extractor\PhpAstExtractor;
 use Symfony\Component\Translation\LocaleSwitcher;
@@ -555,7 +475,7 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('console.command.messenger_failed_messages_remove');
             $container->removeDefinition('cache.messenger.restart_workers_signal');
 
-            if ($container->hasDefinition('messenger.transport.amqp.factory') && !class_exists(AmqpTransportFactory::class)) {
+            if ($container->hasDefinition('messenger.transport.amqp.factory') && !class_exists(MessengerBridge\Amqp\Transport\AmqpTransportFactory::class)) {
                 if (class_exists(\Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransportFactory::class)) {
                     $container->getDefinition('messenger.transport.amqp.factory')
                         ->setClass(\Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransportFactory::class)
@@ -565,7 +485,7 @@ class FrameworkExtension extends Extension
                 }
             }
 
-            if ($container->hasDefinition('messenger.transport.redis.factory') && !class_exists(RedisTransportFactory::class)) {
+            if ($container->hasDefinition('messenger.transport.redis.factory') && !class_exists(MessengerBridge\Redis\Transport\RedisTransportFactory::class)) {
                 if (class_exists(\Symfony\Component\Messenger\Transport\RedisExt\RedisTransportFactory::class)) {
                     $container->getDefinition('messenger.transport.redis.factory')
                         ->setClass(\Symfony\Component\Messenger\Transport\RedisExt\RedisTransportFactory::class)
@@ -686,7 +606,7 @@ class FrameworkExtension extends Extension
             ->addTag('messenger.message_handler');
         $container->registerForAutoconfiguration(BatchHandlerInterface::class)
             ->addTag('messenger.message_handler');
-        $container->registerForAutoconfiguration(TransportFactoryInterface::class)
+        $container->registerForAutoconfiguration(MessengerTransportFactoryInterface::class)
             ->addTag('messenger.transport_factory');
         $container->registerForAutoconfiguration(MimeTypeGuesserInterface::class)
             ->addTag('mime.mime_type_guesser');
@@ -1488,9 +1408,9 @@ class FrameworkExtension extends Extension
         }
 
         $classToServices = [
-            CrowdinProviderFactory::class => 'translation.provider_factory.crowdin',
-            LocoProviderFactory::class => 'translation.provider_factory.loco',
-            LokaliseProviderFactory::class => 'translation.provider_factory.lokalise',
+            TranslationBridge\Crowdin\CrowdinProviderFactory::class => 'translation.provider_factory.crowdin',
+            TranslationBridge\Loco\LocoProviderFactory::class => 'translation.provider_factory.loco',
+            TranslationBridge\Lokalise\LokaliseProviderFactory::class => 'translation.provider_factory.lokalise',
         ];
 
         $parentPackages = ['symfony/framework-bundle', 'symfony/translation', 'symfony/http-client'];
@@ -2039,19 +1959,19 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('serializer.normalizer.flatten_exception');
         }
 
-        if (ContainerBuilder::willBeAvailable('symfony/amqp-messenger', AmqpTransportFactory::class, ['symfony/framework-bundle', 'symfony/messenger'])) {
+        if (ContainerBuilder::willBeAvailable('symfony/amqp-messenger', MessengerBridge\Amqp\Transport\AmqpTransportFactory::class, ['symfony/framework-bundle', 'symfony/messenger'])) {
             $container->getDefinition('messenger.transport.amqp.factory')->addTag('messenger.transport_factory');
         }
 
-        if (ContainerBuilder::willBeAvailable('symfony/redis-messenger', RedisTransportFactory::class, ['symfony/framework-bundle', 'symfony/messenger'])) {
+        if (ContainerBuilder::willBeAvailable('symfony/redis-messenger', MessengerBridge\Redis\Transport\RedisTransportFactory::class, ['symfony/framework-bundle', 'symfony/messenger'])) {
             $container->getDefinition('messenger.transport.redis.factory')->addTag('messenger.transport_factory');
         }
 
-        if (ContainerBuilder::willBeAvailable('symfony/amazon-sqs-messenger', AmazonSqsTransportFactory::class, ['symfony/framework-bundle', 'symfony/messenger'])) {
+        if (ContainerBuilder::willBeAvailable('symfony/amazon-sqs-messenger', MessengerBridge\AmazonSqs\Transport\AmazonSqsTransportFactory::class, ['symfony/framework-bundle', 'symfony/messenger'])) {
             $container->getDefinition('messenger.transport.sqs.factory')->addTag('messenger.transport_factory');
         }
 
-        if (ContainerBuilder::willBeAvailable('symfony/beanstalkd-messenger', BeanstalkdTransportFactory::class, ['symfony/framework-bundle', 'symfony/messenger'])) {
+        if (ContainerBuilder::willBeAvailable('symfony/beanstalkd-messenger', MessengerBridge\Beanstalkd\Transport\BeanstalkdTransportFactory::class, ['symfony/framework-bundle', 'symfony/messenger'])) {
             $container->getDefinition('messenger.transport.beanstalkd.factory')->addTag('messenger.transport_factory');
         }
 
@@ -2546,18 +2466,18 @@ class FrameworkExtension extends Extension
         }
 
         $classToServices = [
-            GmailTransportFactory::class => 'mailer.transport_factory.gmail',
-            InfobipMailerTransportFactory::class => 'mailer.transport_factory.infobip',
-            MailerSendTransportFactory::class => 'mailer.transport_factory.mailersend',
-            MailgunTransportFactory::class => 'mailer.transport_factory.mailgun',
-            MailjetTransportFactory::class => 'mailer.transport_factory.mailjet',
-            MailPaceTransportFactory::class => 'mailer.transport_factory.mailpace',
-            MandrillTransportFactory::class => 'mailer.transport_factory.mailchimp',
-            OhMySmtpTransportFactory::class => 'mailer.transport_factory.ohmysmtp',
-            PostmarkTransportFactory::class => 'mailer.transport_factory.postmark',
-            SendgridTransportFactory::class => 'mailer.transport_factory.sendgrid',
-            SendinblueTransportFactory::class => 'mailer.transport_factory.sendinblue',
-            SesTransportFactory::class => 'mailer.transport_factory.amazon',
+            MailerBridge\Google\Transport\GmailTransportFactory::class => 'mailer.transport_factory.gmail',
+            MailerBridge\Infobip\Transport\InfobipTransportFactory::class => 'mailer.transport_factory.infobip',
+            MailerBridge\MailerSend\Transport\MailerSendTransportFactory::class => 'mailer.transport_factory.mailersend',
+            MailerBridge\Mailgun\Transport\MailgunTransportFactory::class => 'mailer.transport_factory.mailgun',
+            MailerBridge\Mailjet\Transport\MailjetTransportFactory::class => 'mailer.transport_factory.mailjet',
+            MailerBridge\MailPace\Transport\MailPaceTransportFactory::class => 'mailer.transport_factory.mailpace',
+            MailerBridge\Mailchimp\Transport\MandrillTransportFactory::class => 'mailer.transport_factory.mailchimp',
+            MailerBridge\OhMySmtp\Transport\OhMySmtpTransportFactory::class => 'mailer.transport_factory.ohmysmtp',
+            MailerBridge\Postmark\Transport\PostmarkTransportFactory::class => 'mailer.transport_factory.postmark',
+            MailerBridge\Sendgrid\Transport\SendgridTransportFactory::class => 'mailer.transport_factory.sendgrid',
+            MailerBridge\Sendinblue\Transport\SendinblueTransportFactory::class => 'mailer.transport_factory.sendinblue',
+            MailerBridge\Amazon\Transport\SesTransportFactory::class => 'mailer.transport_factory.amazon',
         ];
 
         foreach ($classToServices as $class => $service) {
@@ -2570,8 +2490,8 @@ class FrameworkExtension extends Extension
 
         if ($webhookEnabled) {
             $webhookRequestParsers = [
-                MailgunRequestParser::class => 'mailer.webhook.request_parser.mailgun',
-                PostmarkRequestParser::class => 'mailer.webhook.request_parser.postmark',
+                MailerBridge\Mailgun\Webhook\MailgunRequestParser::class => 'mailer.webhook.request_parser.mailgun',
+                MailerBridge\Postmark\Webhook\PostmarkRequestParser::class => 'mailer.webhook.request_parser.postmark',
             ];
 
             foreach ($webhookRequestParsers as $class => $service) {
@@ -2675,69 +2595,69 @@ class FrameworkExtension extends Extension
             ->addTag('texter.transport_factory');
 
         $classToServices = [
-            AllMySmsTransportFactory::class => 'notifier.transport_factory.all-my-sms',
-            AmazonSnsTransportFactory::class => 'notifier.transport_factory.amazon-sns',
-            BandwidthTransportFactory::class => 'notifier.transport_factory.bandwidth',
-            ChatworkTransportFactory::class => 'notifier.transport_factory.chatwork',
-            ClickatellTransportFactory::class => 'notifier.transport_factory.clickatell',
-            ContactEveryoneTransportFactory::class => 'notifier.transport_factory.contact-everyone',
-            DiscordTransportFactory::class => 'notifier.transport_factory.discord',
-            EngagespotTransportFactory::class => 'notifier.transport_factory.engagespot',
-            EsendexTransportFactory::class => 'notifier.transport_factory.esendex',
-            ExpoTransportFactory::class => 'notifier.transport_factory.expo',
-            FakeChatTransportFactory::class => 'notifier.transport_factory.fake-chat',
-            FakeSmsTransportFactory::class => 'notifier.transport_factory.fake-sms',
-            FirebaseTransportFactory::class => 'notifier.transport_factory.firebase',
-            FortySixElksTransportFactory::class => 'notifier.transport_factory.forty-six-elks',
-            FreeMobileTransportFactory::class => 'notifier.transport_factory.free-mobile',
-            GatewayApiTransportFactory::class => 'notifier.transport_factory.gateway-api',
-            GitterTransportFactory::class => 'notifier.transport_factory.gitter',
-            GoogleChatTransportFactory::class => 'notifier.transport_factory.google-chat',
-            InfobipTransportFactory::class => 'notifier.transport_factory.infobip',
-            IqsmsTransportFactory::class => 'notifier.transport_factory.iqsms',
-            IsendproTransportFactory::class => 'notifier.transport_factory.isendpro',
-            KazInfoTehTransportFactory::class => 'notifier.transport_factory.kaz-info-teh',
-            LightSmsTransportFactory::class => 'notifier.transport_factory.light-sms',
-            LineNotifyTransportFactory::class => 'notifier.transport_factory.line-notify',
-            LinkedInTransportFactory::class => 'notifier.transport_factory.linked-in',
-            MailjetNotifierTransportFactory::class => 'notifier.transport_factory.mailjet',
-            MastodonTransportFactory::class => 'notifier.transport_factory.mastodon',
-            MattermostTransportFactory::class => 'notifier.transport_factory.mattermost',
-            MercureTransportFactory::class => 'notifier.transport_factory.mercure',
-            MessageBirdTransport::class => 'notifier.transport_factory.message-bird',
-            MessageMediaTransportFactory::class => 'notifier.transport_factory.message-media',
-            MicrosoftTeamsTransportFactory::class => 'notifier.transport_factory.microsoft-teams',
-            MobytTransportFactory::class => 'notifier.transport_factory.mobyt',
-            OctopushTransportFactory::class => 'notifier.transport_factory.octopush',
-            OneSignalTransportFactory::class => 'notifier.transport_factory.one-signal',
-            OrangeSmsTransportFactory::class => 'notifier.transport_factory.orange-sms',
-            OvhCloudTransportFactory::class => 'notifier.transport_factory.ovh-cloud',
-            PagerDutyTransportFactory::class => 'notifier.transport_factory.pager-duty',
-            PlivoTransportFactory::class => 'notifier.transport_factory.plivo',
-            PushoverTransportFactory::class => 'notifier.transport_factory.pushover',
-            RingCentralTransportFactory::class => 'notifier.transport_factory.ring-central',
-            RocketChatTransportFactory::class => 'notifier.transport_factory.rocket-chat',
-            SendberryTransportFactory::class => 'notifier.transport_factory.sendberry',
-            SimpleTextinTransportFactory::class => 'notifier.transport_factory.simple-textin',
-            SendinblueNotifierTransportFactory::class => 'notifier.transport_factory.sendinblue',
-            SinchTransportFactory::class => 'notifier.transport_factory.sinch',
-            SlackTransportFactory::class => 'notifier.transport_factory.slack',
-            Sms77TransportFactory::class => 'notifier.transport_factory.sms77',
-            SmsapiTransportFactory::class => 'notifier.transport_factory.smsapi',
-            SmsBiurasTransportFactory::class => 'notifier.transport_factory.sms-biuras',
-            SmscTransportFactory::class => 'notifier.transport_factory.smsc',
-            SmsFactorTransportFactory::class => 'notifier.transport_factory.sms-factor',
-            SpotHitTransportFactory::class => 'notifier.transport_factory.spot-hit',
-            TelegramTransportFactory::class => 'notifier.transport_factory.telegram',
-            TelnyxTransportFactory::class => 'notifier.transport_factory.telnyx',
-            TermiiTransportFactory::class => 'notifier.transport_factory.termii',
-            TurboSmsTransport::class => 'notifier.transport_factory.turbo-sms',
-            TwilioTransportFactory::class => 'notifier.transport_factory.twilio',
-            TwitterTransportFactory::class => 'notifier.transport_factory.twitter',
-            VonageTransportFactory::class => 'notifier.transport_factory.vonage',
-            YunpianTransportFactory::class => 'notifier.transport_factory.yunpian',
-            ZendeskTransportFactory::class => 'notifier.transport_factory.zendesk',
-            ZulipTransportFactory::class => 'notifier.transport_factory.zulip',
+            NotifierBridge\AllMySms\AllMySmsTransportFactory::class => 'notifier.transport_factory.all-my-sms',
+            NotifierBridge\AmazonSns\AmazonSnsTransportFactory::class => 'notifier.transport_factory.amazon-sns',
+            NotifierBridge\Bandwidth\BandwidthTransportFactory::class => 'notifier.transport_factory.bandwidth',
+            NotifierBridge\Chatwork\ChatworkTransportFactory::class => 'notifier.transport_factory.chatwork',
+            NotifierBridge\Clickatell\ClickatellTransportFactory::class => 'notifier.transport_factory.clickatell',
+            NotifierBridge\ContactEveryone\ContactEveryoneTransportFactory::class => 'notifier.transport_factory.contact-everyone',
+            NotifierBridge\Discord\DiscordTransportFactory::class => 'notifier.transport_factory.discord',
+            NotifierBridge\Engagespot\EngagespotTransportFactory::class => 'notifier.transport_factory.engagespot',
+            NotifierBridge\Esendex\EsendexTransportFactory::class => 'notifier.transport_factory.esendex',
+            NotifierBridge\Expo\ExpoTransportFactory::class => 'notifier.transport_factory.expo',
+            NotifierBridge\FakeChat\FakeChatTransportFactory::class => 'notifier.transport_factory.fake-chat',
+            NotifierBridge\FakeSms\FakeSmsTransportFactory::class => 'notifier.transport_factory.fake-sms',
+            NotifierBridge\Firebase\FirebaseTransportFactory::class => 'notifier.transport_factory.firebase',
+            NotifierBridge\FortySixElks\FortySixElksTransportFactory::class => 'notifier.transport_factory.forty-six-elks',
+            NotifierBridge\FreeMobile\FreeMobileTransportFactory::class => 'notifier.transport_factory.free-mobile',
+            NotifierBridge\GatewayApi\GatewayApiTransportFactory::class => 'notifier.transport_factory.gateway-api',
+            NotifierBridge\Gitter\GitterTransportFactory::class => 'notifier.transport_factory.gitter',
+            NotifierBridge\GoogleChat\GoogleChatTransportFactory::class => 'notifier.transport_factory.google-chat',
+            NotifierBridge\Infobip\InfobipTransportFactory::class => 'notifier.transport_factory.infobip',
+            NotifierBridge\Iqsms\IqsmsTransportFactory::class => 'notifier.transport_factory.iqsms',
+            NotifierBridge\Isendpro\IsendproTransportFactory::class => 'notifier.transport_factory.isendpro',
+            NotifierBridge\KazInfoTeh\KazInfoTehTransportFactory::class => 'notifier.transport_factory.kaz-info-teh',
+            NotifierBridge\LightSms\LightSmsTransportFactory::class => 'notifier.transport_factory.light-sms',
+            NotifierBridge\LineNotify\LineNotifyTransportFactory::class => 'notifier.transport_factory.line-notify',
+            NotifierBridge\LinkedIn\LinkedInTransportFactory::class => 'notifier.transport_factory.linked-in',
+            NotifierBridge\Mailjet\MailjetTransportFactory::class => 'notifier.transport_factory.mailjet',
+            NotifierBridge\Mastodon\MastodonTransportFactory::class => 'notifier.transport_factory.mastodon',
+            NotifierBridge\Mattermost\MattermostTransportFactory::class => 'notifier.transport_factory.mattermost',
+            NotifierBridge\Mercure\MercureTransportFactory::class => 'notifier.transport_factory.mercure',
+            NotifierBridge\MessageBird\MessageBirdTransport::class => 'notifier.transport_factory.message-bird',
+            NotifierBridge\MessageMedia\MessageMediaTransportFactory::class => 'notifier.transport_factory.message-media',
+            NotifierBridge\MicrosoftTeams\MicrosoftTeamsTransportFactory::class => 'notifier.transport_factory.microsoft-teams',
+            NotifierBridge\Mobyt\MobytTransportFactory::class => 'notifier.transport_factory.mobyt',
+            NotifierBridge\Octopush\OctopushTransportFactory::class => 'notifier.transport_factory.octopush',
+            NotifierBridge\OneSignal\OneSignalTransportFactory::class => 'notifier.transport_factory.one-signal',
+            NotifierBridge\OrangeSms\OrangeSmsTransportFactory::class => 'notifier.transport_factory.orange-sms',
+            NotifierBridge\OvhCloud\OvhCloudTransportFactory::class => 'notifier.transport_factory.ovh-cloud',
+            NotifierBridge\PagerDuty\PagerDutyTransportFactory::class => 'notifier.transport_factory.pager-duty',
+            NotifierBridge\Plivo\PlivoTransportFactory::class => 'notifier.transport_factory.plivo',
+            NotifierBridge\Pushover\PushoverTransportFactory::class => 'notifier.transport_factory.pushover',
+            NotifierBridge\RingCentral\RingCentralTransportFactory::class => 'notifier.transport_factory.ring-central',
+            NotifierBridge\RocketChat\RocketChatTransportFactory::class => 'notifier.transport_factory.rocket-chat',
+            NotifierBridge\Sendberry\SendberryTransportFactory::class => 'notifier.transport_factory.sendberry',
+            NotifierBridge\SimpleTextin\SimpleTextinTransportFactory::class => 'notifier.transport_factory.simple-textin',
+            NotifierBridge\Sendinblue\SendinblueTransportFactory::class => 'notifier.transport_factory.sendinblue',
+            NotifierBridge\Sinch\SinchTransportFactory::class => 'notifier.transport_factory.sinch',
+            NotifierBridge\Slack\SlackTransportFactory::class => 'notifier.transport_factory.slack',
+            NotifierBridge\Sms77\Sms77TransportFactory::class => 'notifier.transport_factory.sms77',
+            NotifierBridge\Smsapi\SmsapiTransportFactory::class => 'notifier.transport_factory.smsapi',
+            NotifierBridge\SmsBiuras\SmsBiurasTransportFactory::class => 'notifier.transport_factory.sms-biuras',
+            NotifierBridge\Smsc\SmscTransportFactory::class => 'notifier.transport_factory.smsc',
+            NotifierBridge\SmsFactor\SmsFactorTransportFactory::class => 'notifier.transport_factory.sms-factor',
+            NotifierBridge\SpotHit\SpotHitTransportFactory::class => 'notifier.transport_factory.spot-hit',
+            NotifierBridge\Telegram\TelegramTransportFactory::class => 'notifier.transport_factory.telegram',
+            NotifierBridge\Telnyx\TelnyxTransportFactory::class => 'notifier.transport_factory.telnyx',
+            NotifierBridge\Termii\TermiiTransportFactory::class => 'notifier.transport_factory.termii',
+            NotifierBridge\TurboSms\TurboSmsTransport::class => 'notifier.transport_factory.turbo-sms',
+            NotifierBridge\Twilio\TwilioTransportFactory::class => 'notifier.transport_factory.twilio',
+            NotifierBridge\Twitter\TwitterTransportFactory::class => 'notifier.transport_factory.twitter',
+            NotifierBridge\Vonage\VonageTransportFactory::class => 'notifier.transport_factory.vonage',
+            NotifierBridge\Yunpian\YunpianTransportFactory::class => 'notifier.transport_factory.yunpian',
+            NotifierBridge\Zendesk\ZendeskTransportFactory::class => 'notifier.transport_factory.zendesk',
+            NotifierBridge\Zulip\ZulipTransportFactory::class => 'notifier.transport_factory.zulip',
         ];
 
         $parentPackages = ['symfony/framework-bundle', 'symfony/notifier'];
@@ -2750,21 +2670,21 @@ class FrameworkExtension extends Extension
             }
         }
 
-        if (ContainerBuilder::willBeAvailable('symfony/mercure-notifier', MercureTransportFactory::class, $parentPackages) && ContainerBuilder::willBeAvailable('symfony/mercure-bundle', MercureBundle::class, $parentPackages) && \in_array(MercureBundle::class, $container->getParameter('kernel.bundles'), true)) {
-            $container->getDefinition($classToServices[MercureTransportFactory::class])
+        if (ContainerBuilder::willBeAvailable('symfony/mercure-notifier', NotifierBridge\Mercure\MercureTransportFactory::class, $parentPackages) && ContainerBuilder::willBeAvailable('symfony/mercure-bundle', MercureBundle::class, $parentPackages) && \in_array(MercureBundle::class, $container->getParameter('kernel.bundles'), true)) {
+            $container->getDefinition($classToServices[NotifierBridge\Mercure\MercureTransportFactory::class])
                 ->replaceArgument('$registry', new Reference(HubRegistry::class));
-        } elseif (ContainerBuilder::willBeAvailable('symfony/mercure-notifier', MercureTransportFactory::class, $parentPackages)) {
-            $container->removeDefinition($classToServices[MercureTransportFactory::class]);
+        } elseif (ContainerBuilder::willBeAvailable('symfony/mercure-notifier', NotifierBridge\Mercure\MercureTransportFactory::class, $parentPackages)) {
+            $container->removeDefinition($classToServices[NotifierBridge\Mercure\MercureTransportFactory::class]);
         }
 
-        if (ContainerBuilder::willBeAvailable('symfony/fake-chat-notifier', FakeChatTransportFactory::class, ['symfony/framework-bundle', 'symfony/notifier', 'symfony/mailer'])) {
-            $container->getDefinition($classToServices[FakeChatTransportFactory::class])
+        if (ContainerBuilder::willBeAvailable('symfony/fake-chat-notifier', NotifierBridge\FakeChat\FakeChatTransportFactory::class, ['symfony/framework-bundle', 'symfony/notifier', 'symfony/mailer'])) {
+            $container->getDefinition($classToServices[NotifierBridge\FakeChat\FakeChatTransportFactory::class])
                 ->replaceArgument('$mailer', new Reference('mailer'))
                 ->replaceArgument('$logger', new Reference('logger'));
         }
 
-        if (ContainerBuilder::willBeAvailable('symfony/fake-sms-notifier', FakeSmsTransportFactory::class, ['symfony/framework-bundle', 'symfony/notifier', 'symfony/mailer'])) {
-            $container->getDefinition($classToServices[FakeSmsTransportFactory::class])
+        if (ContainerBuilder::willBeAvailable('symfony/fake-sms-notifier', NotifierBridge\FakeSms\FakeSmsTransportFactory::class, ['symfony/framework-bundle', 'symfony/notifier', 'symfony/mailer'])) {
+            $container->getDefinition($classToServices[NotifierBridge\FakeSms\FakeSmsTransportFactory::class])
                 ->replaceArgument('$mailer', new Reference('mailer'))
                 ->replaceArgument('$logger', new Reference('logger'));
         }

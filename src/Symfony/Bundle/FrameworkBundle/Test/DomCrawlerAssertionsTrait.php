@@ -116,7 +116,7 @@ trait DomCrawlerAssertionsTrait
         self::assertArrayNotHasKey($fieldName, $values, $message ?: sprintf('Field "%s" has a value in form "%s".', $fieldName, $formSelector));
     }
 
-    private static function getCrawler(): Crawler
+    protected static function getCrawler(): Crawler
     {
         if (!$crawler = self::getClient()->getCrawler()) {
             static::fail('A client must have a crawler to make assertions. Did you forget to make an HTTP request?');

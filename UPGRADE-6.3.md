@@ -109,3 +109,4 @@ Serializer
 ----------
 
  * Deprecate `MissingConstructorArgumentsException` in favor of `MissingConstructorArgumentException`
+ * Deprecate `CacheableSupportsMethodInterface` in favor of the new `getSupportedTypes(?string $format)` methods

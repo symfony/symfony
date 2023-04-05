@@ -51,7 +51,7 @@ index 4fa5057fe2..9e111adac5 100644
      {
          if ($fixture instanceof ContainerAwareInterface) {
 diff --git a/src/Symfony/Bridge/Doctrine/DependencyInjection/AbstractDoctrineExtension.php b/src/Symfony/Bridge/Doctrine/DependencyInjection/AbstractDoctrineExtension.php
-index 56b108942e..20761fcc26 100644
+index 1ce0ffd40c..585265fb38 100644
 --- a/src/Symfony/Bridge/Doctrine/DependencyInjection/AbstractDoctrineExtension.php
 +++ b/src/Symfony/Bridge/Doctrine/DependencyInjection/AbstractDoctrineExtension.php
 @@ -43,5 +43,5 @@ abstract class AbstractDoctrineExtension extends Extension
@@ -648,10 +648,10 @@ index 6e7669a710..27517d34ae 100644
      {
          if (!$container->hasDefinition('test.private_services_locator')) {
 diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/UnusedTagsPass.php b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/UnusedTagsPass.php
-index d846bc6882..21ee26b1f3 100644
+index 7fa0fb2890..49bcc6dfd9 100644
 --- a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/UnusedTagsPass.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/UnusedTagsPass.php
-@@ -106,5 +106,5 @@ class UnusedTagsPass implements CompilerPassInterface
+@@ -107,5 +107,5 @@ class UnusedTagsPass implements CompilerPassInterface
       * @return void
       */
 -    public function process(ContainerBuilder $container)
@@ -670,17 +670,17 @@ index bda9ca9515..c0d1f91339 100644
      {
          if (!$container->hasParameter('workflow.has_guard_listeners')) {
 diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
-index 8cb557fb7d..7a7830c7df 100644
+index e2223da1ab..986e3e7922 100644
 --- a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
-@@ -279,5 +279,5 @@ class FrameworkExtension extends Extension
+@@ -283,5 +283,5 @@ class FrameworkExtension extends Extension
       * @throws LogicException
       */
 -    public function load(array $configs, ContainerBuilder $container)
 +    public function load(array $configs, ContainerBuilder $container): void
      {
          $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));
-@@ -2812,5 +2812,5 @@ class FrameworkExtension extends Extension
+@@ -2856,5 +2856,5 @@ class FrameworkExtension extends Extension
       * @return void
       */
 -    public static function registerRateLimiter(ContainerBuilder $container, string $name, array $limiterConfig)
@@ -688,17 +688,17 @@ index 8cb557fb7d..7a7830c7df 100644
      {
          trigger_deprecation('symfony/framework-bundle', '6.2', 'The "%s()" method is deprecated.', __METHOD__);
 diff --git a/src/Symfony/Bundle/FrameworkBundle/FrameworkBundle.php b/src/Symfony/Bundle/FrameworkBundle/FrameworkBundle.php
-index 7f48810e50..f85b13d818 100644
+index ffb96a23e5..e7f77881c8 100644
 --- a/src/Symfony/Bundle/FrameworkBundle/FrameworkBundle.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/FrameworkBundle.php
-@@ -93,5 +93,5 @@ class FrameworkBundle extends Bundle
+@@ -94,5 +94,5 @@ class FrameworkBundle extends Bundle
       * @return void
       */
 -    public function boot()
 +    public function boot(): void
      {
          $handler = ErrorHandler::register(null, false);
-@@ -110,5 +110,5 @@ class FrameworkBundle extends Bundle
+@@ -111,5 +111,5 @@ class FrameworkBundle extends Bundle
       * @return void
       */
 -    public function build(ContainerBuilder $container)
@@ -916,7 +916,7 @@ index 24eb1377c5..6367585643 100644
      {
          return 'security.authentication.failure_handler.'.$id.'.'.str_replace('-', '_', $this->getKey());
 diff --git a/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Security/Factory/AuthenticatorFactoryInterface.php b/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Security/Factory/AuthenticatorFactoryInterface.php
-index 764e7d35c3..20442e08a0 100644
+index 8082b6f352..bd9e1cff26 100644
 --- a/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Security/Factory/AuthenticatorFactoryInterface.php
 +++ b/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Security/Factory/AuthenticatorFactoryInterface.php
 @@ -34,5 +34,5 @@ interface AuthenticatorFactoryInterface
@@ -1362,7 +1362,7 @@ index ca5bcaded8..90c2bf5080 100644
      {
          $this->clear();
 diff --git a/src/Symfony/Component/Cache/Adapter/ChainAdapter.php b/src/Symfony/Component/Cache/Adapter/ChainAdapter.php
-index 07ef47f5eb..ea659c2fb4 100644
+index ffaa56f3ed..c63206e18d 100644
 --- a/src/Symfony/Component/Cache/Adapter/ChainAdapter.php
 +++ b/src/Symfony/Component/Cache/Adapter/ChainAdapter.php
 @@ -284,5 +284,5 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
@@ -1384,7 +1384,7 @@ index d447e9f2fd..1f99e0725e 100644
      {
          return \extension_loaded('memcached') && version_compare(phpversion('memcached'), '3.1.6', '>=');
 diff --git a/src/Symfony/Component/Cache/Adapter/PdoAdapter.php b/src/Symfony/Component/Cache/Adapter/PdoAdapter.php
-index 8efbe06efd..b73690d91a 100644
+index dfffb3bd13..e4384af6cc 100644
 --- a/src/Symfony/Component/Cache/Adapter/PdoAdapter.php
 +++ b/src/Symfony/Component/Cache/Adapter/PdoAdapter.php
 @@ -101,5 +101,5 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
@@ -1413,7 +1413,7 @@ index d104530c0d..a1845d3ae9 100644
      {
          unset(self::$valuesCache[$file]);
 diff --git a/src/Symfony/Component/Cache/Adapter/TagAwareAdapter.php b/src/Symfony/Component/Cache/Adapter/TagAwareAdapter.php
-index 7525632e91..cfe5cd863d 100644
+index f64ac99c11..84d32fb424 100644
 --- a/src/Symfony/Component/Cache/Adapter/TagAwareAdapter.php
 +++ b/src/Symfony/Component/Cache/Adapter/TagAwareAdapter.php
 @@ -283,5 +283,5 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
@@ -2114,7 +2114,7 @@ index cc024da461..00b79e915f 100644
      {
          $errors = [];
 diff --git a/src/Symfony/Component/Console/Application.php b/src/Symfony/Component/Console/Application.php
-index 28fec5fdec..e8994f2a90 100644
+index b7aaa6a29e..dd14cf2c5c 100644
 --- a/src/Symfony/Component/Console/Application.php
 +++ b/src/Symfony/Component/Console/Application.php
 @@ -114,5 +114,5 @@ class Application implements ResetInterface
@@ -2432,7 +2432,7 @@ index 433cd41978..02187a7ffc 100644
  
      /**
 diff --git a/src/Symfony/Component/Console/Formatter/OutputFormatterStyle.php b/src/Symfony/Component/Console/Formatter/OutputFormatterStyle.php
-index 9f1601d16d..68bfe5e98b 100644
+index 346a474c61..db3012ced8 100644
 --- a/src/Symfony/Component/Console/Formatter/OutputFormatterStyle.php
 +++ b/src/Symfony/Component/Console/Formatter/OutputFormatterStyle.php
 @@ -42,5 +42,5 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
@@ -2549,7 +2549,7 @@ index eb32bce8fc..57edd56954 100644
      {
          $options = array_merge([
 diff --git a/src/Symfony/Component/Console/Helper/Helper.php b/src/Symfony/Component/Console/Helper/Helper.php
-index 51fd11b260..3acfc88c9a 100644
+index 77de9daba2..a41cbd8111 100644
 --- a/src/Symfony/Component/Console/Helper/Helper.php
 +++ b/src/Symfony/Component/Console/Helper/Helper.php
 @@ -27,5 +27,5 @@ abstract class Helper implements HelperInterface
@@ -3147,10 +3147,10 @@ index b00445ece8..5e9b1086b0 100644
      {
          $this->buffer .= $message;
 diff --git a/src/Symfony/Component/Console/Question/Question.php b/src/Symfony/Component/Console/Question/Question.php
-index e1f981bc1e..f701cb549d 100644
+index 26896bb531..af97d04ddc 100644
 --- a/src/Symfony/Component/Console/Question/Question.php
 +++ b/src/Symfony/Component/Console/Question/Question.php
-@@ -269,5 +269,5 @@ class Question
+@@ -270,5 +270,5 @@ class Question
       * @return bool
       */
 -    protected function isAssoc(array $array)
@@ -3575,7 +3575,7 @@ index 3f070dcc0c..aa0e5186bf 100644
      {
          foreach ($container->findTaggedServiceIds('auto_alias') as $serviceId => $tags) {
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php b/src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php
-index 6cb09ccdfe..85380018ce 100644
+index a68d19ea30..f88c9046e7 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php
 @@ -61,5 +61,5 @@ class AutowirePass extends AbstractRecursivePass
@@ -4036,101 +4036,101 @@ index ac67b468c5..bc1e395810 100644
      {
          if (1 > \func_num_args()) {
 diff --git a/src/Symfony/Component/DependencyInjection/ContainerBuilder.php b/src/Symfony/Component/DependencyInjection/ContainerBuilder.php
-index e920980b28..83a3221b97 100644
+index 44df682ebc..e5957c6f57 100644
 --- a/src/Symfony/Component/DependencyInjection/ContainerBuilder.php
 +++ b/src/Symfony/Component/DependencyInjection/ContainerBuilder.php
-@@ -178,5 +178,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
+@@ -179,5 +179,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
       * @return void
       */
 -    public function setResourceTracking(bool $track)
 +    public function setResourceTracking(bool $track): void
      {
          $this->trackResources = $track;
-@@ -196,5 +196,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
+@@ -197,5 +197,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
       * @return void
       */
 -    public function setProxyInstantiator(InstantiatorInterface $proxyInstantiator)
 +    public function setProxyInstantiator(InstantiatorInterface $proxyInstantiator): void
      {
          $this->proxyInstantiator = $proxyInstantiator;
-@@ -204,5 +204,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
+@@ -205,5 +205,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
       * @return void
       */
 -    public function registerExtension(ExtensionInterface $extension)
 +    public function registerExtension(ExtensionInterface $extension): void
      {
          $this->extensions[$extension->getAlias()] = $extension;
-@@ -486,5 +486,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
+@@ -487,5 +487,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
       * @throws BadMethodCallException When this ContainerBuilder is compiled
       */
 -    public function set(string $id, ?object $service)
 +    public function set(string $id, ?object $service): void
      {
          if ($this->isCompiled() && (isset($this->definitions[$id]) && !$this->definitions[$id]->isSynthetic())) {
-@@ -503,5 +503,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
+@@ -504,5 +504,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
       * @return void
       */
 -    public function removeDefinition(string $id)
 +    public function removeDefinition(string $id): void
      {
          if (isset($this->definitions[$id])) {
-@@ -615,5 +615,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
+@@ -616,5 +616,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
       * @throws BadMethodCallException When this ContainerBuilder is compiled
       */
 -    public function merge(self $container)
 +    public function merge(self $container): void
      {
          if ($this->isCompiled()) {
-@@ -707,5 +707,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
+@@ -708,5 +708,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
       * @return void
       */
 -    public function prependExtensionConfig(string $name, array $config)
 +    public function prependExtensionConfig(string $name, array $config): void
      {
          if (!isset($this->extensionConfigs[$name])) {
-@@ -751,5 +751,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
+@@ -752,5 +752,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
       * @return void
       */
 -    public function compile(bool $resolveEnvPlaceholders = false)
 +    public function compile(bool $resolveEnvPlaceholders = false): void
      {
          $compiler = $this->getCompiler();
-@@ -815,5 +815,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
+@@ -816,5 +816,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
       * @return void
       */
 -    public function addAliases(array $aliases)
 +    public function addAliases(array $aliases): void
      {
          foreach ($aliases as $alias => $id) {
-@@ -829,5 +829,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
+@@ -830,5 +830,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
       * @return void
       */
 -    public function setAliases(array $aliases)
 +    public function setAliases(array $aliases): void
      {
          $this->aliasDefinitions = [];
-@@ -863,5 +863,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
+@@ -864,5 +864,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
       * @return void
       */
 -    public function removeAlias(string $alias)
 +    public function removeAlias(string $alias): void
      {
          if (isset($this->aliasDefinitions[$alias])) {
-@@ -925,5 +925,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
+@@ -926,5 +926,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
       * @return void
       */
 -    public function addDefinitions(array $definitions)
 +    public function addDefinitions(array $definitions): void
      {
          foreach ($definitions as $id => $definition) {
-@@ -939,5 +939,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
+@@ -940,5 +940,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
       * @return void
       */
 -    public function setDefinitions(array $definitions)
 +    public function setDefinitions(array $definitions): void
      {
          $this->definitions = [];
-@@ -1311,5 +1311,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
+@@ -1338,5 +1338,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
       * @return void
       */
 -    public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider)
@@ -4358,7 +4358,7 @@ index f4c6b29258..1402331f9e 100644
 +    public function instantiateProxy(ContainerInterface $container, Definition $definition, string $id, callable $realInstantiator): object;
  }
 diff --git a/src/Symfony/Component/DependencyInjection/Loader/FileLoader.php b/src/Symfony/Component/DependencyInjection/Loader/FileLoader.php
-index 62ac252dd7..466206277a 100644
+index c817f16422..0605b0a773 100644
 --- a/src/Symfony/Component/DependencyInjection/Loader/FileLoader.php
 +++ b/src/Symfony/Component/DependencyInjection/Loader/FileLoader.php
 @@ -99,5 +99,5 @@ abstract class FileLoader extends BaseFileLoader
@@ -4368,14 +4368,14 @@ index 62ac252dd7..466206277a 100644
 +    public function registerClasses(Definition $prototype, string $namespace, string $resource, string|array $exclude = null/* , string $source = null */): void
      {
          if (!str_ends_with($namespace, '\\')) {
-@@ -191,5 +191,5 @@ abstract class FileLoader extends BaseFileLoader
+@@ -195,5 +195,5 @@ abstract class FileLoader extends BaseFileLoader
       * @return void
       */
 -    public function registerAliasesForSinglyImplementedInterfaces()
 +    public function registerAliasesForSinglyImplementedInterfaces(): void
      {
          foreach ($this->interfaces as $interface) {
-@@ -207,5 +207,5 @@ abstract class FileLoader extends BaseFileLoader
+@@ -211,5 +211,5 @@ abstract class FileLoader extends BaseFileLoader
       * @return void
       */
 -    protected function setDefinition(string $id, Definition $definition)
@@ -5122,7 +5122,7 @@ index 239624ec2c..3b497d5ccf 100644
      {
          return $this->nodes;
 diff --git a/src/Symfony/Component/ExpressionLanguage/Parser.php b/src/Symfony/Component/ExpressionLanguage/Parser.php
-index a2911686f0..8f19254f51 100644
+index 71bcf398d4..88bbb13eab 100644
 --- a/src/Symfony/Component/ExpressionLanguage/Parser.php
 +++ b/src/Symfony/Component/ExpressionLanguage/Parser.php
 @@ -178,5 +178,5 @@ class Parser
@@ -5160,7 +5160,7 @@ index a2911686f0..8f19254f51 100644
 +    public function parsePostfixExpression(Node\Node $node): Node\GetAttrNode|Node\Node
      {
          $token = $this->stream->current;
-@@ -417,5 +417,5 @@ class Parser
+@@ -416,5 +416,5 @@ class Parser
       * @return Node\Node
       */
 -    public function parseArguments()
@@ -5431,7 +5431,7 @@ index 9cc32888e1..0fa604ceec 100644
      {
          throw new BadMethodCallException('Buttons do not support form factories.');
 diff --git a/src/Symfony/Component/Form/ChoiceList/Factory/CachingFactoryDecorator.php b/src/Symfony/Component/Form/ChoiceList/Factory/CachingFactoryDecorator.php
-index 304105cbc2..8268ca39fe 100644
+index 40c0604ea4..34f7f441f2 100644
 --- a/src/Symfony/Component/Form/ChoiceList/Factory/CachingFactoryDecorator.php
 +++ b/src/Symfony/Component/Form/ChoiceList/Factory/CachingFactoryDecorator.php
 @@ -218,5 +218,5 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
@@ -5442,7 +5442,7 @@ index 304105cbc2..8268ca39fe 100644
      {
          $this->lists = [];
 diff --git a/src/Symfony/Component/Form/Command/DebugCommand.php b/src/Symfony/Component/Form/Command/DebugCommand.php
-index 9b6b830341..9c656316e4 100644
+index 5e4635870a..439bf4528d 100644
 --- a/src/Symfony/Component/Form/Command/DebugCommand.php
 +++ b/src/Symfony/Component/Form/Command/DebugCommand.php
 @@ -58,5 +58,5 @@ class DebugCommand extends Command
@@ -5556,24 +5556,24 @@ index 62cd0a42a7..55ab20aabc 100644
      {
          $dataToMergeInto = $event->getForm()->getNormData();
 diff --git a/src/Symfony/Component/Form/Extension/Core/EventListener/ResizeFormListener.php b/src/Symfony/Component/Form/Extension/Core/EventListener/ResizeFormListener.php
-index 4c06342e54..ccb381629d 100644
+index cec439754e..0ef6b26c3e 100644
 --- a/src/Symfony/Component/Form/Extension/Core/EventListener/ResizeFormListener.php
 +++ b/src/Symfony/Component/Form/Extension/Core/EventListener/ResizeFormListener.php
-@@ -54,5 +54,5 @@ class ResizeFormListener implements EventSubscriberInterface
+@@ -56,5 +56,5 @@ class ResizeFormListener implements EventSubscriberInterface
       * @return void
       */
 -    public function preSetData(FormEvent $event)
 +    public function preSetData(FormEvent $event): void
      {
          $form = $event->getForm();
-@@ -79,5 +79,5 @@ class ResizeFormListener implements EventSubscriberInterface
+@@ -81,5 +81,5 @@ class ResizeFormListener implements EventSubscriberInterface
       * @return void
       */
 -    public function preSubmit(FormEvent $event)
 +    public function preSubmit(FormEvent $event): void
      {
          $form = $event->getForm();
-@@ -112,5 +112,5 @@ class ResizeFormListener implements EventSubscriberInterface
+@@ -114,5 +114,5 @@ class ResizeFormListener implements EventSubscriberInterface
       * @return void
       */
 -    public function onSubmit(FormEvent $event)
@@ -5650,7 +5650,7 @@ index d710546407..5ff4dc9989 100644
      {
          parent::configureOptions($resolver);
 diff --git a/src/Symfony/Component/Form/Extension/Core/Type/CheckboxType.php b/src/Symfony/Component/Form/Extension/Core/Type/CheckboxType.php
-index b261f926bb..52634b0db7 100644
+index 291ede93ef..a4128a3880 100644
 --- a/src/Symfony/Component/Form/Extension/Core/Type/CheckboxType.php
 +++ b/src/Symfony/Component/Form/Extension/Core/Type/CheckboxType.php
 @@ -24,5 +24,5 @@ class CheckboxType extends AbstractType
@@ -5673,9 +5673,9 @@ index b261f926bb..52634b0db7 100644
 -    public function configureOptions(OptionsResolver $resolver)
 +    public function configureOptions(OptionsResolver $resolver): void
      {
-         $emptyData = fn (FormInterface $form, $viewData) => $viewData;
+         $emptyData = static fn (FormInterface $form, $viewData) => $viewData;
 diff --git a/src/Symfony/Component/Form/Extension/Core/Type/ChoiceType.php b/src/Symfony/Component/Form/Extension/Core/Type/ChoiceType.php
-index 9694ed750a..0a4187c162 100644
+index 05ef3b9656..1db0ce9039 100644
 --- a/src/Symfony/Component/Form/Extension/Core/Type/ChoiceType.php
 +++ b/src/Symfony/Component/Form/Extension/Core/Type/ChoiceType.php
 @@ -63,5 +63,5 @@ class ChoiceType extends AbstractType
@@ -5685,29 +5685,29 @@ index 9694ed750a..0a4187c162 100644
 +    public function buildForm(FormBuilderInterface $builder, array $options): void
      {
          $unknownValues = [];
-@@ -215,5 +215,5 @@ class ChoiceType extends AbstractType
+@@ -216,5 +216,5 @@ class ChoiceType extends AbstractType
      }
  
 -    public function buildView(FormView $view, FormInterface $form, array $options)
 +    public function buildView(FormView $view, FormInterface $form, array $options): void
      {
          $choiceTranslationDomain = $options['choice_translation_domain'];
-@@ -267,5 +267,5 @@ class ChoiceType extends AbstractType
+@@ -268,5 +268,5 @@ class ChoiceType extends AbstractType
      }
  
 -    public function finishView(FormView $view, FormInterface $form, array $options)
 +    public function finishView(FormView $view, FormInterface $form, array $options): void
      {
          if ($options['expanded']) {
-@@ -284,5 +284,5 @@ class ChoiceType extends AbstractType
+@@ -285,5 +285,5 @@ class ChoiceType extends AbstractType
      }
  
 -    public function configureOptions(OptionsResolver $resolver)
 +    public function configureOptions(OptionsResolver $resolver): void
      {
-         $emptyData = function (Options $options) {
+         $emptyData = static function (Options $options) {
 diff --git a/src/Symfony/Component/Form/Extension/Core/Type/CollectionType.php b/src/Symfony/Component/Form/Extension/Core/Type/CollectionType.php
-index 1654d379a8..66ea974d31 100644
+index ef02d8c434..091cc922e0 100644
 --- a/src/Symfony/Component/Form/Extension/Core/Type/CollectionType.php
 +++ b/src/Symfony/Component/Form/Extension/Core/Type/CollectionType.php
 @@ -25,5 +25,5 @@ class CollectionType extends AbstractType
@@ -5716,30 +5716,30 @@ index 1654d379a8..66ea974d31 100644
 -    public function buildForm(FormBuilderInterface $builder, array $options)
 +    public function buildForm(FormBuilderInterface $builder, array $options): void
      {
-         if ($options['allow_add'] && $options['prototype']) {
-@@ -55,5 +55,5 @@ class CollectionType extends AbstractType
+         $prototypeOptions = null;
+@@ -57,5 +57,5 @@ class CollectionType extends AbstractType
       * @return void
       */
 -    public function buildView(FormView $view, FormInterface $form, array $options)
 +    public function buildView(FormView $view, FormInterface $form, array $options): void
      {
          $view->vars = array_replace($view->vars, [
-@@ -71,5 +71,5 @@ class CollectionType extends AbstractType
+@@ -73,5 +73,5 @@ class CollectionType extends AbstractType
       * @return void
       */
 -    public function finishView(FormView $view, FormInterface $form, array $options)
 +    public function finishView(FormView $view, FormInterface $form, array $options): void
      {
          $prefixOffset = -2;
-@@ -105,5 +105,5 @@ class CollectionType extends AbstractType
+@@ -107,5 +107,5 @@ class CollectionType extends AbstractType
       * @return void
       */
 -    public function configureOptions(OptionsResolver $resolver)
 +    public function configureOptions(OptionsResolver $resolver): void
      {
-         $entryOptionsNormalizer = function (Options $options, $value) {
+         $entryOptionsNormalizer = static function (Options $options, $value) {
 diff --git a/src/Symfony/Component/Form/Extension/Core/Type/ColorType.php b/src/Symfony/Component/Form/Extension/Core/Type/ColorType.php
-index 6e205fcbc9..f99464a9e7 100644
+index 31538fc3c7..de208cdade 100644
 --- a/src/Symfony/Component/Form/Extension/Core/Type/ColorType.php
 +++ b/src/Symfony/Component/Form/Extension/Core/Type/ColorType.php
 @@ -37,5 +37,5 @@ class ColorType extends AbstractType
@@ -5749,7 +5749,7 @@ index 6e205fcbc9..f99464a9e7 100644
 +    public function buildForm(FormBuilderInterface $builder, array $options): void
      {
          if (!$options['html5']) {
-@@ -66,5 +66,5 @@ class ColorType extends AbstractType
+@@ -67,5 +67,5 @@ class ColorType extends AbstractType
       * @return void
       */
 -    public function configureOptions(OptionsResolver $resolver)
@@ -5757,7 +5757,7 @@ index 6e205fcbc9..f99464a9e7 100644
      {
          $resolver->setDefaults([
 diff --git a/src/Symfony/Component/Form/Extension/Core/Type/CountryType.php b/src/Symfony/Component/Form/Extension/Core/Type/CountryType.php
-index b647284904..64566e5b64 100644
+index 6f872660a0..f352beb90d 100644
 --- a/src/Symfony/Component/Form/Extension/Core/Type/CountryType.php
 +++ b/src/Symfony/Component/Form/Extension/Core/Type/CountryType.php
 @@ -26,5 +26,5 @@ class CountryType extends AbstractType
@@ -5768,7 +5768,7 @@ index b647284904..64566e5b64 100644
      {
          $resolver->setDefaults([
 diff --git a/src/Symfony/Component/Form/Extension/Core/Type/CurrencyType.php b/src/Symfony/Component/Form/Extension/Core/Type/CurrencyType.php
-index 1c0ac471b8..64e6dea662 100644
+index 89edc6f630..fc06bbb299 100644
 --- a/src/Symfony/Component/Form/Extension/Core/Type/CurrencyType.php
 +++ b/src/Symfony/Component/Form/Extension/Core/Type/CurrencyType.php
 @@ -26,5 +26,5 @@ class CurrencyType extends AbstractType
@@ -5779,7 +5779,7 @@ index 1c0ac471b8..64e6dea662 100644
      {
          $resolver->setDefaults([
 diff --git a/src/Symfony/Component/Form/Extension/Core/Type/DateIntervalType.php b/src/Symfony/Component/Form/Extension/Core/Type/DateIntervalType.php
-index 0e4a7555a0..9f0cc46353 100644
+index 655ef6682f..0e525d09f6 100644
 --- a/src/Symfony/Component/Form/Extension/Core/Type/DateIntervalType.php
 +++ b/src/Symfony/Component/Form/Extension/Core/Type/DateIntervalType.php
 @@ -47,5 +47,5 @@ class DateIntervalType extends AbstractType
@@ -5802,9 +5802,9 @@ index 0e4a7555a0..9f0cc46353 100644
 -    public function configureOptions(OptionsResolver $resolver)
 +    public function configureOptions(OptionsResolver $resolver): void
      {
-         $compound = fn (Options $options) => 'single_text' !== $options['widget'];
+         $compound = static fn (Options $options) => 'single_text' !== $options['widget'];
 diff --git a/src/Symfony/Component/Form/Extension/Core/Type/DateTimeType.php b/src/Symfony/Component/Form/Extension/Core/Type/DateTimeType.php
-index ae47519c53..18a007ba32 100644
+index a0a0c92fe0..0fffe46dfa 100644
 --- a/src/Symfony/Component/Form/Extension/Core/Type/DateTimeType.php
 +++ b/src/Symfony/Component/Form/Extension/Core/Type/DateTimeType.php
 @@ -51,5 +51,5 @@ class DateTimeType extends AbstractType
@@ -5827,9 +5827,9 @@ index ae47519c53..18a007ba32 100644
 -    public function configureOptions(OptionsResolver $resolver)
 +    public function configureOptions(OptionsResolver $resolver): void
      {
-         $compound = fn (Options $options) => 'single_text' !== $options['widget'];
+         $compound = static fn (Options $options) => 'single_text' !== $options['widget'];
 diff --git a/src/Symfony/Component/Form/Extension/Core/Type/DateType.php b/src/Symfony/Component/Form/Extension/Core/Type/DateType.php
-index b08a4dd834..e889f1de28 100644
+index 5c81097e0e..573ed2d2d9 100644
 --- a/src/Symfony/Component/Form/Extension/Core/Type/DateType.php
 +++ b/src/Symfony/Component/Form/Extension/Core/Type/DateType.php
 @@ -44,5 +44,5 @@ class DateType extends AbstractType
@@ -5852,7 +5852,7 @@ index b08a4dd834..e889f1de28 100644
 -    public function configureOptions(OptionsResolver $resolver)
 +    public function configureOptions(OptionsResolver $resolver): void
      {
-         $compound = fn (Options $options) => 'single_text' !== $options['widget'];
+         $compound = static fn (Options $options) => 'single_text' !== $options['widget'];
 diff --git a/src/Symfony/Component/Form/Extension/Core/Type/EmailType.php b/src/Symfony/Component/Form/Extension/Core/Type/EmailType.php
 index 64d01ee67a..0cd6cd3b79 100644
 --- a/src/Symfony/Component/Form/Extension/Core/Type/EmailType.php
@@ -5865,7 +5865,7 @@ index 64d01ee67a..0cd6cd3b79 100644
      {
          $resolver->setDefaults([
 diff --git a/src/Symfony/Component/Form/Extension/Core/Type/FileType.php b/src/Symfony/Component/Form/Extension/Core/Type/FileType.php
-index 16d212ef0f..55960608f8 100644
+index 6e4b78251d..4e52e19cfc 100644
 --- a/src/Symfony/Component/Form/Extension/Core/Type/FileType.php
 +++ b/src/Symfony/Component/Form/Extension/Core/Type/FileType.php
 @@ -42,5 +42,5 @@ class FileType extends AbstractType
@@ -5896,7 +5896,7 @@ index 16d212ef0f..55960608f8 100644
      {
          $dataClass = null;
 diff --git a/src/Symfony/Component/Form/Extension/Core/Type/FormType.php b/src/Symfony/Component/Form/Extension/Core/Type/FormType.php
-index 560d1e2cb3..b683c2ef8d 100644
+index 82aa77f0a3..f3abe461c9 100644
 --- a/src/Symfony/Component/Form/Extension/Core/Type/FormType.php
 +++ b/src/Symfony/Component/Form/Extension/Core/Type/FormType.php
 @@ -42,5 +42,5 @@ class FormType extends BaseType
@@ -5964,7 +5964,7 @@ index a287b66b7c..12dc4a1f71 100644
      {
          $resolver->setDefaults([
 diff --git a/src/Symfony/Component/Form/Extension/Core/Type/LanguageType.php b/src/Symfony/Component/Form/Extension/Core/Type/LanguageType.php
-index 0c6faafec6..8fac78ae1a 100644
+index eeb9e591a1..b0eb640a5f 100644
 --- a/src/Symfony/Component/Form/Extension/Core/Type/LanguageType.php
 +++ b/src/Symfony/Component/Form/Extension/Core/Type/LanguageType.php
 @@ -27,5 +27,5 @@ class LanguageType extends AbstractType
@@ -5975,7 +5975,7 @@ index 0c6faafec6..8fac78ae1a 100644
      {
          $resolver->setDefaults([
 diff --git a/src/Symfony/Component/Form/Extension/Core/Type/LocaleType.php b/src/Symfony/Component/Form/Extension/Core/Type/LocaleType.php
-index 5086b0b0e6..662244cf46 100644
+index e98134febd..9f2662031e 100644
 --- a/src/Symfony/Component/Form/Extension/Core/Type/LocaleType.php
 +++ b/src/Symfony/Component/Form/Extension/Core/Type/LocaleType.php
 @@ -26,5 +26,5 @@ class LocaleType extends AbstractType
@@ -5986,7 +5986,7 @@ index 5086b0b0e6..662244cf46 100644
      {
          $resolver->setDefaults([
 diff --git a/src/Symfony/Component/Form/Extension/Core/Type/MoneyType.php b/src/Symfony/Component/Form/Extension/Core/Type/MoneyType.php
-index aea35410c1..03a13b5a52 100644
+index 27c1dbb49b..24209ffc85 100644
 --- a/src/Symfony/Component/Form/Extension/Core/Type/MoneyType.php
 +++ b/src/Symfony/Component/Form/Extension/Core/Type/MoneyType.php
 @@ -28,5 +28,5 @@ class MoneyType extends AbstractType
@@ -6011,7 +6011,7 @@ index aea35410c1..03a13b5a52 100644
      {
          $resolver->setDefaults([
 diff --git a/src/Symfony/Component/Form/Extension/Core/Type/NumberType.php b/src/Symfony/Component/Form/Extension/Core/Type/NumberType.php
-index 3ddfbfeb1c..309f8dd641 100644
+index 578991f9fd..16f39e873b 100644
 --- a/src/Symfony/Component/Form/Extension/Core/Type/NumberType.php
 +++ b/src/Symfony/Component/Form/Extension/Core/Type/NumberType.php
 @@ -27,5 +27,5 @@ class NumberType extends AbstractType
@@ -6188,7 +6188,7 @@ index 40e7580d80..18c58e30c0 100644
      {
          $view->vars['pattern'] = null;
 diff --git a/src/Symfony/Component/Form/Extension/Core/Type/TimeType.php b/src/Symfony/Component/Form/Extension/Core/Type/TimeType.php
-index a22f2122cd..7d5ff334a3 100644
+index cc734e50a9..c6b47264a8 100644
 --- a/src/Symfony/Component/Form/Extension/Core/Type/TimeType.php
 +++ b/src/Symfony/Component/Form/Extension/Core/Type/TimeType.php
 @@ -38,5 +38,5 @@ class TimeType extends AbstractType
@@ -6211,9 +6211,9 @@ index a22f2122cd..7d5ff334a3 100644
 -    public function configureOptions(OptionsResolver $resolver)
 +    public function configureOptions(OptionsResolver $resolver): void
      {
-         $compound = fn (Options $options) => 'single_text' !== $options['widget'];
+         $compound = static fn (Options $options) => 'single_text' !== $options['widget'];
 diff --git a/src/Symfony/Component/Form/Extension/Core/Type/TimezoneType.php b/src/Symfony/Component/Form/Extension/Core/Type/TimezoneType.php
-index 0827fcfc5a..b3b56c1ce2 100644
+index a5d4bc61c0..b104414403 100644
 --- a/src/Symfony/Component/Form/Extension/Core/Type/TimezoneType.php
 +++ b/src/Symfony/Component/Form/Extension/Core/Type/TimezoneType.php
 @@ -29,5 +29,5 @@ class TimezoneType extends AbstractType
@@ -6303,7 +6303,7 @@ index 7c0f65b9a0..d79b4d30e6 100644
      {
          $resolver->setDefaults([
 diff --git a/src/Symfony/Component/Form/Extension/Core/Type/WeekType.php b/src/Symfony/Component/Form/Extension/Core/Type/WeekType.php
-index f0d8f96467..3fa585b583 100644
+index 8027a41a99..9ffba28dac 100644
 --- a/src/Symfony/Component/Form/Extension/Core/Type/WeekType.php
 +++ b/src/Symfony/Component/Form/Extension/Core/Type/WeekType.php
 @@ -32,5 +32,5 @@ class WeekType extends AbstractType
@@ -6326,7 +6326,7 @@ index f0d8f96467..3fa585b583 100644
 -    public function configureOptions(OptionsResolver $resolver)
 +    public function configureOptions(OptionsResolver $resolver): void
      {
-         $compound = fn (Options $options) => 'single_text' !== $options['widget'];
+         $compound = static fn (Options $options) => 'single_text' !== $options['widget'];
 diff --git a/src/Symfony/Component/Form/Extension/Csrf/EventListener/CsrfValidationListener.php b/src/Symfony/Component/Form/Extension/Csrf/EventListener/CsrfValidationListener.php
 index eca450a165..72330772b9 100644
 --- a/src/Symfony/Component/Form/Extension/Csrf/EventListener/CsrfValidationListener.php
@@ -6580,7 +6580,7 @@ index e2d4357622..ed84c8b4cf 100644
      {
          $form = $event->getForm();
 diff --git a/src/Symfony/Component/Form/Extension/Validator/Type/BaseValidatorExtension.php b/src/Symfony/Component/Form/Extension/Validator/Type/BaseValidatorExtension.php
-index 2abc466fe3..3534aa7744 100644
+index ea01d03699..e9c7e410af 100644
 --- a/src/Symfony/Component/Form/Extension/Validator/Type/BaseValidatorExtension.php
 +++ b/src/Symfony/Component/Form/Extension/Validator/Type/BaseValidatorExtension.php
 @@ -28,5 +28,5 @@ abstract class BaseValidatorExtension extends AbstractTypeExtension
@@ -6591,7 +6591,7 @@ index 2abc466fe3..3534aa7744 100644
      {
          // Make sure that validation groups end up as null, closure or array
 diff --git a/src/Symfony/Component/Form/Extension/Validator/Type/FormTypeValidatorExtension.php b/src/Symfony/Component/Form/Extension/Validator/Type/FormTypeValidatorExtension.php
-index 4602918c3a..5edcb58ec6 100644
+index 54eebaf63e..e6be9e5266 100644
 --- a/src/Symfony/Component/Form/Extension/Validator/Type/FormTypeValidatorExtension.php
 +++ b/src/Symfony/Component/Form/Extension/Validator/Type/FormTypeValidatorExtension.php
 @@ -41,5 +41,5 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
@@ -6609,7 +6609,7 @@ index 4602918c3a..5edcb58ec6 100644
      {
          parent::configureOptions($resolver);
 diff --git a/src/Symfony/Component/Form/Extension/Validator/Type/RepeatedTypeValidatorExtension.php b/src/Symfony/Component/Form/Extension/Validator/Type/RepeatedTypeValidatorExtension.php
-index 2e2c21426a..b11c6159ad 100644
+index d41dc0168c..0cb2b3c6c8 100644
 --- a/src/Symfony/Component/Form/Extension/Validator/Type/RepeatedTypeValidatorExtension.php
 +++ b/src/Symfony/Component/Form/Extension/Validator/Type/RepeatedTypeValidatorExtension.php
 @@ -25,5 +25,5 @@ class RepeatedTypeValidatorExtension extends AbstractTypeExtension
@@ -6620,7 +6620,7 @@ index 2e2c21426a..b11c6159ad 100644
      {
          // Map errors to the first field
 diff --git a/src/Symfony/Component/Form/Extension/Validator/Type/UploadValidatorExtension.php b/src/Symfony/Component/Form/Extension/Validator/Type/UploadValidatorExtension.php
-index 70034135bf..246957f8f7 100644
+index b7a19ed26a..30c8b9e57c 100644
 --- a/src/Symfony/Component/Form/Extension/Validator/Type/UploadValidatorExtension.php
 +++ b/src/Symfony/Component/Form/Extension/Validator/Type/UploadValidatorExtension.php
 @@ -36,5 +36,5 @@ class UploadValidatorExtension extends AbstractTypeExtension
@@ -6937,7 +6937,7 @@ index 472437e465..1dfe39146b 100644
      {
          if ($this->client instanceof ResetInterface) {
 diff --git a/src/Symfony/Component/HttpClient/HttpClientTrait.php b/src/Symfony/Component/HttpClient/HttpClientTrait.php
-index de24e3b7fd..0aff3bbc60 100644
+index 065d9d727a..52990be628 100644
 --- a/src/Symfony/Component/HttpClient/HttpClientTrait.php
 +++ b/src/Symfony/Component/HttpClient/HttpClientTrait.php
 @@ -562,5 +562,5 @@ trait HttpClientTrait
@@ -7070,7 +7070,7 @@ index 081f26a2d0..7ed43e2c07 100644
      {
          ksort($this->cacheControl);
 diff --git a/src/Symfony/Component/HttpFoundation/ParameterBag.php b/src/Symfony/Component/HttpFoundation/ParameterBag.php
-index 44d8d96d28..43124c0ea0 100644
+index 9d7012de35..545339d4ef 100644
 --- a/src/Symfony/Component/HttpFoundation/ParameterBag.php
 +++ b/src/Symfony/Component/HttpFoundation/ParameterBag.php
 @@ -64,5 +64,5 @@ class ParameterBag implements \IteratorAggregate, \Countable
@@ -9147,7 +9147,7 @@ index 4344a6f41f..c3ee27f8a5 100644
      {
          // prevent concurrency within the same connection
 diff --git a/src/Symfony/Component/Lock/Store/DoctrineDbalStore.php b/src/Symfony/Component/Lock/Store/DoctrineDbalStore.php
-index 7e573b3692..cfb2e038d5 100644
+index 7c749bfec0..f24cc1d51f 100644
 --- a/src/Symfony/Component/Lock/Store/DoctrineDbalStore.php
 +++ b/src/Symfony/Component/Lock/Store/DoctrineDbalStore.php
 @@ -76,5 +76,5 @@ class DoctrineDbalStore implements PersistingStoreInterface
@@ -9314,7 +9314,7 @@ index ada843883c..afebb3f3d8 100644
      {
          $this->getCollection()->deleteOne([ // filter
 diff --git a/src/Symfony/Component/Lock/Store/PdoStore.php b/src/Symfony/Component/Lock/Store/PdoStore.php
-index 85d0de78ea..7a0cca622e 100644
+index ec114c13c1..52832c3d05 100644
 --- a/src/Symfony/Component/Lock/Store/PdoStore.php
 +++ b/src/Symfony/Component/Lock/Store/PdoStore.php
 @@ -87,5 +87,5 @@ class PdoStore implements PersistingStoreInterface
@@ -9613,10 +9613,10 @@ index d8e6dd4ad9..f96aae262e 100644
      {
          $this->dispatchedMessages = [];
 diff --git a/src/Symfony/Component/Messenger/Transport/InMemory/InMemoryTransport.php b/src/Symfony/Component/Messenger/Transport/InMemory/InMemoryTransport.php
-index 13a97667b5..b37e71c7b9 100644
+index 4937c4b325..c60e198a4a 100644
 --- a/src/Symfony/Component/Messenger/Transport/InMemory/InMemoryTransport.php
 +++ b/src/Symfony/Component/Messenger/Transport/InMemory/InMemoryTransport.php
-@@ -95,5 +95,5 @@ class InMemoryTransport implements TransportInterface, ResetInterface
+@@ -112,5 +112,5 @@ class InMemoryTransport implements TransportInterface, ResetInterface
       * @return void
       */
 -    public function reset()
@@ -9657,7 +9657,7 @@ index 97f5ded24d..05e3ed5202 100644
      {
          $this->ensureBodyValid();
 diff --git a/src/Symfony/Component/Mime/Header/AbstractHeader.php b/src/Symfony/Component/Mime/Header/AbstractHeader.php
-index faa5fd8b6f..16b7833b7d 100644
+index 122281127a..8a400918a9 100644
 --- a/src/Symfony/Component/Mime/Header/AbstractHeader.php
 +++ b/src/Symfony/Component/Mime/Header/AbstractHeader.php
 @@ -38,5 +38,5 @@ abstract class AbstractHeader implements HeaderInterface
@@ -9819,7 +9819,7 @@ index e3387dfe15..b88d942f05 100644
      {
          $this->suffixes[] = $suffix;
 diff --git a/src/Symfony/Component/Process/InputStream.php b/src/Symfony/Component/Process/InputStream.php
-index 25f574f703..c6042b4826 100644
+index 086f5a9edf..edacc344e9 100644
 --- a/src/Symfony/Component/Process/InputStream.php
 +++ b/src/Symfony/Component/Process/InputStream.php
 @@ -33,5 +33,5 @@ class InputStream implements \IteratorAggregate
@@ -9862,7 +9862,7 @@ index ef54a3d2b0..d084e5ba24 100644
      {
          if (null === $this->getCommandLine()) {
 diff --git a/src/Symfony/Component/PropertyAccess/PropertyAccessor.php b/src/Symfony/Component/PropertyAccess/PropertyAccessor.php
-index 843031f01e..cec83a3c5a 100644
+index c9125af216..bcd044de52 100644
 --- a/src/Symfony/Component/PropertyAccess/PropertyAccessor.php
 +++ b/src/Symfony/Component/PropertyAccess/PropertyAccessor.php
 @@ -123,5 +123,5 @@ class PropertyAccessor implements PropertyAccessorInterface
@@ -10185,45 +10185,45 @@ index e3fb17e81c..cd27f3e387 100644
      {
          $this->strictRequirements = $enabled;
 diff --git a/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php b/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php
-index 03d54d5909..f0219187b2 100644
+index 6da68c7594..57dd442aa2 100644
 --- a/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php
 +++ b/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php
-@@ -97,5 +97,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
+@@ -96,5 +96,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
       * @return void
       */
 -    public function setRouteAnnotationClass(string $class)
 +    public function setRouteAnnotationClass(string $class): void
      {
          $this->routeAnnotationClass = $class;
-@@ -149,5 +149,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
+@@ -148,5 +148,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
       * @return void
       */
 -    protected function addRoute(RouteCollection $collection, object $annot, array $globals, \ReflectionClass $class, \ReflectionMethod $method)
 +    protected function addRoute(RouteCollection $collection, object $annot, array $globals, \ReflectionClass $class, \ReflectionMethod $method): void
      {
          if ($annot->getEnv() && $annot->getEnv() !== $this->env) {
-@@ -238,5 +238,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
+@@ -237,5 +237,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
       * @return void
       */
 -    public function setResolver(LoaderResolverInterface $resolver)
 +    public function setResolver(LoaderResolverInterface $resolver): void
      {
      }
-@@ -251,5 +251,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
+@@ -250,5 +250,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
       * @return string
       */
 -    protected function getDefaultRouteName(\ReflectionClass $class, \ReflectionMethod $method)
 +    protected function getDefaultRouteName(\ReflectionClass $class, \ReflectionMethod $method): string
      {
          $name = str_replace('\\', '_', $class->name).'_'.$method->name;
-@@ -266,5 +266,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
+@@ -265,5 +265,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
       * @return array
       */
 -    protected function getGlobals(\ReflectionClass $class)
 +    protected function getGlobals(\ReflectionClass $class): array
      {
          $globals = $this->resetGlobals();
-@@ -351,5 +351,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
+@@ -350,5 +350,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
       * @return Route
       */
 -    protected function createRoute(string $path, array $defaults, array $requirements, array $options, ?string $host, array $schemes, array $methods, ?string $condition)
@@ -10702,7 +10702,7 @@ index 054dd95728..e6704119b2 100644
      {
          return $this->authenticationToken;
 diff --git a/src/Symfony/Component/Security/Core/Exception/AccessDeniedException.php b/src/Symfony/Component/Security/Core/Exception/AccessDeniedException.php
-index 88804d6591..a991d35f46 100644
+index c95bae03b4..b16304c366 100644
 --- a/src/Symfony/Component/Security/Core/Exception/AccessDeniedException.php
 +++ b/src/Symfony/Component/Security/Core/Exception/AccessDeniedException.php
 @@ -38,5 +38,5 @@ class AccessDeniedException extends RuntimeException
@@ -11001,7 +11001,7 @@ index 3b7c5086f2..97fb99f0b5 100644
      {
          $this->response = $response;
 diff --git a/src/Symfony/Component/Security/Http/EventListener/IsGrantedAttributeListener.php b/src/Symfony/Component/Security/Http/EventListener/IsGrantedAttributeListener.php
-index 7ee9f41fcd..d7c5312900 100644
+index 513b6494e5..c0211b6e39 100644
 --- a/src/Symfony/Component/Security/Http/EventListener/IsGrantedAttributeListener.php
 +++ b/src/Symfony/Component/Security/Http/EventListener/IsGrantedAttributeListener.php
 @@ -40,5 +40,5 @@ class IsGrantedAttributeListener implements EventSubscriberInterface
@@ -11200,6 +11200,17 @@ index 84a84ad1f3..6f66b6d32a 100644
 -    public function supportsDecoding(string $format);
 +    public function supportsDecoding(string $format): bool;
  }
+diff --git a/src/Symfony/Component/Serializer/Exception/PartialDenormalizationException.php b/src/Symfony/Component/Serializer/Exception/PartialDenormalizationException.php
+index b684fddb2f..ade2242791 100644
+--- a/src/Symfony/Component/Serializer/Exception/PartialDenormalizationException.php
++++ b/src/Symfony/Component/Serializer/Exception/PartialDenormalizationException.php
+@@ -29,5 +29,5 @@ class PartialDenormalizationException extends UnexpectedValueException
+      * @return mixed
+      */
+-    public function getData()
++    public function getData(): mixed
+     {
+         return $this->data;
 diff --git a/src/Symfony/Component/Serializer/Mapping/AttributeMetadata.php b/src/Symfony/Component/Serializer/Mapping/AttributeMetadata.php
 index aeee5ac680..4ac78f5458 100644
 --- a/src/Symfony/Component/Serializer/Mapping/AttributeMetadata.php
@@ -11265,7 +11276,7 @@ index fc6336ebdb..e13a834930 100644
      {
          if (1 > \func_num_args()) {
 diff --git a/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php
-index 7d138b0b26..03e28f9d20 100644
+index 58deea9f01..8fe0385cdc 100644
 --- a/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php
 @@ -215,5 +215,5 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
@@ -11290,7 +11301,7 @@ index 7d138b0b26..03e28f9d20 100644
      {
          if (null !== $object = $this->extractObjectToPopulate($class, $context, self::OBJECT_TO_POPULATE)) {
 diff --git a/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
-index 75fe3a5cb1..a28dd40568 100644
+index 20f15becb2..b378cd8c38 100644
 --- a/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
 @@ -139,10 +139,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
@@ -11306,21 +11317,21 @@ index 75fe3a5cb1..a28dd40568 100644
 +    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
      {
          if (!isset($context['cache_key'])) {
-@@ -225,5 +225,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -226,5 +226,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      }
  
 -    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null)
 +    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null): object
      {
          if ($this->classDiscriminatorResolver && $mapping = $this->classDiscriminatorResolver->getMappingForClass($class)) {
-@@ -287,5 +287,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -288,5 +288,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return string[]
       */
 -    abstract protected function extractAttributes(object $object, string $format = null, array $context = []);
 +    abstract protected function extractAttributes(object $object, string $format = null, array $context = []): array;
  
      /**
-@@ -294,15 +294,15 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -295,15 +295,15 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return mixed
       */
 -    abstract protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []);
@@ -11340,7 +11351,7 @@ index 75fe3a5cb1..a28dd40568 100644
      {
          if (!isset($context['cache_key'])) {
 diff --git a/src/Symfony/Component/Serializer/Normalizer/DenormalizerInterface.php b/src/Symfony/Component/Serializer/Normalizer/DenormalizerInterface.php
-index 1d83b2da11..1c632f42bf 100644
+index 4edb70096d..8c844785db 100644
 --- a/src/Symfony/Component/Serializer/Normalizer/DenormalizerInterface.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/DenormalizerInterface.php
 @@ -47,5 +47,5 @@ interface DenormalizerInterface
@@ -11350,7 +11361,7 @@ index 1d83b2da11..1c632f42bf 100644
 +    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed;
  
      /**
-@@ -64,5 +64,5 @@ interface DenormalizerInterface
+@@ -59,5 +59,5 @@ interface DenormalizerInterface
       * @return bool
       */
 -    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */);
@@ -11358,10 +11369,10 @@ index 1d83b2da11..1c632f42bf 100644
  
      /**
 diff --git a/src/Symfony/Component/Serializer/Normalizer/GetSetMethodNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/GetSetMethodNormalizer.php
-index 2719c8b52c..1112f7f3cc 100644
+index d92394834d..ede25327c9 100644
 --- a/src/Symfony/Component/Serializer/Normalizer/GetSetMethodNormalizer.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/GetSetMethodNormalizer.php
-@@ -148,5 +148,5 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
+@@ -145,5 +145,5 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
       * @return void
       */
 -    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = [])
@@ -11380,7 +11391,7 @@ index 40a4fa0e8c..a1e2749aae 100644
      {
          $this->normalizer = $normalizer;
 diff --git a/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php b/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php
-index d6d0707ff5..9953ad3005 100644
+index 40779de316..105cf99b06 100644
 --- a/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php
 @@ -39,5 +39,5 @@ interface NormalizerInterface
@@ -11390,7 +11401,7 @@ index d6d0707ff5..9953ad3005 100644
 +    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null;
  
      /**
-@@ -55,5 +55,5 @@ interface NormalizerInterface
+@@ -50,5 +50,5 @@ interface NormalizerInterface
       * @return bool
       */
 -    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */);
@@ -11398,7 +11409,7 @@ index d6d0707ff5..9953ad3005 100644
  
      /**
 diff --git a/src/Symfony/Component/Serializer/Normalizer/ObjectNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/ObjectNormalizer.php
-index 140e89c6a1..f77348252b 100644
+index dc5067dfb6..ae217b2071 100644
 --- a/src/Symfony/Component/Serializer/Normalizer/ObjectNormalizer.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/ObjectNormalizer.php
 @@ -143,5 +143,5 @@ class ObjectNormalizer extends AbstractObjectNormalizer
@@ -11409,7 +11420,7 @@ index 140e89c6a1..f77348252b 100644
      {
          try {
 diff --git a/src/Symfony/Component/Serializer/Normalizer/PropertyNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/PropertyNormalizer.php
-index 645ba74290..d960bf4b20 100644
+index 56e5ebf740..78bfacef61 100644
 --- a/src/Symfony/Component/Serializer/Normalizer/PropertyNormalizer.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/PropertyNormalizer.php
 @@ -185,5 +185,5 @@ class PropertyNormalizer extends AbstractObjectNormalizer
@@ -11691,7 +11702,7 @@ index 1baf9341e4..2e6d94b696 100644
      {
          if (!$container->hasDefinition('translation.extractor')) {
 diff --git a/src/Symfony/Component/Translation/DependencyInjection/TranslatorPass.php b/src/Symfony/Component/Translation/DependencyInjection/TranslatorPass.php
-index 9d4418d639..d1959f433d 100644
+index dd6ea3c831..faa71809ec 100644
 --- a/src/Symfony/Component/Translation/DependencyInjection/TranslatorPass.php
 +++ b/src/Symfony/Component/Translation/DependencyInjection/TranslatorPass.php
 @@ -22,5 +22,5 @@ class TranslatorPass implements CompilerPassInterface
@@ -12156,10 +12167,10 @@ index 94ad5eacab..7873a33c2b 100644
      {
          if (!$constraint instanceof AtLeastOneOf) {
 diff --git a/src/Symfony/Component/Validator/Constraints/BicValidator.php b/src/Symfony/Component/Validator/Constraints/BicValidator.php
-index 3368a26c51..855dae6e01 100644
+index 54a4c140c9..3661f3206d 100644
 --- a/src/Symfony/Component/Validator/Constraints/BicValidator.php
 +++ b/src/Symfony/Component/Validator/Constraints/BicValidator.php
-@@ -59,5 +59,5 @@ class BicValidator extends ConstraintValidator
+@@ -67,5 +67,5 @@ class BicValidator extends ConstraintValidator
       * @return void
       */
 -    public function validate(mixed $value, Constraint $constraint)
@@ -12617,7 +12628,7 @@ index c6d111cfe3..fed053db79 100644
      {
          if (!$constraint instanceof Time) {
 diff --git a/src/Symfony/Component/Validator/Constraints/TimezoneValidator.php b/src/Symfony/Component/Validator/Constraints/TimezoneValidator.php
-index 20d81e8809..0d18cad247 100644
+index 21481a5afd..2d1cc4f5eb 100644
 --- a/src/Symfony/Component/Validator/Constraints/TimezoneValidator.php
 +++ b/src/Symfony/Component/Validator/Constraints/TimezoneValidator.php
 @@ -30,5 +30,5 @@ class TimezoneValidator extends ConstraintValidator
@@ -13058,52 +13069,52 @@ index 3120c3d919..0ac928f2ca 100644
      {
          foreach (['snapshot', 'association', 'typeClass'] as $k) {
 diff --git a/src/Symfony/Component/VarDumper/Caster/ExceptionCaster.php b/src/Symfony/Component/VarDumper/Caster/ExceptionCaster.php
-index c58e74a50a..dfd381cccf 100644
+index be5a642226..5ee13fc3ed 100644
 --- a/src/Symfony/Component/VarDumper/Caster/ExceptionCaster.php
 +++ b/src/Symfony/Component/VarDumper/Caster/ExceptionCaster.php
-@@ -50,5 +50,5 @@ class ExceptionCaster
+@@ -51,5 +51,5 @@ class ExceptionCaster
       * @return array
       */
 -    public static function castError(\Error $e, array $a, Stub $stub, bool $isNested, int $filter = 0)
 +    public static function castError(\Error $e, array $a, Stub $stub, bool $isNested, int $filter = 0): array
      {
          return self::filterExceptionArray($stub->class, $a, "\0Error\0", $filter);
-@@ -58,5 +58,5 @@ class ExceptionCaster
+@@ -59,5 +59,5 @@ class ExceptionCaster
       * @return array
       */
 -    public static function castException(\Exception $e, array $a, Stub $stub, bool $isNested, int $filter = 0)
 +    public static function castException(\Exception $e, array $a, Stub $stub, bool $isNested, int $filter = 0): array
      {
          return self::filterExceptionArray($stub->class, $a, "\0Exception\0", $filter);
-@@ -66,5 +66,5 @@ class ExceptionCaster
+@@ -67,5 +67,5 @@ class ExceptionCaster
       * @return array
       */
 -    public static function castErrorException(\ErrorException $e, array $a, Stub $stub, bool $isNested)
 +    public static function castErrorException(\ErrorException $e, array $a, Stub $stub, bool $isNested): array
      {
          if (isset($a[$s = Caster::PREFIX_PROTECTED.'severity'], self::$errorTypes[$a[$s]])) {
-@@ -78,5 +78,5 @@ class ExceptionCaster
+@@ -79,5 +79,5 @@ class ExceptionCaster
       * @return array
       */
 -    public static function castThrowingCasterException(ThrowingCasterException $e, array $a, Stub $stub, bool $isNested)
 +    public static function castThrowingCasterException(ThrowingCasterException $e, array $a, Stub $stub, bool $isNested): array
      {
          $trace = Caster::PREFIX_VIRTUAL.'trace';
-@@ -99,5 +99,5 @@ class ExceptionCaster
+@@ -100,5 +100,5 @@ class ExceptionCaster
       * @return array
       */
 -    public static function castSilencedErrorContext(SilencedErrorContext $e, array $a, Stub $stub, bool $isNested)
 +    public static function castSilencedErrorContext(SilencedErrorContext $e, array $a, Stub $stub, bool $isNested): array
      {
          $sPrefix = "\0".SilencedErrorContext::class."\0";
-@@ -129,5 +129,5 @@ class ExceptionCaster
+@@ -130,5 +130,5 @@ class ExceptionCaster
       * @return array
       */
 -    public static function castTraceStub(TraceStub $trace, array $a, Stub $stub, bool $isNested)
 +    public static function castTraceStub(TraceStub $trace, array $a, Stub $stub, bool $isNested): array
      {
          if (!$isNested) {
-@@ -206,5 +206,5 @@ class ExceptionCaster
+@@ -207,5 +207,5 @@ class ExceptionCaster
       * @return array
       */
 -    public static function castFrameStub(FrameStub $frame, array $a, Stub $stub, bool $isNested)
@@ -13661,31 +13672,31 @@ index 0cf42584a0..e2807c7001 100644
      {
          $a['current_byte_index'] = xml_get_current_byte_index($h);
 diff --git a/src/Symfony/Component/VarDumper/Cloner/AbstractCloner.php b/src/Symfony/Component/VarDumper/Cloner/AbstractCloner.php
-index 9df2b79f0a..fd9ed90066 100644
+index 6a746b88e3..4c0940bd31 100644
 --- a/src/Symfony/Component/VarDumper/Cloner/AbstractCloner.php
 +++ b/src/Symfony/Component/VarDumper/Cloner/AbstractCloner.php
-@@ -236,5 +236,5 @@ abstract class AbstractCloner implements ClonerInterface
+@@ -237,5 +237,5 @@ abstract class AbstractCloner implements ClonerInterface
       * @return void
       */
 -    public function addCasters(array $casters)
 +    public function addCasters(array $casters): void
      {
          foreach ($casters as $type => $callback) {
-@@ -248,5 +248,5 @@ abstract class AbstractCloner implements ClonerInterface
+@@ -249,5 +249,5 @@ abstract class AbstractCloner implements ClonerInterface
       * @return void
       */
 -    public function setMaxItems(int $maxItems)
 +    public function setMaxItems(int $maxItems): void
      {
          $this->maxItems = $maxItems;
-@@ -258,5 +258,5 @@ abstract class AbstractCloner implements ClonerInterface
+@@ -259,5 +259,5 @@ abstract class AbstractCloner implements ClonerInterface
       * @return void
       */
 -    public function setMaxString(int $maxString)
 +    public function setMaxString(int $maxString): void
      {
          $this->maxString = $maxString;
-@@ -269,5 +269,5 @@ abstract class AbstractCloner implements ClonerInterface
+@@ -270,5 +270,5 @@ abstract class AbstractCloner implements ClonerInterface
       * @return void
       */
 -    public function setMinDepth(int $minDepth)
@@ -13722,7 +13733,7 @@ index 053a90972b..5876b02373 100644
      {
          if (-1 !== $depth) {
 diff --git a/src/Symfony/Component/VarDumper/Dumper/CliDumper.php b/src/Symfony/Component/VarDumper/Dumper/CliDumper.php
-index c3d848ec17..ba28ebcb11 100644
+index d04c199e67..8b962c311d 100644
 --- a/src/Symfony/Component/VarDumper/Dumper/CliDumper.php
 +++ b/src/Symfony/Component/VarDumper/Dumper/CliDumper.php
 @@ -90,5 +90,5 @@ class CliDumper extends AbstractDumper
@@ -13795,14 +13806,14 @@ index c3d848ec17..ba28ebcb11 100644
 +    protected function dumpKey(Cursor $cursor): void
      {
          if (null !== $key = $cursor->hashKey) {
-@@ -561,5 +561,5 @@ class CliDumper extends AbstractDumper
+@@ -562,5 +562,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    protected function dumpLine(int $depth, bool $endOfValue = false)
 +    protected function dumpLine(int $depth, bool $endOfValue = false): void
      {
          if ($this->colors) {
-@@ -572,5 +572,5 @@ class CliDumper extends AbstractDumper
+@@ -573,5 +573,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    protected function endValue(Cursor $cursor)

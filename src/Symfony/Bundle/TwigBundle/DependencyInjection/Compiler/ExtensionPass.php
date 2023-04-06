@@ -47,13 +47,11 @@ class ExtensionPass implements CompilerPassInterface
             $container->removeDefinition('twig.extension.yaml');
         }
 
-        if ($container->has(ImportMapManager::class)) {
-            $polyfill = $container->getParameter('importmap.polyfill');
-            if ($polyfill != null) {
-                $container->getDefinition('twig.extension.importmap')->addArgument($polyfill);
-            }
-        } else {
+        if (!$container->has(ImportMapManager::class)) {
             $container->removeDefinition('twig.extension.importmap');
+            $container->removeDefinition('twig.runtime.importmap');
+        } elseif (null !== $polyfill = $container->getParameter('importmap.polyfill')) {
+            $container->getDefinition('twig.runtime.importmap')->addArgument($polyfill);
         }
 
         $viewDir = \dirname((new \ReflectionClass(\Symfony\Bridge\Twig\Extension\FormExtension::class))->getFileName(), 2).'/Resources/views';

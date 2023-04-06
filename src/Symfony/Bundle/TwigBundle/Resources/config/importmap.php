@@ -12,12 +12,16 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Bridge\Twig\Extension\ImportMapExtension;
+use Symfony\Bridge\Twig\Extension\ImportMapRuntime;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
 
+        ->set('twig.runtime.importmap', ImportMapRuntime::class)
+        ->args([service('importmap.manager')])
+        ->tag('twig.runtime')
+
         ->set('twig.extension.importmap', ImportMapExtension::class)
-            ->args([service('importmap.manager')])
             ->tag('twig.extension')
 
     ;

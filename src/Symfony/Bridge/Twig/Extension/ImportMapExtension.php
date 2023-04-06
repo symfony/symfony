@@ -11,7 +11,6 @@
 
 namespace Symfony\Bridge\Twig\Extension;
 
-use Symfony\Component\ImportMap\ImportMapManager;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -20,41 +19,10 @@ use Twig\TwigFunction;
  */
 final class ImportMapExtension extends AbstractExtension
 {
-    public function __construct(
-        private readonly ImportMapManager $importMapManager,
-        private readonly string|false $polyfillUrl = ImportMapManager::POLYFILL_URL,
-    ) {
-    }
-
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('importmap', [$this, 'importmap'], ['is_safe' => ['html']]),
+            new TwigFunction('importmap', [ImportMapRuntime::class, 'importmap'], ['is_safe' => ['html']]),
         ];
-    }
-
-    public function importmap(): string
-    {
-        $output = <<<HTML
-        <script type="importmap">
-        {$this->importMapManager->getImportMap()}
-        </script>
-        HTML;
-
-        if ($this->polyfillUrl) {
-            $url = htmlspecialchars($this->polyfillUrl);
-
-            $output .= <<<HTML
-
-            <!-- ES Module Shims: Import maps polyfill for modules browsers without import maps support -->
-            <script async src="{$url}" crossorigin="anonymous"></script>
-            HTML;
-        }
-
-        foreach ($this->importMapManager->getModulesToPreload() as $url) {
-            $output .= "<link rel=\"modulepreload\" href=\"{$url}\">\n";
-        }
-
-        return $output;
     }
 }

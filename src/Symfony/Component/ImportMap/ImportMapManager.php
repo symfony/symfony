@@ -296,7 +296,7 @@ final class ImportMapManager
             return;
         }
 
-        $assetPath = $this->assetsDir.$ths->importMap[$packageName]['path'];
+        $assetPath = $this->assetsDir.$this->importMap[$packageName]['path'];
         if (!is_file($assetPath)) {
             return;
         }

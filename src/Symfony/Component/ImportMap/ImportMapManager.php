@@ -122,7 +122,7 @@ final class ImportMapManager
         $this->modulesToPreload = [];
 
         $importmap = ['imports' => []];
-        foreach ($this->importMap['require'] as $packageName => $data) {
+        foreach ($this->importMap as $packageName => $data) {
             if (isset($data['url'])) {
                 $importmap['imports'][$packageName] = ($data['download'] ?? false) ? $this->vendorUrl($packageName) : $data['url'];
             } elseif (isset($data['path'])) {
@@ -132,7 +132,7 @@ final class ImportMapManager
             }
 
             if ($data['preload'] ?? false) {
-                $this->modulesToPreload[] = $importmap['require'][$packageName];
+                $this->modulesToPreload[] = $importmap[$packageName];
             }
         }
 
@@ -149,24 +149,24 @@ final class ImportMapManager
         $this->loadImportMap();
 
         foreach ($remove as $packageName) {
-            if (!isset($this->importMap['require'][$packageName])) {
+            if (!isset($this->importMap[$packageName])) {
                 continue;
             }
 
-            $this->cleanup($this->importMap['require'], $packageName);
-            unset($this->importMap['require'][$packageName]);
+            $this->cleanup($packageName);
+            unset($this->importMap[$packageName]);
         }
 
         $install = [];
         $packages = [];
-        foreach ($this->importMap['require'] ?? [] as $packageName => $data) {
+        foreach ($this->importMap ?? [] as $packageName => $data) {
             if (isset($data['path'])) {
                 $publicPath = $this->publicAssetsDir.$this->digestName($packageName, $data['path']);
                 if (is_file($publicPath)) {
                     continue;
                 }
 
-                $this->cleanup($this->importMap['require'], $packageName, false);
+                $this->cleanup($packageName, false);
                 @mkdir($this->publicAssetsDir, 0777, true);
                 copy($this->assetsDir.$data['path'], $publicPath);
 
@@ -232,32 +232,32 @@ final class ImportMapManager
 
         foreach ($response->toArray()['map']['imports'] as $packageName => $url) {
             if ($packages[$packageName]->preload) {
-                $this->importMap['require'][$packageName]['preload'] = true;
+                $this->importMap[$packageName]['preload'] = true;
             } else {
-                unset($this->importMap['require'][$packageName]['preload']);
+                unset($this->importMap[$packageName]['preload']);
             }
 
             $relativePath = 'vendor/'.$packageName.'.js';
             $localPath = $this->assetsDir.$relativePath;
 
             if (!$packages[$packageName]->download) {
-                if ($this->importMap['require'][$packageName]['download'] ?? false) {
-                    $this->cleanup($this->importMap['require'], $packageName);
+                if ($this->importMap[$packageName]['download'] ?? false) {
+                    $this->cleanup($packageName);
                 }
-                unset($this->importMap['require'][$packageName]['download']);
-                $this->importMap['require'][$packageName]['url'] = $url;
+                unset($this->importMap[$packageName]['download']);
+                $this->importMap[$packageName]['url'] = $url;
 
                 continue;
             }
 
-            $this->importMap['require'][$packageName]['download'] = true;
-            if (($this->importMap['require'][$packageName]['url'] ?? null) === $url) {
+            $this->importMap[$packageName]['download'] = true;
+            if (($this->importMap[$packageName]['url'] ?? null) === $url) {
                 continue;
             }
 
-            $this->cleanup($this->importMap['require'], $packageName, false);
+            $this->cleanup($packageName, false);
 
-            $this->importMap['require'][$packageName]['url'] = $url;
+            $this->importMap[$packageName]['url'] = $url;
 
             @mkdir(\dirname($localPath), 0777, true);
             file_put_contents($localPath, $this->httpClient->request('GET', $url)->getContent());
@@ -268,9 +268,9 @@ final class ImportMapManager
         }
     }
 
-    private function cleanup(array $importMap, string $packageName, bool $cleanEmptyDirectories = true): void
+    private function cleanup(string $packageName, bool $cleanEmptyDirectories = true): void
     {
-        if ($importMap[$packageName]['download'] ?? false) {
+        if ($ths->importMap[$packageName]['download'] ?? false) {
             $assetPath = $this->assetsDir.'vendor/'.$packageName.'.js';
 
             if (!is_file($assetPath)) {
@@ -292,16 +292,16 @@ final class ImportMapManager
             return;
         }
 
-        if (!($importMap[$packageName]['path'] ?? false)) {
+        if (!($ths->importMap[$packageName]['path'] ?? false)) {
             return;
         }
 
-        $assetPath = $this->assetsDir.$importMap[$packageName]['path'];
+        $assetPath = $this->assetsDir.$ths->importMap[$packageName]['path'];
         if (!is_file($assetPath)) {
             return;
         }
 
-        $publicAssetPath = $this->publicAssetsDir.$this->digestName($packageName, $importMap[$packageName]['path']);
+        $publicAssetPath = $this->publicAssetsDir.$this->digestName($packageName, $ths->importMap[$packageName]['path']);
 
         @unlink($publicAssetPath);
         if ($cleanEmptyDirectories) {

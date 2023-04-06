@@ -155,7 +155,9 @@ use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\ProblemNormalizer;
 use Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer;
+use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\String\LazyString;
 use Symfony\Component\String\Slugger\SluggerInterface;
@@ -1748,6 +1750,12 @@ class FrameworkExtension extends Extension
 
         if (!class_exists(Headers::class)) {
             $container->removeDefinition('serializer.normalizer.mime_message');
+        }
+
+        // compat with Symfony < 6.3
+        if (!is_subclass_of(ProblemNormalizer::class, SerializerAwareInterface::class)) {
+            $container->getDefinition('serializer.normalizer.problem')
+                ->setArguments(['%kernel.debug%']);
         }
 
         $serializerLoaders = [];

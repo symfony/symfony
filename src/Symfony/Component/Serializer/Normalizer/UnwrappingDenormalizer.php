@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerAwareTrait;
 
@@ -37,7 +38,7 @@ final class UnwrappingDenormalizer implements DenormalizerInterface, SerializerA
         return ['*' => false];
     }
 
-    public function denormalize(mixed $data, string $class, string $format = null, array $context = []): mixed
+    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
     {
         $propertyPath = $context[self::UNWRAP_PATH];
         $context['unwrapped'] = true;
@@ -50,7 +51,11 @@ final class UnwrappingDenormalizer implements DenormalizerInterface, SerializerA
             $data = $this->propertyAccessor->getValue($data, $propertyPath);
         }
 
-        return $this->serializer->denormalize($data, $class, $format, $context);
+        if (!$this->serializer instanceof DenormalizerInterface) {
+            throw new LogicException('Cannot unwrap path because the injected serializer is not a denormalizer.');
+        }
+
+        return $this->serializer->denormalize($data, $type, $format, $context);
     }
 
     public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool

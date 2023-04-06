@@ -68,6 +68,7 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
             $violationEntry = [
                 'propertyPath' => $propertyPath,
                 'title' => $violation->getMessage(),
+                'template' => $violation->getMessageTemplate(),
                 'parameters' => $violation->getParameters(),
             ];
             if (null !== $code = $violation->getCode()) {

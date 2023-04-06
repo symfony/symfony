@@ -12,7 +12,13 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
+use Symfony\Component\Serializer\SerializerAwareInterface;
+use Symfony\Component\Serializer\SerializerAwareTrait;
+use Symfony\Component\Validator\Exception\ValidationFailedException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Normalizes errors according to the API Problem spec (RFC 7807).
@@ -22,22 +28,19 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Yonel Ceruto <yonelceruto@gmail.com>
  */
-class ProblemNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
+class ProblemNormalizer implements NormalizerInterface, SerializerAwareInterface, CacheableSupportsMethodInterface
 {
+    use SerializerAwareTrait;
+
     public const TITLE = 'title';
     public const TYPE = 'type';
     public const STATUS = 'status';
 
-    private $debug;
-    private $defaultContext = [
-        self::TYPE => 'https://tools.ietf.org/html/rfc2616#section-10',
-        self::TITLE => 'An error occurred',
-    ];
-
-    public function __construct(bool $debug = false, array $defaultContext = [])
-    {
-        $this->debug = $debug;
-        $this->defaultContext = $defaultContext + $this->defaultContext;
+    public function __construct(
+        private bool $debug = false,
+        private array $defaultContext = [],
+        private ?TranslatorInterface $translator = null,
+    ) {
     }
 
     public function getSupportedTypes(?string $format): array
@@ -53,15 +56,46 @@ class ProblemNormalizer implements NormalizerInterface, CacheableSupportsMethodI
             throw new InvalidArgumentException(sprintf('The object must implement "%s".', FlattenException::class));
         }
 
+        $data = [];
         $context += $this->defaultContext;
         $debug = $this->debug && ($context['debug'] ?? true);
+        $exception = $context['exception'] ?? null;
+        if ($exception instanceof HttpExceptionInterface) {
+            $exception = $exception->getPrevious();
+
+            if ($exception instanceof PartialDenormalizationException) {
+                $trans = $this->translator ? $this->translator->trans(...) : fn ($m, $p) => strtr($m, $p);
+                $template = 'This value should be of type {{ type }}.';
+                $data = [
+                    self::TYPE => 'https://symfony.com/errors/validation',
+                    'violations' => array_map(
+                        fn ($e) => [
+                            'propertyPath' => $e->getPath(),
+                            'title' => $trans($template, [
+                                '{{ type }}' => implode('|', $e->getExpectedTypes() ?? ['?']),
+                            ], 'validators'),
+                            'template' => $template,
+                            'parameter' => [
+                                '{{ type }}' => implode('|', $e->getExpectedTypes() ?? ['?']),
+                            ],
+                        ] + ($debug || $e->canUseMessageForUser() ? ['hint' => $e->getMessage()] : []),
+                        $exception->getErrors()
+                    ),
+                ];
+            } elseif ($exception instanceof ValidationFailedException
+                && $this->serializer instanceof NormalizerInterface
+                && $this->serializer->supportsNormalization($exception->getViolations(), $format, $context)
+            ) {
+                $data = $this->serializer->normalize($exception->getViolations(), $format, $context);
+            }
+        }
 
         $data = [
-            self::TYPE => $context['type'],
-            self::TITLE => $context['title'],
-            self::STATUS => $context['status'] ?? $object->getStatusCode(),
+            self::TYPE => $data[self::TYPE] ?? $context[self::TYPE] ?? 'https://tools.ietf.org/html/rfc2616#section-10',
+            self::TITLE => $data[self::TITLE] ?? $context[self::TITLE] ?? 'An error occurred',
+            self::STATUS => $context[self::STATUS] ?? $object->getStatusCode(),
             'detail' => $debug ? $object->getMessage() : $object->getStatusText(),
-        ];
+        ] + $data;
         if ($debug) {
             $data['class'] = $object->getClass();
             $data['trace'] = $object->getTrace();

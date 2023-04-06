@@ -17,6 +17,7 @@ use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\Part\AbstractPart;
+use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -30,10 +31,10 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface, CacheableSupportsMethodInterface
 {
-    private $serializer;
-    private $normalizer;
-    private $headerClassMap;
-    private $headersProperty;
+    private NormalizerInterface&DenormalizerInterface $serializer;
+    private PropertyNormalizer $normalizer;
+    private array $headerClassMap;
+    private \ReflectionProperty $headersProperty;
 
     public function __construct(PropertyNormalizer $normalizer)
     {
@@ -57,6 +58,9 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
 
     public function setSerializer(SerializerInterface $serializer): void
     {
+        if (!$serializer instanceof NormalizerInterface || !$serializer instanceof DenormalizerInterface) {
+            throw new LogicException(sprintf('The passed serializer should implement both NormalizerInterface and DenormalizerInterface, "%s" given.', get_debug_type($serializer)));
+        }
         $this->serializer = $serializer;
         $this->normalizer->setSerializer($serializer);
     }

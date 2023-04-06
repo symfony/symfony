@@ -103,7 +103,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('serializer.normalizer', ['priority' => -950])
 
         ->set('serializer.normalizer.problem', ProblemNormalizer::class)
-            ->args([param('kernel.debug')])
+            ->args([param('kernel.debug'), '$translator' => service('translator')->nullOnInvalid()])
             ->tag('serializer.normalizer', ['priority' => -890])
 
         ->set('serializer.denormalizer.unwrapping', UnwrappingDenormalizer::class)

@@ -14,7 +14,9 @@ namespace Symfony\Component\Scheduler\Tests\Messenger;
 use PHPUnit\Framework\TestCase;
 use Psr\Clock\ClockInterface;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
+use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
 use Symfony\Component\Scheduler\Generator\MessageGenerator;
 use Symfony\Component\Scheduler\Messenger\SchedulerTransport;
@@ -32,23 +34,32 @@ class SchedulerTransportFactoryTest extends TestCase
         $trigger = $this->createMock(TriggerInterface::class);
         $serializer = $this->createMock(SerializerInterface::class);
         $clock = $this->createMock(ClockInterface::class);
+        $asyncTransport = $this->createMock(TransportInterface::class);
 
         $defaultRecurringMessage = RecurringMessage::trigger($trigger, (object) ['id' => 'default']);
         $customRecurringMessage = RecurringMessage::trigger($trigger, (object) ['id' => 'custom']);
 
         $default = new SchedulerTransport(new MessageGenerator((new SomeScheduleProvider([$defaultRecurringMessage]))->getSchedule(), 'default', $clock));
         $custom = new SchedulerTransport(new MessageGenerator((new SomeScheduleProvider([$customRecurringMessage]))->getSchedule(), 'custom', $clock));
+        $retryInMemory = new SchedulerTransport(new MessageGenerator((new SomeScheduleProvider([$defaultRecurringMessage]))->getSchedule(), 'default', $clock), new InMemoryTransport());
+        $retryAsync = new SchedulerTransport(new MessageGenerator((new SomeScheduleProvider([$defaultRecurringMessage]))->getSchedule(), 'default', $clock), $asyncTransport);
 
         $factory = new SchedulerTransportFactory(
             new Container([
                 'default' => fn () => (new SomeScheduleProvider([$defaultRecurringMessage]))->getSchedule(),
                 'custom' => fn () => (new SomeScheduleProvider([$customRecurringMessage]))->getSchedule(),
             ]),
+            new Container([
+                'async' => fn () => $asyncTransport,
+            ]),
             $clock,
         );
 
         $this->assertEquals($default, $factory->createTransport('schedule://default', [], $serializer));
         $this->assertEquals($custom, $factory->createTransport('schedule://custom', ['cache' => 'app'], $serializer));
+        $this->assertEquals($retryInMemory, $factory->createTransport('schedule://default?retry', [], $serializer));
+        $this->assertEquals($retryInMemory, $factory->createTransport('schedule://default?retry=memory', [], $serializer));
+        $this->assertEquals($retryAsync, $factory->createTransport('schedule://default?retry=async', [], $serializer));
     }
 
     public function testInvalidDsn()
@@ -97,6 +108,7 @@ class SchedulerTransportFactoryTest extends TestCase
             new Container([
                 'default' => fn () => $this->createMock(ScheduleProviderInterface::class),
             ]),
+            new Container([]),
             $this->createMock(ClockInterface::class),
         );
     }

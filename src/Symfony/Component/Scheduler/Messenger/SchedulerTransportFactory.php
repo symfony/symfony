@@ -14,8 +14,10 @@ namespace Symfony\Component\Scheduler\Messenger;
 use Psr\Clock\ClockInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Clock\Clock;
+use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
+use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
 use Symfony\Component\Scheduler\Generator\Checkpoint;
 use Symfony\Component\Scheduler\Generator\MessageGenerator;
@@ -28,6 +30,7 @@ class SchedulerTransportFactory implements TransportFactoryInterface
 {
     public function __construct(
         private readonly ContainerInterface $scheduleProviders,
+        private readonly ContainerInterface $transportProviders,
         private readonly ClockInterface $clock = new Clock(),
     ) {
     }
@@ -48,7 +51,26 @@ class SchedulerTransportFactory implements TransportFactoryInterface
         $schedule = $this->scheduleProviders->get($scheduleName)->getSchedule();
         $checkpoint = new Checkpoint('scheduler_checkpoint_'.$scheduleName, $schedule->getLock(), $schedule->getState());
 
-        return new SchedulerTransport(new MessageGenerator($schedule, $checkpoint, $this->clock));
+        return new SchedulerTransport(new MessageGenerator($schedule, $checkpoint, $this->clock), $this->getRetryTransportFromDsn($dsn));
+    }
+
+    private function getRetryTransportFromDsn(string $dsn): ?TransportInterface
+    {
+        $dsnQuery = parse_url($dsn, \PHP_URL_QUERY);
+        if (null === $dsnQuery) {
+            return null;
+        }
+
+        parse_str($dsnQuery, $dsnOptions);
+        if (false === $retryName = $dsnOptions['retry'] ?? false) {
+            return null;
+        }
+
+        if ('' === $retryName || ('memory' === $retryName && !$this->transportProviders->has($retryName))) {
+            return new InMemoryTransport();
+        }
+
+        return $this->transportProviders->get($retryName);
     }
 
     public function supports(string $dsn, array $options): bool

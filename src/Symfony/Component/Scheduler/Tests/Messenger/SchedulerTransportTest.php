@@ -13,6 +13,8 @@ namespace Symfony\Component\Scheduler\Tests\Messenger;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
+use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Scheduler\Exception\LogicException;
 use Symfony\Component\Scheduler\Generator\MessageGeneratorInterface;
 use Symfony\Component\Scheduler\Messenger\ScheduledStamp;
@@ -62,5 +64,43 @@ class SchedulerTransportTest extends TestCase
 
         $this->expectException(LogicException::class);
         $transport->send(new Envelope(new \stdClass()));
+    }
+
+    public function testRetryTransport()
+    {
+        $messages = [
+            (object) ['id' => 'first'],
+            (object) ['id' => 'second'],
+        ];
+        $generator = $this->createMock(MessageGeneratorInterface::class);
+        $generator->method('getMessages')->willReturnCallback(function () use (&$messages) {
+            return $messages;
+        });
+        $transport = new SchedulerTransport($generator, new InMemoryTransport());
+
+        // First message: failing
+        $envelope = $transport->get()->current();
+        $this->assertInstanceOf(Envelope::class, $envelope);
+        $this->assertNotNull($envelope->last(ScheduledStamp::class));
+        $this->assertSame(current($messages), $envelope->getMessage());
+        // simulate a retry strategy
+        $transport->send(Envelope::wrap($envelope, [new RedeliveryStamp(0)]));
+
+        // First message retrying
+        $envelope = $transport->get()->current();
+        $this->assertInstanceOf(Envelope::class, $envelope);
+        $this->assertNotNull($envelope->last(ScheduledStamp::class));
+        $this->assertNotNull($envelope->last(RedeliveryStamp::class));
+        $this->assertSame(array_shift($messages), $envelope->getMessage());
+        $transport->ack($envelope);
+
+        // Second messages
+        $envelope = $transport->get()->current();
+        $this->assertInstanceOf(Envelope::class, $envelope);
+        $this->assertNotNull($envelope->last(ScheduledStamp::class));
+        $this->assertSame(array_shift($messages), $envelope->getMessage());
+        $transport->ack($envelope);
+
+        $this->assertEmpty($messages);
     }
 }

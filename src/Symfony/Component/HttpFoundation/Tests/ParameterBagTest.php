@@ -378,6 +378,30 @@ class ParameterBagTest extends TestCase
 
         $this->assertNull($bag->getEnum('invalid-value', FooEnum::class));
     }
+
+    public function testGetStringOrNull()
+    {
+        $bag = new ParameterBag(['valid-value' => 'foo']);
+
+        $this->assertSame('foo', $bag->getStringOrNull('valid-value'));
+        $this->assertNull($bag->getStringOrNull('invalid-key'));
+    }
+
+    public function testGetIntegerOrNull()
+    {
+        $bag = new ParameterBag(['valid-value' => 1]);
+
+        $this->assertSame(1, $bag->getIntegerOrNull('valid-value'));
+        $this->assertNull($bag->getIntegerOrNull('invalid-key'));
+    }
+
+    public function testGetBooleanOrNull()
+    {
+        $bag = new ParameterBag(['valid-value' => true]);
+
+        $this->assertSame(true, $bag->getBooleanOrNull('valid-value'));
+        $this->assertNull($bag->getBooleanOrNull('invalid-key'));
+    }
 }
 
 class InputStringable

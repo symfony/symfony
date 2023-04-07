@@ -146,6 +146,11 @@ class ParameterBag implements \IteratorAggregate, \Countable
         return (string) $value;
     }
 
+    public function getStringOrNull(string $key, string $default = null): ?string
+    {
+        return $this->filter($key, $default, \FILTER_SANITIZE_STRING, \FILTER_NULL_ON_FAILURE);
+    }
+
     /**
      * Returns the parameter value converted to integer.
      */
@@ -155,12 +160,22 @@ class ParameterBag implements \IteratorAggregate, \Countable
         return $this->filter($key, $default, \FILTER_VALIDATE_INT, ['flags' => \FILTER_REQUIRE_SCALAR]) ?: 0;
     }
 
+    public function getIntOrNull(string $key, int $default = null): ?int
+    {
+        return $this->filter($key, $default, \FILTER_VALIDATE_INT, \FILTER_NULL_ON_FAILURE);
+    }
+
     /**
      * Returns the parameter value converted to boolean.
      */
     public function getBoolean(string $key, bool $default = false): bool
     {
         return $this->filter($key, $default, \FILTER_VALIDATE_BOOL, ['flags' => \FILTER_REQUIRE_SCALAR]);
+    }
+
+    public function getBooleanOrNull(string $key, bool $default = null): ?bool
+    {
+        return $this->filter($key, $default, \FILTER_VALIDATE_BOOLEAN, \FILTER_NULL_ON_FAILURE);
     }
 
     /**

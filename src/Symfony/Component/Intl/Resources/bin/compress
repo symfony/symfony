@@ -1,0 +1,19 @@
+#!/usr/bin/env php
+<?php
+
+if ('cli' !== PHP_SAPI) {
+    throw new Exception('This script must be run from the command line.');
+}
+if (!extension_loaded('zlib')) {
+    throw new Exception('This script requires the zlib extension.');
+}
+
+foreach (glob(dirname(__DIR__).'/data/*/*.php') as $file) {
+    if (in_array(basename($file), ['en.php', 'meta.php'], true)) {
+        continue;
+    }
+
+    file_put_contents('compress.zlib://'.$file.'.gz', $data);
+
+    unlink($file.(filesize($file.'.gz') >= filesize($file) ? '.gz' : ''));
+}

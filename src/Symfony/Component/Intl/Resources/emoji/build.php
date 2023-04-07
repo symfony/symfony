@@ -19,9 +19,9 @@ use Symfony\Component\VarExporter\VarExporter;
 Builder::cleanTarget();
 $emojisCodePoints = Builder::getEmojisCodePoints();
 Builder::saveRules(Builder::buildRules($emojisCodePoints));
+Builder::saveRules(Builder::buildStripRules($emojisCodePoints));
 Builder::saveRules(Builder::buildGitHubRules($emojisCodePoints));
 Builder::saveRules(Builder::buildSlackRules($emojisCodePoints));
-Builder::saveRules(Builder::buildStripRules($emojisCodePoints));
 
 final class Builder
 {
@@ -178,7 +178,7 @@ final class Builder
             $maps[$codePointsCount][$emoji] = '';
         }
 
-        return ['strip' => self::createRules($maps)];
+        return ['emoji-strip' => self::createRules($maps)];
     }
 
     public static function cleanTarget(): void
@@ -192,7 +192,7 @@ final class Builder
     {
         $firstChars = [];
         foreach ($rulesByLocale as $filename => $rules) {
-            file_put_contents(self::TARGET_DIR."/$filename.php", "<?php\n\nreturn ".VarExporter::export($rules).";\n");
+            file_put_contents('compress.zlib://'.self::TARGET_DIR."/$filename.php.gz", "<?php\n\nreturn ".VarExporter::export($rules).";\n");
 
             foreach ($rules as $k => $v) {
                 if (!str_starts_with($filename, 'emoji-')) {

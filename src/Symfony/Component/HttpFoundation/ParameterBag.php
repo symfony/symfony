@@ -146,9 +146,11 @@ class ParameterBag implements \IteratorAggregate, \Countable
         return (string) $value;
     }
 
-    public function getStringOrNull(string $key, string $default = null): ?string
+    public function getStringOrNull(string $key, string $default = ''): ?string
     {
-        return $this->filter($key, $default, \FILTER_SANITIZE_STRING, \FILTER_NULL_ON_FAILURE);
+        return $this->has($key)
+            ? $this->filter($key, $default, \FILTER_DEFAULT, \FILTER_NULL_ON_FAILURE)
+            : null;
     }
 
     /**
@@ -160,9 +162,11 @@ class ParameterBag implements \IteratorAggregate, \Countable
         return $this->filter($key, $default, \FILTER_VALIDATE_INT, ['flags' => \FILTER_REQUIRE_SCALAR]) ?: 0;
     }
 
-    public function getIntOrNull(string $key, int $default = null): ?int
+    public function getIntOrNull(string $key, int $default = 0): ?int
     {
-        return $this->filter($key, $default, \FILTER_VALIDATE_INT, \FILTER_NULL_ON_FAILURE);
+        return $this->has($key)
+            ? $this->filter($key, $default, \FILTER_VALIDATE_INT, \FILTER_NULL_ON_FAILURE)
+            : null;
     }
 
     /**
@@ -173,9 +177,11 @@ class ParameterBag implements \IteratorAggregate, \Countable
         return $this->filter($key, $default, \FILTER_VALIDATE_BOOL, ['flags' => \FILTER_REQUIRE_SCALAR]);
     }
 
-    public function getBooleanOrNull(string $key, bool $default = null): ?bool
+    public function getBooleanOrNull(string $key, bool $default = false): ?bool
     {
-        return $this->filter($key, $default, \FILTER_VALIDATE_BOOLEAN, \FILTER_NULL_ON_FAILURE);
+        return $this->has($key)
+            ? $this->filter($key, $default, \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE)
+            : null;
     }
 
     /**

@@ -379,7 +379,7 @@ class ParameterBagTest extends TestCase
         $this->assertNull($bag->getEnum('invalid-value', FooEnum::class));
     }
 
-    public function testGetStringOrNull()
+    public function testGetStringOrNull(): void
     {
         $bag = new ParameterBag(['valid-value' => 'foo']);
 
@@ -387,7 +387,7 @@ class ParameterBagTest extends TestCase
         $this->assertNull($bag->getStringOrNull('invalid-key'));
     }
 
-    public function testGetIntegerOrNull()
+    public function testGetIntegerOrNull(): void
     {
         $bag = new ParameterBag(['valid-value' => 1]);
 
@@ -395,7 +395,7 @@ class ParameterBagTest extends TestCase
         $this->assertNull($bag->getIntegerOrNull('invalid-key'));
     }
 
-    public function testGetBooleanOrNull()
+    public function testGetBooleanOrNull(): void
     {
         $bag = new ParameterBag(['valid-value' => true]);
 

@@ -387,19 +387,19 @@ class ParameterBagTest extends TestCase
         $this->assertNull($bag->getStringOrNull('invalid-key'));
     }
 
-    public function testGetIntegerOrNull(): void
+    public function testGetIntOrNull(): void
     {
         $bag = new ParameterBag(['valid-value' => 1]);
 
-        $this->assertSame(1, $bag->getIntegerOrNull('valid-value'));
-        $this->assertNull($bag->getIntegerOrNull('invalid-key'));
+        $this->assertSame(1, $bag->getIntOrNull('valid-value'));
+        $this->assertNull($bag->getIntOrNull('invalid-key'));
     }
 
     public function testGetBooleanOrNull(): void
     {
         $bag = new ParameterBag(['valid-value' => true]);
 
-        $this->assertSame(true, $bag->getBooleanOrNull('valid-value'));
+        $this->assertTrue($bag->getBooleanOrNull('valid-value'));
         $this->assertNull($bag->getBooleanOrNull('invalid-key'));
     }
 

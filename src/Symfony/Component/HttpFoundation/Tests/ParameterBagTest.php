@@ -402,22 +402,6 @@ class ParameterBagTest extends TestCase
         $this->assertTrue($bag->getBooleanOrNull('valid-value'));
         $this->assertNull($bag->getBooleanOrNull('invalid-key'));
     }
-
-    public function testDefaultValueIsUsedWhenInvalidDataProvided(): void
-    {
-        $bag = new ParameterBag(
-            [
-                'invalid-int' => 'foo',
-                'invalid-string' => '',
-                'invalid-boolean' => null,
-            ]
-
-        );
-
-        $this->assertSame(1, $bag->getIntOrNull('invalid-int', 1));
-        $this->assertSame('bar', $bag->getStringOrNull('invalid-string', 'bar'));
-        $this->assertTrue($bag->getBooleanOrNull('invalid-value', true));
-    }
 }
 
 class InputStringable

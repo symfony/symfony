@@ -79,3 +79,12 @@ jobs:
 
       - name: Run intl-data tests
         run: ./phpunit --group intl-data -v
+
+      - name: Test with compressed data
+        run: |
+          [ -f src/Symfony/Component/Intl/Resources/data/locales/en.php ]
+          [ ! -f src/Symfony/Component/Intl/Resources/data/locales/en.php.gz ]
+          src/Symfony/Component/Intl/Resources/bin/compress
+          [ ! -f src/Symfony/Component/Intl/Resources/data/locales/en.php ]
+          [ -f src/Symfony/Component/Intl/Resources/data/locales/en.php.gz ]
+          ./phpunit src/Symfony/Component/Intl

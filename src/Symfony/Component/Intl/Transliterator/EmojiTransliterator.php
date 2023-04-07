@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Intl\Transliterator;
 
+use Symfony\Component\Intl\Util\GzipStreamWrapper;
+
 if (!class_exists(\Transliterator::class)) {
     throw new \LogicException(sprintf('You cannot use the "%s\EmojiTransliterator" class as the "intl" extension is not installed. See https://php.net/intl.', __NAMESPACE__));
 } else {
@@ -40,7 +42,8 @@ if (!class_exists(\Transliterator::class)) {
                 $id = self::REVERSEABLE_IDS[$id];
             }
 
-            if (!preg_match('/^[a-z0-9@_\\.\\-]*$/', $id) || !is_file(\dirname(__DIR__)."/Resources/data/transliterator/emoji/{$id}.php")) {
+            $file = \dirname(__DIR__)."/Resources/data/transliterator/emoji/{$id}.php";
+            if (!preg_match('/^[a-z0-9@_\\.\\-]*$/', $id) || !is_file($file) && !is_file($file .= '.gz')) {
                 \Transliterator::create($id); // Populate intl_get_error_*()
 
                 throw new \IntlException(intl_get_error_message(), intl_get_error_code());
@@ -57,7 +60,7 @@ if (!class_exists(\Transliterator::class)) {
                 $instance = unserialize(sprintf('O:%d:"%s":1:{s:2:"id";s:%d:"%s";}', \strlen(self::class), self::class, \strlen($id), $id));
             }
 
-            $instance->map = $maps[$id] ??= require \dirname(__DIR__)."/Resources/data/transliterator/emoji/{$id}.php";
+            $instance->map = $maps[$id] ??= str_ends_with($file, '.gz') ? GzipStreamWrapper::require($file) : require $file;
 
             return $instance;
         }
@@ -86,7 +89,9 @@ if (!class_exists(\Transliterator::class)) {
             }
 
             foreach (scandir(\dirname(__DIR__).'/Resources/data/transliterator/emoji/') as $file) {
-                if (str_ends_with($file, '.php')) {
+                if (str_ends_with($file, '.php.gz')) {
+                    $ids[] = substr($file, 0, -7);
+                } elseif (str_ends_with($file, '.php')) {
                     $ids[] = substr($file, 0, -4);
                 }
             }

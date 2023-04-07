@@ -60,9 +60,9 @@ class ProblemNormalizerTest extends TestCase
 
         $expected = [
             'type' => 'https://symfony.com/errors/validation',
-            'title' => 'An error occurred',
+            'title' => 'Validation Failed',
             'status' => 422,
-            'detail' => 'Unprocessable Content',
+            'detail' => 'foo: This value should be of type int.',
             'violations' => [
                 [
                     'propertyPath' => 'foo',
@@ -90,7 +90,7 @@ class ProblemNormalizerTest extends TestCase
             'type' => 'https://symfony.com/errors/validation',
             'title' => 'Validation Failed',
             'status' => 422,
-            'detail' => 'Unprocessable Content',
+            'detail' => 'Invalid value',
             'violations' => [
                 [
                     'propertyPath' => '',

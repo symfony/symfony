@@ -68,6 +68,7 @@ class ProblemNormalizer implements NormalizerInterface, SerializerAwareInterface
                 $template = 'This value should be of type {{ type }}.';
                 $data = [
                     self::TYPE => 'https://symfony.com/errors/validation',
+                    self::TITLE => 'Validation Failed',
                     'violations' => array_map(
                         fn ($e) => [
                             'propertyPath' => $e->getPath(),
@@ -75,13 +76,14 @@ class ProblemNormalizer implements NormalizerInterface, SerializerAwareInterface
                                 '{{ type }}' => implode('|', $e->getExpectedTypes() ?? ['?']),
                             ], 'validators'),
                             'template' => $template,
-                            'parameter' => [
+                            'parameters' => [
                                 '{{ type }}' => implode('|', $e->getExpectedTypes() ?? ['?']),
                             ],
                         ] + ($debug || $e->canUseMessageForUser() ? ['hint' => $e->getMessage()] : []),
                         $exception->getErrors()
                     ),
                 ];
+                $data['detail'] = implode("\n", array_map(fn ($e) => $e['propertyPath'].': '.$e['title'], $data['violations']));
             } elseif ($exception instanceof ValidationFailedException
                 && $this->serializer instanceof NormalizerInterface
                 && $this->serializer->supportsNormalization($exception->getViolations(), $format, $context)
@@ -94,7 +96,7 @@ class ProblemNormalizer implements NormalizerInterface, SerializerAwareInterface
             self::TYPE => $data[self::TYPE] ?? $context[self::TYPE] ?? 'https://tools.ietf.org/html/rfc2616#section-10',
             self::TITLE => $data[self::TITLE] ?? $context[self::TITLE] ?? 'An error occurred',
             self::STATUS => $context[self::STATUS] ?? $object->getStatusCode(),
-            'detail' => $debug ? $object->getMessage() : $object->getStatusText(),
+            'detail' => $data['detail'] ?? ($debug ? $object->getMessage() : $object->getStatusText()),
         ] + $data;
         if ($debug) {
             $data['class'] = $object->getClass();

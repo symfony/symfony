@@ -11,6 +11,6 @@
 
 namespace Symfony\Component\BrowserKit\Exception;
 
-class JsonException extends \JsonException implements ExceptionInterface
+class LogicException extends \LogicException implements ExceptionInterface
 {
 }

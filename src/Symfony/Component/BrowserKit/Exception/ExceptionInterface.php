@@ -11,6 +11,11 @@
 
 namespace Symfony\Component\BrowserKit\Exception;
 
-class JsonException extends \JsonException implements ExceptionInterface
+/**
+ * Base ExceptionInterface for the BrowserKit component.
+ *
+ * @author Fabien Potencier <fabien@symfony.com>
+ */
+interface ExceptionInterface extends \Throwable
 {
 }

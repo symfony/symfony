@@ -96,6 +96,11 @@ Notifier
  * [BC BREAK] The following data providers for `TransportTestCase` are now static: `toStringProvider()`, `supportedMessagesProvider()` and `unsupportedMessagesProvider()`
  * [BC BREAK] The `TransportTestCase::createTransport()` method is now static
 
+Security
+--------
+
+ * Deprecate passing a secret as the 2nd argument to the constructor of `Symfony\Component\Security\Http\RememberMe\PersistentRememberMeHandler`
+
 SecurityBundle
 --------------
 

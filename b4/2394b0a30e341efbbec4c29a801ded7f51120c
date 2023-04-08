@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by stof at 2023-04-04T10:08:28Z
+
+Given that subscribers are not deprecated in Doctrine, I don't think we should deprecated them either. It would make it a pain to register a subscriber belonging to a third-party package.
+And we won't be able to remove the code dealing with registering anyway as the methods are part of the upstream API so we still need to support them.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-04-04T10:09:46Z
+
+A subscriber can be registered as a listener so it's possible for 3rd parties to adapt and keep supporting a wide range of versions.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-04-05T10:00:22Z
+
+But what is the benefit of deprecating passing subscribers here ? It will force bundles registering third-party subscribers to duplicate the subscription mapping, and it will not allow us to simplify the code because we cannot remove support for subscribers in 7.0: they are part of the doctrine/event-manager API.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-04-05T10:28:05Z
+
+We should also update the `@param` annotation on the class, to document only the non-deprecated type.
+
+@stof the benefit is to make it clear that using subscribers as services is wrong. It's wrong because they break important laziness expectations.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-04-05T10:37:25Z
+
+> We should also update the `@param` annotation on the class, to document only the non-deprecated type.
+
+I don't think we should do that, as static analysis tools would then report callers as being broken (while a deprecation should not break things)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-04-05T10:41:54Z
+
+We've always been doing that. SA is not part of our BC promise.

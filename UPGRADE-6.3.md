@@ -18,6 +18,7 @@ DependencyInjection
 DoctrineBridge
 --------------
 
+ * Deprecate passing Doctrine subscribers to `ContainerAwareEventManager` class, use listeners instead
  * Deprecate `DoctrineDbalCacheAdapterSchemaSubscriber` in favor of `DoctrineDbalCacheAdapterSchemaListener`
  * Deprecate `MessengerTransportDoctrineSchemaSubscriber` in favor of `MessengerTransportDoctrineSchemaListener`
  * Deprecate `RememberMeTokenProviderDoctrineSchemaSubscriber` in favor of `RememberMeTokenProviderDoctrineSchemaListener`

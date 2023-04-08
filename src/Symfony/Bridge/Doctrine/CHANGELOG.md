@@ -4,6 +4,7 @@ CHANGELOG
 6.3
 ---
 
+ * Deprecate passing Doctrine subscribers to `ContainerAwareEventManager` class, use listeners instead
  * Add `AbstractSchemaListener`, `LockStoreSchemaListener` and `PdoSessionHandlerSchemaListener`
  * Deprecate `DoctrineDbalCacheAdapterSchemaSubscriber` in favor of `DoctrineDbalCacheAdapterSchemaListener`
  * Deprecate `MessengerTransportDoctrineSchemaSubscriber` in favor of `MessengerTransportDoctrineSchemaListener`

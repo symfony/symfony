@@ -12,9 +12,11 @@
 namespace Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\HttpKernel\Attribute\MapUploadedFile;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
@@ -29,6 +31,7 @@ use Symfony\Component\Serializer\Exception\UnexpectedPropertyException;
 use Symfony\Component\Serializer\Exception\UnsupportedFormatException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
@@ -69,13 +72,14 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
     {
         $attribute = $argument->getAttributesOfType(MapQueryString::class, ArgumentMetadata::IS_INSTANCEOF)[0]
             ?? $argument->getAttributesOfType(MapRequestPayload::class, ArgumentMetadata::IS_INSTANCEOF)[0]
+            ?? $argument->getAttributesOfType(MapUploadedFile::class, ArgumentMetadata::IS_INSTANCEOF)[0]
             ?? null;
 
         if (!$attribute) {
             return [];
         }
 
-        if ($argument->isVariadic()) {
+        if (!$attribute instanceof MapUploadedFile && $argument->isVariadic()) {
             throw new \LogicException(sprintf('Mapping variadic argument "$%s" is not supported.', $argument->getName()));
         }
 
@@ -100,24 +104,27 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
 
         foreach ($arguments as $i => $argument) {
             if ($argument instanceof MapQueryString) {
-                $payloadMapper = 'mapQueryString';
+                $payloadMapper = $this->mapQueryString(...);
                 $validationFailedCode = $argument->validationFailedStatusCode;
             } elseif ($argument instanceof MapRequestPayload) {
-                $payloadMapper = 'mapRequestPayload';
+                $payloadMapper = $this->mapRequestPayload(...);
+                $validationFailedCode = $argument->validationFailedStatusCode;
+            } elseif ($argument instanceof MapUploadedFile) {
+                $payloadMapper = $this->mapUploadedFile(...);
                 $validationFailedCode = $argument->validationFailedStatusCode;
             } else {
                 continue;
             }
             $request = $event->getRequest();
 
-            if (!$type = $argument->metadata->getType()) {
+            if (!$argument->metadata->getType()) {
                 throw new \LogicException(sprintf('Could not resolve the "$%s" controller argument: argument should be typed.', $argument->metadata->getName()));
             }
 
             if ($this->validator) {
                 $violations = new ConstraintViolationList();
                 try {
-                    $payload = $this->$payloadMapper($request, $type, $argument);
+                    $payload = $payloadMapper($request, $argument->metadata, $argument);
                 } catch (PartialDenormalizationException $e) {
                     $trans = $this->translator ? $this->translator->trans(...) : fn ($m, $p) => strtr($m, $p);
                     foreach ($e->getErrors() as $error) {
@@ -137,7 +144,11 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
                 }
 
                 if (null !== $payload && !\count($violations)) {
-                    $violations->addAll($this->validator->validate($payload, null, $argument->validationGroups ?? null));
+                    $constraints = $argument->constraints ?? null;
+                    if (\is_array($payload) && !empty($constraints) && !$constraints instanceof Assert\All) {
+                        $constraints = new Assert\All($constraints);
+                    }
+                    $violations->addAll($this->validator->validate($payload, $constraints, $argument->validationGroups ?? null));
                 }
 
                 if (\count($violations)) {
@@ -145,7 +156,7 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
                 }
             } else {
                 try {
-                    $payload = $this->$payloadMapper($request, $type, $argument);
+                    $payload = $payloadMapper($request, $argument->metadata, $argument);
                 } catch (PartialDenormalizationException $e) {
                     throw HttpException::fromStatusCode($validationFailedCode, implode("\n", array_map(static fn ($e) => $e->getMessage(), $e->getErrors())), $e);
                 }
@@ -172,16 +183,16 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
         ];
     }
 
-    private function mapQueryString(Request $request, string $type, MapQueryString $attribute): ?object
+    private function mapQueryString(Request $request, ArgumentMetadata $argument, MapQueryString $attribute): ?object
     {
         if (!$data = $request->query->all()) {
             return null;
         }
 
-        return $this->serializer->denormalize($data, $type, null, $attribute->serializationContext + self::CONTEXT_DENORMALIZE + ['filter_bool' => true]);
+        return $this->serializer->denormalize($data, $argument->getType(), null, $attribute->serializationContext + self::CONTEXT_DENORMALIZE + ['filter_bool' => true]);
     }
 
-    private function mapRequestPayload(Request $request, string $type, MapRequestPayload $attribute): object|array|null
+    private function mapRequestPayload(Request $request, ArgumentMetadata $argument, MapRequestPayload $attribute): object|array|null
     {
         if (null === $format = $request->getContentTypeFormat()) {
             throw new UnsupportedMediaTypeHttpException('Unsupported format.');
@@ -191,8 +202,10 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
             throw new UnsupportedMediaTypeHttpException(sprintf('Unsupported format, expects "%s", but "%s" given.', implode('", "', (array) $attribute->acceptFormat), $format));
         }
 
-        if ('array' === $type && null !== $attribute->type) {
+        if ('array' === $argument->getType() && null !== $attribute->type) {
             $type = $attribute->type.'[]';
+        } else {
+            $type = $argument->getType();
         }
 
         if ($data = $request->request->all()) {
@@ -216,5 +229,10 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
         } catch (UnexpectedPropertyException $e) {
             throw new BadRequestHttpException(sprintf('Request payload contains invalid "%s" property.', $e->property), $e);
         }
+    }
+
+    private function mapUploadedFile(Request $request, ArgumentMetadata $argument, MapUploadedFile $attribute): UploadedFile|array|null
+    {
+        return $request->files->get($attribute->name ?? $argument->getName(), []);
     }
 }

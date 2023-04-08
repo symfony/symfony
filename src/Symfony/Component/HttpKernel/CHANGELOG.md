@@ -10,6 +10,7 @@ CHANGELOG
  * Add `NearMissValueResolverException` to let value resolvers report when an argument could be under their watch but failed to be resolved
  * Add `$type` argument to `#[MapRequestPayload]` that allows mapping a list of items
  * Deprecate `Extension::addAnnotatedClassesToCompile()` and related code infrastructure
+ * Add `#[MapUploadedFile]` attribute to fetch, validate, and inject uploaded files into controller arguments
 
 7.0
 ---

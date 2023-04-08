@@ -52,7 +52,7 @@ class SchedulerTransportTest extends TestCase
     {
         $transport = new SchedulerTransport($this->createMock(MessageGeneratorInterface::class));
 
-        $this->expectException(LogicException::class);
+        $this->expectNotToPerformAssertions();
         $transport->reject(new Envelope(new \stdClass()));
     }
 

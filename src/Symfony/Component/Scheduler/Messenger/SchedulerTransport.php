@@ -40,7 +40,7 @@ class SchedulerTransport implements TransportInterface
 
     public function reject(Envelope $envelope): void
     {
-        throw new LogicException(sprintf('Messages from "%s" must not be rejected.', __CLASS__));
+        // ignore
     }
 
     public function send(Envelope $envelope): Envelope

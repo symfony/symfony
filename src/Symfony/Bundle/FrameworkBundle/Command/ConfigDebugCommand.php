@@ -61,7 +61,7 @@ Either the extension alias or bundle name can be used:
   <info>php %command.full_name% FrameworkBundle</info>
 
 The <info>--format</info> option specifies the format of the configuration,
-this is either "{$helpFormats}".
+these are "{$helpFormats}".
 
   <info>php %command.full_name% framework --format=json</info>
 

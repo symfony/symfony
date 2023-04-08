@@ -25,12 +25,6 @@ use Symfony\Component\Uid\Factory\UlidFactory;
 #[AsCommand(name: 'ulid:generate', description: 'Generate a ULID')]
 class GenerateUlidCommand extends Command
 {
-    private const FORMAT_OPTIONS = [
-        'base32',
-        'base58',
-        'rfc4122',
-    ];
-
     private UlidFactory $factory;
 
     public function __construct(UlidFactory $factory = null)
@@ -46,7 +40,7 @@ class GenerateUlidCommand extends Command
             ->setDefinition([
                 new InputOption('time', null, InputOption::VALUE_REQUIRED, 'The ULID timestamp: a parsable date/time string'),
                 new InputOption('count', 'c', InputOption::VALUE_REQUIRED, 'The number of ULID to generate', 1),
-                new InputOption('format', 'f', InputOption::VALUE_REQUIRED, 'The ULID output format: base32, base58 or rfc4122', 'base32'),
+                new InputOption('format', 'f', InputOption::VALUE_REQUIRED, sprintf('The ULID output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'base32'),
             ])
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command generates a ULID.
@@ -85,10 +79,10 @@ EOF
 
         $formatOption = $input->getOption('format');
 
-        if (\in_array($formatOption, self::FORMAT_OPTIONS)) {
+        if (\in_array($formatOption, $this->getAvailableFormatOptions())) {
             $format = 'to'.ucfirst($formatOption);
         } else {
-            $io->error(sprintf('Invalid format "%s", did you mean "base32", "base58" or "rfc4122"?', $input->getOption('format')));
+            $io->error(sprintf('Invalid format "%s", supported formats are "%s".', $formatOption, implode('", "', $this->getAvailableFormatOptions())));
 
             return 1;
         }
@@ -110,7 +104,16 @@ EOF
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
     {
         if ($input->mustSuggestOptionValuesFor('format')) {
-            $suggestions->suggestValues(self::FORMAT_OPTIONS);
+            $suggestions->suggestValues($this->getAvailableFormatOptions());
         }
+    }
+
+    private function getAvailableFormatOptions(): array
+    {
+        return [
+            'base32',
+            'base58',
+            'rfc4122',
+        ];
     }
 }

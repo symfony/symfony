@@ -84,7 +84,7 @@ class ChoiceType extends AbstractType
             // Check if the choices already contain the empty value
             // Only add the placeholder option if this is not the case
             if (null !== $options['placeholder'] && 0 === \count($choiceList->getChoicesForValues(['']))) {
-                $placeholderView = new ChoiceView(null, '', $options['placeholder']);
+                $placeholderView = new ChoiceView(null, '', $options['placeholder'], $options['placeholder_attr']);
 
                 // "placeholder" is a reserved name
                 $this->addSubForm($builder, 'placeholder', $placeholderView, $options);
@@ -237,6 +237,7 @@ class ChoiceType extends AbstractType
             'choices' => $choiceListView->choices,
             'separator' => '-------------------',
             'placeholder' => null,
+            'placeholder_attr' => [],
             'choice_translation_domain' => $choiceTranslationDomain,
             'choice_translation_parameters' => $options['choice_translation_parameters'],
         ]);
@@ -257,6 +258,7 @@ class ChoiceType extends AbstractType
         // Only add the empty value option if this is not the case
         if (null !== $options['placeholder'] && !$view->vars['placeholder_in_choices']) {
             $view->vars['placeholder'] = $options['placeholder'];
+            $view->vars['placeholder_attr'] = $options['placeholder_attr'];
         }
 
         if ($options['multiple'] && !$options['expanded']) {
@@ -344,6 +346,7 @@ class ChoiceType extends AbstractType
             'group_by' => null,
             'empty_data' => $emptyData,
             'placeholder' => $placeholderDefault,
+            'placeholder_attr' => [],
             'error_bubbling' => false,
             'compound' => $compound,
             // The view data is always a string or an array of strings,
@@ -367,6 +370,7 @@ class ChoiceType extends AbstractType
         $resolver->setAllowedTypes('choice_value', ['null', 'callable', 'string', PropertyPath::class, ChoiceValue::class]);
         $resolver->setAllowedTypes('choice_attr', ['null', 'array', 'callable', 'string', PropertyPath::class, ChoiceAttr::class]);
         $resolver->setAllowedTypes('choice_translation_parameters', ['null', 'array', 'callable', ChoiceTranslationParameters::class]);
+        $resolver->setAllowedTypes('placeholder_attr', ['array']);
         $resolver->setAllowedTypes('preferred_choices', ['array', \Traversable::class, 'callable', 'string', PropertyPath::class, PreferredChoice::class]);
         $resolver->setAllowedTypes('group_by', ['null', 'callable', 'string', PropertyPath::class, GroupBy::class]);
     }

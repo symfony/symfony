@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by kbond at 2023-04-06T19:20:00Z
+
+To clarify the _on failure_ scenarios:
+1. no `failure_transport` configured: swallows the error and appropriate events are dispatched
+2. `failure_transport` configured: swallows the error, appropriate events are dispatched and sent to the failure transport (no retries)
+3. `retry_strategy` configured for your scheduler transport: _ignored_
+
+---------------------------------------------------------------------------
+
+by tucksaun at 2023-04-06T19:23:42Z
+
+Actually:
+3. `retry_strategy` configured for your scheduler transport: a "cannot send messages" exception is thrown
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-04-06T19:28:12Z
+
+> Actually:
+> 3. retry_strategy configured for your scheduler transport: a "cannot send messages" exception is thrown
+
+That's better I think (doesn't give you the impression that they're being retried).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-04-07T15:17:28Z
+
+As the Scheduler component is all about **recurring** messages, I think they should never be retried.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-04-07T15:20:20Z
+
+If you want the message to be retried, you should use the `RedispatchMessage` feature to send the message to another transport that can be retried.
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-04-07T15:33:05Z
+
+> As the Scheduler component is all about recurring messages, I think they should never be retried.
+
+I'm fine with this stance for https://github.com/symfony/symfony/pull/49965 but this PR is required imo.
+
+---------------------------------------------------------------------------
+
+by tucksaun at 2023-04-07T18:52:06Z
+
+I agree (and therefore closed #49965).
+But this PR is required if we don't want workers to crash when the handling of a recurring message fails (because Messenger Worker will call `reject` when a failure happens leading to an unhandled exception)

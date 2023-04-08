@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by tucksaun at 2023-04-05T19:03:56Z
+
+Friendly ping @dunglas @soyuka as this small change would actually affect ApiPlatform's [DocumentNormalizer](https://github.com/api-platform/core/blob/ccef472cade42b189fa8cb7793e27fad1349e289/src/Elasticsearch/Serializer/DocumentNormalizer.php#L24)
+Looks to me like ApiPlatform could go with decoration instead?
+
+---------------------------------------------------------------------------
+
+by soyuka at 2023-04-06T07:22:00Z
+
+Indeed IMO this is a mistake from us, we should've used the AbstractObjectNormalizer instead. :+1: on making this class final!

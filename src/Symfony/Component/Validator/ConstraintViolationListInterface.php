@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator;
 
+use Symfony\Component\Validator\Exception\OutOfBoundsException;
+
 /**
  * A list of constraint violations.
  *
@@ -42,7 +44,7 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
      *
      * @param int $offset The offset of the violation
      *
-     * @throws \OutOfBoundsException if the offset does not exist
+     * @throws OutOfBoundsException if the offset does not exist
      */
     public function get(int $offset): ConstraintViolationInterface;
 

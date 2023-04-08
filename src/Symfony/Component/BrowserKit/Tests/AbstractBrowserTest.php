@@ -350,15 +350,14 @@ class AbstractBrowserTest extends TestCase
         $client->setNextResponse(new Response('<html><form action="/foo"><input type="submit" /></form></html>'));
         $client->request('GET', 'http://www.example.com/foo/foobar');
 
-        try {
-            $client->submitForm('Register', [
-                'username' => 'username',
-                'password' => 'password',
-            ], 'POST');
-            $this->fail('->submitForm() throws a \InvalidArgumentException if the form could not be found');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf(\InvalidArgumentException::class, $e, '->submitForm() throws a \InvalidArgumentException if the form could not be found');
-        }
+        $this->expectExceptionObject(
+            new \InvalidArgumentException('There is no button with "Register" as its content, id, value or name.')
+        );
+
+        $client->submitForm('Register', [
+            'username' => 'username',
+            'password' => 'password',
+        ], 'POST');
     }
 
     public function testSubmitPreserveAuth()

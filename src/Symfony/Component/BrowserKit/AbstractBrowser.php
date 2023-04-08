@@ -333,6 +333,11 @@ abstract class AbstractBrowser
         }
 
         $buttonNode = $this->crawler->selectButton($button);
+
+        if (0 === $buttonNode->count()) {
+            throw new \InvalidArgumentException(sprintf('There is no button with "%s" as its content, id, value or name.', $button));
+        }
+
         $form = $buttonNode->form($fieldValues, $method);
 
         return $this->submit($form, [], $serverParameters);

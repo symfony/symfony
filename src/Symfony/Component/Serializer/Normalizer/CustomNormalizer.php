@@ -16,6 +16,8 @@ use Symfony\Component\Serializer\SerializerAwareTrait;
 
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ *
+ * @final since Symfony 6.3
  */
 class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface, CacheableSupportsMethodInterface
 {

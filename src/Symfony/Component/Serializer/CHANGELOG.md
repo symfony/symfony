@@ -10,7 +10,17 @@ CHANGELOG
  * Make `ProblemNormalizer` give details about `ValidationFailedException` and `PartialDenormalizationException`
  * Deprecate `MissingConstructorArgumentsException` in favor of `MissingConstructorArgumentException`
  * Deprecate `CacheableSupportsMethodInterface` in favor of the new `getSupportedTypes(?string $format)` methods
- * The following Normalizer classes will become final in 7.0: `ObjectNormalizer`
+ * The following Normalizer classes will become final in 7.0:
+   * `ConstraintViolationListNormalizer`
+   * `CustomNormalizer`
+   * `DataUriNormalizer`
+   * `DateIntervalNormalizer`
+   * `DateTimeNormalizer`
+   * `DateTimeZoneNormalizer`
+   * `GetSetMethodNormalizer`
+   * `JsonSerializableNormalizer`
+   * `ObjectNormalizer`
+   * `PropertyNormalizer`
 
 6.2
 ---

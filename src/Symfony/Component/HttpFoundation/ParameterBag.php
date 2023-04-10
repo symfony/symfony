@@ -149,7 +149,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
     public function getStringOrNull(string $key): ?string
     {
         return $this->has($key)
-            ? $this->filter($key, null, \FILTER_DEFAULT, \FILTER_NULL_ON_FAILURE)
+            ? $this->getString($key)
             : null;
     }
 
@@ -165,7 +165,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
     public function getIntOrNull(string $key): ?int
     {
         return $this->has($key)
-            ? $this->filter($key, null, \FILTER_VALIDATE_INT, \FILTER_NULL_ON_FAILURE)
+            ? $this->getInt($key)
             : null;
     }
 
@@ -180,7 +180,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
     public function getBooleanOrNull(string $key): ?bool
     {
         return $this->has($key)
-            ? $this->filter($key, null, \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE)
+            ? $this->getBoolean($key)
             : null;
     }
 

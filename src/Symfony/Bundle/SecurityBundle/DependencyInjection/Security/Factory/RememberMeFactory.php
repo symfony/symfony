@@ -70,10 +70,9 @@ class RememberMeFactory implements AuthenticatorFactoryInterface, PrependExtensi
             $tokenVerifier = $this->createTokenVerifier($container, $firewallName, $config['token_verifier'] ?? null);
             $container->setDefinition($rememberMeHandlerId, new ChildDefinition('security.authenticator.persistent_remember_me_handler'))
                 ->replaceArgument(0, new Reference($tokenProviderId))
-                ->replaceArgument(1, $config['secret'])
-                ->replaceArgument(2, new Reference($userProviderId))
-                ->replaceArgument(4, $config)
-                ->replaceArgument(6, $tokenVerifier)
+                ->replaceArgument(1, new Reference($userProviderId))
+                ->replaceArgument(3, $config)
+                ->replaceArgument(5, $tokenVerifier)
                 ->addTag('security.remember_me_handler', ['firewall' => $firewallName]);
         } else {
             $signatureHasherId = 'security.authenticator.remember_me_signature_hasher.'.$firewallName;

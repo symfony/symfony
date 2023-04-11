@@ -23,17 +23,17 @@ class StaticConstructorNormalizer extends AbstractObjectNormalizer
         return [StaticConstructorDummy::class];
     }
 
-    protected function extractAttributes(object $object, string $format = null, array $context = [])
+    protected function extractAttributes(object $object, string $format = null, array $context = []): array
     {
         return get_object_vars($object);
     }
 
-    protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = [])
+    protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed
     {
         return $object->$attribute;
     }
 
-    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = [])
+    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = []): void
     {
         $object->$attribute = $value;
     }

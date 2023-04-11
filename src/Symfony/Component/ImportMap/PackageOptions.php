@@ -21,6 +21,7 @@ final class PackageOptions
     public function __construct(
         public readonly bool $download = false,
         public readonly bool $preload = false,
+        public readonly ?string $path = null,
     ) {
     }
 }

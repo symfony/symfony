@@ -157,6 +157,19 @@ final class ImportMapManager
             unset($this->importMap[$packageName]);
         }
 
+        foreach ($require as $packageName => $packageOptions) {
+            if (!$packageOptions->path) {
+                continue;
+            }
+
+            $this->importMap[$packageName] = ['path' => $packageOptions->path];
+            if ($packageOptions->preload) {
+                $this->importMap[$packageName]['preload'] = true;
+            }
+
+            unset($require[$packageName]);
+        }
+
         $install = [];
         $packages = [];
         foreach ($this->importMap ?? [] as $packageName => $data) {

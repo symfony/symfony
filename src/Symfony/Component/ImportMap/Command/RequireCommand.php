@@ -17,6 +17,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\ImportMap\ImportMapManager;
 use Symfony\Component\ImportMap\PackageOptions;
 
@@ -39,18 +40,29 @@ final class RequireCommand extends Command
         $this->addArgument('packages', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'The packages to add');
         $this->addOption('download', 'd', InputOption::VALUE_NONE, 'Download packages locally');
         $this->addOption('preload', 'p', InputOption::VALUE_NONE, 'Preload packages');
+        $this->addOption('path', 'pa', InputOption::VALUE_REQUIRED, 'Import a package from a local directory');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $io = new SymfonyStyle($input, $output);
+
+        $packageList = $input->getArgument('packages');
+        if ($input->hasOption('path') && count($packageList) > 1) {
+            $io->error('The "--path" option can only be used when you require a single package.');
+
+            return Command::FAILURE;
+        }
+
         $packageOptions = new PackageOptions(
             $input->getOption('download'),
             $input->getOption('preload'),
+            $input->getOption('path'),
         );
 
         $packages = [];
-        foreach ($input->getArgument('packages') as $package) {
-            $packages[$package] = $packageOptions;
+        foreach ($packageList as $packageName) {
+            $packages[$packageName] = $packageOptions;
         }
 
         $this->importMapManager->require($packages);

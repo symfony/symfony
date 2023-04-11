@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add `AppVariable::getLocale()` to retrieve the current locale when using the `LocaleSwitcher`
+
 6.2
 ---
 

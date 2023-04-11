@@ -37,7 +37,7 @@
         "symfony/polyfill-intl-icu": "~1.0",
         "symfony/property-info": "^5.4|^6.0",
         "symfony/routing": "^5.4|^6.0",
-        "symfony/translation": "^5.4|^6.0",
+        "symfony/translation": "^6.1",
         "symfony/yaml": "^5.4|^6.0",
         "symfony/security-acl": "^2.8|^3.0",
         "symfony/security-core": "^5.4|^6.0",

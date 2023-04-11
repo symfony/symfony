@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Translation\LocaleSwitcher;
 
 class AppVariableTest extends TestCase
 {
@@ -104,6 +105,16 @@ class AppVariableTest extends TestCase
         $this->assertEquals($user, $this->appVariable->getUser());
     }
 
+    public function testGetLocale()
+    {
+        $localeSwitcher = $this->createMock(LocaleSwitcher::class);
+        $this->appVariable->setLocaleSwitcher($localeSwitcher);
+
+        $localeSwitcher->method('getLocale')->willReturn('fr');
+
+        self::assertEquals('fr', $this->appVariable->getLocale());
+    }
+
     public function testGetTokenWithNoToken()
     {
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
@@ -154,6 +165,13 @@ class AppVariableTest extends TestCase
     {
         $this->expectException(\RuntimeException::class);
         $this->appVariable->getSession();
+    }
+
+    public function testGetLocaleWithLocaleSwitcherNotSet()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The "app.locale" variable is not available.');
+        $this->appVariable->getLocale();
     }
 
     public function testGetFlashesWithNoRequest()

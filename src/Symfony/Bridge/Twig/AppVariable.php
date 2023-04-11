@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Translation\LocaleSwitcher;
 
 /**
  * Exposes some Symfony parameters and services as an "app" global variable.
@@ -29,6 +30,7 @@ class AppVariable
     private RequestStack $requestStack;
     private string $environment;
     private bool $debug;
+    private LocaleSwitcher $localeSwitcher;
 
     /**
      * @return void
@@ -60,6 +62,11 @@ class AppVariable
     public function setDebug(bool $debug)
     {
         $this->debug = $debug;
+    }
+
+    public function setLocaleSwitcher(LocaleSwitcher $localeSwitcher): void
+    {
+        $this->localeSwitcher = $localeSwitcher;
     }
 
     /**
@@ -137,6 +144,15 @@ class AppVariable
         }
 
         return $this->debug;
+    }
+
+    public function getLocale(): string
+    {
+        if (!isset($this->localeSwitcher)) {
+            throw new \RuntimeException('The "app.locale" variable is not available.');
+        }
+
+        return $this->localeSwitcher->getLocale();
     }
 
     /**

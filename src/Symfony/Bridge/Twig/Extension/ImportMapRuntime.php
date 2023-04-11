@@ -22,6 +22,7 @@ final class ImportMapRuntime
 {
     public function __construct(
         private readonly ImportMapManager $importMapManager,
+        private readonly string $charset = 'UTF-8',
         private readonly string|false $polyfillUrl = ImportMapManager::POLYFILL_URL,
     ) {
     }
@@ -29,23 +30,25 @@ final class ImportMapRuntime
     public function importmap(): string
     {
         $output = <<<HTML
-        <script type="importmap">
-        {$this->importMapManager->getImportMap()}
-        </script>
-        HTML;
+            <script type="importmap">
+            {$this->importMapManager->getImportMap()}
+            </script>
+            HTML;
 
         if ($this->polyfillUrl) {
-            $url = htmlspecialchars($this->polyfillUrl);
+            $url = htmlspecialchars($this->polyfillUrl, \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset);
 
             $output .= <<<HTML
 
-            <!-- ES Module Shims: Import maps polyfill for modules browsers without import maps support -->
-            <script async src="{$url}" crossorigin="anonymous"></script>
-            HTML;
+                <!-- ES Module Shims: Import maps polyfill for modules browsers without import maps support -->
+                <script async src="{$url}" crossorigin="anonymous"></script>
+                HTML;
         }
 
         foreach ($this->importMapManager->getModulesToPreload() as $url) {
-            $output .= "<link rel=\"modulepreload\" href=\"{$url}\">\n";
+            $url = htmlspecialchars($url, \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset);
+
+            $output .= "\n<link rel=\"modulepreload\" href=\"{$url}\">";
         }
 
         return $output;

@@ -132,7 +132,7 @@ final class ImportMapManager
             }
 
             if ($data['preload'] ?? false) {
-                $this->modulesToPreload[] = $importmap[$packageName];
+                $this->modulesToPreload[] = $importmap['imports'][$packageName];
             }
         }
 
@@ -207,10 +207,8 @@ final class ImportMapManager
 
         $this->jspmGenerate($install, $packages);
 
-        file_put_contents(
-            $this->path,
-            sprintf("<?php\n\nreturn %s;\n", class_exists(VarExporter::class) ? VarExporter::export($this->importMap) : var_export($this->importMap)),
-        );
+        $map = class_exists(VarExporter::class) ? VarExporter::export($this->importMap) : var_export($this->importMap, true);
+        file_put_contents($this->path, "<?php\n\nreturn {$map};\n");
     }
 
     private function jspmGenerate(array $install, array $packages): void
@@ -283,7 +281,7 @@ final class ImportMapManager
 
     private function cleanup(string $packageName, bool $cleanEmptyDirectories = true): void
     {
-        if ($ths->importMap[$packageName]['download'] ?? false) {
+        if ($this->importMap[$packageName]['download'] ?? false) {
             $assetPath = $this->assetsDir.'vendor/'.$packageName.'.js';
 
             if (!is_file($assetPath)) {
@@ -305,7 +303,7 @@ final class ImportMapManager
             return;
         }
 
-        if (!($ths->importMap[$packageName]['path'] ?? false)) {
+        if (!($this->importMap[$packageName]['path'] ?? false)) {
             return;
         }
 
@@ -314,7 +312,7 @@ final class ImportMapManager
             return;
         }
 
-        $publicAssetPath = $this->publicAssetsDir.$this->digestName($packageName, $ths->importMap[$packageName]['path']);
+        $publicAssetPath = $this->publicAssetsDir.$this->digestName($packageName, $this->importMap[$packageName]['path']);
 
         @unlink($publicAssetPath);
         if ($cleanEmptyDirectories) {

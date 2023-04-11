@@ -54,7 +54,7 @@ final class ImportmapController
             throw new NotFoundHttpException();
         }
 
-        $contentType = $this->extensionsMap[$matches[3]] ?? $this->mimeTypes?->guessMimeType($localPath) ?? null;
+        $contentType = $this->extensionsMap[$matches[3]] ?? $this->mimeTypes?->guessMimeType($localPath);
 
         return (new BinaryFileResponse(
             $localPath,
@@ -63,7 +63,6 @@ final class ImportmapController
         ))
             ->setMaxAge(604800)
             ->setImmutable()
-            ->setVary('Accept-Encoding')
             ->setEtag($matches[2])
         ;
     }

@@ -18,11 +18,10 @@ return static function (ContainerConfigurator $container) {
     $container->services()
 
         ->set('twig.runtime.importmap', ImportMapRuntime::class)
-        ->args([service('importmap.manager')])
-        ->tag('twig.runtime')
+            ->args([service('importmap.manager'), param('kernel.charset')])
+            ->tag('twig.runtime')
 
         ->set('twig.extension.importmap', ImportMapExtension::class)
             ->tag('twig.extension')
-
     ;
 };

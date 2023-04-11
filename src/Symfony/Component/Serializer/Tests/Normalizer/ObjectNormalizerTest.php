@@ -27,6 +27,7 @@ use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -36,6 +37,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyPrivatePropertyWithoutGetter;
+use Symfony\Component\Serializer\Tests\Fixtures\FormatAndContextAwareNormalizer;
 use Symfony\Component\Serializer\Tests\Fixtures\OtherSerializedNameDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Php74Dummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Php74DummyPrivate;
@@ -742,6 +744,9 @@ class ObjectNormalizerTest extends TestCase
         })::class)->foo);
     }
 
+    /**
+     * @group legacy
+     */
     public function testExtractAttributesRespectsFormat()
     {
         $normalizer = new FormatAndContextAwareNormalizer();
@@ -755,13 +760,13 @@ class ObjectNormalizerTest extends TestCase
 
     public function testExtractAttributesRespectsContext()
     {
-        $normalizer = new FormatAndContextAwareNormalizer();
+        $normalizer = new ObjectNormalizer();
 
         $data = new ObjectDummy();
         $data->setFoo('bar');
         $data->bar = 'foo';
 
-        $this->assertSame(['foo' => 'bar', 'bar' => 'foo'], $normalizer->normalize($data, null, ['include_foo_and_bar' => true]));
+        $this->assertSame(['foo' => 'bar', 'bar' => 'foo'], $normalizer->normalize($data, null, [AbstractNormalizer::ATTRIBUTES => ['foo', 'bar']]));
     }
 
     public function testDenormalizeFalsePseudoType()
@@ -1037,22 +1042,6 @@ class LazyObjectInner extends ObjectInner
         if ('foo' === $name) {
             return $this->foo = 123;
         }
-    }
-}
-
-class FormatAndContextAwareNormalizer extends ObjectNormalizer
-{
-    protected function isAllowedAttribute($classOrObject, string $attribute, string $format = null, array $context = []): bool
-    {
-        if (\in_array($attribute, ['foo', 'bar']) && 'foo_and_bar_included' === $format) {
-            return true;
-        }
-
-        if (\in_array($attribute, ['foo', 'bar']) && isset($context['include_foo_and_bar']) && true === $context['include_foo_and_bar']) {
-            return true;
-        }
-
-        return false;
     }
 }
 

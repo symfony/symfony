@@ -736,7 +736,7 @@ class CurrenciesTest extends ResourceBundleTestCase
 
     public static function provideValidNumericCodes()
     {
-        $numericToAlpha3 = $this->getNumericToAlpha3Mapping();
+        $numericToAlpha3 = self::getNumericToAlpha3Mapping();
 
         return array_map(
             function ($numeric, $alpha3) { return [$numeric, $alpha3]; },
@@ -761,7 +761,7 @@ class CurrenciesTest extends ResourceBundleTestCase
 
     public static function provideInvalidNumericCodes()
     {
-        $validNumericCodes = array_keys($this->getNumericToAlpha3Mapping());
+        $validNumericCodes = array_keys(self::getNumericToAlpha3Mapping());
         $invalidNumericCodes = array_diff(range(0, 1000), $validNumericCodes);
 
         return array_map(
@@ -791,7 +791,7 @@ class CurrenciesTest extends ResourceBundleTestCase
         $this->assertFalse(Currencies::exists('XXX'));
     }
 
-    private function getNumericToAlpha3Mapping()
+    private static function getNumericToAlpha3Mapping()
     {
         $numericToAlpha3 = [];
 

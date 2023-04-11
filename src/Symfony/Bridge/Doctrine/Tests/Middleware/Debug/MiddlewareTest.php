@@ -156,10 +156,6 @@ EOT;
         $executeMethod($stmt);
 
         // Debug data should not be affected by these changes
-        $product = 'product2';
-        $price = 13.5;
-        $stock = 4;
-
         $debug = $this->debugDataHolder->getData()['default'] ?? [];
         $this->assertCount(2, $debug);
         $this->assertSame('INSERT INTO products(name, price, stock) VALUES (?, ?, ?)', $debug[1]['sql']);
@@ -218,6 +214,14 @@ EOT;
             'rollback and query' => [
                 static fn (Connection $conn, string $sql) => $conn->executeQuery($sql),
                 static fn (Connection $conn) => $conn->rollBack(),
+            ],
+            'prepared statement' => [
+                static function (Connection $conn, string $sql): Result {
+                    return $conn->prepare($sql)->executeQuery();
+                },
+                static function (Connection $conn): bool {
+                    return $conn->commit();
+                },
             ],
         ];
     }

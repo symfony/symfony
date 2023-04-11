@@ -11,13 +11,33 @@
 
 namespace Symfony\Component\Serializer\Tests\Fixtures;
 
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 
 /**
  * @author Guilhem N. <egetick@gmail.com>
  */
-class StaticConstructorNormalizer extends ObjectNormalizer
+class StaticConstructorNormalizer extends AbstractObjectNormalizer
 {
+    public function getSupportedTypes(?string $format): array
+    {
+        return [StaticConstructorDummy::class];
+    }
+
+    protected function extractAttributes(object $object, string $format = null, array $context = [])
+    {
+        return get_object_vars($object);
+    }
+
+    protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = [])
+    {
+        return $object->$attribute;
+    }
+
+    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = [])
+    {
+        $object->$attribute = $value;
+    }
+
     protected function getConstructor(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes): ?\ReflectionMethod
     {
         if (is_a($class, StaticConstructorDummy::class, true)) {

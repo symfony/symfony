@@ -5,7 +5,7 @@ CHANGELOG
 ---
 
  * Deprecate enabling bundle and not configuring it
- * Add `_stateless` attribute to the request when firewall is stateless
+ * Add `_stateless` attribute to the request when firewall is stateless and the attribute is not already set
  * Add `StatelessAuthenticatorFactoryInterface` for authenticators targeting `stateless` firewalls only and that don't require a user provider
  * Modify "icon.svg" to improve accessibility for blind/low vision users
  * Make `Security::login()` return the authenticator response

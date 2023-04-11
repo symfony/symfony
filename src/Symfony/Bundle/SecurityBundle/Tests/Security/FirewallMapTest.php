@@ -57,10 +57,9 @@ class FirewallMapTest extends TestCase
         $this->assertFalse($request->attributes->has('_stateless'));
     }
 
-    public function testGetListeners()
+    /** @dataProvider providesStatefulStatelessRequests */
+    public function testGetListeners(Request $request, bool $expectedState)
     {
-        $request = new Request();
-
         $firewallContext = $this->createMock(FirewallContext::class);
 
         $firewallConfig = new FirewallConfig('main', 'user_checker', null, true, true);
@@ -89,6 +88,13 @@ class FirewallMapTest extends TestCase
         $this->assertEquals([[$listener], $exceptionListener, $logoutListener], $firewallMap->getListeners($request));
         $this->assertEquals($firewallConfig, $firewallMap->getFirewallConfig($request));
         $this->assertEquals('security.firewall.map.context.foo', $request->attributes->get(self::ATTRIBUTE_FIREWALL_CONTEXT));
-        $this->assertTrue($request->attributes->get('_stateless'));
+        $this->assertEquals($expectedState, $request->attributes->get('_stateless'));
+    }
+
+    public static function providesStatefulStatelessRequests(): \Generator
+    {
+        yield [new Request(), true];
+        yield [new Request(attributes: ['_stateless' => false]), false];
+        yield [new Request(attributes: ['_stateless' => true]), true];
     }
 }

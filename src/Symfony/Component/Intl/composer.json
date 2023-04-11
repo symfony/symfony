@@ -1,7 +1,7 @@
 {
     "name": "symfony/intl",
     "type": "library",
-    "description": "Provides a PHP replacement layer for the C intl extension that includes additional data from the ICU library",
+    "description": "Provides access to the localization data of the ICU library",
     "keywords": ["intl", "icu", "internationalization", "localization", "i18n", "l10n"],
     "homepage": "https://symfony.com",
     "license": "MIT",

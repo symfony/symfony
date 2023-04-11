@@ -42,6 +42,7 @@ final class Connection extends AbstractConnectionMiddleware
             $this->debugDataHolder,
             $this->connectionName,
             $sql,
+            $this->stopwatch,
         );
     }
 

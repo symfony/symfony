@@ -534,7 +534,7 @@ class MockHttpClientTest extends HttpClientTestCase
         $this->assertSame(0, $client->getRequestsCount());
     }
 
-    public function testCancellingMockResponseExecutesOnProgressWithUpdatedInfo()
+    public function testCancelingMockResponseExecutesOnProgressWithUpdatedInfo()
     {
         $client = new MockHttpClient(new MockResponse(['foo', 'bar', 'ccc']));
         $canceled = false;

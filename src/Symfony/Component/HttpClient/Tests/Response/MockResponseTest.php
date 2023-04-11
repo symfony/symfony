@@ -118,6 +118,14 @@ class MockResponseTest extends TestCase
         ]))->getStatusCode();
     }
 
+    public function testCancelingAMockResponseNotIssuedByMockHttpClient()
+    {
+        $mockResponse = new MockResponse();
+        $mockResponse->cancel();
+
+        $this->assertTrue($mockResponse->getInfo('canceled'));
+    }
+
     public function testMustBeIssuedByMockHttpClient()
     {
         $this->expectException(InvalidArgumentException::class);

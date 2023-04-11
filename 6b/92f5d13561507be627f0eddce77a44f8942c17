@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by SVillette at 2023-04-03T15:48:04Z
+
+About the failing tests, I may need some help / directions here.
+- The `Integration / Integration (8.1)` seems to be unrelated to this PR (`Cache` related).
+- The `Unit Tests / Unit Tests (8.1)` is failing because `AppVariable::setLocaleSwitcher()` does not have a return type and is not listed in `.github/expected-missing-return-types.diff`. Updating this file should resolve the issue but I can't do it as they are bunch of other changes here.
+- The `Unit Tests / Unit Tests (8.1, low-deps)` fails because `LocaleSwitcher` class is missing. Do I have to skip the test if the class does not exist ?
+- Finally, `continuous-integration/appveyor/pr` fail seems unrelated to this PR (`VarDumper` issue).
+
+---------------------------------------------------------------------------
+
+by stof at 2023-04-07T17:14:30Z
+
+For low-deps, you need to increase the lower bound of the requirement
+
+---------------------------------------------------------------------------
+
+by SVillette at 2023-04-11T08:07:36Z
+
+Thank you for the input, CI is still failling but not because of this PR.

@@ -303,7 +303,8 @@ class Connection
         $this->client->deleteMessage(['QueueUrl' => $this->getQueueUrl(), 'ReceiptHandle' => $id]);
     }
 
-    public function reject(string $id): void {
+    public function reject(string $id): void
+    {
         if ($this->configuration['delete_on_rejection']) {
             $this->client->deleteMessage(['QueueUrl' => $this->getQueueUrl(), 'ReceiptHandle' => $id]);
         } else {

@@ -1,0 +1,103 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-04-10T16:42:44Z
+
+Why do you say "restore"? Does the call change some state? If yes, can't we restore the previous cp instead? Aka use `sapi_windows_cp_get()` before and restore after, instead of hardcoding 65001?
+
+---------------------------------------------------------------------------
+
+by aleksandr-shevchenko at 2023-04-10T19:26:53Z
+
+> Why do you say "restore"? Does the call change some state? If yes, can't we restore the previous cp instead? Aka use `sapi_windows_cp_get()` before and restore after, instead of hardcoding 65001?
+
+```
+    private static function readFromProcess(string|array $command): ?string
+    {
+        if (!\function_exists('proc_open')) {
+            return null;
+        }
+
+        $descriptorspec = [
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
+        ];
+
+        $process = proc_open($command, $descriptorspec, $pipes, null, null, ['suppress_errors' => true]);
+        if (!\is_resource($process)) {
+            return null;
+        }
+
+        $info = stream_get_contents($pipes[1]);
+        fclose($pipes[1]);
+        fclose($pipes[2]);
+        proc_close($process);
+
+        if (\function_exists('sapi_windows_cp_set')) {
+            sapi_windows_cp_set(65001);
+        }
+
+        return $info;
+    }
+
+```
+In this function, before line `$info = stream_get_contents($pipes[1]);` echo can print unicode text to Win10 console, but after that line - not.
+I don't understand why the console gets corrupted, but my solution works. What's wrong with hardcoding UTF-8(65001)?
+
+```
+        if (\function_exists('sapi_windows_cp_get')) {
+            $cp1 = sapi_windows_cp_get();
+            echo $cp1 . " abc йфяЙФЯёЁ üÜiİöÖğĞıIəƏçÇşŞ" . PHP_EOL;
+        }
+
+        $info = stream_get_contents($pipes[1]);
+
+        if (\function_exists('sapi_windows_cp_get')) {
+            $cp2 = sapi_windows_cp_get();
+            echo $cp2 . " abc йфяЙФЯёЁ üÜiİöÖğĞıIəƏçÇşŞ" . PHP_EOL;
+        }
+        echo $info;
+
+```
+<img width="677" alt="ss_2023_04_11__08_42_41" src="https://user-images.githubusercontent.com/25248634/231058518-d173b76b-8551-4b7f-98bc-9566c171dc00.png">
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-04-11T07:42:57Z
+
+Strange :)
+
+> What's wrong with hardcoding UTF-8(65001)?
+
+hardcoding is always an issue, especially when there's a way not to hardcode. Here, this change would break consoles that rely on another CP. Wouldn't my previous suggestion work?
+
+---------------------------------------------------------------------------
+
+by aleksandr-shevchenko at 2023-04-11T10:25:25Z
+
+> Wouldn't my previous suggestion work?
+
+Also works well (and without hardcoding 65001).
+
+```
+        if (\function_exists('sapi_windows_cp_get')) {
+            $cp = sapi_windows_cp_get();
+            echo $cp . " abc йфяЙФЯёЁ üÜiİöÖğĞıIəƏçÇşŞ" . PHP_EOL;
+        }
+
+        $info = stream_get_contents($pipes[1]);
+
+        if (\function_exists('sapi_windows_cp_get') && \function_exists('sapi_windows_cp_set')) {
+            sapi_windows_cp_set($cp);
+            echo $cp . " abc йфяЙФЯёЁ üÜiİöÖğĞıIəƏçÇşŞ" . PHP_EOL;
+        }
+        echo $info;
+
+```
+<img width="430" alt="ss_2023_04_11__14_23_25" src="https://user-images.githubusercontent.com/25248634/231132655-3a7a0958-554e-4a2d-a7b5-82216c50b55e.png">
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-04-11T13:30:08Z
+
+We should probably do the same as https://github.com/symfony/symfony/pull/41113 (or even reuse if possible).
+Also this qualifies as a bugfix, isn't it? Please fill in the PR template you deleted when opening (you can find it in other PRs).

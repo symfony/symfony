@@ -52,7 +52,7 @@ class AmazonSqsReceiver implements ReceiverInterface, MessageCountAwareInterface
                 'headers' => $sqsEnvelope['headers'],
             ]);
         } catch (MessageDecodingFailedException $exception) {
-            $this->connection->delete($sqsEnvelope['id']);
+            $this->connection->reject($sqsEnvelope['id']);
 
             throw $exception;
         }
@@ -63,7 +63,7 @@ class AmazonSqsReceiver implements ReceiverInterface, MessageCountAwareInterface
     public function ack(Envelope $envelope): void
     {
         try {
-            $this->connection->delete($this->findSqsReceivedStamp($envelope)->getId());
+            $this->connection->ack($this->findSqsReceivedStamp($envelope)->getId());
         } catch (HttpException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
@@ -72,7 +72,7 @@ class AmazonSqsReceiver implements ReceiverInterface, MessageCountAwareInterface
     public function reject(Envelope $envelope): void
     {
         try {
-            $this->connection->delete($this->findSqsReceivedStamp($envelope)->getId());
+            $this->connection->reject($this->findSqsReceivedStamp($envelope)->getId());
         } catch (HttpException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }

@@ -48,7 +48,7 @@ class AmazonSqsReceiverTest extends TestCase
         $sqsEnvelop = $this->createSqsEnvelope();
         $connection = $this->createMock(Connection::class);
         $connection->method('get')->willReturn($sqsEnvelop);
-        $connection->expects($this->once())->method('delete');
+        $connection->expects($this->once())->method('reject');
 
         $receiver = new AmazonSqsReceiver($connection, $serializer);
         iterator_to_array($receiver->get());

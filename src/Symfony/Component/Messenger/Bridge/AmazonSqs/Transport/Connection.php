@@ -39,6 +39,7 @@ class Connection
         'wait_time' => 20,
         'poll_timeout' => 0.1,
         'visibility_timeout' => null,
+        'delete_on_rejection' => true,
         'auto_setup' => true,
         'access_key' => null,
         'secret_key' => null,
@@ -92,6 +93,7 @@ class Connection
      * * access_key: AWS access key
      * * secret_key: AWS secret key
      * * session_token: AWS session token (required only when using temporary credentials)
+     * * delete_on_rejection: Whether to delete message on rejection or allow it to be reprocess later (Default: true)
      * * buffer_size: number of messages to prefetch (Default: 9)
      * * wait_time: long polling duration in seconds (Default: 20)
      * * poll_timeout: amount of seconds the transport should wait for new message
@@ -129,6 +131,7 @@ class Connection
             'wait_time' => (int) $options['wait_time'],
             'poll_timeout' => $options['poll_timeout'],
             'visibility_timeout' => $options['visibility_timeout'],
+            'delete_on_rejection' => filter_var($options['delete_on_rejection'], \FILTER_VALIDATE_BOOL),
             'auto_setup' => filter_var($options['auto_setup'], \FILTER_VALIDATE_BOOL),
             'queue_name' => (string) $options['queue_name'],
         ];
@@ -295,12 +298,21 @@ class Connection
         $this->queueUrl = null;
     }
 
-    public function delete(string $id): void
+    public function ack(string $id): void
     {
-        $this->client->deleteMessage([
-            'QueueUrl' => $this->getQueueUrl(),
-            'ReceiptHandle' => $id,
-        ]);
+        $this->client->deleteMessage(['QueueUrl' => $this->getQueueUrl(), 'ReceiptHandle' => $id]);
+    }
+
+    public function reject(string $id): void {
+        if ($this->configuration['delete_on_rejection']) {
+            $this->client->deleteMessage(['QueueUrl' => $this->getQueueUrl(), 'ReceiptHandle' => $id]);
+        } else {
+            $this->client->changeMessageVisibility([
+                'QueueUrl' => $this->getQueueUrl(),
+                'ReceiptHandle' => $id,
+                'VisibilityTimeout' => $this->configuration['visibility_timeout'] ?? 30,
+            ]);
+        }
     }
 
     public function getMessageCount(): int

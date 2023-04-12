@@ -84,6 +84,11 @@ final class TelegramTransport extends AbstractTransport
             $options['text'] = preg_replace('/([_*\[\]()~`>#+\-=|{}.!])/', '\\\\$1', $message->getSubject());
         }
 
+        if (isset($options['photo'])) {
+            $options['caption'] = $options['text'];
+            unset($options['text']);
+        }
+
         $endpoint = sprintf('https://%s/bot%s/%s', $this->getEndpoint(), $this->token, $this->getPath($options));
 
         $response = $this->client->request('POST', $endpoint, [
@@ -117,6 +122,7 @@ final class TelegramTransport extends AbstractTransport
         return match (true) {
             isset($options['message_id']) => 'editMessageText',
             isset($options['callback_query_id']) => 'answerCallbackQuery',
+            isset($options['photo']) => 'sendPhoto',
             default => 'sendMessage',
         };
     }

@@ -83,6 +83,38 @@ final class TelegramOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
+    public function protectContent(bool $bool): static
+    {
+        $this->options['protect_content'] = $bool;
+
+        return $this;
+    }
+
+    /**
+     * Work only when photo option is defined.
+     *
+     * @return $this
+     */
+    public function hasSpoiler(bool $bool): static
+    {
+        $this->options['has_spoiler'] = $bool;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function photo(string $url): static
+    {
+        $this->options['photo'] = $url;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
     public function replyTo(int $messageId): static
     {
         $this->options['reply_to_message_id'] = $messageId;

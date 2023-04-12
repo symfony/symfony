@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
 * Add support to answer callback queries
+* Add support for `sendPhoto` API method
 
 5.3
 ---

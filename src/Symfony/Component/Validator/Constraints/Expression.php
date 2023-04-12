@@ -82,9 +82,4 @@ class Expression extends Constraint
     {
         return [self::CLASS_CONSTRAINT, self::PROPERTY_CONSTRAINT];
     }
-
-    public function validatedBy(): string
-    {
-        return 'validator.expression';
-    }
 }

@@ -648,10 +648,10 @@ index 6e7669a710..27517d34ae 100644
      {
          if (!$container->hasDefinition('test.private_services_locator')) {
 diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/UnusedTagsPass.php b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/UnusedTagsPass.php
-index 7fa0fb2890..49bcc6dfd9 100644
+index 9da5b91bb3..d7acf8040b 100644
 --- a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/UnusedTagsPass.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/UnusedTagsPass.php
-@@ -107,5 +107,5 @@ class UnusedTagsPass implements CompilerPassInterface
+@@ -108,5 +108,5 @@ class UnusedTagsPass implements CompilerPassInterface
       * @return void
       */
 -    public function process(ContainerBuilder $container)
@@ -670,17 +670,17 @@ index bda9ca9515..c0d1f91339 100644
      {
          if (!$container->hasParameter('workflow.has_guard_listeners')) {
 diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
-index 716d648454..25be4a48a9 100644
+index 36622ee23d..cd6a609053 100644
 --- a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
-@@ -205,5 +205,5 @@ class FrameworkExtension extends Extension
+@@ -206,5 +206,5 @@ class FrameworkExtension extends Extension
       * @throws LogicException
       */
 -    public function load(array $configs, ContainerBuilder $container)
 +    public function load(array $configs, ContainerBuilder $container): void
      {
          $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));
-@@ -2784,5 +2784,5 @@ class FrameworkExtension extends Extension
+@@ -2795,5 +2795,5 @@ class FrameworkExtension extends Extension
       * @return void
       */
 -    public static function registerRateLimiter(ContainerBuilder $container, string $name, array $limiterConfig)
@@ -1195,80 +1195,80 @@ index cffea43c49..0645fbd756 100644
      {
          $this->packages[$name] = $package;
 diff --git a/src/Symfony/Component/BrowserKit/AbstractBrowser.php b/src/Symfony/Component/BrowserKit/AbstractBrowser.php
-index e95ec5b821..3346019e13 100644
+index df0484f75b..503d7bd126 100644
 --- a/src/Symfony/Component/BrowserKit/AbstractBrowser.php
 +++ b/src/Symfony/Component/BrowserKit/AbstractBrowser.php
-@@ -64,5 +64,5 @@ abstract class AbstractBrowser
+@@ -67,5 +67,5 @@ abstract class AbstractBrowser
       * @return void
       */
 -    public function followRedirects(bool $followRedirects = true)
 +    public function followRedirects(bool $followRedirects = true): void
      {
          $this->followRedirects = $followRedirects;
-@@ -74,5 +74,5 @@ abstract class AbstractBrowser
+@@ -77,5 +77,5 @@ abstract class AbstractBrowser
       * @return void
       */
 -    public function followMetaRefresh(bool $followMetaRefresh = true)
 +    public function followMetaRefresh(bool $followMetaRefresh = true): void
      {
          $this->followMetaRefresh = $followMetaRefresh;
-@@ -92,5 +92,5 @@ abstract class AbstractBrowser
+@@ -95,5 +95,5 @@ abstract class AbstractBrowser
       * @return void
       */
 -    public function setMaxRedirects(int $maxRedirects)
 +    public function setMaxRedirects(int $maxRedirects): void
      {
          $this->maxRedirects = $maxRedirects < 0 ? -1 : $maxRedirects;
-@@ -113,5 +113,5 @@ abstract class AbstractBrowser
-      * @throws \RuntimeException When Symfony Process Component is not installed
+@@ -116,5 +116,5 @@ abstract class AbstractBrowser
+      * @throws LogicException When Symfony Process Component is not installed
       */
 -    public function insulate(bool $insulated = true)
 +    public function insulate(bool $insulated = true): void
      {
          if ($insulated && !class_exists(\Symfony\Component\Process\Process::class)) {
-@@ -127,5 +127,5 @@ abstract class AbstractBrowser
+@@ -130,5 +130,5 @@ abstract class AbstractBrowser
       * @return void
       */
 -    public function setServerParameters(array $server)
 +    public function setServerParameters(array $server): void
      {
          $this->server = array_merge([
-@@ -139,5 +139,5 @@ abstract class AbstractBrowser
+@@ -142,5 +142,5 @@ abstract class AbstractBrowser
       * @return void
       */
 -    public function setServerParameter(string $key, string $value)
 +    public function setServerParameter(string $key, string $value): void
      {
          $this->server[$key] = $value;
-@@ -438,5 +438,5 @@ abstract class AbstractBrowser
+@@ -441,5 +441,5 @@ abstract class AbstractBrowser
       * @throws \RuntimeException When processing returns exit code
       */
 -    protected function doRequestInProcess(object $request)
 +    protected function doRequestInProcess(object $request): object
      {
          $deprecationsFile = tempnam(sys_get_temp_dir(), 'deprec');
-@@ -471,5 +471,5 @@ abstract class AbstractBrowser
+@@ -474,5 +474,5 @@ abstract class AbstractBrowser
       * @return object
       */
 -    abstract protected function doRequest(object $request);
 +    abstract protected function doRequest(object $request): object;
  
      /**
-@@ -490,5 +490,5 @@ abstract class AbstractBrowser
+@@ -493,5 +493,5 @@ abstract class AbstractBrowser
       * @return object
       */
 -    protected function filterRequest(Request $request)
 +    protected function filterRequest(Request $request): object
      {
          return $request;
-@@ -500,5 +500,5 @@ abstract class AbstractBrowser
+@@ -503,5 +503,5 @@ abstract class AbstractBrowser
       * @return Response
       */
 -    protected function filterResponse(object $response)
 +    protected function filterResponse(object $response): Response
      {
          return $response;
-@@ -625,5 +625,5 @@ abstract class AbstractBrowser
+@@ -628,5 +628,5 @@ abstract class AbstractBrowser
       * @return void
       */
 -    public function restart()
@@ -1276,45 +1276,45 @@ index e95ec5b821..3346019e13 100644
      {
          $this->cookieJar->clear();
 diff --git a/src/Symfony/Component/BrowserKit/CookieJar.php b/src/Symfony/Component/BrowserKit/CookieJar.php
-index 9753d305d9..081d621068 100644
+index f851f81363..311a9f4eee 100644
 --- a/src/Symfony/Component/BrowserKit/CookieJar.php
 +++ b/src/Symfony/Component/BrowserKit/CookieJar.php
-@@ -24,5 +24,5 @@ class CookieJar
+@@ -26,5 +26,5 @@ class CookieJar
       * @return void
       */
 -    public function set(Cookie $cookie)
 +    public function set(Cookie $cookie): void
      {
          $this->cookieJar[$cookie->getDomain()][$cookie->getPath()][$cookie->getName()] = $cookie;
-@@ -71,5 +71,5 @@ class CookieJar
+@@ -73,5 +73,5 @@ class CookieJar
       * @return void
       */
 -    public function expire(string $name, ?string $path = '/', string $domain = null)
 +    public function expire(string $name, ?string $path = '/', string $domain = null): void
      {
          $path ??= '/';
-@@ -101,5 +101,5 @@ class CookieJar
+@@ -103,5 +103,5 @@ class CookieJar
       * @return void
       */
 -    public function clear()
 +    public function clear(): void
      {
          $this->cookieJar = [];
-@@ -113,5 +113,5 @@ class CookieJar
+@@ -115,5 +115,5 @@ class CookieJar
       * @return void
       */
 -    public function updateFromSetCookie(array $setCookies, string $uri = null)
 +    public function updateFromSetCookie(array $setCookies, string $uri = null): void
      {
          $cookies = [];
-@@ -141,5 +141,5 @@ class CookieJar
+@@ -143,5 +143,5 @@ class CookieJar
       * @return void
       */
 -    public function updateFromResponse(Response $response, string $uri = null)
 +    public function updateFromResponse(Response $response, string $uri = null): void
      {
          $this->updateFromSetCookie($response->getHeader('Set-Cookie', false), $uri);
-@@ -215,5 +215,5 @@ class CookieJar
+@@ -217,5 +217,5 @@ class CookieJar
       * @return void
       */
 -    public function flushExpiredCookies()
@@ -1322,17 +1322,17 @@ index 9753d305d9..081d621068 100644
      {
          foreach ($this->cookieJar as $domain => $pathCookies) {
 diff --git a/src/Symfony/Component/BrowserKit/History.php b/src/Symfony/Component/BrowserKit/History.php
-index 01f5e80382..20c3349c14 100644
+index 7fce4e32b0..a7f192c5e3 100644
 --- a/src/Symfony/Component/BrowserKit/History.php
 +++ b/src/Symfony/Component/BrowserKit/History.php
-@@ -27,5 +27,5 @@ class History
+@@ -29,5 +29,5 @@ class History
       * @return void
       */
 -    public function clear()
 +    public function clear(): void
      {
          $this->stack = [];
-@@ -38,5 +38,5 @@ class History
+@@ -40,5 +40,5 @@ class History
       * @return void
       */
 -    public function add(Request $request)
@@ -12879,6 +12879,17 @@ index 22026f46a7..52b1ef696b 100644
 +    public static function castEnvelope(\AMQPEnvelope $c, array $a, Stub $stub, bool $isNested, int $filter = 0): array
      {
          $prefix = Caster::PREFIX_VIRTUAL;
+diff --git a/src/Symfony/Component/VarDumper/Caster/ClassStub.php b/src/Symfony/Component/VarDumper/Caster/ClassStub.php
+index 86b44dd2ab..4df5e7c284 100644
+--- a/src/Symfony/Component/VarDumper/Caster/ClassStub.php
++++ b/src/Symfony/Component/VarDumper/Caster/ClassStub.php
+@@ -89,5 +89,5 @@ class ClassStub extends ConstStub
+      * @return mixed
+      */
+-    public static function wrapCallable(mixed $callable)
++    public static function wrapCallable(mixed $callable): mixed
+     {
+         if (\is_object($callable) || !\is_callable($callable)) {
 diff --git a/src/Symfony/Component/VarDumper/Caster/DOMCaster.php b/src/Symfony/Component/VarDumper/Caster/DOMCaster.php
 index d2d3fc1294..c28829f4e2 100644
 --- a/src/Symfony/Component/VarDumper/Caster/DOMCaster.php
@@ -13046,7 +13057,7 @@ index 3120c3d919..0ac928f2ca 100644
      {
          foreach (['snapshot', 'association', 'typeClass'] as $k) {
 diff --git a/src/Symfony/Component/VarDumper/Caster/ExceptionCaster.php b/src/Symfony/Component/VarDumper/Caster/ExceptionCaster.php
-index be5a642226..5ee13fc3ed 100644
+index 02efb1b023..1634f14b80 100644
 --- a/src/Symfony/Component/VarDumper/Caster/ExceptionCaster.php
 +++ b/src/Symfony/Component/VarDumper/Caster/ExceptionCaster.php
 @@ -51,5 +51,5 @@ class ExceptionCaster
@@ -13098,6 +13109,13 @@ index be5a642226..5ee13fc3ed 100644
 +    public static function castFrameStub(FrameStub $frame, array $a, Stub $stub, bool $isNested): array
      {
          if (!$isNested) {
+@@ -293,5 +293,5 @@ class ExceptionCaster
+      * @return array
+      */
+-    public static function castFlattenException(FlattenException $e, array $a, Stub $stub, bool $isNested)
++    public static function castFlattenException(FlattenException $e, array $a, Stub $stub, bool $isNested): array
+     {
+         if ($isNested) {
 diff --git a/src/Symfony/Component/VarDumper/Caster/FiberCaster.php b/src/Symfony/Component/VarDumper/Caster/FiberCaster.php
 index b797dbd634..ce8deb48d5 100644
 --- a/src/Symfony/Component/VarDumper/Caster/FiberCaster.php
@@ -13549,7 +13567,7 @@ index ea86cb4988..9b84f08439 100644
      {
          $map = [];
 diff --git a/src/Symfony/Component/VarDumper/Caster/StubCaster.php b/src/Symfony/Component/VarDumper/Caster/StubCaster.php
-index 3fef05696f..2ed2fd10cb 100644
+index 4b93ff76f6..f65026281e 100644
 --- a/src/Symfony/Component/VarDumper/Caster/StubCaster.php
 +++ b/src/Symfony/Component/VarDumper/Caster/StubCaster.php
 @@ -26,5 +26,5 @@ class StubCaster
@@ -13559,21 +13577,28 @@ index 3fef05696f..2ed2fd10cb 100644
 +    public static function castStub(Stub $c, array $a, Stub $stub, bool $isNested): array
      {
          if ($isNested) {
-@@ -55,5 +55,5 @@ class StubCaster
+@@ -50,5 +50,5 @@ class StubCaster
+      * @return array
+      */
+-    public static function castCutArray(CutArrayStub $c, array $a, Stub $stub, bool $isNested)
++    public static function castCutArray(CutArrayStub $c, array $a, Stub $stub, bool $isNested): array
+     {
+         return $isNested ? $c->preservedSubset : $a;
+@@ -58,5 +58,5 @@ class StubCaster
       * @return array
       */
 -    public static function cutInternals($obj, array $a, Stub $stub, bool $isNested)
 +    public static function cutInternals($obj, array $a, Stub $stub, bool $isNested): array
      {
          if ($isNested) {
-@@ -69,5 +69,5 @@ class StubCaster
+@@ -72,5 +72,5 @@ class StubCaster
       * @return array
       */
 -    public static function castEnum(EnumStub $c, array $a, Stub $stub, bool $isNested)
 +    public static function castEnum(EnumStub $c, array $a, Stub $stub, bool $isNested): array
      {
          if ($isNested) {
-@@ -95,5 +95,5 @@ class StubCaster
+@@ -98,5 +98,5 @@ class StubCaster
       * @return array
       */
 -    public static function castScalar(ScalarStub $scalarStub, array $a, Stub $stub)
@@ -13681,7 +13706,7 @@ index 6a746b88e3..4c0940bd31 100644
      {
          $this->minDepth = $minDepth;
 diff --git a/src/Symfony/Component/VarDumper/Cloner/Data.php b/src/Symfony/Component/VarDumper/Cloner/Data.php
-index 056b3dfb6a..fea14d593b 100644
+index 64b595d992..5b3bea6366 100644
 --- a/src/Symfony/Component/VarDumper/Cloner/Data.php
 +++ b/src/Symfony/Component/VarDumper/Cloner/Data.php
 @@ -266,5 +266,5 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
@@ -13691,6 +13716,37 @@ index 056b3dfb6a..fea14d593b 100644
 +    public function dump(DumperInterface $dumper): void
      {
          $refs = [0];
+diff --git a/src/Symfony/Component/VarDumper/Cloner/DumperInterface.php b/src/Symfony/Component/VarDumper/Cloner/DumperInterface.php
+index 4c5b315b60..a737e71755 100644
+--- a/src/Symfony/Component/VarDumper/Cloner/DumperInterface.php
++++ b/src/Symfony/Component/VarDumper/Cloner/DumperInterface.php
+@@ -24,5 +24,5 @@ interface DumperInterface
+      * @return void
+      */
+-    public function dumpScalar(Cursor $cursor, string $type, string|int|float|bool|null $value);
++    public function dumpScalar(Cursor $cursor, string $type, string|int|float|bool|null $value): void;
+ 
+     /**
+@@ -35,5 +35,5 @@ interface DumperInterface
+      * @return void
+      */
+-    public function dumpString(Cursor $cursor, string $str, bool $bin, int $cut);
++    public function dumpString(Cursor $cursor, string $str, bool $bin, int $cut): void;
+ 
+     /**
+@@ -46,5 +46,5 @@ interface DumperInterface
+      * @return void
+      */
+-    public function enterHash(Cursor $cursor, int $type, string|int|null $class, bool $hasChild);
++    public function enterHash(Cursor $cursor, int $type, string|int|null $class, bool $hasChild): void;
+ 
+     /**
+@@ -58,4 +58,4 @@ interface DumperInterface
+      * @return void
+      */
+-    public function leaveHash(Cursor $cursor, int $type, string|int|null $class, bool $hasChild, int $cut);
++    public function leaveHash(Cursor $cursor, int $type, string|int|null $class, bool $hasChild, int $cut): void;
+ }
 diff --git a/src/Symfony/Component/VarDumper/Dumper/AbstractDumper.php b/src/Symfony/Component/VarDumper/Dumper/AbstractDumper.php
 index 053a90972b..5876b02373 100644
 --- a/src/Symfony/Component/VarDumper/Dumper/AbstractDumper.php
@@ -13710,7 +13766,7 @@ index 053a90972b..5876b02373 100644
      {
          if (-1 !== $depth) {
 diff --git a/src/Symfony/Component/VarDumper/Dumper/CliDumper.php b/src/Symfony/Component/VarDumper/Dumper/CliDumper.php
-index d04c199e67..8b962c311d 100644
+index c337bfed8d..be74450f6b 100644
 --- a/src/Symfony/Component/VarDumper/Dumper/CliDumper.php
 +++ b/src/Symfony/Component/VarDumper/Dumper/CliDumper.php
 @@ -90,5 +90,5 @@ class CliDumper extends AbstractDumper
@@ -13798,73 +13854,122 @@ index d04c199e67..8b962c311d 100644
      {
          if (-1 === $cursor->hashType) {
 diff --git a/src/Symfony/Component/VarDumper/Dumper/ContextualizedDumper.php b/src/Symfony/Component/VarDumper/Dumper/ContextualizedDumper.php
-index a2e8f8c7b2..5561bc167f 100644
+index 84cfb42595..06cb77d8cb 100644
 --- a/src/Symfony/Component/VarDumper/Dumper/ContextualizedDumper.php
 +++ b/src/Symfony/Component/VarDumper/Dumper/ContextualizedDumper.php
 @@ -35,5 +35,5 @@ class ContextualizedDumper implements DataDumperInterface
-      * @return void
+      * @return string|null
       */
 -    public function dump(Data $data)
-+    public function dump(Data $data): void
++    public function dump(Data $data): ?string
      {
          $context = $data->getContext();
+diff --git a/src/Symfony/Component/VarDumper/Dumper/DataDumperInterface.php b/src/Symfony/Component/VarDumper/Dumper/DataDumperInterface.php
+index e080aff05d..a59bb4d8bd 100644
+--- a/src/Symfony/Component/VarDumper/Dumper/DataDumperInterface.php
++++ b/src/Symfony/Component/VarDumper/Dumper/DataDumperInterface.php
+@@ -25,4 +25,4 @@ interface DataDumperInterface
+      * @return string|null
+      */
+-    public function dump(Data $data);
++    public function dump(Data $data): ?string;
+ }
 diff --git a/src/Symfony/Component/VarDumper/Dumper/HtmlDumper.php b/src/Symfony/Component/VarDumper/Dumper/HtmlDumper.php
-index 91539daaad..be8c4b5550 100644
+index 7ed141e261..f9dda0f800 100644
 --- a/src/Symfony/Component/VarDumper/Dumper/HtmlDumper.php
 +++ b/src/Symfony/Component/VarDumper/Dumper/HtmlDumper.php
-@@ -83,5 +83,5 @@ class HtmlDumper extends CliDumper
-     }
- 
+@@ -86,5 +86,5 @@ class HtmlDumper extends CliDumper
+      * @return void
+      */
 -    public function setStyles(array $styles)
 +    public function setStyles(array $styles): void
      {
          $this->headerIsDumped = false;
-@@ -103,5 +103,5 @@ class HtmlDumper extends CliDumper
-      * @param array $displayOptions A map of display options to customize the behavior
+@@ -95,5 +95,5 @@ class HtmlDumper extends CliDumper
+      * @return void
+      */
+-    public function setTheme(string $themeName)
++    public function setTheme(string $themeName): void
+     {
+         if (!isset(static::$themes[$themeName])) {
+@@ -111,5 +111,5 @@ class HtmlDumper extends CliDumper
+      * @return void
       */
 -    public function setDisplayOptions(array $displayOptions)
 +    public function setDisplayOptions(array $displayOptions): void
      {
          $this->headerIsDumped = false;
-@@ -774,5 +774,5 @@ EOHTML
-     }
- 
+@@ -122,5 +122,5 @@ class HtmlDumper extends CliDumper
+      * @return void
+      */
+-    public function setDumpHeader(?string $header)
++    public function setDumpHeader(?string $header): void
+     {
+         $this->dumpHeader = $header;
+@@ -132,5 +132,5 @@ class HtmlDumper extends CliDumper
+      * @return void
+      */
+-    public function setDumpBoundaries(string $prefix, string $suffix)
++    public function setDumpBoundaries(string $prefix, string $suffix): void
+     {
+         $this->dumpPrefix = $prefix;
+@@ -152,5 +152,5 @@ class HtmlDumper extends CliDumper
+      * @return string
+      */
+-    protected function getDumpHeader()
++    protected function getDumpHeader(): string
+     {
+         $this->headerIsDumped = $this->outputStream ?? $this->lineDumper;
+@@ -791,5 +791,5 @@ EOHTML
+      * @return void
+      */
 -    public function dumpString(Cursor $cursor, string $str, bool $bin, int $cut)
 +    public function dumpString(Cursor $cursor, string $str, bool $bin, int $cut): void
      {
          if ('' === $str && isset($cursor->attr['img-data'], $cursor->attr['content-type'])) {
-@@ -789,5 +789,5 @@ EOHTML
-     }
- 
+@@ -809,5 +809,5 @@ EOHTML
+      * @return void
+      */
 -    public function enterHash(Cursor $cursor, int $type, string|int|null $class, bool $hasChild)
 +    public function enterHash(Cursor $cursor, int $type, string|int|null $class, bool $hasChild): void
      {
          if (Cursor::HASH_OBJECT === $type) {
-@@ -817,5 +817,5 @@ EOHTML
-     }
- 
+@@ -840,5 +840,5 @@ EOHTML
+      * @return void
+      */
 -    public function leaveHash(Cursor $cursor, int $type, string|int|null $class, bool $hasChild, int $cut)
 +    public function leaveHash(Cursor $cursor, int $type, string|int|null $class, bool $hasChild, int $cut): void
      {
          $this->dumpEllipsis($cursor, $hasChild, $cut);
-@@ -924,5 +924,5 @@ EOHTML
-     }
- 
+@@ -950,5 +950,5 @@ EOHTML
+      * @return void
+      */
 -    protected function dumpLine(int $depth, bool $endOfValue = false)
 +    protected function dumpLine(int $depth, bool $endOfValue = false): void
      {
          if (-1 === $this->lastDepth) {
 diff --git a/src/Symfony/Component/VarDumper/Dumper/ServerDumper.php b/src/Symfony/Component/VarDumper/Dumper/ServerDumper.php
-index 546490d9ae..f7fed41e4d 100644
+index 98c2149330..2e85547efb 100644
 --- a/src/Symfony/Component/VarDumper/Dumper/ServerDumper.php
 +++ b/src/Symfony/Component/VarDumper/Dumper/ServerDumper.php
 @@ -45,5 +45,5 @@ class ServerDumper implements DataDumperInterface
-      * @return void
+      * @return string|null
       */
 -    public function dump(Data $data)
-+    public function dump(Data $data): void
++    public function dump(Data $data): ?string
      {
          if (!$this->connection->write($data) && $this->wrappedDumper) {
+diff --git a/src/Symfony/Component/VarDumper/VarDumper.php b/src/Symfony/Component/VarDumper/VarDumper.php
+index 2e1dad116c..abe2b0b229 100644
+--- a/src/Symfony/Component/VarDumper/VarDumper.php
++++ b/src/Symfony/Component/VarDumper/VarDumper.php
+@@ -43,5 +43,5 @@ class VarDumper
+      * @return mixed
+      */
+-    public static function dump(mixed $var/* , string $label = null */)
++    public static function dump(mixed $var/* , string $label = null */): mixed
+     {
+         $label = 2 <= \func_num_args() ? func_get_arg(1) : null;
 diff --git a/src/Symfony/Component/VarExporter/Internal/Exporter.php b/src/Symfony/Component/VarExporter/Internal/Exporter.php
 index ae12ec414a..971280f868 100644
 --- a/src/Symfony/Component/VarExporter/Internal/Exporter.php

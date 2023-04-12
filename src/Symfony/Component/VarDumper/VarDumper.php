@@ -39,6 +39,8 @@ class VarDumper
 
     /**
      * @param string|null $label
+     *
+     * @return mixed
      */
     public static function dump(mixed $var/* , string $label = null */)
     {

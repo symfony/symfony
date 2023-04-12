@@ -68,7 +68,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         $this->clonesIndex = ++$this->clonesCount;
     }
 
-    public function dump(Data $data): void
+    public function dump(Data $data): ?string
     {
         $this->stopwatch?->start('dump');
 
@@ -91,6 +91,8 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         ++$this->dataCount;
 
         $this->stopwatch?->stop('dump');
+
+        return null;
     }
 
     public function collect(Request $request, Response $response, \Throwable $exception = null): void

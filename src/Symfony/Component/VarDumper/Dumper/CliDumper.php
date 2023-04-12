@@ -648,7 +648,7 @@ class CliDumper extends AbstractDumper
         return $result;
     }
 
-    private function getSourceLink(string $file, int $line)
+    private function getSourceLink(string $file, int $line): string|false
     {
         if ($fmt = $this->displayOptions['fileLinkFormat']) {
             return \is_string($fmt) ? strtr($fmt, ['%f' => $file, '%l' => $line]) : ($fmt->format($file, $line) ?: 'file://'.$file.'#L'.$line);

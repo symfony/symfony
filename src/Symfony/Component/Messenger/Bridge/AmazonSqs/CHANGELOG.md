@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Added `delete_on_rejection` option to support let SQS to handle retry and DLQ itself (failure_transport must not be configured)
+
 6.1
 ---
 

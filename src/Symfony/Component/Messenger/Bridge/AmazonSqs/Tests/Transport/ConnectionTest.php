@@ -77,7 +77,7 @@ class ConnectionTest extends TestCase
         $this->assertNull($connection->get());
     }
 
-    public function testSetupIfQueueAlreadyExists(): void
+    public function testSetupIfQueueAlreadyExists()
     {
         $client = $this->createMock(SqsClient::class);
         $client
@@ -94,7 +94,7 @@ class ConnectionTest extends TestCase
             ->setup();
     }
 
-    public function testSetupIfQueueDoesNotExists(): void
+    public function testSetupIfQueueDoesNotExists()
     {
         $client = $this->createMock(SqsClient::class);
         $client
@@ -113,7 +113,7 @@ class ConnectionTest extends TestCase
             ->setup();
     }
 
-    public function testAck(): void
+    public function testAck()
     {
         $client = $this->createMock(SqsClient::class);
         $client
@@ -133,7 +133,7 @@ class ConnectionTest extends TestCase
             ->ack('some-id');
     }
 
-    public function testRejectWithDeletion(): void
+    public function testRejectWithDeletion()
     {
         $client = $this->createMock(SqsClient::class);
         $client
@@ -156,7 +156,7 @@ class ConnectionTest extends TestCase
         (new Connection($config, $client, 'http://queue'))->reject('some-id');
     }
 
-    public function testRejectWithVisibilityTimeout(): void
+    public function testRejectWithVisibilityTimeout()
     {
         $client = $this->createMock(SqsClient::class);
         $client
@@ -204,7 +204,7 @@ class ConnectionTest extends TestCase
         ?string $_groupId,
         ?string $_deduplicationId,
         ?string $xrayTraceId,
-    ): void {
+    ) {
         $attributes = array_map(
             static fn ($v) => new MessageAttributeValue(['DataType' => 'String', 'StringValue' => $v]),
             $headers,
@@ -250,7 +250,7 @@ class ConnectionTest extends TestCase
         ?string $groupId,
         ?string $deduplicationId,
         ?string $xrayTraceId,
-    ): void {
+    ) {
         $attributes = array_map(
             static fn ($v) => new MessageAttributeValue(['DataType' => 'String', 'StringValue' => $v]),
             $headers,
@@ -286,7 +286,7 @@ class ConnectionTest extends TestCase
             ->send($body, $headers, messageGroupId: $groupId, messageDeduplicationId: $deduplicationId, xrayTraceId: $xrayTraceId);
     }
 
-    public function testLoggerWithoutDebugOption(): void
+    public function testLoggerWithoutDebugOption()
     {
         $client = new MockHttpClient([$this->getMockedQueueUrlResponse(), $this->getMockedReceiveMessageResponse()]);
         $logger = $this->getMockBuilder(NullLogger::class)
@@ -298,7 +298,7 @@ class ConnectionTest extends TestCase
         $connection->get();
     }
 
-    public function testLoggerWithDebugOption(): void
+    public function testLoggerWithDebugOption()
     {
         $client = new MockHttpClient([$this->getMockedQueueUrlResponse(), $this->getMockedReceiveMessageResponse()]);
         $logger = $this->getMockBuilder(NullLogger::class)

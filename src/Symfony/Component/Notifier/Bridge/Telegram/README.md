@@ -47,6 +47,35 @@ $chatMessage->options($telegramOptions);
 $chatter->send($chatMessage);
 ```
 
+Adding Photo to a Message
+-------------------------
+
+With a Telegram message, you can use the `TelegramOptions` class to add
+[message options](https://core.telegram.org/bots/api).
+
+```php
+use Symfony\Component\Notifier\Bridge\Telegram\Reply\Markup\Button\InlineKeyboardButton;
+use Symfony\Component\Notifier\Bridge\Telegram\Reply\Markup\InlineKeyboardMarkup;
+use Symfony\Component\Notifier\Bridge\Telegram\TelegramOptions;
+use Symfony\Component\Notifier\Message\ChatMessage;
+
+$chatMessage = new ChatMessage('Photo Caption');
+
+// Create Telegram options
+$telegramOptions = (new TelegramOptions())
+    ->chatId('@symfonynotifierdev')
+    ->parseMode('MarkdownV2')
+    ->disableWebPagePreview(true)
+    ->hasSpoiler(true)
+    ->protectContent(true)
+    ->photo('https://symfony.com/favicons/android-chrome-192x192.png');
+
+// Add the custom options to the chat message and send the message
+$chatMessage->options($telegramOptions);
+
+$chatter->send($chatMessage);
+```
+
 Updating Messages
 -----------------
 

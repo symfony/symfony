@@ -426,6 +426,10 @@ return [
             0 => 'SHP',
             1 => 'St Helena Pound',
         ],
+        'SLL' => [
+            0 => 'SLL',
+            1 => 'Sierra Leonean Leone (1964–2022)',
+        ],
         'SOS' => [
             0 => 'SOS',
             1 => 'Somali Shilling',

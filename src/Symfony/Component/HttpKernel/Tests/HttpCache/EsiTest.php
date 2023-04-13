@@ -102,7 +102,7 @@ class EsiTest extends TestCase
         $response = new Response('<esi:remove> <a href="http://www.example.com">www.example.com</a> </esi:remove> Keep this'."<esi:remove>\n <a>www.example.com</a> </esi:remove> And this");
         $this->assertSame($response, $esi->process($request, $response));
 
-        $this->assertEquals(' Keep this And this', $response->getContent());
+        $this->assertEquals(' Keep this And this', substr($response->getContent(), 24, -24));
     }
 
     public function testCommentTagsAreRemoved()
@@ -113,7 +113,7 @@ class EsiTest extends TestCase
         $response = new Response('<esi:comment text="some comment &gt;" /> Keep this');
         $this->assertSame($response, $esi->process($request, $response));
 
-        $this->assertEquals(' Keep this', $response->getContent());
+        $this->assertEquals(' Keep this', substr($response->getContent(), 24, -24));
     }
 
     public function testProcess()
@@ -124,23 +124,27 @@ class EsiTest extends TestCase
         $response = new Response('foo <esi:comment text="some comment" /><esi:include src="..." alt="alt" onerror="continue" />');
         $this->assertSame($response, $esi->process($request, $response));
 
-        $this->assertEquals('foo <?php echo $this->surrogate->handle($this, \'...\', \'alt\', true) ?>'."\n", $response->getContent());
+        $content = explode(substr($response->getContent(), 0, 24), $response->getContent());
+        $this->assertSame(['', 'foo ', "...\nalt\n1\n", ''], $content);
         $this->assertEquals('ESI', $response->headers->get('x-body-eval'));
 
         $response = new Response('foo <esi:comment text="some comment" /><esi:include src="foo\'" alt="bar\'" onerror="continue" />');
         $this->assertSame($response, $esi->process($request, $response));
 
-        $this->assertEquals('foo <?php echo $this->surrogate->handle($this, \'foo\\\'\', \'bar\\\'\', true) ?>'."\n", $response->getContent());
+        $content = explode(substr($response->getContent(), 0, 24), $response->getContent());
+        $this->assertSame(['', 'foo ', "foo'\nbar'\n1\n", ''], $content);
 
         $response = new Response('foo <esi:include src="..." />');
         $this->assertSame($response, $esi->process($request, $response));
 
-        $this->assertEquals('foo <?php echo $this->surrogate->handle($this, \'...\', \'\', false) ?>'."\n", $response->getContent());
+        $content = explode(substr($response->getContent(), 0, 24), $response->getContent());
+        $this->assertSame(['', 'foo ', "...\n\n\n", ''], $content);
 
         $response = new Response('foo <esi:include src="..."></esi:include>');
         $this->assertSame($response, $esi->process($request, $response));
 
-        $this->assertEquals('foo <?php echo $this->surrogate->handle($this, \'...\', \'\', false) ?>'."\n", $response->getContent());
+        $content = explode(substr($response->getContent(), 0, 24), $response->getContent());
+        $this->assertSame(['', 'foo ', "...\n\n\n", ''], $content);
     }
 
     public function testProcessEscapesPhpTags()
@@ -151,7 +155,8 @@ class EsiTest extends TestCase
         $response = new Response('<?php <? <% <script language=php>');
         $this->assertSame($response, $esi->process($request, $response));
 
-        $this->assertEquals('<?php echo "<?"; ?>php <?php echo "<?"; ?> <?php echo "<%"; ?> <?php echo "<s"; ?>cript language=php>', $response->getContent());
+        $content = explode(substr($response->getContent(), 0, 24), $response->getContent());
+        $this->assertSame(['', '<?php <? <% <script language=php>', ''], $content);
     }
 
     public function testProcessWhenNoSrcInAnEsi()

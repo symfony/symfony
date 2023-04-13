@@ -24,6 +24,10 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 abstract class AbstractSurrogate implements SurrogateInterface
 {
     protected $contentTypes;
+
+    /**
+     * @deprecated since Symfony 6.3
+     */
     protected $phpEscapeMap = [
         ['<?', '<%', '<s', '<S'],
         ['<?php echo "<?"; ?>', '<?php echo "<%"; ?>', '<?php echo "<s"; ?>', '<?php echo "<S"; ?>'],

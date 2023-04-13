@@ -721,20 +721,20 @@ class SerializerTest extends TestCase
         );
 
         $actual = $serializer->deserialize('{ "changed": null }', DummyUnionType::class, 'json', [
-            DateTimeNormalizer::FORMAT_KEY => \DateTime::ISO8601,
+            DateTimeNormalizer::FORMAT_KEY => \DateTimeInterface::ISO8601,
         ]);
 
         $this->assertEquals((new DummyUnionType())->setChanged(null), $actual, 'Union type denormalization first case failed.');
 
         $actual = $serializer->deserialize('{ "changed": "2022-03-22T16:15:05+0000" }', DummyUnionType::class, 'json', [
-            DateTimeNormalizer::FORMAT_KEY => \DateTime::ISO8601,
+            DateTimeNormalizer::FORMAT_KEY => \DateTimeInterface::ISO8601,
         ]);
 
-        $expectedDateTime = \DateTime::createFromFormat(\DateTime::ISO8601, '2022-03-22T16:15:05+0000');
+        $expectedDateTime = \DateTimeImmutable::createFromFormat(\DateTimeInterface::ISO8601, '2022-03-22T16:15:05+0000');
         $this->assertEquals((new DummyUnionType())->setChanged($expectedDateTime), $actual, 'Union type denormalization second case failed.');
 
         $actual = $serializer->deserialize('{ "changed": false }', DummyUnionType::class, 'json', [
-            DateTimeNormalizer::FORMAT_KEY => \DateTime::ISO8601,
+            DateTimeNormalizer::FORMAT_KEY => \DateTimeInterface::ISO8601,
         ]);
 
         $this->assertEquals(new DummyUnionType(), $actual, 'Union type denormalization third case failed.');

@@ -39,7 +39,7 @@ trait ContextMetadataTestTrait
         new Serializer([new DateTimeNormalizer(), $normalizer]);
 
         $dummy = new $contextMetadataDummyClass();
-        $dummy->date = new \DateTime('2011-07-28T08:44:00.123+00:00');
+        $dummy->date = new \DateTimeImmutable('2011-07-28T08:44:00.123+00:00');
 
         self::assertEquals(['date' => '2011-07-28T08:44:00+00:00'], $normalizer->normalize($dummy));
 
@@ -63,13 +63,13 @@ trait ContextMetadataTestTrait
 
         /** @var ContextMetadataDummy|ContextChildMetadataDummy $dummy */
         $dummy = $normalizer->denormalize(['date' => '2011-07-28T08:44:00+00:00'], $contextMetadataDummyClass);
-        self::assertEquals(new \DateTime('2011-07-28T08:44:00+00:00'), $dummy->date);
+        self::assertEquals(new \DateTimeImmutable('2011-07-28T08:44:00+00:00'), $dummy->date);
 
         /** @var ContextMetadataDummy|ContextChildMetadataDummy $dummy */
         $dummy = $normalizer->denormalize(['date' => '2011-07-28T08:44:00+00:00'], ContextMetadataDummy::class, null, [
             ObjectNormalizer::GROUPS => 'extended',
         ]);
-        self::assertEquals(new \DateTime('2011-07-28T08:44:00+00:00'), $dummy->date, 'base denormalization context is unchanged for this group');
+        self::assertEquals(new \DateTimeImmutable('2011-07-28T08:44:00+00:00'), $dummy->date, 'base denormalization context is unchanged for this group');
 
         /** @var ContextMetadataDummy|ContextChildMetadataDummy $dummy */
         $dummy = $normalizer->denormalize(['date' => '28/07/2011'], $contextMetadataDummyClass, null, [

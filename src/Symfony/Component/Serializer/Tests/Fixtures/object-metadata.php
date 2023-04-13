@@ -1,3 +1,3 @@
 <?php
 
-return new DateTime();
+return new DateTimeImmutable();

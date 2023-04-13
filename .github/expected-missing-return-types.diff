@@ -11211,70 +11211,6 @@ index b684fddb2f..ade2242791 100644
 +    public function getData(): mixed
      {
          return $this->data;
-diff --git a/src/Symfony/Component/Serializer/Mapping/AttributeMetadata.php b/src/Symfony/Component/Serializer/Mapping/AttributeMetadata.php
-index aeee5ac680..4ac78f5458 100644
---- a/src/Symfony/Component/Serializer/Mapping/AttributeMetadata.php
-+++ b/src/Symfony/Component/Serializer/Mapping/AttributeMetadata.php
-@@ -98,5 +98,5 @@ class AttributeMetadata implements AttributeMetadataInterface
-      * @return void
-      */
--    public function addGroup(string $group)
-+    public function addGroup(string $group): void
-     {
-         if (!\in_array($group, $this->groups)) {
-@@ -113,5 +113,5 @@ class AttributeMetadata implements AttributeMetadataInterface
-      * @return void
-      */
--    public function setMaxDepth(?int $maxDepth)
-+    public function setMaxDepth(?int $maxDepth): void
-     {
-         $this->maxDepth = $maxDepth;
-@@ -126,5 +126,5 @@ class AttributeMetadata implements AttributeMetadataInterface
-      * @return void
-      */
--    public function setSerializedName(string $serializedName = null)
-+    public function setSerializedName(string $serializedName = null): void
-     {
-         if (1 > \func_num_args()) {
-@@ -153,5 +153,5 @@ class AttributeMetadata implements AttributeMetadataInterface
-      * @return void
-      */
--    public function setIgnore(bool $ignore)
-+    public function setIgnore(bool $ignore): void
-     {
-         $this->ignore = $ignore;
-@@ -218,5 +218,5 @@ class AttributeMetadata implements AttributeMetadataInterface
-      * @return void
-      */
--    public function merge(AttributeMetadataInterface $attributeMetadata)
-+    public function merge(AttributeMetadataInterface $attributeMetadata): void
-     {
-         foreach ($attributeMetadata->getGroups() as $group) {
-diff --git a/src/Symfony/Component/Serializer/Mapping/ClassMetadata.php b/src/Symfony/Component/Serializer/Mapping/ClassMetadata.php
-index fc6336ebdb..e13a834930 100644
---- a/src/Symfony/Component/Serializer/Mapping/ClassMetadata.php
-+++ b/src/Symfony/Component/Serializer/Mapping/ClassMetadata.php
-@@ -64,5 +64,5 @@ class ClassMetadata implements ClassMetadataInterface
-      * @return void
-      */
--    public function addAttributeMetadata(AttributeMetadataInterface $attributeMetadata)
-+    public function addAttributeMetadata(AttributeMetadataInterface $attributeMetadata): void
-     {
-         $this->attributesMetadata[$attributeMetadata->getName()] = $attributeMetadata;
-@@ -77,5 +77,5 @@ class ClassMetadata implements ClassMetadataInterface
-      * @return void
-      */
--    public function merge(ClassMetadataInterface $classMetadata)
-+    public function merge(ClassMetadataInterface $classMetadata): void
-     {
-         foreach ($classMetadata->getAttributesMetadata() as $attributeMetadata) {
-@@ -105,5 +105,5 @@ class ClassMetadata implements ClassMetadataInterface
-      * @return void
-      */
--    public function setClassDiscriminatorMapping(ClassDiscriminatorMapping $mapping = null)
-+    public function setClassDiscriminatorMapping(ClassDiscriminatorMapping $mapping = null): void
-     {
-         if (1 > \func_num_args()) {
 diff --git a/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php
 index 58deea9f01..8fe0385cdc 100644
 --- a/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php
@@ -11350,6 +11286,16 @@ index 20f15becb2..b378cd8c38 100644
 +    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
      {
          if (!isset($context['cache_key'])) {
+diff --git a/src/Symfony/Component/Serializer/Normalizer/DenormalizerAwareInterface.php b/src/Symfony/Component/Serializer/Normalizer/DenormalizerAwareInterface.php
+index 48e8c3fb54..a71c3ea476 100644
+--- a/src/Symfony/Component/Serializer/Normalizer/DenormalizerAwareInterface.php
++++ b/src/Symfony/Component/Serializer/Normalizer/DenormalizerAwareInterface.php
+@@ -22,4 +22,4 @@ interface DenormalizerAwareInterface
+      * @return void
+      */
+-    public function setDenormalizer(DenormalizerInterface $denormalizer);
++    public function setDenormalizer(DenormalizerInterface $denormalizer): void;
+ }
 diff --git a/src/Symfony/Component/Serializer/Normalizer/DenormalizerInterface.php b/src/Symfony/Component/Serializer/Normalizer/DenormalizerInterface.php
 index 4edb70096d..8c844785db 100644
 --- a/src/Symfony/Component/Serializer/Normalizer/DenormalizerInterface.php
@@ -11379,6 +11325,16 @@ index 063d34ea59..fb10337d35 100644
 +    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = []): void
      {
          $setter = 'set'.ucfirst($attribute);
+diff --git a/src/Symfony/Component/Serializer/Normalizer/NormalizerAwareInterface.php b/src/Symfony/Component/Serializer/Normalizer/NormalizerAwareInterface.php
+index 5f3deaa018..99de716dfb 100644
+--- a/src/Symfony/Component/Serializer/Normalizer/NormalizerAwareInterface.php
++++ b/src/Symfony/Component/Serializer/Normalizer/NormalizerAwareInterface.php
+@@ -22,4 +22,4 @@ interface NormalizerAwareInterface
+      * @return void
+      */
+-    public function setNormalizer(NormalizerInterface $normalizer);
++    public function setNormalizer(NormalizerInterface $normalizer): void;
+ }
 diff --git a/src/Symfony/Component/Serializer/Normalizer/NormalizerAwareTrait.php b/src/Symfony/Component/Serializer/Normalizer/NormalizerAwareTrait.php
 index 40a4fa0e8c..a1e2749aae 100644
 --- a/src/Symfony/Component/Serializer/Normalizer/NormalizerAwareTrait.php
@@ -11430,6 +11386,16 @@ index ec12db9bb2..d3b7f036a8 100644
 +    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = []): void
      {
          try {
+diff --git a/src/Symfony/Component/Serializer/SerializerAwareInterface.php b/src/Symfony/Component/Serializer/SerializerAwareInterface.php
+index 4919436d94..24ff404aa4 100644
+--- a/src/Symfony/Component/Serializer/SerializerAwareInterface.php
++++ b/src/Symfony/Component/Serializer/SerializerAwareInterface.php
+@@ -22,4 +22,4 @@ interface SerializerAwareInterface
+      * @return void
+      */
+-    public function setSerializer(SerializerInterface $serializer);
++    public function setSerializer(SerializerInterface $serializer): void;
+ }
 diff --git a/src/Symfony/Component/Serializer/SerializerAwareTrait.php b/src/Symfony/Component/Serializer/SerializerAwareTrait.php
 index 1835568745..2b98fc11d6 100644
 --- a/src/Symfony/Component/Serializer/SerializerAwareTrait.php
@@ -11437,6 +11403,17 @@ index 1835568745..2b98fc11d6 100644
 @@ -25,5 +25,5 @@ trait SerializerAwareTrait
       * @return void
       */
+-    public function setSerializer(SerializerInterface $serializer)
++    public function setSerializer(SerializerInterface $serializer): void
+     {
+         $this->serializer = $serializer;
+diff --git a/src/Symfony/Component/Serializer/Tests/Normalizer/AbstractObjectNormalizerTest.php b/src/Symfony/Component/Serializer/Tests/Normalizer/AbstractObjectNormalizerTest.php
+index c32425b99e..ea8c3ba06e 100644
+--- a/src/Symfony/Component/Serializer/Tests/Normalizer/AbstractObjectNormalizerTest.php
++++ b/src/Symfony/Component/Serializer/Tests/Normalizer/AbstractObjectNormalizerTest.php
+@@ -871,5 +871,5 @@ class ArrayDenormalizerDummy implements DenormalizerInterface, SerializerAwareIn
+     }
+ 
 -    public function setSerializer(SerializerInterface $serializer)
 +    public function setSerializer(SerializerInterface $serializer): void
      {

@@ -32,7 +32,7 @@ interface AttributeMetadataInterface
     /**
      * Adds this attribute to the given group.
      */
-    public function addGroup(string $group);
+    public function addGroup(string $group): void;
 
     /**
      * Gets groups of this attribute.
@@ -44,7 +44,7 @@ interface AttributeMetadataInterface
     /**
      * Sets the serialization max depth for this attribute.
      */
-    public function setMaxDepth(?int $maxDepth);
+    public function setMaxDepth(?int $maxDepth): void;
 
     /**
      * Gets the serialization max depth for this attribute.
@@ -54,7 +54,7 @@ interface AttributeMetadataInterface
     /**
      * Sets the serialization name for this attribute.
      */
-    public function setSerializedName(?string $serializedName);
+    public function setSerializedName(?string $serializedName): void;
 
     /**
      * Gets the serialization name for this attribute.
@@ -68,7 +68,7 @@ interface AttributeMetadataInterface
     /**
      * Sets if this attribute must be ignored or not.
      */
-    public function setIgnore(bool $ignore);
+    public function setIgnore(bool $ignore): void;
 
     /**
      * Gets if this attribute is ignored or not.
@@ -78,7 +78,7 @@ interface AttributeMetadataInterface
     /**
      * Merges an {@see AttributeMetadataInterface} with in the current one.
      */
-    public function merge(self $attributeMetadata);
+    public function merge(self $attributeMetadata): void;
 
     /**
      * Gets all the normalization contexts per group ("*" being the base context applied to all groups).

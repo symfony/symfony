@@ -37,6 +37,7 @@ use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
+use Symfony\Component\Messenger\Stamp\MessageDecodingFailedStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
@@ -109,6 +110,26 @@ class WorkerTest extends TestCase
 
         $bus = $this->createMock(MessageBusInterface::class);
         $bus->method('dispatch')->willThrowException(new \InvalidArgumentException('Why not'));
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        $worker = new Worker(['transport1' => $receiver], $bus, $dispatcher, clock: new MockClock());
+        $worker->run();
+
+        $this->assertSame(1, $receiver->getRejectCount());
+        $this->assertSame(0, $receiver->getAcknowledgeCount());
+    }
+
+    public function testDecodingFailureCausesReject()
+    {
+        $envelope = new Envelope(
+            new DummyMessage('Hello'),
+            [new SentStamp('Some\Sender', 'transport1'), new MessageDecodingFailedStamp()],
+        );
+        $receiver = new DummyReceiver([[$envelope]]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
 
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));

@@ -74,12 +74,7 @@ EOF
         }
 
         foreach ($ids as $id) {
-            $this->phpSerializer?->acceptPhpIncompleteClass();
-            try {
-                $envelope = $receiver->find($id);
-            } finally {
-                $this->phpSerializer?->rejectPhpIncompleteClass();
-            }
+            $envelope = $receiver->find($id);
 
             if (null === $envelope) {
                 $io->error(sprintf('The message with id "%s" was not found.', $id));

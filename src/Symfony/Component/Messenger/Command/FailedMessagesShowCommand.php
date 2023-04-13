@@ -96,29 +96,24 @@ EOF
             $io->comment(sprintf('Displaying only \'%s\' messages', $classFilter));
         }
 
-        $this->phpSerializer?->acceptPhpIncompleteClass();
-        try {
-            foreach ($envelopes as $envelope) {
-                $currentClassName = $envelope->getMessage()::class;
+        foreach ($envelopes as $envelope) {
+            $currentClassName = $envelope->getMessage()::class;
 
-                if ($classFilter && $classFilter !== $currentClassName) {
-                    continue;
-                }
-
-                /** @var RedeliveryStamp|null $lastRedeliveryStamp */
-                $lastRedeliveryStamp = $envelope->last(RedeliveryStamp::class);
-                /** @var ErrorDetailsStamp|null $lastErrorDetailsStamp */
-                $lastErrorDetailsStamp = $envelope->last(ErrorDetailsStamp::class);
-
-                $rows[] = [
-                    $this->getMessageId($envelope),
-                    $currentClassName,
-                    null === $lastRedeliveryStamp ? '' : $lastRedeliveryStamp->getRedeliveredAt()->format('Y-m-d H:i:s'),
-                    $lastErrorDetailsStamp?->getExceptionMessage() ?? '',
-                ];
+            if ($classFilter && $classFilter !== $currentClassName) {
+                continue;
             }
-        } finally {
-            $this->phpSerializer?->rejectPhpIncompleteClass();
+
+            /** @var RedeliveryStamp|null $lastRedeliveryStamp */
+            $lastRedeliveryStamp = $envelope->last(RedeliveryStamp::class);
+            /** @var ErrorDetailsStamp|null $lastErrorDetailsStamp */
+            $lastErrorDetailsStamp = $envelope->last(ErrorDetailsStamp::class);
+
+            $rows[] = [
+                $this->getMessageId($envelope),
+                $currentClassName,
+                null === $lastRedeliveryStamp ? '' : $lastRedeliveryStamp->getRedeliveredAt()->format('Y-m-d H:i:s'),
+                $lastErrorDetailsStamp?->getExceptionMessage() ?? '',
+            ];
         }
 
         $rowsCount = \count($rows);
@@ -148,19 +143,14 @@ EOF
 
         $countPerClass = [];
 
-        $this->phpSerializer?->acceptPhpIncompleteClass();
-        try {
-            foreach ($envelopes as $envelope) {
-                $c = $envelope->getMessage()::class;
+        foreach ($envelopes as $envelope) {
+            $c = $envelope->getMessage()::class;
 
-                if (!isset($countPerClass[$c])) {
-                    $countPerClass[$c] = [$c, 0];
-                }
-
-                ++$countPerClass[$c][1];
+            if (!isset($countPerClass[$c])) {
+                $countPerClass[$c] = [$c, 0];
             }
-        } finally {
-            $this->phpSerializer?->rejectPhpIncompleteClass();
+
+            ++$countPerClass[$c][1];
         }
 
         if (0 === \count($countPerClass)) {
@@ -176,12 +166,7 @@ EOF
     {
         /** @var ListableReceiverInterface $receiver */
         $receiver = $this->getReceiver($failedTransportName);
-        $this->phpSerializer?->acceptPhpIncompleteClass();
-        try {
-            $envelope = $receiver->find($id);
-        } finally {
-            $this->phpSerializer?->rejectPhpIncompleteClass();
-        }
+        $envelope = $receiver->find($id);
         if (null === $envelope) {
             throw new RuntimeException(sprintf('The message "%s" was not found.', $id));
         }

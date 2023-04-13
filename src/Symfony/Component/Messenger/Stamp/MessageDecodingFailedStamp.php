@@ -16,4 +16,12 @@ namespace Symfony\Component\Messenger\Stamp;
  */
 class MessageDecodingFailedStamp implements StampInterface
 {
+    public function __construct(private readonly string $message = '')
+    {
+    }
+
+    public function getMessage(): string
+    {
+        return $this->message;
+    }
 }

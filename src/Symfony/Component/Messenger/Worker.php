@@ -23,11 +23,13 @@ use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Exception\RejectRedeliveredMessageException;
 use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Stamp\AckStamp;
 use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 use Symfony\Component\Messenger\Stamp\FlushBatchHandlersStamp;
+use Symfony\Component\Messenger\Stamp\MessageDecodingFailedStamp;
 use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
@@ -149,23 +151,31 @@ class Worker
         }
 
         $acked = false;
-        $ack = function (Envelope $envelope, \Throwable $e = null) use ($transportName, &$acked) {
-            $acked = true;
-            $this->acks[] = [$transportName, $envelope, $e];
-        };
+        $envelope = $envelope->with(
+            new ReceivedStamp($transportName),
+            new ConsumedByWorkerStamp(),
+            new AckStamp(function (Envelope $envelope, \Throwable $e = null) use ($transportName, &$acked) {
+                $acked = true;
+                $this->acks[] = [$transportName, $envelope, $e];
+            }),
+        );
+
+        $e = null;
 
         try {
-            $e = null;
-            $envelope = $this->bus->dispatch($envelope->with(new ReceivedStamp($transportName), new ConsumedByWorkerStamp(), new AckStamp($ack)));
+            if ($stamp = $envelope->last(MessageDecodingFailedStamp::class)) {
+                throw new MessageDecodingFailedException($stamp->getMessage());
+            }
+
+            $envelope = $this->bus->dispatch($envelope);
         } catch (\Throwable $e) {
         }
 
-        $noAutoAckStamp = $envelope->last(NoAutoAckStamp::class);
-
-        if (!$acked && !$noAutoAckStamp) {
+        if ($stamp = $envelope->last(NoAutoAckStamp::class)) {
+            $this->unacks[$stamp->getHandlerDescriptor()->getBatchHandler()]
+                = [$envelope->withoutAll(AckStamp::class), $transportName];
+        } elseif (!$acked) {
             $this->acks[] = [$transportName, $envelope, $e];
-        } elseif ($noAutoAckStamp) {
-            $this->unacks[$noAutoAckStamp->getHandlerDescriptor()->getBatchHandler()] = [$envelope->withoutAll(AckStamp::class), $transportName];
         }
 
         $this->ack();

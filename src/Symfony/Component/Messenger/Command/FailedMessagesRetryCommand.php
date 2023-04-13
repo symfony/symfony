@@ -28,7 +28,6 @@ use Symfony\Component\Messenger\Stamp\MessageDecodingFailedStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\SingleMessageReceiver;
-use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Worker;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 
@@ -42,13 +41,13 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand
     private MessageBusInterface $messageBus;
     private ?LoggerInterface $logger;
 
-    public function __construct(?string $globalReceiverName, ServiceProviderInterface $failureTransports, MessageBusInterface $messageBus, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, PhpSerializer $phpSerializer = null)
+    public function __construct(?string $globalReceiverName, ServiceProviderInterface $failureTransports, MessageBusInterface $messageBus, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null)
     {
         $this->eventDispatcher = $eventDispatcher;
         $this->messageBus = $messageBus;
         $this->logger = $logger;
 
-        parent::__construct($globalReceiverName, $failureTransports, $phpSerializer);
+        parent::__construct($globalReceiverName, $failureTransports);
     }
 
     protected function configure(): void
@@ -135,14 +134,9 @@ EOF
             // handling the message
             while (true) {
                 $envelopes = [];
-                $this->phpSerializer?->acceptPhpIncompleteClass();
-                try {
-                    foreach ($receiver->all(1) as $envelope) {
-                        ++$count;
-                        $envelopes[] = $envelope;
-                    }
-                } finally {
-                    $this->phpSerializer?->rejectPhpIncompleteClass();
+                foreach ($receiver->all(1) as $envelope) {
+                    ++$count;
+                    $envelopes[] = $envelope;
                 }
 
                 // break the loop if all messages are consumed
@@ -212,12 +206,7 @@ EOF
         }
 
         foreach ($ids as $id) {
-            $this->phpSerializer?->acceptPhpIncompleteClass();
-            try {
-                $envelope = $receiver->find($id);
-            } finally {
-                $this->phpSerializer?->rejectPhpIncompleteClass();
-            }
+            $envelope = $receiver->find($id);
             if (null === $envelope) {
                 throw new RuntimeException(sprintf('The message "%s" was not found.', $id));
             }

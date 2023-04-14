@@ -279,6 +279,7 @@ return [
         'li' => 'limburgués',
         'lil' => 'lillooet',
         'lkt' => 'lakota',
+        'lmo' => 'lombardo',
         'ln' => 'lingala',
         'lo' => 'lao',
         'lol' => 'mongo',

@@ -3,15 +3,20 @@ Mailjet Bridge
 
 Provides Mailjet integration for Symfony Mailer.
 
-Configuration examples:
+Configuration example:
 
-```dotenv
-# API
-MAILER_DSN=mailjet+api://$PUBLIC_KEY:$PRIVATE_KEY@default
-MAILER_DSN=mailjet+api://$PUBLIC_KEY:$PRIVATE_KEY@default?sandbox=true
+```env
 # SMTP
-MAILER_DSN=mailjet+smtp://$PUBLIC_KEY:$PRIVATE_KEY@default
+MAILER_DSN=mailjet+smtp://ACCESS_KEY:SECRET_KEY@default
+
+# API
+MAILER_DSN=mailjet+api://ACCESS_KEY:SECRET_KEY@default
+MAILER_DSN=mailjet+api://ACCESS_KEY:SECRET_KEY@default?sandbox=true
 ```
+
+where:
+ - `ACCESS_KEY` is your Mailjet access key
+ - `SECRET_KEY` is your Mailjet secret key
 
 Resources
 ---------

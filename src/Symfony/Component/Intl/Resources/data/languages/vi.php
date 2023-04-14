@@ -306,6 +306,7 @@ return [
         'li' => 'Tiếng Limburg',
         'lil' => 'Tiếng Lillooet',
         'lkt' => 'Tiếng Lakota',
+        'lmo' => 'Tiếng Lombard',
         'ln' => 'Tiếng Lingala',
         'lo' => 'Tiếng Lào',
         'lol' => 'Tiếng Mongo',

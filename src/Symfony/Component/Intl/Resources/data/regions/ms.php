@@ -226,7 +226,7 @@ return [
         'TM' => 'Turkmenistan',
         'TN' => 'Tunisia',
         'TO' => 'Tonga',
-        'TR' => 'Turki',
+        'TR' => 'Turkiye',
         'TT' => 'Trinidad dan Tobago',
         'TV' => 'Tuvalu',
         'TW' => 'Taiwan',

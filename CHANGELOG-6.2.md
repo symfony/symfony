@@ -7,6 +7,14 @@ in 6.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.2.0...v6.2.1
 
+* 6.2.9 (2023-04-13)
+
+ * bug #49957 [ErrorHandler] Fix sending `Vary` header with `SerializerErrorRenderer` (nicolas-grekas)
+ * bug #49983 [DomCrawler] Avoid passing null to substr/strrpos methods (VincentLanglet)
+ * bug #49079 [DoctrineBridge] fix issue with missing stopwatch events (dmaicher)
+ * bug #49926 [HttpClient] Fix canceling MockResponse (fancyweb)
+ * bug #49889 [FrameworkBundle] Fix registering ExpressionValidator (nicolas-grekas)
+
 * 6.2.8 (2023-03-31)
 
  * bug #49835 [Form] CollectionType apply prototypeOptions to ResizeFormListener new fields (Thorry84)

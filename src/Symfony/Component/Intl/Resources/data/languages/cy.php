@@ -566,6 +566,7 @@ return [
         'fa_AF' => 'Dari',
         'fr_CA' => 'Ffrangeg Canada',
         'fr_CH' => 'Ffrangeg y Swistir',
+        'hi_Latn' => 'Hindi (Lladin)',
         'nds_NL' => 'Sacsoneg Isel',
         'nl_BE' => 'Fflemeg',
         'pt_BR' => 'Portiwgaleg Brasil',

@@ -278,6 +278,7 @@ return [
         'lij' => 'ligurski',
         'lil' => 'liluet',
         'lkt' => 'lakota',
+        'lmo' => 'lombardski',
         'ln' => 'lingala',
         'lo' => 'laoski',
         'lol' => 'mongo',

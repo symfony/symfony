@@ -216,6 +216,8 @@ class Terminal
             2 => ['pipe', 'w'],
         ];
 
+        $cp = \function_exists('sapi_windows_cp_set') ? sapi_windows_cp_get() : 0;
+
         $process = proc_open($command, $descriptorspec, $pipes, null, null, ['suppress_errors' => true]);
         if (!\is_resource($process)) {
             return null;
@@ -225,6 +227,10 @@ class Terminal
         fclose($pipes[1]);
         fclose($pipes[2]);
         proc_close($process);
+
+        if ($cp) {
+            sapi_windows_cp_set($cp);
+        }
 
         return $info;
     }

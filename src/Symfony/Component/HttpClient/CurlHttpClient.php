@@ -89,10 +89,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         $authority = $url['authority'];
         $host = parse_url($authority, \PHP_URL_HOST);
         $port = parse_url($authority, \PHP_URL_PORT) ?: ('http:' === $scheme ? 80 : 443);
-        $proxy = $options['proxy']
-            ?? ('https:' === $url['scheme'] ? $_SERVER['https_proxy'] ?? $_SERVER['HTTPS_PROXY'] ?? null : null)
-            // Ignore HTTP_PROXY except on the CLI to work around httpoxy set of vulnerabilities
-            ?? $_SERVER['http_proxy'] ?? (\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) ? $_SERVER['HTTP_PROXY'] ?? null : null) ?? $_SERVER['all_proxy'] ?? $_SERVER['ALL_PROXY'] ?? null;
+        $proxy = self::getProxyUrl($options['proxy'], $url);
         $url = implode('', $url);
 
         if (!isset($options['normalized_headers']['user-agent'])) {
@@ -400,7 +397,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             }
         }
 
-        return static function ($ch, string $location, bool $noContent) use (&$redirectHeaders) {
+        return static function ($ch, string $location, bool $noContent) use (&$redirectHeaders, $options) {
             try {
                 $location = self::parseUrl($location);
             } catch (InvalidArgumentException) {
@@ -426,11 +423,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             $url = self::parseUrl(curl_getinfo($ch, \CURLINFO_EFFECTIVE_URL));
             $url = self::resolveUrl($location, $url);
 
-            curl_setopt($ch, \CURLOPT_PROXY, $options['proxy']
-                ?? ('https:' === $url['scheme'] ? $_SERVER['https_proxy'] ?? $_SERVER['HTTPS_PROXY'] ?? null : null)
-                // Ignore HTTP_PROXY except on the CLI to work around httpoxy set of vulnerabilities
-                ?? $_SERVER['http_proxy'] ?? (\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) ? $_SERVER['HTTP_PROXY'] ?? null : null) ?? $_SERVER['all_proxy'] ?? $_SERVER['ALL_PROXY'] ?? null
-            );
+            curl_setopt($ch, \CURLOPT_PROXY, self::getProxyUrl($options['proxy'], $url));
 
             return implode('', $url);
         };

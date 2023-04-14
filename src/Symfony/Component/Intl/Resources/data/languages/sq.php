@@ -213,6 +213,7 @@ return [
         'lij' => 'ligurianisht',
         'lil' => 'lilluetisht',
         'lkt' => 'lakotisht',
+        'lmo' => 'lombardisht',
         'ln' => 'lingalisht',
         'lo' => 'laosisht',
         'lou' => 'kreole e Luizianës',

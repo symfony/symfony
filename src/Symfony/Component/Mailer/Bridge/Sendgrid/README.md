@@ -3,6 +3,19 @@ Sendgrid Bridge
 
 Provides Sendgrid integration for Symfony Mailer.
 
+Configuration example:
+
+```env
+# SMTP
+MAILER_DSN=sendgrid+smtp://KEY@default
+
+# API
+MAILER_DSN=sendgrid+api://KEY@default
+```
+
+where:
+ - `KEY` is your Sendgrid API Key
+
 Resources
 ---------
 

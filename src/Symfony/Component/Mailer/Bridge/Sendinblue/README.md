@@ -6,12 +6,15 @@ Provides Sendinblue integration for Symfony Mailer.
 Configuration example:
 
 ```env
-# API
-MAILER_DSN=sendinblue+api://$SENDINBLUE_API_KEY@default
-
 # SMTP
-MAILER_DSN=sendinblue+smtp://$SENDINBLUE_USERNAME:$SENDINBLUE_PASSWORD@default
+MAILER_DSN=sendinblue+smtp://USERNAME:PASSWORD@default
+
+# API
+MAILER_DSN=sendinblue+api://KEY@default
 ```
+
+where:
+ - `KEY` is your Sendinblue API Key
 
 With API, you can use custom headers.
 

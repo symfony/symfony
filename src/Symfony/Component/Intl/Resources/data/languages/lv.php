@@ -548,6 +548,7 @@ return [
         'de_CH' => 'augšvācu (Šveice)',
         'en_GB' => 'angļu (Lielbritānija)',
         'fa_AF' => 'darī',
+        'hi_Latn' => 'hindi (latīņu)',
         'nds_NL' => 'lejassakšu',
         'nl_BE' => 'flāmu',
         'ro_MD' => 'moldāvu',

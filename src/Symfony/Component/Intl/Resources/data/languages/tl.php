@@ -214,6 +214,7 @@ return [
         'li' => 'Limburgish',
         'lil' => 'Lillooet',
         'lkt' => 'Lakota',
+        'lmo' => 'Lombard',
         'ln' => 'Lingala',
         'lo' => 'Lao',
         'lou' => 'Louisiana Creole',

@@ -3,6 +3,13 @@ Google Mailer
 
 Provides Google Gmail integration for Symfony Mailer.
 
+Configuration example:
+
+```env
+# SMTP
+MAILER_DSN=gmail+smtp://USERNAME:APP-PASSWORD@default
+```
+
 Resources
 ---------
 

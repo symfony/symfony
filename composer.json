@@ -150,7 +150,6 @@
         "symfony/phpunit-bridge": "^5.4|^6.0",
         "symfony/runtime": "self.version",
         "symfony/security-acl": "~2.8|~3.0",
-        "symfony/string": "^5.4|^6.0",
         "twig/cssinliner-extra": "^2.12|^3",
         "twig/inky-extra": "^2.12|^3",
         "twig/markdown-extra": "^2.12|^3",

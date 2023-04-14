@@ -141,7 +141,7 @@ jobs:
         run: |
           patch -sp1 < .github/expected-missing-return-types.diff
           git add .
-          composer install -q --optimize-autoloader
+          composer install -q --optimize-autoloader || composer install --optimize-autoloader
           SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.1' php .github/patch-types.php
           git checkout src/Symfony/Contracts/Service/ResetInterface.php
           SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.1' php .github/patch-types.php # ensure the script is idempotent

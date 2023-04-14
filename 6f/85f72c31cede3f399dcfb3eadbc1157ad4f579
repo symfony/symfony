@@ -1,0 +1,950 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-01-28T07:27:22Z
+
+It looks like your committer email is not associated with your Github account
+
+---------------------------------------------------------------------------
+
+by ruudk at 2023-01-28T08:39:22Z
+
+Was this a coincidence that we both did something [similar](https://github.com/symfony/symfony/pull/49134) or did you create this afterwards?
+
+---------------------------------------------------------------------------
+
+by Koc at 2023-01-28T10:00:23Z
+
+@OskarStark thanx, fixed now, please check
+
+@ruudk it is similar but has few differences comparing to your implementation. I've updated PR description to highlight the differences.
+
+BTW anybody know how to fix unrelated fabbot failure?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-01-28T12:16:35Z
+
+this looks promising :)
+
+> there is validation of the mapped object
+
+what about deserializing errors vs. ValidationFailedException? Does either produce a 400 bad request? is only the latter i18n friendly?
+
+---------------------------------------------------------------------------
+
+by Koc at 2023-01-28T18:35:04Z
+
+My idea was start from something like simple implementation in this PR and improve it later before 6.3 release.
+
+1. Add generic Exception Handler which will catch `ValidationFailedException` and convert it to http 400 with serialized Constraint Violations. We already have Normalizer for it but anyway it requires some effort.
+2. Handle `PartialDenormalizationException` in this two Argument Value Resolvers and convert it to `ValidationFailedException`. We need somehow translate messages about missmatched types
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-01-28T18:49:08Z
+
+i like a simple implementation as first iteration, but i like http/i18n compatibility more ;)
+
+---------------------------------------------------------------------------
+
+by y4roc at 2023-01-30T09:15:20Z
+
+Your PR also makes this one https://github.com/symfony/symfony/pull/47425 obsolete.
+
+---------------------------------------------------------------------------
+
+by y4roc at 2023-01-30T10:44:23Z
+
+I would use a separate exception, which builds on the `ValidationFailedException`. So that your listener does not filter out other `ValidationFailedException`.
+
+---------------------------------------------------------------------------
+
+by Koc at 2023-01-30T12:15:46Z
+
+@y4roc we can do it in multiple ways. Honestly I'd prefer to have generic Exception Handlers for some very common exceptions.
+
+Maybe we can introduce some `framework` configuration for them, WDYT? `framework.handle_validation_errors`
+
+---------------------------------------------------------------------------
+
+by faizanakram99 at 2023-01-30T12:23:24Z
+
+How's it different from #45628 ?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-01-30T13:35:40Z
+
+@Koc looking at other resolvers, it seems their responsibility is exactly to throw a HttpException directly
+
+---------------------------------------------------------------------------
+
+by y4roc at 2023-01-30T14:38:00Z
+
+@Koc such an option would be amazing.
+
+Maybe we should add an option to change the serialization type from default `json` to `xml`, or should we overwrite the service.yml?
+
+---------------------------------------------------------------------------
+
+by Koc at 2023-01-30T21:59:12Z
+
+@faizanakram99 updated PR description with comparision
+
+@ro0NL yes, but imho it will be better to make it generic and not applicable to this attributes only
+
+@y4roc added configuration notes and tests for xml
+
+---------------------------------------------------------------------------
+
+by y4roc at 2023-01-31T08:38:27Z
+
+@Koc I startet a PR to your PR. Can you check it please?
+
+---------------------------------------------------------------------------
+
+by y4roc at 2023-01-31T09:03:26Z
+
+@Koc TypeHinting in constructor doesn't work at the moment. You have to use mixed.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-02-04T16:10:19Z
+
+![image](https://user-images.githubusercontent.com/995707/216777661-11c248bf-c344-48f4-9930-c949c9465097.jpeg)
+
+MapRequestContent is mentioned twice in the PR title
+
+---------------------------------------------------------------------------
+
+by y4roc at 2023-02-05T20:40:51Z
+
+@Koc What is, if you called `?limit=a` in your `GetOrdersQuery`? You will get an constraint error, because `a` isn't an integer.
+
+How we could fix this problem?
+
+---------------------------------------------------------------------------
+
+by Koc at 2023-02-05T21:56:18Z
+
+@y4roc this should be handled under the hood by Serializer component thankful to `DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS`. It should throws `PartialDenormalizationException` which we are handling in this PR.
+
+For some reason it not works as expected and throws `TypeError` instead. But I believe that fixing Serializer component is out of scope for current PR :smile: .
+
+For workaround you can use weak typing inside DTOs and `Type` constrint.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-02-07T09:58:59Z
+
+> For workaround you can use weak typing inside DTOs and Type constrint.
+
+this is not the way :)
+
+---------------------------------------------------------------------------
+
+by y4roc at 2023-02-18T11:40:14Z
+
+Perhaps we should split this PR into two separate PRs. One for the mapping and another for the validation of the DTO.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-02-19T07:40:56Z
+
+IMHO, what we need as a HTTP framework is being able to validate user payloads, map user payloads into rich structures, and handle errors in a i18n manner. That's it :)
+
+---------------------------------------------------------------------------
+
+by y4roc at 2023-02-20T10:35:09Z
+
+Yes, they will be needed, but we can split it into two PR to speed the review process up.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-02-20T12:11:30Z
+
+OK, i dont mind how many PRs we need for this feature.
+
+I'd just like to know, does the feature land in 6.3?
+
+It would greatly simplify refactoring deprecated sensio param converters for us.
+
+---------------------------------------------------------------------------
+
+by Koc at 2023-02-21T10:52:32Z
+
+> I'd just like to know, does the feature land in 6.3?
+
+I guess we should address this question to @fabpot / @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by stof at 2023-02-21T16:44:45Z
+
+> I'd just like to know, does the feature land in 6.3?
+
+The answer to that depends on whether the work is ready before the feature freeze (so before end of March, more or less)
+
+---------------------------------------------------------------------------
+
+by Koc at 2023-02-22T12:31:58Z
+
+Test failures unrelated. We have same troubles in [build](https://github.com/symfony/symfony/actions/runs/4242370362/jobs/7373782730) for main branch
+
+---------------------------------------------------------------------------
+
+by ruudk at 2023-02-22T12:41:18Z
+
+Can this feature also be used to inject specific request or query scalar fields?
+
+For a lot of use cases you don't want to map to an object, but just a scalar. Example:
+```php
+#[Route(path: '/', name: 'admin_dashboard')]
+public function indexAction(
+  #[MapQueryString]
+  string $filter = '',
+)
+```
+
+Then getting it with `/?filter=all` would put `$filter = 'all'`.
+
+Same for posted request fields.
+
+If it works like that, we can close my attempt on this:
+- https://github.com/symfony/symfony/pull/49134
+
+---------------------------------------------------------------------------
+
+by Koc at 2023-02-22T22:14:32Z
+
+@ro0NL so, you mean if it is xml or json then use `deserialize`, otherwise - `denormalize`?
+
+---------------------------------------------------------------------------
+
+by Koc at 2023-02-23T00:18:11Z
+
+I've merged 2 attributes: `MapRequestInput + MapRequestContent = MapRequestBody`. We can revert this change if needed.
+
+---------------------------------------------------------------------------
+
+by ruudk at 2023-02-23T08:26:36Z
+
+> otherwise we don't add much value compared to simple `$filter = $request->query->get('filter')`
+
+@ro0NL There is a lot of value when it's injected as a typed variable `string`. The above example will return `mixed`,  and when you work with PHPStan level 9, this will be very annoying. You have to narrow the type down with assertions to get something to work with.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-02-23T08:34:54Z
+
+We'd still need a constraint for proper validating (rather than casting) + error message, see also #48525 for better "simple calls".
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-02-23T15:07:50Z
+
+An important part of the behavior is defining what happens in case of errors I agree.
+Should we generate some json/xml payload with details for example? Which standard should we use for that? And which flexibility do we provide?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-02-23T15:21:54Z
+
+This PR serializes the constration violation list, it's symfony format (`"type": "https:\/\/symfony.com\/errors\/validation",`) by default. It works for me, but other formats would be matter of adding a custom normalizer i suppose.
+
+---------------------------------------------------------------------------
+
+by Koc at 2023-02-23T17:16:39Z
+
+@nicolas-grekas you can check functional tests to see an examples of the responses for failed validation
+
+---------------------------------------------------------------------------
+
+by faizanakram99 at 2023-02-23T18:40:09Z
+
+This PR makes me happy
+
+![image](https://media4.giphy.com/media/j0vs5H7Kcz3Pm9LRDa/giphy.gif?cid=ecf05e479s6yd6yu6d25ce40cxgxedjbgtpue2t84io0j30n&rid=giphy.gif&ct=g)
+
+Thank you @Koc
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-02-23T20:27:36Z
+
+>  An important part of the behavior is defining what happens in case of errors I agree.
+Should we generate some json/xml payload with details for example? Which standard should we use for that? And which flexibility do we provide?
+
+We should throw an exception, and the app deal with it. If the app does not handle it, Symfony could fail gracefully as explained by @ro0NL in his last comment
+
+So the current implementation is cool 👍🏼  we leverage what have been done in the past
+
+---------------------------------------------------------------------------
+
+by Koc at 2023-02-24T15:29:53Z
+
+Test failures looks unrelated, correct me if I'm wrong
+
+---------------------------------------------------------------------------
+
+by Koc at 2023-02-24T21:40:11Z
+
+@nicolas-grekas should I also remove `Map` prefix from the Attributes?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-02-24T23:36:53Z
+
+They should start with Map, that's the convention we're building on, it eases discovery.
+
+---------------------------------------------------------------------------
+
+by Koc at 2023-02-26T11:07:40Z
+
+ah, I misunderstood [this](https://github.com/symfony/symfony/pull/49134/files#r1115739030) comment, it was about resolver, not an Attribute
+
+---------------------------------------------------------------------------
+
+by Koc at 2023-02-27T20:21:38Z
+
+@nicolas-grekas test failures looks unrelated. What else should be done to get it merged? Are we waiting for #48992 first?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-02-28T18:01:31Z
+
+Just tested it, and it works like a charm with `#[MapRequestBody]`
+
+I managed to have both validation working together (type hardening + regular validation). I'll do a PR once merged, it's easier for mergers I think (no issue with weird rebase // multi author)
+
+With the code in PR description:
+```json
+{
+  "comment": "too short",
+  "rating": "this is not an interger 💥"
+}
+```
+
+⬇️
+```json
+{
+  "type": "https:\/\/symfony.com\/errors\/validation",
+  "title": "Validation Failed",
+  "detail": "rating: This value should be of type int.\ncomment: This value is too short. It should have 10 characters or more.",
+  "violations": [
+    {
+      "propertyPath": "rating",
+      "title": "This value should be of type int.",
+      "parameters": {
+        "{{ type }}": "int"
+      }
+    },
+    {
+      "propertyPath": "comment",
+      "title": "This value is too short. It should have 10 characters or more.",
+      "parameters": {
+        "{{ value }}": "\"too short\"",
+        "{{ limit }}": "10"
+      },
+      "type": "urn:uuid:9ff3fdc4-b214-49db-8718-39c315e33d45"
+    }
+  ]
+}
+```
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2023-02-28T18:55:43Z
+
+This is a great PR, I was actually working on something similar on my end, I'm happy it's been done here!
+
+---------------------------------------------------------------------------
+
+by tigitz at 2023-03-01T23:49:12Z
+
+Would there be a way to configure per "mapping" or by default the content type and/or the status code ?
+
+I'm thinking about using `application/problem+json` to follow [RFC7807](https://tools.ietf.org/html/rfc7807) but also returning [415 Unsupported Media Type](https://developer.mozilla.org/fr/docs/Web/HTTP/Status/415) for `#[Assert\File(extensions: ['pdf'])]`
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2023-03-02T08:44:18Z
+
+I'm a bit concerned by the fact that it automatically responds the serialized violations. It seems great for anything API related. But how would this work with classic websites ? Would it be possible to be able to "configure" the attributes with properties declared on it ? For example `validate: true|false`, `autoResponse: true|false` (if `false` it could set the violations in request attributes to pass it as variable to the controller), etc.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-03-02T10:03:33Z
+
+@tigitz IIUC you mean file uploads, where the body payload is the actual file. Perhaps we should explore that after this PR, since here we rely on serializer logic for the payload. Im not sure how it plays out.
+
+@Neirda24 what's the concern? The ValidationFailedException bubbles if it cannot be serialized for the current request format.
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2023-03-02T10:07:42Z
+
+@ro0NL : being able to decide what to do from the controller POV if validation fails. It feels like the controller is almost not needed anymore. Being able to keep control from the controller seems mandatory to me.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2023-03-02T10:10:29Z
+
+@Neirda24 IMO this is comparable to a security firewall: an initial check before the controller to ensure the request is OK (security wise & payload wise). I don't think it's an issue that the controller doesn't have control over the failing case, in both situation: one could easily implement a listener catching ValidationFailedException to display the page they want
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2023-03-02T10:14:18Z
+
+@tgalopin : To me it is not the same context. Security is one thing that regroups several pages (usually) behind a firewall.  So they all shares the same needs. Each controller may or may not share the same behaviour so having a way to handle this differently from one to another seems natural to me. In addition some validation errors may be catched to redurect / store something in database or whatever. Doing this from a listener perspective is blurry at best and may require too much complexity from a beginner POV.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-03-02T10:18:03Z
+
+being able to use controller runtime logic to me hints the same feature set should be supported from within AbstractController
+
+```php
+try {
+   $model = $this->deserialize(...);
+} catch (ValidationExceotion $e) { }
+```
+
+or inject the required services as nessecary
+
+---------------------------------------------------------------------------
+
+by faizanakram99 at 2023-03-06T10:20:01Z
+
+> I understand the feature that is a shortcut to Deserializing and Validating your data (query or request) before it hits the Controller. I think that this is helpful but I know it is already possible using API Platform, although API Platform enforces standards (for example for error validation, resource-oriented designs, but also plain json). I'm afraid that these attributes will lead to bad API designs in the future and wanted to share my concern. Last but not least, the feature you propose looks out of the scope of the HTTP Kernel (adds a dependency on the Serializer and the Validator).
+
+We're already using such a similar arg value resolver in house, and from the reaction to this PR (and related PRs or issues), looks like it is not uncommon. It increases overall DX. I shouldn't need to import a big library just to avoid manually mapping json to PHP objects, the framework should do it for me.
+
+---------------------------------------------------------------------------
+
+by soyuka at 2023-03-06T11:07:01Z
+
+My argument is more that the join of validation and serialization is probably out of the scope of the HTTP Kernel. Actually what you do here is definitely already possible using the Symfony Framework by doing (pseudo code):
+
+```
+class MyController extends AbstractController {
+    #[Route('/route', name: 'app_route')]
+    public function myRoute(Request $request): Response
+    {
+      $serializer = $this->container->get('serializer);
+      $data = $serializer->deserialize($request->getContent(), Dto::class, 'json');
+      $validator = $this->container->get('validator);
+      $validator->validate($data, ...);
+    }
+}
+```
+
+By "need to import a big library " you're probably talking about API Platform, I understand that this is the current "image" of this framework although it's not that "big" and its integration with the Symfony Framework is quite good.
+
+I see some quite interesting things in the DX here don't get me wrong, I just have some concerns about it being a part of the http-kernel.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-03-06T13:34:36Z
+
+> My argument is more that the join of validation and serialization is probably out of the scope of the HTTP Kernel. Actually what you do here is definitely already possible using the Symfony Framework by doing (pseudo code):
+
+Yes, indeed. Attribute does not allow to do things that are not possible with plain PHP. But it's a shortcut to reduce boilerplate code. Like `IsGranted`, `Cache`, `MapEntity` etc.
+
+So I disagree with you. I'm a heavy user of APIP, but sometime I don't use it and this kind of entity would be very useful!
+
+So it's a big 👍🏼 for me
+
+---------------------------------------------------------------------------
+
+by faizanakram99 at 2023-03-06T14:13:56Z
+
+> My argument is more that the join of validation and serialization is probably out of the scope of the HTTP Kernel. Actually what you do here is definitely already possible using the Symfony Framework by doing (pseudo code):
+>
+> ```
+> class MyController extends AbstractController {
+>     #[Route('/route', name: 'app_route')]
+>     public function myRoute(Request $request): Response
+>     {
+>       $serializer = $this->container->get('serializer);
+>       $data = $serializer->deserialize($request->getContent(), Dto::class, 'json');
+>       $validator = $this->container->get('validator);
+>       $validator->validate($data, ...);
+>     }
+> }
+> ```
+
+Indeed, it is possible with a bit of boilerplate, that is specifically what we (users) would like to avoid.
+
+> By "need to import a big library " you're probably talking about API Platform, I understand that this is the current "image" of this framework although it's not that "big" and its integration with the Symfony Framework is quite good.
+
+It is big imho, I mean it does a lot more than just deserialize + validate.
+
+> I see some quite interesting things in the DX here don't get me wrong, I just have some concerns about it being a part of the http-kernel.
+
+Yeah, the concern about this being part of http-kernel is legit. I do think in an another PR @derrabus had suggested to move the changes to serializer component with optional validation
+
+https://github.com/symfony/symfony/pull/45628#issuecomment-1058526792
+
+---------------------------------------------------------------------------
+
+by soyuka at 2023-03-06T14:44:41Z
+
+I also saw https://github.com/symfony/symfony/pull/49134, I find the implementation quite good and it doesn't bring the issues I see here with the serializer/validator link. I love the idea behind these and this is going to inspire us for some of the upcoming features in API P:D.
+
+> It is big imho, I mean it does a lot more than just deserialize + validate.
+
+Thing is it doesn't need to, it can do just the above with about no overhead:
+
+```
+#[Get(uriTemplate: '/books/{id}', controller: MyController::class)]
+class Dto {
+  public $id;
+  #[Assert]
+  public $name;
+}
+
+class MyController {
+  public function __invoke(Dto $data): DtoOutput {
+    return new DtoOutput();
+  }
+}
+```
+
+(NB: pseudo code not sure it works just like that!)
+
+And you can already disable the validation ^^. We're in the process of spliting the code so that one could use only the relevant parts.
+
+/edit: I think we'll find  something even better to avoid the Resource approach, I think I get the why you did this, and I quite like the approach!
+
+---------------------------------------------------------------------------
+
+by Koc at 2023-03-10T20:23:03Z
+
+@nicolas-grekas rebased again :smiley:
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-03-14T18:12:39Z
+
+btw, given #49614 we should consider `#[MapRequestPayload]` here (or a recall to consider getBody() there)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-03-15T13:58:40Z
+
+Can we merge this one? I have a local branch with some changes (merge of type error + validation ; Drop of partial violation normalizer and other nipticks).
+
+---------------------------------------------------------------------------
+
+by Koc at 2023-03-15T21:09:00Z
+
+Yes, please 🙏. We will have 2 months for tuning it
+
+---------------------------------------------------------------------------
+
+by hantsy at 2023-03-16T13:00:14Z
+
+> obsolete
+
+Conversion and validation are two topics.
+
+I am familiar with a few frameworks in Java/Jakarta EE.
+
+Firstly compare to the existing web framework, I would like rename the attributes/annotations in this PR to `#[RequestBody]`, `#[RequestForm]`, and we can also add `#[RequestParam]`, (`#[MatrixParam]` or request param can parse the matrix params), `#[RequestPath]`, `#[RequestPart]`, `#[HeaderParam]`, `#[CookieParam]`, `#[SessionParam]`, etc.
+
+```php
+<?php
+
+class CreatingUserForm
+{
+    public function __construct(
+        #[RequestParam(name:"name")]
+        public readonly string $name,
+        #[RequestParam(name:"age", required:false, defaultValue:"0")]
+        public readonly int $age= 25,
+        #[RequestPart(name:"file")]
+        public readonly byte[] $offset = 0,
+    ) {
+    }
+}
+
+class CreatingUserCommand
+{
+    public function __construct(
+        public readonly string $name,
+        public readonly int $age= 25
+    ) {
+    }
+}
+
+#[Controller]
+class UserApiController
+{
+// accept a traditional multiform/data
+    public function saveFromWeb(
+        #[ReuqestForm] CreatingUserForm $body,
+    ): Response {
+    }
+
+// accept json/xml
+ public function saveFromJson(
+        #[ReuqestBody] CreatingUserCommand $body,
+    ): Response {
+    }
+
+}
+```
+
+Through these attrbutes/annotaions to convert to the target object.
+
+Applying the validation is targeted the converted object.
+
+```php
+
+class CreatingUserCommand
+{
+    public function __construct(
+
+        #[NotBlank]
+        public readonly string $name,
+        #[Positive]
+        public readonly int $age= 25
+    ) {
+    }
+}
+
+// in controller
+
+public function saveFromJson(
+        #[ReuqestBody] #[Validated] CreatingUserCommand $body,
+    ): Response {
+    }
+```
+
+The above dummy usage of attributes/annotations is similar to Jakarta Bean Validations in Spring framework.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-03-16T19:17:28Z
+
+that's more work in terms of maintaining the mapping :), i'd prefer to control it from the calling side (the argument attribute) if there's a usecase
+
+not validating the payload by default sounds like a footgun to me
+
+combining multiple sources eg. body/query/cookie/header into a single DTO could be done witth a new attribute `#[MapRequest]` which takes a nested attribute mapping, using attributes such as #49134 or the one from this PR
+
+then you can create pre-defined mappings in userland: `MapMySpecialRequest extends MapRequest`
+
+it doesnt block this PR IMHO. please merge it :)
+
+---------------------------------------------------------------------------
+
+by hantsy at 2023-03-20T01:24:33Z
+
+>not validating the payload by default sounds like a footgun to me
+
+Validation is another topic, it is discussed in an issue/PR for a long time, see: https://github.com/symfony/symfony/issues/43958
+
+Personally I created a [Body](https://github.com/hantsy/symfony-rest-sample/blob/master/src/ArgumentResolver/Body.php) and [QueryParam](https://github.com/hantsy/symfony-rest-sample/blob/master/src/ArgumentResolver/QueryParam.php) in my Symfony example. But most of time, I write Java, not a professional in PHP/Symfony, so it is just a taste of Symfony feature.
+
+As I know many tech stack/frameworks/spec in PHP are ported from Java, esp, Doctrine ORM, for Hibernate users, migrating Doctrine ORM is easy work. What I means here, when contributing new features to Symfony, for the naming, we could refer to the popular existing frameworks(and not limited to PHP), thus it is easy to attract developers from other platform.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-03-20T07:45:18Z
+
+> Validation is another topic
+
+yes.. i still believe the user payload should be validated by default. Or what's your concern here?
+
+For simple parameter mappings see attributes like #49134, and my note to allow constraint mappings in such cases https://github.com/symfony/symfony/pull/49138#pullrequestreview-1310771975
+
+it doesnt block this PR IMHO. please merge it :)
+
+---------------------------------------------------------------------------
+
+by faizanakram99 at 2023-03-20T07:47:41Z
+
+> it doesnt block this PR IMHO. please merge it :)
+
+yes please
+
+---------------------------------------------------------------------------
+
+by haskel at 2023-03-29T02:56:23Z
+
+I agree with @hantsy that naming is so verbose.
+@Koc What do you think about using shorter names?
+I like the attribute names from [asp.net model binding](https://learn.microsoft.com/en-us/aspnet/core/mvc/models/model-binding?view=aspnetcore-8.0) like `#[FromQuery]`, `#[FromBody]`, `#[FromCookie]` etc. There is a simple experimental [implementation](https://github.com/haskel/request-param-bind-bundle) of this idea.
+Names suggested by Huntsy look nice too.
+
+---------------------------------------------------------------------------
+
+by hantsy at 2023-03-29T09:37:57Z
+
+@haskel The dotnet bind attributes/annotations naming is also clear.
+
+---------------------------------------------------------------------------
+
+by Koc at 2023-03-31T07:26:14Z
+
+@nicolas-grekas code review comments fixed, test failures looks unrelated
+
+---------------------------------------------------------------------------
+
+by webda2l at 2023-04-03T15:12:19Z
+
+If this PR go further, I think the rename to `MapRequestPayload` in a spirit of standardization https://github.com/symfony/symfony/pull/49138#issuecomment-1468597006 should be really considered no?
+
+---------------------------------------------------------------------------
+
+by Koc at 2023-04-04T20:15:23Z
+
+Unbelievable we have almost green pipeline , first time since January, 27th :laughing:
+
+---------------------------------------------------------------------------
+
+by webdevilopers at 2023-04-05T09:11:35Z
+
+About the ad hoc validation:
+We are mostly using the DTOs as CQRS Commands. Instead of validating the object directly we pass it to the Command Bus of the Symfony Messenger. The Messenger offers a validation middleware that validate the Symfony Constraints.
+
+Should be simply go without the middleware then?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-04-05T13:29:02Z
+
+> Instead of validating the object directly we pass it to the Command Bus of the Symfony Messenger
+
+what about a `validate: bool` option on the attributes?
+
+---------------------------------------------------------------------------
+
+by webdevilopers at 2023-04-05T13:52:56Z
+
+> > Instead of validating the object directly we pass it to the Command Bus of the Symfony Messenger
+>
+> what about a `validate: bool` option on the attributes?
+
+A general option sounds good. People can decide wether they want to "pre-validate" the user payload e.g. according to an OpenAPI doc definition or simply populate/map a command and let the validation middleware do the validation.
+
+We also use an exception listener that catches the `ValidationFailed` exceptions and transforms them to human-readable error messages. I guess this would also work when validating ad hoc?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-04-05T14:58:57Z
+
+IMHO user payload should be validated before dispatch, or i see no reason not to :thinking:
+
+---------------------------------------------------------------------------
+
+by webdevilopers at 2023-04-05T15:20:18Z
+
+Sometimes we add data from services to our payload before validating. Here is a very simple example:
+
+```php
+        $command = new CreateQualification(
+            $this->getUser()->tenantId()->toString(),
+            $request->toArray()['qualificationId'],
+            $request->toArray()['title'],
+        );
+
+        $this->commandBus->dispatch($command);
+```
+
+The `tenantId` could also be added in the command handler. But we like to "enrich" our commands and only send it to bus when all the required data is encapsulated.
+
+In this case validation should happen via middleware of the Symfony Messenger.
+
+---------------------------------------------------------------------------
+
+by Koc at 2023-04-05T15:22:26Z
+
+Http Request Payload !== Messenger Command. Commands can contains additional data grabbed from Request Headers/Authentication Token/etc. Like in your example above.
+
+It's fine to validate Request Payload first (independently from the Messenger Command) and re-validate more or less same data again but in Command via Validation Middleware
+
+---------------------------------------------------------------------------
+
+by soyuka at 2023-04-06T07:10:53Z
+
+> what about a validate: bool option on the attributes?
+
+```
+#[ApiPlatform\Metadata\Post(processor: MyController::class, validate: false)]
+class Foo {}
+```
+
+:confused:
+
+---------------------------------------------------------------------------
+
+by webdevilopers at 2023-04-06T07:43:25Z
+
+> Http Request Payload !== Messenger Command. Commands can contains additional data grabbed from Request Headers/Authentication Token/etc. Like in your example above.
+>
+> It's fine to validate Request Payload first (independently from the Messenger Command) and re-validate more or less same data again but in Command via Validation Middleware
+
+Got it. According the initial example and our use case this would result in the following:
+
+```php
+class PostProductReviewPayload
+{
+    public function __construct(
+        #[Assert\NotBlank]
+        #[Assert\Length(min: 10, max: 500)]
+        public readonly string $comment,
+        #[Assert\GreaterThanOrEqual(1)]
+        #[Assert\LessThanOrEqual(5)]
+        public readonly int $rating,
+    ) {
+    }
+}
+```
+
+```php
+final readonly class PostProduct
+{
+    public function __construct(
+        #[Assert\NotBlank]
+        #[Assert\Uuid]
+        public string $userId,
+        #[Assert\NotBlank]
+        #[Assert\Length(min: 10, max: 500)]
+        public string $comment,
+        #[Assert\GreaterThanOrEqual(1)]
+        #[Assert\LessThanOrEqual(5)]
+        public int $rating,
+    ) {
+    }
+
+    public static function fromRequestPayload(PostProductReviewPayload $payload): self
+    {
+        // ...
+    }
+}
+```
+
+```php
+class PostJsonApiController
+{
+    public function __invoke(
+        #[MapRequestPayload] PostProductReviewPayload $payload,
+    ): Response {
+        // $payload is validated and fully typed representation of the request body $request->getContent()
+        //  or $request->request->all()
+        $command = new PostProduct(
+            $this->getUser()->getId()->toString(),
+            $payload['comment'],
+            $payload['rating'],
+        ); // Or alternatively PostProduct::fromRequestPayload($payload)
+
+        $this->commandBus->dispatch($command);
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by Koc at 2023-04-06T09:37:22Z
+
+sure, I will try at least :smile: . Thanx :handshake:
+
+---------------------------------------------------------------------------
+
+by Koc at 2023-04-06T13:29:26Z
+
+how to deal with fabbot failure, is it false-positive?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-04-06T13:30:29Z
+
+yes it is, you can ignore it
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-04-07T05:04:34Z
+
+Thank you for your patience @Koc, this was a huge amount of work 🙏
+
+---------------------------------------------------------------------------
+
+by faizanakram99 at 2023-04-07T12:32:37Z
+
+Is the naming of attributes final, `MapRequestPayload` seems a bit mouthful.
+
+What about names suggested here (`FromQuery`, etc) https://github.com/symfony/symfony/pull/49138#issuecomment-1487875923
+
+---------------------------------------------------------------------------
+
+by renanbr at 2023-04-07T13:00:10Z
+
+Landing late to the discussion :hi:
+
+This PR overlaps some work I participate currently, so here are some feedbacks:
+
+- I would rename `MapRequestPayload` to `MapRequestBody` because it targets specifically the content (not uploaded files e.g.)
+- It would be great if users could configure the format they want to receive data
+    - I didn't get why the proposal uses `->getRequestFormat()` to detect the format and not the `content-type` header
+    - I think the resolver should throw a proper exception for any unexpected format
+- It would be great if users could pick the validation group they want to apply, or even disable it if they want
+- It would be great if users could define presets (`serialization format` + `serialization context` + `validation groups`) and let users use them through their endpoints
+
+Most of these ideas are implemented in https://github.com/acsiomatic/http-payload-bundle (ping @renedelima)
+
+All of them can be done in further PR.
+
+I think the current PR presents no blockers regarding these ideas in this comment.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-04-07T13:13:18Z
+
+> What about names suggested here (FromQuery, etc)
+
+We have a convention to help discovery that controller-related attributes should start with `Map`. I submitted https://github.com/symfony/symfony-docs/pull/18176 to clarify this.
+
+> rename MapRequestPayload to MapRequestBody
+
+"body" is not a word we use in the request object so this would be MapRequestContent. It's an open topic no my side. "payload" is also new vocabulary so we might prefer "content", which is a term we use already.
+
+> targets specifically the content (not uploaded files e.g.)
+
+Which leads to the idea of adding `#[MapUploadedFile]` ;)
+
+> It would be great if users could define presets
+
+My suggestion for this: make the attribute *non* final. Then a preset is just a child attribute. We do something similar for DI-attributes and it works great.
+
+I left your other questions open for someone else :)
+
+---------------------------------------------------------------------------
+
+by Koc at 2023-04-07T16:54:28Z
+
+Mates, can we finally agree on naming, please? :pray: I've renamed it few times already: `MapRequestContent` -> `MapRequestBody` -> `MapRequestPayload`
+
+![image](https://user-images.githubusercontent.com/191082/230646667-ec421a7a-f117-4bf2-9484-75174fd5c4db.png)
+
+![image](https://user-images.githubusercontent.com/191082/230647006-54f9a083-8840-4372-9469-2f4249512426.png)
+
+---------------------------------------------------------------------------
+
+by Koc at 2023-04-07T17:01:13Z
+
+> I think the resolver should throw a proper exception for any unexpected format
+
+@renanbr Have you seen [Functional Tests](https://github.com/symfony/symfony/pull/49138/files#diff-927362e8296b98f998ae0368419317fd75a34054f520cc354c691ddc22cb5b0cR172-R178) which checks for `415 Unsupported Media Type`?
+
+Make class non-final is always easier than vise versa. Let's collect more feedback about all possible "child" implementation first and then remove `final` flag?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-04-11T08:10:05Z
+
+> Make class non-final is always easier than vise versa. Let's collect more feedback about all possible "child" implementation first and then remove final flag?
+
+I'd prefer removing the `final` now. We do have a use case already, and attributes are not good candidates for final types (they don't define abstractions but semantics, and inheritance is the way to extend semantics.)

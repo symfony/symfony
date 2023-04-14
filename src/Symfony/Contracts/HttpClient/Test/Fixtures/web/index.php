@@ -86,6 +86,12 @@ switch ($vars['REQUEST_URI']) {
         header('Location: //?foo=bar', true, 301);
         break;
 
+    case '/301/proxy':
+    case 'http://localhost:8057/301/proxy':
+    case 'http://127.0.0.1:8057/301/proxy':
+        header('Location: http://localhost:8057/', true, 301);
+        break;
+
     case '/302':
         if (!isset($vars['HTTP_AUTHORIZATION'])) {
             header('Location: http://localhost:8057/', true, 302);

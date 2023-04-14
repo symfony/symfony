@@ -32,7 +32,7 @@ class ContextualizedDumper implements DataDumperInterface
     }
 
     /**
-     * @return void
+     * @return string|null
      */
     public function dump(Data $data)
     {
@@ -41,6 +41,6 @@ class ContextualizedDumper implements DataDumperInterface
             $context[$contextProvider::class] = $contextProvider->getContext();
         }
 
-        $this->wrappedDumper->dump($data->withContext($context));
+        return $this->wrappedDumper->dump($data->withContext($context));
     }
 }

@@ -289,6 +289,9 @@ class ExceptionCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castFlattenException(FlattenException $e, array $a, Stub $stub, bool $isNested)
     {
         if ($isNested) {

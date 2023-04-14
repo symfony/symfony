@@ -46,6 +46,9 @@ class StubCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castCutArray(CutArrayStub $c, array $a, Stub $stub, bool $isNested)
     {
         return $isNested ? $c->preservedSubset : $a;

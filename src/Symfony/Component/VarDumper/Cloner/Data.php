@@ -414,7 +414,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
         return $hashCut;
     }
 
-    private function getStub(mixed $item)
+    private function getStub(mixed $item): mixed
     {
         if (!$item || !\is_array($item)) {
             return $item;

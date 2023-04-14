@@ -24,6 +24,7 @@
         "phpdocumentor/reflection-docblock": "^3.2|^4.0|^5.0",
         "symfony/cache": "^5.4|^6.0",
         "symfony/config": "^5.4|^6.0",
+        "symfony/console": "^5.4|^6.0",
         "symfony/dependency-injection": "^5.4|^6.0",
         "symfony/error-handler": "^5.4|^6.0",
         "symfony/filesystem": "^5.4|^6.0",

@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add `AttributesBasedUserProviderInterface` to allow `$attributes` optional argument on `loadUserByIdentifier`
+ * Add `OidcUser` with OIDC support for `OidcUserInfoTokenHandler`
+
 6.2
 ---
 

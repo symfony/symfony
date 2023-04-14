@@ -11,6 +11,11 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
+use Jose\Component\Core\AlgorithmManager;
+use Jose\Component\Core\JWK;
+use Jose\Component\Signature\Algorithm\ES256;
+use Jose\Component\Signature\JWSBuilder;
+use Jose\Component\Signature\Serializer\CompactSerializer;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -321,6 +326,42 @@ class AccessTokenTest extends AbstractWebTestCase
         $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_self_contained_token.yml']);
         $client->catchExceptions(false);
         $client->request('GET', '/foo', [], [], ['HTTP_AUTHORIZATION' => 'Bearer SELF_CONTAINED_ACCESS_TOKEN']);
+        $response = $client->getResponse();
+
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame(['message' => 'Welcome @dunglas!'], json_decode($response->getContent(), true));
+    }
+
+    public function testOidcSuccess()
+    {
+        $time = time();
+        $claims = [
+            'iat' => $time,
+            'nbf' => $time,
+            'exp' => $time + 3600,
+            'iss' => 'https://www.example.com/',
+            'aud' => 'Symfony OIDC',
+            'sub' => 'e21bf182-1538-406e-8ccb-e25a17aba39f',
+            'username' => 'dunglas',
+        ];
+        $token = (new CompactSerializer())->serialize((new JWSBuilder(new AlgorithmManager([
+            new ES256(),
+        ])))->create()
+            ->withPayload(json_encode($claims))
+            // tip: use https://mkjwk.org/ to generate a JWK
+            ->addSignature(new JWK([
+                'kty' => 'EC',
+                'crv' => 'P-256',
+                'x' => '0QEAsI1wGI-dmYatdUZoWSRWggLEpyzopuhwk-YUnA4',
+                'y' => 'KYl-qyZ26HobuYwlQh-r0iHX61thfP82qqEku7i0woo',
+                'd' => 'iA_TV2zvftni_9aFAQwFO_9aypfJFCSpcCyevDvz220',
+            ]), ['alg' => 'ES256'])
+            ->build()
+        );
+
+        $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_oidc.yml']);
+        $client->request('GET', '/foo', [], [], ['HTTP_AUTHORIZATION' => sprintf('Bearer %s', $token)]);
         $response = $client->getResponse();
 
         $this->assertInstanceOf(Response::class, $response);

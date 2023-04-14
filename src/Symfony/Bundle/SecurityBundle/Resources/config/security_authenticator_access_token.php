@@ -14,6 +14,8 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Symfony\Component\Security\Http\AccessToken\ChainAccessTokenExtractor;
 use Symfony\Component\Security\Http\AccessToken\FormEncodedBodyExtractor;
 use Symfony\Component\Security\Http\AccessToken\HeaderAccessTokenExtractor;
+use Symfony\Component\Security\Http\AccessToken\Oidc\OidcTokenHandler;
+use Symfony\Component\Security\Http\AccessToken\Oidc\OidcUserInfoTokenHandler;
 use Symfony\Component\Security\Http\AccessToken\QueryAccessTokenExtractor;
 use Symfony\Component\Security\Http\Authenticator\AccessTokenAuthenticator;
 
@@ -39,6 +41,25 @@ return static function (ContainerConfigurator $container) {
             ->abstract()
             ->args([
                 abstract_arg('access token extractors'),
+            ])
+
+        // OIDC
+        ->set('security.access_token_handler.oidc_user_info', OidcUserInfoTokenHandler::class)
+            ->abstract()
+            ->args([
+                abstract_arg('http client'),
+                service('logger')->nullOnInvalid(),
+                'sub',
+            ])
+
+        ->set('security.access_token_handler.oidc', OidcTokenHandler::class)
+            ->abstract()
+            ->args([
+                abstract_arg('signature algorithm'),
+                abstract_arg('jwk'),
+                service('logger')->nullOnInvalid(),
+                'sub',
+                null,
             ])
     ;
 };

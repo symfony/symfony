@@ -23,6 +23,9 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterLdapLocat
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterTokenUsageTrackingPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\ReplaceDecoratedRememberMeHandlerPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\SortFirewallListenersPass;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\OidcTokenHandlerFactory;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\OidcUserInfoTokenHandlerFactory;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\ServiceTokenHandlerFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AccessTokenFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\CustomAuthenticatorFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FormLoginFactory;
@@ -74,7 +77,11 @@ class SecurityBundle extends Bundle
         $extension->addAuthenticatorFactory(new CustomAuthenticatorFactory());
         $extension->addAuthenticatorFactory(new LoginThrottlingFactory());
         $extension->addAuthenticatorFactory(new LoginLinkFactory());
-        $extension->addAuthenticatorFactory(new AccessTokenFactory());
+        $extension->addAuthenticatorFactory(new AccessTokenFactory([
+            new ServiceTokenHandlerFactory(),
+            new OidcUserInfoTokenHandlerFactory(),
+            new OidcTokenHandlerFactory(),
+        ]));
 
         $extension->addUserProviderFactory(new InMemoryFactory());
         $extension->addUserProviderFactory(new LdapFactory());

@@ -11,7 +11,9 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\TokenHandlerFactoryInterface;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -27,7 +29,10 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
 {
     private const PRIORITY = -40;
 
-    public function __construct()
+    /**
+     * @param array<array-key, TokenHandlerFactoryInterface> $tokenHandlerFactories
+     */
+    public function __construct(private readonly array $tokenHandlerFactories)
     {
         $this->options = [];
         $this->defaultFailureHandlerOptions = [];
@@ -40,7 +45,6 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
 
         $builder = $node->children();
         $builder
-            ->scalarNode('token_handler')->isRequired()->end()
             ->scalarNode('realm')->defaultNull()->end()
             ->arrayNode('token_extractors')
                 ->fixXmlConfig('token_extractors')
@@ -55,6 +59,38 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
                 ->scalarPrototype()->end()
             ->end()
         ;
+
+        $tokenHandlerNodeBuilder = $builder
+            ->arrayNode('token_handler')
+                ->example([
+                    'id' => 'App\Security\CustomTokenHandler',
+                ])
+
+                ->beforeNormalization()
+                    ->ifString()
+                    ->then(static function (string $v): array { return ['id' => $v]; })
+                ->end()
+
+                ->beforeNormalization()
+                    ->ifTrue(static function ($v) { return \is_array($v) && 1 < \count($v); })
+                    ->then(static function () { throw new InvalidConfigurationException('You cannot configure multiple token handlers.'); })
+                ->end()
+
+                // "isRequired" must be set otherwise the following custom validation is not called
+                ->isRequired()
+                ->beforeNormalization()
+                    ->ifTrue(static function ($v) { return \is_array($v) && !$v; })
+                    ->then(static function () { throw new InvalidConfigurationException('You must set a token handler.'); })
+                ->end()
+
+                ->children()
+        ;
+
+        foreach ($this->tokenHandlerFactories as $factory) {
+            $factory->addConfiguration($tokenHandlerNodeBuilder);
+        }
+
+        $tokenHandlerNodeBuilder->end();
     }
 
     public function getPriority(): int
@@ -73,10 +109,11 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
         $failureHandler = isset($config['failure_handler']) ? new Reference($this->createAuthenticationFailureHandler($container, $firewallName, $config)) : null;
         $authenticatorId = sprintf('security.authenticator.access_token.%s', $firewallName);
         $extractorId = $this->createExtractor($container, $firewallName, $config['token_extractors']);
+        $tokenHandlerId = $this->createTokenHandler($container, $firewallName, $config['token_handler'], $userProviderId);
 
         $container
             ->setDefinition($authenticatorId, new ChildDefinition('security.authenticator.access_token'))
-            ->replaceArgument(0, new Reference($config['token_handler']))
+            ->replaceArgument(0, new Reference($tokenHandlerId))
             ->replaceArgument(1, new Reference($extractorId))
             ->replaceArgument(2, $userProviderId ? new Reference($userProviderId) : null)
             ->replaceArgument(3, $successHandler)
@@ -109,5 +146,21 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
         ;
 
         return $extractorId;
+    }
+
+    private function createTokenHandler(ContainerBuilder $container, string $firewallName, array $config, ?string $userProviderId): string
+    {
+        $key = array_keys($config)[0];
+        $id = sprintf('security.access_token_handler.%s', $firewallName);
+
+        foreach ($this->tokenHandlerFactories as $factory) {
+            if ($key !== $factory->getKey()) {
+                continue;
+            }
+
+            $factory->create($container, $id, $config[$key], $userProviderId);
+        }
+
+        return $id;
     }
 }

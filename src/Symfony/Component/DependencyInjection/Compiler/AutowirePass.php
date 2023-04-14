@@ -23,6 +23,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\AutowiringFailedException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\TypedReference;
@@ -279,9 +280,16 @@ class AutowirePass extends AbstractRecursivePass
             if ($checkAttributes) {
                 foreach ($parameter->getAttributes() as $attribute) {
                     if (\in_array($attribute->getName(), [TaggedIterator::class, TaggedLocator::class, Autowire::class, MapDecorated::class], true)) {
-                        $arguments[$index] = $this->processAttribute($attribute->newInstance(), $parameter->allowsNull());
-
-                        continue 2;
+                        try {
+                            $arguments[$index] = $this->processAttribute($attribute->newInstance(), $parameter->allowsNull());
+                            continue 2;
+                        } catch (ParameterNotFoundException $e) {
+                            if (!$parameter->isDefaultValueAvailable()) {
+                                throw new AutowiringFailedException($this->currentId, $e->getMessage(), 0, $e);
+                            }
+                            $arguments[$index] = clone $this->defaultArgument;
+                            $arguments[$index]->value = $parameter->getDefaultValue();
+                        }
                     }
                 }
             }

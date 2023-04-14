@@ -42,6 +42,7 @@ class EsmtpTransport extends SmtpTransport
             new Auth\LoginAuthenticator(),
             new Auth\PlainAuthenticator(),
             new Auth\XOAuth2Authenticator(),
+            new Auth\NtlmAuthenticator(),
         ];
 
         /** @var SocketStream $stream */

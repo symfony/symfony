@@ -287,8 +287,14 @@ class AutowirePass extends AbstractRecursivePass
             if ($checkAttributes) {
                 foreach ($parameter->getAttributes(Autowire::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
                     $attribute = $attribute->newInstance();
-                    $invalidBehavior = $parameter->allowsNull() ? ContainerInterface::NULL_ON_INVALID_REFERENCE : ContainerBuilder::EXCEPTION_ON_INVALID_REFERENCE;
-                    $value = $this->processValue(new TypedReference($type ?: '?', $type ?: 'mixed', $invalidBehavior, $name, [$attribute, ...$target]));
+                    $isOptional = $parameter->allowsNull();
+                    $invalidBehavior = $isOptional ? ContainerInterface::NULL_ON_INVALID_REFERENCE : ContainerBuilder::EXCEPTION_ON_INVALID_REFERENCE;
+                    try {
+                        $value = $this->processValue(new TypedReference($type ?: '?', $type ?: 'mixed', $invalidBehavior, $name, [$attribute, ...$target]));
+                    } catch (ParameterNotFoundException $ex) {
+                        $arguments[$index] = $isOptional ? null : throw $ex;
+                        continue 2;
+                    }
 
                     if ($attribute instanceof AutowireCallable) {
                         $value = (new Definition($type = \is_string($attribute->lazy) ? $attribute->lazy : ($type ?: 'Closure')))

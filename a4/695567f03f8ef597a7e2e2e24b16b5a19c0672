@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-04-12T15:30:39Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.3" but it seems your PR description refers to branch "6.3 for features".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by stof at 2023-04-12T15:55:48Z
+
+Given that this method is not really meant to be called outside `symfony/serializer` (it is expected to be called by the CustomNormalizer of the component that handles that interface), I think the wider return type is fine for callers.
+
+For implementers, widening a return type is not a BC break in PHP 7.4+, so this is fine.

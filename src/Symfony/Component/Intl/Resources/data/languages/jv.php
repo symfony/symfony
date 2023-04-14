@@ -206,6 +206,7 @@ return [
         'li' => 'Limburgish',
         'lil' => 'Lillooet',
         'lkt' => 'Lakota',
+        'lmo' => 'Lombard',
         'ln' => 'Lingala',
         'lo' => 'Laos',
         'lou' => 'Louisiana Creole',

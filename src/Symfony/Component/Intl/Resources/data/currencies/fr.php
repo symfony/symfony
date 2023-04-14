@@ -528,7 +528,7 @@ return [
         ],
         'LAK' => [
             0 => 'LAK',
-            1 => 'kip loatien',
+            1 => 'kip laotien',
         ],
         'LBP' => [
             0 => '£LB',

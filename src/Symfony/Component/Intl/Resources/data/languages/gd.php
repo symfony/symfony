@@ -621,6 +621,7 @@ return [
         'fa_AF' => 'Dari',
         'fr_CA' => 'Fraingis Chanada',
         'fr_CH' => 'Fraingis Eilbheiseach',
+        'hi_Latn' => 'Hindis (Laideann)',
         'nds_NL' => 'Sagsannais Ìochdarach',
         'nl_BE' => 'Flànrais',
         'pt_BR' => 'Portagailis Bhraisileach',

@@ -651,6 +651,7 @@ return [
         'fa_AF' => 'Dari',
         'fr_CA' => 'Canadian French',
         'fr_CH' => 'Swiss French',
+        'hi_Latn' => 'Hindi (Latin)',
         'nds_NL' => 'Low Saxon',
         'nl_BE' => 'Flemish',
         'pt_BR' => 'Brazilian Portuguese',

@@ -269,6 +269,7 @@ return [
         'li' => 'limburški',
         'lil' => 'lilut',
         'lkt' => 'lakota',
+        'lmo' => 'lombard',
         'ln' => 'lingala',
         'lo' => 'laoski',
         'lol' => 'mongo',

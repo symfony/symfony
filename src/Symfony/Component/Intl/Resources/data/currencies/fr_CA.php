@@ -86,10 +86,6 @@ return [
             0 => 'KRW',
             1 => 'won sud-coréen',
         ],
-        'LAK' => [
-            0 => 'LAK',
-            1 => 'kip laotien',
-        ],
         'LBP' => [
             0 => 'LBP',
             1 => 'livre libanaise',

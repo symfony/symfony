@@ -9,5 +9,5 @@ docker run \
     -v /tmp/symfony/icu:/tmp \
     -v $(pwd):/symfony \
     -w /symfony \
-    jakzal/php-intl:latest \
+    jakzal/php-intl:8.1-70.1 \
     php src/Symfony/Component/Intl/Resources/bin/update-data.php

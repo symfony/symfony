@@ -12,6 +12,10 @@
 namespace Symfony\Component\Mailer\Tests\Transport\Smtp;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Mailer\Exception\TransportException;
+use Symfony\Component\Mailer\Transport\Smtp\Auth\CramMd5Authenticator;
+use Symfony\Component\Mailer\Transport\Smtp\Auth\LoginAuthenticator;
+use Symfony\Component\Mailer\Transport\Smtp\Auth\XOAuth2Authenticator;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 use Symfony\Component\Mime\Email;
 
@@ -56,6 +60,137 @@ class EsmtpTransportTest extends TestCase
 
         $this->assertContains("MAIL FROM:<sender@example.org> RET=HDRS\r\n", $stream->getCommands());
         $this->assertContains("RCPT TO:<recipient@example.org> NOTIFY=FAILURE\r\n", $stream->getCommands());
+    }
+
+    public function testConstructorWithDefaultAuthenticators()
+    {
+        $stream = new DummyStream();
+        $transport = new EsmtpTransport(stream: $stream);
+        $transport->setUsername('testuser');
+        $transport->setPassword('p4ssw0rd');
+
+        $message = new Email();
+        $message->from('sender@example.org');
+        $message->addTo('recipient@example.org');
+        $message->text('.');
+
+        try {
+            $transport->send($message);
+            $this->fail('Symfony\Component\Mailer\Exception\TransportException to be thrown');
+        } catch (TransportException $e) {
+            $this->assertStringStartsWith('Failed to authenticate on SMTP server with username "testuser" using the following authenticators: "CRAM-MD5", "LOGIN", "PLAIN", "XOAUTH2".', $e->getMessage());
+        }
+
+        $this->assertEquals(
+            [
+                "EHLO [127.0.0.1]\r\n",
+                // S: 250 localhost
+                // S: 250-AUTH PLAIN LOGIN CRAM-MD5 XOAUTH2
+                "AUTH CRAM-MD5\r\n",
+                // S: 334 PDAxMjM0NTY3ODkuMDEyMzQ1NjdAc3ltZm9ueT4=
+                "dGVzdHVzZXIgNTdlYzg2ODM5OWZhZThjY2M5OWFhZGVjZjhiZTAwNmY=\r\n",
+                // S: 535 5.7.139 Authentication unsuccessful
+                "RSET\r\n",
+                // S: 250 2.0.0 Resetting
+                "AUTH LOGIN\r\n",
+                // S: 334 VXNlcm5hbWU6
+                "dGVzdHVzZXI=\r\n",
+                // S: 334 UGFzc3dvcmQ6
+                "cDRzc3cwcmQ=\r\n",
+                // S: 535 5.7.139 Authentication unsuccessful
+                "RSET\r\n",
+                // S: 250 2.0.0 Resetting
+                "AUTH PLAIN dGVzdHVzZXIAdGVzdHVzZXIAcDRzc3cwcmQ=\r\n",
+                // S: 535 5.7.139 Authentication unsuccessful
+                "RSET\r\n",
+                // S: 250 2.0.0 Resetting
+                "AUTH XOAUTH2 dXNlcj10ZXN0dXNlcgFhdXRoPUJlYXJlciBwNHNzdzByZAEB\r\n",
+                // S: 535 5.7.139 Authentication unsuccessful
+                "RSET\r\n",
+                // S: 250 2.0.0 Resetting
+            ],
+            $stream->getCommands()
+        );
+    }
+
+    public function testConstructorWithRedefinedAuthenticators()
+    {
+        $stream = new DummyStream();
+        $transport = new EsmtpTransport(
+            stream: $stream,
+            authenticators: [new CramMd5Authenticator(), new LoginAuthenticator()]
+        );
+        $transport->setUsername('testuser');
+        $transport->setPassword('p4ssw0rd');
+
+        $message = new Email();
+        $message->from('sender@example.org');
+        $message->addTo('recipient@example.org');
+        $message->text('.');
+
+        try {
+            $transport->send($message);
+            $this->fail('Symfony\Component\Mailer\Exception\TransportException to be thrown');
+        } catch (TransportException $e) {
+            $this->assertStringStartsWith('Failed to authenticate on SMTP server with username "testuser" using the following authenticators: "CRAM-MD5", "LOGIN".', $e->getMessage());
+        }
+
+        $this->assertEquals(
+            [
+                "EHLO [127.0.0.1]\r\n",
+                // S: 250 localhost
+                // S: 250-AUTH PLAIN LOGIN CRAM-MD5 XOAUTH2
+                "AUTH CRAM-MD5\r\n",
+                // S: 334 PDAxMjM0NTY3ODkuMDEyMzQ1NjdAc3ltZm9ueT4=
+                "dGVzdHVzZXIgNTdlYzg2ODM5OWZhZThjY2M5OWFhZGVjZjhiZTAwNmY=\r\n",
+                // S: 535 5.7.139 Authentication unsuccessful
+                "RSET\r\n",
+                // S: 250 2.0.0 Resetting
+                "AUTH LOGIN\r\n",
+                // S: 334 VXNlcm5hbWU6
+                "dGVzdHVzZXI=\r\n",
+                // S: 334 UGFzc3dvcmQ6
+                "cDRzc3cwcmQ=\r\n",
+                // S: 535 5.7.139 Authentication unsuccessful
+                "RSET\r\n",
+                // S: 250 2.0.0 Resetting
+            ],
+            $stream->getCommands()
+        );
+    }
+
+    public function testSetAuthenticators()
+    {
+        $stream = new DummyStream();
+        $transport = new EsmtpTransport(stream: $stream);
+        $transport->setUsername('testuser');
+        $transport->setPassword('p4ssw0rd');
+        $transport->setAuthenticators([new XOAuth2Authenticator()]);
+
+        $message = new Email();
+        $message->from('sender@example.org');
+        $message->addTo('recipient@example.org');
+        $message->text('.');
+
+        try {
+            $transport->send($message);
+            $this->fail('Symfony\Component\Mailer\Exception\TransportException to be thrown');
+        } catch (TransportException $e) {
+            $this->assertStringStartsWith('Failed to authenticate on SMTP server with username "testuser" using the following authenticators: "XOAUTH2".', $e->getMessage());
+        }
+
+        $this->assertEquals(
+            [
+                "EHLO [127.0.0.1]\r\n",
+                // S: 250 localhost
+                // S: 250-AUTH PLAIN LOGIN CRAM-MD5 XOAUTH2
+                "AUTH XOAUTH2 dXNlcj10ZXN0dXNlcgFhdXRoPUJlYXJlciBwNHNzdzByZAEB\r\n",
+                // S: 535 5.7.139 Authentication unsuccessful
+                "RSET\r\n",
+                // S: 250 2.0.0 Resetting
+            ],
+            $stream->getCommands()
+        );
     }
 }
 

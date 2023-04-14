@@ -17,6 +17,7 @@ use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\Annotation\Context;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Serializer\Annotation\SerializedPath;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
@@ -549,13 +550,28 @@ class AbstractObjectNormalizerTest extends TestCase
 
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
         $normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory), null, $extractor);
-        $serializer = new Serializer([new DateTimeNormalizer([DateTimeNormalizer::FORMAT_KEY => 'd-m-Y']), $normalizer]);
+        $serializer = new Serializer([new DateTimeNormalizer(), $normalizer]);
 
         $obj = new ObjectDummyWithContextAttributeAndSerializedPath(new \DateTimeImmutable('22-02-2023'));
 
         $data = $serializer->normalize($obj);
 
-        $this->assertSame(['property' => ['with_path' => '22-02-2023']], $data);
+        $this->assertSame(['property' => ['with_path' => '02-22-2023']], $data);
+    }
+
+    public function testNormalizeUsesContextAttributeForProperties()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+
+        $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
+        $normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory), null, $extractor);
+        $serializer = new Serializer([$normalizer]);
+
+        $obj = new ObjectDummyWithContextAttributeSkipNullValues();
+
+        $data = $serializer->normalize($obj);
+
+        $this->assertSame(['propertyWithoutNullSkipNullValues' => 'foo'], $data);
     }
 }
 
@@ -666,6 +682,15 @@ class ObjectDummyWithContextAttributeAndSerializedPath
         public \DateTimeImmutable $propertyWithPath,
     ) {
     }
+}
+
+class ObjectDummyWithContextAttributeSkipNullValues
+{
+    #[Context([AbstractObjectNormalizer::SKIP_NULL_VALUES => true])]
+    public ?string $propertyWithoutNullSkipNullValues = 'foo';
+
+    #[Context([AbstractObjectNormalizer::SKIP_NULL_VALUES => true])]
+    public ?string $propertyWithNullSkipNullValues = null;
 }
 
 class AbstractObjectNormalizerWithMetadata extends AbstractObjectNormalizer

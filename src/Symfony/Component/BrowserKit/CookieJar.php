@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\BrowserKit;
 
+use Symfony\Component\BrowserKit\Exception\InvalidArgumentException;
+
 /**
  * CookieJar.
  *
@@ -129,7 +131,7 @@ class CookieJar
         foreach ($cookies as $cookie) {
             try {
                 $this->set(Cookie::fromString($cookie, $uri));
-            } catch (\InvalidArgumentException) {
+            } catch (InvalidArgumentException) {
                 // invalid cookies are just ignored
             }
         }

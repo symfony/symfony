@@ -196,14 +196,14 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 $attributeValue = $maxDepthHandler($attributeValue, $object, $attribute, $format, $attributeContext);
             }
 
-            $attributeValue = $this->applyCallbacks($attributeValue, $object, $attribute, $format, $attributeContext);
-
-            $stack[$attribute] = $attributeValue;
+            $stack[$attribute] = $this->applyCallbacks($attributeValue, $object, $attribute, $format, $attributeContext);
         }
 
         foreach ($stack as $attribute => $attributeValue) {
+            $attributeContext = $this->getAttributeNormalizationContext($object, $attribute, $context);
+
             if (null === $attributeValue || \is_scalar($attributeValue)) {
-                $data = $this->updateData($data, $attribute, $attributeValue, $class, $format, $context, $attributesMetadata, $classMetadata);
+                $data = $this->updateData($data, $attribute, $attributeValue, $class, $format, $attributeContext, $attributesMetadata, $classMetadata);
                 continue;
             }
 
@@ -211,7 +211,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 throw new LogicException(sprintf('Cannot normalize attribute "%s" because the injected serializer is not a normalizer.', $attribute));
             }
 
-            $attributeContext = $this->getAttributeNormalizationContext($object, $attribute, $context);
             $childContext = $this->createChildContext($attributeContext, $attribute, $format);
 
             $data = $this->updateData($data, $attribute, $this->serializer->normalize($attributeValue, $format, $childContext), $class, $format, $attributeContext, $attributesMetadata, $classMetadata);

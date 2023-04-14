@@ -1,0 +1,211 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2022-11-21T18:40:43Z
+
+> As the previous PR was merged in 6.2, I hope this one can be released with it. Otherwise, 6.3 will be good too 😃
+
+Feature freeze started 1.5 months ago, so this will be part of 6.3 :)
+
+---------------------------------------------------------------------------
+
+by vincentchalamon at 2022-11-21T18:44:00Z
+
+Hi @wouterj, is there any 6.3, master or main branch for it?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-11-21T18:53:56Z
+
+No, for now the focus is on stabilizing Symfony 6.2 before the release. A 6.3 branch will be created once we're in RC phase for 6.2.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-11-23T11:53:19Z
+
+#48285 should make the overall design fit best here and avoid the need for an event.
+Regarding `TODO Find a way to configure and inject the oidcClient in the handler` I have something in mind that I'll push asap.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-11-25T13:33:30Z
+
+<img width="362" alt="Screenshot 2022-11-25 at 14 31 43" src="https://user-images.githubusercontent.com/7502063/203996329-847124de-031d-47bd-b154-4903a72086d6.png">
+
+Note that fabpot cannot be fixed, at least not in a single commit. Only fabbot can :)
+
+---------------------------------------------------------------------------
+
+by vincentchalamon at 2022-11-25T13:37:28Z
+
+> Note that fabpot cannot be fixed, at least not in a single commit. Only fabbot can :)
+
+@chalasr fabpot fixed :wink:
+
+---------------------------------------------------------------------------
+
+by vincentchalamon at 2022-11-26T11:49:06Z
+
+@welcoMattic That's approximatively the idea, but I won't implement an OidcUser in the UserBadge, cause it'll break the UserProvider feature.
+
+To prevent it, I implement an OidcUserBadge containing the claims, and extends the `loadUserByIdentifier` method by adding an optional parameter `claims`. I'm not fan of this approach, but doing so allows the developer to use its own UserProvider to create its own User object, and get the claims if necessary (e.g.: to create a local User):
+
+```php
+class CustomUserProvider implements UserProviderInterface
+{
+    public function loadUserByIdentifier(string $identifier, array $claims = []): UserInterface
+    {
+        // do some magic
+    }
+}
+```
+
+Another approach is to use the default OidcUserProvider which create an OidcUser. The developer won't have to implement its own User class, and this feature is totally autonomous, and can be activated by the developer (the OidcUserProvider is not enabled by default):
+
+```yaml
+security:
+    providers:
+        oidc:
+            id: Symfony\Component\Security\Core\User\OidcUserProvider
+
+    firewalls:
+        main:
+            pattern: ^/
+            access_token:
+                token_handler:
+                    user_provider: oidc
+                    oidc_user_info:
+                        client:
+                            base_uri: https://www.example.com
+```
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-12-12T19:36:45Z
+
+So now the token handler is usable without any user provider, that's great. One question remains though:
+What if one wants to use their own user class?
+
+The OIDCUserProvider remains present in this PR for this very use case I guess. But if I have my own user class, isn't it simpler to write a custom user provider from scratch?
+Basically, how does one leverage that OIDCUserProvider?
+
+Which makes me wondering: what is simpler between implementing your own user provider vs implementing your own token handler?
+We could argue that the former is something well established while the later is a new concept that users will need to learn, and that may not be relevant for other authenticators.
+
+What path do we take? And anyway, is the OidcUserProvider still useful at this stage?
+
+---------------------------------------------------------------------------
+
+by vincentchalamon at 2022-12-12T20:08:39Z
+
+@wouterj This PR cannot work as it because Passport::getUser enforces UserBadge by its fqcn. @chalasr and I are working on a solution to fix this
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-12-12T20:40:40Z
+
+@vincentchalamon @chalasr I know. I wanted to post it here after finding it yesterday, but I forgot.
+
+Here is my proposal on the user provider stuff (based on my PR: #48594), also fixing this use-case:
+
+1. Always set the user loader to `fn () => new OidcUser(...$claims)` in the OIDC token handler
+2. If `$this->userProvider` is not null in the `AccessTokenAuthenticator` always override the user loader set by the token handler.
+
+This means that if a user does not configure a provider, they'll get the default logic of (1). And if they configured a user provider, it will be used by (2) as expected. As an added benefit, we don't have to couple the token handlers to user providers.
+
+That leaves one thing: How do we create a user provider that leverages the claims of the token (e.g. the use-case mentioned by Robin: using a custom non-persistent user class).
+
+I'm not totally sure, but I have the feeling "claims" is a common enough concept that we might want to add to `UserBadge` (like `Passport`s have attributes). If we do that, a user can set a custom user loader in an event listener to create their own non-persistent user and make use of the claims set in the badge.
+One step further would be to introduce a `ClaimsBasedUserProviderInterface::loadUserByIdentifier(string $identifier, array $claims = [])` interface that user providers can implement. If they do this, `UserBadge` will automatically pass the claims as second argument.
+
+---------------------------------------------------------------------------
+
+by vincentchalamon at 2022-12-13T09:01:05Z
+
+Hi @wouterj, thanks for your quick feedback. I'm implementing your suggestions, including adding a `claims` optional argument in UserBadge.
+It also reverts [one of my commit](https://github.com/symfony/symfony/pull/48272/commits/4be751e551fdc04df6e8fa00940c95fb66dbc81f)? This commit adds a "security" on Passport, ensuring only one UserBadge is configured on the Passport, and calling it without the fqcn enforcement. WDYT? Should I keep it?
+
+> One step further would be to introduce a ClaimsBasedUserProviderInterface::loadUserByIdentifier(string $identifier, array $claims = []) interface that user providers can implement. If they do this, UserBadge will automatically pass the claims as second argument.
+
+I already wanted to create this interface, but it seems partially useless as UserBadge cannot detect if UserLoader is an instanceof ClaimsBasedUserProviderInterface, as UserLoader is just a callable.
+The solution I propose is to set UserBadge::claims null by default, and if it's set as an array I send it to the UserLoader (cf. [my last commit](https://github.com/symfony/symfony/pull/48272/commits/0f675014199ec670735be059404fe3d38dc28211)).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-12-13T11:09:53Z
+
+> I'm not totally sure, but I have the feeling "claims" is a common enough concept that we might want to add to UserBadge (like Passports have attributes).
+
+While doing so simplifies things a lot, I don't think the claims concept can belong to the base user badge given it's irrelevant to the majority of core authenticators. It makes sense to keep it specific to the OIDC integration or at least to AccessToken-based authenticators IMHO.
+Adding some child user badge and making `hasBadge()`/`getBadge()` type-based instead of fqcn-based would work for me
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-12-13T11:28:10Z
+
+Otherwise, we could have a more generic `attributes` map in the same spirit as `Passport::getAttributes()` and put the `claims` array in.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-12-13T12:24:43Z
+
+> Adding some child user badge and making hasBadge()/getBadge() type-based instead of fqcn-based would work for me
+
+Unfortunately, making `getBadge()` aware of inheritance will make `getBadge()` return `list<TokenInterface>` instead of `?TokenInterface`, adding all sorts of complexity.
+
+It is a tricky problem here, but I'm sure we'll find a great solution! (just unsure how many iterations we need till we get there)
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-12-13T12:27:28Z
+
+Optionally, we can also apply the same technique as used in Form types: use the FQCN as the *key* of a badge, but don't require it to be the FQCN of the badge.
+
+E.g. something like this:
+```php
+$passport->addBadge(new UserBadge(...));
+$passport->addBadge(UserBadge::class, new OidcUserBadge(...)); // overrides the UserBadge
+```
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-12-13T12:36:06Z
+
+> Optionally, we can also apply the same technique as used in Form types: use the FQCN as the key of a badge, but don't require it to be the FQCN of the badge.
+
+Works for me!
+
+---------------------------------------------------------------------------
+
+by wouterj at 2023-01-21T18:35:23Z
+
+I've been really slacking on reviewing this one. I'll try to give this is a spin again in my local test project and if it works OK, let's indeed merge and iterate with new PRs if needed afterwards
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-03-05T15:49:15Z
+
+So now this provides a JWT-based handler in addition to the user-info one. Huge work!
+
+---------------------------------------------------------------------------
+
+by Spomky at 2023-03-07T07:16:20Z
+
+> So now this provides a JWT-based handler in addition to the user-info one. Huge work!
+
+I was quite busy lately and hadn't paid attention to this PR.
+I must say that it has really grown and it will certainly delight more than one (including me since I use Auth0 for example)!
+
+---------------------------------------------------------------------------
+
+by Spomky at 2023-03-26T17:30:57Z
+
+Hi @vincentchalamon and al,
+
+I took time to review this PR and to be honest I do not have any questions or remarks. It looks good to me so far.
+Not sure if core team member need additional modifications, but to me it is OK👌🏼.
+
+---------------------------------------------------------------------------
+
+by vincentchalamon at 2023-04-11T08:41:36Z
+
+Ping @chalasr @wouterj: is there any blocking point on this PR?

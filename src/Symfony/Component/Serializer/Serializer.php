@@ -19,9 +19,9 @@ use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
-use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
+use Symfony\Component\Serializer\Exception\UnsupportedFormatException;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
@@ -124,7 +124,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     final public function serialize(mixed $data, string $format, array $context = []): string
     {
         if (!$this->supportsEncoding($format, $context)) {
-            throw new NotEncodableValueException(sprintf('Serialization for the format "%s" is not supported.', $format));
+            throw new UnsupportedFormatException(sprintf('Serialization for the format "%s" is not supported.', $format));
         }
 
         if ($this->encoder->needsNormalization($format, $context)) {
@@ -137,7 +137,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     final public function deserialize(mixed $data, string $type, string $format, array $context = []): mixed
     {
         if (!$this->supportsDecoding($format, $context)) {
-            throw new NotEncodableValueException(sprintf('Deserialization for the format "%s" is not supported.', $format));
+            throw new UnsupportedFormatException(sprintf('Deserialization for the format "%s" is not supported.', $format));
         }
 
         $data = $this->decode($data, $format, $context);

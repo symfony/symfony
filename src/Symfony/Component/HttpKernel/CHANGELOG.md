@@ -11,6 +11,8 @@ CHANGELOG
  * Add `#[WithLogLevel]` for defining log levels for exceptions
  * Add `skip_response_headers` to the `HttpCache` options
  * Introduce targeted value resolvers with `#[ValueResolver]` and `#[AsTargetedValueResolver]`
+ * Add `#[MapRequestPayload]` to map and validate request payload from `Request::getContent()` or `Request::$request->all()` to typed objects
+ * Add `#[MapQueryString]` to map and validate request query string from `Request::$query->all()` to typed objects
 
 6.2
 ---

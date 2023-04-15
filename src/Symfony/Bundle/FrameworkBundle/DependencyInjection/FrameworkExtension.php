@@ -2953,15 +2953,14 @@ class FrameworkExtension extends Extension
         $container->setParameter('importmap.polyfill', $config['polyfill']);
 
         $container
-            ->getDefinition('importmap.controller')
-            ->replaceArgument(0, $config['assets_dir']);
+            ->getDefinition('importmap.controller');
 
         $container
             ->getDefinition('importmap.manager')
             ->replaceArgument(0, $config['path'])
-            ->replaceArgument(1, $config['assets_dir'])
-            ->replaceArgument(2, $config['public_assets_dir'])
-            ->replaceArgument(3, $config['assets_url'])
+            ->replaceArgument(1, $config['vendor_dir'])
+            ->replaceArgument(2, $config['public_dir'])
+            ->replaceArgument(3, $config['base_url'])
             ->replaceArgument(4, $config['provider'])
             ->replaceArgument(5, $container->getParameter('kernel.debug'))
         ;

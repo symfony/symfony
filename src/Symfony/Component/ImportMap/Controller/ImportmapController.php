@@ -31,7 +31,6 @@ final class ImportmapController
     ];
 
     public function __construct(
-        private readonly string $assetsDir,
         private readonly ImportMapManager $importMapManager,
         private ?MimeTypesInterface $mimeTypes = null,
         private readonly array $extensionsMap = self::EXTENSIONS_MAP,
@@ -45,12 +44,8 @@ final class ImportmapController
             throw new NotFoundHttpException();
         }
 
-        $localPath = realpath($this->assetsDir.$matches[1].'.'.$matches[3]);
-        if (
-            // prevents path traversal attacks
-            !str_starts_with($localPath, $this->assetsDir)
-            || $matches[2] !== @hash_file('xxh128', $localPath)
-        ) {
+        $localPath = $this->importMapManager->getPathForUrl($path);
+        if (null === $localPath) {
             throw new NotFoundHttpException();
         }
 

@@ -44,19 +44,26 @@ final class ImportMapManager
      */
     private const PACKAGE_PATTERN = '/^(?:https?:\/\/[\w\.-]+\/)?(?:(?<registry>\w+):)?(?<package>(?:@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*)(?:@(?<version>[\w\._-]+))?(?:(?<subpath>\/.*))?$/';
 
+    private string $baseDir;
+
     private array $importMap;
     private array $modulesToPreload;
+    /**
+     * @var array<string, string>
+     */
+    private array $urlToPath;
     private string $json;
 
     public function __construct(
         private readonly string $path,
-        private readonly string $assetsDir = 'assets/',
-        private readonly string $publicAssetsDir = 'public/assets/',
-        private readonly string $assetsUrl = '/assets/',
+        private readonly string $vendorDir,
+        private readonly string $publicDir,
+        private readonly string $baseUrl = '/javascript/',
         private readonly string $provider = self::PROVIDER_JSPM,
         private readonly bool $debug = false,
         private ?HttpClientInterface $httpClient = null,
     ) {
+        $this->baseDir = dirname($this->path).'/';
         $this->httpClient = $httpClient ?? HttpClient::create(['base_uri' => 'https://api.jspm.io/']);
     }
 
@@ -102,6 +109,13 @@ final class ImportMapManager
         $this->createImportMap(true, [], []);
     }
 
+    public function getPathForUrl(string $url): ?string
+    {
+        $this->buildImportMap();
+
+        return $this->urlToPath[$url] ?? null;
+    }
+
     private function loadImportMap(): void
     {
         if (isset($this->importMap)) {
@@ -120,15 +134,21 @@ final class ImportMapManager
 
         $this->loadImportMap();
         $this->modulesToPreload = [];
+        $this->urlToPath = [];
 
         $importmap = ['imports' => []];
         foreach ($this->importMap as $packageName => $data) {
+            $path = null;
             if (isset($data['url'])) {
-                $importmap['imports'][$packageName] = ($data['download'] ?? false) ? $this->vendorUrl($packageName) : $data['url'];
+                $importmap['imports'][$packageName] = ($data['download'] ?? false) ? $this->baseUrl.$this->digestName($packageName, $path = $this->vendorDir.$packageName.'.js') : $data['url'];
             } elseif (isset($data['path'])) {
-                $importmap['imports'][$packageName] = $this->assetsUrl.$this->digestName($packageName, $data['path']);
+                $importmap['imports'][$packageName] = $this->baseUrl.$this->digestName($packageName, $path = $this->baseDir.$data['path']);
             } else {
                 continue;
+            }
+
+            if ($path) {
+                $this->urlToPath[$importmap['imports'][$packageName]] = $path;
             }
 
             if ($data['preload'] ?? false) {
@@ -174,14 +194,14 @@ final class ImportMapManager
         $packages = [];
         foreach ($this->importMap ?? [] as $packageName => $data) {
             if (isset($data['path'])) {
-                $publicPath = $this->publicAssetsDir.$this->digestName($packageName, $data['path']);
+                $publicPath = $this->publicDir.$this->digestName($packageName, $path = $this->baseDir.$data['path']);
                 if (is_file($publicPath)) {
                     continue;
                 }
 
                 $this->cleanup($packageName, false);
-                @mkdir($this->publicAssetsDir, 0777, true);
-                copy($this->assetsDir.$data['path'], $publicPath);
+                @mkdir(dirname($publicPath), 0777, true);
+                copy($path, $publicPath);
 
                 continue;
             }
@@ -248,9 +268,7 @@ final class ImportMapManager
                 unset($this->importMap[$packageName]['preload']);
             }
 
-            $relativePath = 'vendor/'.$packageName.'.js';
-            $localPath = $this->assetsDir.$relativePath;
-
+            $vendorPath = $this->vendorDir.$packageName.'.js';
             if (!$packages[$packageName]->download) {
                 if ($this->importMap[$packageName]['download'] ?? false) {
                     $this->cleanup($packageName);
@@ -270,25 +288,25 @@ final class ImportMapManager
 
             $this->importMap[$packageName]['url'] = $url;
 
-            @mkdir(\dirname($localPath), 0777, true);
-            file_put_contents($localPath, $this->httpClient->request('GET', $url)->getContent());
+            @mkdir(\dirname($vendorPath), 0777, true);
+            file_put_contents($vendorPath, $this->httpClient->request('GET', $url)->getContent());
 
-            $publicPath = $this->publicAssetsDir.'vendor/'.$this->digestName($packageName, $relativePath);
+            $publicPath = $this->publicDir.$this->digestName($packageName, $vendorPath);
             @mkdir(\dirname($publicPath), 0777, true);
-            copy($localPath, $publicPath);
+            copy($vendorPath, $publicPath);
         }
     }
 
     private function cleanup(string $packageName, bool $cleanEmptyDirectories = true): void
     {
         if ($this->importMap[$packageName]['download'] ?? false) {
-            $assetPath = $this->assetsDir.'vendor/'.$packageName.'.js';
+            $assetPath = $this->vendorDir.$packageName.'.js';
 
             if (!is_file($assetPath)) {
                 return;
             }
 
-            $publicAssetPath = $this->publicAssetsDir.'vendor/'.$this->digestName($packageName, 'vendor/'.$packageName.'.js');
+            $publicAssetPath = $this->publicDir.$this->digestName($packageName, $this->vendorDir.$packageName.'.js');
 
             @unlink($assetPath);
             if ($cleanEmptyDirectories) {
@@ -307,12 +325,12 @@ final class ImportMapManager
             return;
         }
 
-        $assetPath = $this->assetsDir.$this->importMap[$packageName]['path'];
+        $assetPath = $this->baseDir.$this->importMap[$packageName]['path'];
         if (!is_file($assetPath)) {
             return;
         }
 
-        $publicAssetPath = $this->publicAssetsDir.$this->digestName($packageName, $this->importMap[$packageName]['path']);
+        $publicAssetPath = $this->publicDir.$this->digestName($packageName, $this->importMap[$packageName]['path']);
 
         @unlink($publicAssetPath);
         if ($cleanEmptyDirectories) {
@@ -322,11 +340,6 @@ final class ImportMapManager
 
     private function digestName(string $packageName, string $path): string
     {
-        return sprintf('%s.%s.js', $packageName, hash_file('xxh128', $this->assetsDir.$path));
-    }
-
-    private function vendorUrl(string $packageName): string
-    {
-        return $this->assetsUrl.'vendor/'.$this->digestName($packageName, 'vendor/'.$packageName.'.js');
+        return sprintf('%s.%s.js', $packageName, hash_file('xxh128', $path));
     }
 }

@@ -23,7 +23,6 @@ return static function (ContainerConfigurator $container): void {
 
         ->set('importmap.controller', ImportmapController::class)
             ->args([
-                abstract_arg('assets directory'),
                 service('importmap.manager'),
                 service('mime_types')->nullOnInvalid(),
             ])
@@ -32,9 +31,9 @@ return static function (ContainerConfigurator $container): void {
         ->set('importmap.manager', ImportMapManager::class)
             ->args([
                 abstract_arg('importmap.php path'),
-                abstract_arg('assets directory'),
-                abstract_arg('public assets directory'),
-                abstract_arg('assets URL'),
+                abstract_arg('vendor directory'),
+                abstract_arg('public directory'),
+                abstract_arg('base URL'),
                 abstract_arg('provider'),
                 abstract_arg('debug'),
             ])

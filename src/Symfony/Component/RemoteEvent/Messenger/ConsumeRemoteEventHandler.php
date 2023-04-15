@@ -33,6 +33,12 @@ class ConsumeRemoteEventHandler
         }
         $consumer = $this->consumers->get($message->getType());
 
-        $consumer->consume($message->getEvent());
+        if (method_exists($consumer, 'consume')) {
+            $consumer->consume($message->getEvent());
+        } elseif (\is_callable($consumer)) {
+            $consumer($message->getEvent());
+        } else {
+            throw new LogicException(sprintf('The consumer "%s" for message of type "%s" must be a callable or implement a "consume" method.', get_debug_type($consumer), $message->getType()));
+        }
     }
 }

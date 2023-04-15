@@ -66,6 +66,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('serializer'),
                 service('validator')->nullOnInvalid(),
+                service('translator')->nullOnInvalid(),
             ])
             ->tag('controller.targeted_value_resolver', ['name' => RequestPayloadValueResolver::class])
 

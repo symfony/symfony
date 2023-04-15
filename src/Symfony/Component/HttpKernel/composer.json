@@ -36,7 +36,7 @@
         "symfony/finder": "^5.4|^6.0",
         "symfony/http-client-contracts": "^2.5|^3",
         "symfony/process": "^5.4|^6.0",
-        "symfony/property-access": "^5.4|^6.0",
+        "symfony/property-access": "^5.4.5|^6.0.5",
         "symfony/routing": "^5.4|^6.0",
         "symfony/serializer": "^6.3",
         "symfony/stopwatch": "^5.4|^6.0",

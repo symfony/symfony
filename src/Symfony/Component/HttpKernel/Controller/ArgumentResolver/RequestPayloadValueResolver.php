@@ -19,14 +19,15 @@ use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
-use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Exception\UnsupportedFormatException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @author Konstantin Myakshin <molodchick@gmail.com>
@@ -51,7 +52,8 @@ final class RequestPayloadValueResolver implements ValueResolverInterface
 
     public function __construct(
         private readonly SerializerInterface&DenormalizerInterface $serializer,
-        private readonly ?ValidatorInterface $validator,
+        private readonly ?ValidatorInterface $validator = null,
+        private readonly ?TranslatorInterface $translator = null,
     ) {
     }
 
@@ -71,14 +73,37 @@ final class RequestPayloadValueResolver implements ValueResolverInterface
                 throw new \LogicException(sprintf('Could not resolve the "$%s" controller argument: argument should be typed.', $argument->getName()));
             }
 
-            try {
-                $payload = $this->$payloadMapper($request, $type, $attributes[0]);
-            } catch (PartialDenormalizationException $e) {
-                throw new HttpException($validationFailedCode, implode("\n", array_map(static fn (NotNormalizableValueException $e) => $e->getMessage(), $e->getErrors())), $e);
-            }
+            if ($this->validator) {
+                $violations = new ConstraintViolationList();
+                try {
+                    $payload = $this->$payloadMapper($request, $type, $attributes[0]);
+                } catch (PartialDenormalizationException $e) {
+                    $trans = $this->translator ? $this->translator->trans(...) : fn ($m, $p) => strtr($m, $p);
+                    foreach ($e->getErrors() as $error) {
+                        $parameters = ['{{ type }}' => implode('|', $error->getExpectedTypes())];
+                        if ($error->canUseMessageForUser()) {
+                            $parameters['hint'] = $error->getMessage();
+                        }
+                        $template = 'This value should be of type {{ type }}.';
+                        $message = $trans($template, $parameters, 'validators');
+                        $violations->add(new ConstraintViolation($message, $template, $parameters, null, $error->getPath(), null));
+                    }
+                    $payload = $e->getData();
+                }
 
-            if (null !== $payload && \count($violations = $this->validator?->validate($payload) ?? [])) {
-                throw new HttpException($validationFailedCode, implode("\n", array_map(static fn (ConstraintViolationInterface $e) => $e->getMessage(), iterator_to_array($violations))), new ValidationFailedException($payload, $violations));
+                if (null !== $payload) {
+                    $violations->addAll($this->validator->validate($payload));
+                }
+
+                if (\count($violations)) {
+                    throw new HttpException($validationFailedCode, implode("\n", array_map(static fn ($e) => $e->getMessage(), iterator_to_array($violations))), new ValidationFailedException($payload, $violations));
+                }
+            } else {
+                try {
+                    $payload = $this->$payloadMapper($request, $type, $attributes[0]);
+                } catch (PartialDenormalizationException $e) {
+                    throw new HttpException($validationFailedCode, implode("\n", array_map(static fn ($e) => $e->getMessage(), $e->getErrors())), $e);
+                }
             }
 
             if (null !== $payload || $argument->isNullable()) {

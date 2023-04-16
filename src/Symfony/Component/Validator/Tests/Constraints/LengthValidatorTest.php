@@ -40,6 +40,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '""')
             ->setParameter('{{ limit }}', $limit)
+            ->setParameter('{{ value_length }}', 0)
             ->setInvalidValue('')
             ->setPlural($limit)
             ->setCode(Length::NOT_EQUAL_LENGTH_ERROR)
@@ -55,14 +56,14 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
     public static function getThreeOrLessCharacters()
     {
         return [
-            [12],
-            ['12'],
-            ['üü'],
-            ['éé'],
-            [123],
-            ['123'],
-            ['üüü'],
-            ['ééé'],
+            [12, 2],
+            ['12', 2],
+            ['üü', 2],
+            ['éé', 2],
+            [123, 3],
+            ['123', 3],
+            ['üüü', 3],
+            ['ééé', 3],
         ];
     }
 
@@ -79,14 +80,14 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
     public static function getFiveOrMoreCharacters()
     {
         return [
-            [12345],
-            ['12345'],
-            ['üüüüü'],
-            ['ééééé'],
-            [123456],
-            ['123456'],
-            ['üüüüüü'],
-            ['éééééé'],
+            [12345, 5],
+            ['12345', 5],
+            ['üüüüü', 5],
+            ['ééééé', 5],
+            [123456, 6],
+            ['123456', 6],
+            ['üüüüüü', 6],
+            ['éééééé', 6],
         ];
     }
 
@@ -183,7 +184,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getThreeOrLessCharacters
      */
-    public function testInvalidValuesMin($value)
+    public function testInvalidValuesMin($value, $valueLength)
     {
         $constraint = new Length([
             'min' => 4,
@@ -195,6 +196,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$value.'"')
             ->setParameter('{{ limit }}', 4)
+            ->setParameter('{{ value_length }}', $valueLength)
             ->setInvalidValue($value)
             ->setPlural(4)
             ->setCode(Length::TOO_SHORT_ERROR)
@@ -204,7 +206,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getThreeOrLessCharacters
      */
-    public function testInvalidValuesMinNamed($value)
+    public function testInvalidValuesMinNamed($value, $valueLength)
     {
         $constraint = new Length(min: 4, minMessage: 'myMessage');
 
@@ -213,6 +215,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$value.'"')
             ->setParameter('{{ limit }}', 4)
+            ->setParameter('{{ value_length }}', $valueLength)
             ->setInvalidValue($value)
             ->setPlural(4)
             ->setCode(Length::TOO_SHORT_ERROR)
@@ -222,7 +225,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getFiveOrMoreCharacters
      */
-    public function testInvalidValuesMax($value)
+    public function testInvalidValuesMax($value, $valueLength)
     {
         $constraint = new Length([
             'max' => 4,
@@ -234,6 +237,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$value.'"')
             ->setParameter('{{ limit }}', 4)
+            ->setParameter('{{ value_length }}', $valueLength)
             ->setInvalidValue($value)
             ->setPlural(4)
             ->setCode(Length::TOO_LONG_ERROR)
@@ -243,7 +247,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getFiveOrMoreCharacters
      */
-    public function testInvalidValuesMaxNamed($value)
+    public function testInvalidValuesMaxNamed($value, $valueLength)
     {
         $constraint = new Length(max: 4, maxMessage: 'myMessage');
 
@@ -252,6 +256,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$value.'"')
             ->setParameter('{{ limit }}', 4)
+            ->setParameter('{{ value_length }}', $valueLength)
             ->setInvalidValue($value)
             ->setPlural(4)
             ->setCode(Length::TOO_LONG_ERROR)
@@ -261,7 +266,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getThreeOrLessCharacters
      */
-    public function testInvalidValuesExactLessThanFour($value)
+    public function testInvalidValuesExactLessThanFour($value, $valueLength)
     {
         $constraint = new Length([
             'min' => 4,
@@ -274,6 +279,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$value.'"')
             ->setParameter('{{ limit }}', 4)
+            ->setParameter('{{ value_length }}', $valueLength)
             ->setInvalidValue($value)
             ->setPlural(4)
             ->setCode(Length::NOT_EQUAL_LENGTH_ERROR)
@@ -283,7 +289,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getThreeOrLessCharacters
      */
-    public function testInvalidValuesExactLessThanFourNamed($value)
+    public function testInvalidValuesExactLessThanFourNamed($value, $valueLength)
     {
         $constraint = new Length(exactly: 4, exactMessage: 'myMessage');
 
@@ -292,6 +298,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$value.'"')
             ->setParameter('{{ limit }}', 4)
+            ->setParameter('{{ value_length }}', $valueLength)
             ->setInvalidValue($value)
             ->setPlural(4)
             ->setCode(Length::NOT_EQUAL_LENGTH_ERROR)
@@ -301,7 +308,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getFiveOrMoreCharacters
      */
-    public function testInvalidValuesExactMoreThanFour($value)
+    public function testInvalidValuesExactMoreThanFour($value, $valueLength)
     {
         $constraint = new Length([
             'min' => 4,
@@ -314,6 +321,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$value.'"')
             ->setParameter('{{ limit }}', 4)
+            ->setParameter('{{ value_length }}', $valueLength)
             ->setInvalidValue($value)
             ->setPlural(4)
             ->setCode(Length::NOT_EQUAL_LENGTH_ERROR)
@@ -355,6 +363,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'."A\u{0300}".'"')
             ->setParameter('{{ limit }}', 1)
+            ->setParameter('{{ value_length }}', 2)
             ->setInvalidValue("A\u{0300}")
             ->setPlural(1)
             ->setCode(Length::NOT_EQUAL_LENGTH_ERROR)
@@ -370,6 +379,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'."A\u{0300}".'"')
             ->setParameter('{{ limit }}', 1)
+            ->setParameter('{{ value_length }}', 3)
             ->setInvalidValue("A\u{0300}")
             ->setPlural(1)
             ->setCode(Length::NOT_EQUAL_LENGTH_ERROR)

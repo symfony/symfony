@@ -92,7 +92,7 @@ final class RequestPayloadValueResolver implements ValueResolverInterface
                 }
 
                 if (null !== $payload) {
-                    $violations->addAll($this->validator->validate($payload));
+                    $violations->addAll($this->validator->validate($payload, null, $attributes[0]->validationGroups ?? null));
                 }
 
                 if (\count($violations)) {
@@ -125,16 +125,20 @@ final class RequestPayloadValueResolver implements ValueResolverInterface
 
     private function mapRequestPayload(Request $request, string $type, MapRequestPayload $attribute): ?object
     {
+        if (null === $format = $request->getContentTypeFormat()) {
+            throw new HttpException(Response::HTTP_UNSUPPORTED_MEDIA_TYPE, 'Unsupported format.');
+        }
+
+        if ($attribute->acceptFormat && !\in_array($format, (array) $attribute->acceptFormat, true)) {
+            throw new HttpException(Response::HTTP_UNSUPPORTED_MEDIA_TYPE, sprintf('Unsupported format, expects "%s", but "%s" given.', implode('", "', (array) $attribute->acceptFormat), $format));
+        }
+
         if ($data = $request->request->all()) {
-            return $this->serializer->denormalize($data, $type, null, self::CONTEXT_DENORMALIZE + $attribute->context);
+            return $this->serializer->denormalize($data, $type, null, self::CONTEXT_DENORMALIZE + $attribute->serializationContext);
         }
 
         if ('' === $data = $request->getContent()) {
             return null;
-        }
-
-        if (null === $format = $request->getContentTypeFormat()) {
-            throw new HttpException(Response::HTTP_UNSUPPORTED_MEDIA_TYPE, 'Unsupported format.');
         }
 
         if ('form' === $format) {
@@ -142,7 +146,7 @@ final class RequestPayloadValueResolver implements ValueResolverInterface
         }
 
         try {
-            return $this->serializer->deserialize($data, $type, $format, self::CONTEXT_DESERIALIZE + $attribute->context);
+            return $this->serializer->deserialize($data, $type, $format, self::CONTEXT_DESERIALIZE + $attribute->serializationContext);
         } catch (UnsupportedFormatException $e) {
             throw new HttpException(Response::HTTP_UNSUPPORTED_MEDIA_TYPE, sprintf('Unsupported format: "%s".', $format), $e);
         } catch (NotEncodableValueException $e) {

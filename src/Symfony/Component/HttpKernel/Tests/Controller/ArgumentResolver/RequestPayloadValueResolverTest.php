@@ -19,13 +19,16 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestPayloadValue
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Validator\ValidatorBuilder;
 
 class RequestPayloadValueResolverTest extends TestCase
 {
@@ -181,10 +184,197 @@ class RequestPayloadValueResolverTest extends TestCase
 
         $this->assertEquals($payload, $resolver->resolve($request, $argument)[0]);
     }
+
+    /**
+     * @dataProvider provideMatchedFormatContext
+     */
+    public function testAcceptFormatPassed(mixed $acceptFormat, string $contentType, string $content)
+    {
+        $encoders = ['json' => new JsonEncoder(), 'xml' => new XmlEncoder()];
+        $serializer = new Serializer([new ObjectNormalizer()], $encoders);
+        $validator = (new ValidatorBuilder())->getValidator();
+        $resolver = new RequestPayloadValueResolver($serializer, $validator);
+
+        $request = Request::create('/', 'POST', server: ['CONTENT_TYPE' => $contentType], content: $content);
+
+        $argument = new ArgumentMetadata('valid', RequestPayload::class, false, false, null, false, [
+            MapRequestPayload::class => new MapRequestPayload(acceptFormat: $acceptFormat),
+        ]);
+
+        $resolved = $resolver->resolve($request, $argument);
+
+        $this->assertCount(1, $resolved);
+        $this->assertEquals(new RequestPayload(50), $resolved[0]);
+    }
+
+    public static function provideMatchedFormatContext(): iterable
+    {
+        yield 'configure with json as string, sends json' => [
+            'acceptFormat' => 'json',
+            'contentType' => 'application/json',
+            'content' => '{"price": 50}',
+        ];
+
+        yield 'configure with json as array, sends json' => [
+            'acceptFormat' => ['json'],
+            'contentType' => 'application/json',
+            'content' => '{"price": 50}',
+        ];
+
+        yield 'configure with xml as string, sends xml' => [
+            'acceptFormat' => 'xml',
+            'contentType' => 'application/xml',
+            'content' => '<?xml version="1.0"?><request><price>50</price></request>',
+        ];
+
+        yield 'configure with xml as array, sends xml' => [
+            'acceptFormat' => ['xml'],
+            'contentType' => 'application/xml',
+            'content' => '<?xml version="1.0"?><request><price>50</price></request>',
+        ];
+
+        yield 'configure with json or xml, sends json' => [
+            'acceptFormat' => ['json', 'xml'],
+            'contentType' => 'application/json',
+            'content' => '{"price": 50}',
+        ];
+
+        yield 'configure with json or xml, sends xml' => [
+            'acceptFormat' => ['json', 'xml'],
+            'contentType' => 'application/xml',
+            'content' => '<?xml version="1.0"?><request><price>50</price></request>',
+        ];
+    }
+
+    /**
+     * @dataProvider provideMismatchedFormatContext
+     */
+    public function testAcceptFormatNotPassed(mixed $acceptFormat, string $contentType, string $content, string $expectedExceptionMessage)
+    {
+        $serializer = new Serializer([new ObjectNormalizer()]);
+        $validator = (new ValidatorBuilder())->getValidator();
+        $resolver = new RequestPayloadValueResolver($serializer, $validator);
+
+        $request = Request::create('/', 'POST', server: ['CONTENT_TYPE' => $contentType], content: $content);
+
+        $argument = new ArgumentMetadata('valid', RequestPayload::class, false, false, null, false, [
+            MapRequestPayload::class => new MapRequestPayload(acceptFormat: $acceptFormat),
+        ]);
+
+        try {
+            $resolver->resolve($request, $argument);
+
+            $this->fail(sprintf('Expected "%s" to be thrown.', HttpException::class));
+        } catch (HttpException $e) {
+            $this->assertSame(415, $e->getStatusCode());
+            $this->assertSame($expectedExceptionMessage, $e->getMessage());
+        }
+    }
+
+    public static function provideMismatchedFormatContext(): iterable
+    {
+        yield 'configure with json as string, sends xml' => [
+            'acceptFormat' => 'json',
+            'contentType' => 'application/xml',
+            'content' => '<?xml version="1.0"?><request><price>50</price></request>',
+            'expectedExceptionMessage' => 'Unsupported format, expects "json", but "xml" given.',
+        ];
+
+        yield 'configure with json as array, sends xml' => [
+            'acceptFormat' => ['json'],
+            'contentType' => 'application/xml',
+            'content' => '<?xml version="1.0"?><request><price>50</price></request>',
+            'expectedExceptionMessage' => 'Unsupported format, expects "json", but "xml" given.',
+        ];
+
+        yield 'configure with xml as string, sends json' => [
+            'acceptFormat' => 'xml',
+            'contentType' => 'application/json',
+            'content' => '{"price": 50}',
+            'expectedExceptionMessage' => 'Unsupported format, expects "xml", but "json" given.',
+        ];
+
+        yield 'configure with xml as array, sends json' => [
+            'acceptFormat' => ['xml'],
+            'contentType' => 'application/json',
+            'content' => '{"price": 50}',
+            'expectedExceptionMessage' => 'Unsupported format, expects "xml", but "json" given.',
+        ];
+
+        yield 'configure with json or xml, sends jsonld' => [
+            'acceptFormat' => ['json', 'xml'],
+            'contentType' => 'application/ld+json',
+            'content' => '{"@context": "https://schema.org", "@type": "FakeType", "price": 50}',
+            'expectedExceptionMessage' => 'Unsupported format, expects "json", "xml", but "jsonld" given.',
+        ];
+    }
+
+    /**
+     * @dataProvider provideValidationGroupsOnManyTypes
+     */
+    public function testValidationGroupsPassed(mixed $groups)
+    {
+        $input = ['price' => '50', 'title' => 'A long title, so the validation passes'];
+
+        $payload = new RequestPayload(50);
+        $payload->title = 'A long title, so the validation passes';
+
+        $serializer = new Serializer([new ObjectNormalizer()]);
+        $validator = (new ValidatorBuilder())->enableAnnotationMapping()->getValidator();
+        $resolver = new RequestPayloadValueResolver($serializer, $validator);
+
+        $request = Request::create('/', 'POST', $input);
+
+        $argument = new ArgumentMetadata('valid', RequestPayload::class, false, false, null, false, [
+            MapRequestPayload::class => new MapRequestPayload(validationGroups: $groups),
+        ]);
+
+        $resolved = $resolver->resolve($request, $argument);
+
+        $this->assertCount(1, $resolved);
+        $this->assertEquals($payload, $resolved[0]);
+    }
+
+    /**
+     * @dataProvider provideValidationGroupsOnManyTypes
+     */
+    public function testValidationGroupsNotPassed(mixed $groups)
+    {
+        $input = ['price' => '50', 'title' => 'Too short'];
+
+        $serializer = new Serializer([new ObjectNormalizer()]);
+        $validator = (new ValidatorBuilder())->enableAnnotationMapping()->getValidator();
+        $resolver = new RequestPayloadValueResolver($serializer, $validator);
+
+        $argument = new ArgumentMetadata('valid', RequestPayload::class, false, false, null, false, [
+            MapRequestPayload::class => new MapRequestPayload(validationGroups: $groups),
+        ]);
+        $request = Request::create('/', 'POST', $input);
+
+        try {
+            $resolver->resolve($request, $argument);
+            $this->fail(sprintf('Expected "%s" to be thrown.', HttpException::class));
+        } catch (HttpException $e) {
+            $validationFailedException = $e->getPrevious();
+            $this->assertInstanceOf(ValidationFailedException::class, $validationFailedException);
+            $this->assertSame('title', $validationFailedException->getViolations()[0]->getPropertyPath());
+            $this->assertSame('This value is too short. It should have 10 characters or more.', $validationFailedException->getViolations()[0]->getMessage());
+        }
+    }
+
+    public static function provideValidationGroupsOnManyTypes(): iterable
+    {
+        yield 'validation group as string' => ['strict'];
+
+        yield 'validation group as array' => [['strict']];
+
+        yield 'validation group as GroupSequence' => [new Assert\GroupSequence(['strict'])];
+    }
 }
 
 class RequestPayload
 {
+    #[Assert\Length(min: 10, groups: ['strict'])]
     public string $title;
 
     public function __construct(public readonly float $price)

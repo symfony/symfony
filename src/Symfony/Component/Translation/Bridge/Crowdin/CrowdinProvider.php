@@ -109,6 +109,25 @@ final class CrowdinProvider implements ProviderInterface
         $translatorBag = new TranslatorBag();
         $responses = [];
 
+        $localeLanguageMap = [];
+        foreach ($this->listLanguages($locales) as $language) {
+            if (in_array($language['data']['locale'], $locales)) {
+                $localeLanguageMap[$language['data']['locale']] = $language['data']['id'];
+            } elseif (in_array($language['data']['id'], $locales)) {
+                // try fallback to language id
+                $localeLanguageMap[$language['data']['id']] = $language['data']['id'];
+            }
+        }
+
+        if (count($localeLanguageMap) !== count($locales)) {
+            $message = sprintf(
+                "Unable to find all requested locales in Crowdin: \"%s\" not found.",
+                implode(', ', array_diff($locales, array_keys($localeLanguageMap)))
+            );
+            $this->logger->error($message);
+            throw new \InvalidArgumentException($message);
+        }
+
         foreach ($domains as $domain) {
             $fileId = $this->getFileIdByDomain($fileList, $domain);
 
@@ -118,7 +137,7 @@ final class CrowdinProvider implements ProviderInterface
 
             foreach ($locales as $locale) {
                 if ($locale !== $this->defaultLocale) {
-                    $response = $this->exportProjectTranslations($locale, $fileId);
+                    $response = $this->exportProjectTranslations($localeLanguageMap[$locale], $fileId);
                 } else {
                     $response = $this->downloadSourceFile($fileId);
                 }
@@ -328,6 +347,26 @@ final class CrowdinProvider implements ProviderInterface
          * @see https://developer.crowdin.com/enterprise/api/v2/#operation/api.projects.files.download.get (Crowdin Enterprise API)
          */
         return $this->client->request('GET', sprintf('files/%d/download', $fileId));
+    }
+
+    private function listLanguages(): array
+    {
+        /**
+         * @see https://developer.crowdin.com/api/v2/#operation/api.languages.getMany (Crowdin API)
+         * @see https://developer.crowdin.com/enterprise/api/v2/#operation/api.languages.getMany (Crowdin Enterprise API)
+         */
+        // cannot query by locales, we need to fetch all and filter out the relevant ones
+        $response = $this->client->request('GET', '../../languages', [
+            'query' => [
+                'limit' => 500
+            ]
+        ]);
+
+        if (200 !== $response->getStatusCode()) {
+            throw new ProviderException(sprintf('Unable to list set languages.'), $response);
+        }
+
+        return $response->toArray()['data'];
     }
 
     private function listStrings(int $fileId, int $limit, int $offset): array

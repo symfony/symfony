@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by Matth-- at 2023-01-17T13:52:03Z
+
+Not sure what to do about the failing test as the `DoctrineChoiceLoader` extends from the `AbstractLoader` located in the Form component.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-01-17T14:39:01Z
+
+high-deps will be fixed once the PR is merged up. But low-deps requires a change in the lowest bound of the constraint  in the doctrine-bridge
+
+---------------------------------------------------------------------------
+
+by Matth-- at 2023-01-17T14:41:55Z
+
+@stof I could also remove the test case as it does pretty much the same thing as the one in the Form component. I added it in the first case because I had issues with the EntityType. WDYT?
+
+---------------------------------------------------------------------------
+
+by Matth-- at 2023-03-27T07:33:27Z
+
+Is there anything I should change for this PR? Or should we find a different solution to this.
+
+Sorry for the tag
+@xabbuh

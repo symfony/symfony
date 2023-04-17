@@ -1,0 +1,297 @@
+---------------------------------------------------------------------------
+
+by alamirault at 2023-01-27T20:30:45Z
+
+A like the idea, deporting some basic checks and use type hint
+
+---------------------------------------------------------------------------
+
+by ruudk at 2023-02-02T17:36:21Z
+
+@carsonbot what's needed to get some reviews ?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2023-02-03T16:58:31Z
+
+I guess this one is competing with a similar proposal https://github.com/symfony/symfony/pull/49138, right?
+
+---------------------------------------------------------------------------
+
+by ruudk at 2023-02-03T17:05:07Z
+
+I think this is a very different approach and not similar. This provides scalar primitives and the use case is to allow some query parameters in the controller action.
+
+While the other PR tries to deserialize request content into typed objects.
+
+---------------------------------------------------------------------------
+
+by y4roc at 2023-02-03T17:31:18Z
+
+@ruudk the other PR have two attributes. One for the Query and one for the Content.
+
+---------------------------------------------------------------------------
+
+by ruudk at 2023-02-03T17:38:55Z
+
+I see but it serializes to an object, while this PR serializes a query string parameter to a typed property, for example `string`.
+
+And for the RequestParameter is used the form data (equivalent to request->request->get).
+
+If the other PR can also support these cases then this is a obsolete indeed. But AFAIK the other works on request content (json/xml)?
+
+---------------------------------------------------------------------------
+
+by ruudk at 2023-02-22T14:17:26Z
+
+@nicolas-grekas Updated the PR. Renamed `QueryParameter` to `MapQueryParameter`. Removed the support for request parameters.
+
+---------------------------------------------------------------------------
+
+by ruudk at 2023-02-22T18:44:40Z
+
+@nicolas-grekas @stof Thanks for your feedback. Applied the changes. I think it's way better now.
+
+---------------------------------------------------------------------------
+
+by ruudk at 2023-02-23T08:23:34Z
+
+@nicolas-grekas Refactored it a bit, I think it's simpler now. What do you think?
+
+---------------------------------------------------------------------------
+
+by ruudk at 2023-02-23T09:35:48Z
+
+How to solve the Psalm error?
+
+---------------------------------------------------------------------------
+
+by ruudk at 2023-02-23T14:12:20Z
+
+@nicolas-grekas Nice change! I fixed the CS issue. Should be good now.
+
+---------------------------------------------------------------------------
+
+by ruudk at 2023-02-23T14:16:16Z
+
+Thanks for explaining what you did. It's more robust now for sure 👏
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-02-23T15:03:09Z
+
+The error messages never reach end users IIRC for HTTP status codes.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-03-20T12:49:10Z
+
+it be nice if we can validate the user payload directly:
+
+```
+  #[MapQueryParameter]
+  #[Positive]
+  int $age,
+```
+
+since that's the proposed featureset in #49138 too
+
+also `#[MapRequestBodyParameter]` is missing IMHO
+
+i can create issues after merge also
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-20T12:52:09Z
+
+> also #[MapRequestBodyParameter] is missing IMHO
+
+I don't think we want to go this route. POST/PUT/etc payloads are better handled as entities. See form component or (un)serializer.
+
+About allowing validation constraints, we could see how far this can go. In a separate RFC/PR indeed.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-03-20T12:55:20Z
+
+we have many endpoints that use a single value, i dont like to end up with many one-off DTOs
+
+i would only map to DTO if that benefits many controllers and/or layers, eg. when forwarding the DTO to a message bus as command/query message.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-03-20T12:56:59Z
+
+> allowing validation constraints, we could see how far this can go
+
+well, my point is #49138 is already doing it :)
+
+---------------------------------------------------------------------------
+
+by ruudk at 2023-03-20T12:57:25Z
+
+Originally, I included the same concept for POST as well. But that was removed after feedback. Personally, I do see a lot of value in a simple way to get some POST parameters as well. Saying that you should use a form/deserializer is **an** answer, but often way too complicated for the use case, for example a simple AJAX endpoint in an admin to toggle something using POST.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-20T12:58:05Z
+
+`$request->request->get('foo')` is still a thing. I wouldn't add an attribute for this, it looks too niche to me.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-03-20T12:59:23Z
+
+i dont see any reason to not have both flavors in a feature compatible way.
+
+$request->query->get() is also still a thing
+
+the main issue is IMHO the lack of built-in validation of user payloads
+
+---------------------------------------------------------------------------
+
+by ruudk at 2023-03-20T13:01:16Z
+
+> $request->request->get('foo') is still a thing. I wouldn't add an attribute for this, it looks too niche to me.
+
+The whole reason I created this PR was that I wanted to have more type safety than `mixed`. With PHPStan level 9, it's frustrating to work with `$request->request->get('foo')`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-20T13:02:14Z
+
+See #48525 for type safety!
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-03-20T13:26:41Z
+
+> When a filter fails, a 404 is returned.
+
+I don't think that's a good idea, or at least not a good default. This was solved differently in the initial PR and I see that I've missed a very brief discussion on this topic.
+
+From my PoV, it makes a difference whether the query parameter is used to indicate _what_ resource should be returned (e.g. `/get-user?userId=foo`) or _how_ a resource should be returned (e.g. `/list-users?offset=foo&pageSize=bar`).
+
+* For the former, a 404 would be justified: The user ID has to be an integer, so we can safely assume that the user with ID `foo` does not exist. Still, a 400 would be fine as well, albeit less specific.
+* For the latter, I would emit a 400 because the user list does exist, but we cannot render it because we don't understand the values passed for `offset` and `pageSize`. A 404 would be wrong here.
+
+A 400 is the more generic status. It would would be appropriate in both cases, and thus the safer default. Moreover, in a typical Symfony application, we would encode identifiers into the URL path rather than using the query string for that. This means the second case should be the more common one.
+
+tl;dr: I think we should make the status code configurable which we emit for a failed filter, with a default status of `400`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-20T13:37:34Z
+
+404 not found is still correct and the most appropriate to me. The request is not "bad", it's just that it maps to nothing.
+`?id=123456` when there is no such entity with id 123456 also leads to a 404, not a 400, and with your reasoning we could argue that the request is "bad" because we never generated any such URL. Yet, a 404 looks more correct to me, because that URL *could* exist in the future. Any variation of any URL could exist in the future, so 404 is appropriate: the request is not "bad" - it just maps to nothing.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-03-20T14:09:55Z
+
+note https://github.com/symfony/symfony/pull/49138 uses 422 for invalid query strings, which is correct to me
+
+the fact a route already matched, to me, proves it's not a 404
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-20T14:12:51Z
+
+Nope sorry. 422 is about the content type of the request, not the URL. That's something to fix in #49138. I'm going to have a closer look at this, thanks for pointing it.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-03-20T14:16:03Z
+
+>  422 is about the content type of the request
+
+do you have a reference? im looking at https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/422
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-20T14:16:57Z
+
+> the content type of the request entity
+
+"content type"
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-03-20T14:18:19Z
+
+im reading it as "the server understands the content type of the request entity"
+
+but then in "but it was unable to process the contained instructions" refers to the "request entity" as a whole
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-03-20T14:18:59Z
+
+> `?id=123456` when there is no such entity with id 123456 also leads to a 404, not a 400
+
+I don't know if you've read my comment fully because you've picked exactly the case where I agree with you and ignored the rest of it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-20T14:21:13Z
+
+I read it, I just don't make any difference between both cases, because there aren't any, from an HTTP spec perspective.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-03-20T14:27:20Z
+
+@ro0NL Looking at https://httpwg.org/specs/rfc9110.html#status.422 and the example given there, 422 indeed does not look like a good fix for a malformed URL. The spec clearly talks about the request content, not the resource URL.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-03-20T14:32:51Z
+
+i stand corrected :) i wouldnt dare betting on 422 v 400 v 404 anymore from a spec POV, i can only imagine it helps API consumers
+
+it looks like we found an RFC that calls it "request content" explicitly :+1:
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-03-21T07:51:32Z
+
+> About allowing validation constraints, we could see how far this can go. In a separate RFC/PR indeed.
+
+> See https://github.com/symfony/symfony/pull/48525 for type safety!
+
+im not really convinced adding the attribute without constraint validation adds much value then
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-27T21:18:28Z
+
+> Will it be possible to introduce a name converter afterwards? This seems very opinionated regarding query parameters naming and conventions (they're nonexistent anyways).
+
+The names can already be remapped if needed, see argument $name of the attribute. Or did you mean something else?
+
+> having validation be part of the controller is like merging the model and the controller on an MVC point of view.
+
+This is not about validation but about the last step of the routing logic. Thus the 404 when the input doesn't match.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-04-14T10:25:06Z
+
+Can we close this PR?
+
+* https://github.com/symfony/symfony/pull/49138
+
+was merged right now.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-04-14T10:52:24Z
+
+Why close? This PR is complementary, not "instead of".
+
+---------------------------------------------------------------------------
+
+by ruudk at 2023-04-17T12:29:47Z
+
+@nicolas-grekas Can we merge this PR?

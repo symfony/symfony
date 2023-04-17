@@ -23,6 +23,9 @@ use Symfony\Component\Security\Core\User\OidcUser;
 use Symfony\Component\Security\Http\AccessToken\Oidc\OidcTokenHandler;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 
+/**
+ * @requires extension openssl
+ */
 class OidcTokenHandlerTest extends TestCase
 {
     private const AUDIENCE = 'Symfony OIDC';
@@ -64,7 +67,7 @@ class OidcTokenHandlerTest extends TestCase
         $this->assertEquals($claims['sub'], $actualUser->getUserIdentifier());
     }
 
-    public function getClaims(): iterable
+    public static function getClaims(): iterable
     {
         yield ['sub', 'e21bf182-1538-406e-8ccb-e25a17aba39f'];
         yield ['email', 'foo@example.com'];
@@ -90,13 +93,13 @@ class OidcTokenHandlerTest extends TestCase
         ))->getUserBadgeFrom($token);
     }
 
-    public function getInvalidTokens(): iterable
+    public static function getInvalidTokens(): iterable
     {
         // Invalid token
         yield ['invalid'];
         // Token is expired
         yield [
-            $this->buildJWS(json_encode([
+            self::buildJWS(json_encode([
                 'iat' => time() - 3600,
                 'nbf' => time() - 3600,
                 'exp' => time() - 3590,
@@ -108,7 +111,7 @@ class OidcTokenHandlerTest extends TestCase
         ];
         // Invalid audience
         yield [
-            $this->buildJWS(json_encode([
+            self::buildJWS(json_encode([
                 'iat' => time(),
                 'nbf' => time(),
                 'exp' => time() + 3590,
@@ -141,25 +144,25 @@ class OidcTokenHandlerTest extends TestCase
 
         (new OidcTokenHandler(
             new ES256(),
-            $this->getJWK(),
+            self::getJWK(),
             $loggerMock,
             'email',
             self::AUDIENCE
         ))->getUserBadgeFrom($token);
     }
 
-    private function buildJWS(string $payload): string
+    private static function buildJWS(string $payload): string
     {
         return (new CompactSerializer())->serialize((new JWSBuilder(new AlgorithmManager([
             new ES256(),
         ])))->create()
             ->withPayload($payload)
-            ->addSignature($this->getJWK(), ['alg' => 'ES256'])
+            ->addSignature(self::getJWK(), ['alg' => 'ES256'])
             ->build()
         );
     }
 
-    private function getJWK(): JWK
+    private static function getJWK(): JWK
     {
         // tip: use https://mkjwk.org/ to generate a JWK
         return new JWK([

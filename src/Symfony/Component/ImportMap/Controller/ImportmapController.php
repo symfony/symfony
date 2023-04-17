@@ -12,6 +12,7 @@
 namespace Symfony\Component\ImportMap\Controller;
 
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\ImportMap\ImportMapManager;
@@ -38,13 +39,14 @@ final class ImportmapController
         $this->mimeTypes ??= class_exists(MimeTypes::class) ? new MimeTypes() : null;
     }
 
-    public function handle(string $path): Response
+    public function handle(Request $request): Response
     {
-        if (!preg_match('/^(.*)\.(\w+)\.(.*)$/', $path, $matches)) {
+        $uri = $request->getRequestUri();
+        if (!preg_match('/^(.*)\.(\w+)\.(.*)$/', $uri, $matches)) {
             throw new NotFoundHttpException();
         }
 
-        $localPath = $this->importMapManager->getPathForUrl($path);
+        $localPath = $this->importMapManager->getPathForUri($uri);
         if (null === $localPath) {
             throw new NotFoundHttpException();
         }

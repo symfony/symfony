@@ -51,7 +51,7 @@ final class ImportMapManager
     /**
      * @var array<string, string>
      */
-    private array $urlToPath;
+    private array $uriToPath;
     private string $json;
 
     public function __construct(
@@ -109,11 +109,11 @@ final class ImportMapManager
         $this->createImportMap(true, [], []);
     }
 
-    public function getPathForUrl(string $url): ?string
+    public function getPathForUri(string $uri): ?string
     {
         $this->buildImportMap();
 
-        return $this->urlToPath[$url] ?? null;
+        return $this->uriToPath[$uri] ?? null;
     }
 
     private function loadImportMap(): void
@@ -134,7 +134,7 @@ final class ImportMapManager
 
         $this->loadImportMap();
         $this->modulesToPreload = [];
-        $this->urlToPath = [];
+        $this->uriToPath = [];
 
         $importmap = ['imports' => []];
         foreach ($this->importMap as $packageName => $data) {
@@ -148,7 +148,7 @@ final class ImportMapManager
             }
 
             if ($path) {
-                $this->urlToPath[$importmap['imports'][$packageName]] = $path;
+                $this->uriToPath[$importmap['imports'][$packageName]] = $path;
             }
 
             if ($data['preload'] ?? false) {

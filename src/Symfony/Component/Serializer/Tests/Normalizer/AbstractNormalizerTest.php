@@ -20,6 +20,7 @@ use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
@@ -29,6 +30,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\Annotations\IgnoreDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
 use Symfony\Component\Serializer\Tests\Fixtures\NullableConstructorArgumentDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\NullableOptionalConstructorArgumentDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Php80ReadonlyDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\StaticConstructorDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\StaticConstructorNormalizer;
 use Symfony\Component\Serializer\Tests\Fixtures\VariadicConstructorTypedArgsDummy;
@@ -231,6 +233,19 @@ class AbstractNormalizerTest extends TestCase
         $dummy = $normalizer->denormalize(json_decode($data, true), VariadicConstructorTypedArgsDummy::class);
         $this->assertInstanceOf(VariadicConstructorTypedArgsDummy::class, $dummy);
         $this->assertEquals($arr, $dummy->getFoo());
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testWithNameConverter()
+    {
+        $normalizer = new ObjectNormalizer(null, new CamelCaseToSnakeCaseNameConverter());
+
+        $object = new Php80ReadonlyDummy('foo');
+        $this->assertEquals(['some_value' => 'foo'], $normalizer->normalize($object));
+        $this->assertEquals($object, $normalizer->denormalize(['some_value' => 'foo'], Php80ReadonlyDummy::class));
+        $this->assertEquals($object, $normalizer->denormalize(['someValue' => 'foo'], Php80ReadonlyDummy::class));
     }
 
     public static function getNormalizer()

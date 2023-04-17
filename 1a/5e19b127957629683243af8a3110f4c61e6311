@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2023-03-03T12:56:17Z
+
+> This may lead to directory named as `path/..8U6/` which freaked out our synchronization tools and security log scanner.
+
+Are these tools right when they consider this path as risky? To my knowledge, there is no risk of accessing the parent directory here.
+
+But this change looks good anyway, someone seeing a path like `path/..8U6/` could be confused too.
+
+---------------------------------------------------------------------------
+
+by giosh94mhz at 2023-03-03T17:22:12Z
+
+> Are these tools right when they consider this path as risky? To my knowledge, there is no risk of accessing the parent directory here.
+> But this change looks good anyway, someone seeing a path like path/..8U6/ could be confused too.
+
+Precisely as you say.
+
+The tools aren't right, strictly speaking, but usually when I find `/a/path/..like/this`, I verify that there are no fishy patterns, like a `GET /?request=..like/this`.

@@ -943,7 +943,7 @@ class SerializerTest extends TestCase
                 ],
                 'path' => 'dateTime',
                 'useMessageForUser' => true,
-                'message' => 'The data is either an empty string or null, you should pass a string that can be parsed with the passed format or a valid DateTime string.',
+                'message' => 'The data is either not an string, an empty string, or null; you should pass a string that can be parsed with the passed format or a valid DateTime string.',
             ],
             [
                 'currentType' => 'null',
@@ -952,7 +952,7 @@ class SerializerTest extends TestCase
                 ],
                 'path' => 'dateTimeImmutable',
                 'useMessageForUser' => true,
-                'message' => 'The data is either an empty string or null, you should pass a string that can be parsed with the passed format or a valid DateTime string.',
+                'message' => 'The data is either not an string, an empty string, or null; you should pass a string that can be parsed with the passed format or a valid DateTime string.',
             ],
             [
                 'currentType' => 'null',

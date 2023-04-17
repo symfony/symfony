@@ -14,15 +14,17 @@ namespace Symfony\Component\Messenger\Transport\Serialization;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Stamp\MessageDecodingFailedStamp;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Stamp\SerializedMessageStamp;
 use Symfony\Component\Messenger\Stamp\SerializerStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
+use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
-use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer as SymfonySerializer;
 use Symfony\Component\Serializer\SerializerInterface as SymfonySerializerInterface;
@@ -35,14 +37,13 @@ class Serializer implements SerializerInterface
     public const MESSENGER_SERIALIZATION_CONTEXT = 'messenger_serialization';
     private const STAMP_HEADER_PREFIX = 'X-Message-Stamp-';
 
-    private SymfonySerializerInterface $serializer;
-    private string $format;
-    private array $context;
+    private readonly array $context;
 
-    public function __construct(SymfonySerializerInterface $serializer = null, string $format = 'json', array $context = [])
-    {
-        $this->serializer = $serializer ?? self::create()->serializer;
-        $this->format = $format;
+    public function __construct(
+        private readonly DecoderInterface&DenormalizerInterface&SymfonySerializerInterface $serializer,
+        private readonly string $format = 'json',
+        array $context = [],
+    ) {
         $this->context = $context + [self::MESSENGER_SERIALIZATION_CONTEXT => true];
     }
 
@@ -69,20 +70,24 @@ class Serializer implements SerializerInterface
             throw new MessageDecodingFailedException('Encoded envelope does not have a "type" header.');
         }
 
+        ['body' => $body, 'headers' => ['type' => $type]] = $encodedEnvelope;
         $stamps = $this->decodeStamps($encodedEnvelope);
-        $stamps[] = new SerializedMessageStamp($encodedEnvelope['body']);
+        $stamps[] = new SerializedMessageStamp($body);
 
-        $serializerStamp = $this->findFirstSerializerStamp($stamps);
+        $context = ($this->findFirstSerializerStamp($stamps)?->getContext() ?? [])
+            + $this->context;
 
-        $context = $this->context;
-        if (null !== $serializerStamp) {
-            $context = $serializerStamp->getContext() + $context;
+        try {
+            $body = $this->serializer->decode($body, $this->format, $context);
+        } catch (\Throwable $e) {
+            throw new MessageDecodingFailedException($e->getMessage(), $e->getCode(), $e);
         }
 
         try {
-            $message = $this->serializer->deserialize($encodedEnvelope['body'], $encodedEnvelope['headers']['type'], $this->format, $context);
-        } catch (ExceptionInterface $e) {
-            throw new MessageDecodingFailedException('Could not decode message: '.$e->getMessage(), $e->getCode(), $e);
+            $message = $this->serializer->denormalize($body, $type, $this->format, $context);
+        } catch (\Throwable $e) {
+            $stamps[] = new MessageDecodingFailedStamp($e->getMessage());
+            $message = $this->serializer->denormalize($body, \stdClass::class, $this->format, $context);
         }
 
         return new Envelope($message, $stamps);
@@ -120,8 +125,13 @@ class Serializer implements SerializerInterface
             }
 
             try {
-                $stamps[] = $this->serializer->deserialize($value, substr($name, \strlen(self::STAMP_HEADER_PREFIX)).'[]', $this->format, $this->context);
-            } catch (ExceptionInterface $e) {
+                $stamps[] = $this->serializer->deserialize(
+                    $value,
+                    substr($name, \strlen(self::STAMP_HEADER_PREFIX)).'[]',
+                    $this->format,
+                    $this->context,
+                );
+            } catch (\Throwable $e) {
                 throw new MessageDecodingFailedException('Could not decode stamp: '.$e->getMessage(), $e->getCode(), $e);
             }
         }

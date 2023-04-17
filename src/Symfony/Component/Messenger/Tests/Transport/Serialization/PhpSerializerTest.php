@@ -14,20 +14,37 @@ namespace Symfony\Component\Messenger\Tests\Transport\Serialization;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Stamp\MessageDecodingFailedStamp;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
-use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 
 class PhpSerializerTest extends TestCase
 {
     public function testEncodedIsDecodable()
     {
-        $serializer = $this->createPhpSerializer();
-
-        $envelope = new Envelope(new DummyMessage('Hello'));
+        $serializer = new PhpSerializer();
+        $envelope = new Envelope(new DummyMessage());
 
         $encoded = $serializer->encode($envelope);
-        $this->assertStringNotContainsString("\0", $encoded['body'], 'Does not contain the binary characters');
+        $this->assertStringNotContainsString("\0", $encoded['body'], 'Does not contain binary characters');
+        $this->assertEquals($envelope, $serializer->decode($encoded));
+    }
+
+    public function testEncodedSkipsNonEncodeableStamps()
+    {
+        $envelope = new Envelope(new DummyMessage(), [new DummyPhpSerializerNonSendableStamp()]);
+        $encoded = (new PhpSerializer())->encode($envelope);
+
+        $this->assertStringNotContainsString('DummyPhpSerializerNonSendableStamp', $encoded['body']);
+    }
+
+    public function testNonUtf8IsBase64Encoded()
+    {
+        $serializer = new PhpSerializer();
+        $envelope = new Envelope(new DummyMessage("\xE9"));
+
+        $encoded = $serializer->encode($envelope);
+        $this->assertTrue((bool) preg_match('//u', $encoded['body']), 'Encodes non-UTF8 payloads');
         $this->assertEquals($envelope, $serializer->decode($encoded));
     }
 
@@ -36,9 +53,7 @@ class PhpSerializerTest extends TestCase
         $this->expectException(MessageDecodingFailedException::class);
         $this->expectExceptionMessage('Encoded envelope should have at least a "body", or maybe you should implement your own serializer');
 
-        $serializer = $this->createPhpSerializer();
-
-        $serializer->decode([]);
+        (new PhpSerializer())->decode([]);
     }
 
     public function testDecodingFailsWithBadFormat()
@@ -46,11 +61,7 @@ class PhpSerializerTest extends TestCase
         $this->expectException(MessageDecodingFailedException::class);
         $this->expectExceptionMessageMatches('/Could not decode/');
 
-        $serializer = $this->createPhpSerializer();
-
-        $serializer->decode([
-            'body' => '{"message": "bar"}',
-        ]);
+        (new PhpSerializer())->decode(['body' => '{"message": "bar"}']);
     }
 
     public function testDecodingFailsWithBadBase64Body()
@@ -58,52 +69,55 @@ class PhpSerializerTest extends TestCase
         $this->expectException(MessageDecodingFailedException::class);
         $this->expectExceptionMessageMatches('/Could not decode/');
 
-        $serializer = $this->createPhpSerializer();
-
-        $serializer->decode([
-            'body' => 'x',
-        ]);
+        (new PhpSerializer())->decode(['body' => 'x']);
     }
 
     public function testDecodingFailsWithBadClass()
     {
-        $this->expectException(MessageDecodingFailedException::class);
-        $this->expectExceptionMessageMatches('/class "ReceivedSt0mp" not found/');
+        $serializer = new PhpSerializer();
 
-        $serializer = $this->createPhpSerializer();
+        $envelope = $serializer->encode(new Envelope(new DummyMessage()));
+        $envelope['body'] = str_replace('NestedDummyMessage', 'NestedOupsyMessage', $envelope['body']);
 
-        $serializer->decode([
-            'body' => 'O:13:"ReceivedSt0mp":0:{}',
-        ]);
+        $envelope = $serializer->decode($envelope);
+        $stamp = $envelope->last(MessageDecodingFailedStamp::class);
+        $message = $envelope->getMessage();
+
+        $this->assertInstanceOf(MessageDecodingFailedStamp::class, $stamp);
+        $this->assertStringContainsString(NestedOupsyMessage::class, $stamp->getMessage());
+        $this->assertInstanceOf(\__PHP_Incomplete_Class::class, $message);
     }
 
-    public function testEncodedSkipsNonEncodeableStamps()
+    public function testDecodingFailsWithBadData()
     {
-        $serializer = $this->createPhpSerializer();
+        $serializer = new PhpSerializer();
 
-        $envelope = new Envelope(new DummyMessage('Hello'), [
-            new DummyPhpSerializerNonSendableStamp(),
-        ]);
+        $envelope = $serializer->encode(new Envelope(new DummyMessage()));
+        $envelope['body'] = str_replace(
+            's:7:\"message\";s:7:\"message\";',
+            's:7:\"message\";' . serialize(5),
+            $envelope['body'],
+        );
 
-        $encoded = $serializer->encode($envelope);
-        $this->assertStringNotContainsString('DummyPhpSerializerNonSendableStamp', $encoded['body']);
+        $envelope = $serializer->decode($envelope);
+        $stamp = $envelope->last(MessageDecodingFailedStamp::class);
+        $message = $envelope->getMessage();
+
+        $this->assertInstanceOf(MessageDecodingFailedStamp::class, $stamp);
+        $this->assertStringContainsString('Cannot assign int', $stamp->getMessage());
+        $this->assertInstanceOf(\__PHP_Incomplete_Class::class, $message);
     }
+}
 
-    public function testNonUtf8IsBase64Encoded()
-    {
-        $serializer = $this->createPhpSerializer();
-
-        $envelope = new Envelope(new DummyMessage("\xE9"));
-
-        $encoded = $serializer->encode($envelope);
-        $this->assertTrue((bool) preg_match('//u', $encoded['body']), 'Encodes non-UTF8 payloads');
-        $this->assertEquals($envelope, $serializer->decode($encoded));
+class DummyMessage {
+    public function __construct(
+        public readonly string $message = 'message',
+        public readonly NestedDummyMessage $nested = new NestedDummyMessage(),
+    ) {
     }
+}
 
-    protected function createPhpSerializer(): PhpSerializer
-    {
-        return new PhpSerializer();
-    }
+class NestedDummyMessage {
 }
 
 class DummyPhpSerializerNonSendableStamp implements NonSendableStampInterface

@@ -256,7 +256,8 @@ class ApiAttributesTest extends AbstractWebTestCase
                             "template": "This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.",
                             "parameters": {
                                 "{{ value }}": "\"\"",
-                                "{{ limit }}": "10"
+                                "{{ limit }}": "10",
+                                "{{ value_length }}": "0"
                             },
                             "type": "urn:uuid:9ff3fdc4-b214-49db-8718-39c315e33d45"
                         }
@@ -289,6 +290,7 @@ class ApiAttributesTest extends AbstractWebTestCase
                         <parameters>
                             <item key="{{ value }}">"H"</item>
                             <item key="{{ limit }}">10</item>
+                            <item key="{{ value_length }}">1</item>
                         </parameters>
                         <type>urn:uuid:9ff3fdc4-b214-49db-8718-39c315e33d45</type>
                     </violations>
@@ -336,7 +338,8 @@ class ApiAttributesTest extends AbstractWebTestCase
                             "template": "This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.",
                             "parameters": {
                                 "{{ value }}": "\"\"",
-                                "{{ limit }}": "10"
+                                "{{ limit }}": "10",
+                                "{{ value_length }}": "0"
                             },
                             "type": "urn:uuid:9ff3fdc4-b214-49db-8718-39c315e33d45"
                         }

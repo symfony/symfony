@@ -54,7 +54,7 @@ class OidcUserInfoTokenHandlerTest extends TestCase
         $this->assertEquals($claims['sub'], $actualUser->getUserIdentifier());
     }
 
-    public function getClaims(): iterable
+    public static function getClaims(): iterable
     {
         yield ['sub', 'e21bf182-1538-406e-8ccb-e25a17aba39f'];
         yield ['email', 'foo@example.com'];

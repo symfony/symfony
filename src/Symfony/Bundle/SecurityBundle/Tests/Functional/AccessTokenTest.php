@@ -333,6 +333,9 @@ class AccessTokenTest extends AbstractWebTestCase
         $this->assertSame(['message' => 'Welcome @dunglas!'], json_decode($response->getContent(), true));
     }
 
+    /**
+     * @requires extension openssl
+     */
     public function testOidcSuccess()
     {
         $time = time();

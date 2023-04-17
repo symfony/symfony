@@ -29,7 +29,6 @@ class PhpSerializer implements SerializerInterface
         \DateTimeZone::class,
         Uid\Ulid::class,
         Uid\UuidV1::class,
-        Uid\UuidV2::class,
         Uid\UuidV3::class,
         Uid\UuidV4::class,
         Uid\UuidV5::class,

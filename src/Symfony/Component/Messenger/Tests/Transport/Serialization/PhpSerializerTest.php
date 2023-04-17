@@ -95,7 +95,7 @@ class PhpSerializerTest extends TestCase
         $envelope = $serializer->encode(new Envelope(new DummyMessage()));
         $envelope['body'] = str_replace(
             's:7:\"message\";s:7:\"message\";',
-            's:7:\"message\";' . serialize(5),
+            's:7:\"message\";'.serialize(5),
             $envelope['body'],
         );
 
@@ -109,7 +109,8 @@ class PhpSerializerTest extends TestCase
     }
 }
 
-class DummyMessage {
+class DummyMessage
+{
     public function __construct(
         public readonly string $message = 'message',
         public readonly NestedDummyMessage $nested = new NestedDummyMessage(),
@@ -117,7 +118,8 @@ class DummyMessage {
     }
 }
 
-class NestedDummyMessage {
+class NestedDummyMessage
+{
 }
 
 class DummyPhpSerializerNonSendableStamp implements NonSendableStampInterface

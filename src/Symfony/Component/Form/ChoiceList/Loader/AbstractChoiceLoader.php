@@ -59,7 +59,7 @@ abstract class AbstractChoiceLoader implements ChoiceLoaderInterface
 
         if ($value) {
             // if a value callback exists, use it
-            return array_map($value, $choices);
+            return array_map(function ($item) use ($value): string { return $value($item); }, $choices);
         }
 
         return $this->doLoadValuesForChoices($choices);

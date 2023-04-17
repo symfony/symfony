@@ -90,6 +90,18 @@ class CallbackChoiceLoaderTest extends TestCase
         );
     }
 
+    public function testLoadValuesForChoicesCastsCallbackItemsToString()
+    {
+        $choices = [
+           (object) ['id' => 2],
+           (object) ['id' => 3],
+        ];
+
+        $value = function ($item) { return $item->id; };
+
+        $this->assertSame(['2', '3'], self::$loader->loadValuesForChoices($choices, $value));
+    }
+
     public function testLoadValuesForChoicesLoadsChoiceListOnFirstCall()
     {
         $this->assertSame(

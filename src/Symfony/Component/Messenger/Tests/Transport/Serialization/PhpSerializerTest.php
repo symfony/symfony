@@ -30,6 +30,18 @@ class PhpSerializerTest extends TestCase
         $this->assertEquals($envelope, $serializer->decode($encoded));
     }
 
+    public function testDecodedFailedIsEncodable()
+    {
+        $serializer = new PhpSerializer();
+
+        $envelope = $serializer->encode(new Envelope(new DummyMessage()));
+        $envelope['body'] = str_replace('NestedDummyMessage', 'NestedOupsyMessage', $envelope['body']);
+        $envelope = $serializer->decode($envelope);
+        $redecodedEnvelope = $serializer->decode($serializer->encode($envelope));
+
+        $this->assertEquals($envelope->getMessage(), $redecodedEnvelope->getMessage());
+    }
+
     public function testEncodedSkipsNonEncodeableStamps()
     {
         $envelope = new Envelope(new DummyMessage(), [new DummyPhpSerializerNonSendableStamp()]);

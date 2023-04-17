@@ -72,7 +72,7 @@ class Serializer implements SerializerInterface
 
         ['body' => $body, 'headers' => ['type' => $type]] = $encodedEnvelope;
         $stamps = $this->decodeStamps($encodedEnvelope);
-        $stamps[] = new SerializedMessageStamp($body);
+        $stamps[] = new SerializedMessageStamp($body, $type);
 
         $context = ($this->findFirstSerializerStamp($stamps)?->getContext() ?? [])
             + $this->context;
@@ -106,12 +106,13 @@ class Serializer implements SerializerInterface
 
         $envelope = $envelope->withoutStampsOfType(NonSendableStampInterface::class);
 
-        $headers = ['type' => $envelope->getMessage()::class] + $this->encodeStamps($envelope) + $this->getContentTypeHeader();
+        $headers = ['type' => $serializedMessageStamp?->getType() ?? $envelope->getMessage()::class]
+            + $this->encodeStamps($envelope)
+            + $this->getContentTypeHeader();
 
         return [
-            'body' => $serializedMessageStamp
-                ? $serializedMessageStamp->getSerializedMessage()
-                : $this->serializer->serialize($envelope->getMessage(), $this->format, $context),
+            'body' => $serializedMessageStamp?->getSerializedMessage()
+                ?? $this->serializer->serialize($envelope->getMessage(), $this->format, $context),
             'headers' => $headers,
         ];
     }

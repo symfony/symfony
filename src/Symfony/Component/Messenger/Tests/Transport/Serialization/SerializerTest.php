@@ -35,7 +35,22 @@ class SerializerTest extends TestCase
         $decodedEnvelope = $serializer->decode($serializer->encode(new Envelope(new DummyMessage('Hello'))));
 
         $this->assertEquals(new DummyMessage('Hello'), $decodedEnvelope->getMessage());
-        $this->assertEquals(new SerializedMessageStamp('{"message":"Hello"}'), $decodedEnvelope->last(SerializedMessageStamp::class));
+        $this->assertEquals(
+            new SerializedMessageStamp('{"message":"Hello"}', DummyMessage::class),
+            $decodedEnvelope->last(SerializedMessageStamp::class),
+        );
+    }
+
+    public function testDecodedFailedIsEncodable()
+    {
+        $serializer = Serializer::create();
+
+        $envelope = ['body' => '{"unknown": 5}']
+            + $serializer->encode(new Envelope(new DummyMessage('Hello')));
+        $reencodedEnvelope = $serializer->encode($serializer->decode($envelope));
+
+        $this->assertEquals($envelope['body'], $reencodedEnvelope['body']);
+        $this->assertEquals($envelope['headers']['type'], $reencodedEnvelope['headers']['type']);
     }
 
     public function testEncodedWithStampsIsDecodable()
@@ -45,7 +60,7 @@ class SerializerTest extends TestCase
         $envelope = (new Envelope(new DummyMessage('Hello')))
             ->with(new SerializerStamp([ObjectNormalizer::GROUPS => ['foo']]))
             ->with(new ValidationStamp(['foo', 'bar']))
-            ->with(new SerializedMessageStamp('{"message":"Hello"}'))
+            ->with(new SerializedMessageStamp('{"message":"Hello"}', DummyMessage::class))
         ;
 
         $this->assertEquals($envelope, $serializer->decode($serializer->encode($envelope)));
@@ -56,7 +71,10 @@ class SerializerTest extends TestCase
         $serializer = Serializer::create();
 
         $encoded = $serializer->encode(
-            new Envelope(new DummyMessage(''), [new SerializedMessageStamp('{"message":"Hello"}')])
+            new Envelope(
+                new DummyMessage(''),
+                [new SerializedMessageStamp('{"message":"Hello"}', DummyMessage::class)],
+            ),
         );
 
         $this->assertSame('{"message":"Hello"}', $encoded['body'] ?? null);

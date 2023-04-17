@@ -56,8 +56,10 @@ class Ssi extends AbstractSurrogate
         // we don't use a proper XML parser here as we can have SSI tags in a plain text response
         $content = $response->getContent();
 
+        static $cookie;
+        $cookie = hash('xxh128', $cookie ??= random_bytes(16), true);
+        $boundary = base64_encode($cookie);
         $chunks = preg_split('#<!--\#include\s+(.*?)\s*-->#', $content, -1, \PREG_SPLIT_DELIM_CAPTURE);
-        $chunks[0] = str_replace($this->phpEscapeMap[0], $this->phpEscapeMap[1], $chunks[0]);
 
         $i = 1;
         while (isset($chunks[$i])) {
@@ -71,14 +73,10 @@ class Ssi extends AbstractSurrogate
                 throw new \RuntimeException('Unable to process an SSI tag without a "virtual" attribute.');
             }
 
-            $chunks[$i] = sprintf('<?php echo $this->surrogate->handle($this, %s, \'\', false) ?>'."\n",
-                var_export($options['virtual'], true)
-            );
-            ++$i;
-            $chunks[$i] = str_replace($this->phpEscapeMap[0], $this->phpEscapeMap[1], $chunks[$i]);
-            ++$i;
+            $chunks[$i] = $boundary.$options['virtual']."\n\n\n";
+            $i += 2;
         }
-        $content = implode('', $chunks);
+        $content = $boundary.implode('', $chunks).$boundary;
 
         $response->setContent($content);
         $response->headers->set('X-Body-Eval', 'SSI');

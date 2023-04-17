@@ -24,7 +24,8 @@ final class SerializedMessageStamp implements NonSendableStampInterface
         return $this->serializedMessage;
     }
 
-    public function getType(): string {
+    public function getType(): string
+    {
         return $this->messageType;
     }
 }

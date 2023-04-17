@@ -632,6 +632,30 @@ XLIFF
                     ],
                 ]));
             },
+            'listLanguages' => function (string $method, string $url, array $options = []): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/languages?limit=500', $url);
+                $this->assertSame('Authorization: Bearer API_TOKEN', $options['normalized_headers']['authorization'][0]);
+
+                return new MockResponse(json_encode([
+                    'data' => [
+                        [
+                            'data' => [
+                                'id' => 'en-GB',
+                                'osxLocale' => 'en_GB',
+                                'locale' => 'en-GB',
+                            ],
+                        ],
+                        [
+                            'data' => [
+                                'id' => 'fr',
+                                'osxLocale' => 'fr_FR',
+                                'locale' => 'fr-FR',
+                            ],
+                        ],
+                    ],
+                ]));
+            },
             'exportProjectTranslations' => function (string $method, string $url, array $options = []) use ($expectedTargetLanguageId): ResponseInterface {
                 $this->assertSame('POST', $method);
                 $this->assertSame('https://api.crowdin.com/api/v2/projects/1/translations/exports', $url);
@@ -746,12 +770,37 @@ XLIFF
                     ],
                 ]));
             },
+            'listLanguages' => function (string $method, string $url, array $options = []): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/languages?limit=500', $url);
+                $this->assertSame('Authorization: Bearer API_TOKEN', $options['normalized_headers']['authorization'][0]);
+
+                return new MockResponse(json_encode([
+                    'data' => [
+                        [
+                            'data' => [
+                                'id' => 'en',
+                                'osxLocale' => 'en_GB',
+                                'locale' => 'en-GB',
+                            ],
+                        ],
+                        [
+                            'data' => [
+                                'id' => 'fr',
+                                'osxLocale' => 'fr_FR',
+                                'locale' => 'fr-FR',
+                            ],
+                        ],
+                    ],
+                ]));
+            },
             'downloadSource' => function (string $method, string $url): ResponseInterface {
                 $this->assertSame('GET', $method);
                 $this->assertSame('https://api.crowdin.com/api/v2/projects/1/files/12/download', $url);
 
                 return new MockResponse(json_encode(['data' => ['url' => 'https://file.url']]));
             },
+
             'downloadFile' => function (string $method, string $url) use ($responseContent): ResponseInterface {
                 $this->assertSame('GET', $method);
                 $this->assertSame('https://file.url/', $url);
@@ -826,6 +875,30 @@ XLIFF
                     ],
                 ]));
             },
+            'listLanguages' => function (string $method, string $url, array $options = []): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/languages?limit=500', $url);
+                $this->assertSame('Authorization: Bearer API_TOKEN', $options['normalized_headers']['authorization'][0]);
+
+                return new MockResponse(json_encode([
+                    'data' => [
+                        [
+                            'data' => [
+                                'id' => 'en',
+                                'osxLocale' => 'en_GB',
+                                'locale' => 'en-GB',
+                            ],
+                        ],
+                        [
+                            'data' => [
+                                'id' => 'fr',
+                                'osxLocale' => 'fr_FR',
+                                'locale' => 'fr-FR',
+                            ],
+                        ],
+                    ],
+                ]));
+            },
             'exportProjectTranslations' => function (string $method, string $url, array $options = []): ResponseInterface {
                 $this->assertSame('POST', $method);
                 $this->assertSame('https://api.crowdin.com/api/v2/projects/1/translations/exports', $url);
@@ -858,6 +931,30 @@ XLIFF
                             'id' => 12,
                             'name' => 'messages.xlf',
                         ]],
+                    ],
+                ]));
+            },
+            'listLanguages' => function (string $method, string $url, array $options = []): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/languages?limit=500', $url);
+                $this->assertSame('Authorization: Bearer API_TOKEN', $options['normalized_headers']['authorization'][0]);
+
+                return new MockResponse(json_encode([
+                    'data' => [
+                        [
+                            'data' => [
+                                'id' => 'en',
+                                'osxLocale' => 'en_GB',
+                                'locale' => 'en-GB',
+                            ],
+                        ],
+                        [
+                            'data' => [
+                                'id' => 'fr',
+                                'osxLocale' => 'fr_FR',
+                                'locale' => 'fr-FR',
+                            ],
+                        ],
                     ],
                 ]));
             },

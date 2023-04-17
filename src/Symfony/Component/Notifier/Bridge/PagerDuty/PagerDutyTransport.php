@@ -27,6 +27,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class PagerDutyTransport extends AbstractTransport
 {
+    protected const HOST = 'events.pagerduty.com';
+
     public function __construct(#[\SensitiveParameter] private readonly string $token, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         parent::__construct($client, $dispatcher);
@@ -56,7 +58,7 @@ final class PagerDutyTransport extends AbstractTransport
         $body['payload']['summary'] = $message->getContent();
         $body['payload']['source'] = $message->getSubject();
 
-        $response = $this->client->request('POST', 'https://events.pagerduty.com/v2/enqueue', [
+        $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/v2/enqueue', [
             'headers' => [
                 'Accept' => 'application/json',
                 'Authorization' => $this->token,

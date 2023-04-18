@@ -6,6 +6,7 @@ CHANGELOG
 
  * Don't render seconds for HTML5 date pickers unless "with_seconds" is explicitly set
  * Add a `placeholder_attr` option to `ChoiceType`
+ * Deprecate not configuring the "widget" option of date/time form types, it will default to "single_text" in v7
 
 6.2
 ---

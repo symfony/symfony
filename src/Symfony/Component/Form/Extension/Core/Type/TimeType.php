@@ -312,11 +312,10 @@ class TimeType extends AbstractType
             'hours' => range(0, 23),
             'minutes' => range(0, 59),
             'seconds' => range(0, 59),
-            'widget' => function (Options $options) {
-                trigger_deprecation('symfony/form', '6.3', 'Not configuring the "widget" option explicitly is deprecated, its default value will change to "single_text" in 7.0.');
+            'widget' => static function (Options $options) {
+                trigger_deprecation('symfony/form', '6.3', 'Not configuring the "widget" option of form type "time" is deprecated. It will default to "single_text" in Symfony 7.0.');
 
                 return 'choice';
-                // return 'single_text';
             },
             'input' => 'datetime',
             'input_format' => 'H:i:s',

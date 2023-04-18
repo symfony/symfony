@@ -1006,6 +1006,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         $form = $this->factory->createNamed('name', DateTimeType::class, date('Y').'-02-03 04:05:06', [
             'input' => 'string',
             'with_seconds' => false,
+            'widget' => 'choice',
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
@@ -1059,6 +1060,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
             'input' => 'string',
             'placeholder' => 'Change&Me',
             'required' => false,
+            'widget' => 'choice',
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
@@ -1112,6 +1114,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         $form = $this->factory->createNamed('name', DateTimeType::class, $data, [
             'input' => 'array',
             'required' => false,
+            'widget' => 'choice',
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
@@ -1163,6 +1166,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         $form = $this->factory->createNamed('name', DateTimeType::class, date('Y').'-02-03 04:05:06', [
             'input' => 'string',
             'with_seconds' => true,
+            'widget' => 'choice',
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
@@ -1387,6 +1391,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
     {
         $form = $this->factory->createNamed('name', BirthdayType::class, '2000-02-03', [
             'input' => 'string',
+            'widget' => 'choice',
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
@@ -1421,6 +1426,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
             'input' => 'string',
             'placeholder' => '',
             'required' => false,
+            'widget' => 'choice',
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
@@ -1598,6 +1604,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         $form = $this->factory->createNamed('name', TimeType::class, '04:05:06', [
             'input' => 'string',
             'with_seconds' => false,
+            'widget' => 'choice',
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
@@ -1631,6 +1638,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         $form = $this->factory->createNamed('name', TimeType::class, '04:05:06', [
             'input' => 'string',
             'with_seconds' => true,
+            'widget' => 'choice',
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
@@ -1714,6 +1722,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
             'input' => 'string',
             'placeholder' => 'Change&Me',
             'required' => false,
+            'widget' => 'choice',
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
@@ -1747,6 +1756,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
             'input' => 'string',
             'required' => false,
             'placeholder' => ['hour' => 'Change&Me'],
+            'widget' => 'choice',
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],

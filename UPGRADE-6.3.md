@@ -29,6 +29,11 @@ DoctrineBridge
  * Deprecate `MessengerTransportDoctrineSchemaSubscriber` in favor of `MessengerTransportDoctrineSchemaListener`
  * Deprecate `RememberMeTokenProviderDoctrineSchemaSubscriber` in favor of `RememberMeTokenProviderDoctrineSchemaListener`
 
+Form
+----
+
+ * Deprecate not configuring the "widget" option of date/time form types, it will default to "single_text" in v7
+
 FrameworkBundle
 ---------------
 

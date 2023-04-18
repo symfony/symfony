@@ -24,7 +24,7 @@ class CoreExtensionTest extends TestCase
             ->getFormFactory();
 
         $form = $formFactory->createBuilder()
-            ->add('foo', 'Symfony\Component\Form\Extension\Core\Type\DateType')
+            ->add('foo', 'Symfony\Component\Form\Extension\Core\Type\DateType', ['widget' => 'choice'])
             ->getForm();
         $form->submit('foo');
 

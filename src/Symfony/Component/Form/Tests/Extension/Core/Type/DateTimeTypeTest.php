@@ -330,7 +330,7 @@ class DateTimeTypeTest extends BaseTypeTestCase
     {
         // Throws an exception if "data_class" option is not explicitly set
         // to null in the type
-        $this->assertInstanceOf(FormInterface::class, $this->factory->create(static::TESTED_TYPE, new \DateTime()));
+        $this->assertInstanceOf(FormInterface::class, $this->factory->create(static::TESTED_TYPE, new \DateTime(), ['widget' => 'choice']));
     }
 
     public function testSingleTextWidgetShouldUseTheRightInputType()
@@ -348,6 +348,7 @@ class DateTimeTypeTest extends BaseTypeTestCase
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'required' => false,
             'with_seconds' => true,
+            'widget' => 'choice',
         ])
             ->createView();
 
@@ -364,6 +365,7 @@ class DateTimeTypeTest extends BaseTypeTestCase
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'required' => true,
             'with_seconds' => true,
+            'widget' => 'choice',
         ])
             ->createView();
 
@@ -380,6 +382,7 @@ class DateTimeTypeTest extends BaseTypeTestCase
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'placeholder' => 'Empty',
             'with_seconds' => true,
+            'widget' => 'choice',
         ])
             ->createView();
 
@@ -403,6 +406,7 @@ class DateTimeTypeTest extends BaseTypeTestCase
                 'second' => 'Empty second',
             ],
             'with_seconds' => true,
+            'widget' => 'choice',
         ])
             ->createView();
 
@@ -425,6 +429,7 @@ class DateTimeTypeTest extends BaseTypeTestCase
                 'second' => 'Empty second',
             ],
             'with_seconds' => true,
+            'widget' => 'choice',
         ])
             ->createView();
 
@@ -447,6 +452,7 @@ class DateTimeTypeTest extends BaseTypeTestCase
                 'second' => 'Empty second',
             ],
             'with_seconds' => true,
+            'widget' => 'choice',
         ])
             ->createView();
 
@@ -536,7 +542,7 @@ class DateTimeTypeTest extends BaseTypeTestCase
     public function testDateTypeChoiceErrorsBubbleUp()
     {
         $error = new FormError('Invalid!');
-        $form = $this->factory->create(static::TESTED_TYPE, null);
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['widget' => 'choice']);
 
         $form['date']->addError($error);
 
@@ -549,6 +555,7 @@ class DateTimeTypeTest extends BaseTypeTestCase
         $error = new FormError('Invalid!');
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'date_widget' => 'single_text',
+            'time_widget' => 'choice',
         ]);
 
         $form['date']->addError($error);
@@ -560,7 +567,7 @@ class DateTimeTypeTest extends BaseTypeTestCase
     public function testTimeTypeChoiceErrorsBubbleUp()
     {
         $error = new FormError('Invalid!');
-        $form = $this->factory->create(static::TESTED_TYPE, null);
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['widget' => 'choice']);
 
         $form['time']->addError($error);
 
@@ -573,6 +580,7 @@ class DateTimeTypeTest extends BaseTypeTestCase
         $error = new FormError('Invalid!');
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'time_widget' => 'single_text',
+            'date_widget' => 'choice',
         ]);
 
         $form['time']->addError($error);
@@ -585,6 +593,7 @@ class DateTimeTypeTest extends BaseTypeTestCase
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'with_seconds' => true,
+            'widget' => 'choice',
         ]);
 
         $view = $form->createView();
@@ -602,6 +611,7 @@ class DateTimeTypeTest extends BaseTypeTestCase
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'choice_translation_domain' => 'messages',
             'with_seconds' => true,
+            'widget' => 'choice',
         ]);
 
         $view = $form->createView();
@@ -623,6 +633,7 @@ class DateTimeTypeTest extends BaseTypeTestCase
                 'second' => 'test',
             ],
             'with_seconds' => true,
+            'widget' => 'choice',
         ]);
 
         $view = $form->createView();
@@ -675,6 +686,7 @@ class DateTimeTypeTest extends BaseTypeTestCase
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'empty_data' => $emptyData,
+            'widget' => 'choice',
         ]);
         $form->submit(null);
 
@@ -734,5 +746,10 @@ class DateTimeTypeTest extends BaseTypeTestCase
         $form->submit('2018-01-14T21:29:00');
 
         $this->assertSame('14/01/2018 21:29:00 +00:00', $form->getData());
+    }
+
+    protected function getTestOptions(): array
+    {
+        return ['widget' => 'choice'];
     }
 }

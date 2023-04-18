@@ -175,7 +175,7 @@ abstract class AbstractLayoutTestCase extends FormIntegrationTestCase
 
     public function testLabelOnForm()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateType');
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateType', null, ['widget' => 'choice']);
         $view = $form->createView();
         $this->renderWidget($view, ['label' => 'foo']);
         $html = $this->renderLabel($view);
@@ -1327,6 +1327,7 @@ abstract class AbstractLayoutTestCase extends FormIntegrationTestCase
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateTimeType', date('Y').'-02-03 04:05:06', [
             'input' => 'string',
             'with_seconds' => false,
+            'widget' => 'choice',
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
@@ -1367,6 +1368,7 @@ abstract class AbstractLayoutTestCase extends FormIntegrationTestCase
             'input' => 'string',
             'placeholder' => 'Change&Me',
             'required' => false,
+            'widget' => 'choice',
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
@@ -1408,6 +1410,7 @@ abstract class AbstractLayoutTestCase extends FormIntegrationTestCase
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateTimeType', $data, [
             'input' => 'array',
             'required' => false,
+            'widget' => 'choice',
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
@@ -1447,6 +1450,7 @@ abstract class AbstractLayoutTestCase extends FormIntegrationTestCase
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateTimeType', date('Y').'-02-03 04:05:06', [
             'input' => 'string',
             'with_seconds' => true,
+            'widget' => 'choice',
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
@@ -1654,7 +1658,7 @@ abstract class AbstractLayoutTestCase extends FormIntegrationTestCase
     public function testDateErrorBubbling()
     {
         $form = $this->factory->createNamedBuilder('form', 'Symfony\Component\Form\Extension\Core\Type\FormType')
-            ->add('date', 'Symfony\Component\Form\Extension\Core\Type\DateType')
+            ->add('date', 'Symfony\Component\Form\Extension\Core\Type\DateType', ['widget' => 'choice'])
             ->getForm();
         $form->get('date')->addError(new FormError('[trans]Error![/trans]'));
         $view = $form->createView();
@@ -1667,6 +1671,7 @@ abstract class AbstractLayoutTestCase extends FormIntegrationTestCase
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\BirthdayType', '2000-02-03', [
             'input' => 'string',
+            'widget' => 'choice',
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
@@ -1693,6 +1698,7 @@ abstract class AbstractLayoutTestCase extends FormIntegrationTestCase
             'input' => 'string',
             'placeholder' => '',
             'required' => false,
+            'widget' => 'choice',
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
@@ -2127,6 +2133,7 @@ abstract class AbstractLayoutTestCase extends FormIntegrationTestCase
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TimeType', '04:05:06', [
             'input' => 'string',
             'with_seconds' => false,
+            'widget' => 'choice',
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
@@ -2151,6 +2158,7 @@ abstract class AbstractLayoutTestCase extends FormIntegrationTestCase
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TimeType', '04:05:06', [
             'input' => 'string',
             'with_seconds' => true,
+            'widget' => 'choice',
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
@@ -2230,6 +2238,7 @@ abstract class AbstractLayoutTestCase extends FormIntegrationTestCase
             'input' => 'string',
             'placeholder' => 'Change&Me',
             'required' => false,
+            'widget' => 'choice',
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
@@ -2255,6 +2264,7 @@ abstract class AbstractLayoutTestCase extends FormIntegrationTestCase
             'input' => 'string',
             'required' => false,
             'placeholder' => ['hour' => 'Change&Me'],
+            'widget' => 'choice',
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
@@ -2277,7 +2287,7 @@ abstract class AbstractLayoutTestCase extends FormIntegrationTestCase
     public function testTimeErrorBubbling()
     {
         $form = $this->factory->createNamedBuilder('form', 'Symfony\Component\Form\Extension\Core\Type\FormType')
-            ->add('time', 'Symfony\Component\Form\Extension\Core\Type\TimeType')
+            ->add('time', 'Symfony\Component\Form\Extension\Core\Type\TimeType', ['widget' => 'choice'])
             ->getForm();
         $form->get('time')->addError(new FormError('[trans]Error![/trans]'));
         $view = $form->createView();

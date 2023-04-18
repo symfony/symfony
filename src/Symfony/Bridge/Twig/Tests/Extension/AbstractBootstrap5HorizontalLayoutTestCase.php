@@ -86,7 +86,7 @@ abstract class AbstractBootstrap5HorizontalLayoutTestCase extends AbstractBootst
 
     public function testLabelOnForm()
     {
-        $form = $this->factory->createNamed('name', DateType::class);
+        $form = $this->factory->createNamed('name', DateType::class, null, ['widget' => 'choice']);
         $view = $form->createView();
         $this->renderWidget($view, ['label' => 'foo']);
         $html = $this->renderLabel($view);

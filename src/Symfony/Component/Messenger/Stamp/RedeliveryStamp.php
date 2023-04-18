@@ -25,31 +25,19 @@ final class RedeliveryStamp implements StampInterface
     private $flattenException;
 
     /**
-     * @param \DateTimeInterface|null $exceptionMessage
+     * @param \DateTimeInterface|null $redeliveredAt
      */
-    public function __construct(int $retryCount, $exceptionMessage = null, FlattenException $flattenException = null, \DateTimeInterface $redeliveredAt = null)
+    public function __construct(int $retryCount, $redeliveredAt = null)
     {
+        if (2 < \func_num_args() || null !== $redeliveredAt && !$redeliveredAt instanceof \DateTimeInterface) {
+            trigger_deprecation('symfony/messenger', '5.2', sprintf('Using parameters "$exceptionMessage" or "$flattenException" of class "%s" is deprecated, use "%s" instead and/or pass "$redeliveredAt" as parameter #2.', self::class, ErrorDetailsStamp::class));
+            $this->exceptionMessage = $redeliveredAt instanceof \DateTimeInterface ? null : $redeliveredAt;
+            $redeliveredAt = 4 <= \func_num_args() ? func_get_arg(3) : ($redeliveredAt instanceof \DateTimeInterface ? $redeliveredAt : null);
+            $this->flattenException = 3 <= \func_num_args() ? func_get_arg(2) : null;
+        }
+
         $this->retryCount = $retryCount;
         $this->redeliveredAt = $redeliveredAt ?? new \DateTimeImmutable();
-        if (null !== $redeliveredAt) {
-            trigger_deprecation('symfony/messenger', '5.2', sprintf('Using the "$redeliveredAt" as 4th argument of the "%s::__construct()" is deprecated, pass "$redeliveredAt" as second argument instead.', self::class));
-        }
-
-        if ($exceptionMessage instanceof \DateTimeInterface) {
-            // In Symfony 6.0, the second argument will be $redeliveredAt
-            $this->redeliveredAt = $exceptionMessage;
-            if (null !== $redeliveredAt) {
-                throw new \LogicException('It is deprecated to specify a redeliveredAt as 4th argument. The correct way is to specify redeliveredAt as the second argument. Using both is not allowed.');
-            }
-        } elseif (null !== $exceptionMessage) {
-            trigger_deprecation('symfony/messenger', '5.2', sprintf('Using the "$exceptionMessage" parameter in the "%s" class is deprecated, use the "%s" class instead.', self::class, ErrorDetailsStamp::class));
-            $this->exceptionMessage = $exceptionMessage;
-        }
-
-        if (null !== $flattenException) {
-            trigger_deprecation('symfony/messenger', '5.2', sprintf('Using the "$flattenException" parameter in the "%s" class is deprecated, use the "%s" class instead.', self::class, ErrorDetailsStamp::class));
-        }
-        $this->flattenException = $flattenException;
     }
 
     public static function getRetryCountFromEnvelope(Envelope $envelope): int

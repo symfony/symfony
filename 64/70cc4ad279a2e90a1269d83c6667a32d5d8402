@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by enumag at 2023-04-18T09:51:27Z
+
+I'm honestly not quite sure how to fix the psalm issues. One of the class names is always undefined no matter which PHPUnit version is used. :thinking:

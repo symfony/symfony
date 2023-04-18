@@ -132,7 +132,7 @@ abstract class AbstractBrowser
     public function setServerParameters(array $server)
     {
         $this->server = array_merge([
-            'HTTP_USER_AGENT' => 'Symfony BrowserKit',
+            'HTTP_USER_AGENT' => 'SymfonyBrowserKit',
         ], $server);
     }
 

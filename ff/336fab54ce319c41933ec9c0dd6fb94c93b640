@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2023-04-18T15:19:10Z
+
+My review at https://github.com/symfony/symfony/pull/49970#pullrequestreview-1390340803 applies to this PR then.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-04-18T15:26:50Z
+
+CI updated to run the intl tests with compressed data.

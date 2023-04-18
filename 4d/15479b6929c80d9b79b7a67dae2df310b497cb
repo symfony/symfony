@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by isdn at 2023-02-13T13:26:22Z
+
+Regarding https://github.com/symfony/symfony/pull/32573, please see my bugreport https://github.com/symfony/symfony/issues/49320.
+I am not sure if this solution is absolutely correct, but it fixes that issue.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-02-13T13:32:04Z
+
+Note that PR titles (derived from commits) are used to generate the changelog. Can you improve it please? (and remove the reference to the ticket from there?)

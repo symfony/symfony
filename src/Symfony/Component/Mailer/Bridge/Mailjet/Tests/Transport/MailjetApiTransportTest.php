@@ -102,15 +102,21 @@ class MailjetApiTransportTest extends TestCase
     {
         $json = json_encode([
             'Messages' => [
-                'foo' => 'bar',
+                [
+                    'Status' => 'success',
+                    'To' => [
+                        [
+                            'Email' => 'passenger1@mailjet.com',
+                            'MessageUUID' => '7c5f9f29-42ba-4959-b19c-dcd8b2f327ca',
+                            'MessageID' => '576460756513665525',
+                            'MessageHref' => 'https://api.mailjet.com/v3/message/576460756513665525',
+                        ],
+                    ],
+                ],
             ],
         ]);
 
-        $responseHeaders = [
-            'x-mj-request-guid' => ['baz'],
-        ];
-
-        $response = new MockResponse($json, ['response_headers' => $responseHeaders]);
+        $response = new MockResponse($json);
 
         $client = new MockHttpClient($response);
 
@@ -124,7 +130,7 @@ class MailjetApiTransportTest extends TestCase
 
         $sentMessage = $transport->send($email);
         $this->assertInstanceOf(SentMessage::class, $sentMessage);
-        $this->assertSame('baz', $sentMessage->getMessageId());
+        $this->assertSame('576460756513665525', $sentMessage->getMessageId());
     }
 
     public function testSendWithDecodingException()

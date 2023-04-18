@@ -48,12 +48,8 @@ class CallbackChoiceLoaderTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        self::$loader = new CallbackChoiceLoader(function () {
-            return self::$choices;
-        });
-        self::$value = function ($choice) {
-            return $choice->value ?? null;
-        };
+        self::$loader = new CallbackChoiceLoader(fn () => self::$choices);
+        self::$value = fn ($choice) => $choice->value ?? null;
         self::$choices = [
             (object) ['value' => 'choice_one'],
             (object) ['value' => 'choice_two'],
@@ -88,6 +84,18 @@ class CallbackChoiceLoaderTest extends TestCase
             self::$lazyChoiceList->getChoicesForValues(self::$choiceValues),
             'Choice list should not be reloaded.'
         );
+    }
+
+    public function testLoadValuesForChoicesCastsCallbackItemsToString()
+    {
+        $choices = [
+           (object) ['id' => 2],
+           (object) ['id' => 3],
+        ];
+
+        $value = fn ($item) => $item->id;
+
+        $this->assertSame(['2', '3'], self::$loader->loadValuesForChoices($choices, $value));
     }
 
     public function testLoadValuesForChoicesLoadsChoiceListOnFirstCall()

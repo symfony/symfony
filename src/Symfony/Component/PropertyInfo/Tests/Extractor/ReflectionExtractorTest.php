@@ -604,6 +604,15 @@ class ReflectionExtractorTest extends TestCase
         ];
     }
 
+    public function testGetWriteInfoReadonlyProperties()
+    {
+        $writeMutatorConstructor = $this->extractor->getWriteInfo(Php81Dummy::class, 'foo', ['enable_constructor_extraction' => true]);
+        $writeMutatorWithoutConstructor = $this->extractor->getWriteInfo(Php81Dummy::class, 'foo', ['enable_constructor_extraction' => false]);
+
+        $this->assertSame(PropertyWriteInfo::TYPE_CONSTRUCTOR, $writeMutatorConstructor->getType());
+        $this->assertSame(PropertyWriteInfo::TYPE_NONE, $writeMutatorWithoutConstructor->getType());
+    }
+
     /**
      * @dataProvider extractConstructorTypesProvider
      */

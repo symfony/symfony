@@ -342,13 +342,19 @@ class BinaryFileResponse extends Response
             $length = $this->maxlen;
             while ($length && !feof($file)) {
                 $read = $length > $this->chunkSize || 0 > $length ? $this->chunkSize : $length;
-                $read = stream_copy_to_stream($file, $out, $read);
 
-                if (false === $read || connection_aborted()) {
+                if (false === $data = fread($file, $read)) {
                     break;
                 }
-                if (0 < $length) {
-                    $length -= $read;
+                while ('' !== $data) {
+                    $read = fwrite($out, $data);
+                    if (false === $read || connection_aborted()) {
+                        break;
+                    }
+                    if (0 < $length) {
+                        $length -= $read;
+                    }
+                    $data = substr($data, $read);
                 }
             }
 

@@ -42,7 +42,7 @@ class HttpBrowserTest extends AbstractBrowserTest
 
     public static function validContentTypes()
     {
-        $defaultHeaders = ['user-agent' => 'Symfony BrowserKit', 'host' => 'example.com'];
+        $defaultHeaders = ['user-agent' => 'SymfonyBrowserKit', 'host' => 'example.com'];
         yield 'GET/HEAD' => [
             ['GET', 'http://example.com/', ['key' => 'value']],
             ['GET', 'http://example.com/', ['headers' => $defaultHeaders, 'body' => '', 'max_redirects' => 0]],

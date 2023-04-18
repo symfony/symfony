@@ -508,7 +508,7 @@ class AbstractBrowserTest extends TestCase
     {
         $headers = [
             'HTTP_HOST' => 'www.example.com',
-            'HTTP_USER_AGENT' => 'Symfony BrowserKit',
+            'HTTP_USER_AGENT' => 'SymfonyBrowserKit',
             'CONTENT_TYPE' => 'application/vnd.custom+xml',
             'HTTPS' => false,
         ];
@@ -535,7 +535,7 @@ class AbstractBrowserTest extends TestCase
     {
         $headers = [
             'HTTP_HOST' => 'www.example.com:8080',
-            'HTTP_USER_AGENT' => 'Symfony BrowserKit',
+            'HTTP_USER_AGENT' => 'SymfonyBrowserKit',
             'HTTPS' => false,
             'HTTP_REFERER' => 'http://www.example.com:8080/',
         ];
@@ -755,7 +755,7 @@ class AbstractBrowserTest extends TestCase
     {
         $client = $this->getBrowser();
         $this->assertSame('', $client->getServerParameter('HTTP_HOST'));
-        $this->assertSame('Symfony BrowserKit', $client->getServerParameter('HTTP_USER_AGENT'));
+        $this->assertSame('SymfonyBrowserKit', $client->getServerParameter('HTTP_USER_AGENT'));
         $this->assertSame('testvalue', $client->getServerParameter('testkey', 'testvalue'));
     }
 
@@ -764,7 +764,7 @@ class AbstractBrowserTest extends TestCase
         $client = $this->getBrowser();
 
         $this->assertSame('', $client->getServerParameter('HTTP_HOST'));
-        $this->assertSame('Symfony BrowserKit', $client->getServerParameter('HTTP_USER_AGENT'));
+        $this->assertSame('SymfonyBrowserKit', $client->getServerParameter('HTTP_USER_AGENT'));
 
         $client->setServerParameter('HTTP_HOST', 'testhost');
         $this->assertSame('testhost', $client->getServerParameter('HTTP_HOST'));
@@ -778,7 +778,7 @@ class AbstractBrowserTest extends TestCase
         $client = $this->getBrowser();
 
         $this->assertSame('', $client->getServerParameter('HTTP_HOST'));
-        $this->assertSame('Symfony BrowserKit', $client->getServerParameter('HTTP_USER_AGENT'));
+        $this->assertSame('SymfonyBrowserKit', $client->getServerParameter('HTTP_USER_AGENT'));
 
         $client->request('GET', 'https://www.example.com/https/www.example.com', [], [], [
             'HTTP_HOST' => 'testhost',
@@ -788,7 +788,7 @@ class AbstractBrowserTest extends TestCase
         ]);
 
         $this->assertSame('', $client->getServerParameter('HTTP_HOST'));
-        $this->assertSame('Symfony BrowserKit', $client->getServerParameter('HTTP_USER_AGENT'));
+        $this->assertSame('SymfonyBrowserKit', $client->getServerParameter('HTTP_USER_AGENT'));
 
         $this->assertSame('https://www.example.com/https/www.example.com', $client->getRequest()->getUri());
 

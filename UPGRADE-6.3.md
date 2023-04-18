@@ -1,6 +1,12 @@
 UPGRADE FROM 6.2 to 6.3
 =======================
 
+BrowserKit
+----------
+
+ * The default user agent has been renamed from `Symfony BrowserKit` to `SymfonyBrowserKit`
+   to comply with the RFC 9110 specification
+
 Console
 -------
 
@@ -59,6 +65,13 @@ FrameworkBundle
 
  * Deprecate the `notifier.logger_notification_listener` service, use the `notifier.notification_logger_listener` service instead
  * Deprecate the `Http\Client\HttpClient` service, use `Psr\Http\Client\ClientInterface` instead
+
+HttpClient
+----------
+
+ * The default user agents have been renamed from `Symfony HttpClient/Amp`, `Symfony HttpClient/Curl`
+   and `Symfony HttpClient/Native` to `SymfonyHttpClient (Amp)`, `SymfonyHttpClient (Curl)`
+   and `SymfonyHttpClient (Native)` respectively to comply with the RFC 9110 specification
 
 HttpFoundation
 --------------

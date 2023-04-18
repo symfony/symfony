@@ -243,24 +243,31 @@ class DateTimeNormalizerTest extends TestCase
         $this->normalizer->denormalize('invalid date', \DateTimeInterface::class);
     }
 
+    public function testDenormalizeWrongTypeThrowsException()
+    {
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('The data is either not an string, an empty string, or null; you should pass a string that can be parsed with the passed format or a valid DateTime string.');
+        $this->normalizer->denormalize(['date' => '2023-03-03 00:00:00.000000', 'timezone_type' => 1, 'timezone' => '+01:00'], \DateTimeInterface::class);
+    }
+
     public function testDenormalizeNullThrowsException()
     {
         $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage('The data is either an empty string or null, you should pass a string that can be parsed with the passed format or a valid DateTime string.');
+        $this->expectExceptionMessage('The data is either not an string, an empty string, or null; you should pass a string that can be parsed with the passed format or a valid DateTime string.');
         $this->normalizer->denormalize(null, \DateTimeInterface::class);
     }
 
     public function testDenormalizeEmptyStringThrowsException()
     {
         $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage('The data is either an empty string or null, you should pass a string that can be parsed with the passed format or a valid DateTime string.');
+        $this->expectExceptionMessage('The data is either not an string, an empty string, or null; you should pass a string that can be parsed with the passed format or a valid DateTime string.');
         $this->normalizer->denormalize('', \DateTimeInterface::class);
     }
 
     public function testDenormalizeStringWithSpacesOnlyThrowsAnException()
     {
         $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage('The data is either an empty string or null, you should pass a string that can be parsed with the passed format or a valid DateTime string.');
+        $this->expectExceptionMessage('The data is either not an string, an empty string, or null; you should pass a string that can be parsed with the passed format or a valid DateTime string.');
         $this->normalizer->denormalize('  ', \DateTimeInterface::class);
     }
 

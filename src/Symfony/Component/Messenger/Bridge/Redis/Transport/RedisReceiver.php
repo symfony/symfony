@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Bridge\Redis\Transport;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
@@ -40,6 +41,18 @@ class RedisReceiver implements ReceiverInterface, MessageCountAwareInterface
 
         if (null === $message) {
             return [];
+        }
+
+        if (null === $message['data']) {
+            try {
+                $this->connection->reject($message['id']);
+            } catch (TransportException $e) {
+                if ($e->getPrevious()) {
+                    throw $e;
+                }
+            }
+
+            return $this->get();
         }
 
         $redisEnvelope = json_decode($message['data']['message'] ?? '', true);

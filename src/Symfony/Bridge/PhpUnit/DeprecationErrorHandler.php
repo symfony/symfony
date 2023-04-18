@@ -12,8 +12,9 @@
 namespace Symfony\Bridge\PhpUnit;
 
 use PHPUnit\Framework\TestResult;
+use PHPUnit\Runner\ErrorHandler;
 use PHPUnit\Util\Error\Handler;
-use PHPUnit\Util\ErrorHandler;
+use PHPUnit\Util\ErrorHandler as UtilErrorHandler;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\Configuration;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\Deprecation;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\DeprecationGroup;
@@ -75,7 +76,12 @@ class DeprecationErrorHandler
         if (null !== $oldErrorHandler) {
             restore_error_handler();
 
-            if ($oldErrorHandler instanceof ErrorHandler || [ErrorHandler::class, 'handleError'] === $oldErrorHandler) {
+            if (
+                $oldErrorHandler instanceof UtilErrorHandler
+                || [UtilErrorHandler::class, 'handleError'] === $oldErrorHandler
+                || $oldErrorHandler instanceof ErrorHandler
+                || [ErrorHandler::class, 'handleError'] === $oldErrorHandler
+            ) {
                 restore_error_handler();
                 self::register($mode);
             }
@@ -359,6 +365,8 @@ class DeprecationErrorHandler
         if (!$eh = self::$errorHandler) {
             if (class_exists(Handler::class)) {
                 $eh = self::$errorHandler = Handler::class;
+            } elseif (method_exists(UtilErrorHandler::class, '__invoke')) {
+                $eh = self::$errorHandler = UtilErrorHandler::class;
             } elseif (method_exists(ErrorHandler::class, '__invoke')) {
                 $eh = self::$errorHandler = ErrorHandler::class;
             } else {

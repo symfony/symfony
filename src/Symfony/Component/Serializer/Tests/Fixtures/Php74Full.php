@@ -28,6 +28,7 @@ final class Php74Full
     /** @var Php74Full[] */
     public array $collection;
     public Php74FullWithConstructor $php74FullWithConstructor;
+    public Php74FullWithTypedConstructor $php74FullWithTypedConstructor;
     public DummyMessageInterface $dummyMessage;
     /** @var TestFoo[] $nestedArray */
     public TestFoo $nestedObject;
@@ -38,6 +39,13 @@ final class Php74Full
 final class Php74FullWithConstructor
 {
     public function __construct($constructorArgument)
+    {
+    }
+}
+
+final class Php74FullWithTypedConstructor
+{
+    public function __construct(float $something)
     {
     }
 }

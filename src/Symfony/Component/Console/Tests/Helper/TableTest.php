@@ -316,7 +316,7 @@ TABLE
                     ],
                     new TableSeparator(),
                     [
-                        new TableCell('Cupiditate dicta atque porro, tempora exercitationem modi animi nulla nemo vel nihil!', ['colspan' => 3]),
+                        new TableCell('Cupìdĭtâte díctá âtquè pôrrò, tèmpórà exercitátìónèm mòdí ânìmí núllà nèmò vèl níhìl!', ['colspan' => 3]),
                     ],
                 ],
                 'default',
@@ -333,7 +333,7 @@ TABLE
 | 9971-5-0210-0                 | A Tale of                                                   |
 |                               | Two Cities                                                  |
 +-------------------------------+-------------------------------+-----------------------------+
-| Cupiditate dicta atque porro, tempora exercitationem modi animi nulla nemo vel nihil!       |
+| Cupìdĭtâte díctá âtquè pôrrò, tèmpórà exercitátìónèm mòdí ânìmí núllà nèmò vèl níhìl!       |
 +-------------------------------+-------------------------------+-----------------------------+
 
 TABLE

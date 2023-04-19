@@ -33,9 +33,9 @@ class Context
      * @throws InvalidArgumentException
      */
     public function __construct(
-        private array $context = [],
-        private array $normalizationContext = [],
-        private array $denormalizationContext = [],
+        private readonly array $context = [],
+        private readonly array $normalizationContext = [],
+        private readonly array $denormalizationContext = [],
         string|array $groups = [],
     ) {
         if (!$context && !$normalizationContext && !$denormalizationContext) {

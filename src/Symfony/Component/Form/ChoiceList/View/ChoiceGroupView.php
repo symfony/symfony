@@ -26,7 +26,7 @@ class ChoiceGroupView implements \IteratorAggregate
     /**
      * Creates a new choice group view.
      *
-     * @param array<array-key, ChoiceGroupView|ChoiceView> $choices the choice views in the group
+     * @param array<ChoiceGroupView|ChoiceView> $choices the choice views in the group
      */
     public function __construct(string $label, array $choices = [])
     {

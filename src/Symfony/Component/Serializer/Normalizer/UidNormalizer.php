@@ -32,7 +32,7 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface,
         self::NORMALIZATION_FORMAT_RFC4122,
     ];
 
-    private $defaultContext = [
+    private array $defaultContext = [
         self::NORMALIZATION_FORMAT_KEY => self::NORMALIZATION_FORMAT_CANONICAL,
     ];
 

@@ -21,7 +21,7 @@ class ClassMetadata implements ClassMetadataInterface
      *           class' serialized representation. Do not access it. Use
      *           {@link getName()} instead.
      */
-    public $name;
+    public string $name;
 
     /**
      * @var AttributeMetadataInterface[]
@@ -30,21 +30,16 @@ class ClassMetadata implements ClassMetadataInterface
      *           class' serialized representation. Do not access it. Use
      *           {@link getAttributesMetadata()} instead.
      */
-    public $attributesMetadata = [];
+    public array $attributesMetadata = [];
+
+    private ?\ReflectionClass $reflClass = null;
 
     /**
-     * @var \ReflectionClass
-     */
-    private $reflClass;
-
-    /**
-     * @var ClassDiscriminatorMapping|null
-     *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
      *           {@link getClassDiscriminatorMapping()} instead.
      */
-    public $classDiscriminatorMapping;
+    public ?ClassDiscriminatorMapping $classDiscriminatorMapping;
 
     /**
      * Constructs a metadata for the given class.

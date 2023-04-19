@@ -18,15 +18,11 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
  */
 class ClassDiscriminatorFromClassMetadata implements ClassDiscriminatorResolverInterface
 {
-    /**
-     * @var ClassMetadataFactoryInterface
-     */
-    private $classMetadataFactory;
-    private $mappingForMappedObjectCache = [];
+    private array $mappingForMappedObjectCache = [];
 
-    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory)
-    {
-        $this->classMetadataFactory = $classMetadataFactory;
+    public function __construct(
+        private readonly ClassMetadataFactoryInterface $classMetadataFactory,
+    ) {
     }
 
     public function getMappingForClass(string $class): ?ClassDiscriminatorMapping

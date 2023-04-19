@@ -34,7 +34,7 @@ class JsonDecode implements DecoderInterface
      */
     public const RECURSION_DEPTH = 'json_decode_recursion_depth';
 
-    private $defaultContext = [
+    private array $defaultContext = [
         self::ASSOCIATIVE => false,
         self::OPTIONS => 0,
         self::RECURSION_DEPTH => 512,

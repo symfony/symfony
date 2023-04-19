@@ -26,7 +26,7 @@ final class UnwrappingDenormalizer implements DenormalizerInterface, SerializerA
 
     public const UNWRAP_PATH = 'unwrap_path';
 
-    private $propertyAccessor;
+    private readonly PropertyAccessorInterface $propertyAccessor;
 
     public function __construct(PropertyAccessorInterface $propertyAccessor = null)
     {

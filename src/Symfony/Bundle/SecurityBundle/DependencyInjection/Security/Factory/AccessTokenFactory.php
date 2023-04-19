@@ -30,7 +30,7 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
     private const PRIORITY = -40;
 
     /**
-     * @param array<array-key, TokenHandlerFactoryInterface> $tokenHandlerFactories
+     * @param array<TokenHandlerFactoryInterface> $tokenHandlerFactories
      */
     public function __construct(private readonly array $tokenHandlerFactories)
     {

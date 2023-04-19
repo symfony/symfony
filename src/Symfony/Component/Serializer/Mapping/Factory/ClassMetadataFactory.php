@@ -24,16 +24,14 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
 {
     use ClassResolverTrait;
 
-    private $loader;
-
     /**
-     * @var array
+     * @var array<string, ClassMetadataInterface>
      */
-    private $loadedClasses;
+    private array $loadedClasses;
 
-    public function __construct(LoaderInterface $loader)
-    {
-        $this->loader = $loader;
+    public function __construct(
+        private readonly LoaderInterface $loader,
+    ) {
     }
 
     public function getMetadataFor(string|object $value): ClassMetadataInterface

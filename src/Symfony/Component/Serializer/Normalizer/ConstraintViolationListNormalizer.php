@@ -32,13 +32,10 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
     public const TYPE = 'type';
     public const PAYLOAD_FIELDS = 'payload_fields';
 
-    private $defaultContext;
-    private $nameConverter;
-
-    public function __construct(array $defaultContext = [], NameConverterInterface $nameConverter = null)
-    {
-        $this->defaultContext = $defaultContext;
-        $this->nameConverter = $nameConverter;
+    public function __construct(
+        private readonly array $defaultContext = [],
+        private readonly ?NameConverterInterface $nameConverter = null,
+    ) {
     }
 
     public function getSupportedTypes(?string $format): array

@@ -20,23 +20,25 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
  */
 final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
 {
-    private $metadataFactory;
+    /**
+     * @var array<string, array<string, string|null>>
+     */
+    private static array $normalizeCache = [];
 
     /**
-     * @var NameConverterInterface|AdvancedNameConverterInterface|null
+     * @var array<string, array<string, string|null>>
      */
-    private $fallbackNameConverter;
+    private static array $denormalizeCache = [];
 
-    private static $normalizeCache = [];
+    /**
+     * @var array<string, array<string, string>>
+     */
+    private static array $attributesMetadataCache = [];
 
-    private static $denormalizeCache = [];
-
-    private static $attributesMetadataCache = [];
-
-    public function __construct(ClassMetadataFactoryInterface $metadataFactory, NameConverterInterface $fallbackNameConverter = null)
-    {
-        $this->metadataFactory = $metadataFactory;
-        $this->fallbackNameConverter = $fallbackNameConverter;
+    public function __construct(
+        private readonly ClassMetadataFactoryInterface $metadataFactory,
+        private readonly ?NameConverterInterface $fallbackNameConverter = null,
+    ) {
     }
 
     public function normalize(string $propertyName, string $class = null, string $format = null, array $context = []): string
@@ -104,6 +106,9 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
         return $this->fallbackNameConverter ? $this->fallbackNameConverter->denormalize($propertyName, $class, $format, $context) : $propertyName;
     }
 
+    /**
+     * @return array<string, string>
+     */
     private function getCacheValueForAttributesMetadata(string $class, array $context): array
     {
         if (!$this->metadataFactory->hasMetadataFor($class)) {

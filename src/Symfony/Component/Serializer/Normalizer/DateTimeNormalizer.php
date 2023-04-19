@@ -28,7 +28,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
     public const FORMAT_KEY = 'datetime_format';
     public const TIMEZONE_KEY = 'datetime_timezone';
 
-    private $defaultContext = [
+    private array $defaultContext = [
         self::FORMAT_KEY => \DateTime::RFC3339,
         self::TIMEZONE_KEY => null,
     ];

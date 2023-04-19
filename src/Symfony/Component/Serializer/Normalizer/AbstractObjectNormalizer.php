@@ -105,19 +105,23 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     public const PRESERVE_EMPTY_OBJECTS = 'preserve_empty_objects';
 
-    private $propertyTypeExtractor;
-    private $typesCache = [];
-    private $attributesCache = [];
-
-    private $objectClassResolver;
+    private array $typesCache = [];
+    private array $attributesCache = [];
+    private readonly \Closure $objectClassResolver;
 
     /**
      * @var ClassDiscriminatorResolverInterface|null
      */
     protected $classDiscriminatorResolver;
 
-    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = [])
-    {
+    public function __construct(
+        ClassMetadataFactoryInterface $classMetadataFactory = null,
+        NameConverterInterface $nameConverter = null,
+        private ?PropertyTypeExtractorInterface $propertyTypeExtractor = null,
+        ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null,
+        callable $objectClassResolver = null,
+        array $defaultContext = [],
+    ) {
         parent::__construct($classMetadataFactory, $nameConverter, $defaultContext);
 
         if (isset($this->defaultContext[self::MAX_DEPTH_HANDLER]) && !\is_callable($this->defaultContext[self::MAX_DEPTH_HANDLER])) {
@@ -126,13 +130,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
         $this->defaultContext[self::EXCLUDE_FROM_CACHE_KEY] = array_merge($this->defaultContext[self::EXCLUDE_FROM_CACHE_KEY] ?? [], [self::CIRCULAR_REFERENCE_LIMIT_COUNTERS]);
 
-        $this->propertyTypeExtractor = $propertyTypeExtractor;
-
         if (null === $classDiscriminatorResolver && null !== $classMetadataFactory) {
             $classDiscriminatorResolver = new ClassDiscriminatorFromClassMetadata($classMetadataFactory);
         }
         $this->classDiscriminatorResolver = $classDiscriminatorResolver;
-        $this->objectClassResolver = $objectClassResolver;
+        $this->objectClassResolver = ($objectClassResolver ?? 'get_class')(...);
     }
 
     /**
@@ -158,7 +160,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $data = [];
         $stack = [];
         $attributes = $this->getAttributes($object, $format, $context);
-        $class = $this->objectClassResolver ? ($this->objectClassResolver)($object) : $object::class;
+        $class = ($this->objectClassResolver)($object);
         $classMetadata = $this->classMetadataFactory?->getMetadataFor($class);
         $attributesMetadata = $this->classMetadataFactory?->getMetadataFor($class)->getAttributesMetadata();
         if (isset($context[self::MAX_DEPTH_HANDLER])) {
@@ -251,7 +253,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     protected function getAttributes(object $object, ?string $format, array $context): array
     {
-        $class = $this->objectClassResolver ? ($this->objectClassResolver)($object) : $object::class;
+        $class = ($this->objectClassResolver)($object);
         $key = $class.'-'.$context['cache_key'];
 
         if (isset($this->attributesCache[$key])) {
@@ -321,7 +323,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
         $reflectionClass = new \ReflectionClass($type);
         $object = $this->instantiateObject($normalizedData, $type, $context, $reflectionClass, $allowedAttributes, $format);
-        $resolvedClass = $this->objectClassResolver ? ($this->objectClassResolver)($object) : $object::class;
+        $resolvedClass = ($this->objectClassResolver)($object);
 
         $nestedAttributes = $this->getNestedAttributes($resolvedClass);
         $nestedData = [];

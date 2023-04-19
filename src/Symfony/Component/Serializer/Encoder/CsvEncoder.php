@@ -38,7 +38,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
 
     private const FORMULAS_START_CHARACTERS = ['=', '-', '+', '@', "\t", "\r"];
 
-    private $defaultContext = [
+    private array $defaultContext = [
         self::DELIMITER_KEY => ',',
         self::ENCLOSURE_KEY => '"',
         self::ESCAPE_CHAR_KEY => '',

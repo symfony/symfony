@@ -43,11 +43,9 @@ class AnnotationLoader implements LoaderInterface
         Context::class,
     ];
 
-    private $reader;
-
-    public function __construct(Reader $reader = null)
-    {
-        $this->reader = $reader;
+    public function __construct(
+        private readonly ?Reader $reader = null,
+    ) {
     }
 
     public function loadClassMetadata(ClassMetadataInterface $classMetadata): bool

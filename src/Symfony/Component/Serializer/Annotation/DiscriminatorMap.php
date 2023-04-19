@@ -26,8 +26,8 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 class DiscriminatorMap
 {
     public function __construct(
-        private string $typeProperty,
-        private array $mapping,
+        private readonly string $typeProperty,
+        private readonly array $mapping,
     ) {
         if (empty($typeProperty)) {
             throw new InvalidArgumentException(sprintf('Parameter "typeProperty" of annotation "%s" cannot be empty.', static::class));

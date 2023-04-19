@@ -16,17 +16,18 @@ namespace Symfony\Component\Serializer\Exception;
  */
 class NotNormalizableValueException extends UnexpectedValueException
 {
-    private $currentType;
-    private $expectedTypes;
-    private $path;
-    private $useMessageForUser = false;
+    private ?string $currentType = null;
+    private ?array $expectedTypes = null;
+    private ?string $path = null;
+    private bool $useMessageForUser = false;
 
     /**
-     * @param bool $useMessageForUser If the message passed to this exception is something that can be shown
-     *                                safely to your user. In other words, avoid catching other exceptions and
-     *                                passing their message directly to this class.
+     * @param string[] $expectedTypes
+     * @param bool     $useMessageForUser If the message passed to this exception is something that can be shown
+     *                                    safely to your user. In other words, avoid catching other exceptions and
+     *                                    passing their message directly to this class.
      */
-    public static function createForUnexpectedDataType(string $message, $data, array $expectedTypes, string $path = null, bool $useMessageForUser = false, int $code = 0, \Throwable $previous = null): self
+    public static function createForUnexpectedDataType(string $message, mixed $data, array $expectedTypes, string $path = null, bool $useMessageForUser = false, int $code = 0, \Throwable $previous = null): self
     {
         $self = new self($message, $code, $previous);
 

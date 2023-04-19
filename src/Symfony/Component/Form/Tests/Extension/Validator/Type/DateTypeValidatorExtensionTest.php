@@ -20,7 +20,7 @@ class DateTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
 
     protected function createForm(array $options = [])
     {
-        return $this->factory->create(DateType::class, null, $options);
+        return $this->factory->create(DateType::class, null, $options + ['widget' => 'choice']);
     }
 
     public function testInvalidMessage()

@@ -148,16 +148,11 @@ class DateTimeType extends AbstractType
                 $timeOptions['label'] = false;
             }
 
-            if (null !== $options['date_widget']) {
-                $dateOptions['widget'] = $options['date_widget'];
-            }
+            $dateOptions['widget'] = $options['date_widget'] ?? $options['widget'] ?? 'choice';
+            $timeOptions['widget'] = $options['time_widget'] ?? $options['widget'] ?? 'choice';
 
             if (null !== $options['date_label']) {
                 $dateOptions['label'] = $options['date_label'];
-            }
-
-            if (null !== $options['time_widget']) {
-                $timeOptions['widget'] = $options['time_widget'];
             }
 
             if (null !== $options['time_label']) {
@@ -236,12 +231,6 @@ class DateTimeType extends AbstractType
     {
         $compound = static fn (Options $options) => 'single_text' !== $options['widget'];
 
-        // Defaults to the value of "widget"
-        $dateWidget = static fn (Options $options) => 'single_text' === $options['widget'] ? null : $options['widget'];
-
-        // Defaults to the value of "widget"
-        $timeWidget = static fn (Options $options) => 'single_text' === $options['widget'] ? null : $options['widget'];
-
         $resolver->setDefaults([
             'input' => 'datetime',
             'model_timezone' => null,
@@ -249,8 +238,8 @@ class DateTimeType extends AbstractType
             'format' => self::HTML5_FORMAT,
             'date_format' => null,
             'widget' => null,
-            'date_widget' => $dateWidget,
-            'time_widget' => $timeWidget,
+            'date_widget' => null,
+            'time_widget' => null,
             'with_minutes' => true,
             'with_seconds' => false,
             'html5' => true,
@@ -320,19 +309,20 @@ class DateTimeType extends AbstractType
 
             return $dateFormat;
         });
-        $resolver->setNormalizer('date_widget', static function (Options $options, $dateWidget) {
-            if (null !== $dateWidget && 'single_text' === $options['widget']) {
-                throw new LogicException(sprintf('Cannot use the "date_widget" option of the "%s" when the "widget" option is set to "single_text".', self::class));
+        $resolver->setNormalizer('widget', static function (Options $options, $widget) {
+            if ('single_text' === $widget) {
+                if (null !== $options['date_widget']) {
+                    throw new LogicException(sprintf('Cannot use the "date_widget" option of the "%s" when the "widget" option is set to "single_text".', self::class));
+                }
+                if (null !== $options['time_widget']) {
+                    throw new LogicException(sprintf('Cannot use the "time_widget" option of the "%s" when the "widget" option is set to "single_text".', self::class));
+                }
+            } elseif (null === $widget && null === $options['date_widget'] && null === $options['time_widget']) {
+                trigger_deprecation('symfony/form', '6.3', 'Not configuring the "widget" option of form type "datetime" is deprecated. It will default to "single_text" in Symfony 7.0.');
+                // return 'single_text';
             }
 
-            return $dateWidget;
-        });
-        $resolver->setNormalizer('time_widget', static function (Options $options, $timeWidget) {
-            if (null !== $timeWidget && 'single_text' === $options['widget']) {
-                throw new LogicException(sprintf('Cannot use the "time_widget" option of the "%s" when the "widget" option is set to "single_text".', self::class));
-            }
-
-            return $timeWidget;
+            return $widget;
         });
         $resolver->setNormalizer('html5', static function (Options $options, $html5) {
             if ($html5 && self::HTML5_FORMAT !== $options['format']) {

@@ -57,7 +57,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
 
     public function testLabelOnForm()
     {
-        $form = $this->factory->createNamed('name', DateType::class);
+        $form = $this->factory->createNamed('name', DateType::class, null, ['widget' => 'choice']);
         $view = $form->createView();
         $this->renderWidget($view, ['label' => 'foo']);
         $html = $this->renderLabel($view);

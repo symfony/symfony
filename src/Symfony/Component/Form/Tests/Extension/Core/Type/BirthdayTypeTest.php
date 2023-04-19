@@ -25,6 +25,7 @@ class BirthdayTypeTest extends DateTypeTest
         $this->expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'years' => 'bad value',
+            'widget' => 'choice',
         ]);
     }
 }

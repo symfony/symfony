@@ -19,7 +19,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
 {
     public function testLabelOnForm()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateType');
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateType', null, ['widget' => 'choice']);
         $view = $form->createView();
         $this->renderWidget($view, ['label' => 'foo']);
         $html = $this->renderLabel($view);
@@ -1561,6 +1561,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateTimeType', date('Y').'-02-03 04:05:06', [
             'input' => 'string',
             'with_seconds' => false,
+            'widget' => 'choice',
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
@@ -1598,6 +1599,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             'input' => 'string',
             'placeholder' => 'Change&Me',
             'required' => false,
+            'widget' => 'choice',
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
@@ -1637,6 +1639,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateTimeType', $data, [
             'input' => 'array',
             'required' => false,
+            'widget' => 'choice',
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
@@ -1674,6 +1677,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateTimeType', date('Y').'-02-03 04:05:06', [
             'input' => 'string',
             'with_seconds' => true,
+            'widget' => 'choice',
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
@@ -1907,6 +1911,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\BirthdayType', '2000-02-03', [
             'input' => 'string',
+            'widget' => 'choice',
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
@@ -1937,6 +1942,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             'input' => 'string',
             'placeholder' => '',
             'required' => false,
+            'widget' => 'choice',
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
@@ -2465,6 +2471,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TimeType', '04:05:06', [
             'input' => 'string',
             'with_seconds' => false,
+            'widget' => 'choice',
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
@@ -2492,6 +2499,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TimeType', '04:05:06', [
             'input' => 'string',
             'with_seconds' => true,
+            'widget' => 'choice',
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
@@ -2579,6 +2587,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             'input' => 'string',
             'placeholder' => 'Change&Me',
             'required' => false,
+            'widget' => 'choice',
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
@@ -2606,6 +2615,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             'input' => 'string',
             'required' => false,
             'placeholder' => ['hour' => 'Change&Me'],
+            'widget' => 'choice',
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],

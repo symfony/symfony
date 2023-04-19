@@ -50,6 +50,7 @@ class DateTypeTest extends BaseTypeTestCase
         $this->expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'input' => 'fake_input',
+            'widget' => 'choice',
         ]);
     }
 
@@ -379,6 +380,7 @@ class DateTypeTest extends BaseTypeTestCase
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'format' => $format,
+            'widget' => 'choice',
         ])
             ->createView();
 
@@ -416,6 +418,7 @@ class DateTypeTest extends BaseTypeTestCase
         $this->factory->create(static::TESTED_TYPE, null, [
             'months' => [6, 7],
             'format' => 'yy',
+            'widget' => 'choice',
         ]);
     }
 
@@ -435,6 +438,7 @@ class DateTypeTest extends BaseTypeTestCase
         $this->expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'format' => 105,
+            'widget' => 'choice',
         ]);
     }
 
@@ -443,6 +447,7 @@ class DateTypeTest extends BaseTypeTestCase
         $this->expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'format' => [],
+            'widget' => 'choice',
         ]);
     }
 
@@ -451,6 +456,7 @@ class DateTypeTest extends BaseTypeTestCase
         $this->expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'years' => 'bad value',
+            'widget' => 'choice',
         ]);
     }
 
@@ -459,6 +465,7 @@ class DateTypeTest extends BaseTypeTestCase
         $this->expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'months' => 'bad value',
+            'widget' => 'choice',
         ]);
     }
 
@@ -467,6 +474,7 @@ class DateTypeTest extends BaseTypeTestCase
         $this->expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'days' => 'bad value',
+            'widget' => 'choice',
         ]);
     }
 
@@ -523,6 +531,7 @@ class DateTypeTest extends BaseTypeTestCase
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'years' => [2010, 2011],
+            'widget' => 'choice',
         ]);
 
         $view = $form->createView();
@@ -539,6 +548,7 @@ class DateTypeTest extends BaseTypeTestCase
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'months' => [6, 7],
             'format' => \IntlDateFormatter::SHORT,
+            'widget' => 'choice',
         ]);
 
         $view = $form->createView();
@@ -559,6 +569,7 @@ class DateTypeTest extends BaseTypeTestCase
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'months' => [1, 4],
             'format' => 'dd.MMM.yy',
+            'widget' => 'choice',
         ]);
 
         $view = $form->createView();
@@ -579,6 +590,7 @@ class DateTypeTest extends BaseTypeTestCase
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'months' => [1, 4],
             'format' => 'dd.MMMM.yy',
+            'widget' => 'choice',
         ])
             ->createView();
 
@@ -598,6 +610,7 @@ class DateTypeTest extends BaseTypeTestCase
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'months' => [1, 4],
             'format' => 'dd.MMMM.yy',
+            'widget' => 'choice',
         ])
             ->createView();
 
@@ -612,6 +625,7 @@ class DateTypeTest extends BaseTypeTestCase
         \Locale::setDefault('en');
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'days' => [6, 7],
+            'widget' => 'choice',
         ])
             ->createView();
 
@@ -679,7 +693,7 @@ class DateTypeTest extends BaseTypeTestCase
 
         \Locale::setDefault('de_AT');
 
-        $view = $this->factory->create(static::TESTED_TYPE)
+        $view = $this->factory->create(static::TESTED_TYPE, null, ['widget' => 'choice'])
             ->createView();
 
         $this->assertSame('{{ day }}{{ month }}{{ year }}', $view->vars['date_pattern']);
@@ -694,6 +708,7 @@ class DateTypeTest extends BaseTypeTestCase
 
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'format' => \IntlDateFormatter::LONG,
+            'widget' => 'choice',
         ])
             ->createView();
 
@@ -704,6 +719,7 @@ class DateTypeTest extends BaseTypeTestCase
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'format' => 'MMyyyydd',
+            'widget' => 'choice',
         ])
             ->createView();
 
@@ -714,6 +730,7 @@ class DateTypeTest extends BaseTypeTestCase
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'format' => 'MM*yyyy*dd',
+            'widget' => 'choice',
         ])
             ->createView();
 
@@ -740,6 +757,7 @@ class DateTypeTest extends BaseTypeTestCase
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             // EEEE, d 'de' MMMM 'de' y
             'format' => \IntlDateFormatter::FULL,
+            'widget' => 'choice',
         ])
             ->createView();
 
@@ -760,7 +778,7 @@ class DateTypeTest extends BaseTypeTestCase
     {
         // Throws an exception if "data_class" option is not explicitly set
         // to null in the type
-        $this->assertInstanceOf(FormInterface::class, $this->factory->create(static::TESTED_TYPE, new \DateTime()));
+        $this->assertInstanceOf(FormInterface::class, $this->factory->create(static::TESTED_TYPE, new \DateTime(), ['widget' => 'choice']));
     }
 
     public function testSingleTextWidgetShouldUseTheRightInputType()
@@ -777,6 +795,7 @@ class DateTypeTest extends BaseTypeTestCase
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'required' => false,
+            'widget' => 'choice',
         ])
             ->createView();
 
@@ -789,6 +808,7 @@ class DateTypeTest extends BaseTypeTestCase
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'required' => true,
+            'widget' => 'choice',
         ])
             ->createView();
 
@@ -800,6 +820,7 @@ class DateTypeTest extends BaseTypeTestCase
     public function testPassPlaceholderAsString()
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
+            'widget' => 'choice',
             'placeholder' => 'Empty',
         ])
             ->createView();
@@ -812,6 +833,7 @@ class DateTypeTest extends BaseTypeTestCase
     public function testPassPlaceholderAsArray()
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
+            'widget' => 'choice',
             'placeholder' => [
                 'year' => 'Empty year',
                 'month' => 'Empty month',
@@ -828,6 +850,7 @@ class DateTypeTest extends BaseTypeTestCase
     public function testPassPlaceholderAsPartialArrayAddEmptyIfNotRequired()
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
+            'widget' => 'choice',
             'required' => false,
             'placeholder' => [
                 'year' => 'Empty year',
@@ -844,6 +867,7 @@ class DateTypeTest extends BaseTypeTestCase
     public function testPassPlaceholderAsPartialArrayAddNullIfRequired()
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
+            'widget' => 'choice',
             'required' => true,
             'placeholder' => [
                 'year' => 'Empty year',
@@ -956,6 +980,7 @@ class DateTypeTest extends BaseTypeTestCase
     public function testYears()
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
+            'widget' => 'choice',
             'years' => [1900, 2000, 2040],
         ])
             ->createView();
@@ -970,7 +995,7 @@ class DateTypeTest extends BaseTypeTestCase
 
     public function testPassDefaultChoiceTranslationDomain()
     {
-        $form = $this->factory->create(static::TESTED_TYPE);
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['widget' => 'choice']);
 
         $view = $form->createView();
         $this->assertFalse($view['year']->vars['choice_translation_domain']);
@@ -981,6 +1006,7 @@ class DateTypeTest extends BaseTypeTestCase
     public function testPassChoiceTranslationDomainAsString()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'widget' => 'choice',
             'choice_translation_domain' => 'messages',
         ]);
 
@@ -993,6 +1019,7 @@ class DateTypeTest extends BaseTypeTestCase
     public function testPassChoiceTranslationDomainAsArray()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'widget' => 'choice',
             'choice_translation_domain' => [
                 'year' => 'foo',
                 'day' => 'test',
@@ -1025,6 +1052,7 @@ class DateTypeTest extends BaseTypeTestCase
     public function testSubmitNullUsesDefaultEmptyData($emptyData = [], $expectedData = null)
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'widget' => 'choice',
             'empty_data' => $emptyData,
         ]);
         $form->submit(null);
@@ -1082,5 +1110,10 @@ class DateTypeTest extends BaseTypeTestCase
         $form->submit('2018-01-14');
 
         $this->assertSame('14/01/2018', $form->getData());
+    }
+
+    protected function getTestOptions(): array
+    {
+        return ['widget' => 'choice'];
     }
 }

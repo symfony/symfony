@@ -69,6 +69,17 @@ class AutowireAttribute
     }
 }
 
+class AutowireAttributeNullFallback
+{
+    public function __construct(
+        #[Autowire('%required.parameter%')]
+        public string $required,
+        #[Autowire('%optional.parameter%')]
+        public ?string $optional = null,
+    ) {
+    }
+}
+
 interface AsDecoratorInterface
 {
 }

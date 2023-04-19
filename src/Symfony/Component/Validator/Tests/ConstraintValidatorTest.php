@@ -41,6 +41,7 @@ class ConstraintValidatorTest extends TestCase
             ['array', []],
             ['object', $toString = new TestToStringObject()],
             ['ccc', $toString, ConstraintValidator::OBJECT_TO_STRING],
+            ['FirstCase', $toString = TestEnum::FirstCase],
             ['object', $dateTime = new \DateTimeImmutable('1971-02-02T08:00:00UTC')],
             [class_exists(\IntlDateFormatter::class) ? 'Oct 4, 2019, 11:02 AM' : '2019-10-04 11:02:03', new \DateTimeImmutable('2019-10-04T11:02:03+09:00'), ConstraintValidator::PRETTY_DATE],
             [class_exists(\IntlDateFormatter::class) ? 'Feb 2, 1971, 8:00 AM' : '1971-02-02 08:00:00', $dateTime, ConstraintValidator::PRETTY_DATE],
@@ -72,4 +73,10 @@ final class TestToStringObject
     {
         return 'ccc';
     }
+}
+
+enum TestEnum
+{
+    case FirstCase;
+    case SecondCase;
 }

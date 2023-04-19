@@ -22,7 +22,7 @@
     },
     "require-dev": {
         "doctrine/dbal": "^2.13|^3.0",
-        "predis/predis": "~1.0"
+        "predis/predis": "^1.1|^2.0"
     },
     "conflict": {
         "doctrine/dbal": "<2.13",

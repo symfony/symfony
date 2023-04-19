@@ -1,0 +1,73 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-03-24T19:22:34Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.3 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-28T15:51:50Z
+
+Thanks for the PR. Can you have a look at failures? They look related to me.
+About the deprecation, Predis2 should add `@return foo` annotation to the methods that trigger them. Would you mind sending them a PR to do so?
+
+---------------------------------------------------------------------------
+
+by mfettig at 2023-03-30T15:56:48Z
+
+@nicolas-grekas yes, I didn't really know about the integration tests until they failed and they caught that the connection parameters had changed in Predis v2. I updated the test so the PredisClusterSessionHandlerTest should pass now. I also rebased my branch again on 6.3
+
+There is now a problem with the integration test Notifier/Bridge/SimpleTextin/Tests/SimpleTextinTransportFactoryTest.php which looks like its overriding methods but not keeping the static keyword. Not sure if a change there would be appropriate in this branch, but it is keeping the integration test from running fully
+
+The other problem I see is Psalm failing on classes that don't exist.
+1: Class, interface or enum named Predis\Connection\Aggregate\RedisCluster does not exist
+2: Class, interface or enum named Relay\Relay does not exist
+
+For item 1 I guess that is because I tried to keep support for Predis v1, but only v2 is installed at the time the test is ran. Is there a way to handle that or can only one version be supported due to the class changes?
+
+For item 2 I'm not familiar with Relay or how it's being tested. Do you have any recommendations for that error?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-03-30T16:14:22Z
+
+> For item 1 I guess that is because I tried to keep support for Predis v1, but only v2 is installed at the time the test is ran. Is there a way to handle that or can only one version be supported due to the class changes?
+
+Let it complain about that. It won't do it again in the future, as we use the target branch as baseline for the reporting, so we report only _new_ issues.
+
+---------------------------------------------------------------------------
+
+by mfettig at 2023-04-04T18:54:46Z
+
+Freshly rebased on the 6.3 branch. The failure in SimpleTextinTransportFactoryTest has been resolved so the integration tests were able to run fully
+
+Integration test results still have the the deprecation notices for `Countable::count()` and `IteratorAggregate::getIterator()`, but I did look at predis\predis and it looks like the maintainers have addressed that for now with `#[ReturnTypeWillChange]`
+https://github.com/predis/predis/blob/v2.x/src/Connection/Cluster/RedisCluster.php#L594
+https://github.com/predis/predis/blob/v2.x/src/Connection/Cluster/RedisCluster.php#L603
+
+Psalm checks report on the non-existent classes for Predis v1 and Relay as mentioned before
+
+AppVeyor shows an error on `Symfony\Component\VarDumper\Tests\Caster\ExceptionCasterTest::testFlattenException`, which I don't believe is related to the changes made
+
+Please let me know if there is anything more I should do for this PR

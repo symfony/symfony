@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-04-14T20:29:39Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.2" but it seems your PR description refers to branch "6.2 / 6.3".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by radar3301 at 2023-04-14T20:57:02Z
+
+Grr... Tried renaming local patch to https://github.com/radar3301/symfony/tree/autowire-undefined-nullable-6.2
+
+---------------------------------------------------------------------------
+
+by radar3301 at 2023-04-17T18:44:21Z
+
+> Can you add a test case please?
+
+I don't understand any of the test suite stuff...
+
+I'm not even sure that the existing `AutowirePassTest::testAutowireAttribute()` even passes.
+I don't see an `AutowireAttribute` class defined in `Symfony/Component/DependencyInjection/Tests/Compiler`, nor does a `use` alias exist for it.
+I'm not even sure how `$this->assertCount(9, $definition->getArguments());` on a non-existent class passes...
+
+---------------------------------------------------------------------------
+
+by radar3301 at 2023-04-17T19:33:43Z
+
+> non-existent AutowireAttribute class
+
+Nevermind, I found it...
+
+Test cases submitted.

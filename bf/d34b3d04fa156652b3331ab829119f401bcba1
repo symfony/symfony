@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-06T11:29:38Z
+
+Adding a new value for the `widget` option + planning to deprecate might make it harder for ppl to upgrade if they need to support many versions of Symfony with the same codebase.
+
+Instead, what about deprecating *not* setting the `widget` option and making it default to `single_text` in v7?
+
+---------------------------------------------------------------------------
+
+by MrYamous at 2023-03-06T15:30:45Z
+
+> Adding a new value for the `widget` option + planning to deprecate might make it harder for ppl to upgrade if they need to support many versions of Symfony with the same codebase.
+>
+> Instead, what about deprecating *not* setting the `widget` option and making it default to `single_text` in v7?
+
+I got your point and this sounds good to achieve the same result of simplification.
+However, `DateTimeType` already has a other default value (choice), won't that cause the same problem for supporting many versions ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-06T15:38:44Z
+
+We did follow a similar approach in the past. By asking ppl to be explicit in v6, we can then change the default in v7. To support many versions, one should be explicit about the behavior they want in all versions. They can do so immediately.
+
+---------------------------------------------------------------------------
+
+by MrYamous at 2023-03-06T16:35:16Z
+
+> We did follow a similar approach in the past. By asking ppl to be explicit in v6, we can then change the default in v7. To support many versions, one should be explicit about the behavior they want in all versions. They can do so immediately.
+
+Thanks for explanation
+I'll update pr with this approach

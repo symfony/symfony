@@ -275,7 +275,7 @@
 
   <xsd:complexType name="bind" mixed="true">
     <xsd:choice maxOccurs="unbounded">
-      <xsd:element name="bind" type="argument" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="bind" type="bind_argument" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="service" type="service" />
     </xsd:choice>
     <xsd:attribute name="type" type="argument_type" />
@@ -284,6 +284,24 @@
     <xsd:attribute name="on-invalid" type="invalid_sequence" />
     <xsd:attribute name="method" type="xsd:string" />
     <xsd:attribute name="tag" type="xsd:string" />
+  </xsd:complexType>
+
+  <xsd:complexType name="bind_argument" mixed="true">
+    <xsd:choice minOccurs="0">
+      <xsd:element name="bind" type="bind_argument" maxOccurs="unbounded" />
+      <xsd:element name="service" type="service" />
+      <xsd:element name="exclude" type="xsd:string" maxOccurs="unbounded" />
+    </xsd:choice>
+    <xsd:attribute name="type" type="argument_type" />
+    <xsd:attribute name="id" type="xsd:string" />
+    <xsd:attribute name="key" type="xsd:string" />
+    <xsd:attribute name="index" type="xsd:integer" />
+    <xsd:attribute name="on-invalid" type="invalid_sequence" />
+    <xsd:attribute name="tag" type="xsd:string" />
+    <xsd:attribute name="index-by" type="xsd:string" />
+    <xsd:attribute name="default-index-method" type="xsd:string" />
+    <xsd:attribute name="default-priority-method" type="xsd:string" />
+    <xsd:attribute name="exclude" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="argument" mixed="true">

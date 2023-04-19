@@ -341,7 +341,7 @@ class RedisExtIntegrationTest extends TestCase
 
     public function testItProperlyHandlesEmptyMessages()
     {
-        $redisReceiver = new RedisReceiver($this->connection, new Serializer());
+        $redisReceiver = new RedisReceiver($this->connection, Serializer::create());
 
         $this->connection->add('{"message": "Hi1"}', ['type' => DummyMessage::class]);
         $this->connection->add('{"message": "Hi2"}', ['type' => DummyMessage::class]);
@@ -352,7 +352,7 @@ class RedisExtIntegrationTest extends TestCase
         // The consumer died during handling a message while performing xtrim in parallel process
         $this->redis = new \Redis();
         $this->connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), ['delete_after_ack' => true], $this->redis);
-        $redisReceiver = new RedisReceiver($this->connection, new Serializer());
+        $redisReceiver = new RedisReceiver($this->connection, Serializer::create());
 
         /** @var Envelope[] $envelope */
         $envelope = $redisReceiver->get();

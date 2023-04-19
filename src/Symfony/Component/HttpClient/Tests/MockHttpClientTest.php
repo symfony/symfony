@@ -527,4 +527,23 @@ class MockHttpClientTest extends HttpClientTestCase
 
         $this->assertTrue($canceled);
     }
+
+    public function testEmptyResponseFactory()
+    {
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('The response factory iterator passed to MockHttpClient is empty.');
+
+        $client = new MockHttpClient([]);
+        $client->request('GET', 'https://example.com');
+    }
+
+    public function testMoreRequestsThanResponseFactoryResponses()
+    {
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('No more response left in the response factory iterator passed to MockHttpClient: the number of requests exceeds the number of responses.');
+
+        $client = new MockHttpClient([new MockResponse()]);
+        $client->request('GET', 'https://example.com');
+        $client->request('GET', 'https://example.com');
+    }
 }

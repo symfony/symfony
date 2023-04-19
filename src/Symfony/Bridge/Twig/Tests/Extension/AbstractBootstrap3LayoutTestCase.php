@@ -1753,7 +1753,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@type="datetime-local"]
     [@name="name"]
     [@class="my&class form-control"]
-    [@value="2011-02-03T04:05:06"]
+    [@value="2011-02-03T04:05"]
 '
         );
     }

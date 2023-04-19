@@ -69,7 +69,7 @@ class MockHttpClient implements HttpClientInterface, ResetInterface
         } elseif (\is_callable($this->responseFactory)) {
             $response = ($this->responseFactory)($method, $url, $options);
         } elseif (!$this->responseFactory->valid()) {
-            throw new TransportException('The response factory iterator passed to MockHttpClient is empty.');
+            throw new TransportException($this->requestsCount ? 'No more response left in the response factory iterator passed to MockHttpClient: the number of requests exceeds the number of responses.' : 'The response factory iterator passed to MockHttpClient is empty.');
         } else {
             $responseFactory = $this->responseFactory->current();
             $response = \is_callable($responseFactory) ? $responseFactory($method, $url, $options) : $responseFactory;

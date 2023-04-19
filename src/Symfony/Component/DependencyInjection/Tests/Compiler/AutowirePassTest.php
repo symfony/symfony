@@ -1217,6 +1217,38 @@ class AutowirePassTest extends TestCase
         $this->assertNull($service->invalid);
     }
 
+    public function testAutowireAttributeNullFallbackTestRequired()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', AutowireAttributeNullFallback::class)
+            ->setAutowired(true)
+            ->setPublic(true)
+        ;
+
+        $this->expectException(AutowiringFailedException::class);
+        $this->expectExceptionMessage('You have requested a non-existent parameter "required.parameter".');
+        (new AutowirePass())->process($container);
+    }
+
+    public function testAutowireAttributeNullFallbackTestOptional()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', AutowireAttributeNullFallback::class)
+            ->setAutowired(true)
+            ->setPublic(true)
+        ;
+
+        $container->setParameter('required.parameter', 'foo');
+
+        (new AutowirePass())->process($container);
+
+        $definition = $container->getDefinition('foo');
+
+        $this->assertSame(['foo'], $definition->getArguments());
+    }
+
     public function testAsDecoratorAttribute()
     {
         $container = new ContainerBuilder();

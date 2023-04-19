@@ -23,12 +23,13 @@ class CollectionType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $prototypeOptions = null;
+        $resizePrototypeOptions = null;
         if ($options['allow_add'] && $options['prototype']) {
+            $resizePrototypeOptions = array_replace($options['entry_options'], $options['prototype_options']);
             $prototypeOptions = array_replace([
                 'required' => $options['required'],
                 'label' => $options['prototype_name'].'label__',
-            ], array_replace($options['entry_options'], $options['prototype_options']));
+            ], $resizePrototypeOptions);
 
             if (null !== $options['prototype_data']) {
                 $prototypeOptions['data'] = $options['prototype_data'];
@@ -44,7 +45,7 @@ class CollectionType extends AbstractType
             $options['allow_add'],
             $options['allow_delete'],
             $options['delete_empty'],
-            $prototypeOptions
+            $resizePrototypeOptions
         );
 
         $builder->addEventSubscriber($resizeListener);

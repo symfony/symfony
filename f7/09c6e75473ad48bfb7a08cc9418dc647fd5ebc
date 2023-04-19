@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-03-12T19:17:27Z
+
+Hey!
+
+I think @mtarld has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-07-28T10:11:50Z
+
+> I'm just wondering about those `array-key` and `array<Foo>`: don't we prefer using `Foo[]`?
+
+I agree about `array-key`: afaik this is the default and I don't see a point in explicitly providing it.
+
+I'm not sure about `array<...>` vs `...[]` syntax. I would say the code-base currently "prefers" `[]` merely because the other syntax didn't exist a few years ago.
+
+I prefer `array<>`, as using `array<Foo>` and `array<string, Foo>` seems more consistent to me than using `Foo[]` and `array<string, Foo>`. And I don't like `Foo[][]` when nesting arrays :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-09T17:41:20Z
+
+Friendly ping @derrabus )

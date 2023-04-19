@@ -1,0 +1,64 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-03-25T13:32:04Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-28T16:17:24Z
+
+ghanks for starting this. We should also support default options, as is possible when using `$retryable->withOptions()`.
+
+About what you say @GromNaN, it should also be possible to pass a list of per-hosts IPs to the resolve option, and rotate them as fits. This could be done either in this PR if @Tiriel is up to, or in a later one. Of course, that'd need resolving the many IPs outside of the client.
+
+One thing I'm wondering in both cases: shouldn't we shuffle the base URIs (and IPs later on?)
+
+---------------------------------------------------------------------------
+
+by Tiriel at 2023-03-28T17:52:20Z
+
+@nicolas-grekas Sure thing, going to work on the default options!
+For you last question, I wonder if it would be a good idea to leave it open and give an option. Like, if `base_uri` is an array, you can pass a `'shuffle' => true` option defaulting to false, otherwise it doesn't do anything? Or maybe it's too much? Because I can clearly see use cases where you wouldn't want to shuffle, and some people seem to have use cases for the contrary.
+
+As for the IPs, I thought it would be better in another PR since the resolve doesn't take place at the same level, but maybe we can work something out. So I'd say that's up to @GromNaN , if you want to work on the feature yourself or not.
+
+---------------------------------------------------------------------------
+
+by Tiriel at 2023-04-12T11:18:18Z
+
+Made an attempt to make it work with `withOptions`, it's working, but quite frankly I'm not sure if my code is ok or "dirty", so any advice would be appreciated.
+
+Haven't tried yet on the shuffling part, I'd like opinion on wether to shuffle by default or not, or on adding an option for this.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-04-13T08:59:13Z
+
+About shuffling, we could to it this way:
+
+`$hosts = ['h1', 'h2', ['h3', h4']]`
+
+Nested arrays would define shuffle groups, and first level values would be used in order.
+Up for implementing this?
+
+---------------------------------------------------------------------------
+
+by Tiriel at 2023-04-13T09:45:35Z
+
+That's a great idea, thanks!
+Will work on it asap!
+
+---------------------------------------------------------------------------
+
+by Tiriel at 2023-04-19T07:56:42Z
+
+Forgot to ping, but this has been updated with a shuffling attempt and tests accordingly.

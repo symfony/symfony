@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Tests\Fixtures\TestEnum;
 
 class ConstraintValidatorTest extends TestCase
 {
@@ -41,13 +42,16 @@ class ConstraintValidatorTest extends TestCase
             ['array', []],
             ['object', $toString = new TestToStringObject()],
             ['ccc', $toString, ConstraintValidator::OBJECT_TO_STRING],
-            ['FirstCase', $toString = TestEnum::FirstCase],
             ['object', $dateTime = new \DateTimeImmutable('1971-02-02T08:00:00UTC')],
             [class_exists(\IntlDateFormatter::class) ? 'Oct 4, 2019, 11:02 AM' : '2019-10-04 11:02:03', new \DateTimeImmutable('2019-10-04T11:02:03+09:00'), ConstraintValidator::PRETTY_DATE],
             [class_exists(\IntlDateFormatter::class) ? 'Feb 2, 1971, 8:00 AM' : '1971-02-02 08:00:00', $dateTime, ConstraintValidator::PRETTY_DATE],
             [class_exists(\IntlDateFormatter::class) ? 'Jan 1, 1970, 6:00 AM' : '1970-01-01 06:00:00', new \DateTimeImmutable('1970-01-01T06:00:00Z'), ConstraintValidator::PRETTY_DATE],
             [class_exists(\IntlDateFormatter::class) ? 'Jan 1, 1970, 3:00 PM' : '1970-01-01 15:00:00', (new \DateTimeImmutable('1970-01-01T23:00:00'))->setTimezone(new \DateTimeZone('America/New_York')), ConstraintValidator::PRETTY_DATE],
         ];
+
+        if (\PHP_VERSION_ID >= 80100) {
+            $data[] = ['FirstCase', TestEnum::FirstCase];
+        }
 
         date_default_timezone_set($defaultTimezone);
 
@@ -73,10 +77,4 @@ final class TestToStringObject
     {
         return 'ccc';
     }
-}
-
-enum TestEnum
-{
-    case FirstCase;
-    case SecondCase;
 }

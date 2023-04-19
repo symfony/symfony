@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add `UriTemplateHttpClient` to use URI templates as specified in the RFC 6570
  * Add `ServerSentEvent::getArrayData()` to get the Server-Sent Event's data decoded as an array when it's a JSON payload
+ * Allow array of urls as `base_uri` option value in `RetryableHttpClient` to retry on a new url each time
 
 6.2
 ---

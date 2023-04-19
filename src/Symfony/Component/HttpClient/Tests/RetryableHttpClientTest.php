@@ -244,4 +244,104 @@ class RetryableHttpClientTest extends TestCase
         self::assertSame('Test out content', $response->getContent());
         self::assertSame('Test out content', $response->getContent(), 'Content should be buffered');
     }
+
+    public function testRetryWithMultipleBaseUris()
+    {
+        $client = new RetryableHttpClient(
+            new MockHttpClient([
+                new MockResponse('', ['http_code' => 500]),
+                new MockResponse('Hit on second uri', ['http_code' => 200]),
+            ]),
+            new GenericRetryStrategy([500], 0),
+            1
+        );
+
+        $response = $client->request('GET', 'foo-bar', [
+            'base_uri' => [
+                'http://example.com/a/',
+                'http://example.com/b/',
+            ],
+        ]);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('http://example.com/b/foo-bar', $response->getInfo('url'));
+    }
+
+    public function testMultipleBaseUrisAsOptions()
+    {
+        $client = new RetryableHttpClient(
+            new MockHttpClient([
+                new MockResponse('', ['http_code' => 500]),
+                new MockResponse('Hit on second uri', ['http_code' => 200]),
+            ]),
+            new GenericRetryStrategy([500], 0),
+            1
+        );
+
+        $client = $client->withOptions([
+            'base_uri' => [
+                'http://example.com/a/',
+                'http://example.com/b/',
+            ],
+        ]);
+
+        $response = $client->request('GET', 'foo-bar');
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('http://example.com/b/foo-bar', $response->getInfo('url'));
+    }
+
+    public function testRetryWithMultipleBaseUrisShufflesNestedArray()
+    {
+        $client = new RetryableHttpClient(
+            new MockHttpClient([
+                new MockResponse('', ['http_code' => 500]),
+                new MockResponse('Hit on second uri', ['http_code' => 200]),
+            ]),
+            new GenericRetryStrategy([500], 0),
+            1
+        );
+
+        $response = $client->request('GET', 'foo-bar', [
+            'base_uri' => [
+                'http://example.com/a/',
+                [
+                    'http://example.com/b/',
+                    'http://example.com/c/',
+                ],
+                'http://example.com/d/',
+            ],
+        ]);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertMatchesRegularExpression('#^http://example.com/(b|c)/foo-bar$#', $response->getInfo('url'));
+    }
+
+    public function testRetryWithMultipleBaseUrisPreservesNonNestedOrder()
+    {
+        $client = new RetryableHttpClient(
+            new MockHttpClient([
+                new MockResponse('', ['http_code' => 500]),
+                new MockResponse('', ['http_code' => 500]),
+                new MockResponse('', ['http_code' => 500]),
+                new MockResponse('Hit on second uri', ['http_code' => 200]),
+            ]),
+            new GenericRetryStrategy([500], 0),
+            3
+        );
+
+        $response = $client->request('GET', 'foo-bar', [
+            'base_uri' => [
+                'http://example.com/a/',
+                [
+                    'http://example.com/b/',
+                    'http://example.com/c/',
+                ],
+                'http://example.com/d/',
+            ],
+        ]);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('http://example.com/d/foo-bar', $response->getInfo('url'));
+    }
 }

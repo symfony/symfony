@@ -35,6 +35,7 @@ class RetryableHttpClient implements HttpClientInterface, ResetInterface
     private RetryStrategyInterface $strategy;
     private int $maxRetries;
     private LoggerInterface $logger;
+    private array $baseUris = [];
 
     /**
      * @param int $maxRetries The maximum number of times to retry
@@ -47,13 +48,34 @@ class RetryableHttpClient implements HttpClientInterface, ResetInterface
         $this->logger = $logger ?? new NullLogger();
     }
 
+    public function withOptions(array $options): static
+    {
+        if (\array_key_exists('base_uri', $options)) {
+            if (\is_array($options['base_uri'])) {
+                $this->baseUris = $options['base_uri'];
+                unset($options['base_uri']);
+            } else {
+                $this->baseUris = [];
+            }
+        }
+
+        $clone = clone $this;
+        $clone->client = $this->client->withOptions($options);
+
+        return $clone;
+    }
+
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
+        $baseUris = \array_key_exists('base_uri', $options) ? $options['base_uri'] : $this->baseUris;
+        $baseUris = \is_array($baseUris) ? $baseUris : [];
+        $options = self::shiftBaseUri($options, $baseUris);
+
         if ($this->maxRetries <= 0) {
             return new AsyncResponse($this->client, $method, $url, $options);
         }
 
-        return new AsyncResponse($this->client, $method, $url, $options, function (ChunkInterface $chunk, AsyncContext $context) use ($method, $url, $options) {
+        return new AsyncResponse($this->client, $method, $url, $options, function (ChunkInterface $chunk, AsyncContext $context) use ($method, $url, $options, &$baseUris) {
             static $retryCount = 0;
             static $content = '';
             static $firstChunk;
@@ -127,7 +149,7 @@ class RetryableHttpClient implements HttpClientInterface, ResetInterface
             ]);
 
             $context->setInfo('retry_count', $retryCount);
-            $context->replaceRequest($method, $url, $options);
+            $context->replaceRequest($method, $url, self::shiftBaseUri($options, $baseUris));
             $context->pause($delay / 1000);
 
             if ($retryCount >= $this->maxRetries) {
@@ -167,5 +189,15 @@ class RetryableHttpClient implements HttpClientInterface, ResetInterface
         }
 
         yield $lastChunk;
+    }
+
+    private static function shiftBaseUri(array $options, array &$baseUris): array
+    {
+        if ($baseUris) {
+            $baseUri = 1 < \count($baseUris) ? array_shift($baseUris) : current($baseUris);
+            $options['base_uri'] = \is_array($baseUri) ? $baseUri[array_rand($baseUri)] : $baseUri;
+        }
+
+        return $options;
     }
 }

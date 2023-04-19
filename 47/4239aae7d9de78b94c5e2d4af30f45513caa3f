@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by stof at 2023-01-30T11:50:08Z
+
+We should not mix the listeners of various event dispatchers. That would make debugging much harder (as listeners from different dispatchers are totally separate lists).
+
+If we can profile multiple dispatchers, the webprofiler panel must display them separately (see how the mailer panel handles a project with multiple mailers configured for instance).
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-01-30T14:25:32Z
+
+@stof is that what you meant?
+
+![](https://user-images.githubusercontent.com/1898254/215503546-9a223574-1d70-445a-931e-2fa80f0a588a.png)
+
+---------------------------------------------------------------------------
+
+by stof at 2023-01-30T15:38:59Z
+
+Yeah, it should look like that (and it means you won't ever mix the listeners from multiple TraceableEventDispatcher together and so you won't re-sort anything in the collector)
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-01-30T15:53:28Z
+
+Indeed; PR updated thanks!
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-03-28T07:10:34Z
+
+No deprecation anymore 👌

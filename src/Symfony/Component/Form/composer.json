@@ -53,7 +53,7 @@
         "symfony/http-kernel": "<5.4",
         "symfony/translation": "<5.4",
         "symfony/translation-contracts": "<2.5",
-        "symfony/twig-bridge": "<5.4.21|>=6,<6.2.7"
+        "symfony/twig-bridge": "<6.3"
     },
     "suggest": {
         "symfony/validator": "For form validation.",

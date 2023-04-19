@@ -79,7 +79,8 @@ class DateTimeType extends AbstractType
             if (self::HTML5_FORMAT === $pattern) {
                 $builder->addViewTransformer(new DateTimeToHtml5LocalDateTimeTransformer(
                     $options['model_timezone'],
-                    $options['view_timezone']
+                    $options['view_timezone'],
+                    $options['with_seconds']
                 ));
             } else {
                 $builder->addViewTransformer(new DateTimeToLocalizedStringTransformer(
@@ -218,8 +219,12 @@ class DateTimeType extends AbstractType
             // adding the HTML attribute step if not already defined.
             // Otherwise the browser will not display and so not send the seconds
             // therefore the value will always be considered as invalid.
-            if ($options['with_seconds'] && !isset($view->vars['attr']['step'])) {
-                $view->vars['attr']['step'] = 1;
+            if (!isset($view->vars['attr']['step'])) {
+                if ($options['with_seconds']) {
+                    $view->vars['attr']['step'] = 1;
+                } elseif (!$options['with_minutes']) {
+                    $view->vars['attr']['step'] = 3600;
+                }
             }
         }
     }

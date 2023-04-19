@@ -252,7 +252,7 @@ class DateTimeTypeTest extends BaseTypeTestCase
         $outputTime->setTimezone(new \DateTimeZone('America/New_York'));
 
         $this->assertEquals($outputTime, $form->getData());
-        $this->assertEquals('2010-06-02T03:04:00', $form->getViewData());
+        $this->assertEquals('2010-06-02T03:04', $form->getViewData());
     }
 
     public function testSubmitDifferentTimezonesDateTimeImmutable()
@@ -272,7 +272,7 @@ class DateTimeTypeTest extends BaseTypeTestCase
 
         $this->assertInstanceOf(\DateTimeImmutable::class, $form->getData());
         $this->assertEquals($outputTime, $form->getData());
-        $this->assertEquals('2010-06-02T03:04:00', $form->getViewData());
+        $this->assertEquals('2010-06-02T03:04', $form->getViewData());
     }
 
     public function testSubmitStringSingleText()
@@ -287,7 +287,7 @@ class DateTimeTypeTest extends BaseTypeTestCase
         $form->submit('2010-06-02T03:04:00');
 
         $this->assertEquals('2010-06-02 03:04:00', $form->getData());
-        $this->assertEquals('2010-06-02T03:04:00', $form->getViewData());
+        $this->assertEquals('2010-06-02T03:04', $form->getViewData());
     }
 
     public function testSubmitStringSingleTextWithSeconds()
@@ -709,10 +709,10 @@ class DateTimeTypeTest extends BaseTypeTestCase
     public static function provideEmptyData()
     {
         $expectedData = \DateTime::createFromFormat('Y-m-d H:i', '2018-11-11 21:23');
-        $lazyEmptyData = static fn (FormInterface $form) => $form->getConfig()->getCompound() ? ['date' => ['year' => '2018', 'month' => '11', 'day' => '11'], 'time' => ['hour' => '21', 'minute' => '23']] : '2018-11-11T21:23:00';
+        $lazyEmptyData = static fn (FormInterface $form) => $form->getConfig()->getCompound() ? ['date' => ['year' => '2018', 'month' => '11', 'day' => '11'], 'time' => ['hour' => '21', 'minute' => '23']] : '2018-11-11T21:23';
 
         return [
-            'Simple field' => ['single_text', '2018-11-11T21:23:00', $expectedData],
+            'Simple field' => ['single_text', '2018-11-11T21:23', $expectedData],
             'Compound text field' => ['text', ['date' => ['year' => '2018', 'month' => '11', 'day' => '11'], 'time' => ['hour' => '21', 'minute' => '23']], $expectedData],
             'Compound choice field' => ['choice', ['date' => ['year' => '2018', 'month' => '11', 'day' => '11'], 'time' => ['hour' => '21', 'minute' => '23']], $expectedData],
             'Simple field lazy' => ['single_text', $lazyEmptyData, $expectedData],

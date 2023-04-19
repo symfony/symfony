@@ -1523,7 +1523,7 @@ abstract class AbstractLayoutTestCase extends FormIntegrationTestCase
             '/input
     [@type="datetime-local"]
     [@name="name"]
-    [@value="2011-02-03T04:05:06"]
+    [@value="2011-02-03T04:05"]
 '
         );
     }

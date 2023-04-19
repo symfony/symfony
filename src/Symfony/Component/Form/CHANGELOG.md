@@ -4,6 +4,7 @@ CHANGELOG
 6.3
 ---
 
+ * Don't render seconds for HTML5 date pickers unless "with_seconds" is explicitly set
  * Add a `placeholder_attr` option to `ChoiceType`
 
 6.2

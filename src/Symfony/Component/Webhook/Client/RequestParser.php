@@ -45,17 +45,14 @@ class RequestParser extends AbstractRequestParser
 
     protected function doParse(Request $request, string $secret): RemoteEvent
     {
-        // $body = $this->bodyParser->parse($request, $secret);
         $body = $request->toArray();
 
-        // $this->headerParser->validate($request, $secret);
         foreach ([$this->signatureHeaderName, $this->eventHeaderName, $this->idHeaderName] as $header) {
             if (!$request->headers->has($header)) {
                 throw new RejectWebhookException(406, sprintf('Missing "%s" HTTP request signature header.', $header));
             }
         }
 
-        // $this->signatureParser->validate($request, $secret);
         $this->validateSignature($request->headers, $request->getContent(), $secret);
 
         return new RemoteEvent(

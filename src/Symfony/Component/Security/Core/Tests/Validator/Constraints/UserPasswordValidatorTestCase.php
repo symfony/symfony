@@ -87,6 +87,7 @@ abstract class UserPasswordValidatorTestCase extends ConstraintValidatorTestCase
         $this->validator->validate('secret', $constraint);
 
         $this->buildViolation('myMessage')
+            ->setCode(UserPassword::INVALID_PASSWORD_ERROR)
             ->assertRaised();
     }
 
@@ -109,6 +110,7 @@ abstract class UserPasswordValidatorTestCase extends ConstraintValidatorTestCase
         $this->validator->validate($password, $constraint);
 
         $this->buildViolation('myMessage')
+            ->setCode(UserPassword::INVALID_PASSWORD_ERROR)
             ->assertRaised();
     }
 

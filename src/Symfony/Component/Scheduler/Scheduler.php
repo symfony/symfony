@@ -13,7 +13,12 @@ namespace Symfony\Component\Scheduler;
 
 use Symfony\Component\Clock\Clock;
 use Symfony\Component\Clock\ClockInterface;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Worker;
+use Symfony\Component\Scheduler\Generator\ChainMessageGenerator;
 use Symfony\Component\Scheduler\Generator\MessageGenerator;
+use Symfony\Component\Scheduler\Messenger\SchedulerTransport;
 
 /**
  * @experimental
@@ -25,19 +30,39 @@ final class Scheduler
      */
     private array $generators = [];
     private int $index = 0;
-    private bool $shouldStop = false;
+    private MessageBusInterface $bus;
+    private Worker $worker;
 
     /**
+     * @param array<class-string,callable> $handlers
      * @param iterable<Schedule> $schedules
      */
     public function __construct(
-        private readonly array $handlers,
+        array $handlers,
         array $schedules,
         private readonly ClockInterface $clock = new Clock(),
     ) {
         foreach ($schedules as $schedule) {
             $this->addSchedule($schedule);
         }
+
+        $this->bus = new class($handlers) implements MessageBusInterface {
+            /**
+             * @param array<class-string,callable> $handlers
+             */
+            public function __construct(private array $handlers)
+            {
+            }
+
+            public function dispatch(object $message, array $stamps = []): Envelope
+            {
+                $envelope = Envelope::wrap($message, $stamps);
+
+                $this->handlers[$envelope->getMessage()::class]($envelope->getMessage());
+
+                return $envelope;
+            }
+        };
     }
 
     public function addSchedule(Schedule $schedule): void
@@ -58,29 +83,19 @@ final class Scheduler
      */
     public function run(array $options = []): void
     {
-        $options += ['sleep' => 1e6];
+        $this->worker = new Worker(
+            [new SchedulerTransport(new ChainMessageGenerator($this->generators))],
+            $this->bus,
+            clock: $this->clock,
+        );
 
-        while (!$this->shouldStop) {
-            $start = $this->clock->now();
-
-            $ran = false;
-            foreach ($this->generators as $generator) {
-                foreach ($generator->getMessages() as $message) {
-                    $this->handlers[$message::class]($message);
-                    $ran = true;
-                }
-            }
-
-            if (!$ran) {
-                if (0 < $sleep = (int) ($options['sleep'] - 1e6 * ($this->clock->now()->format('U.u') - $start->format('U.u')))) {
-                    $this->clock->sleep($sleep / 1e6);
-                }
-            }
-        }
+        $this->worker->run($options + ['sleep' => 1e6]);
     }
 
     public function stop(): void
     {
-        $this->shouldStop = true;
+        if (isset($this->worker)) {
+            $this->worker->stop();
+        }
     }
 }

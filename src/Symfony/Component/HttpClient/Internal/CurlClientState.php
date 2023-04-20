@@ -25,6 +25,7 @@ final class CurlClientState extends ClientState
 {
     public ?\CurlMultiHandle $handle;
     public ?\CurlShareHandle $share;
+    public bool $performing = false;
 
     /** @var PushedResponse[] */
     public array $pushedResponses = [];

@@ -109,6 +109,8 @@ final class CrowdinProvider implements ProviderInterface
         $translatorBag = new TranslatorBag();
         $responses = [];
 
+        $localeLanguageMap = $this->mapLocalesToLanguageId($locales);
+
         foreach ($domains as $domain) {
             $fileId = $this->getFileIdByDomain($fileList, $domain);
 
@@ -118,7 +120,7 @@ final class CrowdinProvider implements ProviderInterface
 
             foreach ($locales as $locale) {
                 if ($locale !== $this->defaultLocale) {
-                    $response = $this->exportProjectTranslations($locale, $fileId);
+                    $response = $this->exportProjectTranslations($localeLanguageMap[$locale], $fileId);
                 } else {
                     $response = $this->downloadSourceFile($fileId);
                 }
@@ -402,5 +404,39 @@ final class CrowdinProvider implements ProviderInterface
         }
 
         return $result;
+    }
+
+    private function mapLocalesToLanguageId(array $locales): array
+    {
+        /**
+         * We cannot query by locales, we need to fetch all and filter out the relevant ones.
+         *
+         * @see https://developer.crowdin.com/api/v2/#operation/api.languages.getMany (Crowdin API)
+         * @see https://developer.crowdin.com/enterprise/api/v2/#operation/api.languages.getMany (Crowdin Enterprise API)
+         */
+        $response = $this->client->request('GET', '../../languages?limit=500');
+
+        if (200 !== $response->getStatusCode()) {
+            throw new ProviderException('Unable to list set languages.', $response);
+        }
+
+        $localeLanguageMap = [];
+        foreach ($response->toArray()['data'] as $language) {
+            foreach (['locale', 'osxLocale', 'id'] as $key) {
+                if (\in_array($language['data'][$key], $locales, true)) {
+                    $localeLanguageMap[$language['data'][$key]] = $language['data']['id'];
+                }
+            }
+        }
+
+        if (\count($localeLanguageMap) !== \count($locales)) {
+            $message = implode('", "', array_diff($locales, array_keys($localeLanguageMap)));
+            $message = sprintf('Unable to find all requested locales: "%s" not found.', $message);
+            $this->logger->error($message);
+
+            throw new ProviderException($message, $response);
+        }
+
+        return $localeLanguageMap;
     }
 }

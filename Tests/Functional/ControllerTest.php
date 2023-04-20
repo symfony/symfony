@@ -12,9 +12,7 @@
 namespace Symfony\Bridge\PsrHttpMessage\Tests\Functional;
 
 use Symfony\Bridge\PsrHttpMessage\Tests\Fixtures\App\Kernel;
-use Symfony\Bridge\PsrHttpMessage\Tests\Fixtures\App\Kernel44;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\HttpKernel\Kernel as SymfonyKernel;
 
 /**
  * @author Alexander M. Turek <me@derrabus.de>
@@ -50,6 +48,6 @@ final class ControllerTest extends WebTestCase
 
     protected static function getKernelClass(): string
     {
-        return SymfonyKernel::VERSION_ID >= 50200 ? Kernel::class : Kernel44::class;
+        return Kernel::class;
     }
 }

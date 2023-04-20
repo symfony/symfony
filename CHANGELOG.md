@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+# 2.2.0 (TBA)
+
+* Drop support for Symfony 4
+* Bump minimum version of PHP to 7.2
+
 # 2.1.3 (2022-09-05)
 
 * Ignore invalid HTTP headers when creating PSR7 objects

@@ -361,7 +361,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
                             $withChildren = false;
                             $cut = -1;
                         } else {
-                            $cut = $this->dumpChildren($dumper, $cursor, $refs, $children, $cut, $item->type, null !== $item->class);
+                            $cut = $this->dumpChildren($dumper, $cursor, $refs, $children, $cut, $item->type, $item->attr, null !== $item->class);
                         }
                     } elseif ($children && 0 <= $cut) {
                         $cut += \count($children);
@@ -392,7 +392,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @return int The final number of removed items
      */
-    private function dumpChildren(DumperInterface $dumper, Cursor $parentCursor, array &$refs, array $children, int $hashCut, int $hashType, bool $dumpKeys): int
+    private function dumpChildren(DumperInterface $dumper, Cursor $parentCursor, array &$refs, array $children, int $hashCut, int $hashType, array $hashAttributes, bool $dumpKeys): int
     {
         $cursor = clone $parentCursor;
         ++$cursor->depth;
@@ -409,6 +409,13 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
 
                 return $hashCut >= 0 ? $hashCut + $cursor->hashLength - $cursor->hashIndex : $hashCut;
             }
+        }
+
+        // Add uninitialized properties
+        foreach ($hashAttributes["uninitialized"] as $propName => $propType) {
+            $string = "⚠ uninitialized($propType)";
+            $cursor->hashKey = $dumpKeys ? $propName : null;
+            $this->dumpItem($dumper, $cursor, $refs, $string);
         }
 
         return $hashCut;

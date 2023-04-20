@@ -15,6 +15,8 @@ CHANGELOG
    `StopWorkerOnSignalsListener` and make it configurable with SIGINT and
    SIGTERM by default
  * Add `RedispatchMessage` and `RedispatchMessageHandler`
+ * Add `HandleDelayedMessagesOnKernelTerminateListener` to handle delayed
+   messages on `kernel.terminate` event
 
 6.2
 ---

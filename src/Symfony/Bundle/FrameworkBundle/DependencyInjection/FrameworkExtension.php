@@ -2202,6 +2202,18 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('console.command.messenger_failed_messages_remove');
         }
 
+        if ($config['delayed_transport']) {
+            if (!isset($senderReferences[$config['delayed_transport']])) {
+                throw new LogicException(sprintf('Invalid Messenger configuration: the delayed transport "%s" is not a valid transport or service id.', $config['delayed_transport']));
+            }
+
+            $container->getDefinition('messenger.listener.handle_delayed_messages_on_kernel_terminate_listener')
+                ->replaceArgument(1, $senderReferences[$config['delayed_transport']])
+                ->replaceArgument(5, $transportRateLimiterReferences[$config['delayed_transport']] ?? null);
+        } else {
+            $container->removeDefinition('messenger.listener.handle_delayed_messages_on_kernel_terminate_listener');
+        }
+
         if (!$container->hasDefinition('console.command.messenger_consume_messages')) {
             $container->removeDefinition('messenger.listener.reset_services');
         }

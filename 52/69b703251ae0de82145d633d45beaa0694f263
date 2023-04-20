@@ -1,0 +1,142 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-04-17T13:16:54Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by andrii-bodnar at 2023-04-18T13:31:24Z
+
+Hi @pculka, could you please provide locale examples than currently can't be synced with Crowdin?
+
+---------------------------------------------------------------------------
+
+by andrii-bodnar at 2023-04-18T13:33:02Z
+
+The failed Unit tests do not expect the GET languages call, you should include the mock for this call in the tests
+
+---------------------------------------------------------------------------
+
+by pculka at 2023-04-18T13:42:46Z
+
+Hi @andrii-bodnar - In our project we use full locale codes, not language codes. For example for Germany the full locale is de-DE. This is in languages endpoint of Crowdin is stated as locale attribute:
+
+```
+"data": {
+  "id": "de",
+  "name": "German",
+  "editorCode": "de",
+  "twoLettersCode": "de",
+  "threeLettersCode": "deu",
+  "locale": "de-DE",
+  "androidCode": "de-rDE",
+  "osxCode": "de.lproj",
+  "osxLocale": "de",
+  "pluralCategoryNames": [
+      "one",
+      "other"
+  ],
+  "pluralRules": "(n != 1)",
+  "pluralExamples": [
+      "1",
+      "0, 2-999; 1.2, 2.07..."
+  ],
+  "textDirection": "ltr",
+  "dialectOf": null
+}
+```
+When downloading translations in your code - you also properly annotated that the requested parameter has to be LanguageID, but you pass in locale and that fails. If I pass locale, I have to find the correct language ID by the locale and then the languages will be downloaded.
+
+---------------------------------------------------------------------------
+
+by pculka at 2023-04-18T13:47:32Z
+
+I'll try to add GET for the mock
+
+---------------------------------------------------------------------------
+
+by andrii-bodnar at 2023-04-18T13:59:18Z
+
+@pculka got it, the current approach might be unreliable since a user can use a different language code format and in this case it's hard to guess the right language ID. I would suggest encouraging users to use [Language Mapping](https://support.crowdin.com/project-settings/#:~:text=Adding%20Custom%20Language%20Codes) in this case.
+
+**The flow:**
+
+- a user has some locale that is different from the default Crowdin language ID
+- a user set up the Language mapping for this locale in the Crowdin project
+- then, on the Provider side you can use the [Get Project](https://developer.crowdin.com/api/v2/#operation/api.projects.get) to get the `languageMapping` property and find the language ID for the mapped locale.
+- use this language ID for requests.
+
+This will not break any existing integrations and will allow customizing the used language codes.
+
+By the way, something similar is suggested for the other translation provider here - https://symfony.com/doc/current/translation.html#installing-and-configuring-a-third-party-provider
+
+---------------------------------------------------------------------------
+
+by pculka at 2023-04-18T14:35:53Z
+
+Well I think the core problem lies in misunderstanding and misdocumentation of how to use locales should be used within symfony itself. It tends to be easy to confuse code vs locale vs osxlocale, etc. That's why I ended up here, as I was using proper i18n locale string, but in communication with CrowdIn the expected parameters are Language IDs.
+Hence in your suggestion you suggest MIX UP between locale and language id once again. I mean - it is doable, but not sure if that's the right thing to do.
+
+Anyway I've added the mapping, in get project info I now have:
+```
+        "languageMapping": {
+            "de": {
+                "locale": "de-DE"
+            },
+            "hu": {
+                "locale": "hu-HU"
+            }
+        },
+```
+
+You suggest I change this code I provided to check for the project languageMapping setting and just fix it that way, right?
+
+---------------------------------------------------------------------------
+
+by andrii-bodnar at 2023-04-18T14:44:52Z
+
+@pculka does Symfony has some language codes list that is recommended to use for translation catalogs?
+
+---------------------------------------------------------------------------
+
+by pculka at 2023-04-18T19:03:02Z
+
+I doubt it. both 'de' and 'de-DE' are valid locale strings, both referencing german language, but -DE specifies also the region which is optional. I mean. Meaning de-DE should try automatically a fallback maybe? Not sure how to tackle this situation properly.
+
+---------------------------------------------------------------------------
+
+by andrii-bodnar at 2023-04-19T06:32:49Z
+
+Well, the Language Mapping approach might be more complicated. Probably we can keep the suggested approach in this case and not overcomplicate this for now
+
+---------------------------------------------------------------------------
+
+by pculka at 2023-04-19T12:26:24Z
+
+added one more fallback for underscore locale (you had that in one of your tests), and tests are passing.
+Hopefully someone merges this
+
+---------------------------------------------------------------------------
+
+by pculka at 2023-04-19T12:34:21Z
+
+and refactored - extracted the mapping function out
+
+---------------------------------------------------------------------------
+
+by pculka at 2023-04-20T06:39:34Z
+
+@nicolas-grekas please can you check this PR? I also noticed a failed test in appveyor, 1) Symfony\Component\Messenger\Bridge\Redis\Tests\Transport\RedisExtIntegrationTest::testGetAfterReject
+
+something in terms of redis. Maybe there is a problem with redis.dll for windows, which is not compiled for 8.2 - If it is needed, I compiled a working redis.dll for 8.2.5 for x64 both ts and nts versions: https://github.com/pculka/phpredis/releases/tag/5.3.7
+
+But if it is possible to merge without passing appveyor, it would be great to get this done (and if @andrii-bodnar agrees)

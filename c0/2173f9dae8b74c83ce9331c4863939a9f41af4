@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-03-10T08:33:53Z
+
+are we sure about getPayload vs getBody:
+
+![image](https://user-images.githubusercontent.com/1047696/224265049-1591883c-8441-45fe-b42c-02ecb93ed4fb.png)
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-03-10T23:30:27Z
+
+> are we sure about getPayload vs getBody:
+
+Yes. The HTTP RFC is a better reference than ChatGPT. See https://github.com/symfony/symfony/pull/47938#issuecomment-1293311848
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-03-11T07:20:50Z
+
+well, the RFC does mention "payload header fields" vs. "payload body" :sweat_smile:
+
+i tend to agree `getPayload(): InputBag` conveys the latter as well :+1:
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-04-20T12:43:52Z
+
+I'm good with the current state. Solves #47646 I think. @ro0NL, do you agree?

@@ -41,7 +41,9 @@ class UserPasswordValidator extends ConstraintValidator
         }
 
         if (null === $password || '' === $password) {
-            $this->context->addViolation($constraint->message);
+            $this->context->buildViolation($constraint->message)
+                ->setCode(UserPassword::INVALID_PASSWORD_ERROR)
+                ->addViolation();
 
             return;
         }
@@ -59,7 +61,9 @@ class UserPasswordValidator extends ConstraintValidator
         $hasher = $this->hasherFactory->getPasswordHasher($user);
 
         if (null === $user->getPassword() || !$hasher->verify($user->getPassword(), $password, $user instanceof LegacyPasswordAuthenticatedUserInterface ? $user->getSalt() : null)) {
-            $this->context->addViolation($constraint->message);
+            $this->context->buildViolation($constraint->message)
+                ->setCode(UserPassword::INVALID_PASSWORD_ERROR)
+                ->addViolation();
         }
     }
 }

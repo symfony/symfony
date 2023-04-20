@@ -20,6 +20,12 @@ use Symfony\Component\Validator\Constraint;
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class UserPassword extends Constraint
 {
+    public const INVALID_PASSWORD_ERROR = '2d2a8bb4-ddc8-45e4-9b0f-8670d3a3e290';
+
+    protected const ERROR_NAMES = [
+        self::INVALID_PASSWORD_ERROR => 'INVALID_PASSWORD_ERROR',
+    ];
+
     public $message = 'This value should be the user\'s current password.';
     public $service = 'security.validator.user_password';
 

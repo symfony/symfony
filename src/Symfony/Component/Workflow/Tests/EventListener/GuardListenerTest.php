@@ -143,7 +143,7 @@ class GuardListenerTest extends TestCase
         $this->assertTrue($event->isBlocked());
     }
 
-    private function createEvent(Transition $transition = null)
+    private function createEvent(Transition $transition = null): GuardEvent
     {
         $subject = new Subject();
         $transition ??= new Transition('name', 'from', 'to');
@@ -171,7 +171,7 @@ class GuardListenerTest extends TestCase
         ;
     }
 
-    private function configureValidator($isUsed, $valid = true)
+    private function configureValidator($isUsed, $valid = true): void
     {
         if (!$isUsed) {
             $this->validator

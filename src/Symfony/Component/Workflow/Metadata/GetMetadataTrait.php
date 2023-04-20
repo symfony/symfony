@@ -18,6 +18,9 @@ use Symfony\Component\Workflow\Transition;
  */
 trait GetMetadataTrait
 {
+    /**
+     * @return mixed
+     */
     public function getMetadata(string $key, string|Transition $subject = null)
     {
         if (null === $subject) {

@@ -427,14 +427,16 @@ class WorkflowTest extends TestCase
         $this->assertSame($eventNameExpected, $eventDispatcher->dispatchedEvents);
     }
 
-    public static function provideApplyWithEventDispatcherForAnnounceTests()
+    public static function provideApplyWithEventDispatcherForAnnounceTests(): \Generator
     {
         yield [false, [Workflow::DISABLE_ANNOUNCE_EVENT => true]];
         yield [true, [Workflow::DISABLE_ANNOUNCE_EVENT => false]];
         yield [true, []];
     }
 
-    /** @dataProvider provideApplyWithEventDispatcherForAnnounceTests */
+    /**
+     * @dataProvider provideApplyWithEventDispatcherForAnnounceTests
+     */
     public function testApplyWithEventDispatcherForAnnounce(bool $fired, array $context)
     {
         $definition = $this->createComplexWorkflowDefinition();

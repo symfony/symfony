@@ -47,7 +47,7 @@ class GraphvizDumperTest extends TestCase
         $this->assertEquals($expected, $dump);
     }
 
-    public static function provideWorkflowDefinitionWithMarking()
+    public static function provideWorkflowDefinitionWithMarking(): \Generator
     {
         yield [
             self::createComplexWorkflowDefinition(),
@@ -62,13 +62,13 @@ class GraphvizDumperTest extends TestCase
         ];
     }
 
-    public static function provideWorkflowDefinitionWithoutMarking()
+    public static function provideWorkflowDefinitionWithoutMarking(): \Generator
     {
         yield [self::createComplexWorkflowDefinition(), self::provideComplexWorkflowDumpWithoutMarking()];
         yield [self::createSimpleWorkflowDefinition(), self::provideSimpleWorkflowDumpWithoutMarking()];
     }
 
-    public static function createComplexWorkflowDefinitionDumpWithMarking()
+    public static function createComplexWorkflowDefinitionDumpWithMarking(): string
     {
         return 'digraph workflow {
   ratio="compress" rankdir="LR"
@@ -106,7 +106,7 @@ class GraphvizDumperTest extends TestCase
 ';
     }
 
-    public static function createSimpleWorkflowDumpWithMarking()
+    public static function createSimpleWorkflowDumpWithMarking(): string
     {
         return 'digraph workflow {
   ratio="compress" rankdir="LR"
@@ -126,7 +126,7 @@ class GraphvizDumperTest extends TestCase
 ';
     }
 
-    public static function provideComplexWorkflowDumpWithoutMarking()
+    public static function provideComplexWorkflowDumpWithoutMarking(): string
     {
         return 'digraph workflow {
   ratio="compress" rankdir="LR"
@@ -164,7 +164,7 @@ class GraphvizDumperTest extends TestCase
 ';
     }
 
-    public static function provideSimpleWorkflowDumpWithoutMarking()
+    public static function provideSimpleWorkflowDumpWithoutMarking(): string
     {
         return 'digraph workflow {
   ratio="compress" rankdir="LR"

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Workflow\Tests;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Exception\InvalidArgumentException;
@@ -108,7 +109,7 @@ class RegistryTest extends TestCase
         $this->assertCount(0, $workflows);
     }
 
-    private function createWorkflowSupportStrategy($supportedClassName)
+    private function createWorkflowSupportStrategy($supportedClassName): MockObject&WorkflowSupportStrategyInterface
     {
         $strategy = $this->createMock(WorkflowSupportStrategyInterface::class);
         $strategy->expects($this->any())->method('supports')

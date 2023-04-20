@@ -36,6 +36,7 @@ final class CurlClientState extends ClientState
     public $execCounter = \PHP_INT_MIN;
     /** @var LoggerInterface|null */
     public $logger;
+    public $performing = false;
 
     public static $curlVersion;
 

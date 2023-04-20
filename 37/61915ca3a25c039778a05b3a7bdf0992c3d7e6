@@ -1,0 +1,93 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-04-20T06:44:57Z
+
+Can you run some bench comparing with/without LRU, also maybe without cache at all?
+
+---------------------------------------------------------------------------
+
+by danielburger1337 at 2023-04-20T13:27:18Z
+
+> Can you run some bench comparing with/without LRU, also maybe without cache at all?
+
+Just a a quick reminder why the cache was implemented: IPv6 checking is **extremely** slow (in comparison to IPv4).
+
+PHP 8.2.4
+
+Average after 3 runs each and 1 million IP addresses / cache entries:
+
+- With LRU: 3.778 seconds, 2.097152 mb
+- Max Items Cache: 3.615 seconds, 2.097152 mb
+- Current Cache: 2.833 seconds, 100.663296 mb
+
+Other Tests:
+
+- Keeping count of the items stored and not using `count`: 3.593 seconds, 2.097152 mb
+- Keeping count of the items stored and not using `count` (LRU): 3.653 seconds, 2.097152 mb
+
+- Without any Cache (IPv4): 2.484 seconds, 2.097152 mb
+- Without any Cache (IPv6): 5.741 seconds, 2.097152 mb
+
+An option to improve a tiny bit would be to only cache IPv6 results since IPv4 checking seems to be a little bit faster than **ANY** caching.
+
+---
+```php
+<?php
+
+require './vendor/autoload.php';
+
+use Symfony\Component\HttpFoundation\IpUtils;
+
+$start = microtime(true);
+
+for ($i = 0; $i < 1_000_000; ++$i) {
+    IpUtils::checkIp4(random_int(1, 254).random_int(0, 254).random_int(0, 254).random_int(0, 255), '192.168.1.1');
+    // IpUtils::checkIp6('::1', 'fe80::/65');
+}
+
+$end = microtime(true);
+
+var_dump($end - $start, get_peak_memory_usage());
+```
+---
+
+When only checking about 100 IP addresses the difference becomes basically indistinguishable:
+
+- With LRU: 0.00061893463134766 seconds, 2.097152 mb
+- Max Items Cache: 0.00063395500183105 seconds, 2.097152 mb
+- Current Cache: 0.00051212310791016 seconds, 2.097152 mb
+- Without any Cache (IPv4): 0.00046300888061523 seconds, 2.097152 mb
+- Without any Cache (IPv6): 0.00075387954711914 seconds, 2.097152 mb
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-04-20T13:29:32Z
+
+> An option to improve a tiny bit would be to only cache IPv6 results since IPv4 checking seems to be a little bit faster than ANY caching.
+
+let's do this yes! (with an inline comment reminding us about this)
+let's drop the -v6 suffix while doing so
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-04-20T13:31:45Z
+
+> With LRU: 3.778 seconds, 2.097152 mb
+> Without any Cache (IPv6): 5.741 seconds, 2.097152 mb
+
+The difference is not that big actually.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-04-20T13:34:31Z
+
+The cache has been introduced in https://github.com/symfony/symfony/pull/23098
+What about dropping it altogether? The diff doesn't look much worth the added complexity to me.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-04-20T13:41:10Z
+
+the benchmark being done seems to be testing the performance in case of cache misses though.
+
+the cache was added to improve performance for the common case of checking the trusted ips many times, which will do cache hits for most checks.

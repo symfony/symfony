@@ -10,7 +10,8 @@ CHANGELOG
  * Create migration for session table when pdo handler is used
  * Add support for Relay PHP extension for Redis
  * The `Response::sendHeaders()` method now takes an optional HTTP status code as parameter, allowing to send informational responses such as Early Hints responses (103 status code)
- * Add `IpUtils::isPrivateIp`
+ * Add `IpUtils::isPrivateIp()`
+ * Add `Request::getPayload(): InputBag`
  * Deprecate conversion of invalid values in `ParameterBag::getInt()` and `ParameterBag::getBoolean()`,
  * Deprecate ignoring invalid values when using `ParameterBag::filter()`, unless flag `FILTER_NULL_ON_FAILURE` is set
 

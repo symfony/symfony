@@ -98,7 +98,7 @@ class Uri implements UriInterface
      *
      * @return static
      */
-    public function withScheme($scheme)
+    public function withScheme($scheme): UriInterface
     {
         throw new \BadMethodCallException('Not implemented.');
     }
@@ -108,7 +108,7 @@ class Uri implements UriInterface
      *
      * @return static
      */
-    public function withUserInfo($user, $password = null)
+    public function withUserInfo($user, $password = null): UriInterface
     {
         throw new \BadMethodCallException('Not implemented.');
     }
@@ -118,7 +118,7 @@ class Uri implements UriInterface
      *
      * @return static
      */
-    public function withHost($host)
+    public function withHost($host): UriInterface
     {
         throw new \BadMethodCallException('Not implemented.');
     }
@@ -128,7 +128,7 @@ class Uri implements UriInterface
      *
      * @return static
      */
-    public function withPort($port)
+    public function withPort($port): UriInterface
     {
         throw new \BadMethodCallException('Not implemented.');
     }
@@ -138,7 +138,7 @@ class Uri implements UriInterface
      *
      * @return static
      */
-    public function withPath($path)
+    public function withPath($path): UriInterface
     {
         throw new \BadMethodCallException('Not implemented.');
     }
@@ -148,7 +148,7 @@ class Uri implements UriInterface
      *
      * @return static
      */
-    public function withQuery($query)
+    public function withQuery($query): UriInterface
     {
         throw new \BadMethodCallException('Not implemented.');
     }
@@ -158,7 +158,7 @@ class Uri implements UriInterface
      *
      * @return static
      */
-    public function withFragment($fragment)
+    public function withFragment($fragment): UriInterface
     {
         throw new \BadMethodCallException('Not implemented.');
     }

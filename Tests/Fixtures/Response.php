@@ -36,7 +36,7 @@ class Response extends Message implements ResponseInterface
     /**
      * @return static
      */
-    public function withStatus($code, $reasonPhrase = '')
+    public function withStatus($code, $reasonPhrase = ''): ResponseInterface
     {
         throw new \BadMethodCallException('Not implemented.');
     }

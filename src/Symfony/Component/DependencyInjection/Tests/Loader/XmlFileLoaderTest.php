@@ -1181,7 +1181,7 @@ class XmlFileLoaderTest extends TestCase
         $this->assertEquals($actual, $expected);
     }
 
-    public function dataForBindingsAndInnerCollections()
+    public static function dataForBindingsAndInnerCollections()
     {
         return [
            ['bar1', ['item.1', 'item.2']],

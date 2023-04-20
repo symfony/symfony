@@ -11,6 +11,7 @@ CHANGELOG
  * Add `attributes` optional array argument in `UserBadge`
  * Call `UserBadge::userLoader` with attributes if the argument is set
  * Allow to override badge fqcn on `Passport::addBadge`
+ * Add `SecurityTokenValueResolver` to inject token as controller argument
 
 6.2
 ---

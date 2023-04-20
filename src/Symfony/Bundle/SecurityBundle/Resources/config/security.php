@@ -42,6 +42,7 @@ use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Core\User\MissingUserProvider;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Component\Security\Http\Controller\SecurityTokenValueResolver;
 use Symfony\Component\Security\Http\Controller\UserValueResolver;
 use Symfony\Component\Security\Http\EventListener\IsGrantedAttributeListener;
 use Symfony\Component\Security\Http\Firewall;
@@ -101,6 +102,12 @@ return static function (ContainerConfigurator $container) {
                 service('security.token_storage'),
             ])
             ->tag('controller.argument_value_resolver', ['priority' => 120, 'name' => UserValueResolver::class])
+
+        ->set('security.security_token_value_resolver', SecurityTokenValueResolver::class)
+            ->args([
+                service('security.token_storage'),
+            ])
+            ->tag('controller.argument_value_resolver', ['priority' => 120, 'name' => SecurityTokenValueResolver::class])
 
         // Authentication related services
         ->set('security.authentication.trust_resolver', AuthenticationTrustResolver::class)

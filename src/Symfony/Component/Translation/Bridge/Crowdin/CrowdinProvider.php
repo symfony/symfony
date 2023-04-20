@@ -423,7 +423,7 @@ final class CrowdinProvider implements ProviderInterface
         $localeLanguageMap = [];
         foreach ($response->toArray()['data'] as $language) {
             foreach (['locale', 'osxLocale', 'id'] as $key) {
-                if (\in_array($language['data'][$key], $locales)) {
+                if (\in_array($language['data'][$key], $locales, true)) {
                     $localeLanguageMap[$language['data'][$key]] = $language['data']['id'];
                 }
             }

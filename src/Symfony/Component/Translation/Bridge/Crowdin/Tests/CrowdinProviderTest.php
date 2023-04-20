@@ -800,7 +800,6 @@ XLIFF
 
                 return new MockResponse(json_encode(['data' => ['url' => 'https://file.url']]));
             },
-
             'downloadFile' => function (string $method, string $url) use ($responseContent): ResponseInterface {
                 $this->assertSame('GET', $method);
                 $this->assertSame('https://file.url/', $url);

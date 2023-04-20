@@ -83,7 +83,7 @@ EOF
         $filter = $input->getOption('filter');
         if ($filter) {
             if (!class_exists(ExpressionLanguage::class)) {
-                throw new LogicException('Package "symfony/expression-language" is required to use the "filter" option.');
+                throw new LogicException('Package "symfony/expression-language" is required to use the "filter" option. Try running "composer require symfony/expression-language".');
             }
             $this->el = new ExpressionLanguage();
         }

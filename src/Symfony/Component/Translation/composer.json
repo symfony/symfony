@@ -48,12 +48,6 @@
     "provide": {
         "symfony/translation-implementation": "2.3|3.0"
     },
-    "suggest": {
-        "nikic/php-parser": "To use PhpAstExtractor",
-        "symfony/config": "",
-        "symfony/yaml": "",
-        "psr/log-implementation": "To use logging capability in translator"
-    },
     "autoload": {
         "files": [ "Resources/functions.php" ],
         "psr-4": { "Symfony\\Component\\Translation\\": "" },

@@ -35,13 +35,6 @@
         "symfony/service-contracts": "self.version",
         "symfony/translation-contracts": "self.version"
     },
-    "suggest": {
-        "symfony/cache-implementation": "",
-        "symfony/event-dispatcher-implementation": "",
-        "symfony/http-client-implementation": "",
-        "symfony/service-implementation": "",
-        "symfony/translation-implementation": ""
-    },
     "autoload": {
         "psr-4": { "Symfony\\Contracts\\": "" },
         "files": [ "Deprecation/function.php" ],

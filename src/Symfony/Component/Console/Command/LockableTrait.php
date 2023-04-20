@@ -32,7 +32,7 @@ trait LockableTrait
     private function lock(string $name = null, bool $blocking = false): bool
     {
         if (!class_exists(SemaphoreStore::class)) {
-            throw new LogicException('To enable the locking feature you must install the symfony/lock component.');
+            throw new LogicException('To enable the locking feature you must install the symfony/lock component. Try running "composer require symfony/lock".');
         }
 
         if (null !== $this->lock) {

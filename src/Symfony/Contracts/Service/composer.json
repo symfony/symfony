@@ -22,9 +22,6 @@
     "conflict": {
         "ext-psr": "<1.1|>=2"
     },
-    "suggest": {
-        "symfony/service-implementation": ""
-    },
     "autoload": {
         "psr-4": { "Symfony\\Contracts\\Service\\": "" },
         "exclude-from-classmap": [

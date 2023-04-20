@@ -37,10 +37,6 @@
         "psr/event-dispatcher-implementation": "1.0",
         "symfony/event-dispatcher-implementation": "2.0|3.0"
     },
-    "suggest": {
-        "symfony/dependency-injection": "",
-        "symfony/http-kernel": ""
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\EventDispatcher\\": "" },
         "exclude-from-classmap": [

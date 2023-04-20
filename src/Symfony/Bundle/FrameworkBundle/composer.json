@@ -101,16 +101,6 @@
         "symfony/web-profiler-bundle": "<5.4",
         "symfony/workflow": "<5.4"
     },
-    "suggest": {
-        "ext-apcu": "For best performance of the system caches",
-        "symfony/console": "For using the console commands",
-        "symfony/form": "For using forms",
-        "symfony/serializer": "For using the serializer service",
-        "symfony/validator": "For using validation",
-        "symfony/yaml": "For using the debug:config and lint:yaml commands",
-        "symfony/property-info": "For using the property_info service",
-        "symfony/web-link": "For using web links, features such as preloading, prefetching or prerendering"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\FrameworkBundle\\": "" },
         "exclude-from-classmap": [

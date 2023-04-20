@@ -42,10 +42,6 @@
         "symfony/security-bundle": "<5.4",
         "symfony/security-csrf": "<5.4"
     },
-    "suggest": {
-        "symfony/security-csrf": "For using tokens to protect authentication/logout attempts",
-        "symfony/routing": "For using the HttpUtils class to create sub-requests, redirect the user, and match URLs"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Security\\Http\\": "" },
         "exclude-from-classmap": [

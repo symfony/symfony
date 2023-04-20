@@ -42,7 +42,7 @@ final class Address
     public function __construct(string $address, string $name = '')
     {
         if (!class_exists(EmailValidator::class)) {
-            throw new LogicException(sprintf('The "%s" class cannot be used as it needs "%s"; try running "composer require egulias/email-validator".', __CLASS__, EmailValidator::class));
+            throw new LogicException(sprintf('The "%s" class cannot be used as it needs "%s". Try running "composer require egulias/email-validator".', __CLASS__, EmailValidator::class));
         }
 
         self::$validator ??= new EmailValidator();

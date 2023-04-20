@@ -100,7 +100,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         $dsn = new Dsn(sprintf('%s://localhost', $scheme));
 
         $this->assertSame(
-            sprintf('Unable to send notification via "%s" as the bridge is not installed; try running "composer require %s".', $scheme, $package),
+            sprintf('Unable to send notification via "%s" as the bridge is not installed. Try running "composer require %s".', $scheme, $package),
             (new UnsupportedSchemeException($dsn))->getMessage()
         );
     }

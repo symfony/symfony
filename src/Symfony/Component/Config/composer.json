@@ -32,9 +32,6 @@
         "symfony/finder": "<5.4",
         "symfony/service-contracts": "<2.5"
     },
-    "suggest": {
-        "symfony/yaml": "To use the yaml reference dumper"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Config\\": "" },
         "exclude-from-classmap": [

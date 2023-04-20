@@ -54,18 +54,6 @@
         "symfony/translation": "<5.4",
         "symfony/yaml": "<5.4"
     },
-    "suggest": {
-        "psr/cache-implementation": "For using the mapping cache.",
-        "symfony/http-foundation": "",
-        "symfony/intl": "",
-        "symfony/translation": "For translating validation errors.",
-        "symfony/yaml": "",
-        "symfony/config": "",
-        "egulias/email-validator": "Strict (RFC compliant) email validation",
-        "symfony/property-access": "For accessing properties within comparison constraints",
-        "symfony/property-info": "To automatically add NotNull and Type constraints",
-        "symfony/expression-language": "For using the Expression validator and the ExpressionLanguageSyntax constraints"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Validator\\": "" },
         "exclude-from-classmap": [

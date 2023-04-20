@@ -68,14 +68,6 @@
         "symfony/security-core": "<6.0",
         "symfony/validator": "<5.4"
     },
-    "suggest": {
-        "symfony/form": "",
-        "symfony/validator": "",
-        "symfony/property-info": "",
-        "doctrine/data-fixtures": "",
-        "doctrine/dbal": "",
-        "doctrine/orm": ""
-    },
     "autoload": {
         "psr-4": { "Symfony\\Bridge\\Doctrine\\": "" },
         "exclude-from-classmap": [

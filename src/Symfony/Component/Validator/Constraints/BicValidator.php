@@ -159,7 +159,7 @@ class BicValidator extends ConstraintValidator
     {
         if (null === $this->propertyAccessor) {
             if (!class_exists(PropertyAccess::class)) {
-                throw new LogicException('Unable to use property path as the Symfony PropertyAccess component is not installed.');
+                throw new LogicException('Unable to use property path as the Symfony PropertyAccess component is not installed. Try running "composer require symfony/property-access".');
             }
             $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
         }

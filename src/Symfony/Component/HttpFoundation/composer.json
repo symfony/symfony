@@ -34,9 +34,6 @@
     "conflict": {
         "symfony/cache": "<6.2"
     },
-    "suggest" : {
-        "symfony/mime": "To use the file extension guesser"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\HttpFoundation\\": "" },
         "exclude-from-classmap": [

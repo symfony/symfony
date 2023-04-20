@@ -200,4 +200,23 @@ class IpUtilsTest extends TestCase
             ['2606:4700:20::681a:e06',  false],
         ];
     }
+
+    public function testCacheSizeLimit()
+    {
+        $ref = new \ReflectionClass(IpUtils::class);
+
+        /** @var array */
+        $checkedIps = $ref->getStaticPropertyValue('checkedIps');
+        $this->assertIsArray($checkedIps);
+
+        $maxCheckedIps = 1000;
+
+        for ($i = 1; $i < $maxCheckedIps * 1.5; ++$i) {
+            $ip = '192.168.1.'.str_pad((string) $i, 3, '0');
+
+            IpUtils::checkIp4($ip, '127.0.0.1');
+        }
+
+        $this->assertLessThan($maxCheckedIps, \count($checkedIps));
+    }
 }

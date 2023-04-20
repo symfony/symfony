@@ -11,8 +11,7 @@
 
 namespace Symfony\Component\HttpClient;
 
-use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
+use Psr\Log\LoggerAwareInterface;
 use Symfony\Component\HttpClient\Response\AsyncContext;
 use Symfony\Component\HttpClient\Response\AsyncResponse;
 use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
@@ -28,24 +27,23 @@ use Symfony\Contracts\Service\ResetInterface;
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class RetryableHttpClient implements HttpClientInterface, ResetInterface
+class RetryableHttpClient implements HttpClientInterface, ResetInterface, LoggerAwareInterface
 {
     use AsyncDecoratorTrait;
+    use LoggerAwareTrait;
 
     private RetryStrategyInterface $strategy;
     private int $maxRetries;
-    private LoggerInterface $logger;
     private array $baseUris = [];
 
     /**
      * @param int $maxRetries The maximum number of times to retry
      */
-    public function __construct(HttpClientInterface $client, RetryStrategyInterface $strategy = null, int $maxRetries = 3, LoggerInterface $logger = null)
+    public function __construct(HttpClientInterface $client, RetryStrategyInterface $strategy = null, int $maxRetries = 3)
     {
         $this->client = $client;
         $this->strategy = $strategy ?? new GenericRetryStrategy();
         $this->maxRetries = $maxRetries;
-        $this->logger = $logger ?? new NullLogger();
     }
 
     public function withOptions(array $options): static

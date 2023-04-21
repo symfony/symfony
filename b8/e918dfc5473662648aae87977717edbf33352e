@@ -1,0 +1,54 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-27T14:52:06Z
+
+/cc @HypeMC FYI
+
+---------------------------------------------------------------------------
+
+by ktherage at 2023-03-27T14:53:36Z
+
+/cc @BafS also
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2023-03-27T15:34:05Z
+
+The original goal of my PR was to add the class as an argument to the exception, this reverts that as well. While I like the idea of having all the arguments at once, I don't see why the part with the class being passed needs to be removed.
+
+---------------------------------------------------------------------------
+
+by ktherage at 2023-03-27T16:03:38Z
+
+@HypeMC
+
+> The original goal of my PR was to add the class as an argument to the exception, this reverts that as well.
+
+Well, sorry, I missed that part I'll check that.
+
+---------------------------------------------------------------------------
+
+by ktherage at 2023-03-27T17:06:50Z
+
+I have a failing test locally and I think that it's fine as it requires now a constructor parameter that is missing but I'm not sure if I might fix it (ie I actually broke a thing).
+
+It's at src/Symfony/Component/Serializer/Tests/SerializerTest.php:764
+
+details :
+```
+1) Symfony\Component\Serializer\Tests\SerializerTest::testUnionTypeDeserializableWithoutAllowedExtraAttributes
+Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException: Cannot create an instance of "Symfony\Component\Serializer\Tests\DummyCTypeForUnion" from serialized data because its constructor requires the following parameters to be present : "c".
+
+/home/ktherage/Documents/forks/symfony/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php:408
+/home/ktherage/Documents/forks/symfony/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php:244
+/home/ktherage/Documents/forks/symfony/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php:323
+/home/ktherage/Documents/forks/symfony/src/Symfony/Component/Serializer/Serializer.php:227
+/home/ktherage/Documents/forks/symfony/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php:537
+/home/ktherage/Documents/forks/symfony/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php:601
+/home/ktherage/Documents/forks/symfony/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php:370
+/home/ktherage/Documents/forks/symfony/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php:244
+/home/ktherage/Documents/forks/symfony/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php:323
+/home/ktherage/Documents/forks/symfony/src/Symfony/Component/Serializer/Serializer.php:227
+/home/ktherage/Documents/forks/symfony/src/Symfony/Component/Serializer/Serializer.php:145
+/home/ktherage/Documents/forks/symfony/src/Symfony/Component/Serializer/Tests/SerializerTest.php:764
+```

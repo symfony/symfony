@@ -330,6 +330,13 @@ trait RedisTrait
                     $params['parameters']['password'] = $auth;
                 }
             }
+
+            if (isset($params['ssl'])) {
+                foreach ($hosts as $i => $host) {
+                    $hosts[$i]['ssl'] ??= $params['ssl'];
+                }
+            }
+
             if (1 === \count($hosts) && !($params['redis_cluster'] || $params['redis_sentinel'])) {
                 $hosts = $hosts[0];
             } elseif (\in_array($params['failover'], ['slaves', 'distribute'], true) && !isset($params['replication'])) {
@@ -338,7 +345,7 @@ trait RedisTrait
             }
             $params['exceptions'] = false;
 
-            $redis = new $class($hosts, array_diff_key($params, array_diff_key(self::$defaultConnectionOptions, ['ssl' => null])));
+            $redis = new $class($hosts, array_diff_key($params, self::$defaultConnectionOptions));
             if (isset($params['redis_sentinel'])) {
                 $redis->getConnection()->setSentinelTimeout($params['timeout']);
             }

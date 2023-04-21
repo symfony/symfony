@@ -38,7 +38,7 @@ trait FilesystemTrait
 
             if (($expiresAt = (int) fgets($h)) && $time >= $expiresAt) {
                 fclose($h);
-                $pruned = @unlink($file) && !file_exists($file) && $pruned;
+                $pruned = (@unlink($file) || !file_exists($file)) && $pruned;
             } else {
                 fclose($h);
             }

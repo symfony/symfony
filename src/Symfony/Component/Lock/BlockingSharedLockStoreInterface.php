@@ -21,6 +21,8 @@ interface BlockingSharedLockStoreInterface extends SharedLockStoreInterface
     /**
      * Waits until a key becomes free for reading, then stores the resource.
      *
+     * @return void
+     *
      * @throws LockConflictedException
      */
     public function waitAndSaveRead(Key $key);

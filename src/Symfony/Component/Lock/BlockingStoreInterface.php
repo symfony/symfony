@@ -21,6 +21,8 @@ interface BlockingStoreInterface extends PersistingStoreInterface
     /**
      * Waits until a key becomes free, then stores the resource.
      *
+     * @return void
+     *
      * @throws LockConflictedException
      */
     public function waitAndSave(Key $key);

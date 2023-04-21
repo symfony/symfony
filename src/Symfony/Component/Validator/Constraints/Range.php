@@ -92,7 +92,7 @@ class Range extends Constraint
         }
 
         if ((null !== $this->minPropertyPath || null !== $this->maxPropertyPath) && !class_exists(PropertyAccess::class)) {
-            throw new LogicException(sprintf('The "%s" constraint requires the Symfony PropertyAccess component to use the "minPropertyPath" or "maxPropertyPath" option.', static::class));
+            throw new LogicException(sprintf('The "%s" constraint requires the Symfony PropertyAccess component to use the "minPropertyPath" or "maxPropertyPath" option. Try running "composer require symfony/property-access".', static::class));
         }
 
         if (null !== $this->min && null !== $this->max && ($minMessage || $maxMessage)) {

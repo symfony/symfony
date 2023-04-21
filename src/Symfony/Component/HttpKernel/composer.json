@@ -68,12 +68,6 @@
         "symfony/validator": "<5.4",
         "twig/twig": "<2.13"
     },
-    "suggest": {
-        "symfony/browser-kit": "",
-        "symfony/config": "",
-        "symfony/console": "",
-        "symfony/dependency-injection": ""
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\HttpKernel\\": "" },
         "exclude-from-classmap": [

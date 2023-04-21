@@ -25,9 +25,6 @@
         "symfony/error-handler": "^5.4|^6.0",
         "symfony/polyfill-php81": "^1.27"
     },
-    "suggest": {
-        "symfony/error-handler": "For tracking deprecated interfaces usages at runtime with DebugClassLoader"
-    },
     "conflict": {
         "phpunit/phpunit": "<7.5|9.1.2"
     },

@@ -34,12 +34,6 @@
     "provide": {
         "psr/log-implementation": "1.0|2.0|3.0"
     },
-    "suggest": {
-        "symfony/event-dispatcher": "",
-        "symfony/lock": "",
-        "symfony/process": "",
-        "psr/log": "For using the console logger"
-    },
     "conflict": {
         "symfony/dependency-injection": "<5.4",
         "symfony/dotenv": "<5.4",

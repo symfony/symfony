@@ -31,10 +31,6 @@
         "symfony/config": "<5.4",
         "symfony/dependency-injection": "<5.4"
     },
-    "suggest": {
-        "symfony/config": "For service container configuration",
-        "symfony/dependency-injection": "For using as a service from the container"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\DebugBundle\\": "" },
         "exclude-from-classmap": [

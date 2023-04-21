@@ -24,9 +24,6 @@
     "require-dev": {
         "symfony/css-selector": "^5.4|^6.0"
     },
-    "suggest": {
-        "symfony/css-selector": ""
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\DomCrawler\\": "" },
         "exclude-from-classmap": [

@@ -64,23 +64,6 @@
         "symfony/translation": "<5.4",
         "symfony/workflow": "<5.4"
     },
-    "suggest": {
-        "symfony/finder": "",
-        "symfony/asset": "For using the AssetExtension",
-        "symfony/form": "For using the FormExtension",
-        "symfony/html-sanitizer": "For using the HtmlSanitizerExtension",
-        "symfony/http-kernel": "For using the HttpKernelExtension",
-        "symfony/routing": "For using the RoutingExtension",
-        "symfony/translation": "For using the TranslationExtension",
-        "symfony/yaml": "For using the YamlExtension",
-        "symfony/security-core": "For using the SecurityExtension",
-        "symfony/security-csrf": "For using the CsrfExtension",
-        "symfony/security-http": "For using the LogoutUrlExtension",
-        "symfony/stopwatch": "For using the StopwatchExtension",
-        "symfony/var-dumper": "For using the DumpExtension",
-        "symfony/expression-language": "For using the ExpressionExtension",
-        "symfony/web-link": "For using the WebLinkExtension"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Bridge\\Twig\\": "" },
         "exclude-from-classmap": [

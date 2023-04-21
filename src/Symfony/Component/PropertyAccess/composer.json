@@ -23,9 +23,6 @@
     "require-dev": {
         "symfony/cache": "^5.4|^6.0"
     },
-    "suggest": {
-        "psr/cache-implementation": "To cache access methods."
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\PropertyAccess\\": "" },
         "exclude-from-classmap": [

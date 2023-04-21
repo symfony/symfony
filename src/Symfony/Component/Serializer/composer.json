@@ -50,15 +50,6 @@
         "symfony/uid": "<5.4",
         "symfony/yaml": "<5.4"
     },
-    "suggest": {
-        "psr/cache-implementation": "For using the metadata cache.",
-        "symfony/property-info": "To deserialize relations.",
-        "symfony/yaml": "For using the default YAML mapping loader.",
-        "symfony/config": "For using the XML mapping loader.",
-        "symfony/property-access": "For using the ObjectNormalizer.",
-        "symfony/mime": "For using a MIME type guesser within the DataUriNormalizer.",
-        "symfony/var-exporter": "For using the metadata compiler."
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Serializer\\": "" },
         "exclude-from-classmap": [

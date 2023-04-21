@@ -30,11 +30,6 @@
         "phpunit/phpunit": "<5.4.3",
         "symfony/console": "<5.4"
     },
-    "suggest": {
-        "ext-iconv": "To convert non-UTF-8 strings to UTF-8 (or symfony/polyfill-iconv in case ext-iconv cannot be used).",
-        "ext-intl": "To show region name in time zone dump",
-        "symfony/console": "To use the ServerDumpCommand and/or the bin/var-dump-server script"
-    },
     "autoload": {
         "files": [ "Resources/functions/dump.php" ],
         "psr-4": { "Symfony\\Component\\VarDumper\\": "" },

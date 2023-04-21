@@ -74,7 +74,7 @@ class UnsupportedSchemeException extends LogicException
         }
         $package = self::SCHEME_TO_PACKAGE_MAP[$provider] ?? null;
         if ($package && !class_exists($package['class'])) {
-            parent::__construct(sprintf('Unable to send emails via "%s" as the bridge is not installed; try running "composer require %s".', $provider, $package['package']));
+            parent::__construct(sprintf('Unable to send emails via "%s" as the bridge is not installed. Try running "composer require %s".', $provider, $package['package']));
 
             return;
         }

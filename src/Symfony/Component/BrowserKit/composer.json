@@ -25,9 +25,6 @@
         "symfony/mime": "^5.4|^6.0",
         "symfony/process": "^5.4|^6.0"
     },
-    "suggest": {
-        "symfony/process": ""
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\BrowserKit\\": "" },
         "exclude-from-classmap": [

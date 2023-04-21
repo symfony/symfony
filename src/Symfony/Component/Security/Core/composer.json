@@ -41,14 +41,6 @@
         "symfony/ldap": "<5.4",
         "symfony/validator": "<5.4"
     },
-    "suggest": {
-        "psr/container-implementation": "To instantiate the Security class",
-        "symfony/event-dispatcher": "",
-        "symfony/http-foundation": "",
-        "symfony/validator": "For using the user password constraint",
-        "symfony/expression-language": "For using the expression voter",
-        "symfony/ldap": "For using LDAP integration"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Security\\Core\\": "" },
         "exclude-from-classmap": [

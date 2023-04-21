@@ -183,7 +183,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
         }
 
         if (!class_exists(Finder::class)) {
-            throw new \LogicException('Extended glob patterns cannot be used as the Finder component is not installed, try running "composer require symfony/finder".');
+            throw new \LogicException('Extended glob patterns cannot be used as the Finder component is not installed. Try running "composer require symfony/finder".');
         }
 
         yield from (new Finder())

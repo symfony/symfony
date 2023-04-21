@@ -25,9 +25,6 @@
     "conflict": {
         "symfony/console": "<5.4"
     },
-    "suggest": {
-        "symfony/console": "For validating YAML files using the lint command"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Yaml\\": "" },
         "exclude-from-classmap": [

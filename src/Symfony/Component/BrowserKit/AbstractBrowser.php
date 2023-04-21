@@ -118,7 +118,7 @@ abstract class AbstractBrowser
     public function insulate(bool $insulated = true)
     {
         if ($insulated && !class_exists(\Symfony\Component\Process\Process::class)) {
-            throw new LogicException('Unable to isolate requests as the Symfony Process Component is not installed.');
+            throw new LogicException('Unable to isolate requests as the Symfony Process Component is not installed. Try running "composer require symfony/process".');
         }
 
         $this->insulated = $insulated;

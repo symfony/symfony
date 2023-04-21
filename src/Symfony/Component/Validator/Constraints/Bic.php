@@ -69,7 +69,7 @@ class Bic extends Constraint
         }
 
         if (null !== $this->ibanPropertyPath && !class_exists(PropertyAccess::class)) {
-            throw new LogicException(sprintf('The "symfony/property-access" component is required to use the "%s" constraint with the "ibanPropertyPath" option.', self::class));
+            throw new LogicException(sprintf('The "symfony/property-access" component is required to use the "%s" constraint with the "ibanPropertyPath" option. Try running "composer require symfony/property-access".', self::class));
         }
     }
 }

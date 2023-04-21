@@ -23,9 +23,6 @@
         "psr/cache": "^1.0|^2.0|^3.0",
         "symfony/lock": "^5.4|^6.0"
     },
-    "suggest": {
-        "symfony/lock": "For preventing race conditions in rate limiters"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\RateLimiter\\": "" },
         "exclude-from-classmap": [

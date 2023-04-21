@@ -55,12 +55,6 @@
         "symfony/translation-contracts": "<2.5",
         "symfony/twig-bridge": "<6.3"
     },
-    "suggest": {
-        "symfony/validator": "For form validation.",
-        "symfony/security-core": "For hashing users passwords.",
-        "symfony/security-csrf": "For protecting forms against CSRF attacks.",
-        "symfony/twig-bridge": "For templating with Twig."
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Form\\": "" },
         "exclude-from-classmap": [

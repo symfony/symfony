@@ -114,7 +114,7 @@ class KernelBrowser extends HttpKernelBrowser
     public function loginUser(object $user, string $firewallContext = 'main'): static
     {
         if (!interface_exists(UserInterface::class)) {
-            throw new \LogicException(sprintf('"%s" requires symfony/security-core to be installed.', __METHOD__));
+            throw new \LogicException(sprintf('"%s" requires symfony/security-core to be installed. Try running "composer require symfony/security-core".', __METHOD__));
         }
 
         if (!$user instanceof UserInterface) {

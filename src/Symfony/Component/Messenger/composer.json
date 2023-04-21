@@ -42,9 +42,6 @@
         "symfony/http-kernel": "<5.4",
         "symfony/serializer": "<5.4"
     },
-    "suggest": {
-        "enqueue/messenger-adapter": "For using the php-enqueue library as a transport."
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Messenger\\": "" },
         "exclude-from-classmap": [

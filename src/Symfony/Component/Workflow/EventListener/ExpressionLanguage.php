@@ -33,7 +33,7 @@ class ExpressionLanguage extends BaseExpressionLanguage
 
         $this->register('is_valid', fn ($object = 'null', $groups = 'null') => sprintf('0 === count($validator->validate(%s, null, %s))', $object, $groups), function (array $variables, $object = null, $groups = null) {
             if (!$variables['validator'] instanceof ValidatorInterface) {
-                throw new RuntimeException('"is_valid" cannot be used as the Validator component is not installed.');
+                throw new RuntimeException('"is_valid" cannot be used as the Validator component is not installed. Try running "composer require symfony/validator".');
             }
 
             $errors = $variables['validator']->validate($object, null, $groups);

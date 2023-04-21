@@ -18,9 +18,6 @@
     "require": {
         "php": ">=8.1"
     },
-    "suggest": {
-        "symfony/http-foundation": ""
-    },
     "require-dev": {
         "symfony/http-client": "^5.4|^6.0",
         "symfony/http-foundation": "^5.4|^6.0",

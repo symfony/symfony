@@ -142,15 +142,15 @@ final class ProxyHelper
                 continue;
             }
 
-            $signature = self::exportSignature($method);
-            $parentCall = $method->isAbstract() ? "throw new \BadMethodCallException('Cannot forward abstract method \"{$method->class}::{$method->name}()\".')" : "parent::{$method->name}(...\\func_get_args())";
+            $signature = self::exportSignature($method, true, $args);
+            $parentCall = $method->isAbstract() ? "throw new \BadMethodCallException('Cannot forward abstract method \"{$method->class}::{$method->name}()\".')" : "parent::{$method->name}({$args})";
 
             if ($method->isStatic()) {
                 $body = "        $parentCall;";
             } elseif (str_ends_with($signature, '): never') || str_ends_with($signature, '): void')) {
                 $body = <<<EOPHP
                         if (isset(\$this->lazyObjectState)) {
-                            (\$this->lazyObjectState->realInstance ??= (\$this->lazyObjectState->initializer)())->{$method->name}(...\\func_get_args());
+                            (\$this->lazyObjectState->realInstance ??= (\$this->lazyObjectState->initializer)())->{$method->name}({$args});
                         } else {
                             {$parentCall};
                         }
@@ -172,7 +172,7 @@ final class ProxyHelper
 
                 $body = <<<EOPHP
                         if (isset(\$this->lazyObjectState)) {
-                            return (\$this->lazyObjectState->realInstance ??= (\$this->lazyObjectState->initializer)())->{$method->name}(...\\func_get_args());
+                            return (\$this->lazyObjectState->realInstance ??= (\$this->lazyObjectState->initializer)())->{$method->name}({$args});
                         }
 
                         return {$parentCall};
@@ -213,8 +213,11 @@ final class ProxyHelper
             EOPHP;
     }
 
-    public static function exportSignature(\ReflectionFunctionAbstract $function, bool $withParameterTypes = true): string
+    public static function exportSignature(\ReflectionFunctionAbstract $function, bool $withParameterTypes = true, string &$args = null): string
     {
+        $hasByRef = false;
+        $args = '';
+        $param = null;
         $parameters = [];
         foreach ($function->getParameters() as $param) {
             $parameters[] = ($param->getAttributes(\SensitiveParameter::class) ? '#[\SensitiveParameter] ' : '')
@@ -222,6 +225,16 @@ final class ProxyHelper
                 .($param->isPassedByReference() ? '&' : '')
                 .($param->isVariadic() ? '...' : '').'$'.$param->name
                 .($param->isOptional() && !$param->isVariadic() ? ' = '.self::exportDefault($param) : '');
+            $hasByRef = $hasByRef || $param->isPassedByReference();
+            $args .= ($param->isVariadic() ? '...$' : '$').$param->name.', ';
+        }
+
+        if (!$param || !$hasByRef) {
+            $args = '...\func_get_args()';
+        } elseif ($param->isVariadic()) {
+            $args = substr($args, 0, -2);
+        } else {
+            $args .= sprintf('...\array_slice(\func_get_args(), %d)', \count($parameters));
         }
 
         $signature = 'function '.($function->returnsReference() ? '&' : '')

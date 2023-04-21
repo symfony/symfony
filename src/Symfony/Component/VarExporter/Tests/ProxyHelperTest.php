@@ -77,12 +77,12 @@ class ProxyHelperTest extends TestCase
                 return parent::foo1(...\func_get_args());
             }
 
-            public function foo4(\Symfony\Component\VarExporter\Tests\Bar|string $b): void
+            public function foo4(\Symfony\Component\VarExporter\Tests\Bar|string $b, &$d): void
             {
                 if (isset($this->lazyObjectState)) {
-                    ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->foo4(...\func_get_args());
+                    ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->foo4($b, $d, ...\array_slice(\func_get_args(), 2));
                 } else {
-                    parent::foo4(...\func_get_args());
+                    parent::foo4($b, $d, ...\array_slice(\func_get_args(), 2));
                 }
             }
 
@@ -133,7 +133,7 @@ class ProxyHelperTest extends TestCase
                 return throw new \BadMethodCallException('Cannot forward abstract method "Symfony\Component\VarExporter\Tests\TestForProxyHelperInterface1::foo1()".');
             }
 
-            public function foo2(?\Symfony\Component\VarExporter\Tests\Bar $b): \Symfony\Component\VarExporter\Tests\TestForProxyHelperInterface2
+            public function foo2(?\Symfony\Component\VarExporter\Tests\Bar $b, ...$d): \Symfony\Component\VarExporter\Tests\TestForProxyHelperInterface2
             {
                 if (isset($this->lazyObjectState)) {
                     return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->foo2(...\func_get_args());
@@ -196,7 +196,7 @@ abstract class TestForProxyHelper
     {
     }
 
-    public function foo2(?Bar $b): ?self
+    public function foo2(?Bar $b, ...$d): ?self
     {
     }
 
@@ -204,7 +204,7 @@ abstract class TestForProxyHelper
     {
     }
 
-    public function foo4(Bar|string $b): void
+    public function foo4(Bar|string $b, &$d): void
     {
     }
 
@@ -234,7 +234,7 @@ interface TestForProxyHelperInterface1
 
 interface TestForProxyHelperInterface2
 {
-    public function foo2(?Bar $b): self;
+    public function foo2(?Bar $b, ...$d): self;
 
     public static function foo3(): string;
 }

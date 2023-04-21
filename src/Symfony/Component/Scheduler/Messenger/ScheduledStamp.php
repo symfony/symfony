@@ -12,10 +12,18 @@
 namespace Symfony\Component\Scheduler\Messenger;
 
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
+use Symfony\Component\Scheduler\Trigger\TriggerInterface;
 
 /**
  * @experimental
  */
 final class ScheduledStamp implements NonSendableStampInterface
 {
+    public function __construct(
+        public readonly ?string $name,
+        public readonly TriggerInterface $trigger,
+        public readonly \DateTimeImmutable $runAt,
+        public readonly \DateTimeImmutable $nextRun,
+    ) {
+    }
 }

@@ -29,7 +29,7 @@ class SchedulerTransport implements TransportInterface
     public function get(): iterable
     {
         foreach ($this->messageGenerator->getMessages() as $message) {
-            yield Envelope::wrap($message, [new ScheduledStamp()]);
+            yield Envelope::wrap($message);
         }
     }
 

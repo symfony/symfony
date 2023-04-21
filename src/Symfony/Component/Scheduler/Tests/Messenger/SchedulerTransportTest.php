@@ -15,7 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Scheduler\Exception\LogicException;
 use Symfony\Component\Scheduler\Generator\MessageGeneratorInterface;
-use Symfony\Component\Scheduler\Messenger\ScheduledStamp;
 use Symfony\Component\Scheduler\Messenger\SchedulerTransport;
 
 class SchedulerTransportTest extends TestCase
@@ -33,7 +32,6 @@ class SchedulerTransportTest extends TestCase
 
         foreach ($transport->get() as $envelope) {
             $this->assertInstanceOf(Envelope::class, $envelope);
-            $this->assertNotNull($envelope->last(ScheduledStamp::class));
             $this->assertSame(array_shift($messages), $envelope->getMessage());
         }
 

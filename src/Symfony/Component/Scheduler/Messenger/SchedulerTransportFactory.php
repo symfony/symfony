@@ -48,7 +48,7 @@ class SchedulerTransportFactory implements TransportFactoryInterface
         $schedule = $this->scheduleProviders->get($scheduleName)->getSchedule();
         $checkpoint = new Checkpoint('scheduler_checkpoint_'.$scheduleName, $schedule->getLock(), $schedule->getState());
 
-        return new SchedulerTransport(new MessageGenerator($schedule, $checkpoint, $this->clock));
+        return new SchedulerTransport(new MessageGenerator($schedule, $checkpoint, $this->clock, $scheduleName));
     }
 
     public function supports(string $dsn, array $options): bool

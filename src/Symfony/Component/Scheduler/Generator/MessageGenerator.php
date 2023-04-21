@@ -13,6 +13,8 @@ namespace Symfony\Component\Scheduler\Generator;
 
 use Psr\Clock\ClockInterface;
 use Symfony\Component\Clock\Clock;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Scheduler\Messenger\ScheduledStamp;
 use Symfony\Component\Scheduler\Schedule;
 use Symfony\Component\Scheduler\Trigger\TriggerInterface;
 
@@ -29,6 +31,7 @@ final class MessageGenerator implements MessageGeneratorInterface
         private readonly Schedule $schedule,
         string|CheckpointInterface $checkpoint,
         private readonly ClockInterface $clock = new Clock(),
+        private readonly ?string $name = null,
     ) {
         $this->waitUntil = new \DateTimeImmutable('@0');
         if (\is_string($checkpoint)) {
@@ -70,7 +73,7 @@ final class MessageGenerator implements MessageGeneratorInterface
             }
 
             if ($yield) {
-                yield $message;
+                yield Envelope::wrap($message, [new ScheduledStamp($this->name, $trigger, $time, $nextTime)]);
                 $this->checkpoint->save($time, $index);
             }
         }

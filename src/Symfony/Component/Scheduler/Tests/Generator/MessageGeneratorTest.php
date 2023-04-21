@@ -14,7 +14,9 @@ namespace Symfony\Component\Scheduler\Tests\Generator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Clock\ClockInterface;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Scheduler\Generator\MessageGenerator;
+use Symfony\Component\Scheduler\Messenger\ScheduledStamp;
 use Symfony\Component\Scheduler\RecurringMessage;
 use Symfony\Component\Scheduler\Schedule;
 use Symfony\Component\Scheduler\Trigger\TriggerInterface;
@@ -40,14 +42,20 @@ class MessageGeneratorTest extends TestCase
         $schedule = (new Schedule())->add(...$schedule);
         $schedule->stateful(new ArrayAdapter());
 
-        $scheduler = new MessageGenerator($schedule, 'dummy', $clock);
+        $scheduler = new MessageGenerator($schedule, 'dummy', $clock, 'dummy');
 
         // Warmup. The first run is always returns nothing.
         $this->assertSame([], iterator_to_array($scheduler->getMessages()));
 
         foreach ($runs as $time => $expected) {
             $now = self::makeDateTime($time);
-            $this->assertSame($expected, iterator_to_array($scheduler->getMessages()));
+            $messages = iterator_to_array($scheduler->getMessages());
+            $this->assertSame($expected, \array_map(fn(Envelope $e) => $e->getMessage(), $messages));
+
+            foreach ($messages as $envelope) {
+                $this->assertNotNull($stamp = $envelope->last(ScheduledStamp::class));
+                $this->assertSame('dummy', $stamp->name);
+            }
         }
     }
 

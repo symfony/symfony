@@ -82,7 +82,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
                 }
 
                 if ($time >= $expiresAt) {
-                    $pruned = $this->doUnlink($file) && !file_exists($file) && $pruned;
+                    $pruned = ($this->doUnlink($file) || !file_exists($file)) && $pruned;
                 }
             }
         } finally {

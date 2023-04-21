@@ -18,9 +18,14 @@ use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceExce
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
-use Symfony\Contracts\Service\Test\ServiceLocatorTest as BaseServiceLocatorTest;
+use Symfony\Contracts\Service\Test\ServiceLocatorTest as LegacyServiceLocatorTestCase;
+use Symfony\Contracts\Service\Test\ServiceLocatorTestCase;
 
-class ServiceLocatorTest extends BaseServiceLocatorTest
+if (!class_exists(ServiceLocatorTestCase::class)) {
+    class_alias(LegacyServiceLocatorTestCase::class, ServiceLocatorTestCase::class);
+}
+
+class ServiceLocatorTest extends ServiceLocatorTestCase
 {
     public function getServiceLocator(array $factories): ContainerInterface
     {

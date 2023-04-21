@@ -1225,6 +1225,16 @@ class XmlFileLoaderTest extends TestCase
         ];
     }
 
+    public function testTagNameAttribute()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('tag_with_name_attribute.xml');
+
+        $definition = $container->getDefinition('foo');
+        $this->assertSame([['name' => 'name_attribute']], $definition->getTag('tag_name'));
+    }
+
     public function testFromCallable()
     {
         $container = new ContainerBuilder();

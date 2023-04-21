@@ -23,6 +23,8 @@ interface PersistingStoreInterface
     /**
      * Stores the resource if it's not locked by someone else.
      *
+     * @return void
+     *
      * @throws LockAcquiringException
      * @throws LockConflictedException
      */
@@ -30,6 +32,8 @@ interface PersistingStoreInterface
 
     /**
      * Removes a resource from the storage.
+     *
+     * @return void
      *
      * @throws LockReleasingException
      */
@@ -44,6 +48,8 @@ interface PersistingStoreInterface
      * Extends the TTL of a resource.
      *
      * @param float $ttl amount of seconds to keep the lock in the store
+     *
+     * @return void
      *
      * @throws LockConflictedException
      */

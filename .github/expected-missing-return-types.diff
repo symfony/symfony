@@ -7102,94 +7102,94 @@ index 9d7012de35..545339d4ef 100644
      {
          unset($this->parameters[$key]);
 diff --git a/src/Symfony/Component/HttpFoundation/Request.php b/src/Symfony/Component/HttpFoundation/Request.php
-index a6650c49a3..2d5eb50ab4 100644
+index cf7e56f13e..e07d5fab79 100644
 --- a/src/Symfony/Component/HttpFoundation/Request.php
 +++ b/src/Symfony/Component/HttpFoundation/Request.php
-@@ -267,5 +267,5 @@ class Request
+@@ -269,5 +269,5 @@ class Request
       * @return void
       */
 -    public function initialize(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null)
 +    public function initialize(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null): void
      {
          $this->request = new InputBag($request);
-@@ -427,5 +427,5 @@ class Request
+@@ -429,5 +429,5 @@ class Request
       * @return void
       */
 -    public static function setFactory(?callable $callable)
 +    public static function setFactory(?callable $callable): void
      {
          self::$requestFactory = $callable;
-@@ -533,5 +533,5 @@ class Request
+@@ -535,5 +535,5 @@ class Request
       * @return void
       */
 -    public function overrideGlobals()
 +    public function overrideGlobals(): void
      {
          $this->server->set('QUERY_STRING', static::normalizeQueryString(http_build_query($this->query->all(), '', '&')));
-@@ -575,5 +575,5 @@ class Request
+@@ -577,5 +577,5 @@ class Request
       * @return void
       */
 -    public static function setTrustedProxies(array $proxies, int $trustedHeaderSet)
 +    public static function setTrustedProxies(array $proxies, int $trustedHeaderSet): void
      {
          self::$trustedProxies = array_reduce($proxies, function ($proxies, $proxy) {
-@@ -618,5 +618,5 @@ class Request
+@@ -620,5 +620,5 @@ class Request
       * @return void
       */
 -    public static function setTrustedHosts(array $hostPatterns)
 +    public static function setTrustedHosts(array $hostPatterns): void
      {
          self::$trustedHostPatterns = array_map(fn ($hostPattern) => sprintf('{%s}i', $hostPattern), $hostPatterns);
-@@ -666,5 +666,5 @@ class Request
+@@ -668,5 +668,5 @@ class Request
       * @return void
       */
 -    public static function enableHttpMethodParameterOverride()
 +    public static function enableHttpMethodParameterOverride(): void
      {
          self::$httpMethodParameterOverride = true;
-@@ -753,5 +753,5 @@ class Request
+@@ -755,5 +755,5 @@ class Request
       * @return void
       */
 -    public function setSession(SessionInterface $session)
 +    public function setSession(SessionInterface $session): void
      {
          $this->session = $session;
-@@ -1176,5 +1176,5 @@ class Request
+@@ -1178,5 +1178,5 @@ class Request
       * @return void
       */
 -    public function setMethod(string $method)
 +    public function setMethod(string $method): void
      {
          $this->method = null;
-@@ -1299,5 +1299,5 @@ class Request
+@@ -1301,5 +1301,5 @@ class Request
       * @return void
       */
 -    public function setFormat(?string $format, string|array $mimeTypes)
 +    public function setFormat(?string $format, string|array $mimeTypes): void
      {
          if (null === static::$formats) {
-@@ -1331,5 +1331,5 @@ class Request
+@@ -1333,5 +1333,5 @@ class Request
       * @return void
       */
 -    public function setRequestFormat(?string $format)
 +    public function setRequestFormat(?string $format): void
      {
          $this->format = $format;
-@@ -1363,5 +1363,5 @@ class Request
+@@ -1365,5 +1365,5 @@ class Request
       * @return void
       */
 -    public function setDefaultLocale(string $locale)
 +    public function setDefaultLocale(string $locale): void
      {
          $this->defaultLocale = $locale;
-@@ -1385,5 +1385,5 @@ class Request
+@@ -1387,5 +1387,5 @@ class Request
       * @return void
       */
 -    public function setLocale(string $locale)
 +    public function setLocale(string $locale): void
      {
          $this->setPhpDefaultLocale($this->locale = $locale);
-@@ -1900,5 +1900,5 @@ class Request
+@@ -1904,5 +1904,5 @@ class Request
       * @return void
       */
 -    protected static function initializeFormats()
@@ -9050,6 +9050,26 @@ index 7e535ebde1..ebb3df9b2b 100644
 +    public function onCheckPassport(CheckPassportEvent $event): void
      {
          $passport = $event->getPassport();
+diff --git a/src/Symfony/Component/Lock/BlockingSharedLockStoreInterface.php b/src/Symfony/Component/Lock/BlockingSharedLockStoreInterface.php
+index 6929206c42..f2494e1061 100644
+--- a/src/Symfony/Component/Lock/BlockingSharedLockStoreInterface.php
++++ b/src/Symfony/Component/Lock/BlockingSharedLockStoreInterface.php
+@@ -26,4 +26,4 @@ interface BlockingSharedLockStoreInterface extends SharedLockStoreInterface
+      * @throws LockConflictedException
+      */
+-    public function waitAndSaveRead(Key $key);
++    public function waitAndSaveRead(Key $key): void;
+ }
+diff --git a/src/Symfony/Component/Lock/BlockingStoreInterface.php b/src/Symfony/Component/Lock/BlockingStoreInterface.php
+index 8a84272a8b..e22fac0538 100644
+--- a/src/Symfony/Component/Lock/BlockingStoreInterface.php
++++ b/src/Symfony/Component/Lock/BlockingStoreInterface.php
+@@ -26,4 +26,4 @@ interface BlockingStoreInterface extends PersistingStoreInterface
+      * @throws LockConflictedException
+      */
+-    public function waitAndSave(Key $key);
++    public function waitAndSave(Key $key): void;
+ }
 diff --git a/src/Symfony/Component/Lock/LockFactory.php b/src/Symfony/Component/Lock/LockFactory.php
 index 125b6eae50..ac327e8981 100644
 --- a/src/Symfony/Component/Lock/LockFactory.php
@@ -9068,6 +9088,58 @@ index 125b6eae50..ac327e8981 100644
 +    public function createLockFromKey(Key $key, ?float $ttl = 300.0, bool $autoRelease = true): SharedLockInterface
      {
          $lock = new Lock($key, $this->store, $ttl, $autoRelease);
+diff --git a/src/Symfony/Component/Lock/LockInterface.php b/src/Symfony/Component/Lock/LockInterface.php
+index 8ff806497c..991252e453 100644
+--- a/src/Symfony/Component/Lock/LockInterface.php
++++ b/src/Symfony/Component/Lock/LockInterface.php
+@@ -42,5 +42,5 @@ interface LockInterface
+      * @throws LockAcquiringException  If the lock cannot be refreshed
+      */
+-    public function refresh(float $ttl = null);
++    public function refresh(float $ttl = null): void;
+ 
+     /**
+@@ -56,5 +56,5 @@ interface LockInterface
+      * @throws LockReleasingException If the lock cannot be released
+      */
+-    public function release();
++    public function release(): void;
+ 
+     public function isExpired(): bool;
+diff --git a/src/Symfony/Component/Lock/PersistingStoreInterface.php b/src/Symfony/Component/Lock/PersistingStoreInterface.php
+index 10af48c5e6..392446a56a 100644
+--- a/src/Symfony/Component/Lock/PersistingStoreInterface.php
++++ b/src/Symfony/Component/Lock/PersistingStoreInterface.php
+@@ -29,5 +29,5 @@ interface PersistingStoreInterface
+      * @throws LockConflictedException
+      */
+-    public function save(Key $key);
++    public function save(Key $key): void;
+ 
+     /**
+@@ -38,5 +38,5 @@ interface PersistingStoreInterface
+      * @throws LockReleasingException
+      */
+-    public function delete(Key $key);
++    public function delete(Key $key): void;
+ 
+     /**
+@@ -54,4 +54,4 @@ interface PersistingStoreInterface
+      * @throws LockConflictedException
+      */
+-    public function putOffExpiration(Key $key, float $ttl);
++    public function putOffExpiration(Key $key, float $ttl): void;
+ }
+diff --git a/src/Symfony/Component/Lock/SharedLockStoreInterface.php b/src/Symfony/Component/Lock/SharedLockStoreInterface.php
+index 8246152493..1814a18bca 100644
+--- a/src/Symfony/Component/Lock/SharedLockStoreInterface.php
++++ b/src/Symfony/Component/Lock/SharedLockStoreInterface.php
+@@ -26,4 +26,4 @@ interface SharedLockStoreInterface extends PersistingStoreInterface
+      * @throws LockConflictedException
+      */
+-    public function saveRead(Key $key);
++    public function saveRead(Key $key): void;
+ }
 diff --git a/src/Symfony/Component/Lock/Store/CombinedStore.php b/src/Symfony/Component/Lock/Store/CombinedStore.php
 index 9087874c29..5cfd87c4ad 100644
 --- a/src/Symfony/Component/Lock/Store/CombinedStore.php

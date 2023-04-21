@@ -1,10 +1,11 @@
 CHANGELOG
 =========
 
-# 2.2.0 (TBA)
+# 2.2.0 (2023-04-21)
 
 * Drop support for Symfony 4
 * Bump minimum version of PHP to 7.2
+* Support version 2 of the psr/http-message contracts
 
 # 2.1.3 (2022-09-05)
 

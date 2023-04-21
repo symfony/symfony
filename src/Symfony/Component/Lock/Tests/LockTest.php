@@ -516,16 +516,14 @@ class LockTest extends TestCase
             private $keys = [];
             private $initialTtl = 30;
 
-            public function save(Key $key)
+            public function save(Key $key): void
             {
                 $key->reduceLifetime($this->initialTtl);
                 $this->keys[spl_object_hash($key)] = $key;
                 $this->checkNotExpired($key);
-
-                return true;
             }
 
-            public function delete(Key $key)
+            public function delete(Key $key): void
             {
                 unset($this->keys[spl_object_hash($key)]);
             }
@@ -535,7 +533,7 @@ class LockTest extends TestCase
                 return isset($this->keys[spl_object_hash($key)]);
             }
 
-            public function putOffExpiration(Key $key, $ttl)
+            public function putOffExpiration(Key $key, $ttl): void
             {
                 $key->reduceLifetime($ttl);
                 $this->checkNotExpired($key);

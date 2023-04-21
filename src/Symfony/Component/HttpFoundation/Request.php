@@ -89,6 +89,8 @@ class Request
     /**
      * Request body parameters ($_POST).
      *
+     * @see getPayload() for portability between content types
+     *
      * @var InputBag
      */
     public $request;
@@ -1514,6 +1516,8 @@ class Request
 
     /**
      * Gets the request body decoded as array, typically from a JSON payload.
+     *
+     * @see getPayload() for portability between content types
      *
      * @throws JsonException When the body cannot be decoded to an array
      */

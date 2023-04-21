@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-04-21T10:21:51Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-04-21T11:45:43Z
+
+Thanks; Can you add a test case please?
+
+---------------------------------------------------------------------------
+
+by PhilETaylor at 2023-04-21T12:20:42Z
+
+I have taken these proposed changes to `src/Symfony/Component/DependencyInjection/Loader/XmlFileLoader.php` and applied them, manually, in my live project that identified this issue originally,
+
+Then, after a cache:clear, this problem has been resolved. So I confirm this PR fixes my original issue, in the original app that was complaining.
+
+Thanks @MatTheCat - please consider signing up to GitHub Sponsors :)
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-04-21T12:32:50Z
+
+Thanks for testing on a real project @PhilETaylor! Will look at this sponsorship thing :eyes:

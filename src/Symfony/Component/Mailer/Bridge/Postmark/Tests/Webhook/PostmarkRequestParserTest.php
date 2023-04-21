@@ -14,9 +14,9 @@ namespace Symfony\Component\Mailer\Bridge\Postmark\Tests\Webhook;
 use Symfony\Component\Mailer\Bridge\Postmark\RemoteEvent\PostmarkPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Postmark\Webhook\PostmarkRequestParser;
 use Symfony\Component\Webhook\Client\RequestParserInterface;
-use Symfony\Component\Webhook\Test\AbstractRequestParserTest;
+use Symfony\Component\Webhook\Test\AbstractRequestParserTestCase;
 
-class PostmarkRequestParserTest extends AbstractRequestParserTest
+class PostmarkRequestParserTest extends AbstractRequestParserTestCase
 {
     protected function createRequestParser(): RequestParserInterface
     {

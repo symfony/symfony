@@ -16,7 +16,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\RemoteEvent\RemoteEvent;
 use Symfony\Component\Webhook\Client\RequestParserInterface;
 
-abstract class AbstractRequestParserTest extends TestCase
+/**
+ * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @experimental in 6.3
+ */
+abstract class AbstractRequestParserTestCase extends TestCase
 {
     /**
      * @dataProvider getPayloads

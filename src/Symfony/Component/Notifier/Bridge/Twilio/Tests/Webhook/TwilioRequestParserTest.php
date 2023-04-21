@@ -14,9 +14,9 @@ namespace Symfony\Component\Notifier\Bridge\Twilio\Tests\Webhook;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Notifier\Bridge\Twilio\Webhook\TwilioRequestParser;
 use Symfony\Component\Webhook\Client\RequestParserInterface;
-use Symfony\Component\Webhook\Test\AbstractRequestParserTest;
+use Symfony\Component\Webhook\Test\AbstractRequestParserTestCase;
 
-class TwilioRequestParserTest extends AbstractRequestParserTest
+class TwilioRequestParserTest extends AbstractRequestParserTestCase
 {
     protected function createRequestParser(): RequestParserInterface
     {

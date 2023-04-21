@@ -193,7 +193,7 @@ class HttpClientDataCollectorTest extends TestCase
   --url %1$shttp://localhost:8057/json%1$s \\
   --header %1$sAccept: */*%1$s \\
   --header %1$sAccept-Encoding: gzip%1$s \\
-  --header %1$sUser-Agent: SymfonyHttpClient (Native)%1$s',
+  --header %1$sUser-Agent: Symfony HttpClient (Native)%1$s',
         ];
         yield 'GET with base uri' => [
             [
@@ -209,7 +209,7 @@ class HttpClientDataCollectorTest extends TestCase
   --url %1$shttp://localhost:8057/json/1%1$s \\
   --header %1$sAccept: */*%1$s \\
   --header %1$sAccept-Encoding: gzip%1$s \\
-  --header %1$sUser-Agent: SymfonyHttpClient (Native)%1$s',
+  --header %1$sUser-Agent: Symfony HttpClient (Native)%1$s',
         ];
         yield 'GET with resolve' => [
             [
@@ -229,7 +229,7 @@ class HttpClientDataCollectorTest extends TestCase
   --url %1$shttp://localhost:8057/json%1$s \\
   --header %1$sAccept: */*%1$s \\
   --header %1$sAccept-Encoding: gzip%1$s \\
-  --header %1$sUser-Agent: SymfonyHttpClient (Native)%1$s',
+  --header %1$sUser-Agent: Symfony HttpClient (Native)%1$s',
         ];
         yield 'POST with string body' => [
             [
@@ -247,7 +247,7 @@ class HttpClientDataCollectorTest extends TestCase
   --header %1$sContent-Length: 9%1$s \\
   --header %1$sContent-Type: application/x-www-form-urlencoded%1$s \\
   --header %1$sAccept-Encoding: gzip%1$s \\
-  --header %1$sUser-Agent: SymfonyHttpClient (Native)%1$s \\
+  --header %1$sUser-Agent: Symfony HttpClient (Native)%1$s \\
   --data %1$sfoobarbaz%1$s',
         ];
         yield 'POST with array body' => [
@@ -285,7 +285,7 @@ class HttpClientDataCollectorTest extends TestCase
   --header %1$sContent-Type: application/x-www-form-urlencoded%1$s \\
   --header %1$sContent-Length: 211%1$s \\
   --header %1$sAccept-Encoding: gzip%1$s \\
-  --header %1$sUser-Agent: SymfonyHttpClient (Native)%1$s \\
+  --header %1$sUser-Agent: Symfony HttpClient (Native)%1$s \\
   --data %1$sfoo=fooval%1$s --data %1$sbar=barval%1$s --data %1$sbaz=bazval%1$s --data %1$sfoobar[baz]=bazval%1$s --data %1$sfoobar[qux]=quxval%1$s --data %1$sbazqux[0]=bazquxval1%1$s --data %1$sbazqux[1]=bazquxval2%1$s --data %1$sobject[fooprop]=foopropval%1$s --data %1$sobject[barprop]=barpropval%1$s --data %1$stostring=tostringval%1$s',
         ];
 
@@ -312,7 +312,7 @@ class HttpClientDataCollectorTest extends TestCase
   --url %1$shttp://localhost:8057/?foo=fooval&bar=newbarval&foobar[baz]=bazval&foobar[qux]=quxval&bazqux[0]=bazquxval1&bazqux[1]=bazquxval2%1$s \\
   --header %1$sAccept: */*%1$s \\
   --header %1$sAccept-Encoding: gzip%1$s \\
-  --header %1$sUser-Agent: SymfonyHttpClient (Native)%1$s',
+  --header %1$sUser-Agent: Symfony HttpClient (Native)%1$s',
             ];
             yield 'POST with json' => [
                 [
@@ -336,7 +336,7 @@ class HttpClientDataCollectorTest extends TestCase
   --header %1$sAccept: */*%1$s \\
   --header %1$sContent-Length: 120%1$s \\
   --header %1$sAccept-Encoding: gzip%1$s \\
-  --header %1$sUser-Agent: SymfonyHttpClient (Native)%1$s \\
+  --header %1$sUser-Agent: Symfony HttpClient (Native)%1$s \\
   --data %1$s{"foo":{"bar":"baz","qux":[1.1,1.0],"fred":["\u003Cfoo\u003E","\u0027bar\u0027","\u0022baz\u0022","\u0026blong\u0026"]}}%1$s',
             ];
         }
@@ -368,7 +368,7 @@ class HttpClientDataCollectorTest extends TestCase
   --header %1$sAccept: */*%1$s \\
   --header %1$sAuthorization: Basic Zm9vOmJhcg==%1$s \\
   --header %1$sAccept-Encoding: gzip%1$s \\
-  --header %1$sUser-Agent: SymfonyHttpClient (Native)%1$s', '\\' === \DIRECTORY_SEPARATOR ? '"' : "'"), $curlCommand
+  --header %1$sUser-Agent: Symfony HttpClient (Native)%1$s', '\\' === \DIRECTORY_SEPARATOR ? '"' : "'"), $curlCommand
         );
     }
 

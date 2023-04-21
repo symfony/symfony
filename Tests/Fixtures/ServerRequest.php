@@ -35,7 +35,7 @@ class ServerRequest extends Message implements ServerRequestInterface
     {
         parent::__construct($version, $headers, $body);
 
-        if (!($uri instanceof UriInterface)) {
+        if (!$uri instanceof UriInterface) {
             $uri = new Uri((string) $uri);
         }
 

@@ -11825,6 +11825,16 @@ index 8f54752590..cefb1e1b80 100644
 +    public function setCsvControl(string $delimiter = ';', string $enclosure = '"'): void
      {
          $this->delimiter = $delimiter;
+diff --git a/src/Symfony/Component/Translation/Dumper/DumperInterface.php b/src/Symfony/Component/Translation/Dumper/DumperInterface.php
+index 6bf42931ef..60f12bcda3 100644
+--- a/src/Symfony/Component/Translation/Dumper/DumperInterface.php
++++ b/src/Symfony/Component/Translation/Dumper/DumperInterface.php
+@@ -29,4 +29,4 @@ interface DumperInterface
+      * @return void
+      */
+-    public function dump(MessageCatalogue $messages, array $options = []);
++    public function dump(MessageCatalogue $messages, array $options = []): void;
+ }
 diff --git a/src/Symfony/Component/Translation/Dumper/FileDumper.php b/src/Symfony/Component/Translation/Dumper/FileDumper.php
 index ed2c278aaf..0722e1c160 100644
 --- a/src/Symfony/Component/Translation/Dumper/FileDumper.php
@@ -11884,6 +11894,41 @@ index d36f7f385a..dbaeceee09 100644
 +    public function extract(string|iterable $directory, MessageCatalogue $catalogue): void
      {
          foreach ($this->extractors as $extractor) {
+diff --git a/src/Symfony/Component/Translation/Extractor/ExtractorInterface.php b/src/Symfony/Component/Translation/Extractor/ExtractorInterface.php
+index 642130af75..c9ae2693a4 100644
+--- a/src/Symfony/Component/Translation/Extractor/ExtractorInterface.php
++++ b/src/Symfony/Component/Translation/Extractor/ExtractorInterface.php
+@@ -29,5 +29,5 @@ interface ExtractorInterface
+      * @return void
+      */
+-    public function extract(string|iterable $resource, MessageCatalogue $catalogue);
++    public function extract(string|iterable $resource, MessageCatalogue $catalogue): void;
+ 
+     /**
+@@ -36,4 +36,4 @@ interface ExtractorInterface
+      * @return void
+      */
+-    public function setPrefix(string $prefix);
++    public function setPrefix(string $prefix): void;
+ }
+diff --git a/src/Symfony/Component/Translation/Extractor/PhpExtractor.php b/src/Symfony/Component/Translation/Extractor/PhpExtractor.php
+index 6b59c7cacc..50c1eba7c6 100644
+--- a/src/Symfony/Component/Translation/Extractor/PhpExtractor.php
++++ b/src/Symfony/Component/Translation/Extractor/PhpExtractor.php
+@@ -136,5 +136,5 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
+      * @return void
+      */
+-    public function extract(string|iterable $resource, MessageCatalogue $catalog)
++    public function extract(string|iterable $resource, MessageCatalogue $catalog): void
+     {
+         $files = $this->extractFiles($resource);
+@@ -149,5 +149,5 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
+      * @return void
+      */
+-    public function setPrefix(string $prefix)
++    public function setPrefix(string $prefix): void
+     {
+         $this->prefix = $prefix;
 diff --git a/src/Symfony/Component/Translation/Loader/CsvFileLoader.php b/src/Symfony/Component/Translation/Loader/CsvFileLoader.php
 index 7f2f96be64..266c7f48c9 100644
 --- a/src/Symfony/Component/Translation/Loader/CsvFileLoader.php
@@ -11980,6 +12025,68 @@ index 379d947ce7..effc8dab3d 100644
 +    public function deleteCatalogueMetadata(string $key = '', string $domain = 'messages'): void
      {
          if (!$domain) {
+diff --git a/src/Symfony/Component/Translation/MessageCatalogueInterface.php b/src/Symfony/Component/Translation/MessageCatalogueInterface.php
+index ed819f1554..27c279768a 100644
+--- a/src/Symfony/Component/Translation/MessageCatalogueInterface.php
++++ b/src/Symfony/Component/Translation/MessageCatalogueInterface.php
+@@ -49,5 +49,5 @@ interface MessageCatalogueInterface
+      * @return void
+      */
+-    public function set(string $id, string $translation, string $domain = 'messages');
++    public function set(string $id, string $translation, string $domain = 'messages'): void;
+ 
+     /**
+@@ -83,5 +83,5 @@ interface MessageCatalogueInterface
+      * @return void
+      */
+-    public function replace(array $messages, string $domain = 'messages');
++    public function replace(array $messages, string $domain = 'messages'): void;
+ 
+     /**
+@@ -93,5 +93,5 @@ interface MessageCatalogueInterface
+      * @return void
+      */
+-    public function add(array $messages, string $domain = 'messages');
++    public function add(array $messages, string $domain = 'messages'): void;
+ 
+     /**
+@@ -102,5 +102,5 @@ interface MessageCatalogueInterface
+      * @return void
+      */
+-    public function addCatalogue(self $catalogue);
++    public function addCatalogue(self $catalogue): void;
+ 
+     /**
+@@ -112,5 +112,5 @@ interface MessageCatalogueInterface
+      * @return void
+      */
+-    public function addFallbackCatalogue(self $catalogue);
++    public function addFallbackCatalogue(self $catalogue): void;
+ 
+     /**
+@@ -131,4 +131,4 @@ interface MessageCatalogueInterface
+      * @return void
+      */
+-    public function addResource(ResourceInterface $resource);
++    public function addResource(ResourceInterface $resource): void;
+ }
+diff --git a/src/Symfony/Component/Translation/MetadataAwareInterface.php b/src/Symfony/Component/Translation/MetadataAwareInterface.php
+index 39e5326c37..5775c04ed5 100644
+--- a/src/Symfony/Component/Translation/MetadataAwareInterface.php
++++ b/src/Symfony/Component/Translation/MetadataAwareInterface.php
+@@ -35,5 +35,5 @@ interface MetadataAwareInterface
+      * @return void
+      */
+-    public function setMetadata(string $key, mixed $value, string $domain = 'messages');
++    public function setMetadata(string $key, mixed $value, string $domain = 'messages'): void;
+ 
+     /**
+@@ -45,4 +45,4 @@ interface MetadataAwareInterface
+      * @return void
+      */
+-    public function deleteMetadata(string $key = '', string $domain = 'messages');
++    public function deleteMetadata(string $key = '', string $domain = 'messages'): void;
+ }
 diff --git a/src/Symfony/Component/Translation/Reader/TranslationReader.php b/src/Symfony/Component/Translation/Reader/TranslationReader.php
 index 01408d4dcd..cd49c7a920 100644
 --- a/src/Symfony/Component/Translation/Reader/TranslationReader.php
@@ -11998,6 +12105,16 @@ index 01408d4dcd..cd49c7a920 100644
 +    public function read(string $directory, MessageCatalogue $catalogue): void
      {
          if (!is_dir($directory)) {
+diff --git a/src/Symfony/Component/Translation/Reader/TranslationReaderInterface.php b/src/Symfony/Component/Translation/Reader/TranslationReaderInterface.php
+index ea74dc23ff..29888cdafc 100644
+--- a/src/Symfony/Component/Translation/Reader/TranslationReaderInterface.php
++++ b/src/Symfony/Component/Translation/Reader/TranslationReaderInterface.php
+@@ -26,4 +26,4 @@ interface TranslationReaderInterface
+      * @return void
+      */
+-    public function read(string $directory, MessageCatalogue $catalogue);
++    public function read(string $directory, MessageCatalogue $catalogue): void;
+ }
 diff --git a/src/Symfony/Component/Translation/Translator.php b/src/Symfony/Component/Translation/Translator.php
 index 132138e922..22f4a060a1 100644
 --- a/src/Symfony/Component/Translation/Translator.php
@@ -12083,6 +12200,16 @@ index 61e03cb0ea..46dc804662 100644
 +    public function write(MessageCatalogue $catalogue, string $format, array $options = []): void
      {
          if (!isset($this->dumpers[$format])) {
+diff --git a/src/Symfony/Component/Translation/Writer/TranslationWriterInterface.php b/src/Symfony/Component/Translation/Writer/TranslationWriterInterface.php
+index 5ebb9794a6..aef89e88e7 100644
+--- a/src/Symfony/Component/Translation/Writer/TranslationWriterInterface.php
++++ b/src/Symfony/Component/Translation/Writer/TranslationWriterInterface.php
+@@ -32,4 +32,4 @@ interface TranslationWriterInterface
+      * @throws InvalidArgumentException
+      */
+-    public function write(MessageCatalogue $catalogue, string $format, array $options = []);
++    public function write(MessageCatalogue $catalogue, string $format, array $options = []): void;
+ }
 diff --git a/src/Symfony/Component/Validator/Command/DebugCommand.php b/src/Symfony/Component/Validator/Command/DebugCommand.php
 index acb00d7242..37cc40a06f 100644
 --- a/src/Symfony/Component/Validator/Command/DebugCommand.php

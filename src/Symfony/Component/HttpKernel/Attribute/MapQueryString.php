@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Attribute;
 
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestPayloadValueResolver;
+use Symfony\Component\Validator\Constraints\GroupSequence;
 
 /**
  * Controller parameter tag to map the query string of the request to typed object and validate it.
@@ -22,7 +23,8 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestPayloadValue
 class MapQueryString extends ValueResolver
 {
     public function __construct(
-        public readonly array $context = [],
+        public readonly array $serializationContext = [],
+        public readonly string|GroupSequence|array|null $validationGroups = null,
         string $resolver = RequestPayloadValueResolver::class,
     ) {
         parent::__construct($resolver);

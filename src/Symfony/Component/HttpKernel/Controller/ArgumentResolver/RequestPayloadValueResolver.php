@@ -120,7 +120,7 @@ final class RequestPayloadValueResolver implements ValueResolverInterface
             return null;
         }
 
-        return $this->serializer->denormalize($data, $type, null, self::CONTEXT_DENORMALIZE + $attribute->context);
+        return $this->serializer->denormalize($data, $type, null, self::CONTEXT_DENORMALIZE + $attribute->serializationContext);
     }
 
     private function mapRequestPayload(Request $request, string $type, MapRequestPayload $attribute): ?object

@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\HttpKernel\Attribute\ValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestPayloadValueResolver;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -312,7 +313,7 @@ class RequestPayloadValueResolverTest extends TestCase
     /**
      * @dataProvider provideValidationGroupsOnManyTypes
      */
-    public function testValidationGroupsPassed(mixed $groups)
+    public function testValidationGroupsPassed(string $method, ValueResolver $attribute)
     {
         $input = ['price' => '50', 'title' => 'A long title, so the validation passes'];
 
@@ -323,10 +324,10 @@ class RequestPayloadValueResolverTest extends TestCase
         $validator = (new ValidatorBuilder())->enableAnnotationMapping()->getValidator();
         $resolver = new RequestPayloadValueResolver($serializer, $validator);
 
-        $request = Request::create('/', 'POST', $input);
+        $request = Request::create('/', $method, $input);
 
         $argument = new ArgumentMetadata('valid', RequestPayload::class, false, false, null, false, [
-            MapRequestPayload::class => new MapRequestPayload(validationGroups: $groups),
+            $attribute::class => $attribute,
         ]);
 
         $resolved = $resolver->resolve($request, $argument);
@@ -338,7 +339,7 @@ class RequestPayloadValueResolverTest extends TestCase
     /**
      * @dataProvider provideValidationGroupsOnManyTypes
      */
-    public function testValidationGroupsNotPassed(mixed $groups)
+    public function testValidationGroupsNotPassed(string $method, ValueResolver $attribute)
     {
         $input = ['price' => '50', 'title' => 'Too short'];
 
@@ -347,9 +348,9 @@ class RequestPayloadValueResolverTest extends TestCase
         $resolver = new RequestPayloadValueResolver($serializer, $validator);
 
         $argument = new ArgumentMetadata('valid', RequestPayload::class, false, false, null, false, [
-            MapRequestPayload::class => new MapRequestPayload(validationGroups: $groups),
+            $attribute::class => $attribute,
         ]);
-        $request = Request::create('/', 'POST', $input);
+        $request = Request::create('/', $method, $input);
 
         try {
             $resolver->resolve($request, $argument);
@@ -364,11 +365,35 @@ class RequestPayloadValueResolverTest extends TestCase
 
     public static function provideValidationGroupsOnManyTypes(): iterable
     {
-        yield 'validation group as string' => ['strict'];
+        yield 'request payload with validation group as string' => [
+            'POST',
+            new MapRequestPayload(validationGroups: 'strict'),
+        ];
 
-        yield 'validation group as array' => [['strict']];
+        yield 'request payload with validation group as array' => [
+            'POST',
+            new MapRequestPayload(validationGroups: ['strict']),
+        ];
 
-        yield 'validation group as GroupSequence' => [new Assert\GroupSequence(['strict'])];
+        yield 'request payload with validation group as GroupSequence' => [
+            'POST',
+            new MapRequestPayload(validationGroups: new Assert\GroupSequence(['strict'])),
+        ];
+
+        yield 'query with validation group as string' => [
+            'GET',
+            new MapQueryString(validationGroups: 'strict'),
+        ];
+
+        yield 'query with validation group as array' => [
+            'GET',
+            new MapQueryString(validationGroups: ['strict']),
+        ];
+
+        yield 'query with validation group as GroupSequence' => [
+            'GET',
+            new MapQueryString(validationGroups: new Assert\GroupSequence(['strict'])),
+        ];
     }
 }
 

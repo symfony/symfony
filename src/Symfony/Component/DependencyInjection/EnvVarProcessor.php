@@ -149,7 +149,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             || false === ($env = $env ?? getenv($name) ?? false) // null is a possible value because of thread safety issues
         ) {
             foreach ($this->loadedVars as $vars) {
-                if (false !== ($env = ($vars[$name] ?? false)) && '' !== $env) {
+                if (false !== ($env = ($vars[$name] ?? $env)) && '' !== $env) {
                     break;
                 }
             }
@@ -167,7 +167,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
                             continue;
                         }
                         $this->loadedVars[] = $vars = $loader->loadEnvVars();
-                        if (false !== ($env = ($vars[$name] ?? false)) && '' !== $env) {
+                        if (false !== ($env = ($vars[$name] ?? $env)) && '' !== $env) {
                             $ended = false;
                             break;
                         }

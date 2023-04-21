@@ -1,3 +1,5 @@
+#compdef {{ COMMAND_NAME }}
+
 # This file is part of the Symfony package.
 #
 # (c) Fabien Potencier <fabien@symfony.com>

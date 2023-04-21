@@ -97,7 +97,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
 
     public function getIterator(): \Traversable
     {
-        if (!file_exists($this->prefix) || (!$this->recursive && '' === $this->pattern)) {
+        if ((!$this->recursive && '' === $this->pattern) || !file_exists($this->prefix)) {
             return;
         }
 
@@ -148,7 +148,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
                     } while ($prefix !== $dirPath && $dirPath !== $normalizedPath = \dirname($dirPath));
                 }
 
-                if (is_file($path) && (null === $regex || preg_match($regex, substr(str_replace('\\', '/', $path), $prefixLen)))) {
+                if ((null === $regex || preg_match($regex, substr(str_replace('\\', '/', $path), $prefixLen))) && is_file($path)) {
                     yield $path => new \SplFileInfo($path);
                 }
                 if (!is_dir($path)) {
@@ -165,7 +165,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
                     new \RecursiveCallbackFilterIterator(
                         new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS),
                         fn (\SplFileInfo $file, $path) => !isset($this->excludedPrefixes[$path = str_replace('\\', '/', $path)])
-                            && (null === $regex || $file->isDir() || preg_match($regex, substr($path, $prefixLen)))
+                            && (null === $regex || preg_match($regex, substr($path, $prefixLen)) || $file->isDir())
                             && '.' !== $file->getBasename()[0]
                     ),
                     \RecursiveIteratorIterator::LEAVES_ONLY

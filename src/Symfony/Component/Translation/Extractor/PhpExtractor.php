@@ -132,6 +132,9 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
         ],
     ];
 
+    /**
+     * @return void
+     */
     public function extract(string|iterable $resource, MessageCatalogue $catalog)
     {
         $files = $this->extractFiles($resource);
@@ -142,6 +145,9 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
         }
     }
 
+    /**
+     * @return void
+     */
     public function setPrefix(string $prefix)
     {
         $this->prefix = $prefix;

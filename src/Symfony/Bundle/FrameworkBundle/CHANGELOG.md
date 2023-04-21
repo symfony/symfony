@@ -47,6 +47,7 @@ CHANGELOG
  * Deprecate the `Http\Client\HttpClient` service, use `Psr\Http\Client\ClientInterface` instead
  * Add `stop_worker_on_signals` configuration option to `messenger` to define signals which would stop a worker
  * Add support for `--all` option to clear all cache pools with `cache:pool:clear` command
+ * Add `--show-aliases` option to `debug:router` command
 
 6.2
 ---

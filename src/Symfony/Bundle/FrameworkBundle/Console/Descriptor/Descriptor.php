@@ -260,6 +260,19 @@ abstract class Descriptor implements DescriptorInterface
         return $tag;
     }
 
+    /**
+     * @return array<string, string[]>
+     */
+    protected function getReverseAliases(RouteCollection $routes): array
+    {
+        $reverseAliases = [];
+        foreach ($routes->getAliases() as $name => $alias) {
+            $reverseAliases[$alias->getId()][] = $name;
+        }
+
+        return $reverseAliases;
+    }
+
     public static function getClassDescription(string $class, string &$resolvedClass = null): string
     {
         $resolvedClass = $class;

@@ -53,6 +53,10 @@ class TextDescriptor extends Descriptor
             $tableHeaders[] = 'Controller';
         }
 
+        if ($showAliases = $options['show_aliases'] ?? false) {
+            $tableHeaders[] = 'Aliases';
+        }
+
         $tableRows = [];
         foreach ($routes->all() as $name => $route) {
             $controller = $route->getDefault('_controller');
@@ -67,6 +71,10 @@ class TextDescriptor extends Descriptor
 
             if ($showControllers) {
                 $row[] = $controller ? $this->formatControllerLink($controller, $this->formatCallable($controller), $options['container'] ?? null) : '';
+            }
+
+            if ($showAliases) {
+                $row[] = implode('|', ($reverseAliases ??= $this->getReverseAliases($routes))[$name] ?? []);
             }
 
             $tableRows[] = $row;

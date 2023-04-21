@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\PsrHttpMessage\Tests\Fixtures;
 
+use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UploadedFileInterface;
 
 /**
@@ -33,7 +34,7 @@ class UploadedFile implements UploadedFileInterface
         $this->clientMediaType = $clientMediaType;
     }
 
-    public function getStream(): Stream
+    public function getStream(): StreamInterface
     {
         return new Stream(file_get_contents($this->filePath));
     }

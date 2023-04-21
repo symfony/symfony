@@ -42,7 +42,7 @@ class Message implements MessageInterface
      *
      * @return static
      */
-    public function withProtocolVersion($version)
+    public function withProtocolVersion($version): MessageInterface
     {
         throw new \BadMethodCallException('Not implemented.');
     }
@@ -72,7 +72,7 @@ class Message implements MessageInterface
      *
      * @return static
      */
-    public function withHeader($name, $value)
+    public function withHeader($name, $value): MessageInterface
     {
         $this->headers[$name] = (array) $value;
 
@@ -84,7 +84,7 @@ class Message implements MessageInterface
      *
      * @return static
      */
-    public function withAddedHeader($name, $value)
+    public function withAddedHeader($name, $value): MessageInterface
     {
         throw new \BadMethodCallException('Not implemented.');
     }
@@ -94,7 +94,7 @@ class Message implements MessageInterface
      *
      * @return static
      */
-    public function withoutHeader($name)
+    public function withoutHeader($name): MessageInterface
     {
         unset($this->headers[$name]);
 
@@ -111,7 +111,7 @@ class Message implements MessageInterface
      *
      * @return static
      */
-    public function withBody(StreamInterface $body)
+    public function withBody(StreamInterface $body): MessageInterface
     {
         throw new \BadMethodCallException('Not implemented.');
     }

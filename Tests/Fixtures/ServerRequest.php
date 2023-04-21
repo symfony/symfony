@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\PsrHttpMessage\Tests\Fixtures;
 
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
@@ -34,6 +35,10 @@ class ServerRequest extends Message implements ServerRequestInterface
     {
         parent::__construct($version, $headers, $body);
 
+        if (!($uri instanceof UriInterface)) {
+            $uri = new Uri((string) $uri);
+        }
+
         $this->requestTarget = $requestTarget;
         $this->method = $method;
         $this->uri = $uri;
@@ -52,10 +57,8 @@ class ServerRequest extends Message implements ServerRequestInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return static
      */
-    public function withRequestTarget($requestTarget)
+    public function withRequestTarget($requestTarget): RequestInterface
     {
         throw new \BadMethodCallException('Not implemented.');
     }
@@ -67,20 +70,16 @@ class ServerRequest extends Message implements ServerRequestInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return static
      */
-    public function withMethod($method)
+    public function withMethod($method): RequestInterface
     {
         throw new \BadMethodCallException('Not implemented.');
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @return UriInterface
      */
-    public function getUri()
+    public function getUri(): UriInterface
     {
         return $this->uri;
     }
@@ -90,7 +89,7 @@ class ServerRequest extends Message implements ServerRequestInterface
      *
      * @return static
      */
-    public function withUri(UriInterface $uri, $preserveHost = false)
+    public function withUri(UriInterface $uri, $preserveHost = false): RequestInterface
     {
         throw new \BadMethodCallException('Not implemented.');
     }
@@ -110,7 +109,7 @@ class ServerRequest extends Message implements ServerRequestInterface
      *
      * @return static
      */
-    public function withCookieParams(array $cookies)
+    public function withCookieParams(array $cookies): ServerRequestInterface
     {
         throw new \BadMethodCallException('Not implemented.');
     }
@@ -125,7 +124,7 @@ class ServerRequest extends Message implements ServerRequestInterface
      *
      * @return static
      */
-    public function withQueryParams(array $query)
+    public function withQueryParams(array $query): ServerRequestInterface
     {
         throw new \BadMethodCallException('Not implemented.');
     }
@@ -140,7 +139,7 @@ class ServerRequest extends Message implements ServerRequestInterface
      *
      * @return static
      */
-    public function withUploadedFiles(array $uploadedFiles)
+    public function withUploadedFiles(array $uploadedFiles): ServerRequestInterface
     {
         throw new \BadMethodCallException('Not implemented.');
     }
@@ -160,7 +159,7 @@ class ServerRequest extends Message implements ServerRequestInterface
      *
      * @return static
      */
-    public function withParsedBody($data)
+    public function withParsedBody($data): ServerRequestInterface
     {
         throw new \BadMethodCallException('Not implemented.');
     }
@@ -185,7 +184,7 @@ class ServerRequest extends Message implements ServerRequestInterface
      *
      * @return static
      */
-    public function withAttribute($name, $value)
+    public function withAttribute($name, $value): ServerRequestInterface
     {
         throw new \BadMethodCallException('Not implemented.');
     }
@@ -195,7 +194,7 @@ class ServerRequest extends Message implements ServerRequestInterface
      *
      * @return static
      */
-    public function withoutAttribute($name)
+    public function withoutAttribute($name): ServerRequestInterface
     {
         throw new \BadMethodCallException('Not implemented.');
     }

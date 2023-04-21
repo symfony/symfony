@@ -52,7 +52,7 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
         $this->setOptions($options);
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token): Response
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token): ?Response
     {
         return $this->httpUtils->createRedirectResponse($request, $this->determineTargetUrl($request));
     }

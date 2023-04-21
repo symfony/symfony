@@ -37,7 +37,7 @@ class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler
         }
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token): Response
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token): ?Response
     {
         return $this->handler->onAuthenticationSuccess($request, $token);
     }

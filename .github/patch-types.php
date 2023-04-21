@@ -56,6 +56,8 @@ foreach ($loader->getClassMap() as $class => $file) {
         case false !== strpos($file, '/src/Symfony/Component/VarExporter/Tests/Fixtures/LazyGhost/ReadOnlyClass.php'):
         case false !== strpos($file, '/src/Symfony/Component/VarExporter/Tests/Fixtures/LazyProxy/ReadOnlyClass.php'):
         case false !== strpos($file, '/src/Symfony/Component/Cache/Traits/RelayProxy.php'):
+        case false !== strpos($file, '/src/Symfony/Contracts/Service/Test/ServiceLocatorTest.php'):
+        case false !== strpos($file, '/src/Symfony/Contracts/Service/Test/ServiceLocatorTestCase.php'):
             continue 2;
     }
 

@@ -95,6 +95,29 @@ class ConfigurationTest extends TestCase
         $this->assertEquals($defaultConfig, $config['assets']);
     }
 
+    public function testAssetMapperCanBeEnabled()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+        $config = $processor->processConfiguration($configuration, [['http_method_override' => false, 'asset_mapper' => null]]);
+
+        $defaultConfig = [
+            'enabled' => true,
+            'paths' => [],
+            'server' => true,
+            'public_prefix' => '/assets/',
+            'strict_mode' => true,
+            'extensions' => [],
+            'importmap_path' => '%kernel.project_dir%/importmap.php',
+            'importmap_polyfill' => null,
+            'vendor_dir' => '%kernel.project_dir%/assets/vendor',
+            'provider' => 'jspm',
+            'importmap_script_attributes' => [],
+        ];
+
+        $this->assertEquals($defaultConfig, $config['asset_mapper']);
+    }
+
     /**
      * @dataProvider provideValidAssetsPackageNameConfigurationTests
      */
@@ -588,6 +611,19 @@ class ConfigurationTest extends TestCase
                 'packages' => [],
                 'json_manifest_path' => null,
                 'strict_mode' => false,
+            ],
+            'asset_mapper' => [
+                'enabled' => !class_exists(FullStack::class),
+                'paths' => [],
+                'server' => true,
+                'public_prefix' => '/assets/',
+                'strict_mode' => true,
+                'extensions' => [],
+                'importmap_path' => '%kernel.project_dir%/importmap.php',
+                'importmap_polyfill' => null,
+                'vendor_dir' => '%kernel.project_dir%/assets/vendor',
+                'provider' => 'jspm',
+                'importmap_script_attributes' => [],
             ],
             'cache' => [
                 'pools' => [],

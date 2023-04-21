@@ -16,6 +16,8 @@ use Doctrine\DBAL\Connection;
 use Psr\Log\LogLevel;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\Asset\Package;
+use Symfony\Component\AssetMapper\AssetMapper;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\Cache\Adapter\DoctrineAdapter;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
@@ -161,6 +163,7 @@ class Configuration implements ConfigurationInterface
         $this->addSessionSection($rootNode);
         $this->addRequestSection($rootNode);
         $this->addAssetsSection($rootNode, $enableIfStandalone);
+        $this->addAssetMapperSection($rootNode, $enableIfStandalone);
         $this->addTranslatorSection($rootNode, $enableIfStandalone);
         $this->addValidationSection($rootNode, $enableIfStandalone);
         $this->addAnnotationsSection($rootNode, $willBeAvailable);
@@ -803,6 +806,97 @@ class Configuration implements ConfigurationInterface
                                     ->thenInvalid('You cannot use both "version" and "json_manifest_path" at the same time under "assets" packages.')
                                 ->end()
                             ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addAssetMapperSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('asset_mapper')
+                    ->info('Asset Mapper configuration')
+                    ->{$enableIfStandalone('symfony/asset-mapper', AssetMapper::class)}()
+                    ->fixXmlConfig('path')
+                    ->fixXmlConfig('extension')
+                    ->fixXmlConfig('importmap_script_attribute')
+                    ->children()
+                        // add array node called "paths" that will be an array of strings
+                        ->arrayNode('paths')
+                            ->info('Directories that hold assets that should be in the mapper. Can be a simple array of an array of ["path/to/assets": "namespace"]')
+                            ->example(['assets/'])
+                            ->normalizeKeys(false)
+                            ->useAttributeAsKey('namespace')
+                            ->beforeNormalization()
+                                ->always()
+                                ->then(function ($v) {
+                                    $result = [];
+                                    foreach ($v as $key => $item) {
+                                        // "dir" => "namespace"
+                                        if (\is_string($key)) {
+                                            $result[$key] = $item;
+
+                                            continue;
+                                        }
+
+                                        if (\is_array($item)) {
+                                            // $item = ["namespace" => "the/namespace", "value" => "the/dir"]
+                                            $result[$item['value']] = $item['namespace'] ?? '';
+                                        } else {
+                                            // $item = "the/dir"
+                                            $result[$item] = '';
+                                        }
+                                    }
+
+                                    return $result;
+                                })
+                            ->end()
+                            ->prototype('scalar')->end()
+                        ->end()
+                        ->booleanNode('server')
+                            ->info('If true, a "dev server" will return the assets from the public directory (true in "debug" mode only by default)')
+                            ->defaultValue($this->debug)
+                        ->end()
+                        ->scalarNode('public_prefix')
+                            ->info('The public path where the assets will be written to (and served from when "server" is true)')
+                            ->defaultValue('/assets/')
+                        ->end()
+                        ->booleanNode('strict_mode')
+                            ->info('If true, an exception will be thrown if an asset cannot be found when imported from JavaScript or CSS files - e.g. "import \'./non-existent.js\'"')
+                            ->defaultValue(true)
+                        ->end()
+                        ->arrayNode('extensions')
+                            ->info('Key-value pair of file extensions set to their mime type.')
+                            ->normalizeKeys(false)
+                            ->useAttributeAsKey('extension')
+                            ->example(['.zip' => 'application/zip'])
+                            ->prototype('scalar')->end()
+                        ->end()
+                        ->scalarNode('importmap_path')
+                            ->info('The path of the importmap.php file.')
+                            ->defaultValue('%kernel.project_dir%/importmap.php')
+                        ->end()
+                        ->scalarNode('importmap_polyfill')
+                            ->info('URL of the ES Module Polyfill to use, false to disable. Defaults to using a CDN URL.')
+                            ->defaultValue(null)
+                        ->end()
+                        ->arrayNode('importmap_script_attributes')
+                            ->info('Key-value pair of attributes to add to script tags output for the importmap.')
+                            ->normalizeKeys(false)
+                            ->useAttributeAsKey('key')
+                            ->example(['data-turbo-track' => 'reload'])
+                            ->prototype('scalar')->end()
+                        ->end()
+                        ->scalarNode('vendor_dir')
+                            ->info('The directory to store JavaScript vendors.')
+                            ->defaultValue('%kernel.project_dir%/assets/vendor')
+                        ->end()
+                        ->scalarNode('provider')
+                            ->info('The provider (CDN) to use', class_exists(ImportMapManager::class) ? sprintf(' (e.g.: "%s").', implode('", "', ImportMapManager::PROVIDERS)) : '.')
+                            ->defaultValue('jspm')
                         ->end()
                     ->end()
                 ->end()

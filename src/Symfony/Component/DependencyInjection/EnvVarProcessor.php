@@ -313,7 +313,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
         }
 
         if ('csv' === $prefix) {
-            return str_getcsv($env, ',', '"', '');
+            return '' === $env ? [] : str_getcsv($env, ',', '"', '');
         }
 
         if ('trim' === $prefix) {

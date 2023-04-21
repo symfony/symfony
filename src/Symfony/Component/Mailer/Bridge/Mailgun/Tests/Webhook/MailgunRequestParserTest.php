@@ -14,9 +14,9 @@ namespace Symfony\Component\Mailer\Bridge\Mailgun\Tests\Webhook;
 use Symfony\Component\Mailer\Bridge\Mailgun\RemoteEvent\MailgunPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Mailgun\Webhook\MailgunRequestParser;
 use Symfony\Component\Webhook\Client\RequestParserInterface;
-use Symfony\Component\Webhook\Test\AbstractRequestParserTest;
+use Symfony\Component\Webhook\Test\AbstractRequestParserTestCase;
 
-class MailgunRequestParserTest extends AbstractRequestParserTest
+class MailgunRequestParserTest extends AbstractRequestParserTestCase
 {
     protected function createRequestParser(): RequestParserInterface
     {

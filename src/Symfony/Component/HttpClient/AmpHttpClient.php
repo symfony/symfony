@@ -98,7 +98,7 @@ final class AmpHttpClient implements HttpClientInterface, LoggerAwareInterface, 
         }
 
         if (!isset($options['normalized_headers']['user-agent'])) {
-            $options['headers'][] = 'User-Agent: SymfonyHttpClient (Amp)';
+            $options['headers'][] = 'User-Agent: Symfony HttpClient (Amp)';
         }
 
         if (0 < $options['max_duration']) {

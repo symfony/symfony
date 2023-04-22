@@ -72,7 +72,7 @@ class LazyClosure
             throw new RuntimeException(sprintf('Cannot create lazy closure for service "%s" because its corresponding callable is invalid.', $id));
         }
 
-        $code = ProxyHelper::exportSignature($r->getMethod($method));
+        $code = ProxyHelper::exportSignature($r->getMethod($method), true, $args);
 
         if ($asClosure) {
             $code = ' { '.preg_replace('/: static$/', ': \\'.$r->name, $code);
@@ -81,7 +81,7 @@ class LazyClosure
         }
 
         $code = 'new class('.$initializer.') extends \\'.self::class
-            .$code.' { return $this->service->'.$callable[1].'(...\func_get_args()); } '
+            .$code.' { return $this->service->'.$callable[1].'('.$args.'); } '
             .'}';
 
         return $asClosure ? '('.$code.')->'.$method.'(...)' : $code;

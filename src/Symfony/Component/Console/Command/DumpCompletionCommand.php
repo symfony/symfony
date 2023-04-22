@@ -132,8 +132,14 @@ EOH
      */
     private function getSupportedShells(): array
     {
-        return array_map(function ($f) {
-            return pathinfo($f, \PATHINFO_EXTENSION);
-        }, glob(__DIR__.'/../Resources/completion.*'));
+        $shells = [];
+
+        foreach (new \DirectoryIterator(__DIR__.'/../Resources/') as $file) {
+            if (str_starts_with($file->getBasename(), 'completion.') && $file->isFile()) {
+                $shells[] = $file->getExtension();
+            }
+        }
+
+        return $shells;
     }
 }

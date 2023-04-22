@@ -31,6 +31,7 @@ class PostgreSqlConnectionTest extends TestCase
         $this->expectExceptionMessage('Cannot serialize '.PostgreSqlConnection::class);
 
         $driverConnection = $this->createMock(\Doctrine\DBAL\Connection::class);
+        $driverConnection->method('executeStatement')->willReturn(1);
 
         $connection = new PostgreSqlConnection([], $driverConnection);
         serialize($connection);
@@ -42,6 +43,7 @@ class PostgreSqlConnectionTest extends TestCase
         $this->expectExceptionMessage('Cannot unserialize '.PostgreSqlConnection::class);
 
         $driverConnection = $this->createMock(\Doctrine\DBAL\Connection::class);
+        $driverConnection->method('executeStatement')->willReturn(1);
 
         $connection = new PostgreSqlConnection([], $driverConnection);
         $connection->__wakeup();
@@ -50,6 +52,7 @@ class PostgreSqlConnectionTest extends TestCase
     public function testListenOnConnection()
     {
         $driverConnection = $this->createMock(\Doctrine\DBAL\Connection::class);
+        $driverConnection->method('executeStatement')->willReturn(1);
 
         $driverConnection
             ->expects(self::any())
@@ -112,6 +115,7 @@ class PostgreSqlConnectionTest extends TestCase
     public function testGetExtraSetupSql()
     {
         $driverConnection = $this->createMock(\Doctrine\DBAL\Connection::class);
+        $driverConnection->method('executeStatement')->willReturn(1);
         $connection = new PostgreSqlConnection(['table_name' => 'queue_table'], $driverConnection);
 
         $table = new Table('queue_table');
@@ -128,6 +132,7 @@ class PostgreSqlConnectionTest extends TestCase
     public function testTransformTableNameWithSchemaToValidProcedureName()
     {
         $driverConnection = $this->createMock(\Doctrine\DBAL\Connection::class);
+        $driverConnection->method('executeStatement')->willReturn(1);
         $connection = new PostgreSqlConnection(['table_name' => 'schema.queue_table'], $driverConnection);
 
         $table = new Table('schema.queue_table');
@@ -141,6 +146,7 @@ class PostgreSqlConnectionTest extends TestCase
     public function testGetExtraSetupSqlWrongTable()
     {
         $driverConnection = $this->createMock(\Doctrine\DBAL\Connection::class);
+        $driverConnection->method('executeStatement')->willReturn(1);
         $connection = new PostgreSqlConnection(['table_name' => 'queue_table'], $driverConnection);
 
         $table = new Table('queue_table');

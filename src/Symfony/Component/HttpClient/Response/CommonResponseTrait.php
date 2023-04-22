@@ -100,6 +100,9 @@ trait CommonResponseTrait
         return $content;
     }
 
+    /**
+     * @return resource
+     */
     public function toStream(bool $throw = true)
     {
         if ($throw) {

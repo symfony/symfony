@@ -23,7 +23,7 @@ trait FilesystemCommonTrait
     private string $directory;
     private string $tmpSuffix;
 
-    private function init(string $namespace, ?string $directory)
+    private function init(string $namespace, ?string $directory): void
     {
         if (!isset($directory[0])) {
             $directory = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'symfony-cache';
@@ -161,7 +161,7 @@ trait FilesystemCommonTrait
     /**
      * @internal
      */
-    public static function throwError(int $type, string $message, string $file, int $line)
+    public static function throwError(int $type, string $message, string $file, int $line): never
     {
         throw new \ErrorException($message, 0, $type, $file, $line);
     }

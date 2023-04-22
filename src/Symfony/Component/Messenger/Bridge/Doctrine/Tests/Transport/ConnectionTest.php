@@ -11,9 +11,7 @@
 
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Tests\Transport;
 
-use Doctrine\DBAL\Abstraction\Result as AbstractionResult;
 use Doctrine\DBAL\Connection as DBALConnection;
-use Doctrine\DBAL\Driver\Result as DriverResult;
 use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
@@ -59,6 +57,9 @@ class ConnectionTest extends TestCase
         $driverConnection
             ->method('executeQuery')
             ->willReturn($stmt);
+        $driverConnection
+            ->method('executeStatement')
+            ->willReturn(1);
 
         $connection = new Connection([], $driverConnection);
         $doctrineEnvelope = $connection->get();
@@ -156,10 +157,10 @@ class ConnectionTest extends TestCase
 
     private function getResultMock($expectedResult)
     {
-        $stmt = $this->createMock(class_exists(Result::class) ? Result::class : (interface_exists(AbstractionResult::class) ? AbstractionResult::class : Statement::class));
+        $stmt = $this->createMock(class_exists(Result::class) ? Result::class : ResultStatement::class);
 
         $stmt->expects($this->once())
-            ->method(interface_exists(AbstractionResult::class) || class_exists(Result::class) ? 'fetchAssociative' : 'fetch')
+            ->method(class_exists(Result::class) ? 'fetchAssociative' : 'fetch')
             ->willReturn($expectedResult);
 
         return $stmt;
@@ -315,9 +316,9 @@ class ConnectionTest extends TestCase
             'headers' => json_encode(['type' => DummyMessage::class]),
         ];
 
-        $stmt = $this->createMock(class_exists(Result::class) ? Result::class : (interface_exists(AbstractionResult::class) ? AbstractionResult::class : Statement::class));
+        $stmt = $this->createMock(class_exists(Result::class) ? Result::class : ResultStatement::class);
         $stmt->expects($this->once())
-            ->method(interface_exists(AbstractionResult::class) || class_exists(Result::class) ? 'fetchAllAssociative' : 'fetchAll')
+            ->method(class_exists(Result::class) ? 'fetchAllAssociative' : 'fetchAll')
             ->willReturn([$message1, $message2]);
 
         $driverConnection
@@ -360,13 +361,9 @@ class ConnectionTest extends TestCase
         $driverConnection->method('getDatabasePlatform')->willReturn($platform);
         $driverConnection->method('createQueryBuilder')->willReturnCallback(fn () => new QueryBuilder($driverConnection));
 
-        if (interface_exists(DriverResult::class)) {
-            $result = $this->createMock(DriverResult::class);
+        if (class_exists(Result::class)) {
+            $result = $this->createMock(Result::class);
             $result->method('fetchAssociative')->willReturn(false);
-
-            if (class_exists(Result::class)) {
-                $result = new Result($result, $driverConnection);
-            }
         } else {
             $result = $this->createMock(ResultStatement::class);
             $result->method('fetch')->willReturn(false);
@@ -447,16 +444,12 @@ class ConnectionTest extends TestCase
             return new QueryBuilder($driverConnection);
         });
 
-        if (interface_exists(DriverResult::class)) {
-            $result = $this->createMock(DriverResult::class);
-            $result->method('fetchAssociative')->willReturn(false);
-
-            if (class_exists(Result::class)) {
-                $result = new Result($result, $driverConnection);
-            }
+        if (class_exists(Result::class)) {
+            $result = $this->createMock(Result::class);
+            $result->method('fetchAllAssociative')->willReturn([]);
         } else {
             $result = $this->createMock(ResultStatement::class);
-            $result->method('fetch')->willReturn(false);
+            $result->method('fetchAll')->willReturn([]);
         }
 
         $driverConnection

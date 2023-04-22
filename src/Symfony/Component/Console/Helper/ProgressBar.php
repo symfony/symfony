@@ -183,7 +183,7 @@ final class ProgressBar
         $this->messages[$name] = $message;
     }
 
-    public function getMessage(string $name = 'message')
+    public function getMessage(string $name = 'message'): string
     {
         return $this->messages[$name];
     }

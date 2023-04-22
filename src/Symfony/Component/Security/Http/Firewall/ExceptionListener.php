@@ -225,7 +225,7 @@ class ExceptionListener
         }
     }
 
-    private function throwUnauthorizedException(AuthenticationException $authException)
+    private function throwUnauthorizedException(AuthenticationException $authException): never
     {
         $this->logger?->notice(sprintf('No Authentication entry point configured, returning a %s HTTP response. Configure "entry_point" on the firewall "%s" if you want to modify the response.', Response::HTTP_UNAUTHORIZED, $this->firewallName));
 

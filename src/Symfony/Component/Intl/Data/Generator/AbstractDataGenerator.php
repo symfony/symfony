@@ -95,9 +95,9 @@ abstract class AbstractDataGenerator
      */
     abstract protected function scanLocales(LocaleScanner $scanner, string $sourceDir): array;
 
-    abstract protected function compileTemporaryBundles(BundleCompilerInterface $compiler, string $sourceDir, string $tempDir);
+    abstract protected function compileTemporaryBundles(BundleCompilerInterface $compiler, string $sourceDir, string $tempDir): void;
 
-    abstract protected function preGenerate();
+    abstract protected function preGenerate(): void;
 
     abstract protected function generateDataForLocale(BundleEntryReaderInterface $reader, string $tempDir, string $displayLocale): ?array;
 

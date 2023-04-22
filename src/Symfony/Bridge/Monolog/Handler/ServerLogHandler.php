@@ -126,7 +126,7 @@ trait ServerLogHandlerTrait
         return new VarDumperFormatter();
     }
 
-    private static function nullErrorHandler()
+    private static function nullErrorHandler(): void
     {
     }
 

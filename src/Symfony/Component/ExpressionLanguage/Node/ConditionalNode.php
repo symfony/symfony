@@ -40,7 +40,7 @@ class ConditionalNode extends Node
         ;
     }
 
-    public function evaluate(array $functions, array $values)
+    public function evaluate(array $functions, array $values): mixed
     {
         if ($this->nodes['expr1']->evaluate($functions, $values)) {
             return $this->nodes['expr2']->evaluate($functions, $values);

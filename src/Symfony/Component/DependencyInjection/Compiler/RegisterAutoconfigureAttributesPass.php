@@ -47,10 +47,12 @@ final class RegisterAutoconfigureAttributesPass implements CompilerPassInterface
         }
     }
 
-    private static function registerForAutoconfiguration(ContainerBuilder $container, \ReflectionClass $class, \ReflectionAttribute $attribute)
+    private static function registerForAutoconfiguration(ContainerBuilder $container, \ReflectionClass $class, \ReflectionAttribute $attribute): void
     {
         if (self::$registerForAutoconfiguration) {
-            return (self::$registerForAutoconfiguration)($container, $class, $attribute);
+            (self::$registerForAutoconfiguration)($container, $class, $attribute);
+
+            return;
         }
 
         $parseDefinitions = new \ReflectionMethod(YamlFileLoader::class, 'parseDefinitions');
@@ -79,6 +81,6 @@ final class RegisterAutoconfigureAttributesPass implements CompilerPassInterface
             );
         };
 
-        return (self::$registerForAutoconfiguration)($container, $class, $attribute);
+        (self::$registerForAutoconfiguration)($container, $class, $attribute);
     }
 }

@@ -208,7 +208,7 @@ abstract class AbstractFailedMessagesCommand extends Command
         }
     }
 
-    protected function interactiveChooseFailureTransport(SymfonyStyle $io)
+    protected function interactiveChooseFailureTransport(SymfonyStyle $io): string
     {
         $failedTransports = array_keys($this->failureTransports->getProvidedServices());
         $question = new ChoiceQuestion('Select failed transport:', $failedTransports, 0);

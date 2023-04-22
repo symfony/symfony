@@ -305,7 +305,7 @@ EOF
         return $loaderPaths;
     }
 
-    private function getMetadata(string $type, mixed $entity)
+    private function getMetadata(string $type, mixed $entity): mixed
     {
         if ('globals' === $type) {
             return $entity;

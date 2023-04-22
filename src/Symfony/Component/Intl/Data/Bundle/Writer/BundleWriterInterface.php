@@ -20,5 +20,8 @@ namespace Symfony\Component\Intl\Data\Bundle\Writer;
  */
 interface BundleWriterInterface
 {
+    /**
+     * @return void
+     */
     public function write(string $path, string $locale, mixed $data);
 }

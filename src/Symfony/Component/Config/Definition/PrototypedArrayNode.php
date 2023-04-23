@@ -156,6 +156,8 @@ class PrototypedArrayNode extends ArrayNode
     /**
      * Disable adding concrete children for prototyped nodes.
      *
+     * @return never
+     *
      * @throws Exception
      */
     public function addChild(NodeInterface $node)

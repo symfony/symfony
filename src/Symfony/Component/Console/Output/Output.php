@@ -148,6 +148,8 @@ abstract class Output implements OutputInterface
 
     /**
      * Writes a message to the output.
+     *
+     * @return void
      */
     abstract protected function doWrite(string $message, bool $newline);
 }

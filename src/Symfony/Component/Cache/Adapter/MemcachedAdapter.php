@@ -289,7 +289,7 @@ class MemcachedAdapter extends AbstractAdapter
         return '' === $namespace && $this->getClient()->flush();
     }
 
-    private function checkResultCode(mixed $result)
+    private function checkResultCode(mixed $result): mixed
     {
         $code = $this->client->getResultCode();
 

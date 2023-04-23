@@ -143,7 +143,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
         return $this->file.'.meta';
     }
 
-    private function safelyUnserialize(string $file)
+    private function safelyUnserialize(string $file): mixed
     {
         $meta = false;
         $content = file_get_contents($file);

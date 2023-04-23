@@ -57,6 +57,8 @@ abstract class Input implements InputInterface, StreamableInputInterface
 
     /**
      * Processes command line arguments.
+     *
+     * @return void
      */
     abstract protected function parse();
 
@@ -171,6 +173,8 @@ abstract class Input implements InputInterface, StreamableInputInterface
     }
 
     /**
+     * @param resource $stream
+     *
      * @return void
      */
     public function setStream($stream)
@@ -178,6 +182,9 @@ abstract class Input implements InputInterface, StreamableInputInterface
         $this->stream = $stream;
     }
 
+    /**
+     * @return resource
+     */
     public function getStream()
     {
         return $this->stream;

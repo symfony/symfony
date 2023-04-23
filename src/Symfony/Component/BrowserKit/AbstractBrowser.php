@@ -480,6 +480,8 @@ abstract class AbstractBrowser
      *
      * @param object $request An origin request instance
      *
+     * @return string
+     *
      * @throws LogicException When this abstract class is not implemented
      */
     protected function getScript(object $request)

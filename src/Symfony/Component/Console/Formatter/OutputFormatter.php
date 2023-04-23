@@ -121,6 +121,9 @@ class OutputFormatter implements WrappableOutputFormatterInterface
         return $this->formatAndWrap($message, 0);
     }
 
+    /**
+     * @return string
+     */
     public function formatAndWrap(?string $message, int $width)
     {
         if (null === $message) {

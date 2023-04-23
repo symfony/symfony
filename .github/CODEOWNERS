@@ -42,6 +42,8 @@
 /src/Symfony/Bundle/SecurityBundle/ @wouterj @chalasr
 /src/Symfony/Component/Security/ @wouterj @chalasr
 /src/Symfony/Component/Ldap/Security/ @wouterj @chalasr
+# Scheduler
+/src/Symfony/Component/Scheduler/ @kbond
 # TwigBundle
 /src/Symfony/Bundle/TwigBundle/ @yceruto
 # WebLink

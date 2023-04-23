@@ -13,7 +13,6 @@ namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use Symfony\Component\Form\Extension\Core\Type\PercentType;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\Tests\AbstractLayoutTestCase;
 
 abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
 {

@@ -74,7 +74,7 @@ class PropertyPathAccessor implements DataAccessorInterface
         return null !== $form->getPropertyPath();
     }
 
-    private function getPropertyValue(object|array $data, PropertyPathInterface $propertyPath)
+    private function getPropertyValue(object|array $data, PropertyPathInterface $propertyPath): mixed
     {
         try {
             return $this->propertyAccessor->getValue($data, $propertyPath);

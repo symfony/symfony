@@ -130,6 +130,9 @@ class Parser
         return $node;
     }
 
+    /**
+     * @return Node\Node
+     */
     public function parseExpression(int $precedence = 0)
     {
         $expr = $this->getPrimary();
@@ -151,6 +154,9 @@ class Parser
         return $expr;
     }
 
+    /**
+     * @return Node\Node
+     */
     protected function getPrimary()
     {
         $token = $this->stream->current;

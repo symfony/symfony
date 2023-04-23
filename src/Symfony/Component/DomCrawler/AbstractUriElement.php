@@ -115,6 +115,8 @@ abstract class AbstractUriElement
      *
      * @param \DOMElement $node A \DOMElement instance
      *
+     * @return void
+     *
      * @throws \LogicException If given node is not an anchor
      */
     abstract protected function setNode(\DOMElement $node);

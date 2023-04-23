@@ -1325,7 +1325,7 @@ EOF;
         if ($this->asFiles && !$this->inlineFactories) {
             $code .= <<<'EOF'
 
-    protected function load($file, $lazyLoad = true)
+    protected function load($file, $lazyLoad = true): mixed
     {
         if (class_exists($class = __NAMESPACE__.'\\'.$file, false)) {
             return $class::do($this, $lazyLoad);

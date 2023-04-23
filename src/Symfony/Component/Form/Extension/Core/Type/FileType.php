@@ -41,6 +41,9 @@ class FileType extends AbstractType
         $this->translator = $translator;
     }
 
+    /**
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         // Ensure that submitted data is always an uploaded file or an array of some
@@ -82,6 +85,9 @@ class FileType extends AbstractType
         });
     }
 
+    /**
+     * @return void
+     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         if ($options['multiple']) {
@@ -95,11 +101,17 @@ class FileType extends AbstractType
         ]);
     }
 
+    /**
+     * @return void
+     */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['multipart'] = true;
     }
 
+    /**
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $dataClass = null;

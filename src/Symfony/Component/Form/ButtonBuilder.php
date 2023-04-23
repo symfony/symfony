@@ -52,6 +52,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * Unsupported method.
      *
+     * @return never
+     *
      * @throws BadMethodCallException
      */
     public function add(string|FormBuilderInterface $child, string $type = null, array $options = []): static
@@ -61,6 +63,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
+     *
+     * @return never
      *
      * @throws BadMethodCallException
      */
@@ -72,6 +76,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * Unsupported method.
      *
+     * @return never
+     *
      * @throws BadMethodCallException
      */
     public function get(string $name): FormBuilderInterface
@@ -81,6 +87,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
+     *
+     * @return never
      *
      * @throws BadMethodCallException
      */
@@ -116,6 +124,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * Unsupported method.
      *
+     * @return never
+     *
      * @throws BadMethodCallException
      */
     public function addEventListener(string $eventName, callable $listener, int $priority = 0): static
@@ -125,6 +135,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
+     *
+     * @return never
      *
      * @throws BadMethodCallException
      */
@@ -136,6 +148,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * Unsupported method.
      *
+     * @return never
+     *
      * @throws BadMethodCallException
      */
     public function addViewTransformer(DataTransformerInterface $viewTransformer, bool $forcePrepend = false): static
@@ -145,6 +159,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
+     *
+     * @return never
      *
      * @throws BadMethodCallException
      */
@@ -156,6 +172,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * Unsupported method.
      *
+     * @return never
+     *
      * @throws BadMethodCallException
      */
     public function addModelTransformer(DataTransformerInterface $modelTransformer, bool $forceAppend = false): static
@@ -165,6 +183,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
+     *
+     * @return never
      *
      * @throws BadMethodCallException
      */
@@ -196,6 +216,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * Unsupported method.
      *
+     * @return never
+     *
      * @throws BadMethodCallException
      */
     public function setDataMapper(DataMapperInterface $dataMapper = null): static
@@ -222,6 +244,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * Unsupported method.
      *
+     * @return never
+     *
      * @throws BadMethodCallException
      */
     public function setEmptyData(mixed $emptyData): static
@@ -231,6 +255,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
+     *
+     * @return never
      *
      * @throws BadMethodCallException
      */
@@ -242,6 +268,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * Unsupported method.
      *
+     * @return never
+     *
      * @throws BadMethodCallException
      */
     public function setRequired(bool $required): static
@@ -251,6 +279,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
+     *
+     * @return never
      *
      * @throws BadMethodCallException
      */
@@ -262,6 +292,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * Unsupported method.
      *
+     * @return never
+     *
      * @throws BadMethodCallException
      */
     public function setMapped(bool $mapped): static
@@ -272,6 +304,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * Unsupported method.
      *
+     * @return never
+     *
      * @throws BadMethodCallException
      */
     public function setByReference(bool $byReference): static
@@ -281,6 +315,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
+     *
+     * @return never
      *
      * @throws BadMethodCallException
      */
@@ -304,6 +340,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * Unsupported method.
      *
+     * @return never
+     *
      * @throws BadMethodCallException
      */
     public function setData(mixed $data): static
@@ -313,6 +351,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
+     *
+     * @return never
      *
      * @throws BadMethodCallException
      */
@@ -324,6 +364,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * Unsupported method.
      *
+     * @return never
+     *
      * @throws BadMethodCallException
      */
     public function setFormFactory(FormFactoryInterface $formFactory)
@@ -333,6 +375,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
+     *
+     * @return never
      *
      * @throws BadMethodCallException
      */
@@ -344,6 +388,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * Unsupported method.
      *
+     * @return never
+     *
      * @throws BadMethodCallException
      */
     public function setMethod(string $method): static
@@ -353,6 +399,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
+     *
+     * @return never
      *
      * @throws BadMethodCallException
      */
@@ -380,6 +428,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * Unsupported method.
      *
+     * @return never
+     *
      * @throws BadMethodCallException
      */
     public function setInheritData(bool $inheritData): static
@@ -402,6 +452,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * Unsupported method.
      *
+     * @return never
+     *
      * @throws BadMethodCallException
      */
     public function setIsEmptyCallback(?callable $isEmptyCallback): static
@@ -411,6 +463,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
+     *
+     * @return never
      *
      * @throws BadMethodCallException
      */
@@ -570,6 +624,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
+     *
+     * @return never
      */
     public function getFormFactory(): FormFactoryInterface
     {
@@ -578,6 +634,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
+     *
+     * @return never
      *
      * @throws BadMethodCallException
      */
@@ -589,6 +647,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * Unsupported method.
      *
+     * @return never
+     *
      * @throws BadMethodCallException
      */
     public function getMethod(): string
@@ -598,6 +658,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
+     *
+     * @return never
      *
      * @throws BadMethodCallException
      */
@@ -648,6 +710,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
+     *
+     * @return never
      *
      * @throws BadMethodCallException
      */

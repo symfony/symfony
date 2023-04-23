@@ -80,6 +80,11 @@ class Node
         return $results;
     }
 
+    /**
+     * @return array
+     *
+     * @throws \BadMethodCallException when this node cannot be transformed to an array
+     */
     public function toArray()
     {
         throw new \BadMethodCallException(sprintf('Dumping a "%s" instance is not supported yet.', static::class));

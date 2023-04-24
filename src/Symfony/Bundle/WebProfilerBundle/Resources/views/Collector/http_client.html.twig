@@ -91,7 +91,7 @@
                                                 Profile
                                             </th>
                                         {% endif %}
-                                        {% if trace.curlCommand is not null %}
+                                        {% if trace.curlCommand is defined and trace.curlCommand %}
                                             <th>
                                                 <button class="btn btn-sm hidden" title="Copy as cURL" data-clipboard-text="{{ trace.curlCommand }}">Copy as cURL</button>
                                             </th>
@@ -107,7 +107,7 @@
                                     {% endif %}
                                     <tr>
                                         <th class="font-normal">Response</th>
-                                        <td{% if trace.curlCommand %} colspan="2"{% endif %}>
+                                        <td{% if trace.curlCommand is defined and trace.curlCommand %} colspan="2"{% endif %}>
                                             {% if trace.http_code >= 500 %}
                                                 {% set responseStatus = 'error' %}
                                             {% elseif trace.http_code >= 400 %}

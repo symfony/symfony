@@ -21,6 +21,16 @@ class DatePeriodTrigger implements TriggerInterface
     ) {
     }
 
+    public function __toString(): string
+    {
+        return sprintf(
+            '%s - %s, %s',
+            $this->period->getStartDate()->format(\DateTimeInterface::ATOM),
+            $this->period->getEndDate()?->format(\DateTimeInterface::ATOM) ?? '(inf)',
+            '-',
+        );
+    }
+
     public function getNextRunDate(\DateTimeImmutable $run): ?\DateTimeImmutable
     {
         $iterator = $this->period->getIterator();

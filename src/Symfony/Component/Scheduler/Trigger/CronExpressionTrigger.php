@@ -21,7 +21,7 @@ use Symfony\Component\Scheduler\Exception\LogicException;
  *
  * @experimental
  */
-final class CronExpressionTrigger implements TriggerInterface, \Stringable
+final class CronExpressionTrigger implements TriggerInterface
 {
     public function __construct(
         private readonly CronExpression $expression = new CronExpression('* * * * *'),

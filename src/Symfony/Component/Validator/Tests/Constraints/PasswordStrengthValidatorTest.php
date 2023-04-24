@@ -45,7 +45,7 @@ class PasswordStrengthValidatorTest extends ConstraintValidatorTestCase
     public static function getValidValues(): iterable
     {
         yield ['How-is-this', PasswordStrength::STRENGTH_WEAK];
-        yield ['Reasonable-pwd', PasswordStrength::STRENGTH_REASONABLE];
+        yield ['Reasonable-pwd', PasswordStrength::STRENGTH_MEDIUM];
         yield ['This 1s a very g00d Pa55word! ;-)', PasswordStrength::STRENGTH_VERY_STRONG];
         yield ['pudding-smack-👌🏼-fox-😎', PasswordStrength::STRENGTH_VERY_STRONG];
     }

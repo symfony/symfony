@@ -14,6 +14,7 @@ namespace Symfony\Component\Scheduler\Tests\Generator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Clock\ClockInterface;
+use Symfony\Component\Scheduler\Generator\MessageContext;
 use Symfony\Component\Scheduler\Generator\MessageGenerator;
 use Symfony\Component\Scheduler\RecurringMessage;
 use Symfony\Component\Scheduler\Schedule;
@@ -43,12 +44,45 @@ class MessageGeneratorTest extends TestCase
         $scheduler = new MessageGenerator($schedule, 'dummy', $clock);
 
         // Warmup. The first run is always returns nothing.
-        $this->assertSame([], iterator_to_array($scheduler->getMessages()));
+        $this->assertSame([], iterator_to_array($scheduler->getMessages(), false));
 
         foreach ($runs as $time => $expected) {
             $now = self::makeDateTime($time);
-            $this->assertSame($expected, iterator_to_array($scheduler->getMessages()));
+            $this->assertSame($expected, iterator_to_array($scheduler->getMessages(), false));
         }
+    }
+
+    public function testYieldedContext()
+    {
+        // for referencing
+        $now = self::makeDateTime('22:12:00');
+
+        $clock = $this->createMock(ClockInterface::class);
+        $clock->method('now')->willReturnReference($now);
+
+        $message = $this->createMessage((object) ['id' => 'message'], '22:13:00', '22:14:00', '22:16:00');
+        $schedule = (new Schedule())->add($message);
+        $schedule->stateful(new ArrayAdapter());
+
+        $scheduler = new MessageGenerator($schedule, 'dummy', $clock);
+
+        // Warmup. The first run is alw ays returns nothing.
+        $this->assertSame([], iterator_to_array($scheduler->getMessages(), false));
+
+        $now = self::makeDateTime('22:14:10');
+
+        $iterator = $scheduler->getMessages();
+
+        $this->assertInstanceOf(MessageContext::class, $context = $iterator->key());
+        $this->assertSame($message->getTrigger(), $context->trigger);
+        $this->assertEquals(self::makeDateTime('22:13:00'), $context->triggeredAt);
+        $this->assertEquals(self::makeDateTime('22:14:00'), $context->nextTriggerAt);
+
+        $iterator->next();
+        $this->assertInstanceOf(MessageContext::class, $context = $iterator->key());
+        $this->assertSame($message->getTrigger(), $context->trigger);
+        $this->assertEquals(self::makeDateTime('22:14:00'), $context->triggeredAt);
+        $this->assertEquals(self::makeDateTime('22:16:00'), $context->nextTriggerAt);
     }
 
     public static function messagesProvider(): \Generator

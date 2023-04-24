@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Tests\Transport;
 
-use Doctrine\DBAL\Driver\Result as DriverResult;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
@@ -60,7 +59,7 @@ class DoctrineIntegrationTest extends TestCase
             ->setParameter('body', '{"message": "Hi i am delayed"}')
             ->execute();
 
-        $available_at = new \DateTimeImmutable($stmt instanceof Result || $stmt instanceof DriverResult ? $stmt->fetchOne() : $stmt->fetchColumn());
+        $available_at = new \DateTimeImmutable($stmt instanceof Result ? $stmt->fetchOne() : $stmt->fetchColumn());
 
         $now = new \DateTimeImmutable('now + 60 seconds');
         $this->assertGreaterThan($now, $available_at);

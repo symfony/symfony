@@ -99,7 +99,7 @@ class Parser
         return $data;
     }
 
-    private function doParse(string $value, int $flags)
+    private function doParse(string $value, int $flags): mixed
     {
         $this->currentLineNb = -1;
         $this->currentLine = '';
@@ -503,7 +503,7 @@ class Parser
         return empty($data) ? null : $data;
     }
 
-    private function parseBlock(int $offset, string $yaml, int $flags)
+    private function parseBlock(int $offset, string $yaml, int $flags): mixed
     {
         $skippedLineNumbers = $this->skippedLineNumbers;
 

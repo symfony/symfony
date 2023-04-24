@@ -123,6 +123,9 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
         return $this->info + $this->response->getInfo();
     }
 
+    /**
+     * @return resource
+     */
     public function toStream(bool $throw = true)
     {
         if ($throw) {

@@ -79,12 +79,12 @@ final class Dsn
         return $this->port ?? $default;
     }
 
-    public function getOption(string $key, mixed $default = null)
+    public function getOption(string $key, mixed $default = null): mixed
     {
         return $this->options[$key] ?? $default;
     }
 
-    public function getRequiredOption(string $key)
+    public function getRequiredOption(string $key): mixed
     {
         if (!\array_key_exists($key, $this->options) || '' === trim($this->options[$key])) {
             throw new MissingRequiredOptionException($key);

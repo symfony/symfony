@@ -483,7 +483,7 @@ class ErrorHandler
      *
      * @internal
      */
-    public function handleException(\Throwable $exception)
+    public function handleException(\Throwable $exception): void
     {
         $handlerException = null;
 
@@ -534,7 +534,9 @@ class ErrorHandler
 
         try {
             if (null !== $exceptionHandler) {
-                return $exceptionHandler($exception);
+                $exceptionHandler($exception);
+
+                return;
             }
             $handlerException ??= $exception;
         } catch (\Throwable $handlerException) {

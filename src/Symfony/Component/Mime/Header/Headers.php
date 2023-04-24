@@ -264,7 +264,7 @@ final class Headers
         return $arr;
     }
 
-    public function getHeaderBody(string $name)
+    public function getHeaderBody(string $name): mixed
     {
         return $this->has($name) ? $this->get($name)->getBody() : null;
     }

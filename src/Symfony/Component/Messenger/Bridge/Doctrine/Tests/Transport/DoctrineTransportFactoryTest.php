@@ -72,6 +72,7 @@ class DoctrineTransportFactoryTest extends TestCase
         $schemaManager->method('createSchemaConfig')->willReturn($schemaConfig);
         $driverConnection->method('getSchemaManager')->willReturn($schemaManager);
         $driverConnection->method('getDatabasePlatform')->willReturn($platform);
+        $driverConnection->method('executeStatement')->willReturn(1);
         $registry = $this->createMock(ConnectionRegistry::class);
 
         $registry->expects($this->once())

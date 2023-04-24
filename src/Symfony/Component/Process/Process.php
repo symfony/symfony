@@ -912,7 +912,7 @@ class Process implements \IteratorAggregate
      *
      * @internal
      */
-    public function addOutput(string $line)
+    public function addOutput(string $line): void
     {
         $this->lastOutputTime = microtime(true);
 
@@ -926,7 +926,7 @@ class Process implements \IteratorAggregate
      *
      * @internal
      */
-    public function addErrorOutput(string $line)
+    public function addErrorOutput(string $line): void
     {
         $this->lastOutputTime = microtime(true);
 

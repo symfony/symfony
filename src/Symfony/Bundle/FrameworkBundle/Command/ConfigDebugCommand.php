@@ -237,7 +237,7 @@ EOF
         return $availableBundles;
     }
 
-    private function getConfig(ExtensionInterface $extension, ContainerBuilder $container, bool $resolveEnvs = false)
+    private function getConfig(ExtensionInterface $extension, ContainerBuilder $container, bool $resolveEnvs = false): mixed
     {
         return $container->resolveEnvPlaceholders(
             $container->getParameterBag()->resolveValue(

@@ -386,7 +386,7 @@ index 8bfaa0a22c..745ba6aff3 100644
      {
          $this->debug = $debug;
 diff --git a/src/Symfony/Bridge/Twig/Command/DebugCommand.php b/src/Symfony/Bridge/Twig/Command/DebugCommand.php
-index fe581b5987..8109e7c68d 100644
+index 43e4d9c9f1..ea0116870b 100644
 --- a/src/Symfony/Bridge/Twig/Command/DebugCommand.php
 +++ b/src/Symfony/Bridge/Twig/Command/DebugCommand.php
 @@ -63,5 +63,5 @@ class DebugCommand extends Command
@@ -397,7 +397,7 @@ index fe581b5987..8109e7c68d 100644
      {
          $this
 diff --git a/src/Symfony/Bridge/Twig/Command/LintCommand.php b/src/Symfony/Bridge/Twig/Command/LintCommand.php
-index fa8effc12a..deced50a90 100644
+index e059740a13..e7d6fbdd05 100644
 --- a/src/Symfony/Bridge/Twig/Command/LintCommand.php
 +++ b/src/Symfony/Bridge/Twig/Command/LintCommand.php
 @@ -52,5 +52,5 @@ class LintCommand extends Command
@@ -1500,7 +1500,7 @@ index 00e912686b..58872ec2bc 100644
      {
          if (!$container->hasDefinition('console.command.cache_pool_prune')) {
 diff --git a/src/Symfony/Component/Cache/Traits/FilesystemCommonTrait.php b/src/Symfony/Component/Cache/Traits/FilesystemCommonTrait.php
-index 2ee96e9b37..f49ed24f68 100644
+index 200406a564..0bad73fe6a 100644
 --- a/src/Symfony/Component/Cache/Traits/FilesystemCommonTrait.php
 +++ b/src/Symfony/Component/Cache/Traits/FilesystemCommonTrait.php
 @@ -81,5 +81,5 @@ trait FilesystemCommonTrait
@@ -5038,28 +5038,10 @@ index 9e107401a2..7f92321a2b 100644
 +    protected function registerFunctions(): void
      {
          $this->addFunction(ExpressionFunction::fromPhp('constant'));
-diff --git a/src/Symfony/Component/ExpressionLanguage/Node/ConditionalNode.php b/src/Symfony/Component/ExpressionLanguage/Node/ConditionalNode.php
-index fec02abaae..7d02544275 100644
---- a/src/Symfony/Component/ExpressionLanguage/Node/ConditionalNode.php
-+++ b/src/Symfony/Component/ExpressionLanguage/Node/ConditionalNode.php
-@@ -41,5 +41,5 @@ class ConditionalNode extends Node
-     }
- 
--    public function evaluate(array $functions, array $values)
-+    public function evaluate(array $functions, array $values): mixed
-     {
-         if ($this->nodes['expr1']->evaluate($functions, $values)) {
 diff --git a/src/Symfony/Component/ExpressionLanguage/Node/FunctionNode.php b/src/Symfony/Component/ExpressionLanguage/Node/FunctionNode.php
-index d4ab3e0922..811fec7e2e 100644
+index 33323f388f..811fec7e2e 100644
 --- a/src/Symfony/Component/ExpressionLanguage/Node/FunctionNode.php
 +++ b/src/Symfony/Component/ExpressionLanguage/Node/FunctionNode.php
-@@ -41,5 +41,5 @@ class FunctionNode extends Node
-     }
- 
--    public function evaluate(array $functions, array $values)
-+    public function evaluate(array $functions, array $values): mixed
-     {
-         $arguments = [$values];
 @@ -54,5 +54,5 @@ class FunctionNode extends Node
       * @return array
       */
@@ -5106,17 +5088,6 @@ index f6fff09b1e..4661f7d165 100644
 +    protected function isHash(array $value): bool
      {
          $expectedKey = 0;
-diff --git a/src/Symfony/Component/ExpressionLanguage/Node/UnaryNode.php b/src/Symfony/Component/ExpressionLanguage/Node/UnaryNode.php
-index 580ee13095..55e2121fcf 100644
---- a/src/Symfony/Component/ExpressionLanguage/Node/UnaryNode.php
-+++ b/src/Symfony/Component/ExpressionLanguage/Node/UnaryNode.php
-@@ -46,5 +46,5 @@ class UnaryNode extends Node
-     }
- 
--    public function evaluate(array $functions, array $values)
-+    public function evaluate(array $functions, array $values): mixed
-     {
-         $value = $this->nodes['node']->evaluate($functions, $values);
 diff --git a/src/Symfony/Component/ExpressionLanguage/ParsedExpression.php b/src/Symfony/Component/ExpressionLanguage/ParsedExpression.php
 index 239624ec2c..3b497d5ccf 100644
 --- a/src/Symfony/Component/ExpressionLanguage/ParsedExpression.php
@@ -10730,7 +10701,7 @@ index cf41e0c507..61f7397734 100644
 +    public function createNewToken(PersistentTokenInterface $token): void;
  }
 diff --git a/src/Symfony/Component/Security/Core/Authentication/Token/AbstractToken.php b/src/Symfony/Component/Security/Core/Authentication/Token/AbstractToken.php
-index 4416cda616..0fcf4303e0 100644
+index 10cb8f776e..0da1b3330e 100644
 --- a/src/Symfony/Component/Security/Core/Authentication/Token/AbstractToken.php
 +++ b/src/Symfony/Component/Security/Core/Authentication/Token/AbstractToken.php
 @@ -57,5 +57,5 @@ abstract class AbstractToken implements TokenInterface, \Serializable
@@ -11173,17 +11144,6 @@ index 91271d14a3..100c2fb549 100644
 -    public function start(Request $request, AuthenticationException $authException = null);
 +    public function start(Request $request, AuthenticationException $authException = null): Response;
  }
-diff --git a/src/Symfony/Component/Security/Http/Event/LazyResponseEvent.php b/src/Symfony/Component/Security/Http/Event/LazyResponseEvent.php
-index 46a25eed07..b3e25f1af3 100644
---- a/src/Symfony/Component/Security/Http/Event/LazyResponseEvent.php
-+++ b/src/Symfony/Component/Security/Http/Event/LazyResponseEvent.php
-@@ -32,5 +32,5 @@ final class LazyResponseEvent extends RequestEvent
-     }
- 
--    public function setResponse(Response $response)
-+    public function setResponse(Response $response): void
-     {
-         $this->stopPropagation();
 diff --git a/src/Symfony/Component/Security/Http/Event/LoginFailureEvent.php b/src/Symfony/Component/Security/Http/Event/LoginFailureEvent.php
 index 3b7c5086f2..97fb99f0b5 100644
 --- a/src/Symfony/Component/Security/Http/Event/LoginFailureEvent.php
@@ -11238,17 +11198,6 @@ index fc56733efa..8538f5f821 100644
 +    protected function callListeners(RequestEvent $event, iterable $listeners): void
      {
          foreach ($listeners as $listener) {
-diff --git a/src/Symfony/Component/Security/Http/Firewall/AccessListener.php b/src/Symfony/Component/Security/Http/Firewall/AccessListener.php
-index ad343ef085..9a1a2563c4 100644
---- a/src/Symfony/Component/Security/Http/Firewall/AccessListener.php
-+++ b/src/Symfony/Component/Security/Http/Firewall/AccessListener.php
-@@ -65,5 +65,5 @@ class AccessListener extends AbstractListener
-      * @throws AccessDeniedException
-      */
--    public function authenticate(RequestEvent $event)
-+    public function authenticate(RequestEvent $event): void
-     {
-         $request = $event->getRequest();
 diff --git a/src/Symfony/Component/Security/Http/Firewall/FirewallListenerInterface.php b/src/Symfony/Component/Security/Http/Firewall/FirewallListenerInterface.php
 index be200c0d12..69483f8f1d 100644
 --- a/src/Symfony/Component/Security/Http/Firewall/FirewallListenerInterface.php

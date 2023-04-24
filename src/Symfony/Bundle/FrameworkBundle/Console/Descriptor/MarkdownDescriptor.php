@@ -336,7 +336,7 @@ class MarkdownDescriptor extends Descriptor
         }
     }
 
-    protected function describeCallable(mixed $callable, array $options = [])
+    protected function describeCallable(mixed $callable, array $options = []): void
     {
         $string = '';
 
@@ -359,7 +359,9 @@ class MarkdownDescriptor extends Descriptor
                 }
             }
 
-            return $this->write($string."\n");
+            $this->write($string."\n");
+
+            return;
         }
 
         if (\is_string($callable)) {
@@ -375,7 +377,9 @@ class MarkdownDescriptor extends Descriptor
                 $string .= "\n- Static: yes";
             }
 
-            return $this->write($string."\n");
+            $this->write($string."\n");
+
+            return;
         }
 
         if ($callable instanceof \Closure) {
@@ -383,7 +387,9 @@ class MarkdownDescriptor extends Descriptor
 
             $r = new \ReflectionFunction($callable);
             if (str_contains($r->name, '{closure}')) {
-                return $this->write($string."\n");
+                $this->write($string."\n");
+
+                return;
             }
             $string .= "\n".sprintf('- Name: `%s`', $r->name);
 
@@ -394,14 +400,18 @@ class MarkdownDescriptor extends Descriptor
                 }
             }
 
-            return $this->write($string."\n");
+            $this->write($string."\n");
+
+            return;
         }
 
         if (method_exists($callable, '__invoke')) {
             $string .= "\n- Type: `object`";
             $string .= "\n".sprintf('- Name: `%s`', $callable::class);
 
-            return $this->write($string."\n");
+            $this->write($string."\n");
+
+            return;
         }
 
         throw new \InvalidArgumentException('Callable is not describable.');

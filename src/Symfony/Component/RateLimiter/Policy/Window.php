@@ -44,7 +44,7 @@ final class Window implements LimiterStateInterface
         return $this->intervalInSeconds;
     }
 
-    public function add(int $hits = 1, float $now = null)
+    public function add(int $hits = 1, float $now = null): void
     {
         $now ??= microtime(true);
         if (($now - $this->timer) > $this->intervalInSeconds) {

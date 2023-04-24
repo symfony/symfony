@@ -32,7 +32,7 @@ class ArrayAccessibleResourceBundle implements \ArrayAccess, \IteratorAggregate,
         $this->bundleImpl = $bundleImpl;
     }
 
-    public function get(int|string $offset)
+    public function get(int|string $offset): mixed
     {
         $value = $this->bundleImpl->get($offset);
 

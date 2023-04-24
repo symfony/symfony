@@ -30,12 +30,12 @@ trait TraceableListenerTrait
     /**
      * Proxies all method calls to the original listener.
      */
-    public function __call(string $method, array $arguments)
+    public function __call(string $method, array $arguments): mixed
     {
         return $this->listener->{$method}(...$arguments);
     }
 
-    public function getWrappedListener()
+    public function getWrappedListener(): mixed
     {
         return $this->listener;
     }

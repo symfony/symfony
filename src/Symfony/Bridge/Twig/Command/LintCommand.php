@@ -143,7 +143,7 @@ EOF
         return $filesInfo;
     }
 
-    protected function findFiles(string $filename)
+    protected function findFiles(string $filename): iterable
     {
         if (is_file($filename)) {
             return [$filename];
@@ -172,7 +172,7 @@ EOF
         return ['template' => $template, 'file' => $file, 'valid' => true];
     }
 
-    private function display(InputInterface $input, OutputInterface $output, SymfonyStyle $io, array $files)
+    private function display(InputInterface $input, OutputInterface $output, SymfonyStyle $io, array $files): int
     {
         return match ($this->format) {
             'txt' => $this->displayTxt($output, $io, $files),
@@ -205,7 +205,7 @@ EOF
         return min($errors, 1);
     }
 
-    private function displayJson(OutputInterface $output, array $filesInfo)
+    private function displayJson(OutputInterface $output, array $filesInfo): int
     {
         $errors = 0;
 
@@ -224,7 +224,7 @@ EOF
         return min($errors, 1);
     }
 
-    private function renderException(SymfonyStyle $output, string $template, Error $exception, string $file = null, GithubActionReporter $githubReporter = null)
+    private function renderException(SymfonyStyle $output, string $template, Error $exception, string $file = null, GithubActionReporter $githubReporter = null): void
     {
         $line = $exception->getTemplateLine();
 

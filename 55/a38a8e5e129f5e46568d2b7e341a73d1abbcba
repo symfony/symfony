@@ -1,0 +1,58 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-04-24T07:34:23Z
+
+This has been introduced by @Spomky in https://github.com/symfony/symfony/pull/49789. I'd like to have his opinion on this. Does "reasonable" come from any recommended source?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-04-24T07:44:11Z
+
+My personal opinion: "reasonable" is appropriate wording.
+We take responsibility for defining what's a good tradeoff between strength and being annoying to end users according to external sources. Medium doesn't convey that's it's both good enough and annoying enough and people might over-zealously go for strong just because it feels more ... strong, without realizing the effect on UX.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2023-04-24T07:53:37Z
+
+In the revision 3 of the  "NIST Special Publication 800-63B" (https://pages.nist.gov/800-63-3/sp800-63b.html) (last updates from 2020) they link to this paper when talking about password strength meters:
+
+[Meters] de Carné de Carnavalet, Xavier and Mohammad Mannan. “From Very Weak to Very Strong: Analyzing Password-Strength Meters.” In Proceedings of the Network and Distributed System Security Symposium (NDSS), 2014. Available at: http://www.internetsociety.org/sites/default/files/06_3_1.pdf
+
+In that paper we can see the strength scale used by some popular tech companies:
+
+<img width="734" alt="password-strength-levels" src="https://user-images.githubusercontent.com/73419/233933401-4e5044c6-d7c6-44e1-b1e2-bf2e1654293b.png">
+
+Nobody seems to be using "Reasonable" and instead they use "Medium", "Moderate" or "Fair".
+
+---------------------------------------------------------------------------
+
+by Spomky at 2023-04-24T08:26:51Z
+
+Hi,
+
+To be honest, when I came up with the word `reasonable`, I had in mind that it's hard to say how it might evolve in the future. It is also voluntary to use a vague term since in reality it is difficult to really define the strength of a password.
+Nevertheless I agree with you and the term should indeed align with common practice in the field and a word like `Moderate` or `Medium` would be more appropriate.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2023-04-24T08:53:07Z
+
+Thanks for your comment @Spomky.
+
+What really made me think about this was the `minScore` option of the constraint, which can be described as _"Which is the reasonable password strength for your app?"_
+
+If this "reasonable level" can be configured, then none of the predefined levels can be the reasonable one. I think all depends on the app using it. Thanks!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-04-24T11:49:37Z
+
+What about fair or good?
+
+---------------------------------------------------------------------------
+
+by Spomky at 2023-04-24T11:56:57Z
+
+We already have very weak, weak, strong, very strong.
+In the table, FedEx used the same plus Medium and this is the one proposed in this PR. It looks good to me

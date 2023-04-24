@@ -19,7 +19,7 @@ class CallbackTriggerTest extends TestCase
     public function testToString()
     {
         $trigger = new CallbackTrigger(fn () => null);
-        $this->assertMatchesRegularExpression('/^\d{32}$/', (string) $trigger);
+        $this->assertMatchesRegularExpression('/^\d+$/', (string) $trigger);
 
         $trigger = new CallbackTrigger(fn () => null, '');
         $this->assertSame('', (string) $trigger);

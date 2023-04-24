@@ -24,7 +24,7 @@ final class CallbackTrigger implements TriggerInterface
     public function __construct(callable $callback, string $description = null)
     {
         $this->callback = $callback(...);
-        $this->description = $description ?? spl_object_hash($this->callback);
+        $this->description = $description ?? spl_object_id($this->callback);
     }
 
     public function __toString(): string

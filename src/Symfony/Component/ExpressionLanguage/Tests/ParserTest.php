@@ -14,6 +14,10 @@ namespace Symfony\Component\ExpressionLanguage\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ExpressionLanguage\Lexer;
 use Symfony\Component\ExpressionLanguage\Node;
+use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
+use Symfony\Component\ExpressionLanguage\Node\FunctionNode;
+use Symfony\Component\ExpressionLanguage\Node\NameNode;
+use Symfony\Component\ExpressionLanguage\Node\Node as NodeNode;
 use Symfony\Component\ExpressionLanguage\Parser;
 use Symfony\Component\ExpressionLanguage\SyntaxError;
 
@@ -377,5 +381,15 @@ class ParserTest extends TestCase
                     'around position 5 for expression `[foo: foo]`.',
             ],
         ];
+    }
+
+    public function testParseWithoutContext()
+    {
+        $expression = 'is_granted(\'ROLE_EDIT\', subject)';
+        $expected = new FunctionNode('is_granted', new NodeNode([new ConstantNode('ROLE_EDIT'), new NameNode('subject')]));
+
+        $lexer = new Lexer();
+        $parser = new Parser([]);
+        $this->assertEquals($expected, $parser->parseWithoutContext($lexer->tokenize($expression)));
     }
 }

@@ -32,6 +32,7 @@ class Parser
     private array $functions;
     private ?array $names;
     private bool $lint = false;
+    private bool $validateIdentifiers = true;
 
     public function __construct(array $functions)
     {
@@ -94,8 +95,23 @@ class Parser
     public function parse(TokenStream $stream, array $names = []): Node\Node
     {
         $this->lint = false;
+        $this->validateIdentifiers = true;
 
         return $this->doParse($stream, $names);
+    }
+
+    /**
+     * Converts a token stream to a node tree.
+     *
+     * This function does not validate identifiers.
+     * Prefer using `parse` if you can.
+     */
+    public function parseWithoutContext(TokenStream $stream): Node\Node
+    {
+        $this->lint = false;
+        $this->validateIdentifiers = false;
+
+        return $this->doParse($stream, null);
     }
 
     /**
@@ -109,6 +125,7 @@ class Parser
     public function lint(TokenStream $stream, ?array $names = []): void
     {
         $this->lint = true;
+        $this->validateIdentifiers = true;
         $this->doParse($stream, $names);
     }
 
@@ -238,13 +255,13 @@ class Parser
 
                     default:
                         if ('(' === $this->stream->current->value) {
-                            if (false === isset($this->functions[$token->value])) {
+                            if ($this->validateIdentifiers && false === isset($this->functions[$token->value])) {
                                 throw new SyntaxError(sprintf('The function "%s" does not exist.', $token->value), $token->cursor, $this->stream->getExpression(), $token->value, array_keys($this->functions));
                             }
 
                             $node = new Node\FunctionNode($token->value, $this->parseArguments());
                         } else {
-                            if (!$this->lint || \is_array($this->names)) {
+                            if ($this->validateIdentifiers && (!$this->lint || \is_array($this->names))) {
                                 if (!\in_array($token->value, $this->names, true)) {
                                     throw new SyntaxError(sprintf('Variable "%s" is not valid.', $token->value), $token->cursor, $this->stream->getExpression(), $token->value, $this->names);
                                 }

@@ -26,7 +26,7 @@ final class PasswordStrength extends Constraint
 {
     public const STRENGTH_VERY_WEAK = 0;
     public const STRENGTH_WEAK = 1;
-    public const STRENGTH_REASONABLE = 2;
+    public const STRENGTH_MEDIUM = 2;
     public const STRENGTH_STRONG = 3;
     public const STRENGTH_VERY_STRONG = 4;
 
@@ -42,7 +42,7 @@ final class PasswordStrength extends Constraint
 
     public function __construct(array $options = null, int $minScore = null, array $groups = null, mixed $payload = null)
     {
-        $options['minScore'] ??= self::STRENGTH_REASONABLE;
+        $options['minScore'] ??= self::STRENGTH_MEDIUM;
 
         parent::__construct($options, $groups, $payload);
 

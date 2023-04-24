@@ -82,7 +82,7 @@ final class PasswordStrengthValidator extends ConstraintValidator
         return match (true) {
             $entropy >= 120 => PasswordStrength::STRENGTH_VERY_STRONG,
             $entropy >= 100 => PasswordStrength::STRENGTH_STRONG,
-            $entropy >= 80 => PasswordStrength::STRENGTH_REASONABLE,
+            $entropy >= 80 => PasswordStrength::STRENGTH_MEDIUM,
             $entropy >= 60 => PasswordStrength::STRENGTH_WEAK,
             default => PasswordStrength::STRENGTH_VERY_WEAK,
         };

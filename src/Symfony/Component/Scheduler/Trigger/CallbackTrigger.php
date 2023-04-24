@@ -19,15 +19,17 @@ namespace Symfony\Component\Scheduler\Trigger;
 final class CallbackTrigger implements TriggerInterface
 {
     private \Closure $callback;
+    private string $description;
 
-    public function __construct(callable $callback)
+    public function __construct(callable $callback, string $description = null)
     {
         $this->callback = $callback(...);
+        $this->description = $description ?? spl_object_hash($this->callback);
     }
 
     public function __toString(): string
     {
-        return spl_object_hash($this->callback);
+        return $this->description;
     }
 
     public function getNextRunDate(\DateTimeImmutable $run): ?\DateTimeImmutable

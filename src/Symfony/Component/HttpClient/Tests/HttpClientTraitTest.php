@@ -117,6 +117,8 @@ class HttpClientTraitTest extends TestCase
     /**
      * @group network
      *
+     * @requires extension openssl
+     *
      * @dataProvider provideNormalizeBodyMultipartForwardStream
      */
     public function testNormalizeBodyMultipartForwardStream($stream)

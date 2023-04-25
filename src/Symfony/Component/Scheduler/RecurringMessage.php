@@ -43,7 +43,15 @@ final class RecurringMessage
 
     public static function cron(string $expression, object $message): self
     {
-        return new self(CronExpressionTrigger::fromSpec($expression), $message);
+        if (!str_contains($expression, '#')) {
+            return new self(CronExpressionTrigger::fromSpec($expression), $message);
+        }
+
+        if (!$message instanceof \Stringable) {
+            throw new InvalidArgumentException('A message must be stringable to use "hashed" cron expressions.');
+        }
+
+        return new self(CronExpressionTrigger::fromSpec($expression, (string) $message), $message);
     }
 
     public static function trigger(TriggerInterface $trigger, object $message): self

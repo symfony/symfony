@@ -26,6 +26,8 @@
                 <referencedClass name="BackedEnum"/>
                 <referencedClass name="ReflectionIntersectionType"/>
                 <referencedClass name="UnitEnum"/>
+                <!-- These classes have been added in PHP 8.2 -->
+                <referencedClass name="Random\*"/>
             </errorLevel>
         </UndefinedClass>
         <UndefinedDocblockClass>

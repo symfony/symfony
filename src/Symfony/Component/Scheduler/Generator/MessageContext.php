@@ -21,9 +21,10 @@ use Symfony\Component\Scheduler\Trigger\TriggerInterface;
 final class MessageContext
 {
     public function __construct(
+        public readonly string $name,
         public readonly TriggerInterface $trigger,
         public readonly \DateTimeImmutable $triggeredAt,
-        public readonly \DateTimeImmutable|null $nextTriggerAt = null,
+        public readonly ?\DateTimeImmutable $nextTriggerAt = null,
     ) {
     }
 }

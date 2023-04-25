@@ -1,0 +1,76 @@
+---------------------------------------------------------------------------
+
+by vtsykun at 2023-03-25T00:55:21Z
+
+With this approach, you cannot set the start time to the nearest second, so the tasks will always start at 00 seconds and we will have a burst of CPU load at every minutes.
+
+At the same time, this component is very accurate, so the example below will run at a random time depending on when the task was received.
+
+```php
+        return (new Schedule())
+            ->add(RecurringMessage::cron('* * * * *', new \stdClass()))
+            ->add(RecurringMessage::every('15 minutes',  new \stdClass()));
+```
+![Selection_1374](https://user-images.githubusercontent.com/21358010/227669809-baeded7b-4991-46b7-9e63-ca02fe738ea1.png)
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-03-25T01:02:54Z
+
+> With this approach, you cannot set the start time to the nearest second, so the tasks will always start at 00 seconds and we will have a burst of CPU load at every minutes.
+
+This problem already exists with the existing `CronExpressionTrigger`, no?
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-03-25T11:37:04Z
+
+> I wonder if we could "just" create a HashedCronExpression instead.
+
+Yes, if not using #'s, it works exactly like a normal cron expression.
+
+> This could even be part of the CronExpression package instead.
+
+I'll see if there is interest in this there. (https://github.com/dragonmantank/cron-expression/issues/155)
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-03-27T16:57:06Z
+
+> I wonder if we could "just" create a HashedCronExpression instead.
+
+I've modified this to add hash support directly on `CronExpression` via the `fromHash` named constructor.
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-03-29T19:32:39Z
+
+I've made the context optional if the message is stringable.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-04-04T06:16:30Z
+
+IIUC, Jenkins is using `P` and not `#`. Why not use the same here?
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-04-04T12:10:27Z
+
+I personally thought the `#` better conveyed the meaning but I can change to `P`.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-04-04T13:39:30Z
+
+I think it makes sense to keep the "standard" set by Jenkins. I know that some hosting platforms are also using the Jenkins P letter for hashed crons. I agree that using # would be "better", but being more like others is probably a better idea.
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-04-04T16:02:25Z
+
+It's been a while since I've used Jenkins - I believe the syntax [is `H` (for _hash_)](https://www.cloudbees.com/blog/how-to-schedule-a-jenkins-job), not `P`.
+
+I can change to `H` but how should we handle the aliases (`#hourly`, `#daily`, `#midnight`, etc). I find these exceptionally useful.
+
+(We could support both `#` and `H` and keep the _hash_ aliases prefixed with `#`.)

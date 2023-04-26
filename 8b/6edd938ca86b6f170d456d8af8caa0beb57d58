@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2023-04-26T16:30:10Z
+
+Does this change do anything? We should already implement through `Http\Client\HttpClient`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-04-26T16:37:45Z
+
+You should be right, but I still prefer adding this code now since it's going to stay in v7
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-04-26T16:52:20Z
+
+So the plan is to not implement the HTTPlug interface anymore in v7? Does the name `HttplugClient` still make sense then or should we rather add a `PsrClient` as a replacement?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-04-26T16:55:50Z
+
+@derrabus not the *sync* interface, as it is deprecated in favor of the PSR-18 one (the sync Httplug interface is already an empty one extending the PSR-18 one). the client will still implement the async interface (and the PSR-18 one).
+
+---------------------------------------------------------------------------
+
+by stof at 2023-04-26T16:56:23Z
+
+and we *already* have a Psr18Client that implements only the PSR interfaces
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-04-26T16:57:07Z
+
+Ah, got it, thanks.

@@ -17,7 +17,6 @@ use Symfony\Component\Clock\Clock;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
-use Symfony\Component\Scheduler\Generator\Checkpoint;
 use Symfony\Component\Scheduler\Generator\MessageGenerator;
 use Symfony\Component\Scheduler\Schedule;
 
@@ -46,9 +45,8 @@ class SchedulerTransportFactory implements TransportFactoryInterface
 
         /** @var Schedule $schedule */
         $schedule = $this->scheduleProviders->get($scheduleName)->getSchedule();
-        $checkpoint = new Checkpoint('scheduler_checkpoint_'.$scheduleName, $schedule->getLock(), $schedule->getState());
 
-        return new SchedulerTransport(new MessageGenerator($schedule, $checkpoint, $this->clock));
+        return new SchedulerTransport(new MessageGenerator($schedule, $scheduleName, $this->clock));
     }
 
     public function supports(string $dsn, array $options): bool

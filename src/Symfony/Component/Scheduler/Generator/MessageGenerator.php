@@ -27,14 +27,12 @@ final class MessageGenerator implements MessageGeneratorInterface
 
     public function __construct(
         private readonly Schedule $schedule,
-        string|CheckpointInterface $checkpoint,
+        private readonly string $name,
         private readonly ClockInterface $clock = new Clock(),
+        CheckpointInterface $checkpoint = null,
     ) {
         $this->waitUntil = new \DateTimeImmutable('@0');
-        if (\is_string($checkpoint)) {
-            $checkpoint = new Checkpoint('scheduler_checkpoint_'.$checkpoint, $this->schedule->getLock(), $this->schedule->getState());
-        }
-        $this->checkpoint = $checkpoint;
+        $this->checkpoint = $checkpoint ?? new Checkpoint('scheduler_checkpoint_'.$this->name, $this->schedule->getLock(), $this->schedule->getState());
     }
 
     public function getMessages(): \Generator
@@ -70,7 +68,7 @@ final class MessageGenerator implements MessageGeneratorInterface
             }
 
             if ($yield) {
-                yield (new MessageContext($trigger, $time, $nextTime)) => $message;
+                yield (new MessageContext($this->name, $trigger, $time, $nextTime)) => $message;
                 $this->checkpoint->save($time, $index);
             }
         }

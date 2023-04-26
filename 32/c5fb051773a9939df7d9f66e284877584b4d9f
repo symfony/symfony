@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by kbond at 2023-04-25T22:43:02Z
+
+/cc @tucksaun
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-04-26T14:18:53Z
+
+Based on feedback from @tucksaun, I've re-arranged the `MessageGenerator::__construct()` parameters slightly to require a name and make the checkpoint optional.

@@ -104,17 +104,15 @@ class SerializerPassTest extends TestCase
         $serializerPass = new SerializerPass();
         $serializerPass->process($container);
 
-        $traceableNormalizerDefinition = $container->getDefinition('debug.n');
-        $traceableEncoderDefinition = $container->getDefinition('debug.e');
+        $traceableNormalizerDefinition = $container->getDefinition('.debug.serializer.normalizer.n');
+        $traceableEncoderDefinition = $container->getDefinition('.debug.serializer.encoder.e');
 
         $this->assertEquals(TraceableNormalizer::class, $traceableNormalizerDefinition->getClass());
-        $this->assertEquals(['n', null, 0], $traceableNormalizerDefinition->getDecoratedService());
-        $this->assertEquals(new Reference('debug.n.inner'), $traceableNormalizerDefinition->getArgument(0));
+        $this->assertEquals(new Reference('n'), $traceableNormalizerDefinition->getArgument(0));
         $this->assertEquals(new Reference('serializer.data_collector'), $traceableNormalizerDefinition->getArgument(1));
 
         $this->assertEquals(TraceableEncoder::class, $traceableEncoderDefinition->getClass());
-        $this->assertEquals(['e', null, 0], $traceableEncoderDefinition->getDecoratedService());
-        $this->assertEquals(new Reference('debug.e.inner'), $traceableEncoderDefinition->getArgument(0));
+        $this->assertEquals(new Reference('e'), $traceableEncoderDefinition->getArgument(0));
         $this->assertEquals(new Reference('serializer.data_collector'), $traceableEncoderDefinition->getArgument(1));
     }
 }

@@ -39,7 +39,7 @@ final class MailgunPayloadConverter implements PayloadConverterInterface
 
             $event = new MailerDeliveryEvent($name, $payload['id'], $payload);
             // reason is only available on failed messages
-            $event->setReason($payload['reason'] ?? '');
+            $event->setReason($this->getReason($payload));
         } else {
             $name = match ($payload['event']) {
                 'clicked' => MailerEngagementEvent::CLICK,
@@ -71,5 +71,20 @@ final class MailgunPayloadConverter implements PayloadConverterInterface
         }
 
         return MailerDeliveryEvent::BOUNCE;
+    }
+
+    private function getReason(array $payload): string
+    {
+        if ('' !== $payload['delivery-status']['description']) {
+            return $payload['delivery-status']['description'];
+        }
+        if ('' !== $payload['delivery-status']['message']) {
+            return $payload['delivery-status']['message'];
+        }
+        if ('' !== $payload['reason']) {
+            return $payload['reason'];
+        }
+
+        return '';
     }
 }

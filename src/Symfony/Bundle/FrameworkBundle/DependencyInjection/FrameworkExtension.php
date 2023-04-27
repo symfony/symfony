@@ -2761,6 +2761,7 @@ class FrameworkExtension extends Extension
             NotifierBridge\PagerDuty\PagerDutyTransportFactory::class => 'notifier.transport_factory.pager-duty',
             NotifierBridge\Plivo\PlivoTransportFactory::class => 'notifier.transport_factory.plivo',
             NotifierBridge\Pushover\PushoverTransportFactory::class => 'notifier.transport_factory.pushover',
+            NotifierBridge\Redlink\RedlinkTransportFactory::class => 'notifier.transport_factory.redlink',
             NotifierBridge\RingCentral\RingCentralTransportFactory::class => 'notifier.transport_factory.ring-central',
             NotifierBridge\RocketChat\RocketChatTransportFactory::class => 'notifier.transport_factory.rocket-chat',
             NotifierBridge\Sendberry\SendberryTransportFactory::class => 'notifier.transport_factory.sendberry',

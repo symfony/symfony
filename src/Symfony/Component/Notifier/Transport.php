@@ -71,6 +71,7 @@ final class Transport
         Bridge\PagerDuty\PagerDutyTransportFactory::class,
         Bridge\Plivo\PlivoTransportFactory::class,
         Bridge\Pushover\PushoverTransportFactory::class,
+        Bridge\Redlink\RedlinkTransportFactory::class,
         Bridge\RingCentral\RingCentralTransportFactory::class,
         Bridge\RocketChat\RocketChatTransportFactory::class,
         Bridge\Sendberry\SendberryTransportFactory::class,

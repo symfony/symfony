@@ -31,7 +31,7 @@ final class PostmarkTransportFactory extends AbstractTransportFactory
             $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
             $port = $dsn->getPort();
 
-            $transport = (new PostmarkApiTransport($user, $this->client, $this->dispatcher, $this->logger))->setHost($host)->setPort($port);
+            $transport = (new PostmarkApiTransport($user, $this->client, $this->dispatcher, $this->logger, $this->messageBus))->setHost($host)->setPort($port);
         }
 
         if ('postmark+smtp' === $scheme || 'postmark+smtps' === $scheme || 'postmark' === $scheme) {

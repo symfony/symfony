@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\SentMessage;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -28,7 +29,7 @@ abstract class AbstractHttpTransport extends AbstractTransport
     protected $port;
     protected $client;
 
-    public function __construct(HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
+    public function __construct(HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null, MessageBusInterface $messageBus = null)
     {
         $this->client = $client;
         if (null === $client) {
@@ -39,7 +40,7 @@ abstract class AbstractHttpTransport extends AbstractTransport
             $this->client = HttpClient::create();
         }
 
-        parent::__construct($dispatcher, $logger);
+        parent::__construct($dispatcher, $logger, $messageBus);
     }
 
     /**

@@ -21,6 +21,7 @@ use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\Event\SentMessageEvent;
 use Symfony\Component\Mailer\Exception\LogicException;
 use Symfony\Component\Mailer\SentMessage;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\BodyRendererInterface;
 use Symfony\Component\Mime\RawMessage;
@@ -31,13 +32,15 @@ use Symfony\Component\Mime\RawMessage;
 abstract class AbstractTransport implements TransportInterface
 {
     private ?EventDispatcherInterface $dispatcher;
+    protected ?MessageBusInterface $messageBus;
     private LoggerInterface $logger;
     private float $rate = 0;
     private float $lastSent = 0;
 
-    public function __construct(EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
+    public function __construct(EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null, MessageBusInterface $messageBus = null)
     {
         $this->dispatcher = $dispatcher;
+        $this->messageBus = $messageBus;
         $this->logger = $logger ?? new NullLogger();
     }
 

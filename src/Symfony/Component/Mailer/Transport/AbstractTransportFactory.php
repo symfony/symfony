@@ -14,6 +14,7 @@ namespace Symfony\Component\Mailer\Transport;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Exception\IncompleteDsnException;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -24,12 +25,14 @@ abstract class AbstractTransportFactory implements TransportFactoryInterface
     protected $dispatcher;
     protected $client;
     protected $logger;
+    protected $messageBus;
 
-    public function __construct(EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null)
+    public function __construct(EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null, MessageBusInterface $messageBus = null)
     {
         $this->dispatcher = $dispatcher;
         $this->client = $client;
         $this->logger = $logger;
+        $this->messageBus = $messageBus;
     }
 
     public function supports(Dsn $dsn): bool

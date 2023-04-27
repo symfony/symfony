@@ -20,7 +20,10 @@ use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\RemoteEvent\Event\Mailer\MailerDeliveryEvent;
+use Symfony\Component\RemoteEvent\Messenger\ConsumeRemoteEventMessage;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -37,11 +40,11 @@ class PostmarkApiTransport extends AbstractApiTransport
 
     private $messageStream;
 
-    public function __construct(string $key, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
+    public function __construct(string $key, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null, MessageBusInterface $messageBus = null)
     {
         $this->key = $key;
 
-        parent::__construct($client, $dispatcher, $logger);
+        parent::__construct($client, $dispatcher, $logger, $messageBus);
     }
 
     public function __toString(): string
@@ -51,13 +54,26 @@ class PostmarkApiTransport extends AbstractApiTransport
 
     protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface
     {
-        $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/email', [
-            'headers' => [
-                'Accept' => 'application/json',
-                'X-Postmark-Server-Token' => $this->key,
-            ],
-            'json' => $this->getPayload($email, $envelope),
-        ]);
+        try {
+            $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/email', [
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'X-Postmark-Server-Token' => $this->key,
+                ],
+                'json' => $this->getPayload($email, $envelope),
+            ]);
+        } catch (HttpTransportException $e) {
+            if (
+                str_contains($e->getMessage(), 'Unable to send an email: You tried to send to recipient(s) that have been marked as inactive.')
+                && null !== $this->messageBus
+                && class_exists(ConsumeRemoteEventMessage::class)
+            ) {
+                // Postmark throws an exception when sending an email to an inactive email address
+                $this->messageBus->dispatch(new ConsumeRemoteEventMessage('default', new MailerDeliveryEvent(MailerDeliveryEvent::DROPPED, 'MessageID', [])));
+            } else {
+                throw $e;
+            }
+        }
 
         try {
             $statusCode = $response->getStatusCode();

@@ -19,6 +19,13 @@ use Symfony\Component\RemoteEvent\PayloadConverterInterface;
 
 final class MailgunPayloadConverter implements PayloadConverterInterface
 {
+    private const MAILGUN_SPECIFIC_DROPPED_CODES = [
+        605, // Not delivering to previously bounced address
+        606, // Not delivering to unsubscribed address
+        607, // Not delivering to a user who marked your messages as spam
+        625, // Poor mailing list quality
+    ];
+
     public function convert(array $payload): AbstractMailerEvent
     {
         if (\in_array($payload['event'], ['accepted', 'rejected', 'delivered', 'failed', 'blocked'], true)) {
@@ -27,7 +34,7 @@ final class MailgunPayloadConverter implements PayloadConverterInterface
                 'rejected' => MailerDeliveryEvent::DROPPED,
                 'delivered' => MailerDeliveryEvent::DELIVERED,
                 'blocked' => MailerDeliveryEvent::DROPPED,
-                'failed' => 'permanent' === $payload['severity'] ? MailerDeliveryEvent::BOUNCE : MailerDeliveryEvent::DEFERRED,
+                'failed' => $this->matchFailedEvent($payload),
             };
 
             $event = new MailerDeliveryEvent($name, $payload['id'], $payload);
@@ -52,5 +59,17 @@ final class MailgunPayloadConverter implements PayloadConverterInterface
         $event->setTags($payload['tags']);
 
         return $event;
+    }
+
+    private function matchFailedEvent(array $payload): string
+    {
+        if ('temporary' === $payload['severity']) {
+            return MailerDeliveryEvent::DEFERRED;
+        }
+        if (\in_array($payload['delivery-status']['code'], self::MAILGUN_SPECIFIC_DROPPED_CODES, true)) {
+            return MailerDeliveryEvent::DROPPED;
+        }
+
+        return MailerDeliveryEvent::BOUNCE;
     }
 }

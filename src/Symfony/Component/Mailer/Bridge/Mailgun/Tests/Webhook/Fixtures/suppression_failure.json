@@ -10,13 +10,13 @@
         "log-level": "error",
         "event": "failed",
         "severity": "permanent",
-        "reason": "bounce",
+        "reason": "suppress-bounce",
         "delivery-status": {
             "attempt-no": 1,
-            "message": "No Such User Here",
-            "code": 550,
+            "message": "",
+            "code": 605,
             "enhanced-code": "",
-            "description": "",
+            "description": "Not delivering to previously bounced address",
             "session-seconds": 0
         },
         "flags": {

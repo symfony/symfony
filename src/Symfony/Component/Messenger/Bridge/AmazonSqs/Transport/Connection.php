@@ -273,10 +273,6 @@ class Connection
             return;
         }
 
-        if (null !== $this->configuration['account']) {
-            throw new InvalidArgumentException(sprintf('The Amazon SQS queue "%s" does not exist (or you don\'t have permissions on it), and can\'t be created when an account is provided.', $this->configuration['queue_name']));
-        }
-
         $parameters = ['QueueName' => $this->configuration['queue_name']];
 
         if (self::isFifoQueue($this->configuration['queue_name'])) {

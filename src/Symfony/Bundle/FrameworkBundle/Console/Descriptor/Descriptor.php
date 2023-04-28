@@ -337,7 +337,10 @@ abstract class Descriptor implements DescriptorInterface
     protected function getServiceEdges(ContainerBuilder $builder, string $serviceId): array
     {
         try {
-            return array_map(fn (ServiceReferenceGraphEdge $edge) => $edge->getSourceNode()->getId(), $builder->getCompiler()->getServiceReferenceGraph()->getNode($serviceId)->getInEdges());
+            return array_values(array_unique(array_map(
+                fn (ServiceReferenceGraphEdge $edge) => $edge->getSourceNode()->getId(),
+                $builder->getCompiler()->getServiceReferenceGraph()->getNode($serviceId)->getInEdges()
+            )));
         } catch (InvalidArgumentException $exception) {
             return [];
         }

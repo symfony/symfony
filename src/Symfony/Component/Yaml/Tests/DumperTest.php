@@ -710,6 +710,42 @@ YAML
         $this->assertSame($data, $this->parser->parse($yml));
     }
 
+    public function testDumpMultiLineStringAsScalarBlockWhenFirstLineIsEmptyAndSecondLineHasLeadingSpace()
+    {
+        $data = [
+            'data' => [
+                'multi_line' => "\n    the second line has leading spaces\nThe third line does not.",
+            ],
+        ];
+
+        $expected = "data:\n    multi_line: |4-\n\n            the second line has leading spaces\n        The third line does not.";
+
+        $yml = $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
+        $this->assertSame($expected, $yml);
+        $this->assertSame($data, $this->parser->parse($yml));
+    }
+
+    public function testDumpMultiLineStringAsScalarBlockWhenFirstLineHasOnlySpaces()
+    {
+        $data = [
+            'data' => [
+                'multi_line' => "    \nthe second line\nThe third line.",
+            ],
+        ];
+
+        $expectedData = [
+            'data' => [
+                'multi_line' => "\nthe second line\nThe third line.",
+            ],
+        ];
+
+        $expectedYml = "data:\n    multi_line: |-\n            \n        the second line\n        The third line.";
+
+        $yml = $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
+        $this->assertSame($expectedYml, $yml);
+        $this->assertSame($expectedData, $this->parser->parse($yml));
+    }
+
     public function testCarriageReturnFollowedByNewlineIsMaintainedWhenDumpingAsMultiLineLiteralBlock()
     {
         $data = ["a\r\nb\nc"];

@@ -154,6 +154,7 @@ EOH
                 $shells[] = $file->getExtension();
             }
         }
+        sort($shells);
 
         return $this->supportedShells = $shells;
     }

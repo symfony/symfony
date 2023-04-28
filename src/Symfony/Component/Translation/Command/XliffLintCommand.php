@@ -154,7 +154,7 @@ EOF
         return ['file' => $file, 'valid' => 0 === \count($errors), 'messages' => $errors];
     }
 
-    private function display(SymfonyStyle $io, array $files)
+    private function display(SymfonyStyle $io, array $files): int
     {
         return match ($this->format) {
             'txt' => $this->displayTxt($io, $files),
@@ -196,7 +196,7 @@ EOF
         return min($erroredFiles, 1);
     }
 
-    private function displayJson(SymfonyStyle $io, array $filesInfo)
+    private function displayJson(SymfonyStyle $io, array $filesInfo): int
     {
         $errors = 0;
 
@@ -212,6 +212,9 @@ EOF
         return min($errors, 1);
     }
 
+    /**
+     * @return iterable<\SplFileInfo>
+     */
     private function getFiles(string $fileOrDirectory): iterable
     {
         if (is_file($fileOrDirectory)) {
@@ -229,7 +232,10 @@ EOF
         }
     }
 
-    private function getDirectoryIterator(string $directory)
+    /**
+     * @return iterable<\SplFileInfo>
+     */
+    private function getDirectoryIterator(string $directory): iterable
     {
         $default = fn ($directory) => new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($directory, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS),
@@ -243,7 +249,7 @@ EOF
         return $default($directory);
     }
 
-    private function isReadable(string $fileOrDirectory)
+    private function isReadable(string $fileOrDirectory): bool
     {
         $default = fn ($fileOrDirectory) => is_readable($fileOrDirectory);
 

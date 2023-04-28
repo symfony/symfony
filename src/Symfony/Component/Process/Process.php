@@ -285,6 +285,8 @@ class Process implements \IteratorAggregate
      * @param callable|null $callback A PHP callback to run whenever there is some
      *                                output available on STDOUT or STDERR
      *
+     * @return void
+     *
      * @throws RuntimeException When process can't be launched
      * @throws RuntimeException When process is already running
      * @throws LogicException   In case a callback is provided and output has been disabled
@@ -1140,6 +1142,8 @@ class Process implements \IteratorAggregate
      * In case you run a background process (with the start method), you should
      * trigger this method regularly to ensure the process timeout
      *
+     * @return void
+     *
      * @throws ProcessTimedOutException In case the timeout was reached
      */
     public function checkTimeout()
@@ -1180,6 +1184,8 @@ class Process implements \IteratorAggregate
      *
      * Enabling the "create_new_console" option allows a subprocess to continue
      * to run after the main process exited, on both Windows and *nix
+     *
+     * @return void
      */
     public function setOptions(array $options)
     {
@@ -1275,6 +1281,8 @@ class Process implements \IteratorAggregate
      * Updates the status of the process, reads pipes.
      *
      * @param bool $blocking Whether to use a blocking read call
+     *
+     * @return void
      */
     protected function updateStatus(bool $blocking)
     {
@@ -1323,7 +1331,7 @@ class Process implements \IteratorAggregate
      *
      * @throws LogicException in case output has been disabled or process is not started
      */
-    private function readPipesForOutput(string $caller, bool $blocking = false)
+    private function readPipesForOutput(string $caller, bool $blocking = false): void
     {
         if ($this->outputDisabled) {
             throw new LogicException('Output has been disabled.');
@@ -1358,7 +1366,7 @@ class Process implements \IteratorAggregate
      * @param bool $blocking Whether to use blocking calls or not
      * @param bool $close    Whether to close file handles or not
      */
-    private function readPipes(bool $blocking, bool $close)
+    private function readPipes(bool $blocking, bool $close): void
     {
         $result = $this->processPipes->readAndWrite($blocking, $close);
 
@@ -1407,7 +1415,7 @@ class Process implements \IteratorAggregate
     /**
      * Resets data related to the latest run of the process.
      */
-    private function resetProcessData()
+    private function resetProcessData(): void
     {
         $this->starttime = null;
         $this->callback = null;
@@ -1528,7 +1536,7 @@ class Process implements \IteratorAggregate
      *
      * @throws LogicException if the process has not run
      */
-    private function requireProcessIsStarted(string $functionName)
+    private function requireProcessIsStarted(string $functionName): void
     {
         if (!$this->isStarted()) {
             throw new LogicException(sprintf('Process must be started before calling "%s()".', $functionName));
@@ -1540,7 +1548,7 @@ class Process implements \IteratorAggregate
      *
      * @throws LogicException if the process is not yet terminated
      */
-    private function requireProcessIsTerminated(string $functionName)
+    private function requireProcessIsTerminated(string $functionName): void
     {
         if (!$this->isTerminated()) {
             throw new LogicException(sprintf('Process must be terminated before calling "%s()".', $functionName));

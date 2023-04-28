@@ -183,6 +183,8 @@ abstract class AbstractOperation implements OperationInterface
      * stores the results.
      *
      * @param string $domain The domain which the operation will be performed for
+     *
+     * @return void
      */
     abstract protected function processDomain(string $domain);
 }

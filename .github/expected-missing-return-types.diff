@@ -7188,7 +7188,7 @@ index 9d7012de35..545339d4ef 100644
      {
          unset($this->parameters[$key]);
 diff --git a/src/Symfony/Component/HttpFoundation/Request.php b/src/Symfony/Component/HttpFoundation/Request.php
-index cf7e56f13e..e07d5fab79 100644
+index 633b4a63e2..b69b8cc723 100644
 --- a/src/Symfony/Component/HttpFoundation/Request.php
 +++ b/src/Symfony/Component/HttpFoundation/Request.php
 @@ -269,5 +269,5 @@ class Request
@@ -7275,7 +7275,14 @@ index cf7e56f13e..e07d5fab79 100644
 +    public function setLocale(string $locale): void
      {
          $this->setPhpDefaultLocale($this->locale = $locale);
-@@ -1904,5 +1904,5 @@ class Request
+@@ -1736,5 +1736,5 @@ class Request
+      * @return string
+      */
+-    protected function prepareRequestUri()
++    protected function prepareRequestUri(): string
+     {
+         $requestUri = '';
+@@ -1907,5 +1907,5 @@ class Request
       * @return void
       */
 -    protected static function initializeFormats()
@@ -8225,6 +8232,16 @@ index 1924b1ddb0..62c58c8e8b 100644
 +    public function process(ContainerBuilder $container): void
      {
          $annotatedClasses = [];
+diff --git a/src/Symfony/Component/HttpKernel/DependencyInjection/ConfigurableExtension.php b/src/Symfony/Component/HttpKernel/DependencyInjection/ConfigurableExtension.php
+index 12d468cf04..2ca89c128e 100644
+--- a/src/Symfony/Component/HttpKernel/DependencyInjection/ConfigurableExtension.php
++++ b/src/Symfony/Component/HttpKernel/DependencyInjection/ConfigurableExtension.php
+@@ -38,4 +38,4 @@ abstract class ConfigurableExtension extends Extension
+      * @return void
+      */
+-    abstract protected function loadInternal(array $mergedConfig, ContainerBuilder $container);
++    abstract protected function loadInternal(array $mergedConfig, ContainerBuilder $container): void;
+ }
 diff --git a/src/Symfony/Component/HttpKernel/DependencyInjection/ControllerArgumentValueResolverPass.php b/src/Symfony/Component/HttpKernel/DependencyInjection/ControllerArgumentValueResolverPass.php
 index dff3e248ae..381db9aa8f 100644
 --- a/src/Symfony/Component/HttpKernel/DependencyInjection/ControllerArgumentValueResolverPass.php
@@ -9845,12 +9862,12 @@ index 70fa786331..f27afd0f01 100644
      {
          if ($container->has('mime_types')) {
 diff --git a/src/Symfony/Component/Mime/Email.php b/src/Symfony/Component/Mime/Email.php
-index 97f5ded24d..05e3ed5202 100644
+index 7f3496d1fc..be6a1eff61 100644
 --- a/src/Symfony/Component/Mime/Email.php
 +++ b/src/Symfony/Component/Mime/Email.php
-@@ -397,5 +397,5 @@ class Email extends Message
-     }
- 
+@@ -400,5 +400,5 @@ class Email extends Message
+      * @return void
+      */
 -    public function ensureValidity()
 +    public function ensureValidity(): void
      {
@@ -10013,18 +10030,36 @@ index b429812176..21aec2b9e8 100644
 +    public function addAllowedTypes(string $option, string|array $allowedTypes): static
      {
          if ($this->locked) {
+diff --git a/src/Symfony/Component/Process/Exception/ProcessFailedException.php b/src/Symfony/Component/Process/Exception/ProcessFailedException.php
+index cf006daebf..51b1ccb810 100644
+--- a/src/Symfony/Component/Process/Exception/ProcessFailedException.php
++++ b/src/Symfony/Component/Process/Exception/ProcessFailedException.php
+@@ -51,5 +51,5 @@ class ProcessFailedException extends RuntimeException
+      * @return Process
+      */
+-    public function getProcess()
++    public function getProcess(): Process
+     {
+         return $this->process;
 diff --git a/src/Symfony/Component/Process/Exception/ProcessTimedOutException.php b/src/Symfony/Component/Process/Exception/ProcessTimedOutException.php
-index 27ce7fd430..708e611502 100644
+index e507ca3099..75b5f010b8 100644
 --- a/src/Symfony/Component/Process/Exception/ProcessTimedOutException.php
 +++ b/src/Symfony/Component/Process/Exception/ProcessTimedOutException.php
-@@ -47,5 +47,5 @@ class ProcessTimedOutException extends RuntimeException
+@@ -42,5 +42,5 @@ class ProcessTimedOutException extends RuntimeException
+      * @return Process
+      */
+-    public function getProcess()
++    public function getProcess(): Process
+     {
+         return $this->process;
+@@ -50,5 +50,5 @@ class ProcessTimedOutException extends RuntimeException
       * @return bool
       */
 -    public function isGeneralTimeout()
 +    public function isGeneralTimeout(): bool
      {
          return self::TYPE_GENERAL === $this->timeoutType;
-@@ -55,5 +55,5 @@ class ProcessTimedOutException extends RuntimeException
+@@ -58,5 +58,5 @@ class ProcessTimedOutException extends RuntimeException
       * @return bool
       */
 -    public function isIdleTimeout()
@@ -10092,6 +10127,38 @@ index ef54a3d2b0..d084e5ba24 100644
 +    public function start(callable $callback = null, array $env = []): void
      {
          if (null === $this->getCommandLine()) {
+diff --git a/src/Symfony/Component/Process/Process.php b/src/Symfony/Component/Process/Process.php
+index 2f4b5a24cc..afe03a912a 100644
+--- a/src/Symfony/Component/Process/Process.php
++++ b/src/Symfony/Component/Process/Process.php
+@@ -292,5 +292,5 @@ class Process implements \IteratorAggregate
+      * @throws LogicException   In case a callback is provided and output has been disabled
+      */
+-    public function start(callable $callback = null, array $env = [])
++    public function start(callable $callback = null, array $env = []): void
+     {
+         if ($this->isRunning()) {
+@@ -1147,5 +1147,5 @@ class Process implements \IteratorAggregate
+      * @throws ProcessTimedOutException In case the timeout was reached
+      */
+-    public function checkTimeout()
++    public function checkTimeout(): void
+     {
+         if (self::STATUS_STARTED !== $this->status) {
+@@ -1188,5 +1188,5 @@ class Process implements \IteratorAggregate
+      * @return void
+      */
+-    public function setOptions(array $options)
++    public function setOptions(array $options): void
+     {
+         if ($this->isRunning()) {
+@@ -1285,5 +1285,5 @@ class Process implements \IteratorAggregate
+      * @return void
+      */
+-    protected function updateStatus(bool $blocking)
++    protected function updateStatus(bool $blocking): void
+     {
+         if (self::STATUS_STARTED !== $this->status) {
 diff --git a/src/Symfony/Component/PropertyAccess/PropertyAccessor.php b/src/Symfony/Component/PropertyAccess/PropertyAccessor.php
 index c9125af216..bcd044de52 100644
 --- a/src/Symfony/Component/PropertyAccess/PropertyAccessor.php
@@ -10438,7 +10505,7 @@ index e3fb17e81c..cd27f3e387 100644
      {
          $this->strictRequirements = $enabled;
 diff --git a/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php b/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php
-index b06c649885..e98945cb7d 100644
+index decd2a2b1d..a37965ed5b 100644
 --- a/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php
 +++ b/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php
 @@ -96,5 +96,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
@@ -10483,6 +10550,13 @@ index b06c649885..e98945cb7d 100644
 +    protected function createRoute(string $path, array $defaults, array $requirements, array $options, ?string $host, array $schemes, array $methods, ?string $condition): Route
      {
          return new Route($path, $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
+@@ -362,5 +362,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
+      * @return void
+      */
+-    abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot);
++    abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void;
+ 
+     /**
 diff --git a/src/Symfony/Component/Routing/Loader/XmlFileLoader.php b/src/Symfony/Component/Routing/Loader/XmlFileLoader.php
 index 24ec21bb5c..1dac35dc8e 100644
 --- a/src/Symfony/Component/Routing/Loader/XmlFileLoader.php
@@ -10563,7 +10637,7 @@ index 417f156415..75d770d852 100644
      {
          $this->request = $request;
 diff --git a/src/Symfony/Component/Routing/Matcher/UrlMatcher.php b/src/Symfony/Component/Routing/Matcher/UrlMatcher.php
-index 062be150b8..7c925fbbdb 100644
+index d1cee21377..19e949fbc6 100644
 --- a/src/Symfony/Component/Routing/Matcher/UrlMatcher.php
 +++ b/src/Symfony/Component/Routing/Matcher/UrlMatcher.php
 @@ -66,5 +66,5 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
@@ -10580,6 +10654,13 @@ index 062be150b8..7c925fbbdb 100644
 +    public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider): void
      {
          $this->expressionLanguageProviders[] = $provider;
+@@ -259,5 +259,5 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
+      * @return ExpressionLanguage
+      */
+-    protected function getExpressionLanguage()
++    protected function getExpressionLanguage(): ExpressionLanguage
+     {
+         if (null === $this->expressionLanguage) {
 diff --git a/src/Symfony/Component/Routing/RequestContextAwareInterface.php b/src/Symfony/Component/Routing/RequestContextAwareInterface.php
 index 04acbdc800..eedb53c594 100644
 --- a/src/Symfony/Component/Routing/RequestContextAwareInterface.php
@@ -10687,7 +10768,7 @@ index f244e62bed..a5e918317c 100644
      {
          $key = (string) $resource;
 diff --git a/src/Symfony/Component/Routing/Router.php b/src/Symfony/Component/Routing/Router.php
-index b41dd55ef0..c03c3888cd 100644
+index 3fa13457b2..efcbc4219f 100644
 --- a/src/Symfony/Component/Routing/Router.php
 +++ b/src/Symfony/Component/Routing/Router.php
 @@ -121,5 +121,5 @@ class Router implements RouterInterface, RequestMatcherInterface
@@ -10704,28 +10785,28 @@ index b41dd55ef0..c03c3888cd 100644
 +    public function setOption(string $key, mixed $value): void
      {
          if (!\array_key_exists($key, $this->options)) {
-@@ -179,5 +179,5 @@ class Router implements RouterInterface, RequestMatcherInterface
-     }
- 
+@@ -182,5 +182,5 @@ class Router implements RouterInterface, RequestMatcherInterface
+      * @return RouteCollection
+      */
 -    public function getRouteCollection()
 +    public function getRouteCollection(): RouteCollection
      {
          return $this->collection ??= $this->loader->load($this->resource, $this->options['resource_type']);
-@@ -187,5 +187,5 @@ class Router implements RouterInterface, RequestMatcherInterface
+@@ -190,5 +190,5 @@ class Router implements RouterInterface, RequestMatcherInterface
       * @return void
       */
 -    public function setContext(RequestContext $context)
 +    public function setContext(RequestContext $context): void
      {
          $this->context = $context;
-@@ -209,5 +209,5 @@ class Router implements RouterInterface, RequestMatcherInterface
+@@ -212,5 +212,5 @@ class Router implements RouterInterface, RequestMatcherInterface
       * @return void
       */
 -    public function setConfigCacheFactory(ConfigCacheFactoryInterface $configCacheFactory)
 +    public function setConfigCacheFactory(ConfigCacheFactoryInterface $configCacheFactory): void
      {
          $this->configCacheFactory = $configCacheFactory;
-@@ -315,5 +315,5 @@ class Router implements RouterInterface, RequestMatcherInterface
+@@ -318,5 +318,5 @@ class Router implements RouterInterface, RequestMatcherInterface
       * @return void
       */
 -    public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider)
@@ -11064,10 +11145,17 @@ index a493b00e79..377dcacc09 100644
      {
      }
 diff --git a/src/Symfony/Component/Security/Core/User/InMemoryUserProvider.php b/src/Symfony/Component/Security/Core/User/InMemoryUserProvider.php
-index ed6c2d8b38..7b61505fd5 100644
+index e0aef90a14..651578d1f1 100644
 --- a/src/Symfony/Component/Security/Core/User/InMemoryUserProvider.php
 +++ b/src/Symfony/Component/Security/Core/User/InMemoryUserProvider.php
-@@ -98,5 +98,5 @@ class InMemoryUserProvider implements UserProviderInterface
+@@ -55,5 +55,5 @@ class InMemoryUserProvider implements UserProviderInterface
+      * @throws \LogicException
+      */
+-    public function createUser(UserInterface $user)
++    public function createUser(UserInterface $user): void
+     {
+         if (!$user instanceof InMemoryUser) {
+@@ -100,5 +100,5 @@ class InMemoryUserProvider implements UserProviderInterface
       * @throws UserNotFoundException if user whose given username does not exist
       */
 -    private function getUser(string $username): UserInterface
@@ -11265,7 +11353,7 @@ index 513b6494e5..c0211b6e39 100644
      {
          /** @var IsGranted[] $attributes */
 diff --git a/src/Symfony/Component/Security/Http/Firewall.php b/src/Symfony/Component/Security/Http/Firewall.php
-index fc56733efa..8538f5f821 100644
+index f2f86a5dfa..bd47629587 100644
 --- a/src/Symfony/Component/Security/Http/Firewall.php
 +++ b/src/Symfony/Component/Security/Http/Firewall.php
 @@ -51,5 +51,5 @@ class Firewall implements EventSubscriberInterface
@@ -11282,14 +11370,14 @@ index fc56733efa..8538f5f821 100644
 +    public function onKernelFinishRequest(FinishRequestEvent $event): void
      {
          $request = $event->getRequest();
-@@ -109,5 +109,5 @@ class Firewall implements EventSubscriberInterface
-     }
- 
+@@ -112,5 +112,5 @@ class Firewall implements EventSubscriberInterface
+      * @return array
+      */
 -    public static function getSubscribedEvents()
 +    public static function getSubscribedEvents(): array
      {
          return [
-@@ -120,5 +120,5 @@ class Firewall implements EventSubscriberInterface
+@@ -123,5 +123,5 @@ class Firewall implements EventSubscriberInterface
       * @return void
       */
 -    protected function callListeners(RequestEvent $event, iterable $listeners)
@@ -11521,55 +11609,65 @@ index 61b14a1a80..f745caaada 100644
      {
          if (null !== $object = $this->extractObjectToPopulate($class, $context, self::OBJECT_TO_POPULATE)) {
 diff --git a/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
-index 16b2bb70af..e1a7dd2df1 100644
+index ed42d56f40..9cf5a883b3 100644
 --- a/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
-@@ -141,10 +141,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
-      * @param array $context
+@@ -143,5 +143,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+      * @return bool
       */
 -    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */)
 +    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */): bool
      {
          return \is_object($data) && !$data instanceof \Traversable;
-     }
- 
+@@ -151,5 +151,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+      * @return array|string|int|float|bool|\ArrayObject|null
+      */
 -    public function normalize(mixed $object, string $format = null, array $context = [])
 +    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
      {
          if (!isset($context['cache_key'])) {
-@@ -227,5 +227,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
-     }
- 
+@@ -235,5 +235,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+      * @return object
+      */
 -    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null)
 +    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null): object
      {
          if ($this->classDiscriminatorResolver && $mapping = $this->classDiscriminatorResolver->getMappingForClass($class)) {
-@@ -289,5 +289,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -297,5 +297,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return string[]
       */
 -    abstract protected function extractAttributes(object $object, string $format = null, array $context = []);
 +    abstract protected function extractAttributes(object $object, string $format = null, array $context = []): array;
  
      /**
-@@ -296,15 +296,15 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -304,5 +304,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return mixed
       */
 -    abstract protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []);
 +    abstract protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed;
  
      /**
-      * @param array $context
+@@ -311,5 +311,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+      * @return bool
       */
 -    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */)
 +    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */): bool
      {
          return class_exists($type) || (interface_exists($type, false) && null !== $this->classDiscriminatorResolver?->getMappingForClass($type));
-     }
- 
+@@ -319,5 +319,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+      * @return mixed
+      */
 -    public function denormalize(mixed $data, string $type, string $format = null, array $context = [])
 +    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
      {
          if (!isset($context['cache_key'])) {
+@@ -424,5 +424,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+      * @return void
+      */
+-    abstract protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = []);
++    abstract protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = []): void;
+ 
+     /**
 diff --git a/src/Symfony/Component/Serializer/Normalizer/DenormalizableInterface.php b/src/Symfony/Component/Serializer/Normalizer/DenormalizableInterface.php
 index 503f3cb518..78f48e086d 100644
 --- a/src/Symfony/Component/Serializer/Normalizer/DenormalizableInterface.php
@@ -11702,9 +11800,30 @@ index 1835568745..2b98fc11d6 100644
      {
          $this->serializer = $serializer;
 diff --git a/src/Symfony/Component/Serializer/Tests/Normalizer/AbstractObjectNormalizerTest.php b/src/Symfony/Component/Serializer/Tests/Normalizer/AbstractObjectNormalizerTest.php
-index df0b6121ea..7441f9fd6e 100644
+index df0b6121ea..37ca485e88 100644
 --- a/src/Symfony/Component/Serializer/Tests/Normalizer/AbstractObjectNormalizerTest.php
 +++ b/src/Symfony/Component/Serializer/Tests/Normalizer/AbstractObjectNormalizerTest.php
+@@ -592,5 +592,5 @@ class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
+     }
+ 
+-    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = [])
++    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = []): void
+     {
+         $object->$attribute = $value;
+@@ -720,5 +720,5 @@ class AbstractObjectNormalizerWithMetadata extends AbstractObjectNormalizer
+     }
+ 
+-    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = [])
++    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = []): void
+     {
+         $object->$attribute = $value;
+@@ -839,5 +839,5 @@ class AbstractObjectNormalizerCollectionDummy extends AbstractObjectNormalizer
+     }
+ 
+-    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = [])
++    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = []): void
+     {
+         $object->$attribute = $value;
 @@ -896,5 +896,5 @@ class ArrayDenormalizerDummy implements DenormalizerInterface, SerializerAwareIn
      }
  
@@ -11923,6 +12042,16 @@ index 539bcbce14..a172cd2ed4 100644
 -    public function stream(string|TemplateReferenceInterface $name, array $parameters = []);
 +    public function stream(string|TemplateReferenceInterface $name, array $parameters = []): void;
  }
+diff --git a/src/Symfony/Component/Translation/Catalogue/AbstractOperation.php b/src/Symfony/Component/Translation/Catalogue/AbstractOperation.php
+index 65eea0bb9b..12e30f4cf5 100644
+--- a/src/Symfony/Component/Translation/Catalogue/AbstractOperation.php
++++ b/src/Symfony/Component/Translation/Catalogue/AbstractOperation.php
+@@ -187,4 +187,4 @@ abstract class AbstractOperation implements OperationInterface
+      * @return void
+      */
+-    abstract protected function processDomain(string $domain);
++    abstract protected function processDomain(string $domain): void;
+ }
 diff --git a/src/Symfony/Component/Translation/Catalogue/MergeOperation.php b/src/Symfony/Component/Translation/Catalogue/MergeOperation.php
 index 1b777a8435..804cc138fc 100644
 --- a/src/Symfony/Component/Translation/Catalogue/MergeOperation.php
@@ -11963,7 +12092,7 @@ index c845959f1a..faa5b0b34e 100644
 +    public function deleteCatalogueMetadata(string $key = '', string $domain = 'messages'): void;
  }
 diff --git a/src/Symfony/Component/Translation/Command/XliffLintCommand.php b/src/Symfony/Component/Translation/Command/XliffLintCommand.php
-index 91001c5644..cfeb6c1fdc 100644
+index ba68635db7..fd3b32a02a 100644
 --- a/src/Symfony/Component/Translation/Command/XliffLintCommand.php
 +++ b/src/Symfony/Component/Translation/Command/XliffLintCommand.php
 @@ -54,5 +54,5 @@ class XliffLintCommand extends Command
@@ -12126,7 +12255,7 @@ index 642130af75..c9ae2693a4 100644
 +    public function setPrefix(string $prefix): void;
  }
 diff --git a/src/Symfony/Component/Translation/Extractor/PhpExtractor.php b/src/Symfony/Component/Translation/Extractor/PhpExtractor.php
-index 6b59c7cacc..50c1eba7c6 100644
+index 7ff27f7c80..495067ed2e 100644
 --- a/src/Symfony/Component/Translation/Extractor/PhpExtractor.php
 +++ b/src/Symfony/Component/Translation/Extractor/PhpExtractor.php
 @@ -136,5 +136,5 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
@@ -12143,6 +12272,13 @@ index 6b59c7cacc..50c1eba7c6 100644
 +    public function setPrefix(string $prefix): void
      {
          $this->prefix = $prefix;
+@@ -265,5 +265,5 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
+      * @return void
+      */
+-    protected function parseTokens(array $tokens, MessageCatalogue $catalog, string $filename)
++    protected function parseTokens(array $tokens, MessageCatalogue $catalog, string $filename): void
+     {
+         $tokenIterator = new \ArrayIterator($tokens);
 diff --git a/src/Symfony/Component/Translation/Loader/CsvFileLoader.php b/src/Symfony/Component/Translation/Loader/CsvFileLoader.php
 index 7f2f96be64..266c7f48c9 100644
 --- a/src/Symfony/Component/Translation/Loader/CsvFileLoader.php
@@ -12870,7 +13006,7 @@ index 644bbf70cb..4a1336e78b 100644
      {
          if (!$constraint instanceof IsTrue) {
 diff --git a/src/Symfony/Component/Validator/Constraints/IsbnValidator.php b/src/Symfony/Component/Validator/Constraints/IsbnValidator.php
-index c6445b16a5..50d738bdc9 100644
+index 3a64f11cf6..b271a2e1df 100644
 --- a/src/Symfony/Component/Validator/Constraints/IsbnValidator.php
 +++ b/src/Symfony/Component/Validator/Constraints/IsbnValidator.php
 @@ -31,5 +31,5 @@ class IsbnValidator extends ConstraintValidator
@@ -12894,6 +13030,13 @@ index c6445b16a5..50d738bdc9 100644
 +    protected function validateIsbn13(string $isbn): string|bool
      {
          // Error priority:
+@@ -179,5 +179,5 @@ class IsbnValidator extends ConstraintValidator
+      * @return string
+      */
+-    protected function getMessage(Isbn $constraint, string $type = null)
++    protected function getMessage(Isbn $constraint, string $type = null): string
+     {
+         if (null !== $constraint->message) {
 diff --git a/src/Symfony/Component/Validator/Constraints/IsinValidator.php b/src/Symfony/Component/Validator/Constraints/IsinValidator.php
 index 21539cbcb7..86d85efe95 100644
 --- a/src/Symfony/Component/Validator/Constraints/IsinValidator.php
@@ -13213,6 +13356,17 @@ index a7eda1457d..28630f205f 100644
 +    public function getOptions(): array
      {
          return $this->options;
+diff --git a/src/Symfony/Component/Validator/Exception/ValidationFailedException.php b/src/Symfony/Component/Validator/Exception/ValidationFailedException.php
+index 2106e0a0ba..0b64f07c89 100644
+--- a/src/Symfony/Component/Validator/Exception/ValidationFailedException.php
++++ b/src/Symfony/Component/Validator/Exception/ValidationFailedException.php
+@@ -32,5 +32,5 @@ class ValidationFailedException extends RuntimeException
+      * @return mixed
+      */
+-    public function getValue()
++    public function getValue(): mixed
+     {
+         return $this->value;
 diff --git a/src/Symfony/Component/Validator/Mapping/ClassMetadata.php b/src/Symfony/Component/Validator/Mapping/ClassMetadata.php
 index f5f084f2ed..b0f6545ab0 100644
 --- a/src/Symfony/Component/Validator/Mapping/ClassMetadata.php
@@ -14693,17 +14847,6 @@ index c1a77ad157..1e926dc83a 100644
 +    public function setParsedLine(int $parsedLine): void
      {
          $this->parsedLine = $parsedLine;
-diff --git a/src/Symfony/Contracts/Service/Test/ServiceLocatorTestCase.php b/src/Symfony/Contracts/Service/Test/ServiceLocatorTestCase.php
-index 88f6a0687a..a0f20a6a7c 100644
---- a/src/Symfony/Contracts/Service/Test/ServiceLocatorTestCase.php
-+++ b/src/Symfony/Contracts/Service/Test/ServiceLocatorTestCase.php
-@@ -16,5 +16,5 @@ use Psr\Container\ContainerInterface;
- use Symfony\Contracts\Service\ServiceLocatorTrait;
- 
--abstract class ServiceLocatorTest extends TestCase
-+abstract class ServiceLocatorTestCase extends TestCase
- {
-     protected function getServiceLocator(array $factories): ContainerInterface
 diff --git a/src/Symfony/Contracts/Translation/LocaleAwareInterface.php b/src/Symfony/Contracts/Translation/LocaleAwareInterface.php
 index db40ba13e0..48928ca959 100644
 --- a/src/Symfony/Contracts/Translation/LocaleAwareInterface.php

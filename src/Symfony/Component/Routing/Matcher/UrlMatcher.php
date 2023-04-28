@@ -255,6 +255,9 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
         return $defaults;
     }
 
+    /**
+     * @return ExpressionLanguage
+     */
     protected function getExpressionLanguage()
     {
         if (null === $this->expressionLanguage) {

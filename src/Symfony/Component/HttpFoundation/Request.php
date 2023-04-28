@@ -1732,6 +1732,9 @@ class Request
      * Copyright (c) 2005-2010 Zend Technologies USA Inc. (https://www.zend.com/)
      */
 
+    /**
+     * @return string
+     */
     protected function prepareRequestUri()
     {
         $requestUri = '';

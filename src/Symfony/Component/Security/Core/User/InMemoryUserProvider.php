@@ -50,6 +50,8 @@ class InMemoryUserProvider implements UserProviderInterface
     /**
      * Adds a new User to the provider.
      *
+     * @return void
+     *
      * @throws \LogicException
      */
     public function createUser(UserInterface $user)

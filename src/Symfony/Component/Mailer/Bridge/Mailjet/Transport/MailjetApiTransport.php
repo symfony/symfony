@@ -199,7 +199,7 @@ class MailjetApiTransport extends AbstractApiTransport
         return ($this->host ?: self::HOST).($this->port ? ':'.$this->port : '');
     }
 
-    private function castCustomHeader(string $value, string $type)
+    private function castCustomHeader(string $value, string $type): mixed
     {
         return match ($type) {
             'bool' => filter_var($value, \FILTER_VALIDATE_BOOL),

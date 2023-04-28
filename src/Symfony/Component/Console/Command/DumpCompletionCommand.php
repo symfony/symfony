@@ -143,7 +143,7 @@ EOH
      */
     private function getSupportedShells(): array
     {
-        if (null !== $this->supportedShells) {
+        if (isset($this->supportedShells)) {
             return $this->supportedShells;
         }
 

@@ -38,6 +38,9 @@ class ProcessTimedOutException extends RuntimeException
         ));
     }
 
+    /**
+     * @return Process
+     */
     public function getProcess()
     {
         return $this->process;
@@ -59,7 +62,7 @@ class ProcessTimedOutException extends RuntimeException
         return self::TYPE_IDLE === $this->timeoutType;
     }
 
-    public function getExceededTimeout()
+    public function getExceededTimeout(): ?float
     {
         return match ($this->timeoutType) {
             self::TYPE_GENERAL => $this->process->getTimeout(),

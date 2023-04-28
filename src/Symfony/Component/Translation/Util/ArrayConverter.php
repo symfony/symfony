@@ -46,7 +46,7 @@ class ArrayConverter
         return $tree;
     }
 
-    private static function &getElementByPath(array &$tree, array $parts)
+    private static function &getElementByPath(array &$tree, array $parts): mixed
     {
         $elem = &$tree;
         $parentOfElem = null;

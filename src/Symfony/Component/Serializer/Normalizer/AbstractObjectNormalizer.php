@@ -139,12 +139,17 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
     /**
      * @param array $context
+     *
+     * @return bool
      */
     public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */)
     {
         return \is_object($data) && !$data instanceof \Traversable;
     }
 
+    /**
+     * @return array|string|int|float|bool|\ArrayObject|null
+     */
     public function normalize(mixed $object, string $format = null, array $context = [])
     {
         if (!isset($context['cache_key'])) {
@@ -226,6 +231,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         return $data;
     }
 
+    /**
+     * @return object
+     */
     protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null)
     {
         if ($this->classDiscriminatorResolver && $mapping = $this->classDiscriminatorResolver->getMappingForClass($class)) {
@@ -299,12 +307,17 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
     /**
      * @param array $context
+     *
+     * @return bool
      */
     public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */)
     {
         return class_exists($type) || (interface_exists($type, false) && null !== $this->classDiscriminatorResolver?->getMappingForClass($type));
     }
 
+    /**
+     * @return mixed
+     */
     public function denormalize(mixed $data, string $type, string $format = null, array $context = [])
     {
         if (!isset($context['cache_key'])) {
@@ -408,7 +421,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     }
 
     /**
-     * Sets attribute value.
+     * @return void
      */
     abstract protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = []);
 

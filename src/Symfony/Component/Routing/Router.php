@@ -178,6 +178,9 @@ class Router implements RouterInterface, RequestMatcherInterface
         return $this->options[$key];
     }
 
+    /**
+     * @return RouteCollection
+     */
     public function getRouteCollection()
     {
         return $this->collection ??= $this->loader->load($this->resource, $this->options['resource_type']);

@@ -167,7 +167,7 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
         return new LdapUser($entry, $identifier, $password, $this->defaultRoles, $extraFields);
     }
 
-    private function getAttributeValue(Entry $entry, string $attribute)
+    private function getAttributeValue(Entry $entry, string $attribute): mixed
     {
         if (!$entry->hasAttribute($attribute)) {
             throw new InvalidArgumentException(sprintf('Missing attribute "%s" for user "%s".', $attribute, $entry->getDn()));

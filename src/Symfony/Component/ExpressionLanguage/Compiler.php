@@ -28,6 +28,9 @@ class Compiler implements ResetInterface
         $this->functions = $functions;
     }
 
+    /**
+     * @return array
+     */
     public function getFunction(string $name)
     {
         return $this->functions[$name];

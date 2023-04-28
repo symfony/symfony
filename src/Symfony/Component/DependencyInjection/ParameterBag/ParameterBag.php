@@ -255,6 +255,9 @@ class ParameterBag implements ParameterBagInterface
         }, $value);
     }
 
+    /**
+     * @return bool
+     */
     public function isResolved()
     {
         return $this->resolved;

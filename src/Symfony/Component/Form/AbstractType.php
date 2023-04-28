@@ -48,11 +48,17 @@ abstract class AbstractType implements FormTypeInterface
     {
     }
 
+    /**
+     * @return string
+     */
     public function getBlockPrefix()
     {
         return StringUtil::fqcnToBlockPrefix(static::class) ?: '';
     }
 
+    /**
+     * @return string|null
+     */
     public function getParent()
     {
         return FormType::class;

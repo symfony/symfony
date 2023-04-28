@@ -118,6 +118,8 @@ abstract class FormField
 
     /**
      * Initializes the form field.
+     *
+     * @return void
      */
     abstract protected function initialize();
 }

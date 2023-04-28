@@ -58,12 +58,32 @@
             font-weight: bold;
             padding: 0 1px;
         }
-        .log-filter .tab-navigation .tab-control input {
-            display: none;
+        .log-filter .tab-navigation {
+            position: relative;
         }
-        .log-filter .tab-navigation .tab-control label {
-            cursor: pointer;
+        .log-filter .tab-navigation input[type="radio"] {
+            position: absolute;
+            pointer-events: none;
+            opacity: 0;
         }
+        .tab-navigation input[type="radio"]:checked + .tab-control {
+            background-color: var(--tab-active-background);
+            border-radius: 6px;
+            box-shadow: inset 0 0 0 1.5px var(--tab-active-border-color);
+            color: var(--tab-active-color);
+            position: relative;
+            z-index: 1;
+        }
+        .theme-dark .tab-navigation input[type="radio"]:checked + .tab-control {
+            box-shadow: inset 0 0 0 1px var(--tab-border-color);
+        }
+        .tab-navigation input[type="radio"]:focus-visible + .tab-control {
+            outline: 1px solid var(--color-link);
+        }
+        .tab-navigation input[type="radio"]:checked + .tab-control + input[type="radio"] + .tab-control:before{
+            width: 0;
+        }
+
         .log-filters .log-filter .log-filter-content {
             background: var(--base-0);
             border: 1px solid var(--table-border-color);

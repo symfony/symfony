@@ -5,7 +5,7 @@ CHANGELOG
 ---
 
  * Support detection of related parts if `Content-Id` is used instead of the name
- * Add `TextPart::getDispostion()`
+ * Add `TextPart::getDisposition()`
 
 6.2
 ---

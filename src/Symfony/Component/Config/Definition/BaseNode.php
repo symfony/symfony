@@ -442,6 +442,8 @@ abstract class BaseNode implements NodeInterface
     /**
      * Validates the type of a Node.
      *
+     * @return void
+     *
      * @throws InvalidTypeException when the value is invalid
      */
     abstract protected function validateType(mixed $value);

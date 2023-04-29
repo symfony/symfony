@@ -20,6 +20,7 @@ class HeaderUtils
 {
     public const DISPOSITION_ATTACHMENT = 'attachment';
     public const DISPOSITION_INLINE = 'inline';
+    public const DISPOSITION_FORM_DATA = 'form-data';
 
     /**
      * This class should not be instantiated.
@@ -148,7 +149,7 @@ class HeaderUtils
     /**
      * Generates an HTTP Content-Disposition field-value.
      *
-     * @param string $disposition      One of "inline" or "attachment"
+     * @param string $disposition      One of "inline", "attachment" or "form-data"
      * @param string $filename         A unicode string
      * @param string $filenameFallback A string containing only ASCII characters that
      *                                 is semantically equivalent to $filename. If the filename is already ASCII,
@@ -160,8 +161,8 @@ class HeaderUtils
      */
     public static function makeDisposition(string $disposition, string $filename, string $filenameFallback = ''): string
     {
-        if (!\in_array($disposition, [self::DISPOSITION_ATTACHMENT, self::DISPOSITION_INLINE])) {
-            throw new \InvalidArgumentException(sprintf('The disposition must be either "%s" or "%s".', self::DISPOSITION_ATTACHMENT, self::DISPOSITION_INLINE));
+        if (!\in_array($disposition, [self::DISPOSITION_ATTACHMENT, self::DISPOSITION_INLINE, self::DISPOSITION_FORM_DATA])) {
+            throw new \InvalidArgumentException(sprintf('The disposition must be either "%s", "%s", "%s".', self::DISPOSITION_ATTACHMENT, self::DISPOSITION_INLINE, self::DISPOSITION_FORM_DATA));
         }
 
         if ('' === $filenameFallback) {

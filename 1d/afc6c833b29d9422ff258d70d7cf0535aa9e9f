@@ -1,0 +1,281 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-04-21T20:20:50Z
+
+> this misses tests for the whole Pipeline system
+
+It's one of my TODO items above :)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2023-04-22T14:00:46Z
+
+@weaverryan how would be the workflow for folks using e.g. SCSS? Before we just used Webpack Encore. Should we keep using that now to compile it into CSS? Then, how do we connect the compiled assets from `public/build/` with this new pipeline feature? Thanks.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-04-22T15:09:56Z
+
+@javiereguiluz if the assets are already in the `public` folder, you don't need the asset pipeline at all. The pipeline does not replace the existing way (which still makes sense when using the webpack stack)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2023-04-22T15:23:23Z
+
+So, if you use anything that it's not pure CSS or JS, you can't use this, right?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-04-22T16:12:27Z
+
+> @weaverryan how would be the workflow for folks using e.g. SCSS? Before we just used Webpack Encore. Should we keep using that now to compile it into CSS? Then, how do we connect the compiled assets from public/build/ with this new pipeline feature? Thanks.
+> So, if you use anything that it's not pure CSS or JS, you can't use this, right?
+
+This will be the NUMBER 1 question & thing to document. If you need to compile scss -> css or use something like Tailwind, the answer is that you can/should now use *their* standard tools. For example, for Sass, you would install the `sass` binary - https://sass-lang.com/install. You'd probably have an `assets/styles/*.scss` type of setup like you have now. When you run `sass`, you would output these to perhaps `assets/styles/*.css` or perhaps another directory like `assets/built/*.css`.
+
+Anyways, once you do that, you'll ultimately end up with plain, normal CSS files. And THOSE are what you'd reference in your app:
+
+```twig
+<link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+```
+
+Same goes for Tailwind. We'll definitely need to give people specific instructions / recommendations on how to set this all up.
+
+---------------------------------------------------------------------------
+
+by yguedidi at 2023-04-22T18:22:51Z
+
+@weaverryan being a "pipeline", what about providing extra asset compilers for those external tools?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-04-22T23:11:24Z
+
+That’s definitely an option :). Those would use the underlying binaries (e.g. sass), which I’m pretty sure is what you’re thinking too. But yes, certainly an option! Rails does *something* like this - iirc for tailwind for example - but I haven’t dug into the specifics.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-04-24T00:31:43Z
+
+I DO think this should be split into its own component if we want to make the recipe situation simpler. Basically, you could still install symfony/asset without opting into the pipeline - which is what Encore users would do, for example.  It if you installed symfony/asset-pipeline, then we could ship a config file that activates the pipeline and likely ships with a starting assets/ directory.
+
+Other than splitting and some windows tests (the code loves /‘s), this is ready for review.
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2023-04-24T07:55:47Z
+
+This seems neat ! However I'm a bit confused too by the `pipeline` naming. I was expecting a multi step configurable process where each output is injected as input of the next one. To me it looks a lot like what `assets.packages` behave at the moment I don't understand the `pipeline` here.
+
+---------------------------------------------------------------------------
+
+by Kocal at 2023-04-24T08:36:31Z
+
+> > @weaverryan how would be the workflow for folks using e.g. SCSS? Before we just used Webpack Encore. Should we keep using that now to compile it into CSS? Then, how do we connect the compiled assets from public/build/ with this new pipeline feature? Thanks.
+> > So, if you use anything that it's not pure CSS or JS, you can't use this, right?
+>
+> This will be the NUMBER 1 question & thing to document. If you need to compile scss -> css or use something like Tailwind, the answer is that you can/should now use _their_ standard tools. For example, for Sass, you would install the `sass` binary - [sass-lang.com/install](https://sass-lang.com/install). You'd probably have an `assets/styles/*.scss` type of setup like you have now. When you run `sass`, you would output these to perhaps `assets/styles/*.css` or perhaps another directory like `assets/built/*.css`.
+>
+> Anyways, once you do that, you'll ultimately end up with plain, normal CSS files. And THOSE are what you'd reference in your app:
+>
+> ```
+> <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+> ```
+>
+> Same goes for Tailwind. We'll definitely need to give people specific instructions / recommendations on how to set this all up.
+
+How will it works with HMR?
+
+---------------------------------------------------------------------------
+
+by dreadnip at 2023-04-24T08:55:43Z
+
+> @weaverryan being a "pipeline", what about providing extra asset compilers for those external tools?
+
+If you go down this route you're just building a new Assetic. It seems more fitting to keep the scope of this component small and focused on vanilla CSS/JS, matching the related PR about importmaps (https://github.com/symfony/symfony/pull/48371). Webpack can still be the default option for people who need a compilation step.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-04-24T13:06:50Z
+
+> This seems neat ! However I'm a bit confused too by the pipeline naming
+
+I borrowed this name from rails "Propshaft is an asset pipeline library for Rails" - https://github.com/rails/propshaft - but i'm open to other names (though pipeline is pretty catchy). There IS a "compiler" system in there where you can make changes to the source code, but at the moment (and this should perhaps remain this way) that is meant to be lightweight - it's used, e.g., for updating import paths in JS/CSS files.
+
+> ... Same goes for Tailwind. We'll definitely need to give people specific instructions / recommendations on how to set this all up.
+> How will it works with HMR?
+
+AFAIK, HMR doesn't work without a built system like Webpack. If someone wanted to get crazy, an HMR system could be built using Mercure - e.g. run a command that watches CSS files for changes, use Mercure to send that change to the frontend, and on the frontend, swap the old CSS file out for the new one. It would be a neat extra for someone to build in an external bundle, I think. You might even be able to do this without Mercure (since it's just a dev thing) by having an endpoint that stays alive forever, watches the file changes in a loop, and return the server events as they happen.
+
+> If you go down this route you're just building a new Assetic. It seems more fitting to keep the scope of this component small and focused on vanilla CSS/JS, matching the related PR about importmaps (https://github.com/symfony/symfony/pull/48371). Webpack can still be the default option for people who need a compilation step.
+
+This is fair. We shouldn't rush into adding asset compilers for transforming Sass or Tailwind. Let's document using those tools on their own the "normal" way and see how things go.
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2023-04-24T13:39:49Z
+
+```
+I borrowed this name from rails "Propshaft is an asset pipeline library for Rails" - https://github.com/rails/propshaft - but i'm open to other names (though pipeline is pretty catchy). There IS a "compiler" system in there where you can make changes to the source code, but at the moment (and this should perhaps remain this way) that is meant to be lightweight - it's used, e.g., for updating import paths in JS/CSS files.
+```
+⚠️ I would emit a warning about the "Catchy" because I think one of the strong assets of Symfony is the fact that we can understand the purpose of each component by their name. "Pipeline" is often used in CI/CD context and can be very misleading. I don't really see the benfit of having a dedicated component where it seems to integrate very nicely with the Asset component. Shouldn't it be directly in here ?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-04-24T14:18:42Z
+
+>  I would emit a warning about the "Catchy" because I think one of the strong assets of Symfony is the fact that we can understand the purpose of each component by their name.
+
+Can you suggest some alternative names? I like descriptive names too - what kinds of words would be helpful? If not pipeline, then...
+
+* AssetResolver?
+* AssetCompiler?
+* AssetExposer?
+* AssetMapper?
+* AssetPublisher?
+
+> I don't really see the benfit of having a dedicated component where it seems to integrate very nicely with the Asset component. Shouldn't it be directly in here ?
+
+From a practical perspective, if it lives in the same component as `Asset`, then we probably can't ship a recipe that enables the pipeline by default... because often people `composer require symfony/asset` to *just* get the `{{ asset() }}` function. And so we wouldn't want to activate a new system for them. By splitting, if you install `symfony/asset`, you get exactly what you have right now. THEN you can install `symfony/asset-pipeline` (or whatever we name it) to activate that new system in your app.
+
+> it seems to integrate very nicely with the Asset component. Shouldn't it be directly in here
+
+It does integrate nicely :). At the same time, there is only 1 small class that that interacts with the Asset component! 95% of the code in the new component is standalone. I just split it into its own component, and it felt very natural.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-04-24T20:12:33Z
+
+`AssetExposer` seems fitting to me. From [Wiktionary](https://en.m.wiktionary.org/wiki/expose#Verb) “to expose” means
+
+> To make available to [...] other programs.
+
+IIUC the goal of this component is to give assets URLs, to expose them to user agents.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-04-25T01:11:06Z
+
+I've just renamed to AssetMapper to try that out (after a few different people suggested this). The job of the component is to  map assets to a publicly available path.
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2023-04-25T06:29:50Z
+
+Cool @weaverryan  ! Sounds... more precise :) I still wonder : is it not almost the same as https://symfony.com/doc/current/components/asset.html#named-packages ? How would you recommend one over the other ? If we think your component further, wouldn't it have the same kind of configuration ? Being able to map from multiple places, on a different host with a customised public prefix, etc etc ?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-04-25T07:34:42Z
+
+Regarding the JavaScriptImportPathCompiler, I'm wondering whether we need it. Wouldn't it be better to integrate with import maps instead, which would avoid the need to rewrite JS files when their dependency change just to change the imported hash (and so busting them out of the cache as well) ?
+Thus, doing such rewrite of import means that we need complex machinery to compute the file hashes in case of circular dependencies (you cannot compute the hash before rewriting imports as this would break cache busting)
+
+---------------------------------------------------------------------------
+
+by stof at 2023-04-25T09:00:43Z
+
+@Neirda24 the asset component won't expose private files publicly, which is what AssetMapper does. But there is indeed a relation to those packages from `symfony/asset`: AssetMapper provides a special implementation of the asset package of `symfony/asset`. It extends that existing system with more features.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-04-25T10:41:29Z
+
+> Regarding the JavaScriptImportPathCompiler, I'm wondering whether we need it. Wouldn't it be better to integrate with import maps instead, which would avoid the need to rewrite JS files when their dependency change just to change the imported hash
+
+Very good job noticing this @stof - it’s maybe the most important detail in the PR. For others, this feature allows you to say things like “import ‘./other’” and it’ll convert the “other” to the final, versioned filename.
+
+This is the ONE thing that I added that Rails doesn’t have. Rails wants you to “import ‘other.js’” and then register “other.js” in an importmap to point to it.
+
+That really bothers me. The point of importmaps and this new philosophy is to “write JavaScript like you already are, but without the build system”. With Node or Webpack, you use “import ./other” and I feel strongly that this should still work. And we should leave importmaps to be used for external packages (again, so that your code looks exactly like it used to).
+
+If we DID want to solve this cache problem you’re talking about, in theory, I’d rather do it by allowing the user to use ./other, then, in conjunction with importmaps, rewriting that to something like “assets/other.js” and automatically adding it to the importmap for the user. That might be cool - but beyond this PR’s scope :).
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2023-04-25T12:09:37Z
+
+I understand the same thing @stof . Just pointing out that I do not see the value of it being a dedicated component with a dedicated config. IMO it should be an improvement of the actual package system and included in the current Asset component. But if everyone says otherwise maybe I'm missing something...
+
+---------------------------------------------------------------------------
+
+by stof at 2023-04-25T12:29:02Z
+
+@weaverryan browsers will also check the import map for relative imports in case the resolved URL matches the import map. So the import map can be used to handle hashed paths for imports too: https://github.com/WICG/import-maps#mapping-away-hashes-in-script-filenames
+
+---------------------------------------------------------------------------
+
+by stof at 2023-04-25T12:30:14Z
+
+@Neirda24 please read the discussion at https://github.com/symfony/symfony/pull/50112#discussion_r1174102524
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-04-25T12:48:57Z
+
+@stof you’re the best. Thank you :). This didn’t work when I tested, because “other.js” wasn’t in my importmap. So, indeed, it seems like we should combine asset mapper and import map together. Then:
+
+- A) when parsing app.js, we see an import for ./other. We rewrite this path simply to /assets/other.js, but we take note that we saw this file as a dependency (or can we just leave it as ./other?)
+- B) we then automatically add “/assets/other.js” to the import map pointing to its versioned file.
+
+By doing (B), we don’t require the user to need to think “hey, I have this relative import for other.js, I need to add it to my importmap”… which is how I missed this originally :).
+
+WDYT?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-04-25T13:00:45Z
+
+AssetMapper should indeed automatically generate the importmap for any JS file for which it renames the file.
+
+---------------------------------------------------------------------------
+
+by leroy0211 at 2023-04-26T14:28:04Z
+
+How would AssetMapper handle importing of other assets into your js files, or importing npm modules?
+
+Sometimes you wish to import a css file into a js file, which when using webpack will be compiled into the dom as <style> tags.
+The same applies for icons or images, which can be loaded as base64.
+
+Would AssetMapper handle these use-cases too?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-04-26T14:43:46Z
+
+@leroy0211 asset mapper does not perform any bundling. Importing a CSS file in a JS file is not a supported feature of *browsers* (for now), so this won't work.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-04-27T15:48:51Z
+
+This is now ready for review again!
+
+* I've marked the component as experimental. That's a no-brainer - we can get 6 months to learn from real-world edge cases and optimize.
+* I've integrated **importmaps** into this PR - replacing #48371. AssetMapper and importmaps play really well together.
+
+Reminder: there is a super-easy-to-setup demo you can try https://github.com/weaverryan/testing-asset-pipeline
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-04-28T15:43:24Z
+
+Crossed off some final TODOs. This is ready to go. Failures are unrelated :)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-04-28T20:51:16Z
+
+I've got a "false" failure from psalm:
+
+> Error: src/Symfony/Component/AssetMapper/MappedAsset.php:58:9: InaccessibleProperty: Symfony\Component\AssetMapper\MappedAsset::$publicPath is marked readonly (see https://psalm.dev/054)
+
+Referring to https://github.com/symfony/symfony/blob/26d0d028d417d36726a671d72d4476f699243e83/src/Symfony/Component/AssetMapper/MappedAsset.php#L58
+
+But in fact we ARE allowed to set that value... once. Really, I should remove the `if (isset($this->publicPath)) {` above that - it's not strictly needed. But that wouldn't fix the error. Ideas?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-04-30T02:38:25Z
+
+This is ready to go! Tests are green (failures unrelated), some controversial parts have been ironed out.

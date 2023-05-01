@@ -24,6 +24,7 @@ class UnusedTagsPass implements CompilerPassInterface
     private const KNOWN_TAGS = [
         'annotations.cached_reader',
         'assets.package',
+        'asset_mapper.compiler',
         'auto_alias',
         'cache.pool',
         'cache.pool.clearer',

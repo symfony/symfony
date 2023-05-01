@@ -10,6 +10,7 @@
     <xsd:complexType name="config">
         <xsd:choice maxOccurs="unbounded">
             <xsd:element name="assets" type="assets" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="asset-mapper" type="asset_mapper" minOccurs="0" maxOccurs="1" />
             <xsd:element name="form" type="form" minOccurs="0" maxOccurs="1" />
             <xsd:element name="csrf-protection" type="csrf_protection" minOccurs="0" maxOccurs="1" />
             <xsd:element name="esi" type="esi" minOccurs="0" maxOccurs="1" />
@@ -184,6 +185,33 @@
         <xsd:attribute name="version-format" type="xsd:string" />
         <xsd:attribute name="json-manifest-path" type="xsd:string" />
         <xsd:attribute name="strict-mode" type="xsd:boolean" />
+    </xsd:complexType>
+
+    <xsd:complexType name="asset_mapper">
+        <xsd:sequence>
+            <xsd:element name="path" type="asset_mapper_path" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="server" type="xsd:boolean" minOccurs="0" />
+            <xsd:element name="public_prefix" type="xsd:string" minOccurs="0" />
+            <xsd:element name="strict-mode" type="xsd:boolean" minOccurs="0" />
+            <xsd:element name="extension" type="asset_mapper_extension" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="importmap-path" type="xsd:string" minOccurs="0" />
+            <xsd:element name="importmap-polyfill" type="xsd:string" minOccurs="0" nillable="true" />
+            <xsd:element name="importmap-script-attribute" type="asset_mapper_attribute" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="vendor_dir" type="xsd:string" minOccurs="0" />
+            <xsd:element name="provider" type="xsd:string" minOccurs="0" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="asset_mapper_path" mixed="true">
+        <xsd:attribute name="namespace" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="asset_mapper_extension" mixed="true">
+        <xsd:attribute name="extension" type="xsd:string" use="required" />
+    </xsd:complexType>
+
+    <xsd:complexType name="asset_mapper_attribute" mixed="true">
+        <xsd:attribute name="key" type="xsd:string" use="required" />
     </xsd:complexType>
 
     <xsd:complexType name="translator">

@@ -26,6 +26,7 @@
         "league/html-to-markdown": "^5.0",
         "phpdocumentor/reflection-docblock": "^3.0|^4.0|^5.0",
         "symfony/asset": "^5.4|^6.0",
+        "symfony/asset-mapper": "^6.3",
         "symfony/dependency-injection": "^5.4|^6.0",
         "symfony/finder": "^5.4|^6.0",
         "symfony/form": "^6.3",

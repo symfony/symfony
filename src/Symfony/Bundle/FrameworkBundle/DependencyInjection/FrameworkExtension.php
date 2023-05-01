@@ -31,6 +31,8 @@ use Symfony\Bundle\FrameworkBundle\Routing\RouteLoaderInterface;
 use Symfony\Bundle\FullStack;
 use Symfony\Bundle\MercureBundle\MercureBundle;
 use Symfony\Component\Asset\PackageInterface;
+use Symfony\Component\AssetMapper\AssetMapper;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -45,6 +47,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Resource\DirectoryResource;
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\ResourceCheckerInterface;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
@@ -328,6 +331,14 @@ class FrameworkExtension extends Extension
             }
 
             $this->registerAssetsConfiguration($config['assets'], $container, $loader);
+        }
+
+        if ($this->readConfigEnabled('asset_mapper', $container, $config['asset_mapper'])) {
+            if (!class_exists(AssetMapper::class)) {
+                throw new LogicException('AssetMapper support cannot be enabled as the AssetMapper component is not installed. Try running "composer require symfony/asset-mapper".');
+            }
+
+            $this->registerAssetMapperConfiguration($config['asset_mapper'], $container, $loader, $this->readConfigEnabled('assets', $container, $config['assets']));
         }
 
         if ($this->readConfigEnabled('http_client', $container, $config['http_client'])) {
@@ -1229,6 +1240,57 @@ class FrameworkExtension extends Extension
             $container->setDefinition('assets._package_'.$name, $packageDefinition);
             $container->registerAliasForArgument('assets._package_'.$name, PackageInterface::class, $name.'.package');
         }
+    }
+
+    private function registerAssetMapperConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, bool $assetEnabled): void
+    {
+        $loader->load('asset_mapper.php');
+
+        if (!$assetEnabled) {
+            $container->removeDefinition('asset_mapper.asset_package');
+        }
+
+        $publicDirName = $this->getPublicDirectoryName($container);
+        $container->getDefinition('asset_mapper')
+            ->setArgument(3, $config['public_prefix'])
+            ->setArgument(4, $publicDirName)
+            ->setArgument(5, $config['extensions'])
+        ;
+
+        $paths = $config['paths'];
+        foreach ($container->getParameter('kernel.bundles_metadata') as $name => $bundle) {
+            if ($container->fileExists($dir = $bundle['path'].'/Resources/public') || $container->fileExists($dir = $bundle['path'].'/public')) {
+                $paths[$dir] = sprintf('bundles/%s', preg_replace('/bundle$/', '', strtolower($name)));
+            }
+        }
+        $container->getDefinition('asset_mapper.repository')
+            ->setArgument(0, $paths);
+
+        $container->getDefinition('asset_mapper.command.compile')
+            ->setArgument(4, $publicDirName);
+
+        if (!$config['server']) {
+            $container->removeDefinition('asset_mapper.dev_server_subscriber');
+        }
+
+        $container->getDefinition('asset_mapper.compiler.css_asset_url_compiler')
+            ->setArgument(0, $config['strict_mode']);
+
+        $container->getDefinition('asset_mapper.compiler.javascript_import_path_compiler')
+            ->setArgument(0, $config['strict_mode']);
+
+        $container
+            ->getDefinition('asset_mapper.importmap.manager')
+            ->replaceArgument(1, $config['importmap_path'])
+            ->replaceArgument(2, $config['vendor_dir'])
+            ->replaceArgument(3, $config['provider'])
+        ;
+
+        $container
+            ->getDefinition('asset_mapper.importmap.renderer')
+            ->replaceArgument(2, $config['importmap_polyfill'] ?? ImportMapManager::POLYFILL_URL)
+            ->replaceArgument(3, $config['importmap_script_attributes'])
+        ;
     }
 
     /**
@@ -2993,5 +3055,21 @@ class FrameworkExtension extends Extension
 
         $this->configsEnabled[$path] = $value;
         $config['enabled'] = $value;
+    }
+
+    private function getPublicDirectoryName(ContainerBuilder $container): string
+    {
+        $defaultPublicDir = 'public';
+
+        $composerFilePath = $container->getParameter('kernel.project_dir').'/composer.json';
+
+        if (!file_exists($composerFilePath)) {
+            return $defaultPublicDir;
+        }
+
+        $container->addResource(new FileResource($composerFilePath));
+        $composerConfig = json_decode(file_get_contents($composerFilePath), true);
+
+        return $composerConfig['extra']['public-dir'] ?? $defaultPublicDir;
     }
 }

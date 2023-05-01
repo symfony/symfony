@@ -14,7 +14,6 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\RateLimiter\Policy\SlidingWindowLimiter;
 
 class XmlFrameworkExtensionTest extends FrameworkExtensionTestCase
 {
@@ -73,5 +72,20 @@ class XmlFrameworkExtensionTest extends FrameworkExtensionTestCase
         $container = $this->createContainerFromFile('rate_limiter');
 
         $this->assertTrue($container->hasDefinition('limiter.sliding_window'));
+    }
+
+    public function testAssetMapper()
+    {
+        $container = $this->createContainerFromFile('asset_mapper');
+
+        $definition = $container->getDefinition('asset_mapper');
+        $this->assertSame('/assets_path/', $definition->getArgument(3));
+        $this->assertSame(['zip' => 'application/zip'], $definition->getArgument(5));
+
+        $definition = $container->getDefinition('asset_mapper.importmap.renderer');
+        $this->assertSame(['data-turbo-track' => 'reload'], $definition->getArgument(3));
+
+        $definition = $container->getDefinition('asset_mapper.repository');
+        $this->assertSame(['assets/' => '', 'assets2/' => 'my_namespace'], $definition->getArgument(0));
     }
 }

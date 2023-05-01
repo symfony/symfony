@@ -59,6 +59,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\FalseBuiltInDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\NormalizableTraversableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Php74Full;
 use Symfony\Component\Serializer\Tests\Fixtures\Php80WithPromotedTypedConstructor;
+use Symfony\Component\Serializer\Tests\Fixtures\StringBackedEnumDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\TraversableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\TrueBuiltInDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\UpcomingDenormalizerInterface as DenormalizerInterface;
@@ -1208,7 +1209,7 @@ class SerializerTest extends TestCase
         $this->assertSame($expected, $exceptionsAsArray);
     }
 
-    public function testNoCollectDenormalizationErrorsWithWrongEnum()
+    public function testCollectDenormalizationErrorsWithWrongEnum()
     {
         $serializer = new Serializer(
             [
@@ -1223,8 +1224,9 @@ class SerializerTest extends TestCase
                 DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true,
             ]);
         } catch (\Throwable $th) {
-            $this->assertNotInstanceOf(PartialDenormalizationException::class, $th);
-            $this->assertInstanceOf(InvalidArgumentException::class, $th);
+            $this->assertInstanceOf(PartialDenormalizationException::class, $th);
+            $this->assertArrayHasKey(0, $th->getErrors());
+            $this->assertSame("The data must belong to a backed enumeration of type ".StringBackedEnumDummy::class, $th->getErrors()[0]->getMessage());
         }
     }
 

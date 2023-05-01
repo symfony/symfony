@@ -21,6 +21,8 @@ CHANGELOG
    * `JsonSerializableNormalizer`
    * `ObjectNormalizer`
    * `PropertyNormalizer`
+ * Make `BackedEnumNormalizer` throw `NotNormalizableValueException` when the backed type doesn't match
+ * Make `BackedEnumNormalizer` throw `NotNormalizableValueException` when the value does not belong to a backed enumeration
 
 6.2
 ---

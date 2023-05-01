@@ -86,9 +86,16 @@ class BackedEnumNormalizerTest extends TestCase
         $this->normalizer->denormalize(new \stdClass(), StringBackedEnumDummy::class);
     }
 
+    public function testDenormalizeBadBackingTypeThrowsException()
+    {
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('Data expected to be "string", "int" given. You should pass a value that can be parsed as an enumeration case of type '.StringBackedEnumDummy::class.'.');
+        $this->normalizer->denormalize(1, StringBackedEnumDummy::class);
+    }
+
     public function testDenormalizeBadBackingValueThrowsException()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(NotNormalizableValueException::class);
         $this->expectExceptionMessage('The data must belong to a backed enumeration of type '.StringBackedEnumDummy::class);
 
         $this->normalizer->denormalize('POST', StringBackedEnumDummy::class);

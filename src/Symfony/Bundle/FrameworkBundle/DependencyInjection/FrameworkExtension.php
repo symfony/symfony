@@ -381,7 +381,8 @@ class FrameworkExtension extends Extension
                 );
 
             $container->getDefinition('argument_resolver.request_payload')
-                ->replaceArgument(0, new Reference('.argument_resolver.request_payload.no_serializer', ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE));
+                ->replaceArgument(0, new Reference('.argument_resolver.request_payload.no_serializer', ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE))
+                ->clearTag('kernel.event_subscriber');
 
             $container->removeDefinition('console.command.serializer_debug');
         }

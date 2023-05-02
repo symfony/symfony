@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Attribute;
 
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestPayloadValueResolver;
+use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 
 /**
@@ -22,6 +23,8 @@ use Symfony\Component\Validator\Constraints\GroupSequence;
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
 class MapQueryString extends ValueResolver
 {
+    public ArgumentMetadata $metadata;
+
     public function __construct(
         public readonly array $serializationContext = [],
         public readonly string|GroupSequence|array|null $validationGroups = null,

@@ -11,13 +11,16 @@
 
 namespace Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Exception\UnsupportedFormatException;
@@ -31,8 +34,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @author Konstantin Myakshin <molodchick@gmail.com>
+ *
+ * @final
  */
-final class RequestPayloadValueResolver implements ValueResolverInterface
+class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscriberInterface
 {
     /**
      * @see \Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT
@@ -59,24 +64,43 @@ final class RequestPayloadValueResolver implements ValueResolverInterface
 
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
-        $payloadMappers = [
-            MapQueryString::class => ['mapQueryString', Response::HTTP_NOT_FOUND],
-            MapRequestPayload::class => ['mapRequestPayload', Response::HTTP_UNPROCESSABLE_ENTITY],
-        ];
+        $attribute = $argument->getAttributesOfType(MapQueryString::class, ArgumentMetadata::IS_INSTANCEOF)[0]
+            ?? $argument->getAttributesOfType(MapRequestPayload::class, ArgumentMetadata::IS_INSTANCEOF)[0]
+            ?? null;
 
-        foreach ($payloadMappers as $mappingAttribute => [$payloadMapper, $validationFailedCode]) {
-            if (!$attributes = $argument->getAttributesOfType($mappingAttribute, ArgumentMetadata::IS_INSTANCEOF)) {
+        if (!$attribute) {
+            return [];
+        }
+
+        $attribute->metadata = $argument;
+
+        return [$attribute];
+    }
+
+    public function onKernelControllerArguments(ControllerArgumentsEvent $event): void
+    {
+        $arguments = $event->getArguments();
+
+        foreach ($arguments as $i => $argument) {
+            if ($argument instanceof MapQueryString) {
+                $payloadMapper = 'mapQueryString';
+                $validationFailedCode = Response::HTTP_NOT_FOUND;
+            } elseif ($argument instanceof MapRequestPayload) {
+                $payloadMapper = 'mapRequestPayload';
+                $validationFailedCode = Response::HTTP_UNPROCESSABLE_ENTITY;
+            } else {
                 continue;
             }
+            $request = $event->getRequest();
 
-            if (!$type = $argument->getType()) {
-                throw new \LogicException(sprintf('Could not resolve the "$%s" controller argument: argument should be typed.', $argument->getName()));
+            if (!$type = $argument->metadata->getType()) {
+                throw new \LogicException(sprintf('Could not resolve the "$%s" controller argument: argument should be typed.', $argument->metadata->getName()));
             }
 
             if ($this->validator) {
                 $violations = new ConstraintViolationList();
                 try {
-                    $payload = $this->$payloadMapper($request, $type, $attributes[0]);
+                    $payload = $this->$payloadMapper($request, $type, $argument);
                 } catch (PartialDenormalizationException $e) {
                     $trans = $this->translator ? $this->translator->trans(...) : fn ($m, $p) => strtr($m, $p);
                     foreach ($e->getErrors() as $error) {
@@ -92,7 +116,7 @@ final class RequestPayloadValueResolver implements ValueResolverInterface
                 }
 
                 if (null !== $payload) {
-                    $violations->addAll($this->validator->validate($payload, null, $attributes[0]->validationGroups ?? null));
+                    $violations->addAll($this->validator->validate($payload, null, $argument->validationGroups ?? null));
                 }
 
                 if (\count($violations)) {
@@ -100,18 +124,27 @@ final class RequestPayloadValueResolver implements ValueResolverInterface
                 }
             } else {
                 try {
-                    $payload = $this->$payloadMapper($request, $type, $attributes[0]);
+                    $payload = $this->$payloadMapper($request, $type, $argument);
                 } catch (PartialDenormalizationException $e) {
                     throw new HttpException($validationFailedCode, implode("\n", array_map(static fn ($e) => $e->getMessage(), $e->getErrors())), $e);
                 }
             }
 
-            if (null !== $payload || $argument->isNullable()) {
-                return [$payload];
+            if (null === $payload && !$argument->metadata->isNullable()) {
+                throw new HttpException($validationFailedCode);
             }
+
+            $arguments[$i] = $payload;
         }
 
-        return [];
+        $event->setArguments($arguments);
+    }
+
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            KernelEvents::CONTROLLER_ARGUMENTS => 'onKernelControllerArguments',
+        ];
     }
 
     private function mapQueryString(Request $request, string $type, MapQueryString $attribute): ?object

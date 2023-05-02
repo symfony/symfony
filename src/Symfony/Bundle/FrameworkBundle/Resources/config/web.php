@@ -70,6 +70,8 @@ return static function (ContainerConfigurator $container) {
                 service('translator')->nullOnInvalid(),
             ])
             ->tag('controller.targeted_value_resolver', ['name' => RequestPayloadValueResolver::class])
+            ->tag('kernel.event_subscriber')
+            ->lazy()
 
         ->set('argument_resolver.request_attribute', RequestAttributeValueResolver::class)
             ->tag('controller.argument_value_resolver', ['priority' => 100, 'name' => RequestAttributeValueResolver::class])

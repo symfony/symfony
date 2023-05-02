@@ -60,16 +60,22 @@ class LazyClosure
 
         $r = $container->getReflectionClass($class);
 
+        if (null !== $id) {
+            $id = sprintf(' for service "%s"', $id);
+        }
+
         if (!$asClosure) {
+            $id = str_replace('%', '%%', (string) $id);
+
             if (!$r || !$r->isInterface()) {
-                throw new RuntimeException(sprintf('Cannot create adapter for service "%s" because "%s" is not an interface.', $id, $class));
+                throw new RuntimeException(sprintf("Cannot create adapter{$id} because \"%s\" is not an interface.", $class));
             }
             if (1 !== \count($method = $r->getMethods())) {
-                throw new RuntimeException(sprintf('Cannot create adapter for service "%s" because interface "%s" doesn\'t have exactly one method.', $id, $class));
+                throw new RuntimeException(sprintf("Cannot create adapter{$id} because interface \"%s\" doesn't have exactly one method.", $class));
             }
             $method = $method[0]->name;
         } elseif (!$r || !$r->hasMethod($method)) {
-            throw new RuntimeException(sprintf('Cannot create lazy closure for service "%s" because its corresponding callable is invalid.', $id));
+            throw new RuntimeException("Cannot create lazy closure{$id} because its corresponding callable is invalid.");
         }
 
         $code = ProxyHelper::exportSignature($r->getMethod($method), true, $args);

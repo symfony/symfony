@@ -40,45 +40,38 @@ class SerializerPass implements CompilerPassInterface
             return;
         }
 
-        if (!$normalizers = $container->findTaggedServiceIds('serializer.normalizer')) {
+        if (!$normalizers = $this->findAndSortTaggedServices('serializer.normalizer', $container)) {
             throw new RuntimeException('You must tag at least one service as "serializer.normalizer" to use the "serializer" service.');
         }
 
+        if (!$encoders = $this->findAndSortTaggedServices('serializer.encoder', $container)) {
+            throw new RuntimeException('You must tag at least one service as "serializer.encoder" to use the "serializer" service.');
+        }
+
+        if ($container->hasParameter('serializer.default_context')) {
+            $defaultContext = $container->getParameter('serializer.default_context');
+            foreach (array_merge($normalizers, $encoders) as $service) {
+                $definition = $container->getDefinition($service);
+                $definition->setBindings(['array $defaultContext' => new BoundArgument($defaultContext, false)] + $definition->getBindings());
+            }
+
+            $container->getParameterBag()->remove('serializer.default_context');
+        }
+
         if ($container->getParameter('kernel.debug') && $container->hasDefinition('serializer.data_collector')) {
-            foreach (array_keys($normalizers) as $normalizer) {
-                $container->register('debug.'.$normalizer, TraceableNormalizer::class)
-                    ->setDecoratedService($normalizer)
-                    ->setArguments([new Reference('debug.'.$normalizer.'.inner'), new Reference('serializer.data_collector')]);
+            foreach ($normalizers as $i => $normalizer) {
+                $normalizers[$i] = $container->register('.debug.serializer.normalizer.'.$normalizer, TraceableNormalizer::class)
+                    ->setArguments([$normalizer, new Reference('serializer.data_collector')]);
+            }
+
+            foreach ($encoders as $i => $encoder) {
+                $encoders[$i] = $container->register('.debug.serializer.encoder.'.$encoder, TraceableEncoder::class)
+                    ->setArguments([$encoder, new Reference('serializer.data_collector')]);
             }
         }
 
         $serializerDefinition = $container->getDefinition('serializer');
-        $serializerDefinition->replaceArgument(0, $this->findAndSortTaggedServices('serializer.normalizer', $container));
-
-        if (!$encoders = $container->findTaggedServiceIds('serializer.encoder')) {
-            throw new RuntimeException('You must tag at least one service as "serializer.encoder" to use the "serializer" service.');
-        }
-
-        if ($container->getParameter('kernel.debug') && $container->hasDefinition('serializer.data_collector')) {
-            foreach (array_keys($encoders) as $encoder) {
-                $container->register('debug.'.$encoder, TraceableEncoder::class)
-                    ->setDecoratedService($encoder)
-                    ->setArguments([new Reference('debug.'.$encoder.'.inner'), new Reference('serializer.data_collector')]);
-            }
-        }
-
-        $serializerDefinition->replaceArgument(1, $this->findAndSortTaggedServices('serializer.encoder', $container));
-
-        if (!$container->hasParameter('serializer.default_context')) {
-            return;
-        }
-
-        $defaultContext = $container->getParameter('serializer.default_context');
-        foreach (array_keys(array_merge($container->findTaggedServiceIds('serializer.normalizer'), $container->findTaggedServiceIds('serializer.encoder'))) as $service) {
-            $definition = $container->getDefinition($service);
-            $definition->setBindings(['array $defaultContext' => new BoundArgument($defaultContext, false)] + $definition->getBindings());
-        }
-
-        $container->getParameterBag()->remove('serializer.default_context');
+        $serializerDefinition->replaceArgument(0, $normalizers);
+        $serializerDefinition->replaceArgument(1, $encoders);
     }
 }

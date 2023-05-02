@@ -56,7 +56,7 @@ class AddSecurityVotersPass implements CompilerPassInterface
             }
 
             if ($debug) {
-                $voterServices[] = new Reference($debugVoterServiceId = 'debug.security.voter.'.$voterServiceId);
+                $voterServices[] = new Reference($debugVoterServiceId = '.debug.security.voter.'.$voterServiceId);
 
                 $container
                     ->register($debugVoterServiceId, TraceableVoter::class)

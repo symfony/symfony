@@ -155,22 +155,20 @@
             </div>
         </div>
 
-        <script>Sfjs.createFilters();</script>
-
         {% endblock messages %}
     {% endif %}
 
 {% endblock %}
 
 {% macro render_table(messages, is_fallback) %}
-    <table data-filters>
+    <table>
         <thead>
             <tr>
-                <th data-filter="locale">Locale</th>
+                <th>Locale</th>
                 {% if is_fallback %}
                     <th>Fallback locale</th>
                 {% endif %}
-                <th data-filter="domain">Domain</th>
+                <th>Domain</th>
                 <th>Times used</th>
                 <th>Message ID</th>
                 <th>Message Preview</th>
@@ -178,7 +176,7 @@
         </thead>
         <tbody>
         {% for message in messages %}
-            <tr data-filter-locale="{{ message.locale }}" data-filter-domain="{{ message.domain }}">
+            <tr>
                 <td class="font-normal text-small nowrap">{{ message.locale }}</td>
                 {% if is_fallback %}
                     <td class="font-normal text-small nowrap">{{ message.fallbackLocale|default('-') }}</td>

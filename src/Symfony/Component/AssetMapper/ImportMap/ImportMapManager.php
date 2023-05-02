@@ -22,6 +22,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  *
  * @author Kévin Dunglas <kevin@dunglas.dev>
  * @author Ryan Weaver <ryan@symfonycasts.com>
+ *
  * @final
  */
 class ImportMapManager
@@ -81,6 +82,7 @@ class ImportMapManager
      * Adds or updates packages.
      *
      * @param PackageRequireOptions[] $packages
+     *
      * @return ImportMapEntry[]
      */
     public function require(array $packages): array
@@ -143,7 +145,8 @@ class ImportMapManager
 
     /**
      * @param PackageRequireOptions[] $packagesToRequire
-     * @param string[] $packagesToRemove
+     * @param string[]                $packagesToRemove
+     *
      * @return ImportMapEntry[]
      */
     private function updateImportMapConfig(bool $update, array $packagesToRequire, array $packagesToRemove): array
@@ -202,7 +205,7 @@ class ImportMapManager
      *
      * Returns an array of the entries that were added.
      *
-     * @param PackageRequireOptions[] $packagesToRequire
+     * @param PackageRequireOptions[]       $packagesToRequire
      * @param array<string, ImportMapEntry> $importMapEntries
      */
     private function requirePackages(array $packagesToRequire, array &$importMapEntries): array
@@ -216,7 +219,7 @@ class ImportMapManager
         foreach ($packagesToRequire as $requireOptions) {
             $constraint = $requireOptions->packageName;
             if (null !== $requireOptions->versionConstraint) {
-                $constraint .= '@' . $requireOptions->versionConstraint;
+                $constraint .= '@'.$requireOptions->versionConstraint;
             }
             if (null !== $requireOptions->registryName) {
                 $constraint = sprintf('%s:%s', $requireOptions->registryName, $constraint);
@@ -243,7 +246,7 @@ class ImportMapManager
             $data = $response->toArray(false);
 
             if (isset($data['error'])) {
-                throw new \RuntimeException(sprintf('Error requiring JavaScript package: "%s"', $data['error']));
+                throw new \RuntimeException('Error requiring JavaScript package: '.$data['error']);
             }
 
             // Throws the original HttpClient exception
@@ -251,7 +254,7 @@ class ImportMapManager
         }
 
         // if we're requiring just one package, in case it has any peer deps, match the preload
-        $defaultPreload = 1 === count($packagesToRequire) ? $packagesToRequire[0]->preload : false;
+        $defaultPreload = 1 === \count($packagesToRequire) ? $packagesToRequire[0]->preload : false;
 
         $addedEntries = [];
         foreach ($response->toArray()['map']['imports'] as $packageName => $url) {

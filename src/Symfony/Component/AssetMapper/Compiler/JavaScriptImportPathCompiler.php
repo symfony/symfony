@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\AssetMapper\Compiler;
 
-use Symfony\Component\AssetMapper\AssetMapper;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\MappedAsset;
 
@@ -64,6 +63,6 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
 
     public function supports(MappedAsset $asset): bool
     {
-        return 'application/javascript' === $asset->getMimeType()  || 'text/javascript' === $asset->getMimeType();
+        return 'application/javascript' === $asset->getMimeType() || 'text/javascript' === $asset->getMimeType();
     }
 }

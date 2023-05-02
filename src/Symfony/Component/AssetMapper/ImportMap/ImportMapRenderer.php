@@ -16,6 +16,7 @@ namespace Symfony\Component\AssetMapper\ImportMap;
  *
  * @author Kévin Dunglas <kevin@dunglas.dev>
  * @author Ryan Weaver <ryan@symfonycasts.com>
+ *
  * @final
  */
 class ImportMapRenderer
@@ -28,7 +29,7 @@ class ImportMapRenderer
     ) {
     }
 
-    public function render(?string $entryPoint = null): string
+    public function render(string $entryPoint = null): string
     {
         $attributeString = '';
 
@@ -69,7 +70,7 @@ class ImportMapRenderer
         }
 
         if (null !== $entryPoint) {
-            $output .= "\n<script type=\"module\">import '" . str_replace("'", "\\'", $entryPoint) . "';</script>";
+            $output .= "\n<script type=\"module\">import '".str_replace("'", "\\'", $entryPoint)."';</script>";
         }
 
         return $output;

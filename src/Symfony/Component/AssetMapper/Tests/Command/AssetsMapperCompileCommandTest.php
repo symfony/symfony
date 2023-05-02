@@ -13,7 +13,6 @@ namespace Symfony\Component\AssetMapper\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Bundle\FrameworkBundle\Tests\Command\AssetsMapperCompileCommand\Fixture\TestAppKernel;
 use Symfony\Component\AssetMapper\Tests\fixtures\AssetMapperTestAppKernel;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Filesystem\Filesystem;

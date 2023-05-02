@@ -13,7 +13,6 @@ namespace Symfony\Component\AssetMapper\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\PackageInterface;
-use Symfony\Component\AssetMapper\AssetMapper;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\MapperAwareAssetPackage;
 

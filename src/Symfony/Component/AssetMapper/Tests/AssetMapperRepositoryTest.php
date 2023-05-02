@@ -83,8 +83,8 @@ class AssetMapperRepositoryTest extends TestCase
             'already-abcdefVWXYZ0123456789.digested.css' => __DIR__.'/fixtures/dir2/already-abcdefVWXYZ0123456789.digested.css',
             'file3.css' => __DIR__.'/fixtures/dir2/file3.css',
             'file4.js' => __DIR__.'/fixtures/dir2/file4.js',
-            'subdir'.DIRECTORY_SEPARATOR.'file5.js' => __DIR__.'/fixtures/dir2/subdir/file5.js',
-            'subdir'.DIRECTORY_SEPARATOR.'file6.js' => __DIR__.'/fixtures/dir2/subdir/file6.js',
+            'subdir'.\DIRECTORY_SEPARATOR.'file5.js' => __DIR__.'/fixtures/dir2/subdir/file5.js',
+            'subdir'.\DIRECTORY_SEPARATOR.'file6.js' => __DIR__.'/fixtures/dir2/subdir/file6.js',
             'test.gif.foo' => __DIR__.'/fixtures/dir3/test.gif.foo',
         ]);
         $this->assertEquals($expectedAllAssets, array_map('realpath', $actualAllAssets));
@@ -111,13 +111,13 @@ class AssetMapperRepositoryTest extends TestCase
 
         $normalizedExpectedAllAssets = [];
         foreach ($expectedAllAssets as $key => $val) {
-            $normalizedExpectedAllAssets[str_replace('/', DIRECTORY_SEPARATOR, $key)] = realpath($val);
+            $normalizedExpectedAllAssets[str_replace('/', \DIRECTORY_SEPARATOR, $key)] = realpath($val);
         }
 
         $actualAssets = $repository->all();
         $normalizedActualAssets = [];
         foreach ($actualAssets as $key => $val) {
-            $normalizedActualAssets[str_replace('/', DIRECTORY_SEPARATOR, $key)] = realpath($val);
+            $normalizedActualAssets[str_replace('/', \DIRECTORY_SEPARATOR, $key)] = realpath($val);
         }
 
         $this->assertEquals($normalizedExpectedAllAssets, $normalizedActualAssets);

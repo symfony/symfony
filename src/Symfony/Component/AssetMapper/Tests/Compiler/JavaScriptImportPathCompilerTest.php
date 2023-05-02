@@ -40,7 +40,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
         yield 'dynamic_simple_double_quotes' => [
             'sourceLogicalName' => 'app.js',
             'input' => 'import("./other.js");',
-            'expectedDependencies' => ['other.js' => true]
+            'expectedDependencies' => ['other.js' => true],
         ];
 
         yield 'dynamic_simple_multiline' => [
@@ -50,19 +50,19 @@ class JavaScriptImportPathCompilerTest extends TestCase
                 import("./other.js");
                 EOF
             ,
-            'expectedDependencies' => ['other.js' => true]
+            'expectedDependencies' => ['other.js' => true],
         ];
 
         yield 'dynamic_simple_single_quotes' => [
             'sourceLogicalName' => 'app.js',
             'input' => 'import(\'./other.js\');',
-            'expectedDependencies' => ['other.js' => true]
+            'expectedDependencies' => ['other.js' => true],
         ];
 
         yield 'dynamic_simple_tick_quotes' => [
             'sourceLogicalName' => 'app.js',
             'input' => 'import(`./other.js`);',
-            'expectedDependencies' => ['other.js' => true]
+            'expectedDependencies' => ['other.js' => true],
         ];
 
         yield 'dynamic_resolves_multiple' => [

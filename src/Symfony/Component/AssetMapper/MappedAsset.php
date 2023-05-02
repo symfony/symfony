@@ -22,14 +22,14 @@ final class MappedAsset
 {
     public string $publicPath;
     /**
-     * @var string The filesystem path to the source file.
+     * @var string the filesystem path to the source file
      */
     private string $sourcePath;
     private string $content;
     private string $digest;
     private bool $isPredigested;
     private ?string $mimeType;
-    /** @var AssetDependency[]  */
+    /** @var AssetDependency[] */
     private array $dependencies = [];
 
     public function __construct(public readonly string $logicalPath)
@@ -125,7 +125,7 @@ final class MappedAsset
         $this->content = $content;
     }
 
-    public function addDependency(MappedAsset $asset, bool $isLazy = false): void
+    public function addDependency(self $asset, bool $isLazy = false): void
     {
         $this->dependencies[] = new AssetDependency($asset, $isLazy);
     }

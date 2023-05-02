@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\AssetMapper\Compiler;
 
-use Symfony\Component\AssetMapper\AssetMapper;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\MappedAsset;
 

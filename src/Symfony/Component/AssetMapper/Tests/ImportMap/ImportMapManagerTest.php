@@ -27,25 +27,24 @@ class ImportMapManagerTest extends TestCase
     private MockHttpClient $httpClient;
     private Filesystem $filesystem;
 
-
     protected function setUp(): void
     {
         $this->filesystem = new Filesystem();
-        if (!file_exists(__DIR__ . '/../fixtures/importmaps_for_writing')) {
-            $this->filesystem->mkdir(__DIR__ . '/../fixtures/importmaps_for_writing');
+        if (!file_exists(__DIR__.'/../fixtures/importmaps_for_writing')) {
+            $this->filesystem->mkdir(__DIR__.'/../fixtures/importmaps_for_writing');
         }
     }
 
     protected function tearDown(): void
     {
-        $this->filesystem->remove(__DIR__ . '/../fixtures/importmaps_for_writing');
+        $this->filesystem->remove(__DIR__.'/../fixtures/importmaps_for_writing');
     }
 
     public function testGetModulesToPreload()
     {
         $manager = $this->createImportMapManager(
             ['assets' => '', 'assets2' => 'namespaced_assets2'],
-            __DIR__ . '/../fixtures/importmaps/'
+            __DIR__.'/../fixtures/importmaps/'
         );
         $this->assertEquals([
             'https://unpkg.com/@hotwired/stimulus@3.2.1/dist/stimulus.js',
@@ -60,7 +59,7 @@ class ImportMapManagerTest extends TestCase
     {
         $manager = $this->createImportMapManager(
             ['assets' => '', 'assets2' => 'namespaced_assets2'],
-            __DIR__ . '/../fixtures/importmaps/'
+            __DIR__.'/../fixtures/importmaps/'
         );
         $this->assertEquals(['imports' => [
             '@hotwired/stimulus' => 'https://unpkg.com/@hotwired/stimulus@3.2.1/dist/stimulus.js',
@@ -77,7 +76,7 @@ class ImportMapManagerTest extends TestCase
     {
         $manager = $this->createImportMapManager(
             ['assets' => ''],
-            __DIR__ . '/../fixtures/',
+            __DIR__.'/../fixtures/',
             '/final-assets',
             'test_public'
         );
@@ -92,7 +91,7 @@ class ImportMapManagerTest extends TestCase
      */
     public function testRequire(array $packages, array $expectedInstallRequest, array $responseMap, array $expectedImportMap, array $expectedDownloadedFiles)
     {
-        $rootDir = __DIR__ . '/../fixtures/importmaps_for_writing';
+        $rootDir = __DIR__.'/../fixtures/importmaps_for_writing';
         $manager = $this->createImportMapManager(['assets' => ''], $rootDir);
 
         $expectedRequestBody = [
@@ -120,11 +119,11 @@ class ImportMapManagerTest extends TestCase
         $this->httpClient->setResponseFactory($responses);
 
         $manager->require($packages);
-        $actualImportMap = require($rootDir.'/importmap.php');
+        $actualImportMap = require $rootDir.'/importmap.php';
         $this->assertEquals($expectedImportMap, $actualImportMap);
         foreach ($expectedDownloadedFiles as $file) {
-            $this->assertFileExists($rootDir.'/' . $file);
-            $actualContents = file_get_contents($rootDir.'/' . $file);
+            $this->assertFileExists($rootDir.'/'.$file);
+            $actualContents = file_get_contents($rootDir.'/'.$file);
             $this->assertSame(sprintf('contents of %s', $file), $actualContents);
         }
     }
@@ -140,7 +139,7 @@ class ImportMapManagerTest extends TestCase
             'expectedImportMap' => [
                 'lodash' => [
                     'url' => 'https://ga.jspm.io/npm:lodash@1.2.3/lodash.js',
-                ]
+                ],
             ],
             'expectedDownloadedFiles' => [],
         ];
@@ -163,7 +162,7 @@ class ImportMapManagerTest extends TestCase
             'expectedDownloadedFiles' => [],
         ];
 
-        yield  'single_package_that_returns_as_two' => [
+        yield 'single_package_that_returns_as_two' => [
             'packages' => [new PackageRequireOptions('lodash')],
             'expectedInstallRequest' => ['lodash'],
             'responseMap' => [
@@ -258,7 +257,7 @@ class ImportMapManagerTest extends TestCase
 
     public function testRemove()
     {
-        $rootDir = __DIR__ . '/../fixtures/importmaps_for_writing';
+        $rootDir = __DIR__.'/../fixtures/importmaps_for_writing';
         $manager = $this->createImportMapManager(['assets' => ''], $rootDir);
 
         $map = [
@@ -289,7 +288,7 @@ class ImportMapManagerTest extends TestCase
         touch($rootDir.'/assets/other.js');
 
         $manager->remove(['cowsay', 'app']);
-        $actualImportMap = require($rootDir.'/importmap.php');
+        $actualImportMap = require $rootDir.'/importmap.php';
         $expectedImportMap = $map;
         unset($expectedImportMap['cowsay'], $expectedImportMap['app']);
         $this->assertEquals($expectedImportMap, $actualImportMap);
@@ -301,7 +300,7 @@ class ImportMapManagerTest extends TestCase
 
     public function testUpdate()
     {
-        $rootDir = __DIR__ . '/../fixtures/importmaps_for_writing';
+        $rootDir = __DIR__.'/../fixtures/importmaps_for_writing';
         $manager = $this->createImportMapManager(['assets' => ''], $rootDir);
 
         $map = [
@@ -342,11 +341,11 @@ class ImportMapManagerTest extends TestCase
             ]));
         };
         // 1 file will be downloaded
-        $responses[] = new MockResponse(sprintf('contents of cowsay.js'));
+        $responses[] = new MockResponse('contents of cowsay.js');
         $this->httpClient->setResponseFactory($responses);
 
         $manager->update();
-        $actualImportMap = require($rootDir.'/importmap.php');
+        $actualImportMap = require $rootDir.'/importmap.php';
         $expectedImportMap = [
             'lodash' => [
                 'url' => 'https://ga.jspm.io/npm:lodash@1.2.9/lodash.js',
@@ -379,10 +378,10 @@ class ImportMapManagerTest extends TestCase
         $parsed = ImportMapManager::parsePackageName($packageName);
         // remove integer keys - they're noise
 
-        if (is_array($parsed)) {
+        if (\is_array($parsed)) {
             $parsed = array_filter($parsed, function ($key) {
-                return !is_int($key);
-            }, ARRAY_FILTER_USE_KEY);
+                return !\is_int($key);
+            }, \ARRAY_FILTER_USE_KEY);
         }
         $this->assertEquals($expectedReturn, $parsed);
     }
@@ -465,8 +464,8 @@ class ImportMapManagerTest extends TestCase
 
         return new ImportMapManager(
             $mapper,
-            $rootDir . '/importmap.php',
-            $rootDir . '/assets/vendor',
+            $rootDir.'/importmap.php',
+            $rootDir.'/assets/vendor',
             ImportMapManager::PROVIDER_JSPM,
             $this->httpClient
         );

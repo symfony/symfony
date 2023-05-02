@@ -25,8 +25,9 @@ class ImportMapRendererTest extends TestCase
             <script type="importmap">
             {"imports":{}}
             </script>
-            EOF
-        , $html);
+            EOF,
+            $html
+        );
         $this->assertStringContainsString('<script async src="https://ga.jspm.io/npm:es-module-shims', $html);
     }
 
@@ -40,7 +41,7 @@ class ImportMapRendererTest extends TestCase
     {
         $renderer = new ImportMapRenderer($this->createImportMapManager(), 'UTF-8', 'https://polyfillUrl.example', [
             'something' => true,
-            'data-turbo-track' => 'reload'
+            'data-turbo-track' => 'reload',
         ]);
         $html = $renderer->render();
         $this->assertStringContainsString('<script type="importmap" something data-turbo-track="reload">', $html);
@@ -60,7 +61,7 @@ class ImportMapRendererTest extends TestCase
     {
         $renderer = new ImportMapRenderer($this->createImportMapManager([
             '/assets/application.js',
-            'https://cdn.example.com/assets/foo.js'
+            'https://cdn.example.com/assets/foo.js',
         ]));
         $html = $renderer->render();
         $this->assertStringContainsString('<link rel="modulepreload" href="/assets/application.js">', $html);

@@ -558,3 +558,10 @@ interface SingleMethodInterface
 {
     public function theMethod();
 }
+
+class MyCallable
+{
+    public function __invoke(): void
+    {
+    }
+}

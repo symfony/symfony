@@ -32,8 +32,8 @@ class AutowireCallable extends Autowire
         if (!(null !== $callable xor null !== $service)) {
             throw new LogicException('#[AutowireCallable] attribute must declare exactly one of $callable or $service.');
         }
-        if (!(null !== $callable xor null !== $method)) {
-            throw new LogicException('#[AutowireCallable] attribute must declare one of $callable or $method.');
+        if (null === $service && null !== $method) {
+            throw new LogicException('#[AutowireCallable] attribute cannot have a $method without a $service.');
         }
 
         parent::__construct($callable ?? [new Reference($service), $method ?? '__invoke'], lazy: $lazy);

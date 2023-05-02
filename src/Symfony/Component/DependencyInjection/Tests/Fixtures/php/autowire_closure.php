@@ -25,6 +25,7 @@ class Symfony_DI_PhpDumper_Test_Autowire_Closure extends Container
             'bar' => 'getBarService',
             'baz' => 'getBazService',
             'foo' => 'getFooService',
+            'my_callable' => 'getMyCallableService',
         ];
 
         $this->aliases = [];
@@ -53,7 +54,7 @@ class Symfony_DI_PhpDumper_Test_Autowire_Closure extends Container
             $container = $containerRef->get();
 
             return ($container->services['foo'] ??= new \Symfony\Component\DependencyInjection\Tests\Compiler\Foo());
-        }, ($container->services['baz'] ?? self::getBazService($container)), ($container->services['foo'] ??= new \Symfony\Component\DependencyInjection\Tests\Compiler\Foo())->cloneFoo(...));
+        }, ($container->services['baz'] ?? self::getBazService($container)), ($container->services['foo'] ??= new \Symfony\Component\DependencyInjection\Tests\Compiler\Foo())->cloneFoo(...), ($container->services['my_callable'] ??= new \Symfony\Component\DependencyInjection\Tests\Compiler\MyCallable())->__invoke(...));
     }
 
     /**
@@ -74,5 +75,15 @@ class Symfony_DI_PhpDumper_Test_Autowire_Closure extends Container
     protected static function getFooService($container)
     {
         return $container->services['foo'] = new \Symfony\Component\DependencyInjection\Tests\Compiler\Foo();
+    }
+
+    /**
+     * Gets the public 'my_callable' shared service.
+     *
+     * @return \Symfony\Component\DependencyInjection\Tests\Compiler\MyCallable
+     */
+    protected static function getMyCallableService($container)
+    {
+        return $container->services['my_callable'] = new \Symfony\Component\DependencyInjection\Tests\Compiler\MyCallable();
     }
 }

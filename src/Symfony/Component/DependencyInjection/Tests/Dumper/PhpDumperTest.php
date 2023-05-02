@@ -48,6 +48,7 @@ use Symfony\Component\DependencyInjection\Tests\Compiler\AInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Foo;
 use Symfony\Component\DependencyInjection\Tests\Compiler\FooAnnotation;
 use Symfony\Component\DependencyInjection\Tests\Compiler\IInterface;
+use Symfony\Component\DependencyInjection\Tests\Compiler\MyCallable;
 use Symfony\Component\DependencyInjection\Tests\Compiler\SingleMethodInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Wither;
 use Symfony\Component\DependencyInjection\Tests\Compiler\WitherAnnotation;
@@ -1720,6 +1721,8 @@ PHP
         $container = new ContainerBuilder();
         $container->register('foo', Foo::class)
             ->setPublic('true');
+        $container->register('my_callable', MyCallable::class)
+            ->setPublic('true');
         $container->register('baz', \Closure::class)
             ->setFactory(['Closure', 'fromCallable'])
             ->setArguments(['var_dump'])
@@ -1873,6 +1876,8 @@ class LazyClosureConsumer
         public \Closure $baz,
         #[AutowireCallable(service: 'foo', method: 'cloneFoo')]
         public \Closure $buz,
+        #[AutowireCallable(service: 'my_callable')]
+        public \Closure $bar,
     ) {
     }
 }

@@ -258,6 +258,36 @@ class InlineFragmentRendererTest extends TestCase
         Request::setTrustedProxies([], -1);
     }
 
+    public function testStatelessAttributeIsForwardedByDefault()
+    {
+        $request = Request::create('/');
+        $request->attributes->set('_stateless', true);
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel
+            ->expects($this->once())
+            ->method('handle')
+            ->with($this->callback(static fn (Request $subRequest) => $subRequest->attributes->get('_stateless')))
+        ;
+        $strategy = new InlineFragmentRenderer($kernel);
+        $strategy->render('/', $request);
+    }
+
+    public function testStatelessAttributeCanBeDisabled()
+    {
+        $request = Request::create('/');
+        $request->attributes->set('_stateless', true);
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel
+            ->expects($this->once())
+            ->method('handle')
+            ->with($this->callback(static fn (Request $subRequest) => !$subRequest->attributes->get('_stateless')))
+        ;
+        $strategy = new InlineFragmentRenderer($kernel);
+        $strategy->render(new ControllerReference('main_controller', ['_stateless' => false]), $request);
+    }
+
     /**
      * Creates a Kernel expecting a request equals to $request.
      */

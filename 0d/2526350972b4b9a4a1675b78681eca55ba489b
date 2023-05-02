@@ -1,0 +1,84 @@
+---------------------------------------------------------------------------
+
+by artyuum at 2023-04-23T11:55:36Z
+
+@nicolas-grekas I cloned your repo, checked out your branch and used the `link` script to copy that specific version of Symfony into a working Sf project and I'm having the following error (even after nuking the cache):
+> Attempted to call an undefined method named "onKernelControllerArguments" of class "Symfony\Component\HttpKernel\Controller\ArgumentResolver\TraceableValueResolver".
+
+<details><summary>Stacktrace</summary>
+
+```text
+Symfony\Component\ErrorHandler\Error\UndefinedMethodError:
+Attempted to call an undefined method named "onKernelControllerArguments" of class "Symfony\Component\HttpKernel\Controller\ArgumentResolver\TraceableValueResolver".
+
+  at /var/www/html/test/vendor/symfony/event-dispatcher/Debug/WrappedListener.php:116
+  at Symfony\Component\EventDispatcher\Debug\WrappedListener->__invoke()
+     (/var/www/html/test/vendor/symfony/event-dispatcher/EventDispatcher.php:220)
+  at Symfony\Component\EventDispatcher\EventDispatcher->callListeners()
+     (/var/www/html/test/vendor/symfony/event-dispatcher/EventDispatcher.php:56)
+  at Symfony\Component\EventDispatcher\EventDispatcher->dispatch()
+     (/var/www/html/test/vendor/symfony/event-dispatcher/Debug/TraceableEventDispatcher.php:139)
+  at Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcher->dispatch()
+     (/var/www/html/test/vendor/symfony/http-kernel/HttpKernel.php:161)
+  at Symfony\Component\HttpKernel\HttpKernel->handleRaw()
+     (/var/www/html/test/vendor/symfony/http-kernel/HttpKernel.php:74)
+  at Symfony\Component\HttpKernel\HttpKernel->handle()
+     (/var/www/html/test/vendor/symfony/http-kernel/EventListener/ErrorListener.php:108)
+  at Symfony\Component\HttpKernel\EventListener\ErrorListener->onKernelException()
+     (/var/www/html/test/vendor/symfony/event-dispatcher/Debug/WrappedListener.php:116)
+  at Symfony\Component\EventDispatcher\Debug\WrappedListener->__invoke()
+     (/var/www/html/test/vendor/symfony/event-dispatcher/EventDispatcher.php:220)
+  at Symfony\Component\EventDispatcher\EventDispatcher->callListeners()
+     (/var/www/html/test/vendor/symfony/event-dispatcher/EventDispatcher.php:56)
+  at Symfony\Component\EventDispatcher\EventDispatcher->dispatch()
+     (/var/www/html/test/vendor/symfony/event-dispatcher/Debug/TraceableEventDispatcher.php:139)
+  at Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcher->dispatch()
+     (/var/www/html/test/vendor/symfony/http-kernel/HttpKernel.php:224)
+  at Symfony\Component\HttpKernel\HttpKernel->handleThrowable()
+     (/var/www/html/test/vendor/symfony/http-kernel/HttpKernel.php:117)
+  at Symfony\Component\HttpKernel\HttpKernel->terminateWithException()
+     (/var/www/html/test/vendor/symfony/http-kernel/EventListener/DebugHandlersListener.php:74)
+  at Symfony\Component\HttpKernel\EventListener\DebugHandlersListener::Symfony\Component\HttpKernel\EventListener\{closure}()
+     (/var/www/html/test/vendor/symfony/error-handler/ErrorHandler.php:537)
+  at Symfony\Component\ErrorHandler\ErrorHandler->handleException()
+```
+
+</details>
+
+Do you have the same error?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-04-23T16:56:17Z
+
+Yes, I do. This should now be fixed. Can you please try again?
+
+---------------------------------------------------------------------------
+
+by artyuum at 2023-04-23T17:30:48Z
+
+@nicolas-grekas it works. I commented on the issue.
+
+---------------------------------------------------------------------------
+
+by Koc at 2023-04-23T20:33:01Z
+
+We should be careful with usage of the payload as Subject from Controller Arguments in [`#[IsGranted`](https://symfony.com/doc/current/security/expressions.html) Attribute
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-04-24T12:28:26Z
+
+I updated the way traceable resolvers and serializers are wired so that we don't rely on service decoration, but use standard decoration instead. This preserves the definition of the original decorated service, so that we can e.g. use several tags on them without conflicts.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-04-26T10:19:01Z
+
+PR rebased on top of #50158 to split the concern of decoration apart.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-05-02T14:25:29Z
+
+PR rebased and ready.

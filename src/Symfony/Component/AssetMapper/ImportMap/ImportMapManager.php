@@ -111,8 +111,8 @@ class ImportMapManager
      */
     public static function parsePackageName(string $packageName): ?array
     {
-        // https://regex101.com/r/58bl9L/1
-        $regex = '/(?:(?P<registry>[^:\n]+):)?(?P<package>[^@\n]+)(?:@(?P<version>[^\s\n]+))?/';
+        // https://regex101.com/r/d99BEc/1
+        $regex = '/(?:(?P<registry>[^:\n]+):)?((?P<package>@?[^@\n]+))(?:@(?P<version>[^\s\n]+))?/';
 
         return preg_match($regex, $packageName, $matches) ? $matches : null;
     }

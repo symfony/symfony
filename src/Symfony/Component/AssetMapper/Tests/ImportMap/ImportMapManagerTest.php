@@ -422,6 +422,40 @@ class ImportMapManagerTest extends TestCase
                 'version' => '^1.2.3',
             ],
         ];
+
+        yield 'namespaced_package_simple' => [
+            '@hotwired/stimulus',
+            [
+                'package' => '@hotwired/stimulus',
+                'registry' => '',
+            ],
+        ];
+
+        yield 'namespaced_package_with_version_constraint' => [
+            '@hotwired/stimulus@^1.2.3',
+            [
+                'package' => '@hotwired/stimulus',
+                'registry' => '',
+                'version' => '^1.2.3',
+            ],
+        ];
+
+        yield 'namespaced_package_with_registry' => [
+            'npm:@hotwired/stimulus',
+            [
+                'package' => '@hotwired/stimulus',
+                'registry' => 'npm',
+            ],
+        ];
+
+        yield 'namespaced_package_with_registry_and_version' => [
+            'npm:@hotwired/stimulus@^1.2.3',
+            [
+                'package' => '@hotwired/stimulus',
+                'registry' => 'npm',
+                'version' => '^1.2.3',
+            ],
+        ];
     }
 
     private function createImportMapManager(array $dirs, string $rootDir, string $publicPrefix = '/assets/', string $publicDirName = 'public'): ImportMapManager

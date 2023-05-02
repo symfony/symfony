@@ -1,0 +1,116 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-04-26T13:41:42Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.3" but it seems your PR description refers to branch "should change it to 5.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-04-26T13:45:57Z
+
+I believe that this should be handled by https://github.com/psalm/psalm-plugin-symfony instead.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-04-26T14:04:18Z
+
+there is strictly no guarantee that passing a class name to `ContainerInterface::get()` will return you an instance of that class. It depends entirely of the configuration of the container.
+
+So this phpdoc is a big -1 as it lies to the static analyzer, making things worse than the existing type (it would make the SA tool consider some valid code as invalid and some invalid code as valid).
+
+The plugin can instead inspect the actual configuration in your project to return more detailed info (I know that the phpstan symfony plugin does that, but I don't know what is currently implemented in the psalm one)
+
+---------------------------------------------------------------------------
+
+by mathroc at 2023-04-26T15:38:21Z
+
+> there is strictly no guarantee that passing a class name to ContainerInterface::get() will return you an instance of that class. It depends entirely of the configuration of the container.
+
+@stof yeah I mentioned that, that's exactly why I asked. and it's absolutely reasonable to not accept that, would a version that only take care of the nullable part be of interest?
+
+Something like that:
+
+```
+     * @template B of self::*
+     * @param B $invalidBehavior
+     * @psalm-return (
+     *     B is self::EXCEPTION_ON_INVALID_REFERENCE|self::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE
+     *         ? object
+     *         : object|null
+     * )
+```
+
+About the plugin, I am unfortunately not in a position to enable it (because of https://github.com/vimeo/psalm/issues/2905)
+
+---------------------------------------------------------------------------
+
+by wouterj at 2023-04-26T17:34:01Z
+
+I'm fine with adding the generic null conditional (this also is accepted per [our standards](https://symfony.com/doc/current/contributing/code/standards.html#documentation)).
+
+I agree with the others about the FQCN resolving. Note that this also does not have to be transferred to the Symfony plugin, it can read the dumped XML file and use actual information about the return type of any service ID (including non-FQCNs).
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-04-26T17:44:58Z
+
+> About the plugin, I am unfortunately not in a position to enable it (because of [vimeo/psalm#2905](https://github.com/vimeo/psalm/issues/2905))
+
+Okay, but that should not influence the decision whether we merge a change or not. The plugin is the proper place for this logic and if it cannot be installed (for whatever reason), that's the issue that needs to be resolved.
+
+> I'm fine with adding the generic null conditional
+
+Me too.
+
+---------------------------------------------------------------------------
+
+by mathroc at 2023-04-26T17:59:38Z
+
+> Okay, but that should not influence the decision whether we merge a change or not
+
+absolutely :+1: that's just to explain why I was suggesting this
+
+I'll update the merge request
+
+---------------------------------------------------------------------------
+
+by mathroc at 2023-04-26T18:41:49Z
+
+done
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-04-27T07:46:16Z
+
+do you actually use ContainerInterface::get()? or is this a theoratical concern?
+
+having this in PSR container sounds more useful, but it was rejected somehow: https://github.com/php-fig/container/pull/35
+
+---------------------------------------------------------------------------
+
+by mathroc at 2023-04-27T10:24:44Z
+
+> do you actually use ContainerInterface::get()? or is this a theoratical concern?
+
+yeah discovered about 400 usages in a project by making Psalm stricter :see_no_evil:
+
+> having this in PSR container sounds more useful, but it was rejected somehow: https://github.com/php-fig/container/pull/35
+
+just looked at it but it was very different then both my first proposal and this last version
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-04-27T10:36:11Z
+
+symfony's container is a subset of PSR container
+
+dealing with $invalidBehavior is a symfony specific concern, i agree
+
+at this point im more concerned about 400 container usages in a project, regardless of phpdoc :sweat_smile:

@@ -360,7 +360,7 @@ class MessengerPassTest extends TestCase
         $dummyHandlerReference = $dummyHandlerDescriptorDefinition->getArgument(0);
         $dummyHandlerDefinition = $container->getDefinition($dummyHandlerReference);
 
-        $this->assertSame('callable', $dummyHandlerDefinition->getClass());
+        $this->assertSame('Closure', $dummyHandlerDefinition->getClass());
         $this->assertEquals([new Reference(HandlerMappingMethods::class), 'dummyMethod'], $dummyHandlerDefinition->getArgument(0));
         $this->assertSame(['Closure', 'fromCallable'], $dummyHandlerDefinition->getFactory());
 

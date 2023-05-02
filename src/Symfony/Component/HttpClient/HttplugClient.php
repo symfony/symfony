@@ -46,7 +46,7 @@ if (!interface_exists(HttplugInterface::class)) {
 }
 
 if (!interface_exists(RequestFactory::class)) {
-    throw new \LogicException('You cannot use "Symfony\Component\HttpClient\HttplugClient" as the "php-http/message-factory" package is not installed. Try running "composer require nyholm/psr7".');
+    throw new \LogicException('You cannot use "Symfony\Component\HttpClient\HttplugClient" as the "php-http/message-factory" package is not installed. Try running "composer require php-http/message-factory".');
 }
 
 if (!interface_exists(RequestFactoryInterface::class)) {

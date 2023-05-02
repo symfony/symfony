@@ -17,6 +17,7 @@ use Symfony\Component\AssetMapper\AssetMapperDevServerSubscriber;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\AssetMapperRepository;
 use Symfony\Component\AssetMapper\Command\AssetMapperCompileCommand;
+use Symfony\Component\AssetMapper\Command\DebugAssetMapperCommand;
 use Symfony\Component\AssetMapper\Command\ImportMapExportCommand;
 use Symfony\Component\AssetMapper\Command\ImportMapRemoveCommand;
 use Symfony\Component\AssetMapper\Command\ImportMapRequireCommand;
@@ -69,6 +70,14 @@ return static function (ContainerConfigurator $container) {
                 param('kernel.debug'),
             ])
             ->tag('console.command')
+
+            ->set('asset_mapper.command.debug', DebugAssetMapperCommand::class)
+                ->args([
+                    service('asset_mapper'),
+                    service('asset_mapper.repository'),
+                    param('kernel.project_dir'),
+                ])
+                ->tag('console.command')
 
         ->set('asset_mapper_compiler', AssetMapperCompiler::class)
             ->args([

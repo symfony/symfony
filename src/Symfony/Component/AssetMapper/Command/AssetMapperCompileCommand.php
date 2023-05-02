@@ -31,7 +31,7 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
-#[AsCommand(name: 'assetmap:compile', description: 'Compiles all mapped assets and writes them to the final public output directory.')]
+#[AsCommand(name: 'asset-map:compile', description: 'Compiles all mapped assets and writes them to the final public output directory.')]
 final class AssetMapperCompileCommand extends Command
 {
     public function __construct(
@@ -105,6 +105,6 @@ EOT
             ));
         }
 
-        return self::SUCCESS;
+        return 0;
     }
 }

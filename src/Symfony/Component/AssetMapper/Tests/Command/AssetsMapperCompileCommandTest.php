@@ -40,7 +40,7 @@ class AssetsMapperCompileCommandTest extends TestCase
     {
         $application = new Application($this->kernel);
 
-        $command = $application->find('assetmap:compile');
+        $command = $application->find('asset-map:compile');
         $tester = new CommandTester($command);
         $res = $tester->execute([]);
         $this->assertSame(0, $res);
@@ -59,6 +59,21 @@ class AssetsMapperCompileCommandTest extends TestCase
         $finder->in($targetBuildDir)->files();
         $this->assertCount(9, $finder);
         $this->assertFileExists($targetBuildDir.'/manifest.json');
+
+        $expected = [
+            'file1.css',
+            'file2.js',
+            'file3.css',
+            'subdir/file6.js',
+            'subdir/file5.js',
+            'file4.js',
+            'already-abcdefVWXYZ0123456789.digested.css',
+        ];
+        $actual = array_keys(json_decode(file_get_contents($targetBuildDir.'/manifest.json'), true));
+        sort($expected);
+        sort($actual);
+
+        $this->assertSame($expected, $actual);
         $this->assertFileExists($targetBuildDir.'/importmap.json');
     }
 }

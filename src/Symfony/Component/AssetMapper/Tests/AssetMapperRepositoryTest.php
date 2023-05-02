@@ -23,9 +23,9 @@ class AssetMapperRepositoryTest extends TestCase
             __DIR__.'/fixtures/dir2' => '',
         ], __DIR__);
 
-        $this->assertSame(__DIR__.'/fixtures/dir1/file1.css', $repository->find('file1.css'));
-        $this->assertSame(__DIR__.'/fixtures/dir2/file4.js', $repository->find('file4.js'));
-        $this->assertSame(__DIR__.'/fixtures/dir2/subdir/file5.js', $repository->find('subdir/file5.js'));
+        $this->assertSame(realpath(__DIR__.'/fixtures/dir1/file1.css'), $repository->find('file1.css'));
+        $this->assertSame(realpath(__DIR__.'/fixtures/dir2/file4.js'), $repository->find('file4.js'));
+        $this->assertSame(realpath(__DIR__.'/fixtures/dir2/subdir/file5.js'), $repository->find('subdir/file5.js'));
         $this->assertNull($repository->find('file5.css'));
     }
 
@@ -36,10 +36,20 @@ class AssetMapperRepositoryTest extends TestCase
             'dir2' => '',
         ], __DIR__.'/fixtures');
 
-        $this->assertSame(__DIR__.'/fixtures/dir1/file1.css', $repository->find('file1.css'));
-        $this->assertSame(__DIR__.'/fixtures/dir2/file4.js', $repository->find('file4.js'));
-        $this->assertSame(__DIR__.'/fixtures/dir2/subdir/file5.js', $repository->find('subdir/file5.js'));
+        $this->assertSame(realpath(__DIR__.'/fixtures/dir1/file1.css'), $repository->find('file1.css'));
+        $this->assertSame(realpath(__DIR__.'/fixtures/dir2/file4.js'), $repository->find('file4.js'));
+        $this->assertSame(realpath(__DIR__.'/fixtures/dir2/subdir/file5.js'), $repository->find('subdir/file5.js'));
         $this->assertNull($repository->find('file5.css'));
+    }
+
+    public function testFindWithMovingPaths()
+    {
+        $repository = new AssetMapperRepository([
+            __DIR__.'/../Tests/fixtures/dir2' => '',
+        ], __DIR__);
+
+        $this->assertSame(realpath(__DIR__.'/fixtures/dir2/file4.js'), $repository->find('file4.js'));
+        $this->assertSame(realpath(__DIR__.'/fixtures/dir2/file4.js'), $repository->find('subdir/../file4.js'));
     }
 
     public function testFindWithNamespaces()
@@ -49,9 +59,9 @@ class AssetMapperRepositoryTest extends TestCase
             'dir2' => 'dir2_namespace',
         ], __DIR__.'/fixtures');
 
-        $this->assertSame(__DIR__.'/fixtures/dir1/file1.css', $repository->find('dir1_namespace/file1.css'));
-        $this->assertSame(__DIR__.'/fixtures/dir2/file4.js', $repository->find('dir2_namespace/file4.js'));
-        $this->assertSame(__DIR__.'/fixtures/dir2/subdir/file5.js', $repository->find('dir2_namespace/subdir/file5.js'));
+        $this->assertSame(realpath(__DIR__.'/fixtures/dir1/file1.css'), $repository->find('dir1_namespace/file1.css'));
+        $this->assertSame(realpath(__DIR__.'/fixtures/dir2/file4.js'), $repository->find('dir2_namespace/file4.js'));
+        $this->assertSame(realpath(__DIR__.'/fixtures/dir2/subdir/file5.js'), $repository->find('dir2_namespace/subdir/file5.js'));
         // non-namespaced path does not work
         $this->assertNull($repository->find('file4.js'));
     }
@@ -59,10 +69,12 @@ class AssetMapperRepositoryTest extends TestCase
     public function testFindLogicalPath()
     {
         $repository = new AssetMapperRepository([
-            'dir1' => '',
+            'dir1' => 'some_namespace',
             'dir2' => '',
         ], __DIR__.'/fixtures');
         $this->assertSame('subdir/file5.js', $repository->findLogicalPath(__DIR__.'/fixtures/dir2/subdir/file5.js'));
+        $this->assertSame('some_namespace/file2.js', $repository->findLogicalPath(__DIR__.'/fixtures/dir1/file2.js'));
+        $this->assertSame('some_namespace/file2.js', $repository->findLogicalPath(__DIR__.'/../Tests/fixtures/dir1/file2.js'));
     }
 
     public function testAll()
@@ -83,8 +95,8 @@ class AssetMapperRepositoryTest extends TestCase
             'already-abcdefVWXYZ0123456789.digested.css' => __DIR__.'/fixtures/dir2/already-abcdefVWXYZ0123456789.digested.css',
             'file3.css' => __DIR__.'/fixtures/dir2/file3.css',
             'file4.js' => __DIR__.'/fixtures/dir2/file4.js',
-            'subdir'.\DIRECTORY_SEPARATOR.'file5.js' => __DIR__.'/fixtures/dir2/subdir/file5.js',
-            'subdir'.\DIRECTORY_SEPARATOR.'file6.js' => __DIR__.'/fixtures/dir2/subdir/file6.js',
+            'subdir/file5.js' => __DIR__.'/fixtures/dir2/subdir/file5.js',
+            'subdir/file6.js' => __DIR__.'/fixtures/dir2/subdir/file6.js',
             'test.gif.foo' => __DIR__.'/fixtures/dir3/test.gif.foo',
         ]);
         $this->assertEquals($expectedAllAssets, array_map('realpath', $actualAllAssets));
@@ -109,16 +121,10 @@ class AssetMapperRepositoryTest extends TestCase
             'dir3_namespace/test.gif.foo' => __DIR__.'/fixtures/dir3/test.gif.foo',
         ];
 
-        $normalizedExpectedAllAssets = [];
-        foreach ($expectedAllAssets as $key => $val) {
-            $normalizedExpectedAllAssets[str_replace('/', \DIRECTORY_SEPARATOR, $key)] = realpath($val);
-        }
+        $normalizedExpectedAllAssets = array_map('realpath', $expectedAllAssets);
 
         $actualAssets = $repository->all();
-        $normalizedActualAssets = [];
-        foreach ($actualAssets as $key => $val) {
-            $normalizedActualAssets[str_replace('/', \DIRECTORY_SEPARATOR, $key)] = realpath($val);
-        }
+        $normalizedActualAssets = array_map('realpath', $actualAssets);
 
         $this->assertEquals($normalizedExpectedAllAssets, $normalizedActualAssets);
     }

@@ -13,6 +13,7 @@ namespace Symfony\Component\AssetMapper\Command;
 
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\AssetMapper\ImportMap\PackageRequireOptions;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -95,7 +96,8 @@ final class ImportMapRequireCommand extends Command
 
             $message .= '.';
         } else {
-            $message = sprintf('%d new packages (%s) added to the importmap.php!', \count($newPackages), implode(', ', array_keys($newPackages)));
+            $names = array_map(fn (ImportMapEntry $package) => $package->importName, $newPackages);
+            $message = sprintf('%d new packages (%s) added to the importmap.php!', \count($newPackages), implode(', ', $names));
         }
 
         $messages = [$message];

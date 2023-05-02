@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-05-02T09:35:22Z
+
+Thanks for the review @stof. You made me realize that we don't need to move the tags to the decorator. PR updated.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-05-02T09:54:44Z
+
+Could you double check that this does not break data collectors? Pretty sure it's ok for voters due to the way they're registered in debug mode but I don't know for normalizers and arg resolvers (thinking to some tagged locator referencing the original services while expecting to end up with the debug wrappers injected)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-05-02T10:00:26Z
+
+@chalasr I checked the code: the only way they're registered is via this pass. The updated tests should give you the hint to be confident this doesn't break the profiler: the injected refs are the debug ones, which have the stopwatch in them.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-05-02T10:21:32Z
+
+Thanks for confirming

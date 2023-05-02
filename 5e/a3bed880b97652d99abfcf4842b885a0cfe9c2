@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2023-05-02T08:40:09Z
+
+could you add a test covering this behavior to prevent regressions ?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-05-02T15:29:52Z
+
+@stof done. I simplified the code as well.

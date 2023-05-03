@@ -36,7 +36,6 @@
         "guzzlehttp/promises": "^1.4",
         "nyholm/psr7": "^1.0",
         "php-http/httplug": "^1.0|^2.0",
-        "php-http/message-factory": "^1.0",
         "psr/http-client": "^1.0",
         "symfony/dependency-injection": "^5.4|^6.0",
         "symfony/http-kernel": "^5.4|^6.0",
@@ -44,6 +43,7 @@
         "symfony/stopwatch": "^5.4|^6.0"
     },
     "conflict": {
+        "php-http/discovery": "<1.15",
         "symfony/http-foundation": "<6.3"
     },
     "autoload": {

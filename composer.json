@@ -54,7 +54,8 @@
         "symfony/polyfill-intl-normalizer": "~1.0",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/polyfill-php83": "^1.27",
-        "symfony/polyfill-uuid": "^1.15"
+        "symfony/polyfill-uuid": "^1.15",
+        "pear/crypt_gpg": "^1.6"
     },
     "replace": {
         "symfony/asset": "self.version",

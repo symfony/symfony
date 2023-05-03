@@ -75,7 +75,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
         $listenerTag = $this->tagPrefix.'.event_listener';
         $subscriberTag = $this->tagPrefix.'.event_subscriber';
         $listenerRefs = [];
-        $taggedServices = $this->findAndSortTags([$subscriberTag, $listenerTag], $container);
+        $taggedServices = $this->findAndSortTags($subscriberTag, $listenerTag, $container);
 
         $managerDefs = [];
         foreach ($taggedServices as $taggedSubscriber) {
@@ -144,12 +144,17 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
      * @see https://bugs.php.net/53710
      * @see https://bugs.php.net/60926
      */
-    private function findAndSortTags(array $tagNames, ContainerBuilder $container): array
+    private function findAndSortTags(string $subscriberTag, string $listenerTag, ContainerBuilder $container): array
     {
         $sortedTags = [];
+        $taggedIds = [
+            $subscriberTag => $container->findTaggedServiceIds($subscriberTag, true),
+            $listenerTag => $container->findTaggedServiceIds($listenerTag, true),
+        ];
+        $taggedIds[$subscriberTag] = array_diff_key($taggedIds[$subscriberTag], $taggedIds[$listenerTag]);
 
-        foreach ($tagNames as $tagName) {
-            foreach ($container->findTaggedServiceIds($tagName, true) as $serviceId => $tags) {
+        foreach ($taggedIds as $tagName => $serviceIds) {
+            foreach ($serviceIds as $serviceId => $tags) {
                 foreach ($tags as $attributes) {
                     $priority = $attributes['priority'] ?? 0;
                     $sortedTags[$priority][] = [$tagName, $serviceId, $attributes];
@@ -157,11 +162,8 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
             }
         }
 
-        if ($sortedTags) {
-            krsort($sortedTags);
-            $sortedTags = array_merge(...$sortedTags);
-        }
+        krsort($sortedTags);
 
-        return $sortedTags;
+        return array_merge(...$sortedTags);
     }
 }

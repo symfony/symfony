@@ -40,6 +40,13 @@ class AssetsMapperCompileCommandTest extends TestCase
     {
         $application = new Application($this->kernel);
 
+        $targetBuildDir = $this->kernel->getProjectDir().'/public/assets';
+        // put old "built" versions to make sure the system skips using these
+        $this->filesystem->mkdir($targetBuildDir);
+        file_put_contents($targetBuildDir.'/manifest.json', '{}');
+        file_put_contents($targetBuildDir.'/importmap.json', '{"imports": {}}');
+        file_put_contents($targetBuildDir.'/importmap.preload.json', '{}');
+
         $command = $application->find('asset-map:compile');
         $tester = new CommandTester($command);
         $res = $tester->execute([]);
@@ -47,7 +54,6 @@ class AssetsMapperCompileCommandTest extends TestCase
         // match Compiling \d+ assets
         $this->assertMatchesRegularExpression('/Compiling \d+ assets/', $tester->getDisplay());
 
-        $targetBuildDir = $this->kernel->getProjectDir().'/public/assets';
         $this->assertFileExists($targetBuildDir.'/subdir/file5-f4fdc37375c7f5f2629c5659a0579967.js');
         $this->assertSame(<<<EOF
         import '../file4.js';
@@ -57,23 +63,35 @@ class AssetsMapperCompileCommandTest extends TestCase
 
         $finder = new Finder();
         $finder->in($targetBuildDir)->files();
-        $this->assertCount(9, $finder);
+        $this->assertCount(10, $finder);
         $this->assertFileExists($targetBuildDir.'/manifest.json');
 
-        $expected = [
+        $this->assertSame([
+            'already-abcdefVWXYZ0123456789.digested.css',
             'file1.css',
             'file2.js',
             'file3.css',
-            'subdir/file6.js',
-            'subdir/file5.js',
             'file4.js',
-            'already-abcdefVWXYZ0123456789.digested.css',
-        ];
-        $actual = array_keys(json_decode(file_get_contents($targetBuildDir.'/manifest.json'), true));
-        sort($expected);
-        sort($actual);
+            'subdir/file5.js',
+            'subdir/file6.js',
+        ], array_keys(json_decode(file_get_contents($targetBuildDir.'/manifest.json'), true)));
 
-        $this->assertSame($expected, $actual);
         $this->assertFileExists($targetBuildDir.'/importmap.json');
+        $actualImportMap = json_decode(file_get_contents($targetBuildDir.'/importmap.json'), true);
+        $this->assertSame([
+            '@hotwired/stimulus',
+            'lodash',
+            'file6',
+            '/assets/subdir/file5.js', // imported by file6
+            '/assets/file4.js', // imported by file5
+        ], array_keys($actualImportMap['imports']));
+
+        $this->assertFileExists($targetBuildDir.'/importmap.preload.json');
+        $actualPreload = json_decode(file_get_contents($targetBuildDir.'/importmap.preload.json'), true);
+        $this->assertCount(4, $actualPreload);
+        $this->assertStringStartsWith('https://unpkg.com/@hotwired/stimulus', $actualPreload[0]);
+        $this->assertStringStartsWith('/assets/subdir/file6-', $actualPreload[1]);
+        $this->assertStringStartsWith('/assets/subdir/file5-', $actualPreload[2]);
+        $this->assertStringStartsWith('/assets/file4-', $actualPreload[3]);
     }
 }

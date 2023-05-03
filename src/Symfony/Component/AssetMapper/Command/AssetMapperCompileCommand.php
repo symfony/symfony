@@ -66,13 +66,54 @@ EOT
             throw new InvalidArgumentException(sprintf('The public directory "%s" does not exist.', $publicDir));
         }
 
+        $outputDir = $publicDir.$this->assetMapper->getPublicPrefix();
         if ($input->getOption('clean')) {
-            $outputDir = $publicDir.$this->assetMapper->getPublicPrefix();
             $io->comment(sprintf('Cleaning <info>%s</info>', $outputDir));
             $this->filesystem->remove($outputDir);
             $this->filesystem->mkdir($outputDir);
         }
 
+        $manifestPath = $publicDir.$this->assetMapper->getPublicPrefix().AssetMapper::MANIFEST_FILE_NAME;
+        if (is_file($manifestPath)) {
+            $this->filesystem->remove($manifestPath);
+        }
+        $manifest = $this->createManifestAndWriteFiles($io, $publicDir);
+        $this->filesystem->dumpFile($manifestPath, json_encode($manifest, \JSON_PRETTY_PRINT));
+        $io->comment(sprintf('Manifest written to <info>%s</info>', $manifestPath));
+
+        $importMapPath = $outputDir.ImportMapManager::IMPORT_MAP_FILE_NAME;
+        if (is_file($importMapPath)) {
+            $this->filesystem->remove($importMapPath);
+        }
+        $this->filesystem->dumpFile($importMapPath, $this->importMapManager->getImportMapJson());
+
+        $importMapPreloadPath = $outputDir.ImportMapManager::IMPORT_MAP_PRELOAD_FILE_NAME;
+        if (is_file($importMapPreloadPath)) {
+            $this->filesystem->remove($importMapPreloadPath);
+        }
+        $this->filesystem->dumpFile(
+            $importMapPreloadPath,
+            json_encode($this->importMapManager->getModulesToPreload(), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES)
+        );
+        $io->comment(sprintf('Import map written to <info>%s</info> and <info>%s</info> for quick importmap dumping onto the page.', $this->shortenPath($importMapPath), $this->shortenPath($importMapPreloadPath)));
+
+        if ($this->isDebug) {
+            $io->warning(sprintf(
+                'You are compiling assets in development. Symfony will not serve any changed assets until you delete the "%s" directory.',
+                $this->shortenPath($outputDir)
+            ));
+        }
+
+        return 0;
+    }
+
+    private function shortenPath(string $path): string
+    {
+        return str_replace($this->projectDir.'/', '', $path);
+    }
+
+    private function createManifestAndWriteFiles(SymfonyStyle $io, string $publicDir): array
+    {
         $allAssets = $this->assetMapper->allAssets();
 
         $io->comment(sprintf('Compiling <info>%d</info> assets to <info>%s%s</info>', \count($allAssets), $publicDir, $this->assetMapper->getPublicPrefix()));
@@ -88,23 +129,8 @@ EOT
             $this->filesystem->dumpFile($targetPath, $asset->getContent());
             $manifest[$asset->logicalPath] = $asset->getPublicPath();
         }
+        ksort($manifest);
 
-        $manifestPath = $publicDir.$this->assetMapper->getPublicPrefix().AssetMapper::MANIFEST_FILE_NAME;
-        $this->filesystem->dumpFile($manifestPath, json_encode($manifest, \JSON_PRETTY_PRINT));
-        $io->comment(sprintf('Manifest written to <info>%s</info>', $manifestPath));
-
-        $importMapPath = $publicDir.$this->assetMapper->getPublicPrefix().ImportMapManager::IMPORT_MAP_FILE_NAME;
-        $this->filesystem->dumpFile($importMapPath, $this->importMapManager->getImportMapJson());
-        $io->comment(sprintf('Import map written to <info>%s</info>', $importMapPath));
-
-        if ($this->isDebug) {
-            $io->warning(sprintf(
-                'You are compiling assets in development. Symfony will not serve any changed assets until you delete %s and %s.',
-                $manifestPath,
-                $importMapPath
-            ));
-        }
-
-        return 0;
+        return $manifest;
     }
 }

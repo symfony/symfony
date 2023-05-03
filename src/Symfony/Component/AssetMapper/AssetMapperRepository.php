@@ -54,7 +54,7 @@ class AssetMapperRepository
             }
 
             $file = rtrim($path, '/').'/'.$localLogicalPath;
-            if (file_exists($file)) {
+            if (is_file($file)) {
                 return realpath($file);
             }
         }

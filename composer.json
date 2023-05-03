@@ -165,6 +165,7 @@
     },
     "config": {
         "allow-plugins": {
+            "php-http/discovery": false,
             "symfony/runtime": true
         }
     },

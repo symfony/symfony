@@ -128,7 +128,9 @@ class ProfilerController
             throw new NotFoundHttpException('The profiler must be enabled.');
         }
 
-        if ($request->hasSession() && ($session = $request->getSession())->isStarted() && $session->getFlashBag() instanceof AutoExpireFlashBag) {
+        if (!$request->attributes->getBoolean('_stateless') && $request->hasSession()
+            && ($session = $request->getSession())->isStarted() && $session->getFlashBag() instanceof AutoExpireFlashBag
+        ) {
             // keep current flashes for one more request if using AutoExpireFlashBag
             $session->getFlashBag()->setAll($session->getFlashBag()->peekAll());
         }
@@ -172,7 +174,11 @@ class ProfilerController
 
         $this->cspHandler?->disableCsp();
 
-        $session = $request->hasSession() ? $request->getSession() : null;
+
+        $session = null;
+        if ($request->attributes->getBoolean('_stateless') && $request->hasSession()) {
+            $session = $request->getSession();
+        }
 
         return new Response(
             $this->twig->render('@WebProfiler/Profiler/search.html.twig', [
@@ -247,7 +253,7 @@ class ProfilerController
         $limit = $request->query->get('limit');
         $token = $request->query->get('token');
 
-        if ($request->hasSession()) {
+        if (!$request->attributes->getBoolean('_stateless') && $request->hasSession()) {
             $session = $request->getSession();
 
             $session->set('_profiler_search_ip', $ip);

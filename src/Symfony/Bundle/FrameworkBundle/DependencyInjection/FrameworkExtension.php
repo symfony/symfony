@@ -281,11 +281,11 @@ class FrameworkExtension extends Extension
 
         // If the slugger is used but the String component is not available, we should throw an error
         if (!ContainerBuilder::willBeAvailable('symfony/string', SluggerInterface::class, ['symfony/framework-bundle'])) {
-            $container->register('slugger', 'stdClass')
+            $container->register('slugger', SluggerInterface::class)
                 ->addError('You cannot use the "slugger" service since the String component is not installed. Try running "composer require symfony/string".');
         } else {
             if (!ContainerBuilder::willBeAvailable('symfony/translation', LocaleAwareInterface::class, ['symfony/framework-bundle'])) {
-                $container->register('slugger', 'stdClass')
+                $container->register('slugger', SluggerInterface::class)
                     ->addError('You cannot use the "slugger" service since the Translation contracts are not installed. Try running "composer require symfony/translation".');
             }
 
@@ -379,7 +379,7 @@ class FrameworkExtension extends Extension
             $container->getDefinition('argument_resolver.request_payload')
                 ->setArguments([])
                 ->addError('You can neither use "#[MapRequestPayload]" nor "#[MapQueryString]" since the Serializer component is not '
-                    .(class_exists(Serializer::class) ? 'enabled. Try setting "framework.serializer" to true.' : 'installed. Try running "composer require symfony/serializer-pack".')
+                    .(class_exists(Serializer::class) ? 'enabled. Try setting "framework.serializer.enabled" to true.' : 'installed. Try running "composer require symfony/serializer-pack".')
                 )
                 ->addTag('container.error')
                 ->clearTag('kernel.event_subscriber');
@@ -531,6 +531,24 @@ class FrameworkExtension extends Extension
 
         if ($this->readConfigEnabled('webhook', $container, $config['webhook'])) {
             $this->registerWebhookConfiguration($config['webhook'], $container, $loader);
+
+            // If Webhook is installed but the HttpClient or Serializer components are not available, we should throw an error
+            if (!$this->readConfigEnabled('http_client', $container, $config['http_client'])) {
+                $container->getDefinition('webhook.transport')
+                    ->setArguments([])
+                    ->addError('You cannot use the "webhook transport" service since the HttpClient component is not '
+                        .(class_exists(ScopingHttpClient::class) ? 'enabled. Try setting "framework.http_client.enabled" to true.' : 'installed. Try running "composer require symfony/http-client".')
+                    )
+                    ->addTag('container.error');
+            }
+            if (!$this->readConfigEnabled('serializer', $container, $config['serializer'])) {
+                $container->getDefinition('webhook.body_configurator.json')
+                    ->setArguments([])
+                    ->addError('You cannot use the "webhook transport" service since the Serializer component is not '
+                        .(class_exists(Serializer::class) ? 'enabled. Try setting "framework.serializer.enabled" to true.' : 'installed. Try running "composer require symfony/serializer-pack".')
+                    )
+                    ->addTag('container.error');
+            }
         }
 
         if ($this->readConfigEnabled('remote-event', $container, $config['remote-event'])) {

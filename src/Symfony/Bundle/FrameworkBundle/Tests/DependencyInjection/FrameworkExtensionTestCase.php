@@ -82,6 +82,8 @@ use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Webhook\Client\RequestParser;
+use Symfony\Component\Webhook\Controller\WebhookController;
 use Symfony\Component\Workflow;
 use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
 use Symfony\Component\Workflow\Metadata\InMemoryMetadataStore;
@@ -2274,6 +2276,38 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('notifier.channel.chat')->getArgument(1));
         $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('notifier.channel.email')->getArgument(1));
         $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('notifier.channel.sms')->getArgument(1));
+    }
+
+    public function testWebhook()
+    {
+        if (!class_exists(WebhookController::class)) {
+            $this->markTestSkipped('Webhook not available.');
+        }
+
+        $container = $this->createContainerFromFile('webhook');
+
+        $this->assertTrue($container->hasAlias(RequestParser::class));
+        $this->assertSame('webhook.request_parser', (string) $container->getAlias(RequestParser::class));
+        $this->assertSame(RequestParser::class, $container->getDefinition('webhook.request_parser')->getClass());
+
+        $this->assertFalse($container->getDefinition('webhook.transport')->hasErrors());
+        $this->assertFalse($container->getDefinition('webhook.body_configurator.json')->hasErrors());
+    }
+
+    public function testWebhookWithoutSerializer()
+    {
+        if (!class_exists(WebhookController::class)) {
+            $this->markTestSkipped('Webhook not available.');
+        }
+
+        $container = $this->createContainerFromFile('webhook_without_serializer');
+
+        $this->assertFalse($container->getDefinition('webhook.transport')->hasErrors());
+        $this->assertTrue($container->getDefinition('webhook.body_configurator.json')->hasErrors());
+        $this->assertSame(
+            ['You cannot use the "webhook transport" service since the Serializer component is not enabled. Try setting "framework.serializer.enabled" to true.'],
+            $container->getDefinition('webhook.body_configurator.json')->getErrors()
+        );
     }
 
     protected function createContainer(array $data = [])

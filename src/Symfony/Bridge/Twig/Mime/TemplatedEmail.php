@@ -76,7 +76,6 @@ class TemplatedEmail extends Email
     {
         $this->textTemplate = null;
         $this->htmlTemplate = null;
-        $this->context = [];
     }
 
     /**

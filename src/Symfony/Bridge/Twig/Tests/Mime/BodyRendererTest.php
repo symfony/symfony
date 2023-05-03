@@ -133,6 +133,24 @@ HTML;
         $this->assertEquals('Text', $email->getTextBody());
     }
 
+    public function testRendererKeepsContext()
+    {
+        $twig = new Environment(new ArrayLoader([
+            'text' => 'Text',
+        ]));
+        $renderer = new BodyRenderer($twig);
+        $email = (new TemplatedEmail())
+            ->to('fabien@symfony.com')
+            ->from('helene@symfony.com')
+        ;
+        $email->textTemplate('text');
+        $email->context(['test' => 'kept']);
+
+        $renderer->render($email);
+
+        $this->assertSame('kept', $email->getContext()['test']);
+    }
+
     private function prepareEmail(?string $text, ?string $html, array $context = [], HtmlToTextConverterInterface $converter = null): TemplatedEmail
     {
         $twig = new Environment(new ArrayLoader([

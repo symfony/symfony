@@ -20,7 +20,8 @@ namespace Symfony\Component\AssetMapper;
  */
 final class MappedAsset
 {
-    public string $publicPath;
+    private string $publicPath;
+    private string $publicPathWithoutDigest;
     /**
      * @var string the filesystem path to the source file
      */
@@ -88,6 +89,15 @@ final class MappedAsset
         $this->publicPath = $publicPath;
     }
 
+    public function setPublicPathWithoutDigest(string $publicPathWithoutDigest): void
+    {
+        if (isset($this->publicPathWithoutDigest)) {
+            throw new \LogicException('Cannot set public path without digest: it was already set on the asset.');
+        }
+
+        $this->publicPathWithoutDigest = $publicPathWithoutDigest;
+    }
+
     public function setSourcePath(string $sourcePath): void
     {
         if (isset($this->sourcePath)) {
@@ -132,16 +142,6 @@ final class MappedAsset
 
     public function getPublicPathWithoutDigest(): string
     {
-        if ($this->isPredigested()) {
-            return $this->getPublicPath();
-        }
-
-        // remove last part of publicPath and replace with last part of logicalPath
-        $publicPathParts = explode('/', $this->getPublicPath());
-        $logicalPathParts = explode('/', $this->logicalPath);
-        array_pop($publicPathParts);
-        $publicPathParts[] = array_pop($logicalPathParts);
-
-        return implode('/', $publicPathParts);
+        return $this->publicPathWithoutDigest;
     }
 }

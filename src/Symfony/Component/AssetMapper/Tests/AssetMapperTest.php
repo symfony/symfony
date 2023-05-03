@@ -65,6 +65,7 @@ class AssetMapperTest extends TestCase
         $asset = $assetMapper->getAsset('file2.js');
         $this->assertSame('file2.js', $asset->logicalPath);
         $this->assertMatchesRegularExpression('/^\/final-assets\/file2-[a-zA-Z0-9]{7,128}\.js$/', $asset->getPublicPath());
+        $this->assertSame('/final-assets/file2.js', $asset->getPublicPathWithoutDigest());
     }
 
     public function testGetAssetRespectsPreDigestedPaths()
@@ -73,6 +74,8 @@ class AssetMapperTest extends TestCase
         $asset = $assetMapper->getAsset('already-abcdefVWXYZ0123456789.digested.css');
         $this->assertSame('already-abcdefVWXYZ0123456789.digested.css', $asset->logicalPath);
         $this->assertSame('/final-assets/already-abcdefVWXYZ0123456789.digested.css', $asset->getPublicPath());
+        // for pre-digested files, the digest *is* part of the public path
+        $this->assertSame('/final-assets/already-abcdefVWXYZ0123456789.digested.css', $asset->getPublicPathWithoutDigest());
     }
 
     public function testGetAssetUsesManifestIfAvailable()

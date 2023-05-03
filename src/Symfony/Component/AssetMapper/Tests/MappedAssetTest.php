@@ -31,6 +31,14 @@ class MappedAssetTest extends TestCase
         $this->assertSame('/assets/foo.1234567.css', $asset->getPublicPath());
     }
 
+    public function testGetPublicPathWithoutDigest()
+    {
+        $asset = new MappedAsset('anything');
+        $asset->setPublicPathWithoutDigest('/assets/foo.css');
+
+        $this->assertSame('/assets/foo.css', $asset->getPublicPathWithoutDigest());
+    }
+
     /**
      * @dataProvider getExtensionTests
      */
@@ -48,21 +56,21 @@ class MappedAssetTest extends TestCase
         yield 'with_directory' => ['foo/bar.css', 'css'];
     }
 
-    public function testGetSourcePath(): void
+    public function testGetSourcePath()
     {
         $asset = new MappedAsset('foo.css');
         $asset->setSourcePath('/path/to/source.css');
         $this->assertSame('/path/to/source.css', $asset->getSourcePath());
     }
 
-    public function testGetMimeType(): void
+    public function testGetMimeType()
     {
         $asset = new MappedAsset('foo.css');
         $asset->setMimeType('text/css');
         $this->assertSame('text/css', $asset->getMimeType());
     }
 
-    public function testGetDigest(): void
+    public function testGetDigest()
     {
         $asset = new MappedAsset('foo.css');
         $asset->setDigest('1234567', false);
@@ -70,7 +78,7 @@ class MappedAssetTest extends TestCase
         $this->assertFalse($asset->isPredigested());
     }
 
-    public function testGetContent(): void
+    public function testGetContent()
     {
         $asset = new MappedAsset('foo.css');
         $asset->setContent('body { color: red; }');

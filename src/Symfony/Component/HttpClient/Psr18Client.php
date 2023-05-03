@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\HttpClient;
 
-use Http\Discovery\Exception\NotFoundException;
+use Http\Discovery\Psr17Factory;
 use Http\Discovery\Psr17FactoryDiscovery;
-use Nyholm\Psr7\Factory\Psr17Factory;
+use Nyholm\Psr7\Factory\Psr17Factory as NyholmPsr17Factory;
 use Nyholm\Psr7\Request;
 use Nyholm\Psr7\Uri;
 use Psr\Http\Client\ClientInterface;
@@ -33,20 +33,19 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
-if (!interface_exists(RequestFactoryInterface::class)) {
-    throw new \LogicException('You cannot use the "Symfony\Component\HttpClient\Psr18Client" as the "psr/http-factory" package is not installed. Try running "composer require nyholm/psr7".');
+if (!interface_exists(ClientInterface::class)) {
+    throw new \LogicException('You cannot use the "Symfony\Component\HttpClient\Psr18Client" as the "psr/http-client" package is not installed. Try running "composer require php-http/discovery psr/http-client-implementation:*".');
 }
 
-if (!interface_exists(ClientInterface::class)) {
-    throw new \LogicException('You cannot use the "Symfony\Component\HttpClient\Psr18Client" as the "psr/http-client" package is not installed. Try running "composer require psr/http-client".');
+if (!interface_exists(RequestFactoryInterface::class)) {
+    throw new \LogicException('You cannot use the "Symfony\Component\HttpClient\Psr18Client" as the "psr/http-factory" package is not installed. Try running "composer require php-http/discovery psr/http-factory-implementation:*".');
 }
 
 /**
  * An adapter to turn a Symfony HttpClientInterface into a PSR-18 ClientInterface.
  *
- * Run "composer require psr/http-client" to install the base ClientInterface. Run
- * "composer require nyholm/psr7" to install an efficient implementation of response
- * and stream factories with flex-provided autowiring aliases.
+ * Run "composer require php-http/discovery psr/http-client-implementation:*"
+ * to get the required dependencies.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
@@ -62,17 +61,16 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
         $streamFactory ??= $responseFactory instanceof StreamFactoryInterface ? $responseFactory : null;
 
         if (null === $responseFactory || null === $streamFactory) {
-            if (!class_exists(Psr17Factory::class) && !class_exists(Psr17FactoryDiscovery::class)) {
-                throw new \LogicException('You cannot use the "Symfony\Component\HttpClient\Psr18Client" as no PSR-17 factories have been provided. Try running "composer require nyholm/psr7".');
+            if (class_exists(Psr17Factory::class)) {
+                $psr17Factory = new Psr17Factory();
+            } elseif (class_exists(NyholmPsr17Factory::class)) {
+                $psr17Factory = new NyholmPsr17Factory();
+            } else {
+                throw new \LogicException('You cannot use the "Symfony\Component\HttpClient\Psr18Client" as no PSR-17 factories have been provided. Try running "composer require php-http/discovery psr/http-factory-implementation:*".');
             }
 
-            try {
-                $psr17Factory = class_exists(Psr17Factory::class, false) ? new Psr17Factory() : null;
-                $responseFactory ??= $psr17Factory ?? Psr17FactoryDiscovery::findResponseFactory();
-                $streamFactory ??= $psr17Factory ?? Psr17FactoryDiscovery::findStreamFactory();
-            } catch (NotFoundException $e) {
-                throw new \LogicException('You cannot use the "Symfony\Component\HttpClient\HttplugClient" as no PSR-17 factories have been found. Try running "composer require nyholm/psr7".', 0, $e);
-            }
+            $responseFactory ??= $psr17Factory;
+            $streamFactory ??= $psr17Factory;
         }
 
         $this->responseFactory = $responseFactory;
@@ -142,15 +140,15 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
             return $this->responseFactory->createRequest($method, $uri);
         }
 
-        if (class_exists(Request::class)) {
-            return new Request($method, $uri);
-        }
-
         if (class_exists(Psr17FactoryDiscovery::class)) {
             return Psr17FactoryDiscovery::findRequestFactory()->createRequest($method, $uri);
         }
 
-        throw new \LogicException(sprintf('You cannot use "%s()" as the "nyholm/psr7" package is not installed. Try running "composer require nyholm/psr7".', __METHOD__));
+        if (class_exists(Request::class)) {
+            return new Request($method, $uri);
+        }
+
+        throw new \LogicException(sprintf('You cannot use "%s()" as no PSR-17 factories have been found. Try running "composer require php-http/discovery psr/http-factory-implementation:*".', __METHOD__));
     }
 
     public function createStream(string $content = ''): StreamInterface
@@ -180,15 +178,15 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
             return $this->responseFactory->createUri($uri);
         }
 
-        if (class_exists(Uri::class)) {
-            return new Uri($uri);
-        }
-
         if (class_exists(Psr17FactoryDiscovery::class)) {
             return Psr17FactoryDiscovery::findUrlFactory()->createUri($uri);
         }
 
-        throw new \LogicException(sprintf('You cannot use "%s()" as the "nyholm/psr7" package is not installed. Try running "composer require nyholm/psr7".', __METHOD__));
+        if (class_exists(Uri::class)) {
+            return new Uri($uri);
+        }
+
+        throw new \LogicException(sprintf('You cannot use "%s()" as no PSR-17 factories have been found. Try running "composer require php-http/discovery psr/http-factory-implementation:*".', __METHOD__));
     }
 
     public function reset(): void

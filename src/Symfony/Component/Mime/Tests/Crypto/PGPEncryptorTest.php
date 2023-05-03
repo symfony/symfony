@@ -1,8 +1,16 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Mime\Tests\Crypto;
 
-use Crypt_GPG;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Address;
@@ -12,17 +20,17 @@ use Symfony\Component\Mime\Email;
 #[CoversClass(PGPEncrypter::class)]
 final class PGPEncryptorTest extends TestCase
 {
-    private Crypt_GPG $gpg;
+    private \Crypt_GPG $gpg;
 
     private Email $email;
 
     private PGPEncrypter $encrypter;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
-        $this->gpg = new Crypt_GPG();
-        $this->gpg->importKeyFile(__DIR__ . '/../Fixtures/_data/pgp.asc');
+        $this->gpg = new \Crypt_GPG();
+        $this->gpg->importKeyFile(__DIR__ . '/../_data/pgp.asc');
         $this->email = (new Email())
             ->from(new Address('pgp@pulli.dev', 'PuLLi'))
             ->to(new Address('pgp@pulli.dev', 'PuLLi'))
@@ -31,7 +39,7 @@ final class PGPEncryptorTest extends TestCase
         $this->encrypter = new PGPEncrypter();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->removeKey('pgp@pulli.dev');
         parent::tearDown();
@@ -39,14 +47,14 @@ final class PGPEncryptorTest extends TestCase
 
     public function testEncrypting()
     {
-        $encrypted = ($this->encrypter->encrypt($this->email))->toString();
+        $encrypted = $this->encrypter->encrypt($this->email)->toString();
         $this->assertStringContainsString('-----BEGIN PGP MESSAGE-----', $encrypted);
         $this->assertStringContainsString('-----END PGP MESSAGE-----', $encrypted);
     }
 
     public function testEncryptingAndSigning()
     {
-        $encrypted = ($this->encrypter->encryptAndSign($this->email, 'test1234'))->toString();
+        $encrypted = $this->encrypter->encryptAndSign($this->email, 'test1234')->toString();
         $this->assertStringContainsString('-----BEGIN PGP MESSAGE-----', $encrypted);
         $this->assertStringContainsString('-----END PGP MESSAGE-----', $encrypted);
         $this->assertStringNotContainsString('-----BEGIN PGP SIGNATURE-----', $encrypted);

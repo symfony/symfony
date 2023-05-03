@@ -1,7 +1,17 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Mime\Helper;
 
+use Symfony\Component\Mime\Part\AbstractMultipartPart;
 use Symfony\Component\Mime\Part\AbstractPart;
 
 /*
@@ -10,26 +20,17 @@ use Symfony\Component\Mime\Part\AbstractPart;
  */
 trait PGPSigningPreparer
 {
-    /**
-     * @param string $text
-     * @return string
-     */
     protected function normalizeLineEnding(string $text): string
     {
         return str_replace("\n", "\r\n", str_replace(["\r\n", "\r"], "\n", $text));
     }
 
-    /**
-     * @param AbstractPart $part
-     * @param string $msg
-     * @return string
-     */
     protected function prepareMessageForSigning(AbstractPart $part, string $msg): string
     {
         // Only text part
-        if ($part->getMediaType() === 'text') {
+        if ('text' === $part->getMediaType()) {
             $msg = $this->getMessage($part, $msg);
-        } elseif ($part->getMediaType() === 'multipart') {
+        } elseif ($part instanceof AbstractMultipartPart) {
             // Find the text part inside the multipart
             $msg = $this->findTextPart($part->getParts(), $msg);
         }
@@ -39,8 +40,6 @@ trait PGPSigningPreparer
 
     /**
      * @param AbstractPart[] $parts
-     * @param string $msg
-     * @return string
      */
     protected function findTextPart(array $parts, string $msg): string
     {
@@ -51,11 +50,6 @@ trait PGPSigningPreparer
         return $msg;
     }
 
-    /**
-     * @param AbstractPart $part
-     * @param string $msg
-     * @return string
-     */
     protected function getMessage(AbstractPart $part, string $msg): string
     {
         $textPart = $part->toString();

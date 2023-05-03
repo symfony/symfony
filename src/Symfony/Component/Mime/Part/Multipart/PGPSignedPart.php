@@ -42,7 +42,7 @@ class PGPSignedPart extends AbstractMultipartPart
 
     public function bodyToString(): string
     {
-        return "This is an OpenPGP/MIME signed message (RFC 3156 and 4880).\r\n\r\n" . parent::bodyToString();
+        return "This is an OpenPGP/MIME signed message (RFC 3156 and 4880).\r\n\r\n".parent::bodyToString();
     }
 
     public function bodyToIterable(): iterable

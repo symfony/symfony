@@ -1,8 +1,15 @@
 <?php
 
-namespace Symfony\Component\Mime\Part;
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
-use Symfony\Component\Mime\Part\AbstractPart;
+namespace Symfony\Component\Mime\Part;
 
 /*
  * @author PuLLi <the@pulli.dev>
@@ -14,6 +21,7 @@ class PGPEncryptedInitializationPart extends AbstractPart
         parent::__construct();
         $this->getHeaders()->addTextHeader('Content-Disposition', 'attachment');
     }
+
     public function bodyToString(): string
     {
         return "Version: 1\r\n";

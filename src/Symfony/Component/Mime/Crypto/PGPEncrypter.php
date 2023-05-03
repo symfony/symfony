@@ -1,23 +1,27 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Mime\Crypto;
 
-use Crypt_GPG;
-use Crypt_GPG_BadPassphraseException;
-use Crypt_GPG_Exception;
-use Crypt_GPG_FileException;
-use Crypt_GPG_KeyNotFoundException;
-use PEAR_Exception;
+use Symfony\Component\Mime\Header\Headers;
+use Symfony\Component\Mime\Header\MailboxListHeader;
 use Symfony\Component\Mime\Helper\PGPSigningPreparer;
+use Symfony\Component\Mime\Message;
+use Symfony\Component\Mime\Part\Multipart\MixedPart;
 use Symfony\Component\Mime\Part\Multipart\PGPEncryptedPart;
 use Symfony\Component\Mime\Part\Multipart\PGPSignedPart;
 use Symfony\Component\Mime\Part\PGPEncryptedInitializationPart;
 use Symfony\Component\Mime\Part\PGPEncryptedMessagePart;
 use Symfony\Component\Mime\Part\PGPKeyPart;
 use Symfony\Component\Mime\Part\PGPSignaturePart;
-use Symfony\Component\Mime\Header\Headers;
-use Symfony\Component\Mime\Message;
-use Symfony\Component\Mime\Part\Multipart\MixedPart;
 
 /*
  * @author PuLLi <the@pulli.dev>
@@ -26,7 +30,7 @@ class PGPEncrypter
 {
     use PGPSigningPreparer;
 
-    private Crypt_GPG $gpg;
+    private \Crypt_GPG $gpg;
 
     private Headers $headers;
 
@@ -37,12 +41,12 @@ class PGPEncrypter
     public string $signed = '';
 
     /**
-     * @throws Crypt_GPG_FileException
-     * @throws PEAR_Exception
+     * @throws \Crypt_GPG_FileException
+     * @throws \PEAR_Exception
      */
     public function __construct(array $options = [])
     {
-        $this->gpg = new Crypt_GPG(
+        $this->gpg = new \Crypt_GPG(
             array_merge(
                 $options,
                 [
@@ -59,8 +63,8 @@ class PGPEncrypter
     }
 
     /**
-     * @throws Crypt_GPG_Exception
-     * @throws Crypt_GPG_KeyNotFoundException
+     * @throws \Crypt_GPG_Exception
+     * @throws \Crypt_GPG_KeyNotFoundException
      */
     public function encrypt(Message $message, bool $attachKey = false): Message
     {
@@ -68,21 +72,21 @@ class PGPEncrypter
     }
 
     /**
-     * @throws Crypt_GPG_Exception
-     * @throws Crypt_GPG_KeyNotFoundException
-     * @throws Crypt_GPG_BadPassphraseException
+     * @throws \Crypt_GPG_Exception
+     * @throws \Crypt_GPG_KeyNotFoundException
+     * @throws \Crypt_GPG_BadPassphraseException
      */
-    public function encryptAndSign(Message $message, ?string $passphrase = null, bool $attachKey = false): Message
+    public function encryptAndSign(Message $message, string $passphrase = null, bool $attachKey = false): Message
     {
         return $this->encryptWithOrWithoutSigning($message, true, $passphrase, $attachKey);
     }
 
     /**
-     * @throws Crypt_GPG_Exception
-     * @throws Crypt_GPG_KeyNotFoundException
-     * @throws Crypt_GPG_BadPassphraseException
+     * @throws \Crypt_GPG_Exception
+     * @throws \Crypt_GPG_KeyNotFoundException
+     * @throws \Crypt_GPG_BadPassphraseException
      */
-    private function encryptWithOrWithoutSigning(Message $message, bool $sign = false, ?string $passphrase = null, bool $attachKey = false): Message
+    private function encryptWithOrWithoutSigning(Message $message, bool $sign = false, string $passphrase = null, bool $attachKey = false): Message
     {
         $this->headers = $message->getHeaders();
         $body = $message->getBody();
@@ -111,11 +115,11 @@ class PGPEncrypter
     }
 
     /**
-     * @throws Crypt_GPG_Exception
-     * @throws Crypt_GPG_KeyNotFoundException
-     * @throws Crypt_GPG_BadPassphraseException
+     * @throws \Crypt_GPG_Exception
+     * @throws \Crypt_GPG_KeyNotFoundException
+     * @throws \Crypt_GPG_BadPassphraseException
      */
-    public function sign(Message $message, ?string $passphrase = null, bool $attachKey = false): Message
+    public function sign(Message $message, string $passphrase = null, bool $attachKey = false): Message
     {
         $this->headers = $message->getHeaders();
         $body = $message->getBody()->toString();
@@ -131,7 +135,7 @@ class PGPEncrypter
         $this->signed = $body;
 
         $this->gpg->addSignKey($this->determineSigningKey(), $passphrase);
-        $signature = $this->gpg->sign($body, Crypt_GPG::SIGN_MODE_DETACHED);
+        $signature = $this->gpg->sign($body, \Crypt_GPG::SIGN_MODE_DETACHED);
         $this->signature = $signature;
         $part = new PGPSignedPart(
             $messagePart,
@@ -142,8 +146,8 @@ class PGPEncrypter
     }
 
     /**
-     * @throws Crypt_GPG_Exception
-     * @throws Crypt_GPG_KeyNotFoundException
+     * @throws \Crypt_GPG_Exception
+     * @throws \Crypt_GPG_KeyNotFoundException
      */
     private function attachPublicKey(Message $message): MixedPart
     {
@@ -159,7 +163,7 @@ class PGPEncrypter
         $recipients = [
             $this->getAddresses('to'),
             $this->getAddresses('cc'),
-            $this->getAddresses('bcc')
+            $this->getAddresses('bcc'),
         ];
 
         return array_merge(...$recipients);
@@ -174,7 +178,7 @@ class PGPEncrypter
     {
         $addresses = [];
         $addressType = $this->headers->get($type);
-        if ($addressType) {
+        if ($addressType instanceof MailboxListHeader) {
             foreach ($addressType->getAddresses() as $address) {
                 $addresses[] = $address->getAddress();
             }

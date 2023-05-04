@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 
@@ -69,14 +68,17 @@ final class BackedEnumNormalizer implements NormalizerInterface, DenormalizerInt
             }
         }
 
-        if (!\is_int($data) && !\is_string($data)) {
-            throw NotNormalizableValueException::createForUnexpectedDataType('The data is neither an integer nor a string, you should pass an integer or a string that can be parsed as an enumeration case of type '.$type.'.', $data, [Type::BUILTIN_TYPE_INT, Type::BUILTIN_TYPE_STRING], $context['deserialization_path'] ?? null, true);
+        $backingType = (new \ReflectionEnum($type))->getBackingType()->getName();
+        $givenType = \get_debug_type($data);
+
+        if ($givenType !== $backingType) {
+            throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('Data expected to be "%s", "%s" given. You should pass a value that can be parsed as an enumeration case of type %s.', $backingType, $givenType, $type), $data, [$backingType], $context['deserialization_path'] ?? null, true);
         }
 
         try {
             return $type::from($data);
         } catch (\ValueError $e) {
-            throw new InvalidArgumentException('The data must belong to a backed enumeration of type '.$type);
+            throw NotNormalizableValueException::createForUnexpectedDataType('The data must belong to a backed enumeration of type '.$type, $data, [$backingType], $context['deserialization_path'] ?? null, true);
         }
     }
 

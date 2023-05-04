@@ -232,6 +232,28 @@ class PropertyNormalizerTest extends TestCase
         $this->assertEquals('bar', $obj->getBar());
     }
 
+    public function testConstructorDenormalizeWithInvalidArguments()
+    {
+        $obj = $this->normalizer->denormalize(
+            ['foo' => 'foo', 'bar' => 'bar'],
+            PropertyConstructorWithValidationDummy::class,
+            null,
+            ['create_instance_without_constructor' => true]
+        );
+        $this->assertSame('foo', $obj->getFoo());
+        $this->assertSame('bar', $obj->getBar());
+    }
+
+    public function testThatExceptionIsThrownWithInvalidArgumentsWithDefaulltConfiguration()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectErrorMessage(sprintf('Argument "%s" is not acceptable as first argument of "%s"', 'foo', PropertyConstructorWithValidationDummy::class));
+        $this->normalizer->denormalize(
+            ['foo' => 'foo', 'bar' => 'bar'],
+            PropertyConstructorWithValidationDummy::class
+        );
+    }
+
     protected function getNormalizerForCallbacks(): PropertyNormalizer
     {
         return new PropertyNormalizer();
@@ -549,6 +571,34 @@ class PropertyConstructorDummy
 
     public function __construct($foo, $bar)
     {
+        $this->foo = $foo;
+        $this->bar = $bar;
+    }
+
+    public function getFoo()
+    {
+        return $this->foo;
+    }
+
+    public function getBar()
+    {
+        return $this->bar;
+    }
+}
+
+class PropertyConstructorWithValidationDummy
+{
+    protected $foo;
+    private $bar;
+
+    public function __construct($foo, $bar)
+    {
+        if ('foo' === $foo) {
+            throw new \LogicException(sprintf('Argument "%s" is not acceptable as first argument of "%s"', $foo, self::class));
+        }
+        if ('bar' === $bar) {
+            throw new \LogicException(sprintf('Argument "%s" is not acceptable as second argument of "%s"', $bar, self::class));
+        }
         $this->foo = $foo;
         $this->bar = $bar;
     }

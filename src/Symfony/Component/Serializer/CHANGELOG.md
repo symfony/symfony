@@ -51,6 +51,7 @@ CHANGELOG
 
  * Remove `ArrayDenormalizer::setSerializer()`, call `setDenormalizer()` instead
  * Remove the ability to create instances of the annotation classes by passing an array of parameters, use named arguments instead
+ * Add support for denormalizing objects without using constructor
 
 5.4
 ---

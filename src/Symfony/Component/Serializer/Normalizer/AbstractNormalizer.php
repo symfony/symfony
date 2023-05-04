@@ -80,6 +80,11 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     public const DEFAULT_CONSTRUCTOR_ARGUMENTS = 'default_constructor_arguments';
 
     /**
+     * Force to create new instance without using constructor.
+     */
+    public const CREATE_INSTANCE_WITHOUT_CONSTRUCTOR = 'create_instance_without_constructor';
+
+    /**
      * Hashmap of field name => callable to (de)normalize this field.
      *
      * The callable is called if the field is encountered with the arguments:
@@ -327,7 +332,12 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
 
         $constructor = $this->getConstructor($data, $class, $context, $reflectionClass, $allowedAttributes);
         if ($constructor) {
-            if (true !== $constructor->isPublic()) {
+            $createInstanceWithoutConstructor = (
+                !$constructor->isPublic()
+                || (
+                    $context[self::CREATE_INSTANCE_WITHOUT_CONSTRUCTOR] ?? $this->defaultContext[self::CREATE_INSTANCE_WITHOUT_CONSTRUCTOR] ?? false)
+                );
+            if ($createInstanceWithoutConstructor) {
                 return $reflectionClass->newInstanceWithoutConstructor();
             }
 

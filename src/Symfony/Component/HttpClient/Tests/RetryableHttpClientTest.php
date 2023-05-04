@@ -344,4 +344,45 @@ class RetryableHttpClientTest extends TestCase
         self::assertSame(200, $response->getStatusCode());
         self::assertSame('http://example.com/d/foo-bar', $response->getInfo('url'));
     }
+
+    public function testMaxRetriesOption()
+    {
+        $client = new RetryableHttpClient(
+            new MockHttpClient([
+                new MockResponse('', ['http_code' => 500]),
+                new MockResponse('', ['http_code' => 502]),
+                new MockResponse('', ['http_code' => 200]),
+            ]),
+            new GenericRetryStrategy([500, 502], 0),
+            3
+        );
+
+        $response = $client->request('GET', 'http://example.com/foo-bar', [
+            'max_retries' => 1,
+        ]);
+
+        self::assertSame(502, $response->getStatusCode());
+    }
+
+    public function testMaxRetriesWithOptions()
+    {
+        $client = new RetryableHttpClient(
+            new MockHttpClient([
+                new MockResponse('', ['http_code' => 500]),
+                new MockResponse('', ['http_code' => 502]),
+                new MockResponse('', ['http_code' => 504]),
+                new MockResponse('', ['http_code' => 200]),
+            ]),
+            new GenericRetryStrategy([500, 502, 504], 0),
+            3
+        );
+
+        $client = $client->withOptions([
+            'max_retries' => 2,
+        ]);
+
+        $response = $client->request('GET', 'http://example.com/foo-bar');
+
+        self::assertSame(504, $response->getStatusCode());
+    }
 }

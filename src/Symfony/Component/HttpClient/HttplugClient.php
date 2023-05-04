@@ -40,7 +40,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
 if (!interface_exists(HttpAsyncClient::class)) {
-    throw new \LogicException('You cannot use "Symfony\Component\HttpClient\HttplugClient" as the "php-http/httplug" package is not installed. Try running "php-http/discovery php-http/async-client-implementation:*".');
+    throw new \LogicException('You cannot use "Symfony\Component\HttpClient\HttplugClient" as the "php-http/httplug" package is not installed. Try running "composer require php-http/discovery php-http/async-client-implementation:*".');
 }
 
 if (!interface_exists(RequestFactoryInterface::class)) {

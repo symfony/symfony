@@ -40,6 +40,7 @@
         "symfony/translation": "^5.4|^6.0",
         "symfony/translation-contracts": "^1.1|^2|^3",
         "symfony/uid": "^5.4|^6.0",
+        "symfony/var-exporter": "^6.2",
         "psr/cache": "^1.0|^2.0|^3.0",
         "twig/twig": "^2.13|^3.0.4"
     },

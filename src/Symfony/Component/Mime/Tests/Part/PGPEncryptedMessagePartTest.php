@@ -9,14 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Tests\Part;
+namespace Symfony\Component\Mime\Tests\Part;
 
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Part\PGPEncryptedMessagePart;
 
-#[CoversClass(PGPEncryptedMessagePart::class)]
-final class PGPEncryptedMessagePartTest extends TestCase
+class PGPEncryptedMessagePartTest extends TestCase
 {
     public function testPGPEncryptedMessagePart()
     {

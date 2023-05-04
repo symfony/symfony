@@ -11,11 +11,9 @@
 
 namespace Symfony\Component\Mime\Tests\Part\Multipart;
 
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Part\Multipart\PGPEncryptedPart;
 
-#[CoversClass(PGPEncryptedPart::class)]
 final class PGPEncryptedPartTest extends TestCase
 {
     public function testPGPEncryptedPart()

@@ -11,12 +11,10 @@
 
 namespace Symfony\Component\Mime\Tests\Part;
 
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Part\PGPKeyPart;
 
-#[CoversClass(PGPKeyPart::class)]
-final class PGPKeyPartTest extends TestCase
+class PGPKeyPartTest extends TestCase
 {
     public function testPGPKeyPartWithStandardKeyName()
     {

@@ -11,12 +11,10 @@
 
 namespace Symfony\Component\Mime\Tests\Part;
 
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Part\PGPEncryptedInitializationPart;
 
-#[CoversClass(PGPEncryptedInitializationPart::class)]
-final class PGPEncryptedInitializationPartTest extends TestCase
+class PGPEncryptedInitializationPartTest extends TestCase
 {
     public function testPGPEncryptedInitializationPart()
     {

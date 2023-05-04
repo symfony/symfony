@@ -11,12 +11,10 @@
 
 namespace Symfony\Component\Mime\Tests\Part;
 
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Part\PGPSignaturePart;
 
-#[CoversClass(PGPSignaturePart::class)]
-final class PGPSignaturePartTest extends TestCase
+class PGPSignaturePartTest extends TestCase
 {
     public function testPGPSignaturePart()
     {

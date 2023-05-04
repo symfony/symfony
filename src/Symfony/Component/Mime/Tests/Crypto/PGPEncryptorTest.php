@@ -11,14 +11,12 @@
 
 namespace Symfony\Component\Mime\Tests\Crypto;
 
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Crypto\PGPEncrypter;
 use Symfony\Component\Mime\Email;
 
-#[CoversClass(PGPEncrypter::class)]
-final class PGPEncryptorTest extends TestCase
+class PGPEncryptorTest extends TestCase
 {
     private \Crypt_GPG $gpg;
 
@@ -30,7 +28,7 @@ final class PGPEncryptorTest extends TestCase
     {
         parent::setUp();
         $this->gpg = new \Crypt_GPG();
-        $this->gpg->importKeyFile(__DIR__ . '/../_data/pgp.asc');
+        $this->gpg->importKeyFile(__DIR__.'/../_data/pgp.asc');
         $this->email = (new Email())
             ->from(new Address('pgp@pulli.dev', 'PuLLi'))
             ->to(new Address('pgp@pulli.dev', 'PuLLi'))

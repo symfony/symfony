@@ -41,6 +41,7 @@ class XmlEncoderContextBuilderTest extends TestCase
             ->withEncoding($values[XmlEncoder::ENCODING])
             ->withFormatOutput($values[XmlEncoder::FORMAT_OUTPUT])
             ->withLoadOptions($values[XmlEncoder::LOAD_OPTIONS])
+            ->withSaveOptions($values[XmlEncoder::SAVE_OPTIONS])
             ->withRemoveEmptyTags($values[XmlEncoder::REMOVE_EMPTY_TAGS])
             ->withRootNodeName($values[XmlEncoder::ROOT_NODE_NAME])
             ->withStandalone($values[XmlEncoder::STANDALONE])
@@ -63,6 +64,7 @@ class XmlEncoderContextBuilderTest extends TestCase
             XmlEncoder::ENCODING => 'UTF-8',
             XmlEncoder::FORMAT_OUTPUT => false,
             XmlEncoder::LOAD_OPTIONS => \LIBXML_COMPACT,
+            XmlEncoder::SAVE_OPTIONS => \LIBXML_NOERROR,
             XmlEncoder::REMOVE_EMPTY_TAGS => true,
             XmlEncoder::ROOT_NODE_NAME => 'root',
             XmlEncoder::STANDALONE => false,
@@ -77,6 +79,7 @@ class XmlEncoderContextBuilderTest extends TestCase
             XmlEncoder::ENCODING => null,
             XmlEncoder::FORMAT_OUTPUT => null,
             XmlEncoder::LOAD_OPTIONS => null,
+            XmlEncoder::SAVE_OPTIONS => null,
             XmlEncoder::REMOVE_EMPTY_TAGS => null,
             XmlEncoder::ROOT_NODE_NAME => null,
             XmlEncoder::STANDALONE => null,

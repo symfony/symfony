@@ -55,6 +55,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberOne;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberTwo;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyObjectWithEnumConstructor;
+use Symfony\Component\Serializer\Tests\Fixtures\DummyObjectWithEnumProperty;
 use Symfony\Component\Serializer\Tests\Fixtures\FalseBuiltInDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\NormalizableTraversableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Php74Full;
@@ -1208,7 +1209,48 @@ class SerializerTest extends TestCase
         $this->assertSame($expected, $exceptionsAsArray);
     }
 
-    public function testNoCollectDenormalizationErrorsWithWrongEnum()
+    public function testCollectDenormalizationErrorsWithWrongPropertyWithoutConstruct()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
+        $reflectionExtractor = new ReflectionExtractor();
+        $propertyInfoExtractor = new PropertyInfoExtractor([], [$reflectionExtractor], [], [], []);
+
+        $serializer = new Serializer(
+            [
+                new BackedEnumNormalizer(),
+                new ObjectNormalizer($classMetadataFactory, null, null, $propertyInfoExtractor),
+            ],
+            ['json' => new JsonEncoder()]
+        );
+
+        try {
+            $serializer->deserialize('{"get": "POST"}', DummyObjectWithEnumProperty::class, 'json', [
+                 DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true,
+             ]);
+        } catch (\Throwable $e) {
+            $this->assertInstanceOf(PartialDenormalizationException::class, $e);
+        }
+
+        $exceptionsAsArray = array_map(function (NotNormalizableValueException $e): array {
+            return [
+                'currentType' => $e->getCurrentType(),
+                'useMessageForUser' => $e->canUseMessageForUser(),
+                'message' => $e->getMessage(),
+            ];
+        }, $e->getErrors());
+
+        $expected = [
+            [
+                'currentType' => 'string',
+                'useMessageForUser' => true,
+                'message' => 'The data must belong to a backed enumeration of type Symfony\Component\Serializer\Tests\Fixtures\StringBackedEnumDummy',
+            ],
+        ];
+
+        $this->assertSame($expected, $exceptionsAsArray);
+    }
+
+    public function testNoCollectDenormalizationErrorsWithWrongEnumOnConstructor()
     {
         $serializer = new Serializer(
             [
@@ -1219,7 +1261,7 @@ class SerializerTest extends TestCase
         );
 
         try {
-            $serializer->deserialize('{"get": "invalid"}', DummyObjectWithEnumConstructor::class, 'json', [
+            $serializer->deserialize('{"get": "POST"}', DummyObjectWithEnumConstructor::class, 'json', [
                 DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true,
             ]);
         } catch (\Throwable $th) {

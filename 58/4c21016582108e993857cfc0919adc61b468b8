@@ -1,0 +1,240 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-02-28T07:17:06Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.3 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by christian-kolb at 2023-02-28T07:43:47Z
+
+I don't think the last failed test run had anything to do with this PR. The first time the unit tests run through (only the Psalm run was cancelled) and the only change made afterwards was in the CHANGELOG.md.
+
+---------------------------------------------------------------------------
+
+by christian-kolb at 2023-03-01T07:58:39Z
+
+@dunglas The history says that I removed a request for you to review the PR. I don' think I did any I don't even think it's possible for me to do so. In any way I can't request a new one. Is this part of the normal process? Sorry, for the stupid questions, it's my first contribution.
+
+---------------------------------------------------------------------------
+
+by christian-kolb at 2023-03-03T10:31:28Z
+
+@maxbeckers @dunglas This is my first PR. The status is now reviewed. What is left to do for the PR to be merged? Anything I can help with? 🙂
+
+---------------------------------------------------------------------------
+
+by maxbeckers at 2023-03-03T10:36:26Z
+
+@christian-kolb no todos for you ... will be reviewed and merged as soon as possible
+
+---------------------------------------------------------------------------
+
+by christian-kolb at 2023-04-24T07:40:47Z
+
+@mtarld @maxbeckers Sorry to bother you guys. I'm getting worried about whether this pull request is getting merged as the 6.3 Milestone is very close now. Who is responsible for merging the PRs and will do this? 🙂
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-04-24T18:06:06Z
+
+i tend to believe for this signature:
+
+```php
+    public function __construct(
+        public string $name,
+        public ?int $costsInCent,
+    ) {
+    }
+```
+
+`null` is something you'd have to expect, thus a safe default
+
+to me it hints a `NotNull` constraint might be missing, or simply drop the nullability
+
+what should be doable is detecting uninitialized (aka not given) without using constructor promotion:
+
+```
+final class Product
+{
+    public string $name;
+    public ?int $requiredNullable;
+}
+```
+
+in this case you could detect "_given_" properties from initialized properties, thus `{"name": "foo"}` vs `{"name": "foo", "requiredNullable": null}` vs `{"name": "foo", "requiredNullable": 123}`
+
+---------------------------------------------------------------------------
+
+by christian-kolb at 2023-04-24T18:45:32Z
+
+@ro0NL Sorry, I don't think I understand what you want to say.
+
+> `null` is something you'd have to expect, thus a safe default
+
+That's what would still work out of the box with for example the Property Normalizer.
+
+The only thing changing through the PR is that you can supply an additional context to configure that you expect `null` to be present and throw an error when it's not supplied.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-04-24T19:06:18Z
+
+pesonally i dont see any value in enforcing `{"name": "foo", "costsInCent": null}` over `{"name": "foo"}`
+
+---------------------------------------------------------------------------
+
+by christian-kolb at 2023-04-24T19:40:59Z
+
+The value is the option to prevent bugs.
+Setting a default for a value just because it's nullable is a fallback and a little magic. For example:
+
+We have a class with the property `?int $costsInCent`. And the payload would look like this `{"costsInCent": 5000}`.
+Now I rename the property to `?int $totalCostsInCent` but forget to update the client and still send `{"costsInCent": 5000}`.
+The API will never inform me of any problems. It doesn't care that there's a payload which doesn't seem to be relevant and that there's a missing property it expects. Because it's nullable it's simply set to `null`.
+
+This could be covered by more tests, more validation, ... but all of those are then just replacements for the missing control I would also already have with typing.
+
+Personally I think the current behaviour is to loose. There is a concept for missing properties and that's optional values. That could also be typed like `?int $costsInCent = null`. But I get the fallback and the default and don't mind that. I just would like the option to increase the strictness when necessary.
+
+In the end the discussion about this is the same as with using typing or not.
+
+I have had exactly the problems described here multiple times in multiple projects. So this is just a way to eliminate one bug category 🙂
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-04-24T20:38:29Z
+
+Right! What about something similar like forms do: https://symfony.com/doc/current/reference/forms/types/form.html#allow-extra-fields
+
+---------------------------------------------------------------------------
+
+by christian-kolb at 2023-04-25T05:33:18Z
+
+That's an awesome idea. That would fix the second part of my example I didn't even think to solve yet.
+
+The two problems in my example are:
+
+1) There is a value for a property expected, that isn't supplied
+2) There is an additional value supplied, that is not needed on the current object level
+
+**There is a value for a property expected, that isn't supplied**
+
+This could happen through:
+
+- A client not implementing a new endpoint correctly.
+- A client renaming something without changing the endpoint.
+- A client not implementing a new property.
+
+It would be more likely to catch those issues when an endpoint is only used in one place, but it's possible that it's used in for example 5 places in the client but only adapted in 4 of them. Which becomes more relevant, when we're not talking about properties on the first level, but the second or third what we might have with value objects (I'm using those a lot).
+
+**There is an additional value supplied, that is not needed on the current object level**
+
+This could happen through:
+
+- A client not implementing a new endpoint correctly.
+- A client renaming something without changing the endpoint.
+
+---
+
+And we must not forget that the serializer is not just used for client / API combinations. I for example use it also as part of custom doctrine types to store and retrieve value objects in JSON. Or to return read models directly from custom queries (again with multiple levels of object structures) or to dump and retrieve aggregates in an event sourcing context for snapshotting.
+
+This pull requests solves the first of the described problems. I'm not sure if the Serializer structure allowed for an `allow_extra_fields` configuration, as it's based primarily on the data it would denormalize (at least I think it is). But I will look into it and supply a separate pull request to solve the second batch of problems. Thanks for the input 🙂
+
+---------------------------------------------------------------------------
+
+by christian-kolb at 2023-05-04T07:11:55Z
+
+@chalasr @nicolas-grekas Sorry to bother you. It's my first contribution to Symfony and I don't know how to get this merged. I'm hanging here for two months. Could you please help me here or point me to someone who can?
+
+---------------------------------------------------------------------------
+
+by christian-kolb at 2023-05-05T06:39:50Z
+
+> The implementation looks good to me. I'm not sure about the name of the option though. Maybe `FORCE_PASS_ALL_PROPS`? Or `NO_DEFAULT_VALUES`?
+
+@dunglas Thanks for the additional approval. I'm not 100% about the naming myself. But I don't think your suggestions are better. `FORCE_PASS_ALL_PROPS` looks more like the `allow_extra_fields` idea from the last comment which I would like to supply as a separate PR and I would interpret `NO_DEFAULT_VALUES` as the a flag that would ignore property defaults like`bool $isEnabled = true`. It took me an hour just to land on `PREVENT_NULLABLE_FALLBACK`.
+
+My thoughts where:
+
+- It has to change the default behaviour (that does something special). (`prevent`)
+- It only applies to nullable properties. (`nullable`)
+- It only happens when they are not supplied. (`fallback`)
+
+It would be way easier with the nullable fallback being the default 🙂
+
+What just came to mind: Would it be reasonable to switch the logic. So that the default of the context is `true` and only with it the fallback would be used? Then I could change the name to `ALLOW_NULLABLE_FALLBACK`. This could then be set to `false` to have the same result. But it would also kind of question the default used now and I'm not sure it can go this far.
+
+I really don't want to make it miss the 6.3 milestone because of it. Anyone around who could bless that change?
+
+---------------------------------------------------------------------------
+
+by christian-kolb at 2023-05-05T07:04:11Z
+
+@dunglas Ok, sorry scratch that. The flags have to be provided specifically and there is not a single context flag that works like that. So that's no way ether. Still happy to hear other namings 🙂
+
+Otherwise very happy when it would get merged 🙂
+
+---------------------------------------------------------------------------
+
+by mtarld at 2023-05-05T07:38:32Z
+
+I'd go with `ALLOW_NULLABLE_FALLBACK`, it does make sense to me indeed.
+
+---------------------------------------------------------------------------
+
+by christian-kolb at 2023-05-05T11:18:54Z
+
+@mtarld That's unfortunately not possible. That's what I meant in my last comment. `ALLOW_NULLABLE_FALLBACK` is the current behaviour. So introducing a flag wouldn't change anything. Or would change the current behaviour which would be a breaking change. And that is if the relevant people agree that the default behaviour should change.
+I don't mind introducing a second PR that targets Symfony 7 and switches the default. But it's not possible for the 6.3 to change it that way.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-05-05T11:44:14Z
+
+REQUIRE_ALL_PROPERTIES?
+STRICT_PROPERTIES?
+
+---------------------------------------------------------------------------
+
+by mtarld at 2023-05-05T11:45:54Z
+
+Sounds great yes
+
+---------------------------------------------------------------------------
+
+by christian-kolb at 2023-05-05T13:21:21Z
+
+@nicolas-grekas @mtarld Ok, then I will change it to `REQUIRE_ALL_PROPERTIES`
+
+---------------------------------------------------------------------------
+
+by christian-kolb at 2023-05-05T16:00:10Z
+
+> @nicolas-grekas @mtarld Ok, then I will change it to `REQUIRE_ALL_PROPERTIES`
+
+@nicolas-grekas Updated it to `REQUIRE_ALL_PROPERTIES`. The related documentation PR is also already updated.
+The test failures don't seem to be related to my changes.
+
+Anything left for me to do to get it merged and released with 6.3? 🙂

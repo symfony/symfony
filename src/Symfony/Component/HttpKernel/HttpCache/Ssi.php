@@ -64,10 +64,7 @@ class Ssi extends AbstractSurrogate
 
         // we don't use a proper XML parser here as we can have SSI tags in a plain text response
         $content = $response->getContent();
-
-        static $cookie;
-        $cookie = hash('md5', $cookie ?? $cookie = random_bytes(16), true);
-        $boundary = base64_encode($cookie);
+        $boundary = self::generateBodyEvalBoundary();
         $chunks = preg_split('#<!--\#include\s+(.*?)\s*-->#', $content, -1, \PREG_SPLIT_DELIM_CAPTURE);
 
         $i = 1;

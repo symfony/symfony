@@ -267,7 +267,7 @@ class AssetMapper implements AssetMapperInterface
         if (null === $this->manifestData) {
             $path = $this->getPublicAssetsFilesystemPath().'/'.self::MANIFEST_FILE_NAME;
 
-            if (!file_exists($path)) {
+            if (!is_file($path)) {
                 $this->manifestData = [];
             } else {
                 $this->manifestData = json_decode(file_get_contents($path), true);

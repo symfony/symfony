@@ -49,6 +49,7 @@ class ImportMapManager
      */
     private const PACKAGE_PATTERN = '/^(?:https?:\/\/[\w\.-]+\/)?(?:(?<registry>\w+):)?(?<package>(?:@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*)(?:@(?<version>[\w\._-]+))?(?:(?<subpath>\/.*))?$/';
     public const IMPORT_MAP_FILE_NAME = 'importmap.json';
+    public const IMPORT_MAP_PRELOAD_FILE_NAME = 'importmap.preload.json';
 
     private array $importMapEntries;
     private array $modulesToPreload;
@@ -125,9 +126,11 @@ class ImportMapManager
             return;
         }
 
-        $dumpedPath = $this->assetMapper->getPublicAssetsFilesystemPath().'/'.self::IMPORT_MAP_FILE_NAME;
-        if (file_exists($dumpedPath)) {
-            $this->json = file_get_contents($dumpedPath);
+        $dumpedImportMapPath = $this->assetMapper->getPublicAssetsFilesystemPath().'/'.self::IMPORT_MAP_FILE_NAME;
+        $dumpedModulePreloadPath = $this->assetMapper->getPublicAssetsFilesystemPath().'/'.self::IMPORT_MAP_PRELOAD_FILE_NAME;
+        if (is_file($dumpedImportMapPath) && is_file($dumpedModulePreloadPath)) {
+            $this->json = file_get_contents($dumpedImportMapPath);
+            $this->modulesToPreload = json_decode(file_get_contents($dumpedModulePreloadPath), true, 512, \JSON_THROW_ON_ERROR);
 
             return;
         }

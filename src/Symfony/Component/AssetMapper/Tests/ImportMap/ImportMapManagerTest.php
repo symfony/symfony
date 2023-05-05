@@ -84,6 +84,9 @@ class ImportMapManagerTest extends TestCase
             '@hotwired/stimulus' => 'https://unpkg.com/@hotwired/stimulus@3.2.1/dist/stimulus.js',
             'app' => '/assets/app-ea9ebe6156adc038aba53164e2be0867.js',
         ]], json_decode($manager->getImportMapJson(), true));
+        $this->assertEquals([
+            '/assets/app-ea9ebe6156adc038aba53164e2be0867.js',
+        ], $manager->getModulesToPreload());
     }
 
     /**

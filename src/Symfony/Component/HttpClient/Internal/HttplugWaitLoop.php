@@ -120,7 +120,11 @@ final class HttplugWaitLoop
 
         foreach ($response->getHeaders(false) as $name => $values) {
             foreach ($values as $value) {
-                $psrResponse = $psrResponse->withAddedHeader($name, $value);
+                try {
+                    $psrResponse = $psrResponse->withAddedHeader($name, $value);
+                } catch (\InvalidArgumentException $e) {
+                    // ignore invalid header
+                }
             }
         }
 

@@ -263,4 +263,22 @@ class HttplugClientTest extends TestCase
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('OK', (string) $response->getBody());
     }
+
+    public function testInvalidHeaderResponse()
+    {
+        $responseHeaders = [
+            // space in header name not allowed in RFC 7230
+            ' X-XSS-Protection' => '0',
+            'Cache-Control' => 'no-cache',
+        ];
+        $response = new MockResponse('body', ['response_headers' => $responseHeaders]);
+        $this->assertArrayHasKey(' x-xss-protection', $response->getHeaders());
+
+        $client = new HttplugClient(new MockHttpClient($response));
+        $request = $client->createRequest('POST', 'http://localhost:8057/post')
+            ->withBody($client->createStream('foo=0123456789'));
+
+        $resultResponse = $client->sendRequest($request);
+        $this->assertCount(1, $resultResponse->getHeaders());
+    }
 }

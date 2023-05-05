@@ -1,0 +1,77 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-03-06T01:17:45Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.3" but it seems your PR description refers to branch "6.3 for features".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-09T16:33:10Z
+
+Please add a changelog entry indeed.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-03-12T08:34:59Z
+
+It looks like your committer email is not associated with your Github account.
+
+---------------------------------------------------------------------------
+
+by kshtompel at 2023-03-15T21:51:32Z
+
+Do I need recreate PR with new email configured or can leave it as is and commit changes with update email associated with the account
+
+---------------------------------------------------------------------------
+
+by kshtompel at 2023-03-15T21:53:34Z
+
+@nicolas-grekas
+Please advise where to put CHANGELOG update.
+PR is made for version 6.3
+but I see only 6.2 CHANGELOG file latest
+
+---------------------------------------------------------------------------
+
+by kshtompel at 2023-03-23T12:16:41Z
+
+please advise how to change changelog file for the new feature
+
+---------------------------------------------------------------------------
+
+by yceruto at 2023-03-23T13:30:43Z
+
+@kshtompel you can update the changelog in this file `src/Symfony/Component/OptionsResolver/CHANGELOG.md`
+
+---------------------------------------------------------------------------
+
+by kshtompel at 2023-03-23T22:33:42Z
+
+Added CHANGELOG note for version 6.2
+
+---------------------------------------------------------------------------
+
+by kshtompel at 2023-04-04T11:37:15Z
+
+any updates so far?
+
+---------------------------------------------------------------------------
+
+by kshtompel at 2023-04-19T19:26:51Z
+
+@nicolas-grekas
+@yceruto
+do i need change something?
+
+---------------------------------------------------------------------------
+
+by kshtompel at 2023-04-27T23:10:39Z
+
+@yceruto something else here?

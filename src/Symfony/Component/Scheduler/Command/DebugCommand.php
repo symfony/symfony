@@ -69,7 +69,7 @@ final class DebugCommand extends Command
         if (!$names = $input->getArgument('schedule') ?: $this->scheduleNames) {
             $io->error('No schedules found.');
 
-            return self::FAILURE;
+            return 2;
         }
 
         foreach ($names as $name) {
@@ -88,7 +88,7 @@ final class DebugCommand extends Command
             );
         }
 
-        return self::SUCCESS;
+        return 0;
     }
 
     /**

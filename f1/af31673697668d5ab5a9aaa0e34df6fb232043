@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by tucksaun at 2023-05-04T20:13:56Z
+
+If we are ok with going forward with this, shall we support `ProxyManager` proxies given that the bridge is deprecated in 6.3?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-05-05T09:29:09Z
+
+Do we also have the issue for lazy ghosts or no ?
+
+---------------------------------------------------------------------------
+
+by tucksaun at 2023-05-05T11:51:28Z
+
+> Do we also have the issue for lazy ghosts or no ?
+
+Good question. I would say it should be. But let me check that later on today

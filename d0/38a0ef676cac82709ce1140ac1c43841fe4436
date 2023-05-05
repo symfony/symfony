@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2023-05-04T17:23:51Z
+
+is there any way to have a test covering this to prevent regressions ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-05-05T15:46:19Z
+
+I won't be able to add a test covering that because it requires an HTTPS endpoint. Of course we could add some network services, but that's going to be too time consuming to setup properly...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-05-05T15:46:58Z
+
+Of course, I would gladly accept a PR that adds the test if anyone reading is up to give it a try!

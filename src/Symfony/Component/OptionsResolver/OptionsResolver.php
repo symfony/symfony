@@ -141,6 +141,11 @@ class OptionsResolver implements Options
     private $prototypeIndex;
 
     /**
+     * Whether to ignore undefined options.
+     */
+    private bool $ignoreUndefined = false;
+
+    /**
      * Sets the default value of a given option.
      *
      * If the default value should be set based on other options, you can pass
@@ -862,7 +867,7 @@ class OptionsResolver implements Options
         $clone = clone $this;
 
         // Make sure that no unknown options are passed
-        $diff = array_diff_key($options, $clone->defined);
+        $diff = $this->ignoreUndefined ? [] : array_diff_key($options, $clone->defined);
 
         if (\count($diff) > 0) {
             ksort($clone->defined);
@@ -873,6 +878,10 @@ class OptionsResolver implements Options
 
         // Override options set by the user
         foreach ($options as $option => $value) {
+            if ($this->ignoreUndefined && !isset($clone->defined[$option])) {
+                continue;
+            }
+
             $clone->given[$option] = true;
             $clone->defaults[$option] = $value;
             unset($clone->resolved[$option], $clone->lazy[$option]);
@@ -1208,6 +1217,18 @@ class OptionsResolver implements Options
         }
 
         return \count($this->defaults);
+    }
+
+    /**
+     * Sets whether ignore undefined options.
+     *
+     * @return $this
+     */
+    public function setIgnoreUndefined(bool $ignore = true): static
+    {
+        $this->ignoreUndefined = $ignore;
+
+        return $this;
     }
 
     /**

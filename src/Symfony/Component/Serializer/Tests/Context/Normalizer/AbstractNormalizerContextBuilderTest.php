@@ -45,6 +45,7 @@ class AbstractNormalizerContextBuilderTest extends TestCase
             ->withCallbacks($values[AbstractNormalizer::CALLBACKS])
             ->withCircularReferenceHandler($values[AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER])
             ->withIgnoredAttributes($values[AbstractNormalizer::IGNORED_ATTRIBUTES])
+            ->withRequireAllProperties($values[AbstractNormalizer::REQUIRE_ALL_PROPERTIES])
             ->toArray();
 
         $this->assertEquals($values, $context);
@@ -65,6 +66,7 @@ class AbstractNormalizerContextBuilderTest extends TestCase
             AbstractNormalizer::CALLBACKS => [static function (): void {}],
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => static function (): void {},
             AbstractNormalizer::IGNORED_ATTRIBUTES => ['attribute3'],
+            AbstractNormalizer::REQUIRE_ALL_PROPERTIES => true,
         ]];
 
         yield 'With null values' => [[
@@ -77,6 +79,7 @@ class AbstractNormalizerContextBuilderTest extends TestCase
             AbstractNormalizer::CALLBACKS => null,
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => null,
             AbstractNormalizer::IGNORED_ATTRIBUTES => null,
+            AbstractNormalizer::REQUIRE_ALL_PROPERTIES => null,
         ]];
     }
 

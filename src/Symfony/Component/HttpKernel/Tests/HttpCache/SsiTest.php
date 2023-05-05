@@ -101,13 +101,15 @@ class SsiTest extends TestCase
         $response = new Response('foo <!--#include virtual="..." -->');
         $ssi->process($request, $response);
 
-        $this->assertEquals('foo <?php echo $this->surrogate->handle($this, \'...\', \'\', false) ?>'."\n", $response->getContent());
+        $content = explode(substr($response->getContent(), 0, 24), $response->getContent());
+        $this->assertSame(['', 'foo ', "...\n\n\n", ''], $content);
         $this->assertEquals('SSI', $response->headers->get('x-body-eval'));
 
         $response = new Response('foo <!--#include virtual="foo\'" -->');
         $ssi->process($request, $response);
 
-        $this->assertEquals("foo <?php echo \$this->surrogate->handle(\$this, 'foo\\'', '', false) ?>\n", $response->getContent());
+        $content = explode(substr($response->getContent(), 0, 24), $response->getContent());
+        $this->assertSame(['', 'foo ', "foo'\n\n\n", ''], $content);
     }
 
     public function testProcessEscapesPhpTags()
@@ -118,7 +120,8 @@ class SsiTest extends TestCase
         $response = new Response('<?php <? <% <script language=php>');
         $ssi->process($request, $response);
 
-        $this->assertEquals('<?php echo "<?"; ?>php <?php echo "<?"; ?> <?php echo "<%"; ?> <?php echo "<s"; ?>cript language=php>', $response->getContent());
+        $content = explode(substr($response->getContent(), 0, 24), $response->getContent());
+        $this->assertSame(['', '<?php <? <% <script language=php>', ''], $content);
     }
 
     public function testProcessWhenNoSrcInAnSsi()

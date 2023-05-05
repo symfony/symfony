@@ -85,7 +85,7 @@ EOH
         if ($input->getOption('debug')) {
             $this->tailDebugLog($commandName, $output);
 
-            return self::SUCCESS;
+            return 0;
         }
 
         $shell = $input->getArgument('shell') ?? self::guessShell();
@@ -102,12 +102,12 @@ EOH
                 $output->writeln(sprintf('<error>Shell not detected, Symfony shell completion only supports "%s").</>', implode('", "', $supportedShells)));
             }
 
-            return self::INVALID;
+            return 2;
         }
 
         $output->write(str_replace(['{{ COMMAND_NAME }}', '{{ VERSION }}'], [$commandName, $this->getApplication()->getVersion()], file_get_contents($completionFile)));
 
-        return self::SUCCESS;
+        return 0;
     }
 
     private static function guessShell(): string

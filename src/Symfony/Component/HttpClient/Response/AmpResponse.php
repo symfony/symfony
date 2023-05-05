@@ -47,7 +47,6 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
 
     private AmpClientState $multi;
     private ?array $options;
-    private CancellationTokenSource $canceller;
     private \Closure $onProgress;
 
     private static ?string $delay = null;
@@ -71,7 +70,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
 
         $info = &$this->info;
         $headers = &$this->headers;
-        $canceller = $this->canceller = new CancellationTokenSource();
+        $canceller = new CancellationTokenSource();
         $handle = &$this->handle;
 
         $info['url'] = (string) $request->getUri();

@@ -29,6 +29,8 @@ use Symfony\Component\HttpKernel\TerminableInterface;
  */
 class HttpCache implements HttpKernelInterface, TerminableInterface
 {
+    public const BODY_EVAL_BOUNDARY_LENGTH = 24;
+
     private HttpKernelInterface $kernel;
     private StoreInterface $store;
     private Request $request;
@@ -636,26 +638,22 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     private function restoreResponseBody(Request $request, Response $response): void
     {
         if ($response->headers->has('X-Body-Eval')) {
+            \assert(self::BODY_EVAL_BOUNDARY_LENGTH === 24);
+
             ob_start();
 
-            if ($response->headers->has('X-Body-File')) {
-                include $response->headers->get('X-Body-File');
-            } else {
-                $content = $response->getContent();
+            $content = $response->getContent();
+            $boundary = substr($content, 0, 24);
+            $j = strpos($content, $boundary, 24);
+            echo substr($content, 24, $j - 24);
+            $i = $j + 24;
 
-                if (substr($content, -24) === $boundary = substr($content, 0, 24)) {
-                    $j = strpos($content, $boundary, 24);
-                    echo substr($content, 24, $j - 24);
-                    $i = $j + 24;
+            while (false !== $j = strpos($content, $boundary, $i)) {
+                [$uri, $alt, $ignoreErrors, $part] = explode("\n", substr($content, $i, $j - $i), 4);
+                $i = $j + 24;
 
-                    while (false !== $j = strpos($content, $boundary, $i)) {
-                        [$uri, $alt, $ignoreErrors, $part] = explode("\n", substr($content, $i, $j - $i), 4);
-                        $i = $j + 24;
-
-                        echo $this->surrogate->handle($this, $uri, $alt, $ignoreErrors);
-                        echo $part;
-                    }
-                }
+                echo $this->surrogate->handle($this, $uri, $alt, $ignoreErrors);
+                echo $part;
             }
 
             $response->setContent(ob_get_clean());

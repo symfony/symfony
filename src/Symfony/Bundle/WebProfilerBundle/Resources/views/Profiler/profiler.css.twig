@@ -1637,42 +1637,6 @@ tr.status-warning td {
     display: block;
 }
 
-{# Filters
-   ========================================================================= #}
-[data-filters] { position: relative; }
-[data-filtered] { cursor: pointer; }
-[data-filtered]:after { content: '\00a0\25BE'; }
-[data-filtered]:hover .filter-list li { display: inline-flex; }
-[class*="filter-hidden-"] { display: none; }
-.filter-list { position: absolute; border: var(--border); box-shadow: var(--shadow); margin: 0; padding: 0; display: flex; flex-direction: column; }
-.filter-list :after { content: ''; }
-.filter-list li {
-    background: var(--tab-disabled-background);
-    border-bottom: var(--border);
-    color: var(--tab-disabled-color);
-    display: none;
-    list-style: none;
-    margin: 0;
-    padding: 5px 10px;
-    text-align: left;
-    font-weight: normal;
-}
-.filter-list li.active {
-    background: var(--tab-background);
-    color: var(--tab-color);
-}
-.filter-list li.last-active {
-    background: var(--tab-active-background);
-    color: var(--tab-active-color);
-}
-
-.filter-list-level li { cursor: s-resize; }
-.filter-list-level li.active { cursor: n-resize; }
-.filter-list-level li.last-active { cursor: default; }
-.filter-list-level li.last-active:before { content: '\2714\00a0'; }
-.filter-list-choice li:before { content: '\2714\00a0'; color: transparent; }
-.filter-list-choice li.active:before { color: unset; }
-
 {# Twig panel
    ========================================================================= #}
 #twig-dump pre {

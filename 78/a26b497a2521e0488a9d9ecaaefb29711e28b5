@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-05-03T06:53:16Z
+
+#50198 was a new feature so it is only available on the 6.3 branch :sweat_smile:
+
+I looked for a way to test this and it seems we have to update `WebProfilerBundleKernel` to allow configuring the debug mode.

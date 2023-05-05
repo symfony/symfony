@@ -80,9 +80,7 @@ class Esi extends AbstractSurrogate
         $content = preg_replace('#<esi\:remove>.*?</esi\:remove>#s', '', $content);
         $content = preg_replace('#<esi\:comment[^>]+>#s', '', $content);
 
-        static $cookie;
-        $cookie = hash('md5', $cookie ?? $cookie = random_bytes(16), true);
-        $boundary = base64_encode($cookie);
+        $boundary = self::generateBodyEvalBoundary();
         $chunks = preg_split('#<esi\:include\s+(.*?)\s*(?:/|</esi\:include)>#', $content, -1, \PREG_SPLIT_DELIM_CAPTURE);
 
         $i = 1;

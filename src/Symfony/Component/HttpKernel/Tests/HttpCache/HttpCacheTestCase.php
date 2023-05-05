@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\HttpCache\HttpCache;
 use Symfony\Component\HttpKernel\HttpCache\Store;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class HttpCacheTestCase extends TestCase
+abstract class HttpCacheTestCase extends TestCase
 {
     protected $kernel;
     protected $cache;

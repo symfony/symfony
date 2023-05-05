@@ -454,6 +454,44 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
         );
     }
 
+    public function testSubscribersAreSkippedIfListenerDefinedForSameDefinition()
+    {
+        $container = $this->createBuilder();
+
+        $container
+            ->register('a', 'stdClass')
+            ->setPublic(false)
+            ->addTag('doctrine.event_listener', [
+                'event' => 'bar',
+                'priority' => 3,
+            ])
+        ;
+        $container
+            ->register('b', 'stdClass')
+            ->setPublic(false)
+            ->addTag('doctrine.event_listener', [
+                'event' => 'bar',
+            ])
+            ->addTag('doctrine.event_listener', [
+                'event' => 'foo',
+                'priority' => -5,
+            ])
+            ->addTag('doctrine.event_subscriber')
+        ;
+        $this->process($container);
+
+        $eventManagerDef = $container->getDefinition('doctrine.dbal.default_connection.event_manager');
+
+        $this->assertEquals(
+            [
+                [['bar'], 'a'],
+                [['bar'], 'b'],
+                [['foo'], 'b'],
+            ],
+            $eventManagerDef->getArgument(1)
+        );
+    }
+
     public function testProcessNoTaggedServices()
     {
         $container = $this->createBuilder(true);

@@ -138,6 +138,7 @@ class AssetMapper implements AssetMapperInterface
             $asset->setSourcePath($filePath);
 
             $asset->setMimeType($this->getMimeType($logicalPath));
+            $asset->setPublicPathWithoutDigest($this->getPublicPathWithoutDigest($logicalPath));
             $publicPath = $this->getPublicPath($logicalPath);
             $asset->setPublicPath($publicPath);
             [$digest, $isPredigested] = $this->getDigest($asset);
@@ -202,6 +203,11 @@ class AssetMapper implements AssetMapperInterface
         }, $logicalPath);
     }
 
+    private function getPublicPathWithoutDigest(string $logicalPath): string
+    {
+        return $this->publicPrefix.$logicalPath;
+    }
+
     public static function isPathPredigested(string $path): bool
     {
         return 1 === preg_match(self::PREDIGESTED_REGEX, $path);
@@ -239,11 +245,7 @@ class AssetMapper implements AssetMapperInterface
 
         $extension = pathinfo($logicalPath, \PATHINFO_EXTENSION);
 
-        if (!isset($this->extensionsMap[$extension])) {
-            throw new \LogicException(sprintf('The file extension "%s" from "%s" does not correspond to any known types in the asset mapper. To support this extension, configure framework.asset_mapper.extensions.', $extension, $logicalPath));
-        }
-
-        return $this->extensionsMap[$extension];
+        return $this->extensionsMap[$extension] ?? null;
     }
 
     private function calculateContent(MappedAsset $asset): string

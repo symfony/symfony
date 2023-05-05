@@ -54,7 +54,7 @@ class Ssi extends AbstractSurrogate
         $content = $response->getContent();
 
         static $cookie;
-        $cookie = hash('md5', $cookie ?? $cookie = random_bytes(16), true);
+        $cookie = hash('xxh128', $cookie ??= random_bytes(16), true);
         $boundary = base64_encode($cookie);
         $chunks = preg_split('#<!--\#include\s+(.*?)\s*-->#', $content, -1, \PREG_SPLIT_DELIM_CAPTURE);
 

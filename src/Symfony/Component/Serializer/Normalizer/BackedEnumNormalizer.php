@@ -52,7 +52,11 @@ final class BackedEnumNormalizer implements NormalizerInterface, DenormalizerInt
         try {
             return $type::from($data);
         } catch (\ValueError $e) {
-            throw new InvalidArgumentException('The data must belong to a backed enumeration of type '.$type);
+            if (isset($context['has_constructor'])) {
+                throw new InvalidArgumentException('The data must belong to a backed enumeration of type '.$type);
+            }
+
+            throw NotNormalizableValueException::createForUnexpectedDataType('The data must belong to a backed enumeration of type '.$type, $data, [$type], $context['deserialization_path'] ?? null, true, 0, $e);
         }
     }
 

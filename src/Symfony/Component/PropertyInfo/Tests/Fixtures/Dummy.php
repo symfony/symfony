@@ -99,6 +99,16 @@ class Dummy extends ParentDummy
     public $nullableCollectionOfNonNullableElements;
 
     /**
+     * @var array<null|int>
+     */
+    public $nonNullableCollectionOfNullableElements;
+
+    /**
+     * @var null|array<int|string>
+     */
+    public $nullableCollectionOfMultipleNonNullableElementTypes;
+
+    /**
      * @var array
      */
     private $xTotals;

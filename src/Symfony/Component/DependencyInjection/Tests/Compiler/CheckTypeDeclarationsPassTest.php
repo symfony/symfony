@@ -23,6 +23,7 @@ use Symfony\Component\DependencyInjection\Exception\InvalidParameterTypeExceptio
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Bar;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\BarErroredDependency;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\BarMethodCall;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\BarOptionalArgument;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\BarOptionalArgumentNotNull;
@@ -1007,6 +1008,20 @@ class CheckTypeDeclarationsPassTest extends TestCase
             ]);
 
         (new CheckTypeDeclarationsPass())->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testErroredDefinitionsAreNotChecked()
+    {
+        $container = new ContainerBuilder();
+        $container->register('errored_dependency', BarErroredDependency::class)
+            ->setArguments([
+                (new Definition(Foo::class))
+                    ->addError('error'),
+            ]);
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
 
         $this->addToAssertionCount(1);
     }

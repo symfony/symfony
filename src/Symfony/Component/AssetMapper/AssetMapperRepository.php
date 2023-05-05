@@ -55,7 +55,7 @@ class AssetMapperRepository
 
             $file = rtrim($path, '/').'/'.$localLogicalPath;
             if (file_exists($file)) {
-                return $file;
+                return realpath($file);
             }
         }
 
@@ -64,17 +64,24 @@ class AssetMapperRepository
 
     public function findLogicalPath(string $filesystemPath): ?string
     {
+        if (!is_file($filesystemPath)) {
+            return null;
+        }
+
+        $filesystemPath = realpath($filesystemPath);
+
         foreach ($this->getDirectories() as $path => $namespace) {
             if (!str_starts_with($filesystemPath, $path)) {
                 continue;
             }
 
             $logicalPath = substr($filesystemPath, \strlen($path));
+
             if ('' !== $namespace) {
-                $logicalPath = $namespace.'/'.$logicalPath;
+                $logicalPath = $namespace.'/'.ltrim($logicalPath, '/\\');
             }
 
-            return ltrim($logicalPath, '/');
+            return $this->normalizeLogicalPath($logicalPath);
         }
 
         return null;
@@ -100,11 +107,20 @@ class AssetMapperRepository
                 /** @var RecursiveDirectoryIterator $innerIterator */
                 $innerIterator = $iterator->getInnerIterator();
                 $logicalPath = ($namespace ? rtrim($namespace, '/').'/' : '').$innerIterator->getSubPathName();
+                $logicalPath = $this->normalizeLogicalPath($logicalPath);
                 $paths[$logicalPath] = $file->getPathname();
             }
         }
 
         return $paths;
+    }
+
+    /**
+     * @internal
+     */
+    public function allDirectories(): array
+    {
+        return $this->getDirectories();
     }
 
     private function getDirectories(): array
@@ -120,13 +136,13 @@ class AssetMapperRepository
                 if (!file_exists($path)) {
                     throw new \InvalidArgumentException(sprintf('The asset mapper directory "%s" does not exist.', $path));
                 }
-                $this->absolutePaths[$path] = $namespace;
+                $this->absolutePaths[realpath($path)] = $namespace;
 
                 continue;
             }
 
             if (file_exists($this->projectRootDir.'/'.$path)) {
-                $this->absolutePaths[$this->projectRootDir.'/'.$path] = $namespace;
+                $this->absolutePaths[realpath($this->projectRootDir.'/'.$path)] = $namespace;
 
                 continue;
             }
@@ -135,5 +151,13 @@ class AssetMapperRepository
         }
 
         return $this->absolutePaths;
+    }
+
+    /**
+     * Normalize slashes to / for logical paths.
+     */
+    private function normalizeLogicalPath(string $logicalPath): string
+    {
+        return ltrim(str_replace('\\', '/', $logicalPath), '/\\');
     }
 }

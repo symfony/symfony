@@ -92,12 +92,12 @@ final class CachePoolInvalidateTagsCommand extends Command
         if ($errors) {
             $io->error('Done but with errors.');
 
-            return self::FAILURE;
+            return 2;
         }
 
         $io->success('Successfully invalidated cache tags.');
 
-        return self::SUCCESS;
+        return 0;
     }
 
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void

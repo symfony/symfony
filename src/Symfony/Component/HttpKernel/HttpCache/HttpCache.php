@@ -619,7 +619,21 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             if ($response->headers->has('X-Body-File')) {
                 include $response->headers->get('X-Body-File');
             } else {
-                eval('; ?>'.$response->getContent().'<?php ;');
+                $content = $response->getContent();
+
+                if (substr($content, -24) === $boundary = substr($content, 0, 24)) {
+                    $j = strpos($content, $boundary, 24);
+                    echo substr($content, 24, $j - 24);
+                    $i = $j + 24;
+
+                    while (false !== $j = strpos($content, $boundary, $i)) {
+                        [$uri, $alt, $ignoreErrors, $part] = explode("\n", substr($content, $i, $j - $i), 4);
+                        $i = $j + 24;
+
+                        echo $this->surrogate->handle($this, $uri, $alt, $ignoreErrors);
+                        echo $part;
+                    }
+                }
             }
 
             $response->setContent(ob_get_clean());

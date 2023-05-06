@@ -103,6 +103,15 @@ abstract class AnnotationLoaderTestCase extends TestCase
         $this->assertEquals(new PropertyPath('[three][four]'), $attributesMetadata['seven']->getSerializedPath());
     }
 
+    public function testLoadSerializedPathInConstructor()
+    {
+        $classMetadata = new ClassMetadata($this->getNamespace().'\SerializedPathInConstructorDummy');
+        $this->loader->loadClassMetadata($classMetadata);
+
+        $attributesMetadata = $classMetadata->getAttributesMetadata();
+        $this->assertEquals(new PropertyPath('[one][two]'), $attributesMetadata['three']->getSerializedPath());
+    }
+
     public function testLoadClassMetadataAndMerge()
     {
         $classMetadata = new ClassMetadata($this->getNamespace().'\GroupDummy');

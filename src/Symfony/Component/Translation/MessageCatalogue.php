@@ -32,6 +32,15 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     public function __construct(string $locale, array $messages = [])
     {
         $this->locale = $locale;
+        foreach ($messages as $domain => $domainMessages) {
+            foreach ($domainMessages as $key => $message) {
+                if (null === $message) {
+                    unset($messages[$domain][$key]);
+                } else {
+                    $messages[$domain][$key] = (string) $message;
+                }
+            }
+        }
         $this->messages = $messages;
     }
 
@@ -157,8 +166,12 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     {
         $altDomain = str_ends_with($domain, self::INTL_DOMAIN_SUFFIX) ? substr($domain, 0, -\strlen(self::INTL_DOMAIN_SUFFIX)) : $domain.self::INTL_DOMAIN_SUFFIX;
         foreach ($messages as $id => $message) {
-            unset($this->messages[$altDomain][$id]);
-            $this->messages[$domain][$id] = $message;
+            if (null === $message) {
+                unset($this->messages[$domain][$id]);
+            } else {
+                unset($this->messages[$altDomain][$id]);
+                $this->messages[$domain][$id] = (string) $message;
+            }
         }
 
         if ([] === ($this->messages[$altDomain] ?? null)) {

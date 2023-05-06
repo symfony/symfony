@@ -118,6 +118,20 @@ class MessageCatalogueTest extends TestCase
         $this->assertEquals('bar', $catalogue->get('foo', 'domain88'));
     }
 
+    public function testAddWithNonStringMessages()
+    {
+        $catalogue = new MessageCatalogue('en', [
+            'domain1' => ['foo' => 'foo', 'bar' => new StringableObject('bar'), 'baz' => null],
+        ]);
+        $this->assertSame(['foo' => 'foo', 'bar' => 'bar'], $catalogue->all('domain1'));
+
+        $catalogue->add(['foo1' => 'foo1', 'bar1' => new StringableObject('bar1'), 'baz1' => null], 'domain1');
+        $this->assertSame(['foo' => 'foo', 'bar' => 'bar', 'foo1' => 'foo1', 'bar1' => 'bar1'], $catalogue->all('domain1'));
+
+        $catalogue->add(['bar' => null, 'bar1' => null], 'domain1');
+        $this->assertSame(['foo' => 'foo', 'foo1' => 'foo1'], $catalogue->all('domain1'));
+    }
+
     public function testAddIntlIcu()
     {
         $catalogue = new MessageCatalogue('en', ['domain1+intl-icu' => ['foo' => 'foo']]);
@@ -269,5 +283,20 @@ class MessageCatalogueTest extends TestCase
 
         $cat1->addCatalogue($cat2);
         $this->assertEquals(['messages' => ['a' => 'b'], 'domain' => ['b' => 'c']], $cat1->getMetadata('', ''), 'Cat1 contains merged metadata.');
+    }
+}
+
+class StringableObject
+{
+    public $value;
+
+    public function __construct(string $value)
+    {
+        $this->value = $value;
+    }
+
+    public function __toString(): string
+    {
+        return $this->value;
     }
 }

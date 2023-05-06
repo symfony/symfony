@@ -20,7 +20,7 @@
         "composer-runtime-api": ">=2.1",
         "symfony/config": "^6.1",
         "symfony/dependency-injection": "^6.1",
-        "symfony/twig-bridge": "^6.2",
+        "symfony/twig-bridge": "^6.3",
         "symfony/http-foundation": "^5.4|^6.0",
         "symfony/http-kernel": "^6.2",
         "twig/twig": "^2.13|^3.0.4"

@@ -155,12 +155,11 @@ class HttpClientTraitTest extends TestCase
 
     public static function provideNormalizeBodyMultipartForwardStream()
     {
-        yield 'native' => [fopen('https://github.githubassets.com/images/icons/emoji/unicode/1f44d.png', 'r')];
-
-        if (!\defined('OPENSSL_DEFAULT_STREAM_CIPHERS')) {
-            return;
+        if (!\extension_loaded('openssl')) {
+            throw self::markTestSkipped('Extension openssl required.');
         }
 
+        yield 'native' => [fopen('https://github.githubassets.com/images/icons/emoji/unicode/1f44d.png', 'r')];
         yield 'symfony' => [HttpClient::create()->request('GET', 'https://github.githubassets.com/images/icons/emoji/unicode/1f44d.png')->toStream()];
     }
 

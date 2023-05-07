@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocator as ArgumentServiceLocator;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireCallable;
 use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
@@ -283,6 +284,35 @@ class PhpDumperTest extends TestCase
             $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
         }
         $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/services9_inlined_factories.txt', $dump);
+    }
+
+    public function testDumpAsFilesWithFactoriesInlinedWithTaggedIterator()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('foo', FooClass::class)
+            ->addMethodCall('setOtherInstances', [new TaggedIteratorArgument('foo')])
+            ->setShared(false)
+            ->setPublic(true);
+
+        $container
+            ->register('Bar', 'Bar')
+            ->addTag('foo');
+
+        $container
+            ->register('stdClass', '\stdClass')
+            ->addTag('foo');
+
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'build_time' => 1563381341, 'inline_factories' => true, 'inline_class_loader' => true]), true);
+
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
+        }
+
+        $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/services9_inlined_factories_with_tagged_iterrator.txt', $dump);
     }
 
     public function testDumpAsFilesWithLazyFactoriesInlined()

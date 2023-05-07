@@ -173,6 +173,8 @@ services:
         public: true
     errored_definition:
         class: stdClass
+        tags:
+            - container.error: { message: 'Service "errored_definition" is broken.' }
     preload_sidekick:
         class: stdClass
         tags:

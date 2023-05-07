@@ -7,6 +7,36 @@ in 6.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.3.0...v6.3.1
 
+* 6.3.0-BETA2 (2023-05-07)
+
+ * bug #50249 [WebProfilerBundle] Explicit tab controls’ color as they can be buttons (MatTheCat)
+ * bug #50248 [TwigBundle] fixed wrong `symfony/twig-bridge` dependency version (SVillette)
+ * bug #50231 [AssetMapper] Fixing 2 bugs related to the compile command and importmaps (weaverryan)
+ * feature #49553 [Serializer] Add flag to require all properties to be listed in the input (Christian Kolb)
+ * feature #50232 [AssetMapper] Better public without digest (weaverryan)
+ * bug #50214 [WebProfilerBundle] Remove legacy filters remnants (MatTheCat)
+ * bug #50235 [HttpClient] Fix getting through proxies via CONNECT (nicolas-grekas)
+ * bug #50241 [HttpKernel] Prevent initialising lazy services during services reset (tucksaun)
+ * bug #50244 [HttpKernel] Fix restoring surrogate content from cache (nicolas-grekas)
+ * bug #50246 [DependencyInjection] Do not check errored definitions’ type (MatTheCat)
+ * bug #49557 [PropertyInfo] Fix phpDocExtractor nullable array value type (fabpot)
+ * bug #50213 [ErrorHandler] Prevent conflicts with WebProfilerBundle’s JavaScript (MatTheCat)
+ * feature #49608 [OptionsResolver] add `ignoreUndefined()` method to allow skip not interesting options (Constantine Shtompel)
+ * bug #50216 [DependencyInjection] Allow `AutowireCallable` without method (derrabus)
+ * bug #50192 [Serializer] backed enum throw notNormalizableValueException outside construct method (alli83)
+ * bug #50238 [HttpKernel] Don't use eval() to render ESI/SSI (nicolas-grekas)
+ * bug #50224 [DoctrineBridge] skip subscriber if listener already defined (alli83)
+ * bug #50218 Profiler respect stateless attribute (alamirault)
+ * bug #50242 [ErrorHandler] Fix the design of the exception page tabs (javiereguiluz)
+ * feature #50219 [AssetMapper] Adding debug:assetmap command + normalize paths (weaverryan)
+ * bug #49760 [Serializer] Add missing withSaveOptions method to XmlEncoderContextBuilder (mtarld)
+ * bug #50226 [HttpClient] Ensure HttplugClient ignores invalid HTTP headers (nicolas-grekas)
+ * bug #50125 [HttpKernel] Fix handling of `MapRequest*` attributes (nicolas-grekas)
+ * bug #50215 [AssetMapper] Fixing wrong values being output in command (weaverryan)
+ * bug #50203 [Messenger] Fix registering message handlers (nicolas-grekas)
+ * bug #50204 [ErrorHandler] Skip Httplug deprecations for HttplugClient (nicolas-grekas)
+ * bug #50206 [AssetMapper] Fix import map package parsing with an @ namespace (weaverryan)
+
 * 6.3.0-BETA1 (2023-05-01)
 
  * feature #49729 [Scheduler] Add a simple Scheduler class for when the component is used standalone (fabpot)

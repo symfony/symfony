@@ -358,7 +358,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
             }
 
             foreach ($originRequest->getRawHeaders() as [$name, $value]) {
-                $request->setHeader($name, $value);
+                $request->addHeader($name, $value);
             }
 
             if ($request->getUri()->getAuthority() !== $originRequest->getUri()->getAuthority()) {

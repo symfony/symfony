@@ -13,6 +13,7 @@ namespace Symfony\Component\AssetMapper\ImportMap;
 
 use Symfony\Component\AssetMapper\AssetDependency;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
+use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\VarExporter\VarExporter;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -57,6 +58,7 @@ class ImportMapManager
 
     public function __construct(
         private readonly AssetMapperInterface $assetMapper,
+        private readonly PublicAssetsPathResolverInterface $assetsPathResolver,
         private readonly string $importMapConfigPath,
         private readonly string $vendorDir,
         private readonly string $provider = self::PROVIDER_JSPM,
@@ -126,8 +128,8 @@ class ImportMapManager
             return;
         }
 
-        $dumpedImportMapPath = $this->assetMapper->getPublicAssetsFilesystemPath().'/'.self::IMPORT_MAP_FILE_NAME;
-        $dumpedModulePreloadPath = $this->assetMapper->getPublicAssetsFilesystemPath().'/'.self::IMPORT_MAP_PRELOAD_FILE_NAME;
+        $dumpedImportMapPath = $this->assetsPathResolver->getPublicFilesystemPath().'/'.self::IMPORT_MAP_FILE_NAME;
+        $dumpedModulePreloadPath = $this->assetsPathResolver->getPublicFilesystemPath().'/'.self::IMPORT_MAP_PRELOAD_FILE_NAME;
         if (is_file($dumpedImportMapPath) && is_file($dumpedModulePreloadPath)) {
             $this->json = file_get_contents($dumpedImportMapPath);
             $this->modulesToPreload = json_decode(file_get_contents($dumpedModulePreloadPath), true, 512, \JSON_THROW_ON_ERROR);

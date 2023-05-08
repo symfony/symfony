@@ -1271,13 +1271,6 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('asset_mapper.asset_package');
         }
 
-        $publicDirName = $this->getPublicDirectoryName($container);
-        $container->getDefinition('asset_mapper')
-            ->setArgument(3, $config['public_prefix'])
-            ->setArgument(4, $publicDirName)
-            ->setArgument(5, $config['extensions'])
-        ;
-
         $paths = $config['paths'];
         foreach ($container->getParameter('kernel.bundles_metadata') as $name => $bundle) {
             if ($container->fileExists($dir = $bundle['path'].'/Resources/public') || $container->fileExists($dir = $bundle['path'].'/public')) {
@@ -1287,11 +1280,20 @@ class FrameworkExtension extends Extension
         $container->getDefinition('asset_mapper.repository')
             ->setArgument(0, $paths);
 
+        $publicDirName = $this->getPublicDirectoryName($container);
+        $container->getDefinition('asset_mapper.public_assets_path_resolver')
+            ->setArgument(1, $config['public_prefix'])
+            ->setArgument(2, $publicDirName);
+
         $container->getDefinition('asset_mapper.command.compile')
-            ->setArgument(4, $publicDirName);
+            ->setArgument(5, $publicDirName);
 
         if (!$config['server']) {
             $container->removeDefinition('asset_mapper.dev_server_subscriber');
+        } else {
+            $container->getDefinition('asset_mapper.dev_server_subscriber')
+                ->setArgument(1, $config['public_prefix'])
+                ->setArgument(2, $config['extensions']);
         }
 
         $container->getDefinition('asset_mapper.compiler.css_asset_url_compiler')
@@ -1302,9 +1304,9 @@ class FrameworkExtension extends Extension
 
         $container
             ->getDefinition('asset_mapper.importmap.manager')
-            ->replaceArgument(1, $config['importmap_path'])
-            ->replaceArgument(2, $config['vendor_dir'])
-            ->replaceArgument(3, $config['provider'])
+            ->replaceArgument(2, $config['importmap_path'])
+            ->replaceArgument(3, $config['vendor_dir'])
+            ->replaceArgument(4, $config['provider'])
         ;
 
         $container

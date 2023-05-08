@@ -14,6 +14,7 @@ namespace Symfony\Component\AssetMapper\Command;
 use Symfony\Component\AssetMapper\AssetMapper;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
+use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
@@ -35,6 +36,7 @@ use Symfony\Component\Filesystem\Filesystem;
 final class AssetMapperCompileCommand extends Command
 {
     public function __construct(
+        private readonly PublicAssetsPathResolverInterface $publicAssetsPathResolver,
         private readonly AssetMapperInterface $assetMapper,
         private readonly ImportMapManager $importMapManager,
         private readonly Filesystem $filesystem,
@@ -66,28 +68,28 @@ EOT
             throw new InvalidArgumentException(sprintf('The public directory "%s" does not exist.', $publicDir));
         }
 
-        $outputDir = $publicDir.$this->assetMapper->getPublicPrefix();
+        $outputDir = $this->publicAssetsPathResolver->getPublicFilesystemPath();
         if ($input->getOption('clean')) {
             $io->comment(sprintf('Cleaning <info>%s</info>', $outputDir));
             $this->filesystem->remove($outputDir);
             $this->filesystem->mkdir($outputDir);
         }
 
-        $manifestPath = $publicDir.$this->assetMapper->getPublicPrefix().AssetMapper::MANIFEST_FILE_NAME;
+        $manifestPath = $outputDir.'/'.AssetMapper::MANIFEST_FILE_NAME;
         if (is_file($manifestPath)) {
             $this->filesystem->remove($manifestPath);
         }
         $manifest = $this->createManifestAndWriteFiles($io, $publicDir);
         $this->filesystem->dumpFile($manifestPath, json_encode($manifest, \JSON_PRETTY_PRINT));
-        $io->comment(sprintf('Manifest written to <info>%s</info>', $manifestPath));
+        $io->comment(sprintf('Manifest written to <info>%s</info>', $this->shortenPath($manifestPath)));
 
-        $importMapPath = $outputDir.ImportMapManager::IMPORT_MAP_FILE_NAME;
+        $importMapPath = $outputDir.'/'.ImportMapManager::IMPORT_MAP_FILE_NAME;
         if (is_file($importMapPath)) {
             $this->filesystem->remove($importMapPath);
         }
         $this->filesystem->dumpFile($importMapPath, $this->importMapManager->getImportMapJson());
 
-        $importMapPreloadPath = $outputDir.ImportMapManager::IMPORT_MAP_PRELOAD_FILE_NAME;
+        $importMapPreloadPath = $outputDir.'/'.ImportMapManager::IMPORT_MAP_PRELOAD_FILE_NAME;
         if (is_file($importMapPreloadPath)) {
             $this->filesystem->remove($importMapPreloadPath);
         }
@@ -116,7 +118,7 @@ EOT
     {
         $allAssets = $this->assetMapper->allAssets();
 
-        $io->comment(sprintf('Compiling <info>%d</info> assets to <info>%s%s</info>', \count($allAssets), $publicDir, $this->assetMapper->getPublicPrefix()));
+        $io->comment(sprintf('Compiling <info>%d</info> assets to <info>%s%s</info>', \count($allAssets), $publicDir, $this->publicAssetsPathResolver->resolvePublicPath('')));
         $manifest = [];
         foreach ($allAssets as $asset) {
             // $asset->getPublicPath() will start with a "/"

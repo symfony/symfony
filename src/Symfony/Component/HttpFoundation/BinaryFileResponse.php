@@ -310,7 +310,7 @@ class BinaryFileResponse extends Response
             }
 
             $length = $this->maxlen;
-            while ($length && !feof($file)) {
+            while ($length && !feof($file) && !connection_aborted()) {
                 $read = $length > $this->chunkSize || 0 > $length ? $this->chunkSize : $length;
 
                 if (false === $data = fread($file, $read)) {

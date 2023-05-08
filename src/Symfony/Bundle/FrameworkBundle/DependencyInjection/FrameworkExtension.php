@@ -32,6 +32,7 @@ use Symfony\Bundle\FullStack;
 use Symfony\Bundle\MercureBundle\MercureBundle;
 use Symfony\Component\Asset\PackageInterface;
 use Symfony\Component\AssetMapper\AssetMapper;
+use Symfony\Component\AssetMapper\Compiler\AssetCompilerInterface;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
@@ -559,6 +560,8 @@ class FrameworkExtension extends Extension
 
         $container->registerForAutoconfiguration(PackageInterface::class)
             ->addTag('assets.package');
+        $container->registerForAutoconfiguration(AssetCompilerInterface::class)
+            ->addTag('asset_mapper.compiler');
         $container->registerForAutoconfiguration(Command::class)
             ->addTag('console.command');
         $container->registerForAutoconfiguration(ResourceCheckerInterface::class)

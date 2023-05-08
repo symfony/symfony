@@ -214,6 +214,12 @@ abstract class FileLoader extends BaseFileLoader
     {
         $this->container->removeBindings($id);
 
+        foreach ($definition->getTag('container.error') as $error) {
+            if (isset($error['message'])) {
+                $definition->addError($error['message']);
+            }
+        }
+
         if ($this->isLoadingInstanceof) {
             if (!$definition instanceof ChildDefinition) {
                 throw new InvalidArgumentException(sprintf('Invalid type definition "%s": ChildDefinition expected, "%s" given.', $id, get_debug_type($definition)));

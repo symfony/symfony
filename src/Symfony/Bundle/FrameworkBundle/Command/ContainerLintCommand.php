@@ -88,8 +88,6 @@ final class ContainerLintCommand extends Command
                 return $this->buildContainer();
             }, $kernel, $kernel::class);
             $container = $buildContainer();
-
-            $skippedIds = [];
         } else {
             if (!$kernelContainer instanceof Container) {
                 throw new RuntimeException(sprintf('This command does not support the application container: "%s" does not extend "%s".', get_debug_type($kernelContainer), Container::class));
@@ -100,13 +98,6 @@ final class ContainerLintCommand extends Command
             $refl = new \ReflectionProperty($parameterBag, 'resolved');
             $refl->setValue($parameterBag, true);
 
-            $skippedIds = [];
-            foreach ($container->getServiceIds() as $serviceId) {
-                if (str_starts_with($serviceId, '.errored.')) {
-                    $skippedIds[$serviceId] = true;
-                }
-            }
-
             $container->getCompilerPassConfig()->setBeforeOptimizationPasses([]);
             $container->getCompilerPassConfig()->setOptimizationPasses([]);
             $container->getCompilerPassConfig()->setBeforeRemovingPasses([]);
@@ -115,7 +106,7 @@ final class ContainerLintCommand extends Command
         $container->setParameter('container.build_hash', 'lint_container');
         $container->setParameter('container.build_id', 'lint_container');
 
-        $container->addCompilerPass(new CheckTypeDeclarationsPass(true, $skippedIds), PassConfig::TYPE_AFTER_REMOVING, -100);
+        $container->addCompilerPass(new CheckTypeDeclarationsPass(true), PassConfig::TYPE_AFTER_REMOVING, -100);
 
         return $this->containerBuilder = $container;
     }

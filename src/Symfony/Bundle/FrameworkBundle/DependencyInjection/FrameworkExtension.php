@@ -376,13 +376,12 @@ class FrameworkExtension extends Extension
 
             $this->registerSerializerConfiguration($config['serializer'], $container, $loader);
         } else {
-            $container->register('.argument_resolver.request_payload.no_serializer', Serializer::class)
+            $container->getDefinition('argument_resolver.request_payload')
+                ->setArguments([])
                 ->addError('You can neither use "#[MapRequestPayload]" nor "#[MapQueryString]" since the Serializer component is not '
                     .(class_exists(Serializer::class) ? 'enabled. Try setting "framework.serializer" to true.' : 'installed. Try running "composer require symfony/serializer-pack".')
-                );
-
-            $container->getDefinition('argument_resolver.request_payload')
-                ->replaceArgument(0, new Reference('.argument_resolver.request_payload.no_serializer', ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE))
+                )
+                ->addTag('container.error')
                 ->clearTag('kernel.event_subscriber');
 
             $container->removeDefinition('console.command.serializer_debug');

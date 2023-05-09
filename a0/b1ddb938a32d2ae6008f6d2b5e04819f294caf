@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-05-08T09:15:57Z
+
+In #50260, I improved a bit the way to register errored definition. Can you please have a look?
+
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2023-05-09T14:52:35Z
+
+Thanks for the review and the tip about #50260 ! I've added a check on `serializer.enabled`.

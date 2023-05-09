@@ -47,6 +47,10 @@ final class AmpHttpClient implements HttpClientInterface, LoggerAwareInterface, 
     use HttpClientTrait;
     use LoggerAwareTrait;
 
+    public const OPTIONS_DEFAULTS = HttpClientInterface::OPTIONS_DEFAULTS + [
+        'crypto_method' => \STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT,
+    ];
+
     private array $defaultOptions = self::OPTIONS_DEFAULTS;
     private static array $emptyDefaults = self::OPTIONS_DEFAULTS;
     private AmpClientState $multi;

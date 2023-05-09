@@ -16,6 +16,7 @@ use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Response\StreamableInterface;
 use Symfony\Component\HttpClient\Response\StreamWrapper;
 use Symfony\Component\Mime\MimeTypes;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * Provides the common logic from writing HttpClientInterface implementations.
@@ -114,6 +115,15 @@ trait HttpClientTrait
 
         if (isset($options['peer_fingerprint'])) {
             $options['peer_fingerprint'] = self::normalizePeerFingerprint($options['peer_fingerprint']);
+        }
+
+        if (isset($options['crypto_method']) && !\in_array($options['crypto_method'], [
+            \STREAM_CRYPTO_METHOD_TLSv1_0_CLIENT,
+            \STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT,
+            \STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT,
+            \STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT,
+        ], true)) {
+            throw new InvalidArgumentException('Option "crypto_method" must be one of "STREAM_CRYPTO_METHOD_TLSv1_*_CLIENT".');
         }
 
         // Validate on_progress

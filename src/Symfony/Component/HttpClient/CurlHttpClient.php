@@ -36,6 +36,10 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
 {
     use HttpClientTrait;
 
+    public const OPTIONS_DEFAULTS = HttpClientInterface::OPTIONS_DEFAULTS + [
+        'crypto_method' => \STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT,
+    ];
+
     private array $defaultOptions = self::OPTIONS_DEFAULTS + [
         'auth_ntlm' => null, // array|string - an array containing the username as first value, and optionally the
                              //   password as the second one; or string like username:password - enabling NTLM auth
@@ -116,6 +120,12 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             \CURLOPT_SSLKEY => $options['local_pk'],
             \CURLOPT_KEYPASSWD => $options['passphrase'],
             \CURLOPT_CERTINFO => $options['capture_peer_cert_chain'],
+            \CURLOPT_SSLVERSION => match ($options['crypto_method']) {
+                \STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT => \CURL_SSLVERSION_TLSv1_3,
+                \STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT => \CURL_SSLVERSION_TLSv1_2,
+                \STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT => \CURL_SSLVERSION_TLSv1_1,
+                \STREAM_CRYPTO_METHOD_TLSv1_0_CLIENT => \CURL_SSLVERSION_TLSv1_0,
+            },
         ];
 
         if (1.0 === (float) $options['http_version']) {

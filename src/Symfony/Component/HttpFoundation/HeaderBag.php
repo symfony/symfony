@@ -63,7 +63,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      *
      * @param string|null $key The name of the headers to return or null to get them all
      *
-     * @return array<string, array<int, string|null>>|array<int, string|null>
+     * @return array<string, list<string|null>>|list<string|null>
      */
     public function all(string $key = null): array
     {

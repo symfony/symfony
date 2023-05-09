@@ -5,3 +5,7 @@ CHANGELOG
 -----
 
  * Added the bridge
+
+6.3.0
+----
+* renamed from Sendinblue to Brevo

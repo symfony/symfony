@@ -1,20 +1,20 @@
-Sendinblue Bridge
+Brevo Bridge - formerly Sendinblue
 =================
 
-Provides Sendinblue integration for Symfony Mailer.
+Provides Brevo integration for Symfony Mailer.
 
 Configuration example:
 
 ```env
 # SMTP
-MAILER_DSN=sendinblue+smtp://USERNAME:PASSWORD@default
+MAILER_DSN=brevo+smtp://USERNAME:PASSWORD@default
 
 # API
-MAILER_DSN=sendinblue+api://KEY@default
+MAILER_DSN=brevo+api://KEY@default
 ```
 
 where:
- - `KEY` is your Sendinblue API Key
+ - `KEY` is your Brevo API Key
 
 With API, you can use custom headers.
 
@@ -44,7 +44,7 @@ This example allow you to set :
     * sender.ip
     * X-Mailin-Custom
 
-For more informations, you can refer to [Sendinblue API documentation](https://developers.sendinblue.com/reference#sendtransacemail).
+For more informations, you can refer to [Brevo API documentation](https://developers.brevo.com/reference/getting-started-1#sendtransacemail).
 
 Resources
 ---------

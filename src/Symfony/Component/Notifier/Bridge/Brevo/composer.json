@@ -1,8 +1,8 @@
 {
-    "name": "symfony/sendinblue-notifier",
+    "name": "symfony/brevo-notifier",
     "type": "symfony-notifier-bridge",
-    "description": "Symfony Sendinblue Notifier Bridge",
-    "keywords": ["sms", "sendinblue", "notifier"],
+    "description": "Symfony brevo Notifier Bridge",
+    "keywords": ["sms", "brevo", "notifier"],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
@@ -21,7 +21,7 @@
         "symfony/notifier": "^6.2.7"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Sendinblue\\": "" },
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Brevo\\": "" },
         "exclude-from-classmap": [
             "/Tests/"
         ]

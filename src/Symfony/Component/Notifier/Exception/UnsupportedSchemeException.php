@@ -188,9 +188,9 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Sendberry\SendberryTransportFactory::class,
             'package' => 'symfony/sendberry-notifier',
         ],
-        'sendinblue' => [
-            'class' => Bridge\Sendinblue\SendinblueTransportFactory::class,
-            'package' => 'symfony/sendinblue-notifier',
+        'brevo' => [
+            'class' => Bridge\Brevo\BrevoTransportFactory::class,
+            'package' => 'symfony/brevo-notifier',
         ],
         'simpletextin' => [
             'class' => Bridge\SimpleTextin\SimpleTextinTransportFactory::class,

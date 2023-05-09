@@ -1,7 +1,7 @@
 {
-    "name": "symfony/sendinblue-mailer",
+    "name": "symfony/brevo-mailer",
     "type": "symfony-mailer-bridge",
-    "description": "Symfony Sendinblue Mailer Bridge",
+    "description": "Symfony Brevo Mailer Bridge",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",
@@ -26,7 +26,7 @@
         "symfony/mime": "<6.2"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\Mailer\\Bridge\\Sendinblue\\": "" },
+        "psr-4": { "Symfony\\Component\\Mailer\\Bridge\\Brevo\\": "" },
         "exclude-from-classmap": [
             "/Tests/"
         ]

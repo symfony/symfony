@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Mailer\Bridge\Sendinblue\Transport;
+namespace Symfony\Component\Mailer\Bridge\Brevo\Transport;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
@@ -30,7 +30,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @author Yann LUCAS
  */
-final class SendinblueApiTransport extends AbstractApiTransport
+final class BrevoApiTransport extends AbstractApiTransport
 {
     private string $key;
 
@@ -43,7 +43,7 @@ final class SendinblueApiTransport extends AbstractApiTransport
 
     public function __toString(): string
     {
-        return sprintf('sendinblue+api://%s', $this->getEndpoint());
+        return sprintf('brevo+api://%s', $this->getEndpoint());
     }
 
     protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface
@@ -61,7 +61,7 @@ final class SendinblueApiTransport extends AbstractApiTransport
         } catch (DecodingExceptionInterface) {
             throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $statusCode), $response);
         } catch (TransportExceptionInterface $e) {
-            throw new HttpTransportException('Could not reach the remote Sendinblue server.', $response, 0, $e);
+            throw new HttpTransportException('Could not reach the remote Brevo server.', $response, 0, $e);
         }
 
         if (201 !== $statusCode) {
@@ -180,6 +180,6 @@ final class SendinblueApiTransport extends AbstractApiTransport
 
     private function getEndpoint(): ?string
     {
-        return ($this->host ?: 'api.sendinblue.com').($this->port ? ':'.$this->port : '');
+        return ($this->host ?: 'api.brevo.com').($this->port ? ':'.$this->port : '');
     }
 }

@@ -122,7 +122,7 @@ return static function (ContainerConfigurator $container) {
             ->parent('notifier.transport_factory.abstract')
             ->tag('texter.transport_factory')
 
-        ->set('notifier.transport_factory.sendinblue', Bridge\Sendinblue\SendinblueTransportFactory::class)
+        ->set('notifier.transport_factory.brevo', Bridge\Brevo\BrevoTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')
             ->tag('texter.transport_factory')
 

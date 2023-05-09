@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Mailer\Bridge\Sendinblue\Transport;
+namespace Symfony\Component\Mailer\Bridge\Brevo\Transport;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
@@ -18,11 +18,11 @@ use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 /**
  * @author Yann LUCAS
  */
-final class SendinblueSmtpTransport extends EsmtpTransport
+final class BrevoSmtpTransport extends EsmtpTransport
 {
     public function __construct(string $username, #[\SensitiveParameter] string $password, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
-        parent::__construct('smtp-relay.sendinblue.com', 465, true, $dispatcher, $logger);
+        parent::__construct('smtp-relay.brevo.com', 465, true, $dispatcher, $logger);
 
         $this->setUsername($username);
         $this->setPassword($password);

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Mailer\Bridge\Sendinblue\Transport;
+namespace Symfony\Component\Mailer\Bridge\Brevo\Transport;
 
 use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 use Symfony\Component\Mailer\Transport\AbstractTransportFactory;
@@ -19,22 +19,22 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
 /**
  * @author Yann LUCAS
  */
-final class SendinblueTransportFactory extends AbstractTransportFactory
+final class BrevoTransportFactory extends AbstractTransportFactory
 {
     public function create(Dsn $dsn): TransportInterface
     {
         if (!\in_array($dsn->getScheme(), $this->getSupportedSchemes(), true)) {
-            throw new UnsupportedSchemeException($dsn, 'sendinblue', $this->getSupportedSchemes());
+            throw new UnsupportedSchemeException($dsn, 'brevo', $this->getSupportedSchemes());
         }
 
         switch ($dsn->getScheme()) {
             default:
-            case 'sendinblue':
-            case 'sendinblue+smtp':
-                $transport = SendinblueSmtpTransport::class;
+            case 'brevo':
+            case 'brevo+smtp':
+                $transport = BrevoSmtpTransport::class;
                 break;
-            case 'sendinblue+api':
-                return (new SendinblueApiTransport($this->getUser($dsn), $this->client, $this->dispatcher, $this->logger))
+            case 'brevo+api':
+                return (new BrevoApiTransport($this->getUser($dsn), $this->client, $this->dispatcher, $this->logger))
                     ->setHost('default' === $dsn->getHost() ? null : $dsn->getHost())
                     ->setPort($dsn->getPort())
                 ;
@@ -45,6 +45,6 @@ final class SendinblueTransportFactory extends AbstractTransportFactory
 
     protected function getSupportedSchemes(): array
     {
-        return ['sendinblue', 'sendinblue+smtp', 'sendinblue+api'];
+        return ['brevo', 'brevo+smtp', 'brevo+api'];
     }
 }

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Notifier\Bridge\Sendinblue;
+namespace Symfony\Component\Notifier\Bridge\Brevo;
 
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
@@ -24,9 +24,9 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Pierre Tondereau <pierre.tondereau@gmail.com>
  */
-final class SendinblueTransport extends AbstractTransport
+final class BrevoTransport extends AbstractTransport
 {
-    protected const HOST = 'api.sendinblue.com';
+    protected const HOST = 'api.brevo.com';
 
     private string $apiKey;
     private string $sender;
@@ -41,7 +41,7 @@ final class SendinblueTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('sendinblue://%s?sender=%s', $this->getEndpoint(), $this->sender);
+        return sprintf('brevo://%s?sender=%s', $this->getEndpoint(), $this->sender);
     }
 
     public function supports(MessageInterface $message): bool
@@ -71,7 +71,7 @@ final class SendinblueTransport extends AbstractTransport
         try {
             $statusCode = $response->getStatusCode();
         } catch (TransportExceptionInterface $e) {
-            throw new TransportException('Could not reach the remote Sendinblue server.', $response, 0, $e);
+            throw new TransportException('Could not reach the remote Brevo server.', $response, 0, $e);
         }
 
         if (201 !== $statusCode) {

@@ -56,9 +56,9 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Sendgrid\Transport\SendgridTransportFactory::class,
             'package' => 'symfony/sendgrid-mailer',
         ],
-        'sendinblue' => [
-            'class' => Bridge\Sendinblue\Transport\SendinblueTransportFactory::class,
-            'package' => 'symfony/sendinblue-mailer',
+        'brevo' => [
+            'class' => Bridge\Brevo\Transport\BrevoTransportFactory::class,
+            'package' => 'symfony/brevo-mailer',
         ],
         'ses' => [
             'class' => Bridge\Amazon\Transport\SesTransportFactory::class,

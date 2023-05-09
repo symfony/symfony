@@ -71,7 +71,7 @@ final class Transport
         Bridge\RingCentral\RingCentralTransportFactory::class,
         Bridge\RocketChat\RocketChatTransportFactory::class,
         Bridge\Sendberry\SendberryTransportFactory::class,
-        Bridge\Sendinblue\SendinblueTransportFactory::class,
+        Bridge\Brevo\BrevoTransportFactory::class,
         Bridge\SimpleTextin\SimpleTextinTransportFactory::class,
         Bridge\Sinch\SinchTransportFactory::class,
         Bridge\Slack\SlackTransportFactory::class,

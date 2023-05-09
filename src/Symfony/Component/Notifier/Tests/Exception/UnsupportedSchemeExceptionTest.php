@@ -69,7 +69,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             Bridge\RingCentral\RingCentralTransportFactory::class => false,
             Bridge\RocketChat\RocketChatTransportFactory::class => false,
             Bridge\Sendberry\SendberryTransportFactory::class => false,
-            Bridge\Sendinblue\SendinblueTransportFactory::class => false,
+            Bridge\Brevo\BrevoTransportFactory::class => false,
             Bridge\SimpleTextin\SimpleTextinTransportFactory::class => false,
             Bridge\Sinch\SinchTransportFactory::class => false,
             Bridge\Slack\SlackTransportFactory::class => false,
@@ -142,7 +142,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['ringcentral', 'symfony/ring-central-notifier'];
         yield ['rocketchat', 'symfony/rocket-chat-notifier'];
         yield ['sendberry', 'symfony/sendberry-notifier'];
-        yield ['sendinblue', 'symfony/sendinblue-notifier'];
+        yield ['brevo', 'symfony/brevo-notifier'];
         yield ['simpletextin', 'symfony/simple-textin-notifier'];
         yield ['sinch', 'symfony/sinch-notifier'];
         yield ['slack', 'symfony/slack-notifier'];

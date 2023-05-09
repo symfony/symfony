@@ -9,40 +9,40 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Notifier\Bridge\Sendinblue\Tests;
+namespace Symfony\Component\Notifier\Bridge\Brevo\Tests;
 
-use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransportFactory;
+use Symfony\Component\Notifier\Bridge\Brevo\BrevoTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 
-final class SendinblueTransportFactoryTest extends TransportFactoryTestCase
+final class BrevoTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function createFactory(): SendinblueTransportFactory
+    public function createFactory(): BrevoTransportFactory
     {
-        return new SendinblueTransportFactory();
+        return new BrevoTransportFactory();
     }
 
     public static function createProvider(): iterable
     {
         yield [
-            'sendinblue://host.test?sender=0611223344',
-            'sendinblue://apiKey@host.test?sender=0611223344',
+            'brevo://host.test?sender=0611223344',
+            'brevo://apiKey@host.test?sender=0611223344',
         ];
     }
 
     public static function supportsProvider(): iterable
     {
-        yield [true, 'sendinblue://apiKey@default?sender=0611223344'];
+        yield [true, 'brevo://apiKey@default?sender=0611223344'];
         yield [false, 'somethingElse://apiKey@default?sender=0611223344'];
     }
 
     public static function incompleteDsnProvider(): iterable
     {
-        yield 'missing api_key' => ['sendinblue://default?sender=0611223344'];
+        yield 'missing api_key' => ['brevo://default?sender=0611223344'];
     }
 
     public static function missingRequiredOptionProvider(): iterable
     {
-        yield 'missing option: sender' => ['sendinblue://apiKey@host.test'];
+        yield 'missing option: sender' => ['brevo://apiKey@host.test'];
     }
 
     public static function unsupportedSchemeProvider(): iterable

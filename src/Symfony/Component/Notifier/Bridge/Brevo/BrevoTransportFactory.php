@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Notifier\Bridge\Sendinblue;
+namespace Symfony\Component\Notifier\Bridge\Brevo;
 
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
@@ -18,14 +18,14 @@ use Symfony\Component\Notifier\Transport\Dsn;
 /**
  * @author Pierre Tondereau <pierre.tondereau@protonmail.com>
  */
-final class SendinblueTransportFactory extends AbstractTransportFactory
+final class BrevoTransportFactory extends AbstractTransportFactory
 {
-    public function create(Dsn $dsn): SendinblueTransport
+    public function create(Dsn $dsn): BrevoTransport
     {
         $scheme = $dsn->getScheme();
 
-        if ('sendinblue' !== $scheme) {
-            throw new UnsupportedSchemeException($dsn, 'sendinblue', $this->getSupportedSchemes());
+        if ('brevo' !== $scheme) {
+            throw new UnsupportedSchemeException($dsn, 'brevo', $this->getSupportedSchemes());
         }
 
         $apiKey = $this->getUser($dsn);
@@ -33,11 +33,11 @@ final class SendinblueTransportFactory extends AbstractTransportFactory
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
-        return (new SendinblueTransport($apiKey, $sender, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+        return (new BrevoTransport($apiKey, $sender, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }
 
     protected function getSupportedSchemes(): array
     {
-        return ['sendinblue'];
+        return ['brevo'];
     }
 }

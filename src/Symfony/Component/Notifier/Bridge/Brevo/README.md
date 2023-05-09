@@ -1,20 +1,20 @@
-Sendinblue Notifier
+Brevo Notifier - formerly Sendinblue
 ===================
 
-Provides [Sendinblue](https://sendinblue.com) integration for Symfony Notifier.
+Provides [Brevo](https://brevo.com) integration for Symfony Notifier.
 
 DSN example
 -----------
 
 ```
-SENDINBLUE_DSN=sendinblue://API_KEY@default?sender=SENDER
+BREVO_DSN=brevo://API_KEY@default?sender=SENDER
 ```
 
 where:
- - `API_KEY` is your api key from your Sendinblue account
+ - `API_KEY` is your api key from your Breco account
  - `SENDER` is your sender's phone number
 
-See more info at https://developers.sendinblue.com/reference#sendtransacsms
+See more info at https://developers.brevo.com/reference/getting-started-1#sendtransacsms
 
 Resources
 ---------

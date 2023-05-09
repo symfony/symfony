@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
-use DateTime;
-use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
@@ -311,7 +309,7 @@ class DateTimeNormalizerTest extends TestCase
     public function testDenormalizeDateTimeIntegerWithTimestampFormat()
     {
         $timestamp = time();
-        $denormalizedDate = $this->normalizer->denormalize($timestamp, \DateTimeImmutable::class, null, [DateTimeNormalizer::FORMAT_KEY => "U"]);
+        $denormalizedDate = $this->normalizer->denormalize($timestamp, \DateTimeImmutable::class, null, [DateTimeNormalizer::FORMAT_KEY => 'U']);
         $this->assertSame($timestamp, $denormalizedDate->getTimestamp());
     }
 }

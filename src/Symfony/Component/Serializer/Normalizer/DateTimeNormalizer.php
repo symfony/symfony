@@ -80,9 +80,6 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
         return $object->format($dateTimeFormat);
     }
 
-    /**
-     * @param array $context
-     */
     public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */): bool
     {
         return $data instanceof \DateTimeInterface;
@@ -96,7 +93,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
         $dateTimeFormat = $context[self::FORMAT_KEY] ?? null;
         $timezone = $this->getTimezone($context);
 
-        if (null === $data || (!\is_string($data) && !(\is_int($data) && "U" === $dateTimeFormat) ) || '' === trim($data)) {
+        if (null === $data || (!\is_string($data) && !(\is_int($data) && 'U' === $dateTimeFormat)) || '' === trim($data)) {
             throw NotNormalizableValueException::createForUnexpectedDataType('The data is either not an string, an empty string, or null; you should pass a string that can be parsed with the passed format or a valid DateTime string.', $data, [Type::BUILTIN_TYPE_STRING], $context['deserialization_path'] ?? null, true);
         }
 
@@ -131,9 +128,6 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
         }
     }
 
-    /**
-     * @param array $context
-     */
     public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */): bool
     {
         return isset(self::SUPPORTED_TYPES[$type]);

@@ -145,23 +145,31 @@ EOT;
     {
         $this->init();
 
-        $product = 'product1';
-        $price = 12.5;
-        $stock = 5;
+        $sql = <<<EOT
+INSERT INTO products(name, price, stock, picture, tags)
+VALUES (?, ?, ?, ?, ?)
+EOT;
 
-        $stmt = $this->conn->prepare('INSERT INTO products(name, price, stock) VALUES (?, ?, ?)');
+        $expectedRes = $res = $this->getResourceFromString('mydata');
+
+        $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(1, $product);
         $stmt->bindParam(2, $price);
         $stmt->bindParam(3, $stock, ParameterType::INTEGER);
+        $stmt->bindParam(4, $res, ParameterType::BINARY);
+
+        $product = 'product1';
+        $price = 12.5;
+        $stock = 5;
 
         $executeMethod($stmt);
 
         // Debug data should not be affected by these changes
         $debug = $this->debugDataHolder->getData()['default'] ?? [];
         $this->assertCount(2, $debug);
-        $this->assertSame('INSERT INTO products(name, price, stock) VALUES (?, ?, ?)', $debug[1]['sql']);
-        $this->assertSame(['product1', '12.5', 5], $debug[1]['params']);
-        $this->assertSame([ParameterType::STRING, ParameterType::STRING, ParameterType::INTEGER], $debug[1]['types']);
+        $this->assertSame($sql, $debug[1]['sql']);
+        $this->assertSame(['product1', 12.5, 5, $expectedRes], $debug[1]['params']);
+        $this->assertSame([ParameterType::STRING, ParameterType::STRING, ParameterType::INTEGER, ParameterType::BINARY], $debug[1]['types']);
         $this->assertGreaterThan(0, $debug[1]['executionMS']);
     }
 

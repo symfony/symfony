@@ -12,6 +12,7 @@
 namespace Symfony\Component\Scheduler;
 
 use Symfony\Component\Lock\LockInterface;
+use Symfony\Component\Scheduler\Exception\LogicException;
 use Symfony\Contracts\Cache\CacheInterface;
 
 /**
@@ -19,7 +20,7 @@ use Symfony\Contracts\Cache\CacheInterface;
  */
 final class Schedule implements ScheduleProviderInterface
 {
-    /** @var array<RecurringMessage> */
+    /** @var array<string,RecurringMessage> */
     private array $messages = [];
     private ?LockInterface $lock = null;
     private ?CacheInterface $state = null;
@@ -29,8 +30,13 @@ final class Schedule implements ScheduleProviderInterface
      */
     public function add(RecurringMessage $message, RecurringMessage ...$messages): static
     {
-        $this->messages[] = $message;
-        $this->messages = array_merge($this->messages, $messages);
+        foreach ([$message, ...$messages] as $m) {
+            if (isset($this->messages[$m->getId()])) {
+                throw new LogicException('Duplicated schedule message.');
+            }
+
+            $this->messages[$m->getId()] = $m;
+        }
 
         return $this;
     }
@@ -70,7 +76,7 @@ final class Schedule implements ScheduleProviderInterface
      */
     public function getRecurringMessages(): array
     {
-        return $this->messages;
+        return array_values($this->messages);
     }
 
     /**

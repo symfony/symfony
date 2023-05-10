@@ -22,6 +22,8 @@ use Symfony\Component\Scheduler\Trigger\TriggerInterface;
  */
 final class RecurringMessage
 {
+    private string $id;
+
     private function __construct(
         private readonly TriggerInterface $trigger,
         private readonly object $message,
@@ -63,6 +65,29 @@ final class RecurringMessage
     public function withJitter(int $maxSeconds = 60): self
     {
         return new self(new JitterTrigger($this->trigger, $maxSeconds), $this->message);
+    }
+
+    /**
+     * Unique identifier for this message's context.
+     */
+    public function getId(): string
+    {
+        if (isset($this->id)) {
+            return $this->id;
+        }
+
+        try {
+            $message = $this->message instanceof \Stringable ? (string) $this->message : serialize($this->message);
+        } catch (\Exception) {
+            $message = '';
+        }
+
+        return $this->id = hash('crc32c', implode('', [
+            $this->message::class,
+            $message,
+            $this->trigger::class,
+            (string) $this->trigger,
+        ]));
     }
 
     public function getMessage(): object

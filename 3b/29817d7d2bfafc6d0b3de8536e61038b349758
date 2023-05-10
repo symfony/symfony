@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2023-05-09T06:37:48Z
+
+I'm wondering if we should do this at a higher level. Having a jitter is probably a common need for most triggers.
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-05-09T09:53:29Z
+
+Yes, I was thinking that also.
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-05-09T15:25:54Z
+
+> I'm wondering if we should do this at a higher level. Having a jitter is probably a common need for most triggers.
+
+I've updated this PR to add a `JitterTrigger` that can add a _jitter_ to any trigger. Also, added `RecurringMessage::withJitter()` to help with DX (description updated to show usage).

@@ -69,6 +69,11 @@ class FlashBag implements FlashBagInterface
         return $this->flashes;
     }
 
+    public function peekMultiple(array $types): array
+    {
+        return array_intersect_key($this->flashes, array_flip($types));
+    }
+
     public function get(string $type, array $default = []): array
     {
         if (!$this->has($type)) {

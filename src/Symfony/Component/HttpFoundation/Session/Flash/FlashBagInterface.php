@@ -48,6 +48,11 @@ interface FlashBagInterface extends SessionBagInterface
     public function peekAll(): array;
 
     /**
+     * Gets specific types of flash messages.
+     */
+    public function peekMultiple(array $types): array;
+
+    /**
      * Gets and clears flash from the stack.
      *
      * @param array $default Default value if $type does not exist

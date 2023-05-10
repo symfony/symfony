@@ -14,6 +14,7 @@ namespace Symfony\Component\Mailer\Tests\Exception;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClassExistsMock;
 use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
+use Symfony\Component\Mailer\Bridge\Brevo\Transport\BrevoTransportFactory;
 use Symfony\Component\Mailer\Bridge\Google\Transport\GmailTransportFactory;
 use Symfony\Component\Mailer\Bridge\Infobip\Transport\InfobipTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillTransportFactory;
@@ -36,6 +37,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
     {
         ClassExistsMock::register(__CLASS__);
         ClassExistsMock::withMockedClasses([
+            BrevoTransportFactory::class => false,
             GmailTransportFactory::class => false,
             InfobipTransportFactory::class => false,
             MailerSendTransportFactory::class => false,
@@ -65,6 +67,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
 
     public static function messageWhereSchemeIsPartOfSchemeToPackageMapProvider(): \Generator
     {
+        yield ['brevo', 'symfony/brevo-mailer'];
         yield ['gmail', 'symfony/google-mailer'];
         yield ['infobip', 'symfony/infobip-mailer'];
         yield ['mailersend', 'symfony/mailersend-mailer'];

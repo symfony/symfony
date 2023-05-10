@@ -2589,6 +2589,7 @@ class FrameworkExtension extends Extension
         }
 
         $classToServices = [
+            MailerBridge\Brevo\Transport\BrevoTransportFactory::class => 'mailer.transport_factory.brevo',
             MailerBridge\Google\Transport\GmailTransportFactory::class => 'mailer.transport_factory.gmail',
             MailerBridge\Infobip\Transport\InfobipTransportFactory::class => 'mailer.transport_factory.infobip',
             MailerBridge\MailerSend\Transport\MailerSendTransportFactory::class => 'mailer.transport_factory.mailersend',

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Mailer\Bridge\Sendinblue\Transport;
+namespace Symfony\Component\Mailer\Bridge\Brevo\Transport;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
@@ -28,11 +28,9 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
- * @author Yann LUCAS
- *
- * @deprecated since Symfony 6.3, use BrevoApiTransport instead
+ * @author Pierre TANGUY
  */
-final class SendinblueApiTransport extends AbstractApiTransport
+final class BrevoApiTransport extends AbstractApiTransport
 {
     private string $key;
 
@@ -45,7 +43,7 @@ final class SendinblueApiTransport extends AbstractApiTransport
 
     public function __toString(): string
     {
-        return sprintf('sendinblue+api://%s', $this->getEndpoint());
+        return sprintf('brevo+api://%s', $this->getEndpoint());
     }
 
     protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface
@@ -63,7 +61,7 @@ final class SendinblueApiTransport extends AbstractApiTransport
         } catch (DecodingExceptionInterface) {
             throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $statusCode), $response);
         } catch (TransportExceptionInterface $e) {
-            throw new HttpTransportException('Could not reach the remote Sendinblue server.', $response, 0, $e);
+            throw new HttpTransportException('Could not reach the remote Brevo server.', $response, 0, $e);
         }
 
         if (201 !== $statusCode) {
@@ -75,34 +73,37 @@ final class SendinblueApiTransport extends AbstractApiTransport
         return $response;
     }
 
-    protected function stringifyAddresses(array $addresses): array
+    /**
+     * @return list<array{email: string, name?: string}>
+     */
+    private function formatAddresses(array $addresses): array
     {
-        $stringifiedAddresses = [];
+        $formattedAddresses = [];
         foreach ($addresses as $address) {
-            $stringifiedAddresses[] = $this->stringifyAddress($address);
+            $formattedAddresses[] = $this->formatAddress($address);
         }
 
-        return $stringifiedAddresses;
+        return $formattedAddresses;
     }
 
     private function getPayload(Email $email, Envelope $envelope): array
     {
         $payload = [
-            'sender' => $this->stringifyAddress($envelope->getSender()),
-            'to' => $this->stringifyAddresses($this->getRecipients($email, $envelope)),
+            'sender' => $this->formatAddress($envelope->getSender()),
+            'to' => $this->formatAddresses($this->getRecipients($email, $envelope)),
             'subject' => $email->getSubject(),
         ];
         if ($attachements = $this->prepareAttachments($email)) {
             $payload['attachment'] = $attachements;
         }
         if ($emails = $email->getReplyTo()) {
-            $payload['replyTo'] = current($this->stringifyAddresses($emails));
+            $payload['replyTo'] = current($this->formatAddresses($emails));
         }
         if ($emails = $email->getCc()) {
-            $payload['cc'] = $this->stringifyAddresses($emails);
+            $payload['cc'] = $this->formatAddresses($emails);
         }
         if ($emails = $email->getBcc()) {
-            $payload['bcc'] = $this->stringifyAddresses($emails);
+            $payload['bcc'] = $this->formatAddresses($emails);
         }
         if ($email->getTextBody()) {
             $payload['textContent'] = $email->getTextBody();
@@ -169,19 +170,19 @@ final class SendinblueApiTransport extends AbstractApiTransport
         return $headersAndTags;
     }
 
-    private function stringifyAddress(Address $address): array
+    private function formatAddress(Address $address): array
     {
-        $stringifiedAddress = ['email' => $address->getAddress()];
+        $formattedAddress = ['email' => $address->getAddress()];
 
         if ($address->getName()) {
-            $stringifiedAddress['name'] = $address->getName();
+            $formattedAddress['name'] = $address->getName();
         }
 
-        return $stringifiedAddress;
+        return $formattedAddress;
     }
 
     private function getEndpoint(): ?string
     {
-        return ($this->host ?: 'api.sendinblue.com').($this->port ? ':'.$this->port : '');
+        return ($this->host ?: 'api.brevo.com').($this->port ? ':'.$this->port : '');
     }
 }

@@ -26,7 +26,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 trait BuildDebugContainerTrait
 {
-    protected $containerBuilder;
+    protected ContainerBuilder $container;
 
     /**
      * Loads the ContainerBuilder from the cache.
@@ -35,8 +35,8 @@ trait BuildDebugContainerTrait
      */
     protected function getContainerBuilder(KernelInterface $kernel): ContainerBuilder
     {
-        if ($this->containerBuilder) {
-            return $this->containerBuilder;
+        if (isset($this->container)) {
+            return $this->container;
         }
 
         if (!$kernel->isDebug() || !$kernel->getContainer()->getParameter('debug.container.dump') || !(new ConfigCache($kernel->getContainer()->getParameter('debug.container.dump'), true))->isFresh()) {
@@ -59,6 +59,6 @@ trait BuildDebugContainerTrait
             $container->getCompilerPassConfig()->setBeforeRemovingPasses([]);
         }
 
-        return $this->containerBuilder = $container;
+        return $this->container = $container;
     }
 }

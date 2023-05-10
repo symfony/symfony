@@ -112,11 +112,11 @@ class XmlFileLoaderTest extends TestCase
 
     public function testLoadWithExternalEntitiesDisabled()
     {
-        $containerBuilder = new ContainerBuilder();
-        $loader = new XmlFileLoader($containerBuilder, new FileLocator(self::$fixturesPath.'/xml'));
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('services2.xml');
 
-        $this->assertGreaterThan(0, $containerBuilder->getParameterBag()->all(), 'Parameters can be read from the config file.');
+        $this->assertGreaterThan(0, $container->getParameterBag()->all(), 'Parameters can be read from the config file.');
     }
 
     public function testLoadParameters()

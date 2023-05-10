@@ -6,12 +6,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
 
-return function (ContainerConfigurator $containerConfigurator) {
-    $containerConfigurator->parameters()
+return function (ContainerConfigurator $container) {
+    $container->parameters()
         ->set('unit_enum', FooUnitEnum::BAR)
         ->set('enum_array', [FooUnitEnum::BAR, FooUnitEnum::FOO]);
 
-    $services = $containerConfigurator->services();
+    $services = $container->services();
 
     $services->defaults()->public();
 

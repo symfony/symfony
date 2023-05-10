@@ -74,21 +74,21 @@ class MarkdownDescriptor extends Descriptor
         }
     }
 
-    protected function describeContainerTags(ContainerBuilder $builder, array $options = []): void
+    protected function describeContainerTags(ContainerBuilder $container, array $options = []): void
     {
         $showHidden = isset($options['show_hidden']) && $options['show_hidden'];
         $this->write("Container tags\n==============");
 
-        foreach ($this->findDefinitionsByTag($builder, $showHidden) as $tag => $definitions) {
+        foreach ($this->findDefinitionsByTag($container, $showHidden) as $tag => $definitions) {
             $this->write("\n\n".$tag."\n".str_repeat('-', \strlen($tag)));
             foreach ($definitions as $serviceId => $definition) {
                 $this->write("\n\n");
-                $this->describeContainerDefinition($definition, ['omit_tags' => true, 'id' => $serviceId], $builder);
+                $this->describeContainerDefinition($definition, ['omit_tags' => true, 'id' => $serviceId], $container);
             }
         }
     }
 
-    protected function describeContainerService(object $service, array $options = [], ContainerBuilder $builder = null): void
+    protected function describeContainerService(object $service, array $options = [], ContainerBuilder $container = null): void
     {
         if (!isset($options['id'])) {
             throw new \InvalidArgumentException('An "id" option must be provided.');
@@ -97,17 +97,17 @@ class MarkdownDescriptor extends Descriptor
         $childOptions = array_merge($options, ['id' => $options['id'], 'as_array' => true]);
 
         if ($service instanceof Alias) {
-            $this->describeContainerAlias($service, $childOptions, $builder);
+            $this->describeContainerAlias($service, $childOptions, $container);
         } elseif ($service instanceof Definition) {
-            $this->describeContainerDefinition($service, $childOptions, $builder);
+            $this->describeContainerDefinition($service, $childOptions, $container);
         } else {
             $this->write(sprintf('**`%s`:** `%s`', $options['id'], $service::class));
         }
     }
 
-    protected function describeContainerDeprecations(ContainerBuilder $builder, array $options = []): void
+    protected function describeContainerDeprecations(ContainerBuilder $container, array $options = []): void
     {
-        $containerDeprecationFilePath = sprintf('%s/%sDeprecations.log', $builder->getParameter('kernel.build_dir'), $builder->getParameter('kernel.container_class'));
+        $containerDeprecationFilePath = sprintf('%s/%sDeprecations.log', $container->getParameter('kernel.build_dir'), $container->getParameter('kernel.container_class'));
         if (!file_exists($containerDeprecationFilePath)) {
             throw new RuntimeException('The deprecation file does not exist, please try warming the cache first.');
         }
@@ -132,7 +132,7 @@ class MarkdownDescriptor extends Descriptor
         }
     }
 
-    protected function describeContainerServices(ContainerBuilder $builder, array $options = []): void
+    protected function describeContainerServices(ContainerBuilder $container, array $options = []): void
     {
         $showHidden = isset($options['show_hidden']) && $options['show_hidden'];
 
@@ -143,8 +143,8 @@ class MarkdownDescriptor extends Descriptor
         $this->write($title."\n".str_repeat('=', \strlen($title)));
 
         $serviceIds = isset($options['tag']) && $options['tag']
-            ? $this->sortTaggedServicesByPriority($builder->findTaggedServiceIds($options['tag']))
-            : $this->sortServiceIds($builder->getServiceIds());
+            ? $this->sortTaggedServicesByPriority($container->findTaggedServiceIds($options['tag']))
+            : $this->sortServiceIds($container->getServiceIds());
         $showArguments = isset($options['show_arguments']) && $options['show_arguments'];
         $services = ['definitions' => [], 'aliases' => [], 'services' => []];
 
@@ -153,7 +153,7 @@ class MarkdownDescriptor extends Descriptor
         }
 
         foreach ($serviceIds as $serviceId) {
-            $service = $this->resolveServiceDefinition($builder, $serviceId);
+            $service = $this->resolveServiceDefinition($container, $serviceId);
 
             if ($showHidden xor '.' === ($serviceId[0] ?? null)) {
                 continue;
@@ -172,7 +172,7 @@ class MarkdownDescriptor extends Descriptor
             $this->write("\n\nDefinitions\n-----------\n");
             foreach ($services['definitions'] as $id => $service) {
                 $this->write("\n");
-                $this->describeContainerDefinition($service, ['id' => $id, 'show_arguments' => $showArguments], $builder);
+                $this->describeContainerDefinition($service, ['id' => $id, 'show_arguments' => $showArguments], $container);
             }
         }
 
@@ -193,7 +193,7 @@ class MarkdownDescriptor extends Descriptor
         }
     }
 
-    protected function describeContainerDefinition(Definition $definition, array $options = [], ContainerBuilder $builder = null): void
+    protected function describeContainerDefinition(Definition $definition, array $options = [], ContainerBuilder $container = null): void
     {
         $output = '';
 
@@ -257,13 +257,13 @@ class MarkdownDescriptor extends Descriptor
             }
         }
 
-        $inEdges = null !== $builder && isset($options['id']) ? $this->getServiceEdges($builder, $options['id']) : [];
+        $inEdges = null !== $container && isset($options['id']) ? $this->getServiceEdges($container, $options['id']) : [];
         $output .= "\n".'- Usages: '.($inEdges ? implode(', ', $inEdges) : 'none');
 
         $this->write(isset($options['id']) ? sprintf("### %s\n\n%s\n", $options['id'], $output) : $output);
     }
 
-    protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $builder = null): void
+    protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $container = null): void
     {
         $output = '- Service: `'.$alias.'`'
             ."\n".'- Public: '.($alias->isPublic() && !$alias->isPrivate() ? 'yes' : 'no');
@@ -276,12 +276,12 @@ class MarkdownDescriptor extends Descriptor
 
         $this->write(sprintf("### %s\n\n%s\n", $options['id'], $output));
 
-        if (!$builder) {
+        if (!$container) {
             return;
         }
 
         $this->write("\n");
-        $this->describeContainerDefinition($builder->getDefinition((string) $alias), array_merge($options, ['id' => (string) $alias]), $builder);
+        $this->describeContainerDefinition($container->getDefinition((string) $alias), array_merge($options, ['id' => (string) $alias]), $container);
     }
 
     protected function describeContainerParameter(mixed $parameter, array $options = []): void

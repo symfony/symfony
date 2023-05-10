@@ -1,0 +1,101 @@
+---------------------------------------------------------------------------
+
+by kbond at 2023-03-27T17:32:53Z
+
+This change breaks the current test suite for scheduler. I'd like to get some feedback or alternative ideas before going further.
+
+Some context on my requirement for this: In my app, I have an admin GUI that lists all available scheduled tasks. User's can drill into each task (hence the need for a unique ID) and see a run history which includes memory usage and duration. The schedule name and ID on the `ScheduledStamp` would allow connecting specific runs with a recurring message.
+
+There's likely other methods I can use to achieve this same system with symfony/scheduler so I'm not dead set on this being added.
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-03-27T18:18:10Z
+
+> There's likely other methods I can use to achieve this same system with symfony/scheduler so I'm not dead set on this being added.
+
+I've played a little with this. I could have my own custom logic to generate an identifier for a `RecurringMessage` and I can infer the scheduler name from `RecievedStamp::$transport` (`schedule_default` or `schedule_foo` - not ideal, but workable).
+
+But I think I'd need the `RecurringMessage` added to the `ScheduledStamp` or the Trigger object as a bare minimum in order to connect runs with a specific `RecurringMessage`.
+
+Basically, I think we need more context added to the `ScheduledStamp` but it's not possible with the way it's currently coded.
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-03-29T19:51:42Z
+
+> Having more information in the stamp does not look good as the component should work without using Messenger.
+
+Can save for a followup PR but I was thinking to change `MessageGeneratorInterface::getMessages(): iterable<object>` to: `MessageGeneratorInterface::getMessages(): iterable<RecurringMessage>`.
+
+In the stand-alone `Scheduler`, we'd unwrap the message from `RecurringMessage`. In the transport, we could add the `RecurringMessage` to the stamp.
+
+---------------------------------------------------------------------------
+
+by vtsykun at 2023-03-29T19:56:19Z
+
+Correctly I understand that now I can not use the same messages with the different arguments?
+
+```php
+            ->add(RM::cron('*/6 * * * *', new Class1('aaa')))
+            ->add(RM::cron('*/7 * * * *', new Class1('bbb')))
+            ->add(RM::cron('*/7 * * * *',  new Class1('ccc')));
+```
+In this case I got an error `Duplicated schedule message`. - will I need to create `toString` to avoid duplication restriction?
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-03-29T20:00:39Z
+
+> Correctly I understand that now I can not use the same messages with the different arguments?
+
+`CronExpressionTrigger` is now `\Stringable` so those would be unique. I'd like to make `TriggerInterface extend \Stringable`.
+
+---------------------------------------------------------------------------
+
+by vtsykun at 2023-03-29T20:18:32Z
+
+> CronExpressionTrigger is now \Stringable so those would be unique
+
+Not sure that will be good. it means that we will not be able to use two the same tasks if their cron trigger is same.
+
+Maybe more simple use iterable id if need to debug or execute the specific tasks manually, like this
+
+```
+php bin/console debug:scheduler --execute-one=7
+```
+![image1](https://user-images.githubusercontent.com/21358010/228657483-aa1c6350-6990-42db-8b27-4a411024b92c.png)
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-03-29T20:24:50Z
+
+> it means that we will not be able to use two tasks if their cron trigger is same.
+
+In that case, yes, you'd need to make your message stringable.
+
+> Maybe more simple use iterable id if need to debug or execute the specific tasks manually, like this
+
+Indeed, that could be an option. I'd like to track runs in the db so those id's changing whenever a schedule is updated wouldn't be desired. However, if the `ScheduledStamp` had more context, I could overcome this problem.
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-04-25T23:09:03Z
+
+Rebased, refactored and added the ID to `MessageContext` and therefore the `ScheduledStamp`.
+
+To address [this concern](https://github.com/symfony/symfony/pull/49838#issuecomment-1489218761), I now cast the message to a string if stringable, if not, serialize it, if it can't be serialized, ignore. That example now works without needing `Class1` to be stringable.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-05-10T07:04:15Z
+
+@kbond Can you rebase and have a look at the failing tests?
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-05-10T12:58:26Z
+
+> Can you rebase and have a look at the failing tests?
+
+Done.

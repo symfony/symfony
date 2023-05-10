@@ -514,7 +514,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @throws NoSuchPropertyException if the property does not exist or is not public
      */
-    private function writeProperty(array $zval, string $property, mixed $value): void
+    private function writeProperty(array $zval, string $property, mixed $value, bool $recursive = false): void
     {
         if (!\is_object($zval[self::VALUE])) {
             throw new NoSuchPropertyException(sprintf('Cannot write property "%s" to an array. Maybe you should write the property path as "[%1$s]" instead?', $property));
@@ -524,24 +524,37 @@ class PropertyAccessor implements PropertyAccessorInterface
         $class = $object::class;
         $mutator = $this->getWriteInfo($class, $property, $value);
 
-        if (PropertyWriteInfo::TYPE_NONE !== $mutator->getType()) {
-            $type = $mutator->getType();
+        try {
+            if (PropertyWriteInfo::TYPE_NONE !== $mutator->getType()) {
+                $type = $mutator->getType();
 
-            if (PropertyWriteInfo::TYPE_METHOD === $type) {
-                $object->{$mutator->getName()}($value);
-            } elseif (PropertyWriteInfo::TYPE_PROPERTY === $type) {
-                $object->{$mutator->getName()} = $value;
-            } elseif (PropertyWriteInfo::TYPE_ADDER_AND_REMOVER === $type) {
-                $this->writeCollection($zval, $property, $value, $mutator->getAdderInfo(), $mutator->getRemoverInfo());
+                if (PropertyWriteInfo::TYPE_METHOD === $type) {
+                    $object->{$mutator->getName()}($value);
+                } elseif (PropertyWriteInfo::TYPE_PROPERTY === $type) {
+                    $object->{$mutator->getName()} = $value;
+                } elseif (PropertyWriteInfo::TYPE_ADDER_AND_REMOVER === $type) {
+                    $this->writeCollection($zval, $property, $value, $mutator->getAdderInfo(), $mutator->getRemoverInfo());
+                }
+            } elseif ($object instanceof \stdClass && property_exists($object, $property)) {
+                $object->$property = $value;
+            } elseif (!$this->ignoreInvalidProperty) {
+                if ($mutator->hasErrors()) {
+                    throw new NoSuchPropertyException(implode('. ', $mutator->getErrors()).'.');
+                }
+
+                throw new NoSuchPropertyException(sprintf('Could not determine access type for property "%s" in class "%s".', $property, get_debug_type($object)));
             }
-        } elseif ($object instanceof \stdClass && property_exists($object, $property)) {
-            $object->$property = $value;
-        } elseif (!$this->ignoreInvalidProperty) {
-            if ($mutator->hasErrors()) {
-                throw new NoSuchPropertyException(implode('. ', $mutator->getErrors()).'.');
+        } catch (\TypeError $e) {
+            if ($recursive || !$value instanceof \DateTimeInterface || !\in_array($value::class, ['DateTime', 'DateTimeImmutable'], true) || __FILE__ !== $e->getTrace()[0]['file']) {
+                throw $e;
             }
 
-            throw new NoSuchPropertyException(sprintf('Could not determine access type for property "%s" in class "%s".', $property, get_debug_type($object)));
+            $value = $value instanceof \DateTimeImmutable ? \DateTime::createFromImmutable($value) : \DateTimeImmutable::createFromMutable($value);
+            try {
+                $this->writeProperty($zval, $property, $value, true);
+            } catch (\TypeError) {
+                throw $e; // throw the previous error
+            }
         }
     }
 

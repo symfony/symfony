@@ -58,6 +58,9 @@ class SourceMappingUrlsCompilerTest extends TestCase
         $this->assertSame($expectedOutput, $compiler->compile($input, $asset, $assetMapper));
         $assetDependencyLogicalPaths = array_map(fn (AssetDependency $dependency) => $dependency->asset->getLogicalPath(), $asset->getDependencies());
         $this->assertSame($expectedDependencies, $assetDependencyLogicalPaths);
+        if ($expectedDependencies) {
+            $this->assertTrue($asset->getDependencies()[0]->isContentDependency);
+        }
     }
 
     public static function provideCompileTests(): iterable

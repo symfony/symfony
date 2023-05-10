@@ -57,7 +57,10 @@ class AssetMapperCompilerTest extends TestCase
             }
         };
 
-        $compiler = new AssetMapperCompiler([$compiler1, $compiler2, $compiler3]);
+        $compiler = new AssetMapperCompiler(
+            [$compiler1, $compiler2, $compiler3],
+            fn () => $this->createMock(AssetMapperInterface::class),
+        );
         $asset = new MappedAsset('foo.js');
         $asset->setPublicPathWithoutDigest('/assets/foo.js');
         $actualContents = $compiler->compile('starting contents', $asset, $this->createMock(AssetMapperInterface::class));

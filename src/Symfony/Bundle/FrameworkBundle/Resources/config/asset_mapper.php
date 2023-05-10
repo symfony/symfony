@@ -25,6 +25,8 @@ use Symfony\Component\AssetMapper\Command\ImportMapUpdateCommand;
 use Symfony\Component\AssetMapper\Compiler\CssAssetUrlCompiler;
 use Symfony\Component\AssetMapper\Compiler\JavaScriptImportPathCompiler;
 use Symfony\Component\AssetMapper\Compiler\SourceMappingUrlsCompiler;
+use Symfony\Component\AssetMapper\Factory\CachedMappedAssetFactory;
+use Symfony\Component\AssetMapper\Factory\MappedAssetFactory;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapRenderer;
 use Symfony\Component\AssetMapper\MapperAwareAssetPackage;
@@ -36,10 +38,24 @@ return static function (ContainerConfigurator $container) {
         ->set('asset_mapper', AssetMapper::class)
             ->args([
                 service('asset_mapper.repository'),
-                service('asset_mapper_compiler'),
+                service('asset_mapper.mapped_asset_factory'),
                 service('asset_mapper.public_assets_path_resolver'),
             ])
         ->alias(AssetMapperInterface::class, 'asset_mapper')
+
+        ->set('asset_mapper.mapped_asset_factory', MappedAssetFactory::class)
+            ->args([
+                service('asset_mapper.public_assets_path_resolver'),
+                service('asset_mapper_compiler'),
+            ])
+
+        ->set('asset_mapper.cached_mapped_asset_factory', CachedMappedAssetFactory::class)
+            ->args([
+                service('.inner'),
+                param('kernel.cache_dir').'/asset_mapper',
+                param('kernel.debug'),
+            ])
+            ->decorate('asset_mapper.mapped_asset_factory')
 
         ->set('asset_mapper.repository', AssetMapperRepository::class)
             ->args([
@@ -93,6 +109,7 @@ return static function (ContainerConfigurator $container) {
         ->set('asset_mapper_compiler', AssetMapperCompiler::class)
             ->args([
                 tagged_iterator('asset_mapper.compiler'),
+                service_closure('asset_mapper'),
             ])
 
         ->set('asset_mapper.compiler.css_asset_url_compiler', CssAssetUrlCompiler::class)

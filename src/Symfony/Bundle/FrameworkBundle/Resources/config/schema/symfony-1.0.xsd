@@ -190,6 +190,7 @@
     <xsd:complexType name="asset_mapper">
         <xsd:sequence>
             <xsd:element name="path" type="asset_mapper_path" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="excluded-pattern" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="server" type="xsd:boolean" minOccurs="0" />
             <xsd:element name="public_prefix" type="xsd:string" minOccurs="0" />
             <xsd:element name="strict-mode" type="xsd:boolean" minOccurs="0" />

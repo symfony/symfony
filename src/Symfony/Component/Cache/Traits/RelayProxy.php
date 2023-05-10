@@ -537,6 +537,11 @@ class RelayProxy extends Relay implements ResetInterface, LazyObjectInterface
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->publish(...\func_get_args());
     }
 
+    public function spublish($channel, $message): \Relay\Relay|false|int
+    {
+        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->spublish(...\func_get_args());
+    }
+
     public function setnx($key, $value): \Relay\Relay|bool
     {
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->setnx(...\func_get_args());
@@ -885,6 +890,36 @@ class RelayProxy extends Relay implements ResetInterface, LazyObjectInterface
     public function sunionstore($key, ...$other_keys): \Relay\Relay|false|int
     {
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->sunionstore(...\func_get_args());
+    }
+
+    public function subscribe($channels, $callback): bool
+    {
+        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->subscribe(...\func_get_args());
+    }
+
+    public function unsubscribe($channels = []): bool
+    {
+        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->unsubscribe(...\func_get_args());
+    }
+
+    public function psubscribe($patterns, $callback): bool
+    {
+        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->psubscribe(...\func_get_args());
+    }
+
+    public function punsubscribe($patterns = []): bool
+    {
+        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->punsubscribe(...\func_get_args());
+    }
+
+    public function ssubscribe($channels, $callback): bool
+    {
+        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->ssubscribe(...\func_get_args());
+    }
+
+    public function sunsubscribe($channels = []): bool
+    {
+        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->sunsubscribe(...\func_get_args());
     }
 
     public function touch($key_or_array, ...$more_keys): \Relay\Relay|false|int

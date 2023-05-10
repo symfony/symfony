@@ -88,7 +88,7 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
         $series = random_bytes(66);
         $tokenValue = strtr(base64_encode(substr($series, 33)), '+/=', '-_~');
         $series = strtr(base64_encode(substr($series, 0, 33)), '+/=', '-_~');
-        $token = new PersistentToken($user::class, $user->getUserIdentifier(), $series, $tokenValue, new \DateTime());
+        $token = new PersistentToken($user::class, $user->getUserIdentifier(), $series, $tokenValue, new \DateTimeImmutable());
 
         $this->tokenProvider->createNewToken($token);
         $this->createCookie(RememberMeDetails::fromPersistentToken($token, time() + $this->options['lifetime']));
@@ -122,7 +122,7 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
     public function processRememberMe(RememberMeDetails $rememberMeDetails, UserInterface $user): void
     {
         [$lastUsed, $series, $tokenValue, $class] = explode(':', $rememberMeDetails->getValue(), 4);
-        $persistentToken = new PersistentToken($class, $rememberMeDetails->getUserIdentifier(), $series, $tokenValue, new \DateTime('@'.$lastUsed));
+        $persistentToken = new PersistentToken($class, $rememberMeDetails->getUserIdentifier(), $series, $tokenValue, new \DateTimeImmutable('@'.$lastUsed));
 
         // if a token was regenerated less than a minute ago, there is no need to regenerate it
         // if multiple concurrent requests reauthenticate a user we do not want to update the token several times

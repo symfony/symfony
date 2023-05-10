@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Make `PersistentToken` immutable
+ * Deprecate accepting only `DateTime` for `TokenProviderInterface::updateToken()`, use `DateTimeInterface` instead
+
 6.3
 ---
 

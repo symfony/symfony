@@ -46,8 +46,8 @@ class Query
     }
 
     /**
-     * @param string|int                 $param
-     * @param string|int|float|bool|null $variable
+     * @param string|int $param
+     * @param mixed      $variable
      */
     public function setParam($param, &$variable, int $type): void
     {

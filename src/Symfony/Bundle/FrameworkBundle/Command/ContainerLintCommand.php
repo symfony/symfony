@@ -31,7 +31,7 @@ use Symfony\Component\HttpKernel\Kernel;
 #[AsCommand(name: 'lint:container', description: 'Ensure that arguments injected into services match type declarations')]
 final class ContainerLintCommand extends Command
 {
-    private ContainerBuilder $containerBuilder;
+    private ContainerBuilder $container;
 
     protected function configure(): void
     {
@@ -70,8 +70,8 @@ final class ContainerLintCommand extends Command
 
     private function getContainerBuilder(): ContainerBuilder
     {
-        if (isset($this->containerBuilder)) {
-            return $this->containerBuilder;
+        if (isset($this->container)) {
+            return $this->container;
         }
 
         $kernel = $this->getApplication()->getKernel();
@@ -108,6 +108,6 @@ final class ContainerLintCommand extends Command
 
         $container->addCompilerPass(new CheckTypeDeclarationsPass(true), PassConfig::TYPE_AFTER_REMOVING, -100);
 
-        return $this->containerBuilder = $container;
+        return $this->container = $container;
     }
 }

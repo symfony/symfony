@@ -261,15 +261,15 @@ EOF
         }
     }
 
-    private function findProperServiceName(InputInterface $input, SymfonyStyle $io, ContainerBuilder $builder, string $name, bool $showHidden): string
+    private function findProperServiceName(InputInterface $input, SymfonyStyle $io, ContainerBuilder $container, string $name, bool $showHidden): string
     {
         $name = ltrim($name, '\\');
 
-        if ($builder->has($name) || !$input->isInteractive()) {
+        if ($container->has($name) || !$input->isInteractive()) {
             return $name;
         }
 
-        $matchingServices = $this->findServiceIdsContaining($builder, $name, $showHidden);
+        $matchingServices = $this->findServiceIdsContaining($container, $name, $showHidden);
         if (!$matchingServices) {
             throw new InvalidArgumentException(sprintf('No services found that match "%s".', $name));
         }
@@ -281,13 +281,13 @@ EOF
         return $io->choice('Select one of the following services to display its information', $matchingServices);
     }
 
-    private function findProperTagName(InputInterface $input, SymfonyStyle $io, ContainerBuilder $builder, string $tagName): string
+    private function findProperTagName(InputInterface $input, SymfonyStyle $io, ContainerBuilder $container, string $tagName): string
     {
-        if (\in_array($tagName, $builder->findTags(), true) || !$input->isInteractive()) {
+        if (\in_array($tagName, $container->findTags(), true) || !$input->isInteractive()) {
             return $tagName;
         }
 
-        $matchingTags = $this->findTagsContaining($builder, $tagName);
+        $matchingTags = $this->findTagsContaining($container, $tagName);
         if (!$matchingTags) {
             throw new InvalidArgumentException(sprintf('No tags found that match "%s".', $tagName));
         }
@@ -299,15 +299,15 @@ EOF
         return $io->choice('Select one of the following tags to display its information', $matchingTags);
     }
 
-    private function findServiceIdsContaining(ContainerBuilder $builder, string $name, bool $showHidden): array
+    private function findServiceIdsContaining(ContainerBuilder $container, string $name, bool $showHidden): array
     {
-        $serviceIds = $builder->getServiceIds();
+        $serviceIds = $container->getServiceIds();
         $foundServiceIds = $foundServiceIdsIgnoringBackslashes = [];
         foreach ($serviceIds as $serviceId) {
             if (!$showHidden && str_starts_with($serviceId, '.')) {
                 continue;
             }
-            if (!$showHidden && $builder->hasDefinition($serviceId) && $builder->getDefinition($serviceId)->hasTag('container.excluded')) {
+            if (!$showHidden && $container->hasDefinition($serviceId) && $container->getDefinition($serviceId)->hasTag('container.excluded')) {
                 continue;
             }
             if (false !== stripos(str_replace('\\', '', $serviceId), $name)) {
@@ -321,9 +321,9 @@ EOF
         return $foundServiceIds ?: $foundServiceIdsIgnoringBackslashes;
     }
 
-    private function findTagsContaining(ContainerBuilder $builder, string $tagName): array
+    private function findTagsContaining(ContainerBuilder $container, string $tagName): array
     {
-        $tags = $builder->findTags();
+        $tags = $container->findTags();
         $foundTags = [];
         foreach ($tags as $tag) {
             if (str_contains($tag, $tagName)) {

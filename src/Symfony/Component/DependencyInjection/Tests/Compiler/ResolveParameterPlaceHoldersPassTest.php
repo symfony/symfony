@@ -77,55 +77,55 @@ class ResolveParameterPlaceHoldersPassTest extends TestCase
         $this->expectException(ParameterNotFoundException::class);
         $this->expectExceptionMessage('The service "baz_service_id" has a dependency on a non-existent parameter "non_existent_param".');
 
-        $containerBuilder = new ContainerBuilder();
-        $definition = $containerBuilder->register('baz_service_id');
+        $container = new ContainerBuilder();
+        $definition = $container->register('baz_service_id');
         $definition->setArgument(0, '%non_existent_param%');
 
         $pass = new ResolveParameterPlaceHoldersPass();
-        $pass->process($containerBuilder);
+        $pass->process($container);
     }
 
     public function testParameterNotFoundExceptionsIsNotThrown()
     {
-        $containerBuilder = new ContainerBuilder();
-        $definition = $containerBuilder->register('baz_service_id');
+        $container = new ContainerBuilder();
+        $definition = $container->register('baz_service_id');
         $definition->setArgument(0, '%non_existent_param%');
 
         $pass = new ResolveParameterPlaceHoldersPass(true, false);
-        $pass->process($containerBuilder);
+        $pass->process($container);
 
         $this->assertCount(1, $definition->getErrors());
     }
 
     public function testOnlyProxyTagIsResolved()
     {
-        $containerBuilder = new ContainerBuilder();
-        $containerBuilder->setParameter('a_param', 'here_you_go');
-        $definition = $containerBuilder->register('def');
+        $container = new ContainerBuilder();
+        $container->setParameter('a_param', 'here_you_go');
+        $definition = $container->register('def');
         $definition->addTag('foo', ['bar' => '%a_param%']);
         $definition->addTag('proxy', ['interface' => '%a_param%']);
 
         $pass = new ResolveParameterPlaceHoldersPass(true, false);
-        $pass->process($containerBuilder);
+        $pass->process($container);
 
         $this->assertSame(['foo' => [['bar' => '%a_param%']], 'proxy' => [['interface' => 'here_you_go']]], $definition->getTags());
     }
 
     private function createContainerBuilder(): ContainerBuilder
     {
-        $containerBuilder = new ContainerBuilder();
+        $container = new ContainerBuilder();
 
-        $containerBuilder->setParameter('foo.class', 'Foo');
-        $containerBuilder->setParameter('foo.factory.class', 'FooFactory');
-        $containerBuilder->setParameter('foo.arg1', 'bar');
-        $containerBuilder->setParameter('foo.arg2', ['%foo.arg1%' => 'baz']);
-        $containerBuilder->setParameter('foo.method', 'foobar');
-        $containerBuilder->setParameter('foo.property.name', 'bar');
-        $containerBuilder->setParameter('foo.property.value', 'baz');
-        $containerBuilder->setParameter('foo.file', 'foo.php');
-        $containerBuilder->setParameter('alias.id', 'bar');
+        $container->setParameter('foo.class', 'Foo');
+        $container->setParameter('foo.factory.class', 'FooFactory');
+        $container->setParameter('foo.arg1', 'bar');
+        $container->setParameter('foo.arg2', ['%foo.arg1%' => 'baz']);
+        $container->setParameter('foo.method', 'foobar');
+        $container->setParameter('foo.property.name', 'bar');
+        $container->setParameter('foo.property.value', 'baz');
+        $container->setParameter('foo.file', 'foo.php');
+        $container->setParameter('alias.id', 'bar');
 
-        $fooDefinition = $containerBuilder->register('foo', '%foo.class%');
+        $fooDefinition = $container->register('foo', '%foo.class%');
         $fooDefinition->setFactory(['%foo.factory.class%', 'getFoo']);
         $fooDefinition->setArguments(['%foo.arg1%', ['%foo.arg1%' => 'baz']]);
         $fooDefinition->addMethodCall('%foo.method%', ['%foo.arg1%', '%foo.arg2%']);
@@ -133,8 +133,8 @@ class ResolveParameterPlaceHoldersPassTest extends TestCase
         $fooDefinition->setFile('%foo.file%');
         $fooDefinition->setBindings(['$baz' => '%env(BAZ)%']);
 
-        $containerBuilder->setAlias('%alias.id%', 'foo');
+        $container->setAlias('%alias.id%', 'foo');
 
-        return $containerBuilder;
+        return $container;
     }
 }

@@ -32,8 +32,13 @@ final class MappedAsset
     /** @var AssetDependency[] */
     private array $dependencies = [];
 
-    public function __construct(public readonly string $logicalPath)
+    public function __construct(private readonly string $logicalPath)
     {
+    }
+
+    public function getLogicalPath(): string
+    {
+        return $this->logicalPath;
     }
 
     public function getPublicPath(): string

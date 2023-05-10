@@ -35,7 +35,7 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
     public function compile(string $content, MappedAsset $asset, AssetMapperInterface $assetMapper): string
     {
         return preg_replace_callback(self::IMPORT_PATTERN, function ($matches) use ($asset, $assetMapper) {
-            $resolvedPath = $this->resolvePath(\dirname($asset->logicalPath), $matches[1]);
+            $resolvedPath = $this->resolvePath(\dirname($asset->getLogicalPath()), $matches[1]);
 
             $dependentAsset = $assetMapper->getAsset($resolvedPath);
 

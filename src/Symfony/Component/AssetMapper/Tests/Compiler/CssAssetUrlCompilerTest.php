@@ -28,7 +28,7 @@ class CssAssetUrlCompilerTest extends TestCase
         $asset = new MappedAsset($sourceLogicalName);
         $asset->setPublicPathWithoutDigest('/assets/'.$sourceLogicalName);
         $this->assertSame($expectedOutput, $compiler->compile($input, $asset, $this->createAssetMapper()));
-        $assetDependencyLogicalPaths = array_map(fn (AssetDependency $dependency) => $dependency->asset->logicalPath, $asset->getDependencies());
+        $assetDependencyLogicalPaths = array_map(fn (AssetDependency $dependency) => $dependency->asset->getLogicalPath(), $asset->getDependencies());
         $this->assertSame($expectedDependencies, $assetDependencyLogicalPaths);
     }
 

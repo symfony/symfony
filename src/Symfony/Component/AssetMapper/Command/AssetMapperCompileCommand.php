@@ -129,7 +129,7 @@ EOT
             }
 
             $this->filesystem->dumpFile($targetPath, $asset->getContent());
-            $manifest[$asset->logicalPath] = $asset->getPublicPath();
+            $manifest[$asset->getLogicalPath()] = $asset->getPublicPath();
         }
         ksort($manifest);
 

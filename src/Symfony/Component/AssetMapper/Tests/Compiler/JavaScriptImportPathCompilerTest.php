@@ -31,7 +31,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
         $this->assertSame($input, $compiler->compile($input, $asset, $this->createAssetMapper()));
         $actualDependencies = [];
         foreach ($asset->getDependencies() as $dependency) {
-            $actualDependencies[$dependency->asset->logicalPath] = $dependency->isLazy;
+            $actualDependencies[$dependency->asset->getLogicalPath()] = $dependency->isLazy;
         }
         $this->assertEquals($expectedDependencies, $actualDependencies);
     }

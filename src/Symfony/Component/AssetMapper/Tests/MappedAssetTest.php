@@ -20,7 +20,7 @@ class MappedAssetTest extends TestCase
     {
         $asset = new MappedAsset('foo.css');
 
-        $this->assertSame('foo.css', $asset->logicalPath);
+        $this->assertSame('foo.css', $asset->getLogicalPath());
     }
 
     public function testGetPublicPath()

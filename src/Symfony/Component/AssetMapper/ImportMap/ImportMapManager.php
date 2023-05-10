@@ -281,7 +281,7 @@ class ImportMapManager
 
                     throw new \LogicException(sprintf('The package was downloaded to "%s", but this path does not appear to be in any of your asset paths.', $vendorPath));
                 }
-                $path = $mappedAsset->logicalPath;
+                $path = $mappedAsset->getLogicalPath();
             }
 
             $newEntry = new ImportMapEntry($importName, $path, $url, $download, $preload);
@@ -395,7 +395,7 @@ class ImportMapManager
             $dependencyImportMapEntries = array_map(function (AssetDependency $dependency) {
                 return new ImportMapEntry(
                     $dependency->asset->getPublicPathWithoutDigest(),
-                    $dependency->asset->logicalPath,
+                    $dependency->asset->getLogicalPath(),
                     preload: !$dependency->isLazy,
                 );
             }, $dependencies);

@@ -11,17 +11,22 @@
 
 namespace Symfony\Component\Notifier\Bridge\Sendinblue;
 
+use Symfony\Component\Notifier\Bridge\Brevo\BrevoTransport;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
 
 /**
  * @author Pierre Tondereau <pierre.tondereau@protonmail.com>
+ *
+ * @deprecated since Symfony 6.3, use BrevoTransportFactory instead
  */
 final class SendinblueTransportFactory extends AbstractTransportFactory
 {
     public function create(Dsn $dsn): SendinblueTransport
     {
+        trigger_deprecation('symfony/sendinblue-notifier', '6.3', 'The "%s" class is deprecated, use "%s" instead.', SendinblueTransport::class, BrevoTransport::class);
+
         $scheme = $dsn->getScheme();
 
         if ('sendinblue' !== $scheme) {

@@ -68,25 +68,19 @@ class RangeValidator extends ConstraintValidator
         // the DateTime constructor:
         // https://php.net/datetime.formats
         if ($value instanceof \DateTimeInterface) {
-            $dateTimeClass = null;
-
             if (\is_string($min)) {
-                $dateTimeClass = $value instanceof \DateTimeImmutable ? \DateTimeImmutable::class : \DateTime::class;
-
                 try {
-                    $min = new $dateTimeClass($min);
+                    $min = new $value($min);
                 } catch (\Exception) {
-                    throw new ConstraintDefinitionException(sprintf('The min value "%s" could not be converted to a "%s" instance in the "%s" constraint.', $min, $dateTimeClass, get_debug_type($constraint)));
+                    throw new ConstraintDefinitionException(sprintf('The min value "%s" could not be converted to a "%s" instance in the "%s" constraint.', $min, get_debug_type($value), get_debug_type($constraint)));
                 }
             }
 
             if (\is_string($max)) {
-                $dateTimeClass = $dateTimeClass ?: ($value instanceof \DateTimeImmutable ? \DateTimeImmutable::class : \DateTime::class);
-
                 try {
-                    $max = new $dateTimeClass($max);
+                    $max = new $value($max);
                 } catch (\Exception) {
-                    throw new ConstraintDefinitionException(sprintf('The max value "%s" could not be converted to a "%s" instance in the "%s" constraint.', $max, $dateTimeClass, get_debug_type($constraint)));
+                    throw new ConstraintDefinitionException(sprintf('The max value "%s" could not be converted to a "%s" instance in the "%s" constraint.', $max, get_debug_type($value), get_debug_type($constraint)));
                 }
             }
         }
@@ -187,7 +181,7 @@ class RangeValidator extends ConstraintValidator
         }
 
         try {
-            new \DateTime($boundary);
+            new \DateTimeImmutable($boundary);
         } catch (\Exception) {
             return false;
         }

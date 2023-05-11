@@ -93,6 +93,7 @@ class ValidatorTypeGuesserTest extends TestCase
             [new Type('long'), new TypeGuess(IntegerType::class, [], Guess::MEDIUM_CONFIDENCE)],
             [new Type('string'), new TypeGuess(TextType::class, [], Guess::LOW_CONFIDENCE)],
             [new Type(\DateTime::class), new TypeGuess(DateType::class, [], Guess::MEDIUM_CONFIDENCE)],
+            [new Type(\DateTimeImmutable::class), new TypeGuess(DateType::class, ['input' => 'datetime_immutable'], Guess::MEDIUM_CONFIDENCE)],
             [new Type('\DateTime'), new TypeGuess(DateType::class, [], Guess::MEDIUM_CONFIDENCE)],
         ];
     }

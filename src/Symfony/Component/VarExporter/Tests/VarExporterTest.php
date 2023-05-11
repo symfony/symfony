@@ -127,7 +127,7 @@ class VarExporterTest extends TestCase
             \DateTime::createFromFormat('U', 0),
             \DateTimeImmutable::createFromFormat('U', 0),
             $tz = new \DateTimeZone('Europe/Paris'),
-            $interval = ($start = new \DateTime('2009-10-11', $tz))->diff(new \DateTime('2009-10-18', $tz)),
+            $interval = ($start = new \DateTimeImmutable('2009-10-11', $tz))->diff(new \DateTimeImmutable('2009-10-18', $tz)),
             new \DatePeriod($start, $interval, 4),
         ]];
 

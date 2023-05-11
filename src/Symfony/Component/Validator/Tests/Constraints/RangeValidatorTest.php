@@ -288,11 +288,10 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             [new \DateTime('March 10, 2014')],
             [new \DateTime('March 15, 2014')],
             [new \DateTime('March 20, 2014')],
+            [new \DateTimeImmutable('March 10, 2014')],
+            [new \DateTimeImmutable('March 15, 2014')],
+            [new \DateTimeImmutable('March 20, 2014')],
         ];
-
-        $tests[] = [new \DateTimeImmutable('March 10, 2014')];
-        $tests[] = [new \DateTimeImmutable('March 15, 2014')];
-        $tests[] = [new \DateTimeImmutable('March 20, 2014')];
 
         date_default_timezone_set($timezone);
 
@@ -309,10 +308,9 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         $tests = [
             [new \DateTime('March 20, 2013'), 'Mar 20, 2013, 12:00 AM'],
             [new \DateTime('March 9, 2014'), 'Mar 9, 2014, 12:00 AM'],
+            [new \DateTimeImmutable('March 20, 2013'), 'Mar 20, 2013, 12:00 AM'],
+            [new \DateTimeImmutable('March 9, 2014'), 'Mar 9, 2014, 12:00 AM'],
         ];
-
-        $tests[] = [new \DateTimeImmutable('March 20, 2013'), 'Mar 20, 2013, 12:00 AM'];
-        $tests[] = [new \DateTimeImmutable('March 9, 2014'), 'Mar 9, 2014, 12:00 AM'];
 
         date_default_timezone_set($timezone);
 
@@ -329,10 +327,9 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         $tests = [
             [new \DateTime('March 21, 2014'), 'Mar 21, 2014, 12:00 AM'],
             [new \DateTime('March 9, 2015'), 'Mar 9, 2015, 12:00 AM'],
+            [new \DateTimeImmutable('March 21, 2014'), 'Mar 21, 2014, 12:00 AM'],
+            [new \DateTimeImmutable('March 9, 2015'), 'Mar 9, 2015, 12:00 AM'],
         ];
-
-        $tests[] = [new \DateTimeImmutable('March 21, 2014'), 'Mar 21, 2014, 12:00 AM'];
-        $tests[] = [new \DateTimeImmutable('March 9, 2015'), 'Mar 9, 2015, 12:00 AM'];
 
         date_default_timezone_set($timezone);
 

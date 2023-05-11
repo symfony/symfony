@@ -115,6 +115,12 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                     case '\DateTime':
                         return new TypeGuess(DateType::class, [], Guess::MEDIUM_CONFIDENCE);
 
+                    case \DateTimeImmutable::class:
+                    case '\DateTimeImmutable':
+                    case \DateTimeInterface::class:
+                    case '\DateTimeInterface':
+                        return new TypeGuess(DateType::class, ['input' => 'datetime_immutable'], Guess::MEDIUM_CONFIDENCE);
+
                     case 'string':
                         return new TypeGuess(TextType::class, [], Guess::LOW_CONFIDENCE);
                 }

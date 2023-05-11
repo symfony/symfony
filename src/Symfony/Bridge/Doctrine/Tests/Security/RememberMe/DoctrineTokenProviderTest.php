@@ -77,7 +77,7 @@ class DoctrineTokenProviderTest extends TestCase
         $provider->createNewToken($token);
 
         // new request comes in requiring remember-me auth, which updates the token
-        $provider->updateExistingToken($token, $newValue, new \DateTime('-5 seconds'));
+        $provider->updateExistingToken($token, $newValue, new \DateTimeImmutable('-5 seconds'));
         $provider->updateToken($series, $newValue, new \DateTime('-5 seconds'));
 
         // parallel request comes in with the old remember-me cookie and session, which also requires reauth
@@ -102,7 +102,7 @@ class DoctrineTokenProviderTest extends TestCase
         $provider->createNewToken($token);
 
         // new request comes in requiring remember-me auth, which updates the token
-        $provider->updateExistingToken($token, $newValue, new \DateTime('-61 seconds'));
+        $provider->updateExistingToken($token, $newValue, new \DateTimeImmutable('-61 seconds'));
         $provider->updateToken($series, $newValue, new \DateTime('-5 seconds'));
 
         // parallel request comes in with the old remember-me cookie and session, which also requires reauth

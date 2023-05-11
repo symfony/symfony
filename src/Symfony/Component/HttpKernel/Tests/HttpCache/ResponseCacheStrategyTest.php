@@ -77,7 +77,7 @@ class ResponseCacheStrategyTest extends TestCase
         $cacheStrategy = new ResponseCacheStrategy();
 
         $embeddedResponse = new Response();
-        $embeddedResponse->setLastModified(new \DateTime());
+        $embeddedResponse->setLastModified(new \DateTimeImmutable());
         $cacheStrategy->add($embeddedResponse);
 
         $mainResponse = new Response();
@@ -95,7 +95,7 @@ class ResponseCacheStrategyTest extends TestCase
 
         // This main response uses the "validation" model
         $mainResponse = new Response();
-        $mainResponse->setLastModified(new \DateTime());
+        $mainResponse->setLastModified(new \DateTimeImmutable());
         $mainResponse->setEtag('foo');
 
         // Embedded response uses "expiry" model
@@ -117,7 +117,7 @@ class ResponseCacheStrategyTest extends TestCase
         $cacheStrategy = new ResponseCacheStrategy();
 
         $mainResponse = new Response();
-        $mainResponse->setLastModified(new \DateTime());
+        $mainResponse->setLastModified(new \DateTimeImmutable());
         $cacheStrategy->update($mainResponse);
 
         $this->assertTrue($mainResponse->isValidateable());
@@ -138,11 +138,11 @@ class ResponseCacheStrategyTest extends TestCase
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
-        $embeddedDate = new \DateTime('-1 hour');
+        $embeddedDate = new \DateTimeImmutable('-1 hour');
 
         // This master response uses the "validation" model
         $masterResponse = new Response();
-        $masterResponse->setLastModified(new \DateTime('-2 hour'));
+        $masterResponse->setLastModified(new \DateTimeImmutable('-2 hour'));
         $masterResponse->setEtag('foo');
 
         // Embedded response uses "expiry" model
@@ -244,7 +244,7 @@ class ResponseCacheStrategyTest extends TestCase
         $mainResponse = new Response();
         $mainResponse->setSharedMaxAge(3600);
         $mainResponse->setEtag('foo');
-        $mainResponse->setLastModified(new \DateTime());
+        $mainResponse->setLastModified(new \DateTimeImmutable());
 
         $embeddedResponse = new Response();
         $embeddedResponse->setSharedMaxAge(60);

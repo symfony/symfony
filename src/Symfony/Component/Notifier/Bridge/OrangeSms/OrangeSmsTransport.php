@@ -50,7 +50,7 @@ final class OrangeSmsTransport extends AbstractTransport
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof SmsMessage;
+        return $message instanceof SmsMessage && (null === $message->getOptions() || $message->getOptions() instanceof OrangeSmsOptions);
     }
 
     public function doSend(MessageInterface $message): SentMessage
@@ -61,7 +61,11 @@ final class OrangeSmsTransport extends AbstractTransport
 
         $from = $message->getFrom() ?: $this->from;
 
-        $url = 'https://'.$this->getEndpoint().'/smsmessaging/v1/outbound/'.urlencode('tel:'.$from).'/requests';
+        $opts = $message->getOptions();
+        $options = $opts ? $opts->toArray() : [];
+        $options['from'] = $options['from'] ?? $from;
+
+        $url = 'https://'.$this->getEndpoint().'/smsmessaging/v1/outbound/'.urlencode('tel:'.$options['from']).'/requests';
         $headers = [
             'Authorization' => 'Bearer '.$this->getAccessToken(),
             'Content-Type' => 'application/json',
@@ -70,7 +74,7 @@ final class OrangeSmsTransport extends AbstractTransport
         $payload = [
             'outboundSMSMessageRequest' => [
                 'address' => 'tel:'.$message->getPhone(),
-                'senderAddress' => 'tel:'.$from,
+                'senderAddress' => 'tel:'.$options['from'],
                 'outboundSMSTextMessage' => [
                     'message' => $message->getSubject(),
                 ],

@@ -36,6 +36,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Clickatell\ClickatellTransportFactory::class,
             'package' => 'symfony/clickatell-notifier',
         ],
+        'clicksend' => [
+            'class' => Bridge\ClickSend\ClickSendTransportFactory::class,
+            'package' => 'symfony/click-send-notifier',
+        ],
         'contact-everyone' => [
             'class' => Bridge\ContactEveryone\ContactEveryoneTransportFactory::class,
             'package' => 'symfony/contact-everyone-notifier',

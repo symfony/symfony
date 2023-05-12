@@ -279,5 +279,9 @@ return static function (ContainerConfigurator $container) {
         ->set('notifier.transport_factory.simple-textin', Bridge\SimpleTextin\SimpleTextinTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')
             ->tag('texter.transport_factory')
+    
+        ->set('notifier.transport_factory.click-send', Bridge\ClickSend\ClickSendTransportFactory::class)
+            ->parent('notifier.transport_factory.abstract')
+            ->tag('texter.transport_factory')
     ;
 };

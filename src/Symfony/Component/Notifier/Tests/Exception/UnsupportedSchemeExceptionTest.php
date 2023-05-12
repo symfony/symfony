@@ -31,6 +31,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             Bridge\Bandwidth\BandwidthTransportFactory::class => false,
             Bridge\Chatwork\ChatworkTransportFactory::class => false,
             Bridge\Clickatell\ClickatellTransportFactory::class => false,
+            Bridge\ClickSend\ClickSendTransportFactory::class => false,
             Bridge\ContactEveryone\ContactEveryoneTransportFactory::class => false,
             Bridge\Discord\DiscordTransportFactory::class => false,
             Bridge\Engagespot\EngagespotTransportFactory::class => false,
@@ -111,6 +112,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['sns', 'symfony/amazon-sns-notifier'];
         yield ['bandwidth', 'symfony/bandwidth-notifier'];
         yield ['clickatell', 'symfony/clickatell-notifier'];
+        yield ['clicksend', 'symfony/click-send-notifier'];
         yield ['contact-everyone', 'symfony/contact-everyone-notifier'];
         yield ['discord', 'symfony/discord-notifier'];
         yield ['esendex', 'symfony/esendex-notifier'];

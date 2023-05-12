@@ -7,19 +7,21 @@
                         http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
 
     <framework:config http-method-override="false">
-        <framework:asset-mapper>
+        <framework:asset-mapper
+            enabled="true"
+            server="true"
+            public-prefix="/assets_path/"
+            strict-mode="true"
+            importmap-path="%kernel.project_dir%/importmap.php"
+            importmap-polyfill="https://cdn.example.com/polyfill.js"
+            vendor-dir="%kernel.project_dir%/assets/vendor"
+            provider="jspm"
+        >
             <framework:path>assets/</framework:path>
             <framework:path namespace="my_namespace">assets2/</framework:path>
-            <framework:excluded-pattern>*/*.scss</framework:excluded-pattern>
-            <framework:server>true</framework:server>
-            <framework:public_prefix>/assets_path/</framework:public_prefix>
-            <framework:strict-mode>true</framework:strict-mode>
+            <framework:excluded-pattern>*/assets/build/*</framework:excluded-pattern>
             <framework:extension extension="zip">application/zip</framework:extension>
-            <framework:importmap-path>%kernel.project_dir%/importmap.php</framework:importmap-path>
-            <framework:importmap-polyfill>https://cdn.example.com/polyfill.js</framework:importmap-polyfill>
             <framework:importmap-script-attribute key="data-turbo-track">reload</framework:importmap-script-attribute>
-            <framework:vendor_dir>%kernel.project_dir%/assets/vendor</framework:vendor_dir>
-            <framework:provider>jspm</framework:provider>
         </framework:asset-mapper>
     </framework:config>
 </container>

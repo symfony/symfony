@@ -191,16 +191,17 @@
         <xsd:sequence>
             <xsd:element name="path" type="asset_mapper_path" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="excluded-pattern" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
-            <xsd:element name="server" type="xsd:boolean" minOccurs="0" />
-            <xsd:element name="public_prefix" type="xsd:string" minOccurs="0" />
-            <xsd:element name="strict-mode" type="xsd:boolean" minOccurs="0" />
             <xsd:element name="extension" type="asset_mapper_extension" minOccurs="0" maxOccurs="unbounded" />
-            <xsd:element name="importmap-path" type="xsd:string" minOccurs="0" />
-            <xsd:element name="importmap-polyfill" type="xsd:string" minOccurs="0" nillable="true" />
             <xsd:element name="importmap-script-attribute" type="asset_mapper_attribute" minOccurs="0" maxOccurs="unbounded" />
-            <xsd:element name="vendor_dir" type="xsd:string" minOccurs="0" />
-            <xsd:element name="provider" type="xsd:string" minOccurs="0" />
         </xsd:sequence>
+        <xsd:attribute name="enabled" type="xsd:boolean" />
+        <xsd:attribute name="server" type="xsd:boolean" />
+        <xsd:attribute name="public-prefix" type="xsd:string" />
+        <xsd:attribute name="strict-mode" type="xsd:boolean" />
+        <xsd:attribute name="importmap-path" type="xsd:string" />
+        <xsd:attribute name="importmap-polyfill" type="xsd:string" />
+        <xsd:attribute name="vendor-dir" type="xsd:string" />
+        <xsd:attribute name="provider" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="asset_mapper_path" mixed="true">

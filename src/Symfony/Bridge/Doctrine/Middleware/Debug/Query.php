@@ -43,7 +43,7 @@ class Query
         }
     }
 
-    public function setParam(string|int $param, null|string|int|float|bool &$variable, int $type): void
+    public function setParam(string|int $param, mixed &$variable, int $type): void
     {
         // Numeric indexes start at 0 in profiler
         $idx = \is_int($param) ? $param - 1 : $param;

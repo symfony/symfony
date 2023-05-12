@@ -228,6 +228,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\SmsFactor\SmsFactorTransportFactory::class,
             'package' => 'symfony/sms-factor-notifier',
         ],
+        'smsmode' => [
+            'class' => Bridge\Smsmode\SmsmodeTransportFactory::class,
+            'package' => 'symfony/smsmode-notifier',
+        ],
         'sns' => [
             'class' => Bridge\AmazonSns\AmazonSnsTransportFactory::class,
             'package' => 'symfony/amazon-sns-notifier',

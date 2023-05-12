@@ -18,11 +18,15 @@ namespace Symfony\Component\Workflow;
  */
 class Marking
 {
+    /**
+     * @var array<string, int>
+     */
     private array $places = [];
+    private array $enumPlaces = [];
     private ?array $context = null;
 
     /**
-     * @param int[] $representation Keys are the place name and values should be 1
+     * @param array<string, int> $representation Keys are the place name and values should be 1
      */
     public function __construct(array $representation = [])
     {
@@ -31,36 +35,43 @@ class Marking
         }
     }
 
-    /**
-     * @return void
-     */
-    public function mark(string $place)
+    public function mark(string|\UnitEnum $place): void
     {
-        $this->places[$place] = 1;
+        $key = $this->placeToKey($place);
+        $this->places[$key] = 1;
+        if ($place instanceof \UnitEnum) {
+            $this->enumPlaces[$key] = $place;
+        }
+    }
+
+    public function unmark(string|\UnitEnum $place): void
+    {
+        $key = $this->placeToKey($place);
+        unset(
+            $this->places[$key],
+            $this->enumPlaces[$key]
+        );
+    }
+
+    public function has(string|\UnitEnum $place): bool
+    {
+        return isset($this->places[$this->placeToKey($place)]);
     }
 
     /**
-     * @return void
+     * @return array<string, int>
      */
-    public function unmark(string $place)
-    {
-        unset($this->places[$place]);
-    }
-
-    /**
-     * @return bool
-     */
-    public function has(string $place)
-    {
-        return isset($this->places[$place]);
-    }
-
-    /**
-     * @return array
-     */
-    public function getPlaces()
+    public function getPlaces(): array
     {
         return $this->places;
+    }
+
+    /**
+     * @return array<string, string|\UnitEnum>
+     */
+    public function getEnumPlaces(): array
+    {
+        return $this->enumPlaces;
     }
 
     /**
@@ -77,5 +88,18 @@ class Marking
     public function getContext(): ?array
     {
         return $this->context;
+    }
+
+    private function placeToKey(string|\UnitEnum $place): string
+    {
+        if (is_string($place)) {
+            return $place;
+        }
+
+        if ($place instanceof \BackedEnum) {
+            return (string)$place->value;
+        }
+
+        return $place->name;
     }
 }

@@ -14,6 +14,7 @@ namespace Symfony\Component\Workflow\Tests\MarkingStore;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\MarkingStore\MethodMarkingStore;
+use Symfony\Component\Workflow\Tests\MarkingEnum;
 use Symfony\Component\Workflow\Tests\Subject;
 
 class MethodMarkingStoreTest extends TestCase
@@ -109,6 +110,28 @@ class MethodMarkingStoreTest extends TestCase
         $this->expectExceptionMessage('Typed property Symfony\Component\Workflow\Tests\MarkingStore\SubjectWithType::$marking must not be accessed before initialization');
 
         $markingStore->getMarking($subject);
+    }
+
+    public function testGetSetMarkingWithSingleEnumState()
+    {
+        $subject = new Subject();
+
+        $markingStore = new MethodMarkingStore(true);
+
+        $marking = $markingStore->getMarking($subject);
+
+        $this->assertInstanceOf(Marking::class, $marking);
+        $this->assertCount(0, $marking->getPlaces());
+
+        $marking->mark(MarkingEnum::FIRST_PLACE);
+
+        $markingStore->setMarking($subject, $marking);
+
+        $this->assertSame(MarkingEnum::FIRST_PLACE, $subject->getMarking());
+
+        $marking2 = $markingStore->getMarking($subject);
+
+        $this->assertEquals($marking, $marking2);
     }
 
     private function createValueObject(string $markingValue): object

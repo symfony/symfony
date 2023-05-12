@@ -22,7 +22,7 @@ final class Subject
         $this->context = [];
     }
 
-    public function getMarking(): string|array|null
+    public function getMarking(): string|array|null|MarkingEnum
     {
         return $this->marking;
     }

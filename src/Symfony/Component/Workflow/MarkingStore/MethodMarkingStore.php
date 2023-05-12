@@ -66,20 +66,42 @@ final class MethodMarkingStore implements MarkingStoreInterface
         }
 
         if ($this->singleState) {
-            $marking = [(string) $marking => 1];
-        } elseif (!\is_array($marking)) {
+            $result = new Marking();
+            $result->mark($marking);
+
+            return $result;
+        }
+
+        if (!\is_array($marking)) {
             throw new LogicException(sprintf('The method "%s::%s()" did not return an array and the Workflow\'s Marking store is instantiated with $singleState=false.', get_debug_type($subject), $method));
         }
 
-        return new Marking($marking);
+        $result = new Marking();
+        foreach ($marking as $place => $nbTokenOrEnum) {
+            if ($nbTokenOrEnum instanceof \UnitEnum) {
+                $result->mark($nbTokenOrEnum);
+            } else {
+                $result->mark($place);
+            }
+        }
+
+        return $result;
     }
 
     public function setMarking(object $subject, Marking $marking, array $context = []): void
     {
-        $marking = $marking->getPlaces();
-
-        if ($this->singleState) {
-            $marking = key($marking);
+        $enumPlaces = $marking->getEnumPlaces();
+        if ([] !== $enumPlaces) {
+            if ($this->singleState) {
+                $marking = array_values($enumPlaces)[0];
+            } else {
+                $marking = $enumPlaces;
+            }
+        } else {
+            $marking = $marking->getPlaces();
+            if ($this->singleState) {
+                $marking = key($marking);
+            }
         }
 
         $method = 'set'.ucfirst($this->property);

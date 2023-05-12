@@ -99,6 +99,11 @@ final class TermiiOptions implements MessageOptionsInterface
 
     public function toArray(): array
     {
-        return $this->options;
+        $options = $this->options;
+        if (isset($options['recipient_id'])) {
+            unset($options['recipient_id']);
+        }
+
+        return $options;
     }
 }

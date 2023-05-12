@@ -1,11 +1,6 @@
 CHANGELOG
 =========
 
-6.3
----
-
- * Add `OrangeSmsOptions` class
-
 6.2
 ---
 

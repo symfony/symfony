@@ -1,11 +1,6 @@
 CHANGELOG
 =========
 
-6.3
----
-
- * Add `ClickatellOptions` class
-
 6.2
 ---
 

@@ -25,72 +25,38 @@ final class TermiiOptions implements MessageOptionsInterface
         $this->options = $options;
     }
 
-    public function getChannel(): ?string
-    {
-        return $this->options['channel'] ?? null;
-    }
-
-    public function getFrom(): ?string
-    {
-        return $this->options['from'] ?? null;
-    }
-
-    public function getMediaCaption(): ?string
-    {
-        return $this->options['media_caption'] ?? null;
-    }
-
-    public function getMediaUrl(): ?string
-    {
-        return $this->options['media_url'] ?? null;
-    }
-
     public function getRecipientId(): ?string
     {
-        return $this->options['recipient_id'] ?? null;
+        return null;
     }
 
-    public function getType(): ?string
-    {
-        return $this->options['type'] ?? null;
-    }
-
-    public function setChannel(string $channel): self
+    /**
+     * @return $this
+     */
+    public function channel(string $channel): static
     {
         $this->options['channel'] = $channel;
 
         return $this;
     }
 
-    public function setFrom(string $from): self
+    /**
+     * @return $this
+     */
+    public function media(string $url, string $caption = ''): static
     {
-        $this->options['from'] = $from;
+        $this->options['media'] = [
+            'url' => $url,
+            'caption' => $caption,
+        ];
 
         return $this;
     }
 
-    public function setMediaCaption(string $mediaCaption): self
-    {
-        $this->options['media_caption'] = $mediaCaption;
-
-        return $this;
-    }
-
-    public function setMediaUrl(string $mediaUrl): self
-    {
-        $this->options['media_url'] = $mediaUrl;
-
-        return $this;
-    }
-
-    public function setRecipientId(string $id): self
-    {
-        $this->options['recipient_id'] = $id;
-
-        return $this;
-    }
-
-    public function setType(string $type): self
+    /**
+     * @return $this
+     */
+    public function type(string $type): static
     {
         $this->options['type'] = $type;
 
@@ -99,11 +65,6 @@ final class TermiiOptions implements MessageOptionsInterface
 
     public function toArray(): array
     {
-        $options = $this->options;
-        if (isset($options['recipient_id'])) {
-            unset($options['recipient_id']);
-        }
-
-        return $options;
+        return $this->options;
     }
 }

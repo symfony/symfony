@@ -48,7 +48,7 @@ final class EngagespotTransport extends AbstractTransport
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof PushMessage;
+        return $message instanceof PushMessage && (null === $message->getOptions() || $message->getOptions() instanceof EngagespotOptions);
     }
 
     protected function doSend(MessageInterface $message): SentMessage
@@ -58,10 +58,8 @@ final class EngagespotTransport extends AbstractTransport
         }
 
         $endpoint = sprintf('https://%s', $this->getEndpoint());
-        $options = ($opts = $message->getOptions()) ? $opts->toArray() : [];
-        if (!isset($options['to'])) {
-            $options['to'] = $message->getRecipientId();
-        }
+        $options = $message->getOptions()?->toArray() ?? [];
+        $options['to'] ??= $message->getRecipientId();
 
         $sendToEveryone = $options['everyone'] ?? false;
         if (!$sendToEveryone) {

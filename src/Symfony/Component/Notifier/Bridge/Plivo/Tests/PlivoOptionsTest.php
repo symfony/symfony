@@ -18,11 +18,17 @@ class PlivoOptionsTest extends TestCase
 {
     public function testPlivoOptions()
     {
-        $plivoOptions = (new PlivoOptions())->setRecipientId('test_recipient')->setLog(true)->setSrc('test_src')->setMethod('test_method')->setUrl('test_url')->setMediaUrls('test_media_urls')->setPowerpackUuid('test_powerpack_uuid')->setTrackable(true)->setType('test_type');
+        $plivoOptions = (new PlivoOptions())
+            ->log(true)
+            ->method('test_method')
+            ->url('test_url')
+            ->mediaUrls('test_media_urls')
+            ->powerpackUuid('test_powerpack_uuid')
+            ->trackable(true)
+            ->type('test_type');
 
         self::assertSame([
             'log' => true,
-            'src' => 'test_src',
             'method' => 'test_method',
             'url' => 'test_url',
             'media_urls' => 'test_media_urls',

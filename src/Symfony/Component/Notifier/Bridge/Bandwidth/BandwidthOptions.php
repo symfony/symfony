@@ -25,121 +25,73 @@ final class BandwidthOptions implements MessageOptionsInterface
         $this->options = $options;
     }
 
-    public function getAccountId(): ?string
-    {
-        return $this->options['account_id'] ?? null;
-    }
-
-    public function getApplicationId(): ?string
-    {
-        return $this->options['application_id'] ?? null;
-    }
-
-    public function getExpiration(): ?string
-    {
-        return $this->options['expiration'] ?? null;
-    }
-
-    public function getFrom(): ?string
-    {
-        return $this->options['from'] ?? null;
-    }
-
-    public function getMedia(): ?array
-    {
-        return $this->options['media'] ?? null;
-    }
-
-    public function getPriority(): ?string
-    {
-        return $this->options['priority'] ?? null;
-    }
-
     public function getRecipientId(): ?string
     {
-        return $this->options['recipient_id'] ?? null;
+        return null;
     }
 
-    public function getTag(): ?string
+    /**
+     * @return $this
+     */
+    public function accountId(string $accountId): static
     {
-        return $this->options['tag'] ?? null;
-    }
-
-    public function getTo(): ?array
-    {
-        return $this->options['to'] ?? null;
-    }
-
-    public function setAccountId(string $accountId): self
-    {
-        $this->options['account_id'] = $accountId;
+        $this->options['accountId'] = $accountId;
 
         return $this;
     }
 
-    public function setApplicationId(string $applicationId): self
+    /**
+     * @return $this
+     */
+    public function applicationId(string $applicationId): static
     {
-        $this->options['application_id'] = $applicationId;
+        $this->options['applicationId'] = $applicationId;
 
         return $this;
     }
 
-    public function setExpiration(string $expiration): self
+    /**
+     * @return $this
+     */
+    public function expiration(string $expiration): static
     {
         $this->options['expiration'] = $expiration;
 
         return $this;
     }
 
-    public function setFrom(string $from): self
-    {
-        $this->options['from'] = $from;
-
-        return $this;
-    }
-
-    public function setMedia(array $media): self
+    /**
+     * @return $this
+     */
+    public function media(array $media): static
     {
         $this->options['media'] = $media;
 
         return $this;
     }
 
-    public function setPriority(string $priority): self
+    /**
+     * @return $this
+     */
+    public function priority(string $priority): static
     {
         $this->options['priority'] = $priority;
 
         return $this;
     }
 
-    public function setRecipientId(string $id): self
-    {
-        $this->options['recipient_id'] = $id;
-
-        return $this;
-    }
-
-    public function setTag(string $tag): self
+    /**
+     * @return $this
+     */
+    public function tag(string $tag): static
     {
         $this->options['tag'] = $tag;
 
         return $this;
     }
 
-    public function setTo(array $to): self
-    {
-        $this->options['to'] = $to;
-
-        return $this;
-    }
-
     public function toArray(): array
     {
-        $options = $this->options;
-        if (isset($options['recipient_id'])) {
-            unset($options['recipient_id']);
-        }
-
-        return $options;
+        return $this->options;
     }
 }

@@ -18,11 +18,11 @@ class EsendexOptionsTest extends TestCase
 {
     public function testEsendexOptions()
     {
-        $esendexOptions = (new EsendexOptions())->setFrom('test_from')->setAccountReference('test_account_reference')->setRecipientId('test_recipient');
+        $esendexOptions = (new EsendexOptions())
+            ->accountReference('test_account_reference');
 
         self::assertSame([
-            'from' => 'test_from',
-            'account_reference' => 'test_account_reference',
+            'accountreference' => 'test_account_reference',
         ], $esendexOptions->toArray());
     }
 }

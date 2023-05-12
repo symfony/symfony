@@ -18,10 +18,15 @@ class ClickSendOptionsTest extends TestCase
 {
     public function testClickSendOptions()
     {
-        $clickSendOptions = (new ClickSendOptions())->setFrom('test_from')->setCountry('test_country')->setCustomString('test_custom_string')->setFromEmail('test_from_email')->setListId('test_list_id')->setRecipientId('test_recipient_id')->setSchedule(999)->setSource('test_source');
+        $clickSendOptions = (new ClickSendOptions())
+            ->country('test_country')
+            ->customString('test_custom_string')
+            ->fromEmail('test_from_email')
+            ->listId('test_list_id')
+            ->schedule(999)
+            ->source('test_source');
 
         self::assertSame([
-            'from' => 'test_from',
             'country' => 'test_country',
             'custom_string' => 'test_custom_string',
             'from_email' => 'test_from_email',

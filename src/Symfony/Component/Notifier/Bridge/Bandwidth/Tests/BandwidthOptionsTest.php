@@ -18,15 +18,19 @@ class BandwidthOptionsTest extends TestCase
 {
     public function testBandwidthOptions()
     {
-        $bandwidthOptions = (new BandwidthOptions())->setFrom('test_from')->setRecipientId('test_recipient')->setMedia(['foo'])->setTo(['test_too'])->setTag('test_tag')->setAccountId('test_account_id')->setApplicationId('test_application_id')->setExpiration('test_expiration')->setPriority('test_priority');
+        $bandwidthOptions = (new BandwidthOptions())
+            ->media(['foo'])
+            ->tag('test_tag')
+            ->accountId('test_account_id')
+            ->applicationId('test_application_id')
+            ->expiration('test_expiration')
+            ->priority('test_priority');
 
         self::assertSame([
-            'from' => 'test_from',
             'media' => ['foo'],
-            'to' => ['test_too'],
             'tag' => 'test_tag',
-            'account_id' => 'test_account_id',
-            'application_id' => 'test_application_id',
+            'accountId' => 'test_account_id',
+            'applicationId' => 'test_application_id',
             'expiration' => 'test_expiration',
             'priority' => 'test_priority',
         ], $bandwidthOptions->toArray());

@@ -47,11 +47,11 @@ final class SlackTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        if (null === $this->chatChannel) {
-            return sprintf('slack://%s', $this->getEndpoint());
-        }
+        $query = array_filter([
+            'channel' => $this->chatChannel,
+        ]);
 
-        return sprintf('slack://%s?channel=%s', $this->getEndpoint(), urlencode($this->chatChannel));
+        return sprintf('slack://%s%s', $this->getEndpoint(), $query ? '?'.http_build_query($query, '', '&') : '');
     }
 
     public function supports(MessageInterface $message): bool
@@ -68,21 +68,15 @@ final class SlackTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
-        if ($message->getOptions() && !$message->getOptions() instanceof SlackOptions) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, SlackOptions::class));
+        if (!($options = $message->getOptions()) && $notification = $message->getNotification()) {
+            $options = SlackOptions::fromNotification($notification);
         }
 
-        if (!($opts = $message->getOptions()) && $notification = $message->getNotification()) {
-            $opts = SlackOptions::fromNotification($notification);
-        }
-
-        $options = $opts ? $opts->toArray() : [];
-        if (!isset($options['channel'])) {
-            $options['channel'] = $message->getRecipientId() ?: $this->chatChannel;
-        }
+        $options = $options?->toArray() ?? [];
+        $options['channel'] ??= $message->getRecipientId() ?: $this->chatChannel;
         $options['text'] = $message->getSubject();
 
-        $apiMethod = $opts instanceof UpdateMessageSlackOptions ? 'chat.update' : 'chat.postMessage';
+        $apiMethod = $message->getOptions() instanceof UpdateMessageSlackOptions ? 'chat.update' : 'chat.postMessage';
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/api/'.$apiMethod, [
             'json' => array_filter($options),
             'auth_bearer' => $this->accessToken,

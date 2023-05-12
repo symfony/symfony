@@ -12,7 +12,6 @@
 namespace Symfony\Component\Notifier\Bridge\Esendex;
 
 use Symfony\Component\HttpClient\Exception\JsonException;
-use Symfony\Component\HttpClient\Exception\TransportException as HttpClientTransportException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\MessageInterface;
@@ -58,20 +57,16 @@ final class EsendexTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $from = $message->getFrom() ?: $this->from;
-
-        $opts = $message->getOptions();
-        $options = $opts ? $opts->toArray() : [];
-        $options['from'] = $options['from'] ?? $from;
+        $options = $message->getOptions()?->toArray() ?? [];
+        $options['from'] = $message->getFrom() ?: $this->from;
         $options['messages'] = [
             'to' => $message->getPhone(),
             'body' => $message->getSubject(),
         ];
-        $options['accountreference'] = $options['account_reference'] ?? $this->accountReference;
-        unset($options['account_reference']);
+        $options['accountreference'] ??= $this->accountReference;
 
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/v1.0/messagedispatcher', [
-            'auth_basic' => sprintf('%s:%s', $this->email, $this->password),
+            'auth_basic' => [$this->email, $this->password],
             'headers' => [
                 'Accept' => 'application/json',
             ],
@@ -105,9 +100,6 @@ final class EsendexTransport extends AbstractTransport
 
                 $message .= sprintf(' Details from Esendex: %s: "%s".', $error['code'], $error['description']);
             }
-        } catch (HttpClientTransportException) {
-            // Catching this exception is useful to keep compatibility, with symfony/http-client < 4.4.10
-            // See https://github.com/symfony/symfony/pull/37065
         } catch (JsonException) {
         }
 

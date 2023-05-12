@@ -25,7 +25,10 @@ final class MattermostOptions implements MessageOptionsInterface
         $this->options = $options;
     }
 
-    public function recipient(string $id): self
+    /**
+     * @return $this
+     */
+    public function recipient(string $id): static
     {
         $this->options['recipient_id'] = $id;
 

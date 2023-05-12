@@ -25,61 +25,33 @@ final class SmsmodeOptions implements MessageOptionsInterface
         $this->options = $options;
     }
 
-    public function getFrom(): ?string
-    {
-        return $this->options['from'] ?? null;
-    }
-
     public function getRecipientId(): ?string
     {
-        return $this->options['recipient_id'] ?? null;
+        return null;
     }
 
-    public function getRefClient(): ?string
+    /**
+     * @return $this
+     */
+    public function refClient(string $refClient): static
     {
-        return $this->options['ref_client'] ?? null;
-    }
-
-    public function getSentDate(): ?string
-    {
-        return $this->options['sent_date'] ?? null;
-    }
-
-    public function setFrom(string $from): self
-    {
-        $this->options['from'] = $from;
+        $this->options['refClient'] = $refClient;
 
         return $this;
     }
 
-    public function setRecipientId(string $id): self
+    /**
+     * @return $this
+     */
+    public function sentDate(string $sentDate): static
     {
-        $this->options['recipient_id'] = $id;
-
-        return $this;
-    }
-
-    public function setRefClient(string $refClient): self
-    {
-        $this->options['ref_client'] = $refClient;
-
-        return $this;
-    }
-
-    public function setSentDate(string $sentDate): self
-    {
-        $this->options['sent_date'] = $sentDate;
+        $this->options['sentDate'] = $sentDate;
 
         return $this;
     }
 
     public function toArray(): array
     {
-        $options = $this->options;
-        if (isset($options['recipient_id'])) {
-            unset($options['recipient_id']);
-        }
-
-        return $options;
+        return $this->options;
     }
 }

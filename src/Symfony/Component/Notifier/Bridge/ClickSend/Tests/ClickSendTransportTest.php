@@ -16,26 +16,26 @@ use Symfony\Component\Notifier\Bridge\ClickSend\ClickSendOptions;
 use Symfony\Component\Notifier\Bridge\ClickSend\ClickSendTransport;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
+use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class ClickSendTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null, string $from = 'test_from', string $source = 'test_source', int $listId = 99, string $fromEmail = 'foo@bar.com'): ClickSendTransport
+    public static function createTransport(HttpClientInterface $client = null, string $from = 'test_from', string $source = 'test_source', int $listId = 99, string $fromEmail = 'foo@bar.com'): ClickSendTransport
     {
-        return new ClickSendTransport('test_username', 'test_key', $from, $source, $listId, $fromEmail, $client ?? $this->createMock(HttpClientInterface::class));
+        return new ClickSendTransport('test_username', 'test_key', $from, $source, $listId, $fromEmail, $client ?? new MockHttpClient());
     }
 
-    public function invalidFromProvider(): iterable
+    public static function invalidFromProvider(): iterable
     {
         yield 'no zero at start if phone number' => ['+0'];
         yield 'phone number too short' => ['+1'];
     }
 
-    public function supportedMessagesProvider(): iterable
+    public static function supportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
         yield [new SmsMessage('0611223344', 'Hello!', 'from', new ClickSendOptions(['custom_string' => 'test_custom_string']))];
@@ -73,18 +73,18 @@ final class ClickSendTransportTest extends TransportTestCase
         $transport->send($message);
     }
 
-    public function toStringProvider(): iterable
+    public static function toStringProvider(): iterable
     {
-        yield ['clicksend://rest.clicksend.com?from=test_from&source=test_source&list_id=99&from_email=foo%40bar.com', $this->createTransport()];
+        yield ['clicksend://rest.clicksend.com?from=test_from&source=test_source&list_id=99&from_email=foo%40bar.com', self::createTransport()];
     }
 
-    public function unsupportedMessagesProvider(): iterable
+    public static function unsupportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [new DummyMessage()];
     }
 
-    public function validFromProvider(): iterable
+    public static function validFromProvider(): iterable
     {
         yield ['abc'];
         yield ['abcd'];

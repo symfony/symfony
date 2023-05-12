@@ -43,11 +43,7 @@ final class AllMySmsTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        if (null !== $this->from) {
-            return sprintf('allmysms://%s?from=%s', $this->getEndpoint(), $this->from);
-        }
-
-        return sprintf('allmysms://%s', $this->getEndpoint());
+        return sprintf('allmysms://%s%s', $this->getEndpoint(), null !== $this->from ? '?from='.$this->from : '');
     }
 
     public function supports(MessageInterface $message): bool
@@ -61,32 +57,14 @@ final class AllMySmsTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $from = $message->getFrom() ?: $this->from;
-
-        $opts = $message->getOptions();
-        $options = $opts ? $opts->toArray() : [];
-        $options['from'] = $options['from'] ?? $from;
+        $options = $message->getOptions()?->toArray() ?? [];
+        $options['from'] = $message->getFrom() ?: $this->from;
         $options['to'] = $message->getPhone();
         $options['text'] = $message->getSubject();
 
-        if (isset($options['campaign_name'])) {
-            $options['campaignName'] = $options['campaign_name'];
-            unset($options['campaign_name']);
-        }
-
-        if (isset($options['cli_msg_id'])) {
-            $options['cliMsgId'] = $options['cli_msg_id'];
-            unset($options['cli_msg_id']);
-        }
-
-        if (isset($options['unique_identifier'])) {
-            $options['uniqueIdentifier'] = $options['unique_identifier'];
-            unset($options['unique_identifier']);
-        }
-
         $endpoint = sprintf('https://%s/sms/send/', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
-            'auth_basic' => $this->login.':'.$this->apiKey,
+            'auth_basic' => [$this->login, $this->apiKey],
             'json' => array_filter($options),
         ]);
 

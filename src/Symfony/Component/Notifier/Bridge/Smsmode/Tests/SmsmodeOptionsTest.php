@@ -18,12 +18,13 @@ class SmsmodeOptionsTest extends TestCase
 {
     public function testSmsmodeOptions()
     {
-        $smsmodeOptions = (new SmsmodeOptions())->setFrom('test_from')->setRecipientId('test_recipient')->setRefClient('test_ref_client')->setSentDate('test_sent_date');
+        $smsmodeOptions = (new SmsmodeOptions())
+            ->refClient('test_ref_client')
+            ->sentDate('test_sent_date');
 
         self::assertSame([
-            'from' => 'test_from',
-            'ref_client' => 'test_ref_client',
-            'sent_date' => 'test_sent_date',
+            'refClient' => 'test_ref_client',
+            'sentDate' => 'test_sent_date',
         ], $smsmodeOptions->toArray());
     }
 }

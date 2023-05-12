@@ -18,14 +18,18 @@ class TermiiOptionsTest extends TestCase
 {
     public function testTermiiOptions()
     {
-        $termiiOptions = (new TermiiOptions())->setFrom('test_from')->setRecipientId('test_recipient')->setType('test_type')->setChannel('test_channel')->setMediaCaption('test_media_caption')->setMediaUrl('test_media_url');
+        $termiiOptions = (new TermiiOptions())
+            ->type('test_type')
+            ->channel('test_channel')
+            ->media('test_media_url', 'test_media_caption');
 
         self::assertSame([
-            'from' => 'test_from',
             'type' => 'test_type',
             'channel' => 'test_channel',
-            'media_caption' => 'test_media_caption',
-            'media_url' => 'test_media_url',
+            'media' => [
+                'url' => 'test_media_url',
+                'caption' => 'test_media_caption',
+            ],
         ], $termiiOptions->toArray());
     }
 }

@@ -56,27 +56,22 @@ final class TermiiTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $opts = $message->getOptions();
-        $options = $opts ? $opts->toArray() : [];
+        $options = $message->getOptions()?->toArray() ?? [];
         $options['api_key'] = $this->apiKey;
         $options['sms'] = $message->getSubject();
-        $options['from'] = $options['from'] ?? $this->from;
+        $options['from'] = $message->getFrom() ?: $this->from;
         $options['to'] = $message->getPhone();
-        $options['channel'] = $options['channel'] ?? $this->channel;
-        $options['type'] = $options['type'] ?? 'plain';
-
-        if (isset($options['media_url'])) {
-            $options['media']['url'] = $options['media_url'] ?? null;
-            $options['media']['caption'] = $options['media_caption'] ?? null;
-            unset($options['media_url'], $options['media_caption']);
-        }
+        $options['channel'] ??= $this->channel;
+        $options['type'] ??= 'plain';
 
         if (!preg_match('/^[a-zA-Z0-9\s]{3,11}$/', $options['from']) && !preg_match('/^\+?[1-9]\d{1,14}$/', $options['from'])) {
-            throw new InvalidArgumentException(sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID.', $this->from));
+            throw new InvalidArgumentException(sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID.', $options['from']));
         }
 
         $endpoint = sprintf('https://%s/api/sms/send', $this->getEndpoint());
-        $response = $this->client->request('POST', $endpoint, ['json' => array_filter($options)]);
+        $response = $this->client->request('POST', $endpoint, [
+            'json' => array_filter($options),
+        ]);
 
         try {
             $statusCode = $response->getStatusCode();

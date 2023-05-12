@@ -25,108 +25,75 @@ final class PlivoOptions implements MessageOptionsInterface
         $this->options = $options;
     }
 
-    public function getLog(): ?bool
-    {
-        return $this->options['log'] ?? null;
-    }
-
-    public function getMediaUrls(): ?string
-    {
-        return $this->options['media_urls'] ?? null;
-    }
-
-    public function getMethod(): ?string
-    {
-        return $this->options['method'] ?? null;
-    }
-
-    public function getPowerpackUuid(): ?string
-    {
-        return $this->options['powerpack_uuid'] ?? null;
-    }
-
     public function getRecipientId(): ?string
     {
-        return $this->options['recipient_id'] ?? null;
+        return null;
     }
 
-    public function getSrc(): ?string
-    {
-        return $this->options['src'] ?? null;
-    }
-
-    public function getTrackable(): ?bool
-    {
-        return $this->options['trackable'] ?? null;
-    }
-
-    public function getType(): ?string
-    {
-        return $this->options['type'] ?? null;
-    }
-
-    public function getUrl(): ?string
-    {
-        return $this->options['url'] ?? null;
-    }
-
-    public function setLog(bool $log): self
+    /**
+     * @return $this
+     */
+    public function log(bool $log): static
     {
         $this->options['log'] = $log;
 
         return $this;
     }
 
-    public function setMediaUrls(string $mediaUrls): self
+    /**
+     * @return $this
+     */
+    public function mediaUrls(string $mediaUrls): static
     {
         $this->options['media_urls'] = $mediaUrls;
 
         return $this;
     }
 
-    public function setMethod(string $method): self
+    /**
+     * @return $this
+     */
+    public function method(string $method): static
     {
         $this->options['method'] = $method;
 
         return $this;
     }
 
-    public function setPowerpackUuid(string $powerpackUuid): self
+    /**
+     * @return $this
+     */
+    public function powerpackUuid(string $powerpackUuid): static
     {
         $this->options['powerpack_uuid'] = $powerpackUuid;
 
         return $this;
     }
 
-    public function setRecipientId(string $id): self
-    {
-        $this->options['recipient_id'] = $id;
-
-        return $this;
-    }
-
-    public function setSrc(string $src): self
-    {
-        $this->options['src'] = $src;
-
-        return $this;
-    }
-
-    public function setTrackable(bool $trackable): self
+    /**
+     * @return $this
+     */
+    public function trackable(bool $trackable): static
     {
         $this->options['trackable'] = $trackable;
 
         return $this;
     }
 
-    public function setType(string $type): self
+    /**
+     * @return $this
+     */
+    public function type(string $type): static
     {
         $this->options['type'] = $type;
 
         return $this;
     }
 
-    public function setUrl(string $url): self
+    /**
+     * @return $this
+     */
+    public function url(string $url): static
     {
         $this->options['url'] = $url;
 
@@ -135,11 +102,6 @@ final class PlivoOptions implements MessageOptionsInterface
 
     public function toArray(): array
     {
-        $options = $this->options;
-        if (isset($options['recipient_id'])) {
-            unset($options['recipient_id']);
-        }
-
-        return $options;
+        return $this->options;
     }
 }

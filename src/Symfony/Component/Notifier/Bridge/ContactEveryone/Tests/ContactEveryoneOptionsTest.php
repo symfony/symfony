@@ -18,12 +18,13 @@ class ContactEveryoneOptionsTest extends TestCase
 {
     public function testContactEveryoneOptions()
     {
-        $contactEveryoneOptions = (new ContactEveryoneOptions())->setFrom('test_from')->setCategory('test_category')->setDiffusionName('test_diffusion_name')->setRecipientId('test_recipient');
+        $contactEveryoneOptions = (new ContactEveryoneOptions())
+            ->category('test_category')
+            ->diffusionName(123);
 
         self::assertSame([
-            'from' => 'test_from',
             'category' => 'test_category',
-            'diffusion_name' => 'test_diffusion_name',
+            'diffusion_name' => 123,
         ], $contactEveryoneOptions->toArray());
     }
 }

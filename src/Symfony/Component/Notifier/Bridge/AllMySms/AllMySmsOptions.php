@@ -25,108 +25,75 @@ final class AllMySmsOptions implements MessageOptionsInterface
         $this->options = $options;
     }
 
-    public function getAlerting(): ?int
-    {
-        return $this->options['alerting'] ?? null;
-    }
-
-    public function getCampaignName(): ?string
-    {
-        return $this->options['campaign_name'] ?? null;
-    }
-
-    public function getCliMsgId(): ?string
-    {
-        return $this->options['cli_msg_id'] ?? null;
-    }
-
-    public function getDate(): ?string
-    {
-        return $this->options['date'] ?? null;
-    }
-
-    public function getFrom(): ?string
-    {
-        return $this->options['from'] ?? null;
-    }
-
     public function getRecipientId(): ?string
     {
-        return $this->options['recipient_id'] ?? null;
+        return null;
     }
 
-    public function getSimulate(): ?int
-    {
-        return $this->options['simulate'] ?? null;
-    }
-
-    public function getUniqueIdentifier(): ?string
-    {
-        return $this->options['unique_identifier'] ?? null;
-    }
-
-    public function getVerbose(): ?int
-    {
-        return $this->options['verbose'] ?? null;
-    }
-
-    public function setAlerting(int $alerting): self
+    /**
+     * @return $this
+     */
+    public function alerting(int $alerting): static
     {
         $this->options['alerting'] = $alerting;
 
         return $this;
     }
 
-    public function setCampaignName(string $campaignName): self
+    /**
+     * @return $this
+     */
+    public function campaignName(string $campaignName): static
     {
-        $this->options['campaign_name'] = $campaignName;
+        $this->options['campaignName'] = $campaignName;
 
         return $this;
     }
 
-    public function setCliMsgId(string $cliMsgId): self
+    /**
+     * @return $this
+     */
+    public function cliMsgId(string $cliMsgId): static
     {
-        $this->options['cli_msg_id'] = $cliMsgId;
+        $this->options['cliMsgId'] = $cliMsgId;
 
         return $this;
     }
 
-    public function setDate(string $date): self
+    /**
+     * @return $this
+     */
+    public function date(string $date): static
     {
         $this->options['date'] = $date;
 
         return $this;
     }
 
-    public function setFrom(string $from): self
-    {
-        $this->options['from'] = $from;
-
-        return $this;
-    }
-
-    public function setRecipientId(string $id): self
-    {
-        $this->options['recipient_id'] = $id;
-
-        return $this;
-    }
-
-    public function setSimulate(int $simulate): self
+    /**
+     * @return $this
+     */
+    public function simulate(int $simulate): static
     {
         $this->options['simulate'] = $simulate;
 
         return $this;
     }
 
-    public function setUniqueIdentifier(string $uniqueIdentifier): self
+    /**
+     * @return $this
+     */
+    public function uniqueIdentifier(string $uniqueIdentifier): static
     {
-        $this->options['unique_identifier'] = $uniqueIdentifier;
+        $this->options['uniqueIdentifier'] = $uniqueIdentifier;
 
         return $this;
     }
 
-    public function setVerbose(int $verbose): self
+    /**
+     * @return $this
+     */
+    public function verbose(int $verbose): static
     {
         $this->options['verbose'] = $verbose;
 
@@ -135,11 +102,6 @@ final class AllMySmsOptions implements MessageOptionsInterface
 
     public function toArray(): array
     {
-        $options = $this->options;
-        if (isset($options['recipient_id'])) {
-            unset($options['recipient_id']);
-        }
-
-        return $options;
+        return $this->options;
     }
 }

@@ -18,10 +18,17 @@ class MessageMediaOptionsTest extends TestCase
 {
     public function testMessageMediaOptions()
     {
-        $messageMediaOptions = (new MessageMediaOptions())->setFrom('test_from')->setMedia(['test_media'])->setCallbackUrl('test_callback_url')->setFormat('test_format')->setRecipientId('test_recipient')->setDeliveryReport(true)->setMessageExpiryTimestamp(999)->setMetadata(['test_metadata'])->setScheduled('test_scheduled')->setSubject('test_subject');
+        $messageMediaOptions = (new MessageMediaOptions())->
+            media(['test_media'])
+            ->callbackUrl('test_callback_url')
+            ->format('test_format')
+            ->deliveryReport(true)
+            ->expiry(999)
+            ->metadata(['test_metadata'])
+            ->scheduled('test_scheduled')
+            ->subject('test_subject');
 
         self::assertSame([
-            'from' => 'test_from',
             'media' => ['test_media'],
             'callback_url' => 'test_callback_url',
             'format' => 'test_format',

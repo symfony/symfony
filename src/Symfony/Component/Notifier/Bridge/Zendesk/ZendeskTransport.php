@@ -45,7 +45,7 @@ final class ZendeskTransport extends AbstractTransport
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof ChatMessage;
+        return $message instanceof ChatMessage && (null === $message->getOptions() || $message->getOptions() instanceof ZendeskOptions);
     }
 
     protected function doSend(MessageInterface $message = null): SentMessage
@@ -54,23 +54,19 @@ final class ZendeskTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
-        if (null !== $message->getOptions() && !($message->getOptions() instanceof ZendeskOptions)) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, ZendeskOptions::class));
-        }
-
         $endpoint = sprintf('https://%s/api/v2/tickets.json', $this->getEndpoint());
 
         $body = [
             'ticket' => [
                 'subject' => $message->getSubject(),
                 'comment' => [
-                    'body' => $message->getNotification() ? $message->getNotification()->getContent() : '',
+                    'body' => $message->getNotification()?->getContent() ?? '',
                 ],
             ],
         ];
 
-        $options = ($opts = $message->getOptions()) ? $opts->toArray() : [];
-        if ($options['priority'] ?? null) {
+        $options = $message->getOptions()?->toArray() ?? [];
+        if (isset($options['priority'])) {
             $body['ticket']['priority'] = $options['priority'];
         }
 

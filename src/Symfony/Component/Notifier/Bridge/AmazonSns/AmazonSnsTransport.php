@@ -60,16 +60,23 @@ final class AmazonSnsTransport extends AbstractTransport
 
         if ($message instanceof ChatMessage && $message->getOptions() instanceof AmazonSnsOptions) {
             $options = $message->getOptions()->toArray();
+        } else {
+            $options = [];
         }
         $options['Message'] = $message->getSubject();
-        $options[($message instanceof ChatMessage) ? 'TopicArn' : 'PhoneNumber'] = $message->getRecipientId();
+
+        if ($message instanceof SmsMessage) {
+            $options['PhoneNumber'] = $message->getPhone();
+        } else {
+            $options['TopicArn'] = $message->getRecipientId();
+        }
 
         try {
             $response = $this->snsClient->publish($options);
             $message = new SentMessage($message, (string) $this);
             $message->setMessageId($response->getMessageId());
         } catch (\Exception $exception) {
-            $info = isset($response) ? $response->info() : [];
+            $info = $response?->info() ?? [];
             throw new TransportException('Unable to send the message.', $info['response'] ?? null, $info['status'] ?? 0, $exception);
         }
 

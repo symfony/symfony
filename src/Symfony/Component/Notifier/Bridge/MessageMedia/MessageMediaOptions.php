@@ -25,120 +25,85 @@ final class MessageMediaOptions implements MessageOptionsInterface
         $this->options = $options;
     }
 
-    public function getCallbackUrl(): ?string
-    {
-        return $this->options['callback_url'] ?? null;
-    }
-
-    public function getDeliveryReport(): ?bool
-    {
-        return $this->options['delivery_report'] ?? null;
-    }
-
-    public function getFormat(): ?string
-    {
-        return $this->options['format'] ?? null;
-    }
-
-    public function getFrom(): ?string
-    {
-        return $this->options['from'] ?? null;
-    }
-
-    public function getMedia(): ?array
-    {
-        return $this->options['media'] ?? null;
-    }
-
-    public function getMessageExpiryTimestamp(): ?int
-    {
-        return $this->options['message_expiry_timestamp'] ?? null;
-    }
-
-    public function getMetadata(): ?array
-    {
-        return $this->options['metadata'] ?? null;
-    }
-
     public function getRecipientId(): ?string
     {
-        return $this->options['recipient_id'] ?? null;
+        return null;
     }
 
-    public function getScheduled(): ?string
-    {
-        return $this->options['scheduled'] ?? null;
-    }
-
-    public function getSubject(): ?string
-    {
-        return $this->options['subject'] ?? null;
-    }
-
-    public function setCallbackUrl(string $callbackUrl): self
+    /**
+     * @return $this
+     */
+    public function callbackUrl(string $callbackUrl): static
     {
         $this->options['callback_url'] = $callbackUrl;
 
         return $this;
     }
 
-    public function setDeliveryReport(bool $deliveryReport): self
+    /**
+     * @return $this
+     */
+    public function deliveryReport(bool $deliveryReport): static
     {
         $this->options['delivery_report'] = $deliveryReport;
 
         return $this;
     }
 
-    public function setFormat(string $format): self
+    /**
+     * @return $this
+     */
+    public function format(string $format): static
     {
         $this->options['format'] = $format;
 
         return $this;
     }
 
-    public function setFrom(string $from): self
-    {
-        $this->options['from'] = $from;
-
-        return $this;
-    }
-
-    public function setMedia(array $media): self
+    /**
+     * @return $this
+     */
+    public function media(array $media): static
     {
         $this->options['media'] = $media;
 
         return $this;
     }
 
-    public function setMessageExpiryTimestamp(int $messageExpiryTimestamp): self
+    /**
+     * @return $this
+     */
+    public function expiry(int $expiry): static
     {
-        $this->options['message_expiry_timestamp'] = $messageExpiryTimestamp;
+        $this->options['message_expiry_timestamp'] = $expiry;
 
         return $this;
     }
 
-    public function setMetadata(array $metadata): self
+    /**
+     * @return $this
+     */
+    public function metadata(array $metadata): static
     {
         $this->options['metadata'] = $metadata;
 
         return $this;
     }
 
-    public function setRecipientId(string $id): self
-    {
-        $this->options['recipient_id'] = $id;
-
-        return $this;
-    }
-
-    public function setScheduled(string $scheduled): self
+    /**
+     * @return $this
+     */
+    public function scheduled(string $scheduled): static
     {
         $this->options['scheduled'] = $scheduled;
 
         return $this;
     }
 
-    public function setSubject(string $subject): self
+    /**
+     * @return $this
+     */
+    public function subject(string $subject): static
     {
         $this->options['subject'] = $subject;
 
@@ -147,11 +112,6 @@ final class MessageMediaOptions implements MessageOptionsInterface
 
     public function toArray(): array
     {
-        $options = $this->options;
-        if (isset($options['recipient_id'])) {
-            unset($options['recipient_id']);
-        }
-
-        return $options;
+        return $this->options;
     }
 }

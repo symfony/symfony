@@ -45,12 +45,12 @@ final class ClickatellTransport extends AbstractTransport
             return sprintf('clickatell://%s', $this->getEndpoint());
         }
 
-        return sprintf('clickatell://%s?from=%s', $this->getEndpoint(), $this->from);
+        return sprintf('clickatell://%s%s', $this->getEndpoint(), null !== $this->from ? '?from='.$this->from : '');
     }
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof SmsMessage && (null === $message->getOptions() || $message->getOptions() instanceof ClickatellOptions);
+        return $message instanceof SmsMessage;
     }
 
     protected function doSend(MessageInterface $message): SentMessage
@@ -61,11 +61,8 @@ final class ClickatellTransport extends AbstractTransport
 
         $endpoint = sprintf('https://%s/rest/message', $this->getEndpoint());
 
-        $from = $message->getFrom() ?: $this->from ?: '';
-
-        $opts = $message->getOptions();
-        $options = $opts ? $opts->toArray() : [];
-        $options['from'] = $options['from'] ?? $from;
+        $options = [];
+        $options['from'] = $message->getFrom() ?: $this->from;
         $options['to'] = $message->getPhone();
         $options['text'] = $message->getSubject();
 

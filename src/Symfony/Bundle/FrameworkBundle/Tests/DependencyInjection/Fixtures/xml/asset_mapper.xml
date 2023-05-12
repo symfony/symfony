@@ -10,6 +10,7 @@
         <framework:asset-mapper>
             <framework:path>assets/</framework:path>
             <framework:path namespace="my_namespace">assets2/</framework:path>
+            <framework:excluded-pattern>*/*.scss</framework:excluded-pattern>
             <framework:server>true</framework:server>
             <framework:public_prefix>/assets_path/</framework:public_prefix>
             <framework:strict-mode>true</framework:strict-mode>

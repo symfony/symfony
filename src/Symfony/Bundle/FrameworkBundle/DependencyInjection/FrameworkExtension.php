@@ -72,6 +72,7 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\Glob;
 use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
 use Symfony\Component\Form\Extension\HtmlSanitizer\Type\TextTypeHtmlSanitizerExtension;
 use Symfony\Component\Form\Form;
@@ -1277,8 +1278,14 @@ class FrameworkExtension extends Extension
                 $paths[$dir] = sprintf('bundles/%s', preg_replace('/bundle$/', '', strtolower($name)));
             }
         }
+        $excludedPathPatterns = [];
+        foreach ($config['excluded_patterns'] as $path) {
+            $excludedPathPatterns[] = Glob::toRegex($path, true, false);
+        }
+
         $container->getDefinition('asset_mapper.repository')
-            ->setArgument(0, $paths);
+            ->setArgument(0, $paths)
+            ->setArgument(2, $excludedPathPatterns);
 
         $publicDirName = $this->getPublicDirectoryName($container);
         $container->getDefinition('asset_mapper.public_assets_path_resolver')

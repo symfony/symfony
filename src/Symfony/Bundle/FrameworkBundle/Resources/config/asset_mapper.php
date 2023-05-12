@@ -45,6 +45,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 abstract_arg('array of asset mapper paths'),
                 param('kernel.project_dir'),
+                abstract_arg('array of excluded path patterns'),
             ])
 
         ->set('asset_mapper.public_assets_path_resolver', PublicAssetsPathResolver::class)

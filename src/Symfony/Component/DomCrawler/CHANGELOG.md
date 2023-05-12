@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+* Add `CrawlerAnySelectorTextContains` test constraint
+* Add `CrawlerAnySelectorTextSame` test constraint
+
 6.3
 ---
 

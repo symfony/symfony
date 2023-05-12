@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\UrlHelper;
 use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\RequestContextAwareInterface;
 
 class UrlHelperTest extends TestCase
 {
@@ -64,7 +65,42 @@ class UrlHelperTest extends TestCase
         }
 
         $requestContext = new RequestContext($baseUrl, 'GET', $host, $scheme, $httpPort, $httpsPort, $path);
+
         $helper = new UrlHelper(new RequestStack(), $requestContext);
+
+        $this->assertEquals($expected, $helper->getAbsoluteUrl($path));
+    }
+
+    /**
+     * @dataProvider getGenerateAbsoluteUrlRequestContextData
+     */
+    public function testGenerateAbsoluteUrlWithRequestContextAwareInterface($path, $baseUrl, $host, $scheme, $httpPort, $httpsPort, $expected)
+    {
+        if (!class_exists(RequestContext::class)) {
+            $this->markTestSkipped('The Routing component is needed to run tests that depend on its request context.');
+        }
+
+        $requestContext = new RequestContext($baseUrl, 'GET', $host, $scheme, $httpPort, $httpsPort, $path);
+        $contextAware = new class($requestContext) implements RequestContextAwareInterface {
+            private $requestContext;
+
+            public function __construct($requestContext)
+            {
+                $this->requestContext = $requestContext;
+            }
+
+            public function setContext(RequestContext $context)
+            {
+                $this->requestContext = $context;
+            }
+
+            public function getContext()
+            {
+                return $this->requestContext;
+            }
+        };
+
+        $helper = new UrlHelper(new RequestStack(), $contextAware);
 
         $this->assertEquals($expected, $helper->getAbsoluteUrl($path));
     }

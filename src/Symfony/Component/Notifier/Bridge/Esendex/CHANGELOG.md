@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add `EsendexOptions` class
+
 6.2
 ---
 

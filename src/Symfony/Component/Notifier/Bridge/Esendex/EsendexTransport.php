@@ -49,7 +49,7 @@ final class EsendexTransport extends AbstractTransport
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof SmsMessage;
+        return $message instanceof SmsMessage && (null === $message->getOptions() || $message->getOptions() instanceof EsendexOptions);
     }
 
     protected function doSend(MessageInterface $message): SentMessage
@@ -58,26 +58,24 @@ final class EsendexTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $messageData = [
+        $from = $message->getFrom() ?: $this->from;
+
+        $opts = $message->getOptions();
+        $options = $opts ? $opts->toArray() : [];
+        $options['from'] = $options['from'] ?? $from;
+        $options['messages'] = [
             'to' => $message->getPhone(),
             'body' => $message->getSubject(),
         ];
-
-        if ('' !== $message->getFrom()) {
-            $messageData['from'] = $message->getFrom();
-        } elseif (null !== $this->from) {
-            $messageData['from'] = $this->from;
-        }
+        $options['accountreference'] = $options['account_reference'] ?? $this->accountReference;
+        unset($options['account_reference']);
 
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/v1.0/messagedispatcher', [
             'auth_basic' => sprintf('%s:%s', $this->email, $this->password),
             'headers' => [
                 'Accept' => 'application/json',
             ],
-            'json' => [
-                'accountreference' => $this->accountReference,
-                'messages' => [$messageData],
-            ],
+            'json' => array_filter($options),
         ]);
 
         try {

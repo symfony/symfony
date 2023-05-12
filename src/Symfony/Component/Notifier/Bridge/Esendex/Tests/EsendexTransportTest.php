@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\Esendex\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\Notifier\Bridge\Esendex\EsendexOptions;
 use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransport;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -36,6 +37,7 @@ final class EsendexTransportTest extends TransportTestCase
     public static function supportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
+        yield [new SmsMessage('0611223344', 'Hello!', 'from', new EsendexOptions(['from' => 'foo']))];
     }
 
     public static function unsupportedMessagesProvider(): iterable

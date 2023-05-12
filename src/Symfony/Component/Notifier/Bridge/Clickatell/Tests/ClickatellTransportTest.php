@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\Clickatell\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\Notifier\Bridge\Clickatell\ClickatellOptions;
 use Symfony\Component\Notifier\Bridge\Clickatell\ClickatellTransport;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
@@ -39,6 +40,7 @@ final class ClickatellTransportTest extends TransportTestCase
     public static function supportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('+33612345678', 'Hello!')];
+        yield [new SmsMessage('+33612345678', 'Hello!', 'from', new ClickatellOptions(['from' => 'foo']))];
     }
 
     public static function unsupportedMessagesProvider(): iterable

@@ -125,7 +125,7 @@ class Connection implements ResetInterface
      */
     public function send(string $body, array $headers, int $delay = 0): string
     {
-        $now = new \DateTimeImmutable();
+        $now = new \DateTimeImmutable('UTC');
         $availableAt = $now->modify(sprintf('+%d seconds', $delay / 1000));
 
         $queryBuilder = $this->driverConnection->createQueryBuilder()
@@ -221,7 +221,7 @@ class Connection implements ResetInterface
                 ->update($this->configuration['table_name'])
                 ->set('delivered_at', '?')
                 ->where('id = ?');
-            $now = new \DateTimeImmutable();
+            $now = new \DateTimeImmutable('UTC');
             $this->executeStatement($queryBuilder->getSQL(), [
                 $now,
                 $doctrineEnvelope['id'],
@@ -342,7 +342,7 @@ class Connection implements ResetInterface
 
     private function createAvailableMessagesQueryBuilder(): QueryBuilder
     {
-        $now = new \DateTimeImmutable();
+        $now = new \DateTimeImmutable('UTC');
         $redeliverLimit = $now->modify(sprintf('-%d seconds', $this->configuration['redeliver_timeout']));
 
         return $this->createQueryBuilder()

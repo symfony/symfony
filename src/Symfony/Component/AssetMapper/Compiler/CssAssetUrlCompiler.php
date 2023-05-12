@@ -48,13 +48,14 @@ final class CssAssetUrlCompiler implements AssetCompilerInterface
             }
 
             $asset->addDependency($dependentAsset);
+            $relativePath = $this->createRelativePath($asset->getPublicPathWithoutDigest(), $dependentAsset->getPublicPath());
 
-            return 'url("'.$dependentAsset->getPublicPath().'")';
+            return 'url("'.$relativePath.'")';
         }, $content);
     }
 
     public function supports(MappedAsset $asset): bool
     {
-        return 'text/css' === $asset->getMimeType();
+        return 'css' === $asset->getPublicExtension();
     }
 }

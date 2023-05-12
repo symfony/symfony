@@ -48,7 +48,6 @@ class AssetMapperDevServerSubscriberFunctionalTest extends WebTestCase
         $client->request('GET', '/assets/file1-fakedigest.css');
         $response = $client->getResponse();
         $this->assertSame(404, $response->getStatusCode());
-        $this->assertStringContainsString('Asset &quot;file1.css&quot; was found but the digest does not match.', $response->getContent());
     }
 
     public function testPreDigestedAssetIsReturned()

@@ -55,6 +55,11 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
                 $isLazy = str_contains($matches[0], 'import(');
 
                 $asset->addDependency($dependentAsset, $isLazy);
+
+                $relativeImportPath = $this->createRelativePath($asset->getPublicPathWithoutDigest(), $dependentAsset->getPublicPathWithoutDigest());
+                $relativeImportPath = $this->makeRelativeForJavaScript($relativeImportPath);
+
+                return str_replace($matches[1], $relativeImportPath, $matches[0]);
             }
 
             return $matches[0];
@@ -63,6 +68,15 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
 
     public function supports(MappedAsset $asset): bool
     {
-        return 'application/javascript' === $asset->getMimeType() || 'text/javascript' === $asset->getMimeType();
+        return 'js' === $asset->getPublicExtension();
+    }
+
+    private function makeRelativeForJavaScript(string $path): string
+    {
+        if (str_starts_with($path, '../')) {
+            return $path;
+        }
+
+        return './'.$path;
     }
 }

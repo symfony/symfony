@@ -18,6 +18,8 @@ use Symfony\Component\AssetMapper\AssetMapperRepository;
 use Symfony\Component\AssetMapper\Compiler\JavaScriptImportPathCompiler;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\AssetMapper\ImportMap\PackageRequireOptions;
+use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolver;
+use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -462,11 +464,14 @@ class ImportMapManagerTest extends TestCase
 
     private function createImportMapManager(array $dirs, string $rootDir, string $publicPrefix = '/assets/', string $publicDirName = 'public'): ImportMapManager
     {
-        $mapper = $this->createAssetMapper($dirs, $rootDir, $publicPrefix, $publicDirName);
+        $pathResolver = new PublicAssetsPathResolver($rootDir, $publicPrefix, $publicDirName);
+
+        $mapper = $this->createAssetMapper($pathResolver, $dirs, $rootDir);
         $this->httpClient = new MockHttpClient();
 
         return new ImportMapManager(
             $mapper,
+            $pathResolver,
             $rootDir.'/importmap.php',
             $rootDir.'/assets/vendor',
             ImportMapManager::PROVIDER_JSPM,
@@ -474,7 +479,7 @@ class ImportMapManagerTest extends TestCase
         );
     }
 
-    private function createAssetMapper(array $dirs, string $rootDir, string $publicPrefix = '/assets/', string $publicDirName = 'public'): AssetMapper
+    private function createAssetMapper(PublicAssetsPathResolverInterface $pathResolver, array $dirs, string $rootDir): AssetMapper
     {
         $repository = new AssetMapperRepository($dirs, $rootDir);
 
@@ -485,9 +490,7 @@ class ImportMapManagerTest extends TestCase
         return new AssetMapper(
             $repository,
             $compiler,
-            $rootDir,
-            $publicPrefix,
-            $publicDirName,
+            $pathResolver
         );
     }
 }

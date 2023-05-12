@@ -20,43 +20,10 @@ use Symfony\Component\AssetMapper\Compiler\AssetCompilerInterface;
 use Symfony\Component\AssetMapper\Compiler\CssAssetUrlCompiler;
 use Symfony\Component\AssetMapper\Compiler\JavaScriptImportPathCompiler;
 use Symfony\Component\AssetMapper\MappedAsset;
+use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
 
 class AssetMapperTest extends TestCase
 {
-    public function testGetPublicPrefix()
-    {
-        $assetMapper = new AssetMapper(
-            $this->createMock(AssetMapperRepository::class),
-            $this->createMock(AssetMapperCompiler::class),
-            '/projectRootDir/',
-            '/publicPrefix/',
-            'publicDirName',
-        );
-        $this->assertSame('/publicPrefix/', $assetMapper->getPublicPrefix());
-
-        $assetMapper = new AssetMapper(
-            $this->createMock(AssetMapperRepository::class),
-            $this->createMock(AssetMapperCompiler::class),
-            '/projectRootDir/',
-            '/publicPrefix',
-            'publicDirName',
-        );
-        // The trailing slash should be added automatically
-        $this->assertSame('/publicPrefix/', $assetMapper->getPublicPrefix());
-    }
-
-    public function testGetPublicAssetsFilesystemPath()
-    {
-        $assetMapper = new AssetMapper(
-            $this->createMock(AssetMapperRepository::class),
-            $this->createMock(AssetMapperCompiler::class),
-            '/projectRootDir/',
-            '/publicPrefix/',
-            'publicDirName',
-        );
-        $this->assertSame('/projectRootDir/publicDirName/publicPrefix', $assetMapper->getPublicAssetsFilesystemPath());
-    }
-
     public function testGetAsset()
     {
         $assetMapper = $this->createAssetMapper();
@@ -186,18 +153,6 @@ class AssetMapperTest extends TestCase
         $this->assertTrue($asset->isPredigested());
     }
 
-    public function testGetAssetWithMimeType()
-    {
-        $assetMapper = $this->createAssetMapper();
-        $file1Asset = $assetMapper->getAsset('file1.css');
-        $this->assertSame('text/css', $file1Asset->getMimeType());
-        $file2Asset = $assetMapper->getAsset('file2.js');
-        $this->assertSame('text/javascript', $file2Asset->getMimeType());
-        // an extension not in the known extensions
-        $testAsset = $assetMapper->getAsset('test.gif.foo');
-        $this->assertSame('image/gif', $testAsset->getMimeType());
-    }
-
     private function createAssetMapper(string $extraDir = null, AssetCompilerInterface $extraCompiler = null): AssetMapper
     {
         $dirs = ['dir1' => '', 'dir2' => '', 'dir3' => ''];
@@ -214,17 +169,21 @@ class AssetMapperTest extends TestCase
             $compilers[] = $extraCompiler;
         }
         $compiler = new AssetMapperCompiler($compilers);
-        $extensions = [
-            'foo' => 'image/gif',
-        ];
+        $pathResolver = $this->createMock(PublicAssetsPathResolverInterface::class);
+
+        $pathResolver->expects($this->any())
+            ->method('resolvePublicPath')
+            ->willReturnCallback(function (string $logicalPath) {
+                return '/final-assets/'.$logicalPath;
+            });
+        $pathResolver->expects($this->any())
+            ->method('getPublicFilesystemPath')
+            ->willReturn(__DIR__.'/fixtures/test_public/final-assets');
 
         return new AssetMapper(
             $repository,
             $compiler,
-            __DIR__.'/fixtures',
-            '/final-assets/',
-            'test_public',
-            $extensions,
+            $pathResolver,
         );
     }
 }

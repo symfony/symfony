@@ -29,7 +29,7 @@ final class SourceMappingUrlsCompiler implements AssetCompilerInterface
 
     public function supports(MappedAsset $asset): bool
     {
-        return \in_array($asset->getMimeType(), ['application/javascript', 'text/css'], true);
+        return \in_array($asset->getPublicExtension(), ['css', 'js'], true);
     }
 
     public function compile(string $content, MappedAsset $asset, AssetMapperInterface $assetMapper): string
@@ -44,8 +44,9 @@ final class SourceMappingUrlsCompiler implements AssetCompilerInterface
             }
 
             $asset->addDependency($dependentAsset);
+            $relativePath = $this->createRelativePath($asset->getPublicPathWithoutDigest(), $dependentAsset->getPublicPath());
 
-            return $matches[1].'# sourceMappingURL='.$dependentAsset->getPublicPath();
+            return $matches[1].'# sourceMappingURL='.$relativePath;
         }, $content);
     }
 }

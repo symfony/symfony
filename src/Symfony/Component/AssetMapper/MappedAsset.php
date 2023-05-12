@@ -29,7 +29,6 @@ final class MappedAsset
     private string $content;
     private string $digest;
     private bool $isPredigested;
-    private ?string $mimeType;
     /** @var AssetDependency[] */
     private array $dependencies = [];
 
@@ -40,6 +39,11 @@ final class MappedAsset
     public function getPublicPath(): string
     {
         return $this->publicPath;
+    }
+
+    public function getPublicExtension(): string
+    {
+        return pathinfo($this->publicPathWithoutDigest, \PATHINFO_EXTENSION);
     }
 
     public function getSourcePath(): string
@@ -60,16 +64,6 @@ final class MappedAsset
     public function isPredigested(): bool
     {
         return $this->isPredigested;
-    }
-
-    public function getMimeType(): ?string
-    {
-        return $this->mimeType;
-    }
-
-    public function getExtension(): string
-    {
-        return pathinfo($this->logicalPath, \PATHINFO_EXTENSION);
     }
 
     /**
@@ -115,15 +109,6 @@ final class MappedAsset
 
         $this->digest = $digest;
         $this->isPredigested = $isPredigested;
-    }
-
-    public function setMimeType(?string $mimeType): void
-    {
-        if (isset($this->mimeType)) {
-            throw new \LogicException('Cannot set mime type: it was already set on the asset.');
-        }
-
-        $this->mimeType = $mimeType;
     }
 
     public function setContent(string $content): void

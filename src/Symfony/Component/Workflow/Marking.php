@@ -22,6 +22,9 @@ class Marking
      * @var array<string, int>
      */
     private array $places = [];
+    /**
+     * @var array<string, \UnitEnum>
+     */
     private array $enumPlaces = [];
     private ?array $context = null;
 
@@ -37,7 +40,7 @@ class Marking
 
     public function mark(string|\UnitEnum $place): void
     {
-        $key = $this->placeToKey($place);
+        $key = $this->enumOrStringToKey($place);
         $this->places[$key] = 1;
         if ($place instanceof \UnitEnum) {
             $this->enumPlaces[$key] = $place;
@@ -46,7 +49,7 @@ class Marking
 
     public function unmark(string|\UnitEnum $place): void
     {
-        $key = $this->placeToKey($place);
+        $key = $this->enumOrStringToKey($place);
         unset(
             $this->places[$key],
             $this->enumPlaces[$key]
@@ -55,7 +58,7 @@ class Marking
 
     public function has(string|\UnitEnum $place): bool
     {
-        return isset($this->places[$this->placeToKey($place)]);
+        return isset($this->places[$this->enumOrStringToKey($place)]);
     }
 
     /**
@@ -67,7 +70,7 @@ class Marking
     }
 
     /**
-     * @return array<string, string|\UnitEnum>
+     * @return array<string, \UnitEnum>
      */
     public function getEnumPlaces(): array
     {
@@ -90,7 +93,7 @@ class Marking
         return $this->context;
     }
 
-    private function placeToKey(string|\UnitEnum $place): string
+    private function enumOrStringToKey(string|\UnitEnum $place): string
     {
         if (is_string($place)) {
             return $place;

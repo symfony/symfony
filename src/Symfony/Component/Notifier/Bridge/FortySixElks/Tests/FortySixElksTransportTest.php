@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\FortySixElks\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\Notifier\Bridge\FortySixElks\FortySixElksOptions;
 use Symfony\Component\Notifier\Bridge\FortySixElks\FortySixElksTransport;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -37,6 +38,7 @@ class FortySixElksTransportTest extends TransportTestCase
     public static function supportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('+46701111111', 'Hello!')];
+        yield [new SmsMessage('+46701111111', 'Hello!', 'from', new FortySixElksOptions(['from' => 'foo']))];
     }
 
     public static function unsupportedMessagesProvider(): iterable

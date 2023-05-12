@@ -46,7 +46,7 @@ final class MessageBirdTransport extends AbstractTransport
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof SmsMessage;
+        return $message instanceof SmsMessage && (null === $message->getOptions() || $message->getOptions() instanceof MessageBirdOptions);
     }
 
     protected function doSend(MessageInterface $message): SentMessage
@@ -57,14 +57,56 @@ final class MessageBirdTransport extends AbstractTransport
 
         $from = $message->getFrom() ?: $this->from;
 
+        $opts = $message->getOptions();
+        $options = $opts ? $opts->toArray() : [];
+        $options['originator'] = $options['from'] ?? $from;
+        $options['recipients'] = [$message->getPhone()];
+        $options['body'] = $message->getSubject();
+
+        if (isset($options['group_ids'])) {
+            $options['groupIds'] = $options['group_ids'];
+            unset($options['group_ids']);
+        }
+
+        if (isset($options['report_url'])) {
+            $options['reportUrl'] = $options['report_url'];
+            unset($options['report_url']);
+        }
+
+        if (isset($options['type_details'])) {
+            $options['typeDetails'] = $options['type_details'];
+            unset($options['type_details']);
+        }
+
+        if (isset($options['data_coding'])) {
+            $options['datacoding'] = $options['data_coding'];
+            unset($options['data_coding']);
+        }
+
+        if (isset($options['m_class'])) {
+            $options['mclass'] = $options['m_class'];
+            unset($options['m_class']);
+        }
+
+        if (isset($options['shorten_urls'])) {
+            $options['shortenUrls'] = $options['shorten_urls'];
+            unset($options['shorten_urls']);
+        }
+
+        if (isset($options['scheduled_datetime'])) {
+            $options['scheduledDatetime'] = $options['scheduled_datetime'];
+            unset($options['scheduled_datetime']);
+        }
+
+        if (isset($options['created_datetime'])) {
+            $options['createdDatetime'] = $options['created_datetime'];
+            unset($options['created_datetime']);
+        }
+
         $endpoint = sprintf('https://%s/messages', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'auth_basic' => 'AccessKey:'.$this->token,
-            'body' => [
-                'originator' => $from,
-                'recipients' => $message->getPhone(),
-                'body' => $message->getSubject(),
-            ],
+            'body' => array_filter($options),
         ]);
 
         try {

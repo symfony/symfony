@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add `MessageBirdOptions` class
+
 6.2
 ---
 

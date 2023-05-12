@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\AllMySms\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\Notifier\Bridge\AllMySms\AllMySmsOptions;
 use Symfony\Component\Notifier\Bridge\AllMySms\AllMySmsTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
@@ -35,6 +36,7 @@ final class AllMySmsTransportTest extends TransportTestCase
     public static function supportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
+        yield [new SmsMessage('0611223344', 'Hello!', 'from', new AllMySmsOptions(['from' => 'foo']))];
     }
 
     public static function unsupportedMessagesProvider(): iterable

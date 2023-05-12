@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by stof at 2023-05-09T15:11:59Z
+
+I don't see where you actually configure the min TLS version of the amp/socket TLS context in this PR. Is this actually implemented in this PR ?
+Side note, the default in amp/socket is TLS 1.2, so the current behavior for what is supported in symfony/http-client depends on the client being used.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-05-09T15:28:59Z
+
+PR updated to target 6.3 in case we'd like to merge it now.
+
+Status: needs review

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\ContactEveryone\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\Notifier\Bridge\ContactEveryone\ContactEveryoneOptions;
 use Symfony\Component\Notifier\Bridge\ContactEveryone\ContactEveryoneTransport;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -36,6 +37,7 @@ final class ContactEveryoneTransportTest extends TransportTestCase
     public static function supportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
+        yield [new SmsMessage('0611223344', 'Hello!', 'from', new ContactEveryoneOptions(['from' => 'foo']))];
     }
 
     public static function unsupportedMessagesProvider(): iterable

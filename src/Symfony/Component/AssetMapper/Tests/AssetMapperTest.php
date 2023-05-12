@@ -30,7 +30,7 @@ class AssetMapperTest extends TestCase
         $this->assertNull($assetMapper->getAsset('non-existent.js'));
 
         $asset = $assetMapper->getAsset('file2.js');
-        $this->assertSame('file2.js', $asset->logicalPath);
+        $this->assertSame('file2.js', $asset->getLogicalPath());
         $this->assertMatchesRegularExpression('/^\/final-assets\/file2-[a-zA-Z0-9]{7,128}\.js$/', $asset->getPublicPath());
         $this->assertSame('/final-assets/file2.js', $asset->getPublicPathWithoutDigest());
     }
@@ -39,7 +39,7 @@ class AssetMapperTest extends TestCase
     {
         $assetMapper = $this->createAssetMapper();
         $asset = $assetMapper->getAsset('already-abcdefVWXYZ0123456789.digested.css');
-        $this->assertSame('already-abcdefVWXYZ0123456789.digested.css', $asset->logicalPath);
+        $this->assertSame('already-abcdefVWXYZ0123456789.digested.css', $asset->getLogicalPath());
         $this->assertSame('/final-assets/already-abcdefVWXYZ0123456789.digested.css', $asset->getPublicPath());
         // for pre-digested files, the digest *is* part of the public path
         $this->assertSame('/final-assets/already-abcdefVWXYZ0123456789.digested.css', $asset->getPublicPathWithoutDigest());
@@ -73,7 +73,7 @@ class AssetMapperTest extends TestCase
     {
         $assetMapper = $this->createAssetMapper();
         $asset = $assetMapper->getAssetFromSourcePath(__DIR__.'/fixtures/dir1/file1.css');
-        $this->assertSame('file1.css', $asset->logicalPath);
+        $this->assertSame('file1.css', $asset->getLogicalPath());
     }
 
     public function testGetAssetWithContentBasic()
@@ -124,7 +124,7 @@ class AssetMapperTest extends TestCase
 
             public function compile(string $content, MappedAsset $asset, AssetMapperInterface $assetMapper): string
             {
-                if ('subdir/file6.js' === $asset->logicalPath) {
+                if ('subdir/file6.js' === $asset->getLogicalPath()) {
                     return $content.'/* compiled */';
                 }
 

@@ -131,7 +131,7 @@ class AssetMapper implements AssetMapperInterface
     private function getDigest(MappedAsset $asset): array
     {
         // check for a pre-digested file
-        if (1 === preg_match(self::PREDIGESTED_REGEX, $asset->logicalPath, $matches)) {
+        if (1 === preg_match(self::PREDIGESTED_REGEX, $asset->getLogicalPath(), $matches)) {
             return [$matches[1], true];
         }
 
@@ -143,14 +143,14 @@ class AssetMapper implements AssetMapperInterface
 
     private function calculateContent(MappedAsset $asset): string
     {
-        if (isset($this->fileContentsCache[$asset->logicalPath])) {
-            return $this->fileContentsCache[$asset->logicalPath];
+        if (isset($this->fileContentsCache[$asset->getLogicalPath()])) {
+            return $this->fileContentsCache[$asset->getLogicalPath()];
         }
 
         $content = file_get_contents($asset->getSourcePath());
         $content = $this->compiler->compile($content, $asset, $this);
 
-        $this->fileContentsCache[$asset->logicalPath] = $content;
+        $this->fileContentsCache[$asset->getLogicalPath()] = $content;
 
         return $content;
     }

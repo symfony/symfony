@@ -36,6 +36,10 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
     use HttpClientTrait;
     use LoggerAwareTrait;
 
+    public const OPTIONS_DEFAULTS = HttpClientInterface::OPTIONS_DEFAULTS + [
+        'crypto_method' => \STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT,
+    ];
+
     private array $defaultOptions = self::OPTIONS_DEFAULTS;
     private static array $emptyDefaults = self::OPTIONS_DEFAULTS;
 
@@ -198,6 +202,12 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
             $options['timeout'] = min($options['max_duration'], $options['timeout']);
         }
 
+        switch ($cryptoMethod = $options['crypto_method']) {
+            case \STREAM_CRYPTO_METHOD_TLSv1_0_CLIENT: $cryptoMethod |= \STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT;
+            case \STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT: $cryptoMethod |= \STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT;
+            case \STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT: $cryptoMethod |= \STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT;
+        }
+
         $context = [
             'http' => [
                 'protocol_version' => min($options['http_version'] ?: '1.1', '1.1'),
@@ -224,6 +234,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
                 'allow_self_signed' => (bool) $options['peer_fingerprint'],
                 'SNI_enabled' => true,
                 'disable_compression' => true,
+                'crypto_method' => $cryptoMethod,
             ], static fn ($v) => null !== $v),
             'socket' => [
                 'bindto' => $options['bindto'],

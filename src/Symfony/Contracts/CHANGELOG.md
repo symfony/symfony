@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.3
+---
+
+ * Add option `crypto_method` to `HttpClientInterface` to define the minimum TLS version to accept
+
 3.2
 ---
 

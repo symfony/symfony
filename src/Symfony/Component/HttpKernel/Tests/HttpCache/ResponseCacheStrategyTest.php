@@ -257,7 +257,7 @@ class ResponseCacheStrategyTest extends TestCase
 
                     case 'expires':
                         $expires = clone $response->getDate();
-                        $expires->modify('+'.$value.' seconds');
+                        $expires = $expires->modify('+'.$value.' seconds');
                         $response->setExpires($expires);
                         break;
 

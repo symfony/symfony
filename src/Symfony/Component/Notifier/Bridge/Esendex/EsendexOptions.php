@@ -25,49 +25,23 @@ final class EsendexOptions implements MessageOptionsInterface
         $this->options = $options;
     }
 
-    public function getAccountReference(): ?string
-    {
-        return $this->options['account_reference'] ?? null;
-    }
-
-    public function getFrom(): ?string
-    {
-        return $this->options['from'] ?? null;
-    }
-
     public function getRecipientId(): ?string
     {
-        return $this->options['recipient_id'] ?? null;
+        return null;
     }
 
-    public function setAccountReference(string $accountReference): self
+    /**
+     * @return $this
+     */
+    public function accountReference(string $accountReference): static
     {
-        $this->options['account_reference'] = $accountReference;
-
-        return $this;
-    }
-
-    public function setFrom(string $from): self
-    {
-        $this->options['from'] = $from;
-
-        return $this;
-    }
-
-    public function setRecipientId(string $id): self
-    {
-        $this->options['recipient_id'] = $id;
+        $this->options['accountreference'] = $accountReference;
 
         return $this;
     }
 
     public function toArray(): array
     {
-        $options = $this->options;
-        if (isset($options['recipient_id'])) {
-            unset($options['recipient_id']);
-        }
-
-        return $options;
+        return $this->options;
     }
 }

@@ -21,7 +21,7 @@ final class ClickSendTransportFactoryTest extends TransportFactoryTestCase
         return new ClickSendTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield ['clicksend://host.test', 'clicksend://apiUsername:ApiKey@host.test'];
         yield ['clicksend://host.test?from=15556667777', 'clicksend://apiUsername:ApiKey@host.test?from=15556667777'];
@@ -31,19 +31,19 @@ final class ClickSendTransportFactoryTest extends TransportFactoryTestCase
         yield ['clicksend://host.test?from=15556667777&source=api&list_id=1&from_email=foo%40bar.com', 'clicksend://apiUsername:ApiKey@host.test?from=15556667777&source=api&list_id=1&from_email=foo%40bar.com'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield 'missing API username and API key' => ['clicksend://@default'];
         yield 'missing API username or API key' => ['clicksend://apiUsername@default'];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'clicksend://apiUsername:apiKey@default'];
         yield [false, 'somethingElse://apiUsername:apiKey@default'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://apiUsername:apiKey@default'];
     }

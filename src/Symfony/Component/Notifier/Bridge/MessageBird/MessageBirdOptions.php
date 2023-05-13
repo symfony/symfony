@@ -25,168 +25,125 @@ final class MessageBirdOptions implements MessageOptionsInterface
         $this->options = $options;
     }
 
-    public function getCreatedDatetime(): ?string
-    {
-        return $this->options['created_datetime'] ?? null;
-    }
-
-    public function getDataCoding(): ?string
-    {
-        return $this->options['data_coding'] ?? null;
-    }
-
-    public function getFrom(): ?string
-    {
-        return $this->options['from'] ?? null;
-    }
-
-    public function getGateway(): ?int
-    {
-        return $this->options['gateway'] ?? null;
-    }
-
-    public function getGroupIds(): ?array
-    {
-        return $this->options['group_ids'] ?? null;
-    }
-
-    public function getMClass(): ?int
-    {
-        return $this->options['m_class'] ?? null;
-    }
-
     public function getRecipientId(): ?string
     {
-        return $this->options['recipient_id'] ?? null;
+        return null;
     }
 
-    public function getReference(): ?string
+     /**
+     * @return $this
+     */
+    public function createdDatetime(string $createdDatetime): static
     {
-        return $this->options['reference'] ?? null;
-    }
-
-    public function getReportUrl(): ?string
-    {
-        return $this->options['report_url'] ?? null;
-    }
-
-    public function getScheduledDatetime(): ?string
-    {
-        return $this->options['scheduled_datetime'] ?? null;
-    }
-
-    public function getShortenUrls(): ?bool
-    {
-        return $this->options['shorten_urls'] ?? null;
-    }
-
-    public function getType(): ?string
-    {
-        return $this->options['type'] ?? null;
-    }
-
-    public function getTypeDetails(): ?string
-    {
-        return $this->options['type_details'] ?? null;
-    }
-
-    public function getValidity(): ?int
-    {
-        return $this->options['validity'] ?? null;
-    }
-
-    public function setCreatedDatetime(string $createdDatetime): self
-    {
-        $this->options['created_datetime'] = $createdDatetime;
+        $this->options['createdDatetime'] = $createdDatetime;
 
         return $this;
     }
 
-    public function setDataCoding(string $dataCoding): self
+    /**
+     * @return $this
+     */
+    public function dataCoding(string $dataCoding): static
     {
-        $this->options['data_coding'] = $dataCoding;
+        $this->options['dataCoding'] = $dataCoding;
 
         return $this;
     }
 
-    public function setFrom(string $from): self
-    {
-        $this->options['from'] = $from;
-
-        return $this;
-    }
-
-    public function setGateway(int $gateway): self
+    /**
+     * @return $this
+     */
+    public function gateway(int $gateway): static
     {
         $this->options['gateway'] = $gateway;
 
         return $this;
     }
 
-    public function setGroupIds(array $groupIds): self
+    /**
+     * @return $this
+     */
+    public function groupIds(array $groupIds): static
     {
-        $this->options['group_ids'] = $groupIds;
+        $this->options['groupIds'] = $groupIds;
 
         return $this;
     }
 
-    public function setMClass(int $mClass): self
+    /**
+     * @return $this
+     */
+    public function mClass(int $mClass): static
     {
-        $this->options['m_class'] = $mClass;
+        $this->options['mClass'] = $mClass;
 
         return $this;
     }
 
-    public function setRecipientId(string $id): self
-    {
-        $this->options['recipient_id'] = $id;
-
-        return $this;
-    }
-
-    public function setReference(string $reference): self
+    /**
+     * @return $this
+     */
+    public function reference(string $reference): static
     {
         $this->options['reference'] = $reference;
 
         return $this;
     }
 
-    public function setReportUrl(string $reportUrl): self
+    /**
+     * @return $this
+     */
+    public function reportUrl(string $reportUrl): static
     {
-        $this->options['report_url'] = $reportUrl;
+        $this->options['reportUrl'] = $reportUrl;
 
         return $this;
     }
 
-    public function setScheduledDatetime(string $scheduledDatetime): self
+    /**
+     * @return $this
+     */
+    public function scheduledDatetime(string $scheduledDatetime): static
     {
-        $this->options['scheduled_datetime'] = $scheduledDatetime;
+        $this->options['scheduledDatetime'] = $scheduledDatetime;
 
         return $this;
     }
 
-    public function setShortenUrls(bool $shortenUrls): self
+    /**
+     * @return $this
+     */
+    public function shortenUrls(bool $shortenUrls): static
     {
-        $this->options['shorten_urls'] = $shortenUrls;
+        $this->options['shortenUrls'] = $shortenUrls;
 
         return $this;
     }
 
-    public function setType(string $type): self
+    /**
+     * @return $this
+     */
+    public function type(string $type): static
     {
         $this->options['type'] = $type;
 
         return $this;
     }
 
-    public function setTypeDetails(string $typeDetails): self
+    /**
+     * @return $this
+     */
+    public function typeDetails(string $typeDetails): static
     {
-        $this->options['type_details'] = $typeDetails;
+        $this->options['typeDetails'] = $typeDetails;
 
         return $this;
     }
 
-    public function setValidity(int $validity): self
+    /**
+     * @return $this
+     */
+    public function validity(int $validity): static
     {
         $this->options['validity'] = $validity;
 
@@ -195,11 +152,6 @@ final class MessageBirdOptions implements MessageOptionsInterface
 
     public function toArray(): array
     {
-        $options = $this->options;
-        if (isset($options['recipient_id'])) {
-            unset($options['recipient_id']);
-        }
-
-        return $options;
+        return $this->options;
     }
 }

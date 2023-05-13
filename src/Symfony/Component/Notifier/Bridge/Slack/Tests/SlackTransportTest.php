@@ -16,10 +16,8 @@ use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
 use Symfony\Component\Notifier\Bridge\Slack\SlackSentMessage;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransport;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\Test\TransportTestCase;
@@ -167,17 +165,6 @@ final class SlackTransportTest extends TransportTestCase
         $sentMessage = $transport->send($chatMessage);
 
         $this->assertSame('1503435956.000247', $sentMessage->getMessageId());
-    }
-
-    public function testSendWithInvalidOptions()
-    {
-        $this->expectException(LogicException::class);
-
-        $client = new MockHttpClient(fn (string $method, string $url, array $options = []): ResponseInterface => $this->createMock(ResponseInterface::class));
-
-        $transport = self::createTransport($client, 'testChannel');
-
-        $transport->send(new ChatMessage('testMessage', $this->createMock(MessageOptionsInterface::class)));
     }
 
     public function testSendWith200ResponseButNotOk()

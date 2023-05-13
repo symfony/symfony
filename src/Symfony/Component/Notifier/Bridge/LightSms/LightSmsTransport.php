@@ -100,25 +100,19 @@ final class LightSmsTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $from = $message->getFrom() ?: $this->from;
-
         $data = [
             'login' => $this->login,
             'phone' => $phone = $this->escapePhoneNumber($message->getPhone()),
-            'sender' => $from,
+            'sender' => $message->getFrom() ?: $this->from,
             'text' => $message->getSubject(),
             'timestamp' => time(),
         ];
         $data['signature'] = $this->generateSignature($data);
 
         $endpoint = sprintf('https://%s/external/get/send.php', $this->getEndpoint());
-        $response = $this->client->request(
-            'GET',
-            $endpoint,
-            [
-                'query' => $data,
-            ]
-        );
+        $response = $this->client->request('GET', $endpoint, [
+            'query' => $data,
+        ]);
 
         try {
             $statusCode = $response->getStatusCode();

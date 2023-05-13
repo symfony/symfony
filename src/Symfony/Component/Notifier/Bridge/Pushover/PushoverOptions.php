@@ -103,7 +103,7 @@ final class PushoverOptions implements MessageOptionsInterface
      */
     public function asHtml(bool $bool): static
     {
-        $this->options['html'] = $bool ? 1 : 0;
+        $this->options['html'] = (int) $bool;
 
         return $this;
     }

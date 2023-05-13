@@ -46,7 +46,7 @@ final class FirebaseTransport extends AbstractTransport
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof ChatMessage;
+        return $message instanceof ChatMessage && (null === $message->getOptions() || $message->getOptions() instanceof FirebaseOptions);
     }
 
     protected function doSend(MessageInterface $message): SentMessage
@@ -56,14 +56,12 @@ final class FirebaseTransport extends AbstractTransport
         }
 
         $endpoint = sprintf('https://%s', $this->getEndpoint());
-        $options = ($opts = $message->getOptions()) ? $opts->toArray() : [];
-        if (!isset($options['to'])) {
-            $options['to'] = $message->getRecipientId();
-        }
-        if (null === $options['to']) {
+        $options = $message->getOptions()?->toArray() ?? [];
+        $options['to'] = $message->getRecipientId();
+
+        if (!$options['to']) {
             throw new InvalidArgumentException(sprintf('The "%s" transport required the "to" option to be set.', __CLASS__));
         }
-        $options['notification'] ??= [];
         $options['notification']['body'] = $message->getSubject();
         $options['data'] ??= [];
 

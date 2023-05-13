@@ -47,11 +47,7 @@ final class OvhCloudTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        if (null !== $this->sender) {
-            return sprintf('ovhcloud://%s?service_name=%s&sender=%s', $this->getEndpoint(), $this->serviceName, $this->sender);
-        }
-
-        return sprintf('ovhcloud://%s?service_name=%s', $this->getEndpoint(), $this->serviceName);
+        return sprintf('ovhcloud://%s?service_name=%s%s', $this->getEndpoint(), $this->serviceName, $this->sender ? '&sender='.$this->sender : '');
     }
 
     /**

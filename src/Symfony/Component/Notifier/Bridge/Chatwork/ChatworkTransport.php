@@ -54,8 +54,7 @@ class ChatworkTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
-        $messageOptions = $message->getOptions();
-        $options = $messageOptions ? $messageOptions->toArray() : [];
+        $options = $message->getOptions()?->toArray() ?? [];
 
         $bodyBuilder = new ChatworkMessageBodyBuilder();
         if (\array_key_exists('to', $options)) {
@@ -74,7 +73,6 @@ class ChatworkTransport extends AbstractTransport
             'body' => $messageBody,
             'headers' => [
                 'X-ChatWorkToken' => $this->apiToken,
-                'Content-Type' => 'application/x-www-form-urlencoded',
             ],
         ]);
 

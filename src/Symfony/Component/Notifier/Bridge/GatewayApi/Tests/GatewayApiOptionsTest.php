@@ -18,13 +18,15 @@ class GatewayApiOptionsTest extends TestCase
 {
     public function testGatewayApiOptions()
     {
-        $gatewayApiOptions = (new GatewayApiOptions())->setFrom('test_from')->setClass('test_class')->setCallbackUrl('test_callback_url')->setUserRef('test_user_ref')->setRecipientId('test_recipient');
+        $gatewayApiOptions = (new GatewayApiOptions())
+            ->class(123)
+            ->callbackUrl('test_callback_url')
+            ->userRef('test_user_ref');
 
         self::assertSame([
-            'from' => 'test_from',
-            'class' => 'test_class',
+            'class' => 123,
             'callback_url' => 'test_callback_url',
-            'user_ref' => 'test_user_ref',
+            'userref' => 'test_user_ref',
         ], $gatewayApiOptions->toArray());
     }
 }

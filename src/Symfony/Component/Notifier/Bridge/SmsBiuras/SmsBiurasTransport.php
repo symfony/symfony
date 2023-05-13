@@ -59,11 +59,7 @@ final class SmsBiurasTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        if ($this->testMode) {
-            return sprintf('smsbiuras://%s?from=%s&test_mode=%s', $this->getEndpoint(), $this->from, $this->testMode);
-        }
-
-        return sprintf('smsbiuras://%s?from=%s', $this->getEndpoint(), $this->from);
+        return sprintf('smsbiuras://%s?from=%s%s', $this->getEndpoint(), $this->from, $this->testMode ? '&test_mode=1' : '');
     }
 
     public function supports(MessageInterface $message): bool
@@ -77,8 +73,6 @@ final class SmsBiurasTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $from = $message->getFrom() ?: $this->from;
-
         $endpoint = sprintf('https://%s/api?', $this->getEndpoint());
 
         $response = $this->client->request('GET', $endpoint, [
@@ -86,8 +80,8 @@ final class SmsBiurasTransport extends AbstractTransport
                 'uid' => $this->uid,
                 'apikey' => $this->apiKey,
                 'message' => $message->getSubject(),
-                'from' => $from,
-                'test' => $this->testMode ? 1 : 0,
+                'from' => $message->getFrom() ?: $this->from,
+                'test' => (int) $this->testMode,
                 'to' => $message->getPhone(),
             ],
         ]);

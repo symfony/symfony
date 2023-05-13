@@ -40,12 +40,7 @@ final class SmsmodeTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        $queryParameters = [];
-        if ($this->from) {
-            $queryParameters['from'] = $this->from;
-        }
-
-        return sprintf('smsmode://%s', $this->getEndpoint()).($queryParameters ? '?'.http_build_query($queryParameters) : null);
+        return sprintf('smsmode://%s%s', $this->getEndpoint(), null !== $this->from ? '?from='.$this->from : '');
     }
 
     public function supports(MessageInterface $message): bool
@@ -64,32 +59,18 @@ final class SmsmodeTransport extends AbstractTransport
 
         $endpoint = sprintf('https://%s/sms/v1/messages', $this->getEndpoint());
 
-        $opts = $message->getOptions();
-        $options = $opts ? $opts->toArray() : [];
+        $options = $message->getOptions()?->toArray() ?? [];
         $options['body']['text'] = $message->getSubject();
         $options['recipient']['to'] = $message->getPhone();
-
-        if (!isset($options['from'])) {
-            $options['from'] = $this->from;
-        }
+        $options['from'] = $message->getFrom() ?: $this->from;
 
         if (!preg_match('/^[a-zA-Z0-9\s]{1,11}$/', $options['from'] ?? '')) {
-            throw new InvalidArgumentException(sprintf('The "From" value "%s" is not a valid sender ID.', $this->from));
-        }
-
-        if (isset($options['sent_date'])) {
-            $options['sentDate'] = $options['sent_date'];
-            unset($options['sent_date']);
-        }
-
-        if (isset($options['ref_client'])) {
-            $options['refClient'] = $options['ref_client'];
-            unset($options['ref_client']);
+            throw new InvalidArgumentException(sprintf('The "From" value "%s" is not a valid sender ID.', $options['from']));
         }
 
         $response = $this->client->request('POST', $endpoint, [
-                'headers' => ['X-Api-Key' => $this->apiKey],
-                'json' => array_filter($options),
+            'headers' => ['X-Api-Key' => $this->apiKey],
+            'json' => array_filter($options),
         ]);
 
         try {

@@ -18,15 +18,17 @@ class RingCentralOptionsTest extends TestCase
 {
     public function testRingCentralOptions()
     {
-        $ringCentralOptions = (new RingCentralOptions())->setFrom('test_from')->setRecipientId('test_recipient')->setCountryId('test_country_id')->setCountryName('test_country_name')->setCountryUri('test_country_uri')->setCountryCallingCode('test_country_calling_code')->setCountryIsoCode('test_country_iso_code');
+        $ringCentralOptions = (new RingCentralOptions())
+            ->country('test_country_id', 'test_country_iso_code', 'test_country_name', 'test_country_uri', 'test_country_calling_code');
 
         self::assertSame([
-            'from' => 'test_from',
-            'country_id' => 'test_country_id',
-            'country_name' => 'test_country_name',
-            'country_uri' => 'test_country_uri',
-            'country_calling_code' => 'test_country_calling_code',
-            'country_iso_code' => 'test_country_iso_code',
+            'country' => [
+                'id' => 'test_country_id',
+                'isoCode' => 'test_country_iso_code',
+                'name' => 'test_country_name',
+                'uri' => 'test_country_uri',
+                'callingCode' => 'test_country_calling_code',
+            ],
         ], $ringCentralOptions->toArray());
     }
 }

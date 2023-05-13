@@ -59,11 +59,7 @@ final class ZulipTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
-        if (null !== $message->getOptions() && !($message->getOptions() instanceof ZulipOptions)) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, ZulipOptions::class));
-        }
-
-        $options = ($opts = $message->getOptions()) ? $opts->toArray() : [];
+        $options = $message->getOptions()?->toArray() ?? [];
         $options['content'] = $message->getSubject();
 
         if (null === $message->getRecipientId() && empty($options['topic'])) {
@@ -81,7 +77,7 @@ final class ZulipTransport extends AbstractTransport
         $endpoint = sprintf('https://%s/api/v1/messages', $this->getEndpoint());
 
         $response = $this->client->request('POST', $endpoint, [
-            'auth_basic' => $this->email.':'.$this->token,
+            'auth_basic' => [$this->email, $this->token],
             'body' => $options,
         ]);
 

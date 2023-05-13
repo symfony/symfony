@@ -72,11 +72,6 @@ final class OneSignalTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testUnsupportedWithoutRecipientId()
-    {
-        $this->assertFalse(self::createTransport()->supports(new PushMessage('Hello', 'World')));
-    }
-
     public function testSendThrowsWithoutRecipient()
     {
         $transport = self::createTransport();

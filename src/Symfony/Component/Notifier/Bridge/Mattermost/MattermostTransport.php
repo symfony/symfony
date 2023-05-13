@@ -46,7 +46,7 @@ final class MattermostTransport extends AbstractTransport
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof ChatMessage;
+        return $message instanceof ChatMessage && (null === $message->getOptions() || $message->getOptions() instanceof MattermostOptions);
     }
 
     /**
@@ -58,12 +58,9 @@ final class MattermostTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
-        $options = ($opts = $message->getOptions()) ? $opts->toArray() : [];
+        $options = $message->getOptions()?->toArray() ?? [];
         $options['message'] = $message->getSubject();
-
-        if (!isset($options['channel_id'])) {
-            $options['channel_id'] = $message->getRecipientId() ?: $this->channel;
-        }
+        $options['channel_id'] ??= $message->getRecipientId() ?: $this->channel;
 
         $endpoint = sprintf('https://%s/api/v4/posts', $this->getEndpoint());
 

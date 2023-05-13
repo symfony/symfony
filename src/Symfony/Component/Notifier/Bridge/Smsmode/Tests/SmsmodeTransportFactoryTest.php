@@ -21,28 +21,28 @@ final class SmsmodeTransportFactoryTest extends TransportFactoryTestCase
         return new SmsmodeTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield ['smsmode://host.test?from=test', 'smsmode://ApiKey@host.test?from=test'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield 'missing API key' => ['smsmode://@default?from=test'];
     }
 
-    public function missingRequiredOptionProvider(): iterable
+    public static function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: from' => ['smsmode://apiKey@default'];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'smsmode://apiKey@default?from=test'];
         yield [false, 'somethingElse://apiKey@default?from=test'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://apiKey@default?from=test'];
     }

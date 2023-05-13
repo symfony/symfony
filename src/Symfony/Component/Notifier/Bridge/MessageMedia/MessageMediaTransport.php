@@ -62,29 +62,20 @@ final class MessageMediaTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $from = $message->getFrom() ?: $this->from;
-
-        $opts = $message->getOptions();
-        $options = $opts ? $opts->toArray() : [];
-        $options['source_number'] = $options['from'] ?? $from;
+        $options = $message->getOptions()?->toArray() ?? [];
+        $options['source_number'] = $message->getFrom() ?: $this->from;
         $options['destination_number'] = $message->getPhone();
         $options['content'] = $message->getSubject();
 
-        unset($options['from']);
-
         $endpoint = sprintf('https://%s/v1/messages', $this->getEndpoint());
-        $response = $this->client->request(
-            'POST',
-            $endpoint,
-            [
-                'auth_basic' => $this->apiKey.':'.$this->apiSecret,
-                'json' => [
-                    'messages' => [
-                        array_filter($options),
-                    ],
+        $response = $this->client->request('POST', $endpoint, [
+            'auth_basic' => [$this->apiKey, $this->apiSecret],
+            'json' => [
+                'messages' => [
+                    array_filter($options),
                 ],
-            ]
-        );
+            ],
+        ]);
 
         try {
             $statusCode = $response->getStatusCode();

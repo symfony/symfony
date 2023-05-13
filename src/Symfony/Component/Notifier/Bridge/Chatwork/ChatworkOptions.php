@@ -32,9 +32,12 @@ class ChatworkOptions implements MessageOptionsInterface
 
     public function getRecipientId(): ?string
     {
-        return '';
+        return null;
     }
 
+    /**
+     * @return $this
+     */
     public function to(array|string $userIds): static
     {
         $this->options['to'] = $userIds;
@@ -42,6 +45,9 @@ class ChatworkOptions implements MessageOptionsInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function selfUnread(bool $selfUnread): static
     {
         $this->options['selfUnread'] = $selfUnread;

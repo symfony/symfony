@@ -25,73 +25,43 @@ final class GatewayApiOptions implements MessageOptionsInterface
         $this->options = $options;
     }
 
-    public function getClass(): ?int
-    {
-        return $this->options['class'] ?? null;
-    }
-
-    public function getUserRef(): ?string
-    {
-        return $this->options['user_ref'] ?? null;
-    }
-
-    public function getCallbackUrl(): ?string
-    {
-        return $this->options['callback_url'] ?? null;
-    }
-
-    public function getFrom(): ?string
-    {
-        return $this->options['from'] ?? null;
-    }
-
     public function getRecipientId(): ?string
     {
-        return $this->options['recipient_id'] ?? null;
+        return null;
     }
 
-    public function setClass(int $class): self
+    /**
+     * @return $this
+     */
+    public function class(int $class): static
     {
         $this->options['class'] = $class;
 
         return $this;
     }
 
-    public function setUserRef(string $userRef): self
+    /**
+     * @return $this
+     */
+    public function userRef(string $userRef): static
     {
-        $this->options['user_ref'] = $userRef;
+        $this->options['userref'] = $userRef;
 
         return $this;
     }
 
-    public function setCallbackUrl(string $callbackUrl): self
+    /**
+     * @return $this
+     */
+    public function callbackUrl(string $callbackUrl): static
     {
         $this->options['callback_url'] = $callbackUrl;
 
         return $this;
     }
 
-    public function setFrom(string $from): self
-    {
-        $this->options['from'] = $from;
-
-        return $this;
-    }
-
-    public function setRecipientId(string $id): self
-    {
-        $this->options['recipient_id'] = $id;
-
-        return $this;
-    }
-
     public function toArray(): array
     {
-        $options = $this->options;
-        if (isset($options['recipient_id'])) {
-            unset($options['recipient_id']);
-        }
-
-        return $options;
+        return $this->options;
     }
 }

@@ -33,8 +33,10 @@ final class MastodonOptions implements MessageOptionsInterface
 
     /**
      * @param string[] $choices
+     *
+     * @return $this
      */
-    public function poll(array $choices, int $expiresIn): self
+    public function poll(array $choices, int $expiresIn): static
     {
         $this->options['poll'] = [
             'options' => $choices,
@@ -44,7 +46,10 @@ final class MastodonOptions implements MessageOptionsInterface
         return $this;
     }
 
-    public function attachMedia(File $file, File $thumbnail = null, string $description = null, string $focus = null): self
+    /**
+     * @return $this
+     */
+    public function attachMedia(File $file, File $thumbnail = null, string $description = null, string $focus = null): static
     {
         $this->options['attach'][] = [
             'file' => $file,

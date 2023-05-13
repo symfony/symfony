@@ -25,61 +25,33 @@ final class ContactEveryoneOptions implements MessageOptionsInterface
         $this->options = $options;
     }
 
-    public function getDiffusionName(): ?int
-    {
-        return $this->options['diffusion_name'] ?? null;
-    }
-
-    public function getCategory(): ?string
-    {
-        return $this->options['category'] ?? null;
-    }
-
-    public function getFrom(): ?string
-    {
-        return $this->options['from'] ?? null;
-    }
-
     public function getRecipientId(): ?string
     {
-        return $this->options['recipient_id'] ?? null;
+        return null;
     }
 
-    public function setDiffusionName(int $diffusionName): self
+    /**
+     * @return $this
+     */
+    public function diffusionName(int $diffusionName): static
     {
         $this->options['diffusion_name'] = $diffusionName;
 
         return $this;
     }
 
-    public function setCategory(string $category): self
+    /**
+     * @return $this
+     */
+    public function category(string $category): static
     {
         $this->options['category'] = $category;
 
         return $this;
     }
 
-    public function setFrom(string $from): self
-    {
-        $this->options['from'] = $from;
-
-        return $this;
-    }
-
-    public function setRecipientId(string $id): self
-    {
-        $this->options['recipient_id'] = $id;
-
-        return $this;
-    }
-
     public function toArray(): array
     {
-        $options = $this->options;
-        if (isset($options['recipient_id'])) {
-            unset($options['recipient_id']);
-        }
-
-        return $options;
+        return $this->options;
     }
 }

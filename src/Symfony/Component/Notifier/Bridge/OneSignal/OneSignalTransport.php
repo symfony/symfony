@@ -53,7 +53,7 @@ final class OneSignalTransport extends AbstractTransport
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof PushMessage && (null !== $this->defaultRecipientId || ($message->getOptions() instanceof OneSignalOptions && null !== $message->getOptions()->getRecipientId()));
+        return $message instanceof PushMessage && (null === $message->getOptions() || $message->getOptions() instanceof OneSignalOptions);
     }
 
     /**
@@ -65,12 +65,8 @@ final class OneSignalTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, PushMessage::class, $message);
         }
 
-        if ($message->getOptions() && !$message->getOptions() instanceof OneSignalOptions) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, OneSignalOptions::class));
-        }
-
-        if (!($opts = $message->getOptions()) && $notification = $message->getNotification()) {
-            $opts = OneSignalOptions::fromNotification($notification);
+        if (!($options = $message->getOptions()) && $notification = $message->getNotification()) {
+            $options = OneSignalOptions::fromNotification($notification);
         }
 
         $recipientId = $message->getRecipientId() ?? $this->defaultRecipientId;
@@ -79,16 +75,11 @@ final class OneSignalTransport extends AbstractTransport
             throw new LogicException(sprintf('The "%s" transport should have configured `defaultRecipientId` via DSN or provided with message options.', __CLASS__));
         }
 
-        $options = $opts ? $opts->toArray() : [];
+        $options = $options?->toArray() ?? [];
         $options['app_id'] = $this->appId;
         $options['include_player_ids'] = [$recipientId];
-
-        if (!isset($options['headings'])) {
-            $options['headings'] = ['en' => $message->getSubject()];
-        }
-        if (!isset($options['contents'])) {
-            $options['contents'] = ['en' => $message->getContent()];
-        }
+        $options['headings'] ??= ['en' => $message->getSubject()];
+        $options['contents'] ??= ['en' => $message->getContent()];
 
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/api/v1/notifications', [
             'headers' => [

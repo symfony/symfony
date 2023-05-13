@@ -48,7 +48,7 @@ final class FortySixElksTransport extends AbstractTransport
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof SmsMessage && (null === $message->getOptions() || $message->getOptions() instanceof FortySixElksOptions);
+        return $message instanceof SmsMessage;
     }
 
     protected function doSend(MessageInterface $message): SentMessage
@@ -57,15 +57,12 @@ final class FortySixElksTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $from = $message->getFrom() ?: $this->from;
-
-        $opts = $message->getOptions();
-        $options = $opts ? $opts->toArray() : [];
-        $options['from'] = $options['from'] ?? $from;
+        $options = [];
+        $options['from'] = $message->getFrom() ?: $this->from;
         $options['to'] = $message->getPhone();
         $options['message'] = $message->getSubject();
 
-        $endpoint = sprintf('https://%s/a1/sms', self::HOST);
+        $endpoint = sprintf('https://%s/a1/sms', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'auth_basic' => [$this->apiUsername, $this->apiPassword],
             'body' => array_filter($options),

@@ -72,14 +72,13 @@ final class ContactEveryoneTransport extends AbstractTransport
             throw new InvalidArgumentException(sprintf('The "%s" transport does not support "from" in "%s".', __CLASS__, SmsMessage::class));
         }
 
-        $opts = $message->getOptions();
-        $options = $opts ? $opts->toArray() : [];
+        $options = $message->getOptions()?->toArray() ?? [];
         $options['xcharset'] = 'true';
         $options['token'] = $this->token;
         $options['to'] = $message->getPhone();
         $options['msg'] = $message->getSubject();
 
-        $endpoint = sprintf('https://%s/api/light/diffusions/sms', self::HOST);
+        $endpoint = sprintf('https://%s/api/light/diffusions/sms', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'query' => array_filter($options),
         ]);

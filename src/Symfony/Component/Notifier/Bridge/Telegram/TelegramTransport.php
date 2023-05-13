@@ -56,7 +56,7 @@ final class TelegramTransport extends AbstractTransport
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof ChatMessage;
+        return $message instanceof ChatMessage && (null === $message->getOptions() || $message->getOptions() instanceof TelegramOptions);
     }
 
     /**
@@ -68,15 +68,8 @@ final class TelegramTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
-        if ($message->getOptions() && !$message->getOptions() instanceof TelegramOptions) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, TelegramOptions::class));
-        }
-
-        $options = ($opts = $message->getOptions()) ? $opts->toArray() : [];
-        if (!isset($options['chat_id'])) {
-            $options['chat_id'] = $message->getRecipientId() ?: $this->chatChannel;
-        }
-
+        $options = $message->getOptions()?->toArray() ?? [];
+        $options['chat_id'] ??= $message->getRecipientId() ?: $this->chatChannel;
         $options['text'] = $message->getSubject();
 
         if (!isset($options['parse_mode']) || TelegramOptions::PARSE_MODE_MARKDOWN_V2 === $options['parse_mode']) {

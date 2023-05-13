@@ -25,96 +25,65 @@ final class ClickSendOptions implements MessageOptionsInterface
         $this->options = $options;
     }
 
-    public function getCountry(): ?string
-    {
-        return $this->options['country'] ?? null;
-    }
-
-    public function getCustomString(): ?string
-    {
-        return $this->options['custom_string'] ?? null;
-    }
-
-    public function getFrom(): ?string
-    {
-        return $this->options['from'] ?? null;
-    }
-
-    public function getFromEmail(): ?string
-    {
-        return $this->options['from_email'] ?? null;
-    }
-
-    public function getListId(): ?string
-    {
-        return $this->options['list_id'] ?? null;
-    }
-
     public function getRecipientId(): ?string
     {
-        return $this->options['recipient_id'] ?? null;
+        return null;
     }
 
-    public function getSchedule(): ?int
-    {
-        return $this->options['schedule'] ?? null;
-    }
-
-    public function getSource(): ?string
-    {
-        return $this->options['source'] ?? null;
-    }
-
-    public function setCountry(string $country): self
+    /**
+     * @return $this
+     */
+    public function country(string $country): static
     {
         $this->options['country'] = $country;
 
         return $this;
     }
 
-    public function setCustomString(string $customString): self
+    /**
+     * @return $this
+     */
+    public function customString(string $customString): static
     {
         $this->options['custom_string'] = $customString;
 
         return $this;
     }
 
-    public function setFrom(string $from): self
-    {
-        $this->options['from'] = $from;
-
-        return $this;
-    }
-
-    public function setFromEmail(string $fromEmail): self
+    /**
+     * @return $this
+     */
+    public function fromEmail(string $fromEmail): static
     {
         $this->options['from_email'] = $fromEmail;
 
         return $this;
     }
 
-    public function setListId(string $listId): self
+    /**
+     * @return $this
+     */
+    public function listId(string $listId): static
     {
         $this->options['list_id'] = $listId;
 
         return $this;
     }
 
-    public function setRecipientId(string $id): self
-    {
-        $this->options['recipient_id'] = $id;
-
-        return $this;
-    }
-
-    public function setSchedule(int $schedule): self
+    /**
+     * @return $this
+     */
+    public function schedule(int $schedule): static
     {
         $this->options['schedule'] = $schedule;
 
         return $this;
     }
 
-    public function setSource(string $source): self
+    /**
+     * @return $this
+     */
+    public function source(string $source): static
     {
         $this->options['source'] = $source;
 
@@ -123,11 +92,6 @@ final class ClickSendOptions implements MessageOptionsInterface
 
     public function toArray(): array
     {
-        $options = $this->options;
-        if (isset($options['recipient_id'])) {
-            unset($options['recipient_id']);
-        }
-
-        return $options;
+        return $this->options;
     }
 }

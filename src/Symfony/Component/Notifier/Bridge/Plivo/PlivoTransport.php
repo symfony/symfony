@@ -56,18 +56,20 @@ final class PlivoTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $opts = $message->getOptions();
-        $options = $opts ? $opts->toArray() : [];
+        $options = $message->getOptions()?->toArray() ?? [];
         $options['text'] = $message->getSubject();
-        $options['src'] = $options['src'] ?? $this->from;
-        $options['dst'] = $options['dst'] ?? $message->getPhone();
+        $options['src'] = $message->getFrom() ?: $this->from;
+        $options['dst'] = $message->getPhone();
 
         if (!preg_match('/^[a-zA-Z0-9\s]{2,11}$/', $options['src']) && !preg_match('/^\+?[1-9]\d{1,14}$/', $options['src'])) {
-            throw new InvalidArgumentException(sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID. Phone number must contain only numbers and optional + character.', $this->from));
+            throw new InvalidArgumentException(sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID. Phone number must contain only numbers and optional + character.', $options['src']));
         }
 
         $endpoint = sprintf('https://%s/v1/Account/%s/Message/', $this->getEndpoint(), $this->authId);
-        $response = $this->client->request('POST', $endpoint, ['auth_basic' => $this->authId.':'.$this->authToken, 'json' => array_filter($options)]);
+        $response = $this->client->request('POST', $endpoint, [
+            'auth_basic' => [$this->authId, $this->authToken],
+            'json' => array_filter($options),
+        ]);
 
         try {
             $statusCode = $response->getStatusCode();

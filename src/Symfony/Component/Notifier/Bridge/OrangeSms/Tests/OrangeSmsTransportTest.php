@@ -12,7 +12,6 @@
 namespace Symfony\Component\Notifier\Bridge\OrangeSms\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
-use Symfony\Component\Notifier\Bridge\OrangeSms\OrangeSmsOptions;
 use Symfony\Component\Notifier\Bridge\OrangeSms\OrangeSmsTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
@@ -35,7 +34,6 @@ final class OrangeSmsTransportTest extends TransportTestCase
     public static function supportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('+243899999999', 'Hello World!')];
-        yield [new SmsMessage('+243899999999', 'Hello World!'), 'from', new OrangeSmsOptions(['from' => 'foo'])];
     }
 
     public static function unsupportedMessagesProvider(): iterable

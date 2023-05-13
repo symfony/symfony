@@ -44,7 +44,7 @@ final class BandwidthTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('bandwidth://%s?from=%s&account_id=%s&application_id=%s', $this->getEndpoint(), $this->from, $this->accountId, $this->applicationId).($this->priority ? sprintf('&priority=%s', $this->priority) : null);
+        return sprintf('bandwidth://%s?from=%s&account_id=%s&application_id=%s%s', $this->getEndpoint(), $this->from, $this->accountId, $this->applicationId, null !== $this->priority ? '&priority='.$this->priority : '');
     }
 
     public function supports(MessageInterface $message): bool
@@ -60,31 +60,26 @@ final class BandwidthTransport extends AbstractTransport
         if (!$message instanceof SmsMessage) {
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
-        $opts = $message->getOptions();
-        $options = $opts ? $opts->toArray() : [];
+        $options = $message->getOptions()?->toArray() ?? [];
         $options['text'] = $message->getSubject();
-        $options['from'] = $options['from'] ?? $this->from;
-        $options['to'] = $options['to'] ?? [$message->getPhone()];
-        $options['account_id'] = $options['account_id'] ?? $this->accountId;
-        $options['applicationId'] = $options['application_id'] ?? $this->applicationId;
-        unset($options['application_id']);
+        $options['from'] = $message->getFrom() ?: $this->from;
+        $options['to'] = [$message->getPhone()];
+        $options['accountId'] ??= $this->accountId;
+        $options['applicationId'] ??= $this->applicationId;
+        $options['priority'] ??= $this->priority;
 
-        if (!isset($options['priority']) && $this->priority) {
-            $options['priority'] = $this->priority;
+        if (!preg_match('/^\+[1-9]\d{1,14}$/', $options['from'])) {
+            throw new InvalidArgumentException(sprintf('The "From" number "%s" is not a valid phone number. The number must be in E.164 format.', $options['from']));
         }
 
-        if (!preg_match('/^\+[1-9]\d{1,14}$/', $this->from)) {
-            throw new InvalidArgumentException(sprintf('The "From" number "%s" is not a valid phone number. The number must be in E.164 format.', $this->from));
+        if (!preg_match('/^\+[1-9]\d{1,14}$/', $options['to'][0])) {
+            throw new InvalidArgumentException(sprintf('The "To" number "%s" is not a valid phone number. The number must be in E.164 format.', $options['to'][0]));
         }
-
-        if (!preg_match('/^\+[1-9]\d{1,14}$/', $message->getPhone())) {
-            throw new InvalidArgumentException(sprintf('The "To" number "%s" is not a valid phone number. The number must be in E.164 format.', $message->getPhone()));
-        }
-        $endpoint = sprintf('https://%s/api/v2/users/%s/messages', $this->getEndpoint(), $options['account_id']);
+        $endpoint = sprintf('https://%s/api/v2/users/%s/messages', $this->getEndpoint(), $options['accountId']);
         unset($options['accountId']);
 
         $response = $this->client->request('POST', $endpoint, [
-            'auth_basic' => $this->username.':'.$this->password,
+            'auth_basic' => [$this->username, $this->password],
             'json' => array_filter($options),
         ]);
 

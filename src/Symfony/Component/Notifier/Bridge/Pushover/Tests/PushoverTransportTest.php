@@ -64,7 +64,7 @@ final class PushoverTransportTest extends TransportTestCase
             'title' => 'testMessageSubject',
             'token' => 'appToken',
             'user' => 'userKey',
-        ]);
+        ], '', '&');
 
         $client = new MockHttpClient(function (string $method, string $url, array $options = []) use (
             $response,

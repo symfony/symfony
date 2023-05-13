@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2023-05-12T07:10:44Z
+
+Should be rebased :)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-05-12T10:14:41Z
+
+Rebased, reviewed again (by me) and tested again in my local app. Looks good 👍
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-05-12T14:41:42Z
+
+This should be happy now - `service_closure` added - much, much nicer.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-05-12T17:55:00Z
+
+Updated - thanks for the suggestions :)

@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-05-12T17:21:49Z
+
+The TL;DR of this PR is that options shouldn't have getters when they're not required, and their setters should not start with `set*`.
+The options should also not provide yet another way to define what the messages can already convey (from, recipient, etc.), unless there is a compelling reason to. (There might be existing option classes that violate this rule, but that shouldn't be a reason to add more.)
+
+The rest is more CS-related.
+
+/cc @OskarStark @alamirault since you contribute to this component. :pray:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-05-13T09:43:19Z
+
+I'm merging to fix the CI and because this is ready to me, but feel free to comment after the merge if needed!

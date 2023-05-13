@@ -149,7 +149,7 @@ class CacheAttributeListenerTest extends TestCase
         $this->assertSame('5', $this->response->headers->getCacheControlDirective('max-stale'));
         $this->assertSame('6', $this->response->headers->getCacheControlDirective('stale-while-revalidate'));
         $this->assertSame('7', $this->response->headers->getCacheControlDirective('stale-if-error'));
-        $this->assertInstanceOf(\DateTime::class, $this->response->getExpires());
+        $this->assertInstanceOf(\DateTimeInterface::class, $this->response->getExpires());
     }
 
     public function testCacheMaxAgeSupportsStrtotimeFormat()

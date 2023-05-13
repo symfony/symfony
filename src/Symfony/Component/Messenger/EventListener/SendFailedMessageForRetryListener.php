@@ -117,7 +117,8 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
 
     private function shouldRetry(\Throwable $e, Envelope $envelope, RetryStrategyInterface $retryStrategy): bool
     {
-        if ($e instanceof RecoverableExceptionInterface) {
+        $isRetryable = $retryStrategy->isRetryable($envelope, $e);
+        if ($isRetryable && $e instanceof RecoverableExceptionInterface) {
             return true;
         }
 
@@ -126,7 +127,7 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
         if ($e instanceof HandlerFailedException) {
             $shouldNotRetry = true;
             foreach ($e->getNestedExceptions() as $nestedException) {
-                if ($nestedException instanceof RecoverableExceptionInterface) {
+                if ($isRetryable && $nestedException instanceof RecoverableExceptionInterface) {
                     return true;
                 }
 
@@ -144,7 +145,7 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
             return false;
         }
 
-        return $retryStrategy->isRetryable($envelope, $e);
+        return $isRetryable;
     }
 
     private function getRetryStrategyForTransport(string $alias): ?RetryStrategyInterface

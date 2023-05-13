@@ -14,8 +14,10 @@ namespace Symfony\Component\AssetMapper\Tests\ImportMap;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\AssetMapper;
 use Symfony\Component\AssetMapper\AssetMapperCompiler;
+use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\AssetMapperRepository;
 use Symfony\Component\AssetMapper\Compiler\JavaScriptImportPathCompiler;
+use Symfony\Component\AssetMapper\Factory\MappedAssetFactory;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\AssetMapper\ImportMap\PackageRequireOptions;
 use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolver;
@@ -28,6 +30,7 @@ class ImportMapManagerTest extends TestCase
 {
     private MockHttpClient $httpClient;
     private Filesystem $filesystem;
+    private AssetMapperInterface $assetMapper;
 
     protected function setUp(): void
     {
@@ -483,14 +486,18 @@ class ImportMapManagerTest extends TestCase
     {
         $repository = new AssetMapperRepository($dirs, $rootDir);
 
-        $compiler = new AssetMapperCompiler([
-            new JavaScriptImportPathCompiler(),
-        ]);
+        $compiler = new AssetMapperCompiler(
+            [new JavaScriptImportPathCompiler()],
+            fn () => $this->assetMapper
+        );
+        $factory = new MappedAssetFactory($pathResolver, $compiler);
 
-        return new AssetMapper(
+        $this->assetMapper = new AssetMapper(
             $repository,
-            $compiler,
+            $factory,
             $pathResolver
         );
+
+        return $this->assetMapper;
     }
 }

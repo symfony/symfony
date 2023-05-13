@@ -125,9 +125,9 @@ final class MappedAsset
         $this->content = $content;
     }
 
-    public function addDependency(self $asset, bool $isLazy = false): void
+    public function addDependency(AssetDependency $assetDependency): void
     {
-        $this->dependencies[] = new AssetDependency($asset, $isLazy);
+        $this->dependencies[] = $assetDependency;
     }
 
     public function getPublicPathWithoutDigest(): string

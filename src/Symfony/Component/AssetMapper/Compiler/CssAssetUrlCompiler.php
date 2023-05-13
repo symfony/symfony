@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\AssetMapper\Compiler;
 
+use Symfony\Component\AssetMapper\AssetDependency;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\MappedAsset;
 
@@ -47,7 +48,7 @@ final class CssAssetUrlCompiler implements AssetCompilerInterface
                 return $matches[0];
             }
 
-            $asset->addDependency($dependentAsset);
+            $asset->addDependency(new AssetDependency($dependentAsset));
             $relativePath = $this->createRelativePath($asset->getPublicPathWithoutDigest(), $dependentAsset->getPublicPath());
 
             return 'url("'.$relativePath.'")';

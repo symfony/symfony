@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\AssetMapper\Compiler;
 
+use Symfony\Component\AssetMapper\AssetDependency;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\MappedAsset;
 
@@ -54,7 +55,7 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
                 // This will cause the asset to be included in the importmap.
                 $isLazy = str_contains($matches[0], 'import(');
 
-                $asset->addDependency($dependentAsset, $isLazy);
+                $asset->addDependency(new AssetDependency($dependentAsset, $isLazy, false));
 
                 $relativeImportPath = $this->createRelativePath($asset->getPublicPathWithoutDigest(), $dependentAsset->getPublicPathWithoutDigest());
                 $relativeImportPath = $this->makeRelativeForJavaScript($relativeImportPath);

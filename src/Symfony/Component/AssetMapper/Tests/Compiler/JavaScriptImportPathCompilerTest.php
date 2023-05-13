@@ -34,6 +34,9 @@ class JavaScriptImportPathCompilerTest extends TestCase
             $actualDependencies[$dependency->asset->getLogicalPath()] = $dependency->isLazy;
         }
         $this->assertEquals($expectedDependencies, $actualDependencies);
+        if ($expectedDependencies) {
+            $this->assertFalse($asset->getDependencies()[0]->isContentDependency);
+        }
     }
 
     public static function provideCompileTests(): iterable

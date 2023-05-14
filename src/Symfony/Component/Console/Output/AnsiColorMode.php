@@ -78,25 +78,7 @@ enum AnsiColorMode
 
     private function degradeHexColorToAnsi4(int $r, int $g, int $b): int
     {
-        if (0 === round($this->getSaturation($r, $g, $b) / 50)) {
-            return 0;
-        }
-
-        return (int) ((round($b / 255) << 2) | (round($g / 255) << 1) | round($r / 255));
-    }
-
-    private function getSaturation(int $r, int $g, int $b): int
-    {
-        $r = $r / 255;
-        $g = $g / 255;
-        $b = $b / 255;
-        $v = max($r, $g, $b);
-
-        if (0 === $diff = $v - min($r, $g, $b)) {
-            return 0;
-        }
-
-        return (int) ((int) $diff * 100 / $v);
+        return round($b / 255) << 2 | (round($g / 255) << 1) | round($r / 255);
     }
 
     /**

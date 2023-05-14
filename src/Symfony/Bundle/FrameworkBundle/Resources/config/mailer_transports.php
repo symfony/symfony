@@ -76,6 +76,10 @@ return static function (ContainerConfigurator $container) {
             ->parent('mailer.transport_factory.abstract')
             ->tag('mailer.transport_factory')
 
+        ->set('mailer.transport_factory.redlink', RedlinkTransportFactory::class)
+            ->parent('mailer.transport_factory.abstract')
+            ->tag('mailer.transport_factory')
+
         ->set('mailer.transport_factory.sendgrid', SendgridTransportFactory::class)
             ->parent('mailer.transport_factory.abstract')
             ->tag('mailer.transport_factory')

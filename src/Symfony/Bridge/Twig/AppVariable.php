@@ -31,6 +31,7 @@ class AppVariable
     private string $environment;
     private bool $debug;
     private LocaleSwitcher $localeSwitcher;
+    private array $enabledLocales;
 
     /**
      * @return void
@@ -67,6 +68,11 @@ class AppVariable
     public function setLocaleSwitcher(LocaleSwitcher $localeSwitcher): void
     {
         $this->localeSwitcher = $localeSwitcher;
+    }
+
+    public function setEnabledLocales(array $enabledLocales): void
+    {
+        $this->enabledLocales = $enabledLocales;
     }
 
     /**
@@ -153,6 +159,15 @@ class AppVariable
         }
 
         return $this->localeSwitcher->getLocale();
+    }
+
+    public function getEnabled_locales(): array
+    {
+        if (!isset($this->enabledLocales)) {
+            throw new \RuntimeException('The "app.enabled_locales" variable is not available.');
+        }
+
+        return $this->enabledLocales;
     }
 
     /**

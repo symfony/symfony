@@ -112,6 +112,13 @@ class AppVariableTest extends TestCase
         self::assertEquals('fr', $this->appVariable->getLocale());
     }
 
+    public function testGetEnabledLocales()
+    {
+        $this->appVariable->setEnabledLocales(['en', 'fr']);
+
+        self::assertSame(['en', 'fr'], $this->appVariable->getEnabled_locales());
+    }
+
     public function testGetTokenWithNoToken()
     {
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
@@ -169,6 +176,13 @@ class AppVariableTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The "app.locale" variable is not available.');
         $this->appVariable->getLocale();
+    }
+
+    public function testGetEnabledLocalesWithEnabledLocalesNotSet()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The "app.enabled_locales" variable is not available.');
+        $this->appVariable->getEnabled_locales();
     }
 
     public function testGetFlashesWithNoRequest()

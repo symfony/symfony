@@ -74,25 +74,25 @@ class DoctrineIntegrationTest extends TestCase
             'body' => '{"message": "Hi handled"}',
             'headers' => json_encode(['type' => DummyMessage::class]),
             'queue_name' => 'default',
-            'created_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 12:00:00')),
-            'available_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 12:00:00')),
-            'delivered_at' => $this->formatDateTime(new \DateTimeImmutable()),
+            'created_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 12:00:00', new \DateTimeZone('UTC'))),
+            'available_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 12:00:00', new \DateTimeZone('UTC'))),
+            'delivered_at' => $this->formatDateTime(new \DateTimeImmutable('now', new \DateTimeZone('UTC'))),
         ]);
         // one available later
         $this->driverConnection->insert('messenger_messages', [
             'body' => '{"message": "Hi delayed"}',
             'headers' => json_encode(['type' => DummyMessage::class]),
             'queue_name' => 'default',
-            'created_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 12:00:00')),
-            'available_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 13:00:00')),
+            'created_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 12:00:00', new \DateTimeZone('UTC'))),
+            'available_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 13:00:00', new \DateTimeZone('UTC'))),
         ]);
         // one available
         $this->driverConnection->insert('messenger_messages', [
             'body' => '{"message": "Hi available"}',
             'headers' => json_encode(['type' => DummyMessage::class]),
             'queue_name' => 'default',
-            'created_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 12:00:00')),
-            'available_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 12:30:00')),
+            'created_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 12:00:00', new \DateTimeZone('UTC'))),
+            'available_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 12:30:00', new \DateTimeZone('UTC'))),
         ]);
 
         $encoded = $this->connection->get();
@@ -108,33 +108,33 @@ class DoctrineIntegrationTest extends TestCase
             'body' => '{"message": "Hi handled"}',
             'headers' => json_encode(['type' => DummyMessage::class]),
             'queue_name' => 'default',
-            'created_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 12:00:00')),
-            'available_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 12:00:00')),
-            'delivered_at' => $this->formatDateTime(new \DateTimeImmutable()),
+            'created_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 12:00:00', new \DateTimeZone('UTC'))),
+            'available_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 12:00:00', new \DateTimeZone('UTC'))),
+            'delivered_at' => $this->formatDateTime(new \DateTimeImmutable('now', new \DateTimeZone('UTC'))),
         ]);
         // one available later
         $this->driverConnection->insert('messenger_messages', [
             'body' => '{"message": "Hi delayed"}',
             'headers' => json_encode(['type' => DummyMessage::class]),
             'queue_name' => 'default',
-            'created_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 12:00:00')),
-            'available_at' => $this->formatDateTime((new \DateTimeImmutable())->modify('+1 minute')),
+            'created_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 12:00:00', new \DateTimeZone('UTC'))),
+            'available_at' => $this->formatDateTime(new \DateTimeImmutable('+1 minute', new \DateTimeZone('UTC'))),
         ]);
         // one available
         $this->driverConnection->insert('messenger_messages', [
             'body' => '{"message": "Hi available"}',
             'headers' => json_encode(['type' => DummyMessage::class]),
             'queue_name' => 'default',
-            'created_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 12:00:00')),
-            'available_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 12:30:00')),
+            'created_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 12:00:00', new \DateTimeZone('UTC'))),
+            'available_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 12:30:00', new \DateTimeZone('UTC'))),
         ]);
         // another available
         $this->driverConnection->insert('messenger_messages', [
             'body' => '{"message": "Hi available"}',
             'headers' => json_encode(['type' => DummyMessage::class]),
             'queue_name' => 'default',
-            'created_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 12:00:00')),
-            'available_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 12:30:00')),
+            'created_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 12:00:00', new \DateTimeZone('UTC'))),
+            'available_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 12:30:00', new \DateTimeZone('UTC'))),
         ]);
 
         $this->assertSame(2, $this->connection->getMessageCount());
@@ -148,16 +148,16 @@ class DoctrineIntegrationTest extends TestCase
             'body' => '{"message": "Hi requeued"}',
             'headers' => json_encode(['type' => DummyMessage::class]),
             'queue_name' => 'default',
-            'created_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 12:00:00')),
-            'available_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 12:00:00')),
+            'created_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 12:00:00', new \DateTimeZone('UTC'))),
+            'available_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 12:00:00', new \DateTimeZone('UTC'))),
             'delivered_at' => $this->formatDateTime($twoHoursAgo),
         ]);
         $this->driverConnection->insert('messenger_messages', [
             'body' => '{"message": "Hi available"}',
             'headers' => json_encode(['type' => DummyMessage::class]),
             'queue_name' => 'default',
-            'created_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 12:00:00')),
-            'available_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 12:30:00')),
+            'created_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 12:00:00', new \DateTimeZone('UTC'))),
+            'available_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 12:30:00', new \DateTimeZone('UTC'))),
         ]);
 
         $next = $this->connection->get();

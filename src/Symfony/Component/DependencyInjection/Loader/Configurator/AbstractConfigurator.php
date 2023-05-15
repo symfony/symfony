@@ -101,6 +101,7 @@ abstract class AbstractConfigurator
         switch (true) {
             case null === $value:
             case \is_scalar($value):
+            case $value instanceof \UnitEnum:
                 return $value;
 
             case $value instanceof ArgumentInterface:

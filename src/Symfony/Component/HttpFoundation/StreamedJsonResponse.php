@@ -130,6 +130,10 @@ class StreamedJsonResponse extends StreamedResponse
                 echo json_encode($item, $jsonEncodingOptions);
             }
 
+            if ($isFirstItem) { // indicates that the generator was empty
+                echo '[';
+            }
+
             echo '[' === $startTag ? ']' : '}';
         }
 

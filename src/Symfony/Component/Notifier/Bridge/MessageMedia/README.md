@@ -16,6 +16,36 @@ where:
  - `FROM` is your registered sender ID (optional). Accepted values: 3-15 letters, could be alpha tag, shortcode or international phone number.
 When phone number starts with a `+` sign, it needs to be url encoded in the DSN
 
+Adding Options to a Message
+---------------------------
+
+With a MessageMedia Message, you can use the `MessageMediaOptions` class to add
+[message options](https://messagemedia.github.io/documentation/#tag/Messages/operation/SendMessages).
+
+```php
+use Symfony\Component\Notifier\Message\SmsMessage;
+use Symfony\Component\Notifier\Bridge\MessageMedia\MessageMediaOptions;
+
+$sms = new SmsMessage('+1411111111', 'My message');
+
+$options = (new MessageMediaOptions())
+    ->media(['media'])
+    ->callbackUrl('callback_url')
+    ->format('format')
+    ->deliveryReport(true)
+    ->expiry(999)
+    ->metadata(['metadata'])
+    ->scheduled('scheduled')
+    ->subject('subject');
+    // ...
+    ;
+
+// Add the custom options to the sms message and send the message
+$sms->options($options);
+
+$texter->send($sms);
+```
+
 Resources
 ---------
 

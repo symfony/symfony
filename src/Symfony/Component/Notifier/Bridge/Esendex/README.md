@@ -18,6 +18,28 @@ where:
 
 See Esendex documentation at https://developers.esendex.com/api-reference#smsapis
 
+Adding Options to a Message
+---------------------------
+
+With an Esendex Message, you can use the `EsendexOptions` class to add message options.
+
+```php
+use Symfony\Component\Notifier\Message\SmsMessage;
+use Symfony\Component\Notifier\Bridge\Esendex\EsendexOptions;
+
+$sms = new SmsMessage('+1411111111', 'My message');
+
+$options = (new EsendexOptions())
+    ->accountReference('account_reference')
+    // ...
+    ;
+
+// Add the custom options to the sms message and send the message
+$sms->options($options);
+
+$texter->send($sms);
+```
+
 Resources
 ---------
 

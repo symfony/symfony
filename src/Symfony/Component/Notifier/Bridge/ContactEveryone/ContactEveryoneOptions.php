@@ -33,7 +33,7 @@ final class ContactEveryoneOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function diffusionName(int $diffusionName): static
+    public function diffusionName(string $diffusionName): static
     {
         $this->options['diffusion_name'] = $diffusionName;
 

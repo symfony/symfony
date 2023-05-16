@@ -278,6 +278,9 @@ class YamlDumper extends Dumper
                     }
                     $content['exclude'] = 1 === \count($excludes) ? $excludes[0] : $excludes;
                 }
+                if (!$tag->excludeSelf()) {
+                    $content['exclude_self'] = false;
+                }
 
                 return new TaggedValue($value instanceof TaggedIteratorArgument ? 'tagged_iterator' : 'tagged_locator', $content);
             }

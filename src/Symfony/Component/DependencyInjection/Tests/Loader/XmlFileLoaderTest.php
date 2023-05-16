@@ -417,14 +417,14 @@ class XmlFileLoaderTest extends TestCase
         $this->assertEquals($taggedIterator, $container->getDefinition('foo_tagged_iterator')->getArgument(0));
         $taggedIterator2 = new TaggedIteratorArgument('foo_tag', null, null, false, null, ['baz']);
         $this->assertEquals($taggedIterator2, $container->getDefinition('foo2_tagged_iterator')->getArgument(0));
-        $taggedIterator3 = new TaggedIteratorArgument('foo_tag', null, null, false, null, ['baz', 'qux']);
+        $taggedIterator3 = new TaggedIteratorArgument('foo_tag', null, null, false, null, ['baz', 'qux'], false);
         $this->assertEquals($taggedIterator3, $container->getDefinition('foo3_tagged_iterator')->getArgument(0));
 
         $taggedIterator = new TaggedIteratorArgument('foo_tag', 'barfoo', 'foobar', true, 'getPriority');
         $this->assertEquals(new ServiceLocatorArgument($taggedIterator), $container->getDefinition('foo_tagged_locator')->getArgument(0));
         $taggedIterator2 = new TaggedIteratorArgument('foo_tag', 'foo_tag', 'getDefaultFooTagName', true, 'getDefaultFooTagPriority', ['baz']);
         $this->assertEquals(new ServiceLocatorArgument($taggedIterator2), $container->getDefinition('foo2_tagged_locator')->getArgument(0));
-        $taggedIterator3 = new TaggedIteratorArgument('foo_tag', 'foo_tag', 'getDefaultFooTagName', true, 'getDefaultFooTagPriority', ['baz', 'qux']);
+        $taggedIterator3 = new TaggedIteratorArgument('foo_tag', 'foo_tag', 'getDefaultFooTagName', true, 'getDefaultFooTagPriority', ['baz', 'qux'], false);
         $this->assertEquals(new ServiceLocatorArgument($taggedIterator3), $container->getDefinition('foo3_tagged_locator')->getArgument(0));
     }
 

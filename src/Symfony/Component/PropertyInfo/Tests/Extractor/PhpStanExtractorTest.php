@@ -14,6 +14,7 @@ namespace Symfony\Component\PropertyInfo\Tests\Extractor;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummyWithoutDocBlock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DefaultValue;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy;
@@ -351,6 +352,14 @@ class PhpStanExtractorTest extends TestCase
     public function testExtractConstructorTypes($property, array $type = null)
     {
         $this->assertEquals($type, $this->extractor->getTypesFromConstructor('Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummy', $property));
+    }
+
+    /**
+     * @dataProvider constructorTypesProvider
+     */
+    public function testExtractConstructorTypesReturnNullOnEmptyDocBlock($property)
+    {
+        $this->assertNull($this->extractor->getTypesFromConstructor(ConstructorDummyWithoutDocBlock::class, $property));
     }
 
     public static function constructorTypesProvider()

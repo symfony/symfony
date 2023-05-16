@@ -928,7 +928,7 @@ EOHTML
 
         if (!($attr['binary'] ?? false)) {
             $v = preg_replace_callback(static::$unicodeCharsRx, function ($c) {
-                return '<span class="sf-dump-default>\u{'.strtoupper(dechex(mb_ord($c[0]))).'}</span>';
+                return '<span class="sf-dump-default">\u{'.strtoupper(dechex(mb_ord($c[0]))).'}</span>';
             }, $v);
         }
 

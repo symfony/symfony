@@ -849,7 +849,7 @@ EOHTML
 
     protected function style(string $style, string $value, array $attr = []): string
     {
-        if ('' === $value) {
+        if ('' === $value && ('label' !== $style || !isset($attr['file']) && !isset($attr['href']))) {
             return '';
         }
 
@@ -903,7 +903,7 @@ EOHTML
         }
 
         $map = static::$controlCharsMap;
-        $v = "<span class=sf-dump-{$style}>".preg_replace_callback(static::$controlCharsRx, function ($c) use ($map) {
+        $v = '<span class=sf-dump-'.('label' === $style ? 'default' : $style).'>'.preg_replace_callback(static::$controlCharsRx, function ($c) use ($map) {
             $s = $b = '<span class="sf-dump-default';
             $c = $c[$i = 0];
             if ($ns = "\r" === $c[$i] || "\n" === $c[$i]) {
@@ -927,7 +927,7 @@ EOHTML
 
         if (!($attr['binary'] ?? false)) {
             $v = preg_replace_callback(static::$unicodeCharsRx, function ($c) {
-                return '<span class="sf-dump-default">\u{'.strtoupper(dechex(mb_ord($c[0]))).'}</span>';
+                return '<span class=sf-dump-default>\u{'.strtoupper(dechex(mb_ord($c[0]))).'}</span>';
             }, $v);
         }
 
@@ -935,6 +935,9 @@ EOHTML
             $attr['href'] = $href;
         }
         if (isset($attr['href'])) {
+            if ('label' === $style) {
+                $v .= '^';
+            }
             $target = isset($attr['file']) ? '' : ' target="_blank"';
             $v = sprintf('<a href="%s"%s rel="noopener noreferrer">%s</a>', esc($this->utf8Encode($attr['href'])), $target, $v);
         }

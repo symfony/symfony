@@ -12,6 +12,7 @@ init:
     - REG ADD "HKEY_CURRENT_USER\Software\Microsoft\Command Processor" /v DelayedExpansion /t REG_DWORD /d 1 /f
 
 install:
+    - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
     - mkdir c:\php && cd c:\php
     - appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.1.0-Win32-vs16-x86.zip
     - 7z x php-8.1.0-Win32-vs16-x86.zip -y >nul
@@ -68,3 +69,6 @@ test_script:
     - php phpunit src\Symfony --exclude-group tty,benchmark,intl-data,network,transient-on-windows || SET X=!errorlevel!
     - php phpunit src\Symfony\Component\HttpClient || SET X=!errorlevel!
     - exit %X%
+
+on_finish:
+    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))

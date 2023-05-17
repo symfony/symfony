@@ -29,6 +29,9 @@
         "symfony/http-foundation": "^5.4|^6.0",
         "symfony/http-kernel": "^5.4|^6.0"
     },
+    "conflict": {
+        "symfony/framework-bundle": "<6.3"
+    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\AssetMapper\\": "" },
         "exclude-from-classmap": [

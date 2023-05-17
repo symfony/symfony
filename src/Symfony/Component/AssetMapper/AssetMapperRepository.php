@@ -76,7 +76,7 @@ class AssetMapperRepository
         }
 
         foreach ($this->getDirectories() as $path => $namespace) {
-            if (!str_starts_with($filesystemPath, $path)) {
+            if (!str_starts_with($filesystemPath, $path.\DIRECTORY_SEPARATOR)) {
                 continue;
             }
 

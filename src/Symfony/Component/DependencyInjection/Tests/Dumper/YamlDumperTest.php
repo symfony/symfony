@@ -113,7 +113,7 @@ class YamlDumperTest extends TestCase
     {
         $taggedIterator = new TaggedIteratorArgument('foo', 'barfoo', 'foobar', false, 'getPriority');
         $taggedIterator2 = new TaggedIteratorArgument('foo', null, null, false, null, ['baz']);
-        $taggedIterator3 = new TaggedIteratorArgument('foo', null, null, false, null, ['baz', 'qux']);
+        $taggedIterator3 = new TaggedIteratorArgument('foo', null, null, false, null, ['baz', 'qux'], false);
 
         $container = new ContainerBuilder();
 

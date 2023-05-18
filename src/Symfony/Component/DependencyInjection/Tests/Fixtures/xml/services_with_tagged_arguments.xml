@@ -18,7 +18,7 @@
       <argument type="tagged_iterator" tag="foo_tag" exclude="baz"/>
     </service>
     <service id="foo3_tagged_iterator" class="Bar" public="true">
-      <argument type="tagged_iterator" tag="foo_tag">
+      <argument type="tagged_iterator" tag="foo_tag" exclude-self="false">
         <exclude>baz</exclude>
         <exclude>qux</exclude>
       </argument>
@@ -30,7 +30,7 @@
       <argument type="tagged_locator" tag="foo_tag" exclude="baz"/>
     </service>
     <service id="foo3_tagged_locator" class="Bar" public="true">
-      <argument type="tagged_locator" tag="foo_tag">
+      <argument type="tagged_locator" tag="foo_tag" exclude-self="false">
         <exclude>baz</exclude>
         <exclude>qux</exclude>
       </argument>

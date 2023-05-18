@@ -221,7 +221,20 @@ class ImportMapManager
 
         $installData = [];
         $packageRequiresByName = [];
+        $addedEntries = [];
         foreach ($packagesToRequire as $requireOptions) {
+            if (null !== $requireOptions->path) {
+                $newEntry = new ImportMapEntry(
+                    $requireOptions->packageName,
+                    $requireOptions->path,
+                    $requireOptions->preload,
+                );
+                $importMapEntries[$requireOptions->packageName] = $newEntry;
+                $addedEntries[] = $newEntry;
+
+                continue;
+            }
+
             $constraint = $requireOptions->packageName;
             if (null !== $requireOptions->versionConstraint) {
                 $constraint .= '@'.$requireOptions->versionConstraint;
@@ -231,6 +244,10 @@ class ImportMapManager
             }
             $installData[] = $constraint;
             $packageRequiresByName[$requireOptions->packageName] = $requireOptions;
+        }
+
+        if (!$installData) {
+            return $addedEntries;
         }
 
         $json = [
@@ -261,7 +278,6 @@ class ImportMapManager
         // if we're requiring just one package, in case it has any peer deps, match the preload
         $defaultPreload = 1 === \count($packagesToRequire) ? $packagesToRequire[0]->preload : false;
 
-        $addedEntries = [];
         foreach ($response->toArray()['map']['imports'] as $packageName => $url) {
             $requireOptions = $packageRequiresByName[$packageName] ?? null;
             $importName = $requireOptions && $requireOptions->importName ? $requireOptions->importName : $packageName;
@@ -344,7 +360,16 @@ class ImportMapManager
         foreach ($entries as $entry) {
             $config = [];
             if ($entry->path) {
-                $config[$entry->isDownloaded ? 'downloaded_to' : 'path'] = $entry->path;
+                $path = $entry->path;
+                // if the path is an absolute path, convert it to an asset path
+                if (is_file($path)) {
+                    $asset = $this->assetMapper->getAssetFromSourcePath($path);
+                    if (null === $asset) {
+                        throw new \LogicException(sprintf('The "%s" importmap entry contains the path "%s" but it does not appear to be in any of your asset paths.', $entry->importName, $path));
+                    }
+                    $path = $asset->getLogicalPath();
+                }
+                $config[$entry->isDownloaded ? 'downloaded_to' : 'path'] = $path;
             }
             if ($entry->url) {
                 $config['url'] = $entry->url;

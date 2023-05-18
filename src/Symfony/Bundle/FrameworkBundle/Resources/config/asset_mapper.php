@@ -149,6 +149,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('asset_mapper.importmap.manager'),
                 service('asset_mapper'),
+                param('kernel.project_dir'),
             ])
             ->tag('console.command')
 

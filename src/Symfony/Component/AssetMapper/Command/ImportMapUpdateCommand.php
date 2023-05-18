@@ -32,6 +32,18 @@ final class ImportMapUpdateCommand extends Command
         parent::__construct();
     }
 
+    protected function configure(): void
+    {
+        $this
+            ->setHelp(<<<'EOT'
+The <info>%command.name%</info> command will update all from the 3rd part packages
+in <comment>importmap.php</comment> to their latest version, including downloaded packages.
+
+   <info>php %command.full_name%</info>
+EOT
+            );
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);

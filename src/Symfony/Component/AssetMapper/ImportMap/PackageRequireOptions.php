@@ -27,6 +27,7 @@ final class PackageRequireOptions
         public readonly bool $preload = false,
         public readonly ?string $importName = null,
         public readonly ?string $registryName = null,
+        public readonly ?string $path = null,
     ) {
     }
 }

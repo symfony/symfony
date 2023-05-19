@@ -417,11 +417,11 @@ class ImportMapManager
                 $this->modulesToPreload[] = $path;
             }
 
-            $dependencyImportMapEntries = array_map(function (AssetDependency $dependency) {
+            $dependencyImportMapEntries = array_map(function (AssetDependency $dependency) use ($entryOptions) {
                 return new ImportMapEntry(
                     $dependency->asset->getPublicPathWithoutDigest(),
                     $dependency->asset->getLogicalPath(),
-                    preload: !$dependency->isLazy,
+                    preload: $entryOptions->preload && !$dependency->isLazy,
                 );
             }, $dependencies);
             $imports = array_merge($imports, $this->convertEntriesToImports($dependencyImportMapEntries));

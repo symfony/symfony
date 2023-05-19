@@ -77,7 +77,8 @@ class ImportMapManagerTest extends TestCase
             '/assets/pizza/index.js' => '/assets/pizza/index-b3fb5ee31adaf5e1b32d28edf1ab8e7a.js',
             '/assets/popcorn.js' => '/assets/popcorn-c0778b84ef9893592385aebc95a2896e.js',
             '/assets/imported_async.js' => '/assets/imported_async-8f0cd418bfeb0cf63826e09a4474a81c.js',
-            'other_app' => '/assets/namespaced_assets2/app2-344d0d513d424647e7d8a394ffe5e4b5.js',
+            'other_app' => '/assets/namespaced_assets2/app2-d5bf10c20bf9a0b77e67d78fcac301c5.js',
+            '/assets/namespaced_assets2/imported.js' => '/assets/namespaced_assets2/imported-9ab37dabcfe317fba77123a4e573d53b.js',
         ]], json_decode($manager->getImportMapJson(), true));
     }
 

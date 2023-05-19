@@ -38,6 +38,10 @@ class ImportMapManagerTest extends TestCase
         if (!file_exists(__DIR__.'/../fixtures/importmaps_for_writing')) {
             $this->filesystem->mkdir(__DIR__.'/../fixtures/importmaps_for_writing');
         }
+        if (!file_exists(__DIR__.'/../fixtures/importmaps_for_writing/assets')) {
+            $this->filesystem->mkdir(__DIR__.'/../fixtures/importmaps_for_writing/assets');
+        }
+        file_put_contents(__DIR__.'/../fixtures/importmaps_for_writing/assets/some_file.js', '// some_file.js contents');
     }
 
     protected function tearDown(): void
@@ -257,6 +261,18 @@ class ImportMapManagerTest extends TestCase
             'expectedImportMap' => [
                 'lodash' => [
                     'url' => 'https://ga.jspm.io/npm:lodash@1.2.3/lodash.js',
+                ],
+            ],
+            'expectedDownloadedFiles' => [],
+        ];
+
+        yield 'single_package_with_a_path' => [
+            'packages' => [new PackageRequireOptions('some/module', path: __DIR__.'/../fixtures/importmaps_for_writing/assets/some_file.js')],
+            'expectedInstallRequest' => [],
+            'responseMap' => [],
+            'expectedImportMap' => [
+                'some/module' => [
+                    'path' => 'some_file.js',
                 ],
             ],
             'expectedDownloadedFiles' => [],

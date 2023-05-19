@@ -120,7 +120,7 @@ return static function (ContainerConfigurator $container) {
         ->set('url_helper', UrlHelper::class)
             ->args([
                 service('request_stack'),
-                service('router.request_context')->ignoreOnInvalid(),
+                service('router')->ignoreOnInvalid(),
             ])
         ->alias(UrlHelper::class, 'url_helper')
 

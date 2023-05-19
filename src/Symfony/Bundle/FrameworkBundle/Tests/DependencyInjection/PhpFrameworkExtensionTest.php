@@ -88,6 +88,62 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         });
     }
 
+    public function testWorkflowDefaultMarkingStoreDefinition()
+    {
+        $container = $this->createContainerFromClosure(function ($container) {
+            $container->loadFromExtension('framework', [
+                'workflows' => [
+                    'workflow_a' => [
+                        'type' => 'state_machine',
+                        'marking_store' => [
+                            'type' => 'method',
+                            'property' => 'status',
+                        ],
+                        'supports' => [
+                            __CLASS__,
+                        ],
+                        'places' => [
+                            'a',
+                            'b',
+                        ],
+                        'transitions' => [
+                            'a_to_b' => [
+                                'from' => ['a'],
+                                'to' => ['b'],
+                            ],
+                        ],
+                    ],
+                    'workflow_b' => [
+                        'type' => 'state_machine',
+                        'supports' => [
+                            __CLASS__,
+                        ],
+                        'places' => [
+                            'a',
+                            'b',
+                        ],
+                        'transitions' => [
+                            'a_to_b' => [
+                                'from' => ['a'],
+                                'to' => ['b'],
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
+        });
+
+        $workflowA = $container->getDefinition('state_machine.workflow_a');
+        $argumentsA = $workflowA->getArguments();
+        $this->assertArrayHasKey('index_1', $argumentsA, 'workflow_a has a marking_store argument');
+        $this->assertNotNull($argumentsA['index_1'], 'workflow_a marking_store argument is not null');
+
+        $workflowB = $container->getDefinition('state_machine.workflow_b');
+        $argumentsB = $workflowB->getArguments();
+        $this->assertArrayHasKey('index_1', $argumentsB, 'workflow_b has a marking_store argument');
+        $this->assertNull($argumentsB['index_1'], 'workflow_b marking_store argument is null');
+    }
+
     public function testRateLimiterWithLockFactory()
     {
         try {

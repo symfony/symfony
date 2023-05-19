@@ -1,7 +1,7 @@
 Amazon Notifier
 ===============
 
-Provides [Amazon SNS](https://aws.amazon.com/de/sns/) integration for Symfony Notifier.
+Provides [Amazon SNS](https://aws.amazon.com/en/sns/) integration for Symfony Notifier.
 
 DSN example
 -----------

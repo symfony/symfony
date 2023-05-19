@@ -66,7 +66,8 @@ final class TurboSmsTransport extends AbstractTransport
         $this->assertValidSubject($message->getSubject());
 
         $fromMessage = $message->getFrom();
-        if (null !== $fromMessage) {
+
+        if ($fromMessage) {
             $this->assertValidFrom($fromMessage);
             $from = $fromMessage;
         } else {

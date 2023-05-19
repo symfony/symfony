@@ -81,18 +81,22 @@ EOT
 
         $packageList = $input->getArgument('packages');
         $path = null;
-        if ($input->hasOption('path')) {
+        if ($input->getOption('path')) {
             if (\count($packageList) > 1) {
                 $io->error('The "--path" option can only be used when you require a single package.');
 
                 return Command::FAILURE;
             }
 
-            $path = $this->projectDir.'/'.$input->getOption('path');
+            $path = $input->getOption('path');
             if (!is_file($path)) {
-                $io->error(sprintf('The path "%s" does not exist.', $input->getOption('path')));
+                $path = $this->projectDir.'/'.$path;
 
-                return Command::FAILURE;
+                if (!is_file($path)) {
+                    $io->error(sprintf('The path "%s" does not exist.', $input->getOption('path')));
+
+                    return Command::FAILURE;
+                }
             }
         }
 

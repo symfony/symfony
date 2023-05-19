@@ -30,6 +30,15 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals([new FileResource($resource)], $catalogue->getResources());
     }
 
+    public function testLoadNonStringMessages()
+    {
+        $loader = new YamlFileLoader();
+        $resource = __DIR__.'/../fixtures/non-string.yml';
+        $catalogue = $loader->load($resource, 'en', 'domain1');
+
+        $this->assertSame(['root.foo2' => '', 'root.bar' => 'bar'], $catalogue->all('domain1'));
+    }
+
     public function testLoadDoesNothingIfEmpty()
     {
         $loader = new YamlFileLoader();

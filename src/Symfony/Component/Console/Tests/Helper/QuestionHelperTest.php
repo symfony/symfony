@@ -430,7 +430,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $this->assertEquals('8AM', $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream("8AM\n")), $this->createOutputInterface(), $question));
     }
 
-    public function testAskHiddenResponseTrimmed()
+    public function testAskHiddenResponseNotTrimmed()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('This test is not supported on Windows');
@@ -442,7 +442,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $question->setHidden(true);
         $question->setTrimmable(false);
 
-        $this->assertEquals(' 8AM', $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream(' 8AM')), $this->createOutputInterface(), $question));
+        $this->assertEquals(' 8AM'.\PHP_EOL, $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream(' 8AM'.\PHP_EOL)), $this->createOutputInterface(), $question));
     }
 
     public function testAskMultilineResponseWithEOF()

@@ -123,14 +123,12 @@ class Terminal
             return self::$stty;
         }
 
-        // skip check if exec function is disabled
-        if (!\function_exists('exec')) {
+        // skip check if shell_exec function is disabled
+        if (!\function_exists('shell_exec')) {
             return false;
         }
 
-        exec('stty 2>&1', $output, $exitcode);
-
-        return self::$stty = 0 === $exitcode;
+        return self::$stty = (bool) shell_exec('stty 2> '.('\\' === \DIRECTORY_SEPARATOR ? 'NUL' : '/dev/null'));
     }
 
     private static function initDimensions()

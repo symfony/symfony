@@ -251,8 +251,9 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @dataProvider provideConstraintsWithIgnoreNullDisabled
+     * @dataProvider provideConstraintsWithIgnoreNullEnabledOnFirstField
      */
-    public function testValidateUniquenessWithIgnoreNullDisabled(UniqueEntity $constraint)
+    public function testValidateUniquenessWithIgnoreNullDisableOnSecondField(UniqueEntity $constraint)
     {
         $entity1 = new DoubleNameEntity(1, 'Foo', null);
         $entity2 = new DoubleNameEntity(2, 'Foo', null);
@@ -304,6 +305,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @dataProvider provideConstraintsWithIgnoreNullEnabled
+     * @dataProvider provideConstraintsWithIgnoreNullEnabledOnFirstField
      */
     public function testNoValidationIfFirstFieldIsNullAndNullValuesAreIgnored(UniqueEntity $constraint)
     {
@@ -336,6 +338,18 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         ])];
 
         yield 'Named arguments' => [new UniqueEntity(message: 'myMessage', fields: ['name', 'name2'], em: 'foo', ignoreNull: true)];
+    }
+
+    public static function provideConstraintsWithIgnoreNullEnabledOnFirstField(): iterable
+    {
+        yield 'Doctrine style (name field)' => [new UniqueEntity([
+            'message' => 'myMessage',
+            'fields' => ['name', 'name2'],
+            'em' => self::EM_NAME,
+            'ignoreNull' => 'name',
+        ])];
+
+        yield 'Named arguments (name field)' => [new UniqueEntity(message: 'myMessage', fields: ['name', 'name2'], em: 'foo', ignoreNull: 'name')];
     }
 
     public function testValidateUniquenessWithValidCustomErrorPath()

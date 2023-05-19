@@ -1,0 +1,256 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-01-02T10:34:44Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-01-03T06:36:47Z
+
+Hey!
+
+I think @norkunas has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2023-01-09T10:41:54Z
+
+Friendly ping @nicolas-grekas, how can I provide BC for this situation ?
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2023-01-09T12:32:34Z
+
+> not sure about your questions for BC 😬
+
+If I change
+```
+public function setTranslationDomain(?string $translationDomain): static
+```
+to
+```
+public function setTranslationDomain(string|false|null $translationDomain): static
+```
+in the `ValidatorBuilder`, this is not really BC because
+- ValidatorBuilder is not final
+- ValidatorBuilder is not internal
+
+So someone could extends the ValidatorBuilder and override the setTranslationDomain with the "old" signature.
+
+If I change
+```
+public function setTranslationDomain(string $translationDomain): static;
+```
+to
+```
+public function setTranslationDomain(string|false $translationDomain): static;
+```
+in the `ConstraintViolationBuilderInterface`, this is not a BC because old implementation won't support false.
+But for this, the solution I thought about is to move the method to an `@method` annotation.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2023-01-27T16:23:21Z
+
+> not sure about your questions for BC 😬
+
+I change my PR to be BC and resolved your request changes @nicolas-grekas :)
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2023-02-06T14:53:31Z
+
+Tests failure doesn't seem related
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2023-04-08T21:44:00Z
+
+Would you have time to take a look/review this @nicolas-grekas @fabpot ?
+Thanks a lot !
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2023-04-12T15:54:59Z
+
+> Parameter `validator.translation_domain` is also used in `FormTypeCsrfExtension` and in `UploadValidatorExtension` so I suppose we should make them accept `false` also? How do you expect to disable translation otherwise for builders? Or maybe this change is not needed for builders?
+
+If this (https://github.com/symfony/symfony/pull/48852#discussion_r1164241078) is a BC break, it cannot be done for Builder then. So validator.translation_domain cannot be set to false, because of the `setTranslationDomain` call in
+```
+->set('validator.builder', ValidatorBuilder::class)
+            ->factory([Validation::class, 'createValidatorBuilder'])
+            ->call('setConstraintValidatorFactory', [
+                service('validator.validator_factory'),
+            ])
+            ->call('setTranslator', [
+                service('translator')->ignoreOnInvalid(),
+            ])
+            ->call('setTranslationDomain', [
+                param('validator.translation_domain'),
+            ])
+```
+
+It's maybe not needed for Builder then ; I removed it.
+
+The second BC break (https://github.com/symfony/symfony/pull/48852#discussion_r1164241752) is more annoying ; any way to avoid it but still allowing calling setTranslationDomain(false) ?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-04-12T16:04:44Z
+
+Passing a custom translation domain is already possible through `->buildViolation('my_message')->setTranslationDomain('custom')->addViolation()`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-04-13T08:28:10Z
+
+May I ask why you need this feature BTW?
+Why isn't configuring `validation.translation_domain` enough?
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2023-04-13T08:36:19Z
+
+> May I ask why you need this feature BTW? Why isn't configuring `validation.translation_domain` enough?
+
+Sure.
+The validation.translation_domain allows to set a custom Translation domain.
+As mentioned by stof, it's also possible with
+```
+->buildViolation('my_message')->setTranslationDomain('custom')->addViolation()
+```
+
+But currently, there is no way to use the Validator features without the translator.
+In the same way I can pass `translation_domain => false` to not try to translate a form label because it's hardcoded ; I'd like to not try to translate an validator error message. For this:
+```
+->buildViolation('Message')->disableTranslation()->addViolation()
+```
+would be perfect
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-04-13T08:41:29Z
+
+So, we don't need to change addViolation, right?
+What about allowing `validation.translation_domain` to be false and injecting an IdentityTranslator when that's the case?
+All this could be resolved at the bundle level then.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2023-04-13T08:46:44Z
+
+> So, we don't need to change addViolation, right? What about allowing `validation.translation_domain` to be false and injecting an IdentityTranslator when that's the case? All this could be resolved at the bundle level then.
+
+Changing `validation.translation_domain` to false would be globally no ?
+I don't fully know the impact of this config but wouldn't it:
+- Have impact on all the existing constraints (like the Symfony one or FormTypeCsrfExtension/UploadValidatorExtension like you mentioned) => Which I don't want to.
+- Be globally for all my custom validation constraints => Which I like to avoid, because I only have some of my constraint which doesn't require translations/translators.
+
+To me `validation.translation_domain` is a global config, while `addViolation` would be a local config.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-04-13T08:51:22Z
+
+> only have some of my constraint which doesn't require translations/translators.
+
+what's the issue with still processing them through the translator?
+aren't you looking for a micro-optimization?
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2023-04-13T09:10:25Z
+
+> > only have some of my constraint which doesn't require translations/translators.
+>
+> what's the issue with still processing them through the translator? aren't you looking for a micro-optimization?
+
+Can't the same argument be used for the option `translation_domain => false` of form labels ?
+It feel inconsistent to be able to disable the translation for forms but not for validations of forms.
+
+The issue with having them processed by the translator are:
+- It can conflict with existing translations keys
+- It's considered as a missing translation by the profiler
+
+The second point is annoying when you look for all the missing translations, either
+- with https://symfony.com/doc/6.3/translation.html#how-to-find-missing-or-unused-translation-messages-2
+- with a custom implementation which makes functional tests failing because of missing translations (following suggestion like https://github.com/symfony/symfony/issues/36792#issuecomment-632205677)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-04-13T09:40:54Z
+
+> Parameter validator.translation_domain is also used in FormTypeCsrfExtension and in UploadValidatorExtension so I suppose we should make them accept false also?
+
+please have a look at this concern
+
+please also add needed changelog+upgrade entries
+
+> `{%- if translation_domain is same as(false) -%}`
+
+should we update the template so that they use strtr?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-04-13T09:44:34Z
+
+I'm not sure we should support `false` for the global configuration (in the context of the framework, that would break all bundles providing validation messages for instance). And if you have a project were you really don't want to use translations anywhere, you can inject an IdentityTranslator (which is what FrameworkBundle does if you disable the translator component for instance).
+
+I also think we could avoid changing the signature of `addViolation`, keeping the case of disabling translations or changing the domain as a more advanced case that requires using the violation builder (and also without changing the signature of `buildViolation` itself).
+
+If we do these 2 things, it simplifies the code a lot as the ExecutionContext does not need to change anymore and we can add `->disableTranslation` in the ViolationBuilder.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2023-04-13T11:38:30Z
+
+> > `{%- if translation_domain is same as(false) -%}`
+>
+> should we update the template so that they use strtr?
+
+This might be a good idea since it would be consistent with the review of this PR and with the behavior of the IdentityTranslator. But I would say it's better to scope this to another PR (that I can do after if wanted).
+
+> I'm not sure we should support `false` for the global configuration (in the context of the framework, that would break all bundles providing validation messages for instance). And if you have a project were you really don't want to use translations anywhere, you can inject an IdentityTranslator (which is what FrameworkBundle does if you disable the translator component for instance).
+
+I agree
+
+> I also think we could avoid changing the signature of `addViolation`, keeping the case of disabling translations or changing the domain as a more advanced case that requires using the violation builder (and also without changing the signature of `buildViolation` itself).
+>
+> If we do these 2 things, it simplifies the code a lot as the ExecutionContext does not need to change anymore and we can add `->disableTranslation` in the ViolationBuilder.
+
+Since @nicolas-grekas was thinking the same, I reverted this change.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2023-05-16T12:38:08Z
+
+I squashed the commit and rebase the branch.
+
+Is everything ok on this PR @nicolas-grekas ? :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-05-16T12:40:26Z
+
+LGTM yes, thanks. Can you please add some tests?
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2023-05-16T13:04:17Z
+
+> LGTM yes, thanks. Can you please add some tests?
+
+Sure, I added one. Do you think this is enough or is there more to test ?

@@ -77,8 +77,8 @@ class TerminalTest extends TestCase
             $this->markTestSkipped('Must be on windows');
         }
 
-        $sttyString = exec('(stty -a | grep columns) 2>&1', $output, $exitcode);
-        if (0 !== $exitcode) {
+        $sttyString = shell_exec('(stty -a | grep columns) 2> NUL');
+        if (!$sttyString) {
             $this->markTestSkipped('Must have stty support');
         }
 

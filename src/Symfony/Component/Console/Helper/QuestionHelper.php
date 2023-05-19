@@ -500,13 +500,11 @@ class QuestionHelper extends Helper
             return self::$stdinIsInteractive = @posix_isatty(fopen('php://stdin', 'r'));
         }
 
-        if (!\function_exists('exec')) {
+        if (!\function_exists('shell_exec')) {
             return self::$stdinIsInteractive = true;
         }
 
-        exec('stty 2> /dev/null', $output, $status);
-
-        return self::$stdinIsInteractive = 1 !== $status;
+        return self::$stdinIsInteractive = (bool) shell_exec('stty 2> '.('\\' === \DIRECTORY_SEPARATOR ? 'NUL' : '/dev/null'));
     }
 
     /**

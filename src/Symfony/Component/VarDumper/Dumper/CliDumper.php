@@ -139,9 +139,8 @@ class CliDumper extends AbstractDumper
         $attr = $cursor->attr;
 
         switch ($type) {
-            case 'default':
-                $style = 'default';
-                break;
+            case 'label': $style = 'label'; break;
+            case 'default': $style = 'default'; break;
 
             case 'integer':
                 $style = 'num';
@@ -468,7 +467,7 @@ class CliDumper extends AbstractDumper
 
         $map = static::$controlCharsMap;
         $startCchr = $this->colors ? "\033[m\033[{$this->styles['default']}m" : '';
-        $endCchr = $this->colors ? "\033[m\033[{$this->styles[$style]}m" : '';
+        $endCchr = $this->colors ? "\033[m\033[{$this->styles['label' === $style ? 'default' : $style]}m" : '';
         $value = preg_replace_callback(static::$controlCharsRx, function ($c) use ($map, $startCchr, $endCchr) {
             $s = $startCchr;
             $c = $c[$i = 0];
@@ -487,11 +486,11 @@ class CliDumper extends AbstractDumper
             }, $value);
         }
 
-        if ($this->colors) {
+        if ($this->colors && '' !== $value) {
             if ($cchrCount && "\033" === $value[0]) {
                 $value = substr($value, \strlen($startCchr));
             } else {
-                $value = "\033[{$this->styles[$style]}m".$value;
+                $value = "\033[{$this->styles['label' === $style ? 'default' : $style]}m".$value;
             }
             if ($cchrCount && str_ends_with($value, $endCchr)) {
                 $value = substr($value, 0, -\strlen($endCchr));
@@ -510,10 +509,15 @@ class CliDumper extends AbstractDumper
                 }
             }
             if (isset($attr['href'])) {
+                if ('label' === $style) {
+                    $value .= '^';
+                }
                 $value = "\033]8;;{$attr['href']}\033\\{$value}\033]8;;\033\\";
             }
-        } elseif ($attr['if_links'] ?? false) {
-            return '';
+        }
+
+        if ('label' === $style && '' !== $value) {
+            $value .= ' ';
         }
 
         return $value;

@@ -87,7 +87,7 @@ class ConstraintViolationBuilderTest extends TestCase
     public function testTranslationDomainFalse()
     {
         $translator = $this->createMock(TranslatorInterface::class);
-        $translator->expects(self::once())->method('trans');
+        $translator->expects(self::once())->method('trans')->willReturn('');
 
         $builder = new ConstraintViolationBuilder($this->violations, new Valid(), $this->messageTemplate, [], $this->root, 'data', 'foo', $translator);
         $builder->addViolation();

@@ -104,6 +104,10 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
         foreach ($this->authenticators as $authenticator) {
             $this->logger?->debug('Checking support on authenticator.', ['firewall_name' => $this->firewallName, 'authenticator' => $authenticator::class]);
 
+            if (!$authenticator instanceof AuthenticatorInterface) {
+                throw new \InvalidArgumentException(sprintf('Authenticator "%s" must implement "%s".', get_debug_type($authenticator), AuthenticatorInterface::class));
+            }
+
             if (false !== $supports = $authenticator->supports($request)) {
                 $authenticators[] = $authenticator;
                 $lazy = $lazy && null === $supports;

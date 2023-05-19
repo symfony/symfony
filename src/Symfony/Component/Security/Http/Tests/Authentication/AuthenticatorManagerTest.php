@@ -77,6 +77,17 @@ class AuthenticatorManagerTest extends TestCase
         yield [[], false];
     }
 
+    public function testSupportsInvalidAuthenticator()
+    {
+        $manager = $this->createManager([new \stdClass()]);
+
+        $this->expectExceptionObject(
+            new \InvalidArgumentException('Authenticator "stdClass" must implement "Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface".')
+        );
+
+        $manager->supports($this->request);
+    }
+
     public function testSupportCheckedUponRequestAuthentication()
     {
         // the attribute stores the supported authenticators, returning false now

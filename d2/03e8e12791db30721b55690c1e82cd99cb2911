@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by stof at 2023-05-12T16:51:14Z
+
+NOTE: this PR introduce a BC on the constructor of UrlHelper, but since it's final maybe is not required to keep backward compatility.
+
+A final constructor is not an internal one. You can still write code than instantiate the class, and would be impacted by the BC break. Constructors are not only called as `parent::__construct()`
+
+---------------------------------------------------------------------------
+
+by giosh94mhz at 2023-05-15T12:17:30Z
+
+Thank you for the feedback.
+
+> A final constructor is not an internal one. You can still write code than instantiate the class, and would be impacted by the BC break. Constructors are not only called as `parent::__construct()`
+
+Yes, I'm very well aware, I meant that I didn't know if you care of BC of a final helper class. Since you do, I've implemented the compatibility with the deprecation and all.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-05-15T13:35:40Z
+
+https://symfony.com/bc has a good overview of the Symfony BC policy, including what kind of changes you are allowed to do as a contributor.

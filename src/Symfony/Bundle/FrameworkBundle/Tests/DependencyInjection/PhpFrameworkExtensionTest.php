@@ -92,6 +92,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
     {
         $container = $this->createContainerFromClosure(function ($container) {
             $container->loadFromExtension('framework', [
+                'http_method_override' => false,
                 'workflows' => [
                     'workflow_a' => [
                         'type' => 'state_machine',

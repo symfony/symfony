@@ -21,7 +21,7 @@ use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
-use Symfony\Component\Mime\Header\Headers;
+use Symfony\Component\Mime\Header\ParameterizedHeader;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -85,12 +85,74 @@ final class RedlinkApiTransport extends AbstractApiTransport
         return $response;
     }
 
-    private function covertAddresses(array $input)
+    private function convertAddresses(array $input): array
     {
         return array_map(
             fn (Address $address) => ['email' => $address->getAddress(), 'name' => $address->getName()],
             $input
         );
+    }
+
+    private function includeTagsAndHeadersInPayload(Email $email, array &$currentPayload): void
+    {
+        $headers = $email->getHeaders();
+
+        $headersToBypass = ['from', 'sender', 'to', 'cc', 'bcc', 'subject', 'reply-to', 'content-type', 'accept', 'api-key'];
+
+        foreach ($headers->all() as $name => $header) {
+
+            if (\in_array($name, $headersToBypass, true)) {
+                continue;
+            }
+
+            if ($header instanceof TagHeader) {
+                $currentPayload['tags'][] = $header->getValue();
+                continue;
+            }
+
+            if ($header instanceof MetadataHeader) {
+                $currentPayload['headers']['X-'.ucfirst(strtolower($header->getKey()))] = $header->getValue();
+                continue;
+            }
+
+            if($header instanceof ParameterizedHeader) {
+                if ('vars' === $name) {
+                    foreach ($currentPayload['to'] as $to)
+                    {
+                        if($to === $header->getValue())
+                            $to['vars'] = $header->getParameters();
+                    }
+                    continue;
+                }
+            }
+
+            if ('templateid' === $name) {
+                if(!isset($currentPayload['content']))
+                    $currentPayload['content'] = [];
+
+                $currentPayload['content']['templateId'] = (int) $header->getValue();
+
+                continue;
+            }
+
+            $currentPayload['headers'][$name] = $header->getValue();
+        }
+    }
+
+    private function includeAttachmentsInPayload(Email $email, array &$currentPayload): void
+    {
+        $currentPayload['attachments'] = [];
+
+        foreach ($email->getAttachments() as $attachment) {
+            $headers = $attachment->getPreparedHeaders();
+            $filename = $headers->getHeaderParameter('Content-Disposition', 'filename');
+
+            $currentPayload['attachments'][] = [
+                'fileName' => $filename,
+                'fileMime' => $attachment->getMediaType(),
+                'fileContent' => base64_encode(str_replace("\r\n", '', $attachment->bodyToString()))
+            ];
+        }
     }
 
     private function getPayload(Email $email, Envelope $envelope): array
@@ -101,20 +163,20 @@ final class RedlinkApiTransport extends AbstractApiTransport
                 'email' => $envelope->getSender()->getAddress(),
                 'name' => $envelope->getSender()->getName()
             ],
-            'to' => $this->covertAddresses($email->getTo()),
+            'to' => $this->convertAddresses($email->getTo()),
             'subject' => $email->getSubject(),
         ];
 
         if ($email->getReplyTo()) {
-            $payload['replyTo'] = $this->covertAddresses($email->getReplyTo());
+            $payload['replyTo'] = $this->convertAddresses($email->getReplyTo());
         }
 
         if ($email->getCc()) {
-            $payload['cc'] = $this->covertAddresses($email->getCc());
+            $payload['cc'] = $this->convertAddresses($email->getCc());
         }
 
         if ($email->getBcc()) {
-            $payload['bcc'] = $this->covertAddresses($email->getBcc());
+            $payload['bcc'] = $this->convertAddresses($email->getBcc());
         }
 
         if ($email->getTextBody()) {
@@ -124,6 +186,9 @@ final class RedlinkApiTransport extends AbstractApiTransport
         if ($email->getHtmlBody()) {
             $payload['content']['html'] = $email->getHtmlBody();
         }
+
+        $this->includeTagsAndHeadersInPayload($email, $payload);
+        $this->includeAttachmentsInPayload($email, $payload);
 
         return $payload;
     }

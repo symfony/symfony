@@ -15,6 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Mailer\Bridge\Redlink\Transport\RedlinkApiTransport;
+use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\Header\MetadataHeader;
+use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Part\DataPart;
@@ -90,5 +93,65 @@ class RedlinkApiTransportTest extends TestCase
         $message = $transport->send($mail);
 
         $this->assertSame('test', $message->getMessageId());
+    }
+
+    public function testIncludeTagsAndHeadersInPayload()
+    {
+        $email = new Email();
+        $email->getHeaders()
+            ->add(new MetadataHeader('custom', 'test'))
+            ->add(new TagHeader('TagInHeaders'))
+            ->addTextHeader('templateId', 1)
+            ->addParameterizedHeader('vars', 'foo@example.com', ['x' => 'test'])
+            ->addParameterizedHeader('vars', 'foo1@example.com', ['x1' => 'test1'])
+            ->addTextHeader('foo', 'bar');
+
+        $envelope = new Envelope(new Address('bar@example.com', 'Bar'), [
+            new Address('foo@example.com', 'Foo'),
+            new Address('foo1@example.com', 'Foo1')
+        ]);
+
+        $transport = new RedlinkApiTransport('API_TOKEN', 'APP_TOKEN', '1.test.smtp');
+        $method = new \ReflectionMethod(RedlinkApiTransport::class, 'getPayload');
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertArrayHasKey('X-Custom', $payload['headers']);
+        $this->assertEquals('test', $payload['headers']['X-Custom']);
+
+        $this->assertArrayHasKey('tags', $payload);
+        $this->assertEquals('TagInHeaders', current($payload['tags']));
+        $this->assertEquals(1, $payload['content']['templateId']);
+
+        foreach ($payload['to'] as $item) {
+            if($item['email'] === 'foo@example.com')
+            {
+                $this->assertEquals('test', $item['vars']['x']);
+            }
+
+            if($item['email'] === 'foo1@example.com')
+            {
+                $this->assertEquals('test1', $item['vars']['x1']);
+            }
+        }
+
+        $this->assertArrayHasKey('foo', $payload['headers']);
+        $this->assertEquals('bar', $payload['headers']['foo']);
+    }
+
+    public function testConvertAddresses()
+    {
+        $transport = new RedlinkApiTransport('API_TOKEN', 'APP_TOKEN', '1.test.smtp');
+        $method = new \ReflectionMethod(RedlinkApiTransport::class, 'convertAddresses');
+        $result = $method->invoke($transport, [
+            new Address('bar@example.com', 'Bar'),
+            new Address('bar1@example.com', 'Bar1'),
+        ]);
+
+        $this->assertCount(2, $result);
+        $this->assertEquals('bar@example.com', $result[0]['email']);
+        $this->assertEquals('Bar', $result[0]['name']);
+
+        $this->assertEquals('bar1@example.com', $result[1]['email']);
+        $this->assertEquals('Bar1', $result[1]['name']);
     }
 }

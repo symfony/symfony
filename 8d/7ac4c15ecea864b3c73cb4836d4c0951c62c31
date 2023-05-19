@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-05-19T00:09:26Z
+
+I've just simplified this - it's now just a simple bug fix. The "absolute path" thing might be cool. But in practice, during a UX bundle install, we'll use `importmap:require` to update the importmap.php using #50363 and there was no graceful way, anyways, for that feature to output a string like `__DIR__.'/...'`, which is what I wanted. So, let's just stick to using asset logical paths everywhere.

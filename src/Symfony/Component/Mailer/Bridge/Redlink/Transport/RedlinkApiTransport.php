@@ -75,7 +75,7 @@ final class RedlinkApiTransport extends AbstractApiTransport
 
             $errorMessage = $content['errors'][0]['message'] ?? '';
 
-            throw new HttpTransportException(sprintf('Unable to send an Email: ' . $errorMessage . '. UniqId: (%s).', $requestUniqueIdentifier), $response);
+            throw new HttpTransportException(sprintf('Unable to send an Email: '.$errorMessage.'. UniqId: (%s).', $requestUniqueIdentifier), $response);
         }
 
         $messageId = $content['data'][0]['externalId'] ?? '';
@@ -100,7 +100,6 @@ final class RedlinkApiTransport extends AbstractApiTransport
         $headersToBypass = ['from', 'sender', 'to', 'cc', 'bcc', 'subject', 'reply-to', 'content-type', 'accept', 'api-key'];
 
         foreach ($headers->all() as $name => $header) {
-
             if (\in_array($name, $headersToBypass, true)) {
                 continue;
             }
@@ -115,19 +114,21 @@ final class RedlinkApiTransport extends AbstractApiTransport
                 continue;
             }
 
-            if($header instanceof ParameterizedHeader) {
+            if ($header instanceof ParameterizedHeader) {
                 if ('vars' === $name) {
-                    foreach ($currentPayload['to'] as $to)
-                    {
-                        if($to === $header->getValue())
-                            $to['vars'] = $header->getParameters();
+                    $index = 0;
+                    foreach ($currentPayload['to'] as $to) {
+                        if ($to['email'] === $header->getValue())
+                            $currentPayload['to'][$index]['vars'] = $header->getParameters();
+
+                        $index++;
                     }
                     continue;
                 }
             }
 
             if ('templateid' === $name) {
-                if(!isset($currentPayload['content']))
+                if (!isset($currentPayload['content']))
                     $currentPayload['content'] = [];
 
                 $currentPayload['content']['templateId'] = (int) $header->getValue();
@@ -150,7 +151,7 @@ final class RedlinkApiTransport extends AbstractApiTransport
             $currentPayload['attachments'][] = [
                 'fileName' => $filename,
                 'fileMime' => $attachment->getMediaType(),
-                'fileContent' => base64_encode(str_replace("\r\n", '', $attachment->bodyToString()))
+                'fileContent' => base64_encode(str_replace("\r\n", '', $attachment->bodyToString())),
             ];
         }
     }
@@ -161,9 +162,9 @@ final class RedlinkApiTransport extends AbstractApiTransport
             'smtpAccount' => $this->fromSmtp,
             'from' => [
                 'email' => $envelope->getSender()->getAddress(),
-                'name' => $envelope->getSender()->getName()
+                'name' => $envelope->getSender()->getName(),
             ],
-            'to' => $this->convertAddresses($email->getTo()),
+            'to' => $this->convertAddresses($this->getRecipients($email, $envelope)),
             'subject' => $email->getSubject(),
         ];
 
@@ -195,6 +196,6 @@ final class RedlinkApiTransport extends AbstractApiTransport
 
     private function getEndpoint(): ?string
     {
-        return ($this->host ?: 'api.redlink.pl') . ($this->port ? ':' . $this->port : '');
+        return ($this->host ?: 'api.redlink.pl').($this->port ? ':'.$this->port : '');
     }
 }

@@ -59,19 +59,20 @@ class RedlinkApiTransportTest extends TestCase
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
             $this->assertSame('https://api.redlink.pl/v2.1/email', $url);
+
             return new MockResponse(json_encode(
                 [
-                    "meta" => [
-                        "numberOfErrors" => 0,
-                        "numberOfData" => 1,
-                        "status" => 200,
-                        "uniqId" => "00d928f759"
+                    'meta' => [
+                        'numberOfErrors' => 0,
+                        'numberOfData' => 1,
+                        'status' => 200,
+                        'uniqId' => '00d928f759',
                     ],
-                    "data" => [
+                    'data' => [
                         [
-                            "externalId" => "test"
-                        ]
-                    ]
+                            'externalId' => 'test',
+                        ],
+                    ],
                 ]
             ), [
                 'http_code' => 200,
@@ -108,7 +109,7 @@ class RedlinkApiTransportTest extends TestCase
 
         $envelope = new Envelope(new Address('bar@example.com', 'Bar'), [
             new Address('foo@example.com', 'Foo'),
-            new Address('foo1@example.com', 'Foo1')
+            new Address('foo1@example.com', 'Foo1'),
         ]);
 
         $transport = new RedlinkApiTransport('API_TOKEN', 'APP_TOKEN', '1.test.smtp');
@@ -123,13 +124,11 @@ class RedlinkApiTransportTest extends TestCase
         $this->assertEquals(1, $payload['content']['templateId']);
 
         foreach ($payload['to'] as $item) {
-            if($item['email'] === 'foo@example.com')
-            {
+            if ('foo@example.com' === $item['email']) {
                 $this->assertEquals('test', $item['vars']['x']);
             }
 
-            if($item['email'] === 'foo1@example.com')
-            {
+            if ('foo1@example.com' === $item['email']) {
                 $this->assertEquals('test1', $item['vars']['x1']);
             }
         }

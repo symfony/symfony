@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-03-02T13:46:56Z
+
+Hey!
+
+I think @malarzm has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2023-03-02T13:51:10Z
+
+Hi @nicolas-grekas, Would you have some time to review this PR ?
+Thanks a lot
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2023-03-23T20:41:49Z
+
+Hi @fabpot maybe you have some time to take a look or redirect me to the right reviewer ?
+
+Thanks
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2023-03-28T07:20:17Z
+
+> Frankly I have a hard time figuring out a use case for this. Could you please share one?
+
+I have an entity of UserRoles which are related to
+- An Organization
+- A Project
+- A User
+- An email
+
+For a specific Organization and Project, only one UserRole should exists.
+But UserRole with no relation to a project can exists, it will be only related to a Project, it's only allowed one time.
+And the User is nullable, because it's not set until the email is validated.
+
+For the same User/Organization, you cannot have multiple null project
+but for the same Organization/Project, you can have multiple null user (pending)
+```
+UniqueEntity(fields={organization, project, user}, ignoreNull={user})
+```
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2023-04-08T21:44:08Z
+
+Would you have time to take a look/review this @nicolas-grekas @fabpot ?
+Thanks a lot !

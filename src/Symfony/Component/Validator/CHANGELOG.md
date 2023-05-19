@@ -13,6 +13,7 @@ CHANGELOG
  * Add the `filenameMaxLength` option to the `File` constraint
  * Add the `exclude` option to the `Cascade` constraint
  * Add the `value_length` parameter to `Length` constraint
+ * Allow to disable the translation domain for `ConstraintViolationInterface` messages
 
 6.2
 ---

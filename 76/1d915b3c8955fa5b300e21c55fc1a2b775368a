@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-05-16T16:56:05Z
+
+can you please confirm that the label is a link to the source?
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2023-05-16T17:00:38Z
+
+DebugBundle behavior is to have links on the file (FooAction) not on the label. But wait I've found one more problem and I'm crafting a better patch.

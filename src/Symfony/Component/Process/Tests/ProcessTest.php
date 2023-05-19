@@ -1536,6 +1536,16 @@ class ProcessTest extends TestCase
         }
     }
 
+    public function testNotTerminableInputPipe()
+    {
+        $process = $this->getProcess('echo foo');
+        $process->setInput(\STDIN);
+        $process->start();
+        $process->setTimeout(2);
+        $process->wait();
+        $this->assertFalse($process->isRunning());
+    }
+
     /**
      * @param string|array $commandline
      * @param mixed        $input

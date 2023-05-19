@@ -970,6 +970,7 @@ class FrameworkExtension extends Extension
             $definitionDefinition->addArgument(new Reference(sprintf('%s.metadata_store', $workflowId)));
 
             // Create MarkingStore
+            $markingStoreDefinition = null;
             if (isset($workflow['marking_store']['type'])) {
                 $markingStoreDefinition = new ChildDefinition('workflow.marking_store.method');
                 $markingStoreDefinition->setArguments([
@@ -983,7 +984,7 @@ class FrameworkExtension extends Extension
             // Create Workflow
             $workflowDefinition = new ChildDefinition(sprintf('%s.abstract', $type));
             $workflowDefinition->replaceArgument(0, new Reference(sprintf('%s.definition', $workflowId)));
-            $workflowDefinition->replaceArgument(1, $markingStoreDefinition ?? null);
+            $workflowDefinition->replaceArgument(1, $markingStoreDefinition);
             $workflowDefinition->replaceArgument(3, $name);
             $workflowDefinition->replaceArgument(4, $workflow['events_to_dispatch']);
 

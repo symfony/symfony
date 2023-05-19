@@ -421,7 +421,7 @@ class Process implements \IteratorAggregate
 
         do {
             $this->checkTimeout();
-            $running = '\\' === \DIRECTORY_SEPARATOR ? $this->isRunning() : $this->processPipes->areOpen();
+            $running = $this->isRunning() && ('\\' === \DIRECTORY_SEPARATOR || $this->processPipes->areOpen());
             $this->readPipes($running, '\\' !== \DIRECTORY_SEPARATOR || !$running);
         } while ($running);
 

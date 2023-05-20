@@ -7,6 +7,7 @@ class FooClass
     public $qux;
     public $foo;
     public $moo;
+    public $otherInstances;
 
     public $bar = null;
     public $initialized = false;
@@ -40,5 +41,10 @@ class FooClass
     public function setBar($value = null)
     {
         $this->bar = $value;
+    }
+
+    public function setOtherInstances($otherInstances)
+    {
+        $this->otherInstances = $otherInstances;
     }
 }

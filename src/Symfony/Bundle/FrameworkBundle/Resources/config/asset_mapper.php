@@ -25,9 +25,12 @@ use Symfony\Component\AssetMapper\Command\ImportMapUpdateCommand;
 use Symfony\Component\AssetMapper\Compiler\CssAssetUrlCompiler;
 use Symfony\Component\AssetMapper\Compiler\JavaScriptImportPathCompiler;
 use Symfony\Component\AssetMapper\Compiler\SourceMappingUrlsCompiler;
+use Symfony\Component\AssetMapper\Factory\CachedMappedAssetFactory;
+use Symfony\Component\AssetMapper\Factory\MappedAssetFactory;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapRenderer;
 use Symfony\Component\AssetMapper\MapperAwareAssetPackage;
+use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolver;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 return static function (ContainerConfigurator $container) {
@@ -35,18 +38,39 @@ return static function (ContainerConfigurator $container) {
         ->set('asset_mapper', AssetMapper::class)
             ->args([
                 service('asset_mapper.repository'),
-                service('asset_mapper_compiler'),
-                param('kernel.project_dir'),
-                abstract_arg('asset public prefix'),
-                abstract_arg('public directory name'),
-                abstract_arg('extensions map'),
+                service('asset_mapper.mapped_asset_factory'),
+                service('asset_mapper.public_assets_path_resolver'),
             ])
         ->alias(AssetMapperInterface::class, 'asset_mapper')
+
+        ->set('asset_mapper.mapped_asset_factory', MappedAssetFactory::class)
+            ->args([
+                service('asset_mapper.public_assets_path_resolver'),
+                service('asset_mapper_compiler'),
+            ])
+
+        ->set('asset_mapper.cached_mapped_asset_factory', CachedMappedAssetFactory::class)
+            ->args([
+                service('.inner'),
+                param('kernel.cache_dir').'/asset_mapper',
+                param('kernel.debug'),
+            ])
+            ->decorate('asset_mapper.mapped_asset_factory')
+
         ->set('asset_mapper.repository', AssetMapperRepository::class)
             ->args([
                 abstract_arg('array of asset mapper paths'),
                 param('kernel.project_dir'),
+                abstract_arg('array of excluded path patterns'),
             ])
+
+        ->set('asset_mapper.public_assets_path_resolver', PublicAssetsPathResolver::class)
+            ->args([
+                param('kernel.project_dir'),
+                abstract_arg('asset public prefix'),
+                abstract_arg('public directory name'),
+            ])
+
         ->set('asset_mapper.asset_package', MapperAwareAssetPackage::class)
             ->decorate('assets._default_package')
             ->args([
@@ -57,11 +81,14 @@ return static function (ContainerConfigurator $container) {
         ->set('asset_mapper.dev_server_subscriber', AssetMapperDevServerSubscriber::class)
             ->args([
                 service('asset_mapper'),
+                abstract_arg('asset public prefix'),
+                abstract_arg('extensions map'),
             ])
             ->tag('kernel.event_subscriber', ['event' => RequestEvent::class])
 
         ->set('asset_mapper.command.compile', AssetMapperCompileCommand::class)
             ->args([
+                service('asset_mapper.public_assets_path_resolver'),
                 service('asset_mapper'),
                 service('asset_mapper.importmap.manager'),
                 service('filesystem'),
@@ -82,6 +109,7 @@ return static function (ContainerConfigurator $container) {
         ->set('asset_mapper_compiler', AssetMapperCompiler::class)
             ->args([
                 tagged_iterator('asset_mapper.compiler'),
+                service_closure('asset_mapper'),
             ])
 
         ->set('asset_mapper.compiler.css_asset_url_compiler', CssAssetUrlCompiler::class)
@@ -102,6 +130,7 @@ return static function (ContainerConfigurator $container) {
         ->set('asset_mapper.importmap.manager', ImportMapManager::class)
             ->args([
                 service('asset_mapper'),
+                service('asset_mapper.public_assets_path_resolver'),
                 abstract_arg('importmap.php path'),
                 abstract_arg('vendor directory'),
                 abstract_arg('provider'),
@@ -120,6 +149,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('asset_mapper.importmap.manager'),
                 service('asset_mapper'),
+                param('kernel.project_dir'),
             ])
             ->tag('console.command')
 

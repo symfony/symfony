@@ -13,6 +13,7 @@ namespace Symfony\Component\AssetMapper\ImportMap;
 
 use Symfony\Component\AssetMapper\AssetDependency;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
+use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\VarExporter\VarExporter;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -57,6 +58,7 @@ class ImportMapManager
 
     public function __construct(
         private readonly AssetMapperInterface $assetMapper,
+        private readonly PublicAssetsPathResolverInterface $assetsPathResolver,
         private readonly string $importMapConfigPath,
         private readonly string $vendorDir,
         private readonly string $provider = self::PROVIDER_JSPM,
@@ -126,8 +128,8 @@ class ImportMapManager
             return;
         }
 
-        $dumpedImportMapPath = $this->assetMapper->getPublicAssetsFilesystemPath().'/'.self::IMPORT_MAP_FILE_NAME;
-        $dumpedModulePreloadPath = $this->assetMapper->getPublicAssetsFilesystemPath().'/'.self::IMPORT_MAP_PRELOAD_FILE_NAME;
+        $dumpedImportMapPath = $this->assetsPathResolver->getPublicFilesystemPath().'/'.self::IMPORT_MAP_FILE_NAME;
+        $dumpedModulePreloadPath = $this->assetsPathResolver->getPublicFilesystemPath().'/'.self::IMPORT_MAP_PRELOAD_FILE_NAME;
         if (is_file($dumpedImportMapPath) && is_file($dumpedModulePreloadPath)) {
             $this->json = file_get_contents($dumpedImportMapPath);
             $this->modulesToPreload = json_decode(file_get_contents($dumpedModulePreloadPath), true, 512, \JSON_THROW_ON_ERROR);
@@ -219,7 +221,20 @@ class ImportMapManager
 
         $installData = [];
         $packageRequiresByName = [];
+        $addedEntries = [];
         foreach ($packagesToRequire as $requireOptions) {
+            if (null !== $requireOptions->path) {
+                $newEntry = new ImportMapEntry(
+                    $requireOptions->packageName,
+                    $requireOptions->path,
+                    $requireOptions->preload,
+                );
+                $importMapEntries[$requireOptions->packageName] = $newEntry;
+                $addedEntries[] = $newEntry;
+
+                continue;
+            }
+
             $constraint = $requireOptions->packageName;
             if (null !== $requireOptions->versionConstraint) {
                 $constraint .= '@'.$requireOptions->versionConstraint;
@@ -229,6 +244,10 @@ class ImportMapManager
             }
             $installData[] = $constraint;
             $packageRequiresByName[$requireOptions->packageName] = $requireOptions;
+        }
+
+        if (!$installData) {
+            return $addedEntries;
         }
 
         $json = [
@@ -259,7 +278,6 @@ class ImportMapManager
         // if we're requiring just one package, in case it has any peer deps, match the preload
         $defaultPreload = 1 === \count($packagesToRequire) ? $packagesToRequire[0]->preload : false;
 
-        $addedEntries = [];
         foreach ($response->toArray()['map']['imports'] as $packageName => $url) {
             $requireOptions = $packageRequiresByName[$packageName] ?? null;
             $importName = $requireOptions && $requireOptions->importName ? $requireOptions->importName : $packageName;
@@ -279,7 +297,7 @@ class ImportMapManager
 
                     throw new \LogicException(sprintf('The package was downloaded to "%s", but this path does not appear to be in any of your asset paths.', $vendorPath));
                 }
-                $path = $mappedAsset->logicalPath;
+                $path = $mappedAsset->getLogicalPath();
             }
 
             $newEntry = new ImportMapEntry($importName, $path, $url, $download, $preload);
@@ -342,7 +360,16 @@ class ImportMapManager
         foreach ($entries as $entry) {
             $config = [];
             if ($entry->path) {
-                $config[$entry->isDownloaded ? 'downloaded_to' : 'path'] = $entry->path;
+                $path = $entry->path;
+                // if the path is an absolute path, convert it to an asset path
+                if (is_file($path)) {
+                    $asset = $this->assetMapper->getAssetFromSourcePath($path);
+                    if (null === $asset) {
+                        throw new \LogicException(sprintf('The "%s" importmap entry contains the path "%s" but it does not appear to be in any of your asset paths.', $entry->importName, $path));
+                    }
+                    $path = $asset->getLogicalPath();
+                }
+                $config[$entry->isDownloaded ? 'downloaded_to' : 'path'] = $path;
             }
             if ($entry->url) {
                 $config['url'] = $entry->url;
@@ -390,11 +417,11 @@ class ImportMapManager
                 $this->modulesToPreload[] = $path;
             }
 
-            $dependencyImportMapEntries = array_map(function (AssetDependency $dependency) {
+            $dependencyImportMapEntries = array_map(function (AssetDependency $dependency) use ($entryOptions) {
                 return new ImportMapEntry(
                     $dependency->asset->getPublicPathWithoutDigest(),
-                    $dependency->asset->logicalPath,
-                    preload: !$dependency->isLazy,
+                    $dependency->asset->getLogicalPath(),
+                    preload: $entryOptions->preload && !$dependency->isLazy,
                 );
             }, $dependencies);
             $imports = array_merge($imports, $this->convertEntriesToImports($dependencyImportMapEntries));

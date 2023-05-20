@@ -52,41 +52,41 @@ class JsonDescriptor extends Descriptor
         $this->writeData($this->sortParameters($parameters), $options);
     }
 
-    protected function describeContainerTags(ContainerBuilder $builder, array $options = []): void
+    protected function describeContainerTags(ContainerBuilder $container, array $options = []): void
     {
         $showHidden = isset($options['show_hidden']) && $options['show_hidden'];
         $data = [];
 
-        foreach ($this->findDefinitionsByTag($builder, $showHidden) as $tag => $definitions) {
+        foreach ($this->findDefinitionsByTag($container, $showHidden) as $tag => $definitions) {
             $data[$tag] = [];
             foreach ($definitions as $definition) {
-                $data[$tag][] = $this->getContainerDefinitionData($definition, true, false, $builder, $options['id'] ?? null);
+                $data[$tag][] = $this->getContainerDefinitionData($definition, true, false, $container, $options['id'] ?? null);
             }
         }
 
         $this->writeData($data, $options);
     }
 
-    protected function describeContainerService(object $service, array $options = [], ContainerBuilder $builder = null): void
+    protected function describeContainerService(object $service, array $options = [], ContainerBuilder $container = null): void
     {
         if (!isset($options['id'])) {
             throw new \InvalidArgumentException('An "id" option must be provided.');
         }
 
         if ($service instanceof Alias) {
-            $this->describeContainerAlias($service, $options, $builder);
+            $this->describeContainerAlias($service, $options, $container);
         } elseif ($service instanceof Definition) {
-            $this->writeData($this->getContainerDefinitionData($service, isset($options['omit_tags']) && $options['omit_tags'], isset($options['show_arguments']) && $options['show_arguments'], $builder, $options['id']), $options);
+            $this->writeData($this->getContainerDefinitionData($service, isset($options['omit_tags']) && $options['omit_tags'], isset($options['show_arguments']) && $options['show_arguments'], $container, $options['id']), $options);
         } else {
             $this->writeData($service::class, $options);
         }
     }
 
-    protected function describeContainerServices(ContainerBuilder $builder, array $options = []): void
+    protected function describeContainerServices(ContainerBuilder $container, array $options = []): void
     {
         $serviceIds = isset($options['tag']) && $options['tag']
-            ? $this->sortTaggedServicesByPriority($builder->findTaggedServiceIds($options['tag']))
-            : $this->sortServiceIds($builder->getServiceIds());
+            ? $this->sortTaggedServicesByPriority($container->findTaggedServiceIds($options['tag']))
+            : $this->sortServiceIds($container->getServiceIds());
         $showHidden = isset($options['show_hidden']) && $options['show_hidden'];
         $omitTags = isset($options['omit_tags']) && $options['omit_tags'];
         $showArguments = isset($options['show_arguments']) && $options['show_arguments'];
@@ -97,7 +97,7 @@ class JsonDescriptor extends Descriptor
         }
 
         foreach ($serviceIds as $serviceId) {
-            $service = $this->resolveServiceDefinition($builder, $serviceId);
+            $service = $this->resolveServiceDefinition($container, $serviceId);
 
             if ($showHidden xor '.' === ($serviceId[0] ?? null)) {
                 continue;
@@ -106,7 +106,7 @@ class JsonDescriptor extends Descriptor
             if ($service instanceof Alias) {
                 $data['aliases'][$serviceId] = $this->getContainerAliasData($service);
             } elseif ($service instanceof Definition) {
-                $data['definitions'][$serviceId] = $this->getContainerDefinitionData($service, $omitTags, $showArguments, $builder, $serviceId);
+                $data['definitions'][$serviceId] = $this->getContainerDefinitionData($service, $omitTags, $showArguments, $container, $serviceId);
             } else {
                 $data['services'][$serviceId] = $service::class;
             }
@@ -115,21 +115,21 @@ class JsonDescriptor extends Descriptor
         $this->writeData($data, $options);
     }
 
-    protected function describeContainerDefinition(Definition $definition, array $options = [], ContainerBuilder $builder = null): void
+    protected function describeContainerDefinition(Definition $definition, array $options = [], ContainerBuilder $container = null): void
     {
-        $this->writeData($this->getContainerDefinitionData($definition, isset($options['omit_tags']) && $options['omit_tags'], isset($options['show_arguments']) && $options['show_arguments'], $builder, $options['id'] ?? null), $options);
+        $this->writeData($this->getContainerDefinitionData($definition, isset($options['omit_tags']) && $options['omit_tags'], isset($options['show_arguments']) && $options['show_arguments'], $container, $options['id'] ?? null), $options);
     }
 
-    protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $builder = null): void
+    protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $container = null): void
     {
-        if (!$builder) {
+        if (!$container) {
             $this->writeData($this->getContainerAliasData($alias), $options);
 
             return;
         }
 
         $this->writeData(
-            [$this->getContainerAliasData($alias), $this->getContainerDefinitionData($builder->getDefinition((string) $alias), isset($options['omit_tags']) && $options['omit_tags'], isset($options['show_arguments']) && $options['show_arguments'], $builder, (string) $alias)],
+            [$this->getContainerAliasData($alias), $this->getContainerDefinitionData($container->getDefinition((string) $alias), isset($options['omit_tags']) && $options['omit_tags'], isset($options['show_arguments']) && $options['show_arguments'], $container, (string) $alias)],
             array_merge($options, ['id' => (string) $alias])
         );
     }
@@ -156,9 +156,9 @@ class JsonDescriptor extends Descriptor
         throw new LogicException('Using the JSON format to debug environment variables is not supported.');
     }
 
-    protected function describeContainerDeprecations(ContainerBuilder $builder, array $options = []): void
+    protected function describeContainerDeprecations(ContainerBuilder $container, array $options = []): void
     {
-        $containerDeprecationFilePath = sprintf('%s/%sDeprecations.log', $builder->getParameter('kernel.build_dir'), $builder->getParameter('kernel.container_class'));
+        $containerDeprecationFilePath = sprintf('%s/%sDeprecations.log', $container->getParameter('kernel.build_dir'), $container->getParameter('kernel.container_class'));
         if (!file_exists($containerDeprecationFilePath)) {
             throw new RuntimeException('The deprecation file does not exist, please try warming the cache first.');
         }
@@ -217,7 +217,7 @@ class JsonDescriptor extends Descriptor
         return $data;
     }
 
-    private function getContainerDefinitionData(Definition $definition, bool $omitTags = false, bool $showArguments = false, ContainerBuilder $builder = null, string $id = null): array
+    private function getContainerDefinitionData(Definition $definition, bool $omitTags = false, bool $showArguments = false, ContainerBuilder $container = null, string $id = null): array
     {
         $data = [
             'class' => (string) $definition->getClass(),
@@ -242,7 +242,7 @@ class JsonDescriptor extends Descriptor
         }
 
         if ($showArguments) {
-            $data['arguments'] = $this->describeValue($definition->getArguments(), $omitTags, $showArguments, $builder, $id);
+            $data['arguments'] = $this->describeValue($definition->getArguments(), $omitTags, $showArguments, $container, $id);
         }
 
         $data['file'] = $definition->getFile();
@@ -279,7 +279,7 @@ class JsonDescriptor extends Descriptor
             }
         }
 
-        $data['usages'] = null !== $builder && null !== $id ? $this->getServiceEdges($builder, $id) : [];
+        $data['usages'] = null !== $container && null !== $id ? $this->getServiceEdges($container, $id) : [];
 
         return $data;
     }
@@ -390,12 +390,12 @@ class JsonDescriptor extends Descriptor
         throw new \InvalidArgumentException('Callable is not describable.');
     }
 
-    private function describeValue($value, bool $omitTags, bool $showArguments, ContainerBuilder $builder = null, string $id = null): mixed
+    private function describeValue($value, bool $omitTags, bool $showArguments, ContainerBuilder $container = null, string $id = null): mixed
     {
         if (\is_array($value)) {
             $data = [];
             foreach ($value as $k => $v) {
-                $data[$k] = $this->describeValue($v, $omitTags, $showArguments, $builder, $id);
+                $data[$k] = $this->describeValue($v, $omitTags, $showArguments, $container, $id);
             }
 
             return $data;
@@ -417,11 +417,11 @@ class JsonDescriptor extends Descriptor
         }
 
         if ($value instanceof ArgumentInterface) {
-            return $this->describeValue($value->getValues(), $omitTags, $showArguments, $builder, $id);
+            return $this->describeValue($value->getValues(), $omitTags, $showArguments, $container, $id);
         }
 
         if ($value instanceof Definition) {
-            return $this->getContainerDefinitionData($value, $omitTags, $showArguments, $builder, $id);
+            return $this->getContainerDefinitionData($value, $omitTags, $showArguments, $container, $id);
         }
 
         return $value;

@@ -50,7 +50,7 @@ final class DiscordTransport extends AbstractTransport
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof ChatMessage;
+        return $message instanceof ChatMessage && (null === $message->getOptions() || $message->getOptions() instanceof DiscordOptions);
     }
 
     /**
@@ -62,17 +62,14 @@ final class DiscordTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
-        $messageOptions = $message->getOptions();
-        $options = $messageOptions ? $messageOptions->toArray() : [];
+        $options = $message->getOptions()?->toArray() ?? [];
+        $options['content'] = $message->getSubject();
 
-        $content = $message->getSubject();
-
-        if (mb_strlen($content, 'UTF-8') > self::SUBJECT_LIMIT) {
+        if (mb_strlen($options['content'], 'UTF-8') > self::SUBJECT_LIMIT) {
             throw new LengthException(sprintf('The subject length of a Discord message must not exceed %d characters.', self::SUBJECT_LIMIT));
         }
 
         $endpoint = sprintf('https://%s/api/webhooks/%s/%s', $this->getEndpoint(), $this->webhookId, $this->token);
-        $options['content'] = $content;
         $response = $this->client->request('POST', $endpoint, [
             'json' => array_filter($options),
         ]);

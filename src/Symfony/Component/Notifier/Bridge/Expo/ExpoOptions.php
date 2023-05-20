@@ -38,13 +38,10 @@ final class ExpoOptions implements MessageOptionsInterface
 
     public function toArray(): array
     {
-        return array_merge(
-            $this->options,
-            [
-                'to' => $this->to,
-                'data' => $this->data,
-            ]
-        );
+        return array_merge($this->options, [
+            'to' => $this->to,
+            'data' => $this->data,
+        ]);
     }
 
     public function getRecipientId(): ?string

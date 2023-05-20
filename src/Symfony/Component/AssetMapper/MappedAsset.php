@@ -29,17 +29,26 @@ final class MappedAsset
     private string $content;
     private string $digest;
     private bool $isPredigested;
-    private ?string $mimeType;
     /** @var AssetDependency[] */
     private array $dependencies = [];
 
-    public function __construct(public readonly string $logicalPath)
+    public function __construct(private readonly string $logicalPath)
     {
+    }
+
+    public function getLogicalPath(): string
+    {
+        return $this->logicalPath;
     }
 
     public function getPublicPath(): string
     {
         return $this->publicPath;
+    }
+
+    public function getPublicExtension(): string
+    {
+        return pathinfo($this->publicPathWithoutDigest, \PATHINFO_EXTENSION);
     }
 
     public function getSourcePath(): string
@@ -60,16 +69,6 @@ final class MappedAsset
     public function isPredigested(): bool
     {
         return $this->isPredigested;
-    }
-
-    public function getMimeType(): ?string
-    {
-        return $this->mimeType;
-    }
-
-    public function getExtension(): string
-    {
-        return pathinfo($this->logicalPath, \PATHINFO_EXTENSION);
     }
 
     /**
@@ -117,15 +116,6 @@ final class MappedAsset
         $this->isPredigested = $isPredigested;
     }
 
-    public function setMimeType(?string $mimeType): void
-    {
-        if (isset($this->mimeType)) {
-            throw new \LogicException('Cannot set mime type: it was already set on the asset.');
-        }
-
-        $this->mimeType = $mimeType;
-    }
-
     public function setContent(string $content): void
     {
         if (isset($this->content)) {
@@ -135,9 +125,9 @@ final class MappedAsset
         $this->content = $content;
     }
 
-    public function addDependency(self $asset, bool $isLazy = false): void
+    public function addDependency(AssetDependency $assetDependency): void
     {
-        $this->dependencies[] = new AssetDependency($asset, $isLazy);
+        $this->dependencies[] = $assetDependency;
     }
 
     public function getPublicPathWithoutDigest(): string

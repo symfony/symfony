@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\Termii\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\Notifier\Bridge\Termii\TermiiOptions;
 use Symfony\Component\Notifier\Bridge\Termii\TermiiTransport;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -39,6 +40,7 @@ final class TermiiTransportTest extends TransportTestCase
     public static function supportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
+        yield [new SmsMessage('0611223344', 'Hello!', 'from', new TermiiOptions(['from' => 'foo']))];
     }
 
     /**

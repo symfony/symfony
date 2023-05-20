@@ -58,11 +58,9 @@ final class VonageTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $from = $message->getFrom() ?: $this->from;
-
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/sms/json', [
             'body' => [
-                'from' => $from,
+                'from' => $message->getFrom() ?: $this->from,
                 'to' => $message->getPhone(),
                 'text' => $message->getSubject(),
                 'api_key' => $this->apiKey,

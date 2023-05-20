@@ -48,7 +48,7 @@ class WebProfilerBundleKernel extends Kernel
         $routes->add('_', '/')->controller('kernel::homepageController');
     }
 
-    protected function configureContainer(ContainerBuilder $containerBuilder, LoaderInterface $loader): void
+    protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader): void
     {
         $config = [
             'http_method_override' => false,
@@ -58,9 +58,9 @@ class WebProfilerBundleKernel extends Kernel
             'router' => ['utf8' => true],
         ];
 
-        $containerBuilder->loadFromExtension('framework', $config);
+        $container->loadFromExtension('framework', $config);
 
-        $containerBuilder->loadFromExtension('web_profiler', [
+        $container->loadFromExtension('web_profiler', [
             'toolbar' => true,
             'intercept_redirects' => false,
         ]);

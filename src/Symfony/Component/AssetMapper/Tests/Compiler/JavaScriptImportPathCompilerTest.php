@@ -24,15 +24,19 @@ class JavaScriptImportPathCompilerTest extends TestCase
     public function testCompile(string $sourceLogicalName, string $input, array $expectedDependencies)
     {
         $asset = new MappedAsset($sourceLogicalName);
+        $asset->setPublicPathWithoutDigest('/assets/'.$sourceLogicalName);
 
         $compiler = new JavaScriptImportPathCompiler(false);
         // compile - and check that content doesn't change
         $this->assertSame($input, $compiler->compile($input, $asset, $this->createAssetMapper()));
         $actualDependencies = [];
         foreach ($asset->getDependencies() as $dependency) {
-            $actualDependencies[$dependency->asset->logicalPath] = $dependency->isLazy;
+            $actualDependencies[$dependency->asset->getLogicalPath()] = $dependency->isLazy;
         }
         $this->assertEquals($expectedDependencies, $actualDependencies);
+        if ($expectedDependencies) {
+            $this->assertFalse($asset->getDependencies()[0]->isContentDependency);
+        }
     }
 
     public static function provideCompileTests(): iterable
@@ -157,6 +161,76 @@ class JavaScriptImportPathCompilerTest extends TestCase
     }
 
     /**
+     * @dataProvider providePathsCanUpdateTests
+     */
+    public function testImportPathsCanUpdate(string $sourceLogicalName, string $input, string $sourcePublicPath, string $importedPublicPath, string $expectedOutput)
+    {
+        $asset = new MappedAsset($sourceLogicalName);
+        $asset->setPublicPathWithoutDigest($sourcePublicPath);
+
+        $assetMapper = $this->createMock(AssetMapperInterface::class);
+        $importedAsset = new MappedAsset('anything');
+        $importedAsset->setPublicPathWithoutDigest($importedPublicPath);
+        $assetMapper->expects($this->once())
+            ->method('getAsset')
+            ->willReturn($importedAsset);
+
+        $compiler = new JavaScriptImportPathCompiler(false);
+        $this->assertSame($expectedOutput, $compiler->compile($input, $asset, $assetMapper));
+    }
+
+    public static function providePathsCanUpdateTests(): iterable
+    {
+        yield 'simple - no change needed' => [
+            'sourceLogicalName' => 'app.js',
+            'input' => "import './other.js';",
+            'sourcePublicPath' => '/assets/app.js',
+            'importedPublicPath' => '/assets/other.js',
+            'expectedOutput' => "import './other.js';",
+        ];
+
+        yield 'same directory - no change needed' => [
+            'sourceLogicalName' => 'app.js',
+            'input' => "import './other.js';",
+            'sourcePublicPath' => '/assets/js/app.js',
+            'importedPublicPath' => '/assets/js/other.js',
+            'expectedOutput' => "import './other.js';",
+        ];
+
+        yield 'different directories but not adjustment needed' => [
+            'sourceLogicalName' => 'app.js',
+            'input' => "import './subdir/other.js';",
+            'sourcePublicPath' => '/assets/app.js',
+            'importedPublicPath' => '/assets/subdir/other.js',
+            'expectedOutput' => "import './subdir/other.js';",
+        ];
+
+        yield 'sourcePublicPath is deeper than expected so adjustment is made' => [
+            'sourceLogicalName' => 'app.js',
+            'input' => "import './other.js';",
+            'sourcePublicPath' => '/assets/js/app.js',
+            'importedPublicPath' => '/assets/other.js',
+            'expectedOutput' => "import '../other.js';",
+        ];
+
+        yield 'importedPublicPath is different so adjustment is made' => [
+            'sourceLogicalName' => 'app.js',
+            'input' => "import './other.js';",
+            'sourcePublicPath' => '/assets/app.js',
+            'importedPublicPath' => '/assets/js/other.js',
+            'expectedOutput' => "import './js/other.js';",
+        ];
+
+        yield 'both paths are in unexpected places so adjustment is made' => [
+            'sourceLogicalName' => 'app.js',
+            'input' => "import './other.js';",
+            'sourcePublicPath' => '/assets/js/app.js',
+            'importedPublicPath' => '/assets/somewhere/other.js',
+            'expectedOutput' => "import '../somewhere/other.js';",
+        ];
+    }
+
+    /**
      * @dataProvider provideStrictModeTests
      */
     public function testStrictMode(string $sourceLogicalName, string $input, ?string $expectedExceptionMessage)
@@ -209,22 +283,17 @@ class JavaScriptImportPathCompilerTest extends TestCase
                 switch ($path) {
                     case 'other.js':
                         $asset = new MappedAsset('other.js');
-                        $asset->setMimeType('application/javascript');
+                        $asset->setPublicPathWithoutDigest('/assets/other.js');
 
                         return $asset;
                     case 'subdir/foo.js':
                         $asset = new MappedAsset('subdir/foo.js');
-                        $asset->setMimeType('text/javascript');
-
-                        return $asset;
-                    case 'dir_with_index/index.js':
-                        $asset = new MappedAsset('dir_with_index/index.js');
-                        $asset->setMimeType('text/javascript');
+                        $asset->setPublicPathWithoutDigest('/assets/subdir/foo.js');
 
                         return $asset;
                     case 'styles.css':
                         $asset = new MappedAsset('styles.css');
-                        $asset->setMimeType('text/css');
+                        $asset->setPublicPathWithoutDigest('/assets/styles.css');
 
                         return $asset;
                     default:

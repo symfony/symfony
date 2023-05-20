@@ -945,8 +945,9 @@ EOF;
             if (!$isProxyCandidate && !$definition->isShared()) {
                 $c = implode("\n", array_map(fn ($line) => $line ? '    '.$line : $line, explode("\n", $c)));
                 $lazyloadInitialization = $definition->isLazy() ? ', $lazyLoad = true' : '';
+                $useContainerRef = $this->addContainerRef ? ' use ($containerRef)' : '';
 
-                $c = sprintf("        %s = function (\$container%s) {\n%s        };\n\n        return %1\$s(\$container);\n", $factory, $lazyloadInitialization, $c);
+                $c = sprintf("        %s = function (\$container%s)%s {\n%s        };\n\n        return %1\$s(\$container);\n", $factory, $lazyloadInitialization, $useContainerRef, $c);
             }
 
             $code .= $c;

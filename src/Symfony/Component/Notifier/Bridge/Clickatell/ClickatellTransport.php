@@ -45,7 +45,7 @@ final class ClickatellTransport extends AbstractTransport
             return sprintf('clickatell://%s', $this->getEndpoint());
         }
 
-        return sprintf('clickatell://%s?from=%s', $this->getEndpoint(), $this->from);
+        return sprintf('clickatell://%s%s', $this->getEndpoint(), null !== $this->from ? '?from='.$this->from : '');
     }
 
     public function supports(MessageInterface $message): bool
@@ -61,7 +61,10 @@ final class ClickatellTransport extends AbstractTransport
 
         $endpoint = sprintf('https://%s/rest/message', $this->getEndpoint());
 
-        $from = $message->getFrom() ?: $this->from;
+        $options = [];
+        $options['from'] = $message->getFrom() ?: $this->from;
+        $options['to'] = $message->getPhone();
+        $options['text'] = $message->getSubject();
 
         $response = $this->client->request('POST', $endpoint, [
             'headers' => [
@@ -70,11 +73,7 @@ final class ClickatellTransport extends AbstractTransport
                 'Content-Type' => 'application/json',
                 'X-Version' => 1,
             ],
-            'json' => [
-                'from' => $from ?? '',
-                'to' => [$message->getPhone()],
-                'text' => $message->getSubject(),
-            ],
+            'json' => array_filter($options),
         ]);
 
         try {

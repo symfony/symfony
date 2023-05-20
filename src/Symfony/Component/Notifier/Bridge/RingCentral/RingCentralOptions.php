@@ -25,86 +25,23 @@ final class RingCentralOptions implements MessageOptionsInterface
         $this->options = $options;
     }
 
-    public function getCountryCallingCode(): ?string
-    {
-        return $this->options['country_calling_code'] ?? null;
-    }
-
-    public function getCountryId(): ?string
-    {
-        return $this->options['country_id'] ?? null;
-    }
-
-    public function getCountryIsoCode(): ?string
-    {
-        return $this->options['country_iso_code'] ?? null;
-    }
-
-    public function getCountryName(): ?string
-    {
-        return $this->options['country_name'] ?? null;
-    }
-
-    public function getCountryUri(): ?string
-    {
-        return $this->options['country_uri'] ?? null;
-    }
-
-    public function getFrom(): ?string
-    {
-        return $this->options['from'] ?? null;
-    }
-
     public function getRecipientId(): ?string
     {
-        return $this->options['recipient_id'] ?? null;
+        return null;
     }
 
-    public function setCountryCallingCode(string $countryCallingCode): self
+    /**
+     * @return $this
+     */
+    public function country(string $id, string $isoCode = null, string $name = null, string $uri = null, string $callingCode = null): static
     {
-        $this->options['country_calling_code'] = $countryCallingCode;
-
-        return $this;
-    }
-
-    public function setCountryId(string $countryId): self
-    {
-        $this->options['country_id'] = $countryId;
-
-        return $this;
-    }
-
-    public function setCountryIsoCode(string $countryIsoCode): self
-    {
-        $this->options['country_iso_code'] = $countryIsoCode;
-
-        return $this;
-    }
-
-    public function setCountryName(string $countryName): self
-    {
-        $this->options['country_name'] = $countryName;
-
-        return $this;
-    }
-
-    public function setCountryUri(string $countryUri): self
-    {
-        $this->options['country_uri'] = $countryUri;
-
-        return $this;
-    }
-
-    public function setFrom(string $from): self
-    {
-        $this->options['from'] = $from;
-
-        return $this;
-    }
-
-    public function setRecipientId(string $id): self
-    {
-        $this->options['recipient_id'] = $id;
+        $this->options['country'] = [
+            'id' => $id,
+            'isoCode' => $isoCode,
+            'name' => $name,
+            'uri' => $uri,
+            'callingCode' => $callingCode,
+        ];
 
         return $this;
     }

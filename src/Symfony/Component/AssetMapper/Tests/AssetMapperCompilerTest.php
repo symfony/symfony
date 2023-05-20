@@ -24,7 +24,7 @@ class AssetMapperCompilerTest extends TestCase
         $compiler1 = new class() implements AssetCompilerInterface {
             public function supports(MappedAsset $asset): bool
             {
-                return 'text/css' === $asset->getMimeType();
+                return 'css' === $asset->getPublicExtension();
             }
 
             public function compile(string $content, MappedAsset $asset, AssetMapperInterface $assetMapper): string
@@ -36,7 +36,7 @@ class AssetMapperCompilerTest extends TestCase
         $compiler2 = new class() implements AssetCompilerInterface {
             public function supports(MappedAsset $asset): bool
             {
-                return 'application/javascript' === $asset->getMimeType();
+                return 'js' === $asset->getPublicExtension();
             }
 
             public function compile(string $content, MappedAsset $asset, AssetMapperInterface $assetMapper): string
@@ -48,7 +48,7 @@ class AssetMapperCompilerTest extends TestCase
         $compiler3 = new class() implements AssetCompilerInterface {
             public function supports(MappedAsset $asset): bool
             {
-                return 'application/javascript' === $asset->getMimeType();
+                return 'js' === $asset->getPublicExtension();
             }
 
             public function compile(string $content, MappedAsset $asset, AssetMapperInterface $assetMapper): string
@@ -57,9 +57,12 @@ class AssetMapperCompilerTest extends TestCase
             }
         };
 
-        $compiler = new AssetMapperCompiler([$compiler1, $compiler2, $compiler3]);
+        $compiler = new AssetMapperCompiler(
+            [$compiler1, $compiler2, $compiler3],
+            fn () => $this->createMock(AssetMapperInterface::class),
+        );
         $asset = new MappedAsset('foo.js');
-        $asset->setMimeType('application/javascript');
+        $asset->setPublicPathWithoutDigest('/assets/foo.js');
         $actualContents = $compiler->compile('starting contents', $asset, $this->createMock(AssetMapperInterface::class));
         $this->assertSame('starting contents compiler2 called compiler3 called', $actualContents);
     }

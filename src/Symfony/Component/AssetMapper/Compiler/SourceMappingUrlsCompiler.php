@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\AssetMapper\Compiler;
 
+use Symfony\Component\AssetMapper\AssetDependency;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\MappedAsset;
 
@@ -29,13 +30,13 @@ final class SourceMappingUrlsCompiler implements AssetCompilerInterface
 
     public function supports(MappedAsset $asset): bool
     {
-        return \in_array($asset->getMimeType(), ['application/javascript', 'text/css'], true);
+        return \in_array($asset->getPublicExtension(), ['css', 'js'], true);
     }
 
     public function compile(string $content, MappedAsset $asset, AssetMapperInterface $assetMapper): string
     {
         return preg_replace_callback(self::SOURCE_MAPPING_PATTERN, function ($matches) use ($asset, $assetMapper) {
-            $resolvedPath = $this->resolvePath(\dirname($asset->logicalPath), $matches[2]);
+            $resolvedPath = $this->resolvePath(\dirname($asset->getLogicalPath()), $matches[2]);
 
             $dependentAsset = $assetMapper->getAsset($resolvedPath);
             if (!$dependentAsset) {
@@ -43,9 +44,10 @@ final class SourceMappingUrlsCompiler implements AssetCompilerInterface
                 return $matches[0];
             }
 
-            $asset->addDependency($dependentAsset);
+            $asset->addDependency(new AssetDependency($dependentAsset));
+            $relativePath = $this->createRelativePath($asset->getPublicPathWithoutDigest(), $dependentAsset->getPublicPath());
 
-            return $matches[1].'# sourceMappingURL='.$dependentAsset->getPublicPath();
+            return $matches[1].'# sourceMappingURL='.$relativePath;
         }, $content);
     }
 }

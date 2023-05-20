@@ -78,9 +78,11 @@ class XmlFrameworkExtensionTest extends FrameworkExtensionTestCase
     {
         $container = $this->createContainerFromFile('asset_mapper');
 
-        $definition = $container->getDefinition('asset_mapper');
-        $this->assertSame('/assets_path/', $definition->getArgument(3));
-        $this->assertSame(['zip' => 'application/zip'], $definition->getArgument(5));
+        $definition = $container->getDefinition('asset_mapper.public_assets_path_resolver');
+        $this->assertSame('/assets_path/', $definition->getArgument(1));
+
+        $definition = $container->getDefinition('asset_mapper.dev_server_subscriber');
+        $this->assertSame(['zip' => 'application/zip'], $definition->getArgument(2));
 
         $definition = $container->getDefinition('asset_mapper.importmap.renderer');
         $this->assertSame(['data-turbo-track' => 'reload'], $definition->getArgument(3));

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\AssetMapper\Compiler;
 
+use Symfony\Component\AssetMapper\AssetDependency;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\MappedAsset;
 
@@ -35,7 +36,7 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
     public function compile(string $content, MappedAsset $asset, AssetMapperInterface $assetMapper): string
     {
         return preg_replace_callback(self::IMPORT_PATTERN, function ($matches) use ($asset, $assetMapper) {
-            $resolvedPath = $this->resolvePath(\dirname($asset->logicalPath), $matches[1]);
+            $resolvedPath = $this->resolvePath(\dirname($asset->getLogicalPath()), $matches[1]);
 
             $dependentAsset = $assetMapper->getAsset($resolvedPath);
 
@@ -54,7 +55,12 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
                 // This will cause the asset to be included in the importmap.
                 $isLazy = str_contains($matches[0], 'import(');
 
-                $asset->addDependency($dependentAsset, $isLazy);
+                $asset->addDependency(new AssetDependency($dependentAsset, $isLazy, false));
+
+                $relativeImportPath = $this->createRelativePath($asset->getPublicPathWithoutDigest(), $dependentAsset->getPublicPathWithoutDigest());
+                $relativeImportPath = $this->makeRelativeForJavaScript($relativeImportPath);
+
+                return str_replace($matches[1], $relativeImportPath, $matches[0]);
             }
 
             return $matches[0];
@@ -63,6 +69,15 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
 
     public function supports(MappedAsset $asset): bool
     {
-        return 'application/javascript' === $asset->getMimeType() || 'text/javascript' === $asset->getMimeType();
+        return 'js' === $asset->getPublicExtension();
+    }
+
+    private function makeRelativeForJavaScript(string $path): string
+    {
+        if (str_starts_with($path, '../')) {
+            return $path;
+        }
+
+        return './'.$path;
     }
 }

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\Bandwidth\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\Notifier\Bridge\Bandwidth\BandwidthOptions;
 use Symfony\Component\Notifier\Bridge\Bandwidth\BandwidthTransport;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -37,6 +38,7 @@ final class BandwidthTransportTest extends TransportTestCase
     public static function supportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
+        yield [new SmsMessage('0611223344', 'Hello!', 'from', new BandwidthOptions(['from' => 'from']))];
     }
 
     /**

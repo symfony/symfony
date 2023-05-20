@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\AssetMapper\Compiler;
 
+use Symfony\Component\AssetMapper\AssetDependency;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\MappedAsset;
 
@@ -35,7 +36,7 @@ final class CssAssetUrlCompiler implements AssetCompilerInterface
     public function compile(string $content, MappedAsset $asset, AssetMapperInterface $assetMapper): string
     {
         return preg_replace_callback(self::ASSET_URL_PATTERN, function ($matches) use ($asset, $assetMapper) {
-            $resolvedPath = $this->resolvePath(\dirname($asset->logicalPath), $matches[1]);
+            $resolvedPath = $this->resolvePath(\dirname($asset->getLogicalPath()), $matches[1]);
             $dependentAsset = $assetMapper->getAsset($resolvedPath);
 
             if (null === $dependentAsset) {
@@ -47,14 +48,15 @@ final class CssAssetUrlCompiler implements AssetCompilerInterface
                 return $matches[0];
             }
 
-            $asset->addDependency($dependentAsset);
+            $asset->addDependency(new AssetDependency($dependentAsset));
+            $relativePath = $this->createRelativePath($asset->getPublicPathWithoutDigest(), $dependentAsset->getPublicPath());
 
-            return 'url("'.$dependentAsset->getPublicPath().'")';
+            return 'url("'.$relativePath.'")';
         }, $content);
     }
 
     public function supports(MappedAsset $asset): bool
     {
-        return 'text/css' === $asset->getMimeType();
+        return 'css' === $asset->getPublicExtension();
     }
 }

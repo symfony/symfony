@@ -64,6 +64,16 @@ class AnsiColorModeTest extends TestCase
             AnsiColorMode::Ansi8->name => 248,
             AnsiColorMode::Ansi4->name => 7,
         ]];
+
+        yield ['#000000', [
+            AnsiColorMode::Ansi8->name => 16,
+            AnsiColorMode::Ansi4->name => 0,
+        ]];
+
+        yield ['#ffffff', [
+            AnsiColorMode::Ansi8->name => 231,
+            AnsiColorMode::Ansi4->name => 7,
+        ]];
     }
 
     public function testColorsConversionWithoutSharp()

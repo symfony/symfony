@@ -55,11 +55,9 @@ final class SendinblueTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $sender = $message->getFrom() ?: $this->sender;
-
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/v3/transactionalSMS/sms', [
             'json' => [
-                'sender' => $sender,
+                'sender' => $message->getFrom() ?: $this->sender,
                 'recipient' => $message->getPhone(),
                 'content' => $message->getSubject(),
             ],

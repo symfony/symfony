@@ -42,4 +42,13 @@ class RecurringMessageTest extends TestCase
 
         RecurringMessage::cron('#midnight', new \stdClass());
     }
+
+    public function testUniqueId()
+    {
+        $message1 = RecurringMessage::cron('* * * * *', new \stdClass());
+        $message2 = RecurringMessage::cron('* 5 * * *', new \stdClass());
+
+        $this->assertSame($message1->getId(), (clone $message1)->getId());
+        $this->assertNotSame($message1->getId(), $message2->getId());
+    }
 }

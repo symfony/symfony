@@ -59,12 +59,10 @@ final class SmscTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $from = $message->getFrom() ?: $this->from;
-
         $body = [
             'login' => $this->login,
             'psw' => $this->password,
-            'sender' => $from,
+            'sender' => $message->getFrom() ?: $this->from,
             'phones' => $message->getPhone(),
             'mes' => $message->getSubject(),
             'fmt' => 3, // response as JSON

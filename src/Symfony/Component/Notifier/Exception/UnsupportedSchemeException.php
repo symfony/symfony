@@ -36,6 +36,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Clickatell\ClickatellTransportFactory::class,
             'package' => 'symfony/clickatell-notifier',
         ],
+        'clicksend' => [
+            'class' => Bridge\ClickSend\ClickSendTransportFactory::class,
+            'package' => 'symfony/click-send-notifier',
+        ],
         'contact-everyone' => [
             'class' => Bridge\ContactEveryone\ContactEveryoneTransportFactory::class,
             'package' => 'symfony/contact-everyone-notifier',
@@ -223,6 +227,10 @@ class UnsupportedSchemeException extends LogicException
         'sms-factor' => [
             'class' => Bridge\SmsFactor\SmsFactorTransportFactory::class,
             'package' => 'symfony/sms-factor-notifier',
+        ],
+        'smsmode' => [
+            'class' => Bridge\Smsmode\SmsmodeTransportFactory::class,
+            'package' => 'symfony/smsmode-notifier',
         ],
         'sns' => [
             'class' => Bridge\AmazonSns\AmazonSnsTransportFactory::class,

@@ -59,10 +59,6 @@ final class TwilioTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        if ($message->getOptions() && !$message->getOptions() instanceof TwilioOptions) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, TwilioOptions::class));
-        }
-
         $from = $message->getFrom() ?: $this->from;
 
         if (!preg_match('/^[a-zA-Z0-9\s]{2,11}$/', $from) && !preg_match('/^\+[1-9]\d{1,14}$/', $from)) {
@@ -70,7 +66,7 @@ final class TwilioTransport extends AbstractTransport
         }
 
         $endpoint = sprintf('https://%s/2010-04-01/Accounts/%s/Messages.json', $this->getEndpoint(), $this->accountSid);
-        $options = ($opts = $message->getOptions()) ? $opts->toArray() : [];
+        $options = $message->getOptions()?->toArray() ?? [];
         $body = [
             'From' => $from,
             'To' => $message->getPhone(),
@@ -80,7 +76,7 @@ final class TwilioTransport extends AbstractTransport
             $body['StatusCallback'] = $options['webhook_url'];
         }
         $response = $this->client->request('POST', $endpoint, [
-            'auth_basic' => $this->accountSid.':'.$this->authToken,
+            'auth_basic' => [$this->accountSid, $this->authToken],
             'body' => $body,
         ]);
 

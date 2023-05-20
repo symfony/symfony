@@ -33,7 +33,8 @@ class AssetMapperRepository
      */
     public function __construct(
         private readonly array $paths,
-        private readonly string $projectRootDir
+        private readonly string $projectRootDir,
+        private readonly array $excludedPathPatterns = [],
     ) {
     }
 
@@ -54,7 +55,7 @@ class AssetMapperRepository
             }
 
             $file = rtrim($path, '/').'/'.$localLogicalPath;
-            if (is_file($file)) {
+            if (is_file($file) && !$this->isExcluded($file)) {
                 return realpath($file);
             }
         }
@@ -70,8 +71,12 @@ class AssetMapperRepository
 
         $filesystemPath = realpath($filesystemPath);
 
+        if ($this->isExcluded($filesystemPath)) {
+            return null;
+        }
+
         foreach ($this->getDirectories() as $path => $namespace) {
-            if (!str_starts_with($filesystemPath, $path)) {
+            if (!str_starts_with($filesystemPath, $path.\DIRECTORY_SEPARATOR)) {
                 continue;
             }
 
@@ -101,6 +106,10 @@ class AssetMapperRepository
             $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path));
             foreach ($iterator as $file) {
                 if (!$file->isFile()) {
+                    continue;
+                }
+
+                if ($this->isExcluded($file->getPathname())) {
                     continue;
                 }
 
@@ -159,5 +168,19 @@ class AssetMapperRepository
     private function normalizeLogicalPath(string $logicalPath): string
     {
         return ltrim(str_replace('\\', '/', $logicalPath), '/\\');
+    }
+
+    private function isExcluded(string $filesystemPath): bool
+    {
+        // normalize Windows slashes and remove trailing slashes
+        $filesystemPath = rtrim(str_replace('\\', '/', $filesystemPath), '/');
+
+        foreach ($this->excludedPathPatterns as $pattern) {
+            if (preg_match($pattern, $filesystemPath)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

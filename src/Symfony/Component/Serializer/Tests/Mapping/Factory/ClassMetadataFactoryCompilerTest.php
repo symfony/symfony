@@ -19,6 +19,7 @@ use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\MaxDepthDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedNameDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedPathDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedPathInConstructorDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
 
 final class ClassMetadataFactoryCompilerTest extends TestCase
@@ -46,18 +47,20 @@ final class ClassMetadataFactoryCompilerTest extends TestCase
         $maxDepthDummyMetadata = $classMetatadataFactory->getMetadataFor(MaxDepthDummy::class);
         $serializedNameDummyMetadata = $classMetatadataFactory->getMetadataFor(SerializedNameDummy::class);
         $serializedPathDummyMetadata = $classMetatadataFactory->getMetadataFor(SerializedPathDummy::class);
+        $serializedPathInConstructorDummyMetadata = $classMetatadataFactory->getMetadataFor(SerializedPathInConstructorDummy::class);
 
         $code = (new ClassMetadataFactoryCompiler())->compile([
             $dummyMetadata,
             $maxDepthDummyMetadata,
             $serializedNameDummyMetadata,
             $serializedPathDummyMetadata,
+            $serializedPathInConstructorDummyMetadata,
         ]);
 
         file_put_contents($this->dumpPath, $code);
         $compiledMetadata = require $this->dumpPath;
 
-        $this->assertCount(4, $compiledMetadata);
+        $this->assertCount(5, $compiledMetadata);
 
         $this->assertArrayHasKey(Dummy::class, $compiledMetadata);
         $this->assertEquals([
@@ -99,5 +102,13 @@ final class ClassMetadataFactoryCompilerTest extends TestCase
             ],
             null,
         ], $compiledMetadata[SerializedPathDummy::class]);
+
+        $this->assertArrayHasKey(SerializedPathInConstructorDummy::class, $compiledMetadata);
+        $this->assertEquals([
+            [
+                'three' => [[], null, null, '[one][two]'],
+            ],
+            null,
+        ], $compiledMetadata[SerializedPathInConstructorDummy::class]);
     }
 }

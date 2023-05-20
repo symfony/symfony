@@ -22,21 +22,24 @@ use Symfony\Component\AssetMapper\Compiler\AssetCompilerInterface;
  */
 class AssetMapperCompiler
 {
+    private AssetMapperInterface $assetMapper;
+
     /**
      * @param iterable<AssetCompilerInterface> $assetCompilers
+     * @param \Closure(): AssetMapperInterface $assetMapperFactory
      */
-    public function __construct(private iterable $assetCompilers)
+    public function __construct(private readonly iterable $assetCompilers, private readonly \Closure $assetMapperFactory)
     {
     }
 
-    public function compile(string $content, MappedAsset $mappedAsset, AssetMapperInterface $assetMapper): string
+    public function compile(string $content, MappedAsset $mappedAsset): string
     {
         foreach ($this->assetCompilers as $compiler) {
             if (!$compiler->supports($mappedAsset)) {
                 continue;
             }
 
-            $content = $compiler->compile($content, $mappedAsset, $assetMapper);
+            $content = $compiler->compile($content, $mappedAsset, $this->assetMapper ??= ($this->assetMapperFactory)());
         }
 
         return $content;

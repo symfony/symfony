@@ -72,6 +72,7 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\Glob;
 use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
 use Symfony\Component\Form\Extension\HtmlSanitizer\Type\TextTypeHtmlSanitizerExtension;
 use Symfony\Component\Form\Form;
@@ -989,6 +990,7 @@ class FrameworkExtension extends Extension
             $definitionDefinition->addArgument(new Reference(sprintf('%s.metadata_store', $workflowId)));
 
             // Create MarkingStore
+            $markingStoreDefinition = null;
             if (isset($workflow['marking_store']['type'])) {
                 $markingStoreDefinition = new ChildDefinition('workflow.marking_store.method');
                 $markingStoreDefinition->setArguments([
@@ -1002,7 +1004,7 @@ class FrameworkExtension extends Extension
             // Create Workflow
             $workflowDefinition = new ChildDefinition(sprintf('%s.abstract', $type));
             $workflowDefinition->replaceArgument(0, new Reference(sprintf('%s.definition', $workflowId)));
-            $workflowDefinition->replaceArgument(1, $markingStoreDefinition ?? null);
+            $workflowDefinition->replaceArgument(1, $markingStoreDefinition);
             $workflowDefinition->replaceArgument(3, $name);
             $workflowDefinition->replaceArgument(4, $workflow['events_to_dispatch']);
 
@@ -1271,27 +1273,35 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('asset_mapper.asset_package');
         }
 
-        $publicDirName = $this->getPublicDirectoryName($container);
-        $container->getDefinition('asset_mapper')
-            ->setArgument(3, $config['public_prefix'])
-            ->setArgument(4, $publicDirName)
-            ->setArgument(5, $config['extensions'])
-        ;
-
         $paths = $config['paths'];
         foreach ($container->getParameter('kernel.bundles_metadata') as $name => $bundle) {
             if ($container->fileExists($dir = $bundle['path'].'/Resources/public') || $container->fileExists($dir = $bundle['path'].'/public')) {
                 $paths[$dir] = sprintf('bundles/%s', preg_replace('/bundle$/', '', strtolower($name)));
             }
         }
+        $excludedPathPatterns = [];
+        foreach ($config['excluded_patterns'] as $path) {
+            $excludedPathPatterns[] = Glob::toRegex($path, true, false);
+        }
+
         $container->getDefinition('asset_mapper.repository')
-            ->setArgument(0, $paths);
+            ->setArgument(0, $paths)
+            ->setArgument(2, $excludedPathPatterns);
+
+        $publicDirName = $this->getPublicDirectoryName($container);
+        $container->getDefinition('asset_mapper.public_assets_path_resolver')
+            ->setArgument(1, $config['public_prefix'])
+            ->setArgument(2, $publicDirName);
 
         $container->getDefinition('asset_mapper.command.compile')
-            ->setArgument(4, $publicDirName);
+            ->setArgument(5, $publicDirName);
 
         if (!$config['server']) {
             $container->removeDefinition('asset_mapper.dev_server_subscriber');
+        } else {
+            $container->getDefinition('asset_mapper.dev_server_subscriber')
+                ->setArgument(1, $config['public_prefix'])
+                ->setArgument(2, $config['extensions']);
         }
 
         $container->getDefinition('asset_mapper.compiler.css_asset_url_compiler')
@@ -1302,9 +1312,9 @@ class FrameworkExtension extends Extension
 
         $container
             ->getDefinition('asset_mapper.importmap.manager')
-            ->replaceArgument(1, $config['importmap_path'])
-            ->replaceArgument(2, $config['vendor_dir'])
-            ->replaceArgument(3, $config['provider'])
+            ->replaceArgument(2, $config['importmap_path'])
+            ->replaceArgument(3, $config['vendor_dir'])
+            ->replaceArgument(4, $config['provider'])
         ;
 
         $container
@@ -2702,6 +2712,7 @@ class FrameworkExtension extends Extension
             NotifierBridge\Bandwidth\BandwidthTransportFactory::class => 'notifier.transport_factory.bandwidth',
             NotifierBridge\Chatwork\ChatworkTransportFactory::class => 'notifier.transport_factory.chatwork',
             NotifierBridge\Clickatell\ClickatellTransportFactory::class => 'notifier.transport_factory.clickatell',
+            NotifierBridge\ClickSend\ClickSendTransportFactory::class => 'notifier.transport_factory.click-send',
             NotifierBridge\ContactEveryone\ContactEveryoneTransportFactory::class => 'notifier.transport_factory.contact-everyone',
             NotifierBridge\Discord\DiscordTransportFactory::class => 'notifier.transport_factory.discord',
             NotifierBridge\Engagespot\EngagespotTransportFactory::class => 'notifier.transport_factory.engagespot',
@@ -2749,6 +2760,7 @@ class FrameworkExtension extends Extension
             NotifierBridge\SmsBiuras\SmsBiurasTransportFactory::class => 'notifier.transport_factory.sms-biuras',
             NotifierBridge\Smsc\SmscTransportFactory::class => 'notifier.transport_factory.smsc',
             NotifierBridge\SmsFactor\SmsFactorTransportFactory::class => 'notifier.transport_factory.sms-factor',
+            NotifierBridge\Smsmode\SmsmodeTransportFactory::class => 'notifier.transport_factory.smsmode',
             NotifierBridge\SpotHit\SpotHitTransportFactory::class => 'notifier.transport_factory.spot-hit',
             NotifierBridge\Telegram\TelegramTransportFactory::class => 'notifier.transport_factory.telegram',
             NotifierBridge\Telnyx\TelnyxTransportFactory::class => 'notifier.transport_factory.telnyx',

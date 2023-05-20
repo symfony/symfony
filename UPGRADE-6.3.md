@@ -68,6 +68,8 @@ FrameworkBundle
 HttpClient
 ----------
 
+ * The minimum TLS version now defaults to v1.2; use the `crypto_method`
+   option if you need to connect to servers that don't support it
  * The default user agents have been renamed from `Symfony HttpClient/Amp`, `Symfony HttpClient/Curl`
    and `Symfony HttpClient/Native` to `Symfony HttpClient (Amp)`, `Symfony HttpClient (Curl)`
    and `Symfony HttpClient (Native)` respectively to comply with the RFC 9110 specification

@@ -57,16 +57,15 @@ final class FortySixElksTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $from = $message->getFrom() ?: $this->from;
+        $options = [];
+        $options['from'] = $message->getFrom() ?: $this->from;
+        $options['to'] = $message->getPhone();
+        $options['message'] = $message->getSubject();
 
-        $endpoint = sprintf('https://%s/a1/sms', self::HOST);
+        $endpoint = sprintf('https://%s/a1/sms', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
-            'body' => [
-                'from' => $from,
-                'to' => $message->getPhone(),
-                'message' => $message->getSubject(),
-            ],
             'auth_basic' => [$this->apiUsername, $this->apiPassword],
+            'body' => array_filter($options),
         ]);
 
         try {

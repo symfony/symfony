@@ -12,7 +12,6 @@
 namespace Symfony\Component\Notifier\Bridge\SimpleTextin\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
-use Symfony\Component\Notifier\Bridge\SimpleTextin\SimpleTextinOptions;
 use Symfony\Component\Notifier\Bridge\SimpleTextin\SimpleTextinTransport;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -38,7 +37,6 @@ final class SimpleTextinTransportTest extends TransportTestCase
     public static function supportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
-        yield [new SmsMessage('0611223344', 'Hello!', 'from', new SimpleTextinOptions(['from' => 'from_new']))];
     }
 
     /**

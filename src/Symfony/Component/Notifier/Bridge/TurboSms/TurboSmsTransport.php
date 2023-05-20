@@ -66,7 +66,8 @@ final class TurboSmsTransport extends AbstractTransport
         $this->assertValidSubject($message->getSubject());
 
         $fromMessage = $message->getFrom();
-        if (null !== $fromMessage) {
+
+        if ($fromMessage) {
             $this->assertValidFrom($fromMessage);
             $from = $fromMessage;
         } else {
@@ -109,7 +110,7 @@ final class TurboSmsTransport extends AbstractTransport
     private function assertValidSubject(string $subject): void
     {
         // Detect if there is at least one cyrillic symbol in the text
-        if (1 === preg_match("/\p{Cyrillic}/u", $subject)) {
+        if (preg_match("/\p{Cyrillic}/u", $subject)) {
             $subjectLimit = self::SUBJECT_CYRILLIC_LIMIT;
             $symbols = 'cyrillic';
         } else {

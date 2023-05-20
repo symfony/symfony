@@ -41,7 +41,7 @@ final class PagerDutyTransport extends AbstractTransport
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof PushMessage;
+        return $message instanceof PushMessage && (null === $message->getOptions() || $message->getOptions() instanceof PagerDutyOptions);
     }
 
     protected function doSend(MessageInterface $message = null): SentMessage
@@ -50,20 +50,16 @@ final class PagerDutyTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, PushMessage::class, $message);
         }
 
-        if (null !== $message->getOptions() && !($message->getOptions() instanceof PagerDutyOptions)) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, PagerDutyOptions::class));
-        }
-
-        $body = ($opts = $message->getOptions()) ? $opts->toArray() : [];
-        $body['payload']['summary'] = $message->getContent();
-        $body['payload']['source'] = $message->getSubject();
+        $options = $message->getOptions()?->toArray() ?? [];
+        $options['payload']['summary'] = $message->getContent();
+        $options['payload']['source'] = $message->getSubject();
 
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/v2/enqueue', [
             'headers' => [
                 'Accept' => 'application/json',
                 'Authorization' => $this->token,
             ],
-            'json' => $body,
+            'json' => $options,
         ]);
 
         try {

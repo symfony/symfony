@@ -53,7 +53,7 @@ final class MessageMediaTransport extends AbstractTransport
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof SmsMessage;
+        return $message instanceof SmsMessage && (null === $message->getOptions() || $message->getOptions() instanceof MessageMediaOptions);
     }
 
     protected function doSend(MessageInterface $message): SentMessage
@@ -62,25 +62,20 @@ final class MessageMediaTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $from = $message->getFrom() ?: $this->from;
+        $options = $message->getOptions()?->toArray() ?? [];
+        $options['source_number'] = $message->getFrom() ?: $this->from;
+        $options['destination_number'] = $message->getPhone();
+        $options['content'] = $message->getSubject();
 
         $endpoint = sprintf('https://%s/v1/messages', $this->getEndpoint());
-        $response = $this->client->request(
-            'POST',
-            $endpoint,
-            [
-                'auth_basic' => $this->apiKey.':'.$this->apiSecret,
-                'json' => [
-                    'messages' => [
-                        [
-                            'destination_number' => $message->getPhone(),
-                            'source_number' => $from,
-                            'content' => $message->getSubject(),
-                        ],
-                    ],
+        $response = $this->client->request('POST', $endpoint, [
+            'auth_basic' => [$this->apiKey, $this->apiSecret],
+            'json' => [
+                'messages' => [
+                    array_filter($options),
                 ],
-            ]
-        );
+            ],
+        ]);
 
         try {
             $statusCode = $response->getStatusCode();

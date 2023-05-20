@@ -40,12 +40,12 @@ final class RingCentralTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('ringcentral://%s?from=%s', $this->getEndpoint(), $this->from);
+        return sprintf('ringcentral://%s%s', $this->getEndpoint(), null !== $this->from ? '?from='.$this->from : '');
     }
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof SmsMessage;
+        return $message instanceof SmsMessage && (null === $message->getOptions() || $message->getOptions() instanceof RingCentralOptions);
     }
 
     protected function doSend(MessageInterface $message): SentMessage
@@ -54,27 +54,20 @@ final class RingCentralTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $opts = $message->getOptions();
-        $options = $opts ? $opts->toArray() : [];
+        $options = $message->getOptions()?->toArray() ?? [];
         $options['text'] = $message->getSubject();
-        $options['from']['phoneNumber'] = $options['from'] ?? $this->from;
+        $options['from']['phoneNumber'] = $message->getFrom() ?: $this->from;
         $options['to'][]['phoneNumber'] = $message->getPhone();
 
-        if (isset($options['country_id'])) {
-            $options['country']['id'] = $options['country_id'] ?? null;
-            $options['country']['uri'] = $options['country_uri'] ?? null;
-            $options['country']['name'] = $options['country_name'] ?? null;
-            $options['country']['isoCode'] = $options['country_iso_code'] ?? null;
-            $options['country']['callingCode'] = $options['country_calling_code'] ?? null;
-            unset($options['country_id'], $options['country_uri'], $options['country_name'], $options['country_iso_code'], $options['country_calling_code']);
-        }
-
-        if (!preg_match('/^\+[1-9]\d{1,14}$/', $options['from']['phoneNumber'])) {
-            throw new InvalidArgumentException(sprintf('The "From" number "%s" is not a valid phone number. Phone number must be in E.164 format.', $this->from));
+        if (!preg_match('/^\+[1-9]\d{1,14}$/', $options['from']['phoneNumber'] ?? '')) {
+            throw new InvalidArgumentException(sprintf('The "From" number "%s" is not a valid phone number. Phone number must be in E.164 format.', $options['from']['phoneNumber'] ?? ''));
         }
 
         $endpoint = sprintf('https://%s/restapi/v1.0/account/~/extension/~/sms', $this->getEndpoint());
-        $response = $this->client->request('POST', $endpoint, ['auth_bearer' => $this->apiToken, 'json' => array_filter($options)]);
+        $response = $this->client->request('POST', $endpoint, [
+            'auth_bearer' => $this->apiToken,
+            'json' => array_filter($options),
+        ]);
 
         try {
             $statusCode = $response->getStatusCode();

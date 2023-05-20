@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Use `GatewayApiOptions` class
+
 6.2
 ---
 

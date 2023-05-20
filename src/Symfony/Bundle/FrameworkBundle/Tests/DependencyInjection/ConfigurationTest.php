@@ -104,6 +104,7 @@ class ConfigurationTest extends TestCase
         $defaultConfig = [
             'enabled' => true,
             'paths' => [],
+            'excluded_patterns' => [],
             'server' => true,
             'public_prefix' => '/assets/',
             'strict_mode' => true,
@@ -615,6 +616,7 @@ class ConfigurationTest extends TestCase
             'asset_mapper' => [
                 'enabled' => !class_exists(FullStack::class),
                 'paths' => [],
+                'excluded_patterns' => [],
                 'server' => true,
                 'public_prefix' => '/assets/',
                 'strict_mode' => true,

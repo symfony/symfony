@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add the `ContactEveryoneOptions` class
+
 6.2
 ---
 

@@ -64,28 +64,13 @@ final class SmsapiTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        $dsn = sprintf('smsapi://%s', $this->getEndpoint());
-        $params = [];
+        $query = array_filter([
+            'from' => $this->from,
+            'fast' => (int) $this->fast,
+            'test' => (int) $this->test,
+        ]);
 
-        if ('' !== $this->from) {
-            $params['from'] = $this->from;
-        }
-
-        if ($this->fast) {
-            $params['fast'] = (int) $this->fast;
-        }
-
-        if ($this->test) {
-            $params['test'] = (int) $this->test;
-        }
-
-        $query = http_build_query($params, '', '&');
-
-        if ('' !== $query) {
-            $dsn .= sprintf('?%s', $query);
-        }
-
-        return $dsn;
+        return sprintf('smsapi://%s%s', $this->getEndpoint(), $query ? '?'.http_build_query($query, '', '&') : '');
     }
 
     public function supports(MessageInterface $message): bool
@@ -109,10 +94,7 @@ final class SmsapiTransport extends AbstractTransport
             'test' => $this->test,
         ];
 
-        $from = $message->getFrom() ?: $this->from;
-
-        // if from is not empty add it to request body
-        if ('' !== $from) {
+        if ('' !== $from = $message->getFrom() ?: $this->from) {
             $body['from'] = $from;
         }
 

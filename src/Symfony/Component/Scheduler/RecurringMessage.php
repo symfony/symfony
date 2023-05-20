@@ -14,6 +14,7 @@ namespace Symfony\Component\Scheduler;
 use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
 use Symfony\Component\Scheduler\Trigger\CronExpressionTrigger;
 use Symfony\Component\Scheduler\Trigger\DateIntervalTrigger;
+use Symfony\Component\Scheduler\Trigger\JitterTrigger;
 use Symfony\Component\Scheduler\Trigger\TriggerInterface;
 
 /**
@@ -21,6 +22,8 @@ use Symfony\Component\Scheduler\Trigger\TriggerInterface;
  */
 final class RecurringMessage
 {
+    private string $id;
+
     private function __construct(
         private readonly TriggerInterface $trigger,
         private readonly object $message,
@@ -57,6 +60,34 @@ final class RecurringMessage
     public static function trigger(TriggerInterface $trigger, object $message): self
     {
         return new self($trigger, $message);
+    }
+
+    public function withJitter(int $maxSeconds = 60): self
+    {
+        return new self(new JitterTrigger($this->trigger, $maxSeconds), $this->message);
+    }
+
+    /**
+     * Unique identifier for this message's context.
+     */
+    public function getId(): string
+    {
+        if (isset($this->id)) {
+            return $this->id;
+        }
+
+        try {
+            $message = $this->message instanceof \Stringable ? (string) $this->message : serialize($this->message);
+        } catch (\Exception) {
+            $message = '';
+        }
+
+        return $this->id = hash('crc32c', implode('', [
+            $this->message::class,
+            $message,
+            $this->trigger::class,
+            (string) $this->trigger,
+        ]));
     }
 
     public function getMessage(): object

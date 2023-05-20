@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\GatewayApi\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\Notifier\Bridge\GatewayApi\GatewayApiOptions;
 use Symfony\Component\Notifier\Bridge\GatewayApi\GatewayApiTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\SentMessage;
@@ -40,6 +41,7 @@ final class GatewayApiTransportTest extends TransportTestCase
     public static function supportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
+        yield [new SmsMessage('0611223344', 'Hello!', 'from', new GatewayApiOptions(['from' => 'foo']))];
     }
 
     public static function unsupportedMessagesProvider(): iterable

@@ -50,22 +50,24 @@ final class MobytOptions implements MessageOptionsInterface
 
     public function toArray(): array
     {
-        $options = $this->options;
-        unset($options['message'], $options['recipient']);
-
-        return $options;
+        return $this->options;
     }
 
     public function getRecipientId(): ?string
     {
-        return $this->options['recipient'] ?? null;
+        return null;
     }
 
-    public function messageType(string $type): void
+    /**
+     * @return $this
+     */
+    public function messageType(string $type): static
     {
         self::validateMessageType($type);
 
         $this->options['message_type'] = $type;
+
+        return $this;
     }
 
     public static function validateMessageType(string $type): string

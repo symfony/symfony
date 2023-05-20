@@ -66,6 +66,7 @@ interface HttpClientInterface
         'ciphers' => null,
         'peer_fingerprint' => null,
         'capture_peer_cert_chain' => false,
+        'crypto_method' => \STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT, // STREAM_CRYPTO_METHOD_TLSv*_CLIENT - minimum TLS version
         'extra' => [],          // array - additional options that can be ignored if unsupported, unlike regular options
     ];
 

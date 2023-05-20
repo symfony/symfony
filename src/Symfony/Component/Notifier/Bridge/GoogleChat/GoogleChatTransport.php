@@ -77,26 +77,20 @@ final class GoogleChatTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
-        if ($message->getOptions() && !$message->getOptions() instanceof GoogleChatOptions) {
+        if (($options = $message->getOptions()) && !$options instanceof GoogleChatOptions) {
             throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, GoogleChatOptions::class));
         }
 
-        $opts = $message->getOptions();
-        if (!$opts) {
+        if (!$options) {
             if ($notification = $message->getNotification()) {
-                $opts = GoogleChatOptions::fromNotification($notification);
+                $options = GoogleChatOptions::fromNotification($notification);
             } else {
-                $opts = GoogleChatOptions::fromMessage($message);
+                $options = GoogleChatOptions::fromMessage($message);
             }
         }
 
-        if (null !== $this->threadKey && null === $opts->getThreadKey()) {
-            $opts->setThreadKey($this->threadKey);
-        }
+        $threadKey = $options->getThreadKey() ?: $this->threadKey;
 
-        $threadKey = $opts->getThreadKey() ?: $this->threadKey;
-
-        $options = $opts->toArray();
         $url = sprintf('https://%s/v1/spaces/%s/messages?key=%s&token=%s%s',
             $this->getEndpoint(),
             $this->space,
@@ -105,7 +99,7 @@ final class GoogleChatTransport extends AbstractTransport
             $threadKey ? '&threadKey='.urlencode($threadKey) : ''
         );
         $response = $this->client->request('POST', $url, [
-            'json' => array_filter($options),
+            'json' => array_filter($options->toArray()),
         ]);
 
         try {

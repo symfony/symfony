@@ -41,13 +41,11 @@ final class LineNotifyTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
-        $content = $message->getSubject();
-
         $endpoint = sprintf('https://%s/api/notify', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->token,
             'query' => [
-                'message' => $content,
+                'message' => $message->getSubject(),
             ],
         ]);
 

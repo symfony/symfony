@@ -60,13 +60,7 @@ final class OrangeSmsTransport extends AbstractTransport
         }
 
         $from = $message->getFrom() ?: $this->from;
-
         $url = 'https://'.$this->getEndpoint().'/smsmessaging/v1/outbound/'.urlencode('tel:'.$from).'/requests';
-        $headers = [
-            'Authorization' => 'Bearer '.$this->getAccessToken(),
-            'Content-Type' => 'application/json',
-        ];
-
         $payload = [
             'outboundSMSMessageRequest' => [
                 'address' => 'tel:'.$message->getPhone(),
@@ -82,7 +76,7 @@ final class OrangeSmsTransport extends AbstractTransport
         }
 
         $response = $this->client->request('POST', $url, [
-            'headers' => $headers,
+            'auth_bearer' => $this->getAccessToken(),
             'json' => $payload,
         ]);
 

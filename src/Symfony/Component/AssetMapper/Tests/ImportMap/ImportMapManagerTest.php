@@ -14,10 +14,14 @@ namespace Symfony\Component\AssetMapper\Tests\ImportMap;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\AssetMapper;
 use Symfony\Component\AssetMapper\AssetMapperCompiler;
+use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\AssetMapperRepository;
 use Symfony\Component\AssetMapper\Compiler\JavaScriptImportPathCompiler;
+use Symfony\Component\AssetMapper\Factory\MappedAssetFactory;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\AssetMapper\ImportMap\PackageRequireOptions;
+use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolver;
+use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -26,6 +30,7 @@ class ImportMapManagerTest extends TestCase
 {
     private MockHttpClient $httpClient;
     private Filesystem $filesystem;
+    private AssetMapperInterface $assetMapper;
 
     protected function setUp(): void
     {
@@ -33,6 +38,10 @@ class ImportMapManagerTest extends TestCase
         if (!file_exists(__DIR__.'/../fixtures/importmaps_for_writing')) {
             $this->filesystem->mkdir(__DIR__.'/../fixtures/importmaps_for_writing');
         }
+        if (!file_exists(__DIR__.'/../fixtures/importmaps_for_writing/assets')) {
+            $this->filesystem->mkdir(__DIR__.'/../fixtures/importmaps_for_writing/assets');
+        }
+        file_put_contents(__DIR__.'/../fixtures/importmaps_for_writing/assets/some_file.js', '// some_file.js contents');
     }
 
     protected function tearDown(): void
@@ -68,7 +77,8 @@ class ImportMapManagerTest extends TestCase
             '/assets/pizza/index.js' => '/assets/pizza/index-b3fb5ee31adaf5e1b32d28edf1ab8e7a.js',
             '/assets/popcorn.js' => '/assets/popcorn-c0778b84ef9893592385aebc95a2896e.js',
             '/assets/imported_async.js' => '/assets/imported_async-8f0cd418bfeb0cf63826e09a4474a81c.js',
-            'other_app' => '/assets/namespaced_assets2/app2-344d0d513d424647e7d8a394ffe5e4b5.js',
+            'other_app' => '/assets/namespaced_assets2/app2-d5bf10c20bf9a0b77e67d78fcac301c5.js',
+            '/assets/namespaced_assets2/imported.js' => '/assets/namespaced_assets2/imported-9ab37dabcfe317fba77123a4e573d53b.js',
         ]], json_decode($manager->getImportMapJson(), true));
     }
 
@@ -252,6 +262,18 @@ class ImportMapManagerTest extends TestCase
             'expectedImportMap' => [
                 'lodash' => [
                     'url' => 'https://ga.jspm.io/npm:lodash@1.2.3/lodash.js',
+                ],
+            ],
+            'expectedDownloadedFiles' => [],
+        ];
+
+        yield 'single_package_with_a_path' => [
+            'packages' => [new PackageRequireOptions('some/module', path: __DIR__.'/../fixtures/importmaps_for_writing/assets/some_file.js')],
+            'expectedInstallRequest' => [],
+            'responseMap' => [],
+            'expectedImportMap' => [
+                'some/module' => [
+                    'path' => 'some_file.js',
                 ],
             ],
             'expectedDownloadedFiles' => [],
@@ -462,11 +484,14 @@ class ImportMapManagerTest extends TestCase
 
     private function createImportMapManager(array $dirs, string $rootDir, string $publicPrefix = '/assets/', string $publicDirName = 'public'): ImportMapManager
     {
-        $mapper = $this->createAssetMapper($dirs, $rootDir, $publicPrefix, $publicDirName);
+        $pathResolver = new PublicAssetsPathResolver($rootDir, $publicPrefix, $publicDirName);
+
+        $mapper = $this->createAssetMapper($pathResolver, $dirs, $rootDir);
         $this->httpClient = new MockHttpClient();
 
         return new ImportMapManager(
             $mapper,
+            $pathResolver,
             $rootDir.'/importmap.php',
             $rootDir.'/assets/vendor',
             ImportMapManager::PROVIDER_JSPM,
@@ -474,20 +499,22 @@ class ImportMapManagerTest extends TestCase
         );
     }
 
-    private function createAssetMapper(array $dirs, string $rootDir, string $publicPrefix = '/assets/', string $publicDirName = 'public'): AssetMapper
+    private function createAssetMapper(PublicAssetsPathResolverInterface $pathResolver, array $dirs, string $rootDir): AssetMapper
     {
         $repository = new AssetMapperRepository($dirs, $rootDir);
 
-        $compiler = new AssetMapperCompiler([
-            new JavaScriptImportPathCompiler(),
-        ]);
-
-        return new AssetMapper(
-            $repository,
-            $compiler,
-            $rootDir,
-            $publicPrefix,
-            $publicDirName,
+        $compiler = new AssetMapperCompiler(
+            [new JavaScriptImportPathCompiler()],
+            fn () => $this->assetMapper
         );
+        $factory = new MappedAssetFactory($pathResolver, $compiler);
+
+        $this->assetMapper = new AssetMapper(
+            $repository,
+            $factory,
+            $pathResolver
+        );
+
+        return $this->assetMapper;
     }
 }

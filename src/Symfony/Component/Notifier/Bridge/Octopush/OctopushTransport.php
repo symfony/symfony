@@ -64,9 +64,6 @@ final class OctopushTransport extends AbstractTransport
         $endpoint = sprintf('https://%s/api/sms/json', $this->getEndpoint());
 
         $response = $this->client->request('POST', $endpoint, [
-            'headers' => [
-                'content_type' => 'multipart/form-data',
-            ],
             'body' => [
                 'user_login' => $this->userLogin,
                 'api_key' => $this->apiKey,

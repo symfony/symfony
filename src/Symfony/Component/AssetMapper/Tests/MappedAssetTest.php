@@ -20,7 +20,7 @@ class MappedAssetTest extends TestCase
     {
         $asset = new MappedAsset('foo.css');
 
-        $this->assertSame('foo.css', $asset->logicalPath);
+        $this->assertSame('foo.css', $asset->getLogicalPath());
     }
 
     public function testGetPublicPath()
@@ -44,9 +44,10 @@ class MappedAssetTest extends TestCase
      */
     public function testGetExtension(string $filename, string $expectedExtension)
     {
-        $asset = new MappedAsset($filename);
+        $asset = new MappedAsset('anything');
+        $asset->setPublicPathWithoutDigest($filename);
 
-        $this->assertSame($expectedExtension, $asset->getExtension());
+        $this->assertSame($expectedExtension, $asset->getPublicExtension());
     }
 
     public static function getExtensionTests(): iterable
@@ -61,13 +62,6 @@ class MappedAssetTest extends TestCase
         $asset = new MappedAsset('foo.css');
         $asset->setSourcePath('/path/to/source.css');
         $this->assertSame('/path/to/source.css', $asset->getSourcePath());
-    }
-
-    public function testGetMimeType()
-    {
-        $asset = new MappedAsset('foo.css');
-        $asset->setMimeType('text/css');
-        $this->assertSame('text/css', $asset->getMimeType());
     }
 
     public function testGetDigest()

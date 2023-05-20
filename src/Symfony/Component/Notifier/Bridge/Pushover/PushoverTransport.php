@@ -39,7 +39,7 @@ final class PushoverTransport extends AbstractTransport
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof PushMessage;
+        return $message instanceof PushMessage && (null === $message->getOptions() || $message->getOptions() instanceof PushoverOptions);
     }
 
     public function __toString(): string
@@ -53,14 +53,13 @@ final class PushoverTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, PushMessage::class, $message);
         }
 
-        $opts = $message->getOptions();
-        $options = $opts ? $opts->toArray() : [];
+        $options = $message->getOptions()?->toArray() ?? [];
         $options['message'] = $message->getContent();
         $options['title'] = $message->getSubject();
         $options['token'] = $this->appToken;
         $options['user'] = $this->userKey;
 
-        $endpoint = sprintf('https://%s/1/messages.json', self::HOST);
+        $endpoint = sprintf('https://%s/1/messages.json', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'body' => $options,
         ]);

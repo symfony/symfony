@@ -125,7 +125,7 @@ class TextDescriptor extends Descriptor
         $options['output']->table($tableHeaders, $tableRows);
     }
 
-    protected function describeContainerTags(ContainerBuilder $builder, array $options = []): void
+    protected function describeContainerTags(ContainerBuilder $container, array $options = []): void
     {
         $showHidden = isset($options['show_hidden']) && $options['show_hidden'];
 
@@ -135,22 +135,22 @@ class TextDescriptor extends Descriptor
             $options['output']->title('Symfony Container Tags');
         }
 
-        foreach ($this->findDefinitionsByTag($builder, $showHidden) as $tag => $definitions) {
+        foreach ($this->findDefinitionsByTag($container, $showHidden) as $tag => $definitions) {
             $options['output']->section(sprintf('"%s" tag', $tag));
             $options['output']->listing(array_keys($definitions));
         }
     }
 
-    protected function describeContainerService(object $service, array $options = [], ContainerBuilder $builder = null): void
+    protected function describeContainerService(object $service, array $options = [], ContainerBuilder $container = null): void
     {
         if (!isset($options['id'])) {
             throw new \InvalidArgumentException('An "id" option must be provided.');
         }
 
         if ($service instanceof Alias) {
-            $this->describeContainerAlias($service, $options, $builder);
+            $this->describeContainerAlias($service, $options, $container);
         } elseif ($service instanceof Definition) {
-            $this->describeContainerDefinition($service, $options, $builder);
+            $this->describeContainerDefinition($service, $options, $container);
         } else {
             $options['output']->title(sprintf('Information for Service "<info>%s</info>"', $options['id']));
             $options['output']->table(
@@ -162,7 +162,7 @@ class TextDescriptor extends Descriptor
         }
     }
 
-    protected function describeContainerServices(ContainerBuilder $builder, array $options = []): void
+    protected function describeContainerServices(ContainerBuilder $container, array $options = []): void
     {
         $showHidden = isset($options['show_hidden']) && $options['show_hidden'];
         $showTag = $options['tag'] ?? null;
@@ -180,8 +180,8 @@ class TextDescriptor extends Descriptor
         $options['output']->title($title);
 
         $serviceIds = isset($options['tag']) && $options['tag']
-            ? $this->sortTaggedServicesByPriority($builder->findTaggedServiceIds($options['tag']))
-            : $this->sortServiceIds($builder->getServiceIds());
+            ? $this->sortTaggedServicesByPriority($container->findTaggedServiceIds($options['tag']))
+            : $this->sortServiceIds($container->getServiceIds());
         $maxTags = [];
 
         if (isset($options['filter'])) {
@@ -189,7 +189,7 @@ class TextDescriptor extends Descriptor
         }
 
         foreach ($serviceIds as $key => $serviceId) {
-            $definition = $this->resolveServiceDefinition($builder, $serviceId);
+            $definition = $this->resolveServiceDefinition($container, $serviceId);
 
             // filter out hidden services unless shown explicitly
             if ($showHidden xor '.' === ($serviceId[0] ?? null)) {
@@ -221,7 +221,7 @@ class TextDescriptor extends Descriptor
         $tableRows = [];
         $rawOutput = isset($options['raw_text']) && $options['raw_text'];
         foreach ($serviceIds as $serviceId) {
-            $definition = $this->resolveServiceDefinition($builder, $serviceId);
+            $definition = $this->resolveServiceDefinition($container, $serviceId);
 
             $styledServiceId = $rawOutput ? $serviceId : sprintf('<fg=cyan>%s</fg=cyan>', OutputFormatter::escape($serviceId));
             if ($definition instanceof Definition) {
@@ -251,7 +251,7 @@ class TextDescriptor extends Descriptor
         $options['output']->table($tableHeaders, $tableRows);
     }
 
-    protected function describeContainerDefinition(Definition $definition, array $options = [], ContainerBuilder $builder = null): void
+    protected function describeContainerDefinition(Definition $definition, array $options = [], ContainerBuilder $container = null): void
     {
         if (isset($options['id'])) {
             $options['output']->title(sprintf('Information for Service "<info>%s</info>"', $options['id']));
@@ -358,15 +358,15 @@ class TextDescriptor extends Descriptor
             $tableRows[] = ['Arguments', implode("\n", $argumentsInformation)];
         }
 
-        $inEdges = null !== $builder && isset($options['id']) ? $this->getServiceEdges($builder, $options['id']) : [];
+        $inEdges = null !== $container && isset($options['id']) ? $this->getServiceEdges($container, $options['id']) : [];
         $tableRows[] = ['Usages', $inEdges ? implode(\PHP_EOL, $inEdges) : 'none'];
 
         $options['output']->table($tableHeaders, $tableRows);
     }
 
-    protected function describeContainerDeprecations(ContainerBuilder $builder, array $options = []): void
+    protected function describeContainerDeprecations(ContainerBuilder $container, array $options = []): void
     {
-        $containerDeprecationFilePath = sprintf('%s/%sDeprecations.log', $builder->getParameter('kernel.build_dir'), $builder->getParameter('kernel.container_class'));
+        $containerDeprecationFilePath = sprintf('%s/%sDeprecations.log', $container->getParameter('kernel.build_dir'), $container->getParameter('kernel.container_class'));
         if (!file_exists($containerDeprecationFilePath)) {
             $options['output']->warning('The deprecation file does not exist, please try warming the cache first.');
 
@@ -390,7 +390,7 @@ class TextDescriptor extends Descriptor
         $options['output']->listing($formattedLogs);
     }
 
-    protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $builder = null): void
+    protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $container = null): void
     {
         if ($alias->isPublic() && !$alias->isPrivate()) {
             $options['output']->comment(sprintf('This service is a <info>public</info> alias for the service <info>%s</info>', (string) $alias));
@@ -398,11 +398,11 @@ class TextDescriptor extends Descriptor
             $options['output']->comment(sprintf('This service is a <comment>private</comment> alias for the service <info>%s</info>', (string) $alias));
         }
 
-        if (!$builder) {
+        if (!$container) {
             return;
         }
 
-        $this->describeContainerDefinition($builder->getDefinition((string) $alias), array_merge($options, ['id' => (string) $alias]), $builder);
+        $this->describeContainerDefinition($container->getDefinition((string) $alias), array_merge($options, ['id' => (string) $alias]), $container);
     }
 
     protected function describeContainerParameter(mixed $parameter, array $options = []): void

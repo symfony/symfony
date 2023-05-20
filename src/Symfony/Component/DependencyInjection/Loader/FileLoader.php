@@ -262,7 +262,7 @@ abstract class FileLoader extends BaseFileLoader
                 continue;
             }
 
-            if (!str_ends_with($path, '.php') || !$info->isReadable()) {
+            if (!str_ends_with($path, '.php')) {
                 continue;
             }
             $class = $namespace.ltrim(str_replace('/', '\\', substr($path, $prefixLen, -4)), '\\');

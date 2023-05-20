@@ -573,10 +573,26 @@ class PropertyAccessorTest extends TestCase
         yield [(object) ['foo' => null], 'foo?.bar.baz', null];
         yield [(object) ['foo' => (object) ['bar' => null]], 'foo?.bar?.baz', null];
         yield [(object) ['foo' => (object) ['bar' => null]], 'foo.bar?.baz', null];
+
+        yield from self::getNullSafeIndexPaths();
+    }
+
+    public static function getNullSafeIndexPaths(): iterable
+    {
         yield [(object) ['foo' => ['bar' => null]], 'foo[bar?].baz', null];
         yield [[], '[foo?]', null];
         yield [['foo' => ['firstName' => 'Bernhard']], '[foo][bar?]', null];
         yield [['foo' => ['firstName' => 'Bernhard']], '[foo][bar?][baz?]', null];
+    }
+
+    /**
+     * @dataProvider getNullSafeIndexPaths
+     */
+    public function testNullSafeIndexWithThrowOnInvalidIndex($objectOrArray, $path, $value)
+    {
+        $this->propertyAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS, PropertyAccessor::THROW_ON_INVALID_INDEX | PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH);
+
+        $this->assertSame($value, $this->propertyAccessor->getValue($objectOrArray, $path));
     }
 
     public function testTicket5755()

@@ -13,6 +13,7 @@ namespace Symfony\Component\AssetMapper\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\AssetMapperRepository;
+use Symfony\Component\Finder\Glob;
 
 class AssetMapperRepositoryTest extends TestCase
 {
@@ -69,6 +70,7 @@ class AssetMapperRepositoryTest extends TestCase
     public function testFindLogicalPath()
     {
         $repository = new AssetMapperRepository([
+            'dir' => '',
             'dir1' => 'some_namespace',
             'dir2' => '',
         ], __DIR__.'/fixtures');
@@ -127,5 +129,37 @@ class AssetMapperRepositoryTest extends TestCase
         $normalizedActualAssets = array_map('realpath', $actualAssets);
 
         $this->assertEquals($normalizedExpectedAllAssets, $normalizedActualAssets);
+    }
+
+    public function testExcludedPaths()
+    {
+        $excludedPatterns = [
+            '*/subdir/*',
+            '*/*3.css',
+            '*/*.digested.*',
+        ];
+        $excludedGlobs = array_map(function ($pattern) {
+            // globbed equally in FrameworkExtension
+            return Glob::toRegex($pattern, true, false);
+        }, $excludedPatterns);
+        $repository = new AssetMapperRepository([
+            'dir1' => '',
+            'dir2' => '',
+            'dir3' => '',
+        ], __DIR__.'/fixtures', $excludedGlobs);
+
+        $expectedAssets = [
+            'file1.css',
+            'file2.js',
+            'file4.js',
+            'test.gif.foo',
+        ];
+
+        $actualAssets = array_keys($repository->all());
+        sort($actualAssets);
+        $this->assertEquals($expectedAssets, $actualAssets);
+
+        $this->assertNull($repository->find('file3.css'));
+        $this->assertNull($repository->findLogicalPath(__DIR__.'/fixtures/dir2/file3.css'));
     }
 }

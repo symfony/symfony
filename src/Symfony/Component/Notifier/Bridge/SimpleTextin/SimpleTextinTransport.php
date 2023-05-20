@@ -40,17 +40,12 @@ final class SimpleTextinTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        $queryParameters = [];
-        if ($this->from) {
-            $queryParameters['from'] = $this->from;
-        }
-
-        return sprintf('simpletextin://%s', $this->getEndpoint()).($queryParameters ? '?'.http_build_query($queryParameters) : '');
+        return sprintf('simpletextin://%s%s', $this->getEndpoint(), null !== $this->from ? '?from='.$this->from : '');
     }
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof SmsMessage && (null === $message->getOptions() || $message->getOptions() instanceof SimpleTextinOptions);
+        return $message instanceof SmsMessage;
     }
 
     /**
@@ -63,23 +58,14 @@ final class SimpleTextinTransport extends AbstractTransport
         }
         $endpoint = sprintf('https://%s/v2/api/messages', $this->getEndpoint());
 
-        $opts = $message->getOptions();
-        $options = $opts ? $opts->toArray() : [];
+        $options = [];
         $options['text'] = $message->getSubject();
         $options['contactPhone'] = $message->getPhone();
         $options['mode'] = 'AUTO';
+        $options['accountPhone'] = $message->getFrom() ?: $this->from;
 
-        if (!isset($options['from']) && $this->from) {
-            $options['from'] = $this->from;
-        }
-
-        if (isset($options['from']) && !preg_match('/^\+?[1-9]\d{1,14}$/', $options['from'])) {
-            throw new InvalidArgumentException(sprintf('The "From" number "%s" is not a valid phone number.', $this->from));
-        }
-
-        if ($options['from'] ?? false) {
-            $options['accountPhone'] = $options['from'];
-            unset($options['from']);
+        if (null !== $options['accountPhone'] && !preg_match('/^\+?[1-9]\d{1,14}$/', $options['accountPhone'])) {
+            throw new InvalidArgumentException(sprintf('The "From" number "%s" is not a valid phone number.', $options['accountPhone']));
         }
 
         $response = $this->client->request('POST', $endpoint, [

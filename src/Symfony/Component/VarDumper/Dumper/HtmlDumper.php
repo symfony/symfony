@@ -163,18 +163,16 @@ class HtmlDumper extends CliDumper
 <script>
 Sfdump = window.Sfdump || (function (doc) {
 
-var refStyle = doc.createElement('style'),
-    rxEsc = /([.*+?^${}()|\[\]\/\\])/g,
+if (doc.body instanceof HTMLElement) {
+    doc.body.classList.add('sf-js-enabled');
+}
+
+var rxEsc = /([.*+?^${}()|\[\]\/\\])/g,
     idRx = /\bsf-dump-\d+-ref[012]\w+\b/,
     keyHint = 0 <= navigator.platform.toUpperCase().indexOf('MAC') ? 'Cmd' : 'Ctrl',
     addEventListener = function (e, n, cb) {
         e.addEventListener(n, cb, false);
     };
-
-refStyle.innerHTML = 'pre.sf-dump .sf-dump-compact, .sf-dump-str-collapse .sf-dump-str-collapse, .sf-dump-str-expand .sf-dump-str-expand { display: none; }';
-doc.head.appendChild(refStyle);
-refStyle = doc.createElement('style');
-doc.head.appendChild(refStyle);
 
 if (!doc.addEventListener) {
     addEventListener = function (element, eventName, callback) {
@@ -355,19 +353,9 @@ return function (root, x) {
     function xpathHasClass(className) {
         return "contains(concat(' ', normalize-space(@class), ' '), ' " + className +" ')";
     }
-    addEventListener(root, 'mouseover', function (e) {
-        if ('' != refStyle.innerHTML) {
-            refStyle.innerHTML = '';
-        }
-    });
     a('mouseover', function (a, e, c) {
         if (c) {
             e.target.style.cursor = "pointer";
-        } else if (a = idRx.exec(a.className)) {
-            try {
-                refStyle.innerHTML = 'pre.sf-dump .'+a[0]+'{background-color: #B729D9; color: #FFF !important; border-radius: 2px}';
-            } catch (e) {
-            }
         }
     });
     a('click', function (a, e, c) {
@@ -436,6 +424,7 @@ return function (root, x) {
             }
         } else if (/\bsf-dump-ref\b/.test(elt.className) && (a = elt.getAttribute('href'))) {
             a = a.slice(1);
+            elt.className += ' sf-dump-hover';
             elt.className += ' '+a;
 
             if (/[\[{]$/.test(elt.previousSibling.nodeValue)) {
@@ -652,6 +641,16 @@ return function (root, x) {
 
 })(document);
 </script><style>
+.sf-js-enabled pre.sf-dump .sf-dump-compact,
+.sf-js-enabled .sf-dump-str-collapse .sf-dump-str-collapse,
+.sf-js-enabled .sf-dump-str-expand .sf-dump-str-expand {
+    display: none;
+}
+.sf-dump-hover:hover {
+    background-color: #B729D9;
+    color: #FFF !important;
+    border-radius: 2px;
+}
 pre.sf-dump {
     display: block;
     white-space: pre;
@@ -850,7 +849,7 @@ EOHTML
 
     protected function style(string $style, string $value, array $attr = []): string
     {
-        if ('' === $value) {
+        if ('' === $value && ('label' !== $style || !isset($attr['file']) && !isset($attr['href']))) {
             return '';
         }
 
@@ -904,7 +903,7 @@ EOHTML
         }
 
         $map = static::$controlCharsMap;
-        $v = "<span class=sf-dump-{$style}>".preg_replace_callback(static::$controlCharsRx, function ($c) use ($map) {
+        $v = '<span class=sf-dump-'.('label' === $style ? 'default' : $style).'>'.preg_replace_callback(static::$controlCharsRx, function ($c) use ($map) {
             $s = $b = '<span class="sf-dump-default';
             $c = $c[$i = 0];
             if ($ns = "\r" === $c[$i] || "\n" === $c[$i]) {
@@ -928,7 +927,7 @@ EOHTML
 
         if (!($attr['binary'] ?? false)) {
             $v = preg_replace_callback(static::$unicodeCharsRx, function ($c) {
-                return '<span class="sf-dump-default>\u{'.strtoupper(dechex(mb_ord($c[0]))).'}</span>';
+                return '<span class=sf-dump-default>\u{'.strtoupper(dechex(mb_ord($c[0]))).'}</span>';
             }, $v);
         }
 
@@ -936,6 +935,9 @@ EOHTML
             $attr['href'] = $href;
         }
         if (isset($attr['href'])) {
+            if ('label' === $style) {
+                $v .= '^';
+            }
             $target = isset($attr['file']) ? '' : ' target="_blank"';
             $v = sprintf('<a href="%s"%s rel="noopener noreferrer">%s</a>', esc($this->utf8Encode($attr['href'])), $target, $v);
         }

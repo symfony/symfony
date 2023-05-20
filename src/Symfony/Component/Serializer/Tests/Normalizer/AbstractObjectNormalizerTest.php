@@ -18,6 +18,7 @@ use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Annotation\Context;
+use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Serializer\Annotation\SerializedPath;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
@@ -171,6 +172,53 @@ class AbstractObjectNormalizerTest extends TestCase
         $normalizer->denormalize($data, DuplicateKeyNestedDummy::class, 'any');
     }
 
+    public function testDenormalizeWithNestedAttributesInConstructor()
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadata();
+        $data = [
+            'one' => [
+                'two' => [
+                    'three' => 'foo',
+                ],
+                'four' => 'quux',
+            ],
+            'foo' => 'notfoo',
+            'baz' => 'baz',
+        ];
+        $test = $normalizer->denormalize($data, NestedDummyWithConstructor::class, 'any');
+        $this->assertSame('foo', $test->foo);
+        $this->assertSame('quux', $test->quux);
+        $this->assertSame('notfoo', $test->notfoo);
+        $this->assertSame('baz', $test->baz);
+    }
+
+    public function testDenormalizeWithNestedAttributesInConstructorAndDiscriminatorMap()
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadata();
+        $data = [
+            'one' => [
+                'two' => [
+                    'three' => 'foo',
+                ],
+                'four' => 'quux',
+            ],
+            'foo' => 'notfoo',
+            'baz' => 'baz',
+        ];
+
+        $test1 = $normalizer->denormalize($data + ['type' => 'first'], AbstractNestedDummyWithConstructorAndDiscriminator::class, 'any');
+        $this->assertInstanceOf(FirstNestedDummyWithConstructorAndDiscriminator::class, $test1);
+        $this->assertSame('foo', $test1->foo);
+        $this->assertSame('notfoo', $test1->notfoo);
+        $this->assertSame('baz', $test1->baz);
+
+        $test2 = $normalizer->denormalize($data + ['type' => 'second'], AbstractNestedDummyWithConstructorAndDiscriminator::class, 'any');
+        $this->assertInstanceOf(SecondNestedDummyWithConstructorAndDiscriminator::class, $test2);
+        $this->assertSame('quux', $test2->quux);
+        $this->assertSame('notfoo', $test2->notfoo);
+        $this->assertSame('baz', $test2->baz);
+    }
+
     public function testNormalizeWithNestedAttributesMixingArrayTypes()
     {
         $this->expectException(LogicException::class);
@@ -234,6 +282,52 @@ class AbstractObjectNormalizerTest extends TestCase
         $normalizer = new ObjectNormalizer();
         $test = $normalizer->normalize($foobar, 'any');
         $this->assertSame($data, $test);
+    }
+
+    public function testNormalizeWithNestedAttributesInConstructor()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
+
+        $test = $normalizer->normalize(new NestedDummyWithConstructor('foo', 'quux', 'notfoo', 'baz'), 'any');
+        $this->assertSame([
+            'one' => [
+                'two' => [
+                    'three' => 'foo',
+                ],
+                'four' => 'quux',
+            ],
+            'foo' => 'notfoo',
+            'baz' => 'baz',
+        ], $test);
+    }
+
+    public function testNormalizeWithNestedAttributesInConstructorAndDiscriminatorMap()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
+
+        $test1 = $normalizer->normalize(new FirstNestedDummyWithConstructorAndDiscriminator('foo', 'notfoo', 'baz'), 'any');
+        $this->assertSame([
+            'type' => 'first',
+            'one' => [
+                'two' => [
+                    'three' => 'foo',
+                ],
+            ],
+            'foo' => 'notfoo',
+            'baz' => 'baz',
+        ], $test1);
+
+        $test2 = $normalizer->normalize(new SecondNestedDummyWithConstructorAndDiscriminator('quux', 'notfoo', 'baz'), 'any');
+        $this->assertSame([
+            'type' => 'second',
+            'one' => [
+                'four' => 'quux',
+            ],
+            'foo' => 'notfoo',
+            'baz' => 'baz',
+        ], $test2);
     }
 
     public function testDenormalizeCollectionDecodedFromXmlWithOneChild()
@@ -666,6 +760,78 @@ class NestedDummy
     public $baz;
 }
 
+class NestedDummyWithConstructor
+{
+    public function __construct(
+        /**
+         * @SerializedPath("[one][two][three]")
+         */
+        public $foo,
+
+        /**
+         * @SerializedPath("[one][four]")
+         */
+        public $quux,
+
+        /**
+         * @SerializedPath("[foo]")
+         */
+        public $notfoo,
+
+        public $baz,
+    ) {
+    }
+}
+
+/**
+ * @DiscriminatorMap(typeProperty="type", mapping={
+ *     "first" = FirstNestedDummyWithConstructorAndDiscriminator::class,
+ *     "second" = SecondNestedDummyWithConstructorAndDiscriminator::class,
+ * })
+ */
+abstract class AbstractNestedDummyWithConstructorAndDiscriminator
+{
+    public function __construct(
+        /**
+         * @SerializedPath("[foo]")
+         */
+        public $notfoo,
+
+        public $baz,
+    ) {
+    }
+}
+
+class FirstNestedDummyWithConstructorAndDiscriminator extends AbstractNestedDummyWithConstructorAndDiscriminator
+{
+    public function __construct(
+        /**
+         * @SerializedPath("[one][two][three]")
+         */
+        public $foo,
+
+        $notfoo,
+        $baz,
+    ) {
+        parent::__construct($notfoo, $baz);
+    }
+}
+
+class SecondNestedDummyWithConstructorAndDiscriminator extends AbstractNestedDummyWithConstructorAndDiscriminator
+{
+    public function __construct(
+        /**
+         * @SerializedPath("[one][four]")
+         */
+        public $quux,
+
+        $notfoo,
+        $baz,
+    ) {
+        parent::__construct($notfoo, $baz);
+    }
+}
+
 class DuplicateKeyNestedDummy
 {
     /**
@@ -721,7 +887,9 @@ class AbstractObjectNormalizerWithMetadata extends AbstractObjectNormalizer
 
     protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = [])
     {
-        $object->$attribute = $value;
+        if (property_exists($object, $attribute)) {
+            $object->$attribute = $value;
+        }
     }
 }
 

@@ -21,11 +21,6 @@ namespace Symfony\Component\AssetMapper;
 interface AssetMapperInterface
 {
     /**
-     * The path that should be prefixed on all asset paths to point to the output location.
-     */
-    public function getPublicPrefix(): string;
-
-    /**
      * Given the logical path (e.g. path relative to a mapped directory), return the asset.
      */
     public function getAsset(string $logicalPath): ?MappedAsset;
@@ -46,9 +41,4 @@ interface AssetMapperInterface
      * Returns the public path for this asset, if it can be found.
      */
     public function getPublicPath(string $logicalPath): ?string;
-
-    /**
-     * Returns the filesystem path to where assets are stored when compiled.
-     */
-    public function getPublicAssetsFilesystemPath(): string;
 }

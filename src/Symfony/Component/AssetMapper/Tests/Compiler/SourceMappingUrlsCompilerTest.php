@@ -31,12 +31,20 @@ class SourceMappingUrlsCompilerTest extends TestCase
                 switch ($path) {
                     case 'foo.js.map':
                         $asset = new MappedAsset('foo.js.map');
+                        $asset->setPublicPathWithoutDigest('/assets/foo.js.map');
                         $asset->setPublicPath('/assets/foo.123456.js.map');
 
                         return $asset;
                     case 'styles/bar.css.map':
                         $asset = new MappedAsset('styles/bar.css.map');
+                        $asset->setPublicPathWithoutDigest('/assets/styles/bar.css.map');
                         $asset->setPublicPath('/assets/styles/bar.abcd123.css.map');
+
+                        return $asset;
+                    case 'sourcemaps/baz.css.map':
+                        $asset = new MappedAsset('sourcemaps/baz.css.map');
+                        $asset->setPublicPathWithoutDigest('/assets/sourcemaps/baz.css.map');
+                        $asset->setPublicPath('/assets/sourcemaps/baz.987fedc.css.map');
 
                         return $asset;
                     default:
@@ -46,9 +54,13 @@ class SourceMappingUrlsCompilerTest extends TestCase
 
         $compiler = new SourceMappingUrlsCompiler();
         $asset = new MappedAsset($sourceLogicalName);
+        $asset->setPublicPathWithoutDigest('/assets/'.$sourceLogicalName);
         $this->assertSame($expectedOutput, $compiler->compile($input, $asset, $assetMapper));
-        $assetDependencyLogicalPaths = array_map(fn (AssetDependency $dependency) => $dependency->asset->logicalPath, $asset->getDependencies());
+        $assetDependencyLogicalPaths = array_map(fn (AssetDependency $dependency) => $dependency->asset->getLogicalPath(), $asset->getDependencies());
         $this->assertSame($expectedDependencies, $assetDependencyLogicalPaths);
+        if ($expectedDependencies) {
+            $this->assertTrue($asset->getDependencies()[0]->isContentDependency);
+        }
     }
 
     public static function provideCompileTests(): iterable
@@ -62,7 +74,7 @@ class SourceMappingUrlsCompilerTest extends TestCase
             ,
             'expectedOutput' => <<<EOF
                 var fun;
-                //# sourceMappingURL=/assets/foo.123456.js.map
+                //# sourceMappingURL=foo.123456.js.map
                 EOF
             ,
             'expectedDependencies' => ['foo.js.map'],
@@ -77,10 +89,25 @@ class SourceMappingUrlsCompilerTest extends TestCase
             ,
             'expectedOutput' => <<<EOF
                 .class { color: green; }
-                /*# sourceMappingURL=/assets/styles/bar.abcd123.css.map */
+                /*# sourceMappingURL=bar.abcd123.css.map */
                 EOF
             ,
             'expectedDependencies' => ['styles/bar.css.map'],
+        ];
+
+        yield 'sourcemap_in_different_directory_resolves' => [
+            'sourceLogicalName' => 'styles/bar.css',
+            'input' => <<<EOF
+                .class { color: green; }
+                /*# sourceMappingURL=../sourcemaps/baz.css.map */
+                EOF
+            ,
+            'expectedOutput' => <<<EOF
+                .class { color: green; }
+                /*# sourceMappingURL=../sourcemaps/baz.987fedc.css.map */
+                EOF
+            ,
+            'expectedDependencies' => ['sourcemaps/baz.css.map'],
         ];
 
         yield 'no_sourcemap_found' => [

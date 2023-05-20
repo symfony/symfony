@@ -22,6 +22,7 @@ final class MessageContext
 {
     public function __construct(
         public readonly string $name,
+        public readonly string $id,
         public readonly TriggerInterface $trigger,
         public readonly \DateTimeImmutable $triggeredAt,
         public readonly ?\DateTimeImmutable $nextTriggerAt = null,

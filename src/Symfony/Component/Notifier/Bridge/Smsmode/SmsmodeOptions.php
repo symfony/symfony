@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Notifier\Bridge\SimpleTextin;
+namespace Symfony\Component\Notifier\Bridge\Smsmode;
 
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 
 /**
  * @author gnito-org <https://github.com/gnito-org>
  */
-final class SimpleTextinOptions implements MessageOptionsInterface
+final class SmsmodeOptions implements MessageOptionsInterface
 {
     private array $options;
 
@@ -25,35 +25,33 @@ final class SimpleTextinOptions implements MessageOptionsInterface
         $this->options = $options;
     }
 
-    public function getFrom(): ?string
-    {
-        return $this->options['from'] ?? null;
-    }
-
     public function getRecipientId(): ?string
     {
-        return $this->options['recipient_id'] ?? null;
+        return null;
     }
 
-    public function setFrom(string $from): self
+    /**
+     * @return $this
+     */
+    public function refClient(string $refClient): static
     {
-        $this->options['from'] = $from;
+        $this->options['refClient'] = $refClient;
 
         return $this;
     }
 
-    public function setRecipientId(string $id): self
+    /**
+     * @return $this
+     */
+    public function sentDate(string $sentDate): static
     {
-        $this->options['recipient_id'] = $id;
+        $this->options['sentDate'] = $sentDate;
 
         return $this;
     }
 
     public function toArray(): array
     {
-        $options = $this->options;
-        unset($options['recipient_id']);
-
-        return $options;
+        return $this->options;
     }
 }

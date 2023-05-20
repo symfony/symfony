@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Use `AllMySmsOptions` class
+
 6.2
 ---
 

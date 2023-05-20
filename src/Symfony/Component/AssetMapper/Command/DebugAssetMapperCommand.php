@@ -70,7 +70,7 @@ EOT
 
         $rows = [];
         foreach ($allAssets as $asset) {
-            $logicalPath = $asset->logicalPath;
+            $logicalPath = $asset->getLogicalPath();
             $sourcePath = $this->relativizePath($asset->getSourcePath());
 
             if (!$input->getOption('full')) {

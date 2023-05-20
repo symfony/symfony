@@ -45,8 +45,11 @@ class DumpListener implements EventSubscriberInterface
         $dumper = $this->dumper;
         $connection = $this->connection;
 
-        VarDumper::setHandler(static function ($var) use ($cloner, $dumper, $connection) {
+        VarDumper::setHandler(static function ($var, string $label = null) use ($cloner, $dumper, $connection) {
             $data = $cloner->cloneVar($var);
+            if (null !== $label) {
+                $data = $data->withContext(['label' => $label]);
+            }
 
             if (!$connection || !$connection->write($data)) {
                 $dumper->dump($data);

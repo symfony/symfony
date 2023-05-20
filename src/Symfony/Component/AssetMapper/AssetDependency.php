@@ -19,11 +19,20 @@ namespace Symfony\Component\AssetMapper;
 final class AssetDependency
 {
     /**
-     * @param bool $isLazy whether this dependency is immediately needed
+     * @param bool $isLazy              Whether the dependent asset will need to be loaded eagerly
+     *                                  by the parent asset (e.g. a CSS file that imports another
+     *                                  CSS file) or if it will be loaded lazily (e.g. an async
+     *                                  JavaScript import).
+     * @param bool $isContentDependency Whether the parent asset's content depends
+     *                                  on the child asset's content - e.g. if a CSS
+     *                                  file imports another CSS file, then the parent's
+     *                                  content depends on the child CSS asset, because
+     *                                  the child's digested filename will be included.
      */
     public function __construct(
         public readonly MappedAsset $asset,
-        public readonly bool $isLazy,
+        public readonly bool $isLazy = false,
+        public readonly bool $isContentDependency = true,
     ) {
     }
 }

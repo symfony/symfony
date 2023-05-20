@@ -46,7 +46,7 @@ final class MessageBirdTransport extends AbstractTransport
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof SmsMessage;
+        return $message instanceof SmsMessage && (null === $message->getOptions() || $message->getOptions() instanceof MessageBirdOptions);
     }
 
     protected function doSend(MessageInterface $message): SentMessage
@@ -55,16 +55,15 @@ final class MessageBirdTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $from = $message->getFrom() ?: $this->from;
+        $options = $message->getOptions()?->toArray() ?? [];
+        $options['originator'] = $message->getFrom() ?: $this->from;
+        $options['recipients'] = [$message->getPhone()];
+        $options['body'] = $message->getSubject();
 
         $endpoint = sprintf('https://%s/messages', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
-            'auth_basic' => 'AccessKey:'.$this->token,
-            'body' => [
-                'originator' => $from,
-                'recipients' => $message->getPhone(),
-                'body' => $message->getSubject(),
-            ],
+            'auth_basic' => ['AccessKey', $this->token],
+            'body' => array_filter($options),
         ]);
 
         try {

@@ -26,9 +26,13 @@ class CssAssetUrlCompilerTest extends TestCase
     {
         $compiler = new CssAssetUrlCompiler(false);
         $asset = new MappedAsset($sourceLogicalName);
+        $asset->setPublicPathWithoutDigest('/assets/'.$sourceLogicalName);
         $this->assertSame($expectedOutput, $compiler->compile($input, $asset, $this->createAssetMapper()));
-        $assetDependencyLogicalPaths = array_map(fn (AssetDependency $dependency) => $dependency->asset->logicalPath, $asset->getDependencies());
+        $assetDependencyLogicalPaths = array_map(fn (AssetDependency $dependency) => $dependency->asset->getLogicalPath(), $asset->getDependencies());
         $this->assertSame($expectedDependencies, $assetDependencyLogicalPaths);
+        if ($expectedDependencies) {
+            $this->assertTrue($asset->getDependencies()[0]->isContentDependency);
+        }
     }
 
     public static function provideCompileTests(): iterable
@@ -36,7 +40,7 @@ class CssAssetUrlCompilerTest extends TestCase
         yield 'simple_double_quotes' => [
             'sourceLogicalName' => 'styles.css',
             'input' => 'body { background: url("images/foo.png"); }',
-            'expectedOutput' => 'body { background: url("/assets/images/foo.123456.png"); }',
+            'expectedOutput' => 'body { background: url("images/foo.123456.png"); }',
             'expectedDependencies' => ['images/foo.png'],
         ];
 
@@ -50,7 +54,7 @@ class CssAssetUrlCompilerTest extends TestCase
             ,
             'expectedOutput' => <<<EOF
                 body {
-                    background: url("/assets/images/foo.123456.png");
+                    background: url("images/foo.123456.png");
                 }
                 EOF
             ,
@@ -60,28 +64,28 @@ class CssAssetUrlCompilerTest extends TestCase
         yield 'simple_single_quotes' => [
             'sourceLogicalName' => 'styles.css',
             'input' => 'body { background: url(\'images/foo.png\'); }',
-            'expectedOutput' => 'body { background: url("/assets/images/foo.123456.png"); }',
+            'expectedOutput' => 'body { background: url("images/foo.123456.png"); }',
             'expectedDependencies' => ['images/foo.png'],
         ];
 
         yield 'simple_no_quotes' => [
             'sourceLogicalName' => 'styles.css',
             'input' => 'body { background: url(images/foo.png); }',
-            'expectedOutput' => 'body { background: url("/assets/images/foo.123456.png"); }',
+            'expectedOutput' => 'body { background: url("images/foo.123456.png"); }',
             'expectedDependencies' => ['images/foo.png'],
         ];
 
         yield 'import_other_css_file' => [
             'sourceLogicalName' => 'styles.css',
             'input' => '@import url(more-styles.css)',
-            'expectedOutput' => '@import url("/assets/more-styles.abcd123.css")',
+            'expectedOutput' => '@import url("more-styles.abcd123.css")',
             'expectedDependencies' => ['more-styles.css'],
         ];
 
         yield 'move_up_a_directory' => [
             'sourceLogicalName' => 'styles/app.css',
             'input' => 'body { background: url("../images/foo.png"); }',
-            'expectedOutput' => 'body { background: url("/assets/images/foo.123456.png"); }',
+            'expectedOutput' => 'body { background: url("../images/foo.123456.png"); }',
             'expectedDependencies' => ['images/foo.png'],
         ];
 
@@ -153,11 +157,13 @@ class CssAssetUrlCompilerTest extends TestCase
                 switch ($path) {
                     case 'images/foo.png':
                         $asset = new MappedAsset('images/foo.png');
+                        $asset->setPublicPathWithoutDigest('/assets/images/foo.png');
                         $asset->setPublicPath('/assets/images/foo.123456.png');
 
                         return $asset;
                     case 'more-styles.css':
                         $asset = new MappedAsset('more-styles.css');
+                        $asset->setPublicPathWithoutDigest('/assets/more-styles.css');
                         $asset->setPublicPath('/assets/more-styles.abcd123.css');
 
                         return $asset;

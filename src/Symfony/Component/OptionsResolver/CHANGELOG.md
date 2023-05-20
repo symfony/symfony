@@ -4,7 +4,7 @@ CHANGELOG
 6.3
 ---
 
- * Add `OptionsResolver::ignoreUndefined()` to ignore not defined options while resolving
+ * Add `OptionsResolver::setIgnoreUndefined()` and `OptionConfigurator::ignoreUndefined()` to ignore not defined options while resolving
 
 6.0
 ---

@@ -269,17 +269,10 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     {
         $refs = [0];
         $cursor = new Cursor();
-        $label = $this->context['label'] ?? '';
-
-        if ($cursor->attr = $this->context[SourceContextProvider::class] ?? []) {
-            $cursor->attr['if_links'] = true;
-            $cursor->hashType = -1;
-            $dumper->dumpScalar($cursor, 'default', $label.'^');
-            $cursor->attr = ['if_links' => true];
-            $dumper->dumpScalar($cursor, 'default', ' ');
-            $cursor->hashType = 0;
-        }
-
+        $cursor->hashType = -1;
+        $cursor->attr = $this->context[SourceContextProvider::class] ?? [];
+        $dumper->dumpScalar($cursor, 'label', $this->context['label'] ?? '');
+        $cursor->hashType = 0;
         $this->dumpItem($dumper, $cursor, $refs, $this->data[$this->position][$this->key]);
     }
 

@@ -175,7 +175,7 @@ class Notification
     /**
      * @return list<string>
      */
-    public function getChannels(RecipientInterface $recipient): array
+    public function getChannels(): array
     {
         return $this->channels;
     }

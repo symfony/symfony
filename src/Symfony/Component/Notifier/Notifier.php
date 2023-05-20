@@ -70,7 +70,7 @@ final class Notifier implements NotifierInterface
      */
     private function getChannels(Notification $notification, RecipientInterface $recipient): iterable
     {
-        $channels = $notification->getChannels($recipient);
+        $channels = $notification->getChannels();
         if (!$channels) {
             $errorPrefix = sprintf('Unable to determine which channels to use to send the "%s" notification', $notification::class);
             $error = 'you should either pass channels in the constructor, override its "getChannels()" method';

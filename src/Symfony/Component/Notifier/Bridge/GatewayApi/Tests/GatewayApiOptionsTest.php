@@ -19,12 +19,12 @@ class GatewayApiOptionsTest extends TestCase
     public function testGatewayApiOptions()
     {
         $gatewayApiOptions = (new GatewayApiOptions())
-            ->class(123)
+            ->class('test_class')
             ->callbackUrl('test_callback_url')
             ->userRef('test_user_ref');
 
         self::assertSame([
-            'class' => 123,
+            'class' => 'test_class',
             'callback_url' => 'test_callback_url',
             'userref' => 'test_user_ref',
         ], $gatewayApiOptions->toArray());

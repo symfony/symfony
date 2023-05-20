@@ -19,6 +19,34 @@ where:
 - `APPLICATION_ID` is your application ID
 - `PRIORITY` is your priority (optional)
 
+Adding Options to a Message
+---------------------------
+
+With a Bandwidth Message, you can use the `BandwidthOptions` class to add
+[message options](https://dev.bandwidth.com/apis/messaging/#tag/Messages/operation/createMessage).
+
+```php
+use Symfony\Component\Notifier\Message\SmsMessage;
+use Symfony\Component\Notifier\Bridge\Bandwidth\BandwidthOptions;
+
+$sms = new SmsMessage('+1411111111', 'My message');
+
+$options = (new BandwidthOptions())
+    ->media(['foo'])
+    ->tag('tag')
+    ->accountId('account_id')
+    ->applicationId('application_id')
+    ->expiration('test_expiration')
+    ->priority('default')
+    // ...
+    ;
+
+// Add the custom options to the sms message and send the message
+$sms->options($options);
+
+$texter->send($sms);
+```
+
 Resources
 ---------
 

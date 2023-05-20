@@ -16,6 +16,29 @@ where:
  - `FROM` is the sender
  - `TYPE_QUALITY` is the quality of your message: `N` for high, `L` for medium, `LL` for low (default: `L`)
 
+Adding Options to a Message
+---------------------------
+
+With a Mobyt Message, you can use the `MobytOptions` class to add
+[message options](https://gatewayapi.com/docs/apis/rest/).
+
+```php
+use Symfony\Component\Notifier\Message\SmsMessage;
+use Symfony\Component\Notifier\Bridge\Mobyt\MobytOptions;
+
+$sms = new SmsMessage('+1411111111', 'My message');
+
+$options = (new MobytOptions())
+    ->messageType(MobytOptions::MESSAGE_TYPE_QUALITY_HIGH)
+    // ...
+    ;
+
+// Add the custom options to the sms message and send the message
+$sms->options($options);
+
+$texter->send($sms);
+```
+
 Resources
 ---------
 

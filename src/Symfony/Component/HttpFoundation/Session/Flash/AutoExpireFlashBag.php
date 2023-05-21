@@ -75,6 +75,13 @@ class AutoExpireFlashBag implements FlashBagInterface
         return \array_key_exists('display', $this->flashes) ? $this->flashes['display'] : [];
     }
 
+    public function peekMultiple(array $types): array
+    {
+        return \array_key_exists('display', $this->flashes)
+            ? array_intersect_key($this->flashes['display'], array_flip($types))
+            : [];
+    }
+
     public function get(string $type, array $default = []): array
     {
         $return = $default;

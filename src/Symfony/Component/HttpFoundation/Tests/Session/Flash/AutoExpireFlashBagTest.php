@@ -119,6 +119,31 @@ class AutoExpireFlashBagTest extends TestCase
         );
     }
 
+    public function testPeekMultiple()
+    {
+        $array = [
+            'new' => [
+                'notice' => 'Foo',
+                'error' => 'Bar',
+                'warning' => 'Baz',
+            ],
+        ];
+
+        $this->bag->initialize($array);
+        $this->assertEquals([
+            'notice' => 'Foo',
+            'warning' => 'Baz',
+            ], $this->bag->peekMultiple(['notice', 'warning'])
+        );
+
+        $this->assertEquals([
+            'notice' => 'Foo',
+            'error' => 'Bar',
+            'warning' => 'Baz',
+            ], $this->bag->peekAll()
+        );
+    }
+
     public function testGet()
     {
         $this->assertEquals([], $this->bag->get('non_existing'));

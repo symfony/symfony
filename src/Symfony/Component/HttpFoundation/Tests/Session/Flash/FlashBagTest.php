@@ -154,4 +154,25 @@ class FlashBagTest extends TestCase
             ], $this->bag->peekAll()
         );
     }
+
+    public function testPeekMultiple()
+    {
+        $this->bag->set('notice', 'Foo');
+        $this->bag->set('error', 'Bar');
+        $this->bag->set('warning', 'Baz');
+        $this->assertEquals([
+            'notice' => ['Foo'],
+            'warning' => ['Baz'],
+        ], $this->bag->peekMultiple(['notice', 'warning'])
+        );
+        $this->assertTrue($this->bag->has('notice'));
+        $this->assertTrue($this->bag->has('error'));
+        $this->assertTrue($this->bag->has('warning'));
+        $this->assertEquals([
+            'notice' => ['Foo'],
+            'error' => ['Bar'],
+            'warning' => ['Baz'],
+        ], $this->bag->peekAll()
+        );
+    }
 }

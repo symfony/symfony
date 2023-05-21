@@ -78,7 +78,7 @@ final class ArgumentResolver implements ArgumentResolverInterface
                 $representative = get_debug_type($representative);
             }
 
-            throw new \RuntimeException(sprintf('Controller "%s" requires that you provide a value for the "$%s" argument. Either the argument is nullable and no null value has been provided, no default value has been provided or because there is a non optional argument after this one.', $representative, $metadata->getName()));
+            throw new \RuntimeException(sprintf('Controller "%s" requires that you provide a value for the "$%s" argument. Either the argument is nullable and no null value has been provided, no default value has been provided or there is a non-optional argument after this one.', $representative, $metadata->getName()));
         }
 
         return $arguments;

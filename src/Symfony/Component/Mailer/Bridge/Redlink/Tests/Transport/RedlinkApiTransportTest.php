@@ -68,11 +68,7 @@ class RedlinkApiTransportTest extends TestCase
                         'status' => 200,
                         'uniqId' => '00d928f759',
                     ],
-                    'data' => [
-                        [
-                            'externalId' => 'test',
-                        ],
-                    ],
+                    'data' => [],
                 ]
             ), [
                 'http_code' => 200,
@@ -93,7 +89,7 @@ class RedlinkApiTransportTest extends TestCase
 
         $message = $transport->send($mail);
 
-        $this->assertSame('test', $message->getMessageId());
+        $this->assertNotEmpty($message->getMessageId());
     }
 
     public function testIncludeTagsAndHeadersInPayload()
@@ -103,8 +99,10 @@ class RedlinkApiTransportTest extends TestCase
             ->add(new MetadataHeader('custom', 'test'))
             ->add(new TagHeader('TagInHeaders'))
             ->addTextHeader('templateId', 1)
-            ->addParameterizedHeader('vars', 'foo@example.com', ['x' => 'test'])
-            ->addParameterizedHeader('vars', 'foo1@example.com', ['x1' => 'test1'])
+            ->addParameterizedHeader('messageIds', 'messageIds', [
+                'foo@example.com' => 'foo-test@example.com',
+                'foo1@example.com' => 'foo1-test@example.com'
+            ])
             ->addTextHeader('foo', 'bar');
 
         $envelope = new Envelope(new Address('bar@example.com', 'Bar'), [
@@ -125,11 +123,11 @@ class RedlinkApiTransportTest extends TestCase
 
         foreach ($payload['to'] as $item) {
             if ('foo@example.com' === $item['email']) {
-                $this->assertEquals('test', $item['vars']['x']);
+                $this->assertEquals('foo-test@example.com', $item['messageId']);
             }
 
             if ('foo1@example.com' === $item['email']) {
-                $this->assertEquals('test1', $item['vars']['x1']);
+                $this->assertEquals('foo1-test@example.com', $item['messageId']);
             }
         }
 
@@ -149,8 +147,10 @@ class RedlinkApiTransportTest extends TestCase
         $this->assertCount(2, $result);
         $this->assertEquals('bar@example.com', $result[0]['email']);
         $this->assertEquals('Bar', $result[0]['name']);
+        $this->assertArrayHasKey('messageId', $result[0]);
 
         $this->assertEquals('bar1@example.com', $result[1]['email']);
         $this->assertEquals('Bar1', $result[1]['name']);
+        $this->assertArrayHasKey('messageId', $result[1]);
     }
 }

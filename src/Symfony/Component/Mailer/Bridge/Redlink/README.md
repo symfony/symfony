@@ -8,14 +8,28 @@ Configuration example:
 ```env
 MAILER_DSN=redlink+api://API_TOKEN:APP_TOKEN@default?fromSmtp=SMTP_ACCOUNT&version=VERSION
 ```
-
 where:
 - `API_TOKEN` is your user API token, you can get it from the user dashboard
 - `APP_TOKEN` is your application's API token
-- `SMTP_ACCOUNT` is subaccount that will be used to send email, required 
+- `SMTP_ACCOUNT` is subaccount that will be used to send email, required
 - `VERSION` is API version that you want to use, ex. v2.1, optional
 
-For more informations, you can refer to [Redlink API documentation](https://docs.redlink.pl).
+Custom headers usage:
+
+```php
+$messageIds = ['foo@example.com' => 'foo-message-id@example.com'];
+
+$email = new Email();
+$email
+    ->getHeaders()
+    ->add(new TagHeader('TagInHeaders1'))
+    ->add(new TagHeader('TagInHeaders2'))
+    ->addTextHeader('templateId', 1)
+    ->addParameterizedHeader('messageIds', 'messageIds', $messageIds)
+;
+```
+
+For more information, you can refer to [Redlink API documentation](https://docs.redlink.pl).
 
 Resources
 ---------

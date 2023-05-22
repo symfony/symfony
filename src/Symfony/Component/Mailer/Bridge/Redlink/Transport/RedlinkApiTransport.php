@@ -78,7 +78,7 @@ final class RedlinkApiTransport extends AbstractApiTransport
             throw new HttpTransportException(sprintf('Unable to send an Email: '.$errorMessage.'. UniqId: (%s).', $requestUniqueIdentifier), $response);
         }
 
-        $messageId = $content['data'][0]['externalId'] ?? '';
+        $messageId = $content['meta']['uniqId'] ?? '';
 
         $sentMessage->setMessageId($messageId);
 
@@ -88,7 +88,11 @@ final class RedlinkApiTransport extends AbstractApiTransport
     private function convertAddresses(array $input): array
     {
         return array_map(
-            fn (Address $address) => ['email' => $address->getAddress(), 'name' => $address->getName()],
+            fn (Address $address) => [
+                'email' => $address->getAddress(),
+                'name' => $address->getName(),
+                'messageId' => bin2hex(random_bytes(10)) . $address->getAddress()
+            ],
             $input
         );
     }
@@ -115,15 +119,15 @@ final class RedlinkApiTransport extends AbstractApiTransport
             }
 
             if ($header instanceof ParameterizedHeader) {
-                if ('vars' === $name) {
+                if ('messageids' === $name) {
                     $index = 0;
                     foreach ($currentPayload['to'] as $to) {
-                        if ($to['email'] === $header->getValue())
-                            $currentPayload['to'][$index]['vars'] = $header->getParameters();
-
+                        foreach ($header->getParameters() as $email => $messageId) {
+                            if ($to['email'] === $email)
+                                $currentPayload['to'][$index]['messageId'] = $messageId;
+                        }
                         $index++;
                     }
-                    continue;
                 }
             }
 

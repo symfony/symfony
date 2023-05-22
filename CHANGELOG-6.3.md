@@ -7,6 +7,36 @@ in 6.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.3.0...v6.3.1
 
+* 6.3.0-RC1 (2023-05-22)
+
+ * bug #49817 [Scheduler] Improve triggers performance when possible (fabpot)
+ * bug #50376 [WebProfilerBundle] Fix cursor on link that has no href (PhilETaylor)
+ * bug #50349 [Notifier] Document Notifier options in README files (alamirault)
+ * bug #50312 [Security] Skip clearing CSRF Token on stateless logout (chalasr)
+ * bug #50315 [Translation] Fix handling of null messages in `ArrayLoader` (rob006)
+ * bug #50338 [Console] Remove ``exec`` and replace it by ``shell_exec`` (maxbeckers)
+ * bug #50356 [AssetMapper] Fix bug where dependencies were preloaded even if the parent was not (weaverryan)
+ * bug #50347 [DebugBundle][VarDumper] Fix dump labels compatibility (fancyweb)
+ * feature #50363 [AssetMapper] Adding "path" option to importmap:require (weaverryan)
+ * feature #48852 [Validator] Allow to use translation_domain false for validators and to use custom translation domain by constraints (VincentLanglet)
+ * feature #49293 [DoctrineBridge] Allow to ignore specific nullable fields in UniqueEntity (VincentLanglet)
+ * bug #50193 [Serializer] Fix `SerializedPath` not working with constructor arguments (HypeMC)
+ * bug #50280 [PropertyAccess] Fix nullsafe operator on array index (HypeMC)
+ * bug #50362 [FrameworkBundle] Fix Workflow without a marking store definition uses marking store definition of previously defined workflow (krciga22)
+ * bug #50309 [HttpFoundation] UrlHelper is now aware of RequestContext changes (giosh94mhz)
+ * bug #50309 [HttpFoundation] UrlHelper is now aware of RequestContext changes (giosh94mhz)
+ * bug #50355 Bug fix for paths that start with the same string (weaverryan)
+ * bug #50352 [Notifier][TurboSMS] Fix get sender name (ZhukV)
+ * bug #50351 [DependencyInjection] Add `excludeSelf` option to dumpers (HypeMC)
+ * bug #50354 [Process] Stop the process correctly even if underlying input stream is not closed (joelwurtz)
+ * bug #50325 [WebProfilerBundle] Tweak the HTML code of the Twig entry view (javiereguiluz)
+ * bug #50331 [HttpFoundation] Fix problem with empty generator in StreamedJsonResponse (alexander-schranz)
+ * bug #50340 [HttpKernel] Make `QueryParameterValueResolver` provide a value if possible when a parameter is not found (MatTheCat)
+ * bug #50332 [PropertyInfo] Fix `PhpStanExtractor` when constructor has no docblock (HypeMC)
+ * bug #50343 [VarDumper] Fix HTML of invisible characters (fancyweb)
+ * bug #50253 [FrameworkBundle] Generate caches consistently on successive run of `cache:clear` command (Okhoshi)
+ * bug #49063 [Messenger] Respect `isRetryable` decision of the retry strategy for re-delivery (FlyingDR)
+
 * 6.3.0-BETA3 (2023-05-13)
 
  * feature #50286 [AssetMapper] Add cached asset factory (weaverryan)

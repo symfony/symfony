@@ -184,7 +184,7 @@ class ProfilerController
             $this->twig->render('@WebProfiler/Profiler/search.html.twig', [
                 'token' => $request->query->get('token', $session?->get('_profiler_search_token')),
                 'ip' => $request->query->get('ip', $session?->get('_profiler_search_ip')),
-                'method' => $request->query->get('method', $session?->get('_profiler_search_method')),
+                'method' => $request->query->all()['method'] ?? $session?->get('_profiler_search_method'),
                 'status_code' => $request->query->get('status_code', $session?->get('_profiler_search_status_code')),
                 'url' => $request->query->get('url', $session?->get('_profiler_search_url')),
                 'start' => $request->query->get('start', $session?->get('_profiler_search_start')),
@@ -212,7 +212,7 @@ class ProfilerController
         $profile = $this->profiler->loadProfile($token);
 
         $ip = $request->query->get('ip');
-        $method = $request->query->get('method');
+        $method = $request->query->all()['method'] ?? null;
         $statusCode = $request->query->get('status_code');
         $url = $request->query->get('url');
         $start = $request->query->get('start', null);
@@ -245,7 +245,7 @@ class ProfilerController
         $this->denyAccessIfProfilerDisabled();
 
         $ip = $request->query->get('ip');
-        $method = $request->query->get('method');
+        $method = $request->query->all()['method'] ?? null;
         $statusCode = $request->query->get('status_code');
         $url = $request->query->get('url');
         $start = $request->query->get('start', null);

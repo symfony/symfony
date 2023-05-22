@@ -42,7 +42,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         }
     }
 
-    public function find(?string $ip, ?string $url, ?int $limit, ?string $method, int $start = null, int $end = null, string $statusCode = null): array
+    public function find(?string $ip, ?string $url, ?int $limit, string|array|null $method, int $start = null, int $end = null, string $statusCode = null): array
     {
         $file = $this->getIndexFilename();
 
@@ -59,7 +59,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
             [$csvToken, $csvIp, $csvMethod, $csvUrl, $csvTime, $csvParent, $csvStatusCode] = $values;
             $csvTime = (int) $csvTime;
 
-            if ($ip && !str_contains($csvIp, $ip) || $url && !str_contains($csvUrl, $url) || $method && !str_contains($csvMethod, $method) || $statusCode && !str_contains($csvStatusCode, $statusCode)) {
+            if ($ip && !str_contains($csvIp, $ip) || $url && !str_contains($csvUrl, $url) || $method && !\in_array($csvMethod, (array) $method) || $statusCode && !str_contains($csvStatusCode, $statusCode)) {
                 continue;
             }
 

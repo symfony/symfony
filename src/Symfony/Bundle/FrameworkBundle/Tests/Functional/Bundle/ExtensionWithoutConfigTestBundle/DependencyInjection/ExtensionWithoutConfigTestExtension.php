@@ -16,6 +16,10 @@ use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 
 class ExtensionWithoutConfigTestExtension implements ExtensionInterface
 {
+    public function build(ContainerBuilder $container): void
+    {
+    }
+
     public function load(array $configs, ContainerBuilder $container): void
     {
     }

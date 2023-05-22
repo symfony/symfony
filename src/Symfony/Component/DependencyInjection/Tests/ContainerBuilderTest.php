@@ -39,6 +39,7 @@ use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\RealServiceInstantiator;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
@@ -1326,6 +1327,17 @@ class ContainerBuilderTest extends TestCase
         $this->assertEquals([$second, $first], $configs);
     }
 
+    public function testExtensionBuild()
+    {
+        $container = new ContainerBuilder();
+
+        $container->registerExtension(new BuildExtension());
+
+        $container->compile();
+        $testpass = array_filter($container->getCompilerPassConfig()->getPasses(), fn ($pass) => $pass instanceof TestPass);
+        $this->assertCount(1, $testpass, 'The extension did not register a compiler pass.');
+    }
+
     public function testAbstractAlias()
     {
         $container = new ContainerBuilder();
@@ -2063,5 +2075,24 @@ class E
     {
         $this->first = $first;
         $this->second = $second;
+    }
+}
+
+class BuildExtension extends Extension
+{
+    public function load(array $configs, ContainerBuilder $container): void
+    {
+    }
+
+    public function build(ContainerBuilder $container): void
+    {
+        $container->addCompilerPass(new TestPass());
+    }
+}
+
+class TestPass implements CompilerPassInterface
+{
+    public function process(ContainerBuilder $container): void
+    {
     }
 }

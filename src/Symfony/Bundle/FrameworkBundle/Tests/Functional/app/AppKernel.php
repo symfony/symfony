@@ -78,7 +78,7 @@ class AppKernel extends Kernel implements ExtensionInterface, ConfigurationInter
         $loader->load($this->rootConfig);
     }
 
-    protected function build(ContainerBuilder $container): void
+    public function build(ContainerBuilder $container): void
     {
         $container->register('logger', NullLogger::class);
         $container->registerExtension(new TestDumpExtension());

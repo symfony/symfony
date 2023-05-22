@@ -28,6 +28,10 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
 {
     private array $processedConfigs = [];
 
+    public function build(ContainerBuilder $container): void
+    {
+    }
+
     /**
      * @return string|false
      */

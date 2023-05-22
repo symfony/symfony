@@ -16,6 +16,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * ExtensionInterface is the interface implemented by container extension classes.
  *
+ * @method void build(ContainerBuilder $container) Called just before compilation, use this to register compiler passes
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 interface ExtensionInterface

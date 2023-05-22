@@ -209,6 +209,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         if (false !== $extension->getNamespace()) {
             $this->extensionsByNs[$extension->getNamespace()] = $extension;
         }
+
+        // @deprecated remove if statement in Symfony 7
+        if (method_exists($extension, 'build') && \is_callable([$extension, 'build'])) {
+            $extension->build($this);
+        }
     }
 
     /**

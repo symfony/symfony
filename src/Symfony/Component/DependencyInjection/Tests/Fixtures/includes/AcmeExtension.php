@@ -24,4 +24,8 @@ class AcmeExtension implements ExtensionInterface
     {
         return 'acme';
     }
+
+    public function build(ContainerBuilder $container): void
+    {
+    }
 }

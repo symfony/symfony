@@ -15,6 +15,7 @@ DependencyInjection
 -------------------
 
  * Deprecate `ContainerAwareInterface` and `ContainerAwareTrait`, use dependency injection instead
+ * Add `ExtensionInterface::build(ContainerBuilder $container): void` to register compiler passes from an extension
 
    *Before*
    ```php

@@ -41,4 +41,8 @@ class ProjectExtension implements ExtensionInterface
     public function getConfiguration(array $config, ContainerBuilder $container)
     {
     }
+
+    public function build(ContainerBuilder $container): void
+    {
+    }
 }

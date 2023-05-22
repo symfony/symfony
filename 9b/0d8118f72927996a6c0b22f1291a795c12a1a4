@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by upyx at 2023-03-26T16:09:25Z
+
+Why do you think the original version was bad? The `DatePeriod` class doesn't fit the requirements of the triggers: it provides a forward only iterator. The `getNextRunDate` method must return a valid value for any argument **in any** order. It's just a different task.
+
+Now, there are two algos and "magic" with reflections...
+
+The goal of constructors is initialization of objects to a valid state. It's not a big deal, but having logic in a constructor except assertions of arguments is bad practice. Now it has too much "magic".
+
+The `TriggerInterface` allows you to make any composition. Triggers (originally) are not intended to be extended.
+
+IMO it was better.

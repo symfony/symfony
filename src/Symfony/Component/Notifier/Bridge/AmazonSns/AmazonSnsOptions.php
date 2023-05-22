@@ -52,7 +52,7 @@ final class AmazonSnsOptions implements MessageOptionsInterface
     }
 
     /**
-     * @see PublishInput::$Subject
+     * @see PublishInput::$subject
      *
      * @return $this
      */
@@ -64,7 +64,7 @@ final class AmazonSnsOptions implements MessageOptionsInterface
     }
 
     /**
-     * @see PublishInput::$MessageStructure
+     * @see PublishInput::$messageStructure
      *
      * @return $this
      */

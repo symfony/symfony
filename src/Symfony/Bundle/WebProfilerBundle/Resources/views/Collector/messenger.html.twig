@@ -154,7 +154,7 @@
                     {% else %}
                         {{ caller.name }}
                     {% endif %}
-                    line <a class="text-small sf-toggle" data-toggle-selector="#sf-trace-{{ discr }}-{{ loop.index0 }}">{{ caller.line }}</a>
+                    line <a class="text-small sf-toggle" data-toggle-selector="#sf-trace-{{ discr }}-{{ loop.index0 }}" style="cursor: pointer">{{ caller.line }}</a>
 
                     <div class="hidden" id="sf-trace-{{ discr }}-{{ loop.index0 }}">
                         <div class="trace">

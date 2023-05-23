@@ -46,6 +46,40 @@ class AmqpReceiverTest extends TestCase
         $this->assertEquals(new DummyMessage('Hi'), $actualEnvelopes[0]->getMessage());
     }
 
+    public function testItReturnsTheGzipDecompressMessageToTheHandler()
+    {
+        $serializer = new Serializer(
+            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
+        );
+
+        $amqpEnvelope = $this->createAMQPEnvelopeWithContentEncodingGzip();
+        $connection = $this->createMock(Connection::class);
+        $connection->method('getQueueNames')->willReturn(['queueName']);
+        $connection->method('get')->with('queueName')->willReturn($amqpEnvelope);
+
+        $receiver = new AmqpReceiver($connection, $serializer);
+        $actualEnvelopes = iterator_to_array($receiver->get());
+        $this->assertCount(1, $actualEnvelopes);
+        $this->assertEquals(new DummyMessage('Hi'), $actualEnvelopes[0]->getMessage());
+    }
+
+    public function testItReturnsTheDeflateDecompressMessageToTheHandler()
+    {
+        $serializer = new Serializer(
+            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
+        );
+
+        $amqpEnvelope = $this->createAMQPEnvelopeWithContentEncodingGzip();
+        $connection = $this->createMock(Connection::class);
+        $connection->method('getQueueNames')->willReturn(['queueName']);
+        $connection->method('get')->with('queueName')->willReturn($amqpEnvelope);
+
+        $receiver = new AmqpReceiver($connection, $serializer);
+        $actualEnvelopes = iterator_to_array($receiver->get());
+        $this->assertCount(1, $actualEnvelopes);
+        $this->assertEquals(new DummyMessage('Hi'), $actualEnvelopes[0]->getMessage());
+    }
+
     public function testItThrowsATransportExceptionIfItCannotAcknowledgeMessage()
     {
         $this->expectException(TransportException::class);
@@ -78,6 +112,30 @@ class AmqpReceiverTest extends TestCase
     {
         $envelope = $this->createMock(\AMQPEnvelope::class);
         $envelope->method('getBody')->willReturn('{"message": "Hi"}');
+        $envelope->method('getHeaders')->willReturn([
+            'type' => DummyMessage::class,
+        ]);
+
+        return $envelope;
+    }
+
+    private function createAMQPEnvelopeWithContentEncodingGzip(): \AMQPEnvelope
+    {
+        $envelope = $this->createMock(\AMQPEnvelope::class);
+        $envelope->method('getBody')->willReturn(gzencode('{"message": "Hi"}'));
+        $envelope->method('getContentEncoding')->willReturn('gzip');
+        $envelope->method('getHeaders')->willReturn([
+            'type' => DummyMessage::class,
+        ]);
+
+        return $envelope;
+    }
+
+    private function createAMQPEnvelopeWithContentEncodingDeflate(): \AMQPEnvelope
+    {
+        $envelope = $this->createMock(\AMQPEnvelope::class);
+        $envelope->method('getBody')->willReturn(gzdeflate('{"message": "Hi"}'));
+        $envelope->method('getContentEncoding')->willReturn('gzip');
         $envelope->method('getHeaders')->willReturn([
             'type' => DummyMessage::class,
         ]);

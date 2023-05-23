@@ -2103,6 +2103,7 @@ class FrameworkExtension extends Extension
                 ['id' => 'failed_message_processing_middleware'],
             ],
             'after' => [
+                ['id' => 'compress_middleware'],
                 ['id' => 'send_message'],
                 ['id' => 'handle_message'],
             ],

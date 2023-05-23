@@ -24,7 +24,8 @@
         "symfony/event-dispatcher": "^5.4|^6.0",
         "symfony/process": "^5.4|^6.0",
         "symfony/property-access": "^5.4|^6.0",
-        "symfony/serializer": "^5.4|^6.0"
+        "symfony/serializer": "^5.4|^6.0",
+        "ext-zlib": "*"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Messenger\\Bridge\\Amqp\\": "" },

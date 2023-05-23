@@ -23,7 +23,7 @@ jobs:
 
     strategy:
       matrix:
-        php: ['8.1']
+        php: ['8.2']
       fail-fast: false
 
     services:
@@ -155,7 +155,8 @@ jobs:
         run: |
           COMPOSER_HOME="$(composer config home)"
           ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
-          export COMPOSER_ROOT_VERSION=$(grep ' VERSION = ' src/Symfony/Component/HttpKernel/Kernel.php | grep -P -o '[0-9]+\.[0-9]+').x-dev
+          #export COMPOSER_ROOT_VERSION=$(grep ' VERSION = ' src/Symfony/Component/HttpKernel/Kernel.php | grep -P -o '[0-9]+\.[0-9]+').x-dev
+          export COMPOSER_ROOT_VERSION=6.4.x-dev # to be removed once deps allow ^7.0
           echo COMPOSER_ROOT_VERSION=$COMPOSER_ROOT_VERSION >> $GITHUB_ENV
 
           echo "::group::composer update"
@@ -182,7 +183,7 @@ jobs:
           POSTGRES_HOST: localhost
 
       #- name: Run HTTP push tests
-      #  if: matrix.php == '8.1'
+      #  if: matrix.php == '8.2'
       #  run: |
       #    [ -d .phpunit ] && mv .phpunit .phpunit.bak
       #    wget -q https://github.com/symfony/binary-utils/releases/download/v0.1/vulcain_0.1.3_Linux_x86_64.tar.gz -O - | tar xz && mv vulcain /usr/local/bin

@@ -241,9 +241,6 @@ class LazyProxyTraitTest extends TestCase
         $this->assertSame([123], $proxy->foo);
     }
 
-    /**
-     * @requires PHP 8.2
-     */
     public function testReadOnlyClass()
     {
         if (\PHP_VERSION_ID < 80300) {

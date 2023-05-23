@@ -173,11 +173,7 @@ class InputBagTest extends TestCase
         $bag = new InputBag(['invalid-value' => 2]);
 
         $this->expectException(BadRequestException::class);
-        if (\PHP_VERSION_ID >= 80200) {
-            $this->expectExceptionMessage('Parameter "invalid-value" cannot be converted to enum: 2 is not a valid backing value for enum Symfony\Component\HttpFoundation\Tests\Fixtures\FooEnum.');
-        } else {
-            $this->expectExceptionMessage('Parameter "invalid-value" cannot be converted to enum: 2 is not a valid backing value for enum "Symfony\Component\HttpFoundation\Tests\Fixtures\FooEnum".');
-        }
+        $this->expectExceptionMessage('Parameter "invalid-value" cannot be converted to enum: 2 is not a valid backing value for enum Symfony\Component\HttpFoundation\Tests\Fixtures\FooEnum.');
 
         $this->assertNull($bag->getEnum('invalid-value', FooEnum::class));
     }

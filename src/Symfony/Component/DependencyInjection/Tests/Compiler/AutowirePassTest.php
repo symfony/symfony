@@ -301,9 +301,6 @@ class AutowirePassTest extends TestCase
         $pass->process($container);
     }
 
-    /**
-     * @requires PHP 8.2
-     */
     public function testTypeNotGuessableCompositeType()
     {
         $container = new ContainerBuilder();
@@ -435,9 +432,6 @@ class AutowirePassTest extends TestCase
         $this->assertNull($definition->getArgument(0));
     }
 
-    /**
-     * @requires PHP 8.2
-     */
     public function testParameterWithNullableIntersectionIsSkipped()
     {
         $container = new ContainerBuilder();

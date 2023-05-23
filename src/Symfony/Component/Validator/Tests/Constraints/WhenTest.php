@@ -103,9 +103,6 @@ final class WhenTest extends TestCase
         self::assertSame(['Default', 'WhenTestWithAnnotations'], $bazConstraint->groups);
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testAttributes()
     {
         $loader = new AnnotationLoader(new AnnotationReader());

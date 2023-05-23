@@ -13,20 +13,20 @@ init:
 
 install:
     - mkdir c:\php && cd c:\php
-    - appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.1.0-Win32-vs16-x86.zip
-    - 7z x php-8.1.0-Win32-vs16-x86.zip -y >nul
+    - appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.2.0-Win32-vs16-x86.zip
+    - 7z x php-8.2.0-Win32-vs16-x86.zip -y >nul
     - cd ext
-    - appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php_apcu-5.1.21-8.1-ts-vs16-x86.zip
-    - 7z x php_apcu-5.1.21-8.1-ts-vs16-x86.zip -y >nul
-    - appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php_redis-5.3.7-8.1-ts-vs16-x86.zip
-    - 7z x php_redis-5.3.7-8.1-ts-vs16-x86.zip -y >nul
+    #- appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php_apcu-5.1.22-8.2-ts-vs16-x86.zip
+    #- 7z x php_apcu-5.1.22-8.2-ts-vs16-x86.zip -y >nul
+    #- appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php_redis-5.3.7-8.2-ts-vs16-x86.zip
+    #- 7z x php_redis-5.3.7-8.2-ts-vs16-x86.zip -y >nul
     - cd ..
     - copy /Y php.ini-development php.ini-min
     - echo memory_limit=-1 >> php.ini-min
     - echo serialize_precision=-1 >> php.ini-min
     - echo max_execution_time=1200 >> php.ini-min
-    - echo post_max_size=4G >> php.ini-min
-    - echo upload_max_filesize=4G >> php.ini-min
+    - echo post_max_size=2047M >> php.ini-min
+    - echo upload_max_filesize=2047M >> php.ini-min
     - echo date.timezone="America/Los_Angeles" >> php.ini-min
     - echo extension_dir=ext >> php.ini-min
     - echo extension=php_xsl.dll >> php.ini-min
@@ -34,8 +34,8 @@ install:
     - echo zend_extension=php_opcache.dll >> php.ini-max
     - echo opcache.enable_cli=1 >> php.ini-max
     - echo extension=php_openssl.dll >> php.ini-max
-    - echo extension=php_apcu.dll >> php.ini-max
-    - echo extension=php_redis.dll >> php.ini-max
+    #- echo extension=php_apcu.dll >> php.ini-max
+    #- echo extension=php_redis.dll >> php.ini-max
     - echo apc.enable_cli=1 >> php.ini-max
     - echo extension=php_intl.dll >> php.ini-max
     - echo extension=php_mbstring.dll >> php.ini-max
@@ -51,7 +51,8 @@ install:
     - git config --global user.name "Symfony"
     - FOR /F "tokens=* USEBACKQ" %%F IN (`bash -c "grep ' VERSION = ' src/Symfony/Component/HttpKernel/Kernel.php | grep -o '[0-9][0-9]*\.[0-9]'"`) DO (SET SYMFONY_VERSION=%%F)
     - php .github/build-packages.php HEAD^ %SYMFONY_VERSION% src\Symfony\Bridge\PhpUnit
-    - SET COMPOSER_ROOT_VERSION=%SYMFONY_VERSION%.x-dev
+    #- SET COMPOSER_ROOT_VERSION=%SYMFONY_VERSION%.x-dev
+    - SET COMPOSER_ROOT_VERSION=6.4.x-dev
     - php composer.phar update --no-progress --ansi
     - php phpunit install
     - choco install memurai-developer

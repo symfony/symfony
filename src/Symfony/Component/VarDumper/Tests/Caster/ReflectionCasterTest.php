@@ -319,9 +319,6 @@ EOTXT
         );
     }
 
-    /**
-     * @requires PHP 8.2
-     */
     public function testReflectionUnionTypeWithIntersection()
     {
         $var = (new \ReflectionProperty(ReflectionUnionTypeWithIntersectionFixture::class, 'a'))->getType();

@@ -314,8 +314,6 @@ class ReflectionExtractorTest extends TestCase
 
     /**
      * @dataProvider php82TypesProvider
-     *
-     * @requires PHP 8.2
      */
     public function testExtractPhp82Type($property, array $type = null)
     {

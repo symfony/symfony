@@ -118,7 +118,7 @@ EOT
     {
         $allAssets = $this->assetMapper->allAssets();
 
-        $io->comment(sprintf('Compiling <info>%d</info> assets to <info>%s%s</info>', \count($allAssets), $publicDir, $this->publicAssetsPathResolver->resolvePublicPath('')));
+        $io->comment(sprintf('Compiling assets to <info>%s%s</info>', $publicDir, $this->publicAssetsPathResolver->resolvePublicPath('')));
         $manifest = [];
         foreach ($allAssets as $asset) {
             // $asset->getPublicPath() will start with a "/"
@@ -132,6 +132,7 @@ EOT
             $manifest[$asset->getLogicalPath()] = $asset->getPublicPath();
         }
         ksort($manifest);
+        $io->comment(sprintf('Compiled <info>%d</info> assets', \count($manifest)));
 
         return $manifest;
     }

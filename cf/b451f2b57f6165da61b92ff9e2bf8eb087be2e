@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-05-23T16:09:23Z
+
+Thanks for the review @stof. Comments addressed.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-05-23T16:26:01Z
+
+@nicolas-grekas for my comment about the PHP version bump in contracts, it actually applies to all of them, not just the cache contracts
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-05-23T16:33:35Z
+
+@stof oops, fixed!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-05-23T17:03:35Z
+
+- composer/composer[2.4.0, ..., 2.6.x-dev] require symfony/console ^5.4.11 || ^6.0.11 -> found symfony/console[v5.4.11, ..., 5.4.x-dev, v6.0.11, ..., 6.3.x-dev] but it conflicts with your root composer.json require (^6.4|^7.0). /cc @Seldaek
+- async-aws/core[1.10.0, ..., 1.18.1] require symfony/http-client ^4.4.16 || ^5.1.7,!=5.2.0 || ^6.0 -> found symfony/http-client[v4.4.16, ..., 4.4.x-dev, v5.1.7, ..., 5.4.x-dev, v6.0.0, ..., 6.3.x-dev] but it conflicts with your root composer.json require (^6.4|^7.0). /cc @jderusse
+- doctrine/orm[2.12.0, ..., 2.13.x-dev] require symfony/console ^3.0 || ^4.0 || ^5.0 || ^6.0 -> satisfiable by symfony/console[v5.4.0, ..., 5.4.x-dev, v6.0.0, ..., 6.3.x-dev]. /cc @derrabus
+
+It's time to allow Symfony 7 again :)

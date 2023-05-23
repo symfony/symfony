@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-05-23T14:48:29Z
+
+Just made `AssetMapperInterface::allAssets()` iterable - a safer bet and easy win.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-05-23T16:51:26Z
+
+Tests fail :)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-05-23T17:53:00Z
+
+> Tests fail :)
+
+Only because my tests were so good 😛. It's better now - sorry about that. One failure is unrelated.

@@ -16,10 +16,10 @@ install:
     - appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.2.0-Win32-vs16-x86.zip
     - 7z x php-8.2.0-Win32-vs16-x86.zip -y >nul
     - cd ext
-    #- appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php_apcu-5.1.22-8.2-ts-vs16-x86.zip
-    #- 7z x php_apcu-5.1.22-8.2-ts-vs16-x86.zip -y >nul
-    #- appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php_redis-5.3.7-8.2-ts-vs16-x86.zip
-    #- 7z x php_redis-5.3.7-8.2-ts-vs16-x86.zip -y >nul
+    - appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php_apcu-5.1.22-8.2-ts-vs16-x86.zip
+    - 7z x php_apcu-5.1.22-8.2-ts-vs16-x86.zip -y >nul
+    - appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php_redis-5.3.7-8.2-ts-vs16-x86.zip
+    - 7z x php_redis-5.3.7-8.2-ts-vs16-x86.zip -y >nul
     - cd ..
     - copy /Y php.ini-development php.ini-min
     - echo memory_limit=-1 >> php.ini-min
@@ -34,8 +34,9 @@ install:
     - echo zend_extension=php_opcache.dll >> php.ini-max
     - echo opcache.enable_cli=1 >> php.ini-max
     - echo extension=php_openssl.dll >> php.ini-max
-    #- echo extension=php_apcu.dll >> php.ini-max
-    #- echo extension=php_redis.dll >> php.ini-max
+    - echo extension=php_apcu.dll >> php.ini-max
+    - echo extension=php_igbinary.dll >> php.ini-max
+    - echo extension=php_redis.dll >> php.ini-max
     - echo apc.enable_cli=1 >> php.ini-max
     - echo extension=php_intl.dll >> php.ini-max
     - echo extension=php_mbstring.dll >> php.ini-max

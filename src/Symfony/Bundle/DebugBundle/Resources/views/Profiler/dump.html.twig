@@ -11,6 +11,9 @@
             {% for dump in collector.getDumps('html') %}
                 <div class="sf-toolbar-info-piece">
                     <span>
+                    {% if dump.label is defined and '' != dump.label %}
+                        <span class="sf-toolbar-file-line"><strong>{{ dump.label }}</strong> in </span>
+                    {% endif %}
                     {% if dump.file %}
                         {% set link = dump.file|file_link(dump.line) %}
                         {% if link %}
@@ -45,7 +48,12 @@
 
     {% for dump in collector.getDumps('html') %}
         <div class="sf-dump sf-reset">
-            <span class="metadata">In
+            <span class="metadata">
+                {% if dump.label is defined and '' != dump.label %}
+                    <strong>{{ dump.label }}</strong> in
+                {% else %}
+                    In
+                {% endif %}
                 {% if dump.line %}
                     {% set link = dump.file|file_link(dump.line) %}
                     {% if link %}

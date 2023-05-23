@@ -24,11 +24,11 @@
     },
     "require-dev": {
         "psr/log": "^1|^2|^3",
-        "symfony/dependency-injection": "^5.4|^6.0",
-        "symfony/event-dispatcher": "^5.4|^6.0",
-        "symfony/expression-language": "^5.4|^6.0",
-        "symfony/security-core": "^5.4|^6.0",
-        "symfony/validator": "^5.4|^6.0"
+        "symfony/dependency-injection": "^5.4|^6.0|^7.0",
+        "symfony/event-dispatcher": "^5.4|^6.0|^7.0",
+        "symfony/expression-language": "^5.4|^6.0|^7.0",
+        "symfony/security-core": "^5.4|^6.0|^7.0",
+        "symfony/validator": "^5.4|^6.0|^7.0"
     },
     "conflict": {
         "symfony/event-dispatcher": "<5.4"

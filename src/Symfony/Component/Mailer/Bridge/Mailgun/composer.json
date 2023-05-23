@@ -17,11 +17,11 @@
     ],
     "require": {
         "php": ">=8.1",
-        "symfony/mailer": "^5.4.21|^6.2.7"
+        "symfony/mailer": "^5.4.21|^6.2.7|^7.0"
     },
     "require-dev": {
-        "symfony/http-client": "^5.4|^6.0",
-        "symfony/webhook": "^6.3"
+        "symfony/http-client": "^5.4|^6.0|^7.0",
+        "symfony/webhook": "^6.3|^7.0"
     },
     "conflict": {
         "symfony/http-foundation": "<6.2"

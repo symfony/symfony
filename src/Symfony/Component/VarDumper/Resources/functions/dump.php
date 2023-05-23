@@ -49,7 +49,7 @@ if (!function_exists('dd')) {
             header('HTTP/1.1 500 Internal Server Error');
         }
 
-        if (isset($vars[0]) && 1 === count($vars)) {
+        if (array_key_exists(0, $vars) && 1 === count($vars)) {
             VarDumper::dump($vars[0]);
         } else {
             foreach ($vars as $k => $v) {

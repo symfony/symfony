@@ -21,6 +21,8 @@ use Symfony\Component\Security\Core\Exception\UserNotFoundException;
  * handle the request.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @template-implements UserProviderInterface<UserInterface>
  */
 class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterface
 {

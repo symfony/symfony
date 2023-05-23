@@ -29,6 +29,10 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @template TUser of UserInterface
+ *
+ * @template-implements UserProviderInterface<TUser>
  */
 class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInterface
 {

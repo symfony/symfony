@@ -12,8 +12,11 @@
 namespace Symfony\Component\AssetMapper\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
+use Symfony\Component\AssetMapper\Compiler\AssetCompilerInterface;
 use Symfony\Component\AssetMapper\Compiler\JavaScriptImportPathCompiler;
+use Symfony\Component\AssetMapper\Exception\RuntimeException;
 use Symfony\Component\AssetMapper\MappedAsset;
 
 class JavaScriptImportPathCompilerTest extends TestCase
@@ -25,8 +28,9 @@ class JavaScriptImportPathCompilerTest extends TestCase
     {
         $asset = new MappedAsset($sourceLogicalName);
         $asset->setPublicPathWithoutDigest('/assets/'.$sourceLogicalName);
+        $asset->setSourcePath('anything');
 
-        $compiler = new JavaScriptImportPathCompiler(false);
+        $compiler = new JavaScriptImportPathCompiler(AssetCompilerInterface::MISSING_IMPORT_IGNORE, $this->createMock(LoggerInterface::class));
         // compile - and check that content doesn't change
         $this->assertSame($input, $compiler->compile($input, $asset, $this->createAssetMapper()));
         $actualDependencies = [];
@@ -175,7 +179,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
             ->method('getAsset')
             ->willReturn($importedAsset);
 
-        $compiler = new JavaScriptImportPathCompiler(false);
+        $compiler = new JavaScriptImportPathCompiler(AssetCompilerInterface::MISSING_IMPORT_IGNORE, $this->createMock(LoggerInterface::class));
         $this->assertSame($expectedOutput, $compiler->compile($input, $asset, $assetMapper));
     }
 
@@ -231,34 +235,38 @@ class JavaScriptImportPathCompilerTest extends TestCase
     }
 
     /**
-     * @dataProvider provideStrictModeTests
+     * @dataProvider provideMissingImportModeTests
      */
-    public function testStrictMode(string $sourceLogicalName, string $input, ?string $expectedExceptionMessage)
+    public function testMissingImportMode(string $sourceLogicalName, string $input, ?string $expectedExceptionMessage)
     {
         if (null !== $expectedExceptionMessage) {
-            $this->expectException(\RuntimeException::class);
+            $this->expectException(RuntimeException::class);
             $this->expectExceptionMessage($expectedExceptionMessage);
         }
 
         $asset = new MappedAsset($sourceLogicalName);
         $asset->setSourcePath('/path/to/app.js');
 
-        $compiler = new JavaScriptImportPathCompiler(true);
+        $logger = $this->createMock(LoggerInterface::class);
+        $compiler = new JavaScriptImportPathCompiler(
+            AssetCompilerInterface::MISSING_IMPORT_STRICT,
+            $logger
+        );
         $this->assertSame($input, $compiler->compile($input, $asset, $this->createAssetMapper()));
     }
 
-    public static function provideStrictModeTests(): iterable
+    public static function provideMissingImportModeTests(): iterable
     {
         yield 'importing_non_existent_file_throws_exception' => [
             'sourceLogicalName' => 'app.js',
             'input' => "import './non-existent.js';",
-            'expectedExceptionMessage' => 'Unable to find asset "non-existent.js" imported from "/path/to/app.js".',
+            'expectedExceptionMessage' => 'Unable to find asset "./non-existent.js" imported from "/path/to/app.js".',
         ];
 
         yield 'importing_file_just_missing_js_extension_adds_extra_info' => [
             'sourceLogicalName' => 'app.js',
             'input' => "import './other';",
-            'expectedExceptionMessage' => 'Unable to find asset "other" imported from "/path/to/app.js". Try adding ".js" to the end of the import - i.e. "other.js".',
+            'expectedExceptionMessage' => 'Unable to find asset "./other" imported from "/path/to/app.js". Try adding ".js" to the end of the import - i.e. "./other.js".',
         ];
 
         yield 'importing_absolute_file_path_is_ignored' => [

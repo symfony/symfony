@@ -12,8 +12,10 @@
 namespace Symfony\Component\AssetMapper\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\AssetMapper\AssetDependency;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
+use Symfony\Component\AssetMapper\Compiler\AssetCompilerInterface;
 use Symfony\Component\AssetMapper\Compiler\CssAssetUrlCompiler;
 use Symfony\Component\AssetMapper\MappedAsset;
 
@@ -24,8 +26,9 @@ class CssAssetUrlCompilerTest extends TestCase
      */
     public function testCompile(string $sourceLogicalName, string $input, string $expectedOutput, array $expectedDependencies)
     {
-        $compiler = new CssAssetUrlCompiler(false);
+        $compiler = new CssAssetUrlCompiler(AssetCompilerInterface::MISSING_IMPORT_IGNORE, $this->createMock(LoggerInterface::class));
         $asset = new MappedAsset($sourceLogicalName);
+        $asset->setSourcePath('anything');
         $asset->setPublicPathWithoutDigest('/assets/'.$sourceLogicalName);
         $this->assertSame($expectedOutput, $compiler->compile($input, $asset, $this->createAssetMapper()));
         $assetDependencyLogicalPaths = array_map(fn (AssetDependency $dependency) => $dependency->asset->getLogicalPath(), $asset->getDependencies());
@@ -117,7 +120,7 @@ class CssAssetUrlCompilerTest extends TestCase
         $asset = new MappedAsset($sourceLogicalName);
         $asset->setSourcePath('/path/to/styles.css');
 
-        $compiler = new CssAssetUrlCompiler(true);
+        $compiler = new CssAssetUrlCompiler(AssetCompilerInterface::MISSING_IMPORT_STRICT, $this->createMock(LoggerInterface::class));
         $this->assertSame($input, $compiler->compile($input, $asset, $this->createAssetMapper()));
     }
 

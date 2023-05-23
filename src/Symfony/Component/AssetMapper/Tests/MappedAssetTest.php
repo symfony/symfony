@@ -12,6 +12,7 @@
 namespace Symfony\Component\AssetMapper\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\AssetMapper\AssetDependency;
 use Symfony\Component\AssetMapper\MappedAsset;
 
 class MappedAssetTest extends TestCase
@@ -77,5 +78,18 @@ class MappedAssetTest extends TestCase
         $asset = new MappedAsset('foo.css');
         $asset->setContent('body { color: red; }');
         $this->assertSame('body { color: red; }', $asset->getContent());
+    }
+
+    public function testAddDependencies()
+    {
+        $mainAsset = new MappedAsset('file.js');
+
+        $assetFoo = new MappedAsset('foo.js');
+        $dependency = new AssetDependency($assetFoo, false, false);
+        $mainAsset->addDependency($dependency);
+        $mainAsset->addFileDependency('/path/to/foo.js');
+
+        $this->assertSame([$dependency], $mainAsset->getDependencies());
+        $this->assertSame(['/path/to/foo.js'], $mainAsset->getFileDependencies());
     }
 }

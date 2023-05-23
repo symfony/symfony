@@ -1314,7 +1314,17 @@ class FrameworkExtension extends Extension
             ->getDefinition('asset_mapper.importmap.manager')
             ->replaceArgument(2, $config['importmap_path'])
             ->replaceArgument(3, $config['vendor_dir'])
-            ->replaceArgument(4, $config['provider'])
+        ;
+
+        $importMapProviderId = 'asset_mapper.importmap.provider.jspm_provider';
+        if (ImportMapManager::PROVIDER_JSDELIVR_ESM === $config['provider']) {
+            $importMapProviderId = 'asset_mapper.importmap.provider.js_delivr_esm_provider';
+        }
+        $container->setAlias('asset_mapper.importmap.provider', new Alias($importMapProviderId));
+
+        $container
+            ->getDefinition('asset_mapper.importmap.provider.jspm_provider')
+            ->replaceArgument(0, $config['provider'])
         ;
 
         $container

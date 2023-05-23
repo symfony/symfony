@@ -120,6 +120,10 @@ EOT
             );
         }
 
+        if ($input->getOption('download')) {
+            $io->warning(sprintf('The --download option is experimental. It should work well with the default %s provider but check your browser console for 404 errors.', ImportMapManager::PROVIDER_JSDELIVR_ESM));
+        }
+
         $newPackages = $this->importMapManager->require($packages);
         if (1 === \count($newPackages)) {
             $newPackage = $newPackages[0];

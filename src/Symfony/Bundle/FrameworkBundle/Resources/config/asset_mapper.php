@@ -29,6 +29,8 @@ use Symfony\Component\AssetMapper\Factory\CachedMappedAssetFactory;
 use Symfony\Component\AssetMapper\Factory\MappedAssetFactory;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapRenderer;
+use Symfony\Component\AssetMapper\ImportMap\Providers\JsDelivrEsmImportMapProvider;
+use Symfony\Component\AssetMapper\ImportMap\Providers\JspmImportMapProvider;
 use Symfony\Component\AssetMapper\MapperAwareAssetPackage;
 use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolver;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -136,9 +138,17 @@ return static function (ContainerConfigurator $container) {
                 service('asset_mapper.public_assets_path_resolver'),
                 abstract_arg('importmap.php path'),
                 abstract_arg('vendor directory'),
-                abstract_arg('provider'),
+                // dynamic alias to the chosen provider
+                service('asset_mapper.importmap.provider'),
             ])
         ->alias(ImportMapManager::class, 'asset_mapper.importmap.manager')
+
+        ->set('asset_mapper.importmap.provider.jspm_provider', JspmImportMapProvider::class)
+            ->args([
+                abstract_arg('provider'),
+            ])
+
+        ->set('asset_mapper.importmap.provider.js_delivr_esm_provider', JsDelivrEsmImportMapProvider::class)
 
         ->set('asset_mapper.importmap.renderer', ImportMapRenderer::class)
             ->args([

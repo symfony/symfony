@@ -197,7 +197,7 @@
         <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="server" type="xsd:boolean" />
         <xsd:attribute name="public-prefix" type="xsd:string" />
-        <xsd:attribute name="strict-mode" type="xsd:boolean" />
+        <xsd:attribute name="missing-import-mode" type="missing-import-mode" />
         <xsd:attribute name="importmap-path" type="xsd:string" />
         <xsd:attribute name="importmap-polyfill" type="xsd:string" />
         <xsd:attribute name="vendor-dir" type="xsd:string" />
@@ -215,6 +215,14 @@
     <xsd:complexType name="asset_mapper_attribute" mixed="true">
         <xsd:attribute name="key" type="xsd:string" use="required" />
     </xsd:complexType>
+
+    <xsd:simpleType name="missing-import-mode">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="strict" />
+            <xsd:enumeration value="warn" />
+            <xsd:enumeration value="ignore" />
+        </xsd:restriction>
+    </xsd:simpleType>
 
     <xsd:complexType name="translator">
         <xsd:sequence>

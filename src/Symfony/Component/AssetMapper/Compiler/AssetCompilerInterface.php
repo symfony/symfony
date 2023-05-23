@@ -23,6 +23,10 @@ use Symfony\Component\AssetMapper\MappedAsset;
  */
 interface AssetCompilerInterface
 {
+    public const MISSING_IMPORT_STRICT = 'strict';
+    public const MISSING_IMPORT_WARN = 'warn';
+    public const MISSING_IMPORT_IGNORE = 'ignore';
+
     public function supports(MappedAsset $asset): bool;
 
     /**

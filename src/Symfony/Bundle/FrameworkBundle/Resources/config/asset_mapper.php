@@ -114,7 +114,8 @@ return static function (ContainerConfigurator $container) {
 
         ->set('asset_mapper.compiler.css_asset_url_compiler', CssAssetUrlCompiler::class)
             ->args([
-                abstract_arg('strict mode'),
+                abstract_arg('missing import mode'),
+                service('logger'),
             ])
             ->tag('asset_mapper.compiler')
 
@@ -123,7 +124,8 @@ return static function (ContainerConfigurator $container) {
 
         ->set('asset_mapper.compiler.javascript_import_path_compiler', JavaScriptImportPathCompiler::class)
             ->args([
-                abstract_arg('strict mode'),
+                abstract_arg('missing import mode'),
+                service('logger'),
             ])
             ->tag('asset_mapper.compiler')
 

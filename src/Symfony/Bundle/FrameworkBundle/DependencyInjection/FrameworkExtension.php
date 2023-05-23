@@ -1305,10 +1305,10 @@ class FrameworkExtension extends Extension
         }
 
         $container->getDefinition('asset_mapper.compiler.css_asset_url_compiler')
-            ->setArgument(0, $config['strict_mode']);
+            ->setArgument(0, $config['missing_import_mode']);
 
         $container->getDefinition('asset_mapper.compiler.javascript_import_path_compiler')
-            ->setArgument(0, $config['strict_mode']);
+            ->setArgument(0, $config['missing_import_mode']);
 
         $container
             ->getDefinition('asset_mapper.importmap.manager')

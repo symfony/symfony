@@ -17,17 +17,17 @@
     ],
     "require": {
         "php": ">=8.1",
-        "symfony/filesystem": "^5.4|^6.0",
-        "symfony/http-client": "^5.4|^6.0"
+        "symfony/filesystem": "^5.4|^6.0|^7.0",
+        "symfony/http-client": "^5.4|^6.0|^7.0"
     },
     "require-dev": {
-        "symfony/asset": "^5.4|^6.0",
-        "symfony/browser-kit": "^5.4|^6.0",
-        "symfony/console": "^5.4|^6.0",
-        "symfony/finder": "^5.4|^6.0",
-        "symfony/framework-bundle": "^6.3",
-        "symfony/http-foundation": "^5.4|^6.0",
-        "symfony/http-kernel": "^5.4|^6.0"
+        "symfony/asset": "^5.4|^6.0|^7.0",
+        "symfony/browser-kit": "^5.4|^6.0|^7.0",
+        "symfony/console": "^5.4|^6.0|^7.0",
+        "symfony/finder": "^5.4|^6.0|^7.0",
+        "symfony/framework-bundle": "^6.3|^7.0",
+        "symfony/http-foundation": "^5.4|^6.0|^7.0",
+        "symfony/http-kernel": "^5.4|^6.0|^7.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\AssetMapper\\": "" },

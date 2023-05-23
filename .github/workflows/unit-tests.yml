@@ -64,7 +64,7 @@ jobs:
 
           echo COLUMNS=120 >> $GITHUB_ENV
           echo PHPUNIT="$(pwd)/phpunit --exclude-group tty,benchmark,intl-data,integration" >> $GITHUB_ENV
-          echo COMPOSER_UP='composer update --no-progress --ansi'$([[ "${{ matrix.php }}" = "8.2" ]] && echo ' --ignore-platform-req=php+') >> $GITHUB_ENV
+          echo COMPOSER_UP='composer update --no-progress --ansi'$([[ "${{ matrix.mode }}" = experimental ]] && echo ' --ignore-platform-req=php+') >> $GITHUB_ENV
 
           SYMFONY_VERSIONS=$(git ls-remote -q --heads | cut -f2 | grep -o '/[1-9][0-9]*\.[0-9].*' | sort -V)
           SYMFONY_VERSION=$(grep ' VERSION = ' src/Symfony/Component/HttpKernel/Kernel.php | cut -d "'" -f2 | cut -d '.' -f 1-2)
@@ -123,7 +123,7 @@ jobs:
 
           echo SYMFONY_VERSION=$SYMFONY_VERSION >> $GITHUB_ENV
           echo COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev >> $GITHUB_ENV
-          echo SYMFONY_REQUIRE=">=$([ '${{ matrix.mode }}' = low-deps ] && echo 4.4 || echo $SYMFONY_VERSION)" >> $GITHUB_ENV
+          echo SYMFONY_REQUIRE=">=$([ '${{ matrix.mode }}' = low-deps ] && echo 5.4 || echo $SYMFONY_VERSION)" >> $GITHUB_ENV
           [[ "${{ matrix.mode }}" = *-deps ]] && mv composer.json.phpunit composer.json || true
 
       - name: Install dependencies
@@ -199,8 +199,8 @@ jobs:
           (cd src/Symfony/Component/Lock; mv composer.bak composer.json)
           PATCHED_COMPONENTS=$(git diff --name-only src/ | grep composer.json || true)
 
-          # for 5.4 LTS, checkout and test previous major with the patched components (only for patched components)
-          if [[ $PATCHED_COMPONENTS && $SYMFONY_VERSION = 5.4 ]]; then
+          # for 6.4 LTS, checkout and test previous major with the patched components (only for patched components)
+          if [[ $PATCHED_COMPONENTS && $SYMFONY_VERSION = 6.4 ]]; then
               export FLIP='^'
               SYMFONY_VERSION=$(echo $SYMFONY_VERSION | awk '{print $1 - 1}')
               echo -e "\\n\\e[33;1mChecking out Symfony $SYMFONY_VERSION and running tests with patched components as deps\\e[0m"

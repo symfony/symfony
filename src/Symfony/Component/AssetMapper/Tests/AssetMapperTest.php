@@ -69,6 +69,8 @@ class AssetMapperTest extends TestCase
             });
 
         $assets = $assetMapper->allAssets();
+        $this->assertIsIterable($assets);
+        $assets = iterator_to_array($assets);
         $this->assertCount(8, $assets);
         $this->assertInstanceOf(MappedAsset::class, $assets[0]);
     }

@@ -9,9 +9,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 require __DIR__.'/uniontype_classes.php';
 require __DIR__.'/autowiring_classes_80.php';
 require __DIR__.'/intersectiontype_classes.php';
-if (\PHP_VERSION_ID >= 80200) {
-    require __DIR__.'/compositetype_classes.php';
-}
+require __DIR__.'/compositetype_classes.php';
 
 // @deprecated since Symfony 6.3, to be removed in 7.0
 class FooAnnotation

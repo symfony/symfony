@@ -358,7 +358,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
         if ($reflClass->hasProperty($property) && ($reflClass->getProperty($property)->getModifiers() & $this->propertyReflectionFlags)) {
             $reflProperty = $reflClass->getProperty($property);
-            if (\PHP_VERSION_ID < 80100 || !$reflProperty->isReadOnly()) {
+            if (!$reflProperty->isReadOnly()) {
                 return new PropertyWriteInfo(PropertyWriteInfo::TYPE_PROPERTY, $property, $this->getWriteVisiblityForProperty($reflProperty), $reflProperty->isStatic());
             }
 
@@ -572,7 +572,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         try {
             $reflectionProperty = new \ReflectionProperty($class, $property);
 
-            if (\PHP_VERSION_ID >= 80100 && $writeAccessRequired && $reflectionProperty->isReadOnly()) {
+            if ($writeAccessRequired && $reflectionProperty->isReadOnly()) {
                 return false;
             }
 

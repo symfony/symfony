@@ -119,7 +119,7 @@ class DateCaster
             self::formatInterval($p->getDateInterval()),
             $p->include_start_date ? '[' : ']',
             self::formatDateTime($p->getStartDate()),
-            ($end = $p->getEndDate()) ? 'to '.self::formatDateTime($end).(\PHP_VERSION_ID >= 80200 && $p->include_end_date ? ']' : '[') : 'recurring '.$p->recurrences.' time/s'
+            ($end = $p->getEndDate()) ? 'to '.self::formatDateTime($end).($p->include_end_date ? ']' : '[') : 'recurring '.$p->recurrences.' time/s'
         );
 
         $p = [Caster::PREFIX_VIRTUAL.'period' => new ConstStub($period, implode("\n", $dates))];

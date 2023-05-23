@@ -47,11 +47,8 @@ class ConstraintValidatorTest extends TestCase
             [class_exists(\IntlDateFormatter::class) ? 'Feb 2, 1971, 8:00 AM' : '1971-02-02 08:00:00', $dateTime, ConstraintValidator::PRETTY_DATE],
             [class_exists(\IntlDateFormatter::class) ? 'Jan 1, 1970, 6:00 AM' : '1970-01-01 06:00:00', new \DateTimeImmutable('1970-01-01T06:00:00Z'), ConstraintValidator::PRETTY_DATE],
             [class_exists(\IntlDateFormatter::class) ? 'Jan 1, 1970, 3:00 PM' : '1970-01-01 15:00:00', (new \DateTimeImmutable('1970-01-01T23:00:00'))->setTimezone(new \DateTimeZone('America/New_York')), ConstraintValidator::PRETTY_DATE],
+            ['FirstCase', TestEnum::FirstCase],
         ];
-
-        if (\PHP_VERSION_ID >= 80100) {
-            $data[] = ['FirstCase', TestEnum::FirstCase];
-        }
 
         date_default_timezone_set($defaultTimezone);
 

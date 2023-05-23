@@ -776,9 +776,6 @@ class SerializerTest extends TestCase
         ]);
     }
 
-    /**
-     * @requires PHP 8.2
-     */
     public function testFalseBuiltInTypes()
     {
         $extractor = new PropertyInfoExtractor([], [new ReflectionExtractor()]);
@@ -789,9 +786,6 @@ class SerializerTest extends TestCase
         $this->assertEquals(new FalseBuiltInDummy(), $actual);
     }
 
-    /**
-     * @requires PHP 8.2
-     */
     public function testTrueBuiltInTypes()
     {
         $extractor = new PropertyInfoExtractor([], [new ReflectionExtractor()]);

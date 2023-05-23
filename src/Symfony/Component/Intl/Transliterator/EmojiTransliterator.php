@@ -52,14 +52,9 @@ if (!class_exists(\Transliterator::class)) {
             static $maps;
 
             // Create an instance of \Transliterator with a custom id; that's the only way
-            if (\PHP_VERSION_ID >= 80200) {
-                static $newInstance;
-                $instance = ($newInstance ??= (new \ReflectionClass(self::class))->newInstanceWithoutConstructor(...))();
-                $instance->id = $id;
-            } else {
-                $instance = unserialize(sprintf('O:%d:"%s":1:{s:2:"id";s:%d:"%s";}', \strlen(self::class), self::class, \strlen($id), $id));
-            }
-
+            static $newInstance;
+            $instance = ($newInstance ??= (new \ReflectionClass(self::class))->newInstanceWithoutConstructor(...))();
+            $instance->id = $id;
             $instance->map = $maps[$id] ??= str_ends_with($file, '.gz') ? GzipStreamWrapper::require($file) : require $file;
 
             return $instance;
@@ -132,32 +127,17 @@ if (!class_exists(\Transliterator::class)) {
     }
 }
 
-if (\PHP_VERSION_ID >= 80200) {
-    final class EmojiTransliterator extends \Transliterator
-    {
-        use EmojiTransliteratorTrait;
+final class EmojiTransliterator extends \Transliterator
+{
+    use EmojiTransliteratorTrait;
 
-        private const QUICK_CHECK = "\xA9\xAE\xE2\xE3\xF0";
-        private const REVERSEABLE_IDS = [
-            'emoji-github' => 'github-emoji',
-            'emoji-slack' => 'slack-emoji',
-            'github-emoji' => 'emoji-github',
-            'slack-emoji' => 'emoji-slack',
-        ];
+    private const QUICK_CHECK = "\xA9\xAE\xE2\xE3\xF0";
+    private const REVERSEABLE_IDS = [
+        'emoji-github' => 'github-emoji',
+        'emoji-slack' => 'slack-emoji',
+        'github-emoji' => 'emoji-github',
+        'slack-emoji' => 'emoji-slack',
+    ];
 
-        public readonly string $id;
-    }
-} else {
-    final class EmojiTransliterator extends \Transliterator
-    {
-        use EmojiTransliteratorTrait;
-
-        private const QUICK_CHECK = "\xA9\xAE\xE2\xE3\xF0";
-        private const REVERSEABLE_IDS = [
-            'emoji-github' => 'github-emoji',
-            'emoji-slack' => 'slack-emoji',
-            'github-emoji' => 'emoji-github',
-            'slack-emoji' => 'emoji-slack',
-        ];
-    }
+    public readonly string $id;
 }

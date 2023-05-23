@@ -16,20 +16,20 @@
         }
     ],
     "require": {
-        "php": ">=8.1",
+        "php": ">=8.2",
         "symfony/deprecation-contracts": "^2.5|^3",
-        "symfony/filesystem": "^5.4|^6.0|^7.0",
+        "symfony/filesystem": "^6.4|^7.0",
         "symfony/polyfill-ctype": "~1.8"
     },
     "require-dev": {
-        "symfony/event-dispatcher": "^5.4|^6.0|^7.0",
-        "symfony/finder": "^5.4|^6.0|^7.0",
-        "symfony/messenger": "^5.4|^6.0|^7.0",
+        "symfony/event-dispatcher": "^6.4|^7.0",
+        "symfony/finder": "^6.4|^7.0",
+        "symfony/messenger": "^6.4|^7.0",
         "symfony/service-contracts": "^2.5|^3",
-        "symfony/yaml": "^5.4|^6.0|^7.0"
+        "symfony/yaml": "^6.4|^7.0"
     },
     "conflict": {
-        "symfony/finder": "<5.4",
+        "symfony/finder": "<6.4",
         "symfony/service-contracts": "<2.5"
     },
     "autoload": {

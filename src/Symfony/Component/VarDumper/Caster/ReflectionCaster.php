@@ -218,7 +218,7 @@ class ReflectionCaster
         self::addMap($a, $c, [
             'returnsReference' => 'returnsReference',
             'returnType' => 'getReturnType',
-            'class' => \PHP_VERSION_ID >= 80111 ? 'getClosureCalledClass' : 'getClosureScopeClass',
+            'class' => 'getClosureCalledClass',
             'this' => 'getClosureThis',
         ]);
 

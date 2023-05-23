@@ -97,10 +97,7 @@ class PeriodicalTriggerTest extends TestCase
         yield ['every 2 hours', new PeriodicalTrigger('2 hours', $from, $until)];
         yield ['every 2 seconds', new PeriodicalTrigger(new \DateInterval('PT2S'), $from, $until)];
         yield ['DateInterval', new PeriodicalTrigger(new \DateInterval('P1D'), $from, $until)];
-
-        if (\PHP_VERSION_ID >= 80200) {
-            yield ['last day of next month', new PeriodicalTrigger(\DateInterval::createFromDateString('last day of next month'), $from, $until)];
-        }
+        yield ['last day of next month', new PeriodicalTrigger(\DateInterval::createFromDateString('last day of next month'), $from, $until)];
     }
 
     /**

@@ -27,7 +27,7 @@ final class ProxyHelper
      */
     public static function generateLazyGhost(\ReflectionClass $class): string
     {
-        if (\PHP_VERSION_ID >= 80200 && \PHP_VERSION_ID < 80300 && $class->isReadOnly()) {
+        if (\PHP_VERSION_ID < 80300 && $class->isReadOnly()) {
             throw new LogicException(sprintf('Cannot generate lazy ghost: class "%s" is readonly.', $class->name));
         }
         if ($class->isFinal()) {
@@ -91,7 +91,7 @@ final class ProxyHelper
         if ($class?->isFinal()) {
             throw new LogicException(sprintf('Cannot generate lazy proxy: class "%s" is final.', $class->name));
         }
-        if (\PHP_VERSION_ID >= 80200 && \PHP_VERSION_ID < 80300 && $class?->isReadOnly()) {
+        if (\PHP_VERSION_ID < 80300 && $class?->isReadOnly()) {
             throw new LogicException(sprintf('Cannot generate lazy proxy: class "%s" is readonly.', $class->name));
         }
 

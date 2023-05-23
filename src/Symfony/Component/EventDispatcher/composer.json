@@ -16,21 +16,21 @@
         }
     ],
     "require": {
-        "php": ">=8.1",
+        "php": ">=8.2",
         "symfony/event-dispatcher-contracts": "^2.5|^3"
     },
     "require-dev": {
-        "symfony/dependency-injection": "^5.4|^6.0|^7.0",
-        "symfony/expression-language": "^5.4|^6.0|^7.0",
-        "symfony/config": "^5.4|^6.0|^7.0",
-        "symfony/error-handler": "^5.4|^6.0|^7.0",
-        "symfony/http-foundation": "^5.4|^6.0|^7.0",
+        "symfony/dependency-injection": "^6.4|^7.0",
+        "symfony/expression-language": "^6.4|^7.0",
+        "symfony/config": "^6.4|^7.0",
+        "symfony/error-handler": "^6.4|^7.0",
+        "symfony/http-foundation": "^6.4|^7.0",
         "symfony/service-contracts": "^2.5|^3",
-        "symfony/stopwatch": "^5.4|^6.0|^7.0",
+        "symfony/stopwatch": "^6.4|^7.0",
         "psr/log": "^1|^2|^3"
     },
     "conflict": {
-        "symfony/dependency-injection": "<5.4",
+        "symfony/dependency-injection": "<6.4",
         "symfony/service-contracts": "<2.5"
     },
     "provide": {

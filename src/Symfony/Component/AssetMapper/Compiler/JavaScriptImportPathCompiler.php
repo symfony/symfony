@@ -99,17 +99,10 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
 
     private function handleMissingImport(string $message, \Throwable $e = null): void
     {
-        switch ($this->missingImportMode) {
-            case AssetCompilerInterface::MISSING_IMPORT_IGNORE:
-                return;
-
-            case AssetCompilerInterface::MISSING_IMPORT_WARN:
-                $this->logger->warning($message);
-
-                return;
-
-            case AssetCompilerInterface::MISSING_IMPORT_STRICT:
-                throw new RuntimeException($message, 0, $e);
-        }
+        match ($this->missingImportMode) {
+            AssetCompilerInterface::MISSING_IMPORT_IGNORE => null,
+            AssetCompilerInterface::MISSING_IMPORT_WARN => $this->logger->warning($message),
+            AssetCompilerInterface::MISSING_IMPORT_STRICT => throw new RuntimeException($message, 0, $e),
+        };
     }
 }

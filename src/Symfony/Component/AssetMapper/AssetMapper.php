@@ -44,21 +44,15 @@ class AssetMapper implements AssetMapperInterface
         return $this->mappedAssetFactory->createMappedAsset($logicalPath, $filePath);
     }
 
-    /**
-     * @return MappedAsset[]
-     */
-    public function allAssets(): array
+    public function allAssets(): iterable
     {
-        $assets = [];
         foreach ($this->mapperRepository->all() as $logicalPath => $filePath) {
             $asset = $this->getAsset($logicalPath);
             if (null === $asset) {
                 throw new \LogicException(sprintf('Asset "%s" could not be found.', $logicalPath));
             }
-            $assets[] = $asset;
+            yield $asset;
         }
-
-        return $assets;
     }
 
     public function getAssetFromSourcePath(string $sourcePath): ?MappedAsset

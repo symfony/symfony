@@ -28,9 +28,9 @@ interface AssetMapperInterface
     /**
      * Returns all mapped assets.
      *
-     * @return MappedAsset[]
+     * @return iterable<MappedAsset>
      */
-    public function allAssets(): array;
+    public function allAssets(): iterable;
 
     /**
      * Fetches the asset given its source path (i.e. filesystem path).

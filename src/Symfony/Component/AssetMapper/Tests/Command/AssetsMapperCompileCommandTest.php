@@ -52,7 +52,7 @@ class AssetsMapperCompileCommandTest extends TestCase
         $res = $tester->execute([]);
         $this->assertSame(0, $res);
         // match Compiling \d+ assets
-        $this->assertMatchesRegularExpression('/Compiling \d+ assets/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/Compiled \d+ assets/', $tester->getDisplay());
 
         $this->assertFileExists($targetBuildDir.'/subdir/file5-f4fdc37375c7f5f2629c5659a0579967.js');
         $this->assertSame(<<<EOF

@@ -83,6 +83,7 @@ return static function (ContainerConfigurator $container) {
                 service('asset_mapper'),
                 abstract_arg('asset public prefix'),
                 abstract_arg('extensions map'),
+                service('cache.asset_mapper'),
             ])
             ->tag('kernel.event_subscriber', ['event' => RequestEvent::class])
 

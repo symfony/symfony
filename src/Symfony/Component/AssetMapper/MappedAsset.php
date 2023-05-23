@@ -31,6 +31,8 @@ final class MappedAsset
     private bool $isPredigested;
     /** @var AssetDependency[] */
     private array $dependencies = [];
+    /** @var string[] */
+    private array $fileDependencies = [];
 
     public function __construct(private readonly string $logicalPath)
     {
@@ -77,6 +79,14 @@ final class MappedAsset
     public function getDependencies(): array
     {
         return $this->dependencies;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getFileDependencies(): array
+    {
+        return $this->fileDependencies;
     }
 
     public function setPublicPath(string $publicPath): void
@@ -128,6 +138,16 @@ final class MappedAsset
     public function addDependency(AssetDependency $assetDependency): void
     {
         $this->dependencies[] = $assetDependency;
+    }
+
+    /**
+     * Any filesystem files whose contents are used to create this asset.
+     *
+     * This is used to invalidate the cache when any of these files change.
+     */
+    public function addFileDependency(string $sourcePath): void
+    {
+        $this->fileDependencies[] = $sourcePath;
     }
 
     public function getPublicPathWithoutDigest(): string

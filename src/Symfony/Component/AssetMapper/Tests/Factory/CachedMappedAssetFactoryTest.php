@@ -106,6 +106,9 @@ class CachedMappedAssetFactoryTest extends TestCase
         $notDependentOnContentAsset->setSourcePath(__DIR__.'/../fixtures/dir2/already-abcdefVWXYZ0123456789.digested.css');
         $mappedAsset->addDependency(new AssetDependency($notDependentOnContentAsset, isContentDependency: false));
 
+        // just adding any file as an example
+        $mappedAsset->addFileDependency(__DIR__.'/../fixtures/importmap.php');
+
         $factory = $this->createMock(MappedAssetFactoryInterface::class);
         $factory->expects($this->once())
             ->method('createMappedAsset')
@@ -119,12 +122,13 @@ class CachedMappedAssetFactoryTest extends TestCase
         $cachedFactory->createMappedAsset('file1.css', $sourcePath);
 
         $configCacheMetadata = $this->loadConfigCacheMetadataFor($mappedAsset);
-        $this->assertCount(3, $configCacheMetadata);
+        $this->assertCount(4, $configCacheMetadata);
         $this->assertInstanceOf(FileResource::class, $configCacheMetadata[0]);
         $this->assertInstanceOf(FileResource::class, $configCacheMetadata[1]);
-        $this->assertSame($mappedAsset->getSourcePath(), $configCacheMetadata[0]->getResource());
-        $this->assertSame($dependentOnContentAsset->getSourcePath(), $configCacheMetadata[1]->getResource());
-        $this->assertSame($deeplyNestedAsset->getSourcePath(), $configCacheMetadata[2]->getResource());
+        $this->assertSame(realpath(__DIR__.'/../fixtures/importmap.php'), $configCacheMetadata[0]->getResource());
+        $this->assertSame($mappedAsset->getSourcePath(), $configCacheMetadata[1]->getResource());
+        $this->assertSame($dependentOnContentAsset->getSourcePath(), $configCacheMetadata[2]->getResource());
+        $this->assertSame($deeplyNestedAsset->getSourcePath(), $configCacheMetadata[3]->getResource());
     }
 
     private function loadConfigCacheMetadataFor(MappedAsset $mappedAsset): array

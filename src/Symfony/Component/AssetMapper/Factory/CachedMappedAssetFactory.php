@@ -59,7 +59,8 @@ class CachedMappedAssetFactory implements MappedAssetFactoryInterface
      */
     private function collectResourcesFromAsset(MappedAsset $mappedAsset): array
     {
-        $resources = [new FileResource($mappedAsset->getSourcePath())];
+        $resources = array_map(fn (string $path) => new FileResource($path), $mappedAsset->getFileDependencies());
+        $resources[] = new FileResource($mappedAsset->getSourcePath());
 
         foreach ($mappedAsset->getDependencies() as $dependency) {
             if (!$dependency->isContentDependency) {

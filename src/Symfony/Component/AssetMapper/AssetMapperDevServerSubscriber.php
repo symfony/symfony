@@ -128,15 +128,15 @@ final class AssetMapperDevServerSubscriber implements EventSubscriberInterface
             throw new NotFoundHttpException(sprintf('Asset with public path "%s" not found.', $pathInfo));
         }
 
-        $mediaType = $this->getMediaType($asset->getPublicPath());
+        $mediaType = $this->getMediaType($asset->publicPath);
         $response = (new Response(
-            $asset->getContent(),
+            $asset->content,
             headers: $mediaType ? ['Content-Type' => $mediaType] : [],
         ))
             ->setPublic()
             ->setMaxAge(604800)
             ->setImmutable()
-            ->setEtag($asset->getDigest())
+            ->setEtag($asset->digest)
         ;
 
         $event->setResponse($response);
@@ -164,7 +164,7 @@ final class AssetMapperDevServerSubscriber implements EventSubscriberInterface
             $cachedAsset = $this->cacheMapCache->getItem(hash('xxh128', $pathInfo));
             $asset = $cachedAsset->isHit() ? $this->assetMapper->getAsset($cachedAsset->get()) : null;
 
-            if (null !== $asset && $asset->getPublicPath() === $pathInfo) {
+            if (null !== $asset && $asset->publicPath === $pathInfo) {
                 return $asset;
             }
         }
@@ -172,7 +172,7 @@ final class AssetMapperDevServerSubscriber implements EventSubscriberInterface
         // we did not find a match
         $asset = null;
         foreach ($this->assetMapper->allAssets() as $assetCandidate) {
-            if ($pathInfo === $assetCandidate->getPublicPath()) {
+            if ($pathInfo === $assetCandidate->publicPath) {
                 $asset = $assetCandidate;
                 break;
             }
@@ -183,7 +183,7 @@ final class AssetMapperDevServerSubscriber implements EventSubscriberInterface
         }
 
         if (null !== $cachedAsset) {
-            $cachedAsset->set($asset->getLogicalPath());
+            $cachedAsset->set($asset->logicalPath);
             $this->cacheMapCache->save($cachedAsset);
         }
 

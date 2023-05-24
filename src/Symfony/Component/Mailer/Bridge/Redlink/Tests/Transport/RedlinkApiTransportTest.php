@@ -101,7 +101,7 @@ class RedlinkApiTransportTest extends TestCase
             ->addTextHeader('templateId', 1)
             ->addParameterizedHeader('messageIds', 'messageIds', [
                 'foo@example.com' => 'foo-test@example.com',
-                'foo1@example.com' => 'foo1-test@example.com'
+                'foo1@example.com' => 'foo1-test@example.com',
             ])
             ->addTextHeader('foo', 'bar');
 

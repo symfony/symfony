@@ -91,7 +91,7 @@ final class RedlinkApiTransport extends AbstractApiTransport
             fn (Address $address) => [
                 'email' => $address->getAddress(),
                 'name' => $address->getName(),
-                'messageId' => bin2hex(random_bytes(10)) . $address->getAddress()
+                'messageId' => bin2hex(random_bytes(10)).$address->getAddress(),
             ],
             $input
         );
@@ -123,17 +123,19 @@ final class RedlinkApiTransport extends AbstractApiTransport
                     $index = 0;
                     foreach ($currentPayload['to'] as $to) {
                         foreach ($header->getParameters() as $email => $messageId) {
-                            if ($to['email'] === $email)
+                            if ($to['email'] === $email) {
                                 $currentPayload['to'][$index]['messageId'] = $messageId;
+                            }
                         }
-                        $index++;
+                        ++$index;
                     }
                 }
             }
 
             if ('templateid' === $name) {
-                if (!isset($currentPayload['content']))
+                if (!isset($currentPayload['content'])) {
                     $currentPayload['content'] = [];
+                }
 
                 $currentPayload['content']['templateId'] = (int) $header->getValue();
 

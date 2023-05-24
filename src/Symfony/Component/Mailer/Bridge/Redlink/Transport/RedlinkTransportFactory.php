@@ -28,14 +28,14 @@ final class RedlinkTransportFactory extends AbstractTransportFactory
         }
 
         return (new RedlinkApiTransport(
-                $this->getUser($dsn),
-                $this->getPassword($dsn),
-                $dsn->getOption('fromSmtp'),
-                $dsn->getOption('version'),
-                $this->client,
-                $this->dispatcher,
-                $this->logger
-            )
+            $this->getUser($dsn),
+            $this->getPassword($dsn),
+            $dsn->getOption('fromSmtp'),
+            $dsn->getOption('version'),
+            $this->client,
+            $this->dispatcher,
+            $this->logger
+        )
         )
             ->setHost('default' === $dsn->getHost() ? null : $dsn->getHost())
             ->setPort($dsn->getPort());

@@ -13,11 +13,11 @@ namespace ImportMap\Providers;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\ImportMap\PackageRequireOptions;
-use Symfony\Component\AssetMapper\ImportMap\Providers\JsDelivrEsmImportMapProvider;
+use Symfony\Component\AssetMapper\ImportMap\Resolver\JsDelivrEsmResolver;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 
-class JsDelivrEsmImportMapProviderTest extends TestCase
+class JsDelivrEsmResolverTest extends TestCase
 {
     /**
      * @dataProvider provideResolvePackagesTests
@@ -43,7 +43,7 @@ class JsDelivrEsmImportMapProviderTest extends TestCase
 
         $httpClient = new MockHttpClient($responses);
 
-        $provider = new JsDelivrEsmImportMapProvider($httpClient);
+        $provider = new JsDelivrEsmResolver($httpClient);
         $actualResolvedPackages = $provider->resolvePackages($packages);
         $this->assertCount(\count($expectedResolvedPackages), $actualResolvedPackages);
         foreach ($actualResolvedPackages as $package) {
@@ -62,11 +62,11 @@ class JsDelivrEsmImportMapProviderTest extends TestCase
             'packages' => [new PackageRequireOptions('lodash')],
             'expectedRequests' => [
                 [
-                    'url' => '/v1/packages/npm/lodash/resolved',
+                    'url' => '/v1/packages/npm/lodash/resolved?specifier=%2A',
                     'response' => ['body' => ['version' => '1.2.3']],
                 ],
                 [
-                    'url' => 'esm.run/lodash@1.2.3',
+                    'url' => '/lodash@1.2.3/+esm',
                     'response' => ['url' => 'https://cdn.jsdelivr.net/npm/lodash.js@1.2.3/+esm'],
                 ],
             ],
@@ -85,7 +85,7 @@ class JsDelivrEsmImportMapProviderTest extends TestCase
                     'response' => ['body' => ['version' => '2.1.3']],
                 ],
                 [
-                    'url' => 'esm.run/lodash@2.1.3',
+                    'url' => '/lodash@2.1.3/+esm',
                     'response' => ['url' => 'https://cdn.jsdelivr.net/npm/lodash.js@2.1.3/+esm'],
                 ],
             ],
@@ -104,7 +104,7 @@ class JsDelivrEsmImportMapProviderTest extends TestCase
                     'response' => ['body' => ['version' => '3.1.3']],
                 ],
                 [
-                    'url' => 'esm.run/@hotwired/stimulus@3.1.3',
+                    'url' => '/@hotwired/stimulus@3.1.3/+esm',
                     'response' => ['url' => 'https://cdn.jsdelivr.net/npm/@hotwired/stimulus.js@3.1.3/+esm'],
                 ],
             ],
@@ -123,7 +123,7 @@ class JsDelivrEsmImportMapProviderTest extends TestCase
                     'response' => ['body' => ['version' => '3.0.1']],
                 ],
                 [
-                    'url' => 'esm.run/chart.js@3.0.1/auto',
+                    'url' => '/chart.js@3.0.1/auto/+esm',
                     'response' => ['url' => 'https://cdn.jsdelivr.net/npm/chart.js@3.0.1/auto/+esm'],
                 ],
             ],
@@ -142,7 +142,7 @@ class JsDelivrEsmImportMapProviderTest extends TestCase
                     'response' => ['body' => ['version' => '3.0.1']],
                 ],
                 [
-                    'url' => 'esm.run/@chart/chart.js@3.0.1/auto',
+                    'url' => '/@chart/chart.js@3.0.1/auto/+esm',
                     'response' => ['url' => 'https://cdn.jsdelivr.net/npm/@chart/chart.js@3.0.1/auto/+esm'],
                 ],
             ],
@@ -157,11 +157,11 @@ class JsDelivrEsmImportMapProviderTest extends TestCase
             'packages' => [new PackageRequireOptions('lodash', download: true)],
             'expectedRequests' => [
                 [
-                    'url' => '/v1/packages/npm/lodash/resolved',
+                    'url' => '/v1/packages/npm/lodash/resolved?specifier=%2A',
                     'response' => ['body' => ['version' => '1.2.3']],
                 ],
                 [
-                    'url' => 'esm.run/lodash@1.2.3',
+                    'url' => '/lodash@1.2.3/+esm',
                     'response' => [
                         'url' => 'https://cdn.jsdelivr.net/npm/lodash.js@1.2.3/+esm',
                         'body' => 'contents of file',
@@ -181,11 +181,11 @@ class JsDelivrEsmImportMapProviderTest extends TestCase
             'expectedRequests' => [
                 // lodash
                 [
-                    'url' => '/v1/packages/npm/lodash/resolved',
+                    'url' => '/v1/packages/npm/lodash/resolved?specifier=%2A',
                     'response' => ['body' => ['version' => '1.2.3']],
                 ],
                 [
-                    'url' => 'esm.run/lodash@1.2.3',
+                    'url' => '/lodash@1.2.3/+esm',
                     'response' => [
                         'url' => 'https://cdn.jsdelivr.net/npm/lodash.js@1.2.3/+esm',
                         'body' => 'import{Color as t}from"/npm/@kurkle/color@0.3.2/+esm";console.log("yo");',
@@ -197,7 +197,7 @@ class JsDelivrEsmImportMapProviderTest extends TestCase
                     'response' => ['body' => ['version' => '0.3.2']],
                 ],
                 [
-                    'url' => 'esm.run/@kurkle/color@0.3.2',
+                    'url' => '/@kurkle/color@0.3.2/+esm',
                     'response' => [
                         'url' => 'https://cdn.jsdelivr.net/npm/@kurkle/color@0.3.2/+esm',
                         'body' => 'import*as t from"/npm/@popperjs/core@2.11.7/+esm";// hello world',
@@ -209,7 +209,7 @@ class JsDelivrEsmImportMapProviderTest extends TestCase
                     'response' => ['body' => ['version' => '2.11.7']],
                 ],
                 [
-                    'url' => 'esm.run/@popperjs/core@2.11.7',
+                    'url' => '/@popperjs/core@2.11.7/+esm',
                     'response' => [
                         'url' => 'https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/+esm',
                         // point back to the original to try to confuse things or cause extra work

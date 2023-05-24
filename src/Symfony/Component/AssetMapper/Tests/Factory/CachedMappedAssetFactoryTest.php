@@ -45,8 +45,7 @@ class CachedMappedAssetFactoryTest extends TestCase
             true
         );
 
-        $mappedAsset = new MappedAsset('file1.css');
-        $mappedAsset->setSourcePath(__DIR__.'/../fixtures/dir1/file1.css');
+        $mappedAsset = new MappedAsset('file1.css', __DIR__.'/../fixtures/dir1/file1.css');
 
         $factory->expects($this->once())
             ->method('createMappedAsset')
@@ -59,16 +58,14 @@ class CachedMappedAssetFactoryTest extends TestCase
         // and, the objects will be equal, but not identical
         $secondActualAsset = $cachedFactory->createMappedAsset('file1.css', '/anything/file1.css');
         $this->assertNotSame($mappedAsset, $secondActualAsset);
-        $this->assertSame('file1.css', $secondActualAsset->getLogicalPath());
-        $this->assertSame(__DIR__.'/../fixtures/dir1/file1.css', $secondActualAsset->getSourcePath());
+        $this->assertSame('file1.css', $secondActualAsset->logicalPath);
+        $this->assertSame(__DIR__.'/../fixtures/dir1/file1.css', $secondActualAsset->sourcePath);
     }
 
     public function testAssetIsNotBuiltWhenCached()
     {
-        $mappedAsset = new MappedAsset('file1.css');
         $sourcePath = __DIR__.'/../fixtures/dir1/file1.css';
-        $mappedAsset->setSourcePath($sourcePath);
-        $mappedAsset->setContent('cached content');
+        $mappedAsset = new MappedAsset('file1.css', $sourcePath, content: 'cached content');
         $this->saveConfigCache($mappedAsset);
 
         $factory = $this->createMock(MappedAssetFactoryInterface::class);
@@ -82,28 +79,26 @@ class CachedMappedAssetFactoryTest extends TestCase
             ->method('createMappedAsset');
 
         $actualAsset = $cachedFactory->createMappedAsset('file1.css', $sourcePath);
-        $this->assertSame($mappedAsset->getLogicalPath(), $actualAsset->getLogicalPath());
-        $this->assertSame($mappedAsset->getContent(), $actualAsset->getContent());
+        $this->assertSame($mappedAsset->logicalPath, $actualAsset->logicalPath);
+        $this->assertSame($mappedAsset->content, $actualAsset->content);
     }
 
     public function testAssetConfigCacheResourceContainsDependencies()
     {
-        $mappedAsset = new MappedAsset('file1.css');
         $sourcePath = realpath(__DIR__.'/../fixtures/dir1/file1.css');
-        $mappedAsset->setSourcePath($sourcePath);
-        $mappedAsset->setContent('cached content');
+        $mappedAsset = new MappedAsset('file1.css', $sourcePath, content: 'cached content');
 
-        $dependentOnContentAsset = new MappedAsset('file3.css');
-        $dependentOnContentAsset->setSourcePath(realpath(__DIR__.'/../fixtures/dir2/file3.css'));
+        $dependentOnContentAsset = new MappedAsset('file3.css', realpath(__DIR__.'/../fixtures/dir2/file3.css'));
 
-        $deeplyNestedAsset = new MappedAsset('file4.js');
-        $deeplyNestedAsset->setSourcePath(realpath(__DIR__.'/../fixtures/dir2/file4.js'));
+        $deeplyNestedAsset = new MappedAsset('file4.js', realpath(__DIR__.'/../fixtures/dir2/file4.js'));
 
         $dependentOnContentAsset->addDependency(new AssetDependency($deeplyNestedAsset, isContentDependency: true));
         $mappedAsset->addDependency(new AssetDependency($dependentOnContentAsset, isContentDependency: true));
 
-        $notDependentOnContentAsset = new MappedAsset('already-abcdefVWXYZ0123456789.digested.css');
-        $notDependentOnContentAsset->setSourcePath(__DIR__.'/../fixtures/dir2/already-abcdefVWXYZ0123456789.digested.css');
+        $notDependentOnContentAsset = new MappedAsset(
+            'already-abcdefVWXYZ0123456789.digested.css',
+            __DIR__.'/../fixtures/dir2/already-abcdefVWXYZ0123456789.digested.css',
+        );
         $mappedAsset->addDependency(new AssetDependency($notDependentOnContentAsset, isContentDependency: false));
 
         // just adding any file as an example
@@ -126,9 +121,9 @@ class CachedMappedAssetFactoryTest extends TestCase
         $this->assertInstanceOf(FileResource::class, $configCacheMetadata[0]);
         $this->assertInstanceOf(FileResource::class, $configCacheMetadata[1]);
         $this->assertSame(realpath(__DIR__.'/../fixtures/importmap.php'), $configCacheMetadata[0]->getResource());
-        $this->assertSame($mappedAsset->getSourcePath(), $configCacheMetadata[1]->getResource());
-        $this->assertSame($dependentOnContentAsset->getSourcePath(), $configCacheMetadata[2]->getResource());
-        $this->assertSame($deeplyNestedAsset->getSourcePath(), $configCacheMetadata[3]->getResource());
+        $this->assertSame($mappedAsset->sourcePath, $configCacheMetadata[1]->getResource());
+        $this->assertSame($dependentOnContentAsset->sourcePath, $configCacheMetadata[2]->getResource());
+        $this->assertSame($deeplyNestedAsset->sourcePath, $configCacheMetadata[3]->getResource());
     }
 
     private function loadConfigCacheMetadataFor(MappedAsset $mappedAsset): array
@@ -141,11 +136,11 @@ class CachedMappedAssetFactoryTest extends TestCase
     private function saveConfigCache(MappedAsset $mappedAsset): void
     {
         $configCache = new ConfigCache($this->getConfigCachePath($mappedAsset), true);
-        $configCache->write(serialize($mappedAsset), [new FileResource($mappedAsset->getSourcePath())]);
+        $configCache->write(serialize($mappedAsset), [new FileResource($mappedAsset->sourcePath)]);
     }
 
     private function getConfigCachePath(MappedAsset $mappedAsset): string
     {
-        return $this->cacheDir.'/'.hash('xxh128', $mappedAsset->getLogicalPath().':'.$mappedAsset->getSourcePath()).'.php';
+        return $this->cacheDir.'/'.hash('xxh128', $mappedAsset->logicalPath.':'.$mappedAsset->sourcePath).'.php';
     }
 }

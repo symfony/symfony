@@ -902,7 +902,7 @@ class Configuration implements ConfigurationInterface
                             ->defaultValue('%kernel.project_dir%/assets/vendor')
                         ->end()
                         ->scalarNode('provider')
-                            ->info('The provider (CDN) to use'.class_exists(ImportMapManager::class) ? sprintf(' (e.g.: "%s").', implode('", "', ImportMapManager::PROVIDERS)) : '.')
+                            ->info('The provider (CDN) to use'.(class_exists(ImportMapManager::class) ? sprintf(' (e.g.: "%s").', implode('", "', ImportMapManager::PROVIDERS)) : '.'))
                             ->defaultValue('jsdelivr.esm')
                         ->end()
                     ->end()

@@ -9,8 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\AssetMapper\ImportMap\Providers;
+namespace Symfony\Component\AssetMapper\ImportMap\Resolver;
 
+use Symfony\Component\AssetMapper\Exception\RuntimeException;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\AssetMapper\ImportMap\PackageRequireOptions;
 use Symfony\Component\HttpClient\HttpClient;
@@ -19,15 +20,18 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @experimental
  */
-class JspmImportMapProvider implements ImportMapPackageProviderInterface
+final class JspmResolver implements PackageResolverInterface
 {
+    public const BASE_URI = 'https://api.jspm.io/';
+
     private HttpClientInterface $httpClient;
 
     public function __construct(
+        HttpClientInterface $httpClient = null,
         private readonly string $provider = ImportMapManager::PROVIDER_JSPM,
-        HttpClientInterface $httpClient = null
+        private readonly string $baseUri = self::BASE_URI,
     ) {
-        $this->httpClient = $httpClient ?? HttpClient::create(['base_uri' => 'https://api.jspm.io/']);
+        $this->httpClient = $httpClient ?? HttpClient::create();
     }
 
     public function resolvePackages(array $packagesToRequire): array
@@ -38,16 +42,16 @@ class JspmImportMapProvider implements ImportMapPackageProviderInterface
 
         $installData = [];
         $packageRequiresByName = [];
-        foreach ($packagesToRequire as $requireOptions) {
-            $constraint = $requireOptions->packageName;
-            if (null !== $requireOptions->versionConstraint) {
-                $constraint .= '@'.$requireOptions->versionConstraint;
+        foreach ($packagesToRequire as $options) {
+            $constraint = $options->packageName;
+            if (null !== $options->versionConstraint) {
+                $constraint .= '@'.$options->versionConstraint;
             }
-            if (null !== $requireOptions->registryName) {
-                $constraint = sprintf('%s:%s', $requireOptions->registryName, $constraint);
+            if (null !== $options->registryName) {
+                $constraint = sprintf('%s:%s', $options->registryName, $constraint);
             }
             $installData[] = $constraint;
-            $packageRequiresByName[$requireOptions->packageName] = $requireOptions;
+            $packageRequiresByName[$options->packageName] = $options;
         }
 
         $json = [
@@ -60,7 +64,8 @@ class JspmImportMapProvider implements ImportMapPackageProviderInterface
             $json['provider'] = $this->provider;
         }
 
-        $response = $this->httpClient->request('POST', 'https://api.jspm.io/generate', [
+        $response = $this->httpClient->request('POST', 'generate', [
+            'base_uri' => $this->baseUri,
             'json' => $json,
         ]);
 
@@ -68,7 +73,7 @@ class JspmImportMapProvider implements ImportMapPackageProviderInterface
             $data = $response->toArray(false);
 
             if (isset($data['error'])) {
-                throw new \RuntimeException('Error requiring JavaScript package: '.$data['error']);
+                throw new RuntimeException('Error requiring JavaScript package: '.$data['error']);
             }
 
             // Throws the original HttpClient exception
@@ -76,20 +81,22 @@ class JspmImportMapProvider implements ImportMapPackageProviderInterface
         }
 
         // if we're requiring just one package, in case it has any peer deps, match the preload
-        $defaultRequireOptions = $packagesToRequire[0];
+        $defaultOptions = $packagesToRequire[0];
 
         $resolvedPackages = [];
         foreach ($response->toArray()['map']['imports'] as $packageName => $url) {
-            $requireOptions = $packageRequiresByName[$packageName] ?? new PackageRequireOptions($packageName, null, $defaultRequireOptions->download, $defaultRequireOptions->preload);
-            $content = null;
-
-            if ($requireOptions->download) {
-                $content = $this->httpClient->request('GET', $url)->getContent();
-            }
-
-            $resolvedPackages[] = new ResolvedImportMapPackage($requireOptions, $url, $content);
+            $options = $packageRequiresByName[$packageName] ?? new PackageRequireOptions($packageName, null, $defaultOptions->download, $defaultOptions->preload);
+            $resolvedPackages[] = [$options, $url, $options->download ? $this->httpClient->request('GET', $url, ['base_uri' => $this->baseUri]) : null];
         }
 
-        return $resolvedPackages;
+        try {
+            return array_map(fn ($args) => new ResolvedImportMapPackage($args[0], $args[1], $args[2]?->getContent()), $resolvedPackages);
+        } catch (\Throwable $e) {
+            foreach ($resolvedPackages as $args) {
+                $args[2]?->cancel();
+            }
+
+            throw $e;
+        }
     }
 }

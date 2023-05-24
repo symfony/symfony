@@ -13,7 +13,7 @@ namespace Symfony\Component\AssetMapper\ImportMap;
 
 use Symfony\Component\AssetMapper\AssetDependency;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
-use Symfony\Component\AssetMapper\ImportMap\Providers\ImportMapPackageProviderInterface;
+use Symfony\Component\AssetMapper\ImportMap\Resolver\PackageResolverInterface;
 use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
 use Symfony\Component\VarExporter\VarExporter;
 
@@ -62,7 +62,7 @@ class ImportMapManager
         private readonly PublicAssetsPathResolverInterface $assetsPathResolver,
         private readonly string $importMapConfigPath,
         private readonly string $vendorDir,
-        private readonly ImportMapPackageProviderInterface $importMapPackageProvider,
+        private readonly PackageResolverInterface $resolver,
     ) {
     }
 
@@ -239,7 +239,7 @@ class ImportMapManager
             return $addedEntries;
         }
 
-        $resolvedPackages = $this->importMapPackageProvider->resolvePackages($packagesToRequire);
+        $resolvedPackages = $this->resolver->resolvePackages($packagesToRequire);
         foreach ($resolvedPackages as $resolvedPackage) {
             $importName = $resolvedPackage->requireOptions->importName ?: $resolvedPackage->requireOptions->packageName;
             $path = null;
@@ -273,8 +273,8 @@ class ImportMapManager
 
         $asset = $this->assetMapper->getAsset($entry->path);
 
-        if (is_file($asset->getSourcePath())) {
-            @unlink($asset->getSourcePath());
+        if (is_file($asset->sourcePath)) {
+            @unlink($asset->sourcePath);
         }
     }
 
@@ -320,11 +320,10 @@ class ImportMapManager
                 $path = $entry->path;
                 // if the path is an absolute path, convert it to an asset path
                 if (is_file($path)) {
-                    $asset = $this->assetMapper->getAssetFromSourcePath($path);
-                    if (null === $asset) {
+                    if (null === $asset = $this->assetMapper->getAssetFromSourcePath($path)) {
                         throw new \LogicException(sprintf('The "%s" importmap entry contains the path "%s" but it does not appear to be in any of your asset paths.', $entry->importName, $path));
                     }
-                    $path = $asset->getLogicalPath();
+                    $path = $asset->logicalPath;
                 }
                 $config[$entry->isDownloaded ? 'downloaded_to' : 'path'] = $path;
             }
@@ -356,11 +355,10 @@ class ImportMapManager
             $dependencies = [];
 
             if (null !== $entryOptions->path) {
-                $asset = $this->assetMapper->getAsset($entryOptions->path);
-                if (!$asset) {
+                if (!$asset = $this->assetMapper->getAsset($entryOptions->path)) {
                     throw new \InvalidArgumentException(sprintf('The asset "%s" mentioned in "%s" cannot be found in any asset map paths.', $entryOptions->path, basename($this->importMapConfigPath)));
                 }
-                $path = $asset->getPublicPath();
+                $path = $asset->publicPath;
                 $dependencies = $asset->getDependencies();
             } elseif (null !== $entryOptions->url) {
                 $path = $entryOptions->url;
@@ -376,8 +374,8 @@ class ImportMapManager
 
             $dependencyImportMapEntries = array_map(function (AssetDependency $dependency) use ($entryOptions) {
                 return new ImportMapEntry(
-                    $dependency->asset->getPublicPathWithoutDigest(),
-                    $dependency->asset->getLogicalPath(),
+                    $dependency->asset->publicPathWithoutDigest,
+                    $dependency->asset->logicalPath,
                     preload: $entryOptions->preload && !$dependency->isLazy,
                 );
             }, $dependencies);
@@ -394,13 +392,12 @@ class ImportMapManager
         @mkdir(\dirname($vendorPath), 0777, true);
         file_put_contents($vendorPath, $packageContents);
 
-        $mappedAsset = $this->assetMapper->getAssetFromSourcePath($vendorPath);
-        if (null === $mappedAsset) {
+        if (null === $mappedAsset = $this->assetMapper->getAssetFromSourcePath($vendorPath)) {
             unlink($vendorPath);
 
             throw new \LogicException(sprintf('The package was downloaded to "%s", but this path does not appear to be in any of your asset paths.', $vendorPath));
         }
 
-        return $mappedAsset->getLogicalPath();
+        return $mappedAsset->logicalPath;
     }
 }

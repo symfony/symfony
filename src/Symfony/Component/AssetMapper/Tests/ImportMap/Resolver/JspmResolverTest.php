@@ -14,11 +14,11 @@ namespace ImportMap\Providers;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\AssetMapper\ImportMap\PackageRequireOptions;
-use Symfony\Component\AssetMapper\ImportMap\Providers\JspmImportMapProvider;
+use Symfony\Component\AssetMapper\ImportMap\Resolver\JspmResolver;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 
-class JspmImportMapProviderTest extends TestCase
+class JspmResolverTest extends TestCase
 {
     /**
      * @dataProvider provideResolvePackagesTests
@@ -51,7 +51,7 @@ class JspmImportMapProviderTest extends TestCase
 
         $httpClient = new MockHttpClient($responses);
 
-        $provider = new JspmImportMapProvider(ImportMapManager::PROVIDER_JSPM, $httpClient);
+        $provider = new JspmResolver($httpClient, ImportMapManager::PROVIDER_JSPM);
         $actualResolvedPackages = $provider->resolvePackages($packages);
         $this->assertCount(\count($expectedResolvedPackages), $actualResolvedPackages);
         foreach ($actualResolvedPackages as $package) {

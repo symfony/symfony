@@ -133,7 +133,7 @@ EOT
                 $application = $this->getApplication();
                 if ($application instanceof Application) {
                     $projectDir = $application->getKernel()->getProjectDir();
-                    $downloadedPath = $downloadedAsset->getSourcePath();
+                    $downloadedPath = $downloadedAsset->sourcePath;
                     if (str_starts_with($downloadedPath, $projectDir)) {
                         $downloadedPath = substr($downloadedPath, \strlen($projectDir) + 1);
                     }

@@ -21,8 +21,8 @@ use Symfony\Component\AssetMapper\Compiler\JavaScriptImportPathCompiler;
 use Symfony\Component\AssetMapper\Factory\MappedAssetFactory;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\AssetMapper\ImportMap\PackageRequireOptions;
-use Symfony\Component\AssetMapper\ImportMap\Providers\ImportMapPackageProviderInterface;
-use Symfony\Component\AssetMapper\ImportMap\Providers\ResolvedImportMapPackage;
+use Symfony\Component\AssetMapper\ImportMap\Resolver\PackageResolverInterface;
+use Symfony\Component\AssetMapper\ImportMap\Resolver\ResolvedImportMapPackage;
 use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolver;
 use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -31,7 +31,7 @@ class ImportMapManagerTest extends TestCase
 {
     private Filesystem $filesystem;
     private AssetMapperInterface $assetMapper;
-    private ImportMapPackageProviderInterface|MockObject $packageProvider;
+    private PackageResolverInterface&MockObject $packageResolver;
 
     protected function setUp(): void
     {
@@ -108,7 +108,7 @@ class ImportMapManagerTest extends TestCase
         $rootDir = __DIR__.'/../fixtures/importmaps_for_writing';
         $manager = $this->createImportMapManager(['assets' => ''], $rootDir);
 
-        $this->packageProvider->expects($this->exactly(0 === $expectedProviderPackageArgumentCount ? 0 : 1))
+        $this->packageResolver->expects($this->exactly(0 === $expectedProviderPackageArgumentCount ? 0 : 1))
             ->method('resolvePackages')
             ->with($this->callback(function (array $packages) use ($expectedProviderPackageArgumentCount) {
                 return \count($packages) === $expectedProviderPackageArgumentCount;
@@ -321,7 +321,7 @@ class ImportMapManagerTest extends TestCase
         file_put_contents($rootDir.'/assets/vendor/moo.js', 'moo.js contents');
         file_put_contents($rootDir.'/assets/app.js', 'app.js contents');
 
-        $this->packageProvider->expects($this->once())
+        $this->packageResolver->expects($this->once())
             ->method('resolvePackages')
             ->with($this->callback(function ($packages) {
                 $this->assertInstanceOf(PackageRequireOptions::class, $packages[0]);
@@ -465,14 +465,14 @@ class ImportMapManagerTest extends TestCase
         $pathResolver = new PublicAssetsPathResolver($rootDir, $publicPrefix, $publicDirName);
 
         $mapper = $this->createAssetMapper($pathResolver, $dirs, $rootDir);
-        $this->packageProvider = $this->createMock(ImportMapPackageProviderInterface::class);
+        $this->packageResolver = $this->createMock(PackageResolverInterface::class);
 
         return new ImportMapManager(
             $mapper,
             $pathResolver,
             $rootDir.'/importmap.php',
             $rootDir.'/assets/vendor',
-            $this->packageProvider,
+            $this->packageResolver,
         );
     }
 

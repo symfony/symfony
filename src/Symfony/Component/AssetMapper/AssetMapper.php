@@ -74,7 +74,7 @@ class AssetMapper implements AssetMapperInterface
 
         $asset = $this->getAsset($logicalPath);
 
-        return $asset?->getPublicPath();
+        return $asset?->publicPath;
     }
 
     private function loadManifest(): array

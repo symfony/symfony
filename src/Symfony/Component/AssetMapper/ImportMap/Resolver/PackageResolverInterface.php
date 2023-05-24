@@ -9,15 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\AssetMapper\ImportMap\Providers;
+namespace Symfony\Component\AssetMapper\ImportMap\Resolver;
 
-use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
 use Symfony\Component\AssetMapper\ImportMap\PackageRequireOptions;
 
 /**
  * @experimental
  */
-interface ImportMapPackageProviderInterface
+interface PackageResolverInterface
 {
     /**
      * Grabs the URLs for the given packages and converts them to ImportMapEntry objects.

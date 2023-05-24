@@ -45,23 +45,23 @@ final class CssAssetUrlCompiler implements AssetCompilerInterface
     {
         return preg_replace_callback(self::ASSET_URL_PATTERN, function ($matches) use ($asset, $assetMapper) {
             try {
-                $resolvedPath = $this->resolvePath(\dirname($asset->getLogicalPath()), $matches[1]);
+                $resolvedPath = $this->resolvePath(\dirname($asset->logicalPath), $matches[1]);
             } catch (RuntimeException $e) {
-                $this->handleMissingImport(sprintf('Error processing import in "%s": "%s"', $asset->getSourcePath(), $e->getMessage()), $e);
+                $this->handleMissingImport(sprintf('Error processing import in "%s": ', $asset->sourcePath).$e->getMessage(), $e);
 
                 return $matches[0];
             }
             $dependentAsset = $assetMapper->getAsset($resolvedPath);
 
             if (null === $dependentAsset) {
-                $this->handleMissingImport(sprintf('Unable to find asset "%s" referenced in "%s".', $matches[1], $asset->getSourcePath()));
+                $this->handleMissingImport(sprintf('Unable to find asset "%s" referenced in "%s".', $matches[1], $asset->sourcePath));
 
                 // return original, unchanged path
                 return $matches[0];
             }
 
             $asset->addDependency(new AssetDependency($dependentAsset));
-            $relativePath = $this->createRelativePath($asset->getPublicPathWithoutDigest(), $dependentAsset->getPublicPath());
+            $relativePath = $this->createRelativePath($asset->publicPathWithoutDigest, $dependentAsset->publicPath);
 
             return 'url("'.$relativePath.'")';
         }, $content);
@@ -69,7 +69,7 @@ final class CssAssetUrlCompiler implements AssetCompilerInterface
 
     public function supports(MappedAsset $asset): bool
     {
-        return 'css' === $asset->getPublicExtension();
+        return 'css' === $asset->publicExtension;
     }
 
     private function handleMissingImport(string $message, \Throwable $e = null): void

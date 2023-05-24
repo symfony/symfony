@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\AssetMapper\ImportMap\Providers;
+namespace Symfony\Component\AssetMapper\ImportMap\Resolver;
 
 use Symfony\Component\AssetMapper\ImportMap\PackageRequireOptions;
 
 /**
  * @experimental
  */
-class ResolvedImportMapPackage
+final class ResolvedImportMapPackage
 {
     public function __construct(
         public readonly PackageRequireOptions $requireOptions,

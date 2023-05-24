@@ -30,13 +30,13 @@ final class SourceMappingUrlsCompiler implements AssetCompilerInterface
 
     public function supports(MappedAsset $asset): bool
     {
-        return \in_array($asset->getPublicExtension(), ['css', 'js'], true);
+        return \in_array($asset->publicExtension, ['css', 'js'], true);
     }
 
     public function compile(string $content, MappedAsset $asset, AssetMapperInterface $assetMapper): string
     {
         return preg_replace_callback(self::SOURCE_MAPPING_PATTERN, function ($matches) use ($asset, $assetMapper) {
-            $resolvedPath = $this->resolvePath(\dirname($asset->getLogicalPath()), $matches[2]);
+            $resolvedPath = $this->resolvePath(\dirname($asset->logicalPath), $matches[2]);
 
             $dependentAsset = $assetMapper->getAsset($resolvedPath);
             if (!$dependentAsset) {
@@ -45,7 +45,7 @@ final class SourceMappingUrlsCompiler implements AssetCompilerInterface
             }
 
             $asset->addDependency(new AssetDependency($dependentAsset));
-            $relativePath = $this->createRelativePath($asset->getPublicPathWithoutDigest(), $dependentAsset->getPublicPath());
+            $relativePath = $this->createRelativePath($asset->publicPathWithoutDigest, $dependentAsset->publicPath);
 
             return $matches[1].'# sourceMappingURL='.$relativePath;
         }, $content);

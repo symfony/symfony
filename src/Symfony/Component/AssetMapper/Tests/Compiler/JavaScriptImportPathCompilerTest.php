@@ -26,16 +26,14 @@ class JavaScriptImportPathCompilerTest extends TestCase
      */
     public function testCompile(string $sourceLogicalName, string $input, array $expectedDependencies)
     {
-        $asset = new MappedAsset($sourceLogicalName);
-        $asset->setPublicPathWithoutDigest('/assets/'.$sourceLogicalName);
-        $asset->setSourcePath('anything');
+        $asset = new MappedAsset($sourceLogicalName, 'anything', '/assets/'.$sourceLogicalName);
 
         $compiler = new JavaScriptImportPathCompiler(AssetCompilerInterface::MISSING_IMPORT_IGNORE, $this->createMock(LoggerInterface::class));
         // compile - and check that content doesn't change
         $this->assertSame($input, $compiler->compile($input, $asset, $this->createAssetMapper()));
         $actualDependencies = [];
         foreach ($asset->getDependencies() as $dependency) {
-            $actualDependencies[$dependency->asset->getLogicalPath()] = $dependency->isLazy;
+            $actualDependencies[$dependency->asset->logicalPath] = $dependency->isLazy;
         }
         $this->assertEquals($expectedDependencies, $actualDependencies);
         if ($expectedDependencies) {
@@ -169,12 +167,10 @@ class JavaScriptImportPathCompilerTest extends TestCase
      */
     public function testImportPathsCanUpdate(string $sourceLogicalName, string $input, string $sourcePublicPath, string $importedPublicPath, string $expectedOutput)
     {
-        $asset = new MappedAsset($sourceLogicalName);
-        $asset->setPublicPathWithoutDigest($sourcePublicPath);
+        $asset = new MappedAsset($sourceLogicalName, publicPathWithoutDigest: $sourcePublicPath);
 
         $assetMapper = $this->createMock(AssetMapperInterface::class);
-        $importedAsset = new MappedAsset('anything');
-        $importedAsset->setPublicPathWithoutDigest($importedPublicPath);
+        $importedAsset = new MappedAsset('anything', publicPathWithoutDigest: $importedPublicPath);
         $assetMapper->expects($this->once())
             ->method('getAsset')
             ->willReturn($importedAsset);
@@ -244,8 +240,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
             $this->expectExceptionMessage($expectedExceptionMessage);
         }
 
-        $asset = new MappedAsset($sourceLogicalName);
-        $asset->setSourcePath('/path/to/app.js');
+        $asset = new MappedAsset($sourceLogicalName, '/path/to/app.js');
 
         $logger = $this->createMock(LoggerInterface::class);
         $compiler = new JavaScriptImportPathCompiler(
@@ -288,25 +283,12 @@ class JavaScriptImportPathCompilerTest extends TestCase
         $assetMapper->expects($this->any())
             ->method('getAsset')
             ->willReturnCallback(function ($path) {
-                switch ($path) {
-                    case 'other.js':
-                        $asset = new MappedAsset('other.js');
-                        $asset->setPublicPathWithoutDigest('/assets/other.js');
-
-                        return $asset;
-                    case 'subdir/foo.js':
-                        $asset = new MappedAsset('subdir/foo.js');
-                        $asset->setPublicPathWithoutDigest('/assets/subdir/foo.js');
-
-                        return $asset;
-                    case 'styles.css':
-                        $asset = new MappedAsset('styles.css');
-                        $asset->setPublicPathWithoutDigest('/assets/styles.css');
-
-                        return $asset;
-                    default:
-                        return null;
-                }
+                return match ($path) {
+                    'other.js' => new MappedAsset('other.js', publicPathWithoutDigest: '/assets/other.js'),
+                    'subdir/foo.js' => new MappedAsset('subdir/foo.js', publicPathWithoutDigest: '/assets/subdir/foo.js'),
+                    'styles.css' => new MappedAsset('styles.css', publicPathWithoutDigest: '/assets/styles.css'),
+                    default => null,
+                };
             });
 
         return $assetMapper;

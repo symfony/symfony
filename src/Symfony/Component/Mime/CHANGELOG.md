@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+---
+ * Change the visibility of Email::ensureBodyValid() to "protected" to override its behavior in child classes.  
+ * Add RemoteEmail to support remote emails with template defined on the cloud (empty body)
+
 6.3
 ---
 

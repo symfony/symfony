@@ -1,11 +1,15 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+* Reset `$server` parameters in `Symfony\Component\BrowserKit\AbstractBrowser::restart()`
+
 6.3
 ---
 
  * Add `AbstractBrowser::useHtml5Parser()`
- * Reset `$server` parameters in `Symfony\Component\BrowserKit\AbstractBrowser::restart()`
 
 6.1
 ---

@@ -45,9 +45,9 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
     {
         return preg_replace_callback(self::IMPORT_PATTERN, function ($matches) use ($asset, $assetMapper) {
             try {
-                $resolvedPath = $this->resolvePath(\dirname($asset->getLogicalPath()), $matches[1]);
+                $resolvedPath = $this->resolvePath(\dirname($asset->logicalPath), $matches[1]);
             } catch (RuntimeException $e) {
-                $this->handleMissingImport(sprintf('Error processing import in "%s": "%s"', $asset->getSourcePath(), $e->getMessage()), $e);
+                $this->handleMissingImport(sprintf('Error processing import in "%s": ', $asset->sourcePath).$e->getMessage(), $e);
 
                 return $matches[0];
             }
@@ -55,7 +55,7 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
             $dependentAsset = $assetMapper->getAsset($resolvedPath);
 
             if (!$dependentAsset) {
-                $message = sprintf('Unable to find asset "%s" imported from "%s".', $matches[1], $asset->getSourcePath());
+                $message = sprintf('Unable to find asset "%s" imported from "%s".', $matches[1], $asset->sourcePath);
 
                 if (null !== $assetMapper->getAsset(sprintf('%s.js', $resolvedPath))) {
                     $message .= sprintf(' Try adding ".js" to the end of the import - i.e. "%s.js".', $matches[1]);
@@ -73,7 +73,7 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
 
                 $asset->addDependency(new AssetDependency($dependentAsset, $isLazy, false));
 
-                $relativeImportPath = $this->createRelativePath($asset->getPublicPathWithoutDigest(), $dependentAsset->getPublicPathWithoutDigest());
+                $relativeImportPath = $this->createRelativePath($asset->publicPathWithoutDigest, $dependentAsset->publicPathWithoutDigest);
                 $relativeImportPath = $this->makeRelativeForJavaScript($relativeImportPath);
 
                 return str_replace($matches[1], $relativeImportPath, $matches[0]);
@@ -85,7 +85,7 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
 
     public function supports(MappedAsset $asset): bool
     {
-        return 'js' === $asset->getPublicExtension();
+        return 'js' === $asset->publicExtension;
     }
 
     private function makeRelativeForJavaScript(string $path): string

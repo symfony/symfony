@@ -112,7 +112,7 @@ class ConfigurationTest extends TestCase
             'importmap_path' => '%kernel.project_dir%/importmap.php',
             'importmap_polyfill' => null,
             'vendor_dir' => '%kernel.project_dir%/assets/vendor',
-            'provider' => 'jspm',
+            'provider' => 'jsdelivr.esm',
             'importmap_script_attributes' => [],
         ];
 
@@ -624,7 +624,7 @@ class ConfigurationTest extends TestCase
                 'importmap_path' => '%kernel.project_dir%/importmap.php',
                 'importmap_polyfill' => null,
                 'vendor_dir' => '%kernel.project_dir%/assets/vendor',
-                'provider' => 'jspm',
+                'provider' => 'jsdelivr.esm',
                 'importmap_script_attributes' => [],
             ],
             'cache' => [

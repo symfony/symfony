@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-05-24T02:50:18Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.4" but it seems your PR description refers to branch "6.3".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-05-24T03:16:00Z
+
+The "high-deps" failure is because it's trying to pull in the latest commit from `symfony/framework-bundle`, but that is missing the commit from this PR which handles the wiring. But I'm not sure how to fix that.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-05-24T08:29:04Z
+
+The failing high-deps is because your Pr does not target the highest version (as the 6.4 branch has been created). It is fine to ignore that failure as it will be resolved once your merged PR is merged up from 6.3 to 6.4.

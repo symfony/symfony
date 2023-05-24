@@ -771,10 +771,15 @@ class ApplicationTest extends TestCase
         $this->assertInstanceOf(\FooCommand::class, $application->find('foo:'));
     }
 
-    public function testSetCatchExceptions()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testSetCatchExceptions(bool $catchErrors)
     {
         $application = new Application();
         $application->setAutoExit(false);
+        $application->setCatchErrors($catchErrors);
         putenv('COLUMNS=120');
         $tester = new ApplicationTester($application);
 
@@ -796,6 +801,33 @@ class ApplicationTest extends TestCase
             $this->assertInstanceOf(\Exception::class, $e, '->setCatchExceptions() sets the catch exception flag');
             $this->assertEquals('Command "foo" is not defined.', $e->getMessage(), '->setCatchExceptions() sets the catch exception flag');
         }
+    }
+
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testSetCatchErrors(bool $catchExceptions)
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions($catchExceptions);
+        $application->add((new Command('boom'))->setCode(fn () => throw new \Error('This is an error.')));
+
+        putenv('COLUMNS=120');
+        $tester = new ApplicationTester($application);
+
+        try {
+            $tester->run(['command' => 'boom']);
+            $this->fail('The exception is not catched.');
+        } catch (\Throwable $e) {
+            $this->assertInstanceOf(\Error::class, $e);
+            $this->assertSame('This is an error.', $e->getMessage());
+        }
+
+        $application->setCatchErrors(true);
+        $tester->run(['command' => 'boom']);
+        $this->assertStringContainsString('  This is an error.', $tester->getDisplay(true));
     }
 
     public function testAutoExitSetting()

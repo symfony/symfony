@@ -2741,6 +2741,7 @@ class FrameworkExtension extends Extension
             NotifierBridge\MessageMedia\MessageMediaTransportFactory::class => 'notifier.transport_factory.message-media',
             NotifierBridge\MicrosoftTeams\MicrosoftTeamsTransportFactory::class => 'notifier.transport_factory.microsoft-teams',
             NotifierBridge\Mobyt\MobytTransportFactory::class => 'notifier.transport_factory.mobyt',
+            NotifierBridge\Novu\NovuTransportFactory::class => 'notifier.transport_factory.novu',
             NotifierBridge\Octopush\OctopushTransportFactory::class => 'notifier.transport_factory.octopush',
             NotifierBridge\OneSignal\OneSignalTransportFactory::class => 'notifier.transport_factory.one-signal',
             NotifierBridge\OrangeSms\OrangeSmsTransportFactory::class => 'notifier.transport_factory.orange-sms',

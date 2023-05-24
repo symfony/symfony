@@ -62,6 +62,7 @@ final class Transport
         Bridge\MessageMedia\MessageMediaTransportFactory::class,
         Bridge\MicrosoftTeams\MicrosoftTeamsTransportFactory::class,
         Bridge\Mobyt\MobytTransportFactory::class,
+        Bridge\Novu\NovuTransportFactory::class,
         Bridge\Octopush\OctopushTransportFactory::class,
         Bridge\OneSignal\OneSignalTransportFactory::class,
         Bridge\OrangeSms\OrangeSmsTransportFactory::class,

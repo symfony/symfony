@@ -60,6 +60,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             Bridge\MessageMedia\MessageMediaTransportFactory::class => false,
             Bridge\MicrosoftTeams\MicrosoftTeamsTransportFactory::class => false,
             Bridge\Mobyt\MobytTransportFactory::class => false,
+            Bridge\Novu\NovuTransportFactory::class => false,
             Bridge\Octopush\OctopushTransportFactory::class => false,
             Bridge\OneSignal\OneSignalTransportFactory::class => false,
             Bridge\OrangeSms\OrangeSmsTransportFactory::class => false,
@@ -138,6 +139,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['messagemedia', 'symfony/message-media-notifier'];
         yield ['microsoftteams', 'symfony/microsoft-teams-notifier'];
         yield ['mobyt', 'symfony/mobyt-notifier'];
+        yield ['novu', 'symfony/novu-notifier'];
         yield ['octopush', 'symfony/octopush-notifier'];
         yield ['onesignal', 'symfony/one-signal-notifier'];
         yield ['ovhcloud', 'symfony/ovh-cloud-notifier'];

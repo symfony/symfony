@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by bobthecow at 2023-05-23T14:22:01Z
+
+Thanks for jumping on this, @nicolas-grekas!
+
+This fix works, in that it no longer breaks functionality. But it does look like it introduces a change in formatted output that puts empty spans in front of a lot of things:
+
+<img width="891" alt="Screenshot 2023-05-23 at 10 19 29 AM" src="https://github.com/symfony/symfony/assets/53660/c6c7a7a8-e89b-4e2e-af5e-1a7351706bd3">
+
+Either that or this was introduced somewhere else but masked by the BC break in my tests.

@@ -903,7 +903,7 @@ EOHTML
         }
 
         $map = static::$controlCharsMap;
-        $v = '<span class=sf-dump-'.('label' === $style ? 'default' : $style).'>'.preg_replace_callback(static::$controlCharsRx, function ($c) use ($map) {
+        $v = "<span class=sf-dump-{$style}>".preg_replace_callback(static::$controlCharsRx, function ($c) use ($map) {
             $s = $b = '<span class="sf-dump-default';
             $c = $c[$i = 0];
             if ($ns = "\r" === $c[$i] || "\n" === $c[$i]) {
@@ -943,6 +943,9 @@ EOHTML
         }
         if (isset($attr['lang'])) {
             $v = sprintf('<code class="%s">%s</code>', esc($attr['lang']), $v);
+        }
+        if ('label' === $style) {
+            $v .= ' ';
         }
 
         return $v;

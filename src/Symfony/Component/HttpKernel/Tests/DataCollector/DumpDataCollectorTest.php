@@ -28,6 +28,7 @@ class DumpDataCollectorTest extends TestCase
     public function testDump()
     {
         $data = new Data([[123]]);
+        $data = $data->withContext(['label' => 'foo']);
 
         $collector = new DumpDataCollector(null, new FileLinkFormatter([]));
 
@@ -49,11 +50,12 @@ class DumpDataCollectorTest extends TestCase
                 'file' => __FILE__,
                 'line' => $line,
                 'fileExcerpt' => false,
+                'label' => 'foo',
             ],
         ];
         $this->assertEquals($xDump, $dump);
 
-        $this->assertStringMatchesFormat('%a;a:%d:{i:0;a:5:{s:4:"data";%c:39:"Symfony\Component\VarDumper\Cloner\Data":%a', serialize($collector));
+        $this->assertStringMatchesFormat('%a;a:%d:{i:0;a:6:{s:4:"data";%c:39:"Symfony\Component\VarDumper\Cloner\Data":%a', serialize($collector));
         $this->assertSame(0, $collector->getDumpsCount());
 
         $serialized = serialize($collector);
@@ -77,7 +79,7 @@ class DumpDataCollectorTest extends TestCase
         ob_start();
         $collector->collect(new Request(), new Response());
         $this->assertEmpty(ob_get_clean());
-        $this->assertStringMatchesFormat('%a;a:%d:{i:0;a:5:{s:4:"data";%c:39:"Symfony\Component\VarDumper\Cloner\Data":%a', serialize($collector));
+        $this->assertStringMatchesFormat('%a;a:%d:{i:0;a:6:{s:4:"data";%c:39:"Symfony\Component\VarDumper\Cloner\Data":%a', serialize($collector));
     }
 
     public function testCollectDefault()

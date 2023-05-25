@@ -23,6 +23,7 @@ use Symfony\Component\Cache\Exception\LogicException;
 use Symfony\Component\Cache\Marshaller\DeflateMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 use Symfony\Component\Cache\Marshaller\TagAwareMarshaller;
+use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\Traits\RedisTrait;
 
 /**
@@ -44,7 +45,7 @@ use Symfony\Component\Cache\Traits\RedisTrait;
  * @author Nicolas Grekas <p@tchwork.com>
  * @author André Rømcke <andre.romcke+symfony@gmail.com>
  */
-class RedisTagAwareAdapter extends AbstractTagAwareAdapter
+class RedisTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableInterface
 {
     use RedisTrait;
 
@@ -304,5 +305,194 @@ EOLUA;
         }
 
         return $this->redisEvictionPolicy = '';
+    }
+
+
+    private function getPrefix(): string
+    {
+        if ($this->redis instanceof \Predis\ClientInterface) {
+            $prefix = $this->redis->getOptions()->prefix ? $this->redis->getOptions()->prefix->getPrefix() : '';
+        } elseif (\is_array($prefix = $this->redis->getOption(\Redis::OPT_PREFIX) ?? '')) {
+            $prefix = current($prefix);
+        }
+        return $prefix;
+    }
+
+    /**
+     * Returns all existing tag keys from the cache.
+     *
+     * @TODO Verify the LUA scripts are redis-cluster safe.
+     *
+     * @return array
+     */
+    protected function getAllTagKeys(): array
+    {
+        $tagKeys = [];
+        $prefix = $this->getPrefix();
+        // need to trim the \0 for lua script
+        $tagsPrefix = trim(self::TAGS_PREFIX);
+
+        // get all SET entries which are tagged
+        $getTagsLua = <<<'EOLUA'
+            redis.replicate_commands()
+            local cursor = ARGV[1]
+            local prefix = ARGV[2]
+            local tagPrefix = string.gsub(KEYS[1], prefix, "")
+            return redis.call('SCAN', cursor, 'COUNT', 5000, 'MATCH', '*' .. tagPrefix .. '*', 'TYPE', 'set')
+        EOLUA;
+        $cursor = null;
+        do {
+            $results = $this->pipeline(function () use ($getTagsLua, $cursor, $prefix, $tagsPrefix) {
+                yield 'eval' => [$getTagsLua, [$tagsPrefix, $cursor, $prefix], 1];
+            });
+
+            $setKeys = $results->valid() ? iterator_to_array($results) : [];
+            [$cursor, $ids] = $setKeys[$tagsPrefix] ?? [null, null];
+            // merge the fetched ids together
+            $tagKeys = array_merge($tagKeys, $ids);
+        } while ($cursor = (int) $cursor);
+
+        return $tagKeys;
+    }
+
+
+    /**
+     * Checks all tags in the cache for orphaned items and creates a "report" array.
+     *
+     * By default, only completely orphaned tag keys are reported. If
+     * compressMode is enabled the report will include all tag keys
+     * that have any orphaned references to cache items
+     *
+     * @TODO Verify the LUA scripts are redis-cluster safe.
+     * @TODO Is there anything that can be done to reduce memory footprint?
+     *
+     * @param bool $compressMode
+     * @return array{tagKeys: string[], orphanedTagKeys: string[], orphanedTagReferenceKeys?: array<string, string[]>}
+     *      tagKeys: List of all tags in the cache.
+     *      orphanedTagKeys: List of tags that only reference orphaned cache items.
+     *      orphanedTagReferenceKeys: List of all orphaned cache item references per tag.
+     *                           Keyed by tag, value is the list of orphaned cache item keys.
+     */
+    private function getOrphanedTagsStats(bool $compressMode = false): array
+    {
+        $prefix = $this->getPrefix();
+        $tagKeys = $this->getAllTagKeys();
+
+        // lua for fetching all entries/content from a SET
+        $getSetContentLua = <<<'EOLUA'
+            redis.replicate_commands()
+            local cursor = ARGV[1]
+            return redis.call('SSCAN', KEYS[1], cursor, 'COUNT', 5000)
+        EOLUA;
+
+        $orphanedTagReferenceKeys = [];
+        $orphanedTagKeys = [];
+        // Iterate over each tag and check if its entries reference orphaned
+        // cache items.
+        foreach ($tagKeys as $tagKey) {
+            $tagKey = substr($tagKey, strlen($prefix));
+            $cursor = null;
+            $hasExistingKeys = false;
+            do {
+                // Fetch all referenced cache keys from the tag entry.
+                $results = $this->pipeline(function () use ($getSetContentLua, $tagKey, $cursor) {
+                    yield 'eval' => [$getSetContentLua, [$tagKey, $cursor], 1];
+                });
+                [$cursor, $referencedCacheKeys] = $results->valid() ? $results->current() : [null, null];
+
+                if (!empty($referencedCacheKeys)) {
+                    // Counts how many of the referenced cache items exist.
+                    $existingCacheKeysResult = $this->pipeline(function () use ($referencedCacheKeys) {
+                        yield 'exists' => $referencedCacheKeys;
+                    });
+                    $existingCacheKeysCount = $existingCacheKeysResult->valid() ? $existingCacheKeysResult->current() : 0;
+                    $hasExistingKeys = $hasExistingKeys || ($existingCacheKeysCount > 0 ?? false);
+
+                    // If compression mode is enabled and the count between
+                    // referenced and existing cache keys differs collect the
+                    // missing references.
+                    if ($compressMode && count($referencedCacheKeys) > $existingCacheKeysCount) {
+                        // In order to create the delta each single reference
+                        // has to be checked.
+                        foreach ($referencedCacheKeys as $cacheKey) {
+                            $existingCacheKeyResult = $this->pipeline(function () use ($cacheKey) {
+                                yield 'exists' => [$cacheKey];
+                            });
+                            if ($existingCacheKeyResult->valid() && !$existingCacheKeyResult->current()) {
+                                $orphanedTagReferenceKeys[$tagKey][] = $cacheKey;
+                            }
+                        }
+                    }
+                    // Stop processing cursors in case compression mode is
+                    // disabled and the tag references existing keys.
+                    if (!$compressMode && $hasExistingKeys) {
+                         break;
+                    }
+                }
+            } while ($cursor = (int) $cursor);
+            if (!$hasExistingKeys) {
+                $orphanedTagKeys[] = $tagKey;
+            }
+        }
+
+        $stats = ['orphanedTagKeys' => $orphanedTagKeys, 'tagKeys' => $tagKeys];
+        if ($compressMode) {
+            $stats['orphanedTagReferenceKeys'] = $orphanedTagReferenceKeys;
+        }
+        return $stats;
+    }
+
+    /**
+     *
+     * @TODO Verify the LUA scripts are redis-cluster safe.
+     *
+     * @param bool $compressMode
+     * @return bool
+     */
+    private function pruneOrphanedTags(bool $compressMode = false): bool
+    {
+        $success = true;
+        $orphanedTagsStats = $this->getOrphanedTagsStats($compressMode);
+
+        // Delete all tags that don't reference any existing cache item.
+        foreach ($orphanedTagsStats['orphanedTagKeys'] as $orphanedTagKey) {
+            $result = $this->pipeline(function () use ($orphanedTagKey) {
+                yield 'del' => [$orphanedTagKey];
+            });
+            if (!$result->valid() || $result->current() !== 1) {
+                $success = false;
+            }
+        }
+        // If orphaned cache key references are provided prune them too.
+        if (!empty($orphanedTagsStats['orphanedTagReferenceKeys'])) {
+            // lua for deleting member from a SET
+            $removeSetMemberLua = <<<'EOLUA'
+                redis.replicate_commands()
+                return redis.call('SREM', KEYS[1], KEYS[2])
+            EOLUA;
+            // Loop through all tags with orphaned cache item references.
+            foreach ($orphanedTagsStats['orphanedTagReferenceKeys'] as $tagKey => $orphanedCacheKeys) {
+                // Remove each cache item reference from the tag set.
+                foreach ($orphanedCacheKeys as $orphanedCacheKey) {
+                    $result = $this->pipeline(function () use ($removeSetMemberLua, $tagKey, $orphanedCacheKey) {
+                        yield 'srem' => [$tagKey, $orphanedCacheKey];
+                    });
+                    if (!$result->valid() || $result->current() !== 1) {
+                        $success = false;
+                    }
+                }
+            }
+        }
+        return $success;
+    }
+
+    /**
+     * @TODO Make compression mode flag configurable.
+     *
+     * @return bool
+     */
+    public function prune(): bool
+    {
+        return $this->pruneOrphanedTags(true);
     }
 }

@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Allow single integer for the `versions` option of the `Uuid` constraint
+ * Allow single constraint to be passed to the `constraints` option of the `When` constraint
 
 6.3
 ---

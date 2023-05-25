@@ -41,10 +41,11 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
     public function __construct(
         private Algorithm $signatureAlgorithm,
         private JWK $jwk,
-        private ?LoggerInterface $logger = null,
-        private ClockInterface $clock = new Clock(),
+        private string $audience,
+        private array $issuers,
         private string $claim = 'sub',
-        private ?string $audience = null
+        private ?LoggerInterface $logger = null,
+        private ClockInterface $clock = new Clock()
     ) {
     }
 
@@ -80,10 +81,9 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
                 new Checker\IssuedAtChecker(0, false, $this->clock),
                 new Checker\NotBeforeChecker(0, false, $this->clock),
                 new Checker\ExpirationTimeChecker(0, false, $this->clock),
+                new Checker\AudienceChecker($this->audience),
+                new Checker\IssuerChecker($this->issuers),
             ];
-            if ($this->audience) {
-                $checkers[] = new Checker\AudienceChecker($this->audience);
-            }
             $claimCheckerManager = new ClaimCheckerManager($checkers);
             // if this check fails, an InvalidClaimException is thrown
             $claimCheckerManager->check($claims);

@@ -49,7 +49,6 @@
         "doctrine/annotations": "<1.13",
         "doctrine/cache": "<1.11",
         "doctrine/lexer": "<1.1",
-        "phpunit/phpunit": "<5.4.3",
         "symfony/dependency-injection": "<4.4",
         "symfony/expression-language": "<5.1",
         "symfony/http-kernel": "<4.4",

@@ -28,7 +28,6 @@
         "twig/twig": "^2.13|^3.0.4"
     },
     "conflict": {
-        "phpunit/phpunit": "<5.4.3",
         "symfony/console": "<4.4"
     },
     "suggest": {

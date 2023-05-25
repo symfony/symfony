@@ -55,7 +55,6 @@
         "doctrine/dbal": "<2.13.1",
         "doctrine/lexer": "<1.1",
         "doctrine/orm": "<2.12",
-        "phpunit/phpunit": "<5.4.3",
         "symfony/cache": "<6.4",
         "symfony/dependency-injection": "<6.4",
         "symfony/form": "<6.4",

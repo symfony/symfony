@@ -44,7 +44,6 @@
         "symfony/uid": "^6.4|^7.0"
     },
     "conflict": {
-        "phpunit/phpunit": "<5.4.3",
         "symfony/console": "<6.4",
         "symfony/dependency-injection": "<6.4",
         "symfony/doctrine-bridge": "<6.4",

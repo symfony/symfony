@@ -123,7 +123,18 @@ class QuestionHelper extends Helper
             }
 
             if (false === $ret) {
+                $isBlocked = stream_get_meta_data($inputStream)['blocked'] ?? true;
+
+                if (!$isBlocked) {
+                    stream_set_blocking($inputStream, true);
+                }
+
                 $ret = $this->readInput($inputStream, $question);
+
+                if (!$isBlocked) {
+                    stream_set_blocking($inputStream, false);
+                }
+
                 if (false === $ret) {
                     throw new MissingInputException('Aborted.');
                 }

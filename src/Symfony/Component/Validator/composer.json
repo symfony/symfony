@@ -44,7 +44,6 @@
     "conflict": {
         "doctrine/annotations": "<1.13",
         "doctrine/lexer": "<1.1",
-        "phpunit/phpunit": "<5.4.3",
         "symfony/dependency-injection": "<5.4",
         "symfony/expression-language": "<5.4",
         "symfony/http-kernel": "<5.4",

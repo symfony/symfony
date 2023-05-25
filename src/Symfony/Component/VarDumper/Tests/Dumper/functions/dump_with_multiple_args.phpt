@@ -2,6 +2,7 @@
 Test dump() with multiple args shows line number
 --FILE--
 <?php
+putenv('NO_COLOR=1');
 
 $vendor = __DIR__;
 while (!file_exists($vendor.'/vendor')) {

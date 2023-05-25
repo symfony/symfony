@@ -2,6 +2,7 @@
 Test dd() with one arg doesn't show line number
 --FILE--
 <?php
+putenv('NO_COLOR=1');
 
 $vendor = __DIR__;
 while (!file_exists($vendor.'/vendor')) {

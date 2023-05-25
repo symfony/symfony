@@ -139,8 +139,14 @@ class CliDumper extends AbstractDumper
         $attr = $cursor->attr;
 
         switch ($type) {
-            case 'label': $style = 'label'; break;
-            case 'default': $style = 'default'; break;
+            case 'default':
+                $style = 'default';
+                break;
+
+            case 'label':
+                $this->styles += ['label' => $this->styles['default']];
+                $style = 'label';
+                break;
 
             case 'integer':
                 $style = 'num';
@@ -467,7 +473,7 @@ class CliDumper extends AbstractDumper
 
         $map = static::$controlCharsMap;
         $startCchr = $this->colors ? "\033[m\033[{$this->styles['default']}m" : '';
-        $endCchr = $this->colors ? "\033[m\033[{$this->styles['label' === $style ? 'default' : $style]}m" : '';
+        $endCchr = $this->colors ? "\033[m\033[{$this->styles[$style]}m" : '';
         $value = preg_replace_callback(static::$controlCharsRx, function ($c) use ($map, $startCchr, $endCchr) {
             $s = $startCchr;
             $c = $c[$i = 0];
@@ -490,7 +496,7 @@ class CliDumper extends AbstractDumper
             if ($cchrCount && "\033" === $value[0]) {
                 $value = substr($value, \strlen($startCchr));
             } else {
-                $value = "\033[{$this->styles['label' === $style ? 'default' : $style]}m".$value;
+                $value = "\033[{$this->styles[$style]}m".$value;
             }
             if ($cchrCount && str_ends_with($value, $endCchr)) {
                 $value = substr($value, 0, -\strlen($endCchr));

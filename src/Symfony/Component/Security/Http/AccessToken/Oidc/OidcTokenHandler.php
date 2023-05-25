@@ -41,8 +41,8 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
         private Algorithm $signatureAlgorithm,
         private JWK $jwk,
         private ?LoggerInterface $logger = null,
-        private string $claim = 'sub',
-        private ?string $audience = null
+        private string $audience,
+        private string $claim = 'sub'
     ) {
     }
 
@@ -79,10 +79,8 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
                 new Checker\IssuedAtChecker(0, false, $clock),
                 new Checker\NotBeforeChecker(0, false, $clock),
                 new Checker\ExpirationTimeChecker(0, false, $clock),
+                new Checker\AudienceChecker($this->audience),
             ];
-            if ($this->audience) {
-                $checkers[] = new Checker\AudienceChecker($this->audience);
-            }
             $claimCheckerManager = new ClaimCheckerManager($checkers);
             // if this check fails, an InvalidClaimException is thrown
             $claimCheckerManager->check($claims);

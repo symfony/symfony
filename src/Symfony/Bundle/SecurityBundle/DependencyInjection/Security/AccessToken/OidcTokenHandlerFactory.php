@@ -67,7 +67,7 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
                     ->end()
                     ->scalarNode('audience')
                         ->info('Audience set in the token, for validation purpose.')
-                        ->defaultNull()
+                        ->isRequired()
                     ->end()
                     ->arrayNode('signature')
                         ->isRequired()

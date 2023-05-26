@@ -15,13 +15,10 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class ProjectServiceContainer extends Container
 {
     protected $parameters = [];
-    protected readonly \WeakReference $ref;
     protected \Closure $getService;
 
     public function __construct()
     {
-        $containerRef = $this->ref = \WeakReference::create($this);
-        $this->getService = static function () use ($containerRef) { return $containerRef->get()->getService(...\func_get_args()); };
         $this->services = $this->privates = [];
         $this->methodMap = [
             'bar' => 'getBarService',
@@ -66,7 +63,7 @@ class ProjectServiceContainer extends Container
      */
     protected static function getBazService($container)
     {
-        return $container->services['baz'] = new \stdClass(new \Symfony\Component\DependencyInjection\Argument\ServiceLocator($container->getService, [
+        return $container->services['baz'] = new \stdClass(new \Symfony\Component\DependencyInjection\Argument\ServiceLocator($container->getService ??= $container->getService(...), [
             'foo' => [false, 'foo', 'getFooService', false],
         ], [
             'foo' => '?',

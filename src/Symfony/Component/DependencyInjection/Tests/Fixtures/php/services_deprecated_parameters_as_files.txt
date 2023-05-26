@@ -47,11 +47,9 @@ class ProjectServiceContainer extends Container
 
     protected $targetDir;
     protected $parameters = [];
-    protected readonly \WeakReference $ref;
 
     public function __construct(private array $buildParameters = [], protected string $containerDir = __DIR__)
     {
-        $this->ref = \WeakReference::create($this);
         $this->targetDir = \dirname($containerDir);
         $this->parameters = $this->getDefaultParameters();
 

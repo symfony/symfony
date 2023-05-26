@@ -122,6 +122,7 @@ return static function (ContainerConfigurator $container) {
                 service('logger'),
             ])
             ->tag('asset_mapper.compiler')
+            ->tag('monolog.logger', ['channel' => 'asset_mapper'])
 
         ->set('asset_mapper.compiler.source_mapping_urls_compiler', SourceMappingUrlsCompiler::class)
             ->tag('asset_mapper.compiler')
@@ -132,6 +133,7 @@ return static function (ContainerConfigurator $container) {
                 service('logger'),
             ])
             ->tag('asset_mapper.compiler')
+            ->tag('monolog.logger', ['channel' => 'asset_mapper'])
 
         ->set('asset_mapper.importmap.manager', ImportMapManager::class)
             ->args([

@@ -29,11 +29,9 @@ class ProjectServiceContainer extends Container
 {
     protected $targetDir;
     protected $parameters = [];
-    protected readonly \WeakReference $ref;
 
     public function __construct(private array $buildParameters = [], protected string $containerDir = __DIR__)
     {
-        $this->ref = \WeakReference::create($this);
         $this->targetDir = \dirname($containerDir);
         $this->services = $this->privates = [];
         $this->methodMap = [
@@ -65,14 +63,10 @@ class ProjectServiceContainer extends Container
      */
     protected static function getFooService($container)
     {
-        $containerRef = $container->ref;
-
-        $container->factories['foo'] = function ($container) use ($containerRef) {
+        $container->factories['foo'] = function ($container) {
             $instance = new \Symfony\Component\DependencyInjection\Tests\Dumper\FooClass();
 
-            $instance->setOtherInstances(new RewindableGenerator(function () use ($containerRef) {
-                $container = $containerRef->get();
-
+            $instance->setOtherInstances(new RewindableGenerator(function () use ($container) {
                 yield 0 => ($container->privates['Bar'] ??= new \Bar());
                 yield 1 => ($container->privates['stdClass'] ??= new \stdClass());
             }, 2));
@@ -123,8 +117,8 @@ if (!\class_exists(ProjectServiceContainer::class, false)) {
 
 return new \Container%s\ProjectServiceContainer([
     'container.build_hash' => '%s',
-    'container.build_id' => '3f6e2bc2',
-    'container.build_time' => 1563381341,
+    'container.build_id' => '%s',
+    'container.build_time' => %d,
 ], __DIR__.\DIRECTORY_SEPARATOR.'Container%s');
 
 )

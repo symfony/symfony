@@ -27,6 +27,7 @@ use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocator;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Attribute\Exclude;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\DependencyInjection\Compiler\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -134,7 +135,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * @var array<class-string>
      */
-    private array $exclusionAttributes = [];
+    private array $exclusionAttributes = [Exclude::class];
 
     /**
      * @var array<string, bool>

@@ -139,10 +139,9 @@ abstract class FileLoader extends BaseFileLoader
 
         foreach ($classes as $class => $errorMessage) {
             if (null === $errorMessage && $autoconfigureAttributes) {
-                $exclusionAttributes = $this->container->getExclusionAttributes();
-                $exclusionAttributes[] = Exclude::class;
-
                 $r = $this->container->getReflectionClass($class);
+                $exclusionAttributes = $this->container->getExclusionAttributes();
+
                 foreach ($exclusionAttributes as $attribute) {
                     if ($r->getAttributes($attribute)[0] ?? null) {
                         $this->addContainerExcludedTag($class, $source);

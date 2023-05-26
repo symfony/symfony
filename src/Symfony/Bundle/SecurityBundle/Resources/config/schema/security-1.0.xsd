@@ -140,6 +140,7 @@
             <xsd:element name="form-login" type="form_login" minOccurs="0" maxOccurs="1" />
             <xsd:element name="form-login-ldap" type="form_login_ldap" minOccurs="0" maxOccurs="1" />
             <xsd:element name="guard" type="guard" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="access-token" type="access_token" minOccurs="0" maxOccurs="1" />
             <xsd:element name="http-basic" type="http_basic" minOccurs="0" maxOccurs="1" />
             <xsd:element name="http-basic-ldap" type="http_basic_ldap" minOccurs="0" maxOccurs="1" />
             <xsd:element name="json-login" type="json_login" minOccurs="0" maxOccurs="1" />
@@ -299,6 +300,17 @@
         <xsd:attribute name="lifetime" type="xsd:integer" />
         <xsd:attribute name="max-uses" type="xsd:integer" />
         <xsd:attribute name="used-link-cache" type="xsd:string" />
+        <xsd:attribute name="success-handler" type="xsd:string" />
+        <xsd:attribute name="failure-handler" type="xsd:string" />
+        <xsd:attribute name="provider" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="access_token">
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="token-extractor" type="xsd:string" />
+        </xsd:choice>
+        <xsd:attribute name="token-handler" type="xsd:string" />
+        <xsd:attribute name="realm" type="xsd:string" />
         <xsd:attribute name="success-handler" type="xsd:string" />
         <xsd:attribute name="failure-handler" type="xsd:string" />
         <xsd:attribute name="provider" type="xsd:string" />

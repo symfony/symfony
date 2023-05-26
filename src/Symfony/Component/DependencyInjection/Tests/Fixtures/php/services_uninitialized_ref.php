@@ -15,11 +15,9 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
 {
     protected $parameters = [];
-    protected readonly \WeakReference $ref;
 
     public function __construct()
     {
-        $this->ref = \WeakReference::create($this);
         $this->services = $this->privates = [];
         $this->methodMap = [
             'bar' => 'getBarService',
@@ -55,25 +53,13 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
      */
     protected static function getBarService($container)
     {
-        $containerRef = $container->ref;
-
         $container->services['bar'] = $instance = new \stdClass();
 
         $instance->foo1 = ($container->services['foo1'] ?? null);
         $instance->foo2 = null;
         $instance->foo3 = ($container->privates['foo3'] ?? null);
-        $instance->closures = [#[\Closure(name: 'foo1', class: 'stdClass')] function () use ($containerRef) {
-            $container = $containerRef->get();
-
-            return ($container->services['foo1'] ?? null);
-        }, #[\Closure(name: 'foo2')] fn () => null, #[\Closure(name: 'foo3', class: 'stdClass')] function () use ($containerRef) {
-            $container = $containerRef->get();
-
-            return ($container->privates['foo3'] ?? null);
-        }];
-        $instance->iter = new RewindableGenerator(function () use ($containerRef) {
-            $container = $containerRef->get();
-
+        $instance->closures = [#[\Closure(name: 'foo1', class: 'stdClass')] fn () => ($container->services['foo1'] ?? null), #[\Closure(name: 'foo2')] fn () => null, #[\Closure(name: 'foo3', class: 'stdClass')] fn () => ($container->privates['foo3'] ?? null)];
+        $instance->iter = new RewindableGenerator(function () use ($container) {
             if (isset($container->services['foo1'])) {
                 yield 'foo1' => ($container->services['foo1'] ?? null);
             }
@@ -83,11 +69,7 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
             if (isset($container->privates['foo3'])) {
                 yield 'foo3' => ($container->privates['foo3'] ?? null);
             }
-        }, function () use ($containerRef) {
-            $container = $containerRef->get();
-
-            return 0 + (int) (isset($container->services['foo1'])) + (int) (false) + (int) (isset($container->privates['foo3']));
-        });
+        }, fn () => 0 + (int) (isset($container->services['foo1'])) + (int) (false) + (int) (isset($container->privates['foo3'])));
 
         return $instance;
     }

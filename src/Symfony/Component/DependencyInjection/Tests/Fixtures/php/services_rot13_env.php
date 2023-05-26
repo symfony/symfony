@@ -15,13 +15,10 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
 {
     protected $parameters = [];
-    protected readonly \WeakReference $ref;
     protected \Closure $getService;
 
     public function __construct()
     {
-        $containerRef = $this->ref = \WeakReference::create($this);
-        $this->getService = static function () use ($containerRef) { return $containerRef->get()->getService(...\func_get_args()); };
         $this->parameters = $this->getDefaultParameters();
 
         $this->services = $this->privates = [];
@@ -67,7 +64,7 @@ class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
      */
     protected static function getContainer_EnvVarProcessorsLocatorService($container)
     {
-        return $container->services['container.env_var_processors_locator'] = new \Symfony\Component\DependencyInjection\Argument\ServiceLocator($container->getService, [
+        return $container->services['container.env_var_processors_locator'] = new \Symfony\Component\DependencyInjection\Argument\ServiceLocator($container->getService ??= $container->getService(...), [
             'rot13' => ['services', 'Symfony\\Component\\DependencyInjection\\Tests\\Dumper\\Rot13EnvVarProcessor', 'getRot13EnvVarProcessorService', false],
         ], [
             'rot13' => '?',

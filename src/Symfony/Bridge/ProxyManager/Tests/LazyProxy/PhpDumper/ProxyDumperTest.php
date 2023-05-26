@@ -130,7 +130,6 @@ return new class
     public function getFooService(\$lazyLoad = true)
     {
         \$container = \$this;
-        \$containerRef = \\WeakReference::create(\$this);
 
 {$factory}        return new {$class}();
     }

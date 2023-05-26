@@ -141,8 +141,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     private array $removedBindingIds = [];
 
-    private \WeakReference $containerRef;
-
     private const INTERNAL_TYPES = [
         'int' => true,
         'float' => true,
@@ -1064,9 +1062,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 $callable[0] instanceof Reference
                 || $callable[0] instanceof Definition && !isset($inlineServices[spl_object_hash($callable[0])])
             )) {
-                $containerRef = $this->containerRef ??= \WeakReference::create($this);
-                $initializer = static function () use ($containerRef, $callable, &$inlineServices) {
-                    return $containerRef->get()->doResolveServices($callable[0], $inlineServices);
+                $initializer = function () use ($callable, &$inlineServices) {
+                    return $this->doResolveServices($callable[0], $inlineServices);
                 };
 
                 $proxy = eval('return '.LazyClosure::getCode('$initializer', $callable, $definition, $this, $id).';');
@@ -1079,14 +1076,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         if (true === $tryProxy && $definition->isLazy() && ['Closure', 'fromCallable'] !== $definition->getFactory()
             && !$tryProxy = !($proxy = $this->proxyInstantiator ??= new LazyServiceInstantiator()) || $proxy instanceof RealServiceInstantiator
         ) {
-            $containerRef = $this->containerRef ??= \WeakReference::create($this);
             $proxy = $proxy->instantiateProxy(
                 $this,
                 (clone $definition)
                     ->setClass($class)
                     ->setTags(($definition->hasTag('proxy') ? ['proxy' => $parameterBag->resolveValue($definition->getTag('proxy'))] : []) + $definition->getTags()),
-                $id, static function ($proxy = false) use ($containerRef, $definition, &$inlineServices, $id) {
-                    return $containerRef->get()->createService($definition, $inlineServices, true, $id, $proxy);
+                $id, function ($proxy = false) use ($definition, &$inlineServices, $id) {
+                    return $this->createService($definition, $inlineServices, true, $id, $proxy);
                 }
             );
             $this->shareService($definition, $proxy, $id, $inlineServices);
@@ -1214,38 +1210,34 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 $value[$k] = $this->doResolveServices($v, $inlineServices, $isConstructorArgument);
             }
         } elseif ($value instanceof ServiceClosureArgument) {
-            $containerRef = $this->containerRef ??= \WeakReference::create($this);
             $reference = $value->getValues()[0];
-            $value = static fn () => $containerRef->get()->resolveServices($reference);
+            $value = fn () => $this->resolveServices($reference);
         } elseif ($value instanceof IteratorArgument) {
-            $containerRef = $this->containerRef ??= \WeakReference::create($this);
-            $value = new RewindableGenerator(static function () use ($containerRef, $value, &$inlineServices) {
-                $container = $containerRef->get();
+            $value = new RewindableGenerator(function () use ($value, &$inlineServices) {
                 foreach ($value->getValues() as $k => $v) {
                     foreach (self::getServiceConditionals($v) as $s) {
-                        if (!$container->has($s)) {
+                        if (!$this->has($s)) {
                             continue 2;
                         }
                     }
                     foreach (self::getInitializedConditionals($v) as $s) {
-                        if (!$container->doGet($s, ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE, $inlineServices)) {
+                        if (!$this->doGet($s, ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE, $inlineServices)) {
                             continue 2;
                         }
                     }
 
-                    yield $k => $container->doResolveServices($v, $inlineServices);
+                    yield $k => $this->doResolveServices($v, $inlineServices);
                 }
-            }, static function () use ($containerRef, $value): int {
-                $container = $containerRef->get();
+            }, function () use ($value): int {
                 $count = 0;
                 foreach ($value->getValues() as $v) {
                     foreach (self::getServiceConditionals($v) as $s) {
-                        if (!$container->has($s)) {
+                        if (!$this->has($s)) {
                             continue 2;
                         }
                     }
                     foreach (self::getInitializedConditionals($v) as $s) {
-                        if (!$container->doGet($s, ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE)) {
+                        if (!$this->doGet($s, ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE)) {
                             continue 2;
                         }
                     }

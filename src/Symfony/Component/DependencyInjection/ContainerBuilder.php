@@ -132,6 +132,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     private array $autoconfiguredAttributes = [];
 
     /**
+     * @var array<class-string>
+     */
+    private array $exclusionAttributes = [];
+
+    /**
      * @var array<string, bool>
      */
     private array $removedIds = [];
@@ -1342,6 +1347,20 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
+     * Registers an attribute that will be used for excluding all services from classes it is declared on.
+     *
+     * @param class-string $attributeClass
+     */
+    public function registerAttributeForExclusion(string $attributeClass): void
+    {
+        if (\in_array($attributeClass, $this->exclusionAttributes)) {
+            return;
+        }
+
+        $this->exclusionAttributes[] = $attributeClass;
+    }
+
+    /**
      * Registers an autowiring alias that only binds to a specific argument name.
      *
      * The argument name is derived from $name if provided (from $id otherwise)
@@ -1384,6 +1403,14 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function getAutoconfiguredAttributes(): array
     {
         return $this->autoconfiguredAttributes;
+    }
+
+    /**
+     * @return array<class-string>
+     */
+    public function getExclusionAttributes(): array
+    {
+        return $this->exclusionAttributes;
     }
 
     /**

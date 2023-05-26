@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+* Add support for excluding services with declared custom attribute (`ContainerBuilder::registerAttributeForExclusion`)
+
 7.0
 ---
 

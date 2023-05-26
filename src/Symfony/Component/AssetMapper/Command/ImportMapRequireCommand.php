@@ -56,6 +56,14 @@ For example:
     <info>php %command.full_name% lodash --preload</info>
     <info>php %command.full_name% "lodash@^4.15"</info>
 
+You can also require specific paths of a package:
+
+    <info>php %command.full_name% "chart.js/auto"</info>
+
+Or download one package/file, but alias its name in your import map:
+
+    <info>php %command.full_name% "vue/dist/vue.esm-bundler.js=vue"</info>
+
 The <info>preload</info> option will set the <info>preload</info> option in the importmap,
 which will tell the browser to preload the package. This should be used for all
 critical packages that are needed on page load.
@@ -114,7 +122,7 @@ EOT
                 $parts['version'] ?? null,
                 $input->getOption('download'),
                 $input->getOption('preload'),
-                null,
+                $parts['alias'] ?? $parts['package'],
                 isset($parts['registry']) && $parts['registry'] ? $parts['registry'] : null,
                 $path,
             );

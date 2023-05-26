@@ -115,10 +115,18 @@ class ImportMapManager
      */
     public static function parsePackageName(string $packageName): ?array
     {
-        // https://regex101.com/r/d99BEc/1
-        $regex = '/(?:(?P<registry>[^:\n]+):)?((?P<package>@?[^@\n]+))(?:@(?P<version>[^\s\n]+))?/';
+        // https://regex101.com/r/MDz0bN/1
+        $regex = '/(?:(?P<registry>[^:\n]+):)?((?P<package>@?[^=@\n]+))(?:@(?P<version>[^=\s\n]+))?(?:=(?P<alias>[^\s\n]+))?/';
 
-        return preg_match($regex, $packageName, $matches) ? $matches : null;
+        if (!preg_match($regex, $packageName, $matches)) {
+            return null;
+        }
+
+        if (isset($matches['version']) && '' === $matches['version']) {
+            unset($matches['version']);
+        }
+
+        return $matches;
     }
 
     private function buildImportMapJson(): void

@@ -379,14 +379,17 @@ class ImportMapManagerTest extends TestCase
     public function testParsePackageName(string $packageName, array $expectedReturn)
     {
         $parsed = ImportMapManager::parsePackageName($packageName);
-        // remove integer keys - they're noise
+        $this->assertIsArray($parsed);
 
-        if (\is_array($parsed)) {
-            $parsed = array_filter($parsed, function ($key) {
-                return !\is_int($key);
-            }, \ARRAY_FILTER_USE_KEY);
-        }
+        // remove integer keys - they're noise
+        $parsed = array_filter($parsed, fn ($key) => !\is_int($key), \ARRAY_FILTER_USE_KEY);
         $this->assertEquals($expectedReturn, $parsed);
+
+        $parsedWithAlias = ImportMapManager::parsePackageName($packageName.'=some_alias');
+        $this->assertIsArray($parsedWithAlias);
+        $parsedWithAlias = array_filter($parsedWithAlias, fn ($key) => !\is_int($key), \ARRAY_FILTER_USE_KEY);
+        $expectedReturnWithAlias = $expectedReturn + ['alias' => 'some_alias'];
+        $this->assertEquals($expectedReturnWithAlias, $parsedWithAlias, 'Asserting with alias');
     }
 
     public static function getPackageNameTests(): iterable
@@ -442,7 +445,7 @@ class ImportMapManagerTest extends TestCase
             ],
         ];
 
-        yield 'namespaced_package_with_registry' => [
+        yield 'namespaced_package_with_registry_no_version' => [
             'npm:@hotwired/stimulus',
             [
                 'package' => '@hotwired/stimulus',

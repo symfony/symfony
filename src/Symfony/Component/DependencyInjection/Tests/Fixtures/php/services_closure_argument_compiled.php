@@ -15,11 +15,9 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class ProjectServiceContainer extends Container
 {
     protected $parameters = [];
-    protected readonly \WeakReference $ref;
 
     public function __construct()
     {
-        $this->ref = \WeakReference::create($this);
         $this->services = $this->privates = [];
         $this->methodMap = [
             'foo' => 'getFooService',
@@ -57,13 +55,7 @@ class ProjectServiceContainer extends Container
      */
     protected static function getServiceClosureService($container)
     {
-        $containerRef = $container->ref;
-
-        return $container->services['service_closure'] = new \Bar(#[\Closure(name: 'foo', class: 'Foo')] function () use ($containerRef) {
-            $container = $containerRef->get();
-
-            return ($container->services['foo'] ??= new \Foo());
-        });
+        return $container->services['service_closure'] = new \Bar(#[\Closure(name: 'foo', class: 'Foo')] fn () => ($container->services['foo'] ??= new \Foo()));
     }
 
     /**

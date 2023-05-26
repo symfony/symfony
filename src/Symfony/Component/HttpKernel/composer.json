@@ -67,6 +67,7 @@
         "symfony/translation-contracts": "<2.5",
         "symfony/twig-bridge": "<6.4",
         "symfony/validator": "<6.4",
+        "symfony/var-dumper": "<6.4",
         "twig/twig": "<2.13"
     },
     "autoload": {

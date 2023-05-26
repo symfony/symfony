@@ -15,11 +15,9 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 {
     protected $parameters = [];
-    protected readonly \WeakReference $ref;
 
     public function __construct()
     {
-        $this->ref = \WeakReference::create($this);
         $this->services = $this->privates = [];
         $this->methodMap = [
             'bar2' => 'getBar2Service',
@@ -198,12 +196,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
      */
     protected static function getDoctrine_EntityManagerService($container)
     {
-        $containerRef = $container->ref;
-
         $a = new \stdClass();
-        $a->resolver = new \stdClass(new RewindableGenerator(function () use ($containerRef) {
-            $container = $containerRef->get();
-
+        $a->resolver = new \stdClass(new RewindableGenerator(function () use ($container) {
             yield 0 => ($container->privates['doctrine.listener'] ?? self::getDoctrine_ListenerService($container));
         }, 1));
         $a->flag = 'ok';
@@ -526,11 +520,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
      */
     protected static function getMailer_TransportService($container)
     {
-        $containerRef = $container->ref;
-
-        return $container->privates['mailer.transport'] = (new \FactoryCircular(new RewindableGenerator(function () use ($containerRef) {
-            $container = $containerRef->get();
-
+        return $container->privates['mailer.transport'] = (new \FactoryCircular(new RewindableGenerator(function () use ($container) {
             yield 0 => ($container->privates['mailer.transport_factory.amazon'] ?? self::getMailer_TransportFactory_AmazonService($container));
             yield 1 => self::getMailerInline_TransportFactory_AmazonService($container);
         }, 2)))->create();

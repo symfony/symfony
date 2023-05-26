@@ -15,11 +15,9 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class ProjectServiceContainer extends Container
 {
     protected $parameters = [];
-    protected readonly \WeakReference $ref;
 
     public function __construct()
     {
-        $this->ref = \WeakReference::create($this);
         $this->services = $this->privates = [];
         $this->methodMap = [
             'bar' => 'getBarService',
@@ -53,10 +51,8 @@ class ProjectServiceContainer extends Container
      */
     protected static function getBarService($container, $lazyLoad = true)
     {
-        $containerRef = $container->ref;
-
         if (true === $lazyLoad) {
-            return $container->services['bar'] = $container->createProxy('stdClassGhost2fc7938', static fn () => \stdClassGhost2fc7938::createLazyGhost(static fn ($proxy) => self::getBarService($containerRef->get(), $proxy)));
+            return $container->services['bar'] = $container->createProxy('stdClassGhost2fc7938', static fn () => \stdClassGhost2fc7938::createLazyGhost(static fn ($proxy) => self::getBarService($container, $proxy)));
         }
 
         return $lazyLoad;
@@ -69,10 +65,8 @@ class ProjectServiceContainer extends Container
      */
     protected static function getBazService($container, $lazyLoad = true)
     {
-        $containerRef = $container->ref;
-
         if (true === $lazyLoad) {
-            return $container->services['baz'] = $container->createProxy('stdClassProxy2fc7938', static fn () => \stdClassProxy2fc7938::createLazyProxy(static fn () => self::getBazService($containerRef->get(), false)));
+            return $container->services['baz'] = $container->createProxy('stdClassProxy2fc7938', static fn () => \stdClassProxy2fc7938::createLazyProxy(static fn () => self::getBazService($container, false)));
         }
 
         return \foo_bar();
@@ -85,10 +79,8 @@ class ProjectServiceContainer extends Container
      */
     protected static function getBuzService($container, $lazyLoad = true)
     {
-        $containerRef = $container->ref;
-
         if (true === $lazyLoad) {
-            return $container->services['buz'] = $container->createProxy('stdClassProxy2fc7938', static fn () => \stdClassProxy2fc7938::createLazyProxy(static fn () => self::getBuzService($containerRef->get(), false)));
+            return $container->services['buz'] = $container->createProxy('stdClassProxy2fc7938', static fn () => \stdClassProxy2fc7938::createLazyProxy(static fn () => self::getBuzService($container, false)));
         }
 
         return \foo_bar();
@@ -101,10 +93,8 @@ class ProjectServiceContainer extends Container
      */
     protected static function getFooService($container, $lazyLoad = true)
     {
-        $containerRef = $container->ref;
-
         if (true === $lazyLoad) {
-            return $container->services['foo'] = $container->createProxy('stdClassGhost2fc7938', static fn () => \stdClassGhost2fc7938::createLazyGhost(static fn ($proxy) => self::getFooService($containerRef->get(), $proxy)));
+            return $container->services['foo'] = $container->createProxy('stdClassGhost2fc7938', static fn () => \stdClassGhost2fc7938::createLazyGhost(static fn ($proxy) => self::getFooService($container, $proxy)));
         }
 
         return $lazyLoad;

@@ -27,15 +27,9 @@ class getClosureService extends ProjectServiceContainer
      */
     public static function do($container, $lazyLoad = true)
     {
-        $containerRef = $container->ref;
-
         $container->services['closure'] = $instance = new \stdClass();
 
-        $instance->closures = [#[\Closure(name: 'foo', class: 'FooClass')] function () use ($containerRef): ?\stdClass {
-            $container = $containerRef->get();
-
-            return ($container->services['foo'] ?? null);
-        }];
+        $instance->closures = [#[\Closure(name: 'foo', class: 'FooClass')] fn (): ?\stdClass => ($container->services['foo'] ?? null)];
 
         return $instance;
     }
@@ -61,11 +55,9 @@ class ProjectServiceContainer extends Container
 {
     protected $targetDir;
     protected $parameters = [];
-    protected readonly \WeakReference $ref;
 
     public function __construct(private array $buildParameters = [], protected string $containerDir = __DIR__)
     {
-        $this->ref = \WeakReference::create($this);
         $this->targetDir = \dirname($containerDir);
         $this->services = $this->privates = [];
         $this->methodMap = [

@@ -5,19 +5,16 @@ class LazyServiceProjectServiceContainer extends Container
 {%a
     protected static function getFooService($container, $lazyLoad = true)
     {
-        $containerRef = $container->ref;
-
         if (true === $lazyLoad) {
-            return $container->services['foo'] = $container->createProxy('stdClass_%s', static function () use ($containerRef) {
-                return %S\stdClass_%s(static function (&$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface $proxy) use ($containerRef) {
-                    $container = $containerRef->get();
-                    $wrappedInstance = self::getFooService($containerRef->get(), false);
+            return $container->services['foo'] = $container->createProxy('stdClass_%s', static fn () => %S\stdClass_%s(
+                static function (&$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface $proxy) use ($container) {
+                    $wrappedInstance = self::getFooService($container, false);
 
                     $proxy->setProxyInitializer(null);
 
                     return true;
-                });
-            });
+                }
+            ));
         }
 
         return new \stdClass();

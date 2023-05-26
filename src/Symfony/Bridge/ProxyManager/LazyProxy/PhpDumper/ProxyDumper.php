@@ -61,16 +61,15 @@ class ProxyDumper implements DumperInterface
 
         return <<<EOF
         if (true === \$lazyLoad) {
-            $instantiation \$container->createProxy('$proxyClass', static function () use (\$containerRef) {
-                return \\$proxyClass::staticProxyConstructor(static function (&\$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface \$proxy) use (\$containerRef) {
-                    \$container = \$containerRef->get();
+            $instantiation \$container->createProxy('$proxyClass', static fn () => \\$proxyClass::staticProxyConstructor(
+                static function (&\$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface \$proxy) use (\$container) {
                     \$wrappedInstance = $factoryCode;
 
                     \$proxy->setProxyInitializer(null);
 
                     return true;
-                });
-            });
+                }
+            ));
         }
 
 

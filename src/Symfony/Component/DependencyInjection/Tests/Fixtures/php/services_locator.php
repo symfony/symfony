@@ -15,11 +15,9 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class ProjectServiceContainer extends Container
 {
     protected $parameters = [];
-    protected readonly \WeakReference $ref;
 
     public function __construct()
     {
-        $this->ref = \WeakReference::create($this);
         $this->services = $this->privates = [];
         $this->methodMap = [
             'bar_service' => 'getBarServiceService',
@@ -72,17 +70,7 @@ class ProjectServiceContainer extends Container
      */
     protected static function getFooServiceService($container)
     {
-        $containerRef = $container->ref;
-
-        return $container->services['foo_service'] = new \Symfony\Component\DependencyInjection\ServiceLocator(['bar' => #[\Closure(name: 'bar_service', class: 'stdClass')] function () use ($containerRef) {
-            $container = $containerRef->get();
-
-            return ($container->services['bar_service'] ?? self::getBarServiceService($container));
-        }, 'baz' => #[\Closure(name: 'baz_service', class: 'stdClass')] function () use ($containerRef): \stdClass {
-            $container = $containerRef->get();
-
-            return ($container->privates['baz_service'] ??= new \stdClass());
-        }, 'nil' => fn () => NULL]);
+        return $container->services['foo_service'] = new \Symfony\Component\DependencyInjection\ServiceLocator(['bar' => #[\Closure(name: 'bar_service', class: 'stdClass')] fn () => ($container->services['bar_service'] ?? self::getBarServiceService($container)), 'baz' => #[\Closure(name: 'baz_service', class: 'stdClass')] fn (): \stdClass => ($container->privates['baz_service'] ??= new \stdClass()), 'nil' => fn () => NULL]);
     }
 
     /**
@@ -122,13 +110,7 @@ class ProjectServiceContainer extends Container
      */
     protected static function getTranslator1Service($container)
     {
-        $containerRef = $container->ref;
-
-        return $container->services['translator_1'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator(new \Symfony\Component\DependencyInjection\ServiceLocator(['translator.loader_1' => #[\Closure(name: 'translator.loader_1', class: 'stdClass')] function () use ($containerRef) {
-            $container = $containerRef->get();
-
-            return ($container->services['translator.loader_1'] ??= new \stdClass());
-        }]));
+        return $container->services['translator_1'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator(new \Symfony\Component\DependencyInjection\ServiceLocator(['translator.loader_1' => #[\Closure(name: 'translator.loader_1', class: 'stdClass')] fn () => ($container->services['translator.loader_1'] ??= new \stdClass())]));
     }
 
     /**
@@ -138,13 +120,7 @@ class ProjectServiceContainer extends Container
      */
     protected static function getTranslator2Service($container)
     {
-        $containerRef = $container->ref;
-
-        $container->services['translator_2'] = $instance = new \Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator(new \Symfony\Component\DependencyInjection\ServiceLocator(['translator.loader_2' => #[\Closure(name: 'translator.loader_2', class: 'stdClass')] function () use ($containerRef) {
-            $container = $containerRef->get();
-
-            return ($container->services['translator.loader_2'] ??= new \stdClass());
-        }]));
+        $container->services['translator_2'] = $instance = new \Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator(new \Symfony\Component\DependencyInjection\ServiceLocator(['translator.loader_2' => #[\Closure(name: 'translator.loader_2', class: 'stdClass')] fn () => ($container->services['translator.loader_2'] ??= new \stdClass())]));
 
         $instance->addResource('db', ($container->services['translator.loader_2'] ??= new \stdClass()), 'nl');
 
@@ -158,13 +134,7 @@ class ProjectServiceContainer extends Container
      */
     protected static function getTranslator3Service($container)
     {
-        $containerRef = $container->ref;
-
-        $container->services['translator_3'] = $instance = new \Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator(new \Symfony\Component\DependencyInjection\ServiceLocator(['translator.loader_3' => #[\Closure(name: 'translator.loader_3', class: 'stdClass')] function () use ($containerRef) {
-            $container = $containerRef->get();
-
-            return ($container->services['translator.loader_3'] ??= new \stdClass());
-        }]));
+        $container->services['translator_3'] = $instance = new \Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator(new \Symfony\Component\DependencyInjection\ServiceLocator(['translator.loader_3' => #[\Closure(name: 'translator.loader_3', class: 'stdClass')] fn () => ($container->services['translator.loader_3'] ??= new \stdClass())]));
 
         $a = ($container->services['translator.loader_3'] ??= new \stdClass());
 

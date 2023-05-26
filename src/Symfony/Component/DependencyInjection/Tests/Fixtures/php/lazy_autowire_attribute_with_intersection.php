@@ -15,11 +15,9 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class ProjectServiceContainer extends Container
 {
     protected $parameters = [];
-    protected readonly \WeakReference $ref;
 
     public function __construct()
     {
-        $this->ref = \WeakReference::create($this);
         $this->services = $this->privates = [];
         $this->methodMap = [
             'foo' => 'getFooService',
@@ -73,10 +71,8 @@ class ProjectServiceContainer extends Container
      */
     protected static function get_Lazy_Foo_GDmfketService($container, $lazyLoad = true)
     {
-        $containerRef = $container->ref;
-
         if (true === $lazyLoad) {
-            return $container->privates['.lazy.foo.gDmfket'] = $container->createProxy('objectProxy8ac8e9a', static fn () => \objectProxy8ac8e9a::createLazyProxy(static fn () => self::get_Lazy_Foo_GDmfketService($containerRef->get(), false)));
+            return $container->privates['.lazy.foo.gDmfket'] = $container->createProxy('objectProxy8ac8e9a', static fn () => \objectProxy8ac8e9a::createLazyProxy(static fn () => self::get_Lazy_Foo_GDmfketService($container, false)));
         }
 
         return ($container->services['foo'] ?? self::getFooService($container));

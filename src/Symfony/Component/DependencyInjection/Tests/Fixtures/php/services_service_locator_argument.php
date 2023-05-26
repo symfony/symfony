@@ -15,13 +15,10 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class Symfony_DI_PhpDumper_Service_Locator_Argument extends Container
 {
     protected $parameters = [];
-    protected readonly \WeakReference $ref;
     protected \Closure $getService;
 
     public function __construct()
     {
-        $containerRef = $this->ref = \WeakReference::create($this);
-        $this->getService = static function () use ($containerRef) { return $containerRef->get()->getService(...\func_get_args()); };
         $this->services = $this->privates = [];
         $this->syntheticIds = [
             'foo5' => true,
@@ -63,7 +60,7 @@ class Symfony_DI_PhpDumper_Service_Locator_Argument extends Container
     {
         $container->services['bar'] = $instance = new \stdClass();
 
-        $instance->locator = new \Symfony\Component\DependencyInjection\Argument\ServiceLocator($container->getService, [
+        $instance->locator = new \Symfony\Component\DependencyInjection\Argument\ServiceLocator($container->getService ??= $container->getService(...), [
             'foo1' => ['services', 'foo1', 'getFoo1Service', false],
             'foo2' => ['privates', 'foo2', 'getFoo2Service', false],
             'foo3' => [false, 'foo3', 'getFoo3Service', false],

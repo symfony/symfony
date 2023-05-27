@@ -7,6 +7,19 @@ in 6.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.3.0...v6.3.1
 
+* 6.3.0-RC2 (2023-05-27)
+
+ * feature #50445 [AssetMapper] Add "=alias" syntax to importmap:require (weaverryan)
+ * bug #50442 [SecurityBundle] Update security-1.0.xsd to include missing access-token definition (aegypius)
+ * bug #50440 [DependencyInjection] Revert "Use weak references in the container" (nicolas-grekas)
+ * bug #50429 [Console] block input stream if needed (joelwurtz)
+ * bug #50397 [HttpKernel][VarDumper] Fix dumping with labels (nicolas-grekas)
+ * bug #50408 [AssetMapper] Change default importmap "provider" to JsDelivr+esm (weaverryan, nicolas-grekas)
+ * bug #50394 [AssetMapper] Avoid loading potentially ALL assets in dev server (weaverryan)
+ * bug #50400 [AssetMapper] Sometimes asset contents are built from non-asset files (weaverryan)
+ * bug #50406 [VarDumper] Fix `dd()` showing line with `null` (HypeMC)
+ * bug #50393 [AssetMapper] Fixing incorrect exception & adding allowing more realistic error mode (weaverryan)
+
 * 6.3.0-RC1 (2023-05-22)
 
  * bug #49817 [Scheduler] Improve triggers performance when possible (fabpot)

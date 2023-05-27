@@ -11,7 +11,7 @@
                 <select name="method" id="method">
                     <option value="">Any</option>
                     {% for m in ['DELETE', 'GET', 'HEAD', 'PATCH', 'POST', 'PUT'] %}
-                        <option {{ m in method ? 'selected="selected"' }}>{{ m }}</option>
+                        <option {{ m == method or (method is iterable and m in method) ? 'selected' }}>{{ m }}</option>
                     {% endfor %}
                 </select>
             </div>

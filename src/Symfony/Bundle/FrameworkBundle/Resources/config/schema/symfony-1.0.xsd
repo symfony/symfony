@@ -358,6 +358,7 @@
 
     <xsd:complexType name="property_info">
         <xsd:attribute name="enabled" type="xsd:boolean" />
+        <xsd:attribute name="with-constructor-extractor" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="cache">

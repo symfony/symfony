@@ -1679,6 +1679,14 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         $container = $this->createContainerFromFile('property_info');
         $this->assertTrue($container->has('property_info'));
+        $this->assertFalse($container->has('property_info.constructor_extractor'));
+    }
+
+    public function testPropertyInfoWithConstructorExtractorEnabled()
+    {
+        $container = $this->createContainerFromFile('property_info_with_constructor_extractor');
+        $this->assertTrue($container->has('property_info'));
+        $this->assertTrue($container->has('property_info.constructor_extractor'));
     }
 
     public function testPropertyInfoCacheActivated()

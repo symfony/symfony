@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\PropertyInfo\Extractor\ConstructorExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
@@ -43,8 +44,13 @@ return static function (ContainerConfigurator $container) {
         ->set('property_info.reflection_extractor', ReflectionExtractor::class)
             ->tag('property_info.list_extractor', ['priority' => -1000])
             ->tag('property_info.type_extractor', ['priority' => -1002])
+            ->tag('property_info.constructor_extractor', ['priority' => -1002])
             ->tag('property_info.access_extractor', ['priority' => -1000])
             ->tag('property_info.initializable_extractor', ['priority' => -1000])
+
+        ->set('property_info.constructor_extractor', ConstructorExtractor::class)
+            ->args([[]])
+            ->tag('property_info.type_extractor', ['priority' => -999])
 
         ->alias(PropertyReadInfoExtractorInterface::class, 'property_info.reflection_extractor')
         ->alias(PropertyWriteInfoExtractorInterface::class, 'property_info.reflection_extractor')

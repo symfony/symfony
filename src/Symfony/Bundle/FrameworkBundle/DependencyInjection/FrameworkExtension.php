@@ -127,6 +127,7 @@ use Symfony\Component\Notifier\TexterInterface;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface as NotifierTransportFactoryInterface;
 use Symfony\Component\Process\Messenger\RunProcessMessageHandler;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyInfo\Extractor\ConstructorArgumentTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
@@ -407,7 +408,7 @@ class FrameworkExtension extends Extension
         }
 
         if ($propertyInfoEnabled) {
-            $this->registerPropertyInfoConfiguration($container, $loader);
+            $this->registerPropertyInfoConfiguration($config['property_info'], $container, $loader);
         }
 
         if ($this->readConfigEnabled('lock', $container, $config['lock'])) {
@@ -631,6 +632,8 @@ class FrameworkExtension extends Extension
             ->addTag('property_info.list_extractor');
         $container->registerForAutoconfiguration(PropertyTypeExtractorInterface::class)
             ->addTag('property_info.type_extractor');
+        $container->registerForAutoconfiguration(ConstructorArgumentTypeExtractorInterface::class)
+            ->addTag('property_info.constructor_extractor');
         $container->registerForAutoconfiguration(PropertyDescriptionExtractorInterface::class)
             ->addTag('property_info.description_extractor');
         $container->registerForAutoconfiguration(PropertyAccessExtractorInterface::class)
@@ -1960,7 +1963,7 @@ class FrameworkExtension extends Extension
         $container->setParameter('.serializer.named_serializers', $config['named_serializers'] ?? []);
     }
 
-    private function registerPropertyInfoConfiguration(ContainerBuilder $container, PhpFileLoader $loader): void
+    private function registerPropertyInfoConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
         if (!interface_exists(PropertyInfoExtractorInterface::class)) {
             throw new LogicException('PropertyInfo support cannot be enabled as the PropertyInfo component is not installed. Try running "composer require symfony/property-info".');
@@ -1968,18 +1971,24 @@ class FrameworkExtension extends Extension
 
         $loader->load('property_info.php');
 
+        if (!$config['with_constructor_extractor']) {
+            $container->removeDefinition('property_info.constructor_extractor');
+        }
+
         if (
             ContainerBuilder::willBeAvailable('phpstan/phpdoc-parser', PhpDocParser::class, ['symfony/framework-bundle', 'symfony/property-info'])
             && ContainerBuilder::willBeAvailable('phpdocumentor/type-resolver', ContextFactory::class, ['symfony/framework-bundle', 'symfony/property-info'])
         ) {
             $definition = $container->register('property_info.phpstan_extractor', PhpStanExtractor::class);
             $definition->addTag('property_info.type_extractor', ['priority' => -1000]);
+            $definition->addTag('property_info.constructor_extractor', ['priority' => -1000]);
         }
 
         if (ContainerBuilder::willBeAvailable('phpdocumentor/reflection-docblock', DocBlockFactoryInterface::class, ['symfony/framework-bundle', 'symfony/property-info'], true)) {
             $definition = $container->register('property_info.php_doc_extractor', PhpDocExtractor::class);
             $definition->addTag('property_info.description_extractor', ['priority' => -1000]);
             $definition->addTag('property_info.type_extractor', ['priority' => -1001]);
+            $definition->addTag('property_info.constructor_extractor', ['priority' => -1001]);
         }
 
         if ($container->getParameter('kernel.debug')) {

@@ -70,6 +70,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'monolog.logger',
         'notifier.channel',
         'property_info.access_extractor',
+        'property_info.constructor_extractor',
         'property_info.initializable_extractor',
         'property_info.list_extractor',
         'property_info.type_extractor',

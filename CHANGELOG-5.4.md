@@ -7,6 +7,34 @@ in 5.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.4.0...v5.4.1
 
+* 5.4.24 (2023-05-27)
+
+ * bug #50429 [Console] block input stream if needed (joelwurtz)
+ * bug #50315 [Translation] Fix handling of null messages in `ArrayLoader` (rob006)
+ * bug #50338 [Console] Remove ``exec`` and replace it by ``shell_exec`` (maxbeckers)
+ * bug #50362 [FrameworkBundle] Fix Workflow without a marking store definition uses marking store definition of previously defined workflow (krciga22)
+ * bug #50309 [HttpFoundation] UrlHelper is now aware of RequestContext changes (giosh94mhz)
+ * bug #50309 [HttpFoundation] UrlHelper is now aware of RequestContext changes (giosh94mhz)
+ * bug #50354 [Process] Stop the process correctly even if underlying input stream is not closed (joelwurtz)
+ * bug #50332 [PropertyInfo] Fix `PhpStanExtractor` when constructor has no docblock (HypeMC)
+ * bug #50253 [FrameworkBundle] Generate caches consistently on successive run of `cache:clear` command (Okhoshi)
+ * bug #49063 [Messenger] Respect `isRetryable` decision of the retry strategy for re-delivery (FlyingDR)
+ * bug #50251 [Serializer] Handle datetime deserialization in U format (tugmaks)
+ * bug #50266 [HttpFoundation] Fix file streaming after connection aborted (rlshukhov)
+ * bug #50269 Fix param type annotation (l-vo)
+ * bug #50256 [HttpClient] Fix setting duplicate-name headers when redirecting with AmpHttpClient (nicolas-grekas)
+ * bug #50214 [WebProfilerBundle] Remove legacy filters remnants (MatTheCat)
+ * bug #50235 [HttpClient] Fix getting through proxies via CONNECT (nicolas-grekas)
+ * bug #50244 [HttpKernel] Fix restoring surrogate content from cache (nicolas-grekas)
+ * bug #50246 [DependencyInjection] Do not check errored definitions’ type (MatTheCat)
+ * bug #49557 [PropertyInfo] Fix phpDocExtractor nullable array value type (fabpot)
+ * bug #50213 [ErrorHandler] Prevent conflicts with WebProfilerBundle’s JavaScript (MatTheCat)
+ * bug #50192 [Serializer] backed enum throw notNormalizableValueException outside construct method (alli83)
+ * bug #50238 [HttpKernel] Don't use eval() to render ESI/SSI (nicolas-grekas)
+ * bug #50226 [HttpClient] Ensure HttplugClient ignores invalid HTTP headers (nicolas-grekas)
+ * bug #50203 [Messenger] Fix registering message handlers (nicolas-grekas)
+ * bug #50204 [ErrorHandler] Skip Httplug deprecations for HttplugClient (nicolas-grekas)
+
 * 5.4.23 (2023-04-28)
 
  * bug #50143 [Console] trim(): Argument #1 () must be of type string, bool given (danepowell)

@@ -154,6 +154,119 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
         $this->assertEquals('This value is not valid.', $form->getConfig()->getOption('invalid_message'));
     }
 
+    public function testConstraintsFromEntityValid()
+    {
+        // Maps firstName field to Author::firstName -> Length(3) constraint
+        $form = $this->createFormForConstraintsFrom();
+
+        $form->submit(['firstName' => 'foo']);
+
+        $errors = $form->getErrors(true);
+
+        $this->assertCount(0, $errors);
+    }
+
+    public function testConstraintsFromEntityEmpty()
+    {
+        // Maps firstName field to Author::firstName -> Length(3) constraint
+        $form = $this->createFormForConstraintsFrom();
+
+        $form->submit(['firstName' => '']);
+
+        $errors = $form->getErrors(true);
+
+        $this->assertCount(1, $errors);
+    }
+
+    public function testConstraintsFromEntityInvalid()
+    {
+        // Maps firstName field to Author::firstName -> Length(3) constraint
+        $form = $this->createFormForConstraintsFrom();
+
+        $form->submit(['firstName' => 'foobar']);
+
+        $errors = $form->getErrors(true);
+
+        $this->assertCount(1, $errors);
+    }
+
+    public function testConstraintsFromEntityCustomPropertyValid()
+    {
+        // Maps firstName field to Author::lastName -> Length(min: 5) constraint
+        $form = $this->createFormForConstraintsFrom('lastName');
+
+        $form->submit(['firstName' => 'foobar']);
+
+        $errors = $form->getErrors(true);
+
+        $this->assertCount(0, $errors);
+    }
+
+    public function testConstraintsFromEntityCustomPropertyEmpty()
+    {
+        // Maps firstName field to Author::lastName -> Length(min: 5) constraint
+        $form = $this->createFormForConstraintsFrom('lastName');
+
+        $form->submit(['firstName' => '']);
+
+        $errors = $form->getErrors(true);
+
+        $this->assertCount(1, $errors);
+    }
+
+    public function testConstraintsFromEntityCustomPropertyInvalid()
+    {
+        // Maps firstName field to Author::lastName -> Length(min: 5) constraint
+        $form = $this->createFormForConstraintsFrom('lastName');
+
+        $form->submit(['firstName' => 'foo']);
+
+        $errors = $form->getErrors(true);
+
+        $this->assertCount(1, $errors);
+    }
+
+    protected function createFormForConstraintsFrom(string $propertyName = null)
+    {
+        $formMetadata = new ClassMetadata(Form::class);
+        $authorMetadata = (new ClassMetadata(Author::class))
+            ->addPropertyConstraint('firstName', new Length(3))
+            ->addPropertyConstraint('lastName', new Length(min: 5))
+        ;
+        $metadataFactory = $this->createMock(MetadataFactoryInterface::class);
+        $metadataFactory->expects($this->any())
+            ->method('getMetadataFor')
+            ->willReturnCallback(static function ($classOrObject) use ($formMetadata, $authorMetadata) {
+                if (Author::class === $classOrObject || $classOrObject instanceof Author) {
+                    return $authorMetadata;
+                }
+
+                if (Form::class === $classOrObject || $classOrObject instanceof Form) {
+                    return $formMetadata;
+                }
+
+                return new ClassMetadata(\is_string($classOrObject) ? $classOrObject : $classOrObject::class);
+            })
+        ;
+
+        $validator = Validation::createValidatorBuilder()
+            ->setMetadataFactory($metadataFactory)
+            ->getValidator()
+        ;
+
+        $form = Forms::createFormFactoryBuilder()
+            ->addExtension(new ValidatorExtension($validator))
+            ->getFormFactory()
+            ->create(FormTypeTest::TESTED_TYPE)
+            ->add('firstName', TextTypeTest::TESTED_TYPE, [
+                'constraints_from_entity' => Author::class,
+                'constraints_from_property' => $propertyName ?? null,
+            ])
+        ;
+
+        return $form;
+    }
+
     protected function createForm(array $options = [])
     {
         return $this->factory->create(FormTypeTest::TESTED_TYPE, null, $options);

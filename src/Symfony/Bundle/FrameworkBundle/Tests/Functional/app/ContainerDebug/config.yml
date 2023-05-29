@@ -33,3 +33,5 @@ services:
             - '%env(REAL)%'
             - '%env(int:key:2:json:JSON)%'
             - '%env(float:key:2:json:JSON)%'
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ContainerExcluded:
+        tags: ['container.excluded']

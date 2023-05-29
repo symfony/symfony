@@ -26,7 +26,7 @@ enum AnsiColorMode
     case Ansi4;
 
     /*
-     * 8-bit Ansi colors (240 differents colors + 16 duplicate color codes, ensuring backward compatibility).
+     * 8-bit Ansi colors (240 different colors + 16 duplicate color codes, ensuring backward compatibility).
      * Output syntax is: "ESC[38;5;${foreGroundColorcode};48;5;${backGroundColorcode}m"
      * Should be compatible with most terminals.
      */

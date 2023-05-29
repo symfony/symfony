@@ -106,6 +106,9 @@ class JsonDescriptor extends Descriptor
             if ($service instanceof Alias) {
                 $data['aliases'][$serviceId] = $this->getContainerAliasData($service);
             } elseif ($service instanceof Definition) {
+                if ($service->hasTag('container.excluded')) {
+                    continue;
+                }
                 $data['definitions'][$serviceId] = $this->getContainerDefinitionData($service, $omitTags, $showArguments, $builder, $serviceId);
             } else {
                 $data['services'][$serviceId] = $service::class;

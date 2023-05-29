@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-05-27T14:06:32Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-05-28T14:23:12Z
+
+Can you please check if this issue happens on 6.3? We might have fixed this as an improvement already.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-05-28T15:01:09Z
+
+@nicolas-grekas I can confirm this still happens with Symfony 6.3.0 RC2
+
+![](https://github.com/symfony/symfony/assets/1898254/a6cb9597-69de-4d35-8d10-88d25b2692b3)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-05-28T22:10:08Z
+
+Looks good, thank you for contributing.
+Can you have a look ContainerDebugCommandTest and see if you can add a test to prevent future regressions?
+
+---------------------------------------------------------------------------
+
+by Myks92 at 2023-05-29T00:26:48Z
+
+@chalasr, I added tests for `Descriptor` and `ContainerDebugCommand`. Is that what you need?

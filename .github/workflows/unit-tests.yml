@@ -228,12 +228,12 @@ jobs:
             script -e -c './phpunit --group tty' /dev/null
 
       - name: Run tests with SIGCHLD enabled PHP
-        if: "false && matrix.php == '8.2' && ! matrix.mode"
+        if: "matrix.php == '8.2' && ! matrix.mode"
         run: |
           mkdir build
           cd build
-          wget -q https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.2.6-pcntl-sigchild.tar.bz2
-          tar -xjf php-8.2.6-pcntl-sigchild.tar.bz2
+          wget -q https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.2.0-pcntl-sigchild.tar.bz2
+          tar -xjf php-8.2.0-pcntl-sigchild.tar.bz2
           cd ..
 
           ./build/php/bin/php ./phpunit --colors=always src/Symfony/Component/Process

@@ -31,12 +31,8 @@ final class QueryParameterValueResolver implements ValueResolverInterface
 
         $name = $attribute->name ?? $argument->getName();
         if (!$request->query->has($name)) {
-            if ($argument->hasDefaultValue()) {
-                return [$argument->getDefaultValue()];
-            }
-
-            if ($argument->isNullable()) {
-                return [null];
+            if ($argument->isNullable() || $argument->hasDefaultValue()) {
+                return [];
             }
 
             throw new NotFoundHttpException(sprintf('Missing query parameter "%s".', $name));

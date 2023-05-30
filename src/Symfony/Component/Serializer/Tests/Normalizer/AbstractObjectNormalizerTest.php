@@ -41,9 +41,11 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Tests\Fixtures\AbstractWithDiscriminator;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummyFirstChild;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummySecondChild;
+use Symfony\Component\Serializer\Tests\Fixtures\ConcreteWithDiscriminator;
 use Symfony\Component\Serializer\Tests\Fixtures\DummySecondChildQuux;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ObjectDummyWithContextAttribute;
 
@@ -300,6 +302,39 @@ class AbstractObjectNormalizerTest extends TestCase
             'foo' => 'notfoo',
             'baz' => 'baz',
         ], $test);
+    }
+
+    public function testDenormalizeWithDiscriminatorMapNotMappedToAProperty()
+    {
+        $factory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+
+        $loaderMock = new class() implements ClassMetadataFactoryInterface {
+            public function getMetadataFor($value): ClassMetadataInterface
+            {
+                if (ConcreteWithDiscriminator::class === $value) {
+                    return new ClassMetadata(
+                        AbstractWithDiscriminator::class,
+                        new ClassDiscriminatorMapping('discr', [
+                            'first' => ConcreteWithDiscriminator::class,
+                        ])
+                    );
+                }
+
+                throw new InvalidArgumentException();
+            }
+
+            public function hasMetadataFor($value): bool
+            {
+                return ConcreteWithDiscriminator::class === $value;
+            }
+        };
+
+        $discriminatorResolver = new ClassDiscriminatorFromClassMetadata($loaderMock);
+        $normalizer = new AbstractObjectNormalizerDummy($factory, null, new PhpDocExtractor(), $discriminatorResolver);
+        $serializer = new Serializer([$normalizer]);
+        $normalizer->setSerializer($serializer);
+
+        $this->assertInstanceOf(AbstractWithDiscriminator::class, $normalizer->denormalize(['id' => 0, 'instance' => 'test', 'name' => 'test'], ConcreteWithDiscriminator::class, 'any'));
     }
 
     public function testNormalizeWithNestedAttributesInConstructorAndDiscriminatorMap()

@@ -431,3 +431,10 @@ final class ElsaAction
     {
     }
 }
+
+class ParametersLikeDefaultValue
+{
+    public function __construct(string $parameterLike = '%not%one%parameter%here%', string $willBeSetToKeepFirstArgumentDefaultValue = 'ok')
+    {
+    }
+}

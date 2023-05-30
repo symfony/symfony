@@ -95,6 +95,8 @@ class FrameworkBundle extends Bundle
      */
     public function boot()
     {
+        $_ENV['DOCTRINE_DEPRECATIONS'] = $_SERVER['DOCTRINE_DEPRECATIONS'] ??= 'trigger';
+
         $handler = ErrorHandler::register(null, false);
         $this->container->get('debug.error_handler_configurator')->configure($handler);
 

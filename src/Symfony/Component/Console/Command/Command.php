@@ -128,6 +128,9 @@ class Command
 
         if (null !== $name) {
             $this->setName($name);
+        } else {
+            trigger_deprecation('symfony/console', '6.4', 'Calling "%s()" without $name argument is deprecated. It must either be defined in "%s()" or via configuration.', __METHOD__);
+            $this->setName(get_called_class());
         }
 
         if ('' === $this->description) {

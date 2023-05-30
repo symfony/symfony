@@ -26,6 +26,7 @@
     },
     "require-dev": {
         "symfony/cache": "^5.4|^6.0",
+        "symfony/clock": "^6.3",
         "symfony/expression-language": "^5.4|^6.0",
         "symfony/http-client-contracts": "^3.0",
         "symfony/rate-limiter": "^5.4|^6.0",
@@ -37,6 +38,7 @@
         "web-token/jwt-signature-algorithm-ecdsa": "^3.1"
     },
     "conflict": {
+        "symfony/clock": "<6.3",
         "symfony/event-dispatcher": "<5.4.9|>=6,<6.0.9",
         "symfony/http-client-contracts": "<3.0",
         "symfony/security-bundle": "<5.4",

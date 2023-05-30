@@ -7,6 +7,21 @@ in 6.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.3.0...v6.3.1
 
+* 6.3.0 (2023-05-30)
+
+ * bug #50432 [Security] Validate `aud` and `iss` claims on OidcTokenHandler (vincentchalamon)
+ * bug #50477 [Security] Add clock dependency to OidcTokenHandler (nicolas-grekas)
+ * bug #50437 [Filesystem] Follow symlinks when dumping files (ausi)
+ * bug #50478 [DependencyInjection] Escape `` from parameter-like default values (MatTheCat)
+ * bug #50476 [FrameworkBundle] remove support for preloading ESM using headers (dunglas)
+ * bug #50453 [SecurityBundle] add missing xsd definition for OIDC (aegypius)
+ * bug #50468 [FrameworkBundle][PhpUnitBridge] Configure doctrine/deprecations as expected (nicolas-grekas)
+ * bug #50473 [Notifier] Fix ContactEveryoneOptions (nicolas-grekas)
+ * bug #50470 [SecurityBundle] Fix configuring OIDC user info token handler client (vincentchalamon)
+ * bug #50456 [AssetMapper] Fix unable to use asset mapper with CSP (vtsykun)
+ * bug #50458 [HttpKernel] Fix default value ignored with pinned resolvers (HypeMC)
+ * bug #50452 Hide definitions bearing the `container.excluded` tag (Myks92)
+
 * 6.3.0-RC2 (2023-05-27)
 
  * feature #50445 [AssetMapper] Add "=alias" syntax to importmap:require (weaverryan)

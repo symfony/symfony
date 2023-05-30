@@ -69,10 +69,11 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 abstract_arg('signature algorithm'),
                 abstract_arg('signature key'),
+                abstract_arg('audience'),
+                abstract_arg('issuers'),
+                'sub',
                 service('logger')->nullOnInvalid(),
                 service('clock'),
-                'sub',
-                null,
             ])
 
         ->set('security.access_token_handler.oidc.jwk', JWK::class)

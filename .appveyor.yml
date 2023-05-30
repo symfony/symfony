@@ -51,8 +51,7 @@ install:
     - git config --global user.name "Symfony"
     - FOR /F "tokens=* USEBACKQ" %%F IN (`bash -c "grep ' VERSION = ' src/Symfony/Component/HttpKernel/Kernel.php | grep -o '[0-9][0-9]*\.[0-9]'"`) DO (SET SYMFONY_VERSION=%%F)
     - php .github/build-packages.php HEAD^ %SYMFONY_VERSION% src\Symfony\Bridge\PhpUnit
-    #- SET COMPOSER_ROOT_VERSION=%SYMFONY_VERSION%.x-dev
-    - SET COMPOSER_ROOT_VERSION=6.4.x-dev
+    - SET COMPOSER_ROOT_VERSION=%SYMFONY_VERSION%.x-dev
     - php composer.phar update --no-progress --ansi
     - php phpunit install
     - choco install memurai-developer

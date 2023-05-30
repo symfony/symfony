@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by aegypius at 2023-05-30T08:00:27Z
+
+Thanks @nicolas-grekas for the feedback, I hope the PR is in a better shape now !
+
+---------------------------------------------------------------------------
+
+by aegypius at 2023-05-30T09:16:16Z
+
+Sorry @nicolas-grekas, access token was not usable as-is, I merged defintions to be a little more loose but to make sure every case can be achieved

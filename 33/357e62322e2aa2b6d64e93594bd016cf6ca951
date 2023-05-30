@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by ausi at 2023-05-30T15:50:20Z
+
+> Can you please consider this minor patch
+
+I applied the `\dirname($filename)` changes in c2ffd538d57463d4d50963eaada41fa4cb4fa65a
+Your other change would break recursive symlinks, I adjusted the tests to cover that case in 48a66c1c7f7d1aee325e65112a79190c2507040c
+
+---------------------------------------------------------------------------
+
+by ausi at 2023-05-30T16:46:40Z
+
+> …and figure out the failures on appveyor?
+
+Done in d729da4cceb8be2b44580898cfa07d558f6ad858
+In Windows below PHP version 7.4 it seems impossible to read a broken symlink.

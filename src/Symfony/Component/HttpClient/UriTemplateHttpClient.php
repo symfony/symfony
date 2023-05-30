@@ -62,6 +62,11 @@ class UriTemplateHttpClient implements HttpClientInterface, ResetInterface
         return $clone;
     }
 
+    public function __call($name, $arguments)
+    {
+        return $this->client->{$name}(...$arguments);
+    }
+
     /**
      * @return \Closure(string $url, array $vars): string
      */

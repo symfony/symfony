@@ -296,6 +296,26 @@ class ArgumentResolverTest extends TestCase
         $this->assertSame([1], $resolver->getArguments($request, $controller));
     }
 
+    public function testTargetedResolverWithDefaultValue()
+    {
+        $resolver = self::getResolver([], [RequestAttributeValueResolver::class => new RequestAttributeValueResolver()]);
+
+        $request = Request::create('/');
+        $controller = $this->controllerTargetingResolverWithDefaultValue(...);
+
+        $this->assertSame([2], $resolver->getArguments($request, $controller));
+    }
+
+    public function testTargetedResolverWithNullableValue()
+    {
+        $resolver = self::getResolver([], [RequestAttributeValueResolver::class => new RequestAttributeValueResolver()]);
+
+        $request = Request::create('/');
+        $controller = $this->controllerTargetingResolverWithNullableValue(...);
+
+        $this->assertSame([null], $resolver->getArguments($request, $controller));
+    }
+
     public function testDisabledResolver()
     {
         $resolver = self::getResolver(namedResolvers: []);
@@ -370,6 +390,14 @@ class ArgumentResolverTest extends TestCase
     }
 
     public function controllerTargetingResolver(#[ValueResolver(DefaultValueResolver::class)] int $foo = 1)
+    {
+    }
+
+    public function controllerTargetingResolverWithDefaultValue(#[ValueResolver(RequestAttributeValueResolver::class)] int $foo = 2)
+    {
+    }
+
+    public function controllerTargetingResolverWithNullableValue(#[ValueResolver(RequestAttributeValueResolver::class)] ?int $foo)
     {
     }
 

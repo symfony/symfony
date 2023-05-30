@@ -18,6 +18,7 @@ use Jose\Component\Signature\JWSBuilder;
 use Jose\Component\Signature\Serializer\CompactSerializer;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Clock\Clock;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\OidcUser;
 use Symfony\Component\Security\Http\AccessToken\Oidc\OidcTokenHandler;
@@ -55,6 +56,7 @@ class OidcTokenHandlerTest extends TestCase
             new ES256(),
             $this->getJWK(),
             $loggerMock,
+            new Clock(),
             $claim,
             self::AUDIENCE
         ))->getUserBadgeFrom($token);
@@ -88,6 +90,7 @@ class OidcTokenHandlerTest extends TestCase
             new ES256(),
             $this->getJWK(),
             $loggerMock,
+            new Clock(),
             'sub',
             self::AUDIENCE
         ))->getUserBadgeFrom($token);
@@ -146,6 +149,7 @@ class OidcTokenHandlerTest extends TestCase
             new ES256(),
             self::getJWK(),
             $loggerMock,
+            new Clock(),
             'email',
             self::AUDIENCE
         ))->getUserBadgeFrom($token);

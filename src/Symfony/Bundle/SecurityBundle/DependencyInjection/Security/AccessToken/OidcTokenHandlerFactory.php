@@ -28,8 +28,9 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
     public function create(ContainerBuilder $container, string $id, array|string $config): void
     {
         $tokenHandlerDefinition = $container->setDefinition($id, (new ChildDefinition('security.access_token_handler.oidc'))
+            ->replaceArgument(2, $config['audience'])
+            ->replaceArgument(3, $config['issuers'])
             ->replaceArgument(4, $config['claim'])
-            ->replaceArgument(5, $config['audience'])
         );
 
         if (!ContainerBuilder::willBeAvailable('web-token/jwt-core', Algorithm::class, ['symfony/security-bundle'])) {
@@ -39,11 +40,14 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
                 ->addError('You cannot use the "oidc" token handler since "web-token/jwt-core" is not installed. Try running "web-token/jwt-core".');
         }
 
+        // @see Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SignatureAlgorithmFactory
+        // for supported algorithms
         if (\in_array($config['algorithm'], ['ES256', 'ES384', 'ES512'], true)) {
             $tokenHandlerDefinition->replaceArgument(0, new Reference('security.access_token_handler.oidc.signature.'.$config['algorithm']));
         } else {
-            $tokenHandlerDefinition->replaceArgument(0, (new ChildDefinition('security.access_token_handler.oidc.signature')))
-                ->replaceArgument(0, $config['algorithm']);
+            $tokenHandlerDefinition->replaceArgument(0, (new ChildDefinition('security.access_token_handler.oidc.signature'))
+                ->replaceArgument(0, $config['algorithm'])
+            );
         }
 
         $tokenHandlerDefinition->replaceArgument(1, (new ChildDefinition('security.access_token_handler.oidc.jwk'))
@@ -68,7 +72,12 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
                     ->end()
                     ->scalarNode('audience')
                         ->info('Audience set in the token, for validation purpose.')
-                        ->defaultNull()
+                        ->isRequired()
+                    ->end()
+                    ->arrayNode('issuers')
+                        ->info('Issuers allowed to generate the token, for validation purpose.')
+                        ->isRequired()
+                        ->prototype('scalar')->end()
                     ->end()
                     ->scalarNode('algorithm')
                         ->info('Algorithm used to sign the token.')

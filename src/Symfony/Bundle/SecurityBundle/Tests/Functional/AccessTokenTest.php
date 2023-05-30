@@ -343,7 +343,7 @@ class AccessTokenTest extends AbstractWebTestCase
             'iat' => $time,
             'nbf' => $time,
             'exp' => $time + 3600,
-            'iss' => 'https://www.example.com/',
+            'iss' => 'https://www.example.com',
             'aud' => 'Symfony OIDC',
             'sub' => 'e21bf182-1538-406e-8ccb-e25a17aba39f',
             'username' => 'dunglas',

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-05-30T09:04:49Z
+
+Updated to enable the trigger when using the phpunit-bridge also.

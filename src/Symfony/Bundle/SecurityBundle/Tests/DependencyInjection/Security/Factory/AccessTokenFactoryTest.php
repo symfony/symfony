@@ -21,6 +21,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class AccessTokenFactoryTest extends TestCase
 {
@@ -126,6 +127,13 @@ class AccessTokenFactoryTest extends TestCase
                 ->replaceArgument(0, ['base_uri' => 'https://www.example.com/realms/demo/protocol/openid-connect/userinfo']),
             'index_2' => 'sub',
         ];
+
+        if (!interface_exists(HttpClientInterface::class)) {
+            $expected['index_0']
+                ->setFactory(null)
+                ->addError('You cannot use the "oidc_user_info" token handler since the HttpClient component is not installed. Try running "composer require symfony/http-client".');
+        }
+
         $this->assertEquals($expected, $container->getDefinition('security.access_token_handler.firewall1')->getArguments());
     }
 

@@ -642,6 +642,12 @@ class Filesystem
 
         $dir = \dirname($filename);
 
+        if (is_link($filename) && $linkTarget = $this->readlink($filename)) {
+            $this->dumpFile(Path::makeAbsolute($linkTarget, $dir), $content);
+
+            return;
+        }
+
         if (!is_dir($dir)) {
             $this->mkdir($dir);
         }

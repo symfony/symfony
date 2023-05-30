@@ -1174,6 +1174,19 @@ class AutowirePassTest extends TestCase
         $this->assertEquals([new TypedReference(A::class, A::class), 'abc'], $container->getDefinition('foo')->getArguments());
     }
 
+    public function testAutowireDefaultValueParametersLike()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', ParametersLikeDefaultValue::class)
+            ->setAutowired(true)
+            ->setArgument(1, 'ok');
+
+        (new AutowirePass())->process($container);
+
+        $this->assertSame('%%not%%one%%parameter%%here%%', $container->getDefinition('foo')->getArgument(0));
+    }
+
     public function testAutowireAttribute()
     {
         $container = new ContainerBuilder();

@@ -71,7 +71,10 @@ final class ArgumentResolver implements ArgumentResolverInterface
                         throw new ResolverNotFoundException($resolverName, $this->namedResolvers instanceof ServiceProviderInterface ? array_keys($this->namedResolvers->getProvidedServices()) : []);
                     }
 
-                    $argumentValueResolvers = [$this->namedResolvers->get($resolverName)];
+                    $argumentValueResolvers = [
+                        $this->namedResolvers->get($resolverName),
+                        new DefaultValueResolver(),
+                    ];
                 }
             }
 

@@ -20,8 +20,9 @@ use Jose\Component\Signature\JWSTokenSupport;
 use Jose\Component\Signature\JWSVerifier;
 use Jose\Component\Signature\Serializer\CompactSerializer;
 use Jose\Component\Signature\Serializer\JWSSerializerManager;
+use Psr\Clock\ClockInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Clock\NativeClock;
+use Symfony\Component\Clock\Clock;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Http\AccessToken\AccessTokenHandlerInterface;
 use Symfony\Component\Security\Http\AccessToken\Oidc\Exception\InvalidSignatureException;
@@ -41,6 +42,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
         private Algorithm $signatureAlgorithm,
         private JWK $jwk,
         private ?LoggerInterface $logger = null,
+        private ClockInterface $clock = new Clock(),
         private string $claim = 'sub',
         private ?string $audience = null
     ) {
@@ -74,11 +76,10 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
             $headerCheckerManager->check($jws, 0);
 
             // Verify the claims
-            $clock = class_exists(NativeClock::class) ? new NativeClock() : null;
             $checkers = [
-                new Checker\IssuedAtChecker(0, false, $clock),
-                new Checker\NotBeforeChecker(0, false, $clock),
-                new Checker\ExpirationTimeChecker(0, false, $clock),
+                new Checker\IssuedAtChecker(0, false, $this->clock),
+                new Checker\NotBeforeChecker(0, false, $this->clock),
+                new Checker\ExpirationTimeChecker(0, false, $this->clock),
             ];
             if ($this->audience) {
                 $checkers[] = new Checker\AudienceChecker($this->audience);
@@ -93,7 +94,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
 
             // UserLoader argument can be overridden by a UserProvider on AccessTokenAuthenticator::authenticate
             return new UserBadge($claims[$this->claim], fn () => $this->createUser($claims), $claims);
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
             $this->logger?->error('An error while decoding and validating the token.', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),

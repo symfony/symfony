@@ -22,8 +22,8 @@ class ImportMapRuntime
     {
     }
 
-    public function importmap(?string $entryPoint = 'app'): string
+    public function importmap(?string $entryPoint = 'app', array $attributes = []): string
     {
-        return $this->importMapRenderer->render($entryPoint);
+        return $this->importMapRenderer->render($entryPoint, $attributes);
     }
 }

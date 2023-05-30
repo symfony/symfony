@@ -179,14 +179,14 @@ class QueryParameterValueResolverTest extends TestCase
         yield 'parameter not found but nullable' => [
             Request::create('/', 'GET'),
             new ArgumentMetadata('firstName', 'string', false, false, false, true, [new MapQueryParameter()]),
-            [null],
+            [],
             null,
         ];
 
         yield 'parameter not found but optional' => [
             Request::create('/', 'GET'),
             new ArgumentMetadata('firstName', 'string', false, true, false, attributes: [new MapQueryParameter()]),
-            [false],
+            [],
             null,
         ];
 

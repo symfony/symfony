@@ -24,7 +24,7 @@ class ContactEveryoneOptionsTest extends TestCase
 
         self::assertSame([
             'category' => 'test_category',
-            'diffusion_name' => 'test_diffusion_name',
+            'diffusionname' => 'test_diffusion_name',
         ], $contactEveryoneOptions->toArray());
     }
 }

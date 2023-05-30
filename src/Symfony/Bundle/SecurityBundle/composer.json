@@ -60,6 +60,7 @@
         "symfony/browser-kit": "<5.4",
         "symfony/console": "<5.4",
         "symfony/framework-bundle": "<5.4",
+        "symfony/http-client": "<5.4",
         "symfony/ldap": "<5.4",
         "symfony/twig-bundle": "<5.4"
     },

@@ -18,6 +18,7 @@ use Symfony\Component\Security\Http\AccessToken\Oidc\OidcTokenHandler;
 use Symfony\Component\Security\Http\AccessToken\Oidc\OidcUserInfoTokenHandler;
 use Symfony\Component\Security\Http\AccessToken\QueryAccessTokenExtractor;
 use Symfony\Component\Security\Http\Authenticator\AccessTokenAuthenticator;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -44,12 +45,17 @@ return static function (ContainerConfigurator $container) {
             ])
 
         // OIDC
+        ->set('security.access_token_handler.oidc_user_info.http_client', HttpClientInterface::class)
+            ->abstract()
+            ->factory([service('http_client'), 'withOptions'])
+            ->args([abstract_arg('http client options')])
+
         ->set('security.access_token_handler.oidc_user_info', OidcUserInfoTokenHandler::class)
             ->abstract()
             ->args([
                 abstract_arg('http client'),
                 service('logger')->nullOnInvalid(),
-                'sub',
+                abstract_arg('claim'),
             ])
 
         ->set('security.access_token_handler.oidc', OidcTokenHandler::class)

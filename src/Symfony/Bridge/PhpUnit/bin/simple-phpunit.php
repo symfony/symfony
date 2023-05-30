@@ -151,6 +151,11 @@ if ('disabled' === $getEnvVar('SYMFONY_DEPRECATIONS_HELPER')) {
     putenv('SYMFONY_DEPRECATIONS_HELPER=disabled');
 }
 
+if (!$getEnvVar('DOCTRINE_DEPRECATIONS')) {
+    putenv('DOCTRINE_DEPRECATIONS=trigger');
+    $_SERVER['DOCTRINE_DEPRECATIONS'] = $_ENV['DOCTRINE_DEPRECATIONS'] = 'trigger';
+}
+
 $COMPOSER = ($COMPOSER = getenv('COMPOSER_BINARY'))
     || file_exists($COMPOSER = $oldPwd.'/composer.phar')
     || ($COMPOSER = rtrim((string) ('\\' === \DIRECTORY_SEPARATOR ? preg_replace('/[\r\n].*/', '', shell_exec('where.exe composer.phar 2> NUL')) : shell_exec('which composer.phar 2> /dev/null'))))

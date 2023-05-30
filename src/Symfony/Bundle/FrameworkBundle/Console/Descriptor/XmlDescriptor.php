@@ -293,10 +293,8 @@ class XmlDescriptor extends Descriptor
                 continue;
             }
 
-            if ($service instanceof Definition) {
-                if ($service->hasTag('container.excluded')) {
-                    continue;
-                }
+            if ($service instanceof Definition && $service->hasTag('container.excluded')) {
+                continue;
             }
 
             $serviceXML = $this->getContainerServiceDocument($service, $serviceId, null, $showArguments);

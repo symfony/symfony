@@ -209,6 +209,9 @@ return static function (ContainerConfigurator $container) {
             ->tag('kernel.event_subscriber')
             ->tag('monolog.logger', ['channel' => 'messenger'])
 
+        ->alias('messenger.listener.stop_worker_on_sigterm_signal_listener', 'messenger.listener.stop_worker_signals_listener')
+            ->deprecate('6.3', 'symfony/messenger', 'The "%alias_id%" service is deprecated, use "messenger.listener.stop_worker_signals_listener" instead.')
+
         ->set('messenger.listener.stop_worker_on_stop_exception_listener', StopWorkerOnCustomStopExceptionListener::class)
             ->tag('kernel.event_subscriber')
 

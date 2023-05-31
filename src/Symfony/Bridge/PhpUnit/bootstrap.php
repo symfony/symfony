@@ -10,10 +10,11 @@
  */
 
 use Doctrine\Common\Annotations\AnnotationRegistry;
+use Doctrine\Deprecations\Deprecation;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler;
 
 // Detect if we need to serialize deprecations to a file.
-if ($file = getenv('SYMFONY_DEPRECATIONS_SERIALIZE')) {
+if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true) && $file = getenv('SYMFONY_DEPRECATIONS_SERIALIZE')) {
     DeprecationErrorHandler::collectDeprecations($file);
 
     return;
@@ -26,6 +27,10 @@ if (!defined('PHPUNIT_COMPOSER_INSTALL') && !class_exists(\PHPUnit\TextUI\Comman
 
 // Enforce a consistent locale
 setlocale(\LC_ALL, 'C');
+
+if (class_exists(Deprecation::class)) {
+    Deprecation::withoutDeduplication();
+}
 
 if (!class_exists(AnnotationRegistry::class, false) && class_exists(AnnotationRegistry::class)) {
     if (method_exists(AnnotationRegistry::class, 'registerUniqueLoader')) {

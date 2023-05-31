@@ -65,7 +65,7 @@ final class MailjetPayloadConverter implements PayloadConverterInterface
             return $payload['smtp_reply'];
         }
         if (isset($payload['error'])) {
-            return sprintf("%s : %s", $payload['error_related_to'], $payload['error']);
+            return sprintf('%s : %s', $payload['error_related_to'], $payload['error']);
         }
 
         return '';

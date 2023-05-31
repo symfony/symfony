@@ -16,7 +16,7 @@ use Symfony\Component\Mailer\Bridge\Mailjet\Webhook\MailjetRequestParser;
 use Symfony\Component\Webhook\Client\RequestParserInterface;
 use Symfony\Component\Webhook\Test\AbstractRequestParserTestCase;
 
-class MailjetParserTest extends AbstractRequestParserTestCase
+class MailjetRequestParserTest extends AbstractRequestParserTestCase
 {
     protected function createRequestParser(): RequestParserInterface
     {

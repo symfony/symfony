@@ -27,6 +27,7 @@ use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -36,6 +37,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummyFirstChild;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummySecondChild;
+use Symfony\Component\Serializer\Tests\Fixtures\DummyFirstChildQuux;
 use Symfony\Component\Serializer\Tests\Fixtures\DummySecondChildQuux;
 
 class AbstractObjectNormalizerTest extends TestCase
@@ -250,6 +252,61 @@ class AbstractObjectNormalizerTest extends TestCase
         $normalizedData = $normalizer->denormalize(['foo' => 'foo', 'baz' => 'baz', 'quux' => ['value' => 'quux'], 'type' => 'second'], AbstractDummy::class);
 
         $this->assertInstanceOf(DummySecondChildQuux::class, $normalizedData->quux);
+    }
+
+    public function testDenormalizeWithDiscriminatorMapAndObjectToPopulateUsesCorrectClassname()
+    {
+        $factory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+
+        $loaderMock = new class() implements ClassMetadataFactoryInterface {
+            public function getMetadataFor($value): ClassMetadataInterface
+            {
+                if (AbstractDummy::class === $value) {
+                    return new ClassMetadata(
+                        AbstractDummy::class,
+                        new ClassDiscriminatorMapping('type', [
+                            'first' => AbstractDummyFirstChild::class,
+                            'second' => AbstractDummySecondChild::class,
+                        ])
+                    );
+                }
+
+                throw new InvalidArgumentException();
+            }
+
+            public function hasMetadataFor($value): bool
+            {
+                return AbstractDummy::class === $value;
+            }
+        };
+
+        $discriminatorResolver = new ClassDiscriminatorFromClassMetadata($loaderMock);
+        $normalizer = new AbstractObjectNormalizerDummy($factory, null, new PhpDocExtractor(), $discriminatorResolver);
+        $serializer = new Serializer([$normalizer]);
+        $normalizer->setSerializer($serializer);
+
+        $data = [
+            'foo' => 'foo',
+            'quux' => ['value' => 'quux'],
+        ];
+
+        $normalizedData1 = $normalizer->denormalize($data + ['bar' => 'bar'], AbstractDummy::class, 'any', [
+            AbstractNormalizer::OBJECT_TO_POPULATE => new AbstractDummyFirstChild('notfoo', 'notbar'),
+        ]);
+        $this->assertInstanceOf(AbstractDummyFirstChild::class, $normalizedData1);
+        $this->assertSame('foo', $normalizedData1->foo);
+        $this->assertSame('notbar', $normalizedData1->bar);
+        $this->assertInstanceOf(DummyFirstChildQuux::class, $normalizedData1->quux);
+        $this->assertSame('quux', $normalizedData1->quux->getValue());
+
+        $normalizedData2 = $normalizer->denormalize($data + ['baz' => 'baz'], AbstractDummy::class, 'any', [
+            AbstractNormalizer::OBJECT_TO_POPULATE => new AbstractDummySecondChild('notfoo', 'notbaz'),
+        ]);
+        $this->assertInstanceOf(AbstractDummySecondChild::class, $normalizedData2);
+        $this->assertSame('foo', $normalizedData2->foo);
+        $this->assertSame('baz', $normalizedData2->baz);
+        $this->assertInstanceOf(DummySecondChildQuux::class, $normalizedData2->quux);
+        $this->assertSame('quux', $normalizedData2->quux->getValue());
     }
 
     public function testDenormalizeWithNestedDiscriminatorMap()

@@ -198,7 +198,9 @@ class EnvVarProcessor implements EnvVarProcessorInterface
                 throw new RuntimeException(sprintf('Unsupported env var prefix "%s".', $prefix));
             }
 
-            return null;
+            if (!\in_array($prefix, ['string', 'bool', 'not', 'int', 'float'], true)) {
+                return null;
+            }
         }
 
         if ('shuffle' === $prefix) {
@@ -207,7 +209,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             return $env;
         }
 
-        if (!\is_scalar($env)) {
+        if (null !== $env && !\is_scalar($env)) {
             throw new RuntimeException(sprintf('Non-scalar env var "%s" cannot be cast to "%s".', $name, $prefix));
         }
 
@@ -222,7 +224,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
         }
 
         if ('int' === $prefix) {
-            if (false === $env = filter_var($env, \FILTER_VALIDATE_INT) ?: filter_var($env, \FILTER_VALIDATE_FLOAT)) {
+            if (null !== $env && false === $env = filter_var($env, \FILTER_VALIDATE_INT) ?: filter_var($env, \FILTER_VALIDATE_FLOAT)) {
                 throw new RuntimeException(sprintf('Non-numeric env var "%s" cannot be cast to int.', $name));
             }
 
@@ -230,7 +232,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
         }
 
         if ('float' === $prefix) {
-            if (false === $env = filter_var($env, \FILTER_VALIDATE_FLOAT)) {
+            if (null !== $env && false === $env = filter_var($env, \FILTER_VALIDATE_FLOAT)) {
                 throw new RuntimeException(sprintf('Non-numeric env var "%s" cannot be cast to float.', $name));
             }
 

@@ -863,8 +863,8 @@ class ContainerBuilderTest extends TestCase
         $container->register('foo', 'stdClass')
             ->setPublic(true)
             ->setProperties([
-            'fake' => '%env(int:FAKE)%',
-        ]);
+                'fake' => '%env(resolve:FAKE)%',
+            ]);
 
         $container->compile(true);
 

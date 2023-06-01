@@ -794,6 +794,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     private function getMappedClass(array $data, string $class, array $context): string
     {
+        if (null !== $object = $this->extractObjectToPopulate($class, $context, self::OBJECT_TO_POPULATE)) {
+            return $object::class;
+        }
+
         if (!$mapping = $this->classDiscriminatorResolver?->getMappingForClass($class)) {
             return $class;
         }

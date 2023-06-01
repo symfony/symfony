@@ -13,6 +13,7 @@ namespace Symfony\Component\Filesystem\Tests;
 
 use Symfony\Component\Filesystem\Exception\InvalidArgumentException;
 use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * Test class for Filesystem.
@@ -1087,18 +1088,18 @@ class FilesystemTest extends FilesystemTestCase
     {
         $this->markAsSkippedIfSymlinkIsMissing();
 
-        $file = $this->workspace.'/file';
-        $link = $this->workspace.'/link';
+        $file = Path::join($this->workspace, 'file');
+        $link = Path::join($this->workspace, 'link');
 
         touch($file);
         $this->filesystem->symlink($file, $link);
         $this->filesystem->remove($file);
 
-        $this->assertEquals($file, $this->filesystem->readlink($link));
+        $this->assertEquals($file, Path::normalize($this->filesystem->readlink($link)));
         $this->assertNull($this->filesystem->readlink($link, true));
 
         touch($file);
-        $this->assertEquals($file, $this->filesystem->readlink($link, true));
+        $this->assertEquals($file, Path::normalize($this->filesystem->readlink($link, true)));
     }
 
     public function testReadLinkDefaultPathDoesNotExist()

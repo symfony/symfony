@@ -203,7 +203,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * feature #48678 [FrameworkBundle] Rename service `notifier.logger_notification_listener` to `notifier.notification_logger_listener` (ker0x)
  * feature #48516 [PhpUnitBridge] Add `enum_exists` mock (alexandre-daubois)
  * feature #48855 [Notifier] Add new Symfony Notifier for PagerDuty (stloyd)
- * feature #48876 [HttpKernel] Rename HttpStatus atribute to WithHttpStatus (fabpot)
+ * feature #48876 [HttpKernel] Rename HttpStatus attribute to WithHttpStatus (fabpot)
  * feature #48797 [FrameworkBundle] Add `extra` attribute for HttpClient Configuration (voodooism)
  * feature #48747 [HttpKernel] Allow using `#[WithLogLevel]` for setting custom log level for exceptions (angelov)
  * feature #48820 [HttpFoundation] ParameterBag::getEnum() (nikophil)

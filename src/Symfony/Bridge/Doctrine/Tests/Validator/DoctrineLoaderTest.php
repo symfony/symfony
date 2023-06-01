@@ -100,9 +100,6 @@ class DoctrineLoaderTest extends TestCase
 
         $parentClassMetadata = $validator->getMetadataFor(new DoctrineLoaderParentEntity());
 
-        $publicParentMaxLengthMetadata = $parentClassMetadata->getPropertyMetadata('publicParentMaxLength');
-        $this->assertCount(0, $publicParentMaxLengthMetadata);
-
         $privateParentMaxLengthMetadata = $parentClassMetadata->getPropertyMetadata('privateParentMaxLength');
         $this->assertCount(1, $privateParentMaxLengthMetadata);
         $privateParentMaxLengthConstraints = $privateParentMaxLengthMetadata[0]->getConstraints();

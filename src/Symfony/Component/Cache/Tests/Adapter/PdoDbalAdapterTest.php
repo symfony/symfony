@@ -16,7 +16,9 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\AbstractMySQLDriver;
 use Doctrine\DBAL\Driver\Middleware;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\ORM\ORMSetup;
 use PHPUnit\Framework\SkippedTestSuiteError;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
@@ -50,14 +52,16 @@ class PdoDbalAdapterTest extends AdapterTestCase
     public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface
     {
         $this->expectDeprecation('Since symfony/cache 5.4: Usage of a DBAL Connection with "Symfony\Component\Cache\Adapter\PdoAdapter" is deprecated and will be removed in symfony 6.0. Use "Symfony\Component\Cache\Adapter\DoctrineDbalAdapter" instead.');
+        $config = $this->getDbalConfig();
 
-        return new PdoAdapter(DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile]), '', $defaultLifetime);
+        return new PdoAdapter(DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile], $config), '', $defaultLifetime);
     }
 
     public function testConfigureSchemaDecoratedDbalDriver()
     {
         $this->expectDeprecation('Since symfony/cache 5.4: Usage of a DBAL Connection with "Symfony\Component\Cache\Adapter\PdoAdapter" is deprecated and will be removed in symfony 6.0. Use "Symfony\Component\Cache\Adapter\DoctrineDbalAdapter" instead.');
-        $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile]);
+        $config = $this->getDbalConfig();
+        $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile], $config);
         if (!interface_exists(Middleware::class)) {
             $this->markTestSkipped('doctrine/dbal v2 does not support custom drivers using middleware');
         }
@@ -67,7 +71,6 @@ class PdoDbalAdapterTest extends AdapterTestCase
             ->method('wrap')
             ->willReturn(new DriverWrapper($connection->getDriver()));
 
-        $config = new Configuration();
         $config->setMiddlewares([$middleware]);
 
         $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile], $config);
@@ -83,7 +86,8 @@ class PdoDbalAdapterTest extends AdapterTestCase
     public function testConfigureSchema()
     {
         $this->expectDeprecation('Since symfony/cache 5.4: Usage of a DBAL Connection with "Symfony\Component\Cache\Adapter\PdoAdapter" is deprecated and will be removed in symfony 6.0. Use "Symfony\Component\Cache\Adapter\DoctrineDbalAdapter" instead.');
-        $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile]);
+        $config = $this->getDbalConfig();
+        $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile], $config);
         $schema = new Schema();
 
         $adapter = new PdoAdapter($connection);
@@ -104,7 +108,8 @@ class PdoDbalAdapterTest extends AdapterTestCase
     public function testConfigureSchemaTableExists()
     {
         $this->expectDeprecation('Since symfony/cache 5.4: Usage of a DBAL Connection with "Symfony\Component\Cache\Adapter\PdoAdapter" is deprecated and will be removed in symfony 6.0. Use "Symfony\Component\Cache\Adapter\DoctrineDbalAdapter" instead.');
-        $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile]);
+        $config = $this->getDbalConfig();
+        $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile], $config);
         $schema = new Schema();
         $schema->createTable('cache_items');
 
@@ -167,5 +172,15 @@ class PdoDbalAdapterTest extends AdapterTestCase
             ->willReturn($driver);
 
         return $connection;
+    }
+
+    private function getDbalConfig(): Configuration
+    {
+        $config = class_exists(ORMSetup::class) ? ORMSetup::createConfiguration(true) : new Configuration();
+        if (class_exists(DefaultSchemaManagerFactory::class)) {
+            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
+        }
+
+        return $config;
     }
 }

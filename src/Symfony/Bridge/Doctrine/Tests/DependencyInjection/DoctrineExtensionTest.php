@@ -190,7 +190,7 @@ class DoctrineExtensionTest extends TestCase
 
         // The ordinary fixtures contain annotation
         $mappingType = $method->invoke($this->extension, __DIR__.'/../Fixtures', $container);
-        $this->assertSame($mappingType, 'annotation');
+        $this->assertSame($mappingType, \PHP_VERSION_ID < 80000 ? 'annotation' : 'attribute');
 
         // In the attribute folder, attributes are used
         $mappingType = $method->invoke($this->extension, __DIR__.'/../Fixtures/Attribute', $container);
@@ -278,9 +278,9 @@ class DoctrineExtensionTest extends TestCase
 
     public static function providerBundles()
     {
-        yield ['AnnotationsBundle', 'annotation', '/Entity'];
-        yield ['AnnotationsOneLineBundle', 'annotation', '/Entity'];
-        yield ['FullEmbeddableAnnotationsBundle', 'annotation', '/Entity'];
+        yield ['AnnotationsBundle', \PHP_VERSION_ID < 80000 ? 'annotation' : 'attribute', '/Entity'];
+        yield ['AnnotationsOneLineBundle', \PHP_VERSION_ID < 80000 ? 'annotation' : 'attribute', '/Entity'];
+        yield ['FullEmbeddableAnnotationsBundle', \PHP_VERSION_ID < 80000 ? 'annotation' : 'attribute', '/Entity'];
         if (\PHP_VERSION_ID >= 80000) {
             yield ['AttributesBundle', 'attribute', '/Entity'];
             yield ['FullEmbeddableAttributesBundle', 'attribute', '/Entity'];
@@ -291,7 +291,7 @@ class DoctrineExtensionTest extends TestCase
 
         yield ['SrcXmlBundle', 'xml', '/Resources/config/doctrine'];
 
-        yield ['NewAnnotationsBundle', 'annotation', \DIRECTORY_SEPARATOR.'src/Entity'];
+        yield ['NewAnnotationsBundle', \PHP_VERSION_ID < 80000 ? 'annotation' : 'attribute', \DIRECTORY_SEPARATOR.'src/Entity'];
         yield ['NewXmlBundle', 'xml', '/config/doctrine'];
     }
 

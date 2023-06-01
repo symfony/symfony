@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-05-31T16:49:56Z
+
+Why not target 6.3?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-06-01T07:27:04Z
+
+My bad, that's rebased on 6.3 :slightly_smiling_face:
+
+Also, fabbot raised a typo in the changelog, so I take this opportunity to embed it

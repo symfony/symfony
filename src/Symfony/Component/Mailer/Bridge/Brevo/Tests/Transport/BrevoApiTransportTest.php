@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Mailer\Bridge\Sendinblue\Tests\Transport;
+namespace Symfony\Component\Mailer\Bridge\Brevo\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
-use Symfony\Component\Mailer\Bridge\Sendinblue\Transport\SendinblueApiTransport;
+use Symfony\Component\Mailer\Bridge\Brevo\Transport\BrevoApiTransport;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
@@ -24,15 +24,12 @@ use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-/**
- * @group legacy
- */
-class SendinblueApiTransportTest extends TestCase
+class BrevoApiTransportTest extends TestCase
 {
     /**
      * @dataProvider getTransportData
      */
-    public function testToString(SendinblueApiTransport $transport, string $expected)
+    public function testToString(BrevoApiTransport $transport, string $expected)
     {
         $this->assertSame($expected, (string) $transport);
     }
@@ -40,18 +37,18 @@ class SendinblueApiTransportTest extends TestCase
     public static function getTransportData()
     {
         yield [
-            new SendinblueApiTransport('ACCESS_KEY'),
-            'sendinblue+api://api.sendinblue.com',
+            new BrevoApiTransport('ACCESS_KEY'),
+            'brevo+api://api.brevo.com',
         ];
 
         yield [
-            (new SendinblueApiTransport('ACCESS_KEY'))->setHost('example.com'),
-            'sendinblue+api://example.com',
+            (new BrevoApiTransport('ACCESS_KEY'))->setHost('example.com'),
+            'brevo+api://example.com',
         ];
 
         yield [
-            (new SendinblueApiTransport('ACCESS_KEY'))->setHost('example.com')->setPort(99),
-            'sendinblue+api://example.com:99',
+            (new BrevoApiTransport('ACCESS_KEY'))->setHost('example.com')->setPort(99),
+            'brevo+api://example.com:99',
         ];
     }
 
@@ -70,8 +67,8 @@ class SendinblueApiTransportTest extends TestCase
         ;
         $envelope = new Envelope(new Address('alice@system.com', 'Alice'), [new Address('bob@system.com', 'Bob')]);
 
-        $transport = new SendinblueApiTransport('ACCESS_KEY');
-        $method = new \ReflectionMethod(SendinblueApiTransport::class, 'getPayload');
+        $transport = new BrevoApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(BrevoApiTransport::class, 'getPayload');
         $payload = $method->invoke($transport, $email, $envelope);
 
         $this->assertArrayHasKey('X-Mailin-Custom', $payload['headers']);
@@ -92,7 +89,7 @@ class SendinblueApiTransportTest extends TestCase
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
-            $this->assertSame('https://api.sendinblue.com:8984/v3/smtp/email', $url);
+            $this->assertSame('https://api.brevo.com:8984/v3/smtp/email', $url);
             $this->assertStringContainsString('Accept: */*', $options['headers'][2] ?? $options['request_headers'][1]);
 
             return new MockResponse(json_encode(['message' => 'i\'m a teapot']), [
@@ -103,7 +100,7 @@ class SendinblueApiTransportTest extends TestCase
             ]);
         });
 
-        $transport = new SendinblueApiTransport('ACCESS_KEY', $client);
+        $transport = new BrevoApiTransport('ACCESS_KEY', $client);
         $transport->setPort(8984);
 
         $mail = new Email();
@@ -122,7 +119,7 @@ class SendinblueApiTransportTest extends TestCase
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
-            $this->assertSame('https://api.sendinblue.com:8984/v3/smtp/email', $url);
+            $this->assertSame('https://api.brevo.com:8984/v3/smtp/email', $url);
             $this->assertStringContainsString('Accept: */*', $options['headers'][2] ?? $options['request_headers'][1]);
 
             return new MockResponse(json_encode(['messageId' => 'foobar']), [
@@ -130,7 +127,7 @@ class SendinblueApiTransportTest extends TestCase
             ]);
         });
 
-        $transport = new SendinblueApiTransport('ACCESS_KEY', $client);
+        $transport = new BrevoApiTransport('ACCESS_KEY', $client);
         $transport->setPort(8984);
 
         $mail = new Email();

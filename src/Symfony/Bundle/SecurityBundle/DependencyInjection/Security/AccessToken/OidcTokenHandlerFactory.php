@@ -16,6 +16,7 @@ use Jose\Component\Core\JWK;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -34,10 +35,7 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
         );
 
         if (!ContainerBuilder::willBeAvailable('web-token/jwt-core', Algorithm::class, ['symfony/security-bundle'])) {
-            $container->getDefinition('security.access_token_handler.oidc.signature', Algorithm::class)
-                ->addError('You cannot use the "oidc" token handler since "web-token/jwt-core" is not installed. Try running "composer require web-token/jwt-core".');
-            $container->getDefinition('security.access_token_handler.oidc.jwk', JWK::class)
-                ->addError('You cannot use the "oidc" token handler since "web-token/jwt-core" is not installed. Try running "composer require web-token/jwt-core".');
+            throw new LogicException('You cannot use the "oidc" token handler since "web-token/jwt-core" is not installed. Try running "composer require web-token/jwt-core".');
         }
 
         // @see Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SignatureAlgorithmFactory

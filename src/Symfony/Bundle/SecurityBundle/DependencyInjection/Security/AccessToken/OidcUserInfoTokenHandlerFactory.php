@@ -14,6 +14,7 @@ namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -32,9 +33,7 @@ class OidcUserInfoTokenHandlerFactory implements TokenHandlerFactoryInterface
         if (isset($config['client'])) {
             $clientDefinition->setFactory([new Reference($config['client']), 'withOptions']);
         } elseif (!ContainerBuilder::willBeAvailable('symfony/http-client', HttpClientInterface::class, ['symfony/security-bundle'])) {
-            $clientDefinition
-                ->setFactory(null)
-                ->addError('You cannot use the "oidc_user_info" token handler since the HttpClient component is not installed. Try running "composer require symfony/http-client".');
+            throw new LogicException('You cannot use the "oidc_user_info" token handler since the HttpClient component is not installed. Try running "composer require symfony/http-client".');
         }
 
         $container->setDefinition($id, new ChildDefinition('security.access_token_handler.oidc_user_info'))

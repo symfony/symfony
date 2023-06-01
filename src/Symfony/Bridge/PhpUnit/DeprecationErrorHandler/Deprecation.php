@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\PhpUnit\DeprecationErrorHandler;
 
+use Doctrine\Deprecations\Deprecation as DoctrineDeprecation;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\TestSuite;
 use PHPUnit\Metadata\Api\Groups;
@@ -60,9 +61,18 @@ class Deprecation
      */
     public function __construct($message, array $trace, $file, $languageDeprecation = false)
     {
-        if (isset($trace[2]['function']) && 'trigger_deprecation' === $trace[2]['function']) {
-            $file = $trace[2]['file'];
-            array_splice($trace, 1, 1);
+        switch ($trace[2]['function'] ?? '') {
+            case 'trigger_deprecation':
+                $file = $trace[2]['file'];
+                array_splice($trace, 1, 1);
+                break;
+
+            case 'delegateTriggerToBackend':
+                if (DoctrineDeprecation::class === ($trace[2]['class'] ?? '')) {
+                    $file = $trace[3]['file'];
+                    array_splice($trace, 1, 2);
+                }
+                break;
         }
 
         $this->trace = $trace;

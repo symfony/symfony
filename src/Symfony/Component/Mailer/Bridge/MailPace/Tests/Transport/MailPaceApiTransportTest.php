@@ -119,6 +119,57 @@ final class MailPaceApiTransportTest extends TestCase
         $transport->send($mail);
     }
 
+    public function testSendThrowsForErrorsResponse()
+    {
+        $client = new MockHttpClient(static function (string $method, string $url, array $options): ResponseInterface {
+            return new MockResponse(json_encode([
+                'errors' => [
+                    'to' => [
+                        'contains a blocked address',
+                        'number of email addresses exceeds maximum volume',
+                    ],
+                    'attachments.name' => ['Extension file type blocked, see Docs for full list of allowed file types'],
+                ],
+            ]), [
+                'http_code' => 400,
+                'response_headers' => [
+                    'content-type' => 'application/json',
+                ],
+            ]);
+        });
+        $transport = new MailPaceApiTransport('KEY', $client);
+        $transport->setPort(8984);
+
+        $mail = new Email();
+        $mail->subject('Hello!')
+            ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
+            ->from(new Address('fabpot@symfony.com', 'Fabien'))
+            ->text('Hello There!');
+
+        $this->expectException(HttpTransportException::class);
+        $this->expectExceptionMessage('Unable to send an email: to: contains a blocked address & number of email addresses exceeds maximum volume; attachments.name: Extension file type blocked, see Docs for full list of allowed file types (code 400).');
+        $transport->send($mail);
+    }
+
+    public function testSendThrowsForInternalServerErrorResponse()
+    {
+        $client = new MockHttpClient(static function (string $method, string $url, array $options): ResponseInterface {
+            return new MockResponse('', ['http_code' => 500]);
+        });
+        $transport = new MailPaceApiTransport('KEY', $client);
+        $transport->setPort(8984);
+
+        $mail = new Email();
+        $mail->subject('Hello!')
+            ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
+            ->from(new Address('fabpot@symfony.com', 'Fabien'))
+            ->text('Hello There!');
+
+        $this->expectException(HttpTransportException::class);
+        $this->expectExceptionMessage('Unable to send an email:  (code 500).');
+        $transport->send($mail);
+    }
+
     public function testTagAndMetadataHeaders()
     {
         $email = new Email();

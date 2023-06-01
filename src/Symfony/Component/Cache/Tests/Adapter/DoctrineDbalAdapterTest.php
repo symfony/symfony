@@ -160,7 +160,9 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
     private function getDbalConfig()
     {
         $config = new Configuration();
-        $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
+        if (class_exists(DefaultSchemaManagerFactory::class)) {
+            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
+        }
 
         return $config;
     }

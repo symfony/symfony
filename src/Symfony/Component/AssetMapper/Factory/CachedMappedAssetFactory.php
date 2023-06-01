@@ -63,12 +63,8 @@ class CachedMappedAssetFactory implements MappedAssetFactoryInterface
         $resources = array_map(fn (string $path) => is_dir($path) ? new DirectoryResource($path) : new FileResource($path), $mappedAsset->getFileDependencies());
         $resources[] = new FileResource($mappedAsset->sourcePath);
 
-        foreach ($mappedAsset->getDependencies() as $dependency) {
-            if (!$dependency->isContentDependency) {
-                continue;
-            }
-
-            $resources = array_merge($resources, $this->collectResourcesFromAsset($dependency->asset));
+        foreach ($mappedAsset->getDependencies() as $assetDependency) {
+            $resources = array_merge($resources, $this->collectResourcesFromAsset($assetDependency));
         }
 
         return $resources;

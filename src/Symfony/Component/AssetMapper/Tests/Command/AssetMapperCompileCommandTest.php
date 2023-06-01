@@ -13,12 +13,15 @@ namespace Symfony\Component\AssetMapper\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\AssetMapper\Event\PreAssetsCompileEvent;
 use Symfony\Component\AssetMapper\Tests\fixtures\AssetMapperTestAppKernel;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 
-class AssetsMapperCompileCommandTest extends TestCase
+class AssetMapperCompileCommandTest extends TestCase
 {
     private AssetMapperTestAppKernel $kernel;
     private Filesystem $filesystem;
@@ -41,16 +44,19 @@ class AssetsMapperCompileCommandTest extends TestCase
         $application = new Application($this->kernel);
 
         $targetBuildDir = $this->kernel->getProjectDir().'/public/assets';
+        if (is_dir($targetBuildDir)) {
+            $this->filesystem->remove($targetBuildDir);
+        }
         // put old "built" versions to make sure the system skips using these
         $this->filesystem->mkdir($targetBuildDir);
         file_put_contents($targetBuildDir.'/manifest.json', '{}');
-        file_put_contents($targetBuildDir.'/importmap.json', '{"imports": {}}');
-        file_put_contents($targetBuildDir.'/importmap.preload.json', '{}');
+        file_put_contents($targetBuildDir.'/importmap.json', '{}');
+        file_put_contents($targetBuildDir.'/entrypoint.file6.json', '[]]');
 
         $command = $application->find('asset-map:compile');
         $tester = new CommandTester($command);
-        $res = $tester->execute([]);
-        $this->assertSame(0, $res);
+        $exitCode = $tester->execute([]);
+        $this->assertSame(0, $exitCode);
         // match Compiling \d+ assets
         $this->assertMatchesRegularExpression('/Compiled \d+ assets/', $tester->getDisplay());
 
@@ -63,7 +69,7 @@ class AssetsMapperCompileCommandTest extends TestCase
 
         $finder = new Finder();
         $finder->in($targetBuildDir)->files();
-        $this->assertCount(10, $finder);
+        $this->assertCount(10, $finder); // 7 files + manifest.json & importmap.json + entrypoint.file6.json
         $this->assertFileExists($targetBuildDir.'/manifest.json');
 
         $this->assertSame([
@@ -79,19 +85,45 @@ class AssetsMapperCompileCommandTest extends TestCase
         $this->assertFileExists($targetBuildDir.'/importmap.json');
         $actualImportMap = json_decode(file_get_contents($targetBuildDir.'/importmap.json'), true);
         $this->assertSame([
-            '@hotwired/stimulus',
-            'lodash',
-            'file6',
+            '@hotwired/stimulus', // in importmap
+            'lodash', // in importmap
+            'file6',  // in importmap
             '/assets/subdir/file5.js', // imported by file6
             '/assets/file4.js', // imported by file5
-        ], array_keys($actualImportMap['imports']));
+            'file2', // in importmap
+            '/assets/file1.css', // imported by file2.js
+            'file3.css', // in importmap
+            // imported by file3.css: CSS imported by CSS does not need to be in the importmap
+            // 'already-abcdefVWXYZ0123456789.digested.css',
+        ], array_keys($actualImportMap));
+        $this->assertSame('js', $actualImportMap['@hotwired/stimulus']['type']);
 
-        $this->assertFileExists($targetBuildDir.'/importmap.preload.json');
-        $actualPreload = json_decode(file_get_contents($targetBuildDir.'/importmap.preload.json'), true);
-        $this->assertCount(4, $actualPreload);
-        $this->assertStringStartsWith('https://unpkg.com/@hotwired/stimulus', $actualPreload[0]);
-        $this->assertStringStartsWith('/assets/subdir/file6-', $actualPreload[1]);
-        $this->assertStringStartsWith('/assets/subdir/file5-', $actualPreload[2]);
-        $this->assertStringStartsWith('/assets/file4-', $actualPreload[3]);
+        $this->assertFileExists($targetBuildDir.'/entrypoint.file6.json');
+        $entrypointData = json_decode(file_get_contents($targetBuildDir.'/entrypoint.file6.json'), true);
+        $this->assertSame([
+            '/assets/subdir/file5.js',
+            '/assets/file4.js',
+        ], $entrypointData);
+    }
+
+    public function testEventIsDispatched()
+    {
+        $this->kernel->boot();
+        $application = new Application($this->kernel);
+        $container = $this->kernel->getContainer();
+        $dispatcher = $container->get('event_dispatcher');
+        \assert($dispatcher instanceof EventDispatcherInterface);
+
+        $listenerCalled = false;
+        $dispatcher->addListener(PreAssetsCompileEvent::class, function (PreAssetsCompileEvent $event) use (&$listenerCalled) {
+            $listenerCalled = true;
+            $this->assertSame(realpath(__DIR__.'/../fixtures').'/public/assets', $event->getOutputDir());
+            $this->assertInstanceOf(OutputInterface::class, $event->getOutput());
+        });
+
+        $command = $application->find('asset-map:compile');
+        $tester = new CommandTester($command);
+        $tester->execute([]);
+        $this->assertTrue($listenerCalled);
     }
 }

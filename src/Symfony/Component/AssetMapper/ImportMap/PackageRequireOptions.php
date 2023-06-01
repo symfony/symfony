@@ -22,7 +22,6 @@ final class PackageRequireOptions
         public readonly string $packageName,
         public readonly ?string $versionConstraint = null,
         public readonly bool $download = false,
-        public readonly bool $preload = false,
         public readonly ?string $importName = null,
         public readonly ?string $registryName = null,
         public readonly ?string $path = null,

@@ -1339,12 +1339,16 @@ class FrameworkExtension extends Extension
             ->setArgument(0, $config['missing_import_mode']);
 
         $container->getDefinition('asset_mapper.compiler.javascript_import_path_compiler')
-            ->setArgument(0, $config['missing_import_mode']);
+            ->setArgument(1, $config['missing_import_mode']);
 
         $container
             ->getDefinition('asset_mapper.importmap.manager')
-            ->replaceArgument(2, $config['importmap_path'])
             ->replaceArgument(3, $config['vendor_dir'])
+        ;
+
+        $container
+            ->getDefinition('asset_mapper.importmap.config_reader')
+            ->replaceArgument(0, $config['importmap_path'])
         ;
 
         $container
@@ -1354,8 +1358,8 @@ class FrameworkExtension extends Extension
 
         $container
             ->getDefinition('asset_mapper.importmap.renderer')
-            ->replaceArgument(2, $config['importmap_polyfill'] ?? ImportMapManager::POLYFILL_URL)
-            ->replaceArgument(3, $config['importmap_script_attributes'])
+            ->replaceArgument(3, $config['importmap_polyfill'] ?? ImportMapManager::POLYFILL_URL)
+            ->replaceArgument(4, $config['importmap_script_attributes'])
         ;
 
         $container->registerForAutoconfiguration(PackageResolverInterface::class)

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+* Allow an array to be passed as the first argument to the `importmap()` Twig function
+
 6.3
 ---
 

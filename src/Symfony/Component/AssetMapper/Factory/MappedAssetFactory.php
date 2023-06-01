@@ -57,6 +57,7 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
                 $isPredigested,
                 $asset->getDependencies(),
                 $asset->getFileDependencies(),
+                $asset->getJavaScriptImports(),
             );
 
             $this->assetsCache[$logicalPath] = $asset;

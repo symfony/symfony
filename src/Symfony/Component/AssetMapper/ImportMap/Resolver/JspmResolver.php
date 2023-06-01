@@ -77,12 +77,12 @@ final class JspmResolver implements PackageResolverInterface
             $response->getHeaders();
         }
 
-        // if we're requiring just one package, in case it has any peer deps, match the preload
+        // if we're requiring just one package, in case it has any peer deps, match the download
         $defaultOptions = $packagesToRequire[0];
 
         $resolvedPackages = [];
         foreach ($response->toArray()['map']['imports'] as $packageName => $url) {
-            $options = $packageRequiresByName[$packageName] ?? new PackageRequireOptions($packageName, null, $defaultOptions->download, $defaultOptions->preload);
+            $options = $packageRequiresByName[$packageName] ?? new PackageRequireOptions($packageName, null, $defaultOptions->download);
             $resolvedPackages[] = [$options, $url, $options->download ? $this->httpClient->request('GET', $url, ['base_uri' => $this->baseUri]) : null];
         }
 

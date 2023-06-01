@@ -43,7 +43,6 @@ final class ImportMapRequireCommand extends Command
         $this
             ->addArgument('packages', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'The packages to add')
             ->addOption('download', 'd', InputOption::VALUE_NONE, 'Download packages locally')
-            ->addOption('preload', 'p', InputOption::VALUE_NONE, 'Preload packages')
             ->addOption('path', null, InputOption::VALUE_REQUIRED, 'The local path where the package lives relative to the project root')
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command adds packages to <comment>importmap.php</comment> usually
@@ -51,7 +50,7 @@ by finding a CDN URL for the given package and version.
 
 For example:
 
-    <info>php %command.full_name% lodash --preload</info>
+    <info>php %command.full_name% lodash</info>
     <info>php %command.full_name% "lodash@^4.15"</info>
 
 You can also require specific paths of a package:
@@ -61,10 +60,6 @@ You can also require specific paths of a package:
 Or download one package/file, but alias its name in your import map:
 
     <info>php %command.full_name% "vue/dist/vue.esm-bundler.js=vue"</info>
-
-The <info>preload</info> option will set the <info>preload</info> option in the importmap,
-which will tell the browser to preload the package. This should be used for all
-critical packages that are needed on page load.
 
 The <info>download</info> option will download the package locally and point the
 importmap to it. Use this if you want to avoid using a CDN or if you want to
@@ -119,15 +114,10 @@ EOT
                 $parts['package'],
                 $parts['version'] ?? null,
                 $input->getOption('download'),
-                $input->getOption('preload'),
                 $parts['alias'] ?? $parts['package'],
                 isset($parts['registry']) && $parts['registry'] ? $parts['registry'] : null,
                 $path,
             );
-        }
-
-        if ($input->getOption('download')) {
-            $io->warning(sprintf('The --download option is experimental. It should work well with the default %s provider but check your browser console for 404 errors.', ImportMapManager::PROVIDER_JSDELIVR_ESM));
         }
 
         $newPackages = $this->importMapManager->require($packages);
@@ -151,7 +141,7 @@ EOT
             $message .= '.';
         } else {
             $names = array_map(fn (ImportMapEntry $package) => $package->importName, $newPackages);
-            $message = sprintf('%d new packages (%s) added to the importmap.php!', \count($newPackages), implode(', ', $names));
+            $message = sprintf('%d new items (%s) added to the importmap.php!', \count($newPackages), implode(', ', $names));
         }
 
         $messages = [$message];

@@ -20,6 +20,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -129,9 +130,8 @@ class AccessTokenFactoryTest extends TestCase
         ];
 
         if (!interface_exists(HttpClientInterface::class)) {
-            $expected['index_0']
-                ->setFactory(null)
-                ->addError('You cannot use the "oidc_user_info" token handler since the HttpClient component is not installed. Try running "composer require symfony/http-client".');
+            $this->expectException(LogicException::class);
+            $this->expectExceptionMessage('You cannot use the "oidc_user_info" token handler since the HttpClient component is not installed. Try running "composer require symfony/http-client".');
         }
 
         $this->assertEquals($expected, $container->getDefinition('security.access_token_handler.firewall1')->getArguments());

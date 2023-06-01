@@ -67,7 +67,20 @@ final class MailPaceApiTransport extends AbstractApiTransport
         }
 
         if (200 !== $statusCode) {
-            throw new HttpTransportException('Unable to send an email: '.$result['error'].sprintf(' (code %d).', $statusCode), $response);
+            $errorMessage = 'Unable to send an email: ';
+            if (isset($result['error'])) {
+                $errorMessage .= $result['error'];
+            } elseif (isset($result['errors'])) {
+                $errors = [];
+                foreach ($result['errors'] as $key => $val) {
+                    $errors[] = $key.': '.implode(' & ', $val);
+                }
+                $errorMessage .= implode('; ', $errors);
+            } else {
+                $errorMessage .= 'unknown error';
+            }
+            $errorMessage .= sprintf(' (code %d).', $statusCode);
+            throw new HttpTransportException($errorMessage, $response);
         }
 
         $sentMessage->setMessageId($result['id']);

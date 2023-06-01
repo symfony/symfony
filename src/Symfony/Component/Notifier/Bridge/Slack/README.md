@@ -26,6 +26,16 @@ SLACK_DSN=slack://xoxb-......@default?channel=#my-channel-name
 SLACK_DSN=slack://xoxb-......@default?channel=fabien
 ```
 
+Activate Slack transports into config/packages/notifier.yaml
+--------------------------------
+
+```yaml
+framework:
+    notifier:
+        chatter_transports:
+            slack: '%env(SLACK_DSN)%'
+```
+
 Adding Interactions to a Message
 --------------------------------
 
@@ -71,6 +81,7 @@ $slackOptions = (new SlackOptions())
 // Add the custom options to the chat message and send the message
 $chatMessage->options($slackOptions);
 
+/** @var ChatterInterface $chatter */
 $chatter->send($chatMessage);
 ```
 
@@ -101,6 +112,7 @@ $options = (new SlackOptions())
 // Add the custom options to the chat message and send the message
 $chatMessage->options($options);
 
+/** @var ChatterInterface $chatter */
 $chatter->send($chatMessage);
 ```
 
@@ -133,6 +145,7 @@ $options = (new SlackOptions())
 // Add the custom options to the chat message and send the message
 $chatMessage->options($options);
 
+/** @var ChatterInterface $chatter */
 $chatter->send($chatMessage);
 ```
 
@@ -171,6 +184,7 @@ $options = (new SlackOptions())
 // Add the custom options to the chat message and send the message
 $chatMessage->options($options);
 
+/** @var ChatterInterface $chatter */
 $chatter->send($chatMessage);
 ```
 
@@ -194,6 +208,7 @@ $options = (new SlackOptions())
 // Add the custom options to the chat message and send the message
 $chatMessage->options($options);
 
+/** @var ChatterInterface $chatter */
 $chatter->send($chatMessage);
 ```
 

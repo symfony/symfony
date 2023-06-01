@@ -50,6 +50,7 @@ use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummyFirstChild;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummySecondChild;
+use Symfony\Component\Serializer\Tests\Fixtures\DenormalizableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyFirstChildQuux;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberOne;
@@ -118,6 +119,14 @@ class SerializerTest extends TestCase
         $this->expectException(UnexpectedValueException::class);
         $serializer = new Serializer([$this->createMock(CustomNormalizer::class)]);
         $serializer->denormalize('foo', 'stdClass');
+    }
+
+    public function testDenormalizeOnObjectThatOnlySupportsDenormalization()
+    {
+        $serializer = new Serializer([new CustomNormalizer()]);
+
+        $obj = $serializer->denormalize('foo', (new DenormalizableDummy())::class, 'xml');
+        $this->assertInstanceOf(DenormalizableDummy::class, $obj);
     }
 
     public function testDenormalizeOnNormalizer()

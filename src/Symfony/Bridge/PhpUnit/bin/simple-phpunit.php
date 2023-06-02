@@ -260,8 +260,6 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
         if ('\\' === \DIRECTORY_SEPARATOR) {
             file_put_contents('composer.json', preg_replace('/^( {8})"phpunit-bridge": \{$/m', "$0\n$1    ".'"options": {"symlink": false},', file_get_contents('composer.json')));
         }
-        $phpunitBridgeComposerJson = file_get_contents($path.'/composer.json');
-        file_put_contents($path.'/composer.json', preg_replace('/^( {8})"files": .*/m', '', $phpunitBridgeComposerJson));
     } else {
         $passthruOrFail("$COMPOSER require --no-update symfony/phpunit-bridge \"*\"");
     }
@@ -271,9 +269,6 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
     // --no-suggest is not in the list to keep compat with composer 1.0, which is shipped with Ubuntu 16.04LTS
     $exit = proc_close(proc_open("$q$COMPOSER install --no-dev --prefer-dist --no-progress $q", [], $p, getcwd()));
     putenv('COMPOSER_ROOT_VERSION'.(false !== $prevRoot ? '='.$prevRoot : ''));
-    if (file_exists($path)) {
-        file_put_contents($path.'/composer.json', $phpunitBridgeComposerJson);
-    }
     if ($prevCacheDir) {
         putenv("COMPOSER_CACHE_DIR=$prevCacheDir");
     }

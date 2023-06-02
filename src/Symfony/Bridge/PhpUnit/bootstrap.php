@@ -25,6 +25,10 @@ if (!defined('PHPUNIT_COMPOSER_INSTALL') && !class_exists(\PHPUnit\TextUI\Comman
     return;
 }
 
+if (isset($fileIdentifier)) {
+    unset($GLOBALS['__composer_autoload_files'][$fileIdentifier]);
+}
+
 // Enforce a consistent locale
 setlocale(\LC_ALL, 'C');
 

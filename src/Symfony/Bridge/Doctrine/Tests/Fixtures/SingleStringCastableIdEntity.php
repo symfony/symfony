@@ -17,6 +17,7 @@ use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\Id;
 
 /** @Entity */
+#[Entity]
 class SingleStringCastableIdEntity
 {
     /**
@@ -24,9 +25,11 @@ class SingleStringCastableIdEntity
      * @Column(type="string")
      * @GeneratedValue(strategy="NONE")
      */
+    #[Id, Column(type: 'string'), GeneratedValue(strategy: 'NONE')]
     protected $id;
 
     /** @Column(type="string", nullable=true) */
+    #[Column(type: 'string', nullable: true)]
     public $name;
 
     public function __construct($id, $name)

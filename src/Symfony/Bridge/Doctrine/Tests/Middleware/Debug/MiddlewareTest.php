@@ -17,7 +17,9 @@ use Doctrine\DBAL\Driver\Middleware as MiddlewareInterface;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Result;
+use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\ORMSetup;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Middleware\Debug\DebugDataHolder;
 use Symfony\Bridge\Doctrine\Middleware\Debug\Middleware;
@@ -48,14 +50,17 @@ class MiddlewareTest extends TestCase
     {
         $this->stopwatch = $withStopwatch ? new Stopwatch() : null;
 
-        $configuration = new Configuration();
+        $config = class_exists(ORMSetup::class) ? ORMSetup::createConfiguration(true) : new Configuration();
+        if (class_exists(DefaultSchemaManagerFactory::class)) {
+            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
+        }
         $this->debugDataHolder = new DebugDataHolder();
-        $configuration->setMiddlewares([new Middleware($this->debugDataHolder, $this->stopwatch)]);
+        $config->setMiddlewares([new Middleware($this->debugDataHolder, $this->stopwatch)]);
 
         $this->conn = DriverManager::getConnection([
             'driver' => 'pdo_sqlite',
             'memory' => true,
-        ], $configuration);
+        ], $config);
 
         $this->conn->executeQuery(<<<EOT
 CREATE TABLE products (
@@ -150,13 +155,13 @@ EOT;
         $this->init();
 
         $product = 'product1';
-        $price = 12.5;
+        $price = '12.5';
         $stock = 5;
 
         $stmt = $this->conn->prepare('INSERT INTO products(name, price, stock) VALUES (?, ?, ?)');
-        $stmt->bindParam(1, $product);
-        $stmt->bindParam(2, $price);
-        $stmt->bindParam(3, $stock, ParameterType::INTEGER);
+        $stmt->bindValue(1, $product);
+        $stmt->bindValue(2, $price);
+        $stmt->bindValue(3, $stock, ParameterType::INTEGER);
 
         $executeMethod($stmt);
 
@@ -194,6 +199,7 @@ EOT;
     {
         $this->init();
 
+        $this->conn->setNestTransactionsWithSavepoints(true);
         $this->conn->beginTransaction();
         $this->conn->beginTransaction();
         $this->conn->executeStatement('INSERT INTO products(name, price, stock) VALUES ("product1", 12.5, 5)');
@@ -204,19 +210,23 @@ EOT;
         $endTransactionMethod($this->conn);
 
         $debug = $this->debugDataHolder->getData()['default'] ?? [];
-        $this->assertCount(7, $debug);
+        $this->assertCount(9, $debug);
         $this->assertSame('"START TRANSACTION"', $debug[1]['sql']);
         $this->assertGreaterThan(0, $debug[1]['executionMS']);
-        $this->assertSame('INSERT INTO products(name, price, stock) VALUES ("product1", 12.5, 5)', $debug[2]['sql']);
+        $this->assertSame('SAVEPOINT DOCTRINE2_SAVEPOINT_2', $debug[2]['sql']);
         $this->assertGreaterThan(0, $debug[2]['executionMS']);
-        $this->assertSame($expectedEndTransactionDebug, $debug[3]['sql']);
+        $this->assertSame('INSERT INTO products(name, price, stock) VALUES ("product1", 12.5, 5)', $debug[3]['sql']);
         $this->assertGreaterThan(0, $debug[3]['executionMS']);
-        $this->assertSame('"START TRANSACTION"', $debug[4]['sql']);
+        $this->assertSame(('"ROLLBACK"' === $expectedEndTransactionDebug ? 'ROLLBACK TO' : 'RELEASE').' SAVEPOINT DOCTRINE2_SAVEPOINT_2', $debug[4]['sql']);
         $this->assertGreaterThan(0, $debug[4]['executionMS']);
-        $this->assertSame('INSERT INTO products(name, price, stock) VALUES ("product2", 15.5, 12)', $debug[5]['sql']);
+        $this->assertSame($expectedEndTransactionDebug, $debug[5]['sql']);
         $this->assertGreaterThan(0, $debug[5]['executionMS']);
-        $this->assertSame($expectedEndTransactionDebug, $debug[6]['sql']);
+        $this->assertSame('"START TRANSACTION"', $debug[6]['sql']);
         $this->assertGreaterThan(0, $debug[6]['executionMS']);
+        $this->assertSame('INSERT INTO products(name, price, stock) VALUES ("product2", 15.5, 12)', $debug[7]['sql']);
+        $this->assertGreaterThan(0, $debug[7]['executionMS']);
+        $this->assertSame($expectedEndTransactionDebug, $debug[8]['sql']);
+        $this->assertGreaterThan(0, $debug[8]['executionMS']);
     }
 
     public static function provideExecuteAndEndTransactionMethods(): array

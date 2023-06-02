@@ -11,10 +11,13 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
+use Doctrine\ORM\ORMSetup;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\DoctrineDbalStore;
@@ -36,7 +39,12 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
     {
         self::$dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_lock');
 
-        $store = new DoctrineDbalStore(DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile]));
+        $config = class_exists(ORMSetup::class) ? ORMSetup::createConfiguration(true) : new Configuration();
+        if (class_exists(DefaultSchemaManagerFactory::class)) {
+            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
+        }
+
+        $store = new DoctrineDbalStore(DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile], $config));
         $store->createTable();
     }
 
@@ -58,7 +66,12 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
      */
     public function getStore(): PersistingStoreInterface
     {
-        return new DoctrineDbalStore(DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile]));
+        $config = class_exists(ORMSetup::class) ? ORMSetup::createConfiguration(true) : new Configuration();
+        if (class_exists(DefaultSchemaManagerFactory::class)) {
+            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
+        }
+
+        return new DoctrineDbalStore(DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile], $config));
     }
 
     public function testAbortAfterExpiration()

@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Entity
  */
+#[ORM\Entity]
 class CompositeObjectNoToStringIdEntity
 {
     /**
@@ -18,6 +19,9 @@ class CompositeObjectNoToStringIdEntity
      * @ORM\ManyToOne(targetEntity="SingleIntIdNoToStringEntity", cascade={"persist"})
      * @ORM\JoinColumn(name="object_one_id")
      */
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: SingleIntIdNoToStringEntity::class, cascade: ['persist'])]
+    #[ORM\JoinColumn(name: 'object_one_id')]
     protected $objectOne;
 
     /**
@@ -27,6 +31,9 @@ class CompositeObjectNoToStringIdEntity
      * @ORM\ManyToOne(targetEntity="SingleIntIdNoToStringEntity", cascade={"persist"})
      * @ORM\JoinColumn(name="object_two_id")
      */
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: SingleIntIdNoToStringEntity::class, cascade: ['persist'])]
+    #[ORM\JoinColumn(name: 'object_two_id')]
     protected $objectTwo;
 
     public function __construct(SingleIntIdNoToStringEntity $objectOne, SingleIntIdNoToStringEntity $objectTwo)

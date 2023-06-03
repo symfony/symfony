@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2023-05-13T07:19:21Z
+
+@nicolas-grekas  Can you have a look at the tests, they seem broken by your changes.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-05-13T09:52:13Z
+
+PR ready, failures are now false-positives.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2023-05-13T10:15:01Z
+
+This is for 6.4 right, given we are close to RC phase?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-05-20T16:47:21Z
+
+@chalasr UPGRADE/CHANGELOG files updated.

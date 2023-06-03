@@ -231,7 +231,7 @@ index 38618fc15e..eb599eb0b4 100644
      {
          $this->clearEntityManagers();
 diff --git a/src/Symfony/Bridge/Doctrine/Security/RememberMe/DoctrineTokenProvider.php b/src/Symfony/Bridge/Doctrine/Security/RememberMe/DoctrineTokenProvider.php
-index 9d61be61bd..e89985de26 100644
+index 3af51ffd60..2743b97f31 100644
 --- a/src/Symfony/Bridge/Doctrine/Security/RememberMe/DoctrineTokenProvider.php
 +++ b/src/Symfony/Bridge/Doctrine/Security/RememberMe/DoctrineTokenProvider.php
 @@ -70,5 +70,5 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
@@ -6182,7 +6182,7 @@ index 32c58447cd..ec35f6ee41 100644
      {
          $compound = static fn (Options $options) => 'single_text' !== $options['widget'];
 diff --git a/src/Symfony/Component/Form/Extension/Core/Type/DateType.php b/src/Symfony/Component/Form/Extension/Core/Type/DateType.php
-index 3b68dc241a..474139a6ee 100644
+index 80023affcb..d6051f52d1 100644
 --- a/src/Symfony/Component/Form/Extension/Core/Type/DateType.php
 +++ b/src/Symfony/Component/Form/Extension/Core/Type/DateType.php
 @@ -47,5 +47,5 @@ class DateType extends AbstractType
@@ -7352,7 +7352,7 @@ index a87171d2ca..cec8a6f027 100644
      {
          if ($this->client instanceof ResetInterface) {
 diff --git a/src/Symfony/Component/HttpFoundation/BinaryFileResponse.php b/src/Symfony/Component/HttpFoundation/BinaryFileResponse.php
-index cd716e590e..68a0479ef4 100644
+index 71e806fc15..d60290b3ed 100644
 --- a/src/Symfony/Component/HttpFoundation/BinaryFileResponse.php
 +++ b/src/Symfony/Component/HttpFoundation/BinaryFileResponse.php
 @@ -362,5 +362,5 @@ class BinaryFileResponse extends Response
@@ -7399,7 +7399,7 @@ index b74a02e2e1..51b4f7f1c3 100644
      {
          foreach ($files as $key => $file) {
 diff --git a/src/Symfony/Component/HttpFoundation/HeaderBag.php b/src/Symfony/Component/HttpFoundation/HeaderBag.php
-index c49a239726..440f3297de 100644
+index 3128a1d833..6721bbe974 100644
 --- a/src/Symfony/Component/HttpFoundation/HeaderBag.php
 +++ b/src/Symfony/Component/HttpFoundation/HeaderBag.php
 @@ -90,5 +90,5 @@ class HeaderBag implements \IteratorAggregate, \Countable
@@ -7430,21 +7430,28 @@ index c49a239726..440f3297de 100644
 +    public function remove(string $key): void
      {
          $key = strtr($key, self::UPPER, self::LOWER);
-@@ -214,5 +214,5 @@ class HeaderBag implements \IteratorAggregate, \Countable
+@@ -198,5 +198,5 @@ class HeaderBag implements \IteratorAggregate, \Countable
+      * @throws \RuntimeException When the HTTP header is not parseable
+      */
+-    public function getDate(string $key, \DateTimeInterface $default = null): ?\DateTimeInterface
++    public function getDate(string $key, \DateTimeInterface $default = null): ?\DateTimeImmutable
+     {
+         if (null === $value = $this->get($key)) {
+@@ -216,5 +216,5 @@ class HeaderBag implements \IteratorAggregate, \Countable
       * @return void
       */
 -    public function addCacheControlDirective(string $key, bool|string $value = true)
 +    public function addCacheControlDirective(string $key, bool|string $value = true): void
      {
          $this->cacheControl[$key] = $value;
-@@ -242,5 +242,5 @@ class HeaderBag implements \IteratorAggregate, \Countable
+@@ -244,5 +244,5 @@ class HeaderBag implements \IteratorAggregate, \Countable
       * @return void
       */
 -    public function removeCacheControlDirective(string $key)
 +    public function removeCacheControlDirective(string $key): void
      {
          unset($this->cacheControl[$key]);
-@@ -270,5 +270,5 @@ class HeaderBag implements \IteratorAggregate, \Countable
+@@ -272,5 +272,5 @@ class HeaderBag implements \IteratorAggregate, \Countable
       * @return string
       */
 -    protected function getCacheControlHeader()
@@ -12907,7 +12914,7 @@ index d53bbb196f..4eecf85f8e 100644
      {
          return self::PROPERTY_CONSTRAINT;
 diff --git a/src/Symfony/Component/Validator/ConstraintValidator.php b/src/Symfony/Component/Validator/ConstraintValidator.php
-index 8fa522314f..a4c0c5ec64 100644
+index 3c4167be33..59e5b3c09e 100644
 --- a/src/Symfony/Component/Validator/ConstraintValidator.php
 +++ b/src/Symfony/Component/Validator/ConstraintValidator.php
 @@ -40,5 +40,5 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
@@ -12998,7 +13005,7 @@ index 1fdbf0bc3f..aad702453b 100644
 +    public function remove(int $offset): void;
  }
 diff --git a/src/Symfony/Component/Validator/Constraints/AbstractComparisonValidator.php b/src/Symfony/Component/Validator/Constraints/AbstractComparisonValidator.php
-index 29fd4daa8a..c358e6cc6f 100644
+index a81d589f2b..87155e513c 100644
 --- a/src/Symfony/Component/Validator/Constraints/AbstractComparisonValidator.php
 +++ b/src/Symfony/Component/Validator/Constraints/AbstractComparisonValidator.php
 @@ -38,5 +38,5 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
@@ -13170,7 +13177,7 @@ index a50ea62ab6..5f5b5b4e5a 100644
      {
          if (!$constraint instanceof Currency) {
 diff --git a/src/Symfony/Component/Validator/Constraints/DateTimeValidator.php b/src/Symfony/Component/Validator/Constraints/DateTimeValidator.php
-index f02ba54daf..e89c616ec8 100644
+index c88732d4d8..4c0e11eacf 100644
 --- a/src/Symfony/Component/Validator/Constraints/DateTimeValidator.php
 +++ b/src/Symfony/Component/Validator/Constraints/DateTimeValidator.php
 @@ -25,5 +25,5 @@ class DateTimeValidator extends DateValidator
@@ -13455,7 +13462,7 @@ index 3f8f951280..503e779244 100644
      {
          if (!$constraint instanceof NotNull) {
 diff --git a/src/Symfony/Component/Validator/Constraints/RangeValidator.php b/src/Symfony/Component/Validator/Constraints/RangeValidator.php
-index 18c399cd08..c98312a9aa 100644
+index 73273d6788..f8d0945f23 100644
 --- a/src/Symfony/Component/Validator/Constraints/RangeValidator.php
 +++ b/src/Symfony/Component/Validator/Constraints/RangeValidator.php
 @@ -35,5 +35,5 @@ class RangeValidator extends ConstraintValidator

@@ -40,9 +40,9 @@ class DateTimeValidator extends DateValidator
 
         $value = (string) $value;
 
-        \DateTime::createFromFormat($constraint->format, $value);
+        \DateTimeImmutable::createFromFormat($constraint->format, $value);
 
-        $errors = \DateTime::getLastErrors() ?: ['error_count' => 0, 'warnings' => []];
+        $errors = \DateTimeImmutable::getLastErrors() ?: ['error_count' => 0, 'warnings' => []];
 
         if (0 < $errors['error_count']) {
             $this->context->buildViolation($constraint->message)

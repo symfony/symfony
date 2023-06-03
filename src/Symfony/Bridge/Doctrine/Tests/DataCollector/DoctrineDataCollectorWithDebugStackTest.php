@@ -115,6 +115,7 @@ class DoctrineDataCollectorWithDebugStackTest extends TestCase
             [true, [], true, true],
             [null, [], null, true],
             [new \DateTime('2011-09-11'), ['date'], '2011-09-11', true],
+            [new \DateTimeImmutable('2011-09-11'), ['date_immutable'], '2011-09-11', true],
             [fopen(__FILE__, 'r'), [], '/* Resource(stream) */', false, false],
             [
                 new \stdClass(),

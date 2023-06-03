@@ -61,18 +61,14 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
             $comparedValue = $constraint->value;
         }
 
-        // Convert strings to DateTimes if comparing another DateTime
-        // This allows to compare with any date/time value supported by
-        // the DateTime constructor:
+        // Convert strings to date-time objects if comparing to another date-time object
+        // This allows to compare with any date/time value supported by date-time constructors:
         // https://php.net/datetime.formats
         if (\is_string($comparedValue) && $value instanceof \DateTimeInterface) {
-            // If $value is immutable, convert the compared value to a DateTimeImmutable too, otherwise use DateTime
-            $dateTimeClass = $value instanceof \DateTimeImmutable ? \DateTimeImmutable::class : \DateTime::class;
-
             try {
-                $comparedValue = new $dateTimeClass($comparedValue);
+                $comparedValue = new $value($comparedValue);
             } catch (\Exception) {
-                throw new ConstraintDefinitionException(sprintf('The compared value "%s" could not be converted to a "%s" instance in the "%s" constraint.', $comparedValue, $dateTimeClass, get_debug_type($constraint)));
+                throw new ConstraintDefinitionException(sprintf('The compared value "%s" could not be converted to a "%s" instance in the "%s" constraint.', $comparedValue, get_debug_type($value), get_debug_type($constraint)));
             }
         }
 

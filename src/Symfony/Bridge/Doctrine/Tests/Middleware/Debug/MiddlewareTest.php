@@ -126,7 +126,7 @@ EOT;
         $stmt->bindValue(3, 5, ParameterType::INTEGER);
         $stmt->bindValue(4, $res = $this->getResourceFromString('mydata'), ParameterType::BINARY);
         $stmt->bindValue(5, ['foo', 'bar'], Types::SIMPLE_ARRAY);
-        $stmt->bindValue(6, new \DateTime('2022-06-12 11:00:00'), Types::DATETIME_MUTABLE);
+        $stmt->bindValue(6, new \DateTimeImmutable('2022-06-12 11:00:00'), Types::DATETIME_IMMUTABLE);
 
         $executeMethod($stmt);
 

@@ -826,7 +826,7 @@ XML;
     {
         $xmlEncoder = $this->createXmlEncoderWithDateTimeNormalizer();
 
-        $actualXml = $xmlEncoder->encode(['dateTime' => new \DateTime($this->exampleDateTimeString)], 'xml');
+        $actualXml = $xmlEncoder->encode(['dateTime' => new \DateTimeImmutable($this->exampleDateTimeString)], 'xml');
 
         $this->assertEquals($this->createXmlWithDateTime(), $actualXml);
     }
@@ -835,7 +835,7 @@ XML;
     {
         $xmlEncoder = $this->createXmlEncoderWithDateTimeNormalizer();
 
-        $actualXml = $xmlEncoder->encode(['foo' => ['@dateTime' => new \DateTime($this->exampleDateTimeString)]], 'xml');
+        $actualXml = $xmlEncoder->encode(['foo' => ['@dateTime' => new \DateTimeImmutable($this->exampleDateTimeString)]], 'xml');
 
         $this->assertEquals($this->createXmlWithDateTimeField(), $actualXml);
     }
@@ -939,18 +939,18 @@ XML;
         $mock
             ->expects($this->once())
             ->method('normalize')
-            ->with(new \DateTime($this->exampleDateTimeString), 'xml', [])
+            ->with(new \DateTimeImmutable($this->exampleDateTimeString), 'xml', [])
             ->willReturn($this->exampleDateTimeString);
 
         $mock
             ->expects($this->once())
             ->method('getSupportedTypes')
-            ->willReturn([\DateTime::class => true]);
+            ->willReturn([\DateTimeImmutable::class => true]);
 
         $mock
             ->expects($this->once())
             ->method('supportsNormalization')
-            ->with(new \DateTime($this->exampleDateTimeString), 'xml')
+            ->with(new \DateTimeImmutable($this->exampleDateTimeString), 'xml')
             ->willReturn(true);
 
         return $mock;

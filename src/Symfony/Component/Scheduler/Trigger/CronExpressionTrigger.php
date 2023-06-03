@@ -75,7 +75,7 @@ final class CronExpressionTrigger implements TriggerInterface
 
     public function getNextRunDate(\DateTimeImmutable $run): ?\DateTimeImmutable
     {
-        return \DateTimeImmutable::createFromMutable($this->expression->getNextRunDate($run));
+        return \DateTimeImmutable::createFromInterface($this->expression->getNextRunDate($run));
     }
 
     private static function parseHashed(string $expression, string $context): string

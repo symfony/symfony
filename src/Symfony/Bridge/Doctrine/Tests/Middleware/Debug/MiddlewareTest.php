@@ -157,13 +157,11 @@ EOT;
 
         $expectedRes = $res = $this->getResourceFromString('mydata');
 
-        $stmt->bindValue(2, $price);
-        $stmt->bindValue(3, $stock, ParameterType::INTEGER);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindValue(1, 'product1');
+        $stmt->bindValue(2, '12.5');
+        $stmt->bindValue(3, 5, ParameterType::INTEGER);
         $stmt->bindValue(4, $res, ParameterType::BINARY);
-
-        $product = 'product1';
-        $price = '12.5';
-        $stock = 5;
 
         $executeMethod($stmt);
 
@@ -171,7 +169,7 @@ EOT;
         $debug = $this->debugDataHolder->getData()['default'] ?? [];
         $this->assertCount(2, $debug);
         $this->assertSame($sql, $debug[1]['sql']);
-        $this->assertSame(['product1', 12.5, 5, $expectedRes], $debug[1]['params']);
+        $this->assertSame(['product1', '12.5', 5, $expectedRes], $debug[1]['params']);
         $this->assertSame([ParameterType::STRING, ParameterType::STRING, ParameterType::INTEGER, ParameterType::BINARY], $debug[1]['types']);
         $this->assertGreaterThan(0, $debug[1]['executionMS']);
     }

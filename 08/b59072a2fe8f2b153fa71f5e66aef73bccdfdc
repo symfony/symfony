@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-05-16T10:17:39Z
+
+Is this really worth it?
+
+```diff
+-$attributes = $event->getAttributes(SomeAttribute::class);
++$attributes = $event->getAttributes()[SomeAttribute::class] ?? null;
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2023-05-16T10:34:11Z
+
+@nicolas-grekas the difference is that the new argument has a generic signature, telling SA tools that all returned objects are an instance of the provided class name.
+For the case of returning all attributes grouped by a class name, there is no interoperable way to indicate that in phpdoc (Psalm has a `class-string-map` type, but no other tool support it)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-05-16T11:08:58Z
+
+Wouldn't this work?
+`@return array<class-string<T>, list<T>>`
+
+---------------------------------------------------------------------------
+
+by stof at 2023-05-16T11:31:15Z
+
+@nicolas-grekas no. This won't work as it would force using the same `T` (and inferring it from somewhere).
+
+That's precisely why Psalm introduced a `class-string-map` type, which would be exactly what we need here if it was interoperable.

@@ -39,15 +39,17 @@ class PhpProcess extends Process
             $php = $executableFinder->find(false);
             $php = false === $php ? null : array_merge([$php], $executableFinder->findArguments());
         }
-        if ('phpdbg' === \PHP_SAPI) {
-            $file = tempnam(sys_get_temp_dir(), 'dbg');
-            file_put_contents($file, $script);
-            register_shutdown_function('unlink', $file);
-            $php[] = $file;
-            $script = null;
+
+        $file = tempnam(sys_get_temp_dir(), 'phpdbg' === \PHP_SAPI ? 'dbg' : 'cli');
+        if (false === $file) {
+            throw new RuntimeException('The system temp directory is not writable.');
         }
 
-        parent::__construct($php, $cwd, $env, $script, $timeout);
+        file_put_contents($file, $script);
+        register_shutdown_function('unlink', $file);
+        $php[] = $file;
+
+        parent::__construct($php, $cwd, $env, null, $timeout);
     }
 
     /**

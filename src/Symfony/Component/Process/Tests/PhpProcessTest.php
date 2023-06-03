@@ -71,4 +71,15 @@ PHP;
 PHP
         );
     }
+
+    public function testStandardStreamsAreAvailableInTheProcess()
+    {
+        $process = new PhpProcess(<<<PHP
+<?php
+var_dump(\STDOUT);
+PHP);
+        $process->run();
+
+        $this->assertStringMatchesFormat('resource(%d) of type (stream)', $process->getOutput());
+    }
 }

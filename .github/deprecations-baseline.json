@@ -370,6 +370,26 @@
         "count": 2
     },
     {
+        "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrinePostgreSqlIntegrationTest::setUp",
+        "message": "Connection::fetchColumn() is deprecated, use Connection::fetchOne() API instead. (Connection.php:662 called by PostgreSqlSchemaManager.php:63, https://github.com/doctrine/dbal/pull/4019, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrinePostgreSqlIntegrationTest::setUp",
+        "message": "Connection::query() is deprecated, use Connection::executeQuery() instead. (Connection.php:1436 called by AbstractPostgreSQLDriver.php:149, https://github.com/doctrine/dbal/pull/4163, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrinePostgreSqlIntegrationTest::setUp",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:820 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrinePostgreSqlIntegrationTest::setUp",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:731 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 3
+    },
+    {
         "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\ChoiceList\\ORMQueryBuilderLoaderTest::testIdentifierTypeIsStringArray",
         "message": "The annotation mapping driver is deprecated and will be removed in Doctrine ORM 3.0, please migrate to the attribute or XML driver. (AnnotationDriver.php:69 called by DoctrineTestHelper.php:84, https://github.com/doctrine/orm/issues/10098, package doctrine/orm)",
         "count": 1

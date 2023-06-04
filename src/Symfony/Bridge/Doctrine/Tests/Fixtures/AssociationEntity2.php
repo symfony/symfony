@@ -16,6 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity
  */
+#[ORM\Entity]
 class AssociationEntity2
 {
     /**
@@ -23,6 +24,7 @@ class AssociationEntity2
      * @ORM\Id @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
+    #[ORM\Id, ORM\GeneratedValue, ORM\Column(type: 'integer')]
     private $id;
 
     /**
@@ -30,6 +32,7 @@ class AssociationEntity2
      *
      * @var \Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdNoToStringEntity
      */
+    #[ORM\ManyToOne(targetEntity: SingleIntIdNoToStringEntity::class)]
     public $single;
 
     /**
@@ -41,5 +44,8 @@ class AssociationEntity2
      *
      * @var \Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeIntIdEntity
      */
+    #[ORM\ManyToOne(targetEntity: CompositeIntIdEntity::class)]
+    #[ORM\JoinColumn(name: 'composite_id1', referencedColumnName: 'id1')]
+    #[ORM\JoinColumn(name: 'composite_id2', referencedColumnName: 'id2')]
     public $composite;
 }

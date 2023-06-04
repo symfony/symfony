@@ -119,96 +119,75 @@ interface ExecutionContextInterface
     public function getObject(): ?object;
 
     /**
-     * Sets the currently validated value.
+     * Warning: Should not be called by user code, to be used by the validator engine only.
      *
      * @param object|null $object       The currently validated object
      * @param string      $propertyPath The property path to the current value
-     *
-     * @internal Used by the validator engine. Should not be called by user
-     *           code.
      */
     public function setNode(mixed $value, ?object $object, MetadataInterface $metadata = null, string $propertyPath): void;
 
     /**
-     * Sets the currently validated group.
+     * Warning: Should not be called by user code, to be used by the validator engine only.
      *
      * @param string|null $group The validated group
-     *
-     * @internal Used by the validator engine. Should not be called by user
-     *           code.
      */
     public function setGroup(?string $group): void;
 
     /**
-     * Sets the currently validated constraint.
-     *
-     * @internal Used by the validator engine. Should not be called by user
-     *           code.
+     * Warning: Should not be called by user code, to be used by the validator engine only.
      */
     public function setConstraint(Constraint $constraint): void;
 
     /**
-     * Marks an object as validated in a specific validation group.
+     * Warning: Should not be called by user code, to be used by the validator engine only.
      *
      * @param string $cacheKey  The hash of the object
      * @param string $groupHash The group's name or hash, if it is group
      *                          sequence
-     *
-     * @internal Used by the validator engine. Should not be called by user
-     *           code.
      */
     public function markGroupAsValidated(string $cacheKey, string $groupHash): void;
 
     /**
-     * Returns whether an object was validated in a specific validation group.
+     * Warning: Should not be called by user code, to be used by the validator engine only.
      *
      * @param string $cacheKey  The hash of the object
      * @param string $groupHash The group's name or hash, if it is group
      *                          sequence
      *
-     * @internal Used by the validator engine
      */
     public function isGroupValidated(string $cacheKey, string $groupHash): bool;
 
     /**
-     * Marks a constraint as validated for an object.
+     * Warning: Should not be called by user code, to be used by the validator engine only.
      *
      * @param string $cacheKey       The hash of the object
      * @param string $constraintHash The hash of the constraint
-     *
-     * @internal Used by the validator engine. Should not be called by user
-     *           code.
      */
     public function markConstraintAsValidated(string $cacheKey, string $constraintHash): void;
 
     /**
-     * Returns whether a constraint was validated for an object.
+     * Warning: Should not be called by user code, to be used by the validator engine only.
      *
      * @param string $cacheKey       The hash of the object
      * @param string $constraintHash The hash of the constraint
      *
-     * @internal Used by the validator engine
      */
     public function isConstraintValidated(string $cacheKey, string $constraintHash): bool;
 
     /**
-     * Marks that an object was initialized.
+     * Warning: Should not be called by user code, to be used by the validator engine only.
      *
      * @param string $cacheKey The hash of the object
-     *
-     * @internal Used by the validator engine. Should not be called by user
-     *           code.
      *
      * @see ObjectInitializerInterface
      */
     public function markObjectAsInitialized(string $cacheKey): void;
 
     /**
-     * Returns whether an object was initialized.
+     * Warning: Should not be called by user code, to be used by the validator engine only.
      *
      * @param string $cacheKey The hash of the object
      *
-     * @internal Used by the validator engine
      *
      * @see ObjectInitializerInterface
      */

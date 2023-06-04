@@ -21,16 +21,19 @@ use Doctrine\ORM\Mapping\Id;
  *
  * @author Udaltsov Valentin <udaltsov.valentin@gmail.com>
  */
+#[Entity]
 class DoctrineWithEmbedded
 {
     /**
      * @Id
      * @Column(type="smallint")
      */
+    #[Id, Column(type: 'smallint')]
     public $id;
 
     /**
      * @Embedded(class="DoctrineEmbeddable")
      */
+    #[Embedded(class: DoctrineEmbeddable::class)]
     protected $embedded;
 }

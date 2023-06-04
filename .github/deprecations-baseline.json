@@ -330,6 +330,11 @@
         "count": 1
     },
     {
+        "location": "Symfony\\Component\\Lock\\Tests\\Store\\DoctrineDbalStoreTest::testConfigureSchemaTableExists",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:727 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 1
+    },
+    {
         "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\ConnectionTest::testConfigureSchemaTableExists",
         "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:727 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
         "count": 1
@@ -1206,28 +1211,13 @@
     },
     {
         "location": "Symfony\\Component\\HttpFoundation\\Tests\\Session\\Storage\\Handler\\PdoSessionHandlerTest::testConfigureSchemaTableExistsPdo",
-        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:731 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:727 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
         "count": 1
     },
     {
-        "location": "Symfony\\Component\\Lock\\Tests\\Store\\DoctrineDbalStoreTest::setUpBeforeClass",
-        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:820 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
-        "count": 2
-    },
-    {
-        "location": "Symfony\\Component\\Lock\\Tests\\Store\\DoctrineDbalStoreTest::setUpBeforeClass",
+        "location": "Symfony\\Component\\HttpFoundation\\Tests\\Session\\Storage\\Handler\\PdoSessionHandlerTest::testConfigureSchemaTableExistsPdo",
         "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:731 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
-        "count": 2
-    },
-    {
-        "location": "Symfony\\Component\\Lock\\Tests\\Store\\DoctrineDbalStoreTest::testDsn",
-        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:820 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
-        "count": 6
-    },
-    {
-        "location": "Symfony\\Component\\Lock\\Tests\\Store\\DoctrineDbalStoreTest::testDsn",
-        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:731 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
-        "count": 6
+        "count": 1
     },
     {
         "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\ConnectionTest::testConfigureSchemaTableExists",

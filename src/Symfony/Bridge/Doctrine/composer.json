@@ -40,7 +40,7 @@
         "symfony/security-core": "^5.3|^6.0",
         "symfony/expression-language": "^4.4|^5.0|^6.0",
         "symfony/uid": "^5.1|^6.0",
-        "symfony/validator": "^5.2|^6.0",
+        "symfony/validator": "^5.4.25|~6.2.12|^6.3.1",
         "symfony/translation": "^4.4|^5.0|^6.0",
         "symfony/var-dumper": "^4.4|^5.0|^6.0",
         "doctrine/annotations": "^1.10.4|^2",
@@ -63,7 +63,7 @@
         "symfony/proxy-manager-bridge": "<4.4.19",
         "symfony/security-bundle": "<5",
         "symfony/security-core": "<5.3",
-        "symfony/validator": "<5.2"
+        "symfony/validator": "<5.4.25|>=6,<6.2.12|>=6.3,<6.3.1"
     },
     "suggest": {
         "symfony/form": "",

@@ -12,10 +12,12 @@
 namespace Symfony\Bridge\Doctrine\Tests\Fixtures;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\Embeddable\Identifier;
 
 /**
  * @ORM\Entity
  */
+#[ORM\Entity]
 class EmbeddedIdentifierEntity
 {
     /**
@@ -23,5 +25,6 @@ class EmbeddedIdentifierEntity
      *
      * @ORM\Embedded(class="Symfony\Bridge\Doctrine\Tests\Fixtures\Embeddable\Identifier")
      */
+    #[ORM\Embedded(class: Identifier::class)]
     protected $id;
 }

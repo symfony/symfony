@@ -11,7 +11,10 @@
 
 namespace Security\RememberMe;
 
+use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
+use Doctrine\ORM\ORMSetup;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Security\RememberMe\DoctrineTokenProvider;
 use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
@@ -120,10 +123,15 @@ class DoctrineTokenProviderTest extends TestCase
      */
     private function bootstrapProvider()
     {
+        $config = class_exists(ORMSetup::class) ? ORMSetup::createConfiguration(true) : new Configuration();
+        if (class_exists(DefaultSchemaManagerFactory::class)) {
+            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
+        }
+
         $connection = DriverManager::getConnection([
             'driver' => 'pdo_sqlite',
-            'url' => 'sqlite:///:memory:',
-        ]);
+            'memory' => true,
+        ], $config);
         $connection->{method_exists($connection, 'executeStatement') ? 'executeStatement' : 'executeUpdate'}(<<< 'SQL'
             CREATE TABLE rememberme_token (
                 series   char(88)     UNIQUE PRIMARY KEY NOT NULL,

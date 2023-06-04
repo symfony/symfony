@@ -193,15 +193,17 @@ class HeaderBag implements \IteratorAggregate, \Countable
     /**
      * Returns the HTTP header value converted to a date.
      *
+     * @return \DateTimeImmutable|null
+     *
      * @throws \RuntimeException When the HTTP header is not parseable
      */
-    public function getDate(string $key, \DateTime $default = null): ?\DateTimeInterface
+    public function getDate(string $key, \DateTimeInterface $default = null): ?\DateTimeInterface
     {
         if (null === $value = $this->get($key)) {
-            return $default;
+            return null !== $default ? \DateTimeImmutable::createFromInterface($default) : null;
         }
 
-        if (false === $date = \DateTime::createFromFormat(\DATE_RFC2822, $value)) {
+        if (false === $date = \DateTimeImmutable::createFromFormat(\DATE_RFC2822, $value)) {
             throw new \RuntimeException(sprintf('The "%s" HTTP header is not parseable (%s).', $key, $value));
         }
 

@@ -11,7 +11,10 @@
 
 namespace Security\RememberMe;
 
+use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
+use Doctrine\ORM\ORMSetup;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Security\RememberMe\DoctrineTokenProvider;
 use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
@@ -77,7 +80,7 @@ class DoctrineTokenProviderTest extends TestCase
         $provider->createNewToken($token);
 
         // new request comes in requiring remember-me auth, which updates the token
-        $provider->updateExistingToken($token, $newValue, new \DateTime('-5 seconds'));
+        $provider->updateExistingToken($token, $newValue, new \DateTimeImmutable('-5 seconds'));
         $provider->updateToken($series, $newValue, new \DateTime('-5 seconds'));
 
         // parallel request comes in with the old remember-me cookie and session, which also requires reauth
@@ -102,7 +105,7 @@ class DoctrineTokenProviderTest extends TestCase
         $provider->createNewToken($token);
 
         // new request comes in requiring remember-me auth, which updates the token
-        $provider->updateExistingToken($token, $newValue, new \DateTime('-61 seconds'));
+        $provider->updateExistingToken($token, $newValue, new \DateTimeImmutable('-61 seconds'));
         $provider->updateToken($series, $newValue, new \DateTime('-5 seconds'));
 
         // parallel request comes in with the old remember-me cookie and session, which also requires reauth
@@ -120,10 +123,15 @@ class DoctrineTokenProviderTest extends TestCase
      */
     private function bootstrapProvider()
     {
+        $config = class_exists(ORMSetup::class) ? ORMSetup::createConfiguration(true) : new Configuration();
+        if (class_exists(DefaultSchemaManagerFactory::class)) {
+            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
+        }
+
         $connection = DriverManager::getConnection([
             'driver' => 'pdo_sqlite',
-            'url' => 'sqlite:///:memory:',
-        ]);
+            'memory' => true,
+        ], $config);
         $connection->{method_exists($connection, 'executeStatement') ? 'executeStatement' : 'executeUpdate'}(<<< 'SQL'
             CREATE TABLE rememberme_token (
                 series   char(88)     UNIQUE PRIMARY KEY NOT NULL,

@@ -16,6 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Embeddable
  */
+#[ORM\Embeddable]
 class Identifier
 {
     /**
@@ -24,5 +25,6 @@ class Identifier
      * @ORM\Id
      * @ORM\Column(type="integer")
      */
+    #[ORM\Id, ORM\Column(type: 'integer')]
     protected $value;
 }

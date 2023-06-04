@@ -16,10 +16,12 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Embeddable()
  */
+#[ORM\Embeddable]
 class DoctrineLoaderNestedEmbed
 {
     /**
      * @ORM\Column(length=27)
      */
+    #[ORM\Column(length: 27)]
     public $nestedEmbeddedMaxLength;
 }

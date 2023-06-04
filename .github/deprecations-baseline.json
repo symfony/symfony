@@ -1,0 +1,1267 @@
+[
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\ChoiceList\\ORMQueryBuilderLoaderTest::testIdentifierTypeIsStringArray",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:296 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\ChoiceList\\ORMQueryBuilderLoaderTest::testIdentifierTypeIsIntegerArray",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:296 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\ChoiceList\\ORMQueryBuilderLoaderTest::testFilterNonIntegerValues",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:296 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\ChoiceList\\ORMQueryBuilderLoaderTest::testFilterEmptyUuids",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:296 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\ChoiceList\\ORMQueryBuilderLoaderTest::testFilterUid",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:296 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\ChoiceList\\ORMQueryBuilderLoaderTest::testUidThrowProperException",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:296 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\ChoiceList\\ORMQueryBuilderLoaderTest::testEmbeddedIdentifierName",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:296 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::setUp",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:296 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 83
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::setUp",
+        "message": "SqlitePlatform::canEmulateSchemas() is deprecated. (SqlitePlatform.php:898 called by SchemaTool.php:409, https://github.com/doctrine/dbal/pull/4805, package doctrine/dbal)",
+        "count": 166
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::setUp",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:816 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 1328
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::setUp",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:727 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 1328
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testGetProperties",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:296 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testTestGetPropertiesWithEmbedded",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:296 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testExtract",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:296 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 25
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testExtract",
+        "message": "Doctrine\\DBAL\\Platforms\\AbstractPlatform::usesSequenceEmulatedIdentityColumns is deprecated. (AbstractPlatform.php:3945 called by ClassMetadataFactory.php:622, https://github.com/doctrine/dbal/pull/5513, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testExtractWithEmbedded",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:296 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testExtractEnum",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:296 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 5
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testGetPropertiesCatchException",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:296 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testGetTypesCatchException",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:296 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testGeneratedValueNotWritable",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:296 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testGeneratedValueNotWritable",
+        "message": "Doctrine\\DBAL\\Platforms\\AbstractPlatform::usesSequenceEmulatedIdentityColumns is deprecated. (AbstractPlatform.php:3945 called by ClassMetadataFactory.php:622, https://github.com/doctrine/dbal/pull/5513, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testRefreshUserGetsUserByPrimaryKey",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:296 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testRefreshUserGetsUserByPrimaryKey",
+        "message": "SqlitePlatform::canEmulateSchemas() is deprecated. (SqlitePlatform.php:898 called by SchemaTool.php:409, https://github.com/doctrine/dbal/pull/4805, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testRefreshUserGetsUserByPrimaryKey",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:816 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testRefreshUserGetsUserByPrimaryKey",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:727 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testLoadUserByUsername",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:296 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testLoadUserByUsername",
+        "message": "SqlitePlatform::canEmulateSchemas() is deprecated. (SqlitePlatform.php:898 called by SchemaTool.php:409, https://github.com/doctrine/dbal/pull/4805, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testLoadUserByUsername",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:816 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testLoadUserByUsername",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:727 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testLoadUserByUsernameWithNonUserLoaderRepositoryAndWithoutProperty",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:296 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testLoadUserByUsernameWithNonUserLoaderRepositoryAndWithoutProperty",
+        "message": "SqlitePlatform::canEmulateSchemas() is deprecated. (SqlitePlatform.php:898 called by SchemaTool.php:409, https://github.com/doctrine/dbal/pull/4805, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testLoadUserByUsernameWithNonUserLoaderRepositoryAndWithoutProperty",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:816 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testLoadUserByUsernameWithNonUserLoaderRepositoryAndWithoutProperty",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:727 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testRefreshUserRequiresId",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:296 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testRefreshInvalidUser",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:296 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testRefreshInvalidUser",
+        "message": "SqlitePlatform::canEmulateSchemas() is deprecated. (SqlitePlatform.php:898 called by SchemaTool.php:409, https://github.com/doctrine/dbal/pull/4805, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testRefreshInvalidUser",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:816 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testRefreshInvalidUser",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:727 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testSupportProxy",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:296 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testSupportProxy",
+        "message": "SqlitePlatform::canEmulateSchemas() is deprecated. (SqlitePlatform.php:898 called by SchemaTool.php:409, https://github.com/doctrine/dbal/pull/4805, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testSupportProxy",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:816 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testSupportProxy",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:727 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\Constraints\\UniqueEntityValidatorTest::setUp",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:296 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 36
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\Constraints\\UniqueEntityValidatorTest::setUp",
+        "message": "Doctrine\\DBAL\\Platforms\\AbstractPlatform::usesSequenceEmulatedIdentityColumns is deprecated. (AbstractPlatform.php:3945 called by ClassMetadataFactory.php:622, https://github.com/doctrine/dbal/pull/5513, package doctrine/dbal)",
+        "count": 72
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\Constraints\\UniqueEntityValidatorTest::setUp",
+        "message": "SqlitePlatform::canEmulateSchemas() is deprecated. (SqlitePlatform.php:898 called by SchemaTool.php:409, https://github.com/doctrine/dbal/pull/4805, package doctrine/dbal)",
+        "count": 36
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\Constraints\\UniqueEntityValidatorTest::setUp",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:816 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 720
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\Constraints\\UniqueEntityValidatorTest::setUp",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:727 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 720
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\DoctrineLoaderTest::testLoadClassMetadata",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:296 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\DoctrineLoaderTest::testExtractEnum",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:296 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\DoctrineLoaderTest::testFieldMappingsConfiguration",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:296 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\DoctrineLoaderTest::testClassValidator",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:296 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 4
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\DoctrineLoaderTest::testClassNoAutoMapping",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:296 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Component\\Cache\\Tests\\Adapter\\DoctrineDbalAdapterTest::testConfigureSchemaDecoratedDbalDriver",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:816 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Component\\Cache\\Tests\\Adapter\\DoctrineDbalAdapterTest::testConfigureSchemaDecoratedDbalDriver",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:727 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Component\\Cache\\Tests\\Adapter\\DoctrineDbalAdapterTest::testConfigureSchemaTableExists",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:727 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Component\\Cache\\Tests\\Adapter\\DoctrineDbalAdapterTest::testDsn",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:816 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 6
+    },
+    {
+        "location": "Symfony\\Component\\Cache\\Tests\\Adapter\\DoctrineDbalAdapterTest::testDsn",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:727 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 6
+    },
+    {
+        "location": "Symfony\\Component\\Lock\\Tests\\Store\\DoctrineDbalStoreTest::setUpBeforeClass",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:816 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Component\\Lock\\Tests\\Store\\DoctrineDbalStoreTest::setUpBeforeClass",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:727 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Component\\Lock\\Tests\\Store\\DoctrineDbalStoreTest::testDsn",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:816 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 6
+    },
+    {
+        "location": "Symfony\\Component\\Lock\\Tests\\Store\\DoctrineDbalStoreTest::testDsn",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:727 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 6
+    },
+    {
+        "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\ConnectionTest::testConfigureSchemaTableExists",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:727 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrineIntegrationTest::testConnectionSendAndGet",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:816 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrineIntegrationTest::testConnectionSendAndGet",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:727 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrineIntegrationTest::testSendWithDelay",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:816 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrineIntegrationTest::testSendWithDelay",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:727 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrineIntegrationTest::testItRetrieveTheFirstAvailableMessage",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:816 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrineIntegrationTest::testItRetrieveTheFirstAvailableMessage",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:727 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrineIntegrationTest::testItCountMessages",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:816 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrineIntegrationTest::testItCountMessages",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:727 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrineIntegrationTest::testItRetrieveTheMessageThatIsOlderThanRedeliverTimeout",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:816 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrineIntegrationTest::testItRetrieveTheMessageThatIsOlderThanRedeliverTimeout",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:727 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrineIntegrationTest::testTheTransportIsSetupOnGet",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:816 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrineIntegrationTest::testTheTransportIsSetupOnGet",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:727 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrinePostgreSqlIntegrationTest::setUp",
+        "message": "Connection::fetchColumn() is deprecated, use Connection::fetchOne() API instead. (Connection.php:662 called by PostgreSqlSchemaManager.php:63, https://github.com/doctrine/dbal/pull/4019, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrinePostgreSqlIntegrationTest::setUp",
+        "message": "Connection::query() is deprecated, use Connection::executeQuery() instead. (Connection.php:1436 called by AbstractPostgreSQLDriver.php:149, https://github.com/doctrine/dbal/pull/4163, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrinePostgreSqlIntegrationTest::setUp",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:820 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrinePostgreSqlIntegrationTest::setUp",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:731 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\ChoiceList\\ORMQueryBuilderLoaderTest::testIdentifierTypeIsStringArray",
+        "message": "The annotation mapping driver is deprecated and will be removed in Doctrine ORM 3.0, please migrate to the attribute or XML driver. (AnnotationDriver.php:69 called by DoctrineTestHelper.php:84, https://github.com/doctrine/orm/issues/10098, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\ChoiceList\\ORMQueryBuilderLoaderTest::testIdentifierTypeIsIntegerArray",
+        "message": "The annotation mapping driver is deprecated and will be removed in Doctrine ORM 3.0, please migrate to the attribute or XML driver. (AnnotationDriver.php:69 called by DoctrineTestHelper.php:84, https://github.com/doctrine/orm/issues/10098, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\ChoiceList\\ORMQueryBuilderLoaderTest::testFilterNonIntegerValues",
+        "message": "The annotation mapping driver is deprecated and will be removed in Doctrine ORM 3.0, please migrate to the attribute or XML driver. (AnnotationDriver.php:69 called by DoctrineTestHelper.php:84, https://github.com/doctrine/orm/issues/10098, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\ChoiceList\\ORMQueryBuilderLoaderTest::testFilterEmptyUuids",
+        "message": "The annotation mapping driver is deprecated and will be removed in Doctrine ORM 3.0, please migrate to the attribute or XML driver. (AnnotationDriver.php:69 called by DoctrineTestHelper.php:84, https://github.com/doctrine/orm/issues/10098, package doctrine/orm)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\ChoiceList\\ORMQueryBuilderLoaderTest::testFilterUid",
+        "message": "The annotation mapping driver is deprecated and will be removed in Doctrine ORM 3.0, please migrate to the attribute or XML driver. (AnnotationDriver.php:69 called by DoctrineTestHelper.php:84, https://github.com/doctrine/orm/issues/10098, package doctrine/orm)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\ChoiceList\\ORMQueryBuilderLoaderTest::testUidThrowProperException",
+        "message": "The annotation mapping driver is deprecated and will be removed in Doctrine ORM 3.0, please migrate to the attribute or XML driver. (AnnotationDriver.php:69 called by DoctrineTestHelper.php:84, https://github.com/doctrine/orm/issues/10098, package doctrine/orm)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\ChoiceList\\ORMQueryBuilderLoaderTest::testEmbeddedIdentifierName",
+        "message": "The annotation mapping driver is deprecated and will be removed in Doctrine ORM 3.0, please migrate to the attribute or XML driver. (AnnotationDriver.php:69 called by DoctrineTestHelper.php:84, https://github.com/doctrine/orm/issues/10098, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::setUp",
+        "message": "The annotation mapping driver is deprecated and will be removed in Doctrine ORM 3.0, please migrate to the attribute or XML driver. (AnnotationDriver.php:69 called by DoctrineTestHelper.php:84, https://github.com/doctrine/orm/issues/10098, package doctrine/orm)",
+        "count": 83
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testSetDataToUninitializedEntityWithNonRequired",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testSetDataToUninitializedEntityWithNonRequiredToString",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testSetDataToUninitializedEntityWithNonRequiredQueryBuilder",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testConfigureQueryBuilderWithClosureReturningNullUseDefault",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testSetDataMultipleExpandedNull",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testSubmitSingleNonExpandedSingleIdentifier",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testSubmitSingleNonExpandedSingleAssocIdentifier",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testSubmitSingleNonExpandedCompositeIdentifier",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testSubmitMultipleNonExpandedSingleIdentifier",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testSubmitMultipleNonExpandedSingleAssocIdentifier",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testSubmitMultipleNonExpandedSingleIdentifierForExistingData",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testSubmitMultipleNonExpandedCompositeIdentifier",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testSubmitMultipleNonExpandedCompositeIdentifierExistingData",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testSubmitSingleExpanded",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 6
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testSubmitMultipleExpanded",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 6
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testSubmitMultipleExpandedWithNegativeIntegerId",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 6
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testSubmitSingleNonExpandedStringCastableIdentifier",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testSubmitSingleStringCastableIdentifierExpanded",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 4
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testSubmitMultipleNonExpandedStringCastableIdentifierForExistingData",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testSubmitMultipleNonExpandedStringCastableIdentifier",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testSubmitMultipleStringCastableIdentifierExpanded",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 4
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testOverrideChoicesValues",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testOverrideChoicesValuesWithCallable",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testChoicesForValuesOptimization",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testPreferredChoices",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testDisallowChoicesThatAreNotIncludedQueryBuilderSingleIdentifier",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 6
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testSingleIdentifierWithLimit",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testDisallowChoicesThatAreNotIncludedByQueryBuilderSingleIdentifierWithLimit",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testDisallowChoicesThatAreNotIncludedQueryBuilderSingleAssocIdentifier",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 4
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testDisallowChoicesThatAreNotIncludedQueryBuilderAsClosureSingleIdentifier",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 6
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testDisallowChoicesThatAreNotIncludedQueryBuilderAsClosureCompositeIdentifier",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testSubmitSingleStringIdentifier",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testSubmitCompositeStringIdentifier",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testLoaderCaching",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 6
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testLoaderCachingWithParameters",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 6
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testPassIdAndNameToView",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testStripLeadingUnderscoresAndDigitsFromId",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testPassIdAndNameToViewWithParent",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testPassIdAndNameToViewWithGrandParent",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testPassTranslationDomainToView",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testInheritTranslationDomainFromParent",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testPreferOwnTranslationDomain",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testDefaultTranslationDomain",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testPassLabelTranslationParametersToView",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testPassHelpTranslationParametersToView",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testPassAttrTranslationParametersToView",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testInheritLabelTranslationParametersFromParent",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testInheritHelpTranslationParametersFromParent",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testInheritAttrTranslationParametersFromParent",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testPreferOwnLabelTranslationParameters",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testPreferOwnHelpTranslationParameters",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testPreferOwnAttrTranslationParameters",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testDefaultLabelTranslationParameters",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testDefaultHelpTranslationParameters",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testDefaultAttrTranslationParameters",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testPassLabelToView",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testPassMultipartFalseToView",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testSubmitNullExpanded",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testSubmitNullExpandedMultiple",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testSubmitNullUsesDefaultEmptyData",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testSubmitNullMultipleUsesDefaultEmptyData",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::testWithSameLoaderAndDifferentChoiceValueCallbacks",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testGetProperties",
+        "message": "The annotation mapping driver is deprecated and will be removed in Doctrine ORM 3.0, please migrate to the attribute or XML driver. (AnnotationDriver.php:69 called by DoctrineExtractorTest.php:48, https://github.com/doctrine/orm/issues/10098, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testTestGetPropertiesWithEmbedded",
+        "message": "The annotation mapping driver is deprecated and will be removed in Doctrine ORM 3.0, please migrate to the attribute or XML driver. (AnnotationDriver.php:69 called by DoctrineExtractorTest.php:48, https://github.com/doctrine/orm/issues/10098, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testExtract",
+        "message": "The annotation mapping driver is deprecated and will be removed in Doctrine ORM 3.0, please migrate to the attribute or XML driver. (AnnotationDriver.php:69 called by DoctrineExtractorTest.php:48, https://github.com/doctrine/orm/issues/10098, package doctrine/orm)",
+        "count": 25
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testExtractWithEmbedded",
+        "message": "The annotation mapping driver is deprecated and will be removed in Doctrine ORM 3.0, please migrate to the attribute or XML driver. (AnnotationDriver.php:69 called by DoctrineExtractorTest.php:48, https://github.com/doctrine/orm/issues/10098, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testGetPropertiesCatchException",
+        "message": "The annotation mapping driver is deprecated and will be removed in Doctrine ORM 3.0, please migrate to the attribute or XML driver. (AnnotationDriver.php:69 called by DoctrineExtractorTest.php:48, https://github.com/doctrine/orm/issues/10098, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testGetTypesCatchException",
+        "message": "The annotation mapping driver is deprecated and will be removed in Doctrine ORM 3.0, please migrate to the attribute or XML driver. (AnnotationDriver.php:69 called by DoctrineExtractorTest.php:48, https://github.com/doctrine/orm/issues/10098, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testGeneratedValueNotWritable",
+        "message": "The annotation mapping driver is deprecated and will be removed in Doctrine ORM 3.0, please migrate to the attribute or XML driver. (AnnotationDriver.php:69 called by DoctrineExtractorTest.php:48, https://github.com/doctrine/orm/issues/10098, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testRefreshUserGetsUserByPrimaryKey",
+        "message": "The annotation mapping driver is deprecated and will be removed in Doctrine ORM 3.0, please migrate to the attribute or XML driver. (AnnotationDriver.php:69 called by DoctrineTestHelper.php:84, https://github.com/doctrine/orm/issues/10098, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testLoadUserByUsername",
+        "message": "The annotation mapping driver is deprecated and will be removed in Doctrine ORM 3.0, please migrate to the attribute or XML driver. (AnnotationDriver.php:69 called by DoctrineTestHelper.php:84, https://github.com/doctrine/orm/issues/10098, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testLoadUserByUsername",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testLoadUserByUsernameWithNonUserLoaderRepositoryAndWithoutProperty",
+        "message": "The annotation mapping driver is deprecated and will be removed in Doctrine ORM 3.0, please migrate to the attribute or XML driver. (AnnotationDriver.php:69 called by DoctrineTestHelper.php:84, https://github.com/doctrine/orm/issues/10098, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testRefreshUserRequiresId",
+        "message": "The annotation mapping driver is deprecated and will be removed in Doctrine ORM 3.0, please migrate to the attribute or XML driver. (AnnotationDriver.php:69 called by DoctrineTestHelper.php:84, https://github.com/doctrine/orm/issues/10098, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testRefreshInvalidUser",
+        "message": "The annotation mapping driver is deprecated and will be removed in Doctrine ORM 3.0, please migrate to the attribute or XML driver. (AnnotationDriver.php:69 called by DoctrineTestHelper.php:84, https://github.com/doctrine/orm/issues/10098, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testRefreshInvalidUser",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testSupportProxy",
+        "message": "The annotation mapping driver is deprecated and will be removed in Doctrine ORM 3.0, please migrate to the attribute or XML driver. (AnnotationDriver.php:69 called by DoctrineTestHelper.php:84, https://github.com/doctrine/orm/issues/10098, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\Constraints\\UniqueEntityValidatorTest::setUp",
+        "message": "The annotation mapping driver is deprecated and will be removed in Doctrine ORM 3.0, please migrate to the attribute or XML driver. (AnnotationDriver.php:69 called by DoctrineTestHelper.php:84, https://github.com/doctrine/orm/issues/10098, package doctrine/orm)",
+        "count": 28
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\Constraints\\UniqueEntityValidatorTest::testValidateUniqueness",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\Constraints\\UniqueEntityValidatorTest::testValidateCustomErrorPath",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\Constraints\\UniqueEntityValidatorTest::testValidateUniquenessWithIgnoreNullDisabled",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\Constraints\\UniqueEntityValidatorTest::testValidateUniquenessWithValidCustomErrorPath",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\Constraints\\UniqueEntityValidatorTest::testAssociatedEntity",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 4
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\Constraints\\UniqueEntityValidatorTest::testValidateUniquenessNotToStringEntityWithAssociatedEntity",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 4
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\Constraints\\UniqueEntityValidatorTest::testAssociatedEntityWithNull",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 4
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\Constraints\\UniqueEntityValidatorTest::testValidateInheritanceUniqueness",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 5
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\Constraints\\UniqueEntityValidatorTest::testValidateUniquenessWithCompositeObjectNoToStringIdEntity",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\Constraints\\UniqueEntityValidatorTest::testValidateUniquenessWithCustomDoctrineTypeValue",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\Constraints\\UniqueEntityValidatorTest::testValidateUniquenessCause",
+        "message": "AbstractPlatform::getSQLResultCasing is deprecated without replacement and removed in DBAL 3.Use Portability\\Connection with PORTABILITY_FIX_CASE to get portable result cases. (AbstractPlatform.php:3515 called by SQLResultCasing.php:30, https://github.com/doctrine/dbal/pull/4229, package doctrine/dbal)",
+        "count": 3
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\DoctrineLoaderTest::testLoadClassMetadata",
+        "message": "The annotation mapping driver is deprecated and will be removed in Doctrine ORM 3.0, please migrate to the attribute or XML driver. (AnnotationDriver.php:69 called by DoctrineTestHelper.php:84, https://github.com/doctrine/orm/issues/10098, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\DoctrineLoaderTest::testFieldMappingsConfiguration",
+        "message": "The annotation mapping driver is deprecated and will be removed in Doctrine ORM 3.0, please migrate to the attribute or XML driver. (AnnotationDriver.php:69 called by DoctrineTestHelper.php:84, https://github.com/doctrine/orm/issues/10098, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\DoctrineLoaderTest::testClassValidator",
+        "message": "The annotation mapping driver is deprecated and will be removed in Doctrine ORM 3.0, please migrate to the attribute or XML driver. (AnnotationDriver.php:69 called by DoctrineTestHelper.php:84, https://github.com/doctrine/orm/issues/10098, package doctrine/orm)",
+        "count": 4
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\DoctrineLoaderTest::testClassNoAutoMapping",
+        "message": "The annotation mapping driver is deprecated and will be removed in Doctrine ORM 3.0, please migrate to the attribute or XML driver. (AnnotationDriver.php:69 called by DoctrineTestHelper.php:84, https://github.com/doctrine/orm/issues/10098, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\ChoiceList\\ORMQueryBuilderLoaderTest::testIdentifierTypeIsStringArray",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:300 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\ChoiceList\\ORMQueryBuilderLoaderTest::testIdentifierTypeIsIntegerArray",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:300 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\ChoiceList\\ORMQueryBuilderLoaderTest::testFilterNonIntegerValues",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:300 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\ChoiceList\\ORMQueryBuilderLoaderTest::testFilterEmptyUuids",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:300 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\ChoiceList\\ORMQueryBuilderLoaderTest::testFilterUid",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:300 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\ChoiceList\\ORMQueryBuilderLoaderTest::testUidThrowProperException",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:300 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\ChoiceList\\ORMQueryBuilderLoaderTest::testEmbeddedIdentifierName",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:300 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::setUp",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:300 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 83
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::setUp",
+        "message": "SqlitePlatform::canEmulateSchemas() is deprecated. (SqlitePlatform.php:901 called by SchemaTool.php:409, https://github.com/doctrine/dbal/pull/4805, package doctrine/dbal)",
+        "count": 166
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::setUp",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:820 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 1328
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::setUp",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:731 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 1328
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testGetProperties",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:300 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testTestGetPropertiesWithEmbedded",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:300 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testExtract",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:300 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 25
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testExtract",
+        "message": "Doctrine\\DBAL\\Platforms\\AbstractPlatform::usesSequenceEmulatedIdentityColumns is deprecated. (AbstractPlatform.php:3949 called by ClassMetadataFactory.php:622, https://github.com/doctrine/dbal/pull/5513, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testExtractWithEmbedded",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:300 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testExtractEnum",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:300 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 5
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testGetPropertiesCatchException",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:300 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testGetTypesCatchException",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:300 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testGeneratedValueNotWritable",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:300 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testGeneratedValueNotWritable",
+        "message": "Doctrine\\DBAL\\Platforms\\AbstractPlatform::usesSequenceEmulatedIdentityColumns is deprecated. (AbstractPlatform.php:3949 called by ClassMetadataFactory.php:622, https://github.com/doctrine/dbal/pull/5513, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testRefreshUserGetsUserByPrimaryKey",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:300 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testRefreshUserGetsUserByPrimaryKey",
+        "message": "SqlitePlatform::canEmulateSchemas() is deprecated. (SqlitePlatform.php:901 called by SchemaTool.php:409, https://github.com/doctrine/dbal/pull/4805, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testRefreshUserGetsUserByPrimaryKey",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:820 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testRefreshUserGetsUserByPrimaryKey",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:731 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testLoadUserByUsername",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:300 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testLoadUserByUsername",
+        "message": "SqlitePlatform::canEmulateSchemas() is deprecated. (SqlitePlatform.php:901 called by SchemaTool.php:409, https://github.com/doctrine/dbal/pull/4805, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testLoadUserByUsername",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:820 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testLoadUserByUsername",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:731 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testLoadUserByUsernameWithNonUserLoaderRepositoryAndWithoutProperty",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:300 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testLoadUserByUsernameWithNonUserLoaderRepositoryAndWithoutProperty",
+        "message": "SqlitePlatform::canEmulateSchemas() is deprecated. (SqlitePlatform.php:901 called by SchemaTool.php:409, https://github.com/doctrine/dbal/pull/4805, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testLoadUserByUsernameWithNonUserLoaderRepositoryAndWithoutProperty",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:820 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testLoadUserByUsernameWithNonUserLoaderRepositoryAndWithoutProperty",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:731 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testRefreshUserRequiresId",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:300 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testRefreshInvalidUser",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:300 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testRefreshInvalidUser",
+        "message": "SqlitePlatform::canEmulateSchemas() is deprecated. (SqlitePlatform.php:901 called by SchemaTool.php:409, https://github.com/doctrine/dbal/pull/4805, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testRefreshInvalidUser",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:820 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testRefreshInvalidUser",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:731 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testSupportProxy",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:300 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testSupportProxy",
+        "message": "SqlitePlatform::canEmulateSchemas() is deprecated. (SqlitePlatform.php:901 called by SchemaTool.php:409, https://github.com/doctrine/dbal/pull/4805, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testSupportProxy",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:820 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testSupportProxy",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:731 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\Constraints\\UniqueEntityValidatorTest::setUp",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:300 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 36
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\Constraints\\UniqueEntityValidatorTest::setUp",
+        "message": "Doctrine\\DBAL\\Platforms\\AbstractPlatform::usesSequenceEmulatedIdentityColumns is deprecated. (AbstractPlatform.php:3949 called by ClassMetadataFactory.php:622, https://github.com/doctrine/dbal/pull/5513, package doctrine/dbal)",
+        "count": 72
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\Constraints\\UniqueEntityValidatorTest::setUp",
+        "message": "SqlitePlatform::canEmulateSchemas() is deprecated. (SqlitePlatform.php:901 called by SchemaTool.php:409, https://github.com/doctrine/dbal/pull/4805, package doctrine/dbal)",
+        "count": 36
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\Constraints\\UniqueEntityValidatorTest::setUp",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:820 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 720
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\Constraints\\UniqueEntityValidatorTest::setUp",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:731 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 720
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\DoctrineLoaderTest::testLoadClassMetadata",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:300 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\DoctrineLoaderTest::testExtractEnum",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:300 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\DoctrineLoaderTest::testFieldMappingsConfiguration",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:300 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\DoctrineLoaderTest::testClassValidator",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:300 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 4
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\DoctrineLoaderTest::testClassNoAutoMapping",
+        "message": "Doctrine\\DBAL\\Connection::getEventManager is deprecated. (Connection.php:300 called by EntityManager.php:167, https://github.com/doctrine/dbal/issues/5784, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Component\\Cache\\Tests\\Adapter\\DoctrineDbalAdapterTest::testConfigureSchemaDecoratedDbalDriver",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:820 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Component\\Cache\\Tests\\Adapter\\DoctrineDbalAdapterTest::testConfigureSchemaDecoratedDbalDriver",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:731 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Component\\Cache\\Tests\\Adapter\\DoctrineDbalAdapterTest::testConfigureSchemaTableExists",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:731 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Component\\Cache\\Tests\\Adapter\\DoctrineDbalAdapterTest::testDsn",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:820 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 6
+    },
+    {
+        "location": "Symfony\\Component\\Cache\\Tests\\Adapter\\DoctrineDbalAdapterTest::testDsn",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:731 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 6
+    },
+    {
+        "location": "Symfony\\Component\\Lock\\Tests\\Store\\DoctrineDbalStoreTest::setUpBeforeClass",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:820 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Component\\Lock\\Tests\\Store\\DoctrineDbalStoreTest::setUpBeforeClass",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:731 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Component\\Lock\\Tests\\Store\\DoctrineDbalStoreTest::testDsn",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:820 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 6
+    },
+    {
+        "location": "Symfony\\Component\\Lock\\Tests\\Store\\DoctrineDbalStoreTest::testDsn",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:731 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 6
+    },
+    {
+        "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\ConnectionTest::testConfigureSchemaTableExists",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:731 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrineIntegrationTest::testConnectionSendAndGet",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:820 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrineIntegrationTest::testConnectionSendAndGet",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:731 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrineIntegrationTest::testSendWithDelay",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:820 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrineIntegrationTest::testSendWithDelay",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:731 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrineIntegrationTest::testItRetrieveTheFirstAvailableMessage",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:820 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrineIntegrationTest::testItRetrieveTheFirstAvailableMessage",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:731 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrineIntegrationTest::testItCountMessages",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:820 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrineIntegrationTest::testItCountMessages",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:731 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrineIntegrationTest::testItRetrieveTheMessageThatIsOlderThanRedeliverTimeout",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:820 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrineIntegrationTest::testItRetrieveTheMessageThatIsOlderThanRedeliverTimeout",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:731 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrineIntegrationTest::testTheTransportIsSetupOnGet",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getPrimaryKeyColumns is deprecated. Use getPrimaryKey() and Index::getColumns() instead. (Table.php:820 called by Table.php:708, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrineIntegrationTest::testTheTransportIsSetupOnGet",
+        "message": "Doctrine\\DBAL\\Schema\\Table::getForeignKeyColumns is deprecated. Use getForeignKey() and ForeignKeyConstraint::getLocalColumns() instead. (Table.php:731 called by Table.php:709, https://github.com/doctrine/dbal/pull/5731, package doctrine/dbal)",
+        "count": 2
+    }
+]

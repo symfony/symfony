@@ -92,27 +92,49 @@ class AnnotationLoader implements LoaderInterface
      */
     private function getAnnotations(object $reflection): iterable
     {
+        $dedup = [];
+
         foreach ($reflection->getAttributes(GroupSequence::class) as $attribute) {
+            $dedup[] = $attribute->newInstance();
             yield $attribute->newInstance();
         }
         foreach ($reflection->getAttributes(GroupSequenceProvider::class) as $attribute) {
+            $dedup[] = $attribute->newInstance();
             yield $attribute->newInstance();
         }
         foreach ($reflection->getAttributes(Constraint::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+            $dedup[] = $attribute->newInstance();
             yield $attribute->newInstance();
         }
         if (!$this->reader) {
             return;
         }
 
+        $annotations = [];
+
         if ($reflection instanceof \ReflectionClass) {
-            yield from $this->reader->getClassAnnotations($reflection);
+            $annotations = $this->reader->getClassAnnotations($reflection);
         }
         if ($reflection instanceof \ReflectionMethod) {
-            yield from $this->reader->getMethodAnnotations($reflection);
+            $annotations = $this->reader->getMethodAnnotations($reflection);
         }
         if ($reflection instanceof \ReflectionProperty) {
-            yield from $this->reader->getPropertyAnnotations($reflection);
+            $annotations = $this->reader->getPropertyAnnotations($reflection);
+        }
+
+        foreach ($dedup as $annotation) {
+            if ($annotation instanceof Constraint) {
+                $annotation->groups; // trigger initialization of the "groups" property
+            }
+        }
+
+        foreach ($annotations as $annotation) {
+            if ($annotation instanceof Constraint) {
+                $annotation->groups; // trigger initialization of the "groups" property
+            }
+            if (!\in_array($annotation, $dedup, false)) {
+                yield $annotation;
+            }
         }
     }
 }

@@ -16,12 +16,15 @@ use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
 
 /** @Entity */
+#[Entity]
 class SingleIntIdNoToStringEntity
 {
     /** @Id @Column(type="integer") */
+    #[Id, Column(type: 'integer')]
     protected $id;
 
     /** @Column(type="string", nullable=true) */
+    #[Column(type: 'string', nullable: true)]
     public $name;
 
     public function __construct($id, $name)

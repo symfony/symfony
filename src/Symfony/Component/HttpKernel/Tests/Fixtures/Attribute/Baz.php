@@ -9,12 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\Doctrine\Tests\Fixtures;
+namespace Symfony\Component\HttpKernel\Tests\Fixtures\Attribute;
 
-use Doctrine\ORM\Mapping\Entity;
-
-/** @Entity */
-#[Entity]
-class Employee extends Person
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::TARGET_FUNCTION | \Attribute::IS_REPEATABLE)]
+class Baz
 {
 }

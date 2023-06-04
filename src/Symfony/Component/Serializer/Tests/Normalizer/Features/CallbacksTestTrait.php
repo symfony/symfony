@@ -156,12 +156,12 @@ trait CallbacksTestTrait
             'Format a date' => [
                 [
                     'bar' => function ($bar) {
-                        $this->assertInstanceOf(\DateTime::class, $bar);
+                        $this->assertInstanceOf(\DateTimeImmutable::class, $bar);
 
                         return $bar->format('d-m-Y H:i:s');
                     },
                 ],
-                new \DateTime('2011-09-10 06:30:00'),
+                new \DateTimeImmutable('2011-09-10 06:30:00'),
                 ['bar' => '10-09-2011 06:30:00', 'foo' => null],
             ],
             'Collect a property' => [
@@ -220,11 +220,11 @@ trait CallbacksTestTrait
                     'bar' => function ($bar) {
                         $this->assertIsString($bar);
 
-                        return \DateTime::createFromFormat('d-m-Y H:i:s', $bar);
+                        return \DateTimeImmutable::createFromFormat('d-m-Y H:i:s', $bar);
                     },
                 ],
                 '10-09-2011 06:30:00',
-                new CallbacksObject(new \DateTime('2011-09-10 06:30:00')),
+                new CallbacksObject(new \DateTimeImmutable('2011-09-10 06:30:00')),
             ],
             'Collect a property' => [
                 [

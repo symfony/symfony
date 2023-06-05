@@ -1281,6 +1281,24 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertTrue(is_link($targetPath.\DIRECTORY_SEPARATOR.'link1'));
     }
 
+    public function testMirrorCopiesLinksByFollowingSymlinks()
+    {
+        $this->markAsSkippedIfSymlinkIsMissing();
+
+        $sourcePath = $this->workspace.\DIRECTORY_SEPARATOR.'source'.\DIRECTORY_SEPARATOR;
+
+        mkdir($sourcePath);
+        file_put_contents($sourcePath.'file1', 'FILE1');
+        symlink($sourcePath.'file1', $sourcePath.'link1');
+
+        $targetPath = $this->workspace.\DIRECTORY_SEPARATOR.'target'.\DIRECTORY_SEPARATOR;
+
+        $this->filesystem->mirror($sourcePath, $targetPath, null, ['follow_symlinks' => true]);
+
+        $this->assertDirectoryExists($targetPath);
+        $this->assertFalse(is_link($targetPath.\DIRECTORY_SEPARATOR.'link1'));
+    }
+
     public function testMirrorCopiesLinkedDirectoryContents()
     {
         $this->markAsSkippedIfSymlinkIsMissing(true);

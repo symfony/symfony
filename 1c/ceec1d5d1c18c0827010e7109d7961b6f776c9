@@ -1,0 +1,70 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-06-02T13:09:49Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-06-02T13:09:50Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.4" but it seems your PR description refers to branch "6.4 for features / 5.4, 6.2, or 6.3 for bug fixes".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by stof at 2023-06-02T13:19:15Z
+
+To make the CI pass, you need to regenerate the `.github/expected-missing-return-types.diff` file (instructions for that are at the top of the file) so that the CI does not complain about not using native types on those methods.
+
+---------------------------------------------------------------------------
+
+by upchuk at 2023-06-02T15:40:10Z
+
+@stof I'm trying but I am getting an error ` Uncaught Error: Failed opening required '/var/www/html/.github/../.phpunit/phpunit/vendor/autoload.php'`, when i run `SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.1' php .github/patch-types.php`.
+
+The phpunit folder is not there, should it be?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-06-02T15:46:32Z
+
+@upchuk run `./phpunit install` first
+
+---------------------------------------------------------------------------
+
+by upchuk at 2023-06-05T06:53:48Z
+
+@stof thanks. Did that but now I get
+```
+[05-Jun-2023 06:52:32 UTC] PHP Fatal error:  Uncaught RuntimeException: Case mismatch between loaded and declared class names: "Doctrine\DBAL\Platforms\MySqlPlatform" vs "Doctrine\DBAL\Platforms\MySQLPlatform". in /var/www/html/src/Symfony/Component/ErrorHandler/DebugClassLoader.php:331
+```
+
+I think you can just go ahead and make the fix yourself, it's much faster :D

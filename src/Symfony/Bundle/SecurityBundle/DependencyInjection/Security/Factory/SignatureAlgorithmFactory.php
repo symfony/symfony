@@ -19,6 +19,8 @@ use Symfony\Component\Security\Http\AccessToken\Oidc\OidcTokenHandler;
 /**
  * Creates a signature algorithm for {@see OidcTokenHandler}.
  *
+ * @internal
+ *
  * @experimental
  */
 final class SignatureAlgorithmFactory

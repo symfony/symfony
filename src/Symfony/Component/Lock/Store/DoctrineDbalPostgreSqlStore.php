@@ -275,7 +275,7 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
     private function filterDsn(string $dsn): string
     {
         if (!str_contains($dsn, '://')) {
-            throw new InvalidArgumentException(sprintf('String "%" is not a valid DSN for Doctrine DBAL.', $dsn));
+            throw new InvalidArgumentException(sprintf('String "%s" is not a valid DSN for Doctrine DBAL.', $dsn));
         }
 
         [$scheme, $rest] = explode(':', $dsn, 2);

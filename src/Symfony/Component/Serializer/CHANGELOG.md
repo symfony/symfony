@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+7.0
+---
+
+ * Remove denormalization support for `AbstractUid` in `UidNormalizer`, use one of `AbstractUid` child class instead
+ * Denormalizing to an abstract class in `UidNormalizer` now throws an `\Error`
+
 6.3
 ---
 

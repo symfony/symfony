@@ -16,15 +16,12 @@ use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\OneToOne;
 
-/** @Entity */
 #[Entity]
 class SingleAssociationToIntIdEntity
 {
-    /** @Id @OneToOne(targetEntity="SingleIntIdNoToStringEntity", cascade={"ALL"}) */
     #[Id, OneToOne(targetEntity: SingleIntIdNoToStringEntity::class, cascade: ['ALL'])]
     protected $entity;
 
-    /** @Column(type="string", nullable=true) */
     #[Column(type: 'string', nullable: true)]
     public $name;
 

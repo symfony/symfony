@@ -18,70 +18,37 @@ use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToOne;
 
 /**
- * @Entity
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 #[Entity]
 class DoctrineRelation
 {
-    /**
-     * @Id
-     * @Column(type="smallint")
-     */
     #[Id, Column(type: 'smallint')]
     public $id;
 
-    /**
-     * @Column(type="guid", name="rguid_column")
-     */
     #[Column(type: 'guid', name: 'rguid_column')]
     protected $rguid;
 
-    /**
-     * @Column(type="guid")
-     * @ManyToOne(targetEntity="DoctrineDummy", inversedBy="indexedFoo")
-     */
     #[Column(type: 'guid')]
     #[ManyToOne(targetEntity: DoctrineDummy::class, inversedBy: 'indexedFoo')]
     protected $foo;
 
-    /**
-     * @ManyToOne(targetEntity="DoctrineDummy")
-     */
     #[ManyToOne(targetEntity: DoctrineDummy::class)]
     protected $baz;
 
-    /**
-     * @Column(type="datetime")
-     */
     #[Column(type: 'datetime')]
     private $dt;
 
-    /**
-     * @Column(type="foo")
-     */
     #[Column(type: 'foo')]
     private $customType;
 
-    /**
-     * @Column(type="guid", name="different_than_field")
-     * @ManyToOne(targetEntity="DoctrineDummy", inversedBy="indexedBuz")
-     */
     #[Column(type: 'guid', name: 'different_than_field')]
     #[ManyToOne(targetEntity: DoctrineDummy::class, inversedBy: 'indexedBuz')]
     protected $buzField;
 
-    /**
-     * @ManyToOne(targetEntity="DoctrineDummy", inversedBy="dummyGeneratedValueList")
-     */
     #[ManyToOne(targetEntity: DoctrineDummy::class, inversedBy: 'dummyGeneratedValueList')]
     private $dummyRelation;
 
-    /**
-     * @ManyToOne(targetEntity="DoctrineGeneratedValue", inversedBy="relationList")
-     * @JoinColumn(name="gen_value_col_id", referencedColumnName="gen_value_col_id")
-     */
     #[ManyToOne(targetEntity: DoctrineGeneratedValue::class, inversedBy: 'relationList')]
     #[JoinColumn(name: 'gen_value_col_id', referencedColumnName: 'gen_value_col_id')]
     private $generatedValueRelation;

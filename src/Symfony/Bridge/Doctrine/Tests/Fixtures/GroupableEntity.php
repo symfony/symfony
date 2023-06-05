@@ -15,19 +15,15 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
 
-/** @Entity */
 #[Entity]
 class GroupableEntity
 {
-    /** @Id @Column(type="integer") */
     #[Id, Column(type: 'integer')]
     protected $id;
 
-    /** @Column(type="string", nullable=true) */
     #[Column(type: 'string', nullable: true)]
     public $name;
 
-    /** @Column(type="string", nullable=true) */
     #[Column(type: 'string', nullable: true)]
     public $groupName;
 

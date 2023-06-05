@@ -19,36 +19,19 @@ use Doctrine\ORM\Mapping\OneToMany;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @Entity
  */
 #[Entity]
 class DoctrineGeneratedValue
 {
-    /**
-     * @Id
-     * @GeneratedValue(strategy="AUTO")
-     * @Column(type="integer")
-     */
     #[Id, GeneratedValue(strategy: 'AUTO'), Column(type: 'integer')]
     public $id;
 
-    /**
-     * @Column
-     */
     #[Column]
     public $foo;
 
-    /**
-     * @var int
-     * @Column(type="integer", name="gen_value_col_id")
-     */
     #[Column(type: 'integer', name: 'gen_value_col_id')]
     public $valueId;
 
-    /**
-     * @OneToMany(targetEntity="DoctrineRelation", mappedBy="generatedValueRelation", indexBy="rguid_column", orphanRemoval=true)
-     */
     #[OneToMany(targetEntity: DoctrineRelation::class, mappedBy: 'generatedValueRelation', indexBy: 'rguid_column', orphanRemoval: true)]
     protected $relationList;
 }

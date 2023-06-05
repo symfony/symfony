@@ -13,7 +13,6 @@ namespace Symfony\Bridge\Doctrine\Tests\Fixtures;
 
 use Doctrine\ORM\Mapping\Entity;
 
-/** @Entity */
 #[Entity]
 class Employee extends Person
 {

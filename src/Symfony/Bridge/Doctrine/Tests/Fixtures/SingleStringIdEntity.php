@@ -15,15 +15,12 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
 
-/** @Entity */
 #[Entity]
 class SingleStringIdEntity
 {
-    /** @Id @Column(type="string") */
     #[Id, Column(type: 'string')]
     protected $id;
 
-    /** @Column(type="string") */
     #[Column(type: 'string')]
     public $name;
 

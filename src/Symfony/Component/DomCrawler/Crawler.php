@@ -778,7 +778,7 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * @return static
      *
-     * @throws \RuntimeException if the CssSelector Component is not available
+     * @throws \LogicException if the CssSelector Component is not available
      */
     public function filter(string $selector)
     {

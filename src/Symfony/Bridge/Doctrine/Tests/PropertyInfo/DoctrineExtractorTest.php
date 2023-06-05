@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Doctrine\Tests\PropertyInfo;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\EventManager;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Types\Type as DBALType;
@@ -54,7 +55,8 @@ class DoctrineExtractorTest extends TestCase
         if (!(new \ReflectionMethod(EntityManager::class, '__construct'))->isPublic()) {
             $entityManager = EntityManager::create(['driver' => 'pdo_sqlite'], $config);
         } else {
-            $entityManager = new EntityManager(DriverManager::getConnection(['driver' => 'pdo_sqlite'], $config), $config);
+            $eventManager = new EventManager();
+            $entityManager = new EntityManager(DriverManager::getConnection(['driver' => 'pdo_sqlite'], $config, $eventManager), $config, $eventManager);
         }
 
         if (!DBALType::hasType('foo')) {

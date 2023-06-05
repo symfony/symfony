@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Doctrine\Tests;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\EventManager;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\ORM\Configuration;
@@ -51,7 +52,9 @@ final class DoctrineTestHelper
             return EntityManager::create($params, $config);
         }
 
-        return new EntityManager(DriverManager::getConnection($params, $config), $config);
+        $eventManager = new EventManager();
+
+        return new EntityManager(DriverManager::getConnection($params, $config, $eventManager), $config, $eventManager);
     }
 
     public static function createTestConfiguration(): Configuration

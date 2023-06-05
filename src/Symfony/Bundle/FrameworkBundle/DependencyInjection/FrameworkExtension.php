@@ -342,6 +342,8 @@ class FrameworkExtension extends Extension
             }
 
             $this->registerAssetMapperConfiguration($config['asset_mapper'], $container, $loader, $this->readConfigEnabled('assets', $container, $config['assets']));
+        } else {
+            $container->removeDefinition('cache.asset_mapper');
         }
 
         if ($this->readConfigEnabled('http_client', $container, $config['http_client'])) {
@@ -485,6 +487,7 @@ class FrameworkExtension extends Extension
             }
             $this->registerSchedulerConfiguration($config['scheduler'], $container, $loader);
         } else {
+            $container->removeDefinition('cache.scheduler');
             $container->removeDefinition('console.command.scheduler_debug');
         }
 

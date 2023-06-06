@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Add $immutable flag to date-time transformers
+
 6.3
 ---
 

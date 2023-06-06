@@ -23,7 +23,7 @@ class DateTimeToRfc3339Transformer extends BaseDateTimeTransformer
     /**
      * Transforms a normalized date into a localized date.
      *
-     * @param \DateTimeInterface $dateTime A DateTimeInterface object
+     * @param \DateTimeInterface $dateTime
      *
      * @throws TransformationFailedException If the given value is not a \DateTimeInterface
      */
@@ -53,7 +53,7 @@ class DateTimeToRfc3339Transformer extends BaseDateTimeTransformer
      * @throws TransformationFailedException If the given value is not a string,
      *                                       if the value could not be transformed
      */
-    public function reverseTransform(mixed $rfc3339): ?\DateTime
+    public function reverseTransform(mixed $rfc3339): ?\DateTimeInterface
     {
         if (!\is_string($rfc3339)) {
             throw new TransformationFailedException('Expected a string.');
@@ -68,13 +68,13 @@ class DateTimeToRfc3339Transformer extends BaseDateTimeTransformer
         }
 
         try {
-            $dateTime = new \DateTime($rfc3339);
+            $dateTime = $this->immutable ? new \DateTimeImmutable($rfc3339) : new \DateTime($rfc3339);
         } catch (\Exception $e) {
             throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
         }
 
         if ($this->inputTimezone !== $dateTime->getTimezone()->getName()) {
-            $dateTime->setTimezone(new \DateTimeZone($this->inputTimezone));
+            $dateTime = $dateTime->setTimezone(new \DateTimeZone($this->inputTimezone));
         }
 
         if (!checkdate($matches[2], $matches[3], $matches[1])) {

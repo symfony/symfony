@@ -41,9 +41,9 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      *
      * @throws UnexpectedTypeException If a format is not supported or if a timezone is not a string
      */
-    public function __construct(string $inputTimezone = null, string $outputTimezone = null, int $dateFormat = null, int $timeFormat = null, int $calendar = \IntlDateFormatter::GREGORIAN, string $pattern = null)
+    public function __construct(string $inputTimezone = null, string $outputTimezone = null, int $dateFormat = null, int $timeFormat = null, int $calendar = \IntlDateFormatter::GREGORIAN, string $pattern = null, bool $immutable = false)
     {
-        parent::__construct($inputTimezone, $outputTimezone);
+        parent::__construct($inputTimezone, $outputTimezone, $immutable);
 
         $dateFormat ??= \IntlDateFormatter::MEDIUM;
         $timeFormat ??= \IntlDateFormatter::SHORT;
@@ -65,7 +65,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
     /**
      * Transforms a normalized date into a localized date string/array.
      *
-     * @param \DateTimeInterface $dateTime A DateTimeInterface object
+     * @param \DateTimeInterface $dateTime
      *
      * @throws TransformationFailedException if the given value is not a \DateTimeInterface
      *                                       or if the date could not be transformed
@@ -97,7 +97,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      * @throws TransformationFailedException if the given value is not a string,
      *                                       if the date could not be parsed
      */
-    public function reverseTransform(mixed $value): ?\DateTime
+    public function reverseTransform(mixed $value): ?\DateTimeInterface
     {
         if (!\is_string($value)) {
             throw new TransformationFailedException('Expected a string.');
@@ -130,22 +130,23 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
         }
 
         try {
+            $class = $this->immutable ? 'DateTimeImmutable' : 'DateTime';
             if ($dateOnly) {
                 // we only care about year-month-date, which has been delivered as a timestamp pointing to UTC midnight
-                $dateTime = new \DateTime(gmdate('Y-m-d', $timestamp), new \DateTimeZone($this->outputTimezone));
+                $dateTime = new $class(gmdate('Y-m-d', $timestamp), new \DateTimeZone($this->outputTimezone));
             } else {
                 // read timestamp into DateTime object - the formatter delivers a timestamp
-                $dateTime = new \DateTime(sprintf('@%s', $timestamp));
+                $dateTime = new $class(sprintf('@%s', $timestamp));
             }
             // set timezone separately, as it would be ignored if set via the constructor,
             // see https://php.net/datetime.construct
-            $dateTime->setTimezone(new \DateTimeZone($this->outputTimezone));
+            $dateTime = $dateTime->setTimezone(new \DateTimeZone($this->outputTimezone));
         } catch (\Exception $e) {
             throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
         }
 
         if ($this->outputTimezone !== $this->inputTimezone) {
-            $dateTime->setTimezone(new \DateTimeZone($this->inputTimezone));
+            $dateTime = $dateTime->setTimezone(new \DateTimeZone($this->inputTimezone));
         }
 
         return $dateTime;

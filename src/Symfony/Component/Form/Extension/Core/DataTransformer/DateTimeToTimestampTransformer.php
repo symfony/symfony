@@ -26,7 +26,7 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
     /**
      * Transforms a DateTime object into a timestamp in the configured timezone.
      *
-     * @param \DateTimeInterface $dateTime A DateTimeInterface object
+     * @param \DateTimeInterface $dateTime
      *
      * @throws TransformationFailedException If the given value is not a \DateTimeInterface
      */
@@ -51,7 +51,7 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
      * @throws TransformationFailedException If the given value is not a timestamp
      *                                       or if the given timestamp is invalid
      */
-    public function reverseTransform(mixed $value): ?\DateTime
+    public function reverseTransform(mixed $value): ?\DateTimeInterface
     {
         if (null === $value) {
             return null;
@@ -62,12 +62,12 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
         }
 
         try {
-            $dateTime = new \DateTime();
-            $dateTime->setTimezone(new \DateTimeZone($this->outputTimezone));
-            $dateTime->setTimestamp($value);
+            $dateTime = $this->immutable ? new \DateTimeImmutable() : new \DateTime();
+            $dateTime = $dateTime->setTimezone(new \DateTimeZone($this->outputTimezone));
+            $dateTime = $dateTime->setTimestamp($value);
 
             if ($this->inputTimezone !== $this->outputTimezone) {
-                $dateTime->setTimezone(new \DateTimeZone($this->inputTimezone));
+                $dateTime = $dateTime->setTimezone(new \DateTimeZone($this->inputTimezone));
             }
         } catch (\Exception $e) {
             throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);

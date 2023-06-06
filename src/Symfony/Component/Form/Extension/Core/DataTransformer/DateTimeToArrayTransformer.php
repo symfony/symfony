@@ -33,9 +33,9 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
      * @param string[]|null $fields         The date fields
      * @param bool          $pad            Whether to use padding
      */
-    public function __construct(string $inputTimezone = null, string $outputTimezone = null, array $fields = null, bool $pad = false, \DateTimeInterface $referenceDate = null)
+    public function __construct(string $inputTimezone = null, string $outputTimezone = null, array $fields = null, bool $pad = false, \DateTimeInterface $referenceDate = null, bool $immutable = false)
     {
-        parent::__construct($inputTimezone, $outputTimezone);
+        parent::__construct($inputTimezone, $outputTimezone, $immutable);
 
         $this->fields = $fields ?? ['year', 'month', 'day', 'hour', 'minute', 'second'];
         $this->pad = $pad;
@@ -45,7 +45,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
     /**
      * Transforms a normalized date into a localized date.
      *
-     * @param \DateTimeInterface $dateTime A DateTimeInterface object
+     * @param \DateTimeInterface $dateTime
      *
      * @throws TransformationFailedException If the given value is not a \DateTimeInterface
      */
@@ -100,7 +100,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
      * @throws TransformationFailedException If the given value is not an array,
      *                                       if the value could not be transformed
      */
-    public function reverseTransform(mixed $value): ?\DateTime
+    public function reverseTransform(mixed $value): ?\DateTimeInterface
     {
         if (null === $value) {
             return null;
@@ -155,7 +155,8 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
         }
 
         try {
-            $dateTime = new \DateTime(sprintf(
+            $class = $this->immutable ? 'DateTimeImmutable' : 'DateTime';
+            $dateTime = new $class(sprintf(
                 '%s-%s-%s %s:%s:%s',
                 empty($value['year']) ? $this->referenceDate->format('Y') : $value['year'],
                 empty($value['month']) ? $this->referenceDate->format('m') : $value['month'],
@@ -168,7 +169,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
             );
 
             if ($this->inputTimezone !== $this->outputTimezone) {
-                $dateTime->setTimezone(new \DateTimeZone($this->inputTimezone));
+                $dateTime = $dateTime->setTimezone(new \DateTimeZone($this->inputTimezone));
             }
         } catch (\Exception $e) {
             throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);

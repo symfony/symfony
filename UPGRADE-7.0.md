@@ -17,6 +17,18 @@ Console
  * Passing null to `*Command::setApplication()`, `*FormatterStyle::setForeground/setBackground()`, `Helper::setHelpSet()`, `Input*::setDefault()` and `Question::setAutocompleterCallback/setValidator()` must be done explicitly
  * Remove `StringInput::REGEX_STRING`
 
+DependencyInjection
+-------------------
+
+ * Remove `#[MapDecorated]`, use `#[AutowireDecorated]` instead
+ * Remove `ProxyHelper`, use `Symfony\Component\VarExporter\ProxyHelper` instead
+ * Remove `ReferenceSetArgumentTrait`
+ * Remove support of `@required` annotation, use the `Symfony\Contracts\Service\Attribute\Required` attribute instead
+ * Passing `null` to `ContainerAwareTrait::setContainer()` must be done explicitly
+ * Remove `PhpDumper` options `inline_factories_parameter` and `inline_class_loader_parameter`, use options `inline_factories` and `inline_class_loader` instead
+ * Parameter names of `ParameterBag` cannot be numerics
+ * Remove `ContainerAwareInterface` and `ContainerAwareTrait`, use dependency injection instead
+
 DoctrineBridge
 --------------
 
@@ -25,6 +37,7 @@ DoctrineBridge
  * Remove `RememberMeTokenProviderDoctrineSchemaSubscriber`, use `RememberMeTokenProviderDoctrineSchemaListener` instead
  * Remove `DbalLogger`, use a middleware instead
  * Remove `DoctrineDataCollector::addLogger()`, use a `DebugDataHolder` instead
+ * Remove `ContainerAwareLoader`, use dependency injection in your fixtures instead
  * `ContainerAwareEventManager::getListeners()` must be called with an event name
  * DoctrineBridge now requires `doctrine/event-manager:^2`
  * Add parameter `$isSameDatabase` to `DoctrineTokenProvider::configureSchema()`

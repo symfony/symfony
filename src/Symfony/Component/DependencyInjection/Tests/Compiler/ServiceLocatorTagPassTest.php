@@ -206,13 +206,13 @@ class ServiceLocatorTagPassTest extends TestCase
         $container->register('service-2');
 
         $locator = ServiceLocatorTagPass::register($container, [
-            'service-2' => new Reference('service-2'),
-            'service-1' => new Reference('service-1'),
+            new Reference('service-2'),
+            new Reference('service-1'),
         ]);
         $locator = $container->getDefinition($locator);
         $factories = $locator->getArguments()[0];
 
-        static::assertSame(['service-2', 'service-1'], array_keys($factories));
+        static::assertSame(['service-1', 'service-2'], array_keys($factories));
     }
 
     public function testBindingsAreProcessed()

@@ -60,17 +60,6 @@ index b275304d7d..48ba999884 100644
 +    public function getTime(): int
      {
          $time = 0;
-diff --git a/src/Symfony/Bridge/Doctrine/DataFixtures/ContainerAwareLoader.php b/src/Symfony/Bridge/Doctrine/DataFixtures/ContainerAwareLoader.php
-index 448da935d9..06c97eb70c 100644
---- a/src/Symfony/Bridge/Doctrine/DataFixtures/ContainerAwareLoader.php
-+++ b/src/Symfony/Bridge/Doctrine/DataFixtures/ContainerAwareLoader.php
-@@ -40,5 +40,5 @@ class ContainerAwareLoader extends Loader
-      * @return void
-      */
--    public function addFixture(FixtureInterface $fixture)
-+    public function addFixture(FixtureInterface $fixture): void
-     {
-         if ($fixture instanceof ContainerAwareInterface) {
 diff --git a/src/Symfony/Bridge/Doctrine/DependencyInjection/AbstractDoctrineExtension.php b/src/Symfony/Bridge/Doctrine/DependencyInjection/AbstractDoctrineExtension.php
 index 1ce0ffd40c..585265fb38 100644
 --- a/src/Symfony/Bridge/Doctrine/DependencyInjection/AbstractDoctrineExtension.php
@@ -566,17 +555,17 @@ index 94b95e5029..c8a563163e 100644
      {
          if (!$configuration) {
 diff --git a/src/Symfony/Bundle/FrameworkBundle/Console/Application.php b/src/Symfony/Bundle/FrameworkBundle/Console/Application.php
-index 02709ba649..5a3e972793 100644
+index 0451b31fe1..14806da8ee 100644
 --- a/src/Symfony/Bundle/FrameworkBundle/Console/Application.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/Console/Application.php
-@@ -56,5 +56,5 @@ class Application extends BaseApplication
+@@ -55,5 +55,5 @@ class Application extends BaseApplication
       * @return void
       */
 -    public function reset()
 +    public function reset(): void
      {
          if ($this->kernel->getContainer()->has('services_resetter')) {
-@@ -145,5 +145,5 @@ class Application extends BaseApplication
+@@ -137,5 +137,5 @@ class Application extends BaseApplication
       * @return void
       */
 -    protected function registerCommands()
@@ -3733,10 +3722,10 @@ index 3f070dcc0c..aa0e5186bf 100644
      {
          foreach ($container->findTaggedServiceIds('auto_alias') as $serviceId => $tags) {
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php b/src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php
-index e28b60c6ea..a5b3d3d00b 100644
+index 3e94ed1b2c..1fd3fa27ea 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php
-@@ -73,5 +73,5 @@ class AutowirePass extends AbstractRecursivePass
+@@ -72,5 +72,5 @@ class AutowirePass extends AbstractRecursivePass
       * @return void
       */
 -    public function process(ContainerBuilder $container)
@@ -4190,27 +4179,6 @@ index 3ea2228b94..f1d7078383 100644
 +    protected function load(string $file): mixed
      {
          return require $file;
-diff --git a/src/Symfony/Component/DependencyInjection/ContainerAwareInterface.php b/src/Symfony/Component/DependencyInjection/ContainerAwareInterface.php
-index 9b3709c965..97b54712c9 100644
---- a/src/Symfony/Component/DependencyInjection/ContainerAwareInterface.php
-+++ b/src/Symfony/Component/DependencyInjection/ContainerAwareInterface.php
-@@ -26,4 +26,4 @@ interface ContainerAwareInterface
-      * @return void
-      */
--    public function setContainer(?ContainerInterface $container);
-+    public function setContainer(?ContainerInterface $container): void;
- }
-diff --git a/src/Symfony/Component/DependencyInjection/ContainerAwareTrait.php b/src/Symfony/Component/DependencyInjection/ContainerAwareTrait.php
-index 4174fec8d0..f6a7b2da12 100644
---- a/src/Symfony/Component/DependencyInjection/ContainerAwareTrait.php
-+++ b/src/Symfony/Component/DependencyInjection/ContainerAwareTrait.php
-@@ -31,5 +31,5 @@ trait ContainerAwareTrait
-      * @return void
-      */
--    public function setContainer(ContainerInterface $container = null)
-+    public function setContainer(ContainerInterface $container = null): void
-     {
-         if (1 > \func_num_args()) {
 diff --git a/src/Symfony/Component/DependencyInjection/ContainerBuilder.php b/src/Symfony/Component/DependencyInjection/ContainerBuilder.php
 index a7a9c145aa..bd16e937ca 100644
 --- a/src/Symfony/Component/DependencyInjection/ContainerBuilder.php
@@ -4631,52 +4599,52 @@ index 1ede090384..7b6b63c599 100644
      {
          throw new LogicException('Impossible to call remove() on a frozen ParameterBag.');
 diff --git a/src/Symfony/Component/DependencyInjection/ParameterBag/ParameterBag.php b/src/Symfony/Component/DependencyInjection/ParameterBag/ParameterBag.php
-index c1cd9087f0..a9efa77a6d 100644
+index 40447dbbcb..9d0cd64d85 100644
 --- a/src/Symfony/Component/DependencyInjection/ParameterBag/ParameterBag.php
 +++ b/src/Symfony/Component/DependencyInjection/ParameterBag/ParameterBag.php
-@@ -35,5 +35,5 @@ class ParameterBag implements ParameterBagInterface
+@@ -36,5 +36,5 @@ class ParameterBag implements ParameterBagInterface
       * @return void
       */
 -    public function clear()
 +    public function clear(): void
      {
          $this->parameters = [];
-@@ -43,5 +43,5 @@ class ParameterBag implements ParameterBagInterface
+@@ -44,5 +44,5 @@ class ParameterBag implements ParameterBagInterface
       * @return void
       */
 -    public function add(array $parameters)
 +    public function add(array $parameters): void
      {
          foreach ($parameters as $key => $value) {
-@@ -104,5 +104,5 @@ class ParameterBag implements ParameterBagInterface
+@@ -105,5 +105,5 @@ class ParameterBag implements ParameterBagInterface
       * @return void
       */
 -    public function set(string $name, array|bool|string|int|float|\UnitEnum|null $value)
 +    public function set(string $name, array|bool|string|int|float|\UnitEnum|null $value): void
      {
          if (is_numeric($name)) {
-@@ -122,5 +122,5 @@ class ParameterBag implements ParameterBagInterface
+@@ -121,5 +121,5 @@ class ParameterBag implements ParameterBagInterface
       * @throws ParameterNotFoundException if the parameter is not defined
       */
 -    public function deprecate(string $name, string $package, string $version, string $message = 'The parameter "%s" is deprecated.')
 +    public function deprecate(string $name, string $package, string $version, string $message = 'The parameter "%s" is deprecated.'): void
      {
          if (!\array_key_exists($name, $this->parameters)) {
-@@ -139,5 +139,5 @@ class ParameterBag implements ParameterBagInterface
+@@ -138,5 +138,5 @@ class ParameterBag implements ParameterBagInterface
       * @return void
       */
 -    public function remove(string $name)
 +    public function remove(string $name): void
      {
          unset($this->parameters[$name], $this->deprecatedParameters[$name]);
-@@ -147,5 +147,5 @@ class ParameterBag implements ParameterBagInterface
+@@ -146,5 +146,5 @@ class ParameterBag implements ParameterBagInterface
       * @return void
       */
 -    public function resolve()
 +    public function resolve(): void
      {
          if ($this->resolved) {
-@@ -259,5 +259,5 @@ class ParameterBag implements ParameterBagInterface
+@@ -258,5 +258,5 @@ class ParameterBag implements ParameterBagInterface
       * @return bool
       */
 -    public function isResolved()
@@ -8297,31 +8265,31 @@ index af21469b1c..7b024368c5 100644
      {
      }
 diff --git a/src/Symfony/Component/HttpKernel/Bundle/BundleInterface.php b/src/Symfony/Component/HttpKernel/Bundle/BundleInterface.php
-index fe200629f4..692c41ec53 100644
+index 400a9e0c92..870cbe80e5 100644
 --- a/src/Symfony/Component/HttpKernel/Bundle/BundleInterface.php
 +++ b/src/Symfony/Component/HttpKernel/Bundle/BundleInterface.php
-@@ -29,5 +29,5 @@ interface BundleInterface extends ContainerAwareInterface
+@@ -28,5 +28,5 @@ interface BundleInterface
       * @return void
       */
 -    public function boot();
 +    public function boot(): void;
  
      /**
-@@ -36,5 +36,5 @@ interface BundleInterface extends ContainerAwareInterface
+@@ -35,5 +35,5 @@ interface BundleInterface
       * @return void
       */
 -    public function shutdown();
 +    public function shutdown(): void;
  
      /**
-@@ -45,5 +45,5 @@ interface BundleInterface extends ContainerAwareInterface
+@@ -44,5 +44,5 @@ interface BundleInterface
       * @return void
       */
 -    public function build(ContainerBuilder $container);
 +    public function build(ContainerBuilder $container): void;
  
      /**
-@@ -72,4 +72,4 @@ interface BundleInterface extends ContainerAwareInterface
+@@ -71,4 +71,4 @@ interface BundleInterface
       * @return void
       */
 -    public function setContainer(?ContainerInterface $container);

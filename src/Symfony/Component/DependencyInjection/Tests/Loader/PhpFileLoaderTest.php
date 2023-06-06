@@ -14,7 +14,6 @@ namespace Symfony\Component\DependencyInjection\Tests\Loader;
 require_once __DIR__.'/../Fixtures/includes/AcmeExtension.php';
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\Builder\ConfigBuilderGenerator;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -29,8 +28,6 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
 
 class PhpFileLoaderTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testSupports()
     {
         $loader = new PhpFileLoader(new ContainerBuilder(), new FileLocator());
@@ -212,13 +209,8 @@ class PhpFileLoaderTest extends TestCase
         $loader->load($fixtures.'/config/when_env.php');
     }
 
-    /**
-     * @group legacy
-     */
     public function testServiceWithServiceLocatorArgument()
     {
-        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Using integers as keys in a "service_locator()" argument is deprecated. The keys will default to the IDs of the original services in 7.0.');
-
         $fixtures = realpath(__DIR__.'/../Fixtures');
         $loader = new PhpFileLoader($container = new ContainerBuilder(), new FileLocator());
         $loader->load($fixtures.'/config/services_with_service_locator_argument.php');

@@ -200,26 +200,30 @@ $chatter->send($chatMessage);
 Updating a Slack Message
 ------------------------
 
-First, save the full message ID when sending a message::
+First, save the full message ID when sending a message:
 
-    use Symfony\Component\Notifier\Bridge\Slack\SlackSentMessage;
-    use Symfony\Component\Notifier\Message\ChatMessage;
+```php
+use Symfony\Component\Notifier\Bridge\Slack\SlackSentMessage;
+use Symfony\Component\Notifier\Message\ChatMessage;
 
-    $sentMessage = $chatter->send(new ChatMessage('Original message'));
+$sentMessage = $chatter->send(new ChatMessage('Original message'));
 
-    // Make sure that Slack transport was used
-    if ($sentMessage instanceOf SlackSentMessage) {
-        $fullMessageId = $sentMessage->getFullMessageId();
-    }
+// Make sure that Slack transport was used
+if ($sentMessage instanceOf SlackSentMessage) {
+    $fullMessageId = $sentMessage->getFullMessageId();
+}
+```
 
 Then, use that full message ID to create a new
-:class:`UpdateMessageSlackOptions` class::
+``UpdateMessageSlackOptions`` class:
 
-    use Symfony\Component\Notifier\Bridge\Slack\UpdateMessageSlackOptions;
-    use Symfony\Component\Notifier\Message\ChatMessage;
+```php
+use Symfony\Component\Notifier\Bridge\Slack\UpdateMessageSlackOptions;
+use Symfony\Component\Notifier\Message\ChatMessage;
 
-    $options = new UpdateMessageSlackOptions($fullMessageId);
-    $chatter->send(new ChatMessage('Updated message', $options));
+$options = new UpdateMessageSlackOptions($fullMessageId);
+$chatter->send(new ChatMessage('Updated message', $options));
+```
 
 Resources
 ---------

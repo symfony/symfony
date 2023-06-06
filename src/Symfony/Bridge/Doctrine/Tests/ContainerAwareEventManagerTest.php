@@ -40,18 +40,13 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->assertSame([$listener1, $listener2], array_values($this->evm->getListeners('foo')));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testDispatchEventRespectOrderWithSubscribers()
+    public function testUsingDoctrineSubscribersThrows()
     {
-        $this->evm = new ContainerAwareEventManager($this->container, ['sub1', 'sub2']);
+        $this->evm = new ContainerAwareEventManager($this->container, [new MySubscriber(['foo'])]);
 
-        $this->container->set('sub1', $subscriber1 = new MySubscriber(['foo']));
-        $this->container->set('sub2', $subscriber2 = new MySubscriber(['foo']));
-
-        $this->expectDeprecation('Since symfony/doctrine-bridge 6.3: Using Doctrine subscribers as services is deprecated, declare listeners instead');
-        $this->assertSame([$subscriber1,  $subscriber2], array_values($this->evm->getListeners('foo')));
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Using Doctrine subscriber "Symfony\Bridge\Doctrine\Tests\MySubscriber" is not allowed, declare it as a listener instead.');
+        $this->evm->getListeners('foo');
     }
 
     public function testDispatchEvent()
@@ -79,40 +74,6 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->assertSame(0, $listener4->calledByEventNameCount);
         $this->assertSame(1, $listener5->calledByInvokeCount);
         $this->assertSame(1, $listener5->calledByEventNameCount);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testDispatchEventWithSubscribers()
-    {
-        $this->evm = new ContainerAwareEventManager($this->container, ['lazy4']);
-
-        $this->container->set('lazy4', $subscriber1 = new MySubscriber(['foo']));
-        $this->assertSame(0, $subscriber1->calledSubscribedEventsCount);
-
-        $this->container->set('lazy1', $listener1 = new MyListener());
-        $this->expectDeprecation('Since symfony/doctrine-bridge 6.3: Using Doctrine subscribers as services is deprecated, declare listeners instead');
-        $this->evm->addEventListener('foo', 'lazy1');
-        $this->evm->addEventListener('foo', $listener2 = new MyListener());
-        $this->evm->addEventSubscriber($subscriber2 = new MySubscriber(['bar']));
-
-        $this->assertSame(1, $subscriber2->calledSubscribedEventsCount);
-
-        $this->evm->dispatchEvent('foo');
-        $this->evm->dispatchEvent('bar');
-
-        $this->assertSame(1, $subscriber1->calledSubscribedEventsCount);
-        $this->assertSame(1, $subscriber2->calledSubscribedEventsCount);
-
-        $this->assertSame(0, $listener1->calledByInvokeCount);
-        $this->assertSame(1, $listener1->calledByEventNameCount);
-        $this->assertSame(0, $listener2->calledByInvokeCount);
-        $this->assertSame(1, $listener2->calledByEventNameCount);
-        $this->assertSame(0, $subscriber1->calledByInvokeCount);
-        $this->assertSame(1, $subscriber1->calledByEventNameCount);
-        $this->assertSame(1, $subscriber2->calledByInvokeCount);
-        $this->assertSame(0, $subscriber2->calledByEventNameCount);
     }
 
     public function testAddEventListenerAfterDispatchEvent()
@@ -166,60 +127,6 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->assertSame(1, $listener10->calledByEventNameCount);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testAddEventListenerAndSubscriberAfterDispatchEvent()
-    {
-        $this->evm = new ContainerAwareEventManager($this->container, ['lazy7']);
-
-        $this->container->set('lazy7', $subscriber1 = new MySubscriber(['foo']));
-        $this->assertSame(0, $subscriber1->calledSubscribedEventsCount);
-
-        $this->container->set('lazy1', $listener1 = new MyListener());
-        $this->expectDeprecation('Since symfony/doctrine-bridge 6.3: Using Doctrine subscribers as services is deprecated, declare listeners instead');
-        $this->evm->addEventListener('foo', 'lazy1');
-        $this->assertSame(1, $subscriber1->calledSubscribedEventsCount);
-
-        $this->evm->addEventSubscriber($subscriber2 = new MySubscriber(['bar']));
-
-        $this->assertSame(1, $subscriber2->calledSubscribedEventsCount);
-
-        $this->evm->dispatchEvent('foo');
-        $this->evm->dispatchEvent('bar');
-
-        $this->assertSame(1, $subscriber1->calledSubscribedEventsCount);
-        $this->assertSame(1, $subscriber2->calledSubscribedEventsCount);
-
-        $this->container->set('lazy6', $listener2 = new MyListener());
-        $this->evm->addEventListener('foo', $listener2 = new MyListener());
-        $this->evm->addEventListener('bar', $listener2);
-        $this->evm->addEventSubscriber($subscriber3 = new MySubscriber(['bar']));
-
-        $this->assertSame(1, $subscriber1->calledSubscribedEventsCount);
-        $this->assertSame(1, $subscriber2->calledSubscribedEventsCount);
-        $this->assertSame(1, $subscriber3->calledSubscribedEventsCount);
-
-        $this->evm->dispatchEvent('foo');
-        $this->evm->dispatchEvent('bar');
-
-        $this->assertSame(1, $subscriber1->calledSubscribedEventsCount);
-        $this->assertSame(1, $subscriber2->calledSubscribedEventsCount);
-        $this->assertSame(1, $subscriber3->calledSubscribedEventsCount);
-
-        $this->assertSame(0, $listener1->calledByInvokeCount);
-        $this->assertSame(2, $listener1->calledByEventNameCount);
-        $this->assertSame(0, $subscriber1->calledByInvokeCount);
-        $this->assertSame(2, $subscriber1->calledByEventNameCount);
-        $this->assertSame(2, $subscriber2->calledByInvokeCount);
-        $this->assertSame(0, $subscriber2->calledByEventNameCount);
-
-        $this->assertSame(1, $listener2->calledByInvokeCount);
-        $this->assertSame(1, $listener2->calledByEventNameCount);
-        $this->assertSame(1, $subscriber3->calledByInvokeCount);
-        $this->assertSame(0, $subscriber3->calledByEventNameCount);
-    }
-
     public function testGetListenersForEvent()
     {
         $this->container->set('lazy', $listener1 = new MyListener());
@@ -227,36 +134,6 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->evm->addEventListener('foo', $listener2 = new MyListener());
 
         $this->assertSame([$listener1, $listener2], array_values($this->evm->getListeners('foo')));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testGetListenersForEventWhenSubscribersArePresent()
-    {
-        $this->evm = new ContainerAwareEventManager($this->container, ['lazy2']);
-
-        $this->container->set('lazy', $listener1 = new MyListener());
-        $this->container->set('lazy2', $subscriber1 = new MySubscriber(['foo']));
-        $this->expectDeprecation('Since symfony/doctrine-bridge 6.3: Using Doctrine subscribers as services is deprecated, declare listeners instead');
-        $this->evm->addEventListener('foo', 'lazy');
-        $this->evm->addEventListener('foo', $listener2 = new MyListener());
-
-        $this->assertSame([$subscriber1, $listener1, $listener2], array_values($this->evm->getListeners('foo')));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testGetListeners()
-    {
-        $this->container->set('lazy', $listener1 = new MyListener());
-        $this->evm->addEventListener('foo', 'lazy');
-        $this->evm->addEventListener('foo', $listener2 = new MyListener());
-
-        $this->expectDeprecation('Since symfony/doctrine-bridge 6.2: Calling "Symfony\Bridge\Doctrine\ContainerAwareEventManager::getListeners()" without an event name is deprecated. Call "getAllListeners()" instead.');
-
-        $this->assertSame([$listener1, $listener2], array_values($this->evm->getListeners()['foo']));
     }
 
     public function testGetAllListeners()
@@ -299,15 +176,15 @@ class ContainerAwareEventManagerTest extends TestCase
 
 class MyListener
 {
-    public $calledByInvokeCount = 0;
-    public $calledByEventNameCount = 0;
+    public int $calledByInvokeCount = 0;
+    public int $calledByEventNameCount = 0;
 
-    public function __invoke()
+    public function __invoke(): void
     {
         ++$this->calledByInvokeCount;
     }
 
-    public function foo()
+    public function foo(): void
     {
         ++$this->calledByEventNameCount;
     }
@@ -315,8 +192,8 @@ class MyListener
 
 class MySubscriber extends MyListener implements EventSubscriber
 {
-    public $calledSubscribedEventsCount = 0;
-    private $listenedEvents;
+    public int $calledSubscribedEventsCount = 0;
+    private array $listenedEvents;
 
     public function __construct(array $listenedEvents)
     {

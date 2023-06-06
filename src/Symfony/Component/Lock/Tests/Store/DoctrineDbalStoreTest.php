@@ -23,8 +23,6 @@ use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\DoctrineDbalStore;
 
-class_exists(\Doctrine\DBAL\Platforms\PostgreSqlPlatform::class);
-
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
  *
@@ -41,9 +39,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
         self::$dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_lock');
 
         $config = class_exists(ORMSetup::class) ? ORMSetup::createConfiguration(true) : new Configuration();
-        if (class_exists(DefaultSchemaManagerFactory::class)) {
-            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
-        }
+        $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
 
         $store = new DoctrineDbalStore(DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile], $config));
         $store->createTable();
@@ -146,7 +142,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
         $store->save($key);
     }
 
-    public static function providePlatforms()
+    public static function providePlatforms(): \Generator
     {
         yield [\Doctrine\DBAL\Platforms\PostgreSQLPlatform::class];
         yield [\Doctrine\DBAL\Platforms\PostgreSQL94Platform::class];

@@ -17,19 +17,15 @@ use Doctrine\ORM\Mapping\Id;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-/** @Entity */
 #[Entity]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    /** @Id @Column(type="integer") */
     #[Id, Column(type: 'integer')]
     protected $id1;
 
-    /** @Id @Column(type="integer") */
     #[Id, Column(type: 'integer')]
     protected $id2;
 
-    /** @Column(type="string") */
     #[Column(type: 'string')]
     public $name;
 

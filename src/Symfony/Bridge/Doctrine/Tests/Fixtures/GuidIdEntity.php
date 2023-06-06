@@ -15,11 +15,9 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
 
-/** @Entity */
 #[Entity]
 class GuidIdEntity
 {
-    /** @Id @Column(type="guid") */
     #[Id, Column(type: 'guid')]
     protected $id;
 

@@ -15,18 +15,12 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * an entity that has two objects (class without toString methods) as primary key.
- *
- * @ORM\Entity
  */
 #[ORM\Entity]
 class CompositeObjectNoToStringIdEntity
 {
     /**
      * @var SingleIntIdNoToStringEntity
-     *
-     * @ORM\Id
-     * @ORM\ManyToOne(targetEntity="SingleIntIdNoToStringEntity", cascade={"persist"})
-     * @ORM\JoinColumn(name="object_one_id")
      */
     #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: SingleIntIdNoToStringEntity::class, cascade: ['persist'])]
@@ -35,10 +29,6 @@ class CompositeObjectNoToStringIdEntity
 
     /**
      * @var SingleIntIdNoToStringEntity
-     *
-     * @ORM\Id
-     * @ORM\ManyToOne(targetEntity="SingleIntIdNoToStringEntity", cascade={"persist"})
-     * @ORM\JoinColumn(name="object_two_id")
      */
     #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: SingleIntIdNoToStringEntity::class, cascade: ['persist'])]

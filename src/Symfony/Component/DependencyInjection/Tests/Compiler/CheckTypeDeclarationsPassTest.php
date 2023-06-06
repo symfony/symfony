@@ -32,6 +32,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPa
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\FooObject;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\IntersectionConstructor;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\UnionConstructor;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\UnionConstructorPHP82;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Waldo;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\WaldoFoo;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Wobble;
@@ -853,6 +854,26 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $container->register('union', UnionConstructor::class)
             ->setFactory([UnionConstructor::class, 'create'])
             ->setArguments([false]);
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @requires PHP 8.2
+     */
+    public function testUnionTypePassesWithTrue()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('unionTrue', UnionConstructorPHP82::class)
+            ->setFactory([UnionConstructorPHP82::class, 'createTrue'])
+            ->setArguments([true]);
+
+        $container->register('unionNull', UnionConstructorPHP82::class)
+            ->setFactory([UnionConstructorPHP82::class, 'createNull'])
+            ->setArguments([null]);
 
         (new CheckTypeDeclarationsPass(true))->process($container);
 

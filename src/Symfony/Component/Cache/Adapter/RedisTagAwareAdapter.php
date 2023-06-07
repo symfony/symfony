@@ -307,7 +307,6 @@ EOLUA;
         return $this->redisEvictionPolicy = '';
     }
 
-
     private function getPrefix(): string
     {
         if ($this->redis instanceof \Predis\ClientInterface) {
@@ -315,6 +314,7 @@ EOLUA;
         } elseif (\is_array($prefix = $this->redis->getOption(\Redis::OPT_PREFIX) ?? '')) {
             $prefix = current($prefix);
         }
+
         return $prefix;
     }
 
@@ -322,8 +322,6 @@ EOLUA;
      * Returns all existing tag keys from the cache.
      *
      * @TODO Verify the LUA scripts are redis-cluster safe.
-     *
-     * @return array
      */
     protected function getAllTagKeys(): array
     {
@@ -355,7 +353,6 @@ EOLUA;
         return $tagKeys;
     }
 
-
     /**
      * Checks all tags in the cache for orphaned items and creates a "report" array.
      *
@@ -366,12 +363,11 @@ EOLUA;
      * @TODO Verify the LUA scripts are redis-cluster safe.
      * @TODO Is there anything that can be done to reduce memory footprint?
      *
-     * @param bool $compressMode
      * @return array{tagKeys: string[], orphanedTagKeys: string[], orphanedTagReferenceKeys?: array<string, string[]>}
-     *      tagKeys: List of all tags in the cache.
-     *      orphanedTagKeys: List of tags that only reference orphaned cache items.
-     *      orphanedTagReferenceKeys: List of all orphaned cache item references per tag.
-     *                           Keyed by tag, value is the list of orphaned cache item keys.
+     *                                                                                                                 tagKeys: List of all tags in the cache.
+     *                                                                                                                 orphanedTagKeys: List of tags that only reference orphaned cache items.
+     *                                                                                                                 orphanedTagReferenceKeys: List of all orphaned cache item references per tag.
+     *                                                                                                                 Keyed by tag, value is the list of orphaned cache item keys.
      */
     private function getOrphanedTagsStats(bool $compressMode = false): array
     {
@@ -390,7 +386,7 @@ EOLUA;
         // Iterate over each tag and check if its entries reference orphaned
         // cache items.
         foreach ($tagKeys as $tagKey) {
-            $tagKey = substr($tagKey, strlen($prefix));
+            $tagKey = substr($tagKey, \strlen($prefix));
             $cursor = null;
             $hasExistingKeys = false;
             do {
@@ -411,7 +407,7 @@ EOLUA;
                     // If compression mode is enabled and the count between
                     // referenced and existing cache keys differs collect the
                     // missing references.
-                    if ($compressMode && count($referencedCacheKeys) > $existingCacheKeysCount) {
+                    if ($compressMode && \count($referencedCacheKeys) > $existingCacheKeysCount) {
                         // In order to create the delta each single reference
                         // has to be checked.
                         foreach ($referencedCacheKeys as $cacheKey) {
@@ -426,7 +422,7 @@ EOLUA;
                     // Stop processing cursors in case compression mode is
                     // disabled and the tag references existing keys.
                     if (!$compressMode && $hasExistingKeys) {
-                         break;
+                        break;
                     }
                 }
             } while ($cursor = (int) $cursor);
@@ -439,15 +435,12 @@ EOLUA;
         if ($compressMode) {
             $stats['orphanedTagReferenceKeys'] = $orphanedTagReferenceKeys;
         }
+
         return $stats;
     }
 
     /**
-     *
      * @TODO Verify the LUA scripts are redis-cluster safe.
-     *
-     * @param bool $compressMode
-     * @return bool
      */
     private function pruneOrphanedTags(bool $compressMode = false): bool
     {
@@ -459,7 +452,7 @@ EOLUA;
             $result = $this->pipeline(function () use ($orphanedTagKey) {
                 yield 'del' => [$orphanedTagKey];
             });
-            if (!$result->valid() || $result->current() !== 1) {
+            if (!$result->valid() || 1 !== $result->current()) {
                 $success = false;
             }
         }
@@ -474,22 +467,21 @@ EOLUA;
             foreach ($orphanedTagsStats['orphanedTagReferenceKeys'] as $tagKey => $orphanedCacheKeys) {
                 // Remove each cache item reference from the tag set.
                 foreach ($orphanedCacheKeys as $orphanedCacheKey) {
-                    $result = $this->pipeline(function () use ($removeSetMemberLua, $tagKey, $orphanedCacheKey) {
+                    $result = $this->pipeline(function () use ($tagKey, $orphanedCacheKey) {
                         yield 'srem' => [$tagKey, $orphanedCacheKey];
                     });
-                    if (!$result->valid() || $result->current() !== 1) {
+                    if (!$result->valid() || 1 !== $result->current()) {
                         $success = false;
                     }
                 }
             }
         }
+
         return $success;
     }
 
     /**
      * @TODO Make compression mode flag configurable.
-     *
-     * @return bool
      */
     public function prune(): bool
     {

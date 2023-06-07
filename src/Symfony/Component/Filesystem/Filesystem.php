@@ -523,7 +523,8 @@ class Filesystem
      * @param array             $options  An array of boolean options
      *                                    Valid options are:
      *                                    - $options['override'] If true, target files newer than origin files are overwritten (see copy(), defaults to false)
-     *                                    - $options['copy_on_windows'] Whether to copy files instead of links on Windows (see symlink(), defaults to false)
+     *                                    - $options['copy_on_windows'] (deprecated) Whether to copy files instead of links on Windows (see symlink(), defaults to false)
+     *                                    - $options['follow_symlinks'] Whether to copy files instead of links, where using symlinks in not working: windows, different drive, docker context not supporting symlinks (see symlink(), defaults to false)
      *                                    - $options['delete'] Whether to delete files that are not in the source directory (defaults to false)
      *
      * @return void
@@ -532,6 +533,9 @@ class Filesystem
      */
     public function mirror(string $originDir, string $targetDir, \Traversable $iterator = null, array $options = [])
     {
+        if (isset($options['copy_on_windows'])) {
+            trigger_deprecation('symfony/filesystem', '6.4', 'Calling "%s()" with option "copy_on_windows" is deprecated, use "follow_symlinks" option instead.', __METHOD__);
+        }
         $targetDir = rtrim($targetDir, '/\\');
         $originDir = rtrim($originDir, '/\\');
         $originDirLen = \strlen($originDir);
@@ -556,10 +560,10 @@ class Filesystem
             }
         }
 
-        $copyOnWindows = $options['copy_on_windows'] ?? false;
+        $followSymlinks = ($options['follow_symlinks'] ?? false) || ($options['copy_on_windows'] ?? false);
 
         if (null === $iterator) {
-            $flags = $copyOnWindows ? \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS : \FilesystemIterator::SKIP_DOTS;
+            $flags = $followSymlinks ? \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS : \FilesystemIterator::SKIP_DOTS;
             $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($originDir, $flags), \RecursiveIteratorIterator::SELF_FIRST);
         }
 
@@ -574,7 +578,7 @@ class Filesystem
             $target = $targetDir.substr($file->getPathname(), $originDirLen);
             $filesCreatedWhileMirroring[$target] = true;
 
-            if (!$copyOnWindows && is_link($file)) {
+            if (!$followSymlinks && is_link($file)) {
                 $this->symlink($file->getLinkTarget(), $target);
             } elseif (is_dir($file)) {
                 $this->mkdir($target);

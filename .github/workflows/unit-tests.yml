@@ -27,11 +27,11 @@ jobs:
       matrix:
         include:
           - php: '8.1'
-          - php: '8.1'
-            mode: high-deps
-          - php: '8.1'
-            mode: low-deps
           - php: '8.2'
+            mode: high-deps
+          - php: '8.2'
+            mode: low-deps
+          - php: '8.3'
             #mode: experimental
       fail-fast: false
 

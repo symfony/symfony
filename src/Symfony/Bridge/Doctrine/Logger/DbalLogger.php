@@ -15,8 +15,12 @@ use Doctrine\DBAL\Logging\SQLLogger;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 
+trigger_deprecation('symfony/doctrine-bridge', '6.4', '"%s" is deprecated, use a middleware instead.', DbalLogger::class);
+
 /**
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 6.4, use a middleware instead.
  */
 class DbalLogger implements SQLLogger
 {

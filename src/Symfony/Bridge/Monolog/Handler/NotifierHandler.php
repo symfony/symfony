@@ -71,7 +71,7 @@ class NotifierHandler extends AbstractHandler
         $this->notifier->send($notification, ...$this->notifier->getAdminRecipients());
     }
 
-    private function getHighestRecord(array $records): array
+    private function getHighestRecord(array $records): array|LogRecord
     {
         $highestRecord = null;
         foreach ($records as $record) {

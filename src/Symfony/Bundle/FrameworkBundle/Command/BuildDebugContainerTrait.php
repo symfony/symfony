@@ -50,7 +50,14 @@ trait BuildDebugContainerTrait
             $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
             $container->compile();
         } else {
-            (new XmlFileLoader($container = new ContainerBuilder(), new FileLocator()))->load($kernel->getContainer()->getParameter('debug.container.dump'));
+            $buildContainer = \Closure::bind(function () {
+                $containerBuilder = $this->getContainerBuilder();
+                $this->prepareContainer($containerBuilder);
+
+                return $containerBuilder;
+            }, $kernel, \get_class($kernel));
+            $container = $buildContainer();
+            (new XmlFileLoader($container, new FileLocator()))->load($kernel->getContainer()->getParameter('debug.container.dump'));
             $locatorPass = new ServiceLocatorTagPass();
             $locatorPass->process($container);
 

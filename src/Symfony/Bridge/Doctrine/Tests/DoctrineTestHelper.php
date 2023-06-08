@@ -45,11 +45,6 @@ final class DoctrineTestHelper
         ];
 
         $config ??= self::createTestConfiguration();
-
-        if (!(new \ReflectionMethod(EntityManager::class, '__construct'))->isPublic()) {
-            return EntityManager::create($params, $config);
-        }
-
         $eventManager = new EventManager();
 
         return new EntityManager(DriverManager::getConnection($params, $config, $eventManager), $config, $eventManager);
@@ -57,7 +52,7 @@ final class DoctrineTestHelper
 
     public static function createTestConfiguration(): Configuration
     {
-        $config = class_exists(ORMSetup::class) ? ORMSetup::createConfiguration(true) : new Configuration();
+        $config = ORMSetup::createConfiguration(true);
         $config->setEntityNamespaces(['SymfonyTestsDoctrine' => 'Symfony\Bridge\Doctrine\Tests\Fixtures']);
         $config->setAutoGenerateProxyClasses(true);
         $config->setProxyDir(sys_get_temp_dir());

@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by HypeMC at 2023-06-04T15:56:40Z
+
+> Good catch. I'd call that a bugfix
+
+Works for me, if needed I'll rebase this with 5.4 once #50546 is merged.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-08T21:13:33Z
+
+(rebase unlocked)
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2023-06-08T21:23:01Z
+
+> (rebase unlocked)
+
+@nicolas-grekas Already done :smile:

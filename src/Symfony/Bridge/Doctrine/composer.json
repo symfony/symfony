@@ -36,7 +36,6 @@
         "symfony/messenger": "^6.4|^7.0",
         "symfony/property-access": "^6.4|^7.0",
         "symfony/property-info": "^6.4|^7.0",
-        "symfony/proxy-manager-bridge": "^6.4|^7.0",
         "symfony/security-core": "^6.4|^7.0",
         "symfony/stopwatch": "^6.4|^7.0",
         "symfony/translation": "^6.4|^7.0",

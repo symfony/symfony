@@ -48,17 +48,17 @@ final class RecurringMessage
         return new self(new PeriodicalTrigger($frequency, $from, $until), $message);
     }
 
-    public static function cron(string $expression, object $message): self
+    public static function cron(string $expression, object $message, \DateTimeZone|string $timezone = null): self
     {
         if (!str_contains($expression, '#')) {
-            return new self(CronExpressionTrigger::fromSpec($expression), $message);
+            return new self(CronExpressionTrigger::fromSpec($expression, null, $timezone), $message);
         }
 
         if (!$message instanceof \Stringable) {
             throw new InvalidArgumentException('A message must be stringable to use "hashed" cron expressions.');
         }
 
-        return new self(CronExpressionTrigger::fromSpec($expression, (string) $message), $message);
+        return new self(CronExpressionTrigger::fromSpec($expression, (string) $message, $timezone), $message);
     }
 
     public static function trigger(TriggerInterface $trigger, object $message): self

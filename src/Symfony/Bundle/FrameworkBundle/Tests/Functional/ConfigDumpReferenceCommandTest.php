@@ -27,6 +27,26 @@ class ConfigDumpReferenceCommandTest extends AbstractWebTestCase
      * @testWith [true]
      *           [false]
      */
+    public function testShowList(bool $debug)
+    {
+        $tester = $this->createCommandTester($debug);
+        $ret = $tester->execute([]);
+
+        $this->assertSame(0, $ret, 'Returns 0 in case of success');
+        $this->assertStringContainsString('Available registered bundles with their extension alias if available', $tester->getDisplay());
+        $this->assertStringContainsString('  DefaultConfigTestBundle            default_config_test', $tester->getDisplay());
+        $this->assertStringContainsString('  ExtensionWithoutConfigTestBundle   extension_without_config_test', $tester->getDisplay());
+        $this->assertStringContainsString('  FrameworkBundle                    framework', $tester->getDisplay());
+        $this->assertStringContainsString('  TestBundle                         test', $tester->getDisplay());
+        $this->assertStringContainsString('Available registered non-bundle extension aliases', $tester->getDisplay());
+        $this->assertStringContainsString('  foo', $tester->getDisplay());
+        $this->assertStringContainsString('  test_dump', $tester->getDisplay());
+    }
+
+    /**
+     * @testWith [true]
+     *           [false]
+     */
     public function testDumpKernelExtension(bool $debug)
     {
         $tester = $this->createCommandTester($debug);
@@ -120,7 +140,7 @@ EOL
 
     public static function provideCompletionSuggestions(): iterable
     {
-        $name = ['DefaultConfigTestBundle', 'default_config_test', 'ExtensionWithoutConfigTestBundle', 'extension_without_config_test', 'FrameworkBundle', 'framework', 'TestBundle', 'test'];
+        $name = ['foo', 'default_config_test', 'extension_without_config_test', 'framework', 'test', 'test_dump', 'DefaultConfigTestBundle', 'ExtensionWithoutConfigTestBundle', 'FrameworkBundle', 'TestBundle'];
         yield 'name, no debug' => [false, [''], $name];
         yield 'name, debug' => [true, [''], $name];
 

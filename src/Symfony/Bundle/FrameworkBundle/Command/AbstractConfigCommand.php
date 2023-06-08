@@ -54,6 +54,44 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
         }
     }
 
+    protected function listNonBundleExtensions(OutputInterface|StyleInterface $output): void
+    {
+        $title = 'Available registered non-bundle extension aliases';
+        $headers = ['Extension alias'];
+        $rows = [];
+
+        $kernel = $this->getApplication()->getKernel();
+
+        $bundleExtensions = [];
+        foreach ($kernel->getBundles() as $bundle) {
+            if ($extension = $bundle->getContainerExtension()) {
+                $bundleExtensions[\get_class($extension)] = true;
+            }
+        }
+
+        $extensions = $this->getContainerBuilder($kernel)->getExtensions();
+
+        foreach ($extensions as $alias => $extension) {
+            if (isset($bundleExtensions[\get_class($extension)])) {
+                continue;
+            }
+            $rows[] = [$alias];
+        }
+
+        if (!$rows) {
+            return;
+        }
+
+        if ($output instanceof StyleInterface) {
+            $output->title($title);
+            $output->table($headers, $rows);
+        } else {
+            $output->writeln($title);
+            $table = new Table($output);
+            $table->setHeaders($headers)->setRows($rows)->render();
+        }
+    }
+
     protected function findExtension(string $name): ExtensionInterface
     {
         $bundles = $this->initializeBundles();

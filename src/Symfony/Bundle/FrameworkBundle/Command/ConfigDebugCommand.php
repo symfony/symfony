@@ -77,14 +77,7 @@ EOF
 
         if (null === $name = $input->getArgument('name')) {
             $this->listBundles($errorIo);
-
-            $kernel = $this->getApplication()->getKernel();
-            if ($kernel instanceof ExtensionInterface
-                && ($kernel instanceof ConfigurationInterface || $kernel instanceof ConfigurationExtensionInterface)
-                && $kernel->getAlias()
-            ) {
-                $errorIo->table(['Kernel Extension'], [[$kernel->getAlias()]]);
-            }
+            $this->listNonBundleExtensions($errorIo);
 
             $errorIo->comment('Provide the name of a bundle as the first argument of this command to dump its configuration. (e.g. <comment>debug:config FrameworkBundle</comment>)');
             $errorIo->comment('For dumping a specific option, add its path as the second argument of this command. (e.g. <comment>debug:config FrameworkBundle serializer</comment> to dump the <comment>framework.serializer</comment> configuration)');
@@ -190,7 +183,8 @@ EOF
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
     {
         if ($input->mustSuggestArgumentValuesFor('name')) {
-            $suggestions->suggestValues($this->getAvailableBundles(!preg_match('/^[A-Z]/', $input->getCompletionValue())));
+            $suggestions->suggestValues($this->getAvailableExtensions());
+            $suggestions->suggestValues($this->getAvailableBundles());
 
             return;
         }
@@ -205,11 +199,23 @@ EOF
         }
     }
 
-    private function getAvailableBundles(bool $alias): array
+    private function getAvailableExtensions(): array
+    {
+        $kernel = $this->getApplication()->getKernel();
+
+        $extensions = [];
+        foreach ($this->getContainerBuilder($kernel)->getExtensions() as $alias => $extension) {
+            $extensions[] = $alias;
+        }
+
+        return $extensions;
+    }
+
+    private function getAvailableBundles(): array
     {
         $availableBundles = [];
         foreach ($this->getApplication()->getKernel()->getBundles() as $bundle) {
-            $availableBundles[] = $alias ? $bundle->getContainerExtension()->getAlias() : $bundle->getName();
+            $availableBundles[] = $bundle->getName();
         }
 
         return $availableBundles;

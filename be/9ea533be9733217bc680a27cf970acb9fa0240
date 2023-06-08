@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by kbond at 2023-06-06T14:03:01Z
+
+> Im also not sure about the CHANGELOG.md entry I should make.
+
+This would be in the _Scheduler_ `CHANGELOG.md` under `6.4`.
+
+---------------------------------------------------------------------------
+
+by danielburger1337 at 2023-06-06T14:29:20Z
+
+I am even worse at using git than I thought. 😒
+
+I think the rebase worked in the end but for some reason GitHub automatically requested a review from a bunch of people.
+Sorry for the notification spam!
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-06-06T14:52:19Z
+
+No worries, I've seen that a lot lately with PR's being updated from 6.3 to 6.4. I don't think there's a way to avoid.

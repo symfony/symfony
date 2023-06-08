@@ -30,6 +30,7 @@ use Symfony\Component\HttpFoundation\RequestMatcher\PathRequestMatcher;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
 use Symfony\Component\Security\Core\User\InMemoryUserChecker;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -871,16 +872,14 @@ class SecurityExtensionTest extends TestCase
         $this->assertFalse($container->has('security.logout.listener.clear_site_data.'.$firewallId));
     }
 
-    /**
-     * @group legacy
-     */
     public function testNothingDoneWithEmptyConfiguration()
     {
         $container = $this->getRawContainer();
 
         $container->loadFromExtension('security');
 
-        $this->expectDeprecation('Since symfony/security-bundle 6.3: Enabling bundle "Symfony\Bundle\SecurityBundle\SecurityBundle" and not configuring it is deprecated.');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Enabling bundle "Symfony\Bundle\SecurityBundle\SecurityBundle" and not configuring it is not allowed.');
 
         $container->compile();
 

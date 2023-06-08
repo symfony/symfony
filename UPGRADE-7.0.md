@@ -5,8 +5,13 @@ Symfony 6.4 and Symfony 7.0 will be released simultaneously at the end of Novemb
 release process, both versions will have the same features, but Symfony 7.0 won't include any deprecated features.
 To upgrade, make sure to resolve all deprecation notices.
 
+SecurityBundle
+--------------
+
+ * Enabling SecurityBundle and not configuring it is not allowed
+
 Serializer
 ----------
 
-* Remove denormalization support for `AbstractUid` in `UidNormalizer`, use one of `AbstractUid` child class instead
-* Denormalizing to an abstract class in `UidNormalizer` now throws an `\Error`
+ * Remove denormalization support for `AbstractUid` in `UidNormalizer`, use one of `AbstractUid` child class instead
+ * Denormalizing to an abstract class in `UidNormalizer` now throws an `\Error`

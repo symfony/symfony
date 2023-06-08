@@ -194,12 +194,12 @@ EOF
 
         // Fall back to default config if the extension has one
 
-        if (!$extension instanceof ConfigurationExtensionInterface) {
+        if (!$extension instanceof ConfigurationExtensionInterface && !$extension instanceof ConfigurationInterface) {
             throw new \LogicException(sprintf('The extension with alias "%s" does not have configuration.', $extensionAlias));
         }
 
         $configs = $container->getExtensionConfig($extensionAlias);
-        $configuration = $extension->getConfiguration($configs, $container);
+        $configuration = $extension instanceof ConfigurationInterface ? $extension : $extension->getConfiguration($configs, $container);
         $this->validateConfiguration($extension, $configuration);
 
         return (new Processor())->processConfiguration($configuration, $configs);

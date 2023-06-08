@@ -62,13 +62,13 @@ abstract class AbstractHttpTransport extends AbstractTransport
         return $this;
     }
 
-    abstract protected function doSendHttp(SentMessage $message): ResponseInterface;
+    abstract protected function doSendHttp(SentMessage $message): ?ResponseInterface;
 
     protected function doSend(SentMessage $message): void
     {
         try {
             $response = $this->doSendHttp($message);
-            $message->appendDebug($response->getInfo('debug') ?? '');
+            $message->appendDebug($response?->getInfo('debug') ?? '');
         } catch (HttpTransportException $e) {
             $e->appendDebug($e->getResponse()->getInfo('debug') ?? '');
 

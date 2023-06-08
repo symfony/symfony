@@ -24,9 +24,9 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 abstract class AbstractApiTransport extends AbstractHttpTransport
 {
-    abstract protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface;
+    abstract protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ?ResponseInterface;
 
-    protected function doSendHttp(SentMessage $message): ResponseInterface
+    protected function doSendHttp(SentMessage $message): ?ResponseInterface
     {
         try {
             $email = MessageConverter::toEmail($message->getOriginalMessage());

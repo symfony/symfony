@@ -60,7 +60,7 @@
         "symfony/string": "^5.0|^6.0",
         "symfony/translation": "^5.3|^6.0",
         "symfony/twig-bundle": "^4.4|^5.0|^6.0",
-        "symfony/validator": "^5.2|^6.0",
+        "symfony/validator": "^5.3.11|^6.0",
         "symfony/workflow": "^5.2|^6.0",
         "symfony/yaml": "^4.4|^5.0|^6.0",
         "symfony/property-info": "^4.4|^5.0|^6.0",
@@ -93,7 +93,7 @@
         "symfony/translation": "<5.3",
         "symfony/twig-bridge": "<4.4",
         "symfony/twig-bundle": "<4.4",
-        "symfony/validator": "<5.2",
+        "symfony/validator": "<5.3.11",
         "symfony/web-profiler-bundle": "<4.4",
         "symfony/workflow": "<5.2"
     },

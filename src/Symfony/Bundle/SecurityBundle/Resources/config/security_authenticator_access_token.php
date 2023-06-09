@@ -88,6 +88,7 @@ return static function (ContainerConfigurator $container) {
             ->factory([SignatureAlgorithmFactory::class, 'create'])
             ->args([
                 abstract_arg('signature algorithm'),
+                tagged_locator('oidc_token.algorithm', 'key')
             ])
 
         ->set('security.access_token_handler.oidc.signature.ES256', ES256::class)

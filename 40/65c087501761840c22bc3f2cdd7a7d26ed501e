@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-08T22:17:38Z
+
+(rebase needed)
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-06-09T07:18:50Z
+
+Rebased and updated with `DbalLogger` (and other) deprecations introduced in 6.4
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-06-09T07:23:08Z
+
+FYI: DbalLogger is removed by #50571 already. But I'm fine either way, let's keep the change here and finish your PR first.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-06-09T07:36:54Z
+
+You need to adjust the expected-missing-return-types.diff file. You can borrow the necessary change from #50571.

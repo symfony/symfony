@@ -16,6 +16,9 @@ use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * @deprecated since Symfony 6.4, to be removed in 7.0
+ */
 class ContainerAwareFixture implements FixtureInterface, ContainerAwareInterface
 {
     public ?ContainerInterface $container = null;

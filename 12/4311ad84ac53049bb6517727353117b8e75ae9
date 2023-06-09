@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-06-09T15:07:58Z
+
+It looks like you unchecked the "Allow edits from maintainer" box. That is fine, but please note that if you have multiple commits, you'll need to squash your commits into one before this can be merged. Or, you can check the "Allow edits from maintainers" box and the maintainer can squash for you.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by stof at 2023-06-09T15:54:11Z
+
+@nicolas-grekas this makes me think that we should have a test validating those files in CI.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-09T16:19:43Z
+
+We do have a CI, see how it even sent a PR :stuck_out_tongue_closed_eyes:

@@ -412,19 +412,19 @@
             </trans-unit>
             <trans-unit id="106">
                 <source>This value contains characters that are not allowed by the current restriction-level.</source>
-                <target>Cette valeur contient des caractères qui ne sont pas autorisés par le niveau de restriction actuel.</source>
+                <target>Cette valeur contient des caractères qui ne sont pas autorisés par le niveau de restriction actuel.</target>
             </trans-unit>
             <trans-unit id="107">
                 <source>Using invisible characters is not allowed.</source>
-                <target>Utiliser des caractères invisibles n'est pas autorisé.</source>
+                <target>Utiliser des caractères invisibles n'est pas autorisé.</target>
             </trans-unit>
             <trans-unit id="108">
                 <source>Mixing numbers from different scripts is not allowed.</source>
-                <target>Mélanger des chiffres provenant de différents scripts n'est pas autorisé.</source>
+                <target>Mélanger des chiffres provenant de différents scripts n'est pas autorisé.</target>
             </trans-unit>
             <trans-unit id="109">
                 <source>Using hidden overlay characters is not allowed.</source>
-                <target>Utiliser des caractères de superposition cachés n'est pas autorisé.</source>
+                <target>Utiliser des caractères de superposition cachés n'est pas autorisé.</target>
             </trans-unit>
         </body>
     </file>

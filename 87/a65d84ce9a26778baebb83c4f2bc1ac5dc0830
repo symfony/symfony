@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by stof at 2023-06-01T17:21:54Z
+
+environment variables are always strings though. What you are covering in tests is not something compatible with actual environment variables (or with the DotEnv component).
+
+---------------------------------------------------------------------------
+
+by Okhoshi at 2023-06-01T17:29:45Z
+
+Because you can set any scalar value from PHP code, and they won't be converted to strings nor anything will prevent you to set them in the first place. FWIW, we've never had any troubles so far, be it with Symfony or DotEnv component.
+
+I'm covering with tests because it was a supported behaviour that has been broken with 6.3 release. If you think it shouldn't have been supported from the start, and thus that this is not a bug, I'm also fine with that, feel free to let me know and close this PR.
+But it's not really consistent then since any other scalar value will work.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-06-01T17:45:15Z
+
+It was not a _supported_ behavior. It was an _undefined_ behavior that happened to work.

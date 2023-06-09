@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+7.0
+---
+
+ * Remove `DoctrineDbalCacheAdapterSchemaSubscriber`, use `DoctrineDbalCacheAdapterSchemaListener` instead
+ * Remove `MessengerTransportDoctrineSchemaSubscriber`, use `MessengerTransportDoctrineSchemaListener` instead
+ * Remove `RememberMeTokenProviderDoctrineSchemaSubscriber`, use `RememberMeTokenProviderDoctrineSchemaListener` instead
+ * Remove `DbalLogger`, use a middleware instead
+ * Remove `DoctrineDataCollector::addLogger()`, use a `DebugDataHolder` instead
+ * `ContainerAwareEventManager::getListeners()` must be called with an event name
+ * DoctrineBridge now requires `doctrine/event-manager:^2`
+
 6.4
 ---
 

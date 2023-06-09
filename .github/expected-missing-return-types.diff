@@ -8,31 +8,24 @@ git checkout src/Symfony/Contracts/Service/ResetInterface.php
 git checkout composer.json src/
 
 diff --git a/src/Symfony/Bridge/Doctrine/DataCollector/DoctrineDataCollector.php b/src/Symfony/Bridge/Doctrine/DataCollector/DoctrineDataCollector.php
-index ada5fcbd49..51af652f08 100644
+index f127a38708..ed7fd8b1b6 100644
 --- a/src/Symfony/Bridge/Doctrine/DataCollector/DoctrineDataCollector.php
 +++ b/src/Symfony/Bridge/Doctrine/DataCollector/DoctrineDataCollector.php
-@@ -51,5 +51,5 @@ class DoctrineDataCollector extends DataCollector
-      * @return void
-      */
--    public function addLogger(string $name, DebugStack $logger)
-+    public function addLogger(string $name, DebugStack $logger): void
-     {
-         $this->loggers[$name] = $logger;
-@@ -59,5 +59,5 @@ class DoctrineDataCollector extends DataCollector
+@@ -49,5 +49,5 @@ class DoctrineDataCollector extends DataCollector
       * @return void
       */
 -    public function collect(Request $request, Response $response, \Throwable $exception = null)
 +    public function collect(Request $request, Response $response, \Throwable $exception = null): void
      {
          $this->data = [
-@@ -90,5 +90,5 @@ class DoctrineDataCollector extends DataCollector
+@@ -80,5 +80,5 @@ class DoctrineDataCollector extends DataCollector
       * @return void
       */
 -    public function reset()
 +    public function reset(): void
      {
          $this->data = [];
-@@ -119,5 +119,5 @@ class DoctrineDataCollector extends DataCollector
+@@ -109,5 +109,5 @@ class DoctrineDataCollector extends DataCollector
       * @return int
       */
 -    public function getQueryCount()
@@ -201,17 +194,6 @@ index c096b558db..8d584900a9 100644
 +    public function configureOptions(OptionsResolver $resolver): void
      {
          parent::configureOptions($resolver);
-diff --git a/src/Symfony/Bridge/Doctrine/Logger/DbalLogger.php b/src/Symfony/Bridge/Doctrine/Logger/DbalLogger.php
-index b2369e95d6..c33484608e 100644
---- a/src/Symfony/Bridge/Doctrine/Logger/DbalLogger.php
-+++ b/src/Symfony/Bridge/Doctrine/Logger/DbalLogger.php
-@@ -52,5 +52,5 @@ class DbalLogger implements SQLLogger
-      * @return void
-      */
--    protected function log(string $message, array $params)
-+    protected function log(string $message, array $params): void
-     {
-         $this->logger->debug($message, $params);
 diff --git a/src/Symfony/Bridge/Doctrine/Messenger/DoctrineClearEntityManagerWorkerSubscriber.php b/src/Symfony/Bridge/Doctrine/Messenger/DoctrineClearEntityManagerWorkerSubscriber.php
 index 38618fc15e..eb599eb0b4 100644
 --- a/src/Symfony/Bridge/Doctrine/Messenger/DoctrineClearEntityManagerWorkerSubscriber.php
@@ -999,17 +981,17 @@ index a2c5815e4b..1c9721ccc6 100644
 +    public function addConfiguration(NodeDefinition $builder): void;
  }
 diff --git a/src/Symfony/Bundle/SecurityBundle/DependencyInjection/SecurityExtension.php b/src/Symfony/Bundle/SecurityBundle/DependencyInjection/SecurityExtension.php
-index 37978b285f..ca1f5ae517 100644
+index 3c504b6001..55f1a0353b 100644
 --- a/src/Symfony/Bundle/SecurityBundle/DependencyInjection/SecurityExtension.php
 +++ b/src/Symfony/Bundle/SecurityBundle/DependencyInjection/SecurityExtension.php
-@@ -82,5 +82,5 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
+@@ -83,5 +83,5 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
       * @return void
       */
 -    public function prepend(ContainerBuilder $container)
 +    public function prepend(ContainerBuilder $container): void
      {
          foreach ($this->getSortedFactories() as $factory) {
-@@ -94,5 +94,5 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
+@@ -95,5 +95,5 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
       * @return void
       */
 -    public function load(array $configs, ContainerBuilder $container)
@@ -4698,7 +4680,7 @@ index f610b014a0..9458751c28 100644
 +    abstract protected function setNode(\DOMElement $node): void;
  }
 diff --git a/src/Symfony/Component/DomCrawler/Crawler.php b/src/Symfony/Component/DomCrawler/Crawler.php
-index 59eec3068c..b750e80938 100644
+index 274aeee5fc..ccf37dae8b 100644
 --- a/src/Symfony/Component/DomCrawler/Crawler.php
 +++ b/src/Symfony/Component/DomCrawler/Crawler.php
 @@ -96,5 +96,5 @@ class Crawler implements \Countable, \IteratorAggregate
@@ -8383,7 +8365,7 @@ index efa1a4f737..752eb19faf 100644
 +    public function lateCollect(): void;
  }
 diff --git a/src/Symfony/Component/HttpKernel/DataCollector/RequestDataCollector.php b/src/Symfony/Component/HttpKernel/DataCollector/RequestDataCollector.php
-index 094683ccce..5582af522e 100644
+index 91e17358a0..d1c8bfe7d0 100644
 --- a/src/Symfony/Component/HttpKernel/DataCollector/RequestDataCollector.php
 +++ b/src/Symfony/Component/HttpKernel/DataCollector/RequestDataCollector.php
 @@ -199,5 +199,5 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
@@ -8964,7 +8946,7 @@ index 0f3630e7fe..ddf77b8a19 100644
      {
          return <<<'EOF'
 diff --git a/src/Symfony/Component/HttpKernel/Kernel.php b/src/Symfony/Component/HttpKernel/Kernel.php
-index 9d4c5f22b3..4030ab8b12 100644
+index 76205bc0b8..f4240cdd1b 100644
 --- a/src/Symfony/Component/HttpKernel/Kernel.php
 +++ b/src/Symfony/Component/HttpKernel/Kernel.php
 @@ -107,5 +107,5 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
@@ -10911,7 +10893,7 @@ index bde72c0eb0..3d6813e1d4 100644
      {
          if (!\is_array($config)) {
 diff --git a/src/Symfony/Component/Routing/Matcher/Dumper/CompiledUrlMatcherDumper.php b/src/Symfony/Component/Routing/Matcher/Dumper/CompiledUrlMatcherDumper.php
-index e92a5ea3d7..4a0af31349 100644
+index 0e740bdf6c..21b68e3600 100644
 --- a/src/Symfony/Component/Routing/Matcher/Dumper/CompiledUrlMatcherDumper.php
 +++ b/src/Symfony/Component/Routing/Matcher/Dumper/CompiledUrlMatcherDumper.php
 @@ -54,5 +54,5 @@ EOF;
@@ -13947,7 +13929,7 @@ index d2d3fc1294..c28829f4e2 100644
      {
          $a += [
 diff --git a/src/Symfony/Component/VarDumper/Caster/DateCaster.php b/src/Symfony/Component/VarDumper/Caster/DateCaster.php
-index 1394a78132..ee8471c88f 100644
+index 2779b37f9e..4bb25e9966 100644
 --- a/src/Symfony/Component/VarDumper/Caster/DateCaster.php
 +++ b/src/Symfony/Component/VarDumper/Caster/DateCaster.php
 @@ -28,5 +28,5 @@ class DateCaster
@@ -14292,7 +14274,7 @@ index 6ff046754d..2b9382f1a7 100644
      {
          $prefix = Caster::PREFIX_VIRTUAL;
 diff --git a/src/Symfony/Component/VarDumper/Caster/ReflectionCaster.php b/src/Symfony/Component/VarDumper/Caster/ReflectionCaster.php
-index 4adb9bc9fe..bc151bb2a2 100644
+index a356729bd0..a3f1b49e4e 100644
 --- a/src/Symfony/Component/VarDumper/Caster/ReflectionCaster.php
 +++ b/src/Symfony/Component/VarDumper/Caster/ReflectionCaster.php
 @@ -39,5 +39,5 @@ class ReflectionCaster

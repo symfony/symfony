@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\HttpFoundation\Session\Storage\Proxy;
 
+use Symfony\Component\HttpFoundation\Exception\SessionIdCreationException;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\StrictSessionHandler;
 
 /**
  * @author Drak <drak@zikula.org>
  */
-class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterface, \SessionUpdateTimestampHandlerInterface
+class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterface, \SessionUpdateTimestampHandlerInterface, \SessionIdInterface
 {
     protected $handler;
 
@@ -72,5 +73,18 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
     public function updateTimestamp(#[\SensitiveParameter] string $sessionId, string $data): bool
     {
         return $this->handler instanceof \SessionUpdateTimestampHandlerInterface ? $this->handler->updateTimestamp($sessionId, $data) : $this->write($sessionId, $data);
+    }
+
+    public function create_sid(): string
+    {
+        if ($this->handler instanceof \SessionIdInterface) {
+            return $this->handler->create_sid();
+        }
+
+        if (!$id = session_create_id()) {
+            throw new SessionIdCreationException();
+        }
+
+        return $id;
     }
 }

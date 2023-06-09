@@ -168,8 +168,26 @@ class SessionHandlerProxyTest extends TestCase
             [new SessionHandlerProxy(new StrictSessionHandler(new \SessionHandler()))],
         ];
     }
+
+    public function testCreateSid()
+    {
+        $mock = $this->createMock(SessionIdSessionHandler::class);
+        $mock->expects($this->once())
+            ->method('create_sid')
+            ->willReturn('a-valid-session-identifier');
+
+        $proxy = new SessionHandlerProxy($mock);
+        $this->assertSame('a-valid-session-identifier', $proxy->create_sid());
+
+        $this->proxy->create_sid();
+        $this->addToAssertionCount(1);
+    }
 }
 
 abstract class TestSessionHandler implements \SessionHandlerInterface, \SessionUpdateTimestampHandlerInterface
+{
+}
+
+abstract class SessionIdSessionHandler implements \SessionHandlerInterface, \SessionIdInterface
 {
 }

@@ -36,7 +36,6 @@
         "php": ">=8.2",
         "composer-runtime-api": ">=2.1",
         "ext-xml": "*",
-        "friendsofphp/proxy-manager-lts": "^1.0.2",
         "doctrine/event-manager": "^1.2|^2",
         "doctrine/persistence": "^2|^3",
         "twig/twig": "^2.13|^3.0.4",
@@ -93,7 +92,6 @@
         "symfony/process": "self.version",
         "symfony/property-access": "self.version",
         "symfony/property-info": "self.version",
-        "symfony/proxy-manager-bridge": "self.version",
         "symfony/rate-limiter": "self.version",
         "symfony/remote-event": "self.version",
         "symfony/routing": "self.version",
@@ -181,7 +179,6 @@
         "psr-4": {
             "Symfony\\Bridge\\Doctrine\\": "src/Symfony/Bridge/Doctrine/",
             "Symfony\\Bridge\\Monolog\\": "src/Symfony/Bridge/Monolog/",
-            "Symfony\\Bridge\\ProxyManager\\": "src/Symfony/Bridge/ProxyManager/",
             "Symfony\\Bridge\\Twig\\": "src/Symfony/Bridge/Twig/",
             "Symfony\\Bundle\\": "src/Symfony/Bundle/",
             "Symfony\\Component\\": "src/Symfony/Component/"

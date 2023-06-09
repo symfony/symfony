@@ -31,7 +31,6 @@
         "ext-psr": "<1.1|>=2",
         "symfony/config": "<6.4",
         "symfony/finder": "<6.4",
-        "symfony/proxy-manager-bridge": "<6.4",
         "symfony/yaml": "<6.4"
     },
     "provide": {

@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-05-05T15:41:42Z
+
+What about adding `max_retries` instead? this would be more flexible.
+Not that this doesn't need to be an "extra" option - it shouldn't actually.
+This will need to override the `withOptions` method also.
+You might want to take some inspiration from UriTemplateHttpClient, which also manages its own option.
+
+---------------------------------------------------------------------------
+
+by danielburger1337 at 2023-05-05T21:50:12Z
+
+> What about adding `max_retries` instead? this would be more flexible. Not that this doesn't need to be an "extra" option - it shouldn't actually. This will need to override the `withOptions` method also. You might want to take some inspiration from UriTemplateHttpClient, which also manages its own option.
+
+Yes, this would be much more flexible approach and I like it!
+
+To be extra clear, would this option overide the  `maxRetries` property of the RetryableHttpClient when cloned?
+Because otherwise I'm not quite sure what you mean.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-05-05T23:12:58Z
+
+Yes, it would override it indeed.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-05-06T06:36:15Z
+
+Can you please update the pr header? You still mention no_retry. Thanks
+
+---------------------------------------------------------------------------
+
+by danielburger1337 at 2023-05-06T07:48:49Z
+
+> Can you please update the pr header? You still mention no_retry. Thanks
+
+What do you mean by PR header? Do you mean my original PR description?
+
+Sorry, I never heard that term before.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-05-06T12:37:50Z
+
+Yes the PR description and the code example. Thanks
+
+---------------------------------------------------------------------------
+
+by danielburger1337 at 2023-05-06T14:57:44Z
+
+> Yes the PR description and the code example. Thanks
+
+Done

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by stof at 2023-06-06T15:57:19Z
+
+Doesn't this risk breaking concurrency features of support for streaming chunks ? The override of headers is probably the only use case for which extending AsyncResponse is a _working_ solution.
+
+So if we don't make AsyncResponse final anymore, maybe a bunch of its methods should become final instance, to prevent overriding them by thinking that it will work while it would break half of the ways the client can be used. Any of the methods dealing with the content cannot be used to implement additional logic without breaking the streamed usage.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-06T16:05:16Z
+
+Let's make getContent ~, toArray~ and toStream final? The rest should be fine being extended.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-06-07T08:46:18Z
+
+@nicolas-grekas done ✅

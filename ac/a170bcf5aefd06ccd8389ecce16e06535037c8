@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by stof at 2023-06-08T12:51:10Z
+
+Btw, `Verify Packages` currently does not catch this mistake in the CI.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-08T12:53:49Z
+
+> this misses the removal of replace in the root composer.json
+
+fixed!

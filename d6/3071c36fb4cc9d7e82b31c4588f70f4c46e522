@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-06T11:26:12Z
+
+Can't we target 6.4? That'd be nicer to the community.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-06-06T11:50:37Z
+
+> Can't we target 6.4?
+
+You mean drop DBAL 2 in 6.4 already? We can, but I didn't want to cut off projects that still run on DBAL 2 (or at least support it) on a minor release. I cannot really tell what the impact of that change would be.
+
+> That'd be nicer to the community.
+
+One could argue that giving the community an LTS for migrating away from a still very popular package would be nicer though.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-06-06T11:58:04Z
+
+Well, older versions of DoctrineBundle don't work well with Symfony 6.3 anyway (for instance, the `MapEntity` attribute would break) and DoctrineBundle 2.9+ already requires DBAL 3.6+.
+So I would say that if you are still using DBAL 2, you are almost required to stick to Symfony 5.4 currently.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-06T12:00:54Z
+
+> You mean drop DBAL 2 in 6.4 already?
+
+Yes!
+Major versions should be as boring as possibly doable, and that includes not doing version bumps if possible. Minor versions are better candidates for those bumps.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-06-08T13:54:25Z
+
+> Minor versions are better candidates for those bumps.
+
+In our case, it leaves DBAL 2 projects pinned to a non-LTS Symfony branch. But well, [they have been warned](https://www.doctrine-project.org/2022/01/22/sunsetting-dbal-2.html), right?
+
+I can work out a PR for 6.4 once #50576 and #50579 are done. We can continue the discussion there.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-08T22:21:01Z
+
+I'm torn now. I'd fine either way, which means fine for 7.0 :)

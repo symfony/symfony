@@ -72,11 +72,9 @@ class SessionHandlerFactory
                     throw new \InvalidArgumentException('Unsupported PDO OCI DSN. Try running "composer require doctrine/dbal".');
                 }
                 $connection[3] = '-';
-                $params = class_exists(DsnParser::class) ? (new DsnParser())->parse($connection) : ['url' => $connection];
+                $params = (new DsnParser())->parse($connection);
                 $config = class_exists(ORMSetup::class) ? ORMSetup::createConfiguration(true) : new Configuration();
-                if (class_exists(DefaultSchemaManagerFactory::class)) {
-                    $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
-                }
+                $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
 
                 $connection = DriverManager::getConnection($params, $config);
                 $connection = method_exists($connection, 'getNativeConnection') ? $connection->getNativeConnection() : $connection->getWrappedConnection();

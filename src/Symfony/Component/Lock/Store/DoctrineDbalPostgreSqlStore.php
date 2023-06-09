@@ -53,26 +53,20 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
             if (!class_exists(DriverManager::class)) {
                 throw new InvalidArgumentException('Failed to parse DSN. Try running "composer require doctrine/dbal".');
             }
-            if (class_exists(DsnParser::class)) {
-                $params = (new DsnParser([
-                    'db2' => 'ibm_db2',
-                    'mssql' => 'pdo_sqlsrv',
-                    'mysql' => 'pdo_mysql',
-                    'mysql2' => 'pdo_mysql',
-                    'postgres' => 'pdo_pgsql',
-                    'postgresql' => 'pdo_pgsql',
-                    'pgsql' => 'pdo_pgsql',
-                    'sqlite' => 'pdo_sqlite',
-                    'sqlite3' => 'pdo_sqlite',
-                ]))->parse($this->filterDsn($connOrUrl));
-            } else {
-                $params = ['url' => $this->filterDsn($connOrUrl)];
-            }
+            $params = (new DsnParser([
+                'db2' => 'ibm_db2',
+                'mssql' => 'pdo_sqlsrv',
+                'mysql' => 'pdo_mysql',
+                'mysql2' => 'pdo_mysql',
+                'postgres' => 'pdo_pgsql',
+                'postgresql' => 'pdo_pgsql',
+                'pgsql' => 'pdo_pgsql',
+                'sqlite' => 'pdo_sqlite',
+                'sqlite3' => 'pdo_sqlite',
+            ]))->parse($this->filterDsn($connOrUrl));
 
             $config = class_exists(ORMSetup::class) ? ORMSetup::createConfiguration() : new Configuration();
-            if (class_exists(DefaultSchemaManagerFactory::class)) {
-                $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
-            }
+            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
 
             $this->conn = DriverManager::getConnection($params, $config);
         }

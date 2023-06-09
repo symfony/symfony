@@ -12,18 +12,18 @@
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Tests\Transport;
 
 use Doctrine\DBAL\Connection as DBALConnection;
-use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\MariaDBPlatform;
-use Doctrine\DBAL\Platforms\MySQL57Platform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\OraclePlatform;
-use Doctrine\DBAL\Platforms\SQLServer2012Platform;
+use Doctrine\DBAL\Platforms\SQLServerPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaConfig;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
@@ -128,11 +128,7 @@ class ConnectionTest extends TestCase
         $schemaConfig->method('getMaxIdentifierLength')->willReturn(63);
         $schemaConfig->method('getDefaultTableOptions')->willReturn([]);
         $schemaManager->method('createSchemaConfig')->willReturn($schemaConfig);
-        if (method_exists(DBALConnection::class, 'createSchemaManager')) {
-            $driverConnection->method('createSchemaManager')->willReturn($schemaManager);
-        } else {
-            $driverConnection->method('getSchemaManager')->willReturn($schemaManager);
-        }
+        $driverConnection->method('createSchemaManager')->willReturn($schemaManager);
 
         return $driverConnection;
     }
@@ -155,12 +151,12 @@ class ConnectionTest extends TestCase
         return $queryBuilder;
     }
 
-    private function getResultMock($expectedResult)
+    private function getResultMock($expectedResult): Result&MockObject
     {
-        $stmt = $this->createMock(class_exists(Result::class) ? Result::class : ResultStatement::class);
+        $stmt = $this->createMock(Result::class);
 
         $stmt->expects($this->once())
-            ->method(class_exists(Result::class) ? 'fetchAssociative' : 'fetch')
+            ->method('fetchAssociative')
             ->willReturn($expectedResult);
 
         return $stmt;
@@ -316,9 +312,9 @@ class ConnectionTest extends TestCase
             'headers' => json_encode(['type' => DummyMessage::class]),
         ];
 
-        $stmt = $this->createMock(class_exists(Result::class) ? Result::class : ResultStatement::class);
+        $stmt = $this->createMock(Result::class);
         $stmt->expects($this->once())
-            ->method(class_exists(Result::class) ? 'fetchAllAssociative' : 'fetchAll')
+            ->method('fetchAllAssociative')
             ->willReturn([$message1, $message2]);
 
         $driverConnection
@@ -361,13 +357,8 @@ class ConnectionTest extends TestCase
         $driverConnection->method('getDatabasePlatform')->willReturn($platform);
         $driverConnection->method('createQueryBuilder')->willReturnCallback(fn () => new QueryBuilder($driverConnection));
 
-        if (class_exists(Result::class)) {
-            $result = $this->createMock(Result::class);
-            $result->method('fetchAssociative')->willReturn(false);
-        } else {
-            $result = $this->createMock(ResultStatement::class);
-            $result->method('fetch')->willReturn(false);
-        }
+        $result = $this->createMock(Result::class);
+        $result->method('fetchAssociative')->willReturn(false);
 
         $driverConnection->expects($this->once())->method('beginTransaction');
         $driverConnection
@@ -385,19 +376,17 @@ class ConnectionTest extends TestCase
     public static function providePlatformSql(): iterable
     {
         yield 'MySQL' => [
-            new MySQL57Platform(),
+            new MySQLPlatform(),
             'SELECT m.* FROM messenger_messages m WHERE (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) AND (m.queue_name = ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE',
         ];
 
-        if (class_exists(MariaDBPlatform::class)) {
-            yield 'MariaDB' => [
-                new MariaDBPlatform(),
-                'SELECT m.* FROM messenger_messages m WHERE (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) AND (m.queue_name = ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE',
-            ];
-        }
+        yield 'MariaDB' => [
+            new MariaDBPlatform(),
+            'SELECT m.* FROM messenger_messages m WHERE (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) AND (m.queue_name = ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE',
+        ];
 
         yield 'SQL Server' => [
-            new SQLServer2012Platform(),
+            new SQLServerPlatform(),
             'SELECT m.* FROM messenger_messages m WITH (UPDLOCK, ROWLOCK) WHERE (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) AND (m.queue_name = ?) ORDER BY available_at ASC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY  ',
         ];
 
@@ -451,13 +440,8 @@ class ConnectionTest extends TestCase
             return new QueryBuilder($driverConnection);
         });
 
-        if (class_exists(Result::class)) {
-            $result = $this->createMock(Result::class);
-            $result->method('fetchAllAssociative')->willReturn([]);
-        } else {
-            $result = $this->createMock(ResultStatement::class);
-            $result->method('fetchAll')->willReturn([]);
-        }
+        $result = $this->createMock(Result::class);
+        $result->method('fetchAllAssociative')->willReturn([]);
 
         $driverConnection
             ->expects($this->once())
@@ -473,19 +457,17 @@ class ConnectionTest extends TestCase
     public function provideFindAllSqlGeneratedByPlatform(): iterable
     {
         yield 'MySQL' => [
-            new MySQL57Platform(),
+            new MySQLPlatform(),
             'SELECT m.* FROM messenger_messages m WHERE (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) AND (m.queue_name = ?) LIMIT 50',
         ];
 
-        if (class_exists(MariaDBPlatform::class)) {
-            yield 'MariaDB' => [
-                new MariaDBPlatform(),
-                'SELECT m.* FROM messenger_messages m WHERE (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) AND (m.queue_name = ?) LIMIT 50',
-            ];
-        }
+        yield 'MariaDB' => [
+            new MariaDBPlatform(),
+            'SELECT m.* FROM messenger_messages m WHERE (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) AND (m.queue_name = ?) LIMIT 50',
+        ];
 
         yield 'SQL Server' => [
-            new SQLServer2012Platform(),
+            new SQLServerPlatform(),
             'SELECT m.* FROM messenger_messages m WHERE (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) AND (m.queue_name = ?) ORDER BY (SELECT 0) OFFSET 0 ROWS FETCH NEXT 50 ROWS ONLY',
         ];
 

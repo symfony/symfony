@@ -11,7 +11,6 @@
 
 namespace Symfony\Bridge\Doctrine\DataCollector;
 
-use Doctrine\DBAL\Logging\DebugStack;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\Persistence\ManagerRegistry;
@@ -31,11 +30,6 @@ class DoctrineDataCollector extends DataCollector
 {
     private array $connections;
     private array $managers;
-
-    /**
-     * @var array<string, DebugStack>
-     */
-    private array $loggers = [];
 
     public function __construct(
         private ManagerRegistry $registry,
@@ -61,16 +55,8 @@ class DoctrineDataCollector extends DataCollector
     {
         $queries = [];
 
-        if (null !== $this->debugDataHolder) {
-            foreach ($this->debugDataHolder->getData() as $name => $data) {
-                $queries[$name] = $this->sanitizeQueries($name, $data);
-            }
-
-            return $queries;
-        }
-
-        foreach ($this->loggers as $name => $logger) {
-            $queries[$name] = $this->sanitizeQueries($name, $logger->queries);
+        foreach ($this->debugDataHolder->getData() as $name => $data) {
+            $queries[$name] = $this->sanitizeQueries($name, $data);
         }
 
         return $queries;
@@ -82,17 +68,7 @@ class DoctrineDataCollector extends DataCollector
     public function reset()
     {
         $this->data = [];
-
-        if (null !== $this->debugDataHolder) {
-            $this->debugDataHolder->reset();
-
-            return;
-        }
-
-        foreach ($this->loggers as $logger) {
-            $logger->queries = [];
-            $logger->currentQuery = 0;
-        }
+        $this->debugDataHolder->reset();
     }
 
     public function getManagers()

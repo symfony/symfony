@@ -12,9 +12,7 @@
 namespace Symfony\Bridge\Doctrine\Security\RememberMe;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\Result as DriverResult;
 use Doctrine\DBAL\ParameterType;
-use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
@@ -43,11 +41,9 @@ use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
  */
 class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInterface
 {
-    private Connection $conn;
-
-    public function __construct(Connection $conn)
-    {
-        $this->conn = $conn;
+    public function __construct(
+        private Connection $conn,
+    ) {
     }
 
     public function loadTokenBySeries(string $series): PersistentTokenInterface
@@ -57,13 +53,9 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
         $paramValues = ['series' => $series];
         $paramTypes = ['series' => ParameterType::STRING];
         $stmt = $this->conn->executeQuery($sql, $paramValues, $paramTypes);
-        $row = $stmt instanceof Result || $stmt instanceof DriverResult ? $stmt->fetchAssociative() : $stmt->fetch(\PDO::FETCH_ASSOC);
+        $row = $stmt->fetchAssociative() ?: throw new TokenNotFoundException('No token found.');
 
-        if ($row) {
-            return new PersistentToken($row['class'], $row['username'], $series, $row['value'], new \DateTime($row['last_used']));
-        }
-
-        throw new TokenNotFoundException('No token found.');
+        return new PersistentToken($row['class'], $row['username'], $series, $row['value'], new \DateTime($row['last_used']));
     }
 
     /**
@@ -74,11 +66,7 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
         $sql = 'DELETE FROM rememberme_token WHERE series=:series';
         $paramValues = ['series' => $series];
         $paramTypes = ['series' => ParameterType::STRING];
-        if (method_exists($this->conn, 'executeStatement')) {
-            $this->conn->executeStatement($sql, $paramValues, $paramTypes);
-        } else {
-            $this->conn->executeUpdate($sql, $paramValues, $paramTypes);
-        }
+        $this->conn->executeStatement($sql, $paramValues, $paramTypes);
     }
 
     /**
@@ -97,11 +85,8 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
             'lastUsed' => Types::DATETIME_IMMUTABLE,
             'series' => ParameterType::STRING,
         ];
-        if (method_exists($this->conn, 'executeStatement')) {
-            $updated = $this->conn->executeStatement($sql, $paramValues, $paramTypes);
-        } else {
-            $updated = $this->conn->executeUpdate($sql, $paramValues, $paramTypes);
-        }
+        $updated = $this->conn->executeStatement($sql, $paramValues, $paramTypes);
+
         if ($updated < 1) {
             throw new TokenNotFoundException('No token found.');
         }
@@ -127,11 +112,7 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
             'value' => ParameterType::STRING,
             'lastUsed' => Types::DATETIME_IMMUTABLE,
         ];
-        if (method_exists($this->conn, 'executeStatement')) {
-            $this->conn->executeStatement($sql, $paramValues, $paramTypes);
-        } else {
-            $this->conn->executeUpdate($sql, $paramValues, $paramTypes);
-        }
+        $this->conn->executeStatement($sql, $paramValues, $paramTypes);
     }
 
     public function verifyToken(PersistentTokenInterface $token, #[\SensitiveParameter] string $tokenValue): bool

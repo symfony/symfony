@@ -118,21 +118,16 @@ class DoctrineTokenProviderTest extends TestCase
         $this->assertFalse($provider->verifyToken($token, $oldValue));
     }
 
-    /**
-     * @return DoctrineTokenProvider
-     */
-    private function bootstrapProvider()
+    private function bootstrapProvider(): DoctrineTokenProvider
     {
         $config = class_exists(ORMSetup::class) ? ORMSetup::createConfiguration(true) : new Configuration();
-        if (class_exists(DefaultSchemaManagerFactory::class)) {
-            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
-        }
+        $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
 
         $connection = DriverManager::getConnection([
             'driver' => 'pdo_sqlite',
             'memory' => true,
         ], $config);
-        $connection->{method_exists($connection, 'executeStatement') ? 'executeStatement' : 'executeUpdate'}(<<< 'SQL'
+        $connection->executeStatement(<<< 'SQL'
             CREATE TABLE rememberme_token (
                 series   char(88)     UNIQUE PRIMARY KEY NOT NULL,
                 value    char(88)     NOT NULL,
@@ -140,7 +135,7 @@ class DoctrineTokenProviderTest extends TestCase
                 class    varchar(100) NOT NULL,
                 username varchar(200) NOT NULL
             );
-SQL
+            SQL
         );
 
         return new DoctrineTokenProvider($connection);

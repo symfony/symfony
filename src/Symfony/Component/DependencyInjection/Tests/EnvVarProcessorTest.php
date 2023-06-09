@@ -60,6 +60,67 @@ class EnvVarProcessorTest extends TestCase
     }
 
     /**
+     * @dataProvider validRealEnvValues
+     */
+    public function testGetEnvRealEnv($value, $processed)
+    {
+        $_ENV['FOO'] = $value;
+
+        $processor = new EnvVarProcessor(new Container());
+
+        $result = $processor->getEnv('string', 'FOO', function () {
+            $this->fail('Should not be called');
+        });
+
+        $this->assertSame($processed, $result);
+
+        unset($_ENV['FOO']);
+    }
+
+    public static function validRealEnvValues()
+    {
+        return [
+            ['hello', 'hello'],
+            [true, '1'],
+            [false, ''],
+            [1, '1'],
+            [0, '0'],
+            [1.1, '1.1'],
+            [10, '10'],
+        ];
+    }
+
+    public function testGetEnvRealEnvInvalid()
+    {
+        $_ENV['FOO'] = null;
+        $this->expectException(EnvNotFoundException::class);
+        $this->expectExceptionMessage('Environment variable not found: "FOO".');
+
+        $processor = new EnvVarProcessor(new Container());
+
+        $processor->getEnv('string', 'FOO', function () {
+            $this->fail('Should not be called');
+        });
+
+        unset($_ENV['FOO']);
+    }
+
+    public function testGetEnvRealEnvNonScalar()
+    {
+        $_ENV['FOO'] = [];
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Non-scalar env var "FOO" cannot be cast to "string".');
+
+        $processor = new EnvVarProcessor(new Container());
+
+        $processor->getEnv('string', 'FOO', function () {
+            $this->fail('Should not be called');
+        });
+
+        unset($_ENV['FOO']);
+    }
+
+    /**
      * @dataProvider validBools
      */
     public function testGetEnvBool($value, $processed)
@@ -97,6 +158,7 @@ class EnvVarProcessorTest extends TestCase
             ['true', true],
             ['false', false],
             ['null', false],
+            ['', false],
             ['1', true],
             ['0', false],
             ['1.1', true],

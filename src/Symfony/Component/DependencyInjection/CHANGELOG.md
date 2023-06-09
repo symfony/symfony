@@ -22,6 +22,7 @@ CHANGELOG
  * Deprecate `#[MapDecorated]`, use `#[AutowireDecorated]` instead
  * Deprecate the `@required` annotation, use the `Symfony\Contracts\Service\Attribute\Required` attribute instead
  * Add `constructor` option to services declaration and to `#[Autoconfigure]`
+ * Add `list` env var processor
 
 6.2
 ---

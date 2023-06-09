@@ -45,6 +45,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             'file' => 'string',
             'float' => 'float',
             'int' => 'int',
+            'list' => 'array',
             'json' => 'array',
             'key' => 'bool|int|float|string|array',
             'url' => 'array',
@@ -249,8 +250,9 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             return base64_decode(strtr($env, '-_', '+/'));
         }
 
-        if ('json' === $prefix) {
-            $env = json_decode($env, true);
+
+        if ('json' === $prefix || 'list' === $prefix) {
+            $env = json_decode($prefix === 'list' ?  "[$env]" : $env, true);
 
             if (\JSON_ERROR_NONE !== json_last_error()) {
                 throw new RuntimeException(sprintf('Invalid JSON in env var "%s": ', $name).json_last_error_msg());

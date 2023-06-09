@@ -724,6 +724,31 @@ CSV;
         ];
     }
 
+    /**
+     * @dataProvider validList
+     */
+    public function testGetEnvList($value, $processed)
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $result = $processor->getEnv('list', "foo", function ($name) use ($value) {
+            $this->assertSame('foo', $name);
+
+            return $value;
+        });
+
+        $this->assertSame($processed, $result);
+    }
+
+    public static function validList()
+    {
+        return [
+            ['1', [1]],
+            ['"1", 2, 3.0, 1e1', ["1", 2, 3.0, 10.0]],
+            [null, null],
+        ];
+    }
+
     public function testEnvLoader()
     {
         $_ENV['BAZ_ENV_LOADER'] = '';

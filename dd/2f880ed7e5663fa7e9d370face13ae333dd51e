@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2023-06-08T09:15:30Z
+
+This PR should target 5.4.
+
+It looks like the translations from the `NoSuspiciousCharacters` constraint are completely missing, feel free to add them :smiley:
+
+---------------------------------------------------------------------------
+
+by ker0x at 2023-06-08T10:16:23Z
+
+@fancyweb Done!
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2023-06-09T09:22:36Z
+
+:warning: It still needs to target 5.4

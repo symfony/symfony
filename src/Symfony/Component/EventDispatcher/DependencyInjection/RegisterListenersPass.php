@@ -65,6 +65,8 @@ class RegisterListenersPass implements CompilerPassInterface
 
         $globalDispatcherDefinition = $container->findDefinition('event_dispatcher');
 
+        $this->computeBeforeAfterPriority($container);
+
         foreach ($container->findTaggedServiceIds('kernel.event_listener', true) as $id => $events) {
             $noPreload = 0;
 
@@ -181,6 +183,98 @@ class RegisterListenersPass implements CompilerPassInterface
         }
 
         return $name;
+    }
+
+    private function computeBeforeAfterPriority(ContainerBuilder $container): void
+    {
+        $listeners = [];
+        foreach ($container->findTaggedServiceIds('kernel.event_listener', true) as $id => $events) {
+            foreach ($events as $event) {
+                if (!isset($event['event'])) {
+                    if ($container->getDefinition($id)->hasTag('kernel.event_subscriber')) {
+                        continue;
+                    }
+
+                    $event['method'] ??= '__invoke';
+                    $event['event'] = $this->getEventFromTypeDeclaration($container, $id, $event['method']);
+                }
+
+                $listeners[$event['event']] ??= [];
+
+                if (isset($event['before']) || isset($event['after'])) {
+                    if (isset($event['before']) && isset($event['after'])) {
+                        throw new InvalidArgumentException(sprintf('Bad listener definition for "%s": cannot set "after" and "before" at the same time.', $id));
+                    }
+
+                    if ($container->findDefinition($id) === $container->findDefinition($event['before'] ?? $event['after'])) {
+                        throw new InvalidArgumentException(sprintf('Bad listener definition for "%s": listener cannot self-reference in "before" or "after" definition.', $id, $event['event']));
+                    }
+
+                    if (($event['priority'] ?? 0) !== 0 && (isset($event['before']) || isset($event['after']))) {
+                        throw new InvalidArgumentException(sprintf('Bad listener definition for "%s": cannot set "priority" and "before" at the same time.', $id));
+                    }
+                    $listeners[$event['event']][$id] = ['before' => $event['before'] ?? null, 'after' => $event['after'] ?? null];
+                } else {
+                    $listeners[$event['event']][$id] = ['priority' => $event['priority'] ?? 0];
+                }
+            }
+        }
+
+        foreach ($listeners as $eventName => $listenersForEvent) {
+            foreach ($listenersForEvent as $listenerName => $listenerDefinition) {
+                if (isset($listenerDefinition['before']) || isset($listenerDefinition['after'])) {
+                    if ($listenerDefinition['before'] && !isset($listenersForEvent[$listenerDefinition['before']])) {
+                        throw new InvalidArgumentException(sprintf('Given "before" "%s" for listener "%s" does not listen the same event.', $listenerDefinition['before'], $listenerName));
+                    }
+
+                    if ($listenerDefinition['after'] && !isset($listenersForEvent[$listenerDefinition['after']])) {
+                        throw new InvalidArgumentException(sprintf('Given "after" "%s" for listener "%s" does not listen the same event.', $listenerDefinition['after'], $listenerName));
+                    }
+
+                    $this->updateListenerPriority(
+                        $container,
+                        $eventName,
+                        $listenerName,
+                        $this->computePriority($listenersForEvent, $listenerName)
+                    );
+                }
+            }
+        }
+    }
+
+    private function computePriority(array $listeners, string $listenerName, array $alreadyVisited = []): int
+    {
+        if ($alreadyVisited[$listenerName] ?? false) {
+            throw new InvalidArgumentException(sprintf('Circular reference detected for listener "%s".', $listenerName));
+        }
+
+        $alreadyVisited[$listenerName] = true;
+
+        if (isset($listeners[$listenerName]['before'])) {
+            return $this->computePriority($listeners, $listeners[$listenerName]['before'], $alreadyVisited) + 1;
+        }
+
+        if (isset($listeners[$listenerName]['after'])) {
+            return $this->computePriority($listeners, $listeners[$listenerName]['after'], $alreadyVisited) - 1;
+        }
+
+        return $listeners[$listenerName]['priority'] ?? 0;
+    }
+
+    private function updateListenerPriority(ContainerBuilder $container, string $eventName, string $listenerName, int $priority): void
+    {
+        $listenerDefinition = $container->getDefinition($listenerName);
+        $events = $listenerDefinition->getTag('kernel.event_listener');
+
+        foreach ($events as &$event) {
+            if ($event['event'] === $eventName) {
+                $event['priority'] = $priority;
+                break;
+            }
+        }
+
+        $listenerDefinition->clearTag('kernel.event_listener');
+        $listenerDefinition->addTag('kernel.event_listener', $events);
     }
 }
 

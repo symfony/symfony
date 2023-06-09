@@ -24,6 +24,8 @@ class AsEventListener
         public ?string $method = null,
         public int $priority = 0,
         public ?string $dispatcher = null,
+        public ?string $before = null,
+        public ?string $after = null,
     ) {
     }
 }

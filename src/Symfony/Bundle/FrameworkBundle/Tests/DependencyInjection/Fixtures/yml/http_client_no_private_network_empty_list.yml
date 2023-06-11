@@ -1,0 +1,5 @@
+framework:
+    http_method_override: false
+    http_client:
+        default_options:
+            no_private_network: true

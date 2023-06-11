@@ -84,6 +84,7 @@ use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\NoPrivateNetworkHttpClient;
 use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
@@ -2435,6 +2436,8 @@ class FrameworkExtension extends Extension
         $options = $config['default_options'] ?? [];
         $retryOptions = $options['retry_failed'] ?? ['enabled' => false];
         unset($options['retry_failed']);
+        $noPrivateNetworksOptions = $options['no_private_network'] ?? ['enabled' => false];
+        unset($options['no_private_network']);
         $defaultUriTemplateVars = $options['vars'] ?? [];
         unset($options['vars']);
         $container->getDefinition('http_client.transport')->setArguments([$options, $config['max_host_connections'] ?? 6]);
@@ -2452,6 +2455,20 @@ class FrameworkExtension extends Extension
 
         if ($this->readConfigEnabled('http_client.retry_failed', $container, $retryOptions)) {
             $this->registerRetryableHttpClient($retryOptions, 'http_client', $container);
+        }
+
+        if ($this->readConfigEnabled('http_client.no_private_network', $container, $noPrivateNetworksOptions)) {
+            $subnets = $noPrivateNetworksOptions['subnets'];
+            if (0 === \count($subnets)) {
+                $subnets = null;
+            }
+
+            $container
+                ->register('http_client.no_private_network', NoPrivateNetworkHttpClient::class)
+                ->setDecoratedService('http_client', null, 11) // higher priority than RetryableHttpClient (10)
+                ->setArguments([new Reference('http_client.no_private_network.inner'), $subnets])
+                ->addTag('monolog.logger', ['channel' => 'http_client'])
+            ;
         }
 
         if ($hasUriTemplate = class_exists(UriTemplateHttpClient::class)) {

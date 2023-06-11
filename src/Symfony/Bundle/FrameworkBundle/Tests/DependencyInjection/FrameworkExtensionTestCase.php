@@ -53,6 +53,7 @@ use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\NoPrivateNetworkHttpClient;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
@@ -1955,6 +1956,26 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $this->assertSame(RetryableHttpClient::class, $container->getDefinition('foo.retryable')->getClass());
         $this->assertSame(4, $container->getDefinition('foo.retry_strategy')->getArgument(2));
+    }
+
+    public function testHttpClientNoPrivateNetworks()
+    {
+        if (!class_exists(NoPrivateNetworkHttpClient::class)) {
+            $this->expectException(LogicException::class);
+        }
+        $container = $this->createContainerFromFile('http_client_no_private_network');
+
+        $this->assertSame(['127.0.0.1/8', '192.168.0.1/16'], $container->getDefinition('http_client.no_private_network')->getArgument(1));
+    }
+
+    public function testHttpClientNoPrivateNetworksEmptyList()
+    {
+        if (!class_exists(NoPrivateNetworkHttpClient::class)) {
+            $this->expectException(LogicException::class);
+        }
+        $container = $this->createContainerFromFile('http_client_no_private_network_empty_list');
+
+        $this->assertNull($container->getDefinition('http_client.no_private_network')->getArgument(1));
     }
 
     public function testHttpClientWithQueryParameterKey()

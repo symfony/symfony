@@ -49,7 +49,7 @@ class ConfigDebugCommand extends AbstractConfigCommand
                 new InputArgument('name', InputArgument::OPTIONAL, 'The bundle name or the extension alias'),
                 new InputArgument('path', InputArgument::OPTIONAL, 'The configuration option path'),
                 new InputOption('resolve-env', null, InputOption::VALUE_NONE, 'Display resolved environment variable values instead of placeholders'),
-                new InputOption('format', null, InputOption::VALUE_REQUIRED, sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), class_exists(Yaml::class) ? 'yaml' : 'json'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), class_exists(Yaml::class) ? 'txt' : 'json'),
             ])
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command dumps the current configuration for an
@@ -97,16 +97,18 @@ EOF
 
         $format = $input->getOption('format');
 
-        if ('yaml' === $format && !class_exists(Yaml::class)) {
-            $errorIo->error('Setting the "format" option to "yaml" requires the Symfony Yaml component. Try running "composer install symfony/yaml" or use "--format=json" instead.');
+        if (\in_array($format, ['txt', 'yml'], true) && !class_exists(Yaml::class)) {
+            $errorIo->error('Setting the "format" option to "txt" or "yaml" requires the Symfony Yaml component. Try running "composer install symfony/yaml" or use "--format=json" instead.');
 
             return 1;
         }
 
         if (null === $path = $input->getArgument('path')) {
-            $io->title(
-                sprintf('Current configuration for %s', $name === $extensionAlias ? sprintf('extension with alias "%s"', $extensionAlias) : sprintf('"%s"', $name))
-            );
+            if ('txt' === $input->getOption('format')) {
+                $io->title(
+                    sprintf('Current configuration for %s', $name === $extensionAlias ? sprintf('extension with alias "%s"', $extensionAlias) : sprintf('"%s"', $name))
+                );
+            }
 
             $io->writeln($this->convertToFormat([$extensionAlias => $config], $format));
 
@@ -131,7 +133,7 @@ EOF
     private function convertToFormat(mixed $config, string $format): string
     {
         return match ($format) {
-            'yaml' => Yaml::dump($config, 10),
+            'txt', 'yaml' => Yaml::dump($config, 10),
             'json' => json_encode($config, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE),
             default => throw new InvalidArgumentException(sprintf('Supported formats are "%s".', implode('", "', $this->getAvailableFormatOptions()))),
         };
@@ -268,6 +270,6 @@ EOF
 
     private function getAvailableFormatOptions(): array
     {
-        return ['yaml', 'json'];
+        return ['txt', 'yaml', 'json'];
     }
 }

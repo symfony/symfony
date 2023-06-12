@@ -11,6 +11,7 @@ CHANGELOG
  * Remove `DoctrineDataCollector::addLogger()`, use a `DebugDataHolder` instead
  * `ContainerAwareEventManager::getListeners()` must be called with an event name
  * DoctrineBridge now requires `doctrine/event-manager:^2`
+ * Add parameter `$isSameDatabase` to `DoctrineTokenProvider::configureSchema()`
 
 6.4
 ---

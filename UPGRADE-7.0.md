@@ -5,6 +5,11 @@ Symfony 6.4 and Symfony 7.0 will be released simultaneously at the end of Novemb
 release process, both versions will have the same features, but Symfony 7.0 won't include any deprecated features.
 To upgrade, make sure to resolve all deprecation notices.
 
+Cache
+-----
+
+ * Add parameter `$isSameDatabase` to `DoctrineDbalAdapter::configureSchema()`
+
 DoctrineBridge
 --------------
 
@@ -15,6 +20,17 @@ DoctrineBridge
  * Remove `DoctrineDataCollector::addLogger()`, use a `DebugDataHolder` instead
  * `ContainerAwareEventManager::getListeners()` must be called with an event name
  * DoctrineBridge now requires `doctrine/event-manager:^2`
+ * Add parameter `$isSameDatabase` to `DoctrineTokenProvider::configureSchema()`
+
+Lock
+----
+
+ * Add parameter `$isSameDatabase` to `DoctrineDbalStore::configureSchema()`
+
+Messenger
+---------
+
+ * Add parameter `$isSameDatabase` to `DoctrineTransport::configureSchema()`
 
 ProxyManagerBridge
 ------------------

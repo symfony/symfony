@@ -97,6 +97,7 @@ class TextDescriptor extends Descriptor
             ['Host Regex', '' !== $route->getHost() ? $route->compile()->getHostRegex() : ''],
             ['Scheme', $route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY'],
             ['Method', $route->getMethods() ? implode('|', $route->getMethods()) : 'ANY'],
+            ['Path Variables', $this->formatRouterConfig($route->compile()->getPathVariables())],
             ['Requirements', $route->getRequirements() ? $this->formatRouterConfig($route->getRequirements()) : 'NO CUSTOM'],
             ['Class', $route::class],
             ['Defaults', $this->formatRouterConfig($defaults)],

@@ -208,6 +208,7 @@ class JsonDescriptor extends Descriptor
             'scheme' => $route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY',
             'method' => $route->getMethods() ? implode('|', $route->getMethods()) : 'ANY',
             'class' => $route::class,
+            'variables' => $route->compile()->getVariables(),
             'defaults' => $route->getDefaults(),
             'requirements' => $route->getRequirements() ?: 'NO CUSTOM',
             'options' => $route->getOptions(),

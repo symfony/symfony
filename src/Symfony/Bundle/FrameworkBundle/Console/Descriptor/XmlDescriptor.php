@@ -194,6 +194,15 @@ class XmlDescriptor extends Descriptor
             }
         }
 
+        $variables = $route->compile()->getPathVariables();
+        if (!empty($variables)) {
+            $routeXML->appendChild($variablesXML = $dom->createElement('variables'));
+            foreach ($variables as $variable) {
+                $variablesXML->appendChild($variableXML = $dom->createElement('variable'));
+                $variableXML->appendChild(new \DOMText($variable));
+            }
+        }
+
         $originRequirements = $requirements = $route->getRequirements();
         unset($requirements['_scheme'], $requirements['_method']);
         if ($requirements) {

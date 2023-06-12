@@ -23,6 +23,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
+use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -107,6 +108,7 @@ EOF
             if (!$route) {
                 throw new InvalidArgumentException(sprintf('The route "%s" does not exist.', $name));
             }
+            $this->checkRouteValidity($route, $name);
 
             $helper->describe($io, $route, [
                 'format' => $input->getOption('format'),
@@ -168,5 +170,14 @@ EOF
     private function getAvailableFormatOptions(): array
     {
         return (new DescriptorHelper())->getFormats();
+    }
+
+    private function checkRouteValidity(Route $route, string $name): void
+    {
+        foreach (array_keys($route->getRequirements()) as $requirementName) {
+            if (!in_array($requirementName, $route->compile()->getPathVariables())) {
+                throw new \LogicException(sprintf('A requirement name ("%s" given) must match a path variable. You may have forgotten to add it, or there may be a typo in the configuration for route "%s" ?', $requirementName, $name));
+            }
+        }
     }
 }

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Add `no_private_network` option for `http_client.default_options`
+
 6.3
 ---
 

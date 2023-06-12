@@ -10,9 +10,6 @@
             <framework:default-options>
                 <framework:no-private-network />
             </framework:default-options>
-            <framework:scoped-client name="foo" base-uri="http://example.com">
-                <framework:retry-failed multiplier="4"/>
-            </framework:scoped-client>
         </framework:http-client>
     </framework:config>
 </container>

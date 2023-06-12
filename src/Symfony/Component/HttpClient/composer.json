@@ -43,8 +43,7 @@
         "symfony/stopwatch": "^5.4|^6.0"
     },
     "conflict": {
-        "php-http/discovery": "<1.15",
-        "symfony/http-foundation": "<6.3"
+        "php-http/discovery": "<1.15"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\HttpClient\\": "" },

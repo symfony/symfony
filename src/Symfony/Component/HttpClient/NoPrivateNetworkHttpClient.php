@@ -30,6 +30,21 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
 {
     use HttpClientTrait;
 
+    private const PRIVATE_SUBNETS = [
+        '127.0.0.0/8',    // RFC1700 (Loopback)
+        '10.0.0.0/8',     // RFC1918
+        '192.168.0.0/16', // RFC1918
+        '172.16.0.0/12',  // RFC1918
+        '169.254.0.0/16', // RFC3927
+        '0.0.0.0/8',      // RFC5735
+        '240.0.0.0/4',    // RFC1112
+        '::1/128',        // Loopback
+        'fc00::/7',       // Unique Local Address
+        'fe80::/10',      // Link Local Address
+        '::ffff:0:0/96',  // IPv4 translations
+        '::/128',         // Unspecified address
+    ];
+
     private HttpClientInterface $client;
     private string|array|null $subnets;
 
@@ -59,7 +74,7 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
         $options['on_progress'] = function (int $dlNow, int $dlSize, array $info) use ($onProgress, $subnets): void {
             static $lastPrimaryIp = '';
             if ($info['primary_ip'] !== $lastPrimaryIp) {
-                if ($info['primary_ip'] && IpUtils::checkIp($info['primary_ip'], $subnets ?? IpUtils::PRIVATE_SUBNETS)) {
+                if ($info['primary_ip'] && IpUtils::checkIp($info['primary_ip'], $subnets ?? self::PRIVATE_SUBNETS)) {
                     throw new TransportException(sprintf('IP "%s" is blocked for "%s".', $info['primary_ip'], $info['url']));
                 }
 

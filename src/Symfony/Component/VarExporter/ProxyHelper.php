@@ -58,20 +58,15 @@ final class ProxyHelper
                 throw new LogicException(sprintf('Cannot generate lazy ghost: class "%s" extends "%s" which is internal.', $class->name, $parent->name));
             }
         }
-        $propertyScopes = self::exportPropertyScopes($class->name);
 
         return <<<EOPHP
              extends \\{$class->name} implements \Symfony\Component\VarExporter\LazyObjectInterface
             {
                 use \Symfony\Component\VarExporter\LazyGhostTrait;
-
-                private const LAZY_OBJECT_PROPERTY_SCOPES = {$propertyScopes};
             }
 
             // Help opcache.preload discover always-needed symbols
-            class_exists(\Symfony\Component\VarExporter\Internal\Hydrator::class);
             class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectRegistry::class);
-            class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectState::class);
 
             EOPHP;
     }
@@ -104,36 +99,20 @@ final class ProxyHelper
         }
         $methodReflectors = array_merge(...$methodReflectors);
 
-        $extendsInternalClass = false;
+        $methodsHaveToBeProxied = false;
         if ($parent = $class) {
             do {
-                $extendsInternalClass = \stdClass::class !== $parent->name && $parent->isInternal();
-            } while (!$extendsInternalClass && $parent = $parent->getParentClass());
+                $methodsHaveToBeProxied = \stdClass::class !== $parent->name && $parent->isInternal();
+            } while (!$methodsHaveToBeProxied && $parent = $parent->getParentClass());
         }
-        $methodsHaveToBeProxied = $extendsInternalClass;
         $methods = [];
-
-        foreach ($methodReflectors as $method) {
-            if ('__get' !== strtolower($method->name) || 'mixed' === ($type = self::exportType($method) ?? 'mixed')) {
-                continue;
-            }
-            $methodsHaveToBeProxied = true;
-            $trait = new \ReflectionMethod(LazyProxyTrait::class, '__get');
-            $body = \array_slice(file($trait->getFileName()), $trait->getStartLine() - 1, $trait->getEndLine() - $trait->getStartLine());
-            $body[0] = str_replace('): mixed', '): '.$type, $body[0]);
-            $methods['__get'] = strtr(implode('', $body).'    }', [
-                'Hydrator' => '\\'.Hydrator::class,
-                'Registry' => '\\'.LazyObjectRegistry::class,
-            ]);
-            break;
-        }
 
         foreach ($methodReflectors as $method) {
             if (($method->isStatic() && !$method->isAbstract()) || isset($methods[$lcName = strtolower($method->name)])) {
                 continue;
             }
             if ($method->isFinal()) {
-                if ($extendsInternalClass || $methodsHaveToBeProxied || method_exists(LazyProxyTrait::class, $method->name)) {
+                if ($methodsHaveToBeProxied || method_exists(LazyProxyTrait::class, $method->name)) {
                     throw new LogicException(sprintf('Cannot generate lazy proxy: method "%s::%s()" is final.', $class->name, $method->name));
                 }
                 continue;
@@ -149,8 +128,8 @@ final class ProxyHelper
                 $body = "        $parentCall;";
             } elseif (str_ends_with($signature, '): never') || str_ends_with($signature, '): void')) {
                 $body = <<<EOPHP
-                        if (isset(\$this->lazyObjectState)) {
-                            (\$this->lazyObjectState->realInstance ??= (\$this->lazyObjectState->initializer)())->{$method->name}({$args});
+                        if (\$parent = \ReflectionLazyObject::fromInstance(\$this)?->initialize()) {
+                            \$parent->{$method->name}({$args});
                         } else {
                             {$parentCall};
                         }
@@ -171,8 +150,8 @@ final class ProxyHelper
                 }
 
                 $body = <<<EOPHP
-                        if (isset(\$this->lazyObjectState)) {
-                            return (\$this->lazyObjectState->realInstance ??= (\$this->lazyObjectState->initializer)())->{$method->name}({$args});
+                        if (\$parent = \ReflectionLazyObject::fromInstance(\$this)?->initialize()) {
+                            return \$parent->{$method->name}({$args});
                         }
 
                         return {$parentCall};
@@ -195,20 +174,15 @@ final class ProxyHelper
             $methods = ['initializeLazyObject' => implode('', $body).'    }'] + $methods;
         }
         $body = $methods ? "\n".implode("\n\n", $methods)."\n" : '';
-        $propertyScopes = $class ? self::exportPropertyScopes($class->name) : '[]';
 
         return <<<EOPHP
             {$parent} implements \\{$interfaces}
             {
                 use \Symfony\Component\VarExporter\LazyProxyTrait;
-
-                private const LAZY_OBJECT_PROPERTY_SCOPES = {$propertyScopes};
             {$body}}
 
             // Help opcache.preload discover always-needed symbols
-            class_exists(\Symfony\Component\VarExporter\Internal\Hydrator::class);
             class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectRegistry::class);
-            class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectState::class);
 
             EOPHP;
     }
@@ -316,18 +290,6 @@ final class ProxyHelper
         sort($types);
 
         return implode($glue, $types);
-    }
-
-    private static function exportPropertyScopes(string $parent): string
-    {
-        $propertyScopes = Hydrator::$propertyScopes[$parent] ??= Hydrator::getPropertyScopes($parent);
-        uksort($propertyScopes, 'strnatcmp');
-        $propertyScopes = VarExporter::export($propertyScopes);
-        $propertyScopes = str_replace(VarExporter::export($parent), 'parent::class', $propertyScopes);
-        $propertyScopes = preg_replace("/(?|(,)\n( )       |\n        |,\n    (\]))/", '$1$2', $propertyScopes);
-        $propertyScopes = str_replace("\n", "\n    ", $propertyScopes);
-
-        return $propertyScopes;
     }
 
     private static function exportDefault(\ReflectionParameter $param): string

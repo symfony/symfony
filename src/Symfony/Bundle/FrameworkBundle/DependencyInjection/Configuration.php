@@ -1864,8 +1864,22 @@ class Configuration implements ConfigurationInterface
                                     ->normalizeKeys(false)
                                     ->variablePrototype()->end()
                                 ->end()
+                                ->arrayNode('no_private_network')
+                                    ->fixXmlConfig('subnet')
+                                    ->canBeEnabled()
+                                    ->addDefaultsIfNotSet()
+                                    ->children()
+                                        ->arrayNode('subnets')
+                                            ->scalarPrototype()->end()
+                                            ->beforeNormalization()
+                                                ->ifString()
+                                                ->then(fn (string $n): array => [$n])
+                                            ->end()
+                                            ->info('A list of subnets to block requests to. If an empty list is given, all private networks will be blocked.')
+                                        ->end()
+                                    ->end()
+                                ->end()
                                 ->append($this->addHttpClientRetrySection())
-                                ->append($this->addHttpClientNoPrivateNetworksSection())
                             ->end()
                         ->end()
                         ->scalarNode('mock_response_factory')
@@ -2020,28 +2034,6 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
             ->end()
-        ;
-    }
-
-    private function addHttpClientNoPrivateNetworksSection()
-    {
-        $root = new NodeBuilder();
-
-        return $root
-            ->arrayNode('no_private_network')
-                ->fixXmlConfig('subnet')
-                ->canBeEnabled()
-                ->addDefaultsIfNotSet()
-                ->children()
-                    ->arrayNode('subnets')
-                        ->scalarPrototype()->end()
-                        ->beforeNormalization()
-                            ->ifString()
-                            ->then(fn (string $n): array => [$n])
-                        ->end()
-                        ->info('A list of subnets to block requests to. If an empty list is given, all private networks will be blocked.')
-                    ->end()
-                ->end()
         ;
     }
 

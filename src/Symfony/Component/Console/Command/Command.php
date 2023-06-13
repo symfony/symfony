@@ -39,20 +39,6 @@ class Command
     public const FAILURE = 1;
     public const INVALID = 2;
 
-    /**
-     * @var string|null The default command name
-     *
-     * @deprecated since Symfony 6.1, use the AsCommand attribute instead
-     */
-    protected static $defaultName;
-
-    /**
-     * @var string|null The default command description
-     *
-     * @deprecated since Symfony 6.1, use the AsCommand attribute instead
-     */
-    protected static $defaultDescription;
-
     private ?Application $application = null;
     private ?string $name = null;
     private ?string $processTitle = null;
@@ -70,40 +56,20 @@ class Command
 
     public static function getDefaultName(): ?string
     {
-        $class = static::class;
-
-        if ($attribute = (new \ReflectionClass($class))->getAttributes(AsCommand::class)) {
+        if ($attribute = (new \ReflectionClass(static::class))->getAttributes(AsCommand::class)) {
             return $attribute[0]->newInstance()->name;
         }
 
-        $r = new \ReflectionProperty($class, 'defaultName');
-
-        if ($class !== $r->class || null === static::$defaultName) {
-            return null;
-        }
-
-        trigger_deprecation('symfony/console', '6.1', 'Relying on the static property "$defaultName" for setting a command name is deprecated. Add the "%s" attribute to the "%s" class instead.', AsCommand::class, static::class);
-
-        return static::$defaultName;
+        return null;
     }
 
     public static function getDefaultDescription(): ?string
     {
-        $class = static::class;
-
-        if ($attribute = (new \ReflectionClass($class))->getAttributes(AsCommand::class)) {
+        if ($attribute = (new \ReflectionClass(static::class))->getAttributes(AsCommand::class)) {
             return $attribute[0]->newInstance()->description;
         }
 
-        $r = new \ReflectionProperty($class, 'defaultDescription');
-
-        if ($class !== $r->class || null === static::$defaultDescription) {
-            return null;
-        }
-
-        trigger_deprecation('symfony/console', '6.1', 'Relying on the static property "$defaultDescription" for setting a command description is deprecated. Add the "%s" attribute to the "%s" class instead.', AsCommand::class, static::class);
-
-        return static::$defaultDescription;
+        return null;
     }
 
     /**
@@ -152,11 +118,8 @@ class Command
     /**
      * @return void
      */
-    public function setApplication(Application $application = null)
+    public function setApplication(?Application $application)
     {
-        if (1 > \func_num_args()) {
-            trigger_deprecation('symfony/console', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
-        }
         $this->application = $application;
         if ($application) {
             $this->setHelperSet($application->getHelperSet());
@@ -460,12 +423,8 @@ class Command
      *
      * @throws InvalidArgumentException When argument mode is not valid
      */
-    public function addArgument(string $name, int $mode = null, string $description = '', mixed $default = null /* array|\Closure $suggestedValues = null */): static
+    public function addArgument(string $name, int $mode = null, string $description = '', mixed $default = null, array|\Closure $suggestedValues = []): static
     {
-        $suggestedValues = 5 <= \func_num_args() ? func_get_arg(4) : [];
-        if (!\is_array($suggestedValues) && !$suggestedValues instanceof \Closure) {
-            throw new \TypeError(sprintf('Argument 5 passed to "%s()" must be array or \Closure, "%s" given.', __METHOD__, get_debug_type($suggestedValues)));
-        }
         $this->definition->addArgument(new InputArgument($name, $mode, $description, $default, $suggestedValues));
         $this->fullDefinition?->addArgument(new InputArgument($name, $mode, $description, $default, $suggestedValues));
 
@@ -484,12 +443,8 @@ class Command
      *
      * @throws InvalidArgumentException If option mode is invalid or incompatible
      */
-    public function addOption(string $name, string|array $shortcut = null, int $mode = null, string $description = '', mixed $default = null /* array|\Closure $suggestedValues = [] */): static
+    public function addOption(string $name, string|array $shortcut = null, int $mode = null, string $description = '', mixed $default = null, array|\Closure $suggestedValues = []): static
     {
-        $suggestedValues = 6 <= \func_num_args() ? func_get_arg(5) : [];
-        if (!\is_array($suggestedValues) && !$suggestedValues instanceof \Closure) {
-            throw new \TypeError(sprintf('Argument 5 passed to "%s()" must be array or \Closure, "%s" given.', __METHOD__, get_debug_type($suggestedValues)));
-        }
         $this->definition->addOption(new InputOption($name, $shortcut, $mode, $description, $default, $suggestedValues));
         $this->fullDefinition?->addOption(new InputOption($name, $shortcut, $mode, $description, $default, $suggestedValues));
 

@@ -21,10 +21,8 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @final since Symfony 6.3
  */
-class ConstraintViolationListNormalizer implements NormalizerInterface
+final class ConstraintViolationListNormalizer implements NormalizerInterface
 {
     public const INSTANCE = 'instance';
     public const STATUS = 'status';

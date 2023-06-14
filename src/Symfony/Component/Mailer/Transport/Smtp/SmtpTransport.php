@@ -244,12 +244,7 @@ class SmtpTransport extends AbstractTransport
         }
     }
 
-    /**
-     * @internal since version 6.1, to be made private in 7.0
-     *
-     * @final since version 6.1, to be made private in 7.0
-     */
-    protected function doHeloCommand(): void
+    private function doHeloCommand(): void
     {
         $this->executeCommand(sprintf("HELO %s\r\n", $this->domain), [250]);
     }

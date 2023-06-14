@@ -23,10 +23,8 @@ use Symfony\Component\Mime\Email;
 
 /**
  * @author Alexander Borisov <boshurik@gmail.com>
- *
- * @final since Symfony 6.1
  */
-class MailerHandler extends AbstractProcessingHandler
+final class MailerHandler extends AbstractProcessingHandler
 {
     use CompatibilityProcessingHandler;
 

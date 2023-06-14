@@ -18,10 +18,8 @@ use Symfony\Component\Serializer\Exception\LogicException;
  * A normalizer that uses an objects own JsonSerializable implementation.
  *
  * @author Fred Cox <mcfedr@gmail.com>
- *
- * @final since Symfony 6.3
  */
-class JsonSerializableNormalizer extends AbstractNormalizer
+final class JsonSerializableNormalizer extends AbstractNormalizer
 {
     public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {

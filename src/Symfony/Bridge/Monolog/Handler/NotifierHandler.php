@@ -16,17 +16,14 @@ use Monolog\Level;
 use Monolog\Logger;
 use Monolog\LogRecord;
 use Symfony\Component\Notifier\Notification\Notification;
-use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\Notifier\NotifierInterface;
 
 /**
  * Uses Notifier as a log handler.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @final since Symfony 6.1
  */
-class NotifierHandler extends AbstractHandler
+final class NotifierHandler extends AbstractHandler
 {
     use CompatibilityHandler;
 

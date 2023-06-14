@@ -77,10 +77,8 @@ if (Logger::API >= 3) {
  * This mapping can be customized with the $verbosityLevelMap constructor parameter.
  *
  * @author Tobias Schultze <http://tobion.de>
- *
- * @final since Symfony 6.1
  */
-class ConsoleHandler extends AbstractProcessingHandler implements EventSubscriberInterface
+final class ConsoleHandler extends AbstractProcessingHandler implements EventSubscriberInterface
 {
     use CompatibilityHandler;
     use CompatibilityIsHandlingHandler;

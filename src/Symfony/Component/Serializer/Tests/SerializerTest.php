@@ -89,7 +89,7 @@ class SerializerTest extends TestCase
     public function testNormalizeNoMatch()
     {
         $this->expectException(UnexpectedValueException::class);
-        $serializer = new Serializer([$this->createMock(CustomNormalizer::class)]);
+        $serializer = new Serializer([$this->createMock(NormalizerInterface::class)]);
         $serializer->normalize(new \stdClass(), 'xml');
     }
 
@@ -117,7 +117,7 @@ class SerializerTest extends TestCase
     public function testDenormalizeNoMatch()
     {
         $this->expectException(UnexpectedValueException::class);
-        $serializer = new Serializer([$this->createMock(CustomNormalizer::class)]);
+        $serializer = new Serializer([$this->createMock(NormalizerInterface::class)]);
         $serializer->denormalize('foo', 'stdClass');
     }
 

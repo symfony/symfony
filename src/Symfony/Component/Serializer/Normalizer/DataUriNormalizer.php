@@ -22,10 +22,8 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
  * Denormalizes a data URI to a {@see \SplFileObject} object.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @final since Symfony 6.3
  */
-class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface
+final class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface
 {
     private const SUPPORTED_TYPES = [
         \SplFileInfo::class => true,

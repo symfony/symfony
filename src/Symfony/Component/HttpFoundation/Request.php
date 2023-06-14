@@ -1526,7 +1526,7 @@ class Request
     public function toArray(): array
     {
         if ('' === $content = $this->getContent()) {
-            throw new JsonException('Request body is empty.');
+            return [];
         }
 
         try {

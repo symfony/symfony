@@ -2744,31 +2744,6 @@ index 8ebc84376b..4af2691707 100644
 +    protected function writeError(OutputInterface $output, \Exception $error): void
      {
          if ($output instanceof SymfonyStyle) {
-diff --git a/src/Symfony/Component/Console/Helper/Table.php b/src/Symfony/Component/Console/Helper/Table.php
-index cf714873f5..e16ffaf97d 100644
---- a/src/Symfony/Component/Console/Helper/Table.php
-+++ b/src/Symfony/Component/Console/Helper/Table.php
-@@ -70,5 +70,5 @@ class Table
-      * @return void
-      */
--    public static function setStyleDefinition(string $name, TableStyle $style)
-+    public static function setStyleDefinition(string $name, TableStyle $style): void
-     {
-         self::$styles ??= self::initStyles();
-@@ -195,5 +195,5 @@ class Table
-      * @return $this
-      */
--    public function setRows(array $rows)
-+    public function setRows(array $rows): static
-     {
-         $this->rows = [];
-@@ -316,5 +316,5 @@ class Table
-      * @return void
-      */
--    public function render()
-+    public function render(): void
-     {
-         $divider = new TableSeparator();
 diff --git a/src/Symfony/Component/Console/Input/ArgvInput.php b/src/Symfony/Component/Console/Input/ArgvInput.php
 index 59f9217ec5..77b402b7d7 100644
 --- a/src/Symfony/Component/Console/Input/ArgvInput.php

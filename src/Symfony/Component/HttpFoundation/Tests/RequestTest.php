@@ -1279,9 +1279,7 @@ class RequestTest extends TestCase
     public function testToArrayEmpty()
     {
         $req = new Request();
-        $this->expectException(JsonException::class);
-        $this->expectExceptionMessage('Request body is empty.');
-        $req->toArray();
+        $this->assertSame([], $req->toArray());
     }
 
     public function testToArrayNonJson()

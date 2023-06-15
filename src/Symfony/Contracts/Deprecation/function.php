@@ -11,7 +11,7 @@
 
 if (!function_exists('trigger_deprecation')) {
     /**
-     * Triggers a silenced deprecation notice.
+     * Triggers a (silenced) deprecation notice.
      *
      * @param string $package The name of the Composer package that is triggering the deprecation
      * @param string $version The version of the package that introduced the deprecation
@@ -22,6 +22,12 @@ if (!function_exists('trigger_deprecation')) {
      */
     function trigger_deprecation(string $package, string $version, string $message, mixed ...$args): void
     {
-        @trigger_error(($package || $version ? "Since $package $version: " : '').($args ? vsprintf($message, $args) : $message), \E_USER_DEPRECATED);
+        $error = ($package || $version ? "Since $package $version: " : '').($args ? vsprintf($message, $args) : $message);
+
+        if ((bool) ($_SERVER['SYMFONY_DEPRECATIONS_SCREAM'] ?? $_ENV['SYMFONY_DEPRECATIONS_SCREAM'] ?? false)) {
+            trigger_error($error, \E_USER_DEPRECATED);
+        } else {
+            @trigger_error($error, \E_USER_DEPRECATED);
+        }
     }
 }

@@ -209,8 +209,10 @@ class GenericMetadata implements MetadataInterface
             foreach ($this->constraintsByGroup as $groupConstraints) {
                 $constraints = array_merge($constraints, $groupConstraints);
             }
+
             return $constraints;
         }
+
         return $this->constraintsByGroup[$group] ?? [];
     }
 

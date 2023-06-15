@@ -1130,11 +1130,14 @@ class RecursiveValidatorTest extends TestCase
             'callback' => $callback,
             'groups' => 'Group 2',
         ]));
+        $this->metadata->addConstraint(new Callback([
+            'callback' => $callback,
+        ]));
 
         $violations = $this->validate($entity, null, '*');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(2, $violations);
+        $this->assertCount(3, $violations);
     }
 
     public function testReplaceDefaultGroupByGroupSequenceObject()

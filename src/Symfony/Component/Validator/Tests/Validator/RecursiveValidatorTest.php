@@ -1114,6 +1114,29 @@ class RecursiveValidatorTest extends TestCase
         $this->assertCount(2, $violations);
     }
 
+    public function testValidateAllGroups()
+    {
+        $entity = new Entity();
+
+        $callback = function ($value, ExecutionContextInterface $context) {
+            $context->addViolation('Message');
+        };
+
+        $this->metadata->addConstraint(new Callback([
+            'callback' => $callback,
+            'groups' => 'Group 1',
+        ]));
+        $this->metadata->addConstraint(new Callback([
+            'callback' => $callback,
+            'groups' => 'Group 2',
+        ]));
+
+        $violations = $this->validate($entity, null, '*');
+
+        /* @var ConstraintViolationInterface[] $violations */
+        $this->assertCount(2, $violations);
+    }
+
     public function testReplaceDefaultGroupByGroupSequenceObject()
     {
         $entity = new Entity();

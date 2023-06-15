@@ -1136,6 +1136,7 @@ class RecursiveValidatorTest extends TestCase
 
         $violations = $this->validate($entity, null, '*');
 
+        /* @var ConstraintViolationInterface[] $violations */
         $this->assertCount(3, $violations);
     }
 

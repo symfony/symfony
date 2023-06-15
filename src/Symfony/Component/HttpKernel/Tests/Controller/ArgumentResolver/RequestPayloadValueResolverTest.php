@@ -221,6 +221,22 @@ class RequestPayloadValueResolverTest extends TestCase
         $this->assertEquals([$payload], $event->getArguments());
     }
 
+    public function testItThrowsOnVariadicArgument()
+    {
+        $serializer = new Serializer();
+        $validator = $this->createMock(ValidatorInterface::class);
+        $resolver = new RequestPayloadValueResolver($serializer, $validator);
+
+        $argument = new ArgumentMetadata('variadic', RequestPayload::class, true, false, null, false, [
+            MapRequestPayload::class => new MapRequestPayload(),
+        ]);
+        $request = Request::create('/', 'POST');
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Mapping variadic argument "$variadic" is not supported.');
+        $resolver->resolve($request, $argument);
+    }
+
     /**
      * @dataProvider provideMatchedFormatContext
      */

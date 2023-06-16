@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-05-24T11:13:32Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2023-05-24T11:39:49Z
+
+Hi @wouter-toppy! Thanks for your first contribution. As 6.3 is in feature-freeze, could you open your PR against 6.4 branch please? Thanks
+
+---------------------------------------------------------------------------
+
+by wouter-toppy at 2023-05-24T11:50:07Z
+
+> Hi @wouter-toppy! Thanks for your first contribution. As 6.3 is in feature-freeze, could you open your PR against 6.4 branch please? Thanks
+
+Done
+
+---------------------------------------------------------------------------
+
+by wouter-toppy at 2023-05-24T15:07:11Z
+
+@welcoMattic  pipeline is still failing, but I cant see if that is a problem at my side.
+tested the component, and it should be ready for merge to 6.4
+
+---------------------------------------------------------------------------
+
+by wouter-toppy at 2023-06-14T11:59:17Z
+
+@OskarStark  anything i need to do to get this merged?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-06-15T07:20:07Z
+
+One last thing, can you please open a PR against `symfony/recipes` ? Thanks
+
+---------------------------------------------------------------------------
+
+by wouter-toppy at 2023-06-15T07:29:07Z
+
+> One last thing, can you please open a PR against `symfony/recipes` ? Thanks
+
+@OskarStark https://github.com/symfony/recipes/pull/1214

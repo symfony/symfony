@@ -38,8 +38,13 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
  */
 class Security extends LegacySecurity
 {
+    /** @non-deprecated */
     public const ACCESS_DENIED_ERROR = SecurityRequestAttributes::ACCESS_DENIED_ERROR;
+
+    /** @non-deprecated */
     public const AUTHENTICATION_ERROR = SecurityRequestAttributes::AUTHENTICATION_ERROR;
+
+    /** @non-deprecated */
     public const LAST_USERNAME = SecurityRequestAttributes::LAST_USERNAME;
 
     public function __construct(private readonly ContainerInterface $container, private readonly array $authenticators = [])

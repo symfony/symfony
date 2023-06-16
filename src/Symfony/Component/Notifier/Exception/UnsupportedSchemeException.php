@@ -156,6 +156,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Novu\NovuTransportFactory::class,
             'package' => 'symfony/novu-notifier',
         ],
+        'ntfy' => [
+            'class' => Bridge\Ntfy\NtfyTransportFactory::class,
+            'package' => 'symfony/ntfy-notifier',
+        ],
         'octopush' => [
             'class' => Bridge\Octopush\OctopushTransportFactory::class,
             'package' => 'symfony/octopush-notifier',

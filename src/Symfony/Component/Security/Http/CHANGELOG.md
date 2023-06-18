@@ -6,6 +6,8 @@ CHANGELOG
 
  * `UserValueResolver` no longer implements `ArgumentValueResolverInterface`
  * Deprecate calling the constructor of `DefaultLoginRateLimiter` with an empty secret
+ * [BC BREAK] Remove experimental `InvalidSignatureException` and `MissingClaimException` classes from the `AccessToken\Oidc\Exception` namespace
+ * Deprecate passing a logger to the `OidcTokenHandler` constructor
 
 6.3
 ---

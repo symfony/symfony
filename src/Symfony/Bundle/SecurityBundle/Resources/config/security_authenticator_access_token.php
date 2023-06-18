@@ -71,7 +71,6 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('audience'),
                 abstract_arg('issuers'),
                 'sub',
-                service('logger')->nullOnInvalid(),
                 service('clock'),
             ])
 

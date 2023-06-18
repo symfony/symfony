@@ -95,7 +95,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
             // UserLoader argument can be overridden by a UserProvider on AccessTokenAuthenticator::authenticate
             return new UserBadge($claims[$this->claim], fn () => $this->createUser($claims), $claims);
         } catch (\Exception $e) {
-            $this->logger?->error('An error while decoding and validating the token.', [
+            $this->logger?->error('An error occurred while decoding and validating the token.', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);

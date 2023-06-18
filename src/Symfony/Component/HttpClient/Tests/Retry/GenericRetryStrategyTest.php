@@ -67,7 +67,7 @@ class GenericRetryStrategyTest extends TestCase
 
     public static function provideDelay(): iterable
     {
-        // delay, multiplier, maxDelay, retries, expectedDelay
+        // delay, multiplier, maxDelay, previousRetries, expectedDelay
         yield [1000, 1, 5000, 0, 1000];
         yield [1000, 1, 5000, 1, 1000];
         yield [1000, 1, 5000, 2, 1000];
@@ -90,19 +90,29 @@ class GenericRetryStrategyTest extends TestCase
         yield [0, 2, 10000, 1, 0];
     }
 
-    public function testJitter()
+    /**
+     * @dataProvider provideJitter
+     */
+    public function testJitter(float $multiplier, int $previousRetries)
     {
-        $strategy = new GenericRetryStrategy([], 1000, 1, 0, 1);
+        $strategy = new GenericRetryStrategy([], 1000, $multiplier, 0, 1);
         $min = 2000;
         $max = 0;
         for ($i = 0; $i < 50; ++$i) {
-            $delay = $strategy->getDelay($this->getContext(0, 'GET', 'http://example.com/', 200), null, null);
+            $delay = $strategy->getDelay($this->getContext($previousRetries, 'GET', 'http://example.com/', 200), null, null);
             $min = min($min, $delay);
             $max = max($max, $delay);
         }
         $this->assertGreaterThanOrEqual(1000, $max - $min);
         $this->assertGreaterThanOrEqual(1000, $max);
         $this->assertLessThanOrEqual(1000, $min);
+    }
+
+    public static function provideJitter(): iterable
+    {
+        // multiplier, previousRetries
+        yield [1, 0];
+        yield [1.1, 2];
     }
 
     private function getContext($retryCount, $method, $url, $statusCode): AsyncContext

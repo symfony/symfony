@@ -1,6 +1,11 @@
 UPGRADE FROM 6.2 to 6.3
 =======================
 
+Cache
+-----
+
+ * `DoctrineDbalAdapter` now takes an optional `$isSameDatabase` parameter
+
 Console
 -------
 
@@ -22,6 +27,8 @@ DoctrineBridge
  * Deprecate `DoctrineDbalCacheAdapterSchemaSubscriber` in favor of `DoctrineDbalCacheAdapterSchemaListener`
  * Deprecate `MessengerTransportDoctrineSchemaSubscriber` in favor of `MessengerTransportDoctrineSchemaListener`
  * Deprecate `RememberMeTokenProviderDoctrineSchemaSubscriber` in favor of `RememberMeTokenProviderDoctrineSchemaListener`
+ * `DoctrineTransport` now takes an optional `$isSameDatabase` parameter
+ * `DoctrineTokenProvider` now takes an optional `$isSameDatabase` parameter
 
 Form
 ----

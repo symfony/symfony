@@ -23,7 +23,7 @@ Symfony 6.3 is [backed][27] by
 - [Les-Tilleuls.coop][30]
 - [basecom][31]
 
-As the creator of Symfony, **SensioLabs** supports companies using Symfony,
+As the creator of Symfony, **SensioLabs** supports companies using Symfony
 with an offering encompassing consultancy, expertise, services, training, and
 technical assistance to ensure the success of web application development projects.
 
@@ -33,12 +33,12 @@ innovate fast, and accelerate your growth in the ever-evolving space of digital
 commerce. You decide how far you want to go, and we'll be by your side.
 
 **Les-Tilleuls.coop** is a team of 70+ Symfony experts who can help you design,
-develop and fix your projects. We provide a wide range of professional services
-including development, consulting, coaching, training and audits. We also are
-highly skilled in JS, Go and DevOps. We are a worker cooperative!
+develop and fix your projects. We provide a wide range of professional services,
+including development, consulting, coaching, training, and audits. We also are
+highly skilled in JS, Go, and DevOps. We are a worker cooperative!
 
 As a professional software service provider, **basecom** implements customized
-solutions in the areas of e-commerce, PIM solutions and web portals. With their
+solutions in the areas of e-commerce, PIM solutions, and web portals. With their
 experience and certified expertise, they have been one of the most renowned
 Symfony specialists in Germany for many years.
 

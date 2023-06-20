@@ -308,11 +308,35 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      * @param bool $remove Whether to remove the extra keys
      *
      * @return $this
+     *
+     * @deprecated since Symfony 6.3, use setIgnoreExtraKeys(true) and setIgnoreExtraKeys() instead
      */
     public function ignoreExtraKeys(bool $remove = true): static
     {
-        $this->ignoreExtraKeys = true;
-        $this->removeExtraKeys = $remove;
+        trigger_deprecation('symfony/config', '6.3', 'The "%s()" method is deprecated, use "setIgnoreExtraKeys(true)" and "setIgnoreExtraKeys()" instead.', __METHOD__);
+
+        $this->setIgnoreExtraKeys(true);
+        $this->setRemoveExtraKeys($remove);
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setIgnoreExtraKeys(bool $ignoreExtraKeys): static
+    {
+        $this->ignoreExtraKeys = $ignoreExtraKeys;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setRemoveExtraKeys(bool $removeExtraKeys): static
+    {
+        $this->removeExtraKeys = $removeExtraKeys;
 
         return $this;
     }

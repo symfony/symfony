@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Allow enum values in `EnumNode`
+ * Deprecate `ArrayNodeDefinition::ignoreExtraKeys()`, use `ArrayNodeDefinition::setIgnoreExtraKeys(true)` and `ArrayNodeDefinition::setRemoveExtraKeys()` instead
 
 6.2
 ---

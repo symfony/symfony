@@ -12,6 +12,7 @@
 namespace Symfony\Component\Config\Tests\Definition\Builder;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\BooleanNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
@@ -23,6 +24,8 @@ use Symfony\Component\Config\Definition\PrototypedArrayNode;
 
 class ArrayNodeDefinitionTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testAppendingSomeNode()
     {
         $parent = new ArrayNodeDefinition('root');
@@ -208,16 +211,45 @@ class ArrayNodeDefinitionTest extends TestCase
         $this->assertTrue($this->getField($enabledNode, 'defaultValue'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testIgnoreExtraKeys()
     {
         $node = new ArrayNodeDefinition('root');
 
         $this->assertFalse($this->getField($node, 'ignoreExtraKeys'));
 
+        $this->expectDeprecation('Since symfony/config 6.3: The "Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition::ignoreExtraKeys()" method is deprecated, use "setIgnoreExtraKeys(true)" and "setIgnoreExtraKeys()" instead.');
+
         $result = $node->ignoreExtraKeys();
 
         $this->assertEquals($node, $result);
         $this->assertTrue($this->getField($node, 'ignoreExtraKeys'));
+    }
+
+    public function testSetIgnoreExtraKeys()
+    {
+        $node = new ArrayNodeDefinition('root');
+
+        $this->assertFalse($this->getField($node, 'ignoreExtraKeys'));
+
+        $result = $node->setIgnoreExtraKeys(true);
+
+        $this->assertEquals($node, $result);
+        $this->assertTrue($this->getField($node, 'ignoreExtraKeys'));
+    }
+
+    public function testSetRemoveExtraKeys()
+    {
+        $node = new ArrayNodeDefinition('root');
+
+        $this->assertTrue($this->getField($node, 'removeExtraKeys'));
+
+        $result = $node->setRemoveExtraKeys(false);
+
+        $this->assertEquals($node, $result);
+        $this->assertFalse($this->getField($node, 'removeExtraKeys'));
     }
 
     public function testNormalizeKeys()

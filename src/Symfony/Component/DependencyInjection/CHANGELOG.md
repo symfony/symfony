@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Deprecate `ContainerAwareInterface` and `ContainerAwareTrait`, use dependency injection instead
+ * Added support for `$schema` in Yaml config files
 
 6.3
 ---

@@ -1,0 +1,3 @@
+$schema: 'https://some-schema.org/schema.json'
+parameters:
+    foo: bar

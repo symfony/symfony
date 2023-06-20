@@ -1181,4 +1181,13 @@ class YamlFileLoaderTest extends TestCase
         $definition = $container->getDefinition('static_constructor');
         $this->assertEquals((new Definition('stdClass'))->setFactory([null, 'create']), $definition);
     }
+
+    public function testSchemaInYaml()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('schema.yml');
+
+        $this->assertEquals('bar', $container->getParameter('foo'));
+    }
 }

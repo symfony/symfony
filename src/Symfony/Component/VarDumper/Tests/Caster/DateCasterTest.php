@@ -106,6 +106,52 @@ EODUMP;
         ];
     }
 
+    /**
+     * @dataProvider provideNoTimezoneDateTimes
+     */
+    public function testCastDateTimeNoTimezone($time, $xDate, $xInfos)
+    {
+        $stub = new Stub();
+        $date = new NoTimezoneDate($time);
+        $cast = DateCaster::castDateTime($date, Caster::castObject($date, \DateTime::class), $stub, false, 0);
+
+        $xDump = <<<EODUMP
+array:1 [
+  "\\x00~\\x00date" => $xDate
+]
+EODUMP;
+
+        $this->assertDumpEquals($xDump, $cast);
+
+        $xDump = <<<EODUMP
+Symfony\Component\VarDumper\Caster\ConstStub {
+  +type: 1
+  +class: "$xDate"
+  +value: "%A$xInfos%A"
+  +cut: 0
+  +handle: 0
+  +refCount: 0
+  +position: 0
+  +attr: []
+}
+EODUMP;
+
+        $this->assertDumpMatchesFormat($xDump, $cast["\0~\0date"]);
+    }
+
+    public static function provideNoTimezoneDateTimes()
+    {
+        return [
+            ['2017-04-30 00:00:00.000000', '2017-04-30 00:00:00.0 +00:00', 'Sunday, April 30, 2017'],
+            ['2017-04-30 00:00:00.100000', '2017-04-30 00:00:00.100 +00:00', 'Sunday, April 30, 2017'],
+            ['2017-04-30 00:00:00.120000', '2017-04-30 00:00:00.120 +00:00', 'Sunday, April 30, 2017'],
+            ['2017-04-30 00:00:00.123000', '2017-04-30 00:00:00.123 +00:00', 'Sunday, April 30, 2017'],
+            ['2017-04-30 00:00:00.123400', '2017-04-30 00:00:00.123400 +00:00', 'Sunday, April 30, 2017'],
+            ['2017-04-30 00:00:00.123450', '2017-04-30 00:00:00.123450 +00:00', 'Sunday, April 30, 2017'],
+            ['2017-04-30 00:00:00.123456', '2017-04-30 00:00:00.123456 +00:00', 'Sunday, April 30, 2017'],
+        ];
+    }
+
     public function testCastDateTimeWithAdditionalChildProperty()
     {
         $stub = new Stub();
@@ -421,5 +467,13 @@ EODUMP;
         $interval->invert = $invert;
 
         return $interval;
+    }
+}
+
+class NoTimezoneDate extends \DateTime
+{
+    public function getTimezone(): \DateTimeZone|false
+    {
+        return false;
     }
 }

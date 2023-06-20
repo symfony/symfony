@@ -482,7 +482,7 @@ class Connection implements ResetInterface
         $comparator = $this->createComparator($schemaManager);
         $schemaDiff = $this->compareSchemas($comparator, method_exists($schemaManager, 'introspectSchema') ? $schemaManager->introspectSchema() : $schemaManager->createSchema(), $this->getSchema());
         $platform = $this->driverConnection->getDatabasePlatform();
-        $queries = method_exists($platform, 'getAlterSchemaSQL') ? $platform->getAlterSchemaSQL($schemaDiff) : $schemaDiff->toSaveSql($platform);
+        $queries = $schemaDiff->toSaveSql($platform);
 
         foreach ($queries as $sql) {
             if (method_exists($this->driverConnection, 'executeStatement')) {

@@ -33,20 +33,18 @@ final class Address
      */
     private const FROM_STRING_PATTERN = '~(?<displayName>[^<]*)<(?<addrSpec>.*)>[^>]*~';
 
-    private static EmailValidator $validator;
+    private static EmailValidator|EmailValidatorInterface $validator;
     private static IdnAddressEncoder $encoder;
 
     private string $address;
     private string $name;
 
-    public function __construct(string $address, string $name = '')
+    public function __construct(string $address, string $name = '', EmailValidatorInterface $customValidator = null)
     {
-        if (!class_exists(EmailValidator::class)) {
-            throw new LogicException(sprintf('The "%s" class cannot be used as it needs "%s". Try running "composer require egulias/email-validator".', __CLASS__, EmailValidator::class));
+        if (($customValidator === null) && !class_exists(EmailValidator::class)) {
+            throw new LogicException(sprintf('The "%s" class cannot be used as it needs "%s". Try running "composer require egulias/email-validator" or create a custom validator implementing "%s"', __CLASS__, EmailValidator::class, EmailValidatorInterface::class));
         }
-
-        self::$validator ??= new EmailValidator();
-
+        self::$validator = ($customValidator) ?: new EmailValidator();
         $this->address = trim($address);
         $this->name = trim(str_replace(["\n", "\r"], '', $name));
 

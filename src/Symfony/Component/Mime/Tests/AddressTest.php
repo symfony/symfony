@@ -30,6 +30,14 @@ class AddressTest extends TestCase
         $this->assertEquals('fabien@xn--symfon-nwa.com', $a->getEncodedAddress());
     }
 
+    public function testCustomValidator()
+    {
+        $customValidator = new CustomAddressValidator();
+        $emailWithCustomValidator = new Address('john..doe@example.com', 'John', $customValidator);
+        $this->expectException(\InvalidArgumentException::class);
+        $emailWithoutCustomValidator = new Address('john..doe@example.com', 'John');
+    }
+
     public function testConstructorWithInvalidAddress()
     {
         $this->expectException(\InvalidArgumentException::class);

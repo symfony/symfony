@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2023-04-21T19:00:04Z
+
+This does not seem to deprecate the default name though AFAICT
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2023-04-25T07:10:12Z
+
+@stof Indeed, I don't think it's worth it to deprecate the default name and Nicolas agreed after discussing it with him on Slack.

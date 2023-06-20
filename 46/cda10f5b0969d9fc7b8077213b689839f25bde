@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-06-13T08:32:40Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-06-13T08:47:23Z
+
+Thank you for your PR. I disagree with the motivation of your change for two reasons:
+
+* I don't want to implement workarounds for broken mocks. Your mock probably does not behave like the `DateTime` objects your code is usually dealing with. That is a clear sign that you should fix your mock.
+* Mocking `DateTime` is in most cases a very pointless thing to do. One exception might be testing this very edge case. 🙈
+
+However [as per PHP's documentation](https://www.php.net/manual/en/datetime.gettimezone), `false` is a possible return value of `getTimezone()`, so VarDumper should be able to handle it.
+
+I'm fine with the change, once my review has been addressed.
+
+---------------------------------------------------------------------------
+
+by bogdanmoza at 2023-06-13T12:06:25Z
+
+Thanks for the quick reply, you are right about the motivation, what I was thinking is that since PHP enables you to return false, then of course that allows for some special cases like dumping a Mock, and it is possible without a Mock also.

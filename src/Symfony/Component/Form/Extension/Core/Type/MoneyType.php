@@ -37,7 +37,9 @@ class MoneyType extends AbstractType
                 $options['grouping'],
                 $options['rounding_mode'],
                 $options['divisor'],
-                $options['html5'] ? 'en' : null
+                $options['html5'] ? 'en' : null,
+                $options['format']
+
             ))
         ;
     }
@@ -50,7 +52,7 @@ class MoneyType extends AbstractType
         $view->vars['money_pattern'] = self::getPattern($options['currency']);
 
         if ($options['html5']) {
-            $view->vars['type'] = 'number';
+            $view->vars['type'] = $options['format'] === 'integer' ? 'integer' : 'number';
         }
     }
 
@@ -60,14 +62,15 @@ class MoneyType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'scale' => 2,
-            'grouping' => false,
-            'rounding_mode' => \NumberFormatter::ROUND_HALFUP,
-            'divisor' => 1,
-            'currency' => 'EUR',
-            'compound' => false,
-            'html5' => false,
+            'scale'           => 2,
+            'grouping'        => false,
+            'rounding_mode'   => \NumberFormatter::ROUND_HALFUP,
+            'divisor'         => 1,
+            'currency'        => 'EUR',
+            'compound'        => false,
+            'html5'           => false,
             'invalid_message' => 'Please enter a valid money amount.',
+            'format'          => 'float'
         ]);
 
         $resolver->setAllowedValues('rounding_mode', [
@@ -80,6 +83,7 @@ class MoneyType extends AbstractType
             \NumberFormatter::ROUND_CEILING,
         ]);
 
+        $resolver->setAllowedValues('format', ['float', 'integer']);
         $resolver->setAllowedTypes('scale', 'int');
 
         $resolver->setAllowedTypes('html5', 'bool');

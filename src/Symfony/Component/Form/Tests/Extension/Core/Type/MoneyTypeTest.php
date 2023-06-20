@@ -123,4 +123,17 @@ class MoneyTypeTest extends BaseTypeTestCase
         $this->assertSame('12345.60', $form->createView()->vars['value']);
         $this->assertSame('number', $form->createView()->vars['type']);
     }
+
+    public function testHtml5EnablesSpecificFormattingWithIntegerFormat()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['html5' => true, 'scale' => 2, 'format' => 'integer']);
+        $this->assertSame('integer', $form->createView()->vars['type']);
+    }
+
+    public function testValueToIntegerWithSpecificOptionFormatToInteger()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['format' => 'integer']);
+        $form->submit('12345.6');
+        $this->assertSame(12345, $form->getData());
+    }
 }

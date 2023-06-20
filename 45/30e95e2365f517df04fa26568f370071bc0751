@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-09T12:37:51Z
+
+Thanks. We also need to scan the code base for all usages of both and adjust as needed.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-06-09T12:42:01Z
+
+Should this be done in this PR? I thought this would be done in the 7.0 one. But I can have a look in this one if needed :slightly_smiling_face:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-09T12:48:00Z
+
+That's always been our policy yes: ensure we don't trigger self-deprecation and that the code path that are going to be removed do trigger a notice before being removed.
+
+---------------------------------------------------------------------------
+
+by Kocal at 2023-06-12T20:41:08Z
+
+What is the upgrade path for apps/bundles using this interface/trait? eg: the DoctrineBundle for container-aware migrations.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-06-13T05:11:03Z
+
+@Kocal we've implemented `Doctrine\Migrations\Version\MigrationFactory`

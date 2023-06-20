@@ -111,15 +111,6 @@ class RememberMeFactory implements AuthenticatorFactoryInterface, PrependExtensi
             ->replaceArgument(3, $config['name'] ?? $this->options['name'])
         ;
 
-        foreach ($container->findTaggedServiceIds('security.remember_me_aware') as $serviceId => $attributes) {
-            // register ContextListener
-            if (str_starts_with($serviceId, 'security.context_listener')) {
-                continue;
-            }
-
-            throw new \LogicException(sprintf('Symfony Authenticator Security dropped support for the "security.remember_me_aware" tag, service "%s" will no longer work as expected.', $serviceId));
-        }
-
         return $authenticatorId;
     }
 

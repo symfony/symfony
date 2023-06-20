@@ -86,7 +86,7 @@ EOF
         }
 
         foreach ($localSecrets ?? [] as $name => $value) {
-            if (isset($rows[$name]) && !\in_array($value, ['', false, null], true)) {
+            if (isset($rows[$name])) {
                 $rows[$name][] = $dump($value);
             }
         }

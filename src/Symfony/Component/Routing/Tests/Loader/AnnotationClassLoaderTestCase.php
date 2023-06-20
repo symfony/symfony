@@ -12,6 +12,7 @@
 namespace Symfony\Component\Routing\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Routing\Alias;
 use Symfony\Component\Routing\Loader\AnnotationClassLoader;
 use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\AbstractClassController;
 
@@ -55,6 +56,7 @@ abstract class AnnotationClassLoaderTestCase extends TestCase
         $routes = $this->loader->load($this->getNamespace().'\ActionPathController');
         $this->assertCount(1, $routes);
         $this->assertEquals('/path', $routes->get('action')->getPath());
+        $this->assertEquals(new Alias('action'), $routes->getAlias($this->getNamespace().'\ActionPathController::action'));
     }
 
     public function testRequirementsWithoutPlaceholderName()
@@ -72,6 +74,19 @@ abstract class AnnotationClassLoaderTestCase extends TestCase
         $this->assertEquals('/here', $routes->get('lol')->getPath());
         $this->assertEquals(['GET', 'POST'], $routes->get('lol')->getMethods());
         $this->assertEquals(['https'], $routes->get('lol')->getSchemes());
+        $this->assertEquals(new Alias('lol'), $routes->getAlias($this->getNamespace().'\InvokableController'));
+        $this->assertEquals(new Alias('lol'), $routes->getAlias($this->getNamespace().'\InvokableController::__invoke'));
+    }
+
+    public function testInvokableMethodControllerLoader()
+    {
+        $routes = $this->loader->load($this->getNamespace().'\InvokableMethodController');
+        $this->assertCount(1, $routes);
+        $this->assertEquals('/here', $routes->get('lol')->getPath());
+        $this->assertEquals(['GET', 'POST'], $routes->get('lol')->getMethods());
+        $this->assertEquals(['https'], $routes->get('lol')->getSchemes());
+        $this->assertEquals(new Alias('lol'), $routes->getAlias($this->getNamespace().'\InvokableMethodController'));
+        $this->assertEquals(new Alias('lol'), $routes->getAlias($this->getNamespace().'\InvokableMethodController::__invoke'));
     }
 
     public function testInvokableLocalizedControllerLoading()
@@ -119,6 +134,8 @@ abstract class AnnotationClassLoaderTestCase extends TestCase
         $this->assertSame(['put', 'post'], array_keys($routes->all()));
         $this->assertEquals('/the/path', $routes->get('put')->getPath());
         $this->assertEquals('/the/path', $routes->get('post')->getPath());
+        $this->assertEquals(new Alias('post'), $routes->getAlias($this->getNamespace().'\MethodActionControllers::post'));
+        $this->assertEquals(new Alias('put'), $routes->getAlias($this->getNamespace().'\MethodActionControllers::put'));
     }
 
     public function testInvokableClassRouteLoadWithMethodAnnotation()

@@ -16,12 +16,16 @@ use Doctrine\Common\DataFixtures\Loader;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+trigger_deprecation('symfony/dependency-injection', '6.4', '"%s" is deprecated, use dependency injection in your fixtures instead.', ContainerAwareLoader::class);
+
 /**
  * Doctrine data fixtures loader that injects the service container into
  * fixture objects that implement ContainerAwareInterface.
  *
  * Note: Use of this class requires the Doctrine data fixtures extension, which
  * is a suggested dependency for Symfony.
+ *
+ * @deprecated since Symfony 6.4, use dependency injection in your fixtures instead
  */
 class ContainerAwareLoader extends Loader
 {

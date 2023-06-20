@@ -8,31 +8,31 @@ git checkout src/Symfony/Contracts/Service/ResetInterface.php
 git checkout composer.json src/
 
 diff --git a/src/Symfony/Bridge/Doctrine/DataCollector/DoctrineDataCollector.php b/src/Symfony/Bridge/Doctrine/DataCollector/DoctrineDataCollector.php
-index ada5fcbd49..51af652f08 100644
+index 8b57ff111c..92febe31e8 100644
 --- a/src/Symfony/Bridge/Doctrine/DataCollector/DoctrineDataCollector.php
 +++ b/src/Symfony/Bridge/Doctrine/DataCollector/DoctrineDataCollector.php
-@@ -51,5 +51,5 @@ class DoctrineDataCollector extends DataCollector
-      * @return void
+@@ -57,5 +57,5 @@ class DoctrineDataCollector extends DataCollector
+      * @deprecated since Symfony 6.4, use a DebugDataHolder instead.
       */
 -    public function addLogger(string $name, DebugStack $logger)
 +    public function addLogger(string $name, DebugStack $logger): void
      {
-         $this->loggers[$name] = $logger;
-@@ -59,5 +59,5 @@ class DoctrineDataCollector extends DataCollector
+         trigger_deprecation('symfony/doctrine-bridge', '6.4', '"%s()" is deprecated. Pass an instance of "%s" to the constructor instead.', __METHOD__, DebugDataHolder::class);
+@@ -67,5 +67,5 @@ class DoctrineDataCollector extends DataCollector
       * @return void
       */
 -    public function collect(Request $request, Response $response, \Throwable $exception = null)
 +    public function collect(Request $request, Response $response, \Throwable $exception = null): void
      {
          $this->data = [
-@@ -90,5 +90,5 @@ class DoctrineDataCollector extends DataCollector
+@@ -98,5 +98,5 @@ class DoctrineDataCollector extends DataCollector
       * @return void
       */
 -    public function reset()
 +    public function reset(): void
      {
          $this->data = [];
-@@ -119,5 +119,5 @@ class DoctrineDataCollector extends DataCollector
+@@ -127,5 +127,5 @@ class DoctrineDataCollector extends DataCollector
       * @return int
       */
 -    public function getQueryCount()
@@ -40,10 +40,10 @@ index ada5fcbd49..51af652f08 100644
      {
          return array_sum(array_map('count', $this->data['queries']));
 diff --git a/src/Symfony/Bridge/Doctrine/DataFixtures/ContainerAwareLoader.php b/src/Symfony/Bridge/Doctrine/DataFixtures/ContainerAwareLoader.php
-index 4fa5057fe2..9e111adac5 100644
+index 448da935d9..06c97eb70c 100644
 --- a/src/Symfony/Bridge/Doctrine/DataFixtures/ContainerAwareLoader.php
 +++ b/src/Symfony/Bridge/Doctrine/DataFixtures/ContainerAwareLoader.php
-@@ -36,5 +36,5 @@ class ContainerAwareLoader extends Loader
+@@ -40,5 +40,5 @@ class ContainerAwareLoader extends Loader
       * @return void
       */
 -    public function addFixture(FixtureInterface $fixture)
@@ -202,10 +202,10 @@ index c096b558db..8d584900a9 100644
      {
          parent::configureOptions($resolver);
 diff --git a/src/Symfony/Bridge/Doctrine/Logger/DbalLogger.php b/src/Symfony/Bridge/Doctrine/Logger/DbalLogger.php
-index b2369e95d6..c33484608e 100644
+index d1a70f79d2..e052053918 100644
 --- a/src/Symfony/Bridge/Doctrine/Logger/DbalLogger.php
 +++ b/src/Symfony/Bridge/Doctrine/Logger/DbalLogger.php
-@@ -52,5 +52,5 @@ class DbalLogger implements SQLLogger
+@@ -56,5 +56,5 @@ class DbalLogger implements SQLLogger
       * @return void
       */
 -    protected function log(string $message, array $params)
@@ -502,7 +502,7 @@ index eadeafba55..4f1ca3bfef 100644
      {
          $configuration = new Configuration();
 diff --git a/src/Symfony/Bundle/FrameworkBundle/Console/Application.php b/src/Symfony/Bundle/FrameworkBundle/Console/Application.php
-index cdbb90a3a9..b137a12012 100644
+index 5083538709..82093403f1 100644
 --- a/src/Symfony/Bundle/FrameworkBundle/Console/Application.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/Console/Application.php
 @@ -56,5 +56,5 @@ class Application extends BaseApplication
@@ -512,7 +512,7 @@ index cdbb90a3a9..b137a12012 100644
 +    public function reset(): void
      {
          if ($this->kernel->getContainer()->has('services_resetter')) {
-@@ -144,5 +144,5 @@ class Application extends BaseApplication
+@@ -145,5 +145,5 @@ class Application extends BaseApplication
       * @return void
       */
 -    protected function registerCommands()
@@ -4127,20 +4127,20 @@ index 3ea2228b94..f1d7078383 100644
      {
          return require $file;
 diff --git a/src/Symfony/Component/DependencyInjection/ContainerAwareInterface.php b/src/Symfony/Component/DependencyInjection/ContainerAwareInterface.php
-index 084a321ab5..09fb37f3aa 100644
+index 9b3709c965..97b54712c9 100644
 --- a/src/Symfony/Component/DependencyInjection/ContainerAwareInterface.php
 +++ b/src/Symfony/Component/DependencyInjection/ContainerAwareInterface.php
-@@ -24,4 +24,4 @@ interface ContainerAwareInterface
+@@ -26,4 +26,4 @@ interface ContainerAwareInterface
       * @return void
       */
 -    public function setContainer(?ContainerInterface $container);
 +    public function setContainer(?ContainerInterface $container): void;
  }
 diff --git a/src/Symfony/Component/DependencyInjection/ContainerAwareTrait.php b/src/Symfony/Component/DependencyInjection/ContainerAwareTrait.php
-index ac67b468c5..bc1e395810 100644
+index 4174fec8d0..f6a7b2da12 100644
 --- a/src/Symfony/Component/DependencyInjection/ContainerAwareTrait.php
 +++ b/src/Symfony/Component/DependencyInjection/ContainerAwareTrait.php
-@@ -27,5 +27,5 @@ trait ContainerAwareTrait
+@@ -31,5 +31,5 @@ trait ContainerAwareTrait
       * @return void
       */
 -    public function setContainer(ContainerInterface $container = null)
@@ -4698,7 +4698,7 @@ index f610b014a0..9458751c28 100644
 +    abstract protected function setNode(\DOMElement $node): void;
  }
 diff --git a/src/Symfony/Component/DomCrawler/Crawler.php b/src/Symfony/Component/DomCrawler/Crawler.php
-index 59eec3068c..b750e80938 100644
+index 274aeee5fc..ccf37dae8b 100644
 --- a/src/Symfony/Component/DomCrawler/Crawler.php
 +++ b/src/Symfony/Component/DomCrawler/Crawler.php
 @@ -96,5 +96,5 @@ class Crawler implements \Countable, \IteratorAggregate
@@ -8236,31 +8236,31 @@ index ed2189e4e7..28e90cdcf9 100644
  
      public function getMetadataBag(): MetadataBag;
 diff --git a/src/Symfony/Component/HttpKernel/Bundle/Bundle.php b/src/Symfony/Component/HttpKernel/Bundle/Bundle.php
-index 2ddf55f2cb..52049a92b4 100644
+index af21469b1c..7b024368c5 100644
 --- a/src/Symfony/Component/HttpKernel/Bundle/Bundle.php
 +++ b/src/Symfony/Component/HttpKernel/Bundle/Bundle.php
-@@ -35,5 +35,5 @@ abstract class Bundle implements BundleInterface
+@@ -38,5 +38,5 @@ abstract class Bundle implements BundleInterface
       * @return void
       */
 -    public function boot()
 +    public function boot(): void
      {
      }
-@@ -42,5 +42,5 @@ abstract class Bundle implements BundleInterface
+@@ -45,5 +45,5 @@ abstract class Bundle implements BundleInterface
       * @return void
       */
 -    public function shutdown()
 +    public function shutdown(): void
      {
      }
-@@ -52,5 +52,5 @@ abstract class Bundle implements BundleInterface
+@@ -55,5 +55,5 @@ abstract class Bundle implements BundleInterface
       * @return void
       */
 -    public function build(ContainerBuilder $container)
 +    public function build(ContainerBuilder $container): void
      {
      }
-@@ -122,5 +122,5 @@ abstract class Bundle implements BundleInterface
+@@ -125,5 +125,5 @@ abstract class Bundle implements BundleInterface
       * @return void
       */
 -    public function registerCommands(Application $application)
@@ -8268,30 +8268,36 @@ index 2ddf55f2cb..52049a92b4 100644
      {
      }
 diff --git a/src/Symfony/Component/HttpKernel/Bundle/BundleInterface.php b/src/Symfony/Component/HttpKernel/Bundle/BundleInterface.php
-index 02cb9641db..abe408eb24 100644
+index fe200629f4..692c41ec53 100644
 --- a/src/Symfony/Component/HttpKernel/Bundle/BundleInterface.php
 +++ b/src/Symfony/Component/HttpKernel/Bundle/BundleInterface.php
-@@ -28,5 +28,5 @@ interface BundleInterface extends ContainerAwareInterface
+@@ -29,5 +29,5 @@ interface BundleInterface extends ContainerAwareInterface
       * @return void
       */
 -    public function boot();
 +    public function boot(): void;
  
      /**
-@@ -35,5 +35,5 @@ interface BundleInterface extends ContainerAwareInterface
+@@ -36,5 +36,5 @@ interface BundleInterface extends ContainerAwareInterface
       * @return void
       */
 -    public function shutdown();
 +    public function shutdown(): void;
  
      /**
-@@ -44,5 +44,5 @@ interface BundleInterface extends ContainerAwareInterface
+@@ -45,5 +45,5 @@ interface BundleInterface extends ContainerAwareInterface
       * @return void
       */
 -    public function build(ContainerBuilder $container);
 +    public function build(ContainerBuilder $container): void;
  
      /**
+@@ -72,4 +72,4 @@ interface BundleInterface extends ContainerAwareInterface
+      * @return void
+      */
+-    public function setContainer(?ContainerInterface $container);
++    public function setContainer(?ContainerInterface $container): void;
+ }
 diff --git a/src/Symfony/Component/HttpKernel/CacheClearer/CacheClearerInterface.php b/src/Symfony/Component/HttpKernel/CacheClearer/CacheClearerInterface.php
 index 5ca4265624..1cb3611f8d 100644
 --- a/src/Symfony/Component/HttpKernel/CacheClearer/CacheClearerInterface.php
@@ -8964,7 +8970,7 @@ index 0f3630e7fe..ddf77b8a19 100644
      {
          return <<<'EOF'
 diff --git a/src/Symfony/Component/HttpKernel/Kernel.php b/src/Symfony/Component/HttpKernel/Kernel.php
-index 9d4c5f22b3..4030ab8b12 100644
+index c2d67c0f17..5c4841305b 100644
 --- a/src/Symfony/Component/HttpKernel/Kernel.php
 +++ b/src/Symfony/Component/HttpKernel/Kernel.php
 @@ -107,5 +107,5 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
@@ -10911,7 +10917,7 @@ index bde72c0eb0..3d6813e1d4 100644
      {
          if (!\is_array($config)) {
 diff --git a/src/Symfony/Component/Routing/Matcher/Dumper/CompiledUrlMatcherDumper.php b/src/Symfony/Component/Routing/Matcher/Dumper/CompiledUrlMatcherDumper.php
-index e92a5ea3d7..4a0af31349 100644
+index 0e740bdf6c..21b68e3600 100644
 --- a/src/Symfony/Component/Routing/Matcher/Dumper/CompiledUrlMatcherDumper.php
 +++ b/src/Symfony/Component/Routing/Matcher/Dumper/CompiledUrlMatcherDumper.php
 @@ -54,5 +54,5 @@ EOF;

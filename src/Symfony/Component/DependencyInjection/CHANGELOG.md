@@ -4,6 +4,7 @@ CHANGELOG
 6.4
 ---
 
+ * Allow using `#[Target]` with no arguments to state that a parameter must match a named autowiring alias
  * Deprecate `ContainerAwareInterface` and `ContainerAwareTrait`, use dependency injection instead
 
 6.3

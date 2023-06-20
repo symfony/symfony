@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Add `SignalMap` to map signal value to its name
+
 6.3
 ---
 

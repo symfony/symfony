@@ -1,0 +1,30 @@
+{
+    "name": "symfony/redlink-notifier",
+    "type": "symfony-notifier-bridge",
+    "description": "Symfony Redlink Notifier Bridge",
+    "keywords": ["sms", "redlink", "notifier"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mateusz Żyła",
+            "email": "mateusz.zyla@protonmail.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "symfony/http-client": "^5.4|^6.0",
+        "symfony/notifier": "^6.3"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Redlink\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

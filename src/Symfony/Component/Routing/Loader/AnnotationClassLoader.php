@@ -125,10 +125,20 @@ abstract class AnnotationClassLoader implements LoaderInterface
             return $collection;
         }
 
+        $fqcnAlias = false;
         foreach ($class->getMethods() as $method) {
             $this->defaultRouteIndex = 0;
+            $routeNamesBefore = array_keys($collection->all());
             foreach ($this->getAnnotations($method) as $annot) {
                 $this->addRoute($collection, $annot, $globals, $class, $method);
+                if ('__invoke' === $method->name) {
+                    $fqcnAlias = true;
+                }
+            }
+
+            if (1 === $collection->count() - \count($routeNamesBefore)) {
+                $newRouteName = current(array_diff(array_keys($collection->all()), $routeNamesBefore));
+                $collection->addAlias(sprintf('%s::%s', $class->name, $method->name), $newRouteName);
             }
         }
 
@@ -136,7 +146,13 @@ abstract class AnnotationClassLoader implements LoaderInterface
             $globals = $this->resetGlobals();
             foreach ($this->getAnnotations($class) as $annot) {
                 $this->addRoute($collection, $annot, $globals, $class, $class->getMethod('__invoke'));
+                $fqcnAlias = true;
             }
+        }
+
+        if ($fqcnAlias && 1 === $collection->count()) {
+            $collection->addAlias($class->name, $invokeRouteName = key($collection->all()));
+            $collection->addAlias(sprintf('%s::__invoke', $class->name), $invokeRouteName);
         }
 
         return $collection;

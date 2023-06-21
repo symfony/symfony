@@ -19,8 +19,6 @@ use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\DependencyInjection\ChildDefinition;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -545,9 +543,14 @@ class RegisterTestController
     }
 }
 
-class ContainerAwareRegisterTestController implements ContainerAwareInterface
+class ContainerAwareRegisterTestController
 {
-    use ContainerAwareTrait;
+    protected ?ContainerInterface $container;
+
+    public function setContainer(ContainerInterface $container = null): void
+    {
+        $this->container = $container;
+    }
 
     public function fooAction(ControllerDummy $bar)
     {

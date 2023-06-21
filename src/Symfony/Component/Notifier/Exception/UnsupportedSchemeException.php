@@ -152,6 +152,14 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Mobyt\MobytTransportFactory::class,
             'package' => 'symfony/mobyt-notifier',
         ],
+        'novu' => [
+            'class' => Bridge\Novu\NovuTransportFactory::class,
+            'package' => 'symfony/novu-notifier',
+        ],
+        'ntfy' => [
+            'class' => Bridge\Ntfy\NtfyTransportFactory::class,
+            'package' => 'symfony/ntfy-notifier',
+        ],
         'octopush' => [
             'class' => Bridge\Octopush\OctopushTransportFactory::class,
             'package' => 'symfony/octopush-notifier',
@@ -179,6 +187,10 @@ class UnsupportedSchemeException extends LogicException
         'pushover' => [
             'class' => Bridge\Pushover\PushoverTransportFactory::class,
             'package' => 'symfony/pushover-notifier',
+        ],
+        'redlink' => [
+            'class' => Bridge\Redlink\RedlinkTransportFactory::class,
+            'package' => 'symfony/redlink-notifier',
         ],
         'ringcentral' => [
             'class' => Bridge\RingCentral\RingCentralTransportFactory::class,

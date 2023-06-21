@@ -60,6 +60,8 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             Bridge\MessageMedia\MessageMediaTransportFactory::class => false,
             Bridge\MicrosoftTeams\MicrosoftTeamsTransportFactory::class => false,
             Bridge\Mobyt\MobytTransportFactory::class => false,
+            Bridge\Novu\NovuTransportFactory::class => false,
+            Bridge\Ntfy\NtfyTransportFactory::class => false,
             Bridge\Octopush\OctopushTransportFactory::class => false,
             Bridge\OneSignal\OneSignalTransportFactory::class => false,
             Bridge\OrangeSms\OrangeSmsTransportFactory::class => false,
@@ -68,6 +70,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             Bridge\Plivo\PlivoTransportFactory::class => false,
             Bridge\Pushover\PushoverTransportFactory::class => false,
             Bridge\RingCentral\RingCentralTransportFactory::class => false,
+            Bridge\Redlink\RedlinkTransportFactory::class => false,
             Bridge\RocketChat\RocketChatTransportFactory::class => false,
             Bridge\Sendberry\SendberryTransportFactory::class => false,
             Bridge\Sendinblue\SendinblueTransportFactory::class => false,
@@ -138,10 +141,13 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['messagemedia', 'symfony/message-media-notifier'];
         yield ['microsoftteams', 'symfony/microsoft-teams-notifier'];
         yield ['mobyt', 'symfony/mobyt-notifier'];
+        yield ['novu', 'symfony/novu-notifier'];
+        yield ['ntfy', 'symfony/ntfy-notifier'];
         yield ['octopush', 'symfony/octopush-notifier'];
         yield ['onesignal', 'symfony/one-signal-notifier'];
         yield ['ovhcloud', 'symfony/ovh-cloud-notifier'];
         yield ['plivo', 'symfony/plivo-notifier'];
+        yield ['redlink', 'symfony/redlink-notifier'];
         yield ['ringcentral', 'symfony/ring-central-notifier'];
         yield ['rocketchat', 'symfony/rocket-chat-notifier'];
         yield ['sendberry', 'symfony/sendberry-notifier'];

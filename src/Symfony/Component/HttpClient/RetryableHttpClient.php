@@ -60,6 +60,9 @@ class RetryableHttpClient implements HttpClientInterface, ResetInterface
         }
 
         $clone = clone $this;
+        $clone->maxRetries = (int) ($options['max_retries'] ?? $this->maxRetries);
+        unset($options['max_retries']);
+
         $clone->client = $this->client->withOptions($options);
 
         return $clone;
@@ -71,11 +74,14 @@ class RetryableHttpClient implements HttpClientInterface, ResetInterface
         $baseUris = \is_array($baseUris) ? $baseUris : [];
         $options = self::shiftBaseUri($options, $baseUris);
 
-        if ($this->maxRetries <= 0) {
+        $maxRetries = (int) ($options['max_retries'] ?? $this->maxRetries);
+        unset($options['max_retries']);
+
+        if ($maxRetries <= 0) {
             return new AsyncResponse($this->client, $method, $url, $options);
         }
 
-        return new AsyncResponse($this->client, $method, $url, $options, function (ChunkInterface $chunk, AsyncContext $context) use ($method, $url, $options, &$baseUris) {
+        return new AsyncResponse($this->client, $method, $url, $options, function (ChunkInterface $chunk, AsyncContext $context) use ($method, $url, $options, $maxRetries, &$baseUris) {
             static $retryCount = 0;
             static $content = '';
             static $firstChunk;
@@ -152,7 +158,7 @@ class RetryableHttpClient implements HttpClientInterface, ResetInterface
             $context->replaceRequest($method, $url, self::shiftBaseUri($options, $baseUris));
             $context->pause($delay / 1000);
 
-            if ($retryCount >= $this->maxRetries) {
+            if ($retryCount >= $maxRetries) {
                 $context->passthru();
             }
         });

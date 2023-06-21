@@ -77,5 +77,11 @@ class PasswordStrengthValidatorTest extends ConstraintValidatorTestCase
             'The password strength is too low. Please use a stronger password.',
             PasswordStrength::PASSWORD_STRENGTH_ERROR,
         ];
+        yield [
+            new PasswordStrength(message: 'This password should be strong.'),
+            'password',
+            'This password should be strong.',
+            PasswordStrength::PASSWORD_STRENGTH_ERROR,
+        ];
     }
 }

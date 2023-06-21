@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Bundle;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 
 /**
@@ -66,4 +67,9 @@ interface BundleInterface extends ContainerAwareInterface
      * The path should always be returned as a Unix path (with /).
      */
     public function getPath(): string;
+
+    /**
+     * @return void
+     */
+    public function setContainer(?ContainerInterface $container);
 }

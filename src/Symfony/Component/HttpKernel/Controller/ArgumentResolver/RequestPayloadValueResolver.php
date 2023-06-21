@@ -72,6 +72,10 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
             return [];
         }
 
+        if ($argument->isVariadic()) {
+            throw new \LogicException(sprintf('Mapping variadic argument "$%s" is not supported.', $argument->getName()));
+        }
+
         $attribute->metadata = $argument;
 
         return [$attribute];

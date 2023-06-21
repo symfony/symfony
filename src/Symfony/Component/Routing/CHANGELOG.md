@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Add FQCN and FQCN::method aliases for routes loaded from attributes/annotations when applicable
+
 6.2
 ---
 

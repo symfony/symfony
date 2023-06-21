@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Add `with-metadata` option to the `workflow:dump` command to include places,
+   transitions and workflow's metadata into dumped graph
+
 6.2
 ---
 

@@ -115,6 +115,7 @@ class Application extends BaseApplication
         $command = parent::get($name);
 
         if ($command instanceof ContainerAwareInterface) {
+            trigger_deprecation('symfony/dependency-injection', '6.4', 'Relying on "%s" to get the container in "%s" is deprecated, register the command as a service and use dependency injection instead.', ContainerAwareInterface::class, get_debug_type($command));
             $command->setContainer($this->kernel->getContainer());
         }
 

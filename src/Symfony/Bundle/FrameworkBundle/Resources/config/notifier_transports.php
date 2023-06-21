@@ -279,12 +279,24 @@ return static function (ContainerConfigurator $container) {
         ->set('notifier.transport_factory.simple-textin', Bridge\SimpleTextin\SimpleTextinTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')
             ->tag('texter.transport_factory')
-    
+
         ->set('notifier.transport_factory.click-send', Bridge\ClickSend\ClickSendTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')
             ->tag('texter.transport_factory')
-    
+
         ->set('notifier.transport_factory.smsmode', Bridge\Smsmode\SmsmodeTransportFactory::class)
+            ->parent('notifier.transport_factory.abstract')
+            ->tag('texter.transport_factory')
+
+        ->set('notifier.transport_factory.novu', Bridge\Novu\NovuTransportFactory::class)
+            ->parent('notifier.transport_factory.abstract')
+            ->tag('texter.transport_factory')
+
+        ->set('notifier.transport_factory.ntfy', Bridge\Ntfy\NtfyTransportFactory::class)
+            ->parent('notifier.transport_factory.abstract')
+            ->tag('texter.transport_factory')
+
+        ->set('notifier.transport_factory.redlink', Bridge\Redlink\RedlinkTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')
             ->tag('texter.transport_factory')
     ;

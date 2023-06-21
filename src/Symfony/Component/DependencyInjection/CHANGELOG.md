@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Deprecate `ContainerAwareInterface` and `ContainerAwareTrait`, use dependency injection instead
+
 6.3
 ---
 

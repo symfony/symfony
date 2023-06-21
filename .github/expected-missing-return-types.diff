@@ -8,24 +8,24 @@ git checkout src/Symfony/Contracts/Service/ResetInterface.php
 git checkout composer.json src/
 
 diff --git a/src/Symfony/Bridge/Doctrine/DataCollector/DoctrineDataCollector.php b/src/Symfony/Bridge/Doctrine/DataCollector/DoctrineDataCollector.php
-index f127a38708..ed7fd8b1b6 100644
+index c61c28a147..640539c1d0 100644
 --- a/src/Symfony/Bridge/Doctrine/DataCollector/DoctrineDataCollector.php
 +++ b/src/Symfony/Bridge/Doctrine/DataCollector/DoctrineDataCollector.php
-@@ -49,5 +49,5 @@ class DoctrineDataCollector extends DataCollector
+@@ -43,5 +43,5 @@ class DoctrineDataCollector extends DataCollector
       * @return void
       */
 -    public function collect(Request $request, Response $response, \Throwable $exception = null)
 +    public function collect(Request $request, Response $response, \Throwable $exception = null): void
      {
          $this->data = [
-@@ -80,5 +80,5 @@ class DoctrineDataCollector extends DataCollector
+@@ -66,5 +66,5 @@ class DoctrineDataCollector extends DataCollector
       * @return void
       */
 -    public function reset()
 +    public function reset(): void
      {
          $this->data = [];
-@@ -109,5 +109,5 @@ class DoctrineDataCollector extends DataCollector
+@@ -85,5 +85,5 @@ class DoctrineDataCollector extends DataCollector
       * @return int
       */
 -    public function getQueryCount()
@@ -33,10 +33,10 @@ index f127a38708..ed7fd8b1b6 100644
      {
          return array_sum(array_map('count', $this->data['queries']));
 diff --git a/src/Symfony/Bridge/Doctrine/DataFixtures/ContainerAwareLoader.php b/src/Symfony/Bridge/Doctrine/DataFixtures/ContainerAwareLoader.php
-index 4fa5057fe2..9e111adac5 100644
+index 448da935d9..06c97eb70c 100644
 --- a/src/Symfony/Bridge/Doctrine/DataFixtures/ContainerAwareLoader.php
 +++ b/src/Symfony/Bridge/Doctrine/DataFixtures/ContainerAwareLoader.php
-@@ -36,5 +36,5 @@ class ContainerAwareLoader extends Loader
+@@ -40,5 +40,5 @@ class ContainerAwareLoader extends Loader
       * @return void
       */
 -    public function addFixture(FixtureInterface $fixture)
@@ -213,24 +213,24 @@ index 38618fc15e..eb599eb0b4 100644
      {
          $this->clearEntityManagers();
 diff --git a/src/Symfony/Bridge/Doctrine/Security/RememberMe/DoctrineTokenProvider.php b/src/Symfony/Bridge/Doctrine/Security/RememberMe/DoctrineTokenProvider.php
-index 3af51ffd60..2743b97f31 100644
+index f4fb8173e8..6db6c5e4ec 100644
 --- a/src/Symfony/Bridge/Doctrine/Security/RememberMe/DoctrineTokenProvider.php
 +++ b/src/Symfony/Bridge/Doctrine/Security/RememberMe/DoctrineTokenProvider.php
-@@ -70,5 +70,5 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
+@@ -62,5 +62,5 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
       * @return void
       */
 -    public function deleteTokenBySeries(string $series)
 +    public function deleteTokenBySeries(string $series): void
      {
          $sql = 'DELETE FROM rememberme_token WHERE series=:series';
-@@ -85,5 +85,5 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
+@@ -73,5 +73,5 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
       * @return void
       */
 -    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed)
 +    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed): void
      {
          $sql = 'UPDATE rememberme_token SET value=:value, lastUsed=:lastUsed WHERE series=:series';
-@@ -111,5 +111,5 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
+@@ -96,5 +96,5 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
       * @return void
       */
 -    public function createNewToken(PersistentTokenInterface $token)
@@ -484,7 +484,7 @@ index eadeafba55..4f1ca3bfef 100644
      {
          $configuration = new Configuration();
 diff --git a/src/Symfony/Bundle/FrameworkBundle/Console/Application.php b/src/Symfony/Bundle/FrameworkBundle/Console/Application.php
-index cdbb90a3a9..b137a12012 100644
+index 02709ba649..5a3e972793 100644
 --- a/src/Symfony/Bundle/FrameworkBundle/Console/Application.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/Console/Application.php
 @@ -56,5 +56,5 @@ class Application extends BaseApplication
@@ -494,7 +494,7 @@ index cdbb90a3a9..b137a12012 100644
 +    public function reset(): void
      {
          if ($this->kernel->getContainer()->has('services_resetter')) {
-@@ -144,5 +144,5 @@ class Application extends BaseApplication
+@@ -145,5 +145,5 @@ class Application extends BaseApplication
       * @return void
       */
 -    protected function registerCommands()
@@ -630,10 +630,10 @@ index 6e7669a710..27517d34ae 100644
      {
          if (!$container->hasDefinition('test.private_services_locator')) {
 diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/UnusedTagsPass.php b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/UnusedTagsPass.php
-index b40c759eb4..65fa45d18d 100644
+index b04516410f..fc5a085a37 100644
 --- a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/UnusedTagsPass.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/UnusedTagsPass.php
-@@ -110,5 +110,5 @@ class UnusedTagsPass implements CompilerPassInterface
+@@ -109,5 +109,5 @@ class UnusedTagsPass implements CompilerPassInterface
       * @return void
       */
 -    public function process(ContainerBuilder $container)
@@ -652,7 +652,7 @@ index bda9ca9515..c0d1f91339 100644
      {
          if (!$container->hasParameter('workflow.has_guard_listeners')) {
 diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
-index 981a865672..b7e456ba54 100644
+index e40878c332..53fd77f206 100644
 --- a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
 @@ -212,5 +212,5 @@ class FrameworkExtension extends Extension
@@ -662,7 +662,7 @@ index 981a865672..b7e456ba54 100644
 +    public function load(array $configs, ContainerBuilder $container): void
      {
          $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));
-@@ -2901,5 +2901,5 @@ class FrameworkExtension extends Extension
+@@ -2904,5 +2904,5 @@ class FrameworkExtension extends Extension
       * @return void
       */
 -    public static function registerRateLimiter(ContainerBuilder $container, string $name, array $limiterConfig)
@@ -981,7 +981,7 @@ index a2c5815e4b..1c9721ccc6 100644
 +    public function addConfiguration(NodeDefinition $builder): void;
  }
 diff --git a/src/Symfony/Bundle/SecurityBundle/DependencyInjection/SecurityExtension.php b/src/Symfony/Bundle/SecurityBundle/DependencyInjection/SecurityExtension.php
-index 3c504b6001..55f1a0353b 100644
+index c32269a801..29f86b364d 100644
 --- a/src/Symfony/Bundle/SecurityBundle/DependencyInjection/SecurityExtension.php
 +++ b/src/Symfony/Bundle/SecurityBundle/DependencyInjection/SecurityExtension.php
 @@ -83,5 +83,5 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
@@ -2727,7 +2727,7 @@ index 8ebc84376b..4af2691707 100644
      {
          if ($output instanceof SymfonyStyle) {
 diff --git a/src/Symfony/Component/Console/Helper/Table.php b/src/Symfony/Component/Console/Helper/Table.php
-index cf714873f5..e16ffaf97d 100644
+index db238c0fb8..85afdd4d31 100644
 --- a/src/Symfony/Component/Console/Helper/Table.php
 +++ b/src/Symfony/Component/Console/Helper/Table.php
 @@ -70,5 +70,5 @@ class Table
@@ -4109,20 +4109,20 @@ index 3ea2228b94..f1d7078383 100644
      {
          return require $file;
 diff --git a/src/Symfony/Component/DependencyInjection/ContainerAwareInterface.php b/src/Symfony/Component/DependencyInjection/ContainerAwareInterface.php
-index 084a321ab5..09fb37f3aa 100644
+index 9b3709c965..97b54712c9 100644
 --- a/src/Symfony/Component/DependencyInjection/ContainerAwareInterface.php
 +++ b/src/Symfony/Component/DependencyInjection/ContainerAwareInterface.php
-@@ -24,4 +24,4 @@ interface ContainerAwareInterface
+@@ -26,4 +26,4 @@ interface ContainerAwareInterface
       * @return void
       */
 -    public function setContainer(?ContainerInterface $container);
 +    public function setContainer(?ContainerInterface $container): void;
  }
 diff --git a/src/Symfony/Component/DependencyInjection/ContainerAwareTrait.php b/src/Symfony/Component/DependencyInjection/ContainerAwareTrait.php
-index ac67b468c5..bc1e395810 100644
+index 4174fec8d0..f6a7b2da12 100644
 --- a/src/Symfony/Component/DependencyInjection/ContainerAwareTrait.php
 +++ b/src/Symfony/Component/DependencyInjection/ContainerAwareTrait.php
-@@ -27,5 +27,5 @@ trait ContainerAwareTrait
+@@ -31,5 +31,5 @@ trait ContainerAwareTrait
       * @return void
       */
 -    public function setContainer(ContainerInterface $container = null)
@@ -7301,7 +7301,7 @@ index 472437e465..1dfe39146b 100644
      {
          if ($this->client instanceof ResetInterface) {
 diff --git a/src/Symfony/Component/HttpClient/HttpClientTrait.php b/src/Symfony/Component/HttpClient/HttpClientTrait.php
-index 48782153b4..f2bbcf288d 100644
+index 3364d32acd..1b990e5a5a 100644
 --- a/src/Symfony/Component/HttpClient/HttpClientTrait.php
 +++ b/src/Symfony/Component/HttpClient/HttpClientTrait.php
 @@ -679,5 +679,5 @@ trait HttpClientTrait
@@ -8218,31 +8218,31 @@ index ed2189e4e7..28e90cdcf9 100644
  
      public function getMetadataBag(): MetadataBag;
 diff --git a/src/Symfony/Component/HttpKernel/Bundle/Bundle.php b/src/Symfony/Component/HttpKernel/Bundle/Bundle.php
-index 2ddf55f2cb..52049a92b4 100644
+index af21469b1c..7b024368c5 100644
 --- a/src/Symfony/Component/HttpKernel/Bundle/Bundle.php
 +++ b/src/Symfony/Component/HttpKernel/Bundle/Bundle.php
-@@ -35,5 +35,5 @@ abstract class Bundle implements BundleInterface
+@@ -38,5 +38,5 @@ abstract class Bundle implements BundleInterface
       * @return void
       */
 -    public function boot()
 +    public function boot(): void
      {
      }
-@@ -42,5 +42,5 @@ abstract class Bundle implements BundleInterface
+@@ -45,5 +45,5 @@ abstract class Bundle implements BundleInterface
       * @return void
       */
 -    public function shutdown()
 +    public function shutdown(): void
      {
      }
-@@ -52,5 +52,5 @@ abstract class Bundle implements BundleInterface
+@@ -55,5 +55,5 @@ abstract class Bundle implements BundleInterface
       * @return void
       */
 -    public function build(ContainerBuilder $container)
 +    public function build(ContainerBuilder $container): void
      {
      }
-@@ -122,5 +122,5 @@ abstract class Bundle implements BundleInterface
+@@ -125,5 +125,5 @@ abstract class Bundle implements BundleInterface
       * @return void
       */
 -    public function registerCommands(Application $application)
@@ -8250,30 +8250,36 @@ index 2ddf55f2cb..52049a92b4 100644
      {
      }
 diff --git a/src/Symfony/Component/HttpKernel/Bundle/BundleInterface.php b/src/Symfony/Component/HttpKernel/Bundle/BundleInterface.php
-index 02cb9641db..abe408eb24 100644
+index fe200629f4..692c41ec53 100644
 --- a/src/Symfony/Component/HttpKernel/Bundle/BundleInterface.php
 +++ b/src/Symfony/Component/HttpKernel/Bundle/BundleInterface.php
-@@ -28,5 +28,5 @@ interface BundleInterface extends ContainerAwareInterface
+@@ -29,5 +29,5 @@ interface BundleInterface extends ContainerAwareInterface
       * @return void
       */
 -    public function boot();
 +    public function boot(): void;
  
      /**
-@@ -35,5 +35,5 @@ interface BundleInterface extends ContainerAwareInterface
+@@ -36,5 +36,5 @@ interface BundleInterface extends ContainerAwareInterface
       * @return void
       */
 -    public function shutdown();
 +    public function shutdown(): void;
  
      /**
-@@ -44,5 +44,5 @@ interface BundleInterface extends ContainerAwareInterface
+@@ -45,5 +45,5 @@ interface BundleInterface extends ContainerAwareInterface
       * @return void
       */
 -    public function build(ContainerBuilder $container);
 +    public function build(ContainerBuilder $container): void;
  
      /**
+@@ -72,4 +72,4 @@ interface BundleInterface extends ContainerAwareInterface
+      * @return void
+      */
+-    public function setContainer(?ContainerInterface $container);
++    public function setContainer(?ContainerInterface $container): void;
+ }
 diff --git a/src/Symfony/Component/HttpKernel/CacheClearer/CacheClearerInterface.php b/src/Symfony/Component/HttpKernel/CacheClearer/CacheClearerInterface.php
 index 5ca4265624..1cb3611f8d 100644
 --- a/src/Symfony/Component/HttpKernel/CacheClearer/CacheClearerInterface.php
@@ -9602,45 +9608,45 @@ index 9087874c29..5cfd87c4ad 100644
      {
          foreach ($this->stores as $store) {
 diff --git a/src/Symfony/Component/Lock/Store/DoctrineDbalPostgreSqlStore.php b/src/Symfony/Component/Lock/Store/DoctrineDbalPostgreSqlStore.php
-index e6525b59f3..5a227743f3 100644
+index 55fffc301b..dc2ccb0ec5 100644
 --- a/src/Symfony/Component/Lock/Store/DoctrineDbalPostgreSqlStore.php
 +++ b/src/Symfony/Component/Lock/Store/DoctrineDbalPostgreSqlStore.php
-@@ -82,5 +82,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
+@@ -76,5 +76,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
       * @return void
       */
 -    public function save(Key $key)
 +    public function save(Key $key): void
      {
          // prevent concurrency within the same connection
-@@ -117,5 +117,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
+@@ -111,5 +111,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
       * @return void
       */
 -    public function saveRead(Key $key)
 +    public function saveRead(Key $key): void
      {
          // prevent concurrency within the same connection
-@@ -152,5 +152,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
+@@ -146,5 +146,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
       * @return void
       */
 -    public function putOffExpiration(Key $key, float $ttl)
 +    public function putOffExpiration(Key $key, float $ttl): void
      {
          // postgresql locks forever.
-@@ -164,5 +164,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
+@@ -158,5 +158,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
       * @return void
       */
 -    public function delete(Key $key)
 +    public function delete(Key $key): void
      {
          // Prevent deleting locks own by an other key in the same connection
-@@ -204,5 +204,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
+@@ -198,5 +198,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
       * @return void
       */
 -    public function waitAndSave(Key $key)
 +    public function waitAndSave(Key $key): void
      {
          // prevent concurrency within the same connection
-@@ -230,5 +230,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
+@@ -224,5 +224,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
       * @return void
       */
 -    public function waitAndSaveRead(Key $key)
@@ -9648,24 +9654,24 @@ index e6525b59f3..5a227743f3 100644
      {
          // prevent concurrency within the same connection
 diff --git a/src/Symfony/Component/Lock/Store/DoctrineDbalStore.php b/src/Symfony/Component/Lock/Store/DoctrineDbalStore.php
-index e915f30a79..7bed81cdac 100644
+index e6a588ff4c..08a0171a18 100644
 --- a/src/Symfony/Component/Lock/Store/DoctrineDbalStore.php
 +++ b/src/Symfony/Component/Lock/Store/DoctrineDbalStore.php
-@@ -101,5 +101,5 @@ class DoctrineDbalStore implements PersistingStoreInterface
+@@ -95,5 +95,5 @@ class DoctrineDbalStore implements PersistingStoreInterface
       * @return void
       */
 -    public function save(Key $key)
 +    public function save(Key $key): void
      {
          $key->reduceLifetime($this->initialTtl);
-@@ -143,5 +143,5 @@ class DoctrineDbalStore implements PersistingStoreInterface
+@@ -137,5 +137,5 @@ class DoctrineDbalStore implements PersistingStoreInterface
       * @return void
       */
 -    public function putOffExpiration(Key $key, $ttl)
 +    public function putOffExpiration(Key $key, $ttl): void
      {
          if ($ttl < 1) {
-@@ -177,5 +177,5 @@ class DoctrineDbalStore implements PersistingStoreInterface
+@@ -171,5 +171,5 @@ class DoctrineDbalStore implements PersistingStoreInterface
       * @return void
       */
 -    public function delete(Key $key)
@@ -10059,7 +10065,7 @@ index 86fa255015..08cbde055f 100644
      {
          $busIds = [];
 diff --git a/src/Symfony/Component/Messenger/EventListener/SendFailedMessageForRetryListener.php b/src/Symfony/Component/Messenger/EventListener/SendFailedMessageForRetryListener.php
-index 73c4013b6b..c8b52a3c0e 100644
+index ba775b0c17..1e1c50b517 100644
 --- a/src/Symfony/Component/Messenger/EventListener/SendFailedMessageForRetryListener.php
 +++ b/src/Symfony/Component/Messenger/EventListener/SendFailedMessageForRetryListener.php
 @@ -52,5 +52,5 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
@@ -10790,7 +10796,7 @@ index e3fb17e81c..cd27f3e387 100644
      {
          $this->strictRequirements = $enabled;
 diff --git a/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php b/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php
-index decd2a2b1d..a37965ed5b 100644
+index ed3f85cc02..64f8571c92 100644
 --- a/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php
 +++ b/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php
 @@ -96,5 +96,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
@@ -10800,42 +10806,42 @@ index decd2a2b1d..a37965ed5b 100644
 +    public function setRouteAnnotationClass(string $class): void
      {
          $this->routeAnnotationClass = $class;
-@@ -148,5 +148,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
+@@ -164,5 +164,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
       * @return void
       */
 -    protected function addRoute(RouteCollection $collection, object $annot, array $globals, \ReflectionClass $class, \ReflectionMethod $method)
 +    protected function addRoute(RouteCollection $collection, object $annot, array $globals, \ReflectionClass $class, \ReflectionMethod $method): void
      {
          if ($annot->getEnv() && $annot->getEnv() !== $this->env) {
-@@ -241,5 +241,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
+@@ -257,5 +257,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
       * @return void
       */
 -    public function setResolver(LoaderResolverInterface $resolver)
 +    public function setResolver(LoaderResolverInterface $resolver): void
      {
      }
-@@ -254,5 +254,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
+@@ -270,5 +270,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
       * @return string
       */
 -    protected function getDefaultRouteName(\ReflectionClass $class, \ReflectionMethod $method)
 +    protected function getDefaultRouteName(\ReflectionClass $class, \ReflectionMethod $method): string
      {
          $name = str_replace('\\', '_', $class->name).'_'.$method->name;
-@@ -269,5 +269,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
+@@ -285,5 +285,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
       * @return array
       */
 -    protected function getGlobals(\ReflectionClass $class)
 +    protected function getGlobals(\ReflectionClass $class): array
      {
          $globals = $this->resetGlobals();
-@@ -354,5 +354,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
+@@ -370,5 +370,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
       * @return Route
       */
 -    protected function createRoute(string $path, array $defaults, array $requirements, array $options, ?string $host, array $schemes, array $methods, ?string $condition)
 +    protected function createRoute(string $path, array $defaults, array $requirements, array $options, ?string $host, array $schemes, array $methods, ?string $condition): Route
      {
          return new Route($path, $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
-@@ -362,5 +362,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
+@@ -378,5 +378,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
       * @return void
       */
 -    abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot);
@@ -13929,7 +13935,7 @@ index d2d3fc1294..c28829f4e2 100644
      {
          $a += [
 diff --git a/src/Symfony/Component/VarDumper/Caster/DateCaster.php b/src/Symfony/Component/VarDumper/Caster/DateCaster.php
-index 2779b37f9e..4bb25e9966 100644
+index 7790822fe3..0e02d0ccfe 100644
 --- a/src/Symfony/Component/VarDumper/Caster/DateCaster.php
 +++ b/src/Symfony/Component/VarDumper/Caster/DateCaster.php
 @@ -28,5 +28,5 @@ class DateCaster

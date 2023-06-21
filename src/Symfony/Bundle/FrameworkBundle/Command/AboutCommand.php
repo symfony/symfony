@@ -101,6 +101,10 @@ EOT
         if (is_file($path)) {
             $size = filesize($path) ?: 0;
         } else {
+            if (!is_dir($path)) {
+                return 'n/a';
+            }
+
             $size = 0;
             foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path, \RecursiveDirectoryIterator::SKIP_DOTS | \RecursiveDirectoryIterator::FOLLOW_SYMLINKS)) as $file) {
                 if ($file->isReadable()) {

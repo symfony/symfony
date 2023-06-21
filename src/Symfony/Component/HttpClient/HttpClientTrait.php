@@ -540,7 +540,7 @@ trait HttpClientTrait
             }
 
             // https://tools.ietf.org/html/rfc3986#section-3.3
-            $parts[$part] = preg_replace_callback("#[^-A-Za-z0-9._~!$&/'()[\]*+,;=:@\\\\^`{|}%]++#", function ($m) { return rawurlencode($m[0]); }, $parts[$part]);
+            $parts[$part] = preg_replace_callback("#[^-A-Za-z0-9._~!$&/'()[\]*+,;=:@{}%]++#", function ($m) { return rawurlencode($m[0]); }, $parts[$part]);
         }
 
         return [
@@ -627,11 +627,7 @@ trait HttpClientTrait
                     '%3B' => ';',
                     '%40' => '@',
                     '%5B' => '[',
-                    '%5C' => '\\',
                     '%5D' => ']',
-                    '%5E' => '^',
-                    '%60' => '`',
-                    '%7C' => '|',
                 ]);
             }
 

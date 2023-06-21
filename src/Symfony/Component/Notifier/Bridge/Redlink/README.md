@@ -1,5 +1,5 @@
 Redlink Notifier
-=================
+================
 
 Provides [Redlink](https://redlink.pl) integration for Symfony Notifier.
 

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Allow single integer for the `versions` option of the `Uuid` constraint
+
 6.3
 ---
 

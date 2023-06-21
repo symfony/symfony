@@ -18,6 +18,7 @@ use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportF
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
 use Symfony\Component\Messenger\EventListener\AddErrorDetailsStampListener;
 use Symfony\Component\Messenger\EventListener\DispatchPcntlSignalListener;
+use Symfony\Component\Messenger\EventListener\HandleDelayedMessagesOnKernelTerminateListener;
 use Symfony\Component\Messenger\EventListener\ResetServicesListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTransportListener;
@@ -191,6 +192,17 @@ return static function (ContainerConfigurator $container) {
             ->tag('monolog.logger', ['channel' => 'messenger'])
 
         ->set('messenger.listener.dispatch_pcntl_signal_listener', DispatchPcntlSignalListener::class)
+            ->tag('kernel.event_subscriber')
+
+        ->set('messenger.listener.handle_delayed_messages_on_kernel_terminate_listener', HandleDelayedMessagesOnKernelTerminateListener::class)
+            ->args([
+                service('messenger.routable_message_bus'),
+                abstract_arg('delayed transport'),
+                param('messenger.receiver_name'),
+                service('event_dispatcher'),
+                service('logger')->ignoreOnInvalid(),
+                abstract_arg('rate limiter'),
+            ])
             ->tag('kernel.event_subscriber')
 
         ->set('messenger.listener.stop_worker_on_restart_signal_listener', StopWorkerOnRestartSignalListener::class)

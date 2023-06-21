@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Add the special group name `*` which can be passed to `ValidatorInterface::validate()` to validate all constraints, regardless of their group.
+
 6.3
 ---
 

@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Extension;
 
-use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
+use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 

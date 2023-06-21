@@ -14,6 +14,7 @@ CHANGELOG
  * Deprecate `Kernel::stripComments()`
  * Support the `!` character at the beginning of a string as a negation operator in the url filter of the profiler
  * Deprecate `UriSigner`, use `UriSigner` from the HttpFoundation component instead
+ * Deprecate `FileLinkFormatter`, use `FileLinkFormatter` from the ErrorHandler component instead
 
 6.3
 ---

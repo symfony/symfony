@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpKernel;
 
 use Symfony\Component\HttpFoundation\UriSigner as HttpFoundationUriSigner;
 
-trigger_deprecation('symfony/dependency-injection', '6.4', 'The "%s" class is deprecated, use "%s" instead.', UriSigner::class, HttpFoundationUriSigner::class);
+trigger_deprecation('symfony/http-kernel', '6.4', 'The "%s" class is deprecated, use "%s" instead.', UriSigner::class, HttpFoundationUriSigner::class);
 
 class_exists(HttpFoundationUriSigner::class);
 

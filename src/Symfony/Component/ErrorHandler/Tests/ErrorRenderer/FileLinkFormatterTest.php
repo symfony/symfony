@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpKernel\Tests\Debug;
+namespace Symfony\Component\ErrorHandler\Tests\ErrorRenderer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 
 class FileLinkFormatterTest extends TestCase
 {
@@ -79,5 +79,45 @@ class FileLinkFormatterTest extends TestCase
     public function testSerialize()
     {
         $this->assertInstanceOf(FileLinkFormatter::class, unserialize(serialize(new FileLinkFormatter())));
+    }
+
+    /**
+     * @dataProvider providePathMappings
+     */
+    public function testIdeFileLinkFormatWithPathMappingParameters($mappings)
+    {
+        $params = array_reduce($mappings, function ($c, $m) {
+            return "$c&".implode('>', $m);
+        }, '');
+        $sut = new FileLinkFormatter("vscode://file/%f:%l$params");
+        foreach ($mappings as $mapping) {
+            $fileGuest = $mapping['guest'].'file.php';
+            $fileHost = $mapping['host'].'file.php';
+            $this->assertSame("vscode://file/$fileHost:3", $sut->format($fileGuest, 3));
+        }
+    }
+
+    public static function providePathMappings()
+    {
+        yield 'single path mapping' => [
+            [
+                [
+                    'guest' => '/var/www/app/',
+                    'host' => '/user/name/project/',
+                ],
+            ],
+        ];
+        yield 'multiple path mapping' => [
+            [
+                [
+                    'guest' => '/var/www/app/',
+                    'host' => '/user/name/project/',
+                ],
+                [
+                    'guest' => '/var/www/app2/',
+                    'host' => '/user/name/project2/',
+                ],
+            ],
+        ];
     }
 }

@@ -43,13 +43,12 @@ interface NormalizerInterface
     /**
      * Checks whether the given class is supported for normalization by this normalizer.
      *
-     * @param mixed       $data    Data to normalize
-     * @param string|null $format  The format being (de-)serialized from or into
-     * @param array       $context Context options for the normalizer
+     * @param mixed       $data   Data to normalize
+     * @param string|null $format The format being (de-)serialized from or into
      *
      * @return bool
      */
-    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */);
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []);
 
     /**
      * Returns the types potentially supported by this normalizer.
@@ -66,5 +65,5 @@ interface NormalizerInterface
      *
      * @return array<class-string|'*'|'object'|string, bool|null>
      */
-    /* public function getSupportedTypes(?string $format): array; */
+    public function getSupportedTypes(?string $format): array;
 }

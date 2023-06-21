@@ -51,14 +51,13 @@ interface DenormalizerInterface
     /**
      * Checks whether the given class is supported for denormalization by this normalizer.
      *
-     * @param mixed       $data    Data to denormalize from
-     * @param string      $type    The class to which the data should be denormalized
-     * @param string|null $format  The format being deserialized from
-     * @param array       $context Options available to the denormalizer
+     * @param mixed       $data   Data to denormalize from
+     * @param string      $type   The class to which the data should be denormalized
+     * @param string|null $format The format being deserialized from
      *
      * @return bool
      */
-    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */);
+    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []);
 
     /**
      * Returns the types potentially supported by this denormalizer.
@@ -75,5 +74,5 @@ interface DenormalizerInterface
      *
      * @return array<class-string|'*'|'object'|string, bool|null>
      */
-    /* public function getSupportedTypes(?string $format): array; */
+    public function getSupportedTypes(?string $format): array;
 }

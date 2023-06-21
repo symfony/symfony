@@ -11912,24 +11912,24 @@ index b684fddb2f..ade2242791 100644
      {
          return $this->data;
 diff --git a/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php
-index 079b1e7a9e..e3cfe43e67 100644
+index efe4a6e0e1..fbf291af7e 100644
 --- a/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php
-@@ -221,5 +221,5 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
+@@ -211,5 +211,5 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
       * @throws LogicException if the 'allow_extra_attributes' context variable is false and no class metadata factory is provided
       */
 -    protected function getAllowedAttributes(string|object $classOrObject, array $context, bool $attributesAsString = false)
 +    protected function getAllowedAttributes(string|object $classOrObject, array $context, bool $attributesAsString = false): array|bool
      {
          $allowExtraAttributes = $context[self::ALLOW_EXTRA_ATTRIBUTES] ?? $this->defaultContext[self::ALLOW_EXTRA_ATTRIBUTES];
-@@ -271,5 +271,5 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
+@@ -261,5 +261,5 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
       * @return bool
       */
 -    protected function isAllowedAttribute(object|string $classOrObject, string $attribute, string $format = null, array $context = [])
 +    protected function isAllowedAttribute(object|string $classOrObject, string $attribute, string $format = null, array $context = []): bool
      {
          $ignoredAttributes = $context[self::IGNORED_ATTRIBUTES] ?? $this->defaultContext[self::IGNORED_ATTRIBUTES];
-@@ -322,5 +322,5 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
+@@ -312,5 +312,5 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
       * @throws MissingConstructorArgumentsException
       */
 -    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null)
@@ -11937,59 +11937,58 @@ index 079b1e7a9e..e3cfe43e67 100644
      {
          if (null !== $object = $this->extractObjectToPopulate($class, $context, self::OBJECT_TO_POPULATE)) {
 diff --git a/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
-index 0dba039bc0..576445825e 100644
+index 4f061239b9..85c9f17a83 100644
 --- a/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
-@@ -143,5 +143,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -141,5 +141,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return bool
       */
--    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */)
-+    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */): bool
+-    public function supportsNormalization(mixed $data, string $format = null, array $context = [])
++    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
      {
          return \is_object($data) && !$data instanceof \Traversable;
-@@ -151,5 +151,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -149,5 +149,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return array|string|int|float|bool|\ArrayObject|null
       */
 -    public function normalize(mixed $object, string $format = null, array $context = [])
 +    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
      {
          if (!isset($context['cache_key'])) {
-@@ -235,5 +235,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -233,5 +233,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return object
       */
 -    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null)
 +    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null): object
      {
          if ($class !== $mappedClass = $this->getMappedClass($data, $class, $context)) {
-@@ -286,5 +286,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -284,5 +284,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return string[]
       */
 -    abstract protected function extractAttributes(object $object, string $format = null, array $context = []);
 +    abstract protected function extractAttributes(object $object, string $format = null, array $context = []): array;
  
      /**
-@@ -293,5 +293,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -291,10 +291,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return mixed
       */
 -    abstract protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []);
 +    abstract protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed;
  
      /**
-@@ -300,5 +300,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return bool
       */
--    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */)
-+    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */): bool
+-    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = [])
++    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
      {
          return class_exists($type) || (interface_exists($type, false) && null !== $this->classDiscriminatorResolver?->getMappingForClass($type));
-@@ -308,5 +308,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -304,5 +304,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return mixed
       */
 -    public function denormalize(mixed $data, string $type, string $format = null, array $context = [])
 +    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
      {
          if (!isset($context['cache_key'])) {
-@@ -414,5 +414,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -410,5 +410,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return void
       */
 -    abstract protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = []);
@@ -12017,7 +12016,7 @@ index 48e8c3fb54..a71c3ea476 100644
 +    public function setDenormalizer(DenormalizerInterface $denormalizer): void;
  }
 diff --git a/src/Symfony/Component/Serializer/Normalizer/DenormalizerInterface.php b/src/Symfony/Component/Serializer/Normalizer/DenormalizerInterface.php
-index 4edb70096d..8c844785db 100644
+index e4d0ed9123..8a39d97f36 100644
 --- a/src/Symfony/Component/Serializer/Normalizer/DenormalizerInterface.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/DenormalizerInterface.php
 @@ -47,5 +47,5 @@ interface DenormalizerInterface
@@ -12027,18 +12026,18 @@ index 4edb70096d..8c844785db 100644
 +    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed;
  
      /**
-@@ -59,5 +59,5 @@ interface DenormalizerInterface
+@@ -58,5 +58,5 @@ interface DenormalizerInterface
       * @return bool
       */
--    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */);
-+    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */): bool;
+-    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []);
++    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool;
  
      /**
 diff --git a/src/Symfony/Component/Serializer/Normalizer/GetSetMethodNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/GetSetMethodNormalizer.php
-index 063d34ea59..fb10337d35 100644
+index 3d11567a7b..22e873b151 100644
 --- a/src/Symfony/Component/Serializer/Normalizer/GetSetMethodNormalizer.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/GetSetMethodNormalizer.php
-@@ -147,5 +147,5 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
+@@ -131,5 +131,5 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
       * @return void
       */
 -    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = [])
@@ -12067,7 +12066,7 @@ index 40a4fa0e8c..a1e2749aae 100644
      {
          $this->normalizer = $normalizer;
 diff --git a/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php b/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php
-index 40779de316..105cf99b06 100644
+index 01979d6fcf..e918540c83 100644
 --- a/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php
 @@ -39,5 +39,5 @@ interface NormalizerInterface
@@ -12077,18 +12076,18 @@ index 40779de316..105cf99b06 100644
 +    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null;
  
      /**
-@@ -50,5 +50,5 @@ interface NormalizerInterface
+@@ -49,5 +49,5 @@ interface NormalizerInterface
       * @return bool
       */
--    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */);
-+    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */): bool;
+-    public function supportsNormalization(mixed $data, string $format = null, array $context = []);
++    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool;
  
      /**
 diff --git a/src/Symfony/Component/Serializer/Normalizer/ObjectNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/ObjectNormalizer.php
-index 357c36426e..f4423f47f4 100644
+index af530f8d3d..dd672812f1 100644
 --- a/src/Symfony/Component/Serializer/Normalizer/ObjectNormalizer.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/ObjectNormalizer.php
-@@ -146,5 +146,5 @@ class ObjectNormalizer extends AbstractObjectNormalizer
+@@ -136,5 +136,5 @@ class ObjectNormalizer extends AbstractObjectNormalizer
       * @return void
       */
 -    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = [])
@@ -12096,10 +12095,10 @@ index 357c36426e..f4423f47f4 100644
      {
          try {
 diff --git a/src/Symfony/Component/Serializer/Normalizer/PropertyNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/PropertyNormalizer.php
-index ec12db9bb2..d3b7f036a8 100644
+index cfe93bc10b..7f1d8e5e13 100644
 --- a/src/Symfony/Component/Serializer/Normalizer/PropertyNormalizer.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/PropertyNormalizer.php
-@@ -187,5 +187,5 @@ class PropertyNormalizer extends AbstractObjectNormalizer
+@@ -171,5 +171,5 @@ class PropertyNormalizer extends AbstractObjectNormalizer
       * @return void
       */
 -    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = [])

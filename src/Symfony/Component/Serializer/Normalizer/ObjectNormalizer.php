@@ -52,17 +52,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
 
     public function getSupportedTypes(?string $format): array
     {
-        return ['object' => __CLASS__ === static::class || $this->hasCacheableSupportsMethod()];
-    }
-
-    /**
-     * @deprecated since Symfony 6.3, use "getSupportedTypes()" instead
-     */
-    public function hasCacheableSupportsMethod(): bool
-    {
-        trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
-
-        return __CLASS__ === static::class;
+        return ['object' => true];
     }
 
     protected function extractAttributes(object $object, string $format = null, array $context = []): array

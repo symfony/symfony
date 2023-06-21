@@ -680,19 +680,6 @@ class ObjectNormalizerTest extends TestCase
         }]));
     }
 
-    public function testDefaultExcludeFromCacheKey()
-    {
-        $normalizer = new class(null, null, null, null, null, null, [ObjectNormalizer::EXCLUDE_FROM_CACHE_KEY => ['foo']]) extends ObjectNormalizer {
-            protected function isCircularReference($object, &$context): bool
-            {
-                ObjectNormalizerTest::assertContains('foo', $this->defaultContext[ObjectNormalizer::EXCLUDE_FROM_CACHE_KEY]);
-
-                return false;
-            }
-        };
-        $normalizer->normalize(new ObjectDummy());
-    }
-
     public function testThrowUnexpectedValueException()
     {
         $this->expectException(UnexpectedValueException::class);

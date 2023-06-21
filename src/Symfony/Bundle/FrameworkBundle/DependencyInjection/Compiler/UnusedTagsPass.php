@@ -86,7 +86,6 @@ class UnusedTagsPass implements CompilerPassInterface
         'scheduler.schedule_provider',
         'security.authenticator.login_linker',
         'security.expression_language_provider',
-        'security.remember_me_aware',
         'security.remember_me_handler',
         'security.voter',
         'serializer.encoder',

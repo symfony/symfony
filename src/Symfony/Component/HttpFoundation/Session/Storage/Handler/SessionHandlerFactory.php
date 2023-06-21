@@ -13,10 +13,10 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\DriverManager;
-use Relay\Relay;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Tools\DsnParser;
 use Doctrine\ORM\ORMSetup;
+use Relay\Relay;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 
 /**

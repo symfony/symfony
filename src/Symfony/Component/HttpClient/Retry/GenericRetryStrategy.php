@@ -102,7 +102,7 @@ class GenericRetryStrategy implements RetryStrategyInterface
         $delay = $this->delayMs * $this->multiplier ** $context->getInfo('retry_count');
 
         if ($this->jitter > 0) {
-            $randomness = $delay * $this->jitter;
+            $randomness = (int) ($delay * $this->jitter);
             $delay = $delay + random_int(-$randomness, +$randomness);
         }
 

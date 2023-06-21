@@ -114,7 +114,7 @@ class TranslatorTest extends TestCase
         $document->loadHTMLFile(__DIR__.'/Fixtures/ids.html');
         $document = simplexml_import_dom($document);
         $elements = $document->xpath($translator->cssToXPath($css));
-        $this->assertCount(\count($elementsId), $elementsId);
+        $this->assertCount(\count($elementsId), $elements);
         foreach ($elements as $element) {
             if (null !== $element->attributes()->id) {
                 $this->assertContains((string) $element->attributes()->id, $elementsId);

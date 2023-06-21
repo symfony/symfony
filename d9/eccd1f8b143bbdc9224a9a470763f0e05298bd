@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2023-05-25T11:46:19Z
+
+Symfony doesn't do backward-incompatible changes without deprecating first, this should target 6.4 and provide BC layers if/where needed.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-05-25T11:47:49Z
+
+@chalasr Nicolas and Christian are giving me instructions for the same issue [here](https://github.com/symfony/symfony/pull/50396). I'm having a look, thanks!
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-05-25T11:49:05Z
+
+AFAICT there is no BC break here, this should be fine as-is on 6.4.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-05-25T11:51:41Z
+
+> AFAICT there is no BC break here, this should be fine as-is on 6.4.
+
+I agree, as it is widening the type
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-05-25T11:58:59Z
+
+I thought again about it, you're right, it shouldn't cause any issue as it is in the constructor. Thank you both :pray:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-08T21:53:37Z
+
+This PR should be put on hold until we settle on https://github.com/symfony/symfony/pull/50396#issuecomment-1575013763

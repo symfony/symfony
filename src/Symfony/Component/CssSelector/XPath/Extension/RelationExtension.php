@@ -47,8 +47,12 @@ class RelationExtension extends AbstractExtension
 
     public function translateRelationDirectAdjacent(XPathExpr $xpath, XPathExpr $combinedXpath): XPathExpr
     {
+        $combinedXpath
+            ->addNameTest()
+            ->addCondition('position() = 1');
         return $xpath
-            ->addCondition(sprintf('following-sibling::*[(name() = \'%s\') and (position() = 1)]', $combinedXpath->getElement()));
+            ->join('[following-sibling::', $combinedXpath, ']', true)
+            ;
     }
 
     public function translateRelationIndirectAdjacent(XPathExpr $xpath, XPathExpr $combinedXpath): XPathExpr

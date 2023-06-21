@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-13T16:26:58Z
+
+PR updated with php_apcu.dll from https://phpdev.toolsforresearch.com/php-8.2.6-Win32-vs16-x86.zip, thanks to @Jan-E!
+~php_redis.dll doesn't seem to work so I removed testing redis on appveyor. We already have it in our integration tests anyway.~
+
+---------------------------------------------------------------------------
+
+by Jan-E at 2023-06-13T16:31:46Z
+
+Redis in my builds needs igbinary as well. If you build redis yourself on Windows, try `--disable-redis-igbinary`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-13T16:45:50Z
+
+Oh thanks for the hint! PR updated, works!
+
+---------------------------------------------------------------------------
+
+by Jan-E at 2023-06-13T20:23:30Z
+
+For the failing 8.3 test: igbinary does not compile yet, but apcu and redis do work:
+https://www.apachelounge.com/viewtopic.php?t=6617
+Please note that I am still building with OpenSSL 1.1.1.
+
+---------------------------------------------------------------------------
+
+by Jan-E at 2023-06-15T02:32:32Z
+
+BTW: my pleasure, as a Drupal developer.

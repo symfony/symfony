@@ -39,6 +39,17 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
         ]));
     }
 
+    public function testConstraintIsExecuted()
+    {
+        $constraint = new NotNull();
+        $this->expectValidateValue(0, 'Foo', [$constraint]);
+
+        $this->validator->validate('Foo', new When([
+            'expression' => 'true',
+            'constraints' => $constraint,
+        ]));
+    }
+
     public function testConstraintsAreExecutedWithNull()
     {
         $constraints = [

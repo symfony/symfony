@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-05-23T07:25:44Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.3" but it seems your PR description refers to branch "6.4 after feature freeze".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-05-25T11:28:41Z
+
+@alexandre-daubois Can you rebase on the `6.4` branch?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-06-03T15:14:23Z
+
+I'm not sure I like this change. The argument is named `versions`, so I would not expect a single integer to be supported.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-09T09:33:27Z
+
+> The argument is named versions, so I would not expect a single integer to be supported.
+
+There is a least one precedent on the topic, Route's schemes + methods accept a single value:
+https://github.com/symfony/symfony/blob/6.4/src/Symfony/Component/Routing/Annotation/Route.php#L44-L45
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-06-09T09:40:02Z
+
+I actually found some other examples. Many other constraints accept `array|string`:
+
+- CardScheme with `$schemes` https://github.com/symfony/symfony/blob/6.4/src/Symfony/Component/Validator/Constraints/CardScheme.php#L57
+- Cascade with `$exclude` https://github.com/symfony/symfony/blob/6.4/src/Symfony/Component/Validator/Constraints/Cascade.php#L28
+- File with `$mimeTypes` and `$extensions` https://github.com/symfony/symfony/blob/6.4/src/Symfony/Component/Validator/Constraints/File.php#L55
+
+This PR (and [this one](https://github.com/symfony/symfony/pull/50425)) could bring some consistency here in my opnion :slightly_smiling_face:

@@ -17,6 +17,7 @@ use Symfony\Component\AssetMapper\Factory\CachedMappedAssetFactory;
 use Symfony\Component\AssetMapper\Factory\MappedAssetFactoryInterface;
 use Symfony\Component\AssetMapper\MappedAsset;
 use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -103,6 +104,7 @@ class CachedMappedAssetFactoryTest extends TestCase
 
         // just adding any file as an example
         $mappedAsset->addFileDependency(__DIR__.'/../fixtures/importmap.php');
+        $mappedAsset->addFileDependency(__DIR__.'/../fixtures/dir3');
 
         $factory = $this->createMock(MappedAssetFactoryInterface::class);
         $factory->expects($this->once())
@@ -117,13 +119,14 @@ class CachedMappedAssetFactoryTest extends TestCase
         $cachedFactory->createMappedAsset('file1.css', $sourcePath);
 
         $configCacheMetadata = $this->loadConfigCacheMetadataFor($mappedAsset);
-        $this->assertCount(4, $configCacheMetadata);
+        $this->assertCount(5, $configCacheMetadata);
         $this->assertInstanceOf(FileResource::class, $configCacheMetadata[0]);
-        $this->assertInstanceOf(FileResource::class, $configCacheMetadata[1]);
+        $this->assertInstanceOf(DirectoryResource::class, $configCacheMetadata[1]);
+        $this->assertInstanceOf(FileResource::class, $configCacheMetadata[2]);
         $this->assertSame(realpath(__DIR__.'/../fixtures/importmap.php'), $configCacheMetadata[0]->getResource());
-        $this->assertSame($mappedAsset->sourcePath, $configCacheMetadata[1]->getResource());
-        $this->assertSame($dependentOnContentAsset->sourcePath, $configCacheMetadata[2]->getResource());
-        $this->assertSame($deeplyNestedAsset->sourcePath, $configCacheMetadata[3]->getResource());
+        $this->assertSame($mappedAsset->sourcePath, $configCacheMetadata[2]->getResource());
+        $this->assertSame($dependentOnContentAsset->sourcePath, $configCacheMetadata[3]->getResource());
+        $this->assertSame($deeplyNestedAsset->sourcePath, $configCacheMetadata[4]->getResource());
     }
 
     private function loadConfigCacheMetadataFor(MappedAsset $mappedAsset): array

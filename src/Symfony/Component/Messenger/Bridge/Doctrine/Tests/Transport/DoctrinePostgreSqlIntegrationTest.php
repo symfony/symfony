@@ -17,7 +17,6 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Tools\DsnParser;
-use Doctrine\ORM\ORMSetup;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\PostgreSqlConnection;
@@ -42,7 +41,7 @@ class DoctrinePostgreSqlIntegrationTest extends TestCase
 
         $url = "pdo-pgsql://postgres:password@$host";
         $params = class_exists(DsnParser::class) ? (new DsnParser())->parse($url) : ['url' => $url];
-        $config = class_exists(ORMSetup::class) ? ORMSetup::createConfiguration() : new Configuration();
+        $config = new Configuration();
         if (class_exists(DefaultSchemaManagerFactory::class)) {
             $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
         }

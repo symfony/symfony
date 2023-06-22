@@ -22,7 +22,6 @@ use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Tools\DsnParser;
-use Doctrine\ORM\ORMSetup;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
@@ -89,7 +88,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
                 $params = ['url' => $connOrDsn];
             }
 
-            $config = class_exists(ORMSetup::class) ? ORMSetup::createConfiguration() : new Configuration();
+            $config = new Configuration();
             if (class_exists(DefaultSchemaManagerFactory::class)) {
                 $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
             }

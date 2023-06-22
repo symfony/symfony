@@ -18,7 +18,6 @@ use Doctrine\DBAL\Driver\Middleware;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\ORM\ORMSetup;
 use PHPUnit\Framework\SkippedTestSuiteError;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
@@ -160,7 +159,7 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
 
     private function getDbalConfig()
     {
-        $config = class_exists(ORMSetup::class) ? ORMSetup::createConfiguration(true) : new Configuration();
+        $config = new Configuration();
         if (class_exists(DefaultSchemaManagerFactory::class)) {
             $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
         }

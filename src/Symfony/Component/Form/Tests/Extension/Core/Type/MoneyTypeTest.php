@@ -126,14 +126,20 @@ class MoneyTypeTest extends BaseTypeTestCase
 
     public function testHtml5EnablesSpecificFormattingWithIntegerFormat()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, ['html5' => true, 'scale' => 2, 'format' => 'integer']);
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['html5' => true, 'scale' => 2, 'input' => 'integer']);
         $this->assertSame('integer', $form->createView()->vars['type']);
     }
 
-    public function testValueToIntegerWithSpecificOptionFormatToInteger()
+    public function testValueToIntegerWithSpecificOptionInputToInteger()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, ['format' => 'integer']);
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'integer']);
         $form->submit('12345.6');
         $this->assertSame(12345, $form->getData());
+    }
+
+    public function testInputTypeIntegerAndDivisorNotEgalToOne()
+    {
+        $this->expectException(\LogicException::class);
+        $this->factory->create(static::TESTED_TYPE, null, ['divisor' => 2, 'input' => 'integer']);
     }
 }

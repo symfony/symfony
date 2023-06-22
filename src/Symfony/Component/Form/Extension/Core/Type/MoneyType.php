@@ -38,7 +38,7 @@ class MoneyType extends AbstractType
                 $options['rounding_mode'],
                 $options['divisor'],
                 $options['html5'] ? 'en' : null,
-                $options['format']
+                $options['input']
 
             ))
         ;
@@ -52,7 +52,7 @@ class MoneyType extends AbstractType
         $view->vars['money_pattern'] = self::getPattern($options['currency']);
 
         if ($options['html5']) {
-            $view->vars['type'] = $options['format'] === 'integer' ? 'integer' : 'number';
+            $view->vars['type'] = $options['input'] === 'integer' ? 'integer' : 'number';
         }
     }
 
@@ -70,7 +70,7 @@ class MoneyType extends AbstractType
             'compound'        => false,
             'html5'           => false,
             'invalid_message' => 'Please enter a valid money amount.',
-            'format'          => 'float'
+            'input'           => 'float'
         ]);
 
         $resolver->setAllowedValues('rounding_mode', [
@@ -83,7 +83,7 @@ class MoneyType extends AbstractType
             \NumberFormatter::ROUND_CEILING,
         ]);
 
-        $resolver->setAllowedValues('format', ['float', 'integer']);
+        $resolver->setAllowedValues('input', ['float', 'integer']);
         $resolver->setAllowedTypes('scale', 'int');
 
         $resolver->setAllowedTypes('html5', 'bool');
@@ -91,6 +91,14 @@ class MoneyType extends AbstractType
         $resolver->setNormalizer('grouping', static function (Options $options, $value) {
             if ($value && $options['html5']) {
                 throw new LogicException('Cannot use the "grouping" option when the "html5" option is enabled.');
+            }
+
+            return $value;
+        });
+
+        $resolver->setNormalizer('input', static function (Options $options, $value) {
+            if ($value === 'integer' && $options['divisor'] !== 1) {
+                throw new LogicException('Cannot use the "input" option when the "divisor" option is different from 1.');
             }
 
             return $value;

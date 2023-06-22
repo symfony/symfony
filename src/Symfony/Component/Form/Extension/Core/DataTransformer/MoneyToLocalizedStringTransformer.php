@@ -22,14 +22,14 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransformer
 {
     private int $divisor;
-    private string $format;
+    private string $input;
 
-    public function __construct(?int $scale = 2, ?bool $grouping = true, ?int $roundingMode = \NumberFormatter::ROUND_HALFUP, ?int $divisor = 1, string $locale = null, string $format = 'float')
+    public function __construct(?int $scale = 2, ?bool $grouping = true, ?int $roundingMode = \NumberFormatter::ROUND_HALFUP, ?int $divisor = 1, string $locale = null, string $input = 'float')
     {
         parent::__construct($scale ?? 2, $grouping ?? true, $roundingMode, $locale);
 
         $this->divisor = $divisor ?? 1;
-        $this->format  = $format;
+        $this->input   = $input;
     }
 
     /**
@@ -63,8 +63,8 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
     public function reverseTransform(mixed $value): int|float|null
     {
         $value = parent::reverseTransform($value);
-        if ($this->format === 'integer') {
-            return (int) $value * $this->divisor;
+        if ($this->input === 'integer' && $this->divisor === 1) {
+            return (int) $value;
         }
         if (null !== $value && 1 !== $this->divisor) {
             $value = (float) (string) ($value * $this->divisor);

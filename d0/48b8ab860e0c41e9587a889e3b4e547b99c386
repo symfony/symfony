@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-22T08:07:53Z
+
+/cc @morozov @derrabus @greg0ire does [that](https://github.com/symfony/symfony/pull/50742/files#diff-2a38c9deb498eec50126c297bb3d094c8efb29364934e902d6481761ace6f20a) sound correct to you?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-06-22T08:30:33Z
+
+IIRC, the alternative to `toSaveSql` is to introspect only the schema assets that you actually manage before comparing it to the target schema. The rationale is that if you introspect a database with lots of tables/columns/indexes/etc although you're interested in one table only, you keep the database unnecessarily busy.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-22T08:32:58Z
+
+Can you help with this? I'm not fluent enough in Doctrine to turn that into code :see_no_evil:
+Or is the attached patch good enough?

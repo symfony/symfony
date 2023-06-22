@@ -17,7 +17,6 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
-use Doctrine\ORM\ORMSetup;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\DoctrineDbalStore;
@@ -39,7 +38,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
     {
         self::$dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_lock');
 
-        $config = class_exists(ORMSetup::class) ? ORMSetup::createConfiguration(true) : new Configuration();
+        $config = new Configuration();
         if (class_exists(DefaultSchemaManagerFactory::class)) {
             $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
         }
@@ -66,7 +65,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
      */
     public function getStore(): PersistingStoreInterface
     {
-        $config = class_exists(ORMSetup::class) ? ORMSetup::createConfiguration(true) : new Configuration();
+        $config = new Configuration();
         if (class_exists(DefaultSchemaManagerFactory::class)) {
             $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
         }

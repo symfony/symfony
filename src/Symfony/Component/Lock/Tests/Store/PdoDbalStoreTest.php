@@ -16,7 +16,6 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\ORM\ORMSetup;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
@@ -40,7 +39,7 @@ class PdoDbalStoreTest extends AbstractStoreTestCase
     {
         self::$dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_lock');
 
-        $config = class_exists(ORMSetup::class) ? ORMSetup::createConfiguration(true) : new Configuration();
+        $config = new Configuration();
         if (class_exists(DefaultSchemaManagerFactory::class)) {
             $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
         }
@@ -69,7 +68,7 @@ class PdoDbalStoreTest extends AbstractStoreTestCase
     {
         $this->expectDeprecation('Since symfony/lock 5.4: Usage of a DBAL Connection with "Symfony\Component\Lock\Store\PdoStore" is deprecated and will be removed in symfony 6.0. Use "Symfony\Component\Lock\Store\DoctrineDbalStore" instead.');
 
-        $config = class_exists(ORMSetup::class) ? ORMSetup::createConfiguration(true) : new Configuration();
+        $config = new Configuration();
         if (class_exists(DefaultSchemaManagerFactory::class)) {
             $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
         }

@@ -15,7 +15,6 @@ use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Tools\DsnParser;
-use Doctrine\ORM\ORMSetup;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Traits\RedisClusterProxy;
 use Symfony\Component\Cache\Traits\RedisProxy;
@@ -77,7 +76,7 @@ class SessionHandlerFactory
                 }
                 $connection[3] = '-';
                 $params = class_exists(DsnParser::class) ? (new DsnParser())->parse($connection) : ['url' => $connection];
-                $config = class_exists(ORMSetup::class) ? ORMSetup::createConfiguration(true) : new Configuration();
+                $config = new Configuration();
                 if (class_exists(DefaultSchemaManagerFactory::class)) {
                     $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
                 }

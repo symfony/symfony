@@ -17,7 +17,6 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Tools\DsnParser;
-use Doctrine\ORM\ORMSetup;
 use Symfony\Component\Lock\BlockingSharedLockStoreInterface;
 use Symfony\Component\Lock\BlockingStoreInterface;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
@@ -71,7 +70,7 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
                 $params = ['url' => $this->filterDsn($connOrUrl)];
             }
 
-            $config = class_exists(ORMSetup::class) ? ORMSetup::createConfiguration() : new Configuration();
+            $config = new Configuration();
             if (class_exists(DefaultSchemaManagerFactory::class)) {
                 $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
             }

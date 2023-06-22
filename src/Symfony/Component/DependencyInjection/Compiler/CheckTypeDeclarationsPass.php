@@ -41,6 +41,8 @@ use Symfony\Component\ExpressionLanguage\Expression;
  */
 final class CheckTypeDeclarationsPass extends AbstractRecursivePass
 {
+    protected bool $skipScalars = true;
+
     private const SCALAR_TYPES = [
         'int' => true,
         'float' => true,

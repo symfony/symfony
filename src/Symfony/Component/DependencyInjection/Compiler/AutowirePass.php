@@ -35,6 +35,8 @@ use Symfony\Component\VarExporter\ProxyHelper;
  */
 class AutowirePass extends AbstractRecursivePass
 {
+    protected bool $skipScalars = true;
+
     private array $types;
     private array $ambiguousServiceTypes;
     private array $autowiringAliases;

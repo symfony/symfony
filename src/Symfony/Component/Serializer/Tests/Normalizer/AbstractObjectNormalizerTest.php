@@ -724,6 +724,27 @@ class AbstractObjectNormalizerTest extends TestCase
 
         $this->assertSame(['propertyWithoutNullSkipNullValues' => 'foo'], $data);
     }
+
+    public function testDefaultExcludeFromCacheKey()
+    {
+        $object = new DummyChild();
+        $object->bar = 'not called';
+
+        $normalizer = new class(null, null, null, null, null, [AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY => ['foo']]) extends AbstractObjectNormalizerDummy {
+            public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+            {
+                AbstractObjectNormalizerTest::assertContains('foo', $this->defaultContext[ObjectNormalizer::EXCLUDE_FROM_CACHE_KEY]);
+                $data->bar = 'called';
+
+                return true;
+            }
+        };
+
+        $serializer = new Serializer([$normalizer]);
+        $serializer->normalize($object);
+
+        $this->assertSame('called', $object->bar);
+    }
 }
 
 class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer

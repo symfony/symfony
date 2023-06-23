@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by stof at 2023-06-21T11:08:53Z
+
+To solve the issue reported by psalm for ServiceLocatorTrait, you should also improve the type of its constructor argument to say that its array of callables should be indexed by strings.
+
+---------------------------------------------------------------------------
+
+by andersonamuller at 2023-06-21T12:47:16Z
+
+> To solve the issue reported by psalm for ServiceLocatorTrait, you should also improve the type of its constructor argument to say that its array of callables should be indexed by strings.
+
+Yes, indeed, I first wanted to confirm that is a valid change. I will fix the rest when I have more time.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-06-23T07:29:03Z
+
+@andersonamuller Can you rebase your PR to get rid of the merge commit? Thank you.

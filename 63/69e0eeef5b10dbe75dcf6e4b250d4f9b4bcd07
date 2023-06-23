@@ -1,0 +1,72 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-01-12T13:27:22Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.3" but it seems your PR description refers to branch "6.2".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by jmsche at 2023-01-12T16:03:48Z
+
+There's also an issue when on small screen size for the Symfony CLI icon missing:
+
+![image](https://user-images.githubusercontent.com/3929498/212117906-77389e04-990a-4e0d-a056-045b6a71cbf1.png)
+
+Can I take care of it in this PR, should I create an other PR, or should I open an issue on Symfony CLI repository?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-01-14T19:08:08Z
+
+You can tackle this here
+
+---------------------------------------------------------------------------
+
+by jmsche at 2023-01-16T10:39:52Z
+
+I just pushed the following changes:
+
+* use CSS variables for -green color
+* fix non visible Symfony CLI icon on small screen
+* use the same style for green status (bottom colored line instead of full background)
+
+The PR description has been updated as well, with updated/new screenshots.
+
+However as you can see on the screenshots, using the green color CSS variables changes the green color, including for badges (green is now less "pronounced"). Is this an issue?
+
+---------------------------------------------------------------------------
+
+by jmsche at 2023-02-24T21:21:54Z
+
+Hi, friendly ping for a review :)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2023-06-22T18:06:59Z
+
+I like everything ... except the change in the green color. The new shade looks a bit dull because its saturation is lower. I'd prefer to keep the original if others agree. Thanks.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-06-22T18:33:10Z
+
+I tend to agree here. The value used currently look like the value used inside the profiler to render this green box for the 200 status code in the light theme. However, as the toolbar is using a dark background, we should probably use the green color used in the dark theme of the profiler instead.
+
+---------------------------------------------------------------------------
+
+by jmsche at 2023-06-23T06:51:08Z
+
+Updated green color, here are new screenshots (I reused a green hex used in profiler CSS):
+
+![toolbar-full](https://github.com/symfony/symfony/assets/3929498/8465d329-e6d8-4460-a1b2-4e397eb8a7a1)
+
+![toolbar-server-open](https://github.com/symfony/symfony/assets/3929498/68fee476-8060-41b3-a7ed-5fec7fa19447)
+
+![toolbar-mobile](https://github.com/symfony/symfony/assets/3929498/47f2d46a-f912-4607-ba53-18dfd32653e5)

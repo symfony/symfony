@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by mdeboer at 2023-06-22T20:32:02Z
+
+Wow, just turned off my pc so figured I'd approve these changes on my phone. But apparently it creates a commit for every change, if you want I can squash them tomorrow 😂
+
+Wasn't sure about the formatting. Not too happy with how it looked but thought that'd be something for a different PR.
+
+Got lots of questions like why the serializer context keys are mentioned in the docblock but not used etc. But yeah, for a new PR I suppose 😅

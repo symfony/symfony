@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by stof at 2023-06-12T15:39:34Z
+
+The title should be only for the text format IMO
+
+---------------------------------------------------------------------------
+
+by Toflar at 2023-06-12T15:40:57Z
+
+There is no text format. The default is `yaml` and it hasn't been parsable ever since. Now in 6.3, there's a new fallback to `json` in case the Yaml component is not installed. But there is also a new `--format` option.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-06-12T16:22:16Z
+
+then maybe the title should be removed or be an info written to stderr instead of stdout
+
+---------------------------------------------------------------------------
+
+by Toflar at 2023-06-12T16:54:57Z
+
+I don't really see any value in the title either but I don't feel like I'm in charge to decide on this 😄
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-06-12T18:11:11Z
+
+maybe show title if --format is not given
+
+or put different, the default format can be new `text` which shows title+yaml, but --format=yaml shows no title
+
+---------------------------------------------------------------------------
+
+by Toflar at 2023-06-12T18:17:16Z
+
+I like that suggestions so I've quickly implemented a first version - wdyt?

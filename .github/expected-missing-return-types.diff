@@ -626,7 +626,7 @@ index fedc30d06e..bb934fe1f6 100644
      {
          if (!$container->hasDefinition('session.marshalling_handler')) {
 diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/TestServiceContainerRealRefPass.php b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/TestServiceContainerRealRefPass.php
-index 09f272daa9..1fd0608bde 100644
+index aed3b13404..91a6804fea 100644
 --- a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/TestServiceContainerRealRefPass.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/TestServiceContainerRealRefPass.php
 @@ -25,5 +25,5 @@ class TestServiceContainerRealRefPass implements CompilerPassInterface
@@ -648,10 +648,10 @@ index 6e7669a710..27517d34ae 100644
      {
          if (!$container->hasDefinition('test.private_services_locator')) {
 diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/UnusedTagsPass.php b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/UnusedTagsPass.php
-index b40c759eb4..65fa45d18d 100644
+index b04516410f..fc5a085a37 100644
 --- a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/UnusedTagsPass.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/UnusedTagsPass.php
-@@ -110,5 +110,5 @@ class UnusedTagsPass implements CompilerPassInterface
+@@ -109,5 +109,5 @@ class UnusedTagsPass implements CompilerPassInterface
       * @return void
       */
 -    public function process(ContainerBuilder $container)
@@ -999,7 +999,7 @@ index a2c5815e4b..1c9721ccc6 100644
 +    public function addConfiguration(NodeDefinition $builder): void;
  }
 diff --git a/src/Symfony/Bundle/SecurityBundle/DependencyInjection/SecurityExtension.php b/src/Symfony/Bundle/SecurityBundle/DependencyInjection/SecurityExtension.php
-index 37978b285f..ca1f5ae517 100644
+index ddb1d3cc92..18203f5104 100644
 --- a/src/Symfony/Bundle/SecurityBundle/DependencyInjection/SecurityExtension.php
 +++ b/src/Symfony/Bundle/SecurityBundle/DependencyInjection/SecurityExtension.php
 @@ -82,5 +82,5 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
@@ -3759,7 +3759,7 @@ index 2ad4a048ba..719267be1e 100644
 +    public function process(ContainerBuilder $container): void;
  }
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/DecoratorServicePass.php b/src/Symfony/Component/DependencyInjection/Compiler/DecoratorServicePass.php
-index c38bfa7744..10d999f093 100644
+index d05878fe85..dc75d9ef10 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/DecoratorServicePass.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/DecoratorServicePass.php
 @@ -31,5 +31,5 @@ class DecoratorServicePass extends AbstractRecursivePass
@@ -3769,6 +3769,17 @@ index c38bfa7744..10d999f093 100644
 +    public function process(ContainerBuilder $container): void
      {
          $definitions = new \SplPriorityQueue();
+diff --git a/src/Symfony/Component/DependencyInjection/Compiler/DefinitionErrorExceptionPass.php b/src/Symfony/Component/DependencyInjection/Compiler/DefinitionErrorExceptionPass.php
+index b6ee648160..5682941b11 100644
+--- a/src/Symfony/Component/DependencyInjection/Compiler/DefinitionErrorExceptionPass.php
++++ b/src/Symfony/Component/DependencyInjection/Compiler/DefinitionErrorExceptionPass.php
+@@ -33,5 +33,5 @@ class DefinitionErrorExceptionPass extends AbstractRecursivePass
+      * @return void
+      */
+-    public function process(ContainerBuilder $container)
++    public function process(ContainerBuilder $container): void
+     {
+         try {
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/ExtensionCompilerPass.php b/src/Symfony/Component/DependencyInjection/Compiler/ExtensionCompilerPass.php
 index 953b7f942e..96912701e5 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/ExtensionCompilerPass.php
@@ -7319,7 +7330,7 @@ index 472437e465..1dfe39146b 100644
      {
          if ($this->client instanceof ResetInterface) {
 diff --git a/src/Symfony/Component/HttpClient/HttpClientTrait.php b/src/Symfony/Component/HttpClient/HttpClientTrait.php
-index 48782153b4..f2bbcf288d 100644
+index 3364d32acd..1b990e5a5a 100644
 --- a/src/Symfony/Component/HttpClient/HttpClientTrait.php
 +++ b/src/Symfony/Component/HttpClient/HttpClientTrait.php
 @@ -679,5 +679,5 @@ trait HttpClientTrait
@@ -7491,7 +7502,7 @@ index 9d7012de35..545339d4ef 100644
      {
          unset($this->parameters[$key]);
 diff --git a/src/Symfony/Component/HttpFoundation/Request.php b/src/Symfony/Component/HttpFoundation/Request.php
-index 9445a4b281..9854e19828 100644
+index 0bef6f8d70..ca99fd9dad 100644
 --- a/src/Symfony/Component/HttpFoundation/Request.php
 +++ b/src/Symfony/Component/HttpFoundation/Request.php
 @@ -269,5 +269,5 @@ class Request
@@ -7578,14 +7589,14 @@ index 9445a4b281..9854e19828 100644
 +    public function setLocale(string $locale): void
      {
          $this->setPhpDefaultLocale($this->locale = $locale);
-@@ -1738,5 +1738,5 @@ class Request
+@@ -1756,5 +1756,5 @@ class Request
       * @return string
       */
 -    protected function prepareRequestUri()
 +    protected function prepareRequestUri(): string
      {
          $requestUri = '';
-@@ -1909,5 +1909,5 @@ class Request
+@@ -1927,5 +1927,5 @@ class Request
       * @return void
       */
 -    protected static function initializeFormats()
@@ -9626,45 +9637,45 @@ index 9087874c29..5cfd87c4ad 100644
      {
          foreach ($this->stores as $store) {
 diff --git a/src/Symfony/Component/Lock/Store/DoctrineDbalPostgreSqlStore.php b/src/Symfony/Component/Lock/Store/DoctrineDbalPostgreSqlStore.php
-index e6525b59f3..5a227743f3 100644
+index d87a7d5667..1409a85a83 100644
 --- a/src/Symfony/Component/Lock/Store/DoctrineDbalPostgreSqlStore.php
 +++ b/src/Symfony/Component/Lock/Store/DoctrineDbalPostgreSqlStore.php
-@@ -82,5 +82,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
+@@ -81,5 +81,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
       * @return void
       */
 -    public function save(Key $key)
 +    public function save(Key $key): void
      {
          // prevent concurrency within the same connection
-@@ -117,5 +117,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
+@@ -116,5 +116,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
       * @return void
       */
 -    public function saveRead(Key $key)
 +    public function saveRead(Key $key): void
      {
          // prevent concurrency within the same connection
-@@ -152,5 +152,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
+@@ -151,5 +151,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
       * @return void
       */
 -    public function putOffExpiration(Key $key, float $ttl)
 +    public function putOffExpiration(Key $key, float $ttl): void
      {
          // postgresql locks forever.
-@@ -164,5 +164,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
+@@ -163,5 +163,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
       * @return void
       */
 -    public function delete(Key $key)
 +    public function delete(Key $key): void
      {
          // Prevent deleting locks own by an other key in the same connection
-@@ -204,5 +204,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
+@@ -203,5 +203,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
       * @return void
       */
 -    public function waitAndSave(Key $key)
 +    public function waitAndSave(Key $key): void
      {
          // prevent concurrency within the same connection
-@@ -230,5 +230,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
+@@ -229,5 +229,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
       * @return void
       */
 -    public function waitAndSaveRead(Key $key)
@@ -9672,24 +9683,24 @@ index e6525b59f3..5a227743f3 100644
      {
          // prevent concurrency within the same connection
 diff --git a/src/Symfony/Component/Lock/Store/DoctrineDbalStore.php b/src/Symfony/Component/Lock/Store/DoctrineDbalStore.php
-index e915f30a79..7bed81cdac 100644
+index 0fce5d900c..b826c2866e 100644
 --- a/src/Symfony/Component/Lock/Store/DoctrineDbalStore.php
 +++ b/src/Symfony/Component/Lock/Store/DoctrineDbalStore.php
-@@ -101,5 +101,5 @@ class DoctrineDbalStore implements PersistingStoreInterface
+@@ -100,5 +100,5 @@ class DoctrineDbalStore implements PersistingStoreInterface
       * @return void
       */
 -    public function save(Key $key)
 +    public function save(Key $key): void
      {
          $key->reduceLifetime($this->initialTtl);
-@@ -143,5 +143,5 @@ class DoctrineDbalStore implements PersistingStoreInterface
+@@ -142,5 +142,5 @@ class DoctrineDbalStore implements PersistingStoreInterface
       * @return void
       */
 -    public function putOffExpiration(Key $key, $ttl)
 +    public function putOffExpiration(Key $key, $ttl): void
      {
          if ($ttl < 1) {
-@@ -177,5 +177,5 @@ class DoctrineDbalStore implements PersistingStoreInterface
+@@ -176,5 +176,5 @@ class DoctrineDbalStore implements PersistingStoreInterface
       * @return void
       */
 -    public function delete(Key $key)
@@ -10083,7 +10094,7 @@ index 86fa255015..08cbde055f 100644
      {
          $busIds = [];
 diff --git a/src/Symfony/Component/Messenger/EventListener/SendFailedMessageForRetryListener.php b/src/Symfony/Component/Messenger/EventListener/SendFailedMessageForRetryListener.php
-index 73c4013b6b..c8b52a3c0e 100644
+index ba775b0c17..1e1c50b517 100644
 --- a/src/Symfony/Component/Messenger/EventListener/SendFailedMessageForRetryListener.php
 +++ b/src/Symfony/Component/Messenger/EventListener/SendFailedMessageForRetryListener.php
 @@ -52,5 +52,5 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
@@ -12109,31 +12120,31 @@ index 1835568745..2b98fc11d6 100644
      {
          $this->serializer = $serializer;
 diff --git a/src/Symfony/Component/Serializer/Tests/Normalizer/AbstractObjectNormalizerTest.php b/src/Symfony/Component/Serializer/Tests/Normalizer/AbstractObjectNormalizerTest.php
-index c90ec1185f..45e617705e 100644
+index 78046229eb..bed7c33cec 100644
 --- a/src/Symfony/Component/Serializer/Tests/Normalizer/AbstractObjectNormalizerTest.php
 +++ b/src/Symfony/Component/Serializer/Tests/Normalizer/AbstractObjectNormalizerTest.php
-@@ -743,5 +743,5 @@ class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
+@@ -764,5 +764,5 @@ class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
      }
  
 -    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = [])
 +    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = []): void
      {
          $object->$attribute = $value;
-@@ -943,5 +943,5 @@ class AbstractObjectNormalizerWithMetadata extends AbstractObjectNormalizer
+@@ -964,5 +964,5 @@ class AbstractObjectNormalizerWithMetadata extends AbstractObjectNormalizer
      }
  
 -    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = [])
 +    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = []): void
      {
          if (property_exists($object, $attribute)) {
-@@ -1064,5 +1064,5 @@ class AbstractObjectNormalizerCollectionDummy extends AbstractObjectNormalizer
+@@ -1085,5 +1085,5 @@ class AbstractObjectNormalizerCollectionDummy extends AbstractObjectNormalizer
      }
  
 -    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = [])
 +    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = []): void
      {
          $object->$attribute = $value;
-@@ -1121,5 +1121,5 @@ class ArrayDenormalizerDummy implements DenormalizerInterface, SerializerAwareIn
+@@ -1142,5 +1142,5 @@ class ArrayDenormalizerDummy implements DenormalizerInterface, SerializerAwareIn
      }
  
 -    public function setSerializer(SerializerInterface $serializer)
@@ -13953,7 +13964,7 @@ index d2d3fc1294..c28829f4e2 100644
      {
          $a += [
 diff --git a/src/Symfony/Component/VarDumper/Caster/DateCaster.php b/src/Symfony/Component/VarDumper/Caster/DateCaster.php
-index 1394a78132..ee8471c88f 100644
+index a0cbddb76f..32fed323bb 100644
 --- a/src/Symfony/Component/VarDumper/Caster/DateCaster.php
 +++ b/src/Symfony/Component/VarDumper/Caster/DateCaster.php
 @@ -28,5 +28,5 @@ class DateCaster

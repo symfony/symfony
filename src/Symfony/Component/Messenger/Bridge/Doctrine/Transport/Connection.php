@@ -480,13 +480,39 @@ class Connection implements ResetInterface
         $comparator = $this->createComparator($schemaManager);
         $schemaDiff = $this->compareSchemas($comparator, method_exists($schemaManager, 'introspectSchema') ? $schemaManager->introspectSchema() : $schemaManager->createSchema(), $this->getSchema());
         $platform = $this->driverConnection->getDatabasePlatform();
-        $queries = method_exists($platform, 'getAlterSchemaSQL') ? $platform->getAlterSchemaSQL($schemaDiff) : $schemaDiff->toSaveSql($platform);
+        $exec = method_exists($this->driverConnection, 'executeStatement') ? 'executeStatement' : 'exec';
 
-        foreach ($queries as $sql) {
-            if (method_exists($this->driverConnection, 'executeStatement')) {
-                $this->driverConnection->executeStatement($sql);
-            } else {
-                $this->driverConnection->exec($sql);
+        if (!method_exists(SchemaDiff::class, 'getCreatedSchemas')) {
+            foreach ($schemaDiff->toSaveSql($platform) as $sql) {
+                $this->driverConnection->$exec($sql);
+            }
+
+            return;
+        }
+
+        if ($platform->supportsSchemas()) {
+            foreach ($schemaDiff->getCreatedSchemas() as $schema) {
+                $this->driverConnection->$exec($platform->getCreateSchemaSQL($schema));
+            }
+        }
+
+        if ($platform->supportsSequences()) {
+            foreach ($schemaDiff->getAlteredSequences() as $sequence) {
+                $this->driverConnection->$exec($platform->getAlterSequenceSQL($sequence));
+            }
+
+            foreach ($schemaDiff->getCreatedSequences() as $sequence) {
+                $this->driverConnection->$exec($platform->getCreateSequenceSQL($sequence));
+            }
+        }
+
+        foreach ($platform->getCreateTablesSQL($schemaDiff->getCreatedTables()) as $sql) {
+            $this->driverConnection->$exec($sql);
+        }
+
+        foreach ($schemaDiff->getAlteredTables() as $tableDiff) {
+            foreach ($platform->getAlterTableSQL($tableDiff) as $sql) {
+                $this->driverConnection->$exec($sql);
             }
         }
     }

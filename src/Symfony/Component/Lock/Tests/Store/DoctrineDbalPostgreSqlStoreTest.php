@@ -17,7 +17,6 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Tools\DsnParser;
-use Doctrine\ORM\ORMSetup;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
@@ -173,7 +172,7 @@ class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTestCase
     private static function getDbalConnection(string $dsn): Connection
     {
         $params = class_exists(DsnParser::class) ? (new DsnParser(['sqlite' => 'pdo_sqlite']))->parse($dsn) : ['url' => $dsn];
-        $config = class_exists(ORMSetup::class) ? ORMSetup::createConfiguration(true) : new Configuration();
+        $config = new Configuration();
         if (class_exists(DefaultSchemaManagerFactory::class)) {
             $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
         }

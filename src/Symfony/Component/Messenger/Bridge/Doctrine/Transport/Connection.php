@@ -451,7 +451,32 @@ class Connection implements ResetInterface
         $schemaManager = $this->driverConnection->createSchemaManager();
         $schemaDiff = $schemaManager->createComparator()
             ->compareSchemas($schemaManager->introspectSchema(), $this->getSchema());
+        $platform = $this->driverConnection->getDatabasePlatform();
 
-        $schemaManager->alterSchema($schemaDiff);
+        if ($platform->supportsSchemas()) {
+            foreach ($schemaDiff->getCreatedSchemas() as $schema) {
+                $this->driverConnection->executeStatement($platform->getCreateSchemaSQL($schema));
+            }
+        }
+
+        if ($platform->supportsSequences()) {
+            foreach ($schemaDiff->getAlteredSequences() as $sequence) {
+                $this->driverConnection->executeStatement($platform->getAlterSequenceSQL($sequence));
+            }
+
+            foreach ($schemaDiff->getCreatedSequences() as $sequence) {
+                $this->driverConnection->executeStatement($platform->getCreateSequenceSQL($sequence));
+            }
+        }
+
+        foreach ($platform->getCreateTablesSQL($schemaDiff->getCreatedTables()) as $sql) {
+            $this->driverConnection->executeStatement($sql);
+        }
+
+        foreach ($schemaDiff->getAlteredTables() as $tableDiff) {
+            foreach ($platform->getAlterTableSQL($tableDiff) as $sql) {
+                $this->driverConnection->executeStatement($sql);
+            }
+        }
     }
 }

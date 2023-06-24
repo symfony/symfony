@@ -1513,7 +1513,25 @@ class Request
      */
     public function getPayload(): InputBag
     {
-        return $this->request->count() ? clone $this->request : new InputBag($this->toArray());
+        if ($this->request->count()) {
+            return clone $this->request;
+        }
+
+        if ('' === $content = $this->getContent()) {
+            return new InputBag([]);
+        }
+
+        try {
+            $content = json_decode($content, true, 512, \JSON_BIGINT_AS_STRING | \JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            throw new JsonException('Could not decode request body.', $e->getCode(), $e);
+        }
+
+        if (!\is_array($content)) {
+            throw new JsonException(sprintf('JSON content was expected to decode to an array, "%s" returned.', get_debug_type($content)));
+        }
+
+        return new InputBag($content);
     }
 
     /**

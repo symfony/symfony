@@ -608,7 +608,7 @@ index fedc30d06e..bb934fe1f6 100644
      {
          if (!$container->hasDefinition('session.marshalling_handler')) {
 diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/TestServiceContainerRealRefPass.php b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/TestServiceContainerRealRefPass.php
-index 09f272daa9..1fd0608bde 100644
+index aed3b13404..91a6804fea 100644
 --- a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/TestServiceContainerRealRefPass.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/TestServiceContainerRealRefPass.php
 @@ -25,5 +25,5 @@ class TestServiceContainerRealRefPass implements CompilerPassInterface
@@ -3151,7 +3151,7 @@ index 3a06311a8b..8204b8a744 100644
 +    abstract protected function doWrite(string $message, bool $newline): void;
  }
 diff --git a/src/Symfony/Component/Console/Output/OutputInterface.php b/src/Symfony/Component/Console/Output/OutputInterface.php
-index fb1557720f..8b31dee20c 100644
+index 19a8179011..6240e9493b 100644
 --- a/src/Symfony/Component/Console/Output/OutputInterface.php
 +++ b/src/Symfony/Component/Console/Output/OutputInterface.php
 @@ -40,5 +40,5 @@ interface OutputInterface
@@ -3168,21 +3168,21 @@ index fb1557720f..8b31dee20c 100644
 +    public function writeln(string|iterable $messages, int $options = 0): void;
  
      /**
-@@ -57,5 +57,5 @@ interface OutputInterface
+@@ -59,5 +59,5 @@ interface OutputInterface
       * @return void
       */
 -    public function setVerbosity(int $level);
 +    public function setVerbosity(int $level): void;
  
      /**
-@@ -89,5 +89,5 @@ interface OutputInterface
+@@ -93,5 +93,5 @@ interface OutputInterface
       * @return void
       */
 -    public function setDecorated(bool $decorated);
 +    public function setDecorated(bool $decorated): void;
  
      /**
-@@ -99,5 +99,5 @@ interface OutputInterface
+@@ -103,5 +103,5 @@ interface OutputInterface
       * @return void
       */
 -    public function setFormatter(OutputFormatterInterface $formatter);
@@ -3741,7 +3741,7 @@ index 2ad4a048ba..719267be1e 100644
 +    public function process(ContainerBuilder $container): void;
  }
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/DecoratorServicePass.php b/src/Symfony/Component/DependencyInjection/Compiler/DecoratorServicePass.php
-index c38bfa7744..10d999f093 100644
+index d05878fe85..dc75d9ef10 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/DecoratorServicePass.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/DecoratorServicePass.php
 @@ -31,5 +31,5 @@ class DecoratorServicePass extends AbstractRecursivePass
@@ -3751,6 +3751,17 @@ index c38bfa7744..10d999f093 100644
 +    public function process(ContainerBuilder $container): void
      {
          $definitions = new \SplPriorityQueue();
+diff --git a/src/Symfony/Component/DependencyInjection/Compiler/DefinitionErrorExceptionPass.php b/src/Symfony/Component/DependencyInjection/Compiler/DefinitionErrorExceptionPass.php
+index 92c6d56c72..bdfdc4b6cd 100644
+--- a/src/Symfony/Component/DependencyInjection/Compiler/DefinitionErrorExceptionPass.php
++++ b/src/Symfony/Component/DependencyInjection/Compiler/DefinitionErrorExceptionPass.php
+@@ -33,5 +33,5 @@ class DefinitionErrorExceptionPass extends AbstractRecursivePass
+      * @return void
+      */
+-    public function process(ContainerBuilder $container)
++    public function process(ContainerBuilder $container): void
+     {
+         try {
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/ExtensionCompilerPass.php b/src/Symfony/Component/DependencyInjection/Compiler/ExtensionCompilerPass.php
 index 953b7f942e..96912701e5 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/ExtensionCompilerPass.php
@@ -7473,7 +7484,7 @@ index 9d7012de35..545339d4ef 100644
      {
          unset($this->parameters[$key]);
 diff --git a/src/Symfony/Component/HttpFoundation/Request.php b/src/Symfony/Component/HttpFoundation/Request.php
-index 9445a4b281..9854e19828 100644
+index 0bef6f8d70..ca99fd9dad 100644
 --- a/src/Symfony/Component/HttpFoundation/Request.php
 +++ b/src/Symfony/Component/HttpFoundation/Request.php
 @@ -269,5 +269,5 @@ class Request
@@ -7560,14 +7571,14 @@ index 9445a4b281..9854e19828 100644
 +    public function setLocale(string $locale): void
      {
          $this->setPhpDefaultLocale($this->locale = $locale);
-@@ -1738,5 +1738,5 @@ class Request
+@@ -1756,5 +1756,5 @@ class Request
       * @return string
       */
 -    protected function prepareRequestUri()
 +    protected function prepareRequestUri(): string
      {
          $requestUri = '';
-@@ -1909,5 +1909,5 @@ class Request
+@@ -1927,5 +1927,5 @@ class Request
       * @return void
       */
 -    protected static function initializeFormats()
@@ -9608,45 +9619,45 @@ index 9087874c29..5cfd87c4ad 100644
      {
          foreach ($this->stores as $store) {
 diff --git a/src/Symfony/Component/Lock/Store/DoctrineDbalPostgreSqlStore.php b/src/Symfony/Component/Lock/Store/DoctrineDbalPostgreSqlStore.php
-index 55fffc301b..dc2ccb0ec5 100644
+index 482cbef232..c6c50075f5 100644
 --- a/src/Symfony/Component/Lock/Store/DoctrineDbalPostgreSqlStore.php
 +++ b/src/Symfony/Component/Lock/Store/DoctrineDbalPostgreSqlStore.php
-@@ -76,5 +76,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
+@@ -75,5 +75,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
       * @return void
       */
 -    public function save(Key $key)
 +    public function save(Key $key): void
      {
          // prevent concurrency within the same connection
-@@ -111,5 +111,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
+@@ -110,5 +110,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
       * @return void
       */
 -    public function saveRead(Key $key)
 +    public function saveRead(Key $key): void
      {
          // prevent concurrency within the same connection
-@@ -146,5 +146,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
+@@ -145,5 +145,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
       * @return void
       */
 -    public function putOffExpiration(Key $key, float $ttl)
 +    public function putOffExpiration(Key $key, float $ttl): void
      {
          // postgresql locks forever.
-@@ -158,5 +158,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
+@@ -157,5 +157,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
       * @return void
       */
 -    public function delete(Key $key)
 +    public function delete(Key $key): void
      {
          // Prevent deleting locks own by an other key in the same connection
-@@ -198,5 +198,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
+@@ -197,5 +197,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
       * @return void
       */
 -    public function waitAndSave(Key $key)
 +    public function waitAndSave(Key $key): void
      {
          // prevent concurrency within the same connection
-@@ -224,5 +224,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
+@@ -223,5 +223,5 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
       * @return void
       */
 -    public function waitAndSaveRead(Key $key)
@@ -9654,24 +9665,24 @@ index 55fffc301b..dc2ccb0ec5 100644
      {
          // prevent concurrency within the same connection
 diff --git a/src/Symfony/Component/Lock/Store/DoctrineDbalStore.php b/src/Symfony/Component/Lock/Store/DoctrineDbalStore.php
-index e6a588ff4c..08a0171a18 100644
+index b54c0d933c..4de765dd95 100644
 --- a/src/Symfony/Component/Lock/Store/DoctrineDbalStore.php
 +++ b/src/Symfony/Component/Lock/Store/DoctrineDbalStore.php
-@@ -95,5 +95,5 @@ class DoctrineDbalStore implements PersistingStoreInterface
+@@ -94,5 +94,5 @@ class DoctrineDbalStore implements PersistingStoreInterface
       * @return void
       */
 -    public function save(Key $key)
 +    public function save(Key $key): void
      {
          $key->reduceLifetime($this->initialTtl);
-@@ -137,5 +137,5 @@ class DoctrineDbalStore implements PersistingStoreInterface
+@@ -136,5 +136,5 @@ class DoctrineDbalStore implements PersistingStoreInterface
       * @return void
       */
 -    public function putOffExpiration(Key $key, $ttl)
 +    public function putOffExpiration(Key $key, $ttl): void
      {
          if ($ttl < 1) {
-@@ -171,5 +171,5 @@ class DoctrineDbalStore implements PersistingStoreInterface
+@@ -170,5 +170,5 @@ class DoctrineDbalStore implements PersistingStoreInterface
       * @return void
       */
 -    public function delete(Key $key)
@@ -12091,31 +12102,31 @@ index 1835568745..2b98fc11d6 100644
      {
          $this->serializer = $serializer;
 diff --git a/src/Symfony/Component/Serializer/Tests/Normalizer/AbstractObjectNormalizerTest.php b/src/Symfony/Component/Serializer/Tests/Normalizer/AbstractObjectNormalizerTest.php
-index c90ec1185f..45e617705e 100644
+index 78046229eb..bed7c33cec 100644
 --- a/src/Symfony/Component/Serializer/Tests/Normalizer/AbstractObjectNormalizerTest.php
 +++ b/src/Symfony/Component/Serializer/Tests/Normalizer/AbstractObjectNormalizerTest.php
-@@ -743,5 +743,5 @@ class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
+@@ -764,5 +764,5 @@ class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
      }
  
 -    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = [])
 +    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = []): void
      {
          $object->$attribute = $value;
-@@ -943,5 +943,5 @@ class AbstractObjectNormalizerWithMetadata extends AbstractObjectNormalizer
+@@ -964,5 +964,5 @@ class AbstractObjectNormalizerWithMetadata extends AbstractObjectNormalizer
      }
  
 -    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = [])
 +    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = []): void
      {
          if (property_exists($object, $attribute)) {
-@@ -1064,5 +1064,5 @@ class AbstractObjectNormalizerCollectionDummy extends AbstractObjectNormalizer
+@@ -1085,5 +1085,5 @@ class AbstractObjectNormalizerCollectionDummy extends AbstractObjectNormalizer
      }
  
 -    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = [])
 +    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = []): void
      {
          $object->$attribute = $value;
-@@ -1121,5 +1121,5 @@ class ArrayDenormalizerDummy implements DenormalizerInterface, SerializerAwareIn
+@@ -1142,5 +1142,5 @@ class ArrayDenormalizerDummy implements DenormalizerInterface, SerializerAwareIn
      }
  
 -    public function setSerializer(SerializerInterface $serializer)

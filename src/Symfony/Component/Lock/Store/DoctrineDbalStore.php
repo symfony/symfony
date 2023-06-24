@@ -20,7 +20,6 @@ use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Tools\DsnParser;
-use Doctrine\ORM\ORMSetup;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\InvalidTtlException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
@@ -84,7 +83,7 @@ class DoctrineDbalStore implements PersistingStoreInterface
                 'sqlite3' => 'pdo_sqlite',
             ]))->parse($connOrUrl);
 
-            $config = class_exists(ORMSetup::class) ? ORMSetup::createConfiguration() : new Configuration();
+            $config = new Configuration();
             $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
 
             $this->conn = DriverManager::getConnection($params, $config);

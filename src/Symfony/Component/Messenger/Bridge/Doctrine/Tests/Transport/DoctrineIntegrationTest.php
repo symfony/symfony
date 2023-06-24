@@ -16,7 +16,6 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Tools\DsnParser;
-use Doctrine\ORM\ORMSetup;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
@@ -33,7 +32,7 @@ class DoctrineIntegrationTest extends TestCase
     {
         $dsn = getenv('MESSENGER_DOCTRINE_DSN') ?: 'pdo-sqlite://:memory:';
         $params = (new DsnParser())->parse($dsn);
-        $config = class_exists(ORMSetup::class) ? ORMSetup::createConfiguration() : new Configuration();
+        $config = new Configuration();
         $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
 
         $this->driverConnection = DriverManager::getConnection($params, $config);

@@ -88,6 +88,17 @@ final class WhenTest extends TestCase
         ], $barConstraint->constraints);
         self::assertSame(['foo'], $barConstraint->groups);
 
+        [$quxConstraint] = $metadata->properties['qux']->getConstraints();
+
+        self::assertInstanceOf(When::class, $quxConstraint);
+        self::assertSame('true', $quxConstraint->expression);
+        self::assertEquals([
+            new NotNull([
+                'groups' => ['foo'],
+            ]),
+        ], $quxConstraint->constraints);
+        self::assertSame(['foo'], $quxConstraint->groups);
+
         [$bazConstraint] = $metadata->getters['baz']->getConstraints();
 
         self::assertInstanceOf(When::class, $bazConstraint);
@@ -149,6 +160,17 @@ final class WhenTest extends TestCase
         ], $barConstraint->constraints);
         self::assertSame(['foo'], $barConstraint->groups);
 
+        [$quxConstraint] = $metadata->properties['qux']->getConstraints();
+
+        self::assertInstanceOf(When::class, $quxConstraint);
+        self::assertSame('true', $quxConstraint->expression);
+        self::assertEquals([
+            new NotNull([
+                'groups' => ['foo'],
+            ]),
+        ], $quxConstraint->constraints);
+        self::assertSame(['foo'], $quxConstraint->groups);
+
         [$bazConstraint] = $metadata->getters['baz']->getConstraints();
 
         self::assertInstanceOf(When::class, $bazConstraint);
@@ -179,6 +201,11 @@ class WhenTestWithAnnotations
      * @When(expression="false", constraints={@NotNull, @NotBlank}, groups={"foo"})
      */
     private $bar;
+
+    /**
+     * @When(expression="true", constraints=@NotNull, groups={"foo"})
+     */
+    private $qux;
 
     /**
      * @When(expression="true", constraints={@NotNull, @NotBlank})

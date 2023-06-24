@@ -8,7 +8,7 @@ services:
         class: Class2
         public: true
         tags:
-            - container.decorator: { id: bar }
+            - container.decorator: { id: bar, inner: b }
         file: file.php
         lazy: true
         arguments: [!service { class: Class1 }]

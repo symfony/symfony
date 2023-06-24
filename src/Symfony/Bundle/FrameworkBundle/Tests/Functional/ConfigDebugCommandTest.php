@@ -88,12 +88,25 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
      * @testWith [true]
      *           [false]
      */
+    public function testDumpWithoutTitleIsValidJson(bool $debug)
+    {
+        $tester = $this->createCommandTester($debug);
+        $ret = $tester->execute(['name' => 'TestBundle', '--format' => 'json']);
+
+        $this->assertSame(0, $ret, 'Returns 0 in case of success');
+        $this->assertJson($tester->getDisplay());
+    }
+
+    /**
+     * @testWith [true]
+     *           [false]
+     */
     public function testDumpWithUnsupportedFormat(bool $debug)
     {
         $tester = $this->createCommandTester($debug);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Supported formats are "yaml", "json"');
+        $this->expectExceptionMessage('Supported formats are "txt", "yaml", "json"');
 
         $tester->execute([
             'name' => 'test',

@@ -41,6 +41,9 @@ class TestServiceContainerRealRefPass implements CompilerPassInterface
                 if ($id !== $target) {
                     $renamedIds[$id] = $target;
                 }
+                if ($inner = $definitions[$target]->getTag('container.decorator')[0]['inner'] ?? null) {
+                    $renamedIds[$id] = $inner;
+                }
             } else {
                 unset($privateServices[$id]);
             }

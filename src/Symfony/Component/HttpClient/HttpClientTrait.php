@@ -28,6 +28,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 trait HttpClientTrait
 {
     private static int $CHUNK_SIZE = 16372;
+    
+    private array $defaultOptions = [];
 
     public function withOptions(array $options): static
     {

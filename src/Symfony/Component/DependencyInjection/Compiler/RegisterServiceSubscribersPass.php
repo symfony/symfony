@@ -31,6 +31,8 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
  */
 class RegisterServiceSubscribersPass extends AbstractRecursivePass
 {
+    protected bool $skipScalars = true;
+
     protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         if (!$value instanceof Definition || $value->isAbstract() || $value->isSynthetic() || !$value->hasTag('container.service_subscriber')) {

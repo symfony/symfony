@@ -24,6 +24,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class ReplaceAliasByActualDefinitionPass extends AbstractRecursivePass
 {
+    protected bool $skipScalars = true;
+
     private array $replacements;
 
     /**

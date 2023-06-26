@@ -401,8 +401,9 @@ class RegisterListenersPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->setParameter('event_dispatcher.event_aliases', [AliasedEvent::class => 'aliased_event']);
-        $container->register('foo', TypedListener::class)->addTag('kernel.event_listener', ['method' => 'onEvent']);
-        $container->register('bar', TypedListener::class)->addTag('kernel.event_listener');
+        $container->register('foo', InvokableTypedListener::class)->addTag('kernel.event_listener', ['method' => 'onEvent']);
+        $container->register('bar', InvokableTypedListener::class)->addTag('kernel.event_listener');
+        $container->register('baz', TypedListenerWithOnlyOnePublicMethod::class)->addTag('kernel.event_listener');
         $container->register('event_dispatcher');
 
         $registerListenersPass = new RegisterListenersPass();
@@ -423,6 +424,14 @@ class RegisterListenersPassTest extends TestCase
                 [
                     'aliased_event',
                     [new ServiceClosureArgument(new Reference('bar')), '__invoke'],
+                    0,
+                ],
+            ],
+            [
+                'addListener',
+                [
+                    CustomEvent::class,
+                    [new ServiceClosureArgument(new Reference('baz')), 'onEvent'],
                     0,
                 ],
             ],
@@ -541,12 +550,19 @@ final class AliasedEvent
 {
 }
 
-final class TypedListener
+final class InvokableTypedListener
 {
     public function __invoke(AliasedEvent $event): void
     {
     }
 
+    public function onEvent(CustomEvent $event): void
+    {
+    }
+}
+
+final class TypedListenerWithOnlyOnePublicMethod
+{
     public function onEvent(CustomEvent $event): void
     {
     }

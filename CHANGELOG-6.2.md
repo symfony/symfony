@@ -7,6 +7,35 @@ in 6.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.2.0...v6.2.1
 
+* 6.2.12 (2023-06-26)
+
+ * bug #50763 [DependencyInjection] Skip errored definitions deep-referenced as runtime exceptions (nicolas-grekas)
+ * bug #50728 [HttpClient] Explicitly exclude CURLOPT_POSTREDIR (nicolas-grekas)
+ * bug #48961 [WebProfilerBundle] right blocks: fix display (jmsche)
+ * bug #50671 [HttpClient] Fix encoding some characters in query strings (Daniel Kozák)
+ * bug #50655 Revert "Respect isRetryable decision of the retry strategy for re-delivery" (bendavies)
+ * bug #50665 [FrameworkBundle] Ignore missing directories in about command (ro0NL)
+ * bug #50644 [VarDumper] Dumping DateTime throws error if getTimezone is false (bogdanmoza)
+ * bug #50656 Only update autoload_runtime.php when it changed (Seldaek)
+ * bug #50698 [HttpClient] Fix int conversion for `GenericRetryStrategy` with floated multiplier  (francisbesset)
+ * bug #50611 [Clock] Fix MockClock::modify() on PHP 8.3 (nicolas-grekas)
+ * bug #50548 [FrameworkBundle] Show non-bundle extensions in `debug:config` & `config:dump` list view & completion (HypeMC)
+ * bug #50585 [Cache] Fix RedisTrait::createConnection for cluster (darkanakin41)
+ * bug #50546 [FrameworkBundle] Fix `debug:config` & `config:dump` in debug mode (HypeMC)
+ * bug #50560 [DependencyInjection] Support PHP 8.2 `true` and `null` type (ruudk)
+ * bug #50562 [Lock] Fix sprintf (fancyweb)
+ * bug #50524 Fix Doctrine deprecations (nicolas-grekas)
+ * bug #50539 [Validator] Remove internal from methods on non-internal interfaces (wouterj)
+ * bug #50534 [PhpUnitBridge] Fix support for the NO_COLOR env var (nicolas-grekas)
+ * bug #50517 [DependencyInjection] Fix casting scalar env vars from null (fancyweb)
+ * bug #50515 [Mailer] [MailPace] Fix undefined array key in errors response (Florian Heller)
+ * bug #50507 [Cache] Fix DBAL deprecations (MatTheCat)
+ * bug #50501 [Serializer] Fix discriminator map not working with `AbstractNormalizer::OBJECT_TO_POPULATE` (HypeMC)
+ * bug #50480 [Serializer] Fix discriminator map not working with `AbstractNormalizer::OBJECT_TO_POPULATE` (HypeMC)
+ * bug #50437 [Filesystem] Follow symlinks when dumping files (ausi)
+ * bug #50478 [DependencyInjection] Escape `` from parameter-like default values (MatTheCat)
+ * bug #50452 Hide definitions bearing the `container.excluded` tag (Myks92)
+
 * 6.2.11 (2023-05-27)
 
  * bug #50442 [SecurityBundle] Update security-1.0.xsd to include missing access-token definition (aegypius)

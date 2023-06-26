@@ -24,6 +24,8 @@ use Symfony\Component\VarExporter\ProxyHelper;
  */
 class ResolveNamedArgumentsPass extends AbstractRecursivePass
 {
+    protected bool $skipScalars = true;
+
     protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         if ($value instanceof AbstractArgument && $value->getText().'.' === $value->getTextWithContext()) {

@@ -24,6 +24,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class InlineServiceDefinitionsPass extends AbstractRecursivePass
 {
+    protected bool $skipScalars = true;
+
     private ?AnalyzeServiceReferencesPass $analyzingPass;
     private array $cloningIds = [];
     private array $connectedIds = [];

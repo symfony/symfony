@@ -28,6 +28,8 @@ use Symfony\Component\VarExporter\ProxyHelper;
  */
 class ResolveBindingsPass extends AbstractRecursivePass
 {
+    protected bool $skipScalars = true;
+
     private array $usedBindings = [];
     private array $unusedBindings = [];
     private array $errorMessages = [];

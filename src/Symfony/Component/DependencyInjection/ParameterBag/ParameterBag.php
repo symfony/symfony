@@ -198,7 +198,7 @@ class ParameterBag implements ParameterBagInterface
             return $args;
         }
 
-        if (!\is_string($value) || 2 > \strlen($value)) {
+        if (!\is_string($value) || '' === $value || !str_contains($value, '%')) {
             return $value;
         }
 

@@ -15,6 +15,7 @@ CHANGELOG
    `StopWorkerOnSignalsListener` and make it configurable with SIGINT and
    SIGTERM by default
  * Add `RedispatchMessage` and `RedispatchMessageHandler`
+ * Add optional parameter `$isSameDatabase` to `DoctrineTransport::configureSchema()`
 
 6.2
 ---

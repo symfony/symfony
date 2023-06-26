@@ -80,19 +80,7 @@ class RegisterListenersPass implements CompilerPassInterface
                 $event['event'] = $aliases[$event['event']] ?? $event['event'];
 
                 if (!isset($event['method'])) {
-                    $event['method'] = 'on'.preg_replace_callback([
-                        '/(?<=\b|_)[a-z]/i',
-                        '/[^a-z0-9]/i',
-                    ], fn ($matches) => strtoupper($matches[0]), $event['event']);
-                    $event['method'] = preg_replace('/[^a-z0-9]/i', '', $event['method']);
-
-                    if (null !== ($class = $container->getDefinition($id)->getClass()) && ($r = $container->getReflectionClass($class, false)) && !$r->hasMethod($event['method'])) {
-                        if (!$r->hasMethod('__invoke')) {
-                            throw new InvalidArgumentException(\sprintf('None of the "%s" or "__invoke" methods exist for the service "%s". Please define the "method" attribute on "kernel.event_listener" tags.', $event['method'], $id));
-                        }
-
-                        $event['method'] = '__invoke';
-                    }
+                    $event['method'] = $this->resolveListenerMethodFromTypeDeclaration($container, $id, $event['event'], $aliases);
                 }
 
                 $dispatcherDefinition = $globalDispatcherDefinition;
@@ -182,6 +170,54 @@ class RegisterListenersPass implements CompilerPassInterface
         }
 
         return $name;
+    }
+
+    /**
+     * Resolve the listener method:
+     *   - look for a method named after the event (camelized, with "on" prefix)
+     *   - if such a method does not exist, check if only one public method exist which expect the event as parameter
+     *   - otherwise, throw an exception because we need more information.
+     */
+    private function resolveListenerMethodFromTypeDeclaration(ContainerBuilder $container, string $id, string $eventName, array $aliases): string
+    {
+        $method = 'on'.preg_replace_callback([
+            '/(?<=\b|_)[a-z]/i',
+            '/[^a-z0-9]/i',
+        ], fn ($matches) => strtoupper($matches[0]), $eventName);
+        $method = preg_replace('/[^a-z0-9]/i', '', $method);
+
+        if (
+            null === ($class = $container->getDefinition($id)->getClass())
+            || !($r = $container->getReflectionClass($class, false))
+            || $r->hasMethod($method)
+        ) {
+            return $method;
+        }
+
+        $publicMethods = $r->getMethods(\ReflectionMethod::IS_PUBLIC);
+        $eventName = array_flip($aliases)[$eventName] ?? $eventName;
+
+        $candidateMethods = [];
+        foreach ($publicMethods as $publicMethod) {
+            if (
+                !$publicMethod->isStatic()
+                && 1 === $publicMethod->getNumberOfRequiredParameters()
+                && ($type = $publicMethod->getParameters()[0]->getType()) instanceof \ReflectionNamedType
+                && is_a($eventName, $type->getName(), allow_string: true)
+            ) {
+                $candidateMethods[] = $publicMethod->getName();
+            }
+        }
+
+        if (1 === \count($candidateMethods)) {
+            return $candidateMethods[0];
+        }
+
+        if ($r->hasMethod('__invoke')) {
+            return '__invoke';
+        }
+
+        throw new InvalidArgumentException(\sprintf('Service "%s" is missing a "method" attribute on "kernel.event_listener" tags.', $id));
     }
 }
 

@@ -50,9 +50,9 @@ class RelationExtension extends AbstractExtension
         $combinedXpath
             ->addNameTest()
             ->addCondition('position() = 1');
+
         return $xpath
-            ->join('[following-sibling::', $combinedXpath, ']', true)
-            ;
+            ->join('[following-sibling::', $combinedXpath, ']', true);
     }
 
     public function translateRelationIndirectAdjacent(XPathExpr $xpath, XPathExpr $combinedXpath): XPathExpr

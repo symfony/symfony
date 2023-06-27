@@ -57,7 +57,7 @@ class ValidatorBuilder
     private ?ContainerInterface $groupProviderLocator = null;
     private ?CacheItemPoolInterface $mappingCache = null;
     private ?TranslatorInterface $translator = null;
-    private ?string $translationDomain = null;
+    private string|false|null $translationDomain = null;
 
     /**
      * Adds an object initializer to the validator.
@@ -348,6 +348,16 @@ class ValidatorBuilder
     public function setTranslationDomain(?string $translationDomain): static
     {
         $this->translationDomain = $translationDomain;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function disableTranslation(): static
+    {
+        $this->translationDomain = false;
 
         return $this;
     }

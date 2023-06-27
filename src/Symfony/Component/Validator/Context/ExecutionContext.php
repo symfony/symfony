@@ -45,7 +45,7 @@ class ExecutionContext implements ExecutionContextInterface
     private mixed $root;
 
     private TranslatorInterface $translator;
-    private ?string $translationDomain;
+    private string|false|null $translationDomain;
 
     /**
      * The violations generated in the current context.
@@ -111,7 +111,7 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * @internal Called by {@link ExecutionContextFactory}. Should not be used in user code.
      */
-    public function __construct(ValidatorInterface $validator, mixed $root, TranslatorInterface $translator, string $translationDomain = null)
+    public function __construct(ValidatorInterface $validator, mixed $root, TranslatorInterface $translator, string|false $translationDomain = null)
     {
         $this->validator = $validator;
         $this->root = $root;

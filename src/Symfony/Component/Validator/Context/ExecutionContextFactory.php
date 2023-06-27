@@ -24,9 +24,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ExecutionContextFactory implements ExecutionContextFactoryInterface
 {
     private TranslatorInterface $translator;
-    private ?string $translationDomain;
+    private string|false|null $translationDomain;
 
-    public function __construct(TranslatorInterface $translator, string $translationDomain = null)
+    public function __construct(TranslatorInterface $translator, string|false $translationDomain = null)
     {
         $this->translator = $translator;
         $this->translationDomain = $translationDomain;

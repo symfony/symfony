@@ -101,6 +101,7 @@ Lock
 ----
 
  * Deprecate the `gcProbablity` option to fix a typo in its name, use the `gcProbability` option instead
+ * Add optional parameter `$isSameDatabase` to `DoctrineDbalStore::configureSchema()`
 
 Messenger
 ---------

@@ -15,6 +15,9 @@ use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 
 class JsonMockResponse extends MockResponse
 {
+    /**
+     * @param mixed $body The json response body to encode
+     */
     public function __construct(mixed $body = [], array $info = [])
     {
         try {

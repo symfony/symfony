@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+6.4
+---
+ * Add `constraints_from_entity` and `constraints_from_property` option to `FormType`
+
 6.3
 ---
 

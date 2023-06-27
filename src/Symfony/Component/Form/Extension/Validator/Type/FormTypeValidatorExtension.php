@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Extension\Validator\Type;
 
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Validator\EventListener\ConstraintsFromListener;
 use Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -42,6 +43,7 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->addEventSubscriber(new ConstraintsFromListener($this->validator));
         $builder->addEventSubscriber(new ValidationListener($this->validator, $this->violationMapper));
     }
 
@@ -58,6 +60,8 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
         $resolver->setDefaults([
             'error_mapping' => [],
             'constraints' => [],
+            'constraints_from_entity' => null,
+            'constraints_from_property' => null,
             'invalid_message' => 'This value is not valid.',
             'invalid_message_parameters' => [],
             'allow_extra_fields' => false,
@@ -65,6 +69,8 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
         ]);
         $resolver->setAllowedTypes('constraints', [Constraint::class, Constraint::class.'[]']);
         $resolver->setNormalizer('constraints', $constraintsNormalizer);
+        $resolver->setAllowedTypes('constraints_from_entity', ['string', 'null']);
+        $resolver->setAllowedTypes('constraints_from_property', ['string', 'null']);
     }
 
     public static function getExtendedTypes(): iterable

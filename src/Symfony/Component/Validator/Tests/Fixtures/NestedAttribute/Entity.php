@@ -78,6 +78,8 @@ class Entity extends EntityParent implements EntityInterfaceB
     private $internal;
     public $data = 'Overridden data';
     public $initialized = false;
+    #[Assert\Type('integer')]
+    protected $other;
 
     public function __construct($internal = null)
     {

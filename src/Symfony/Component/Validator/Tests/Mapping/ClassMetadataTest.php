@@ -163,8 +163,8 @@ class ClassMetadataTest extends TestCase
         $parent->addPropertyConstraint('firstName', new ConstraintA());
         $parent->addPropertyConstraint('firstName', new ConstraintB(['groups' => 'foo']));
 
-        $this->metadata->mergeConstraints($parent);
         $this->metadata->addPropertyConstraint('firstName', new ConstraintA());
+        $this->metadata->mergeConstraints($parent);
 
         $constraintA1 = new ConstraintA(['groups' => [
             'Default',
@@ -179,35 +179,29 @@ class ClassMetadataTest extends TestCase
             'groups' => ['foo'],
         ]);
 
-        $constraints = [
-            $constraintA1,
-            $constraintB,
-            $constraintA2,
-        ];
-
-        $constraintsByGroup = [
-            'Default' => [
-                $constraintA1,
-                $constraintA2,
-            ],
-            'EntityParent' => [
-                $constraintA1,
-            ],
-            'Entity' => [
-                $constraintA1,
-                $constraintA2,
-            ],
-            'foo' => [
-                $constraintB,
-            ],
-        ];
-
         $members = $this->metadata->getPropertyMetadata('firstName');
 
-        $this->assertCount(1, $members);
-        $this->assertEquals(self::PARENTCLASS, $members[0]->getClassName());
-        $this->assertEquals($constraints, $members[0]->getConstraints());
-        $this->assertEquals($constraintsByGroup, $members[0]->constraintsByGroup);
+        $this->assertCount(2, $members);
+        $this->assertEquals(self::CLASSNAME, $members[0]->getClassName());
+        $this->assertEquals([$constraintA2], $members[0]->getConstraints());
+        $this->assertEquals(
+            [
+                'Default' => [$constraintA2],
+                'Entity' => [$constraintA2],
+            ],
+            $members[0]->constraintsByGroup
+        );
+        $this->assertEquals(self::PARENTCLASS, $members[1]->getClassName());
+        $this->assertEquals([$constraintA1, $constraintB], $members[1]->getConstraints());
+        $this->assertEquals(
+            [
+                'Default' => [$constraintA1],
+                'Entity' => [$constraintA1],
+                'EntityParent' => [$constraintA1],
+                'foo' => [$constraintB],
+            ],
+            $members[1]->constraintsByGroup
+        );
     }
 
     public function testMemberMetadatas()

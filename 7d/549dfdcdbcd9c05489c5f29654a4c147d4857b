@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-06-26T07:36:34Z
+
+I fail to see how the error can actually happen as this property is initialised inside the constructor.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-26T07:38:00Z
+
+I guess it can happen when the constructor is not called by a child class. Which child class are we talking about? Isn't this an issue with the child class?
+
+---------------------------------------------------------------------------
+
+by shyim at 2023-06-26T07:39:29Z
+
+I think the problem comes from old cache items, without null on the typed property it gets to uninitialized. Always hard to add types to serialised objects 😅 . We have no class in Shopware which extends that class
+
+https://3v4l.org/ajENt

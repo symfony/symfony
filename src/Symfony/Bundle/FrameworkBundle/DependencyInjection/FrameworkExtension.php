@@ -1654,6 +1654,10 @@ class FrameworkExtension extends Extension
             $validatorBuilder->addMethodCall('setMappingCache', [new Reference('validator.mapping.cache.adapter')]);
         }
 
+        if (\array_key_exists('disable_translation', $config) && $config['disable_translation']) {
+            $validatorBuilder->addMethodCall('disableTranslation');
+        }
+
         $container->setParameter('validator.auto_mapping', $config['auto_mapping']);
         if (!$propertyInfoEnabled || !class_exists(PropertyInfoLoader::class)) {
             $container->removeDefinition('validator.property_info_loader');

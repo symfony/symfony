@@ -766,6 +766,7 @@ class ConfigurationTest extends TestCase
                 'enable_attributes' => !class_exists(FullStack::class),
                 'static_method' => ['loadValidatorMetadata'],
                 'translation_domain' => 'validators',
+                'disable_translation' => false,
                 'mapping' => [
                     'paths' => [],
                 ],

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2023-06-28T17:03:33Z
+
+@alli83 Do other classes updated by https://github.com/symfony/symfony/pull/50689 need a mention as well? If yes, can you please address them all in this PR? (It's ok for minor changes like markdown updates)

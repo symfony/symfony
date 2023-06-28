@@ -1,0 +1,54 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-06-23T08:58:28Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-06-23T08:58:29Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.4" but it seems your PR description refers to branch "6.4 for bug fixes to 3.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-23T13:09:48Z
+
+We didn't add this because this can be done in PHP directly: `if ('dev' === $env) etc`.
+Adding this doesn't hurt of course (but it's not a bugfix)
+
+---------------------------------------------------------------------------
+
+by helyakin at 2023-06-28T12:47:23Z
+
+Thank you everyone for your feedbacks, and thank you @javiereguiluz for those very nice words 😊
+
+I'm really happy to have finally made my first contribution to Symfony 👯 !

@@ -58,7 +58,8 @@ return static function (ContainerConfigurator $container) {
         ->set('security.role_hierarchy.roles', [])
     ;
 
-    $container->services()
+    /** @var AbstractServiceConfigurator $configurator */
+    $configurator = $container->services()
         ->set('security.authorization_checker', AuthorizationChecker::class)
             ->args([
                 service('security.token_storage'),
@@ -263,14 +264,6 @@ return static function (ContainerConfigurator $container) {
             ])
         ->alias(HttpUtils::class, 'security.http_utils')
 
-        // Validator
-        ->set('security.validator.user_password', UserPasswordValidator::class)
-            ->args([
-                service('security.token_storage'),
-                service('security.password_hasher_factory'),
-            ])
-            ->tag('validator.constraint_validator', ['alias' => 'security.validator.user_password'])
-
         // Cache
         ->set('cache.security_expression_language')
             ->parent('cache.system')
@@ -299,4 +292,14 @@ return static function (ContainerConfigurator $container) {
             ->parent('cache.system')
             ->tag('cache.pool')
     ;
+
+    // Only configure validator if symfony/validator is installed
+    if (class_exists(\Symfony\Component\Validator\ConstraintValidator::class)) {
+        $configurator->set('security.validator.user_password', UserPasswordValidator::class)
+                     ->args([
+                         service('security.token_storage'),
+                         service('security.password_hasher_factory'),
+                     ])
+                     ->tag('validator.constraint_validator', ['alias' => 'security.validator.user_password']);
+    }
 };

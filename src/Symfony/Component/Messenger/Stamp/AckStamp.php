@@ -16,6 +16,7 @@ use Symfony\Component\Messenger\Envelope;
 /**
  * Marker stamp for messages that can be ack/nack'ed.
  */
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class AckStamp implements NonSendableStampInterface
 {
     private $ack;

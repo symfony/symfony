@@ -23,6 +23,7 @@ use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
  *
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class ReceivedStamp implements NonSendableStampInterface
 {
     private string $transportName;

@@ -16,6 +16,7 @@ use Symfony\Component\Messenger\Envelope;
 /**
  * Stamp applied when a messages needs to be redelivered.
  */
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class RedeliveryStamp implements StampInterface
 {
     private int $retryCount;

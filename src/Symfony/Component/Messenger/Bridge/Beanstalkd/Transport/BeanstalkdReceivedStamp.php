@@ -16,6 +16,7 @@ use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 /**
  * @author Antonio Pauletich <antonio.pauletich95@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 class BeanstalkdReceivedStamp implements NonSendableStampInterface
 {
     private string $id;

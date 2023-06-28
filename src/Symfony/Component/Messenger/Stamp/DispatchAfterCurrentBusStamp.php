@@ -18,6 +18,7 @@ namespace Symfony\Component\Messenger\Stamp;
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class DispatchAfterCurrentBusStamp implements NonSendableStampInterface
 {
 }

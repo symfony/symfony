@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Stamp;
 
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class SerializedMessageStamp implements NonSendableStampInterface
 {
     public function __construct(private string $serializedMessage)

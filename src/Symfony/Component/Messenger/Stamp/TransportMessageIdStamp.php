@@ -16,6 +16,7 @@ namespace Symfony\Component\Messenger\Stamp;
  *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class TransportMessageIdStamp implements StampInterface
 {
     private mixed $id;

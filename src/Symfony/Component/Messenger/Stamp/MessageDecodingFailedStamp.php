@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Stamp;
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 class MessageDecodingFailedStamp implements StampInterface
 {
 }

@@ -16,6 +16,7 @@ use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 /**
  * @author Alexander Schranz <alexander@sulu.io>
  */
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 class RedisReceivedStamp implements NonSendableStampInterface
 {
     private string $id;

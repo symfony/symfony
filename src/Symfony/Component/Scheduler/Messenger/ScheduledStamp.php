@@ -17,6 +17,7 @@ use Symfony\Component\Scheduler\Generator\MessageContext;
 /**
  * @experimental
  */
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class ScheduledStamp implements NonSendableStampInterface
 {
     public function __construct(public readonly MessageContext $messageContext)

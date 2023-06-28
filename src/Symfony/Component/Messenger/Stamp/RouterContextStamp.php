@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Stamp;
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 class RouterContextStamp implements StampInterface
 {
     private string $baseUrl;

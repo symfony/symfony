@@ -16,6 +16,7 @@ use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 class AmazonSqsReceivedStamp implements NonSendableStampInterface
 {
     private string $id;

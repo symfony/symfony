@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-06-16T14:47:24Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.0" but it seems your PR description refers to branch "7".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-06-16T22:17:04Z
+
+The fact there is no UPGRADE entry added in this PR nor in the 6.3 PR looks suspicious to me as it's a breaking change that used to trigger deprecation notices on 6.3.  Either there's a good reason not to mention it that I'm not aware of, or we just forgot to do it and then it should be fixed up
+
+---------------------------------------------------------------------------
+
+by alli83 at 2023-06-18T21:04:57Z
+
+@chalasr thank you for your feedback. I made an other PR that targets 6.3 and aims to add the missing notes in UPGRADE-6.3.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-21T12:11:59Z
+
+Rebase unlocked. Please add lines to the UPGRADE+CHANGELOG files stating that a new argument has been added to the corresponding methods also.
+
+---------------------------------------------------------------------------
+
+by alli83 at 2023-06-26T15:39:32Z
+
+> Rebase unlocked. Please add lines to the UPGRADE+CHANGELOG files stating that a new argument has been added to the corresponding methods also.
+
+I open a new PR on 6.3 for the missing CHANGELOG mention ?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-06-28T16:17:36Z
+
+> I open a new PR on 6.3 for the missing CHANGELOG mention ?
+
+Ideally yes, please. Wanna-be-added parameters trigger deprecation notices in case of inheritance and direct calls, so they should be documented as any other deprecation
+
+---------------------------------------------------------------------------
+
+by alli83 at 2023-06-28T16:45:40Z
+
+> > I open a new PR on 6.3 for the missing CHANGELOG mention ?
+>
+> Ideally yes, please. Wanna-be-added parameters trigger deprecation notices in case of inheritance and direct calls, so they should be documented as any other deprecation
+
+@chalasr , an other PR for missing changeling and upgrade 6.3 https://github.com/symfony/symfony/pull/50798

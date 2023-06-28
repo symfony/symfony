@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Stamp;
 /**
  * Apply this stamp to delay delivery of your message on a transport.
  */
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class DelayStamp implements StampInterface
 {
     private int $delay;

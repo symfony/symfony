@@ -26,6 +26,7 @@ use Symfony\Component\Messenger\EventListener\StopWorkerOnRestartSignalListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnSignalsListener;
 use Symfony\Component\Messenger\Handler\RedispatchMessageHandler;
 use Symfony\Component\Messenger\Middleware\AddBusNameStampMiddleware;
+use Symfony\Component\Messenger\Middleware\AutoStampMiddleware;
 use Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware;
 use Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
@@ -111,6 +112,8 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('router'),
             ])
+
+        ->set('messenger.middleware.auto_stamp_middleware', AutoStampMiddleware::class)
 
         // Discovery
         ->set('messenger.receiver_locator', ServiceLocator::class)

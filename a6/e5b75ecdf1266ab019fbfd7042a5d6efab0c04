@@ -1,0 +1,92 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-26T07:10:47Z
+
+This should target 5.4 to me since it's a bugfix.
+
+---------------------------------------------------------------------------
+
+by nikophil at 2023-06-26T07:40:10Z
+
+@nicolas-grekas I've rebased the PR
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-06-26T07:47:54Z
+
+Thank you for your findings on this bug.
+
+> If it does not, we evaluate if one unique public method exists which would take the event as unique parameter (ie: the listener definition above would resolve someMethod() as the listener's method).
+
+This looks like a new feature. Even if there is currently a runtime exception for this situation, I don't think we should support it as a bugfix.
+The bugfix should be restricted to throwing an exception on build time when the method (`__invoke` or `onEventName`) doesn't exist.
+
+I see situations where the "only public method" will fail and the developers will have to rework their configuration while it would be working previously:
+- a public getter or setter is added for DI or testing
+- a second event listener is added
+
+For brevity, developers should set the `AsEventListener` attribute on the method instead of the class.
+
+---------------------------------------------------------------------------
+
+by nikophil at 2023-06-26T08:08:37Z
+
+> This looks like a new feature. Even if there is currently a runtime exception for this situation, I don't think we should support it as a bugfix.
+> The bugfix should be restricted to throwing an exception on build time when the method (__invoke or onEventName) doesn't exist.
+
+ok let's do this: I'll split the PR and in the bugfix I'll only throw an exception if the resolved method does not exist
+
+> I see situations where the "only public method" will fail and the developers will have to rework their configuration while it would be working previously:
+>
+>    a public getter or setter is added for DI or testing
+>    a second event listener is added
+>
+> For brevity, developers should set the AsEventListener attribut on the method instead of the class.
+
+indeed, there will be a failure in these cases, but for both cases, we don't have any way to resolve the method name, then their listener declaration becomes invalid. And since the error will occur in compile time, I think this is acceptable
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-06-26T08:11:05Z
+
+> ok let's do this: I'll split the PR and in the bugfix I'll only throw an exception if the resolved method does not exist
+
+👍🏻 Sounds like a plan.
+
+---------------------------------------------------------------------------
+
+by nikophil at 2023-06-26T08:16:00Z
+
+> For brevity, developers should set the AsEventListener attribut on the method instead of the class.
+
+This is just an idea, but since listeners are callables and not actual services, maybe in 7.0 we should allow `#[AsEventListener]` to be set on the class only if the class in invokable? This would simplify a lot all this method-resolving stuff, and remove some un-needed magic
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-06-26T08:32:09Z
+
+I wouldn't bother developers with such a restriction. We're not going to deprecate [documented](https://symfony.com/doc/current/event_dispatcher.html#defining-event-listeners-with-php-attributes) way of using this attribute.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-26T08:32:17Z
+
+>  I'll split the PR and in the bugfix I'll only throw an exception if the resolved method does not exist
+
+Totally. I missed this was a new feature.
+
+> This is just an idea, but since listeners are callables and not actual services, maybe in 7.0 we should allow #[AsEventListener] to be set on the class only if the class in invokable? This would simplify a lot all this method-resolving stuff, and remove some un-needed magic
+
+I would advise against this. It'd be needlessly rigid.
+
+---------------------------------------------------------------------------
+
+by nikophil at 2023-06-26T15:43:16Z
+
+CI failures seems unrelated
+
+---------------------------------------------------------------------------
+
+by nikophil at 2023-06-27T09:59:37Z
+
+@nicolas-grekas done!

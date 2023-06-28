@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.0
+---
+
+ * Add parameter `$isSameDatabase` to `DoctrineDbalAdapter::configureSchema()`
+
 6.3
 ---
 

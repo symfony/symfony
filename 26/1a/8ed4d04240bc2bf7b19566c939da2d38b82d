@@ -1,0 +1,91 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2022-05-22T11:32:35Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2022-05-22T12:00:30Z
+
+~What about other `Date*` types? Shouldn't this be done at the transformer level so such consistency can be checked in all of them?~
+
+EDIT: no model transformation to hook into for such cases
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2022-05-22T12:22:34Z
+
+Should we create a dedicated listener that can be used in other `Date*` types as well?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2022-05-27T06:53:54Z
+
+> Should we create a dedicated listener that can be used in other `Date*` types as well?
+
+I don't think we need to extract this into a dedicated listener, but you are right that we should trigger the deprecation in these types as well. I have updated the code accordingly.
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2022-05-29T14:00:02Z
+
+> What's the motivation for this PR?
+> What's the alternative way, aka how actionable is this deprecation?
+> Is this never supposed to happen or is this a common error?
+
+I discovered this while working on some form related tests recently where tests failed on GHA while passing locally. From my experience such failures are hard to track down if you have them on production servers but not locally. Now you would at least see more information in the deprecation log that make you aware of a potential issue.
+
+What I can imagine as an alternative is being able to omit the `model_timezone` option when the input is a date object and let the timezone default to the timezone of the date object.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-05-30T12:32:09Z
+
+> What I can imagine as an alternative is being able to omit the model_timezone option when the input is a date object and let the timezone default to the timezone of the date object.
+
+Does this mean that the `model_timezone` option shouldn't exist at all, if the datetime object already embeds it?
+
+If yes, let's deprecate it?
+
+If no, what's its purpose? And can you add the new envisioned behavior as commented code? It's going to be a `throw` isn't it?
+
+---------------------------------------------------------------------------
+
+by stof at 2022-05-30T12:57:25Z
+
+Well, model_timezone is still very useful for the reverse transformation, to know which timezone should be used as the target of the transformation (this one cannot be inferred from the DateTime object, as we need to produce it)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2022-05-30T13:02:57Z
+
+We also need it for any other input than `DateTime`/`DateTimeImmutable` (i.e. `string` and `array`).
+
+I am going to update the PR later to address your feedback, Nicolas.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-07-28T10:03:13Z
+
+Friendly ping @xabbuh
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-02-04T09:08:26Z
+
+Is this one ready for another round of reviews?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-02-04T11:08:35Z
+
+Yes, the PR is ready to be reviewed again.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-09T09:21:26Z
+
+friendly ping @xabbuh  :)

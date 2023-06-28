@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Remove implementing `Http\Message\RequestFactory` from `HttplugClient`
+ * Add `HarFileResponseFactory` testing utility, allow to replay responses from `.har` files
 
 6.4
 ---

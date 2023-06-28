@@ -1,0 +1,80 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-27T09:47:26Z
+
+`bool:default::GOOGLE_RECAPTCHA_SITE_KEY`?
+
+---------------------------------------------------------------------------
+
+by GaryPEGEOT at 2023-06-27T13:07:52Z
+
+> `bool:default::GOOGLE_RECAPTCHA_SITE_KEY`?
+
+I tried with bool first, but any other value than '1' or 'true' get interpreted as false:
+
+```
+ // Displaying detailed environment variable usage matching GOOGLE_RECAPTCHA_SITE_KEY
+
+%env(bool:GOOGLE_RECAPTCHA_SITE_KEY)%
+-------------------------------------
+
+ ----------------- --------------------------------------------
+  Default value     n/a
+  Real value        "some_value"
+  Processed value   false
+ ----------------- --------------------------------------------
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-27T19:37:28Z
+
+> I tried with bool first, but any other value than '1' or 'true' get interpreted as false:
+
+That's unexpected. We use FILTER_VALIDATE_BOOL, which handles way more cases. The test suite is also proving that.
+Not convinced personally sorry. Please provide more insights.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-06-27T20:18:38Z
+
+> Returns true for "1", "true", "on" and "yes". Returns false otherwise.
+
+;)
+
+personally im not to fond of turning `SOME=false` into `bool(true)` and `SOME=0` into `bool(false)`, but yes, this processor would allow to derive a bool value as such. IMHO an empty string check should be used instead of `empty()`.
+
+we do this in runtime for some env: `$enabled = '' !== $value`
+
+however, in hindsight i'd split it into 2 envs, rather than 1 conditional env, thus:
+
+```
+$enabled = bool:SOME_ENABLED
+$value = string:SOME_VALUE
+```
+
+---------------------------------------------------------------------------
+
+by GaryPEGEOT at 2023-06-28T07:30:31Z
+
+> On second thought, we already do have the `NO_COLOR` env vars which works like that, and this is indeed not the same as `bool`. On the behavior side, this should not throw when the env var is not defined. It does current if I'm not wrong. The check should be moved below the code handling "default" and should account for not found vars. I would also not use empty but use a comparison to the empty string only.
+
+@nicolas-grekas maybe check for `null` as well? I wouldn't consider null as defined
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-28T07:40:58Z
+
+`null`and `false` also yes
+
+---------------------------------------------------------------------------
+
+by GaryPEGEOT at 2023-06-28T07:57:54Z
+
+Fixed the checks and added a few test cases
+
+---------------------------------------------------------------------------
+
+by stof at 2023-06-28T14:07:56Z
+
+@nicolas-grekas but as we don't use `FILTER_NULL_ON_FAILURE`, anything that does not parse as either true or false in `FILTER_VALIDATE_BOOLEAN` gets returned as `false`. This is what happens for this key having a value `some_value`

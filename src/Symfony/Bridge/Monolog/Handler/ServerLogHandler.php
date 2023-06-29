@@ -130,6 +130,9 @@ trait ServerLogHandlerTrait
     {
     }
 
+    /**
+     * @return resource
+     */
     private function createSocket()
     {
         $socket = stream_socket_client($this->host, $errno, $errstr, 0, \STREAM_CLIENT_CONNECT | \STREAM_CLIENT_ASYNC_CONNECT | \STREAM_CLIENT_PERSISTENT, $this->context);

@@ -7391,17 +7391,6 @@ index 71e806fc15..d60290b3ed 100644
 +    public static function trustXSendfileTypeHeader(): void
      {
          self::$trustXSendfileTypeHeader = true;
-diff --git a/src/Symfony/Component/HttpFoundation/ExpressionRequestMatcher.php b/src/Symfony/Component/HttpFoundation/ExpressionRequestMatcher.php
-index fe65e920d9..6a78e6e779 100644
---- a/src/Symfony/Component/HttpFoundation/ExpressionRequestMatcher.php
-+++ b/src/Symfony/Component/HttpFoundation/ExpressionRequestMatcher.php
-@@ -33,5 +33,5 @@ class ExpressionRequestMatcher extends RequestMatcher
-      * @return void
-      */
--    public function setExpression(ExpressionLanguage $language, Expression|string $expression)
-+    public function setExpression(ExpressionLanguage $language, Expression|string $expression): void
-     {
-         $this->language = $language;
 diff --git a/src/Symfony/Component/HttpFoundation/FileBag.php b/src/Symfony/Component/HttpFoundation/FileBag.php
 index b74a02e2e1..51b4f7f1c3 100644
 --- a/src/Symfony/Component/HttpFoundation/FileBag.php
@@ -7621,66 +7610,6 @@ index 0bef6f8d70..ca99fd9dad 100644
 +    protected static function initializeFormats(): void
      {
          static::$formats = [
-diff --git a/src/Symfony/Component/HttpFoundation/RequestMatcher.php b/src/Symfony/Component/HttpFoundation/RequestMatcher.php
-index 8c5f1d8134..fdd3a666e9 100644
---- a/src/Symfony/Component/HttpFoundation/RequestMatcher.php
-+++ b/src/Symfony/Component/HttpFoundation/RequestMatcher.php
-@@ -73,5 +73,5 @@ class RequestMatcher implements RequestMatcherInterface
-      * @return void
-      */
--    public function matchScheme(string|array|null $scheme)
-+    public function matchScheme(string|array|null $scheme): void
-     {
-         $this->schemes = null !== $scheme ? array_map('strtolower', (array) $scheme) : [];
-@@ -83,5 +83,5 @@ class RequestMatcher implements RequestMatcherInterface
-      * @return void
-      */
--    public function matchHost(?string $regexp)
-+    public function matchHost(?string $regexp): void
-     {
-         $this->host = $regexp;
-@@ -95,5 +95,5 @@ class RequestMatcher implements RequestMatcherInterface
-      * @return void
-      */
--    public function matchPort(?int $port)
-+    public function matchPort(?int $port): void
-     {
-         $this->port = $port;
-@@ -105,5 +105,5 @@ class RequestMatcher implements RequestMatcherInterface
-      * @return void
-      */
--    public function matchPath(?string $regexp)
-+    public function matchPath(?string $regexp): void
-     {
-         $this->path = $regexp;
-@@ -117,5 +117,5 @@ class RequestMatcher implements RequestMatcherInterface
-      * @return void
-      */
--    public function matchIp(string $ip)
-+    public function matchIp(string $ip): void
-     {
-         $this->matchIps($ip);
-@@ -129,5 +129,5 @@ class RequestMatcher implements RequestMatcherInterface
-      * @return void
-      */
--    public function matchIps(string|array|null $ips)
-+    public function matchIps(string|array|null $ips): void
-     {
-         $ips = null !== $ips ? (array) $ips : [];
-@@ -143,5 +143,5 @@ class RequestMatcher implements RequestMatcherInterface
-      * @return void
-      */
--    public function matchMethod(string|array|null $method)
-+    public function matchMethod(string|array|null $method): void
-     {
-         $this->methods = null !== $method ? array_map('strtoupper', (array) $method) : [];
-@@ -153,5 +153,5 @@ class RequestMatcher implements RequestMatcherInterface
-      * @return void
-      */
--    public function matchAttribute(string $key, string $regexp)
-+    public function matchAttribute(string $key, string $regexp): void
-     {
-         $this->attributes[$key] = $regexp;
 diff --git a/src/Symfony/Component/HttpFoundation/RequestStack.php b/src/Symfony/Component/HttpFoundation/RequestStack.php
 index 5aa8ba7934..80742b0764 100644
 --- a/src/Symfony/Component/HttpFoundation/RequestStack.php

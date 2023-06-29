@@ -22,6 +22,19 @@ DoctrineBridge
  * DoctrineBridge now requires `doctrine/event-manager:^2`
  * Add parameter `$isSameDatabase` to `DoctrineTokenProvider::configureSchema()`
 
+HttpFoundation
+--------------
+
+ * Calling `ParameterBag::filter()` on an invalid value throws an `UnexpectedValueException` instead of returning `false`.
+   The exception is more specific for `InputBag` which throws a `BadRequestException` when invalid value is found.
+   The flag `FILTER_NULL_ON_FAILURE` can be used to return `null` instead of throwing an exception.
+ * The methods `ParameterBag::getInt()` and `ParameterBag::getBool()` no longer fallback to `0` or `false`
+   when the value cannot be converted to the expected type. They throw a `UnexpectedValueException` instead.
+ * Replace `RequestMatcher` with `ChainRequestMatcher`
+ * Replace `ExpressionRequestMatcher` with `RequestMatcher\ExpressionRequestMatcher`
+ * Remove `Request::getContentType()`, use `Request::getContentTypeFormat()` instead
+ * Throw an `InvalidArgumentException` when calling `Request::create()` with a malformed URI
+
 Lock
 ----
 

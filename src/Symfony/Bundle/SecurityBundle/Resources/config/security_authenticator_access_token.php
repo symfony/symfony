@@ -33,7 +33,6 @@ return static function (ContainerConfigurator $container) {
                 null,
                 null,
             ])
-            ->call('setTranslator', [service('translator')->ignoreOnInvalid()])
 
         ->set('security.authenticator.access_token.chain_extractor', ChainAccessTokenExtractor::class)
             ->abstract()

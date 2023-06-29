@@ -149,7 +149,7 @@ abstract class AnnotationClassLoaderTestCase extends TestCase
     public function testGlobalDefaultsRoutesLoadWithAnnotation()
     {
         $routes = $this->loader->load($this->getNamespace().'\GlobalDefaultsClass');
-        $this->assertCount(2, $routes);
+        $this->assertCount(4, $routes);
 
         $specificLocaleRoute = $routes->get('specific_locale');
 
@@ -162,6 +162,9 @@ abstract class AnnotationClassLoaderTestCase extends TestCase
         $this->assertSame('/defaults/specific-format', $specificFormatRoute->getPath());
         $this->assertSame('g_locale', $specificFormatRoute->getDefault('_locale'));
         $this->assertSame('s_format', $specificFormatRoute->getDefault('_format'));
+
+        $this->assertSame(['GET'], $routes->get('redundant_method')->getMethods());
+        $this->assertSame(['https'], $routes->get('redundant_scheme')->getSchemes());
     }
 
     public function testUtf8RoutesLoadWithAnnotation()

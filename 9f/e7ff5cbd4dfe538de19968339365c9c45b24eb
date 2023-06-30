@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-06-28T17:19:32Z
+
+with this enabled we could think of new frameworkbundle config, to route all clients to the test server, so we guarantee no external traffic occurs

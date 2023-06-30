@@ -19,7 +19,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\IdReader;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
 use Symfony\Component\Form\Exception\LogicException;
@@ -29,8 +28,6 @@ use Symfony\Component\Form\Exception\LogicException;
  */
 class DoctrineChoiceLoaderTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     /**
      * @var MockObject&ChoiceListFactoryInterface
      */

@@ -12,13 +12,10 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\HttpFoundation\IpUtils;
 
 class IpUtilsTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testSeparateCachesPerProtocol()
     {
         $ip = '192.168.52.1';

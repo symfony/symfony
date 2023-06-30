@@ -345,8 +345,7 @@ class Request
 
         $components = parse_url($uri);
         if (false === $components) {
-            trigger_deprecation('symfony/http-foundation', '6.3', 'Calling "%s()" with an invalid URI is deprecated.', __METHOD__);
-            $components = [];
+            throw new \InvalidArgumentException(sprintf('Malformed URI "%s".', $uri));
         }
         if (isset($components['host'])) {
             $server['SERVER_NAME'] = $components['host'];
@@ -1335,18 +1334,6 @@ class Request
     public function setRequestFormat(?string $format)
     {
         $this->format = $format;
-    }
-
-    /**
-     * Gets the usual name of the format associated with the request's media type (provided in the Content-Type header).
-     *
-     * @deprecated since Symfony 6.2, use getContentTypeFormat() instead
-     */
-    public function getContentType(): ?string
-    {
-        trigger_deprecation('symfony/http-foundation', '6.2', 'The "%s()" method is deprecated, use "getContentTypeFormat()" instead.', __METHOD__);
-
-        return $this->getContentTypeFormat();
     }
 
     /**

@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+7.0
+---
+
+ * Calling `ParameterBag::filter()` throws an `UnexpectedValueException` on invalid value, unless flag `FILTER_NULL_ON_FAILURE` is set
+ * Calling `ParameterBag::getInt()` and `ParameterBag::getBool()` throws an `UnexpectedValueException` on invalid value
+ * Remove classes `RequestMatcher` and `ExpressionRequestMatcher`
+ * Remove `Request::getContentType()`, use `Request::getContentTypeFormat()` instead
+ * Throw an `InvalidArgumentException` when calling `Request::create()` with a malformed URI
+
 6.4
 ---
 

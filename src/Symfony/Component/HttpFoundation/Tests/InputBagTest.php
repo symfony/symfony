@@ -12,15 +12,12 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Tests\Fixtures\FooEnum;
 
 class InputBagTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testGet()
     {
         $bag = new InputBag(['foo' => 'bar', 'null' => null, 'int' => 1, 'float' => 1.0, 'bool' => false, 'stringable' => new class() implements \Stringable {
@@ -39,28 +36,24 @@ class InputBagTest extends TestCase
         $this->assertFalse($bag->get('bool'), '->get() gets the value of a bool parameter');
     }
 
-    /**
-     * @group legacy
-     */
     public function testGetIntError()
     {
-        $this->expectDeprecation('Since symfony/http-foundation 6.3: Ignoring invalid values when using "Symfony\Component\HttpFoundation\InputBag::getInt(\'foo\')" is deprecated and will throw a "Symfony\Component\HttpFoundation\Exception\BadRequestException" in 7.0; use method "filter()" with flag "FILTER_NULL_ON_FAILURE" to keep ignoring them.');
-
         $bag = new InputBag(['foo' => 'bar']);
-        $result = $bag->getInt('foo');
-        $this->assertSame(0, $result);
+
+        $this->expectException(BadRequestException::class);
+        $this->expectExceptionMessage('Input value "foo" is invalid and flag "FILTER_NULL_ON_FAILURE" was not set.');
+
+        $bag->getInt('foo');
     }
 
-    /**
-     * @group legacy
-     */
     public function testGetBooleanError()
     {
-        $this->expectDeprecation('Since symfony/http-foundation 6.3: Ignoring invalid values when using "Symfony\Component\HttpFoundation\InputBag::getBoolean(\'foo\')" is deprecated and will throw a "Symfony\Component\HttpFoundation\Exception\BadRequestException" in 7.0; use method "filter()" with flag "FILTER_NULL_ON_FAILURE" to keep ignoring them.');
-
         $bag = new InputBag(['foo' => 'bar']);
-        $result = $bag->getBoolean('foo');
-        $this->assertFalse($result);
+
+        $this->expectException(BadRequestException::class);
+        $this->expectExceptionMessage('Input value "foo" is invalid and flag "FILTER_NULL_ON_FAILURE" was not set.');
+
+        $bag->getBoolean('foo');
     }
 
     public function testGetString()

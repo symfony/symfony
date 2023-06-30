@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\Bundle;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
@@ -21,7 +20,7 @@ use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-interface BundleInterface extends ContainerAwareInterface
+interface BundleInterface
 {
     /**
      * Boots the Bundle.

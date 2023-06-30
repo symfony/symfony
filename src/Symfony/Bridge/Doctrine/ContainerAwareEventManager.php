@@ -189,7 +189,7 @@ class ContainerAwareEventManager extends EventManager
                 $listener = $this->container->get($listener);
             }
             // throw new \InvalidArgumentException(sprintf('Using Doctrine subscriber "%s" is not allowed, declare it as a listener instead.', \is_object($listener) ? $listener::class : $listener));
-            trigger_deprecation('symfony/doctrine-bridge', '6.3', 'Using Doctrine subscribers as services is deprecated, declare listeners instead');
+            trigger_deprecation('symfony/doctrine-bridge', '6.3', 'Registering "%s" as a Doctrine subscriber is deprecated. Register it as a listener instead, using e.g. the #[AsDoctrineListener] attribute.', \is_object($listener) ? get_debug_type($listener) : $listener);
             parent::addEventSubscriber($listener);
         }
     }

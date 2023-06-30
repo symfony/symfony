@@ -138,11 +138,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     }
 
     /**
-     * @param array $context
-     *
      * @return bool
      */
-    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */)
+    public function supportsNormalization(mixed $data, string $format = null, array $context = [])
     {
         return \is_object($data) && !$data instanceof \Traversable;
     }
@@ -295,11 +293,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     abstract protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []);
 
     /**
-     * @param array $context
-     *
      * @return bool
      */
-    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */)
+    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = [])
     {
         return class_exists($type) || (interface_exists($type, false) && null !== $this->classDiscriminatorResolver?->getMappingForClass($type));
     }

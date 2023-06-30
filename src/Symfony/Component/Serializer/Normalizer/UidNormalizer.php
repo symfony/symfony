@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Uid\AbstractUid;
 
-final class UidNormalizer implements NormalizerInterface, DenormalizerInterface, CacheableSupportsMethodInterface
+final class UidNormalizer implements NormalizerInterface, DenormalizerInterface
 {
     public const NORMALIZATION_FORMAT_KEY = 'uid_normalization_format';
 
@@ -78,15 +78,5 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface,
     public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
     {
         return is_subclass_of($type, AbstractUid::class, true);
-    }
-
-    /**
-     * @deprecated since Symfony 6.3, use "getSupportedTypes()" instead
-     */
-    public function hasCacheableSupportsMethod(): bool
-    {
-        trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
-
-        return true;
     }
 }

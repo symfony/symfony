@@ -23,16 +23,12 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
  *
  * @final
  */
-class ArrayDenormalizer implements ContextAwareDenormalizerInterface, DenormalizerAwareInterface, CacheableSupportsMethodInterface
+class ArrayDenormalizer implements DenormalizerInterface, DenormalizerAwareInterface
 {
     use DenormalizerAwareTrait;
 
     public function setDenormalizer(DenormalizerInterface $denormalizer): void
     {
-        if (!method_exists($denormalizer, 'getSupportedTypes')) {
-            trigger_deprecation('symfony/serializer', '6.3', 'Not implementing the "DenormalizerInterface::getSupportedTypes()" in "%s" is deprecated.', get_debug_type($denormalizer));
-        }
-
         $this->denormalizer = $denormalizer;
     }
 
@@ -81,15 +77,5 @@ class ArrayDenormalizer implements ContextAwareDenormalizerInterface, Denormaliz
 
         return str_ends_with($type, '[]')
             && $this->denormalizer->supportsDenormalization($data, substr($type, 0, -2), $format, $context);
-    }
-
-    /**
-     * @deprecated since Symfony 6.3, use "getSupportedTypes()" instead
-     */
-    public function hasCacheableSupportsMethod(): bool
-    {
-        trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
-
-        return $this->denormalizer instanceof CacheableSupportsMethodInterface && $this->denormalizer->hasCacheableSupportsMethod();
     }
 }

@@ -731,20 +731,6 @@ class ObjectNormalizerTest extends TestCase
         })::class)->foo);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testExtractAttributesRespectsFormat()
-    {
-        $normalizer = new FormatAndContextAwareNormalizer();
-
-        $data = new ObjectDummy();
-        $data->setFoo('bar');
-        $data->bar = 'foo';
-
-        $this->assertSame(['foo' => 'bar', 'bar' => 'foo'], $normalizer->normalize($data, 'foo_and_bar_included'));
-    }
-
     public function testExtractAttributesRespectsContext()
     {
         $normalizer = new ObjectNormalizer();

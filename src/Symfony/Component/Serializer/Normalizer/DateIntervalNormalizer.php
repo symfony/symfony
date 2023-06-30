@@ -22,7 +22,7 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
  *
  * @final since Symfony 6.3
  */
-class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterface, CacheableSupportsMethodInterface
+class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterface
 {
     public const FORMAT_KEY = 'dateinterval_format';
 
@@ -38,7 +38,7 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
     public function getSupportedTypes(?string $format): array
     {
         return [
-            \DateInterval::class => __CLASS__ === static::class || $this->hasCacheableSupportsMethod(),
+            \DateInterval::class => true,
         ];
     }
 
@@ -54,22 +54,9 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
         return $object->format($context[self::FORMAT_KEY] ?? $this->defaultContext[self::FORMAT_KEY]);
     }
 
-    /**
-     * @param array $context
-     */
-    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return $data instanceof \DateInterval;
-    }
-
-    /**
-     * @deprecated since Symfony 6.3, use "getSupportedTypes()" instead
-     */
-    public function hasCacheableSupportsMethod(): bool
-    {
-        trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
-
-        return __CLASS__ === static::class;
     }
 
     /**
@@ -122,10 +109,7 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
         }
     }
 
-    /**
-     * @param array $context
-     */
-    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */): bool
+    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
     {
         return \DateInterval::class === $type;
     }

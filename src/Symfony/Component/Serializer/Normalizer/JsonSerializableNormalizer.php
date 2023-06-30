@@ -43,22 +43,16 @@ class JsonSerializableNormalizer extends AbstractNormalizer
     public function getSupportedTypes(?string $format): array
     {
         return [
-            \JsonSerializable::class => __CLASS__ === static::class || $this->hasCacheableSupportsMethod(),
+            \JsonSerializable::class => true,
         ];
     }
 
-    /**
-     * @param array $context
-     */
-    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return $data instanceof \JsonSerializable;
     }
 
-    /**
-     * @param array $context
-     */
-    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */): bool
+    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
     {
         return false;
     }
@@ -66,15 +60,5 @@ class JsonSerializableNormalizer extends AbstractNormalizer
     public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
     {
         throw new LogicException(sprintf('Cannot denormalize with "%s".', \JsonSerializable::class));
-    }
-
-    /**
-     * @deprecated since Symfony 6.3, use "getSupportedTypes()" instead
-     */
-    public function hasCacheableSupportsMethod(): bool
-    {
-        trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
-
-        return __CLASS__ === static::class;
     }
 }

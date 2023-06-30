@@ -14,13 +14,10 @@ namespace Symfony\Bridge\Doctrine\Tests;
 use Doctrine\Common\EventSubscriber;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\ContainerAwareEventManager;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\DependencyInjection\Container;
 
 class ContainerAwareEventManagerTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     private $container;
     private $evm;
 

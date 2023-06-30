@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.4
+---
+
+ * Allow custom working directory in `TestHttpServer`
+
 3.3
 ---
 

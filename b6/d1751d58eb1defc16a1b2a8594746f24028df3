@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2023-06-29T12:20:07Z
+
+@nicolas-grekas I'm afraid I need your help with the data collector return types. It sometimes seem to return a `Data` object and other times a plain value. I can't really reason when a method can return `Data`. I've fixed the types that caused the tests to fail, but I'm not sure about the untested methods. Can you have a close look at them? :pray:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-29T12:29:32Z
+
+What about going with mixed? We changed some of them to return Data instead of the original data because from the pov of a twig template, we can make a Data object behave as the original one. mixed and `@return Data|mixed` if that makes sense?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-06-29T12:36:25Z
+
+`Data|mixed` is still mixed though.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2023-06-29T14:14:47Z
+
+Alright, I did some further testing and it seems like scalar types are kept as-is, while other types become `Data` when calling `cloneVar()`. For the data collectors that do `$this->cloneVar($this->data)`, I've updated the non-scalar return types to be `Data|array`. Seems like that does the trick (at least, to make all tests green).

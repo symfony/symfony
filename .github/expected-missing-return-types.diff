@@ -1767,64 +1767,65 @@ index b7162d7706..3d41be7340 100644
      {
          if (isset($this->options[$option->getName()]) && !$option->equals($this->options[$option->getName()])) {
 diff --git a/src/Symfony/Component/Console/Input/InputInterface.php b/src/Symfony/Component/Console/Input/InputInterface.php
-index aaed5fd01d..e7de9bcdec 100644
+index ca22bdbba5..4f4b1306b4 100644
 --- a/src/Symfony/Component/Console/Input/InputInterface.php
 +++ b/src/Symfony/Component/Console/Input/InputInterface.php
-@@ -57,5 +57,5 @@ interface InputInterface
+@@ -54,5 +54,5 @@ interface InputInterface
       * @return mixed
       */
 -    public function getParameterOption(string|array $values, string|bool|int|float|array|null $default = false, bool $onlyParams = false);
 +    public function getParameterOption(string|array $values, string|bool|int|float|array|null $default = false, bool $onlyParams = false): mixed;
  
      /**
-@@ -66,5 +66,5 @@ interface InputInterface
+@@ -63,5 +63,5 @@ interface InputInterface
       * @throws RuntimeException
       */
 -    public function bind(InputDefinition $definition);
 +    public function bind(InputDefinition $definition): void;
  
      /**
-@@ -75,5 +75,5 @@ interface InputInterface
+@@ -72,5 +72,5 @@ interface InputInterface
       * @throws RuntimeException When not enough arguments are given
       */
 -    public function validate();
 +    public function validate(): void;
  
      /**
-@@ -91,5 +91,5 @@ interface InputInterface
+@@ -88,5 +88,5 @@ interface InputInterface
       * @throws InvalidArgumentException When argument given doesn't exist
       */
 -    public function getArgument(string $name);
 +    public function getArgument(string $name): mixed;
  
      /**
-@@ -100,5 +100,5 @@ interface InputInterface
+@@ -97,5 +97,5 @@ interface InputInterface
       * @throws InvalidArgumentException When argument given doesn't exist
       */
 -    public function setArgument(string $name, mixed $value);
 +    public function setArgument(string $name, mixed $value): void;
  
      /**
-@@ -121,5 +121,5 @@ interface InputInterface
+@@ -118,5 +118,5 @@ interface InputInterface
       * @throws InvalidArgumentException When option given doesn't exist
       */
 -    public function getOption(string $name);
 +    public function getOption(string $name): mixed;
  
      /**
-@@ -130,5 +130,5 @@ interface InputInterface
+@@ -127,5 +127,5 @@ interface InputInterface
       * @throws InvalidArgumentException When option given doesn't exist
       */
 -    public function setOption(string $name, mixed $value);
 +    public function setOption(string $name, mixed $value): void;
  
      /**
-@@ -147,4 +147,4 @@ interface InputInterface
+@@ -144,5 +144,5 @@ interface InputInterface
       * @return void
       */
 -    public function setInteractive(bool $interactive);
 +    public function setInteractive(bool $interactive): void;
- }
+ 
+     /**
 diff --git a/src/Symfony/Component/Console/Input/InputOption.php b/src/Symfony/Component/Console/Input/InputOption.php
 index c9e8aa82b6..ee7c119cd2 100644
 --- a/src/Symfony/Component/Console/Input/InputOption.php
@@ -3303,24 +3304,24 @@ index f4c6b29258..1402331f9e 100644
 +    public function instantiateProxy(ContainerInterface $container, Definition $definition, string $id, callable $realInstantiator): object;
  }
 diff --git a/src/Symfony/Component/DependencyInjection/Loader/FileLoader.php b/src/Symfony/Component/DependencyInjection/Loader/FileLoader.php
-index 86543c1e85..4772c08c3d 100644
+index 963715dd16..5089e994ea 100644
 --- a/src/Symfony/Component/DependencyInjection/Loader/FileLoader.php
 +++ b/src/Symfony/Component/DependencyInjection/Loader/FileLoader.php
 @@ -99,5 +99,5 @@ abstract class FileLoader extends BaseFileLoader
       * @return void
       */
--    public function registerClasses(Definition $prototype, string $namespace, string $resource, string|array $exclude = null/* , string $source = null */)
-+    public function registerClasses(Definition $prototype, string $namespace, string $resource, string|array $exclude = null/* , string $source = null */): void
+-    public function registerClasses(Definition $prototype, string $namespace, string $resource, string|array $exclude = null, string $source = null)
++    public function registerClasses(Definition $prototype, string $namespace, string $resource, string|array $exclude = null, string $source = null): void
      {
          if (!str_ends_with($namespace, '\\')) {
-@@ -195,5 +195,5 @@ abstract class FileLoader extends BaseFileLoader
+@@ -194,5 +194,5 @@ abstract class FileLoader extends BaseFileLoader
       * @return void
       */
 -    public function registerAliasesForSinglyImplementedInterfaces()
 +    public function registerAliasesForSinglyImplementedInterfaces(): void
      {
          foreach ($this->interfaces as $interface) {
-@@ -211,5 +211,5 @@ abstract class FileLoader extends BaseFileLoader
+@@ -210,5 +210,5 @@ abstract class FileLoader extends BaseFileLoader
       * @return void
       */
 -    protected function setDefinition(string $id, Definition $definition)
@@ -4150,7 +4151,7 @@ index 241725b9c5..420932897f 100644
      {
          $token = $this->current;
 diff --git a/src/Symfony/Component/Filesystem/Filesystem.php b/src/Symfony/Component/Filesystem/Filesystem.php
-index a379ce1863..e2035fb337 100644
+index 55db9d91ac..26dcc0d6dc 100644
 --- a/src/Symfony/Component/Filesystem/Filesystem.php
 +++ b/src/Symfony/Component/Filesystem/Filesystem.php
 @@ -37,5 +37,5 @@ class Filesystem
@@ -4240,8 +4241,8 @@ index a379ce1863..e2035fb337 100644
 @@ -704,5 +704,5 @@ class Filesystem
       * @throws IOException If the file is not writable
       */
--    public function appendToFile(string $filename, $content/* , bool $lock = false */)
-+    public function appendToFile(string $filename, $content/* , bool $lock = false */): void
+-    public function appendToFile(string $filename, $content, bool $lock = false)
++    public function appendToFile(string $filename, $content, bool $lock = false): void
      {
          if (\is_array($content)) {
 diff --git a/src/Symfony/Component/Finder/Finder.php b/src/Symfony/Component/Finder/Finder.php
@@ -9270,50 +9271,51 @@ index a0154bd7ce..70c0d942e2 100644
      {
          if (!isset($this->elements[$offset])) {
 diff --git a/src/Symfony/Component/PropertyAccess/PropertyPathInterface.php b/src/Symfony/Component/PropertyAccess/PropertyPathInterface.php
-index 11f6ed405b..53e7b33451 100644
+index 9502b1a397..f676e0f7e6 100644
 --- a/src/Symfony/Component/PropertyAccess/PropertyPathInterface.php
 +++ b/src/Symfony/Component/PropertyAccess/PropertyPathInterface.php
-@@ -33,5 +33,5 @@ interface PropertyPathInterface extends \Traversable
+@@ -31,5 +31,5 @@ interface PropertyPathInterface extends \Traversable
       * @return int
       */
 -    public function getLength();
 +    public function getLength(): int;
  
      /**
-@@ -45,5 +45,5 @@ interface PropertyPathInterface extends \Traversable
+@@ -43,5 +43,5 @@ interface PropertyPathInterface extends \Traversable
       * @return self|null
       */
 -    public function getParent();
 +    public function getParent(): ?\Symfony\Component\PropertyAccess\PropertyPathInterface;
  
      /**
-@@ -52,5 +52,5 @@ interface PropertyPathInterface extends \Traversable
+@@ -50,5 +50,5 @@ interface PropertyPathInterface extends \Traversable
       * @return list<string>
       */
 -    public function getElements();
 +    public function getElements(): array;
  
      /**
-@@ -63,5 +63,5 @@ interface PropertyPathInterface extends \Traversable
+@@ -61,5 +61,5 @@ interface PropertyPathInterface extends \Traversable
       * @throws Exception\OutOfBoundsException If the offset is invalid
       */
 -    public function getElement(int $index);
 +    public function getElement(int $index): string;
  
      /**
-@@ -74,5 +74,5 @@ interface PropertyPathInterface extends \Traversable
+@@ -72,5 +72,5 @@ interface PropertyPathInterface extends \Traversable
       * @throws Exception\OutOfBoundsException If the offset is invalid
       */
 -    public function isProperty(int $index);
 +    public function isProperty(int $index): bool;
  
      /**
-@@ -85,4 +85,4 @@ interface PropertyPathInterface extends \Traversable
+@@ -83,5 +83,5 @@ interface PropertyPathInterface extends \Traversable
       * @throws Exception\OutOfBoundsException If the offset is invalid
       */
 -    public function isIndex(int $index);
 +    public function isIndex(int $index): bool;
- }
+ 
+     /**
 diff --git a/src/Symfony/Component/PropertyInfo/DependencyInjection/PropertyInfoPass.php b/src/Symfony/Component/PropertyInfo/DependencyInjection/PropertyInfoPass.php
 index 1c240b43da..a96fbefdb9 100644
 --- a/src/Symfony/Component/PropertyInfo/DependencyInjection/PropertyInfoPass.php
@@ -9672,7 +9674,7 @@ index 417f156415..75d770d852 100644
      {
          $this->request = $request;
 diff --git a/src/Symfony/Component/Routing/Matcher/UrlMatcher.php b/src/Symfony/Component/Routing/Matcher/UrlMatcher.php
-index d1cee21377..19e949fbc6 100644
+index 89ff907e66..d70c095349 100644
 --- a/src/Symfony/Component/Routing/Matcher/UrlMatcher.php
 +++ b/src/Symfony/Component/Routing/Matcher/UrlMatcher.php
 @@ -66,5 +66,5 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
@@ -9689,7 +9691,7 @@ index d1cee21377..19e949fbc6 100644
 +    public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider): void
      {
          $this->expressionLanguageProviders[] = $provider;
-@@ -259,5 +259,5 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
+@@ -248,5 +248,5 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
       * @return ExpressionLanguage
       */
 -    protected function getExpressionLanguage()
@@ -10713,17 +10715,17 @@ index 48e8c3fb54..a71c3ea476 100644
 +    public function setDenormalizer(DenormalizerInterface $denormalizer): void;
  }
 diff --git a/src/Symfony/Component/Serializer/Normalizer/DenormalizerInterface.php b/src/Symfony/Component/Serializer/Normalizer/DenormalizerInterface.php
-index e4d0ed9123..8a39d97f36 100644
+index 7cb1164034..b3feecc078 100644
 --- a/src/Symfony/Component/Serializer/Normalizer/DenormalizerInterface.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/DenormalizerInterface.php
-@@ -47,5 +47,5 @@ interface DenormalizerInterface
+@@ -45,5 +45,5 @@ interface DenormalizerInterface
       * @throws ExceptionInterface       Occurs for all the other cases of errors
       */
 -    public function denormalize(mixed $data, string $type, string $format = null, array $context = []);
 +    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed;
  
      /**
-@@ -58,5 +58,5 @@ interface DenormalizerInterface
+@@ -56,5 +56,5 @@ interface DenormalizerInterface
       * @return bool
       */
 -    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []);
@@ -10763,17 +10765,17 @@ index 40a4fa0e8c..a1e2749aae 100644
      {
          $this->normalizer = $normalizer;
 diff --git a/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php b/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php
-index 01979d6fcf..e918540c83 100644
+index 8d9f751d93..1e4a883e6d 100644
 --- a/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php
-@@ -39,5 +39,5 @@ interface NormalizerInterface
+@@ -37,5 +37,5 @@ interface NormalizerInterface
       * @throws ExceptionInterface         Occurs for all the other cases of errors
       */
 -    public function normalize(mixed $object, string $format = null, array $context = []);
 +    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null;
  
      /**
-@@ -49,5 +49,5 @@ interface NormalizerInterface
+@@ -47,5 +47,5 @@ interface NormalizerInterface
       * @return bool
       */
 -    public function supportsNormalization(mixed $data, string $format = null, array $context = []);
@@ -11695,36 +11697,37 @@ index 88f90a0cdb..fd6deb6eb1 100644
      {
          unset($this->violations[$offset]);
 diff --git a/src/Symfony/Component/Validator/ConstraintViolationListInterface.php b/src/Symfony/Component/Validator/ConstraintViolationListInterface.php
-index 1fdbf0bc3f..aad702453b 100644
+index 1c4acd87e4..bdf59f8db4 100644
 --- a/src/Symfony/Component/Validator/ConstraintViolationListInterface.php
 +++ b/src/Symfony/Component/Validator/ConstraintViolationListInterface.php
-@@ -31,5 +31,5 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
+@@ -29,5 +29,5 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
       * @return void
       */
 -    public function add(ConstraintViolationInterface $violation);
 +    public function add(ConstraintViolationInterface $violation): void;
  
      /**
-@@ -38,5 +38,5 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
+@@ -36,5 +36,5 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
       * @return void
       */
 -    public function addAll(self $otherList);
 +    public function addAll(self $otherList): void;
  
      /**
-@@ -63,5 +63,5 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
+@@ -61,5 +61,5 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
       * @return void
       */
 -    public function set(int $offset, ConstraintViolationInterface $violation);
 +    public function set(int $offset, ConstraintViolationInterface $violation): void;
  
      /**
-@@ -72,4 +72,4 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
+@@ -70,5 +70,5 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
       * @return void
       */
 -    public function remove(int $offset);
 +    public function remove(int $offset): void;
- }
+ 
+     /**
 diff --git a/src/Symfony/Component/Validator/Constraints/AbstractComparisonValidator.php b/src/Symfony/Component/Validator/Constraints/AbstractComparisonValidator.php
 index a81d589f2b..87155e513c 100644
 --- a/src/Symfony/Component/Validator/Constraints/AbstractComparisonValidator.php
@@ -12488,10 +12491,10 @@ index 241ce901b5..bde6394ec3 100644
      {
          $this->collectedData = [];
 diff --git a/src/Symfony/Component/Validator/Violation/ConstraintViolationBuilderInterface.php b/src/Symfony/Component/Validator/Violation/ConstraintViolationBuilderInterface.php
-index 02fbeb797c..79964d5ce2 100644
+index 854a83538c..2a1bc5f1f8 100644
 --- a/src/Symfony/Component/Validator/Violation/ConstraintViolationBuilderInterface.php
 +++ b/src/Symfony/Component/Validator/Violation/ConstraintViolationBuilderInterface.php
-@@ -113,4 +113,4 @@ interface ConstraintViolationBuilderInterface
+@@ -116,4 +116,4 @@ interface ConstraintViolationBuilderInterface
       * @return void
       */
 -    public function addViolation();
@@ -13617,16 +13620,16 @@ index 98c2149330..2e85547efb 100644
      {
          if (!$this->connection->write($data) && $this->wrappedDumper) {
 diff --git a/src/Symfony/Component/VarDumper/VarDumper.php b/src/Symfony/Component/VarDumper/VarDumper.php
-index 2e1dad116c..abe2b0b229 100644
+index a89f2369bb..78905c797d 100644
 --- a/src/Symfony/Component/VarDumper/VarDumper.php
 +++ b/src/Symfony/Component/VarDumper/VarDumper.php
 @@ -43,5 +43,5 @@ class VarDumper
       * @return mixed
       */
--    public static function dump(mixed $var/* , string $label = null */)
-+    public static function dump(mixed $var/* , string $label = null */): mixed
+-    public static function dump(mixed $var, string $label = null)
++    public static function dump(mixed $var, string $label = null): mixed
      {
-         $label = 2 <= \func_num_args() ? func_get_arg(1) : null;
+         if (null === self::$handler) {
 diff --git a/src/Symfony/Component/VarExporter/Internal/Hydrator.php b/src/Symfony/Component/VarExporter/Internal/Hydrator.php
 index f665f6ee15..429db33d19 100644
 --- a/src/Symfony/Component/VarExporter/Internal/Hydrator.php

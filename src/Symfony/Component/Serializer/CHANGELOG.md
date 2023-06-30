@@ -4,14 +4,14 @@ CHANGELOG
 7.0
 ---
 
+ * Add method `getSupportedTypes()` to `DenormalizerInterface` and `NormalizerInterface`
  * Remove denormalization support for `AbstractUid` in `UidNormalizer`, use one of `AbstractUid` child class instead
  * Denormalizing to an abstract class in `UidNormalizer` now throws an `\Error`
  * Remove `ContextAwareDenormalizerInterface`, use `DenormalizerInterface` instead
  * Remove `ContextAwareNormalizerInterface`, use `NormalizerInterface` instead
  * Remove `CacheableSupportsMethodInterface`, use `NormalizerInterface` and `DenormalizerInterface` instead
- * First argument of `ClassMetadata::setSerializedName()` is now required
- * Third argument `array $context = []` of the `NormalizerInterface::supportsNormalization()` is now required
- * Fourth argument `array $context = []` of the `DenormalizerInterface::supportsDenormalization()` is now required
+ * First argument of `AttributeMetadata::setSerializedName()` is now required
+ * Add argument `$context` to `NormalizerInterface::supportsNormalization()` and `DenormalizerInterface::supportsDenormalization()`
 
 6.3
 ---

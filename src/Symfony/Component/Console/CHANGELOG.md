@@ -4,6 +4,7 @@ CHANGELOG
 7.0
 ---
 
+ * Add method `__toString()` to `InputInterface`
  * Remove `Command::$defaultName` and `Command::$defaultDescription`, use the `AsCommand` attribute instead
  * Passing null to `*Command::setApplication()`, `*FormatterStyle::setForeground/setBackground()`, `Helper::setHelpSet()`, `Input*::setDefault()` and `Question::setAutocompleterCallback/setValidator()` must be done explicitly
  * Remove `StringInput::REGEX_STRING`

@@ -21,8 +21,6 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
- *
- * @method getSupportedTypes(?string $format): array
  */
 interface DenormalizerInterface
 {

@@ -17,10 +17,8 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
- *
- * @final since Symfony 6.1
  */
-class VarDumperFormatter implements FormatterInterface
+final class VarDumperFormatter implements FormatterInterface
 {
     use CompatibilityFormatter;
 

@@ -41,10 +41,8 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  * stack is recommended.
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
- *
- * @final since Symfony 6.1
  */
-class ElasticsearchLogstashHandler extends AbstractHandler
+final class ElasticsearchLogstashHandler extends AbstractHandler
 {
     use CompatibilityHandler;
 

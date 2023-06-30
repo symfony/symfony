@@ -20,10 +20,7 @@ use Monolog\LogRecord;
 use Symfony\Bridge\Monolog\Formatter\VarDumperFormatter;
 
 if (trait_exists(FormattableHandlerTrait::class)) {
-    /**
-     * @final since Symfony 6.1
-     */
-    class ServerLogHandler extends AbstractProcessingHandler
+    final class ServerLogHandler extends AbstractProcessingHandler
     {
         use CompatibilityHandler;
         use CompatibilityProcessingHandler;
@@ -35,10 +32,7 @@ if (trait_exists(FormattableHandlerTrait::class)) {
         }
     }
 } else {
-    /**
-     * @final since Symfony 6.1
-     */
-    class ServerLogHandler extends AbstractProcessingHandler
+    final class ServerLogHandler extends AbstractProcessingHandler
     {
         use CompatibilityHandler;
         use CompatibilityProcessingHandler;

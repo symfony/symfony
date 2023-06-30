@@ -934,7 +934,7 @@ XML;
 
     private function createMockDateTimeNormalizer(): MockObject&NormalizerInterface
     {
-        $mock = $this->createMock(CustomNormalizer::class);
+        $mock = $this->createMock(NormalizerInterface::class);
 
         $mock
             ->expects($this->once())

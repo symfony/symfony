@@ -22,10 +22,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  * leading to a 404 Not Found if the attribute value isn't a valid backing value for the enum type.
  *
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
- *
- * @final since Symfony 6.2
  */
-class BackedEnumValueResolver implements ArgumentValueResolverInterface, ValueResolverInterface
+final class BackedEnumValueResolver implements ArgumentValueResolverInterface, ValueResolverInterface
 {
     /**
      * @deprecated since Symfony 6.2, use resolve() instead

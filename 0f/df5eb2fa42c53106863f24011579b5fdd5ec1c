@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-09T16:23:58Z
+
+(failures are related)
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-06-09T16:36:53Z
+
+I'll have a look at them, thank you for investigating Nicolas!
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-06-21T15:21:41Z
+
+I'm currently having a look at the failing job https://github.com/symfony/symfony/actions/runs/5335835620/jobs/9669640171?pr=50578

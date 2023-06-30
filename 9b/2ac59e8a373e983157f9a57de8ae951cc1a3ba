@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-06-20T18:25:14Z
+
+There is also a compiler pass that we should update as well.
+
+---------------------------------------------------------------------------
+
+by alamirault at 2023-06-20T20:58:33Z
+
+@xabbuh do you think this deprecation is better and valid ? I don't know if use `$id` is correct
+
+```php
+trigger_deprecation('symfony/doctrine-bridge', '6.3', 'Implementing "%s" in "%s" is deprecated, declare it as a listener instead.', EventSubscriber::class, $id);
+```
+
+https://github.com/symfony/symfony/blob/c08780e0242b9c3f1768d5212a63e1ff831abcb3/src/Symfony/Bridge/Doctrine/DependencyInjection/CompilerPass/RegisterEventListenersAndSubscribersPass.php#L109
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-06-21T07:21:59Z
+
+@alamirault looks good to me
+
+---------------------------------------------------------------------------
+
+by Chris53897 at 2023-06-22T07:46:19Z
+
+Thanks for working on this
+
+---------------------------------------------------------------------------
+
+by stof at 2023-06-22T19:12:03Z
+
+I'm not sure we should mention the attribute in this deprecation message. For services not relying on autoconfiguration, the attribute is not the way to migrate the configuration.
+
+And for services relying on autoconfiguration to register it as a subscriber, it means that they implement the EventSubscriberInterface of DoctrineBundle (the base EventSubscriber of doctrine/event-manager is not autoconfigured as we would not know in which event manager the listener should be registered when you have multiple doctrine packages in your project), which is already deprecated in DoctrineBundle 2.10 in factor of the the attribute.
+
+Thus, depending on the Doctrine project you are using, the DoctrineBundle would not be relevant for the migration.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-22T19:17:51Z
+
+For apps the attribute is the best suggestion we can make, isn't it? For bundles I agree but those need more care.
+Any proposal?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-06-22T19:49:06Z
+
+Even for apps, the attribute to use will be different depending on whether they use the ORM or the MongoDB ODM or another Doctrine project. And some apps might have decided to not use autoconfiguration but manual configuration.
+
+Well, I think this deprecation should keep saying `register them as listener` for the ContainerAwareEventManager which has no way to know for which project it is used. for the compiler pass, it could mention the tag name to use (as it knows which tag name it processes).
+For apps using the deprecated EventSubscriberInterface of DoctrineBundle for autoconfiguration, they will already get a deprecation warning hinting at the attribute (because in that case, it is indeed the proper migration path)

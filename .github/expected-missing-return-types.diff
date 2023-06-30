@@ -2210,7 +2210,7 @@ index cc024da461..00b79e915f 100644
      {
          $errors = [];
 diff --git a/src/Symfony/Component/Console/Application.php b/src/Symfony/Component/Console/Application.php
-index b7aaa6a29e..dd14cf2c5c 100644
+index f8526ae5ce..72da224185 100644
 --- a/src/Symfony/Component/Console/Application.php
 +++ b/src/Symfony/Component/Console/Application.php
 @@ -114,5 +114,5 @@ class Application implements ResetInterface
@@ -2340,66 +2340,66 @@ index b7aaa6a29e..dd14cf2c5c 100644
      {
          foreach ($command->getHelperSet() as $helper) {
 diff --git a/src/Symfony/Component/Console/Command/Command.php b/src/Symfony/Component/Console/Command/Command.php
-index 704b112d1a..b296bffcbd 100644
+index fae37b686a..5bc670292d 100644
 --- a/src/Symfony/Component/Console/Command/Command.php
 +++ b/src/Symfony/Component/Console/Command/Command.php
-@@ -145,5 +145,5 @@ class Command
+@@ -111,5 +111,5 @@ class Command
       * @return void
       */
 -    public function ignoreValidationErrors()
 +    public function ignoreValidationErrors(): void
      {
          $this->ignoreValidationErrors = true;
-@@ -153,5 +153,5 @@ class Command
+@@ -119,5 +119,5 @@ class Command
       * @return void
       */
--    public function setApplication(Application $application = null)
-+    public function setApplication(Application $application = null): void
+-    public function setApplication(?Application $application)
++    public function setApplication(?Application $application): void
      {
-         if (1 > \func_num_args()) {
-@@ -171,5 +171,5 @@ class Command
+         $this->application = $application;
+@@ -134,5 +134,5 @@ class Command
       * @return void
       */
 -    public function setHelperSet(HelperSet $helperSet)
 +    public function setHelperSet(HelperSet $helperSet): void
      {
          $this->helperSet = $helperSet;
-@@ -200,5 +200,5 @@ class Command
+@@ -163,5 +163,5 @@ class Command
       * @return bool
       */
 -    public function isEnabled()
 +    public function isEnabled(): bool
      {
          return true;
-@@ -210,5 +210,5 @@ class Command
+@@ -173,5 +173,5 @@ class Command
       * @return void
       */
 -    protected function configure()
 +    protected function configure(): void
      {
      }
-@@ -228,5 +228,5 @@ class Command
+@@ -191,5 +191,5 @@ class Command
       * @see setCode()
       */
 -    protected function execute(InputInterface $input, OutputInterface $output)
 +    protected function execute(InputInterface $input, OutputInterface $output): int
      {
          throw new LogicException('You must override the execute() method in the concrete command class.');
-@@ -242,5 +242,5 @@ class Command
+@@ -205,5 +205,5 @@ class Command
       * @return void
       */
 -    protected function interact(InputInterface $input, OutputInterface $output)
 +    protected function interact(InputInterface $input, OutputInterface $output): void
      {
      }
-@@ -258,5 +258,5 @@ class Command
+@@ -221,5 +221,5 @@ class Command
       * @return void
       */
 -    protected function initialize(InputInterface $input, OutputInterface $output)
 +    protected function initialize(InputInterface $input, OutputInterface $output): void
      {
      }
-@@ -701,5 +701,5 @@ class Command
+@@ -656,5 +656,5 @@ class Command
       * @throws InvalidArgumentException if the helper is not defined
       */
 -    public function getHelper(string $name): mixed
@@ -2436,14 +2436,14 @@ index 5850c3d7b8..e2371f88fd 100644
      {
          $this
 diff --git a/src/Symfony/Component/Console/Command/SignalableCommandInterface.php b/src/Symfony/Component/Console/Command/SignalableCommandInterface.php
-index 4d0876003d..d33732acb6 100644
+index 7ebffede11..40b301d18f 100644
 --- a/src/Symfony/Component/Console/Command/SignalableCommandInterface.php
 +++ b/src/Symfony/Component/Console/Command/SignalableCommandInterface.php
-@@ -31,4 +31,4 @@ interface SignalableCommandInterface
+@@ -29,4 +29,4 @@ interface SignalableCommandInterface
       * @return int|false The exit code to return or false to continue the normal execution
       */
--    public function handleSignal(int $signal, /* int|false $previousExitCode = 0 */);
-+    public function handleSignal(int $signal, /* int|false $previousExitCode = 0 */): int|false;
+-    public function handleSignal(int $signal, int|false $previousExitCode = 0);
++    public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false;
  }
 diff --git a/src/Symfony/Component/Console/DependencyInjection/AddConsoleCommandPass.php b/src/Symfony/Component/Console/DependencyInjection/AddConsoleCommandPass.php
 index 27705ddb63..1b25473f75 100644
@@ -2528,38 +2528,38 @@ index 433cd41978..02187a7ffc 100644
  
      /**
 diff --git a/src/Symfony/Component/Console/Formatter/OutputFormatterStyle.php b/src/Symfony/Component/Console/Formatter/OutputFormatterStyle.php
-index 346a474c61..db3012ced8 100644
+index f075e881d8..b93a539df1 100644
 --- a/src/Symfony/Component/Console/Formatter/OutputFormatterStyle.php
 +++ b/src/Symfony/Component/Console/Formatter/OutputFormatterStyle.php
 @@ -42,5 +42,5 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
       * @return void
       */
--    public function setForeground(string $color = null)
-+    public function setForeground(string $color = null): void
+-    public function setForeground(?string $color)
++    public function setForeground(?string $color): void
      {
-         if (1 > \func_num_args()) {
-@@ -53,5 +53,5 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
+         $this->color = new Color($this->foreground = $color ?: '', $this->background, $this->options);
+@@ -50,5 +50,5 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
       * @return void
       */
--    public function setBackground(string $color = null)
-+    public function setBackground(string $color = null): void
+-    public function setBackground(?string $color)
++    public function setBackground(?string $color): void
      {
-         if (1 > \func_num_args()) {
-@@ -69,5 +69,5 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
+         $this->color = new Color($this->foreground, $this->background = $color ?: '', $this->options);
+@@ -63,5 +63,5 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
       * @return void
       */
 -    public function setOption(string $option)
 +    public function setOption(string $option): void
      {
          $this->options[] = $option;
-@@ -78,5 +78,5 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
+@@ -72,5 +72,5 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
       * @return void
       */
 -    public function unsetOption(string $option)
 +    public function unsetOption(string $option): void
      {
          $pos = array_search($option, $this->options);
-@@ -91,5 +91,5 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
+@@ -85,5 +85,5 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
       * @return void
       */
 -    public function setOptions(array $options)
@@ -2645,31 +2645,31 @@ index eb32bce8fc..57edd56954 100644
      {
          $options = array_merge([
 diff --git a/src/Symfony/Component/Console/Helper/Helper.php b/src/Symfony/Component/Console/Helper/Helper.php
-index 3631b30f69..5e4407a591 100644
+index c80c1f468f..9578a074bb 100644
 --- a/src/Symfony/Component/Console/Helper/Helper.php
 +++ b/src/Symfony/Component/Console/Helper/Helper.php
 @@ -27,5 +27,5 @@ abstract class Helper implements HelperInterface
       * @return void
       */
--    public function setHelperSet(HelperSet $helperSet = null)
-+    public function setHelperSet(HelperSet $helperSet = null): void
+-    public function setHelperSet(?HelperSet $helperSet)
++    public function setHelperSet(?HelperSet $helperSet): void
      {
-         if (1 > \func_num_args()) {
-@@ -95,5 +95,5 @@ abstract class Helper implements HelperInterface
+         $this->helperSet = $helperSet;
+@@ -92,5 +92,5 @@ abstract class Helper implements HelperInterface
       * @return string
       */
 -    public static function formatTime(int|float $secs)
 +    public static function formatTime(int|float $secs): string
      {
          static $timeFormats = [
-@@ -127,5 +127,5 @@ abstract class Helper implements HelperInterface
+@@ -124,5 +124,5 @@ abstract class Helper implements HelperInterface
       * @return string
       */
 -    public static function formatMemory(int $memory)
 +    public static function formatMemory(int $memory): string
      {
          if ($memory >= 1024 * 1024 * 1024) {
-@@ -147,5 +147,5 @@ abstract class Helper implements HelperInterface
+@@ -144,5 +144,5 @@ abstract class Helper implements HelperInterface
       * @return string
       */
 -    public static function removeDecoration(OutputFormatterInterface $formatter, ?string $string)
@@ -2904,16 +2904,16 @@ index 0f5617cd17..bdd5dd264f 100644
      {
          $this->stream = $stream;
 diff --git a/src/Symfony/Component/Console/Input/InputArgument.php b/src/Symfony/Component/Console/Input/InputArgument.php
-index 5cb151488d..2dc276a372 100644
+index fa57f5d0d4..e657b56ad7 100644
 --- a/src/Symfony/Component/Console/Input/InputArgument.php
 +++ b/src/Symfony/Component/Console/Input/InputArgument.php
 @@ -96,5 +96,5 @@ class InputArgument
       * @throws LogicException When incorrect default value is given
       */
--    public function setDefault(string|bool|int|float|array $default = null)
-+    public function setDefault(string|bool|int|float|array $default = null): void
+-    public function setDefault(string|bool|int|float|array|null $default)
++    public function setDefault(string|bool|int|float|array|null $default): void
      {
-         if (1 > \func_num_args()) {
+         if ($this->isRequired() && null !== $default) {
 diff --git a/src/Symfony/Component/Console/Input/InputAwareInterface.php b/src/Symfony/Component/Console/Input/InputAwareInterface.php
 index 0ad27b4558..f5e544930e 100644
 --- a/src/Symfony/Component/Console/Input/InputAwareInterface.php
@@ -3037,16 +3037,16 @@ index aaed5fd01d..e7de9bcdec 100644
 +    public function setInteractive(bool $interactive): void;
  }
 diff --git a/src/Symfony/Component/Console/Input/InputOption.php b/src/Symfony/Component/Console/Input/InputOption.php
-index fdf88dcc27..cf7a71a3c4 100644
+index c9e8aa82b6..ee7c119cd2 100644
 --- a/src/Symfony/Component/Console/Input/InputOption.php
 +++ b/src/Symfony/Component/Console/Input/InputOption.php
 @@ -182,5 +182,5 @@ class InputOption
       * @return void
       */
--    public function setDefault(string|bool|int|float|array $default = null)
-+    public function setDefault(string|bool|int|float|array $default = null): void
+-    public function setDefault(string|bool|int|float|array|null $default)
++    public function setDefault(string|bool|int|float|array|null $default): void
      {
-         if (1 > \func_num_args()) {
+         if (self::VALUE_NONE === (self::VALUE_NONE & $this->mode) && null !== $default) {
 diff --git a/src/Symfony/Component/Console/Input/StreamableInputInterface.php b/src/Symfony/Component/Console/Input/StreamableInputInterface.php
 index 4b95fcb11e..b95fab2601 100644
 --- a/src/Symfony/Component/Console/Input/StreamableInputInterface.php
@@ -3283,10 +3283,10 @@ index b00445ece8..5e9b1086b0 100644
      {
          $this->buffer .= $message;
 diff --git a/src/Symfony/Component/Console/Question/Question.php b/src/Symfony/Component/Console/Question/Question.php
-index 26896bb531..af97d04ddc 100644
+index dec0954e79..873b302873 100644
 --- a/src/Symfony/Component/Console/Question/Question.php
 +++ b/src/Symfony/Component/Console/Question/Question.php
-@@ -270,5 +270,5 @@ class Question
+@@ -264,5 +264,5 @@ class Question
       * @return bool
       */
 -    protected function isAssoc(array $array)
@@ -4684,7 +4684,7 @@ index c1cd9087f0..a9efa77a6d 100644
      {
          return $this->resolved;
 diff --git a/src/Symfony/Component/DependencyInjection/ParameterBag/ParameterBagInterface.php b/src/Symfony/Component/DependencyInjection/ParameterBag/ParameterBagInterface.php
-index 51a662afc2..19e1f18d29 100644
+index 8c76fe7a8e..b255b0e8ef 100644
 --- a/src/Symfony/Component/DependencyInjection/ParameterBag/ParameterBagInterface.php
 +++ b/src/Symfony/Component/DependencyInjection/ParameterBag/ParameterBagInterface.php
 @@ -29,5 +29,5 @@ interface ParameterBagInterface

@@ -20,7 +20,7 @@
         "composer-plugin-api": "^1.0|^2.0"
     },
     "require-dev": {
-        "composer/composer": "^1.0.2|^2.0",
+        "composer/composer": "^2.6",
         "symfony/console": "^6.4|^7.0",
         "symfony/dotenv": "^6.4|^7.0",
         "symfony/http-foundation": "^6.4|^7.0",

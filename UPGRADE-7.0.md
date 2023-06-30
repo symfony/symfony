@@ -10,6 +10,13 @@ Cache
 
  * Add parameter `$isSameDatabase` to `DoctrineDbalAdapter::configureSchema()`
 
+Console
+-------
+
+ * Remove `Command::$defaultName` and `Command::$defaultDescription`, use the `AsCommand` attribute instead
+ * Passing null to `*Command::setApplication()`, `*FormatterStyle::setForeground/setBackground()`, `Helper::setHelpSet()`, `Input*::setDefault()` and `Question::setAutocompleterCallback/setValidator()` must be done explicitly
+ * Remove `StringInput::REGEX_STRING`
+
 DoctrineBridge
 --------------
 

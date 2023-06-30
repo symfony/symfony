@@ -82,11 +82,9 @@ interface ParameterBagInterface
     /**
      * Replaces parameter placeholders (%name%) by their values.
      *
-     * @return mixed
-     *
      * @throws ParameterNotFoundException if a placeholder references a parameter that does not exist
      */
-    public function resolveValue(mixed $value);
+    public function resolveValue(mixed $value): mixed;
 
     /**
      * Escape parameter placeholders %.

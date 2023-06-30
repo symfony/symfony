@@ -286,11 +286,9 @@ abstract class ConstraintValidatorTestCase extends TestCase
     }
 
     /**
-     * @return ConstraintValidatorInterface
-     *
-     * @psalm-return T
+     * @return T
      */
-    abstract protected function createValidator();
+    abstract protected function createValidator(): ConstraintValidatorInterface;
 }
 
 final class ConstraintViolationAssertion

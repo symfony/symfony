@@ -113,11 +113,17 @@ class DoctrineDataCollector extends DataCollector
         }
     }
 
+    /**
+     * @return array
+     */
     public function getManagers()
     {
         return $this->data['managers'];
     }
 
+    /**
+     * @return array
+     */
     public function getConnections()
     {
         return $this->data['connections'];
@@ -131,11 +137,17 @@ class DoctrineDataCollector extends DataCollector
         return array_sum(array_map('count', $this->data['queries']));
     }
 
+    /**
+     * @return array
+     */
     public function getQueries()
     {
         return $this->data['queries'];
     }
 
+    /**
+     * @return int
+     */
     public function getTime()
     {
         $time = 0;

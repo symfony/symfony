@@ -2831,7 +2831,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerWebhookConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
+    private function registerWebhookConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
         if (!class_exists(WebhookController::class)) {
             throw new LogicException('Webhook support cannot be enabled as the component is not installed. Try running "composer require symfony/webhook".');
@@ -2852,7 +2852,7 @@ class FrameworkExtension extends Extension
         $controller->replaceArgument(1, new Reference($config['message_bus']));
     }
 
-    private function registerRemoteEventConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
+    private function registerRemoteEventConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
         if (!class_exists(RemoteEvent::class)) {
             throw new LogicException('RemoteEvent support cannot be enabled as the component is not installed. Try running "composer require symfony/remote-event".');

@@ -129,6 +129,8 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
 
     /**
      * Sets the console output to use for printing logs.
+     *
+     * @return void
      */
     public function setOutput(OutputInterface $output)
     {
@@ -148,6 +150,8 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
     /**
      * Before a command is executed, the handler gets activated and the console output
      * is set in order to know where to write the logs.
+     *
+     * @return void
      */
     public function onCommand(ConsoleCommandEvent $event)
     {
@@ -161,6 +165,8 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
 
     /**
      * After a command has been executed, it disables the output.
+     *
+     * @return void
      */
     public function onTerminate(ConsoleTerminateEvent $event)
     {

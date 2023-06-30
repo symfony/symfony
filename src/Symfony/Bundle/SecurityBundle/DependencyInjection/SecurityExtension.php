@@ -593,7 +593,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         return [$matcher, $listeners, $exceptionListener, null !== $logoutListenerId ? new Reference($logoutListenerId) : null, $firewallAuthenticationProviders];
     }
 
-    private function createContextListener(ContainerBuilder $container, string $contextKey, ?string $firewallEventDispatcherId)
+    private function createContextListener(ContainerBuilder $container, string $contextKey, ?string $firewallEventDispatcherId): string
     {
         if (isset($this->contextListeners[$contextKey])) {
             return $this->contextListeners[$contextKey];

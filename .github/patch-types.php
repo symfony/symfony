@@ -73,11 +73,11 @@ foreach ($loader->getClassMap() as $class => $file) {
     $refl = new \ReflectionClass($class);
     foreach ($refl->getMethods() as $method) {
         if (
-            !$refl->isInterface()
-            || $method->getReturnType()
+            $method->getReturnType()
             || str_contains($method->getDocComment(), '@return')
             || str_starts_with($method->getName(), '__')
             || $method->getDeclaringClass()->getName() !== $class
+            || str_contains($method->getDeclaringClass()->getName(), '\\Test\\')
         ) {
             continue;
         }

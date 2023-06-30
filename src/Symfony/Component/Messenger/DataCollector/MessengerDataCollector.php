@@ -27,7 +27,7 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
 {
     private array $traceableBuses = [];
 
-    public function registerBus(string $name, TraceableMessageBus $bus)
+    public function registerBus(string $name, TraceableMessageBus $bus): void
     {
         $this->traceableBuses[$name] = $bus;
     }

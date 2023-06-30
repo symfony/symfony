@@ -150,7 +150,7 @@ jobs:
           git checkout src/Symfony/Contracts/Service/ResetInterface.php
           git diff --exit-code
 
-      - name: Check interface return types
+      - name: Check return types
         if: "matrix.php == '8.2' && ! matrix.mode"
         run: |
           php .github/patch-types.php lint

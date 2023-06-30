@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Deprecate `ContainerAwareInterface` and `ContainerAwareTrait`, use dependency injection instead
+ * Add `defined` env var processor that returns `true` for defined and neither null nor empty env vars
 
 6.3
 ---

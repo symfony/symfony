@@ -925,4 +925,21 @@ CSV;
             });
         }));
     }
+
+    /**
+     * @dataProvider provideGetEnvDefined
+     */
+    public function testGetEnvDefined(bool $expected, callable $callback)
+    {
+        $this->assertSame($expected, (new EnvVarProcessor(new Container()))->getEnv('defined', 'NO_SOMETHING', $callback));
+    }
+
+    public static function provideGetEnvDefined(): iterable
+    {
+        yield 'Defined' => [true, fn () => 'foo'];
+        yield 'Falsy but defined' => [true, fn () => '0'];
+        yield 'Empty string' => [false, fn () => ''];
+        yield 'Null' => [false, fn () => null];
+        yield 'Env var not defined' => [false, fn () => throw new EnvNotFoundException()];
+    }
 }

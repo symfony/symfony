@@ -56,6 +56,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             'require' => 'bool|int|float|string|array',
             'enum' => \BackedEnum::class,
             'shuffle' => 'array',
+            'defined' => 'bool',
         ];
     }
 
@@ -101,6 +102,14 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             }
 
             return $backedEnumClassName::tryFrom($backedEnumValue) ?? throw new RuntimeException(sprintf('Enum value "%s" is not backed by "%s".', $backedEnumValue, $backedEnumClassName));
+        }
+
+        if ('defined' === $prefix) {
+            try {
+                return '' !== ($getEnv($name) ?? '');
+            } catch (EnvNotFoundException) {
+                return false;
+            }
         }
 
         if ('default' === $prefix) {

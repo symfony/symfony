@@ -1864,7 +1864,7 @@ class Configuration implements ConfigurationInterface
                                     ->normalizeKeys(false)
                                     ->variablePrototype()->end()
                                 ->end()
-                                ->append($this->addHttpClientRetrySection())
+                                ->append($this->createHttpClientRetrySection())
                             ->end()
                         ->end()
                         ->scalarNode('mock_response_factory')
@@ -2012,7 +2012,7 @@ class Configuration implements ConfigurationInterface
                                         ->normalizeKeys(false)
                                         ->variablePrototype()->end()
                                     ->end()
-                                    ->append($this->addHttpClientRetrySection())
+                                    ->append($this->createHttpClientRetrySection())
                                 ->end()
                             ->end()
                         ->end()
@@ -2022,7 +2022,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addHttpClientRetrySection()
+    private function createHttpClientRetrySection(): ArrayNodeDefinition
     {
         $root = new NodeBuilder();
 
@@ -2226,7 +2226,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addRemoteEventSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
+    private function addRemoteEventSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
             ->children()

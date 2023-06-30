@@ -1,6 +1,18 @@
 CHANGELOG
 =========
 
+7.0
+---
+
+ * Remove `#[MapDecorated]`, use `#[AutowireDecorated]` instead
+ * Remove `ProxyHelper`, use `Symfony\Component\VarExporter\ProxyHelper` instead
+ * Remove `ReferenceSetArgumentTrait`
+ * Remove support of `@required` annotation, use the `Symfony\Contracts\Service\Attribute\Required` attribute instead
+ * Passing `null` to `ContainerAwareTrait::setContainer()` must be done explicitly
+ * Remove `PhpDumper` options `inline_factories_parameter` and `inline_class_loader_parameter`, use options `inline_factories` and `inline_class_loader` instead
+ * Parameter names of `ParameterBag` cannot be numerics
+ * Remove `ContainerAwareInterface` and `ContainerAwareTrait`, use dependency injection instead
+
 6.4
 ---
 

@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
 use Symfony\Component\Config\Exception\LoaderLoadException;
 use Symfony\Component\Config\FileLocator;
@@ -47,8 +46,6 @@ use Symfony\Component\ExpressionLanguage\Expression;
 
 class YamlFileLoaderTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     protected static $fixturesPath;
 
     public static function setUpBeforeClass(): void
@@ -422,13 +419,8 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals(new ServiceLocatorArgument($taggedIterator), $container->getDefinition('bar_service_tagged_locator')->getArgument(0));
     }
 
-    /**
-     * @group legacy
-     */
     public function testServiceWithServiceLocatorArgument()
     {
-        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Using integers as keys in a "!service_locator" tag is deprecated. The keys will default to the IDs of the original services in 7.0.');
-
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('services_with_service_locator_argument.yml');

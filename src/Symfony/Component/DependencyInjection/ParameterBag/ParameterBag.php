@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\ParameterBag;
 
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -106,9 +107,7 @@ class ParameterBag implements ParameterBagInterface
     public function set(string $name, array|bool|string|int|float|\UnitEnum|null $value)
     {
         if (is_numeric($name)) {
-            trigger_deprecation('symfony/dependency-injection', '6.2', sprintf('Using numeric parameter name "%s" is deprecated and will throw as of 7.0.', $name));
-            // uncomment the following line in 7.0
-            // throw new InvalidArgumentException(sprintf('The parameter name "%s" cannot be numeric.', $name));
+            throw new InvalidArgumentException(sprintf('The parameter name "%s" cannot be numeric.', $name));
         }
 
         $this->parameters[$name] = $value;

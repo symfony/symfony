@@ -19,7 +19,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -112,14 +111,7 @@ class Application extends BaseApplication
     {
         $this->registerCommands();
 
-        $command = parent::get($name);
-
-        if ($command instanceof ContainerAwareInterface) {
-            trigger_deprecation('symfony/dependency-injection', '6.4', 'Relying on "%s" to get the container in "%s" is deprecated, register the command as a service and use dependency injection instead.', ContainerAwareInterface::class, get_debug_type($command));
-            $command->setContainer($this->kernel->getContainer());
-        }
-
-        return $command;
+        return parent::get($name);
     }
 
     public function all(string $namespace = null): array

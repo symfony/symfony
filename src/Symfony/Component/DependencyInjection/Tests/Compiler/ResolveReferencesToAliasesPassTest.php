@@ -86,6 +86,8 @@ class ResolveReferencesToAliasesPassTest extends TestCase
     }
 
     /**
+     * The test should be kept in the group as it always expects a deprecation.
+     *
      * @group legacy
      */
     public function testDeprecationNoticeWhenReferencedByAlias()
@@ -106,6 +108,8 @@ class ResolveReferencesToAliasesPassTest extends TestCase
     }
 
     /**
+     * The test should be kept in the group as it always expects a deprecation.
+     *
      * @group legacy
      */
     public function testDeprecationNoticeWhenReferencedByDefinition()

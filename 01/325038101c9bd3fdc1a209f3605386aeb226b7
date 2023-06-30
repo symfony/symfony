@@ -1,0 +1,77 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-06-21T20:25:38Z
+
+> Blocking as the necessary CHANGELOG and UPGRADE guide changes are missing ;)
+
+Yeah 👍🏼 But I don't remember what are the new guidelines for 7.0. Is there a summary of what I must do for each files?
+
+---------------------------------------------------------------------------
+
+by tucksaun at 2023-06-22T02:47:36Z
+
+It was on my todo list for the summer, thank you for taking care of it 😌
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-06-23T13:29:37Z
+
+> Is there a summary of what I must do for each files?
+
+[UPGRADE-7.0.md](https://github.com/symfony/symfony/blob/6.4/UPGRADE-7.0.md) needs to be updated on the branch 7.0 for each deprecated feature that is removed. As [you tried before](https://github.com/symfony/symfony/commit/f8730746fde29a02582f4d81b8ec27cf91fc8fd4#diff-6d49df895edd288cee25c95df434ae329795980f8024cdeb33ccd66ab65fb52c).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-23T13:32:07Z
+
+See fabbot also (except the false-positive on the switch)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-06-28T22:07:36Z
+
+I don't know how to fix theses tests in https://github.com/symfony/symfony/actions/runs/5406243227/jobs/9822895029?pr=50736#step:8:9587
+
+```
+1) Symfony\Component\Messenger\Tests\Stamp\ErrorDetailsStampTest::testDeserialization
+Error: Interface "Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface" not found
+
+/home/runner/work/symfony/symfony/src/Symfony/Component/Messenger/Transport/Serialization/Normalizer/FlattenExceptionNormalizer.php:25
+/home/runner/work/symfony/symfony/src/Symfony/Component/Messenger/vendor/symfony/error-handler/DebugClassLoader.php:296
+/home/runner/work/symfony/symfony/src/Symfony/Component/Messenger/Tests/Stamp/ErrorDetailsStampTest.php:62
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-29T08:45:39Z
+
+> fix theses tests
+
+Can we stop using `ContextAwareNormalizerInterface` in Messenger on branch 6.4? If not, we'll have to declare on branch 6.4 that Messenger 6.4 doesn't work with serializer ^7
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-06-29T08:57:52Z
+
+I checked, and We don't allow 7 in lower branches
+https://github.com/symfony/symfony/blob/5.4/src/Symfony/Component/ErrorHandler/composer.json#L25
+
+> Can we stop using `ContextAwareNormalizerInterface` in Messenger on branch 6.4?
+
+I can check
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-06-29T11:33:25Z
+
+> Can we stop using `ContextAwareNormalizerInterface` in Messenger on branch 6.4?
+
+We probably can by dropping support for Serializer 5 which would be acceptable imho.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-06-29T18:24:11Z
+
+> Can we stop using `ContextAwareNormalizerInterface` in Messenger on branch 6.4
+
+Done ➡ https://github.com/symfony/symfony/pull/50824

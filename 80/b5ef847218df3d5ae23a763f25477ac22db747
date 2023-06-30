@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-06-30T00:01:32Z
+
+The description of #45034 was incorrect. The feature was merged into 6.2.
+
+I updated the requirement to `^6.2`. That doesn't change anything given the existing transitive dependency to `symfony/http-foundation: ^6.2.7`.

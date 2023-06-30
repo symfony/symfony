@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2023-06-27T13:37:34Z
+
+@stof your review has made me change my mind about some part of this PR. Modernizing the code of the toolbar means that many things will break. Let's keep the old code that works perfectly.
+
+This PR now only splits the toolbar code and modernizes the profiler code.
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2023-06-29T07:15:56Z
+
+Christophe, thanks for the new review. I've made all the changes that you proposed. Thanks!

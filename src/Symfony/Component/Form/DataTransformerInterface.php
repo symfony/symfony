@@ -58,13 +58,11 @@ interface DataTransformerInterface
      *
      * @param TValue|null $value The value in the original representation
      *
-     * @return mixed
-     *
-     * @psalm-return TTransformedValue|null
+     * @return TTransformedValue|null
      *
      * @throws TransformationFailedException when the transformation fails
      */
-    public function transform(mixed $value);
+    public function transform(mixed $value): mixed;
 
     /**
      * Transforms a value from the transformed representation to its original
@@ -89,11 +87,9 @@ interface DataTransformerInterface
      *
      * @param TTransformedValue|null $value The value in the transformed representation
      *
-     * @return mixed
-     *
-     * @psalm-return TValue|null
+     * @return TValue|null
      *
      * @throws TransformationFailedException when the transformation fails
      */
-    public function reverseTransform(mixed $value);
+    public function reverseTransform(mixed $value): mixed;
 }

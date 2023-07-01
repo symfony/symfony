@@ -236,6 +236,9 @@ class TextPart extends AbstractPart
         return ['_headers', 'body', 'charset', 'subtype', 'disposition', 'name', 'encoding'];
     }
 
+    /**
+     * @return void
+     */
     public function __wakeup()
     {
         $r = new \ReflectionProperty(AbstractPart::class, 'headers');

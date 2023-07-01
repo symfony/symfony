@@ -835,6 +835,9 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         return ['environment', 'debug'];
     }
 
+    /**
+     * @return void
+     */
     public function __wakeup()
     {
         if (\is_object($this->environment) || \is_object($this->debug)) {

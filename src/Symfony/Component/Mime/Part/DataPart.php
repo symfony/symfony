@@ -146,6 +146,9 @@ class DataPart extends TextPart
         return ['_headers', '_parent', 'filename', 'mediaType'];
     }
 
+    /**
+     * @return void
+     */
     public function __wakeup()
     {
         $r = new \ReflectionProperty(AbstractPart::class, 'headers');

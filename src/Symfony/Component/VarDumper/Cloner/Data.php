@@ -121,6 +121,9 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
         yield from $value;
     }
 
+    /**
+     * @return mixed
+     */
     public function __get(string $key)
     {
         if (null !== $data = $this->seek($key)) {

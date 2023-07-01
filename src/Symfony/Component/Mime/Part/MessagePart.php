@@ -65,7 +65,7 @@ class MessagePart extends DataPart
         return ['message'];
     }
 
-    public function __wakeup()
+    public function __wakeup(): void
     {
         $this->__construct($this->message);
     }

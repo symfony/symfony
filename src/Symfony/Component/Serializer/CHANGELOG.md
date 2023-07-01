@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Add `Version` and  `VersionConstraint` annotation/attributes to help versioning on normalize/denormalize operations
+
 6.3
 ---
 

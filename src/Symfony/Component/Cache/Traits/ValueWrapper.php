@@ -16,7 +16,7 @@
  *
  * @internal
  */
-class ©
+class Â©
 {
     private const EXPIRY_OFFSET = 1648206727;
     private const INT32_MAX = 2147483647;

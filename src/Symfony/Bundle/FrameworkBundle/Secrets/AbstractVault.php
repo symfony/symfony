@@ -40,10 +40,7 @@ abstract class AbstractVault
         }
     }
 
-    /**
-     * @return string
-     */
-    protected function getPrettyPath(string $path)
+    protected function getPrettyPath(string $path): string
     {
         return str_replace(getcwd().\DIRECTORY_SEPARATOR, '', $path);
     }

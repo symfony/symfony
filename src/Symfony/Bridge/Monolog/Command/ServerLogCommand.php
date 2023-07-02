@@ -50,10 +50,7 @@ class ServerLogCommand extends Command
         return parent::isEnabled();
     }
 
-    /**
-     * @return void
-     */
-    protected function configure()
+    protected function configure(): void
     {
         if (!class_exists(ConsoleFormatter::class)) {
             return;

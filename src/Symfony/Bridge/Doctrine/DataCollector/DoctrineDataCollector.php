@@ -39,10 +39,7 @@ class DoctrineDataCollector extends DataCollector
         $this->managers = $registry->getManagerNames();
     }
 
-    /**
-     * @return void
-     */
-    public function collect(Request $request, Response $response, \Throwable $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null): void
     {
         $this->data = [
             'queries' => $this->collectQueries(),
@@ -62,51 +59,33 @@ class DoctrineDataCollector extends DataCollector
         return $queries;
     }
 
-    /**
-     * @return void
-     */
-    public function reset()
+    public function reset(): void
     {
         $this->data = [];
         $this->debugDataHolder->reset();
     }
 
-    /**
-     * @return array
-     */
-    public function getManagers()
+    public function getManagers(): array
     {
         return $this->data['managers'];
     }
 
-    /**
-     * @return array
-     */
-    public function getConnections()
+    public function getConnections(): array
     {
         return $this->data['connections'];
     }
 
-    /**
-     * @return int
-     */
-    public function getQueryCount()
+    public function getQueryCount(): int
     {
         return array_sum(array_map('count', $this->data['queries']));
     }
 
-    /**
-     * @return array
-     */
-    public function getQueries()
+    public function getQueries(): array
     {
         return $this->data['queries'];
     }
 
-    /**
-     * @return int
-     */
-    public function getTime()
+    public function getTime(): int
     {
         $time = 0;
         foreach ($this->data['queries'] as $queries) {

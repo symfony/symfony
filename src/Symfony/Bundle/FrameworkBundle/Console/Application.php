@@ -51,10 +51,7 @@ class Application extends BaseApplication
         return $this->kernel;
     }
 
-    /**
-     * @return void
-     */
-    public function reset()
+    public function reset(): void
     {
         if ($this->kernel->getContainer()->has('services_resetter')) {
             $this->kernel->getContainer()->get('services_resetter')->reset();
@@ -133,10 +130,7 @@ class Application extends BaseApplication
         return parent::add($command);
     }
 
-    /**
-     * @return void
-     */
-    protected function registerCommands()
+    protected function registerCommands(): void
     {
         if ($this->commandsRegistered) {
             return;

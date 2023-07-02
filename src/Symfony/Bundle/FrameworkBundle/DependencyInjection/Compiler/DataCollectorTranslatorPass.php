@@ -20,10 +20,7 @@ use Symfony\Component\Translation\TranslatorBagInterface;
  */
 class DataCollectorTranslatorPass implements CompilerPassInterface
 {
-    /**
-     * @return void
-     */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->has('translator')) {
             return;

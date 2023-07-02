@@ -25,10 +25,8 @@ abstract class Helper implements HelperInterface
 
     /**
      * Sets the default charset.
-     *
-     * @return void
      */
-    public function setCharset(string $charset)
+    public function setCharset(string $charset): void
     {
         $this->charset = $charset;
     }

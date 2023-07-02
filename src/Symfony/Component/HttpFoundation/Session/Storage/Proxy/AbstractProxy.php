@@ -71,11 +71,9 @@ abstract class AbstractProxy
     /**
      * Sets the session ID.
      *
-     * @return void
-     *
      * @throws \LogicException
      */
-    public function setId(string $id)
+    public function setId(string $id): void
     {
         if ($this->isActive()) {
             throw new \LogicException('Cannot change the ID of an active session.');
@@ -95,11 +93,9 @@ abstract class AbstractProxy
     /**
      * Sets the session name.
      *
-     * @return void
-     *
      * @throws \LogicException
      */
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         if ($this->isActive()) {
             throw new \LogicException('Cannot change the name of an active session.');

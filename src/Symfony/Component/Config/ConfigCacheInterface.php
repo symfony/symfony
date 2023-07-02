@@ -39,9 +39,7 @@ interface ConfigCacheInterface
      * @param string                   $content  The content to write into the cache
      * @param ResourceInterface[]|null $metadata An array of ResourceInterface instances
      *
-     * @return void
-     *
      * @throws \RuntimeException When the cache file cannot be written
      */
-    public function write(string $content, array $metadata = null);
+    public function write(string $content, array $metadata = null): void;
 }

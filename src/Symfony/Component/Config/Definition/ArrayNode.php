@@ -32,10 +32,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     protected $removeExtraKeys = true;
     protected $normalizeKeys = true;
 
-    /**
-     * @return void
-     */
-    public function setNormalizeKeys(bool $normalizeKeys)
+    public function setNormalizeKeys(bool $normalizeKeys): void
     {
         $this->normalizeKeys = $normalizeKeys;
     }
@@ -80,10 +77,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * Sets the xml remappings that should be performed.
      *
      * @param array $remappings An array of the form [[string, string]]
-     *
-     * @return void
      */
-    public function setXmlRemappings(array $remappings)
+    public function setXmlRemappings(array $remappings): void
     {
         $this->xmlRemappings = $remappings;
     }
@@ -101,40 +96,32 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Sets whether to add default values for this array if it has not been
      * defined in any of the configuration files.
-     *
-     * @return void
      */
-    public function setAddIfNotSet(bool $boolean)
+    public function setAddIfNotSet(bool $boolean): void
     {
         $this->addIfNotSet = $boolean;
     }
 
     /**
      * Sets whether false is allowed as value indicating that the array should be unset.
-     *
-     * @return void
      */
-    public function setAllowFalse(bool $allow)
+    public function setAllowFalse(bool $allow): void
     {
         $this->allowFalse = $allow;
     }
 
     /**
      * Sets whether new keys can be defined in subsequent configurations.
-     *
-     * @return void
      */
-    public function setAllowNewKeys(bool $allow)
+    public function setAllowNewKeys(bool $allow): void
     {
         $this->allowNewKeys = $allow;
     }
 
     /**
      * Sets if deep merging should occur.
-     *
-     * @return void
      */
-    public function setPerformDeepMerging(bool $boolean)
+    public function setPerformDeepMerging(bool $boolean): void
     {
         $this->performDeepMerging = $boolean;
     }
@@ -144,10 +131,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @param bool $boolean To allow extra keys
      * @param bool $remove  To remove extra keys
-     *
-     * @return void
      */
-    public function setIgnoreExtraKeys(bool $boolean, bool $remove = true)
+    public function setIgnoreExtraKeys(bool $boolean, bool $remove = true): void
     {
         $this->ignoreExtraKeys = $boolean;
         $this->removeExtraKeys = $this->ignoreExtraKeys && $remove;
@@ -161,10 +146,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         return $this->ignoreExtraKeys;
     }
 
-    /**
-     * @return void
-     */
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
@@ -193,12 +175,10 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Adds a child node.
      *
-     * @return void
-     *
      * @throws \InvalidArgumentException when the child node has no name
      * @throws \InvalidArgumentException when the child node's name is not unique
      */
-    public function addChild(NodeInterface $node)
+    public function addChild(NodeInterface $node): void
     {
         $name = $node->getName();
         if ('' === $name) {
@@ -258,10 +238,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         return $value;
     }
 
-    /**
-     * @return void
-     */
-    protected function validateType(mixed $value)
+    protected function validateType(mixed $value): void
     {
         if (!\is_array($value) && (!$this->allowFalse || false !== $value)) {
             $ex = new InvalidTypeException(sprintf('Invalid type for path "%s". Expected "array", but got "%s"', $this->getPath(), get_debug_type($value)));

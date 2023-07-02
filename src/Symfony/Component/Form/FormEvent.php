@@ -45,10 +45,8 @@ class FormEvent extends Event
 
     /**
      * Allows updating with some filtered data.
-     *
-     * @return void
      */
-    public function setData(mixed $data)
+    public function setData(mixed $data): void
     {
         $this->data = $data;
     }

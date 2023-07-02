@@ -63,20 +63,16 @@ abstract class AbstractBrowser
 
     /**
      * Sets whether to automatically follow redirects or not.
-     *
-     * @return void
      */
-    public function followRedirects(bool $followRedirects = true)
+    public function followRedirects(bool $followRedirects = true): void
     {
         $this->followRedirects = $followRedirects;
     }
 
     /**
      * Sets whether to automatically follow meta refresh redirects or not.
-     *
-     * @return void
      */
-    public function followMetaRefresh(bool $followMetaRefresh = true)
+    public function followMetaRefresh(bool $followMetaRefresh = true): void
     {
         $this->followMetaRefresh = $followMetaRefresh;
     }
@@ -91,10 +87,8 @@ abstract class AbstractBrowser
 
     /**
      * Sets the maximum number of redirects that crawler can follow.
-     *
-     * @return void
      */
-    public function setMaxRedirects(int $maxRedirects)
+    public function setMaxRedirects(int $maxRedirects): void
     {
         $this->maxRedirects = $maxRedirects < 0 ? -1 : $maxRedirects;
         $this->followRedirects = -1 !== $this->maxRedirects;
@@ -111,11 +105,9 @@ abstract class AbstractBrowser
     /**
      * Sets the insulated flag.
      *
-     * @return void
-     *
      * @throws LogicException When Symfony Process Component is not installed
      */
-    public function insulate(bool $insulated = true)
+    public function insulate(bool $insulated = true): void
     {
         if ($insulated && !class_exists(\Symfony\Component\Process\Process::class)) {
             throw new LogicException('Unable to isolate requests as the Symfony Process Component is not installed. Try running "composer require symfony/process".');
@@ -126,10 +118,8 @@ abstract class AbstractBrowser
 
     /**
      * Sets server parameters.
-     *
-     * @return void
      */
-    public function setServerParameters(array $server)
+    public function setServerParameters(array $server): void
     {
         $this->server = array_merge([
             'HTTP_USER_AGENT' => 'Symfony BrowserKit',
@@ -138,10 +128,8 @@ abstract class AbstractBrowser
 
     /**
      * Sets single server parameter.
-     *
-     * @return void
      */
-    public function setServerParameter(string $key, string $value)
+    public function setServerParameter(string $key, string $value): void
     {
         $this->server[$key] = $value;
     }
@@ -436,11 +424,9 @@ abstract class AbstractBrowser
     /**
      * Makes a request in another process.
      *
-     * @return object
-     *
      * @throws \RuntimeException When processing returns exit code
      */
-    protected function doRequestInProcess(object $request)
+    protected function doRequestInProcess(object $request): object
     {
         $deprecationsFile = tempnam(sys_get_temp_dir(), 'deprec');
         putenv('SYMFONY_DEPRECATIONS_SERIALIZE='.$deprecationsFile);
@@ -470,41 +456,33 @@ abstract class AbstractBrowser
 
     /**
      * Makes a request.
-     *
-     * @return object
      */
-    abstract protected function doRequest(object $request);
+    abstract protected function doRequest(object $request): object;
 
     /**
      * Returns the script to execute when the request must be insulated.
      *
      * @param object $request An origin request instance
      *
-     * @return string
-     *
      * @throws LogicException When this abstract class is not implemented
      */
-    protected function getScript(object $request)
+    protected function getScript(object $request): string
     {
         throw new LogicException('To insulate requests, you need to override the getScript() method.');
     }
 
     /**
      * Filters the BrowserKit request to the origin one.
-     *
-     * @return object
      */
-    protected function filterRequest(Request $request)
+    protected function filterRequest(Request $request): object
     {
         return $request;
     }
 
     /**
      * Filters the origin response to the BrowserKit one.
-     *
-     * @return Response
      */
-    protected function filterResponse(object $response)
+    protected function filterResponse(object $response): Response
     {
         return $response;
     }
@@ -626,10 +604,8 @@ abstract class AbstractBrowser
      * Restarts the client.
      *
      * It flushes history and all cookies.
-     *
-     * @return void
      */
-    public function restart()
+    public function restart(): void
     {
         $this->cookieJar->clear();
         $this->history->clear();

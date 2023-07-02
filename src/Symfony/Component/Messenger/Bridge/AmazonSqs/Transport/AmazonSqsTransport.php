@@ -34,7 +34,7 @@ class AmazonSqsTransport implements TransportInterface, SetupableTransportInterf
     private ?SenderInterface $sender;
 
     /**
-     * @param MessageCountAwareInterface&ReceiverInterface|null $receiver
+     * @param (MessageCountAwareInterface&ReceiverInterface)|null $receiver
      */
     public function __construct(Connection $connection, SerializerInterface $serializer = null, ReceiverInterface $receiver = null, SenderInterface $sender = null)
     {
@@ -78,10 +78,7 @@ class AmazonSqsTransport implements TransportInterface, SetupableTransportInterf
         }
     }
 
-    /**
-     * @return void
-     */
-    public function reset()
+    public function reset(): void
     {
         try {
             $this->connection->reset();
@@ -90,10 +87,7 @@ class AmazonSqsTransport implements TransportInterface, SetupableTransportInterf
         }
     }
 
-    /**
-     * @return MessageCountAwareInterface&ReceiverInterface
-     */
-    private function getReceiver(): ReceiverInterface
+    private function getReceiver(): MessageCountAwareInterface&ReceiverInterface
     {
         return $this->receiver ??= new AmazonSqsReceiver($this->connection, $this->serializer);
     }

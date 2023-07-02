@@ -60,20 +60,16 @@ class ParameterBag implements \IteratorAggregate, \Countable
 
     /**
      * Replaces the current parameters by a new set.
-     *
-     * @return void
      */
-    public function replace(array $parameters = [])
+    public function replace(array $parameters = []): void
     {
         $this->parameters = $parameters;
     }
 
     /**
      * Adds parameters.
-     *
-     * @return void
      */
-    public function add(array $parameters = [])
+    public function add(array $parameters = []): void
     {
         $this->parameters = array_replace($this->parameters, $parameters);
     }
@@ -83,10 +79,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
         return \array_key_exists($key, $this->parameters) ? $this->parameters[$key] : $default;
     }
 
-    /**
-     * @return void
-     */
-    public function set(string $key, mixed $value)
+    public function set(string $key, mixed $value): void
     {
         $this->parameters[$key] = $value;
     }
@@ -101,10 +94,8 @@ class ParameterBag implements \IteratorAggregate, \Countable
 
     /**
      * Removes a parameter.
-     *
-     * @return void
      */
-    public function remove(string $key)
+    public function remove(string $key): void
     {
         unset($this->parameters[$key]);
     }

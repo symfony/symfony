@@ -34,18 +34,12 @@ class ServiceReferenceGraphNode
         $this->value = $value;
     }
 
-    /**
-     * @return void
-     */
-    public function addInEdge(ServiceReferenceGraphEdge $edge)
+    public function addInEdge(ServiceReferenceGraphEdge $edge): void
     {
         $this->inEdges[] = $edge;
     }
 
-    /**
-     * @return void
-     */
-    public function addOutEdge(ServiceReferenceGraphEdge $edge)
+    public function addOutEdge(ServiceReferenceGraphEdge $edge): void
     {
         $this->outEdges[] = $edge;
     }
@@ -104,10 +98,8 @@ class ServiceReferenceGraphNode
 
     /**
      * Clears all edges.
-     *
-     * @return void
      */
-    public function clear()
+    public function clear(): void
     {
         $this->inEdges = $this->outEdges = [];
     }

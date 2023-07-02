@@ -21,10 +21,7 @@ trait NormalizerAwareTrait
      */
     protected $normalizer;
 
-    /**
-     * @return void
-     */
-    public function setNormalizer(NormalizerInterface $normalizer)
+    public function setNormalizer(NormalizerInterface $normalizer): void
     {
         $this->normalizer = $normalizer;
     }

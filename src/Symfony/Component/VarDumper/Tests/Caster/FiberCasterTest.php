@@ -20,7 +20,7 @@ class FiberCasterTest extends TestCase
 
     public function testCastFiberNotStarted()
     {
-        $fiber = new \Fiber(static fn() => true);
+        $fiber = new \Fiber(static fn () => true);
 
         $expected = <<<EODUMP
 Fiber {

@@ -384,10 +384,7 @@ class Email extends Message
         return $this->generateBody();
     }
 
-    /**
-     * @return void
-     */
-    public function ensureValidity()
+    public function ensureValidity(): void
     {
         $this->ensureBodyValid();
 

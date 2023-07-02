@@ -27,7 +27,7 @@ class SignalRegistryTest extends TestCase
             if (9 === $i) {
                 continue;
             }
-            pcntl_signal($i, SIG_DFL);
+            pcntl_signal($i, \SIG_DFL);
         }
     }
 

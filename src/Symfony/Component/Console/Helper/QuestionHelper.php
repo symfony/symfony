@@ -89,10 +89,8 @@ class QuestionHelper extends Helper
 
     /**
      * Prevents usage of stty.
-     *
-     * @return void
      */
-    public static function disableStty()
+    public static function disableStty(): void
     {
         self::$stty = false;
     }
@@ -190,10 +188,8 @@ class QuestionHelper extends Helper
 
     /**
      * Outputs the question prompt.
-     *
-     * @return void
      */
-    protected function writePrompt(OutputInterface $output, Question $question)
+    protected function writePrompt(OutputInterface $output, Question $question): void
     {
         $message = $question->getQuestion();
 
@@ -228,10 +224,8 @@ class QuestionHelper extends Helper
 
     /**
      * Outputs an error message.
-     *
-     * @return void
      */
-    protected function writeError(OutputInterface $output, \Exception $error)
+    protected function writeError(OutputInterface $output, \Exception $error): void
     {
         if (null !== $this->getHelperSet() && $this->getHelperSet()->has('formatter')) {
             $message = $this->getHelperSet()->get('formatter')->formatBlock($error->getMessage(), 'error');

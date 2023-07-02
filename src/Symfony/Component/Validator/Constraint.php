@@ -51,8 +51,6 @@ abstract class Constraint
 
     /**
      * Domain-specific data attached to a constraint.
-     *
-     * @var mixed
      */
     public $payload;
 
@@ -181,11 +179,9 @@ abstract class Constraint
      * this method will be called at most once per constraint instance and
      * option name.
      *
-     * @return void
-     *
      * @throws InvalidOptionsException If an invalid option name is given
      */
-    public function __set(string $option, mixed $value)
+    public function __set(string $option, mixed $value): void
     {
         if ('groups' === $option) {
             $this->groups = (array) $value;
@@ -223,10 +219,8 @@ abstract class Constraint
 
     /**
      * Adds the given group if this constraint is in the Default group.
-     *
-     * @return void
      */
-    public function addImplicitGroupName(string $group)
+    public function addImplicitGroupName(string $group): void
     {
         if (null === $this->groups && \array_key_exists('groups', (array) $this)) {
             throw new \LogicException(sprintf('"%s::$groups" is set to null. Did you forget to call "%s::__construct()"?', static::class, self::class));
@@ -242,11 +236,9 @@ abstract class Constraint
      *
      * Override this method to define a default option.
      *
-     * @return string|null
-     *
      * @see __construct()
      */
-    public function getDefaultOption()
+    public function getDefaultOption(): ?string
     {
         return null;
     }
@@ -260,7 +252,7 @@ abstract class Constraint
      *
      * @see __construct()
      */
-    public function getRequiredOptions()
+    public function getRequiredOptions(): array
     {
         return [];
     }
@@ -271,10 +263,8 @@ abstract class Constraint
      * By default, this is the fully qualified name of the constraint class
      * suffixed with "Validator". You can override this method to change that
      * behavior.
-     *
-     * @return string
      */
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return static::class.'Validator';
     }
@@ -288,7 +278,7 @@ abstract class Constraint
      *
      * @return string|string[] One or more constant values
      */
-    public function getTargets()
+    public function getTargets(): string|array
     {
         return self::PROPERTY_CONSTRAINT;
     }

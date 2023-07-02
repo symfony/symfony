@@ -89,7 +89,7 @@ class AppKernel extends Kernel implements ExtensionInterface, ConfigurationInter
         return ['varDir', 'testCase', 'rootConfig', 'environment', 'debug'];
     }
 
-    public function __wakeup()
+    public function __wakeup(): void
     {
         foreach ($this as $k => $v) {
             if (\is_object($v)) {

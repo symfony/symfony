@@ -763,7 +763,7 @@ class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
     {
     }
 
-    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = [])
+    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = []): void
     {
         $object->$attribute = $value;
     }
@@ -963,7 +963,7 @@ class AbstractObjectNormalizerWithMetadata extends AbstractObjectNormalizer
     {
     }
 
-    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = [])
+    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = []): void
     {
         if (property_exists($object, $attribute)) {
             $object->$attribute = $value;
@@ -1084,7 +1084,7 @@ class AbstractObjectNormalizerCollectionDummy extends AbstractObjectNormalizer
     {
     }
 
-    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = [])
+    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = []): void
     {
         $object->$attribute = $value;
     }
@@ -1141,7 +1141,7 @@ class ArrayDenormalizerDummy implements DenormalizerInterface, SerializerAwareIn
             && $this->serializer->supportsDenormalization($data, substr($type, 0, -2), $format, $context);
     }
 
-    public function setSerializer(SerializerInterface $serializer)
+    public function setSerializer(SerializerInterface $serializer): void
     {
         $this->serializer = $serializer;
     }

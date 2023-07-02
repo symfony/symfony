@@ -37,10 +37,7 @@ class TokenStorage implements TokenStorageInterface, ResetInterface
         return $this->token;
     }
 
-    /**
-     * @return void
-     */
-    public function setToken(?TokenInterface $token)
+    public function setToken(?TokenInterface $token): void
     {
         if ($token) {
             // ensure any initializer is called
@@ -56,10 +53,7 @@ class TokenStorage implements TokenStorageInterface, ResetInterface
         $this->initializer = null === $initializer ? null : $initializer(...);
     }
 
-    /**
-     * @return void
-     */
-    public function reset()
+    public function reset(): void
     {
         $this->setToken(null);
     }

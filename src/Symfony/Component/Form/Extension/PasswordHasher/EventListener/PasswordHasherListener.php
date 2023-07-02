@@ -35,10 +35,7 @@ class PasswordHasherListener
         $this->propertyAccessor ??= PropertyAccess::createPropertyAccessor();
     }
 
-    /**
-     * @return void
-     */
-    public function registerPassword(FormEvent $event)
+    public function registerPassword(FormEvent $event): void
     {
         if (null === $event->getData() || '' === $event->getData()) {
             return;
@@ -53,10 +50,7 @@ class PasswordHasherListener
         ];
     }
 
-    /**
-     * @return void
-     */
-    public function hashPasswords(FormEvent $event)
+    public function hashPasswords(FormEvent $event): void
     {
         $form = $event->getForm();
 

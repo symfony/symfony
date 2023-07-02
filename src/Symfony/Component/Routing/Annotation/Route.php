@@ -76,26 +76,17 @@ class Route
         }
     }
 
-    /**
-     * @return void
-     */
-    public function setPath(string $path)
+    public function setPath(string $path): void
     {
         $this->path = $path;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getPath()
+    public function getPath(): ?string
     {
         return $this->path;
     }
 
-    /**
-     * @return void
-     */
-    public function setLocalizedPaths(array $localizedPaths)
+    public function setLocalizedPaths(array $localizedPaths): void
     {
         $this->localizedPaths = $localizedPaths;
     }
@@ -105,130 +96,82 @@ class Route
         return $this->localizedPaths;
     }
 
-    /**
-     * @return void
-     */
-    public function setHost(string $pattern)
+    public function setHost(string $pattern): void
     {
         $this->host = $pattern;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getHost()
+    public function getHost(): ?string
     {
         return $this->host;
     }
 
-    /**
-     * @return void
-     */
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    /**
-     * @return void
-     */
-    public function setRequirements(array $requirements)
+    public function setRequirements(array $requirements): void
     {
         $this->requirements = $requirements;
     }
 
-    /**
-     * @return array
-     */
-    public function getRequirements()
+    public function getRequirements(): array
     {
         return $this->requirements;
     }
 
-    /**
-     * @return void
-     */
-    public function setOptions(array $options)
+    public function setOptions(array $options): void
     {
         $this->options = $options;
     }
 
-    /**
-     * @return array
-     */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }
 
-    /**
-     * @return void
-     */
-    public function setDefaults(array $defaults)
+    public function setDefaults(array $defaults): void
     {
         $this->defaults = $defaults;
     }
 
-    /**
-     * @return array
-     */
-    public function getDefaults()
+    public function getDefaults(): array
     {
         return $this->defaults;
     }
 
-    /**
-     * @return void
-     */
-    public function setSchemes(array|string $schemes)
+    public function setSchemes(array|string $schemes): void
     {
         $this->schemes = (array) $schemes;
     }
 
-    /**
-     * @return array
-     */
-    public function getSchemes()
+    public function getSchemes(): array
     {
         return $this->schemes;
     }
 
-    /**
-     * @return void
-     */
-    public function setMethods(array|string $methods)
+    public function setMethods(array|string $methods): void
     {
         $this->methods = (array) $methods;
     }
 
-    /**
-     * @return array
-     */
-    public function getMethods()
+    public function getMethods(): array
     {
         return $this->methods;
     }
 
-    /**
-     * @return void
-     */
-    public function setCondition(?string $condition)
+    public function setCondition(?string $condition): void
     {
         $this->condition = $condition;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getCondition()
+    public function getCondition(): ?string
     {
         return $this->condition;
     }

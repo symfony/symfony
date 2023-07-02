@@ -110,13 +110,11 @@ class ExpressionLanguage
      * @param callable $compiler  A callable able to compile the function
      * @param callable $evaluator A callable able to evaluate the function
      *
-     * @return void
-     *
      * @throws \LogicException when registering a function after calling evaluate(), compile() or parse()
      *
      * @see ExpressionFunction
      */
-    public function register(string $name, callable $compiler, callable $evaluator)
+    public function register(string $name, callable $compiler, callable $evaluator): void
     {
         if (isset($this->parser)) {
             throw new \LogicException('Registering functions after calling evaluate(), compile() or parse() is not supported.');
@@ -125,28 +123,19 @@ class ExpressionLanguage
         $this->functions[$name] = ['compiler' => $compiler, 'evaluator' => $evaluator];
     }
 
-    /**
-     * @return void
-     */
-    public function addFunction(ExpressionFunction $function)
+    public function addFunction(ExpressionFunction $function): void
     {
         $this->register($function->getName(), $function->getCompiler(), $function->getEvaluator());
     }
 
-    /**
-     * @return void
-     */
-    public function registerProvider(ExpressionFunctionProviderInterface $provider)
+    public function registerProvider(ExpressionFunctionProviderInterface $provider): void
     {
         foreach ($provider->getFunctions() as $function) {
             $this->addFunction($function);
         }
     }
 
-    /**
-     * @return void
-     */
-    protected function registerFunctions()
+    protected function registerFunctions(): void
     {
         $this->addFunction(ExpressionFunction::fromPhp('constant'));
 

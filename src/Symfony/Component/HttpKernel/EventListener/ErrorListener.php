@@ -51,10 +51,7 @@ class ErrorListener implements EventSubscriberInterface
         $this->exceptionsMapping = $exceptionsMapping;
     }
 
-    /**
-     * @return void
-     */
-    public function logKernelException(ExceptionEvent $event)
+    public function logKernelException(ExceptionEvent $event): void
     {
         $throwable = $event->getThrowable();
         $logLevel = $this->resolveLogLevel($throwable);
@@ -92,10 +89,7 @@ class ErrorListener implements EventSubscriberInterface
         $this->logException($throwable, sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', $e->getClass(), $e->getMessage(), $e->getFile(), $e->getLine()), $logLevel);
     }
 
-    /**
-     * @return void
-     */
-    public function onKernelException(ExceptionEvent $event)
+    public function onKernelException(ExceptionEvent $event): void
     {
         if (null === $this->controller) {
             return;
@@ -138,10 +132,7 @@ class ErrorListener implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @return void
-     */
-    public function onControllerArguments(ControllerArgumentsEvent $event)
+    public function onControllerArguments(ControllerArgumentsEvent $event): void
     {
         $e = $event->getRequest()->attributes->get('exception');
 

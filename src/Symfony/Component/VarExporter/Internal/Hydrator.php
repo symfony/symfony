@@ -254,10 +254,7 @@ class Hydrator
         };
     }
 
-    /**
-     * @return array
-     */
-    public static function getPropertyScopes($class)
+    public static function getPropertyScopes($class): array
     {
         $propertyScopes = [];
         $r = new \ReflectionClass($class);

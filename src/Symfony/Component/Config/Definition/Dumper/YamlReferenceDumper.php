@@ -30,18 +30,12 @@ class YamlReferenceDumper
 {
     private ?string $reference = null;
 
-    /**
-     * @return string
-     */
-    public function dump(ConfigurationInterface $configuration)
+    public function dump(ConfigurationInterface $configuration): string
     {
         return $this->dumpNode($configuration->getConfigTreeBuilder()->buildTree());
     }
 
-    /**
-     * @return string
-     */
-    public function dumpAtPath(ConfigurationInterface $configuration, string $path)
+    public function dumpAtPath(ConfigurationInterface $configuration, string $path): string
     {
         $rootNode = $node = $configuration->getConfigTreeBuilder()->buildTree();
 
@@ -67,10 +61,7 @@ class YamlReferenceDumper
         return $this->dumpNode($node);
     }
 
-    /**
-     * @return string
-     */
-    public function dumpNode(NodeInterface $node)
+    public function dumpNode(NodeInterface $node): string
     {
         $this->reference = '';
         $this->writeNode($node);

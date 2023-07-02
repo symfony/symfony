@@ -38,26 +38,17 @@ class Event extends BaseEvent
         $this->context = $context;
     }
 
-    /**
-     * @return Marking
-     */
-    public function getMarking()
+    public function getMarking(): Marking
     {
         return $this->marking;
     }
 
-    /**
-     * @return object
-     */
-    public function getSubject()
+    public function getSubject(): object
     {
         return $this->subject;
     }
 
-    /**
-     * @return Transition|null
-     */
-    public function getTransition()
+    public function getTransition(): ?Transition
     {
         return $this->transition;
     }
@@ -67,18 +58,12 @@ class Event extends BaseEvent
         return $this->workflow;
     }
 
-    /**
-     * @return string
-     */
-    public function getWorkflowName()
+    public function getWorkflowName(): string
     {
         return $this->workflow->getName();
     }
 
-    /**
-     * @return mixed
-     */
-    public function getMetadata(string $key, string|Transition|null $subject)
+    public function getMetadata(string $key, string|Transition|null $subject): mixed
     {
         return $this->workflow->getMetadataStore()->getMetadata($key, $subject);
     }

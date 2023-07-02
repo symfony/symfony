@@ -27,7 +27,7 @@ namespace Symfony\Contracts\Service;
 interface ResetInterface
 {
     /**
-     * @return void
+     * @return void Not natively enforced to keep compatibility with implementations that do have a return value
      */
     public function reset();
 }

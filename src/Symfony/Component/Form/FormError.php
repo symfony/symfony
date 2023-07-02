@@ -99,11 +99,9 @@ class FormError
      *
      * This method must only be called once.
      *
-     * @return void
-     *
      * @throws BadMethodCallException If the method is called more than once
      */
-    public function setOrigin(FormInterface $origin)
+    public function setOrigin(FormInterface $origin): void
     {
         if (null !== $this->origin) {
             throw new BadMethodCallException('setOrigin() must only be called once.');

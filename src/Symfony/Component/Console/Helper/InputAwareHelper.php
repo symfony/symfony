@@ -23,10 +23,7 @@ abstract class InputAwareHelper extends Helper implements InputAwareInterface
 {
     protected $input;
 
-    /**
-     * @return void
-     */
-    public function setInput(InputInterface $input)
+    public function setInput(InputInterface $input): void
     {
         $this->input = $input;
     }

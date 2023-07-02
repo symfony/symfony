@@ -16,7 +16,6 @@ use Symfony\Component\Notifier\Bridge\Smsmode\SmsmodeOptions;
 use Symfony\Component\Notifier\Bridge\Smsmode\SmsmodeTransport;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Tests\Transport\DummyMessage;

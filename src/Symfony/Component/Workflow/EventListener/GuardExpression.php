@@ -24,18 +24,12 @@ class GuardExpression
         $this->expression = $expression;
     }
 
-    /**
-     * @return Transition
-     */
-    public function getTransition()
+    public function getTransition(): Transition
     {
         return $this->transition;
     }
 
-    /**
-     * @return string
-     */
-    public function getExpression()
+    public function getExpression(): string
     {
         return $this->expression;
     }

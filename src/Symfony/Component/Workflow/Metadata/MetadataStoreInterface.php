@@ -34,8 +34,6 @@ interface MetadataStoreInterface
      * @param string|Transition|null $subject Use null to get workflow metadata
      *                                        Use a string (the place name) to get place metadata
      *                                        Use a Transition instance to get transition metadata
-     *
-     * @return mixed
      */
-    public function getMetadata(string $key, string|Transition $subject = null);
+    public function getMetadata(string $key, string|Transition $subject = null): mixed;
 }

@@ -47,10 +47,7 @@ class ParameterNotFoundException extends InvalidArgumentException implements Not
         $this->updateRepr();
     }
 
-    /**
-     * @return void
-     */
-    public function updateRepr()
+    public function updateRepr(): void
     {
         if (null !== $this->sourceId) {
             $this->message = sprintf('The service "%s" has a dependency on a non-existent parameter "%s".', $this->sourceId, $this->key);
@@ -74,44 +71,29 @@ class ParameterNotFoundException extends InvalidArgumentException implements Not
         }
     }
 
-    /**
-     * @return string
-     */
-    public function getKey()
+    public function getKey(): string
     {
         return $this->key;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getSourceId()
+    public function getSourceId(): ?string
     {
         return $this->sourceId;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getSourceKey()
+    public function getSourceKey(): ?string
     {
         return $this->sourceKey;
     }
 
-    /**
-     * @return void
-     */
-    public function setSourceId(?string $sourceId)
+    public function setSourceId(?string $sourceId): void
     {
         $this->sourceId = $sourceId;
 
         $this->updateRepr();
     }
 
-    /**
-     * @return void
-     */
-    public function setSourceKey(?string $sourceKey)
+    public function setSourceKey(?string $sourceKey): void
     {
         $this->sourceKey = $sourceKey;
 

@@ -31,10 +31,7 @@ class RedisStore implements PersistingStoreInterface
     ) {
     }
 
-    /**
-     * @return void
-     */
-    public function save(Key $key, float $ttlInSecond)
+    public function save(Key $key, float $ttlInSecond): void
     {
         if (0 > $ttlInSecond) {
             throw new InvalidArgumentException("The TTL should be greater than 0, '$ttlInSecond' given.");
@@ -97,10 +94,7 @@ class RedisStore implements PersistingStoreInterface
         }
     }
 
-    /**
-     * @return void
-     */
-    public function putOffExpiration(Key $key, float $ttlInSecond)
+    public function putOffExpiration(Key $key, float $ttlInSecond): void
     {
         if (0 > $ttlInSecond) {
             throw new InvalidArgumentException("The TTL should be greater than 0, '$ttlInSecond' given.");
@@ -142,10 +136,7 @@ class RedisStore implements PersistingStoreInterface
         }
     }
 
-    /**
-     * @return void
-     */
-    public function delete(Key $key)
+    public function delete(Key $key): void
     {
         $script = '
             local key = KEYS[1]

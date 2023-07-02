@@ -25,10 +25,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class DoctrineCaster
 {
-    /**
-     * @return array
-     */
-    public static function castCommonProxy(CommonProxy $proxy, array $a, Stub $stub, bool $isNested)
+    public static function castCommonProxy(CommonProxy $proxy, array $a, Stub $stub, bool $isNested): array
     {
         foreach (['__cloner__', '__initializer__'] as $k) {
             if (\array_key_exists($k, $a)) {
@@ -40,10 +37,7 @@ class DoctrineCaster
         return $a;
     }
 
-    /**
-     * @return array
-     */
-    public static function castOrmProxy(OrmProxy $proxy, array $a, Stub $stub, bool $isNested)
+    public static function castOrmProxy(OrmProxy $proxy, array $a, Stub $stub, bool $isNested): array
     {
         foreach (['_entityPersister', '_identifier'] as $k) {
             if (\array_key_exists($k = "\0Doctrine\\ORM\\Proxy\\Proxy\0".$k, $a)) {
@@ -55,10 +49,7 @@ class DoctrineCaster
         return $a;
     }
 
-    /**
-     * @return array
-     */
-    public static function castPersistentCollection(PersistentCollection $coll, array $a, Stub $stub, bool $isNested)
+    public static function castPersistentCollection(PersistentCollection $coll, array $a, Stub $stub, bool $isNested): array
     {
         foreach (['snapshot', 'association', 'typeClass'] as $k) {
             if (\array_key_exists($k = "\0Doctrine\\ORM\\PersistentCollection\0".$k, $a)) {

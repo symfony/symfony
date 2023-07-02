@@ -38,18 +38,12 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
         $this->color = new Color($this->foreground = $foreground ?: '', $this->background = $background ?: '', $this->options = $options);
     }
 
-    /**
-     * @return void
-     */
-    public function setForeground(?string $color)
+    public function setForeground(?string $color): void
     {
         $this->color = new Color($this->foreground = $color ?: '', $this->background, $this->options);
     }
 
-    /**
-     * @return void
-     */
-    public function setBackground(?string $color)
+    public function setBackground(?string $color): void
     {
         $this->color = new Color($this->foreground, $this->background = $color ?: '', $this->options);
     }
@@ -59,19 +53,13 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
         $this->href = $url;
     }
 
-    /**
-     * @return void
-     */
-    public function setOption(string $option)
+    public function setOption(string $option): void
     {
         $this->options[] = $option;
         $this->color = new Color($this->foreground, $this->background, $this->options);
     }
 
-    /**
-     * @return void
-     */
-    public function unsetOption(string $option)
+    public function unsetOption(string $option): void
     {
         $pos = array_search($option, $this->options);
         if (false !== $pos) {
@@ -81,10 +69,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
         $this->color = new Color($this->foreground, $this->background, $this->options);
     }
 
-    /**
-     * @return void
-     */
-    public function setOptions(array $options)
+    public function setOptions(array $options): void
     {
         $this->color = new Color($this->foreground, $this->background, $this->options = $options);
     }

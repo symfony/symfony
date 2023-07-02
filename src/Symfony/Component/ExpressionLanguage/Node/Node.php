@@ -57,20 +57,14 @@ class Node
         return implode("\n", $repr);
     }
 
-    /**
-     * @return void
-     */
-    public function compile(Compiler $compiler)
+    public function compile(Compiler $compiler): void
     {
         foreach ($this->nodes as $node) {
             $node->compile($compiler);
         }
     }
 
-    /**
-     * @return mixed
-     */
-    public function evaluate(array $functions, array $values)
+    public function evaluate(array $functions, array $values): mixed
     {
         $results = [];
         foreach ($this->nodes as $node) {
@@ -81,19 +75,14 @@ class Node
     }
 
     /**
-     * @return array
-     *
      * @throws \BadMethodCallException when this node cannot be transformed to an array
      */
-    public function toArray()
+    public function toArray(): array
     {
         throw new \BadMethodCallException(sprintf('Dumping a "%s" instance is not supported yet.', static::class));
     }
 
-    /**
-     * @return string
-     */
-    public function dump()
+    public function dump(): string
     {
         $dump = '';
 
@@ -104,18 +93,12 @@ class Node
         return $dump;
     }
 
-    /**
-     * @return string
-     */
-    protected function dumpString(string $value)
+    protected function dumpString(string $value): string
     {
         return sprintf('"%s"', addcslashes($value, "\0\t\"\\"));
     }
 
-    /**
-     * @return bool
-     */
-    protected function isHash(array $value)
+    protected function isHash(array $value): bool
     {
         $expectedKey = 0;
 

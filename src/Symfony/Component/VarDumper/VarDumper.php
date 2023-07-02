@@ -37,10 +37,7 @@ class VarDumper
      */
     private static $handler;
 
-    /**
-     * @return mixed
-     */
-    public static function dump(mixed $var, string $label = null)
+    public static function dump(mixed $var, string $label = null): mixed
     {
         if (null === self::$handler) {
             self::register();

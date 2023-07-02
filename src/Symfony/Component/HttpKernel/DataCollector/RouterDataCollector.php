@@ -48,10 +48,7 @@ class RouterDataCollector extends DataCollector
         unset($this->controllers[$request]);
     }
 
-    /**
-     * @return void
-     */
-    public function reset()
+    public function reset(): void
     {
         $this->controllers = new \SplObjectStorage();
 
@@ -62,20 +59,15 @@ class RouterDataCollector extends DataCollector
         ];
     }
 
-    /**
-     * @return string
-     */
-    protected function guessRoute(Request $request, string|object|array $controller)
+    protected function guessRoute(Request $request, string|object|array $controller): string
     {
         return 'n/a';
     }
 
     /**
      * Remembers the controller associated to each request.
-     *
-     * @return void
      */
-    public function onKernelController(ControllerEvent $event)
+    public function onKernelController(ControllerEvent $event): void
     {
         $this->controllers[$event->getRequest()] = $event->getController();
     }

@@ -38,10 +38,7 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
         return $this->getEngine($name)->render($name, $parameters);
     }
 
-    /**
-     * @return void
-     */
-    public function stream(string|TemplateReferenceInterface $name, array $parameters = [])
+    public function stream(string|TemplateReferenceInterface $name, array $parameters = []): void
     {
         $engine = $this->getEngine($name);
         if (!$engine instanceof StreamingEngineInterface) {
@@ -56,10 +53,7 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
         return $this->getEngine($name)->exists($name);
     }
 
-    /**
-     * @return void
-     */
-    public function addEngine(EngineInterface $engine)
+    public function addEngine(EngineInterface $engine): void
     {
         $this->engines[] = $engine;
     }

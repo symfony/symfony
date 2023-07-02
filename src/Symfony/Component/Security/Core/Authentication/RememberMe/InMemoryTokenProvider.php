@@ -31,10 +31,7 @@ class InMemoryTokenProvider implements TokenProviderInterface
         return $this->tokens[$series];
     }
 
-    /**
-     * @return void
-     */
-    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed)
+    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed): void
     {
         if (!isset($this->tokens[$series])) {
             throw new TokenNotFoundException('No token found.');
@@ -50,18 +47,12 @@ class InMemoryTokenProvider implements TokenProviderInterface
         $this->tokens[$series] = $token;
     }
 
-    /**
-     * @return void
-     */
-    public function deleteTokenBySeries(string $series)
+    public function deleteTokenBySeries(string $series): void
     {
         unset($this->tokens[$series]);
     }
 
-    /**
-     * @return void
-     */
-    public function createNewToken(PersistentTokenInterface $token)
+    public function createNewToken(PersistentTokenInterface $token): void
     {
         $this->tokens[$token->getSeries()] = $token;
     }

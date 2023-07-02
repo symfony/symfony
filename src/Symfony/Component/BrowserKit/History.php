@@ -25,10 +25,8 @@ class History
 
     /**
      * Clears the history.
-     *
-     * @return void
      */
-    public function clear()
+    public function clear(): void
     {
         $this->stack = [];
         $this->position = -1;
@@ -36,10 +34,8 @@ class History
 
     /**
      * Adds a Request to the history.
-     *
-     * @return void
      */
-    public function add(Request $request)
+    public function add(Request $request): void
     {
         $this->stack = \array_slice($this->stack, 0, $this->position + 1);
         $this->stack[] = clone $request;

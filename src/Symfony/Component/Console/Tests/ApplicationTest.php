@@ -74,7 +74,7 @@ class ApplicationTest extends TestCase
                 if (9 === $i) {
                     continue;
                 }
-                pcntl_signal($i, SIG_DFL);
+                pcntl_signal($i, \SIG_DFL);
             }
         }
     }
@@ -2049,7 +2049,7 @@ class ApplicationTest extends TestCase
 
         // And now we test without the blank handler
         $blankHandlerSignaled = false;
-        pcntl_signal(\SIGUSR1, SIG_DFL);
+        pcntl_signal(\SIGUSR1, \SIG_DFL);
 
         $application = $this->createSignalableApplication($command, $dispatcher);
         $application->setSignalsToDispatchEvent(\SIGUSR1);
@@ -2312,7 +2312,7 @@ class TerminatableWithEventCommand extends Command implements SignalableCommandI
 
         for ($i = 0; $i <= 10 && $this->shouldContinue; ++$i) {
             $output->writeln('Still processing...');
-            posix_kill(posix_getpid(), SIGINT);
+            posix_kill(posix_getpid(), \SIGINT);
         }
 
         $output->writeln('Wrapping up, wait a sec...');

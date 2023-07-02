@@ -178,10 +178,7 @@ class InputOption
         return self::VALUE_NEGATABLE === (self::VALUE_NEGATABLE & $this->mode);
     }
 
-    /**
-     * @return void
-     */
-    public function setDefault(string|bool|int|float|array|null $default)
+    public function setDefault(string|bool|int|float|array|null $default): void
     {
         if (self::VALUE_NONE === (self::VALUE_NONE & $this->mode) && null !== $default) {
             throw new LogicException('Cannot set a default value when using InputOption::VALUE_NONE mode.');

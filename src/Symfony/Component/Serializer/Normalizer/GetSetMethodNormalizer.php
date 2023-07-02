@@ -125,10 +125,7 @@ final class GetSetMethodNormalizer extends AbstractObjectNormalizer
         return null;
     }
 
-    /**
-     * @return void
-     */
-    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = [])
+    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = []): void
     {
         $setter = 'set'.ucfirst($attribute);
         $key = $object::class.':'.$setter;

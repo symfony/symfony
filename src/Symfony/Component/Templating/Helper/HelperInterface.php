@@ -20,17 +20,13 @@ interface HelperInterface
 {
     /**
      * Returns the canonical name of this helper.
-     *
-     * @return string
      */
-    public function getName();
+    public function getName(): string;
 
     /**
      * Sets the default charset.
-     *
-     * @return void
      */
-    public function setCharset(string $charset);
+    public function setCharset(string $charset): void;
 
     /**
      * Gets the default charset.

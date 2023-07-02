@@ -233,10 +233,8 @@ abstract class AbstractCloner implements ClonerInterface
      * see e.g. static::$defaultCasters.
      *
      * @param callable[] $casters A map of casters
-     *
-     * @return void
      */
-    public function addCasters(array $casters)
+    public function addCasters(array $casters): void
     {
         foreach ($casters as $type => $callback) {
             $this->casters[$type][] = $callback;
@@ -245,20 +243,16 @@ abstract class AbstractCloner implements ClonerInterface
 
     /**
      * Sets the maximum number of items to clone past the minimum depth in nested structures.
-     *
-     * @return void
      */
-    public function setMaxItems(int $maxItems)
+    public function setMaxItems(int $maxItems): void
     {
         $this->maxItems = $maxItems;
     }
 
     /**
      * Sets the maximum cloned length for strings.
-     *
-     * @return void
      */
-    public function setMaxString(int $maxString)
+    public function setMaxString(int $maxString): void
     {
         $this->maxString = $maxString;
     }
@@ -266,10 +260,8 @@ abstract class AbstractCloner implements ClonerInterface
     /**
      * Sets the minimum tree depth where we are guaranteed to clone all the items.  After this
      * depth is reached, only setMaxItems items will be cloned.
-     *
-     * @return void
      */
-    public function setMinDepth(int $minDepth)
+    public function setMinDepth(int $minDepth): void
     {
         $this->minDepth = $minDepth;
     }

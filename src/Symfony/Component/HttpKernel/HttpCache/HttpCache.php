@@ -236,10 +236,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         return $response;
     }
 
-    /**
-     * @return void
-     */
-    public function terminate(Request $request, Response $response)
+    public function terminate(Request $request, Response $response): void
     {
         // Do not call any listeners in case of a cache hit.
         // This ensures identical behavior as if you had a separate
@@ -454,10 +451,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @param bool          $catch Whether to catch exceptions or not
      * @param Response|null $entry A Response instance (the stale entry if present, null otherwise)
-     *
-     * @return Response
      */
-    protected function forward(Request $request, bool $catch = false, Response $entry = null)
+    protected function forward(Request $request, bool $catch = false, Response $entry = null): Response
     {
         $this->surrogate?->addSurrogateCapability($request);
 
@@ -587,11 +582,9 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     /**
      * Writes the Response to the cache.
      *
-     * @return void
-     *
      * @throws \Exception
      */
-    protected function store(Request $request, Response $response)
+    protected function store(Request $request, Response $response): void
     {
         try {
             $restoreHeaders = [];
@@ -666,10 +659,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         $response->headers->remove('X-Body-File');
     }
 
-    /**
-     * @return void
-     */
-    protected function processResponseBody(Request $request, Response $response)
+    protected function processResponseBody(Request $request, Response $response): void
     {
         if ($this->surrogate?->needsParsing($response)) {
             $this->surrogate->process($request, $response);

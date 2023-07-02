@@ -29,10 +29,7 @@ class TraceableUrlMatcher extends UrlMatcher
 
     protected $traces;
 
-    /**
-     * @return array
-     */
-    public function getTraces(string $pathinfo)
+    public function getTraces(string $pathinfo): array
     {
         $this->traces = [];
 
@@ -44,10 +41,7 @@ class TraceableUrlMatcher extends UrlMatcher
         return $this->traces;
     }
 
-    /**
-     * @return array
-     */
-    public function getTracesForRequest(Request $request)
+    public function getTracesForRequest(Request $request): array
     {
         $this->request = $request;
         $traces = $this->getTraces($request->getPathInfo());

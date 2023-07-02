@@ -53,10 +53,7 @@ class CombinedStore implements SharedLockStoreInterface, LoggerAwareInterface
         $this->logger = new NullLogger();
     }
 
-    /**
-     * @return void
-     */
-    public function save(Key $key)
+    public function save(Key $key): void
     {
         $successCount = 0;
         $failureCount = 0;
@@ -90,10 +87,7 @@ class CombinedStore implements SharedLockStoreInterface, LoggerAwareInterface
         throw new LockConflictedException();
     }
 
-    /**
-     * @return void
-     */
-    public function saveRead(Key $key)
+    public function saveRead(Key $key): void
     {
         $successCount = 0;
         $failureCount = 0;
@@ -131,10 +125,7 @@ class CombinedStore implements SharedLockStoreInterface, LoggerAwareInterface
         throw new LockConflictedException();
     }
 
-    /**
-     * @return void
-     */
-    public function putOffExpiration(Key $key, float $ttl)
+    public function putOffExpiration(Key $key, float $ttl): void
     {
         $successCount = 0;
         $failureCount = 0;
@@ -175,10 +166,7 @@ class CombinedStore implements SharedLockStoreInterface, LoggerAwareInterface
         throw new LockConflictedException();
     }
 
-    /**
-     * @return void
-     */
-    public function delete(Key $key)
+    public function delete(Key $key): void
     {
         foreach ($this->stores as $store) {
             try {

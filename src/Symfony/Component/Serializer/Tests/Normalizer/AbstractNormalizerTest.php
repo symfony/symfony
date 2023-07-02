@@ -14,6 +14,7 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
+use Symfony\Component\Serializer\Annotation\VersionConstraint;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
@@ -27,6 +28,7 @@ use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractNormalizerDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\IgnoreDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Annotations\VersionDummy as AnnotationsVersionDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
 use Symfony\Component\Serializer\Tests\Fixtures\NullableConstructorArgumentDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\NullableOptionalConstructorArgumentDummy;
@@ -265,5 +267,80 @@ class AbstractNormalizerTest extends TestCase
         $normalizer = new PropertyNormalizer($this->classMetadata);
 
         $this->assertSame([], $normalizer->normalize($dummy));
+    }
+
+    /**
+     * @dataProvider providesNormalizeVersionAndConstraints
+     */
+    public function testNormalizeVersionConstraint(?string $version, ?string $since, ?string $until, array $expectedVersionedProperties)
+    {
+        $classMetadata = new ClassMetadata(AnnotationsVersionDummy::class);
+
+        $attributeVersionMetadata = new AttributeMetadata('objectVersion');
+        $attributeVersionMetadata->setVersion(true);
+        $classMetadata->addAttributeMetadata($attributeVersionMetadata);
+
+        $attributeVersionConstraintMetadata = new AttributeMetadata('versionedProperty');
+        $attributeVersionConstraintMetadata->setVersionConstraint(new VersionConstraint(since: $since, until: $until));
+        $classMetadata->addAttributeMetadata($attributeVersionConstraintMetadata);
+
+        $attributeVersionConstraint2Metadata = new AttributeMetadata('versionedProperty2');
+        $attributeVersionConstraint2Metadata->setVersionConstraint(new VersionConstraint(since: $since, until: $until));
+        $classMetadata->addAttributeMetadata($attributeVersionConstraint2Metadata);
+
+        $this->classMetadata->method('getMetadataFor')->willReturn($classMetadata);
+
+        $dummy = new AnnotationsVersionDummy();
+        $dummy->objectVersion = $version;
+        $dummy->versionedProperty = 'foo';
+        $dummy->versionedProperty2 = 'foo2';
+
+        $normalizer = new PropertyNormalizer($this->classMetadata);
+
+        $this->assertSame([
+                'foo' => null,
+                'objectVersion' => $version,
+            ] + $expectedVersionedProperties, $normalizer->normalize($dummy));
+    }
+
+    public static function providesNormalizeVersionAndConstraints(): \Generator
+    {
+        yield 'Version in range' => ['1.2', '1.1', '1.5', ['versionedProperty' => 'foo', 'versionedProperty2' => 'foo2']];
+        yield 'Version out of range' => ['0.9', '1.1', '1.5', []];
+    }
+
+    /**
+     * @dataProvider providesDenormalizeVersionAndConstraints
+     */
+    public function testDenormalizeVersionConstraint(?string $version, ?string $since, ?string $until, array $normalizedVersionedProperties, ?string $expectedVersionedProperty)
+    {
+        $classMetadata = new ClassMetadata(AnnotationsVersionDummy::class);
+
+        $attributeVersionMetadata = new AttributeMetadata('objectVersion');
+        $attributeVersionMetadata->setVersion(true);
+        $classMetadata->addAttributeMetadata($attributeVersionMetadata);
+
+        $attributeVersionConstraintMetadata = new AttributeMetadata('versionedProperty');
+        $attributeVersionConstraintMetadata->setVersionConstraint(new VersionConstraint(since: $since, until: $until));
+        $classMetadata->addAttributeMetadata($attributeVersionConstraintMetadata);
+
+        $this->classMetadata->method('getMetadataFor')->willReturn($classMetadata);
+
+        $normalized = [
+            'foo' => null,
+            'objectVersion' => $version,
+            'versionedProperty' => 'foo',
+        ];
+
+        $normalizer = new PropertyNormalizer($this->classMetadata);
+
+        $denormalizedObject = $normalizer->denormalize($normalized, AnnotationsVersionDummy::class);
+        $this->assertSame($expectedVersionedProperty, $denormalizedObject->versionedProperty);
+    }
+
+    public static function providesDenormalizeVersionAndConstraints(): \Generator
+    {
+        yield 'Version in range' => ['1.2', '1.1', '1.5', ['versionedProperty' => 'foo'], 'foo'];
+        yield 'Version out of range' => ['0.9', '1.1', '1.5', [], null];
     }
 }

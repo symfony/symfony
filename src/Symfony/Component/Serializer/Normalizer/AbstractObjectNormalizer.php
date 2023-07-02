@@ -138,8 +138,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     }
 
     /**
-     * @param array $context
-     *
      * @return bool
      */
     public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */)
@@ -204,6 +202,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             }
 
             $stack[$attribute] = $this->applyCallbacks($attributeValue, $object, $attribute, $format, $attributeContext);
+        }
+
+        $objectVersion = $this->getObjectVersion($object, $stack);
+        if (null !== $objectVersion) {
+            $stack = $this->filterAttributesByVersion($objectVersion, $attributesMetadata, $stack);
         }
 
         foreach ($stack as $attribute => $attributeValue) {
@@ -320,7 +323,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         }
 
         $allowedAttributes = $this->getAllowedAttributes($type, $context, true);
+        $versionedConstraintAttributeCallables = $this->getVersionedConstraintAttributeCallables($type);
         $normalizedData = $this->prepareForDenormalization($data);
+
         $extraAttributes = [];
 
         $mappedClass = $this->getMappedClass($normalizedData, $type, $context);
@@ -336,6 +341,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             $normalizedData = $this->removeNestedValue($serializedPath->getElements(), $normalizedData);
         }
 
+        $objectVersion = $this->getObjectVersion($type, $normalizedData);
         $normalizedData = array_merge($normalizedData, $nestedData);
 
         $object = $this->instantiateObject($normalizedData, $mappedClass, $context, new \ReflectionClass($mappedClass), $allowedAttributes, $format);
@@ -382,6 +388,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             }
 
             $value = $this->applyCallbacks($value, $resolvedClass, $attribute, $format, $attributeContext);
+            if (null !== $objectVersion) {
+                $value = $this->getValueByVersion($value, $objectVersion, $attribute, $versionedConstraintAttributeCallables);
+            }
 
             try {
                 $this->setAttributeValue($object, $attribute, $value, $format, $attributeContext);
@@ -592,6 +601,21 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         }
 
         throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type of the "%s" attribute for class "%s" must be one of "%s" ("%s" given).', $attribute, $currentClass, implode('", "', array_keys($expectedTypes)), get_debug_type($data)), $data, array_keys($expectedTypes), $context['deserialization_path'] ?? $attribute);
+    }
+
+    private function getObjectVersion(object|string $objectOrClass, array $stack): ?string
+    {
+        $objectVersion = null;
+        foreach ($this->classMetadataFactory?->getMetadataFor($objectOrClass)->getAttributesMetadata() ?? [] as $attribute => $attributeMetadata) {
+            if ($attributeMetadata->isVersion()) {
+                if (null !== $objectVersion) {
+                    throw new LogicException(sprintf('Too many version ["%s","%s] attributes class "%s".', $attribute, $objectVersion, \is_object($objectOrClass) ? $objectOrClass::class : $objectOrClass));
+                }
+                $objectVersion = $attribute;
+            }
+        }
+
+        return $objectVersion ? $stack[$objectVersion] : null;
     }
 
     /**
@@ -811,5 +835,44 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         }
 
         return $mappedClass;
+    }
+
+    /**
+     * @param array<string, AttributeMetadataInterface> $attributesMetadata
+     */
+    private function filterAttributesByVersion(string $objectVersion, array $attributesMetadata, array $stack): array
+    {
+        return array_filter(
+            $stack,
+            fn (string $key) => $this->isVersionCompatible($objectVersion, $attributesMetadata, $key),
+            \ARRAY_FILTER_USE_KEY
+        );
+    }
+
+    /**
+     * @param array<string, callable> $callables
+     */
+    private function getValueByVersion(mixed $value, string $objectVersion, string $attribute, array $callables): mixed
+    {
+        if (!isset($callables[$attribute])) {
+            return $value;
+        }
+
+        return $callables[$attribute]($objectVersion) ? $value : null;
+    }
+
+    /**
+     * @param class-string $class
+     *
+     * @return array<class-string, Closure(string)>
+     */
+    private function getVersionedConstraintAttributeCallables(string $class): array
+    {
+        $attributes = [];
+        foreach ($this->classMetadataFactory?->getMetadataFor($class)?->getAttributesMetadata() ?? [] as $attribute => $attributeMetadata) {
+            $attributes[$attribute] = $attributeMetadata->isVersionCompatible(...);
+        }
+
+        return $attributes;
     }
 }

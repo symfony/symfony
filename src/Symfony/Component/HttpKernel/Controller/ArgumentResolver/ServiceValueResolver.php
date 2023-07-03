@@ -14,7 +14,6 @@ namespace Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
@@ -23,39 +22,13 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-final class ServiceValueResolver implements ArgumentValueResolverInterface, ValueResolverInterface
+final class ServiceValueResolver implements ValueResolverInterface
 {
     private ContainerInterface $container;
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * @deprecated since Symfony 6.2, use resolve() instead
-     */
-    public function supports(Request $request, ArgumentMetadata $argument): bool
-    {
-        @trigger_deprecation('symfony/http-kernel', '6.2', 'The "%s()" method is deprecated, use "resolve()" instead.', __METHOD__);
-
-        $controller = $request->attributes->get('_controller');
-
-        if (\is_array($controller) && \is_callable($controller, true) && \is_string($controller[0])) {
-            $controller = $controller[0].'::'.$controller[1];
-        } elseif (!\is_string($controller) || '' === $controller) {
-            return false;
-        }
-
-        if ('\\' === $controller[0]) {
-            $controller = ltrim($controller, '\\');
-        }
-
-        if (!$this->container->has($controller) && false !== $i = strrpos($controller, ':')) {
-            $controller = substr($controller, 0, $i).strtolower(substr($controller, $i));
-        }
-
-        return $this->container->has($controller) && $this->container->get($controller)->has($argument->getName());
     }
 
     public function resolve(Request $request, ArgumentMetadata $argument): array

@@ -5,6 +5,11 @@ CHANGELOG
 ---
 
  * Add argument `$reflector` to `ArgumentResolverInterface::getArguments()` and `ArgumentMetadataFactoryInterface::createArgumentMetadata()`
+ * Remove `ArgumentValueResolverInterface`, use `ValueResolverInterface` instead
+ * Remove `StreamedResponseListener`
+ * Remove `AbstractSurrogate::$phpEscapeMap`
+ * Remove `HttpKernelInterface::MASTER_REQUEST`
+ * Remove `terminate_on_cache_hit` option from `HttpCache`
 
 6.4
 ---

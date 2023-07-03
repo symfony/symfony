@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2023-07-02T12:29:39Z
+
+For reference, commands to automate 90% of these changes:
+
+```bash
+# convert types
+sed -i 's/ *"\*\*\/Tests\/"//' composer.json
+composer u -o
+SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.2' php .github/patch-types.php
+git checkout composer.json
+
+# cleanup
+git diff-tree --no-commit-id --name-only HEAD -r | xargs -L1 ./tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --rules phpdoc_trim_consecutive_blank_line_separation,no_superfluous_phpdoc_tags,ordered_imports,no_empty_phpdoc,no_whitespace_in_blank_line,no_extra_blank_lines,phpdoc_trim_consecutive_blank_line_separation
+git diff-tree --no-commit-id --name-only HEAD -r | xargs -L1 sed -i ':a;N;$!ba;s/{\n\n/{\n/'
+```

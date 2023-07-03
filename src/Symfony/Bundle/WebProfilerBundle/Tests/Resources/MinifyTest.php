@@ -23,8 +23,12 @@ class MinifyTest extends TestCase
     public function testNoSingleLineComments()
     {
         $dir = \dirname(__DIR__, 2).'/Resources/views/Profiler';
-        $message = 'There cannot be any single line comment in this file. Consider using multiple line comment. ';
-        $this->assertTrue(2 === substr_count(file_get_contents($dir.'/base_js.html.twig'), '//'), $message);
-        $this->assertTrue(0 === substr_count(file_get_contents($dir.'/toolbar.css.twig'), '//'), $message);
+
+        foreach (glob($dir.'/*js.html.twig') as $jsFile) {
+            $fileContents = file_get_contents($dir.'/base_js.html.twig');
+            $fileContents = str_replace('\'//\'', '', $fileContents);
+
+            $this->assertEquals(0, substr_count($fileContents, '//'), 'There cannot be any single line comment in "'.$jsFile.'". Consider using multiple line comment. ');
+        }
     }
 }

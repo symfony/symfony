@@ -104,7 +104,7 @@ class MailjetApiTransport extends AbstractApiTransport
         return $response;
     }
 
-    private function getPayload(Email $email, Envelope $envelope): array
+    public function getPayload(Email $email, Envelope $envelope): array
     {
         $html = $email->getHtmlBody();
         if (null !== $html && \is_resource($html)) {

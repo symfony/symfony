@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.0
+---
+
+ * Add argument `$reflector` to `ArgumentResolverInterface::getArguments()` and `ArgumentMetadataFactoryInterface::createArgumentMetadata()`
+
 6.4
 ---
 

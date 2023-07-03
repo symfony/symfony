@@ -16,6 +16,7 @@ Console
  * Remove `Command::$defaultName` and `Command::$defaultDescription`, use the `AsCommand` attribute instead
  * Passing null to `*Command::setApplication()`, `*FormatterStyle::setForeground/setBackground()`, `Helper::setHelpSet()`, `Input*::setDefault()` and `Question::setAutocompleterCallback/setValidator()` must be done explicitly
  * Remove `StringInput::REGEX_STRING`
+ * Add method `__toString()` to `InputInterface`
 
 DependencyInjection
 -------------------
@@ -28,6 +29,8 @@ DependencyInjection
  * Remove `PhpDumper` options `inline_factories_parameter` and `inline_class_loader_parameter`, use options `inline_factories` and `inline_class_loader` instead
  * Parameter names of `ParameterBag` cannot be numerics
  * Remove `ContainerAwareInterface` and `ContainerAwareTrait`, use dependency injection instead
+ * Add argument `$id` and `$asGhostObject` to `DumperInterface::isProxyCandidate()` and `getProxyCode()`
+ * Add argument `$source` to `FileLoader::registerClasses()`
 
 DoctrineBridge
 --------------
@@ -42,6 +45,16 @@ DoctrineBridge
  * DoctrineBridge now requires `doctrine/event-manager:^2`
  * Add parameter `$isSameDatabase` to `DoctrineTokenProvider::configureSchema()`
 
+Filesystem
+----------
+
+ * Add argument `$lock` to `Filesystem::appendToFile()`
+
+FrameworkBundle
+---------------
+
+ * Remove command `translation:update`, use `translation:extract` instead
+
 HttpFoundation
 --------------
 
@@ -55,6 +68,11 @@ HttpFoundation
  * Remove `Request::getContentType()`, use `Request::getContentTypeFormat()` instead
  * Throw an `InvalidArgumentException` when calling `Request::create()` with a malformed URI
 
+HttpKernel
+----------
+
+ * Add argument `$reflector` to `ArgumentResolverInterface::getArguments()` and `ArgumentMetadataFactoryInterface::createArgumentMetadata()`
+
 Lock
 ----
 
@@ -65,10 +83,26 @@ Messenger
 
  * Add parameter `$isSameDatabase` to `DoctrineTransport::configureSchema()`
 
+PropertyAccess
+--------------
+
+ * Add method `isNullSafe()` to `PropertyPathInterface`
+
 ProxyManagerBridge
 ------------------
 
  * Remove the bridge, use VarExporter's lazy objects instead
+
+Routing
+-------
+
+ * Add argument `$routeParameters` to `UrlMatcher::handleRouteRequirements()`
+
+Security
+--------
+
+ * Add argument `$badgeFqcn` to `Passport::addBadge()`
+ * Add argument `$lifetime` to `LoginLinkHandlerInterface::createLoginLink()`
 
 SecurityBundle
 --------------
@@ -78,11 +112,23 @@ SecurityBundle
 Serializer
 ----------
 
+ * Add method `getSupportedTypes()` to `DenormalizerInterface` and `NormalizerInterface`
  * Remove denormalization support for `AbstractUid` in `UidNormalizer`, use one of `AbstractUid` child class instead
  * Denormalizing to an abstract class in `UidNormalizer` now throws an `\Error`
  * Remove `ContextAwareDenormalizerInterface`, use `DenormalizerInterface` instead
  * Remove `ContextAwareNormalizerInterface`, use `NormalizerInterface` instead
  * Remove `CacheableSupportsMethodInterface`, use `NormalizerInterface` and `DenormalizerInterface` instead
- * First argument of `ClassMetadata::setSerializedName()` is now required
- * Third argument `array $context = []` of the `NormalizerInterface::supportsNormalization()` is now required
- * Fourth argument `array $context = []` of the `DenormalizerInterface::supportsDenormalization()` is now required
+ * First argument of `AttributeMetadata::setSerializedName()` is now required
+ * Add argument `$context` to `NormalizerInterface::supportsNormalization()` and `DenormalizerInterface::supportsDenormalization()`
+
+Validator
+---------
+
+ * Add methods `getConstraint()`, `getCause()` and `__toString()` to `ConstraintViolationInterface`
+ * Add method `__toString()` to `ConstraintViolationListInterface`
+ * Add method `disableTranslation()` to `ConstraintViolationBuilderInterface`
+
+VarDumper
+---------
+
+ * Add argument `$label` to `VarDumper::dump()`

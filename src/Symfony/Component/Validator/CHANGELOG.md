@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+7.0
+---
+
+ * Add methods `getConstraint()`, `getCause()` and `__toString()` to `ConstraintViolationInterface`
+ * Add method `__toString()` to `ConstraintViolationListInterface`
+ * Add method `disableTranslation()` to `ConstraintViolationBuilderInterface`
+
 6.4
 ---
 

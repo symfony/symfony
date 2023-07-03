@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.0
+---
+
+ * Add method `isNullSafe()` to `PropertyPathInterface`
+
 6.3
 ---
 

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.0
+---
+
+ * Add argument `$routeParameters` to `UrlMatcher::handleRouteRequirements()`
+
 6.4
 ---
 

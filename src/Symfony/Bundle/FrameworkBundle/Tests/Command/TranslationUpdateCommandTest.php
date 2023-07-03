@@ -29,14 +29,6 @@ class TranslationUpdateCommandTest extends TestCase
     private $fs;
     private $translationDir;
 
-    public function testDumpMessagesAndCleanWithDeprecatedCommandName()
-    {
-        $tester = $this->createCommandTester(['messages' => ['foo' => 'foo']]);
-        $tester->execute(['command' => 'translation:update', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true]);
-        $this->assertMatchesRegularExpression('/foo/', $tester->getDisplay());
-        $this->assertMatchesRegularExpression('/1 message was successfully extracted/', $tester->getDisplay());
-    }
-
     public function testDumpMessagesAndClean()
     {
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo']]);

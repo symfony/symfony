@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.0
+---
+
+ * Add argument `$label` to `VarDumper::dump()`
+
 6.3
 ---
 

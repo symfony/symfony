@@ -20,8 +20,6 @@ use Symfony\Component\Validator\Exception\OutOfBoundsException;
  *
  * @extends \ArrayAccess<int, ConstraintViolationInterface>
  * @extends \Traversable<int, ConstraintViolationInterface>
- *
- * @method string __toString() Converts the violation into a string for debugging purposes. Not implementing it is deprecated since Symfony 6.1.
  */
 interface ConstraintViolationListInterface extends \Traversable, \Countable, \ArrayAccess
 {
@@ -72,4 +70,9 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
      * @return void
      */
     public function remove(int $offset);
+
+    /**
+     * Converts the violation into a string for debugging purposes.
+     */
+    public function __toString(): string;
 }

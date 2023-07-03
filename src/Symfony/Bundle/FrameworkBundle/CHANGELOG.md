@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.0
+---
+
+ * Remove command `translation:update`, use `translation:extract` instead
+
 6.3
 ---
 

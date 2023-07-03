@@ -16,8 +16,6 @@ namespace Symfony\Component\PropertyAccess;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @method bool isNullSafe(int $index) Returns whether the element at the given index is null safe. Not implementing it is deprecated since Symfony 6.2
- *
  * @extends \Traversable<int, string>
  */
 interface PropertyPathInterface extends \Traversable
@@ -85,4 +83,9 @@ interface PropertyPathInterface extends \Traversable
      * @throws Exception\OutOfBoundsException If the offset is invalid
      */
     public function isIndex(int $index);
+
+    /**
+     * Returns whether the element at the given index is null safe.
+     */
+    public function isNullSafe(int $index): bool;
 }

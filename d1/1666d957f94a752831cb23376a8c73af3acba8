@@ -1,0 +1,54 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-07-01T19:11:38Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.4" but it seems your PR description refers to branch "6.2".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-07-01T19:26:34Z
+
+It would be nice to have a job that assert that no `.php` file is executable.
+
+```bash
+#!/bin/bash
+
+# Find executable PHP files
+files=$(find . -name "*.php" -type f -perm /u+x,g+x,o+x)
+
+# Check if any executable files were found
+if [ -n "$files" ]; then
+    echo "Executable PHP files found:"
+    echo "$files"
+    exit 1
+else
+    echo "No executable PHP files found."
+    exit 0
+fi
+
+```
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-07-01T21:00:21Z
+
+You can fix the permission for all this files on branch 6.2.
+```
+src/Symfony/Component/HttpClient/Tests/DataCollector/HttpClientDataCollectorTest.php
+src/Symfony/Component/HttpClient/Tests/NoPrivateNetworkHttpClientTest.php
+src/Symfony/Component/HttpClient/Tests/TraceableHttpClientTest.php
+src/Symfony/Component/HttpClient/Tests/DependencyInjection/HttpClientPassTest.php
+src/Symfony/Component/Messenger/Tests/Fixtures/MyOwnException.php
+src/Symfony/Component/Messenger/Event/WorkerRateLimitedEvent.php
+src/Symfony/Component/DependencyInjection/Tests/Fixtures/IntTagClass.php
+src/Symfony/Component/DependencyInjection/Tests/Fixtures/AutoconfiguredService1.php
+src/Symfony/Component/DependencyInjection/Tests/Fixtures/AutoconfiguredService2.php
+src/Symfony/Component/Process/Tests/ErrorProcessInitiator.php
+```

@@ -16,8 +16,8 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver;
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ContainerAwareController;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Tests\Controller\ContainerControllerResolverTest;
@@ -180,29 +180,6 @@ class ControllerResolverTest extends ContainerControllerResolverTest
     protected function createMockContainer()
     {
         return $this->createMock(ContainerInterface::class);
-    }
-}
-
-class ContainerAwareController implements ContainerAwareInterface
-{
-    private ?ContainerInterface $container = null;
-
-    public function setContainer(?ContainerInterface $container): void
-    {
-        $this->container = $container;
-    }
-
-    public function getContainer(): ?ContainerInterface
-    {
-        return $this->container;
-    }
-
-    public function testAction()
-    {
-    }
-
-    public function __invoke()
-    {
     }
 }
 

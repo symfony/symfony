@@ -30,18 +30,12 @@ class DoctrineClearEntityManagerWorkerSubscriber implements EventSubscriberInter
         $this->managerRegistry = $managerRegistry;
     }
 
-    /**
-     * @return void
-     */
-    public function onWorkerMessageHandled()
+    public function onWorkerMessageHandled(): void
     {
         $this->clearEntityManagers();
     }
 
-    /**
-     * @return void
-     */
-    public function onWorkerMessageFailed()
+    public function onWorkerMessageFailed(): void
     {
         $this->clearEntityManagers();
     }

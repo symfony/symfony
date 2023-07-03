@@ -207,11 +207,9 @@ class FrameworkExtension extends Extension
     /**
      * Responds to the app.config configuration parameter.
      *
-     * @return void
-     *
      * @throws LogicException
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));
 

@@ -159,7 +159,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
      *
      * @return array{0:ClassMetadata<T>, 1:string}|null
      */
-    protected function getMetadata(string $class)
+    protected function getMetadata(string $class): ?array
     {
         // normalize class name
         $class = self::getRealClass(ltrim($class, '\\'));

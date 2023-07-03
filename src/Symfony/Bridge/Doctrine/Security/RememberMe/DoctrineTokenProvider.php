@@ -58,10 +58,7 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
         return new PersistentToken($row['class'], $row['username'], $series, $row['value'], new \DateTime($row['last_used']));
     }
 
-    /**
-     * @return void
-     */
-    public function deleteTokenBySeries(string $series)
+    public function deleteTokenBySeries(string $series): void
     {
         $sql = 'DELETE FROM rememberme_token WHERE series=:series';
         $paramValues = ['series' => $series];
@@ -69,10 +66,7 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
         $this->conn->executeStatement($sql, $paramValues, $paramTypes);
     }
 
-    /**
-     * @return void
-     */
-    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed)
+    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed): void
     {
         $sql = 'UPDATE rememberme_token SET value=:value, lastUsed=:lastUsed WHERE series=:series';
         $paramValues = [
@@ -92,10 +86,7 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
         }
     }
 
-    /**
-     * @return void
-     */
-    public function createNewToken(PersistentTokenInterface $token)
+    public function createNewToken(PersistentTokenInterface $token): void
     {
         $sql = 'INSERT INTO rememberme_token (class, username, series, value, lastUsed) VALUES (:class, :username, :series, :value, :lastUsed)';
         $paramValues = [

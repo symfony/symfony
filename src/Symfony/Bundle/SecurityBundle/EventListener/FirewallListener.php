@@ -36,10 +36,7 @@ class FirewallListener extends Firewall
         parent::__construct($map, $dispatcher);
     }
 
-    /**
-     * @return void
-     */
-    public function configureLogoutUrlGenerator(RequestEvent $event)
+    public function configureLogoutUrlGenerator(RequestEvent $event): void
     {
         if (!$event->isMainRequest()) {
             return;
@@ -50,10 +47,7 @@ class FirewallListener extends Firewall
         }
     }
 
-    /**
-     * @return void
-     */
-    public function onKernelFinishRequest(FinishRequestEvent $event)
+    public function onKernelFinishRequest(FinishRequestEvent $event): void
     {
         if ($event->isMainRequest()) {
             $this->logoutUrlGenerator->setCurrentFirewall(null);

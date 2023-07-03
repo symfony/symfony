@@ -21,10 +21,7 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
  */
 class WorkflowGuardListenerPass implements CompilerPassInterface
 {
-    /**
-     * @return void
-     */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasParameter('workflow.has_guard_listeners')) {
             return;

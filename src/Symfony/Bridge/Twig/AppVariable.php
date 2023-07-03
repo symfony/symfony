@@ -32,34 +32,22 @@ class AppVariable
     private bool $debug;
     private LocaleSwitcher $localeSwitcher;
 
-    /**
-     * @return void
-     */
-    public function setTokenStorage(TokenStorageInterface $tokenStorage)
+    public function setTokenStorage(TokenStorageInterface $tokenStorage): void
     {
         $this->tokenStorage = $tokenStorage;
     }
 
-    /**
-     * @return void
-     */
-    public function setRequestStack(RequestStack $requestStack)
+    public function setRequestStack(RequestStack $requestStack): void
     {
         $this->requestStack = $requestStack;
     }
 
-    /**
-     * @return void
-     */
-    public function setEnvironment(string $environment)
+    public function setEnvironment(string $environment): void
     {
         $this->environment = $environment;
     }
 
-    /**
-     * @return void
-     */
-    public function setDebug(bool $debug)
+    public function setDebug(bool $debug): void
     {
         $this->debug = $debug;
     }

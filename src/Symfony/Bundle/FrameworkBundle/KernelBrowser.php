@@ -39,9 +39,6 @@ class KernelBrowser extends HttpKernelBrowser
         parent::__construct($kernel, $server, $history, $cookieJar);
     }
 
-    /**
-     * Returns the container.
-     */
     public function getContainer(): ContainerInterface
     {
         $container = $this->kernel->getContainer();
@@ -49,9 +46,6 @@ class KernelBrowser extends HttpKernelBrowser
         return $container->has('test.service_container') ? $container->get('test.service_container') : $container;
     }
 
-    /**
-     * Returns the kernel.
-     */
     public function getKernel(): KernelInterface
     {
         return $this->kernel;
@@ -73,10 +67,8 @@ class KernelBrowser extends HttpKernelBrowser
      * Enables the profiler for the very next request.
      *
      * If the profiler is not enabled, the call to this method does nothing.
-     *
-     * @return void
      */
-    public function enableProfiler()
+    public function enableProfiler(): void
     {
         if ($this->getContainer()->has('profiler')) {
             $this->profiler = true;
@@ -88,20 +80,16 @@ class KernelBrowser extends HttpKernelBrowser
      *
      * By default, the Client reboots the Kernel for each request. This method
      * allows to keep the same kernel across requests.
-     *
-     * @return void
      */
-    public function disableReboot()
+    public function disableReboot(): void
     {
         $this->reboot = false;
     }
 
     /**
      * Enables kernel reboot between requests.
-     *
-     * @return void
      */
-    public function enableReboot()
+    public function enableReboot(): void
     {
         $this->reboot = true;
     }

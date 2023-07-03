@@ -127,10 +127,8 @@ final class ConsoleHandler extends AbstractProcessingHandler implements EventSub
 
     /**
      * Sets the console output to use for printing logs.
-     *
-     * @return void
      */
-    public function setOutput(OutputInterface $output)
+    public function setOutput(OutputInterface $output): void
     {
         $this->output = $output;
     }
@@ -148,10 +146,8 @@ final class ConsoleHandler extends AbstractProcessingHandler implements EventSub
     /**
      * Before a command is executed, the handler gets activated and the console output
      * is set in order to know where to write the logs.
-     *
-     * @return void
      */
-    public function onCommand(ConsoleCommandEvent $event)
+    public function onCommand(ConsoleCommandEvent $event): void
     {
         $output = $event->getOutput();
         if ($output instanceof ConsoleOutputInterface) {
@@ -163,10 +159,8 @@ final class ConsoleHandler extends AbstractProcessingHandler implements EventSub
 
     /**
      * After a command has been executed, it disables the output.
-     *
-     * @return void
      */
-    public function onTerminate(ConsoleTerminateEvent $event)
+    public function onTerminate(ConsoleTerminateEvent $event): void
     {
         $this->close();
     }

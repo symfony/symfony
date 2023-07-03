@@ -90,10 +90,7 @@ class_exists(Registry::class);
  */
 class FrameworkBundle extends Bundle
 {
-    /**
-     * @return void
-     */
-    public function boot()
+    public function boot(): void
     {
         $_ENV['DOCTRINE_DEPRECATIONS'] = $_SERVER['DOCTRINE_DEPRECATIONS'] ??= 'trigger';
 
@@ -115,10 +112,7 @@ class FrameworkBundle extends Bundle
         }
     }
 
-    /**
-     * @return void
-     */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         parent::build($container);
 

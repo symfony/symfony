@@ -28,11 +28,6 @@ class NotNull extends Constraint
         self::IS_NULL_ERROR => 'IS_NULL_ERROR',
     ];
 
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
     public $message = 'This value should not be null.';
 
     public function __construct(array $options = null, string $message = null, array $groups = null, mixed $payload = null)

@@ -30,11 +30,6 @@ class Collection extends Composite
         self::NO_SUCH_FIELD_ERROR => 'NO_SUCH_FIELD_ERROR',
     ];
 
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
     public $fields = [];
     public $allowExtraFields = false;
     public $allowMissingFields = false;

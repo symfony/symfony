@@ -41,11 +41,6 @@ class Isbn extends Constraint
         self::TYPE_NOT_RECOGNIZED_ERROR => 'TYPE_NOT_RECOGNIZED_ERROR',
     ];
 
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
     public $isbn10Message = 'This value is not a valid ISBN-10.';
     public $isbn13Message = 'This value is not a valid ISBN-13.';
     public $bothIsbnMessage = 'This value is neither a valid ISBN-10 nor a valid ISBN-13.';

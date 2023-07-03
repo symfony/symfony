@@ -40,11 +40,6 @@ class UniqueEntity extends Constraint
     public $ignoreNull = true;
 
     /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
-    /**
      * @param array|string      $fields     The combination of fields that must contain unique values or a set of options
      * @param bool|array|string $ignoreNull The combination of fields that ignore null values
      */

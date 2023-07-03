@@ -33,11 +33,6 @@ class Ulid extends Constraint
         self::TOO_LARGE_ERROR => 'TOO_LARGE_ERROR',
     ];
 
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
     public $message = 'This is not a valid ULID.';
 
     public function __construct(

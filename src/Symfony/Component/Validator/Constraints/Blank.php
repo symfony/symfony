@@ -28,11 +28,6 @@ class Blank extends Constraint
         self::NOT_BLANK_ERROR => 'NOT_BLANK_ERROR',
     ];
 
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
     public $message = 'This value should be blank.';
 
     public function __construct(array $options = null, string $message = null, array $groups = null, mixed $payload = null)

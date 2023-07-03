@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Http\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -25,7 +24,7 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
  *
  * @author Iltar van der Berg <kjarli@gmail.com>
  */
-final class UserValueResolver implements ArgumentValueResolverInterface, ValueResolverInterface
+final class UserValueResolver implements ValueResolverInterface
 {
     private TokenStorageInterface $tokenStorage;
 

@@ -10,7 +10,7 @@ CHANGELOG
  * Remove `ContextAwareDenormalizerInterface`, use `DenormalizerInterface` instead
  * Remove `ContextAwareNormalizerInterface`, use `NormalizerInterface` instead
  * Remove `CacheableSupportsMethodInterface`, use `NormalizerInterface` and `DenormalizerInterface` instead
- * First argument of `AttributeMetadata::setSerializedName()` is now required
+ * Require explicit argument when calling `AttributeMetadata::setSerializedName()` and `ClassMetadata::setClassDiscriminatorMapping()`
  * Add argument `$context` to `NormalizerInterface::supportsNormalization()` and `DenormalizerInterface::supportsDenormalization()`
 
 6.3

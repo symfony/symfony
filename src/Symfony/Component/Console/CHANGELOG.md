@@ -6,7 +6,7 @@ CHANGELOG
 
  * Add method `__toString()` to `InputInterface`
  * Remove `Command::$defaultName` and `Command::$defaultDescription`, use the `AsCommand` attribute instead
- * Passing null to `*Command::setApplication()`, `*FormatterStyle::setForeground/setBackground()`, `Helper::setHelpSet()`, `Input*::setDefault()` and `Question::setAutocompleterCallback/setValidator()` must be done explicitly
+ * Require explicit argument when calling `*Command::setApplication()`, `*FormatterStyle::setForeground/setBackground()`, `Helper::setHelpSet()`, `Input*::setDefault()` and `Question::setAutocompleterCallback/setValidator()`
  * Remove `StringInput::REGEX_STRING`
 
 6.4

@@ -111,7 +111,6 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Bridge as MessengerBridge;
 use Symfony\Component\Messenger\Command\StatsCommand;
 use Symfony\Component\Messenger\Handler\BatchHandlerInterface;
-use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Middleware\RouterContextMiddleware;
@@ -213,7 +212,7 @@ class FrameworkExtension extends Extension
         $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));
 
         if (class_exists(InstalledVersions::class) && InstalledVersions::isInstalled('symfony/symfony') && 'symfony/symfony' !== (InstalledVersions::getRootPackage()['name'] ?? '')) {
-            trigger_deprecation('symfony/symfony', '6.1', 'Requiring the "symfony/symfony" package is deprecated; replace it with standalone components instead.');
+            throw new \LogicException('Requiring the "symfony/symfony" package is unsupported; replace it with standalone components instead.');
         }
 
         $loader->load('web.php');
@@ -647,8 +646,6 @@ class FrameworkExtension extends Extension
             ->addTag('validator.constraint_validator');
         $container->registerForAutoconfiguration(ObjectInitializerInterface::class)
             ->addTag('validator.initializer');
-        $container->registerForAutoconfiguration(MessageHandlerInterface::class)
-            ->addTag('messenger.message_handler');
         $container->registerForAutoconfiguration(BatchHandlerInterface::class)
             ->addTag('messenger.message_handler');
         $container->registerForAutoconfiguration(MessengerTransportFactoryInterface::class)
@@ -2591,7 +2588,6 @@ class FrameworkExtension extends Extension
             MailerBridge\Mailjet\Transport\MailjetTransportFactory::class => 'mailer.transport_factory.mailjet',
             MailerBridge\MailPace\Transport\MailPaceTransportFactory::class => 'mailer.transport_factory.mailpace',
             MailerBridge\Mailchimp\Transport\MandrillTransportFactory::class => 'mailer.transport_factory.mailchimp',
-            MailerBridge\OhMySmtp\Transport\OhMySmtpTransportFactory::class => 'mailer.transport_factory.ohmysmtp',
             MailerBridge\Postmark\Transport\PostmarkTransportFactory::class => 'mailer.transport_factory.postmark',
             MailerBridge\Sendgrid\Transport\SendgridTransportFactory::class => 'mailer.transport_factory.sendgrid',
             MailerBridge\Sendinblue\Transport\SendinblueTransportFactory::class => 'mailer.transport_factory.sendinblue',
@@ -2891,45 +2887,6 @@ class FrameworkExtension extends Extension
 
             $container->registerAliasForArgument($limiterId, RateLimiterFactory::class, $name.'.limiter');
         }
-    }
-
-    /**
-     * @deprecated since Symfony 6.2
-     *
-     * @return void
-     */
-    public static function registerRateLimiter(ContainerBuilder $container, string $name, array $limiterConfig)
-    {
-        trigger_deprecation('symfony/framework-bundle', '6.2', 'The "%s()" method is deprecated.', __METHOD__);
-
-        // default configuration (when used by other DI extensions)
-        $limiterConfig += ['lock_factory' => 'lock.factory', 'cache_pool' => 'cache.rate_limiter'];
-
-        $limiter = $container->setDefinition($limiterId = 'limiter.'.$name, new ChildDefinition('limiter'));
-
-        if (null !== $limiterConfig['lock_factory']) {
-            if (!interface_exists(LockInterface::class)) {
-                throw new LogicException(sprintf('Rate limiter "%s" requires the Lock component to be installed. Try running "composer require symfony/lock".', $name));
-            }
-            if (!$container->hasDefinition('lock.factory.abstract')) {
-                throw new LogicException(sprintf('Rate limiter "%s" requires the Lock component to be configured.', $name));
-            }
-
-            $limiter->replaceArgument(2, new Reference($limiterConfig['lock_factory']));
-        }
-        unset($limiterConfig['lock_factory']);
-
-        if (null === $storageId = $limiterConfig['storage_service'] ?? null) {
-            $container->register($storageId = 'limiter.storage.'.$name, CacheStorage::class)->addArgument(new Reference($limiterConfig['cache_pool']));
-        }
-
-        $limiter->replaceArgument(1, new Reference($storageId));
-        unset($limiterConfig['storage_service'], $limiterConfig['cache_pool']);
-
-        $limiterConfig['id'] = $name;
-        $limiter->replaceArgument(0, $limiterConfig);
-
-        $container->registerAliasForArgument($limiterId, RateLimiterFactory::class, $name.'.limiter');
     }
 
     private function registerUidConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void

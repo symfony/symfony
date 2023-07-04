@@ -5,6 +5,12 @@ CHANGELOG
 ---
 
  * Remove command `translation:update`, use `translation:extract` instead
+ * Make the `http_method_override` config option default to `false`
+ * Remove `AbstractController::renderForm()`, use `render()` instead
+ * Remove the `Symfony\Component\Serializer\Normalizer\ObjectNormalizer` and
+   `Symfony\Component\Serializer\Normalizer\PropertyNormalizer` autowiring aliases, type-hint against
+   `Symfony\Component\Serializer\Normalizer\NormalizerInterface` or implement `NormalizerAwareInterface` instead
+ * Remove the `Http\Client\HttpClient` service, use `Psr\Http\Client\ClientInterface` instead
 
 6.3
 ---

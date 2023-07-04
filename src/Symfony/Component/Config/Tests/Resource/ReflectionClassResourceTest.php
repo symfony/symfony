@@ -14,7 +14,6 @@ namespace Symfony\Component\Config\Tests\Resource;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\ReflectionClassResource;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 class ReflectionClassResourceTest extends TestCase
@@ -175,27 +174,6 @@ EOPHP;
         $this->assertTrue($res->isFresh(0));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testMessageSubscriber()
-    {
-        $res = new ReflectionClassResource(new \ReflectionClass(TestMessageSubscriber::class));
-        $this->assertTrue($res->isFresh(0));
-
-        TestMessageSubscriberConfigHolder::$handledMessages = ['SomeMessageClass' => []];
-        $this->assertFalse($res->isFresh(0));
-
-        $res = new ReflectionClassResource(new \ReflectionClass(TestMessageSubscriber::class));
-        $this->assertTrue($res->isFresh(0));
-
-        TestMessageSubscriberConfigHolder::$handledMessages = ['OtherMessageClass' => []];
-        $this->assertFalse($res->isFresh(0));
-
-        $res = new ReflectionClassResource(new \ReflectionClass(TestMessageSubscriber::class));
-        $this->assertTrue($res->isFresh(0));
-    }
-
     public function testServiceSubscriber()
     {
         $res = new ReflectionClassResource(new \ReflectionClass(TestServiceSubscriber::class));
@@ -229,22 +207,6 @@ class TestEventSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return self::$subscribedEvents;
-    }
-}
-
-if (interface_exists(MessageSubscriberInterface::class)) {
-    class TestMessageSubscriber implements MessageSubscriberInterface
-    {
-        public static function getHandledMessages(): iterable
-        {
-            foreach (TestMessageSubscriberConfigHolder::$handledMessages as $key => $subscribedMessage) {
-                yield $key => $subscribedMessage;
-            }
-        }
-    }
-    class TestMessageSubscriberConfigHolder
-    {
-        public static $handledMessages = [];
     }
 }
 

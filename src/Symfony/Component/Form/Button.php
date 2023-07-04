@@ -81,11 +81,8 @@ class Button implements \IteratorAggregate, FormInterface
         throw new BadMethodCallException('Buttons cannot have children.');
     }
 
-    public function setParent(FormInterface $parent = null): static
+    public function setParent(?FormInterface $parent): static
     {
-        if (1 > \func_num_args()) {
-            trigger_deprecation('symfony/form', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
-        }
         if ($this->submitted) {
             throw new AlreadySubmittedException('You cannot set the parent of a submitted button.');
         }

@@ -53,7 +53,6 @@ class AmazonSqsTransportTest extends TestCase
     protected function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);
-        // Mocking the concrete receiver class because mocking multiple interfaces is deprecated
         $this->receiver = $this->createMock(AmazonSqsReceiver::class);
         $this->sender = $this->createMock(SenderInterface::class);
 

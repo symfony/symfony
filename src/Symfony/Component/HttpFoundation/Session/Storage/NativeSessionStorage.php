@@ -317,11 +317,8 @@ class NativeSessionStorage implements SessionStorageInterface
     /**
      * @return void
      */
-    public function setMetadataBag(MetadataBag $metaBag = null)
+    public function setMetadataBag(?MetadataBag $metaBag)
     {
-        if (1 > \func_num_args()) {
-            trigger_deprecation('symfony/http-foundation', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
-        }
         $this->metadataBag = $metaBag ?? new MetadataBag();
     }
 
@@ -396,12 +393,8 @@ class NativeSessionStorage implements SessionStorageInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function setSaveHandler(AbstractProxy|\SessionHandlerInterface $saveHandler = null)
+    public function setSaveHandler(AbstractProxy|\SessionHandlerInterface|null $saveHandler)
     {
-        if (1 > \func_num_args()) {
-            trigger_deprecation('symfony/http-foundation', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
-        }
-
         // Wrap $saveHandler in proxy and prevent double wrapping of proxy
         if (!$saveHandler instanceof AbstractProxy && $saveHandler instanceof \SessionHandlerInterface) {
             $saveHandler = new SessionHandlerProxy($saveHandler);

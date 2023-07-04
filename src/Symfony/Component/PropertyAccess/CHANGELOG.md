@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add method `isNullSafe()` to `PropertyPathInterface`
+ * Require explicit argument when calling `PropertyAccessorBuilder::setCacheItemPool()`
 
 6.3
 ---

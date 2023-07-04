@@ -150,6 +150,8 @@ class TwigExtension extends Extension
 
         if (isset($config['autoescape_service']) && isset($config['autoescape_service_method'])) {
             $config['autoescape'] = [new Reference($config['autoescape_service']), $config['autoescape_service_method']];
+        } else {
+            $config['autoescape'] = 'name';
         }
 
         $container->getDefinition('twig')->replaceArgument(1, array_intersect_key($config, [

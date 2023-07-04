@@ -48,7 +48,7 @@ if (trait_exists(FormattableHandlerTrait::class)) {
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  *
- * @internal since Symfony 6.1
+ * @internal
  */
 trait ServerLogHandlerTrait
 {

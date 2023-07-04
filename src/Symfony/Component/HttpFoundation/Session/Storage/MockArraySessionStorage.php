@@ -192,11 +192,8 @@ class MockArraySessionStorage implements SessionStorageInterface
     /**
      * @return void
      */
-    public function setMetadataBag(MetadataBag $bag = null)
+    public function setMetadataBag(?MetadataBag $bag)
     {
-        if (1 > \func_num_args()) {
-            trigger_deprecation('symfony/http-foundation', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
-        }
         $this->metadataBag = $bag ?? new MetadataBag();
     }
 

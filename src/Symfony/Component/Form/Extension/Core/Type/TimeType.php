@@ -218,8 +218,7 @@ class TimeType extends AbstractType
                 }
 
                 if ($date->getTimezone()->getName() !== $options['model_timezone']) {
-                    trigger_deprecation('symfony/form', '6.4', sprintf('Using a "%s" instance with a timezone ("%s") not matching the configured model timezone "%s" is deprecated.', $date::class, $date->getTimezone()->getName(), $options['model_timezone']));
-                    // throw new LogicException(sprintf('Using a "%s" instance with a timezone ("%s") not matching the configured model timezone "%s" is not supported.', $date::class, $date->getTimezone()->getName(), $options['model_timezone']));
+                    throw new LogicException(sprintf('Using a "%s" instance with a timezone ("%s") not matching the configured model timezone "%s" is not supported.', get_debug_type($date), $date->getTimezone()->getName(), $options['model_timezone']));
                 }
             });
         }
@@ -327,11 +326,7 @@ class TimeType extends AbstractType
             'hours' => range(0, 23),
             'minutes' => range(0, 59),
             'seconds' => range(0, 59),
-            'widget' => static function (Options $options) {
-                trigger_deprecation('symfony/form', '6.3', 'Not configuring the "widget" option of form type "time" is deprecated. It will default to "single_text" in Symfony 7.0.');
-
-                return 'choice';
-            },
+            'widget' => 'single_text',
             'input' => 'datetime',
             'input_format' => 'H:i:s',
             'with_minutes' => true,

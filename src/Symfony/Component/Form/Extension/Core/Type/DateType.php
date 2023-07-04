@@ -190,8 +190,7 @@ class DateType extends AbstractType
                 }
 
                 if ($date->getTimezone()->getName() !== $options['model_timezone']) {
-                    trigger_deprecation('symfony/form', '6.4', sprintf('Using a "%s" instance with a timezone ("%s") not matching the configured model timezone "%s" is deprecated.', $date::class, $date->getTimezone()->getName(), $options['model_timezone']));
-                    // throw new LogicException(sprintf('Using a "%s" instance with a timezone ("%s") not matching the configured model timezone "%s" is not supported.', $date::class, $date->getTimezone()->getName(), $options['model_timezone']));
+                    throw new LogicException(sprintf('Using a "%s" instance with a timezone ("%s") not matching the configured model timezone "%s" is not supported.', get_debug_type($date), $date->getTimezone()->getName(), $options['model_timezone']));
                 }
             });
         }
@@ -286,11 +285,7 @@ class DateType extends AbstractType
             'years' => range((int) date('Y') - 5, (int) date('Y') + 5),
             'months' => range(1, 12),
             'days' => range(1, 31),
-            'widget' => static function (Options $options) {
-                trigger_deprecation('symfony/form', '6.3', 'Not configuring the "widget" option of form type "date" is deprecated. It will default to "single_text" in Symfony 7.0.');
-
-                return 'choice';
-            },
+            'widget' => 'single_text',
             'input' => 'datetime',
             'format' => $format,
             'model_timezone' => null,

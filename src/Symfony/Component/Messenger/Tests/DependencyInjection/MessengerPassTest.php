@@ -34,8 +34,6 @@ use Symfony\Component\Messenger\DataCollector\MessengerDataCollector;
 use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
-use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
-use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
@@ -152,19 +150,6 @@ class MessengerPassTest extends TestCase
     public function testTaggedMessageHandler()
     {
         $container = $this->getContainerBuilder($busId = 'message_bus');
-        $container->registerAttributeForAutoconfiguration(AsMessageHandler::class, static function (ChildDefinition $definition, AsMessageHandler $attribute, \ReflectionClass|\ReflectionMethod $reflector): void {
-            $tagAttributes = get_object_vars($attribute);
-            $tagAttributes['from_transport'] = $tagAttributes['fromTransport'];
-            unset($tagAttributes['fromTransport']);
-            if ($reflector instanceof \ReflectionMethod) {
-                if (isset($tagAttributes['method'])) {
-                    throw new LogicException(sprintf('AsMessageHandler attribute cannot declare a method on "%s::%s()".', $reflector->class, $reflector->name));
-                }
-                $tagAttributes['method'] = $reflector->getName();
-            }
-
-            $definition->addTag('messenger.message_handler', $tagAttributes);
-        });
         $container
             ->register(TaggedDummyHandler::class, TaggedDummyHandler::class)
             ->setAutoconfigured(true)
@@ -192,19 +177,6 @@ class MessengerPassTest extends TestCase
     public function testTaggedMessageHandlerWithUnionTypes()
     {
         $container = $this->getContainerBuilder($busId = 'message_bus');
-        $container->registerAttributeForAutoconfiguration(AsMessageHandler::class, static function (ChildDefinition $definition, AsMessageHandler $attribute, \ReflectionClass|\ReflectionMethod $reflector): void {
-            $tagAttributes = get_object_vars($attribute);
-            $tagAttributes['from_transport'] = $tagAttributes['fromTransport'];
-            unset($tagAttributes['fromTransport']);
-            if ($reflector instanceof \ReflectionMethod) {
-                if (isset($tagAttributes['method'])) {
-                    throw new LogicException(sprintf('AsMessageHandler attribute cannot declare a method on "%s::%s()".', $reflector->class, $reflector->name));
-                }
-                $tagAttributes['method'] = $reflector->getName();
-            }
-
-            $definition->addTag('messenger.message_handler', $tagAttributes);
-        });
         $container
             ->register(TaggedDummyHandlerWithUnionTypes::class, TaggedDummyHandlerWithUnionTypes::class)
             ->setAutoconfigured(true)
@@ -309,22 +281,20 @@ class MessengerPassTest extends TestCase
         (new MessengerPass())->process($container);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testGetClassesFromTheHandlerSubscriberInterface()
+    public function testGetClassesFromTheAttribute()
     {
         $container = $this->getContainerBuilder($busId = 'message_bus');
         $container
             ->register(HandlerWithMultipleMessages::class, HandlerWithMultipleMessages::class)
-            ->addTag('messenger.message_handler')
+            ->setAutoconfigured(true)
         ;
         $container
             ->register(PrioritizedHandler::class, PrioritizedHandler::class)
-            ->addTag('messenger.message_handler')
+            ->setAutoconfigured(true)
         ;
 
-        $this->expectDeprecation('Since symfony/messenger 6.2: Implementing "Symfony\Component\Messenger\Handler\MessageSubscriberInterface" is deprecated, use the "Symfony\Component\Messenger\Attribute\AsMessageHandler" attribute instead.');
+        (new AttributeAutoconfigurationPass())->process($container);
+        (new ResolveInstanceofConditionalsPass())->process($container);
         (new MessengerPass())->process($container);
 
         $handlersMapping = $container->getDefinition($busId.'.messenger.handlers_locator')->getArgument(0);
@@ -336,21 +306,20 @@ class MessengerPassTest extends TestCase
         $this->assertHandlerDescriptor($container, $handlersMapping, SecondMessage::class, [PrioritizedHandler::class, HandlerWithMultipleMessages::class], [['priority' => 10]]);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testGetClassesAndMethodsAndPrioritiesFromTheSubscriber()
+    public function testGetClassesAndMethodsAndPrioritiesFromTheAttribute()
     {
         $container = $this->getContainerBuilder($busId = 'message_bus');
         $container
             ->register(HandlerMappingMethods::class, HandlerMappingMethods::class)
-            ->addTag('messenger.message_handler')
+            ->setAutoconfigured(true)
         ;
         $container
             ->register(PrioritizedHandler::class, PrioritizedHandler::class)
-            ->addTag('messenger.message_handler')
+            ->setAutoconfigured(true)
         ;
 
+        (new AttributeAutoconfigurationPass())->process($container);
+        (new ResolveInstanceofConditionalsPass())->process($container);
         (new MessengerPass())->process($container);
 
         $handlersMapping = $container->getDefinition($busId.'.messenger.handlers_locator')->getArgument(0);
@@ -418,9 +387,6 @@ class MessengerPassTest extends TestCase
         (new MessengerPass())->process($container);
     }
 
-    /**
-     * @group legacy
-     */
     public function testThrowsExceptionIfTheHandlerMethodDoesNotExist()
     {
         $this->expectException(RuntimeException::class);
@@ -429,9 +395,11 @@ class MessengerPassTest extends TestCase
         $container->register('message_bus', MessageBusInterface::class)->addTag('messenger.bus');
         $container
             ->register(HandlerMappingWithNonExistentMethod::class, HandlerMappingWithNonExistentMethod::class)
-            ->addTag('messenger.message_handler')
+            ->setAutoconfigured(true)
         ;
 
+        (new AttributeAutoconfigurationPass())->process($container);
+        (new ResolveInstanceofConditionalsPass())->process($container);
         (new MessengerPass())->process($container);
     }
 
@@ -492,39 +460,6 @@ class MessengerPassTest extends TestCase
         $this->assertSame(['amqp', 'dummy'], $container->getDefinition('console.command.messenger_setup_transports')->getArgument(1));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testItShouldNotThrowIfGeneratorIsReturnedInsteadOfArray()
-    {
-        $container = $this->getContainerBuilder($busId = 'message_bus');
-        $container
-            ->register(HandlerWithGenerators::class, HandlerWithGenerators::class)
-            ->addTag('messenger.message_handler')
-        ;
-
-        (new MessengerPass())->process($container);
-
-        $handlersMapping = $container->getDefinition($busId.'.messenger.handlers_locator')->getArgument(0);
-
-        $this->assertHandlerDescriptor(
-            $container,
-            $handlersMapping,
-            DummyMessage::class,
-            [[HandlerWithGenerators::class, 'dummyMethod']]
-        );
-
-        $this->assertHandlerDescriptor(
-            $container,
-            $handlersMapping,
-            SecondMessage::class,
-            [[HandlerWithGenerators::class, 'secondMessage']]
-        );
-    }
-
-    /**
-     * @group legacy
-     */
     public function testItRegistersHandlersOnDifferentBuses()
     {
         $container = $this->getContainerBuilder($eventsBusId = 'event_bus');
@@ -532,8 +467,11 @@ class MessengerPassTest extends TestCase
 
         $container
             ->register(HandlerOnSpecificBuses::class, HandlerOnSpecificBuses::class)
-            ->addTag('messenger.message_handler');
+            ->setAutoconfigured(true)
+        ;
 
+        (new AttributeAutoconfigurationPass())->process($container);
+        (new ResolveInstanceofConditionalsPass())->process($container);
         (new MessengerPass())->process($container);
 
         $eventsHandlerMapping = $container->getDefinition($eventsBusId.'.messenger.handlers_locator')->getArgument(0);
@@ -557,19 +495,18 @@ class MessengerPassTest extends TestCase
         );
     }
 
-    /**
-     * @group legacy
-     */
     public function testItThrowsAnExceptionOnUnknownBus()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Invalid configuration returned by method "Symfony\Component\Messenger\Tests\DependencyInjection\HandlerOnUndefinedBus::getHandledMessages()" for message "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage": bus "some_undefined_bus" does not exist.');
+        $this->expectExceptionMessage('Invalid handler service "Symfony\Component\Messenger\Tests\DependencyInjection\HandlerOnUndefinedBus": bus "some_undefined_bus" specified on the tag "messenger.message_handler" does not exist (known ones are: "message_bus").');
         $container = $this->getContainerBuilder();
         $container
             ->register(HandlerOnUndefinedBus::class, HandlerOnUndefinedBus::class)
-            ->addTag('messenger.message_handler')
+            ->setAutoconfigured(true)
         ;
 
+        (new AttributeAutoconfigurationPass())->process($container);
+        (new ResolveInstanceofConditionalsPass())->process($container);
         (new MessengerPass())->process($container);
     }
 
@@ -586,35 +523,18 @@ class MessengerPassTest extends TestCase
         (new MessengerPass())->process($container);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testUndefinedMessageClassForHandlerImplementingMessageHandlerInterface()
+    public function testUndefinedMessageClassForHandlerViaAttribute()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Invalid handler service "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessageHandlerViaHandlerInterface": class or interface "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessage" used as argument type in method "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessageHandlerViaHandlerInterface::__invoke()" not found.');
+        $this->expectExceptionMessage('Invalid handler service "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessageHandlerViaAttribute": class or interface "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessage" used as argument type in method "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessageHandlerViaAttribute::__invoke()" not found.');
         $container = $this->getContainerBuilder();
         $container
-            ->register(UndefinedMessageHandlerViaHandlerInterface::class, UndefinedMessageHandlerViaHandlerInterface::class)
-            ->addTag('messenger.message_handler')
+            ->register(UndefinedMessageHandlerViaAttribute::class, UndefinedMessageHandlerViaAttribute::class)
+            ->setAutoconfigured(true)
         ;
 
-        (new MessengerPass())->process($container);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testUndefinedMessageClassForHandlerImplementingMessageSubscriberInterface()
-    {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Invalid handler service "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessageHandlerViaSubscriberInterface": class or interface "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessage" returned by method "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessageHandlerViaSubscriberInterface::getHandledMessages()" not found.');
-        $container = $this->getContainerBuilder();
-        $container
-            ->register(UndefinedMessageHandlerViaSubscriberInterface::class, UndefinedMessageHandlerViaSubscriberInterface::class)
-            ->addTag('messenger.message_handler')
-        ;
-
+        (new AttributeAutoconfigurationPass())->process($container);
+        (new ResolveInstanceofConditionalsPass())->process($container);
         (new MessengerPass())->process($container);
     }
 
@@ -701,18 +621,19 @@ class MessengerPassTest extends TestCase
         (new MessengerPass())->process($container);
     }
 
-    /**
-     * @group legacy
-     */
     public function testNeedsToHandleAtLeastOneMessage()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Invalid handler service "Symfony\Component\Messenger\Tests\DependencyInjection\HandleNoMessageHandler": method "Symfony\Component\Messenger\Tests\DependencyInjection\HandleNoMessageHandler::getHandledMessages()" must return one or more messages.');
         $container = $this->getContainerBuilder();
         $container
             ->register(HandleNoMessageHandler::class, HandleNoMessageHandler::class)
-            ->addTag('messenger.message_handler')
+            ->setAutoconfigured(true)
         ;
+
+        (new AttributeAutoconfigurationPass())->process($container);
+        (new ResolveInstanceofConditionalsPass())->process($container);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Invalid handler service "Symfony\Component\Messenger\Tests\DependencyInjection\HandleNoMessageHandler": method "Symfony\Component\Messenger\Tests\DependencyInjection\HandleNoMessageHandler::__invoke()" requires at least one argument, first one being the message it handles.');
 
         (new MessengerPass())->process($container);
     }
@@ -739,7 +660,7 @@ class MessengerPassTest extends TestCase
 
         $container->setParameter($middlewareParameter = $fooBusId.'.middleware', [
             ['id' => UselessMiddleware::class],
-            ['id' => 'middleware_with_factory', 'arguments' => $factoryChildMiddlewareArgs1 = ['index_0' => 'foo', 'bar']],
+            ['id' => 'middleware_with_factory', 'arguments' => ['index_0' => 'foo', 'bar']],
             ['id' => 'middleware_with_factory', 'arguments' => $factoryChildMiddlewareArgs2 = ['index_0' => 'baz']],
             ['id' => 'middleware_with_factory_using_default'],
         ]);
@@ -788,7 +709,7 @@ class MessengerPassTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Invalid middleware: service "not_defined_middleware" not found.');
         $container = $this->getContainerBuilder($fooBusId = 'messenger.bus.foo');
-        $container->setParameter($middlewareParameter = $fooBusId.'.middleware', [
+        $container->setParameter($fooBusId.'.middleware', [
             ['id' => 'not_defined_middleware', 'arguments' => []],
         ]);
 
@@ -801,7 +722,7 @@ class MessengerPassTest extends TestCase
         $this->expectExceptionMessage('Invalid middleware factory "not_an_abstract_definition": a middleware factory must be an abstract definition.');
         $container = $this->getContainerBuilder($fooBusId = 'messenger.bus.foo');
         $container->register('not_an_abstract_definition', UselessMiddleware::class);
-        $container->setParameter($middlewareParameter = $fooBusId.'.middleware', [
+        $container->setParameter($fooBusId.'.middleware', [
             ['id' => 'not_an_abstract_definition', 'arguments' => ['foo']],
         ]);
 
@@ -861,6 +782,20 @@ class MessengerPassTest extends TestCase
         $container->register('messenger.receiver_locator', ServiceLocator::class)
             ->addArgument(new Reference('service_container'))
         ;
+
+        $container->registerAttributeForAutoconfiguration(AsMessageHandler::class, static function (ChildDefinition $definition, AsMessageHandler $attribute, \ReflectionClass|\ReflectionMethod $reflector): void {
+            $tagAttributes = get_object_vars($attribute);
+            $tagAttributes['from_transport'] = $tagAttributes['fromTransport'];
+            unset($tagAttributes['fromTransport']);
+            if ($reflector instanceof \ReflectionMethod) {
+                if (isset($tagAttributes['method'])) {
+                    throw new LogicException(sprintf('AsMessageHandler attribute cannot declare a method on "%s::%s()".', $reflector->class, $reflector->name));
+                }
+                $tagAttributes['method'] = $reflector->getName();
+            }
+
+            $definition->addTag('messenger.message_handler', $tagAttributes);
+        });
 
         return $container;
     }
@@ -958,21 +893,10 @@ class UndefinedMessageHandler
     }
 }
 
-class UndefinedMessageHandlerViaHandlerInterface implements MessageHandlerInterface
+#[AsMessageHandler]
+class UndefinedMessageHandlerViaAttribute
 {
     public function __invoke(UndefinedMessage $message)
-    {
-    }
-}
-
-class UndefinedMessageHandlerViaSubscriberInterface implements MessageSubscriberInterface
-{
-    public static function getHandledMessages(): iterable
-    {
-        return [UndefinedMessage::class];
-    }
-
-    public function __invoke()
     {
     }
 }
@@ -1002,114 +926,66 @@ class BuiltinArgumentTypeHandler
     }
 }
 
-class HandlerWithMultipleMessages implements MessageSubscriberInterface
+#[AsMessageHandler(handles: DummyMessage::class)]
+#[AsMessageHandler(handles: SecondMessage::class)]
+class HandlerWithMultipleMessages
 {
-    public static function getHandledMessages(): iterable
+    public function __invoke($message)
     {
-        return [
-            DummyMessage::class,
-            SecondMessage::class,
-        ];
+    }
+}
+
+#[AsMessageHandler(handles: SecondMessage::class, priority: 10)]
+class PrioritizedHandler
+{
+    public function __invoke(SecondMessage $message)
+    {
+    }
+}
+
+#[AsMessageHandler(handles: DummyMessage::class, method: 'dummyMethod')]
+#[AsMessageHandler(handles: SecondMessage::class, method: 'secondMessage', priority: 20)]
+class HandlerMappingMethods
+{
+    public function dummyMethod(DummyMessage $message)
+    {
     }
 
+    public function secondMessage(SecondMessage $message)
+    {
+    }
+}
+
+#[AsMessageHandler(handles: DummyMessage::class, method: 'dummyMethod')]
+class HandlerMappingWithNonExistentMethod
+{
+}
+
+#[AsMessageHandler]
+class HandleNoMessageHandler
+{
     public function __invoke()
     {
     }
 }
 
-class PrioritizedHandler implements MessageSubscriberInterface
+#[AsMessageHandler(handles: DummyMessage::class, method: 'dummyMethodForEvents', bus: 'event_bus')]
+#[AsMessageHandler(handles: DummyMessage::class, method: 'dummyMethodForCommands', bus: 'command_bus')]
+class HandlerOnSpecificBuses
 {
-    public static function getHandledMessages(): iterable
+    public function dummyMethodForEvents(DummyMessage $message)
     {
-        yield SecondMessage::class => ['priority' => 10];
     }
 
-    public function __invoke()
+    public function dummyMethodForCommands(DummyMessage $message)
     {
     }
 }
 
-class HandlerMappingMethods implements MessageSubscriberInterface
+#[AsMessageHandler(handles: DummyMessage::class, bus: 'some_undefined_bus', method: 'dummyMethodForSomeBus')]
+class HandlerOnUndefinedBus
 {
-    public static function getHandledMessages(): iterable
-    {
-        yield DummyMessage::class => 'dummyMethod';
-        yield SecondMessage::class => ['method' => 'secondMessage', 'priority' => 20];
-    }
-
-    public function dummyMethod()
-    {
-    }
-
-    public function secondMessage()
-    {
-    }
-}
-
-class HandlerMappingWithNonExistentMethod implements MessageSubscriberInterface
-{
-    public static function getHandledMessages(): iterable
-    {
-        return [
-            DummyMessage::class => 'dummyMethod',
-        ];
-    }
-}
-
-class HandleNoMessageHandler implements MessageSubscriberInterface
-{
-    public static function getHandledMessages(): iterable
-    {
-        return [];
-    }
-
-    public function __invoke()
-    {
-    }
-}
-
-class HandlerWithGenerators implements MessageSubscriberInterface
-{
-    public static function getHandledMessages(): iterable
-    {
-        yield DummyMessage::class => 'dummyMethod';
-        yield SecondMessage::class => 'secondMessage';
-    }
-
-    public function dummyMethod()
-    {
-    }
-
-    public function secondMessage()
-    {
-    }
-}
-
-class HandlerOnSpecificBuses implements MessageSubscriberInterface
-{
-    public static function getHandledMessages(): iterable
-    {
-        yield DummyMessage::class => ['method' => 'dummyMethodForEvents', 'bus' => 'event_bus'];
-        yield DummyMessage::class => ['method' => 'dummyMethodForCommands', 'bus' => 'command_bus'];
-    }
-
-    public function dummyMethodForEvents()
-    {
-    }
-
-    public function dummyMethodForCommands()
-    {
-    }
-}
-
-class HandlerOnUndefinedBus implements MessageSubscriberInterface
-{
-    public static function getHandledMessages(): iterable
-    {
-        yield DummyMessage::class => ['method' => 'dummyMethodForSomeBus', 'bus' => 'some_undefined_bus'];
-    }
-
-    public function dummyMethodForSomeBus()
+    public function dummyMethodForSomeBus(DummyMessage $message)
     {
     }
 }

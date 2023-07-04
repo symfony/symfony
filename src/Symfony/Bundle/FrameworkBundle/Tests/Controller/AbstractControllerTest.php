@@ -471,58 +471,6 @@ class AbstractControllerTest extends TestCase
         $this->assertSame('bar', $response->getContent());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testRenderForm()
-    {
-        $formView = new FormView();
-
-        $form = $this->getMockBuilder(FormInterface::class)->getMock();
-        $form->expects($this->once())->method('createView')->willReturn($formView);
-
-        $twig = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
-        $twig->expects($this->once())->method('render')->with('foo', ['bar' => $formView])->willReturn('bar');
-
-        $container = new Container();
-        $container->set('twig', $twig);
-
-        $controller = $this->createController();
-        $controller->setContainer($container);
-
-        $response = $controller->renderForm('foo', ['bar' => $form]);
-
-        $this->assertTrue($response->isSuccessful());
-        $this->assertSame('bar', $response->getContent());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testRenderFormSubmittedAndInvalid()
-    {
-        $formView = new FormView();
-
-        $form = $this->getMockBuilder(FormInterface::class)->getMock();
-        $form->expects($this->once())->method('createView')->willReturn($formView);
-        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
-        $form->expects($this->once())->method('isValid')->willReturn(false);
-
-        $twig = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
-        $twig->expects($this->once())->method('render')->with('foo', ['bar' => $formView])->willReturn('bar');
-
-        $container = new Container();
-        $container->set('twig', $twig);
-
-        $controller = $this->createController();
-        $controller->setContainer($container);
-
-        $response = $controller->renderForm('foo', ['bar' => $form]);
-
-        $this->assertSame(422, $response->getStatusCode());
-        $this->assertSame('bar', $response->getContent());
-    }
-
     public function testStreamTwig()
     {
         $twig = $this->createMock(Environment::class);

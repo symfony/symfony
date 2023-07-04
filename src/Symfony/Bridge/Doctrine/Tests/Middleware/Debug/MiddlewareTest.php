@@ -277,5 +277,7 @@ EOT;
         $this->conn->beginTransaction();
         $sqlMethod($this->conn, 'SELECT * FROM products');
         $endTransactionMethod($this->conn);
+
+        $this->addToAssertionCount(1);
     }
 }

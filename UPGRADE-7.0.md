@@ -4,6 +4,7 @@ UPGRADE FROM 6.4 to 7.0
 Symfony 6.4 and Symfony 7.0 will be released simultaneously at the end of November 2023. According to the Symfony
 release process, both versions will have the same features, but Symfony 7.0 won't include any deprecated features.
 To upgrade, make sure to resolve all deprecation notices.
+Read more about this in the [Symfony documentation](https://symfony.com/doc/current/setup/upgrade_major.html).
 
 Cache
 -----
@@ -14,6 +15,32 @@ Console
 -------
 
  * Remove `Command::$defaultName` and `Command::$defaultDescription`, use the `AsCommand` attribute instead
+
+   *Before*
+   ```php
+   use Symfony\Component\Console\Command\Command;
+
+   class CreateUserCommand extends Command
+   {
+       protected static $defaultName = 'app:create-user';
+       protected static $defaultDescription = 'Creates users';
+
+       // ...
+   }
+   ```
+
+   *After*
+   ```php
+   use Symfony\Component\Console\Attribute\AsCommand;
+   use Symfony\Component\Console\Command\Command;
+
+   #[AsCommand(name: 'app:create-user', description: 'Creates users')]
+   class CreateUserCommand extends Command
+   {
+       // ...
+   }
+   ```
+
  * Passing null to `*Command::setApplication()`, `*FormatterStyle::setForeground/setBackground()`, `Helper::setHelpSet()`, `Input*::setDefault()` and `Question::setAutocompleterCallback/setValidator()` must be done explicitly
  * Remove `StringInput::REGEX_STRING`
  * Add method `__toString()` to `InputInterface`
@@ -128,7 +155,7 @@ Security
 SecurityBundle
 --------------
 
- * Enabling SecurityBundle and not configuring it is not allowed
+ * Enabling SecurityBundle and not configuring it is not allowed, either remove the bundle or configure at least one firewall
 
 Serializer
 ----------
@@ -136,9 +163,75 @@ Serializer
  * Add method `getSupportedTypes()` to `DenormalizerInterface` and `NormalizerInterface`
  * Remove denormalization support for `AbstractUid` in `UidNormalizer`, use one of `AbstractUid` child class instead
  * Denormalizing to an abstract class in `UidNormalizer` now throws an `\Error`
- * Remove `ContextAwareDenormalizerInterface`, use `DenormalizerInterface` instead
- * Remove `ContextAwareNormalizerInterface`, use `NormalizerInterface` instead
+ * Remove `ContextAwareDenormalizerInterface` and `ContextAwareNormalizerInterface`, use `DenormalizerInterface` and `NormalizerInterface` instead
+
+   *Before*
+   ```php
+   use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
+
+   class TopicNormalizer implements ContextAwareNormalizerInterface
+   {
+       public function normalize($topic, string $format = null, array $context = [])
+       {
+       }
+   }
+   ```
+
+   *After*
+   ```php
+   use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+
+   class TopicNormalizer implements NormalizerInterface
+   {
+       public function normalize($topic, string $format = null, array $context = [])
+       {
+       }
+   }
+   ```
  * Remove `CacheableSupportsMethodInterface`, use `NormalizerInterface` and `DenormalizerInterface` instead
+
+   *Before*
+   ```php
+   use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+   use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
+
+   class TopicNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
+   {
+       public function supportsNormalization($data, string $format = null, array $context = []): bool
+       {
+           return $data instanceof Topic;
+       }
+
+       public function hasCacheableSupportsMethod(): bool
+       {
+           return true;
+       }
+
+       // ...
+   }
+   ```
+
+   *After*
+   ```php
+   use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+
+   class TopicNormalizer implements NormalizerInterface
+   {
+       public function supportsNormalization($data, string $format = null, array $context = []): bool
+       {
+           return $data instanceof Topic;
+       }
+
+       public function getSupportedTypes(?string $format): array
+       {
+           return [
+               Topic::class => true,
+           ];
+       }
+
+       // ...
+   }
+   ```
  * First argument of `AttributeMetadata::setSerializedName()` is now required
  * Add argument `$context` to `NormalizerInterface::supportsNormalization()` and `DenormalizerInterface::supportsDenormalization()`
 

@@ -4,6 +4,7 @@ CHANGELOG
 6.4
 ---
 
+ * `BundleInterface` no longer extends `ContainerAwareInterface`
  * Add optional `$className` parameter to `ControllerEvent::getAttributes()`
 
 6.3

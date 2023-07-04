@@ -50,26 +50,6 @@ class DateTimeValueResolverTest extends TestCase
         yield [FooDateTime::class];
     }
 
-    /**
-     * @group legacy
-     */
-    public function testSupports()
-    {
-        $resolver = new DateTimeValueResolver();
-
-        $argument = new ArgumentMetadata('dummy', \DateTime::class, false, false, null);
-        $request = self::requestWithAttributes(['dummy' => 'now']);
-        $this->assertTrue($resolver->supports($request, $argument));
-
-        $argument = new ArgumentMetadata('dummy', FooDateTime::class, false, false, null);
-        $request = self::requestWithAttributes(['dummy' => 'now']);
-        $this->assertTrue($resolver->supports($request, $argument));
-
-        $argument = new ArgumentMetadata('dummy', \stdClass::class, false, false, null);
-        $request = self::requestWithAttributes(['dummy' => 'now']);
-        $this->assertFalse($resolver->supports($request, $argument));
-    }
-
     public function testUnsupportedArgument()
     {
         $resolver = new DateTimeValueResolver();

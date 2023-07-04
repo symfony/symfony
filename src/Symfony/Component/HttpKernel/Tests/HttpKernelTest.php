@@ -51,7 +51,7 @@ class HttpKernelTest extends TestCase
         $kernel = $this->getHttpKernel(new EventDispatcher(), function () { throw new \RuntimeException(); }, $requestStack);
 
         try {
-            $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, true);
+            $kernel->handle(new Request(), HttpKernelInterface::MAIN_REQUEST, true);
         } catch (\Throwable $exception) {
         }
 
@@ -64,7 +64,7 @@ class HttpKernelTest extends TestCase
         $kernel = $this->getHttpKernel(new EventDispatcher(), function () { throw new \RuntimeException(); }, $requestStack);
 
         try {
-            $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, false);
+            $kernel->handle(new Request(), HttpKernelInterface::MAIN_REQUEST, false);
         } catch (\Throwable $exception) {
         }
 
@@ -77,7 +77,7 @@ class HttpKernelTest extends TestCase
         $kernel = $this->getHttpKernel(new EventDispatcher(), function () { throw new \Error(); }, $requestStack);
 
         try {
-            $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, true);
+            $kernel->handle(new Request(), HttpKernelInterface::MAIN_REQUEST, true);
         } catch (\Throwable $exception) {
         }
 

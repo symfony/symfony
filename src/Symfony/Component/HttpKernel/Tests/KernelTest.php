@@ -13,14 +13,11 @@ namespace Symfony\Component\HttpKernel\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
-use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
@@ -39,8 +36,6 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\ResettableService;
 
 class KernelTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     protected function tearDown(): void
     {
         try {
@@ -626,45 +621,6 @@ EOF
         };
 
         $this->assertMatchesRegularExpression('/^[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*TestDebugContainer$/', $kernel->getContainerClass());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testKernelWithParameterDeprecation()
-    {
-        $kernel = new class('test', true) extends Kernel {
-            public function __construct(string $env, bool $debug)
-            {
-                $this->container = new ContainerBuilder(new ParameterBag(['container.dumper.inline_factories' => true, 'container.dumper.inline_class_loader' => true]));
-                parent::__construct($env, $debug);
-            }
-
-            public function registerBundles(): iterable
-            {
-                return [];
-            }
-
-            public function registerContainerConfiguration(LoaderInterface $loader): void
-            {
-            }
-
-            public function boot(): void
-            {
-                $this->container->compile();
-                parent::dumpContainer(new ConfigCache(tempnam(sys_get_temp_dir(), 'symfony-kernel-deprecated-parameter'), true), $this->container, Container::class, $this->getContainerBaseClass());
-            }
-
-            public function getContainerClass(): string
-            {
-                return parent::getContainerClass();
-            }
-        };
-
-        $this->expectDeprecation('Since symfony/http-kernel 6.3: Parameter "container.dumper.inline_factories" is deprecated, use ".container.dumper.inline_factories" instead.');
-        $this->expectDeprecation('Since symfony/http-kernel 6.3: Parameter "container.dumper.inline_class_loader" is deprecated, use ".container.dumper.inline_class_loader" instead.');
-
-        $kernel->boot();
     }
 
     /**

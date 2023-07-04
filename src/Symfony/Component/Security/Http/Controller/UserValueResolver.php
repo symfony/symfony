@@ -33,22 +33,6 @@ final class UserValueResolver implements ValueResolverInterface
         $this->tokenStorage = $tokenStorage;
     }
 
-    /**
-     * @deprecated since Symfony 6.2, use resolve() instead
-     */
-    public function supports(Request $request, ArgumentMetadata $argument): bool
-    {
-        @trigger_deprecation('symfony/http-kernel', '6.2', 'The "%s()" method is deprecated, use "resolve()" instead.', __METHOD__);
-
-        // with the attribute, the type can be any UserInterface implementation
-        // otherwise, the type must be UserInterface
-        if (UserInterface::class !== $argument->getType() && !$argument->getAttributesOfType(CurrentUser::class, ArgumentMetadata::IS_INSTANCEOF)) {
-            return false;
-        }
-
-        return true;
-    }
-
     public function resolve(Request $request, ArgumentMetadata $argument): array
     {
         // with the attribute, the type can be any UserInterface implementation

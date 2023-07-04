@@ -26,14 +26,6 @@ abstract class AbstractSurrogate implements SurrogateInterface
     protected $contentTypes;
 
     /**
-     * @deprecated since Symfony 6.3
-     */
-    protected $phpEscapeMap = [
-        ['<?', '<%', '<s', '<S'],
-        ['<?php echo "<?"; ?>', '<?php echo "<%"; ?>', '<?php echo "<s"; ?>', '<?php echo "<S"; ?>'],
-    ];
-
-    /**
      * @param array $contentTypes An array of content-type that should be parsed for Surrogate information
      *                            (default: text/html, text/xml, application/xhtml+xml, and application/xml)
      */

@@ -14,21 +14,6 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 class AuthenticatorTest extends AbstractWebTestCase
 {
     /**
-     * @group legacy
-     *
-     * @dataProvider provideEmails
-     */
-    public function testLegacyGlobalUserProvider($email)
-    {
-        $client = $this->createClient(['test_case' => 'Authenticator', 'root_config' => 'implicit_user_provider.yml']);
-
-        $client->request('GET', '/profile', [], [], [
-            'HTTP_X-USER-EMAIL' => $email,
-        ]);
-        $this->assertJsonStringEqualsJsonString('{"email":"'.$email.'"}', $client->getResponse()->getContent());
-    }
-
-    /**
      * @dataProvider provideEmails
      */
     public function testFirewallUserProvider($email, $withinFirewall)

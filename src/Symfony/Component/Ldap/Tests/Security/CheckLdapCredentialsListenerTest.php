@@ -30,7 +30,6 @@ use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
-use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 use Symfony\Contracts\Service\ServiceLocatorTrait;
@@ -127,49 +126,6 @@ class CheckLdapCredentialsListenerTest extends TestCase
         $listener->onCheckPassport($this->createEvent());
     }
 
-    /**
-     * @group legacy
-     *
-     * @dataProvider queryForDnProvider
-     */
-    public function testLegacyQueryForDn(string $dnString, string $queryString)
-    {
-        $collection = new class([new Entry('')]) extends \ArrayObject implements CollectionInterface {
-            public function toArray(): array
-            {
-                return $this->getArrayCopy();
-            }
-        };
-
-        $query = $this->createMock(QueryInterface::class);
-        $query->expects($this->once())->method('execute')->willReturn($collection);
-
-        $this->ldap
-            ->method('bind')
-            ->willReturnCallback(function (...$args) {
-                static $series = [
-                    ['elsa', 'test1234A$'],
-                    ['', 's3cr3t'],
-                ];
-
-                $this->assertSame(array_shift($series), $args);
-            })
-        ;
-        $this->ldap->expects($this->any())->method('escape')->with('Wouter', '', LdapInterface::ESCAPE_FILTER)->willReturn('wouter');
-        $this->ldap->expects($this->once())->method('query')->with('{user_identifier}', 'wouter_test')->willReturn($query);
-
-        $listener = $this->createListener();
-        $listener->onCheckPassport($this->createEvent('s3cr3t', new LdapBadge('app.ldap', $dnString, 'elsa', 'test1234A$', $queryString)));
-    }
-
-    public static function queryForDnProvider(): iterable
-    {
-        yield ['{username}', '{username}_test'];
-        yield ['{user_identifier}', '{username}_test'];
-        yield ['{username}', '{user_identifier}_test'];
-        yield ['{user_identifier}', '{user_identifier}_test'];
-    }
-
     public function testQueryForDn()
     {
         $collection = new class([new Entry('')]) extends \ArrayObject implements CollectionInterface {
@@ -254,13 +210,6 @@ if (interface_exists(AuthenticatorInterface::class)) {
         }
 
         public function authenticate(Request $request): Passport
-        {
-        }
-
-        /**
-         * @internal for compatibility with Symfony 5.4
-         */
-        public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface
         {
         }
 

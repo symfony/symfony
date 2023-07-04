@@ -98,7 +98,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         if (!array_filter($configs)) {
             trigger_deprecation('symfony/security-bundle', '6.3', 'Enabling bundle "%s" and not configuring it is deprecated.', SecurityBundle::class);
             // uncomment the following line in 7.0
-            // throw new InvalidArgumentException(sprintf('Enabling bundle "%s" and not configuring it is not allowed.', SecurityBundle::class));
+            // throw new InvalidConfigurationException(sprintf('Enabling bundle "%s" and not configuring it is not allowed.', SecurityBundle::class));
             return;
         }
 
@@ -192,9 +192,6 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $container->getDefinition('security.authorization_checker')->setArgument(3, false);
     }
 
-    /**
-     * @throws \InvalidArgumentException if the $strategy is invalid
-     */
     private function createStrategyDefinition(string $strategy, bool $allowIfAllAbstainDecisions, bool $allowIfEqualGrantedDeniedDecisions): Definition
     {
         return match ($strategy) {
@@ -202,7 +199,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             MainConfiguration::STRATEGY_CONSENSUS => new Definition(ConsensusStrategy::class, [$allowIfAllAbstainDecisions, $allowIfEqualGrantedDeniedDecisions]),
             MainConfiguration::STRATEGY_UNANIMOUS => new Definition(UnanimousStrategy::class, [$allowIfAllAbstainDecisions]),
             MainConfiguration::STRATEGY_PRIORITY => new Definition(PriorityStrategy::class, [$allowIfAllAbstainDecisions]),
-            default => throw new \InvalidArgumentException(sprintf('The strategy "%s" is not supported.', $strategy)),
+            default => throw new InvalidConfigurationException(sprintf('The strategy "%s" is not supported.', $strategy)),
         };
     }
 

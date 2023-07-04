@@ -42,11 +42,6 @@ class CssColor extends Constraint
     ];
 
     /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
-    /**
      * @var string[]
      */
     private static $validationModes = [

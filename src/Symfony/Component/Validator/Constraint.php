@@ -50,11 +50,6 @@ abstract class Constraint
     protected const ERROR_NAMES = [];
 
     /**
-     * @deprecated since Symfony 6.1, use protected const ERROR_NAMES instead
-     */
-    protected static $errorNames = [];
-
-    /**
      * Domain-specific data attached to a constraint.
      *
      * @var mixed
@@ -79,13 +74,7 @@ abstract class Constraint
             return static::ERROR_NAMES[$errorCode];
         }
 
-        if (!isset(static::$errorNames[$errorCode])) {
-            throw new InvalidArgumentException(sprintf('The error code "%s" does not exist for constraint of type "%s".', $errorCode, static::class));
-        }
-
-        trigger_deprecation('symfony/validator', '6.1', 'The "%s::$errorNames" property is deprecated, use protected const ERROR_NAMES instead.', static::class);
-
-        return static::$errorNames[$errorCode];
+        throw new InvalidArgumentException(sprintf('The error code "%s" does not exist for constraint of type "%s".', $errorCode, static::class));
     }
 
     /**

@@ -40,11 +40,6 @@ class Uuid extends Constraint
         self::INVALID_VARIANT_ERROR => 'INVALID_VARIANT_ERROR',
     ];
 
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
     // Possible versions defined by RFC 4122
     public const V1_MAC = 1;
     public const V2_DCE = 2;

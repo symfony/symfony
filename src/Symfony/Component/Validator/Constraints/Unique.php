@@ -31,11 +31,6 @@ class Unique extends Constraint
         self::IS_NOT_UNIQUE => 'IS_NOT_UNIQUE',
     ];
 
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
     public $message = 'This collection should contain only unique elements.';
     public $normalizer;
 

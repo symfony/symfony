@@ -7,6 +7,9 @@ CHANGELOG
  * Add methods `getConstraint()`, `getCause()` and `__toString()` to `ConstraintViolationInterface`
  * Add method `__toString()` to `ConstraintViolationListInterface`
  * Add method `disableTranslation()` to `ConstraintViolationBuilderInterface`
+ * Remove static property `$errorNames` from all constraints, use const `ERROR_NAMES` instead
+ * Remove `VALIDATION_MODE_LOOSE` from `Email` constraint, use `VALIDATION_MODE_HTML5` instead
+ * Remove constraint `ExpressionLanguageSyntax`, use `ExpressionSyntax` instead
 
 6.4
 ---

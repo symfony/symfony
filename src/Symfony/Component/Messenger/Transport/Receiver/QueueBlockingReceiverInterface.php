@@ -22,8 +22,8 @@ interface QueueBlockingReceiverInterface extends BlockingReceiverInterface
      * Pull messages from the specified queue names instead of consuming from all queues.
      *
      * @param string[]                       $queueNames
-     * @param callable(\AMQPEnvelope):?false $callback   if callback return false, then processing thread will be
-     *                                                   returned to PHP script
+     * @param callable(\Symfony\Component\Messenger\Envelope):?false $callback   if callback return false, then processing thread will be
+     *                                                                           returned to PHP script
      */
     public function pullFromQueues(array $queueNames, callable $callback): void;
 }

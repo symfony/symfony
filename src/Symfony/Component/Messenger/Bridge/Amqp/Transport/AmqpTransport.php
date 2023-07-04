@@ -48,7 +48,7 @@ class AmqpTransport implements QueueReceiverInterface, QueueBlockingReceiverInte
 
     public function pullFromQueues(array $queueNames, callable $callback): void
     {
-        $this->receiver->pullFromQueues($queueNames, $callback);
+        $this->getReceiver()->pullFromQueues($queueNames, $callback);
     }
 
     public function getFromQueues(array $queueNames): iterable

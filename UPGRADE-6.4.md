@@ -1,6 +1,11 @@
 UPGRADE FROM 6.3 to 6.4
 =======================
 
+Cache
+-----
+
+ * `EarlyExpirationHandler` no longer implements `MessageHandlerInterface`, rely on `AsMessageHandler` instead
+
 DependencyInjection
 -------------------
 

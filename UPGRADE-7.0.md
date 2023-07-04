@@ -45,6 +45,11 @@ DoctrineBridge
  * DoctrineBridge now requires `doctrine/event-manager:^2`
  * Add parameter `$isSameDatabase` to `DoctrineTokenProvider::configureSchema()`
 
+ExpressionLanguage
+------------------
+
+ * The `in` and `not in` operators now use strict comparison
+
 Filesystem
 ----------
 

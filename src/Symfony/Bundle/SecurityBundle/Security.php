@@ -20,25 +20,12 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\LogicException;
 use Symfony\Component\Security\Core\Exception\LogoutException;
-use Symfony\Component\Security\Core\Security as LegacySecurity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
 use Symfony\Component\Security\Http\ParameterBagUtils;
-use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Contracts\Service\ServiceProviderInterface;
-
-if (class_exists(LegacySecurity::class)) {
-    class_alias(LegacySecurity::class, InternalSecurity::class);
-} else {
-    /**
-     * @internal
-     */
-    class InternalSecurity
-    {
-    }
-}
 
 /**
  * Helper class for commonly-needed security tasks.
@@ -49,23 +36,8 @@ if (class_exists(LegacySecurity::class)) {
  *
  * @final
  */
-class Security extends InternalSecurity implements AuthorizationCheckerInterface
+class Security implements AuthorizationCheckerInterface
 {
-    /**
-     * @deprecated since Symfony 6.4, use SecurityRequestAttributes::ACCESS_DENIED_ERROR instead
-     */
-    public const ACCESS_DENIED_ERROR = SecurityRequestAttributes::ACCESS_DENIED_ERROR;
-
-    /**
-     * @deprecated since Symfony 6.4, use SecurityRequestAttributes::ACCESS_DENIED_ERROR instead
-     */
-    public const AUTHENTICATION_ERROR = SecurityRequestAttributes::AUTHENTICATION_ERROR;
-
-    /**
-     * @deprecated since Symfony 6.4, use SecurityRequestAttributes::ACCESS_DENIED_ERROR instead
-     */
-    public const LAST_USERNAME = SecurityRequestAttributes::LAST_USERNAME;
-
     public function __construct(
         private readonly ContainerInterface $container,
         private readonly array $authenticators = [],

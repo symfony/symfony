@@ -40,11 +40,6 @@ class Cidr extends Constraint
         Ip::V6 => 128,
     ];
 
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
     public $version = Ip::ALL;
 
     public $message = 'This value is not a valid CIDR notation.';

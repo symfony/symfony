@@ -46,14 +46,6 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
         return $this->providers;
     }
 
-    /**
-     * @internal for compatibility with Symfony 5.4
-     */
-    public function loadUserByUsername(string $username): UserInterface
-    {
-        return $this->loadUserByIdentifier($username);
-    }
-
     public function loadUserByIdentifier(string $identifier): UserInterface
     {
         foreach ($this->providers as $provider) {

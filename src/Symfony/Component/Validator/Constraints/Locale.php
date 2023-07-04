@@ -30,11 +30,6 @@ class Locale extends Constraint
         self::NO_SUCH_LOCALE_ERROR => 'NO_SUCH_LOCALE_ERROR',
     ];
 
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
     public $message = 'This value is not a valid locale.';
     public $canonicalize = true;
 

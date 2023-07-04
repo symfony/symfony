@@ -27,10 +27,5 @@ class LessThanOrEqual extends AbstractComparison
         self::TOO_HIGH_ERROR => 'TOO_HIGH_ERROR',
     ];
 
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
     public $message = 'This value should be less than or equal to {{ compared_value }}.';
 }

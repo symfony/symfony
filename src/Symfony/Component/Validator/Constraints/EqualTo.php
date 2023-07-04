@@ -27,10 +27,5 @@ class EqualTo extends AbstractComparison
         self::NOT_EQUAL_ERROR => 'NOT_EQUAL_ERROR',
     ];
 
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
     public $message = 'This value should be equal to {{ compared_value }}.';
 }

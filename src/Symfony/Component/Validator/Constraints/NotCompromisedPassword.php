@@ -30,11 +30,6 @@ class NotCompromisedPassword extends Constraint
         self::COMPROMISED_PASSWORD_ERROR => 'COMPROMISED_PASSWORD_ERROR',
     ];
 
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
     public $message = 'This password has been leaked in a data breach, it must not be used. Please use another password.';
     public $threshold = 1;
     public $skipOnError = false;

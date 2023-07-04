@@ -175,6 +175,9 @@ EOPHP;
         $this->assertTrue($res->isFresh(0));
     }
 
+    /**
+     * @group legacy
+     */
     public function testMessageSubscriber()
     {
         $res = new ReflectionClassResource(new \ReflectionClass(TestMessageSubscriber::class));
@@ -229,18 +232,20 @@ class TestEventSubscriber implements EventSubscriberInterface
     }
 }
 
-class TestMessageSubscriber implements MessageSubscriberInterface
-{
-    public static function getHandledMessages(): iterable
+if (interface_exists(MessageSubscriberInterface::class)) {
+    class TestMessageSubscriber implements MessageSubscriberInterface
     {
-        foreach (TestMessageSubscriberConfigHolder::$handledMessages as $key => $subscribedMessage) {
-            yield $key => $subscribedMessage;
+        public static function getHandledMessages(): iterable
+        {
+            foreach (TestMessageSubscriberConfigHolder::$handledMessages as $key => $subscribedMessage) {
+                yield $key => $subscribedMessage;
+            }
         }
     }
-}
-class TestMessageSubscriberConfigHolder
-{
-    public static $handledMessages = [];
+    class TestMessageSubscriberConfigHolder
+    {
+        public static $handledMessages = [];
+    }
 }
 
 class TestServiceSubscriber implements ServiceSubscriberInterface

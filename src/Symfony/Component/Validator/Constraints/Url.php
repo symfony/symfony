@@ -29,11 +29,6 @@ class Url extends Constraint
         self::INVALID_URL_ERROR => 'INVALID_URL_ERROR',
     ];
 
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
     public $message = 'This value is not a valid URL.';
     public $protocols = ['http', 'https'];
     public $relativeProtocol = false;

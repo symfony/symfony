@@ -90,13 +90,6 @@ class MongoDbStore implements PersistingStoreInterface
      */
     public function __construct(Collection|Client|string $mongo, array $options = [], float $initialTtl = 300.0)
     {
-        if (isset($options['gcProbablity'])) {
-            trigger_deprecation('symfony/lock', '6.3', 'The "gcProbablity" option (notice the typo in its name) is deprecated in "%s"; use the "gcProbability" option instead.', __CLASS__);
-
-            $options['gcProbability'] = $options['gcProbablity'];
-            unset($options['gcProbablity']);
-        }
-
         $this->options = array_merge([
             'gcProbability' => 0.001,
             'database' => null,

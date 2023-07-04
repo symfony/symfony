@@ -7,6 +7,11 @@ CHANGELOG
  * Add argument `$badgeFqcn` to `Passport::addBadge()`
  * Add argument `$lifetime` to `LoginLinkHandlerInterface::createLoginLink()`
 
+6.4
+---
+
+ * `UserValueResolver` no longer implements `ArgumentValueResolverInterface`
+
 6.3
 ---
 

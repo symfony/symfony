@@ -65,7 +65,6 @@ class MainConfiguration implements ConfigurationInterface
                 ->end()
                 ->booleanNode('hide_user_not_found')->defaultTrue()->end()
                 ->booleanNode('erase_credentials')->defaultTrue()->end()
-                ->booleanNode('enable_authenticator_manager')->setDeprecated('symfony/security-bundle', '6.2', 'The "%node%" option at "%path%" is deprecated.')->defaultTrue()->end()
                 ->arrayNode('access_decision_manager')
                     ->addDefaultsIfNotSet()
                     ->children()
@@ -217,14 +216,6 @@ class MainConfiguration implements ConfigurationInterface
                 ->treatTrueLike([])
                 ->canBeUnset()
                 ->beforeNormalization()
-                    ->ifTrue(fn ($v): bool => isset($v['csrf_token_generator']) && !isset($v['csrf_token_manager']))
-                    ->then(function (array $v): array {
-                        $v['csrf_token_manager'] = $v['csrf_token_generator'];
-
-                        return $v;
-                    })
-                ->end()
-                ->beforeNormalization()
                     ->ifTrue(fn ($v): bool => \is_array($v) && (isset($v['csrf_token_manager']) xor isset($v['enable_csrf'])))
                     ->then(function (array $v): array {
                         if (isset($v['csrf_token_manager'])) {
@@ -240,13 +231,6 @@ class MainConfiguration implements ConfigurationInterface
                     ->booleanNode('enable_csrf')->defaultNull()->end()
                     ->scalarNode('csrf_token_id')->defaultValue('logout')->end()
                     ->scalarNode('csrf_parameter')->defaultValue('_csrf_token')->end()
-                    ->scalarNode('csrf_token_generator')
-                        ->setDeprecated(
-                            'symfony/security-bundle',
-                            '6.3',
-                            'The "%node%" option is deprecated. Use "csrf_token_manager" instead.'
-                        )
-                    ->end()
                     ->scalarNode('csrf_token_manager')->end()
                     ->scalarNode('path')->defaultValue('/logout')->end()
                     ->scalarNode('target')->defaultValue('/')->end()

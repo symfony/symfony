@@ -44,11 +44,6 @@ class File extends Constraint
         self::FILENAME_TOO_LONG => 'FILENAME_TOO_LONG',
     ];
 
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
     public $binaryFormat;
     public $mimeTypes = [];
     public ?int $filenameMaxLength = null;

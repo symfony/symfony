@@ -38,11 +38,6 @@ class Range extends Constraint
         self::TOO_LOW_ERROR => 'TOO_LOW_ERROR',
     ];
 
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
     public $notInRangeMessage = 'This value should be between {{ min }} and {{ max }}.';
     public $minMessage = 'This value should be {{ limit }} or more.';
     public $maxMessage = 'This value should be {{ limit }} or less.';

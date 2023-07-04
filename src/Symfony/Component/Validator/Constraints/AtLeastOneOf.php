@@ -26,11 +26,6 @@ class AtLeastOneOf extends Composite
         self::AT_LEAST_ONE_OF_ERROR => 'AT_LEAST_ONE_OF_ERROR',
     ];
 
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
     public $constraints = [];
     public $message = 'This value should satisfy at least one of the following constraints:';
     public $messageCollection = 'Each element of this collection should satisfy its own set of constraints.';

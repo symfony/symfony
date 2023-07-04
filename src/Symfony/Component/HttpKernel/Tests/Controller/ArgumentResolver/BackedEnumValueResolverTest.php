@@ -21,20 +21,13 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\Suit;
 class BackedEnumValueResolverTest extends TestCase
 {
     /**
-     * In Symfony 7, keep this test case but remove the call to supports().
-     *
-     * @group legacy
-     *
      * @dataProvider provideTestSupportsData
      */
     public function testSupports(Request $request, ArgumentMetadata $metadata, bool $expectedSupport)
     {
         $resolver = new BackedEnumValueResolver();
 
-        if (!$expectedSupport) {
-            $this->assertSame([], $resolver->resolve($request, $metadata));
-        }
-        self::assertSame($expectedSupport, $resolver->supports($request, $metadata));
+        $this->assertCount((int) $expectedSupport, $resolver->resolve($request, $metadata));
     }
 
     public static function provideTestSupportsData(): iterable

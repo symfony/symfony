@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.0
+---
+
+ * Remove `{username}` parameter, use `{user_identifier}` instead
+
 6.2
 ---
 

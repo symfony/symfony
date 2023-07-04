@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * `FlattenExceptionNormalizer` no longer implements `ContextAwareNormalizerInterface`
+
 6.3
 ---
 

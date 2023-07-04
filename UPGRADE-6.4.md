@@ -14,6 +14,11 @@ DoctrineBridge
  * Deprecate `DoctrineDataCollector::addLogger()`, use a `DebugDataHolder` instead
  * Deprecate `ContainerAwareLoader`, use dependency injection in your fixtures instead
 
+ErrorHandler
+------------
+
+ * `FlattenExceptionNormalizer` no longer implements `ContextAwareNormalizerInterface`
+
 Form
 ----
 
@@ -24,3 +29,13 @@ HttpFoundation
 --------------
 
  * Make `HeaderBag::getDate()`, `Response::getDate()`, `getExpires()` and `getLastModified()` return a `DateTimeImmutable`
+
+HttpKernel
+----------
+
+ * `BundleInterface` no longer extends `ContainerAwareInterface`
+
+Security
+--------
+
+ * `UserValueResolver` no longer implements `ArgumentValueResolverInterface`

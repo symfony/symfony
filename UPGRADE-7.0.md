@@ -68,6 +68,11 @@ HttpFoundation
  * Remove `Request::getContentType()`, use `Request::getContentTypeFormat()` instead
  * Throw an `InvalidArgumentException` when calling `Request::create()` with a malformed URI
 
+HttpClient
+----------
+
+ * Remove implementing `Http\Message\RequestFactory` from `HttplugClient`
+
 HttpKernel
 ----------
 

@@ -1,6 +1,11 @@
 UPGRADE FROM 6.3 to 6.4
 =======================
 
+Cache
+-----
+
+ * `EarlyExpirationHandler` no longer implements `MessageHandlerInterface`, rely on `AsMessageHandler` instead
+
 DependencyInjection
 -------------------
 
@@ -14,6 +19,11 @@ DoctrineBridge
  * Deprecate `DoctrineDataCollector::addLogger()`, use a `DebugDataHolder` instead
  * Deprecate `ContainerAwareLoader`, use dependency injection in your fixtures instead
 
+ErrorHandler
+------------
+
+ * `FlattenExceptionNormalizer` no longer implements `ContextAwareNormalizerInterface`
+
 Form
 ----
 
@@ -24,3 +34,13 @@ HttpFoundation
 --------------
 
  * Make `HeaderBag::getDate()`, `Response::getDate()`, `getExpires()` and `getLastModified()` return a `DateTimeImmutable`
+
+HttpKernel
+----------
+
+ * `BundleInterface` no longer extends `ContainerAwareInterface`
+
+Security
+--------
+
+ * `UserValueResolver` no longer implements `ArgumentValueResolverInterface`

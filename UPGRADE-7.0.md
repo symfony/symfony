@@ -98,6 +98,12 @@ Messenger
 
  * Add parameter `$isSameDatabase` to `DoctrineTransport::configureSchema()`
 
+Mime
+----
+
+ * Remove `Email::attachPart()` method, use `Email::addPart()` instead
+ * Parameter `$body` is now required (at least null) in `Message::setBody()`
+
 PropertyAccess
 --------------
 

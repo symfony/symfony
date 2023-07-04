@@ -104,10 +104,8 @@ class Worker
                     if (!$receiver instanceof QueueBlockingReceiverInterface) {
                         throw new RuntimeException(sprintf('Receiver for "%s" does not implement "%s".', $transportName, QueueBlockingReceiverInterface::class));
                     }
-                } else {
-                    if (!$receiver instanceof QueueReceiverInterface) {
-                        throw new RuntimeException(sprintf('Receiver for "%s" does not implement "%s".', $transportName, QueueReceiverInterface::class));
-                    }
+                } elseif (!$receiver instanceof QueueReceiverInterface) {
+                    throw new RuntimeException(sprintf('Receiver for "%s" does not implement "%s".', $transportName, QueueReceiverInterface::class));
                 }
             }
         }
@@ -130,10 +128,10 @@ class Worker
                     };
 
                     if ($queueNames) {
-                        /* @var QueueBlockingReceiverInterface $receiver */
+                        /** @var QueueBlockingReceiverInterface $receiver */
                         $receiver->pullFromQueues($queueNames, $callback);
                     } else {
-                        /* @var BlockingReceiverInterface $receiver */
+                        /** @var BlockingReceiverInterface $receiver */
                         $receiver->pull($callback);
                     }
                 } else {

@@ -91,7 +91,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     public function load(array $configs, ContainerBuilder $container): void
     {
         if (!array_filter($configs)) {
-            throw new InvalidArgumentException(sprintf('Enabling bundle "%s" and not configuring it is not allowed.', SecurityBundle::class));
+            throw new InvalidConfigurationException(sprintf('Enabling bundle "%s" and not configuring it is not allowed.', SecurityBundle::class));
         }
 
         $mainConfig = $this->getConfiguration($configs, $container);
@@ -184,9 +184,6 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $container->getDefinition('security.authorization_checker')->setArgument(3, false);
     }
 
-    /**
-     * @throws \InvalidArgumentException if the $strategy is invalid
-     */
     private function createStrategyDefinition(string $strategy, bool $allowIfAllAbstainDecisions, bool $allowIfEqualGrantedDeniedDecisions): Definition
     {
         return match ($strategy) {
@@ -194,7 +191,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             MainConfiguration::STRATEGY_CONSENSUS => new Definition(ConsensusStrategy::class, [$allowIfAllAbstainDecisions, $allowIfEqualGrantedDeniedDecisions]),
             MainConfiguration::STRATEGY_UNANIMOUS => new Definition(UnanimousStrategy::class, [$allowIfAllAbstainDecisions]),
             MainConfiguration::STRATEGY_PRIORITY => new Definition(PriorityStrategy::class, [$allowIfAllAbstainDecisions]),
-            default => throw new \InvalidArgumentException(sprintf('The strategy "%s" is not supported.', $strategy)),
+            default => throw new InvalidConfigurationException(sprintf('The strategy "%s" is not supported.', $strategy)),
         };
     }
 

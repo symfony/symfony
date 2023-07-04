@@ -16,6 +16,8 @@ use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\LogicException;
 use Symfony\Component\Security\Core\Exception\LogoutException;
 use Symfony\Component\Security\Core\Security as LegacySecurity;
@@ -27,6 +29,17 @@ use Symfony\Component\Security\Http\ParameterBagUtils;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 
+if (class_exists(LegacySecurity::class)) {
+    class_alias(LegacySecurity::class, InternalSecurity::class);
+} else {
+    /**
+     * @internal
+     */
+    class InternalSecurity
+    {
+    }
+}
+
 /**
  * Helper class for commonly-needed security tasks.
  *
@@ -36,15 +49,50 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
  *
  * @final
  */
-class Security extends LegacySecurity
+class Security extends InternalSecurity implements AuthorizationCheckerInterface
 {
+    /**
+     * @deprecated since Symfony 6.4, use SecurityRequestAttributes::ACCESS_DENIED_ERROR instead
+     */
     public const ACCESS_DENIED_ERROR = SecurityRequestAttributes::ACCESS_DENIED_ERROR;
+
+    /**
+     * @deprecated since Symfony 6.4, use SecurityRequestAttributes::ACCESS_DENIED_ERROR instead
+     */
     public const AUTHENTICATION_ERROR = SecurityRequestAttributes::AUTHENTICATION_ERROR;
+
+    /**
+     * @deprecated since Symfony 6.4, use SecurityRequestAttributes::ACCESS_DENIED_ERROR instead
+     */
     public const LAST_USERNAME = SecurityRequestAttributes::LAST_USERNAME;
 
-    public function __construct(private readonly ContainerInterface $container, private readonly array $authenticators = [])
+    public function __construct(
+        private readonly ContainerInterface $container,
+        private readonly array $authenticators = [],
+    ) {
+    }
+
+    public function getUser(): ?UserInterface
     {
-        parent::__construct($container, false);
+        if (!$token = $this->getToken()) {
+            return null;
+        }
+
+        return $token->getUser();
+    }
+
+    /**
+     * Checks if the attributes are granted against the current authentication token and optionally supplied subject.
+     */
+    public function isGranted(mixed $attributes, mixed $subject = null): bool
+    {
+        return $this->container->get('security.authorization_checker')
+            ->isGranted($attributes, $subject);
+    }
+
+    public function getToken(): ?TokenInterface
+    {
+        return $this->container->get('security.token_storage')->getToken();
     }
 
     public function getFirewallConfig(Request $request): ?FirewallConfig

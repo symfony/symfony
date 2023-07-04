@@ -128,10 +128,10 @@ class Worker
                     };
 
                     if ($queueNames) {
-                        /** @var QueueBlockingReceiverInterface $receiver */
+                        \assert($receiver instanceof QueueBlockingReceiverInterface);
                         $receiver->pullFromQueues($queueNames, $callback);
                     } else {
-                        /** @var BlockingReceiverInterface $receiver */
+                        \assert($receiver instanceof BlockingReceiverInterface);
                         $receiver->pull($callback);
                     }
                 } else {

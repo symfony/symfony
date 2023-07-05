@@ -25,6 +25,22 @@ class DateCasterTest extends TestCase
 {
     use VarDumperTestTrait;
 
+    private $previousTimezone;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->previousTimezone = date_default_timezone_get();
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        date_default_timezone_set($this->previousTimezone);
+    }
+
     /**
      * @dataProvider provideDateTimes
      */
@@ -111,6 +127,8 @@ EODUMP;
      */
     public function testCastDateTimeNoTimezone($time, $xDate, $xInfos)
     {
+        date_default_timezone_set('UTC');
+
         $stub = new Stub();
         $date = new NoTimezoneDate($time);
         $cast = DateCaster::castDateTime($date, Caster::castObject($date, \DateTime::class), $stub, false, 0);

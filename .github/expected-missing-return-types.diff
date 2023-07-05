@@ -317,6 +317,37 @@ index 8c8667ff0e..e19e185cfb 100644
 +    abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void;
  
      /**
+diff --git a/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php b/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php
+index cf41e0c507..61f7397734 100644
+--- a/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php
++++ b/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php
+@@ -28,5 +28,5 @@ interface TokenProviderInterface
+      * @throws TokenNotFoundException if the token is not found
+      */
+-    public function loadTokenBySeries(string $series);
++    public function loadTokenBySeries(string $series): PersistentTokenInterface;
+ 
+     /**
+@@ -35,5 +35,5 @@ interface TokenProviderInterface
+      * @return void
+      */
+-    public function deleteTokenBySeries(string $series);
++    public function deleteTokenBySeries(string $series): void;
+ 
+     /**
+@@ -44,5 +44,5 @@ interface TokenProviderInterface
+      * @throws TokenNotFoundException if the token is not found
+      */
+-    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed);
++    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed): void;
+ 
+     /**
+@@ -51,4 +51,4 @@ interface TokenProviderInterface
+      * @return void
+      */
+-    public function createNewToken(PersistentTokenInterface $token);
++    public function createNewToken(PersistentTokenInterface $token): void;
+ }
 diff --git a/src/Symfony/Component/Translation/Extractor/ExtractorInterface.php b/src/Symfony/Component/Translation/Extractor/ExtractorInterface.php
 index 642130af75..c9ae2693a4 100644
 --- a/src/Symfony/Component/Translation/Extractor/ExtractorInterface.php

@@ -82,6 +82,9 @@ abstract class DataCollector implements DataCollectorInterface
         return ['data'];
     }
 
+    /**
+     * @return void
+     */
     public function __wakeup()
     {
     }

@@ -76,7 +76,9 @@ foreach ($loader->getClassMap() as $class => $file) {
         if (
             $method->getReturnType()
             || str_contains($method->getDocComment(), '@return')
-            || str_starts_with($method->getName(), '__')
+            || '__construct' === $method->getName()
+            || '__destruct' === $method->getName()
+            || '__clone' === $method->getName()
             || $method->getDeclaringClass()->getName() !== $class
             || str_contains($method->getDeclaringClass()->getName(), '\\Test\\')
         ) {

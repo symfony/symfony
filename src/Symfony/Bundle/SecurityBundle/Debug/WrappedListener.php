@@ -24,12 +24,15 @@ final class WrappedListener
 {
     use TraceableListenerTrait;
 
+    /**
+     * @param callable(RequestEvent):void $listener
+     */
     public function __construct(callable $listener)
     {
         $this->listener = $listener;
     }
 
-    public function __invoke(RequestEvent $event)
+    public function __invoke(RequestEvent $event): void
     {
         $startTime = microtime(true);
         ($this->listener)($event);

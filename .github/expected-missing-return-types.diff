@@ -131,3 +131,20 @@ index 8c8667ff0e..e19e185cfb 100644
 +    abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void;
  
      /**
+diff --git a/src/Symfony/Component/Validator/ConstraintValidatorInterface.php b/src/Symfony/Component/Validator/ConstraintValidatorInterface.php
+index fe7da2e8f7..61d3632e2a 100644
+--- a/src/Symfony/Component/Validator/ConstraintValidatorInterface.php
++++ b/src/Symfony/Component/Validator/ConstraintValidatorInterface.php
+@@ -24,5 +24,5 @@ interface ConstraintValidatorInterface
+      * @return void
+      */
+-    public function initialize(ExecutionContextInterface $context);
++    public function initialize(ExecutionContextInterface $context): void;
+ 
+     /**
+@@ -31,4 +31,4 @@ interface ConstraintValidatorInterface
+      * @return void
+      */
+-    public function validate(mixed $value, Constraint $constraint);
++    public function validate(mixed $value, Constraint $constraint): void;
+ }

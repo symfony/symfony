@@ -456,8 +456,10 @@ abstract class AbstractBrowser
 
     /**
      * Makes a request.
+     *
+     * @return object
      */
-    abstract protected function doRequest(object $request): object;
+    abstract protected function doRequest(object $request);
 
     /**
      * Returns the script to execute when the request must be insulated.

@@ -583,17 +583,21 @@ EOF;
             }
             $alreadyGenerated[$asGhostObject][$class] = true;
 
-            $r = $this->container->getReflectionClass($class);
-            do {
-                $file = $r->getFileName();
-                if (str_ends_with($file, ') : eval()\'d code')) {
-                    $file = substr($file, 0, strrpos($file, '(', -17));
+            foreach (array_column($definition->getTag('proxy'), 'interface') ?: [$class] as $r) {
+                if (!$r = $this->container->getReflectionClass($r)) {
+                    continue;
                 }
-                if (is_file($file)) {
-                    $this->container->addResource(new FileResource($file));
-                }
-                $r = $r->getParentClass() ?: null;
-            } while ($r?->isUserDefined());
+                do {
+                    $file = $r->getFileName();
+                    if (str_ends_with($file, ') : eval()\'d code')) {
+                        $file = substr($file, 0, strrpos($file, '(', -17));
+                    }
+                    if (is_file($file)) {
+                        $this->container->addResource(new FileResource($file));
+                    }
+                    $r = $r->getParentClass() ?: null;
+                } while ($r?->isUserDefined());
+            }
 
             if ("\n" === $proxyCode = "\n".$proxyDumper->getProxyCode($definition, $id)) {
                 continue;

@@ -39,7 +39,7 @@ class LazyFirewallContext extends FirewallContext
         return [$this];
     }
 
-    public function __invoke(RequestEvent $event)
+    public function __invoke(RequestEvent $event): void
     {
         $listeners = [];
         $request = $event->getRequest();

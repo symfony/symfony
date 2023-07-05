@@ -22,7 +22,7 @@ final class RedispatchMessageHandler
     ) {
     }
 
-    public function __invoke(RedispatchMessage $message)
+    public function __invoke(RedispatchMessage $message): void
     {
         $this->bus->dispatch($message->envelope, [new TransportNamesStamp($message->transportNames)]);
     }

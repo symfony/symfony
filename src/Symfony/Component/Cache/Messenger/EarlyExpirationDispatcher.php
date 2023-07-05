@@ -34,6 +34,9 @@ class EarlyExpirationDispatcher
         $this->callbackWrapper = null === $callbackWrapper ? null : $callbackWrapper(...);
     }
 
+    /**
+     * @return mixed
+     */
     public function __invoke(callable $callback, CacheItem $item, bool &$save, AdapterInterface $pool, \Closure $setMetadata, LoggerInterface $logger = null)
     {
         if (!$item->isHit() || null === $message = EarlyExpirationMessage::create($this->reverseContainer, $callback, $item, $pool)) {

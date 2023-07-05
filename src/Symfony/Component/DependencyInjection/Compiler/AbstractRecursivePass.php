@@ -37,7 +37,10 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
     private ExpressionLanguage $expressionLanguage;
     private bool $inExpression = false;
 
-    public function process(ContainerBuilder $container): void
+    /**
+     * @return void
+     */
+    public function process(ContainerBuilder $container)
     {
         $this->container = $container;
 
@@ -65,8 +68,10 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
 
     /**
      * Processes a value found in a definition tree.
+     *
+     * @return mixed
      */
-    protected function processValue(mixed $value, bool $isRoot = false): mixed
+    protected function processValue(mixed $value, bool $isRoot = false)
     {
         if (\is_array($value)) {
             foreach ($value as $k => $v) {

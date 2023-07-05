@@ -424,9 +424,11 @@ abstract class AbstractBrowser
     /**
      * Makes a request in another process.
      *
+     * @return object
+     *
      * @throws \RuntimeException When processing returns exit code
      */
-    protected function doRequestInProcess(object $request): object
+    protected function doRequestInProcess(object $request)
     {
         $deprecationsFile = tempnam(sys_get_temp_dir(), 'deprec');
         putenv('SYMFONY_DEPRECATIONS_SERIALIZE='.$deprecationsFile);
@@ -466,25 +468,31 @@ abstract class AbstractBrowser
      *
      * @param object $request An origin request instance
      *
+     * @return string
+     *
      * @throws LogicException When this abstract class is not implemented
      */
-    protected function getScript(object $request): string
+    protected function getScript(object $request)
     {
         throw new LogicException('To insulate requests, you need to override the getScript() method.');
     }
 
     /**
      * Filters the BrowserKit request to the origin one.
+     *
+     * @return object
      */
-    protected function filterRequest(Request $request): object
+    protected function filterRequest(Request $request)
     {
         return $request;
     }
 
     /**
      * Filters the origin response to the BrowserKit one.
+     *
+     * @return Response
      */
-    protected function filterResponse(object $response): Response
+    protected function filterResponse(object $response)
     {
         return $response;
     }

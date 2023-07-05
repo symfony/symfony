@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add FQCN and FQCN::method aliases for routes loaded from attributes/annotations when applicable
+ * Add native return type to `AnnotationClassLoader::setResolver()`
 
 6.2
 ---

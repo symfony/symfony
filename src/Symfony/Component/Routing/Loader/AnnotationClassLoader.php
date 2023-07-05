@@ -253,10 +253,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
         return \is_string($resource) && preg_match('/^(?:\\\\?[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)+$/', $resource) && (!$type || \in_array($type, ['annotation', 'attribute'], true));
     }
 
-    /**
-     * @return void
-     */
-    public function setResolver(LoaderResolverInterface $resolver)
+    public function setResolver(LoaderResolverInterface $resolver): void
     {
     }
 

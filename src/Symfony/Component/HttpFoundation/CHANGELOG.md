@@ -9,6 +9,7 @@ CHANGELOG
  * Remove classes `RequestMatcher` and `ExpressionRequestMatcher`
  * Remove `Request::getContentType()`, use `Request::getContentTypeFormat()` instead
  * Throw an `InvalidArgumentException` when calling `Request::create()` with a malformed URI
+ * Require explicit argument when calling `JsonResponse::setCallback()`, `Response::setExpires/setLastModified/setEtag()`, `MockArraySessionStorage/NativeSessionStorage::setMetadataBag()`, `NativeSessionStorage::setSaveHandler()`
 
 6.4
 ---

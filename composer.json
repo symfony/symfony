@@ -141,7 +141,6 @@
         "pda/pheanstalk": "^4.0",
         "php-http/discovery": "^1.15",
         "php-http/httplug": "^1.0|^2.0",
-        "php-http/message-factory": "^1.0",
         "phpdocumentor/reflection-docblock": "^5.2",
         "phpstan/phpdoc-parser": "^1.0",
         "predis/predis": "^1.1|^2.0",

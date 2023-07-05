@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FirewallListenerFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
@@ -40,8 +39,6 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 
 class SecurityExtensionTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testInvalidCheckPath()
     {
         $this->expectException(InvalidConfigurationException::class);

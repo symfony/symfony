@@ -7,17 +7,6 @@ git checkout src/Symfony/Contracts/Service/ResetInterface.php
 (echo "$head" && echo && git diff -U2 src/) > .github/expected-missing-return-types.diff
 git checkout composer.json src/
 
-diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
-index 4b79ab7363..b72ff1d63b 100644
---- a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
-+++ b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
-@@ -2902,5 +2902,5 @@ class FrameworkExtension extends Extension
-      * @return void
-      */
--    public static function registerRateLimiter(ContainerBuilder $container, string $name, array $limiterConfig)
-+    public static function registerRateLimiter(ContainerBuilder $container, string $name, array $limiterConfig): void
-     {
-         trigger_deprecation('symfony/framework-bundle', '6.2', 'The "%s()" method is deprecated.', __METHOD__);
 diff --git a/src/Symfony/Component/Asset/Packages.php b/src/Symfony/Component/Asset/Packages.php
 index cffea43c49..0645fbd756 100644
 --- a/src/Symfony/Component/Asset/Packages.php
@@ -607,10 +596,10 @@ index bb40307e17..998fb85b27 100644
 +    public function setBuilder(NodeBuilder $builder): void;
  }
 diff --git a/src/Symfony/Component/Config/Definition/Builder/NodeBuilder.php b/src/Symfony/Component/Config/Definition/Builder/NodeBuilder.php
-index 7cda0bc7d8..b2311826f4 100644
+index 49b73c8045..51b0719782 100644
 --- a/src/Symfony/Component/Config/Definition/Builder/NodeBuilder.php
 +++ b/src/Symfony/Component/Config/Definition/Builder/NodeBuilder.php
-@@ -111,5 +111,5 @@ class NodeBuilder implements NodeParentInterface
+@@ -108,5 +108,5 @@ class NodeBuilder implements NodeParentInterface
       * @return NodeDefinition&ParentNodeDefinitionInterface
       */
 -    public function end()
@@ -2935,7 +2924,7 @@ index 2d6542660b..20287f9286 100644
      {
          $this->extensionConfig = [];
 diff --git a/src/Symfony/Component/DependencyInjection/Container.php b/src/Symfony/Component/DependencyInjection/Container.php
-index 3ea2228b94..f1d7078383 100644
+index 2b9eeb84cc..29905ed51b 100644
 --- a/src/Symfony/Component/DependencyInjection/Container.php
 +++ b/src/Symfony/Component/DependencyInjection/Container.php
 @@ -83,5 +83,5 @@ class Container implements ContainerInterface, ResetInterface
@@ -3811,7 +3800,7 @@ index f1b982315c..ed8ad1fab4 100644
      {
      }
 diff --git a/src/Symfony/Component/EventDispatcher/DependencyInjection/RegisterListenersPass.php b/src/Symfony/Component/EventDispatcher/DependencyInjection/RegisterListenersPass.php
-index c86f438d41..3bfb39db57 100644
+index 47fa9ce841..67d01c3c5b 100644
 --- a/src/Symfony/Component/EventDispatcher/DependencyInjection/RegisterListenersPass.php
 +++ b/src/Symfony/Component/EventDispatcher/DependencyInjection/RegisterListenersPass.php
 @@ -52,5 +52,5 @@ class RegisterListenersPass implements CompilerPassInterface
@@ -4371,7 +4360,7 @@ index 422f28bf33..b1d608fd4d 100644
      {
      }
 diff --git a/src/Symfony/Component/Form/ButtonBuilder.php b/src/Symfony/Component/Form/ButtonBuilder.php
-index 20a30968d4..dbded1d7f3 100644
+index 2c8c12ce23..8c484d7275 100644
 --- a/src/Symfony/Component/Form/ButtonBuilder.php
 +++ b/src/Symfony/Component/Form/ButtonBuilder.php
 @@ -57,5 +57,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
@@ -4447,151 +4436,151 @@ index 20a30968d4..dbded1d7f3 100644
 @@ -221,5 +221,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
       * @throws BadMethodCallException
       */
--    public function setDataMapper(DataMapperInterface $dataMapper = null): static
-+    public function setDataMapper(DataMapperInterface $dataMapper = null): never
+-    public function setDataMapper(?DataMapperInterface $dataMapper): static
++    public function setDataMapper(?DataMapperInterface $dataMapper): never
      {
-         if (1 > \func_num_args()) {
-@@ -249,5 +249,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
+         throw new BadMethodCallException('Buttons do not support data mappers.');
+@@ -245,5 +245,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
       * @throws BadMethodCallException
       */
 -    public function setEmptyData(mixed $emptyData): static
 +    public function setEmptyData(mixed $emptyData): never
      {
          throw new BadMethodCallException('Buttons do not support empty data.');
-@@ -261,5 +261,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
+@@ -257,5 +257,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
       * @throws BadMethodCallException
       */
 -    public function setErrorBubbling(bool $errorBubbling): static
 +    public function setErrorBubbling(bool $errorBubbling): never
      {
          throw new BadMethodCallException('Buttons do not support error bubbling.');
-@@ -273,5 +273,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
+@@ -269,5 +269,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
       * @throws BadMethodCallException
       */
 -    public function setRequired(bool $required): static
 +    public function setRequired(bool $required): never
      {
          throw new BadMethodCallException('Buttons cannot be required.');
-@@ -285,5 +285,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
+@@ -281,5 +281,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
       * @throws BadMethodCallException
       */
 -    public function setPropertyPath(string|PropertyPathInterface|null $propertyPath): static
 +    public function setPropertyPath(string|PropertyPathInterface|null $propertyPath): never
      {
          throw new BadMethodCallException('Buttons do not support property paths.');
-@@ -297,5 +297,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
+@@ -293,5 +293,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
       * @throws BadMethodCallException
       */
 -    public function setMapped(bool $mapped): static
 +    public function setMapped(bool $mapped): never
      {
          throw new BadMethodCallException('Buttons do not support data mapping.');
-@@ -309,5 +309,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
+@@ -305,5 +305,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
       * @throws BadMethodCallException
       */
 -    public function setByReference(bool $byReference): static
 +    public function setByReference(bool $byReference): never
      {
          throw new BadMethodCallException('Buttons do not support data mapping.');
-@@ -321,5 +321,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
+@@ -317,5 +317,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
       * @throws BadMethodCallException
       */
 -    public function setCompound(bool $compound): static
 +    public function setCompound(bool $compound): never
      {
          throw new BadMethodCallException('Buttons cannot be compound.');
-@@ -345,5 +345,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
+@@ -341,5 +341,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
       * @throws BadMethodCallException
       */
 -    public function setData(mixed $data): static
 +    public function setData(mixed $data): never
      {
          throw new BadMethodCallException('Buttons do not support data.');
-@@ -357,5 +357,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
+@@ -353,5 +353,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
       * @throws BadMethodCallException
       */
 -    public function setDataLocked(bool $locked): static
 +    public function setDataLocked(bool $locked): never
      {
          throw new BadMethodCallException('Buttons do not support data locking.');
-@@ -369,5 +369,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
+@@ -365,5 +365,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
       * @throws BadMethodCallException
       */
 -    public function setFormFactory(FormFactoryInterface $formFactory)
 +    public function setFormFactory(FormFactoryInterface $formFactory): never
      {
          throw new BadMethodCallException('Buttons do not support form factories.');
-@@ -381,5 +381,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
+@@ -377,5 +377,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
       * @throws BadMethodCallException
       */
 -    public function setAction(string $action): static
 +    public function setAction(string $action): never
      {
          throw new BadMethodCallException('Buttons do not support actions.');
-@@ -393,5 +393,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
+@@ -389,5 +389,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
       * @throws BadMethodCallException
       */
 -    public function setMethod(string $method): static
 +    public function setMethod(string $method): never
      {
          throw new BadMethodCallException('Buttons do not support methods.');
-@@ -405,5 +405,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
+@@ -401,5 +401,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
       * @throws BadMethodCallException
       */
 -    public function setRequestHandler(RequestHandlerInterface $requestHandler): static
 +    public function setRequestHandler(RequestHandlerInterface $requestHandler): never
      {
          throw new BadMethodCallException('Buttons do not support request handlers.');
-@@ -433,5 +433,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
+@@ -429,5 +429,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
       * @throws BadMethodCallException
       */
 -    public function setInheritData(bool $inheritData): static
 +    public function setInheritData(bool $inheritData): never
      {
          throw new BadMethodCallException('Buttons do not support data inheritance.');
-@@ -457,5 +457,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
+@@ -453,5 +453,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
       * @throws BadMethodCallException
       */
 -    public function setIsEmptyCallback(?callable $isEmptyCallback): static
 +    public function setIsEmptyCallback(?callable $isEmptyCallback): never
      {
          throw new BadMethodCallException('Buttons do not support "is empty" callback.');
-@@ -469,5 +469,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
+@@ -465,5 +465,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
       * @throws BadMethodCallException
       */
 -    public function getEventDispatcher(): EventDispatcherInterface
 +    public function getEventDispatcher(): never
      {
          throw new BadMethodCallException('Buttons do not support event dispatching.');
-@@ -628,5 +628,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
+@@ -624,5 +624,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
       * @return never
       */
 -    public function getFormFactory(): FormFactoryInterface
 +    public function getFormFactory(): never
      {
          throw new BadMethodCallException('Buttons do not support adding children.');
-@@ -640,5 +640,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
+@@ -636,5 +636,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
       * @throws BadMethodCallException
       */
 -    public function getAction(): string
 +    public function getAction(): never
      {
          throw new BadMethodCallException('Buttons do not support actions.');
-@@ -652,5 +652,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
+@@ -648,5 +648,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
       * @throws BadMethodCallException
       */
 -    public function getMethod(): string
 +    public function getMethod(): never
      {
          throw new BadMethodCallException('Buttons do not support methods.');
-@@ -664,5 +664,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
+@@ -660,5 +660,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
       * @throws BadMethodCallException
       */
 -    public function getRequestHandler(): RequestHandlerInterface
 +    public function getRequestHandler(): never
      {
          throw new BadMethodCallException('Buttons do not support request handlers.');
-@@ -716,5 +716,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
+@@ -712,5 +712,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
       * @throws BadMethodCallException
       */
 -    public function getIsEmptyCallback(): ?callable
@@ -4955,7 +4944,7 @@ index 655ef6682f..0e525d09f6 100644
      {
          $compound = static fn (Options $options) => 'single_text' !== $options['widget'];
 diff --git a/src/Symfony/Component/Form/Extension/Core/Type/DateTimeType.php b/src/Symfony/Component/Form/Extension/Core/Type/DateTimeType.php
-index 9ec4c9cca4..28a33fb6d6 100644
+index 73ae5708c9..90815a20cf 100644
 --- a/src/Symfony/Component/Form/Extension/Core/Type/DateTimeType.php
 +++ b/src/Symfony/Component/Form/Extension/Core/Type/DateTimeType.php
 @@ -53,5 +53,5 @@ class DateTimeType extends AbstractType
@@ -4965,14 +4954,14 @@ index 9ec4c9cca4..28a33fb6d6 100644
 +    public function buildForm(FormBuilderInterface $builder, array $options): void
      {
          $parts = ['year', 'month', 'day', 'hour'];
-@@ -217,5 +217,5 @@ class DateTimeType extends AbstractType
+@@ -216,5 +216,5 @@ class DateTimeType extends AbstractType
       * @return void
       */
 -    public function buildView(FormView $view, FormInterface $form, array $options)
 +    public function buildView(FormView $view, FormInterface $form, array $options): void
      {
          $view->vars['widget'] = $options['widget'];
-@@ -245,5 +245,5 @@ class DateTimeType extends AbstractType
+@@ -244,5 +244,5 @@ class DateTimeType extends AbstractType
       * @return void
       */
 -    public function configureOptions(OptionsResolver $resolver)
@@ -4980,7 +4969,7 @@ index 9ec4c9cca4..28a33fb6d6 100644
      {
          $compound = static fn (Options $options) => 'single_text' !== $options['widget'];
 diff --git a/src/Symfony/Component/Form/Extension/Core/Type/DateType.php b/src/Symfony/Component/Form/Extension/Core/Type/DateType.php
-index 480afc315f..e9f6364b07 100644
+index d204a914bd..7ae99cbfa6 100644
 --- a/src/Symfony/Component/Form/Extension/Core/Type/DateType.php
 +++ b/src/Symfony/Component/Form/Extension/Core/Type/DateType.php
 @@ -49,5 +49,5 @@ class DateType extends AbstractType
@@ -4990,14 +4979,14 @@ index 480afc315f..e9f6364b07 100644
 +    public function buildForm(FormBuilderInterface $builder, array $options): void
      {
          $dateFormat = \is_int($options['format']) ? $options['format'] : self::DEFAULT_FORMAT;
-@@ -201,5 +201,5 @@ class DateType extends AbstractType
+@@ -200,5 +200,5 @@ class DateType extends AbstractType
       * @return void
       */
 -    public function finishView(FormView $view, FormInterface $form, array $options)
 +    public function finishView(FormView $view, FormInterface $form, array $options): void
      {
          $view->vars['widget'] = $options['widget'];
-@@ -241,5 +241,5 @@ class DateType extends AbstractType
+@@ -240,5 +240,5 @@ class DateType extends AbstractType
       * @return void
       */
 -    public function configureOptions(OptionsResolver $resolver)
@@ -5347,7 +5336,7 @@ index 40e7580d80..18c58e30c0 100644
      {
          $view->vars['pattern'] = null;
 diff --git a/src/Symfony/Component/Form/Extension/Core/Type/TimeType.php b/src/Symfony/Component/Form/Extension/Core/Type/TimeType.php
-index 623259f17a..1b7bd9a33f 100644
+index 7788290d7a..fff39fbc5d 100644
 --- a/src/Symfony/Component/Form/Extension/Core/Type/TimeType.php
 +++ b/src/Symfony/Component/Form/Extension/Core/Type/TimeType.php
 @@ -38,5 +38,5 @@ class TimeType extends AbstractType
@@ -5357,14 +5346,14 @@ index 623259f17a..1b7bd9a33f 100644
 +    public function buildForm(FormBuilderInterface $builder, array $options): void
      {
          $parts = ['hour'];
-@@ -229,5 +229,5 @@ class TimeType extends AbstractType
+@@ -228,5 +228,5 @@ class TimeType extends AbstractType
       * @return void
       */
 -    public function buildView(FormView $view, FormInterface $form, array $options)
 +    public function buildView(FormView $view, FormInterface $form, array $options): void
      {
          $view->vars = array_replace($view->vars, [
-@@ -260,5 +260,5 @@ class TimeType extends AbstractType
+@@ -259,5 +259,5 @@ class TimeType extends AbstractType
       * @return void
       */
 -    public function configureOptions(OptionsResolver $resolver)
@@ -5822,10 +5811,10 @@ index ed363a7b15..967d95cc27 100644
      {
          return $this->path->mapsForm($this->key());
 diff --git a/src/Symfony/Component/Form/FormConfigBuilder.php b/src/Symfony/Component/Form/FormConfigBuilder.php
-index 9fed3d1a0a..5cd4eb5f16 100644
+index 29e643680e..ef10087b80 100644
 --- a/src/Symfony/Component/Form/FormConfigBuilder.php
 +++ b/src/Symfony/Component/Form/FormConfigBuilder.php
-@@ -537,5 +537,5 @@ class FormConfigBuilder implements FormConfigBuilderInterface
+@@ -534,5 +534,5 @@ class FormConfigBuilder implements FormConfigBuilderInterface
       * @return $this
       */
 -    public function setFormFactory(FormFactoryInterface $formFactory)
@@ -6757,7 +6746,7 @@ index ebe4b748ad..059a6b5ac8 100644
      {
          $this->name = $name;
 diff --git a/src/Symfony/Component/HttpFoundation/Session/Storage/MockArraySessionStorage.php b/src/Symfony/Component/HttpFoundation/Session/Storage/MockArraySessionStorage.php
-index d30b56d691..0f002902bd 100644
+index 65f06c69e4..8f51fbbacd 100644
 --- a/src/Symfony/Component/HttpFoundation/Session/Storage/MockArraySessionStorage.php
 +++ b/src/Symfony/Component/HttpFoundation/Session/Storage/MockArraySessionStorage.php
 @@ -72,5 +72,5 @@ class MockArraySessionStorage implements SessionStorageInterface
@@ -6805,11 +6794,11 @@ index d30b56d691..0f002902bd 100644
 @@ -193,5 +193,5 @@ class MockArraySessionStorage implements SessionStorageInterface
       * @return void
       */
--    public function setMetadataBag(MetadataBag $bag = null)
-+    public function setMetadataBag(MetadataBag $bag = null): void
+-    public function setMetadataBag(?MetadataBag $bag)
++    public function setMetadataBag(?MetadataBag $bag): void
      {
-         if (1 > \func_num_args()) {
-@@ -223,5 +223,5 @@ class MockArraySessionStorage implements SessionStorageInterface
+         $this->metadataBag = $bag ?? new MetadataBag();
+@@ -220,5 +220,5 @@ class MockArraySessionStorage implements SessionStorageInterface
       * @return void
       */
 -    protected function loadSession()
@@ -6828,7 +6817,7 @@ index 95f69f2e13..971b890f0f 100644
      {
          if (!$this->started) {
 diff --git a/src/Symfony/Component/HttpFoundation/Session/Storage/NativeSessionStorage.php b/src/Symfony/Component/HttpFoundation/Session/Storage/NativeSessionStorage.php
-index 7c6b6f9296..0b63abb810 100644
+index e2e6f9f1f9..5c08f6f102 100644
 --- a/src/Symfony/Component/HttpFoundation/Session/Storage/NativeSessionStorage.php
 +++ b/src/Symfony/Component/HttpFoundation/Session/Storage/NativeSessionStorage.php
 @@ -187,5 +187,5 @@ class NativeSessionStorage implements SessionStorageInterface
@@ -6869,25 +6858,25 @@ index 7c6b6f9296..0b63abb810 100644
 @@ -318,5 +318,5 @@ class NativeSessionStorage implements SessionStorageInterface
       * @return void
       */
--    public function setMetadataBag(MetadataBag $metaBag = null)
-+    public function setMetadataBag(MetadataBag $metaBag = null): void
+-    public function setMetadataBag(?MetadataBag $metaBag)
++    public function setMetadataBag(?MetadataBag $metaBag): void
      {
-         if (1 > \func_num_args()) {
-@@ -351,5 +351,5 @@ class NativeSessionStorage implements SessionStorageInterface
+         $this->metadataBag = $metaBag ?? new MetadataBag();
+@@ -348,5 +348,5 @@ class NativeSessionStorage implements SessionStorageInterface
       * @return void
       */
 -    public function setOptions(array $options)
 +    public function setOptions(array $options): void
      {
          if (headers_sent() || \PHP_SESSION_ACTIVE === session_status()) {
-@@ -397,5 +397,5 @@ class NativeSessionStorage implements SessionStorageInterface
+@@ -394,5 +394,5 @@ class NativeSessionStorage implements SessionStorageInterface
       * @throws \InvalidArgumentException
       */
--    public function setSaveHandler(AbstractProxy|\SessionHandlerInterface $saveHandler = null)
-+    public function setSaveHandler(AbstractProxy|\SessionHandlerInterface $saveHandler = null): void
+-    public function setSaveHandler(AbstractProxy|\SessionHandlerInterface|null $saveHandler)
++    public function setSaveHandler(AbstractProxy|\SessionHandlerInterface|null $saveHandler): void
      {
-         if (1 > \func_num_args()) {
-@@ -430,5 +430,5 @@ class NativeSessionStorage implements SessionStorageInterface
+         // Wrap $saveHandler in proxy and prevent double wrapping of proxy
+@@ -423,5 +423,5 @@ class NativeSessionStorage implements SessionStorageInterface
       * @return void
       */
 -    protected function loadSession(array &$session = null)
@@ -7487,17 +7476,17 @@ index 47027233a7..2be5cfc7de 100644
      {
          $this->fragmentPath = $path;
 diff --git a/src/Symfony/Component/HttpKernel/HttpCache/AbstractSurrogate.php b/src/Symfony/Component/HttpKernel/HttpCache/AbstractSurrogate.php
-index 95518bed2b..2f7d5ee3b5 100644
+index e3f4d9552d..723e2c2f9c 100644
 --- a/src/Symfony/Component/HttpKernel/HttpCache/AbstractSurrogate.php
 +++ b/src/Symfony/Component/HttpKernel/HttpCache/AbstractSurrogate.php
-@@ -63,5 +63,5 @@ abstract class AbstractSurrogate implements SurrogateInterface
+@@ -55,5 +55,5 @@ abstract class AbstractSurrogate implements SurrogateInterface
       * @return void
       */
 -    public function addSurrogateCapability(Request $request)
 +    public function addSurrogateCapability(Request $request): void
      {
          $current = $request->headers->get('Surrogate-Capability');
-@@ -112,5 +112,5 @@ abstract class AbstractSurrogate implements SurrogateInterface
+@@ -104,5 +104,5 @@ abstract class AbstractSurrogate implements SurrogateInterface
       * @return void
       */
 -    protected function removeFromControl(Response $response)
@@ -7516,31 +7505,31 @@ index 5db840a802..c16398a8ea 100644
      {
          if (str_contains($response->getContent(), '<esi:include')) {
 diff --git a/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php b/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php
-index eabacfec62..d882807f38 100644
+index 1698c3d21f..bb4c7e3234 100644
 --- a/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php
 +++ b/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php
-@@ -246,5 +246,5 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
+@@ -240,5 +240,5 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
       * @return void
       */
 -    public function terminate(Request $request, Response $response)
 +    public function terminate(Request $request, Response $response): void
      {
          // Do not call any listeners in case of a cache hit.
-@@ -466,5 +466,5 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
+@@ -458,5 +458,5 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
       * @return Response
       */
 -    protected function forward(Request $request, bool $catch = false, Response $entry = null)
 +    protected function forward(Request $request, bool $catch = false, Response $entry = null): Response
      {
          $this->surrogate?->addSurrogateCapability($request);
-@@ -600,5 +600,5 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
+@@ -592,5 +592,5 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
       * @throws \Exception
       */
 -    protected function store(Request $request, Response $response)
 +    protected function store(Request $request, Response $response): void
      {
          try {
-@@ -678,5 +678,5 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
+@@ -670,5 +670,5 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
       * @return void
       */
 -    protected function processResponseBody(Request $request, Response $response)
@@ -7697,7 +7686,7 @@ index 0f3630e7fe..ddf77b8a19 100644
      {
          return <<<'EOF'
 diff --git a/src/Symfony/Component/HttpKernel/Kernel.php b/src/Symfony/Component/HttpKernel/Kernel.php
-index 76205bc0b8..f4240cdd1b 100644
+index 563b663262..6118d09871 100644
 --- a/src/Symfony/Component/HttpKernel/Kernel.php
 +++ b/src/Symfony/Component/HttpKernel/Kernel.php
 @@ -107,5 +107,5 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
@@ -8534,31 +8523,31 @@ index 88233655f9..abfb1fe7a6 100644
      {
          $token = $this->getUniqueToken($key);
 diff --git a/src/Symfony/Component/Lock/Store/MongoDbStore.php b/src/Symfony/Component/Lock/Store/MongoDbStore.php
-index ada843883c..afebb3f3d8 100644
+index 20ef3bc4ac..1417a5d84c 100644
 --- a/src/Symfony/Component/Lock/Store/MongoDbStore.php
 +++ b/src/Symfony/Component/Lock/Store/MongoDbStore.php
-@@ -194,5 +194,5 @@ class MongoDbStore implements PersistingStoreInterface
+@@ -187,5 +187,5 @@ class MongoDbStore implements PersistingStoreInterface
       * @throws DriverRuntimeException        for other driver errors (e.g. connection errors)
       */
 -    public function createTtlIndex(int $expireAfterSeconds = 0)
 +    public function createTtlIndex(int $expireAfterSeconds = 0): void
      {
          $this->getCollection()->createIndex(
-@@ -211,5 +211,5 @@ class MongoDbStore implements PersistingStoreInterface
+@@ -204,5 +204,5 @@ class MongoDbStore implements PersistingStoreInterface
       * @throws LockExpiredException when save is called on an expired lock
       */
 -    public function save(Key $key)
 +    public function save(Key $key): void
      {
          $key->reduceLifetime($this->initialTtl);
-@@ -237,5 +237,5 @@ class MongoDbStore implements PersistingStoreInterface
+@@ -230,5 +230,5 @@ class MongoDbStore implements PersistingStoreInterface
       * @throws LockExpiredException
       */
 -    public function putOffExpiration(Key $key, float $ttl)
 +    public function putOffExpiration(Key $key, float $ttl): void
      {
          $key->reduceLifetime($ttl);
-@@ -256,5 +256,5 @@ class MongoDbStore implements PersistingStoreInterface
+@@ -249,5 +249,5 @@ class MongoDbStore implements PersistingStoreInterface
       * @return void
       */
 -    public function delete(Key $key)
@@ -8799,10 +8788,10 @@ index 3b6d6b8a39..98bc75ecd7 100644
      {
          $this
 diff --git a/src/Symfony/Component/Messenger/DependencyInjection/MessengerPass.php b/src/Symfony/Component/Messenger/DependencyInjection/MessengerPass.php
-index 86fa255015..08cbde055f 100644
+index f6f26d6946..5a98a6a0dc 100644
 --- a/src/Symfony/Component/Messenger/DependencyInjection/MessengerPass.php
 +++ b/src/Symfony/Component/Messenger/DependencyInjection/MessengerPass.php
-@@ -37,5 +37,5 @@ class MessengerPass implements CompilerPassInterface
+@@ -34,5 +34,5 @@ class MessengerPass implements CompilerPassInterface
       * @return void
       */
 -    public function process(ContainerBuilder $container)
@@ -8898,10 +8887,10 @@ index 70fa786331..f27afd0f01 100644
      {
          if ($container->has('mime_types')) {
 diff --git a/src/Symfony/Component/Mime/Email.php b/src/Symfony/Component/Mime/Email.php
-index 7f3496d1fc..be6a1eff61 100644
+index 67eea6c877..101d432675 100644
 --- a/src/Symfony/Component/Mime/Email.php
 +++ b/src/Symfony/Component/Mime/Email.php
-@@ -400,5 +400,5 @@ class Email extends Message
+@@ -388,5 +388,5 @@ class Email extends Message
       * @return void
       */
 -    public function ensureValidity()
@@ -8984,10 +8973,10 @@ index 61c06d8f50..883293f6e0 100644
      {
          $this->value = $value;
 diff --git a/src/Symfony/Component/Mime/Message.php b/src/Symfony/Component/Mime/Message.php
-index e636c2e8e5..4c0597d16f 100644
+index 6b78316606..91797a13d2 100644
 --- a/src/Symfony/Component/Mime/Message.php
 +++ b/src/Symfony/Component/Mime/Message.php
-@@ -129,5 +129,5 @@ class Message extends RawMessage
+@@ -126,5 +126,5 @@ class Message extends RawMessage
       * @return void
       */
 -    public function ensureValidity()
@@ -9196,7 +9185,7 @@ index 40dbd41620..ac31fdc922 100644
      {
          if (self::STATUS_STARTED !== $this->status) {
 diff --git a/src/Symfony/Component/PropertyAccess/PropertyAccessor.php b/src/Symfony/Component/PropertyAccess/PropertyAccessor.php
-index 0bf5c0afa9..dc0f2eae19 100644
+index ac45dbe3b0..24bd3924f2 100644
 --- a/src/Symfony/Component/PropertyAccess/PropertyAccessor.php
 +++ b/src/Symfony/Component/PropertyAccess/PropertyAccessor.php
 @@ -123,5 +123,5 @@ class PropertyAccessor implements PropertyAccessorInterface
@@ -10340,16 +10329,6 @@ index c925e00050..95d5bd4321 100644
 +    public function setTranslator(?TranslatorInterface $translator): void
      {
          $this->translator = $translator;
-diff --git a/src/Symfony/Component/Security/Http/EntryPoint/AuthenticationEntryPointInterface.php b/src/Symfony/Component/Security/Http/EntryPoint/AuthenticationEntryPointInterface.php
-index 91271d14a3..100c2fb549 100644
---- a/src/Symfony/Component/Security/Http/EntryPoint/AuthenticationEntryPointInterface.php
-+++ b/src/Symfony/Component/Security/Http/EntryPoint/AuthenticationEntryPointInterface.php
-@@ -43,4 +43,4 @@ interface AuthenticationEntryPointInterface
-      * @return Response
-      */
--    public function start(Request $request, AuthenticationException $authException = null);
-+    public function start(Request $request, AuthenticationException $authException = null): Response;
- }
 diff --git a/src/Symfony/Component/Security/Http/Event/LoginFailureEvent.php b/src/Symfony/Component/Security/Http/Event/LoginFailureEvent.php
 index 3b7c5086f2..97fb99f0b5 100644
 --- a/src/Symfony/Component/Security/Http/Event/LoginFailureEvent.php
@@ -10726,10 +10705,10 @@ index 7cb1164034..b3feecc078 100644
  
      /**
 diff --git a/src/Symfony/Component/Serializer/Normalizer/GetSetMethodNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/GetSetMethodNormalizer.php
-index 3d11567a7b..22e873b151 100644
+index 7873f651a2..2778c8d3bf 100644
 --- a/src/Symfony/Component/Serializer/Normalizer/GetSetMethodNormalizer.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/GetSetMethodNormalizer.php
-@@ -131,5 +131,5 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
+@@ -129,5 +129,5 @@ final class GetSetMethodNormalizer extends AbstractObjectNormalizer
       * @return void
       */
 -    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = [])
@@ -10787,10 +10766,10 @@ index 533c07e6dd..66f30c7f93 100644
      {
          try {
 diff --git a/src/Symfony/Component/Serializer/Normalizer/PropertyNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/PropertyNormalizer.php
-index cfe93bc10b..7f1d8e5e13 100644
+index d4c5a97e89..c64626e1d6 100644
 --- a/src/Symfony/Component/Serializer/Normalizer/PropertyNormalizer.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/PropertyNormalizer.php
-@@ -171,5 +171,5 @@ class PropertyNormalizer extends AbstractObjectNormalizer
+@@ -169,5 +169,5 @@ final class PropertyNormalizer extends AbstractObjectNormalizer
       * @return void
       */
 -    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = [])
@@ -11273,31 +11252,6 @@ index 642130af75..c9ae2693a4 100644
 -    public function setPrefix(string $prefix);
 +    public function setPrefix(string $prefix): void;
  }
-diff --git a/src/Symfony/Component/Translation/Extractor/PhpExtractor.php b/src/Symfony/Component/Translation/Extractor/PhpExtractor.php
-index 7ff27f7c80..495067ed2e 100644
---- a/src/Symfony/Component/Translation/Extractor/PhpExtractor.php
-+++ b/src/Symfony/Component/Translation/Extractor/PhpExtractor.php
-@@ -136,5 +136,5 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
-      * @return void
-      */
--    public function extract(string|iterable $resource, MessageCatalogue $catalog)
-+    public function extract(string|iterable $resource, MessageCatalogue $catalog): void
-     {
-         $files = $this->extractFiles($resource);
-@@ -149,5 +149,5 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
-      * @return void
-      */
--    public function setPrefix(string $prefix)
-+    public function setPrefix(string $prefix): void
-     {
-         $this->prefix = $prefix;
-@@ -265,5 +265,5 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
-      * @return void
-      */
--    protected function parseTokens(array $tokens, MessageCatalogue $catalog, string $filename)
-+    protected function parseTokens(array $tokens, MessageCatalogue $catalog, string $filename): void
-     {
-         $tokenIterator = new \ArrayIterator($tokens);
 diff --git a/src/Symfony/Component/Translation/Loader/CsvFileLoader.php b/src/Symfony/Component/Translation/Loader/CsvFileLoader.php
 index 7f2f96be64..266c7f48c9 100644
 --- a/src/Symfony/Component/Translation/Loader/CsvFileLoader.php
@@ -11591,38 +11545,38 @@ index acb00d7242..37cc40a06f 100644
      {
          $this
 diff --git a/src/Symfony/Component/Validator/Constraint.php b/src/Symfony/Component/Validator/Constraint.php
-index d53bbb196f..4eecf85f8e 100644
+index 8156c99196..cfab6055f1 100644
 --- a/src/Symfony/Component/Validator/Constraint.php
 +++ b/src/Symfony/Component/Validator/Constraint.php
-@@ -236,5 +236,5 @@ abstract class Constraint
+@@ -225,5 +225,5 @@ abstract class Constraint
       * @return void
       */
 -    public function addImplicitGroupName(string $group)
 +    public function addImplicitGroupName(string $group): void
      {
          if (null === $this->groups && \array_key_exists('groups', (array) $this)) {
-@@ -256,5 +256,5 @@ abstract class Constraint
+@@ -245,5 +245,5 @@ abstract class Constraint
       * @see __construct()
       */
 -    public function getDefaultOption()
 +    public function getDefaultOption(): ?string
      {
          return null;
-@@ -270,5 +270,5 @@ abstract class Constraint
+@@ -259,5 +259,5 @@ abstract class Constraint
       * @see __construct()
       */
 -    public function getRequiredOptions()
 +    public function getRequiredOptions(): array
      {
          return [];
-@@ -284,5 +284,5 @@ abstract class Constraint
+@@ -273,5 +273,5 @@ abstract class Constraint
       * @return string
       */
 -    public function validatedBy()
 +    public function validatedBy(): string
      {
          return static::class.'Validator';
-@@ -298,5 +298,5 @@ abstract class Constraint
+@@ -287,5 +287,5 @@ abstract class Constraint
       * @return string|string[] One or more constant values
       */
 -    public function getTargets()
@@ -11810,10 +11764,10 @@ index 5528252c52..de7c2c1257 100644
      {
          if (!$constraint instanceof Choice) {
 diff --git a/src/Symfony/Component/Validator/Constraints/Collection.php b/src/Symfony/Component/Validator/Constraints/Collection.php
-index ee50fca169..62effcb311 100644
+index a857c2aa43..21c0f07a19 100644
 --- a/src/Symfony/Component/Validator/Constraints/Collection.php
 +++ b/src/Symfony/Component/Validator/Constraints/Collection.php
-@@ -61,5 +61,5 @@ class Collection extends Composite
+@@ -56,5 +56,5 @@ class Collection extends Composite
       * @return void
       */
 -    protected function initializeNestedConstraints()
@@ -11916,10 +11870,10 @@ index 0e3d848430..b4a6755388 100644
      {
          if (!$constraint instanceof Date) {
 diff --git a/src/Symfony/Component/Validator/Constraints/EmailValidator.php b/src/Symfony/Component/Validator/Constraints/EmailValidator.php
-index 8c0ff77308..ca64a5fe88 100644
+index 72765dfbf7..6d14b36e92 100644
 --- a/src/Symfony/Component/Validator/Constraints/EmailValidator.php
 +++ b/src/Symfony/Component/Validator/Constraints/EmailValidator.php
-@@ -55,5 +55,5 @@ class EmailValidator extends ConstraintValidator
+@@ -49,5 +49,5 @@ class EmailValidator extends ConstraintValidator
       * @return void
       */
 -    public function validate(mixed $value, Constraint $constraint)
@@ -13613,10 +13567,10 @@ index 98c2149330..2e85547efb 100644
      {
          if (!$this->connection->write($data) && $this->wrappedDumper) {
 diff --git a/src/Symfony/Component/VarDumper/VarDumper.php b/src/Symfony/Component/VarDumper/VarDumper.php
-index a89f2369bb..78905c797d 100644
+index eda2727d50..5fde05973b 100644
 --- a/src/Symfony/Component/VarDumper/VarDumper.php
 +++ b/src/Symfony/Component/VarDumper/VarDumper.php
-@@ -43,5 +43,5 @@ class VarDumper
+@@ -41,5 +41,5 @@ class VarDumper
       * @return mixed
       */
 -    public static function dump(mixed $var, string $label = null)
@@ -13813,7 +13767,7 @@ index 9acd540dcc..495573aec4 100644
 +    public function getMetadata(string $key, string|Transition $subject = null): mixed;
  }
 diff --git a/src/Symfony/Component/Workflow/Registry.php b/src/Symfony/Component/Workflow/Registry.php
-index 287d8b750f..9462747d84 100644
+index ad72693c5a..50bf899d1c 100644
 --- a/src/Symfony/Component/Workflow/Registry.php
 +++ b/src/Symfony/Component/Workflow/Registry.php
 @@ -28,5 +28,5 @@ class Registry

@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+7.0
+---
+
+ * Throw when using `DateTime` or `DateTimeImmutable` model data with a different timezone than configured with the
+   `model_timezone` option in `DateType`, `DateTimeType`, and `TimeType`
+ * Make the "widget" option of date/time form types default to "single_text"
+ * Require explicit argument when calling `Button/Form::setParent()`, `ButtonBuilder/FormConfigBuilder::setDataMapper()`, `TransformationFailedException::setInvalidMessage()`
+
 6.4
 ---
 

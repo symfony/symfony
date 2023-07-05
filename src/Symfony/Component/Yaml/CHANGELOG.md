@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.0
+---
+
+ * Remove the `!php/const:` tag, use `!php/const` instead (without the colon)
+
 6.3
 ---
 

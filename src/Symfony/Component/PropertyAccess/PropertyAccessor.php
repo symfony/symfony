@@ -290,14 +290,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         for ($i = 0; $i < $lastIndex; ++$i) {
             $property = $propertyPath->getElement($i);
             $isIndex = $propertyPath->isIndex($i);
-
-            $isNullSafe = false;
-            if (method_exists($propertyPath, 'isNullSafe')) {
-                // To be removed in symfony 7 once we are sure isNullSafe is always implemented.
-                $isNullSafe = $propertyPath->isNullSafe($i);
-            } else {
-                trigger_deprecation('symfony/property-access', '6.2', 'The "%s()" method in class "%s" needs to be implemented in version 7.0, not defining it is deprecated.', 'isNullSafe', PropertyPathInterface::class);
-            }
+            $isNullSafe = $propertyPath->isNullSafe($i);
 
             if ($isIndex) {
                 // Create missing nested arrays on demand

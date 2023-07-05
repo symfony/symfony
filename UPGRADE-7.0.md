@@ -11,6 +11,11 @@ Cache
 
  * Add parameter `$isSameDatabase` to `DoctrineDbalAdapter::configureSchema()`
 
+Config
+------
+
+ * Require explicit argument when calling `NodeBuilder::setParent()`
+
 Console
 -------
 
@@ -41,7 +46,7 @@ Console
    }
    ```
 
- * Passing null to `*Command::setApplication()`, `*FormatterStyle::setForeground/setBackground()`, `Helper::setHelpSet()`, `Input*::setDefault()` and `Question::setAutocompleterCallback/setValidator()` must be done explicitly
+ * Require explicit argument when calling `*Command::setApplication()`, `*FormatterStyle::setForeground/setBackground()`, `Helper::setHelpSet()`, `Input*::setDefault()` and `Question::setAutocompleterCallback/setValidator()`
  * Remove `StringInput::REGEX_STRING`
  * Add method `__toString()` to `InputInterface`
 
@@ -52,7 +57,7 @@ DependencyInjection
  * Remove `ProxyHelper`, use `Symfony\Component\VarExporter\ProxyHelper` instead
  * Remove `ReferenceSetArgumentTrait`
  * Remove support of `@required` annotation, use the `Symfony\Contracts\Service\Attribute\Required` attribute instead
- * Passing `null` to `ContainerAwareTrait::setContainer()` must be done explicitly
+ * Require explicit argument when calling `ContainerAwareTrait::setContainer()`
  * Remove `PhpDumper` options `inline_factories_parameter` and `inline_class_loader_parameter`, use options `inline_factories` and `inline_class_loader` instead
  * Parameter names of `ParameterBag` cannot be numerics
  * Remove `ContainerAwareInterface` and `ContainerAwareTrait`, use dependency injection instead
@@ -82,10 +87,34 @@ Filesystem
 
  * Add argument `$lock` to `Filesystem::appendToFile()`
 
+Form
+----
+
+ * Throw when using `DateTime` or `DateTimeImmutable` model data with a different timezone than configured with the
+   `model_timezone` option in `DateType`, `DateTimeType`, and `TimeType`
+ * Make the "widget" option of date/time form types default to "single_text"
+ * Require explicit argument when calling `Button/Form::setParent()`, `ButtonBuilder/FormConfigBuilder::setDataMapper()`, `TransformationFailedException::setInvalidMessage()`
+
 FrameworkBundle
 ---------------
 
  * Remove command `translation:update`, use `translation:extract` instead
+ * Make the `http_method_override` config option default to `false`
+ * Remove the `Symfony\Component\Serializer\Normalizer\ObjectNormalizer` and
+   `Symfony\Component\Serializer\Normalizer\PropertyNormalizer` autowiring aliases, type-hint against
+   `Symfony\Component\Serializer\Normalizer\NormalizerInterface` or implement `NormalizerAwareInterface` instead
+ * Remove the `Http\Client\HttpClient` service, use `Psr\Http\Client\ClientInterface` instead
+ * Remove `AbstractController::renderForm()`, use `render()` instead
+
+   *Before*
+   ```php
+   $this->renderForm(..., ['form' => $form]);
+   ```
+
+   *After*
+   ```php
+   $this->render(..., ['form' => $form]);
+   ```
 
 HttpFoundation
 --------------
@@ -99,6 +128,7 @@ HttpFoundation
  * Replace `ExpressionRequestMatcher` with `RequestMatcher\ExpressionRequestMatcher`
  * Remove `Request::getContentType()`, use `Request::getContentTypeFormat()` instead
  * Throw an `InvalidArgumentException` when calling `Request::create()` with a malformed URI
+ * Require explicit argument when calling `JsonResponse::setCallback()`, `Response::setExpires/setLastModified/setEtag()`, `MockArraySessionStorage/NativeSessionStorage::setMetadataBag()`, `NativeSessionStorage::setSaveHandler()`
 
 HttpClient
 ----------
@@ -114,6 +144,7 @@ HttpKernel
  * Remove `AbstractSurrogate::$phpEscapeMap`
  * Remove `HttpKernelInterface::MASTER_REQUEST`
  * Remove `terminate_on_cache_hit` option from `HttpCache`
+ * Require explicit argument when calling `ConfigDataCollector::setKernel()`, `RouterListener::setCurrentRequest()`
 
 Lock
 ----
@@ -121,21 +152,34 @@ Lock
  * Add parameter `$isSameDatabase` to `DoctrineDbalStore::configureSchema()`
  * Remove the `gcProbablity` (notice the typo) option, use `gcProbability` instead
 
+Mailer
+------
+
+ * Remove the OhMySmtp bridge in favor of the MailPace bridge
+
 Messenger
 ---------
 
  * Add parameter `$isSameDatabase` to `DoctrineTransport::configureSchema()`
+ * Remove `MessageHandlerInterface` and `MessageSubscriberInterface`, use `#[AsMessageHandler]` instead
+ * Remove `StopWorkerOnSigtermSignalListener` in favor of
+   `StopWorkerOnSignalsListener` and make it configurable with SIGINT and
+ * Remove `Symfony\Component\Messenger\Transport\InMemoryTransport` and
+   `Symfony\Component\Messenger\Transport\InMemoryTransportFactory` in favor of
+   `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport` and
+   `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransportFactory`
 
 Mime
 ----
 
  * Remove `Email::attachPart()` method, use `Email::addPart()` instead
- * Parameter `$body` is now required (at least null) in `Message::setBody()`
+ * Require explicit argument when calling `Message::setBody()`
 
 PropertyAccess
 --------------
 
  * Add method `isNullSafe()` to `PropertyPathInterface`
+ * Require explicit argument when calling `PropertyAccessorBuilder::setCacheItemPool()`
 
 ProxyManagerBridge
 ------------------
@@ -152,6 +196,7 @@ Security
 
  * Add argument `$badgeFqcn` to `Passport::addBadge()`
  * Add argument `$lifetime` to `LoginLinkHandlerInterface::createLoginLink()`
+ * Require explicit argument when calling `TokenStorage::setToken()`
 
 SecurityBundle
 --------------
@@ -189,6 +234,7 @@ Serializer
        }
    }
    ```
+
  * Remove `CacheableSupportsMethodInterface`, use `NormalizerInterface` and `DenormalizerInterface` instead
 
    *Before*
@@ -233,8 +279,23 @@ Serializer
        // ...
    }
    ```
- * First argument of `AttributeMetadata::setSerializedName()` is now required
+
+ * Require explicit argument when calling `AttributeMetadata::setSerializedName()` and `ClassMetadata::setClassDiscriminatorMapping()`
  * Add argument `$context` to `NormalizerInterface::supportsNormalization()` and `DenormalizerInterface::supportsDenormalization()`
+
+Translation
+-----------
+
+ * Remove `PhpStringTokenParser`
+ * Remove `PhpExtractor` in favor of `PhpAstExtractor`
+
+TwigBundle
+----------
+
+ * Remove the `Twig_Environment` autowiring alias, use `Twig\Environment` instead
+ * Remove option `twig.autoescape`; create a class that implements your escaping strategy
+   (check `FileExtensionEscapingStrategy::guess()` for inspiration) and reference it using
+   the `twig.autoescape_service` option instead
 
 Validator
 ---------
@@ -250,3 +311,14 @@ VarDumper
 ---------
 
  * Add argument `$label` to `VarDumper::dump()`
+ * Require explicit argument when calling `VarDumper::setHandler()`
+
+Workflow
+--------
+
+ * Require explicit argument when calling `Definition::setInitialPlaces()`
+
+Yaml
+----
+
+ * Remove the `!php/const:` tag, use `!php/const` instead (without the colon)

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.0
+---
+
+ * Require explicit argument when calling `Definition::setInitialPlaces()`
+
 6.4
 ---
 

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.0
+---
+
+ * Remove `ServiceLocatorTest`, use `ServiceLocatorTestCase` instead
+
 3.4
 ---
 

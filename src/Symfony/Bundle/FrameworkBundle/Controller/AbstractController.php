@@ -186,7 +186,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
         }
 
         if (!$session instanceof FlashBagAwareSessionInterface) {
-            trigger_deprecation('symfony/framework-bundle', '6.2', 'Calling "addFlash()" method when the session does not implement %s is deprecated.', FlashBagAwareSessionInterface::class);
+            throw new \LogicException(sprintf('You cannot use the addFlash method because class "%s" doesn\'t implement "%s".', get_debug_type($session), FlashBagAwareSessionInterface::class));
         }
 
         $session->getFlashBag()->add($type, $message);
@@ -266,20 +266,6 @@ abstract class AbstractController implements ServiceSubscriberInterface
         $response->setContent($content);
 
         return $response;
-    }
-
-    /**
-     * Renders a view and sets the appropriate status code when a form is listed in parameters.
-     *
-     * If an invalid form is found in the list of parameters, a 422 status code is returned.
-     *
-     * @deprecated since Symfony 6.2, use render() instead
-     */
-    protected function renderForm(string $view, array $parameters = [], Response $response = null): Response
-    {
-        trigger_deprecation('symfony/framework-bundle', '6.2', 'The "%s::renderForm()" method is deprecated, use "render()" instead.', get_debug_type($this));
-
-        return $this->render($view, $parameters, $response);
     }
 
     /**

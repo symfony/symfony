@@ -33,10 +33,8 @@ use Symfony\Component\Serializer\Annotation\Ignore;
  *
  * @author Nils Adermann <naderman@naderman.de>
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @final since Symfony 6.3
  */
-class GetSetMethodNormalizer extends AbstractObjectNormalizer
+final class GetSetMethodNormalizer extends AbstractObjectNormalizer
 {
     private static $setterAccessibleCache = [];
 

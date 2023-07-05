@@ -20,11 +20,8 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
-use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
-use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 use Symfony\Component\Messenger\TraceableMessageBus;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 
@@ -109,9 +106,7 @@ class MessengerPass implements CompilerPassInterface
 
                     if (isset($options['bus'])) {
                         if (!\in_array($options['bus'], $busIds)) {
-                            // @deprecated since Symfony 6.2, in 7.0 change to:
-                            // $messageLocation = isset($tag['handles']) ? 'declared in your tag attribute "handles"' : sprintf('used as argument type in method "%s::%s()"', $r->getName(), $method);
-                            $messageLocation = isset($tag['handles']) ? 'declared in your tag attribute "handles"' : ($r->implementsInterface(MessageSubscriberInterface::class) ? sprintf('returned by method "%s::getHandledMessages()"', $r->getName()) : sprintf('used as argument type in method "%s::%s()"', $r->getName(), $method));
+                            $messageLocation = isset($tag['handles']) ? 'declared in your tag attribute "handles"' : sprintf('used as argument type in method "%s::%s()"', $r->getName(), $method);
 
                             throw new RuntimeException(sprintf('Invalid configuration '.$messageLocation.' for message "%s": bus "%s" does not exist.', $message, $options['bus']));
                         }
@@ -120,9 +115,7 @@ class MessengerPass implements CompilerPassInterface
                     }
 
                     if ('*' !== $message && !class_exists($message) && !interface_exists($message, false)) {
-                        // @deprecated since Symfony 6.2, in 7.0 change to:
-                        // $messageLocation = isset($tag['handles']) ? 'declared in your tag attribute "handles"' : sprintf('used as argument type in method "%s::%s()"', $r->getName(), $method);
-                        $messageLocation = isset($tag['handles']) ? 'declared in your tag attribute "handles"' : ($r->implementsInterface(MessageSubscriberInterface::class) ? sprintf('returned by method "%s::getHandledMessages()"', $r->getName()) : sprintf('used as argument type in method "%s::%s()"', $r->getName(), $method));
+                        $messageLocation = isset($tag['handles']) ? 'declared in your tag attribute "handles"' : sprintf('used as argument type in method "%s::%s()"', $r->getName(), $method);
 
                         throw new RuntimeException(sprintf('Invalid handler service "%s": class or interface "%s" '.$messageLocation.' not found.', $serviceId, $message));
                     }
@@ -147,7 +140,7 @@ class MessengerPass implements CompilerPassInterface
                 }
 
                 if (null === $message) {
-                    throw new RuntimeException(sprintf('Invalid handler service "%s": method "%s::getHandledMessages()" must return one or more messages.', $serviceId, $r->getName()));
+                    throw new RuntimeException(sprintf('Invalid handler service "%s": the list of messages to handle is empty.', $serviceId, $r->getName()));
                 }
             }
         }
@@ -203,16 +196,6 @@ class MessengerPass implements CompilerPassInterface
 
     private function guessHandledClasses(\ReflectionClass $handlerClass, string $serviceId, string $methodName): iterable
     {
-        if ($handlerClass->implementsInterface(MessageSubscriberInterface::class)) {
-            trigger_deprecation('symfony/messenger', '6.2', 'Implementing "%s" is deprecated, use the "%s" attribute instead.', MessageSubscriberInterface::class, AsMessageHandler::class);
-
-            return $handlerClass->getName()::getHandledMessages();
-        }
-
-        if ($handlerClass->implementsInterface(MessageHandlerInterface::class)) {
-            trigger_deprecation('symfony/messenger', '6.2', 'Implementing "%s" is deprecated, use the "%s" attribute instead.', MessageHandlerInterface::class, AsMessageHandler::class);
-        }
-
         try {
             $method = $handlerClass->getMethod($methodName);
         } catch (\ReflectionException) {

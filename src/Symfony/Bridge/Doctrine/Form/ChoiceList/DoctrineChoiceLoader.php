@@ -57,9 +57,6 @@ class DoctrineChoiceLoader extends AbstractChoiceLoader
             : $this->manager->getRepository($this->class)->findAll();
     }
 
-    /**
-     * @internal to be remove in Symfony 6
-     */
     protected function doLoadValuesForChoices(array $choices): array
     {
         // Optimize performance for single-field identifiers. We already

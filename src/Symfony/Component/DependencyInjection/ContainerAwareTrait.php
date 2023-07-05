@@ -23,7 +23,7 @@ trigger_deprecation('symfony/dependency-injection', '6.4', '"%s" is deprecated, 
 trait ContainerAwareTrait
 {
     /**
-     * @var ContainerInterface
+     * @var ContainerInterface|null
      */
     protected $container;
 

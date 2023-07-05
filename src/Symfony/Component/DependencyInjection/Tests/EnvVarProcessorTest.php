@@ -910,12 +910,13 @@ CSV;
 
     /**
      * @testWith    ["", "string"]
+     *              [null, ""]
      *              [false, "bool"]
      *              [true, "not"]
      *              [0, "int"]
      *              [0.0, "float"]
      */
-    public function testGetEnvCastsNull($expected, string $prefix)
+    public function testGetEnvCastsNullBehavior($expected, string $prefix)
     {
         $processor = new EnvVarProcessor(new Container());
 
@@ -924,6 +925,19 @@ CSV;
                 return null;
             });
         }));
+    }
+
+    public function testGetEnvWithEmptyStringPrefixCastsToString()
+    {
+        $processor = new EnvVarProcessor(new Container());
+        unset($_ENV['FOO']);
+        $_ENV['FOO'] = 4;
+
+        try {
+            $this->assertSame('4', $processor->getEnv('', 'FOO', function () { $this->fail('Should not be called'); }));
+        } finally {
+            unset($_ENV['FOO']);
+        }
     }
 
     /**

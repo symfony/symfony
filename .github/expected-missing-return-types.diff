@@ -120,6 +120,16 @@ index 0df94e1092..061e7d7fd9 100644
 -    public function prepend(ContainerBuilder $container);
 +    public function prepend(ContainerBuilder $container): void;
  }
+diff --git a/src/Symfony/Component/EventDispatcher/EventSubscriberInterface.php b/src/Symfony/Component/EventDispatcher/EventSubscriberInterface.php
+index 2085e428e9..ca0d6964e5 100644
+--- a/src/Symfony/Component/EventDispatcher/EventSubscriberInterface.php
++++ b/src/Symfony/Component/EventDispatcher/EventSubscriberInterface.php
+@@ -46,4 +46,4 @@ interface EventSubscriberInterface
+      * @return array<string, string|array{0: string, 1: int}|list<array{0: string, 1?: int}>>
+      */
+-    public static function getSubscribedEvents();
++    public static function getSubscribedEvents(): array;
+ }
 diff --git a/src/Symfony/Component/ExpressionLanguage/ExpressionLanguage.php b/src/Symfony/Component/ExpressionLanguage/ExpressionLanguage.php
 index e8200d9b64..34ad94ceef 100644
 --- a/src/Symfony/Component/ExpressionLanguage/ExpressionLanguage.php
@@ -348,6 +358,38 @@ index cf41e0c507..61f7397734 100644
 -    public function createNewToken(PersistentTokenInterface $token);
 +    public function createNewToken(PersistentTokenInterface $token): void;
  }
+diff --git a/src/Symfony/Component/Security/Http/Firewall.php b/src/Symfony/Component/Security/Http/Firewall.php
+index f2f86a5dfa..bd47629587 100644
+--- a/src/Symfony/Component/Security/Http/Firewall.php
++++ b/src/Symfony/Component/Security/Http/Firewall.php
+@@ -51,5 +51,5 @@ class Firewall implements EventSubscriberInterface
+      * @return void
+      */
+-    public function onKernelRequest(RequestEvent $event)
++    public function onKernelRequest(RequestEvent $event): void
+     {
+         if (!$event->isMainRequest()) {
+@@ -99,5 +99,5 @@ class Firewall implements EventSubscriberInterface
+      * @return void
+      */
+-    public function onKernelFinishRequest(FinishRequestEvent $event)
++    public function onKernelFinishRequest(FinishRequestEvent $event): void
+     {
+         $request = $event->getRequest();
+@@ -112,5 +112,5 @@ class Firewall implements EventSubscriberInterface
+      * @return array
+      */
+-    public static function getSubscribedEvents()
++    public static function getSubscribedEvents(): array
+     {
+         return [
+@@ -123,5 +123,5 @@ class Firewall implements EventSubscriberInterface
+      * @return void
+      */
+-    protected function callListeners(RequestEvent $event, iterable $listeners)
++    protected function callListeners(RequestEvent $event, iterable $listeners): void
+     {
+         foreach ($listeners as $listener) {
 diff --git a/src/Symfony/Component/Translation/Extractor/ExtractorInterface.php b/src/Symfony/Component/Translation/Extractor/ExtractorInterface.php
 index 642130af75..c9ae2693a4 100644
 --- a/src/Symfony/Component/Translation/Extractor/ExtractorInterface.php

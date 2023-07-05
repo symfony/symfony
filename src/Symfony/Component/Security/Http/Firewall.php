@@ -47,7 +47,10 @@ class Firewall implements EventSubscriberInterface
         $this->exceptionListeners = new \SplObjectStorage();
     }
 
-    public function onKernelRequest(RequestEvent $event): void
+    /**
+     * @return void
+     */
+    public function onKernelRequest(RequestEvent $event)
     {
         if (!$event->isMainRequest()) {
             return;
@@ -92,7 +95,10 @@ class Firewall implements EventSubscriberInterface
         $this->callListeners($event, $authenticationListeners());
     }
 
-    public function onKernelFinishRequest(FinishRequestEvent $event): void
+    /**
+     * @return void
+     */
+    public function onKernelFinishRequest(FinishRequestEvent $event)
     {
         $request = $event->getRequest();
 
@@ -102,7 +108,10 @@ class Firewall implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents(): array
+    /**
+     * @return array
+     */
+    public static function getSubscribedEvents()
     {
         return [
             KernelEvents::REQUEST => ['onKernelRequest', 8],
@@ -110,7 +119,10 @@ class Firewall implements EventSubscriberInterface
         ];
     }
 
-    protected function callListeners(RequestEvent $event, iterable $listeners): void
+    /**
+     * @return void
+     */
+    protected function callListeners(RequestEvent $event, iterable $listeners)
     {
         foreach ($listeners as $listener) {
             $listener($event);

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\Authenticator;
 
+use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -109,7 +110,7 @@ class ConcreteFormAuthenticator extends AbstractLoginFormAuthenticator
         return $this->loginUrl;
     }
 
-    public function authenticate(Request $request)
+    public function authenticate(Request $request): Passport
     {
         return new SelfValidatingPassport(new UserBadge('dummy'));
     }

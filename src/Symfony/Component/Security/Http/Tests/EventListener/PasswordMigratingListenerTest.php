@@ -173,15 +173,15 @@ class DummyTestMigratingUserProvider extends TestMigratingUserProvider
     {
     }
 
-    public function refreshUser(UserInterface $user)
+    public function refreshUser(UserInterface $user): UserInterface
     {
     }
 
-    public function supportsClass(string $class)
+    public function supportsClass(string $class): bool
     {
     }
 
-    public function loadUserByUsername(string $username)
+    public function loadUserByUsername(string $username): UserInterface
     {
     }
 }
@@ -214,7 +214,7 @@ class DummyTestPasswordAuthenticatedUser extends TestPasswordAuthenticatedUser
     {
     }
 
-    public function getUsername()
+    public function getUsername(): string
     {
     }
 

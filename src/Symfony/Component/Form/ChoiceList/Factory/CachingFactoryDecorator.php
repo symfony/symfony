@@ -214,10 +214,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
         return $this->views[$hash];
     }
 
-    /**
-     * @return void
-     */
-    public function reset()
+    public function reset(): void
     {
         $this->lists = [];
         $this->views = [];

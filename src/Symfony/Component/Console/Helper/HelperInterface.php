@@ -20,10 +20,8 @@ interface HelperInterface
 {
     /**
      * Sets the helper set associated with this helper.
-     *
-     * @return void
      */
-    public function setHelperSet(?HelperSet $helperSet);
+    public function setHelperSet(?HelperSet $helperSet): void;
 
     /**
      * Gets the helper set associated with this helper.
@@ -32,8 +30,6 @@ interface HelperInterface
 
     /**
      * Returns the canonical name of this helper.
-     *
-     * @return string
      */
-    public function getName();
+    public function getName(): string;
 }

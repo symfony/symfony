@@ -22,10 +22,7 @@ trait TranslatorTrait
 {
     private ?string $locale = null;
 
-    /**
-     * @return void
-     */
-    public function setLocale(string $locale)
+    public function setLocale(string $locale): void
     {
         $this->locale = $locale;
     }

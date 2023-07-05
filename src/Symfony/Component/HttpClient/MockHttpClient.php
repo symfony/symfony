@@ -106,10 +106,7 @@ class MockHttpClient implements HttpClientInterface, ResetInterface
         return $clone;
     }
 
-    /**
-     * @return void
-     */
-    public function reset()
+    public function reset(): void
     {
         $this->requestsCount = 0;
     }

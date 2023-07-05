@@ -32,10 +32,7 @@ class Esi extends AbstractSurrogate
         return 'esi';
     }
 
-    /**
-     * @return void
-     */
-    public function addSurrogateControl(Response $response)
+    public function addSurrogateControl(Response $response): void
     {
         if (str_contains($response->getContent(), '<esi:include')) {
             $response->headers->set('Surrogate-Control', 'content="ESI/1.0"');

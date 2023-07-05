@@ -23,10 +23,7 @@ abstract class Helper implements HelperInterface
 {
     protected $helperSet;
 
-    /**
-     * @return void
-     */
-    public function setHelperSet(?HelperSet $helperSet)
+    public function setHelperSet(?HelperSet $helperSet): void
     {
         $this->helperSet = $helperSet;
     }
@@ -88,10 +85,7 @@ abstract class Helper implements HelperInterface
         return mb_substr($string, $from, $length, $encoding);
     }
 
-    /**
-     * @return string
-     */
-    public static function formatTime(int|float $secs)
+    public static function formatTime(int|float $secs): string
     {
         static $timeFormats = [
             [0, '< 1 sec'],
@@ -120,10 +114,7 @@ abstract class Helper implements HelperInterface
         }
     }
 
-    /**
-     * @return string
-     */
-    public static function formatMemory(int $memory)
+    public static function formatMemory(int $memory): string
     {
         if ($memory >= 1024 * 1024 * 1024) {
             return sprintf('%.1f GiB', $memory / 1024 / 1024 / 1024);
@@ -140,10 +131,7 @@ abstract class Helper implements HelperInterface
         return sprintf('%d B', $memory);
     }
 
-    /**
-     * @return string
-     */
-    public static function removeDecoration(OutputFormatterInterface $formatter, ?string $string)
+    public static function removeDecoration(OutputFormatterInterface $formatter, ?string $string): string
     {
         $isDecorated = $formatter->isDecorated();
         $formatter->setDecorated(false);

@@ -95,10 +95,8 @@ abstract class FileLoader extends BaseFileLoader
      * @param string               $resource  The directory to look for classes, glob-patterns allowed
      * @param string|string[]|null $exclude   A globbed path of files to exclude or an array of globbed paths of files to exclude
      * @param string|null          $source    The path to the file that defines the auto-discovery rule
-     *
-     * @return void
      */
-    public function registerClasses(Definition $prototype, string $namespace, string $resource, string|array $exclude = null, string $source = null)
+    public function registerClasses(Definition $prototype, string $namespace, string $resource, string|array $exclude = null, string $source = null): void
     {
         if (!str_ends_with($namespace, '\\')) {
             throw new InvalidArgumentException(sprintf('Namespace prefix must end with a "\\": "%s".', $namespace));
@@ -190,10 +188,7 @@ abstract class FileLoader extends BaseFileLoader
         }
     }
 
-    /**
-     * @return void
-     */
-    public function registerAliasesForSinglyImplementedInterfaces()
+    public function registerAliasesForSinglyImplementedInterfaces(): void
     {
         foreach ($this->interfaces as $interface) {
             if (!empty($this->singlyImplemented[$interface]) && !isset($this->aliases[$interface]) && !$this->container->has($interface)) {
@@ -206,10 +201,8 @@ abstract class FileLoader extends BaseFileLoader
 
     /**
      * Registers a definition in the container with its instanceof-conditionals.
-     *
-     * @return void
      */
-    protected function setDefinition(string $id, Definition $definition)
+    protected function setDefinition(string $id, Definition $definition): void
     {
         $this->container->removeBindings($id);
 

@@ -58,7 +58,7 @@ abstract class DataCollector implements DataCollectorInterface
     /**
      * @return callable[] The casters to add to the cloner
      */
-    protected function getCasters()
+    protected function getCasters(): array
     {
         $casters = [
             '*' => function ($v, array $a, Stub $s, $isNested) {
@@ -82,10 +82,7 @@ abstract class DataCollector implements DataCollectorInterface
         return ['data'];
     }
 
-    /**
-     * @return void
-     */
-    public function __wakeup()
+    public function __wakeup(): void
     {
     }
 

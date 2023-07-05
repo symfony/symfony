@@ -50,10 +50,7 @@ class XliffLintCommand extends Command
         $this->requireStrictFileNames = $requireStrictFileNames;
     }
 
-    /**
-     * @return void
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addArgument('filename', InputArgument::IS_ARRAY, 'A file, a directory or "-" for reading from STDIN')

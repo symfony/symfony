@@ -25,32 +25,24 @@ interface ExtensionInterface
      *
      * @param array<array<mixed>> $configs
      *
-     * @return void
-     *
      * @throws \InvalidArgumentException When provided tag is not defined in this extension
      */
-    public function load(array $configs, ContainerBuilder $container);
+    public function load(array $configs, ContainerBuilder $container): void;
 
     /**
      * Returns the namespace to be used for this extension (XML namespace).
-     *
-     * @return string
      */
-    public function getNamespace();
+    public function getNamespace(): string;
 
     /**
      * Returns the base path for the XSD files.
-     *
-     * @return string|false
      */
-    public function getXsdValidationBasePath();
+    public function getXsdValidationBasePath(): string|false;
 
     /**
      * Returns the recommended alias to use in XML.
      *
      * This alias is also the mandatory prefix to use when using YAML.
-     *
-     * @return string
      */
-    public function getAlias();
+    public function getAlias(): string;
 }

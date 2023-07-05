@@ -265,10 +265,8 @@ class Request
      * @param array                $files      The FILES parameters
      * @param array                $server     The SERVER parameters
      * @param string|resource|null $content    The raw body data
-     *
-     * @return void
      */
-    public function initialize(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null)
+    public function initialize(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null): void
     {
         $this->request = new InputBag($request);
         $this->query = new InputBag($query);
@@ -424,10 +422,8 @@ class Request
      * This is mainly useful when you need to override the Request class
      * to keep BC with an existing system. It should not be used for any
      * other purpose.
-     *
-     * @return void
      */
-    public static function setFactory(?callable $callable)
+    public static function setFactory(?callable $callable): void
     {
         self::$requestFactory = $callable;
     }
@@ -530,10 +526,8 @@ class Request
      *
      * It overrides $_GET, $_POST, $_REQUEST, $_SERVER, $_COOKIE.
      * $_FILES is never overridden, see rfc1867
-     *
-     * @return void
      */
-    public function overrideGlobals()
+    public function overrideGlobals(): void
     {
         $this->server->set('QUERY_STRING', static::normalizeQueryString(http_build_query($this->query->all(), '', '&')));
 
@@ -572,10 +566,8 @@ class Request
      *
      * @param array $proxies          A list of trusted proxies, the string 'REMOTE_ADDR' will be replaced with $_SERVER['REMOTE_ADDR']
      * @param int   $trustedHeaderSet A bit field of Request::HEADER_*, to set which headers to trust from your proxies
-     *
-     * @return void
      */
-    public static function setTrustedProxies(array $proxies, int $trustedHeaderSet)
+    public static function setTrustedProxies(array $proxies, int $trustedHeaderSet): void
     {
         self::$trustedProxies = array_reduce($proxies, function ($proxies, $proxy) {
             if ('REMOTE_ADDR' !== $proxy) {
@@ -615,10 +607,8 @@ class Request
      * You should only list the hosts you manage using regexs.
      *
      * @param array $hostPatterns A list of trusted host patterns
-     *
-     * @return void
      */
-    public static function setTrustedHosts(array $hostPatterns)
+    public static function setTrustedHosts(array $hostPatterns): void
     {
         self::$trustedHostPatterns = array_map(fn ($hostPattern) => sprintf('{%s}i', $hostPattern), $hostPatterns);
         // we need to reset trusted hosts on trusted host patterns change
@@ -663,10 +653,8 @@ class Request
      * If these methods are not protected against CSRF, this presents a possible vulnerability.
      *
      * The HTTP method can only be overridden when the real HTTP method is POST.
-     *
-     * @return void
      */
-    public static function enableHttpMethodParameterOverride()
+    public static function enableHttpMethodParameterOverride(): void
     {
         self::$httpMethodParameterOverride = true;
     }
@@ -750,10 +738,7 @@ class Request
         return null !== $this->session && (!$skipIfUninitialized || $this->session instanceof SessionInterface);
     }
 
-    /**
-     * @return void
-     */
-    public function setSession(SessionInterface $session)
+    public function setSession(SessionInterface $session): void
     {
         $this->session = $session;
     }
@@ -1173,10 +1158,8 @@ class Request
 
     /**
      * Sets the request method.
-     *
-     * @return void
      */
-    public function setMethod(string $method)
+    public function setMethod(string $method): void
     {
         $this->method = null;
         $this->server->set('REQUEST_METHOD', $method);
@@ -1296,10 +1279,8 @@ class Request
      * Associates a format with mime types.
      *
      * @param string|string[] $mimeTypes The associated mime types (the preferred one must be the first as it will be used as the content type)
-     *
-     * @return void
      */
-    public function setFormat(?string $format, string|array $mimeTypes)
+    public function setFormat(?string $format, string|array $mimeTypes): void
     {
         if (null === static::$formats) {
             static::initializeFormats();
@@ -1328,10 +1309,8 @@ class Request
 
     /**
      * Sets the request format.
-     *
-     * @return void
      */
-    public function setRequestFormat(?string $format)
+    public function setRequestFormat(?string $format): void
     {
         $this->format = $format;
     }
@@ -1348,10 +1327,8 @@ class Request
 
     /**
      * Sets the default locale.
-     *
-     * @return void
      */
-    public function setDefaultLocale(string $locale)
+    public function setDefaultLocale(string $locale): void
     {
         $this->defaultLocale = $locale;
 
@@ -1370,10 +1347,8 @@ class Request
 
     /**
      * Sets the locale.
-     *
-     * @return void
      */
-    public function setLocale(string $locale)
+    public function setLocale(string $locale): void
     {
         $this->setPhpDefaultLocale($this->locale = $locale);
     }
@@ -1739,10 +1714,7 @@ class Request
      * Copyright (c) 2005-2010 Zend Technologies USA Inc. (https://www.zend.com/)
      */
 
-    /**
-     * @return string
-     */
-    protected function prepareRequestUri()
+    protected function prepareRequestUri(): string
     {
         $requestUri = '';
 
@@ -1910,10 +1882,8 @@ class Request
 
     /**
      * Initializes HTTP request formats.
-     *
-     * @return void
      */
-    protected static function initializeFormats()
+    protected static function initializeFormats(): void
     {
         static::$formats = [
             'html' => ['text/html', 'application/xhtml+xml'],

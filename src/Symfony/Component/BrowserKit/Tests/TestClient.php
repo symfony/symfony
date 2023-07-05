@@ -41,7 +41,7 @@ class TestClient extends AbstractBrowser
         return $response;
     }
 
-    protected function getScript(object $request)
+    protected function getScript(object $request): string
     {
         $r = new \ReflectionClass(Response::class);
         $path = $r->getFileName();

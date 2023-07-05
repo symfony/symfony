@@ -194,10 +194,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * Adds some helpers.
      *
      * @param HelperInterface[] $helpers An array of helper
-     *
-     * @return void
      */
-    public function addHelpers(array $helpers)
+    public function addHelpers(array $helpers): void
     {
         foreach ($helpers as $alias => $helper) {
             $this->set($helper, \is_int($alias) ? null : $alias);
@@ -208,19 +206,14 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * Sets the helpers.
      *
      * @param HelperInterface[] $helpers An array of helper
-     *
-     * @return void
      */
-    public function setHelpers(array $helpers)
+    public function setHelpers(array $helpers): void
     {
         $this->helpers = [];
         $this->addHelpers($helpers);
     }
 
-    /**
-     * @return void
-     */
-    public function set(HelperInterface $helper, string $alias = null)
+    public function set(HelperInterface $helper, string $alias = null): void
     {
         $this->helpers[$helper->getName()] = $helper;
         if (null !== $alias) {
@@ -254,10 +247,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Decorates the current template with another one.
-     *
-     * @return void
      */
-    public function extend(string $template)
+    public function extend(string $template): void
     {
         $this->parents[$this->current] = $template;
     }
@@ -286,10 +277,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Sets the charset to use.
-     *
-     * @return void
      */
-    public function setCharset(string $charset)
+    public function setCharset(string $charset): void
     {
         if ('UTF8' === $charset = strtoupper($charset)) {
             $charset = 'UTF-8'; // iconv on Windows requires "UTF-8" instead of "UTF8"
@@ -311,10 +300,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Adds an escaper for the given context.
-     *
-     * @return void
      */
-    public function setEscaper(string $context, callable $escaper)
+    public function setEscaper(string $context, callable $escaper): void
     {
         $this->escapers[$context] = $escaper;
         self::$escaperCache[$context] = [];
@@ -334,10 +321,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
         return $this->escapers[$context];
     }
 
-    /**
-     * @return void
-     */
-    public function addGlobal(string $name, mixed $value)
+    public function addGlobal(string $name, mixed $value): void
     {
         $this->globals[$name] = $value;
     }
@@ -366,10 +350,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * For each function there is a define to avoid problems with strings being
      * incorrectly specified.
-     *
-     * @return void
      */
-    protected function initializeEscapers()
+    protected function initializeEscapers(): void
     {
         $flags = \ENT_QUOTES | \ENT_SUBSTITUTE;
 

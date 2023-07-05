@@ -61,7 +61,7 @@ class StaticPrefixCollection
     /**
      * Adds a route to a group.
      */
-    public function addRoute(string $prefix, array|StaticPrefixCollection $route): void
+    public function addRoute(string $prefix, array|self $route): void
     {
         [$prefix, $staticPrefix] = $this->getCommonPrefix($prefix, $prefix);
 

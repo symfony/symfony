@@ -21,9 +21,7 @@ interface SharedLockStoreInterface extends PersistingStoreInterface
     /**
      * Stores the resource if it's not locked for reading by someone else.
      *
-     * @return void
-     *
      * @throws LockConflictedException
      */
-    public function saveRead(Key $key);
+    public function saveRead(Key $key): void;
 }

@@ -125,10 +125,7 @@ class File extends Constraint
         }
     }
 
-    /**
-     * @return void
-     */
-    public function __set(string $option, mixed $value)
+    public function __set(string $option, mixed $value): void
     {
         if ('maxSize' === $option) {
             $this->normalizeBinaryFormat($value);

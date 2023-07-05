@@ -18,10 +18,10 @@ use Symfony\Component\HttpFoundation\RequestMatcher\IsJsonRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcher\MethodRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\Mailer\Bridge\Postmark\RemoteEvent\PostmarkPayloadConverter;
-use Symfony\Component\Webhook\Client\AbstractRequestParser;
-use Symfony\Component\Webhook\Exception\RejectWebhookException;
 use Symfony\Component\RemoteEvent\Event\Mailer\AbstractMailerEvent;
 use Symfony\Component\RemoteEvent\Exception\ParseException;
+use Symfony\Component\Webhook\Client\AbstractRequestParser;
+use Symfony\Component\Webhook\Exception\RejectWebhookException;
 
 final class PostmarkRequestParser extends AbstractRequestParser
 {

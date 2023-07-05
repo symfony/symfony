@@ -165,10 +165,7 @@ final class PropertyNormalizer extends AbstractObjectNormalizer
         return $reflectionProperty->getValue($object);
     }
 
-    /**
-     * @return void
-     */
-    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = [])
+    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = []): void
     {
         try {
             $reflectionProperty = $this->getReflectionProperty($object, $attribute);

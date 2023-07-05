@@ -533,7 +533,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * @return $this
      */
-    public function setFormFactory(FormFactoryInterface $formFactory)
+    public function setFormFactory(FormFactoryInterface $formFactory): static
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');

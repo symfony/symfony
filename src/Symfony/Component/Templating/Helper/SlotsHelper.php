@@ -27,11 +27,9 @@ class SlotsHelper extends Helper
      * This method starts an output buffer that will be
      * closed when the stop() method is called.
      *
-     * @return void
-     *
      * @throws \InvalidArgumentException if a slot with the same name is already started
      */
-    public function start(string $name)
+    public function start(string $name): void
     {
         if (\in_array($name, $this->openSlots)) {
             throw new \InvalidArgumentException(sprintf('A slot named "%s" is already started.', $name));
@@ -47,11 +45,9 @@ class SlotsHelper extends Helper
     /**
      * Stops a slot.
      *
-     * @return void
-     *
      * @throws \LogicException if no slot has been started
      */
-    public function stop()
+    public function stop(): void
     {
         if (!$this->openSlots) {
             throw new \LogicException('No slot started.');
@@ -80,10 +76,8 @@ class SlotsHelper extends Helper
 
     /**
      * Sets a slot value.
-     *
-     * @return void
      */
-    public function set(string $name, string $content)
+    public function set(string $name, string $content): void
     {
         $this->slots[$name] = $content;
     }

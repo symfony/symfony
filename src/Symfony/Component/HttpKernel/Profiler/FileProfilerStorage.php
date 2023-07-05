@@ -87,10 +87,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         return array_values($result);
     }
 
-    /**
-     * @return void
-     */
-    public function purge()
+    public function purge(): void
     {
         $flags = \FilesystemIterator::SKIP_DOTS;
         $iterator = new \RecursiveDirectoryIterator($this->folder, $flags);
@@ -245,10 +242,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         return '' === $line ? null : $line;
     }
 
-    /**
-     * @return Profile
-     */
-    protected function createProfileFromData(string $token, array $data, Profile $parent = null)
+    protected function createProfileFromData(string $token, array $data, Profile $parent = null): Profile
     {
         $profile = new Profile($token);
         $profile->setIp($data['ip']);

@@ -49,10 +49,8 @@ class InMemoryUserProvider implements UserProviderInterface
 
     /**
      * Adds a new User to the provider.
-     *
-     * @return void
      */
-    public function createUser(UserInterface $user)
+    public function createUser(UserInterface $user): void
     {
         if (!$user instanceof InMemoryUser) {
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_debug_type($user)));

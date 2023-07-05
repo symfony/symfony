@@ -34,10 +34,7 @@ abstract class AbstractConfigurator
     /** @internal */
     protected Definition|Alias|null $definition = null;
 
-    /**
-     * @return mixed
-     */
-    public function __call(string $method, array $args)
+    public function __call(string $method, array $args): mixed
     {
         if (method_exists($this, 'set'.$method)) {
             return $this->{'set'.$method}(...$args);
@@ -51,10 +48,7 @@ abstract class AbstractConfigurator
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
 
-    /**
-     * @return void
-     */
-    public function __wakeup()
+    public function __wakeup(): void
     {
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
     }

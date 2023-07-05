@@ -122,10 +122,7 @@ class Message extends RawMessage
         yield from $body->toIterable();
     }
 
-    /**
-     * @return void
-     */
-    public function ensureValidity()
+    public function ensureValidity(): void
     {
         if (!$this->headers->has('To') && !$this->headers->has('Cc') && !$this->headers->has('Bcc')) {
             throw new LogicException('An email must have a "To", "Cc", or "Bcc" header.');

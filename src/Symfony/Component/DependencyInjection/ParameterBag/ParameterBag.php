@@ -32,18 +32,12 @@ class ParameterBag implements ParameterBagInterface
         $this->add($parameters);
     }
 
-    /**
-     * @return void
-     */
-    public function clear()
+    public function clear(): void
     {
         $this->parameters = [];
     }
 
-    /**
-     * @return void
-     */
-    public function add(array $parameters)
+    public function add(array $parameters): void
     {
         foreach ($parameters as $key => $value) {
             $this->set($key, $value);
@@ -101,10 +95,7 @@ class ParameterBag implements ParameterBagInterface
         return $this->parameters[$name];
     }
 
-    /**
-     * @return void
-     */
-    public function set(string $name, array|bool|string|int|float|\UnitEnum|null $value)
+    public function set(string $name, array|bool|string|int|float|\UnitEnum|null $value): void
     {
         if (is_numeric($name)) {
             throw new InvalidArgumentException(sprintf('The parameter name "%s" cannot be numeric.', $name));
@@ -116,11 +107,9 @@ class ParameterBag implements ParameterBagInterface
     /**
      * Deprecates a service container parameter.
      *
-     * @return void
-     *
      * @throws ParameterNotFoundException if the parameter is not defined
      */
-    public function deprecate(string $name, string $package, string $version, string $message = 'The parameter "%s" is deprecated.')
+    public function deprecate(string $name, string $package, string $version, string $message = 'The parameter "%s" is deprecated.'): void
     {
         if (!\array_key_exists($name, $this->parameters)) {
             throw new ParameterNotFoundException($name);
@@ -134,18 +123,12 @@ class ParameterBag implements ParameterBagInterface
         return \array_key_exists($name, $this->parameters);
     }
 
-    /**
-     * @return void
-     */
-    public function remove(string $name)
+    public function remove(string $name): void
     {
         unset($this->parameters[$name], $this->deprecatedParameters[$name]);
     }
 
-    /**
-     * @return void
-     */
-    public function resolve()
+    public function resolve(): void
     {
         if ($this->resolved) {
             return;
@@ -254,10 +237,7 @@ class ParameterBag implements ParameterBagInterface
         }, $value);
     }
 
-    /**
-     * @return bool
-     */
-    public function isResolved()
+    public function isResolved(): bool
     {
         return $this->resolved;
     }

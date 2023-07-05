@@ -20,10 +20,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
  */
 class FloatNode extends NumericNode
 {
-    /**
-     * @return void
-     */
-    protected function validateType(mixed $value)
+    protected function validateType(mixed $value): void
     {
         // Integers are also accepted, we just cast them
         if (\is_int($value)) {

@@ -39,10 +39,8 @@ abstract class FileLoader extends Loader
 
     /**
      * Sets the current directory.
-     *
-     * @return void
      */
-    public function setCurrentDir(string $dir)
+    public function setCurrentDir(string $dir): void
     {
         $this->currentDir = $dir;
     }
@@ -64,13 +62,11 @@ abstract class FileLoader extends Loader
      * @param string|null          $sourceResource The original resource importing the new resource
      * @param string|string[]|null $exclude        Glob patterns to exclude from the import
      *
-     * @return mixed
-     *
      * @throws LoaderLoadException
      * @throws FileLoaderImportCircularReferenceException
      * @throws FileLocatorFileNotFoundException
      */
-    public function import(mixed $resource, string $type = null, bool $ignoreErrors = false, string $sourceResource = null, string|array $exclude = null)
+    public function import(mixed $resource, string $type = null, bool $ignoreErrors = false, string $sourceResource = null, string|array $exclude = null): mixed
     {
         if (\is_string($resource) && \strlen($resource) !== ($i = strcspn($resource, '*?{[')) && !str_contains($resource, "\n")) {
             $excluded = [];

@@ -79,10 +79,8 @@ class Container implements ContainerInterface, ResetInterface
      *
      *  * Parameter values are resolved;
      *  * The parameter bag is frozen.
-     *
-     * @return void
      */
-    public function compile()
+    public function compile(): void
     {
         $this->parameterBag->resolve();
 
@@ -113,11 +111,9 @@ class Container implements ContainerInterface, ResetInterface
     /**
      * Gets a parameter.
      *
-     * @return array|bool|string|int|float|\UnitEnum|null
-     *
      * @throws ParameterNotFoundException if the parameter is not defined
      */
-    public function getParameter(string $name)
+    public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null
     {
         return $this->parameterBag->get($name);
     }
@@ -127,10 +123,7 @@ class Container implements ContainerInterface, ResetInterface
         return $this->parameterBag->has($name);
     }
 
-    /**
-     * @return void
-     */
-    public function setParameter(string $name, array|bool|string|int|float|\UnitEnum|null $value)
+    public function setParameter(string $name, array|bool|string|int|float|\UnitEnum|null $value): void
     {
         $this->parameterBag->set($name, $value);
     }
@@ -140,10 +133,8 @@ class Container implements ContainerInterface, ResetInterface
      *
      * Setting a synthetic service to null resets it: has() returns false and get()
      * behaves in the same way as if the service was never created.
-     *
-     * @return void
      */
-    public function set(string $id, ?object $service)
+    public function set(string $id, ?object $service): void
     {
         // Runs the internal initializer; used by the dumped container to include always-needed files
         if (isset($this->privates['service_container']) && $this->privates['service_container'] instanceof \Closure) {
@@ -283,10 +274,7 @@ class Container implements ContainerInterface, ResetInterface
         return isset($this->services[$id]);
     }
 
-    /**
-     * @return void
-     */
-    public function reset()
+    public function reset(): void
     {
         $services = $this->services + $this->privates;
         $this->services = $this->factories = $this->privates = [];
@@ -338,10 +326,8 @@ class Container implements ContainerInterface, ResetInterface
 
     /**
      * Creates a service by requiring its factory file.
-     *
-     * @return mixed
      */
-    protected function load(string $file)
+    protected function load(string $file): mixed
     {
         return require $file;
     }

@@ -21,10 +21,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class CollectionValidator extends ConstraintValidator
 {
-    /**
-     * @return void
-     */
-    public function validate(mixed $value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof Collection) {
             throw new UnexpectedTypeException($constraint, Collection::class);

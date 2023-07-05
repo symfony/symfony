@@ -52,10 +52,7 @@ class Collection extends Composite
         $this->missingFieldsMessage = $missingFieldsMessage ?? $this->missingFieldsMessage;
     }
 
-    /**
-     * @return void
-     */
-    protected function initializeNestedConstraints()
+    protected function initializeNestedConstraints(): void
     {
         parent::initializeNestedConstraints();
 

@@ -27,7 +27,7 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      *
      * @param array<string, mixed> $options
      */
-    public function add(string|FormBuilderInterface $child, string $type = null, array $options = []): static;
+    public function add(string|self $child, string $type = null, array $options = []): static;
 
     /**
      * Creates a form builder.

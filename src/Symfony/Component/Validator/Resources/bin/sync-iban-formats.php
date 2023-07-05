@@ -187,7 +187,7 @@ final class WikipediaIbanProvider
     {
         $tablesResponse = file_get_contents('https://www.wikitable2json.com/api/International_Bank_Account_Number?table=3&keyRows=1&clearRef=true');
 
-        return json_decode($tablesResponse, true, 512, JSON_THROW_ON_ERROR)[0];
+        return json_decode($tablesResponse, true, 512, \JSON_THROW_ON_ERROR)[0];
     }
 
     private function buildIbanRegexp(string $countryCode, string $bbanFormat): string

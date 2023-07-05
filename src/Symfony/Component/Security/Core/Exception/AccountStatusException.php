@@ -32,10 +32,7 @@ abstract class AccountStatusException extends AuthenticationException
         return $this->user;
     }
 
-    /**
-     * @return void
-     */
-    public function setUser(UserInterface $user)
+    public function setUser(UserInterface $user): void
     {
         $this->user = $user;
     }

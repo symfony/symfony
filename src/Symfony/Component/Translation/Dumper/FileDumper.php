@@ -36,18 +36,13 @@ abstract class FileDumper implements DumperInterface
      * Sets the template for the relative paths to files.
      *
      * @param string $relativePathTemplate A template for the relative paths to files
-     *
-     * @return void
      */
-    public function setRelativePathTemplate(string $relativePathTemplate)
+    public function setRelativePathTemplate(string $relativePathTemplate): void
     {
         $this->relativePathTemplate = $relativePathTemplate;
     }
 
-    /**
-     * @return void
-     */
-    public function dump(MessageCatalogue $messages, array $options = [])
+    public function dump(MessageCatalogue $messages, array $options = []): void
     {
         if (!\array_key_exists('path', $options)) {
             throw new InvalidArgumentException('The file dumper needs a path option.');

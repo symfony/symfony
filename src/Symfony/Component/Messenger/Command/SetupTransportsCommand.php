@@ -39,10 +39,7 @@ class SetupTransportsCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * @return void
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addArgument('transport', InputArgument::OPTIONAL, 'Name of the transport to setup', null)

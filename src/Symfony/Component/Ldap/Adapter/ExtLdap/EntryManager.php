@@ -34,7 +34,7 @@ class EntryManager implements EntryManagerInterface
     /**
      * @return $this
      */
-    public function add(Entry $entry)
+    public function add(Entry $entry): static
     {
         $con = $this->getConnectionResource();
 
@@ -48,7 +48,7 @@ class EntryManager implements EntryManagerInterface
     /**
      * @return $this
      */
-    public function update(Entry $entry)
+    public function update(Entry $entry): static
     {
         $con = $this->getConnectionResource();
 
@@ -62,7 +62,7 @@ class EntryManager implements EntryManagerInterface
     /**
      * @return $this
      */
-    public function remove(Entry $entry)
+    public function remove(Entry $entry): static
     {
         $con = $this->getConnectionResource();
 
@@ -81,7 +81,7 @@ class EntryManager implements EntryManagerInterface
      * @throws NotBoundException
      * @throws LdapException
      */
-    public function addAttributeValues(Entry $entry, string $attribute, array $values)
+    public function addAttributeValues(Entry $entry, string $attribute, array $values): static
     {
         $con = $this->getConnectionResource();
 
@@ -100,7 +100,7 @@ class EntryManager implements EntryManagerInterface
      * @throws NotBoundException
      * @throws LdapException
      */
-    public function removeAttributeValues(Entry $entry, string $attribute, array $values)
+    public function removeAttributeValues(Entry $entry, string $attribute, array $values): static
     {
         $con = $this->getConnectionResource();
 
@@ -114,7 +114,7 @@ class EntryManager implements EntryManagerInterface
     /**
      * @return $this
      */
-    public function rename(Entry $entry, string $newRdn, bool $removeOldRdn = true)
+    public function rename(Entry $entry, string $newRdn, bool $removeOldRdn = true): static
     {
         $con = $this->getConnectionResource();
 
@@ -133,7 +133,7 @@ class EntryManager implements EntryManagerInterface
      * @throws NotBoundException if the connection has not been previously bound
      * @throws LdapException     if an error is thrown during the rename operation
      */
-    public function move(Entry $entry, string $newParent)
+    public function move(Entry $entry, string $newParent): static
     {
         $con = $this->getConnectionResource();
         $rdn = $this->parseRdnFromEntry($entry);
@@ -167,7 +167,7 @@ class EntryManager implements EntryManagerInterface
      *
      * @throws UpdateOperationException in case of an error
      */
-    public function applyOperations(string $dn, iterable $operations)
+    public function applyOperations(string $dn, iterable $operations): static
     {
         $operationsMapped = [];
         foreach ($operations as $modification) {

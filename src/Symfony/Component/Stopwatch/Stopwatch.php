@@ -57,11 +57,9 @@ class Stopwatch implements ResetInterface
      *
      * @param string|null $id The id of the session to re-open, null to create a new one
      *
-     * @return void
-     *
      * @throws \LogicException When the section to re-open is not reachable
      */
-    public function openSection(string $id = null)
+    public function openSection(string $id = null): void
     {
         $current = end($this->activeSections);
 
@@ -81,11 +79,9 @@ class Stopwatch implements ResetInterface
      *
      * @see getSectionEvents()
      *
-     * @return void
-     *
      * @throws \LogicException When there's no started section to be stopped
      */
-    public function stopSection(string $id)
+    public function stopSection(string $id): void
     {
         $this->stop('__section__');
 
@@ -149,10 +145,8 @@ class Stopwatch implements ResetInterface
 
     /**
      * Resets the stopwatch to its original state.
-     *
-     * @return void
      */
-    public function reset()
+    public function reset(): void
     {
         $this->sections = $this->activeSections = ['__root__' => new Section(null, $this->morePrecision)];
     }

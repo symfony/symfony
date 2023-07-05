@@ -82,19 +82,13 @@ class HtmlDumper extends CliDumper
         $this->styles = static::$themes['dark'] ?? self::$themes['dark'];
     }
 
-    /**
-     * @return void
-     */
-    public function setStyles(array $styles)
+    public function setStyles(array $styles): void
     {
         $this->headerIsDumped = false;
         $this->styles = $styles + $this->styles;
     }
 
-    /**
-     * @return void
-     */
-    public function setTheme(string $themeName)
+    public function setTheme(string $themeName): void
     {
         if (!isset(static::$themes[$themeName])) {
             throw new \InvalidArgumentException(sprintf('Theme "%s" does not exist in class "%s".', $themeName, static::class));
@@ -107,10 +101,8 @@ class HtmlDumper extends CliDumper
      * Configures display options.
      *
      * @param array $displayOptions A map of display options to customize the behavior
-     *
-     * @return void
      */
-    public function setDisplayOptions(array $displayOptions)
+    public function setDisplayOptions(array $displayOptions): void
     {
         $this->headerIsDumped = false;
         $this->displayOptions = $displayOptions + $this->displayOptions;
@@ -118,20 +110,16 @@ class HtmlDumper extends CliDumper
 
     /**
      * Sets an HTML header that will be dumped once in the output stream.
-     *
-     * @return void
      */
-    public function setDumpHeader(?string $header)
+    public function setDumpHeader(?string $header): void
     {
         $this->dumpHeader = $header;
     }
 
     /**
      * Sets an HTML prefix and suffix that will encapse every single dump.
-     *
-     * @return void
      */
-    public function setDumpBoundaries(string $prefix, string $suffix)
+    public function setDumpBoundaries(string $prefix, string $suffix): void
     {
         $this->dumpPrefix = $prefix;
         $this->dumpSuffix = $suffix;
@@ -148,10 +136,8 @@ class HtmlDumper extends CliDumper
 
     /**
      * Dumps the HTML header.
-     *
-     * @return string
      */
-    protected function getDumpHeader()
+    protected function getDumpHeader(): string
     {
         $this->headerIsDumped = $this->outputStream ?? $this->lineDumper;
 
@@ -162,7 +148,6 @@ class HtmlDumper extends CliDumper
         $line = str_replace('{$options}', json_encode($this->displayOptions, \JSON_FORCE_OBJECT), <<<'EOHTML'
 <script>
 Sfdump = window.Sfdump || (function (doc) {
-
 doc.documentElement.classList.add('sf-js-enabled');
 
 var rxEsc = /([.*+?^${}()|\[\]\/\\])/g,
@@ -784,10 +769,7 @@ EOHTML
         return $this->dumpHeader = preg_replace('/\s+/', ' ', $line).'</style>'.$this->dumpHeader;
     }
 
-    /**
-     * @return void
-     */
-    public function dumpString(Cursor $cursor, string $str, bool $bin, int $cut)
+    public function dumpString(Cursor $cursor, string $str, bool $bin, int $cut): void
     {
         if ('' === $str && isset($cursor->attr['img-data'], $cursor->attr['content-type'])) {
             $this->dumpKey($cursor);
@@ -802,10 +784,7 @@ EOHTML
         }
     }
 
-    /**
-     * @return void
-     */
-    public function enterHash(Cursor $cursor, int $type, string|int|null $class, bool $hasChild)
+    public function enterHash(Cursor $cursor, int $type, string|int|null $class, bool $hasChild): void
     {
         if (Cursor::HASH_OBJECT === $type) {
             $cursor->attr['depth'] = $cursor->depth;
@@ -833,10 +812,7 @@ EOHTML
         }
     }
 
-    /**
-     * @return void
-     */
-    public function leaveHash(Cursor $cursor, int $type, string|int|null $class, bool $hasChild, int $cut)
+    public function leaveHash(Cursor $cursor, int $type, string|int|null $class, bool $hasChild, int $cut): void
     {
         $this->dumpEllipsis($cursor, $hasChild, $cut);
         if ($hasChild) {
@@ -949,10 +925,7 @@ EOHTML
         return $v;
     }
 
-    /**
-     * @return void
-     */
-    protected function dumpLine(int $depth, bool $endOfValue = false)
+    protected function dumpLine(int $depth, bool $endOfValue = false): void
     {
         if (-1 === $this->lastDepth) {
             $this->line = sprintf($this->dumpPrefix, $this->dumpId, $this->indentPad).$this->line;

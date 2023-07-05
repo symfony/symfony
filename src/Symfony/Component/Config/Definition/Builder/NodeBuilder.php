@@ -104,10 +104,8 @@ class NodeBuilder implements NodeParentInterface
 
     /**
      * Returns the parent node.
-     *
-     * @return NodeDefinition&ParentNodeDefinitionInterface
      */
-    public function end()
+    public function end(): NodeDefinition&ParentNodeDefinitionInterface
     {
         return $this->parent;
     }

@@ -60,10 +60,8 @@ class ConsoleSectionOutput extends StreamOutput
      * Clears previous output for this section.
      *
      * @param int $lines Number of lines to clear. If null, then the entire output of this section is cleared
-     *
-     * @return void
      */
-    public function clear(int $lines = null)
+    public function clear(int $lines = null): void
     {
         if (empty($this->content) || !$this->isDecorated()) {
             return;
@@ -83,10 +81,8 @@ class ConsoleSectionOutput extends StreamOutput
 
     /**
      * Overwrites the previous output with a new message.
-     *
-     * @return void
      */
-    public function overwrite(string|iterable $message)
+    public function overwrite(string|iterable $message): void
     {
         $this->clear();
         $this->writeln($message);
@@ -163,10 +159,7 @@ class ConsoleSectionOutput extends StreamOutput
         ++$this->lines;
     }
 
-    /**
-     * @return void
-     */
-    protected function doWrite(string $message, bool $newline)
+    protected function doWrite(string $message, bool $newline): void
     {
         if (!$this->isDecorated()) {
             parent::doWrite($message, $newline);

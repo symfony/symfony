@@ -55,13 +55,7 @@ abstract class AbstractFileExtractor
         return true;
     }
 
-    /**
-     * @return bool
-     */
-    abstract protected function canBeExtracted(string $file);
+    abstract protected function canBeExtracted(string $file): bool;
 
-    /**
-     * @return iterable
-     */
-    abstract protected function extractFromDirectory(string|array $resource);
+    abstract protected function extractFromDirectory(string|array $resource): iterable;
 }

@@ -50,27 +50,21 @@ interface TokenInterface
     /**
      * Sets the authenticated user in the token.
      *
-     * @return void
-     *
      * @throws \InvalidArgumentException
      */
-    public function setUser(UserInterface $user);
+    public function setUser(UserInterface $user): void;
 
     /**
      * Removes sensitive information from the token.
-     *
-     * @return void
      */
-    public function eraseCredentials();
+    public function eraseCredentials(): void;
 
     public function getAttributes(): array;
 
     /**
      * @param array $attributes The token attributes
-     *
-     * @return void
      */
-    public function setAttributes(array $attributes);
+    public function setAttributes(array $attributes): void;
 
     public function hasAttribute(string $name): bool;
 
@@ -79,10 +73,7 @@ interface TokenInterface
      */
     public function getAttribute(string $name): mixed;
 
-    /**
-     * @return void
-     */
-    public function setAttribute(string $name, mixed $value);
+    public function setAttribute(string $name, mixed $value): void;
 
     /**
      * Returns all the necessary state of the object for serialization purposes.

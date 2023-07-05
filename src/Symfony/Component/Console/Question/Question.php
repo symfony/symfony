@@ -260,10 +260,7 @@ class Question
         return $this->normalizer;
     }
 
-    /**
-     * @return bool
-     */
-    protected function isAssoc(array $array)
+    protected function isAssoc(array $array): bool
     {
         return (bool) \count(array_filter(array_keys($array), 'is_string'));
     }

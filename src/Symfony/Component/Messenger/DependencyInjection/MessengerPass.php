@@ -30,10 +30,7 @@ use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
  */
 class MessengerPass implements CompilerPassInterface
 {
-    /**
-     * @return void
-     */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $busIds = [];
         foreach ($container->findTaggedServiceIds('messenger.bus') as $busId => $tags) {

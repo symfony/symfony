@@ -52,10 +52,7 @@ class TaggedIteratorArgument extends IteratorArgument
         $this->excludeSelf = $excludeSelf;
     }
 
-    /**
-     * @return string
-     */
-    public function getTag()
+    public function getTag(): string
     {
         return $this->tag;
     }

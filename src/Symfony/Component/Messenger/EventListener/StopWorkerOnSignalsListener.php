@@ -27,7 +27,7 @@ class StopWorkerOnSignalsListener implements EventSubscriberInterface
     public function __construct(array $signals = null, LoggerInterface $logger = null)
     {
         if (null === $signals && \defined('SIGTERM')) {
-            $signals = [SIGTERM, SIGINT];
+            $signals = [\SIGTERM, \SIGINT];
         }
         $this->signals = $signals ?? [];
         $this->logger = $logger;

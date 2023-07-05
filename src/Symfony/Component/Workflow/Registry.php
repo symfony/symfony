@@ -24,10 +24,7 @@ class Registry
 {
     private array $workflows = [];
 
-    /**
-     * @return void
-     */
-    public function addWorkflow(WorkflowInterface $workflow, WorkflowSupportStrategyInterface $supportStrategy)
+    public function addWorkflow(WorkflowInterface $workflow, WorkflowSupportStrategyInterface $supportStrategy): void
     {
         $this->workflows[] = [$workflow, $supportStrategy];
     }

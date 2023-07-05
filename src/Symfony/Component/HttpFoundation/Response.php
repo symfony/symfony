@@ -331,8 +331,6 @@ class Response
     /**
      * Sends HTTP headers.
      *
-     * @param null|positive-int $statusCode The status code to use, override the statusCode property if set and not null
-     *
      * @return $this
      */
     public function sendHeaders(/* int $statusCode = null */): static
@@ -372,7 +370,7 @@ class Response
                 $newValues = null === $previousValues ? $values : array_diff($values, $previousValues);
             }
 
-            foreach ($newValues  as $value) {
+            foreach ($newValues as $value) {
                 header($name.': '.$value, $replace, $this->statusCode);
             }
 

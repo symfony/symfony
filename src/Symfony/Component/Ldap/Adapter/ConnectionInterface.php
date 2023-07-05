@@ -31,8 +31,6 @@ interface ConnectionInterface
      * @throws AlreadyExistsException      When the connection can't be created because of an LDAP_ALREADY_EXISTS error
      * @throws ConnectionTimeoutException  When the connection can't be created because of an LDAP_TIMEOUT error
      * @throws InvalidCredentialsException When the connection can't be created because of an LDAP_INVALID_CREDENTIALS error
-     *
-     * @return void
      */
-    public function bind(string $dn = null, #[\SensitiveParameter] string $password = null);
+    public function bind(string $dn = null, #[\SensitiveParameter] string $password = null): void;
 }

@@ -63,10 +63,7 @@ class BicValidator extends ConstraintValidator
         $this->propertyAccessor = $propertyAccessor;
     }
 
-    /**
-     * @return void
-     */
-    public function validate(mixed $value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof Bic) {
             throw new UnexpectedTypeException($constraint, Bic::class);

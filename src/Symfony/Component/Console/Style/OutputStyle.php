@@ -30,10 +30,7 @@ abstract class OutputStyle implements OutputInterface, StyleInterface
         $this->output = $output;
     }
 
-    /**
-     * @return void
-     */
-    public function newLine(int $count = 1)
+    public function newLine(int $count = 1): void
     {
         $this->output->write(str_repeat(\PHP_EOL, $count));
     }
@@ -43,26 +40,17 @@ abstract class OutputStyle implements OutputInterface, StyleInterface
         return new ProgressBar($this->output, $max);
     }
 
-    /**
-     * @return void
-     */
-    public function write(string|iterable $messages, bool $newline = false, int $type = self::OUTPUT_NORMAL)
+    public function write(string|iterable $messages, bool $newline = false, int $type = self::OUTPUT_NORMAL): void
     {
         $this->output->write($messages, $newline, $type);
     }
 
-    /**
-     * @return void
-     */
-    public function writeln(string|iterable $messages, int $type = self::OUTPUT_NORMAL)
+    public function writeln(string|iterable $messages, int $type = self::OUTPUT_NORMAL): void
     {
         $this->output->writeln($messages, $type);
     }
 
-    /**
-     * @return void
-     */
-    public function setVerbosity(int $level)
+    public function setVerbosity(int $level): void
     {
         $this->output->setVerbosity($level);
     }
@@ -72,10 +60,7 @@ abstract class OutputStyle implements OutputInterface, StyleInterface
         return $this->output->getVerbosity();
     }
 
-    /**
-     * @return void
-     */
-    public function setDecorated(bool $decorated)
+    public function setDecorated(bool $decorated): void
     {
         $this->output->setDecorated($decorated);
     }
@@ -85,10 +70,7 @@ abstract class OutputStyle implements OutputInterface, StyleInterface
         return $this->output->isDecorated();
     }
 
-    /**
-     * @return void
-     */
-    public function setFormatter(OutputFormatterInterface $formatter)
+    public function setFormatter(OutputFormatterInterface $formatter): void
     {
         $this->output->setFormatter($formatter);
     }
@@ -118,10 +100,7 @@ abstract class OutputStyle implements OutputInterface, StyleInterface
         return $this->output->isDebug();
     }
 
-    /**
-     * @return OutputInterface
-     */
-    protected function getErrorOutput()
+    protected function getErrorOutput(): OutputInterface
     {
         if (!$this->output instanceof ConsoleOutputInterface) {
             return $this->output;

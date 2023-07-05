@@ -91,11 +91,9 @@ class InputArgument
     /**
      * Sets the default value.
      *
-     * @return void
-     *
      * @throws LogicException When incorrect default value is given
      */
-    public function setDefault(string|bool|int|float|array|null $default)
+    public function setDefault(string|bool|int|float|array|null $default): void
     {
         if ($this->isRequired() && null !== $default) {
             throw new LogicException('Cannot set a default value except for InputArgument::OPTIONAL mode.');

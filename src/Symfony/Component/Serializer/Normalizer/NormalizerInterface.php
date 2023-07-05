@@ -36,17 +36,15 @@ interface NormalizerInterface
      * @throws LogicException             Occurs when the normalizer is not called in an expected context
      * @throws ExceptionInterface         Occurs for all the other cases of errors
      */
-    public function normalize(mixed $object, string $format = null, array $context = []);
+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null;
 
     /**
      * Checks whether the given class is supported for normalization by this normalizer.
      *
      * @param mixed       $data   Data to normalize
      * @param string|null $format The format being (de-)serialized from or into
-     *
-     * @return bool
      */
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []);
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool;
 
     /**
      * Returns the types potentially supported by this normalizer.

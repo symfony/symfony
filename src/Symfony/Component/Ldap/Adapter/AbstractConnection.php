@@ -30,10 +30,7 @@ abstract class AbstractConnection implements ConnectionInterface
         $this->config = $resolver->resolve($config);
     }
 
-    /**
-     * @return void
-     */
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'host' => 'localhost',

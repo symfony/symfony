@@ -55,10 +55,7 @@ class ResponseHeaderBag extends HeaderBag
         return $headers;
     }
 
-    /**
-     * @return array
-     */
-    public function allPreserveCaseWithoutCookies()
+    public function allPreserveCaseWithoutCookies(): array
     {
         $headers = $this->allPreserveCase();
         if (isset($this->headerNames['set-cookie'])) {
@@ -68,10 +65,7 @@ class ResponseHeaderBag extends HeaderBag
         return $headers;
     }
 
-    /**
-     * @return void
-     */
-    public function replace(array $headers = [])
+    public function replace(array $headers = []): void
     {
         $this->headerNames = [];
 
@@ -103,10 +97,7 @@ class ResponseHeaderBag extends HeaderBag
         return $headers;
     }
 
-    /**
-     * @return void
-     */
-    public function set(string $key, string|array|null $values, bool $replace = true)
+    public function set(string $key, string|array|null $values, bool $replace = true): void
     {
         $uniqueKey = strtr($key, self::UPPER, self::LOWER);
 
@@ -134,10 +125,7 @@ class ResponseHeaderBag extends HeaderBag
         }
     }
 
-    /**
-     * @return void
-     */
-    public function remove(string $key)
+    public function remove(string $key): void
     {
         $uniqueKey = strtr($key, self::UPPER, self::LOWER);
         unset($this->headerNames[$uniqueKey]);
@@ -169,10 +157,7 @@ class ResponseHeaderBag extends HeaderBag
         return $this->computedCacheControl[$key] ?? null;
     }
 
-    /**
-     * @return void
-     */
-    public function setCookie(Cookie $cookie)
+    public function setCookie(Cookie $cookie): void
     {
         $this->cookies[$cookie->getDomain()][$cookie->getPath()][$cookie->getName()] = $cookie;
         $this->headerNames['set-cookie'] = 'Set-Cookie';
@@ -180,10 +165,8 @@ class ResponseHeaderBag extends HeaderBag
 
     /**
      * Removes a cookie from the array, but does not unset it in the browser.
-     *
-     * @return void
      */
-    public function removeCookie(string $name, ?string $path = '/', string $domain = null)
+    public function removeCookie(string $name, ?string $path = '/', string $domain = null): void
     {
         $path ??= '/';
 
@@ -233,20 +216,16 @@ class ResponseHeaderBag extends HeaderBag
 
     /**
      * Clears a cookie in the browser.
-     *
-     * @return void
      */
-    public function clearCookie(string $name, ?string $path = '/', string $domain = null, bool $secure = false, bool $httpOnly = true, string $sameSite = null)
+    public function clearCookie(string $name, ?string $path = '/', string $domain = null, bool $secure = false, bool $httpOnly = true, string $sameSite = null): void
     {
         $this->setCookie(new Cookie($name, null, 1, $path, $domain, $secure, $httpOnly, false, $sameSite));
     }
 
     /**
      * @see HeaderUtils::makeDisposition()
-     *
-     * @return string
      */
-    public function makeDisposition(string $disposition, string $filename, string $filenameFallback = '')
+    public function makeDisposition(string $disposition, string $filename, string $filenameFallback = ''): string
     {
         return HeaderUtils::makeDisposition($disposition, $filename, $filenameFallback);
     }

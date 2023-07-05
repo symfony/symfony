@@ -92,10 +92,8 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
     /**
      * Sets the annotation class to read route properties from.
-     *
-     * @return void
      */
-    public function setRouteAnnotationClass(string $class)
+    public function setRouteAnnotationClass(string $class): void
     {
         $this->routeAnnotationClass = $class;
     }
@@ -160,10 +158,8 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
     /**
      * @param RouteAnnotation $annot or an object that exposes a similar interface
-     *
-     * @return void
      */
-    protected function addRoute(RouteCollection $collection, object $annot, array $globals, \ReflectionClass $class, \ReflectionMethod $method)
+    protected function addRoute(RouteCollection $collection, object $annot, array $globals, \ReflectionClass $class, \ReflectionMethod $method): void
     {
         if ($annot->getEnv() && $annot->getEnv() !== $this->env) {
             return;
@@ -253,10 +249,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
         return \is_string($resource) && preg_match('/^(?:\\\\?[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)+$/', $resource) && (!$type || \in_array($type, ['annotation', 'attribute'], true));
     }
 
-    /**
-     * @return void
-     */
-    public function setResolver(LoaderResolverInterface $resolver)
+    public function setResolver(LoaderResolverInterface $resolver): void
     {
     }
 
@@ -266,10 +259,8 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
     /**
      * Gets the default route name for a class method.
-     *
-     * @return string
      */
-    protected function getDefaultRouteName(\ReflectionClass $class, \ReflectionMethod $method)
+    protected function getDefaultRouteName(\ReflectionClass $class, \ReflectionMethod $method): string
     {
         $name = str_replace('\\', '_', $class->name).'_'.$method->name;
         $name = \function_exists('mb_strtolower') && preg_match('//u', $name) ? mb_strtolower($name, 'UTF-8') : strtolower($name);
@@ -281,10 +272,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
         return $name;
     }
 
-    /**
-     * @return array
-     */
-    protected function getGlobals(\ReflectionClass $class)
+    protected function getGlobals(\ReflectionClass $class): array
     {
         $globals = $this->resetGlobals();
 
@@ -366,18 +354,12 @@ abstract class AnnotationClassLoader implements LoaderInterface
         ];
     }
 
-    /**
-     * @return Route
-     */
-    protected function createRoute(string $path, array $defaults, array $requirements, array $options, ?string $host, array $schemes, array $methods, ?string $condition)
+    protected function createRoute(string $path, array $defaults, array $requirements, array $options, ?string $host, array $schemes, array $methods, ?string $condition): Route
     {
         return new Route($path, $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
     }
 
-    /**
-     * @return void
-     */
-    abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot);
+    abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void;
 
     /**
      * @param \ReflectionClass|\ReflectionMethod $reflection

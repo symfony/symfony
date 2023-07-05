@@ -120,3 +120,14 @@ index 36502e8962..73733eb0ef 100644
 +    public function build(ContainerBuilder $container): void;
  
      /**
+diff --git a/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php b/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php
+index 8c8667ff0e..e19e185cfb 100644
+--- a/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php
++++ b/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php
+@@ -363,5 +363,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
+      * @return void
+      */
+-    abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot);
++    abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void;
+ 
+     /**

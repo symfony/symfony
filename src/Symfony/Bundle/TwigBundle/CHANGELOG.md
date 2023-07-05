@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Allow omitting the `autoescape_service_method` option when `autoescape_service` is set to an invokable service id
+
 6.3
 ---
 

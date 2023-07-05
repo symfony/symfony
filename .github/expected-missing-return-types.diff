@@ -131,6 +131,97 @@ index e8200d9b64..34ad94ceef 100644
 +    protected function registerFunctions(): void
      {
          $this->addFunction(ExpressionFunction::fromPhp('constant'));
+diff --git a/src/Symfony/Component/Form/AbstractType.php b/src/Symfony/Component/Form/AbstractType.php
+index ad4b195696..ba4cf5c85b 100644
+--- a/src/Symfony/Component/Form/AbstractType.php
++++ b/src/Symfony/Component/Form/AbstractType.php
+@@ -24,5 +24,5 @@ abstract class AbstractType implements FormTypeInterface
+      * @return void
+      */
+-    public function buildForm(FormBuilderInterface $builder, array $options)
++    public function buildForm(FormBuilderInterface $builder, array $options): void
+     {
+     }
+@@ -31,5 +31,5 @@ abstract class AbstractType implements FormTypeInterface
+      * @return void
+      */
+-    public function buildView(FormView $view, FormInterface $form, array $options)
++    public function buildView(FormView $view, FormInterface $form, array $options): void
+     {
+     }
+@@ -38,5 +38,5 @@ abstract class AbstractType implements FormTypeInterface
+      * @return void
+      */
+-    public function finishView(FormView $view, FormInterface $form, array $options)
++    public function finishView(FormView $view, FormInterface $form, array $options): void
+     {
+     }
+@@ -45,5 +45,5 @@ abstract class AbstractType implements FormTypeInterface
+      * @return void
+      */
+-    public function configureOptions(OptionsResolver $resolver)
++    public function configureOptions(OptionsResolver $resolver): void
+     {
+     }
+@@ -52,5 +52,5 @@ abstract class AbstractType implements FormTypeInterface
+      * @return string
+      */
+-    public function getBlockPrefix()
++    public function getBlockPrefix(): string
+     {
+         return StringUtil::fqcnToBlockPrefix(static::class) ?: '';
+@@ -60,5 +60,5 @@ abstract class AbstractType implements FormTypeInterface
+      * @return string|null
+      */
+-    public function getParent()
++    public function getParent(): ?string
+     {
+         return FormType::class;
+diff --git a/src/Symfony/Component/Form/FormTypeInterface.php b/src/Symfony/Component/Form/FormTypeInterface.php
+index 0c586d3f71..6c625cf403 100644
+--- a/src/Symfony/Component/Form/FormTypeInterface.php
++++ b/src/Symfony/Component/Form/FormTypeInterface.php
+@@ -31,5 +31,5 @@ interface FormTypeInterface
+      * @see FormTypeExtensionInterface::buildForm()
+      */
+-    public function buildForm(FormBuilderInterface $builder, array $options);
++    public function buildForm(FormBuilderInterface $builder, array $options): void;
+ 
+     /**
+@@ -49,5 +49,5 @@ interface FormTypeInterface
+      * @see FormTypeExtensionInterface::buildView()
+      */
+-    public function buildView(FormView $view, FormInterface $form, array $options);
++    public function buildView(FormView $view, FormInterface $form, array $options): void;
+ 
+     /**
+@@ -68,5 +68,5 @@ interface FormTypeInterface
+      * @see FormTypeExtensionInterface::finishView()
+      */
+-    public function finishView(FormView $view, FormInterface $form, array $options);
++    public function finishView(FormView $view, FormInterface $form, array $options): void;
+ 
+     /**
+@@ -75,5 +75,5 @@ interface FormTypeInterface
+      * @return void
+      */
+-    public function configureOptions(OptionsResolver $resolver);
++    public function configureOptions(OptionsResolver $resolver): void;
+ 
+     /**
+@@ -85,5 +85,5 @@ interface FormTypeInterface
+      * @return string
+      */
+-    public function getBlockPrefix();
++    public function getBlockPrefix(): string;
+ 
+     /**
+@@ -92,4 +92,4 @@ interface FormTypeInterface
+      * @return string|null
+      */
+-    public function getParent();
++    public function getParent(): ?string;
+ }
 diff --git a/src/Symfony/Component/HttpKernel/Bundle/Bundle.php b/src/Symfony/Component/HttpKernel/Bundle/Bundle.php
 index af21469b1c..7b024368c5 100644
 --- a/src/Symfony/Component/HttpKernel/Bundle/Bundle.php

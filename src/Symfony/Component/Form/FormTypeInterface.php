@@ -26,9 +26,11 @@ interface FormTypeInterface
      *
      * @param array<string, mixed> $options
      *
+     * @return void
+     *
      * @see FormTypeExtensionInterface::buildForm()
      */
-    public function buildForm(FormBuilderInterface $builder, array $options): void;
+    public function buildForm(FormBuilderInterface $builder, array $options);
 
     /**
      * Builds the form view.
@@ -42,9 +44,11 @@ interface FormTypeInterface
      *
      * @param array<string, mixed> $options
      *
+     * @return void
+     *
      * @see FormTypeExtensionInterface::buildView()
      */
-    public function buildView(FormView $view, FormInterface $form, array $options): void;
+    public function buildView(FormView $view, FormInterface $form, array $options);
 
     /**
      * Finishes the form view.
@@ -59,25 +63,33 @@ interface FormTypeInterface
      *
      * @param array<string, mixed> $options
      *
+     * @return void
+     *
      * @see FormTypeExtensionInterface::finishView()
      */
-    public function finishView(FormView $view, FormInterface $form, array $options): void;
+    public function finishView(FormView $view, FormInterface $form, array $options);
 
     /**
      * Configures the options for this type.
+     *
+     * @return void
      */
-    public function configureOptions(OptionsResolver $resolver): void;
+    public function configureOptions(OptionsResolver $resolver);
 
     /**
      * Returns the prefix of the template block name for this type.
      *
      * The block prefix defaults to the underscored short class name with
      * the "Type" suffix removed (e.g. "UserProfileType" => "user_profile").
+     *
+     * @return string
      */
-    public function getBlockPrefix(): string;
+    public function getBlockPrefix();
 
     /**
      * Returns the name of the parent type.
+     *
+     * @return string|null
      */
-    public function getParent(): ?string;
+    public function getParent();
 }

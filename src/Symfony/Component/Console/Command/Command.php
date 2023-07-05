@@ -159,8 +159,10 @@ class Command
 
     /**
      * Configures the current command.
+     *
+     * @return void
      */
-    protected function configure(): void
+    protected function configure()
     {
     }
 
@@ -189,8 +191,10 @@ class Command
      * This method is executed before the InputDefinition is validated.
      * This means that this is the only place where the command can
      * interactively ask for values of missing required arguments.
+     *
+     * @return void
      */
-    protected function interact(InputInterface $input, OutputInterface $output): void
+    protected function interact(InputInterface $input, OutputInterface $output)
     {
     }
 
@@ -203,8 +207,10 @@ class Command
      *
      * @see InputInterface::bind()
      * @see InputInterface::validate()
+     *
+     * @return void
      */
-    protected function initialize(InputInterface $input, OutputInterface $output): void
+    protected function initialize(InputInterface $input, OutputInterface $output)
     {
     }
 

@@ -584,7 +584,6 @@ EOF;
             $alreadyGenerated[$asGhostObject][$class] = true;
 
             foreach (array_column($definition->getTag('proxy'), 'interface') ?: [$class] as $r) {
-                dump($r);
                 if (!$r = $this->container->getReflectionClass($r)) {
                     continue;
                 }

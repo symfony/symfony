@@ -21,7 +21,6 @@ use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
-use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class SendinblueApiTransportTest extends TestCase
@@ -131,7 +130,6 @@ class SendinblueApiTransportTest extends TestCase
         $transport = new SendinblueApiTransport('ACCESS_KEY', $client);
         $transport->setPort(8984);
 
-        $dataPart = new DataPart('body');
         $mail = new Email();
         $mail->subject('Hello!')
             ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
@@ -141,7 +139,6 @@ class SendinblueApiTransportTest extends TestCase
             ->addCc('foo@bar.fr')
             ->addBcc('foo@bar.fr')
             ->addReplyTo('foo@bar.fr')
-            ->attachPart($dataPart)
         ;
 
         $message = $transport->send($mail);

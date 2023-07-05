@@ -88,18 +88,20 @@ class PeriodicalTrigger implements TriggerInterface, \Stringable
     public function getNextRunDate(\DateTimeImmutable $run): ?\DateTimeImmutable
     {
         if ($this->intervalInSeconds) {
-            if ($this->from > $run) {
-                return $this->from;
-            }
             if ($this->until <= $run) {
                 return null;
             }
 
-            $from = $this->from->format('U.u');
+            $fromDate = min($this->from, $run);
+            $from = $fromDate->format('U.u');
             $delta = $run->format('U.u') - $from;
             $recurrencesPassed = floor($delta / $this->intervalInSeconds);
             $nextRunTimestamp = sprintf('%.6F', ($recurrencesPassed + 1) * $this->intervalInSeconds + $from);
-            $nextRun = \DateTimeImmutable::createFromFormat('U.u', $nextRunTimestamp, $this->from->getTimezone());
+            $nextRun = \DateTimeImmutable::createFromFormat('U.u', $nextRunTimestamp, $fromDate->getTimezone());
+
+            if ($this->from > $nextRun) {
+                return $this->from;
+            }
 
             return $this->until > $nextRun ? $nextRun : null;
         }

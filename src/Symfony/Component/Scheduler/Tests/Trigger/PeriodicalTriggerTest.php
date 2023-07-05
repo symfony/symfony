@@ -176,8 +176,13 @@ class PeriodicalTriggerTest extends TestCase
         ];
         yield [
             $trigger,
-            new \DateTimeImmutable('2020-02-20T01:59:59.999999+02:00'),
+            new \DateTimeImmutable('2020-02-20T01:40:00+02:00'),
             new \DateTimeImmutable('2020-02-20T02:00:00+02:00'),
+        ];
+        yield [
+            $trigger,
+            new \DateTimeImmutable('2020-02-20T01:59:00+02:00'),
+            new \DateTimeImmutable('2020-02-20T02:09:00+02:00'),
         ];
         yield [
             $trigger,

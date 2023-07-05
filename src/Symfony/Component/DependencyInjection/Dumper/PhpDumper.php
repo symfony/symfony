@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Dumper;
 
 use Composer\Autoload\ClassLoader;
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
@@ -568,8 +569,19 @@ EOF;
                 continue;
             }
             $alreadyGenerated[$asGhostObject][$class] = true;
-            // register class' reflector for resource tracking
-            $this->container->getReflectionClass($class);
+
+            $r = $this->container->getReflectionClass($class);
+            do {
+                $file = $r->getFileName();
+                if (str_ends_with($file, ') : eval()\'d code')) {
+                    $file = substr($file, 0, strrpos($file, '(', -17));
+                }
+                if (is_file($file)) {
+                    $this->container->addResource(new FileResource($file));
+                }
+                $r = $r->getParentClass() ?: null;
+            } while ($r?->isUserDefined());
+
             if ("\n" === $proxyCode = "\n".$proxyDumper->getProxyCode($definition, $id)) {
                 continue;
             }

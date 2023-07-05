@@ -99,11 +99,9 @@ class MessengerPass implements CompilerPassInterface
                         $options = ['method' => $options];
                     }
 
-                    if (!isset($options['from_transport']) && isset($tag['from_transport'])) {
-                        $options['from_transport'] = $tag['from_transport'];
-                    }
-
-                    $priority = $tag['priority'] ?? $options['priority'] ?? 0;
+                    $options += array_filter($tag);
+                    unset($options['handles']);
+                    $priority = $options['priority'] ?? 0;
                     $method = $options['method'] ?? '__invoke';
 
                     if (isset($options['bus'])) {
@@ -112,7 +110,7 @@ class MessengerPass implements CompilerPassInterface
                             // $messageLocation = isset($tag['handles']) ? 'declared in your tag attribute "handles"' : sprintf('used as argument type in method "%s::%s()"', $r->getName(), $method);
                             $messageLocation = isset($tag['handles']) ? 'declared in your tag attribute "handles"' : ($r->implementsInterface(MessageSubscriberInterface::class) ? sprintf('returned by method "%s::getHandledMessages()"', $r->getName()) : sprintf('used as argument type in method "%s::%s()"', $r->getName(), $method));
 
-                            throw new RuntimeException(sprintf('Invalid configuration "%s" for message "%s": bus "%s" does not exist.', $messageLocation, $message, $options['bus']));
+                            throw new RuntimeException(sprintf('Invalid configuration '.$messageLocation.' for message "%s": bus "%s" does not exist.', $message, $options['bus']));
                         }
 
                         $buses = [$options['bus']];
@@ -123,7 +121,7 @@ class MessengerPass implements CompilerPassInterface
                         // $messageLocation = isset($tag['handles']) ? 'declared in your tag attribute "handles"' : sprintf('used as argument type in method "%s::%s()"', $r->getName(), $method);
                         $messageLocation = isset($tag['handles']) ? 'declared in your tag attribute "handles"' : ($r->implementsInterface(MessageSubscriberInterface::class) ? sprintf('returned by method "%s::getHandledMessages()"', $r->getName()) : sprintf('used as argument type in method "%s::%s()"', $r->getName(), $method));
 
-                        throw new RuntimeException(sprintf('Invalid handler service "%s": class or interface "%s" "%s" not found.', $serviceId, $message, $messageLocation));
+                        throw new RuntimeException(sprintf('Invalid handler service "%s": class or interface "%s" '.$messageLocation.' not found.', $serviceId, $message));
                     }
 
                     if (!$r->hasMethod($method)) {

@@ -143,6 +143,12 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             }
         }
 
+        $returnNull = false;
+        if ('' === $prefix) {
+            $returnNull = true;
+            $prefix = 'string';
+        }
+
         if (false !== $i || 'string' !== $prefix) {
             $env = $getEnv($name);
         } elseif (isset($_ENV[$name])) {
@@ -194,6 +200,10 @@ class EnvVarProcessor implements EnvVarProcessorInterface
         }
 
         if (null === $env) {
+            if ($returnNull) {
+                return null;
+            }
+
             if (!isset($this->getProvidedTypes()[$prefix])) {
                 throw new RuntimeException(sprintf('Unsupported env var prefix "%s".', $prefix));
             }

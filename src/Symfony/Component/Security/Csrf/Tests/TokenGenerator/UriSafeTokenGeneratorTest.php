@@ -57,4 +57,28 @@ class UriSafeTokenGeneratorTest extends TestCase
         $this->assertStringNotMatchesFormat('%S/%S', $token, 'is URI safe');
         $this->assertStringNotMatchesFormat('%S=%S', $token, 'is URI safe');
     }
+
+    /**
+     * @dataProvider validDataProvider
+     */
+    public function testValidLength(int $entropy, int $length)
+    {
+        $generator = new UriSafeTokenGenerator($entropy);
+        $token = $generator->generateToken();
+        $this->assertSame($length, \strlen($token));
+    }
+
+    public static function validDataProvider(): \Iterator
+    {
+        yield [24, 4];
+        yield 'Float length' => [20, 3];
+    }
+
+    public function testInvalidLength()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Entropy should be greater than 7.');
+
+        new UriSafeTokenGenerator(7);
+    }
 }

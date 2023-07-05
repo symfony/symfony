@@ -63,6 +63,17 @@ index 0df94e1092..061e7d7fd9 100644
 -    public function prepend(ContainerBuilder $container);
 +    public function prepend(ContainerBuilder $container): void;
  }
+diff --git a/src/Symfony/Component/ExpressionLanguage/ExpressionLanguage.php b/src/Symfony/Component/ExpressionLanguage/ExpressionLanguage.php
+index e8200d9b64..34ad94ceef 100644
+--- a/src/Symfony/Component/ExpressionLanguage/ExpressionLanguage.php
++++ b/src/Symfony/Component/ExpressionLanguage/ExpressionLanguage.php
+@@ -139,5 +139,5 @@ class ExpressionLanguage
+      * @return void
+      */
+-    protected function registerFunctions()
++    protected function registerFunctions(): void
+     {
+         $this->addFunction(ExpressionFunction::fromPhp('constant'));
 diff --git a/src/Symfony/Component/HttpKernel/Bundle/Bundle.php b/src/Symfony/Component/HttpKernel/Bundle/Bundle.php
 index af21469b1c..7b024368c5 100644
 --- a/src/Symfony/Component/HttpKernel/Bundle/Bundle.php

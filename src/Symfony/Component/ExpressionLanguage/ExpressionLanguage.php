@@ -135,7 +135,10 @@ class ExpressionLanguage
         }
     }
 
-    protected function registerFunctions(): void
+    /**
+     * @return void
+     */
+    protected function registerFunctions()
     {
         $this->addFunction(ExpressionFunction::fromPhp('constant'));
 

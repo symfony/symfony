@@ -42,6 +42,17 @@ index 2ad4a048ba..719267be1e 100644
 -    public function process(ContainerBuilder $container);
 +    public function process(ContainerBuilder $container): void;
  }
+diff --git a/src/Symfony/Component/DependencyInjection/Extension/ExtensionInterface.php b/src/Symfony/Component/DependencyInjection/Extension/ExtensionInterface.php
+index da170567d4..e2ddc68b04 100644
+--- a/src/Symfony/Component/DependencyInjection/Extension/ExtensionInterface.php
++++ b/src/Symfony/Component/DependencyInjection/Extension/ExtensionInterface.php
+@@ -30,5 +30,5 @@ interface ExtensionInterface
+      * @throws \InvalidArgumentException When provided tag is not defined in this extension
+      */
+-    public function load(array $configs, ContainerBuilder $container);
++    public function load(array $configs, ContainerBuilder $container): void;
+ 
+     /**
 diff --git a/src/Symfony/Component/DependencyInjection/Extension/PrependExtensionInterface.php b/src/Symfony/Component/DependencyInjection/Extension/PrependExtensionInterface.php
 index 0df94e1092..061e7d7fd9 100644
 --- a/src/Symfony/Component/DependencyInjection/Extension/PrependExtensionInterface.php

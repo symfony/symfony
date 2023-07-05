@@ -11,6 +11,7 @@ CHANGELOG
 ---
 
  * `UserValueResolver` no longer implements `ArgumentValueResolverInterface`
+ * Add native return type to `Firewall::getSubscribedEvents()` 
 
 6.3
 ---

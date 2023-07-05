@@ -119,7 +119,7 @@ class RegisterListenersPass implements CompilerPassInterface
                         if (!$r->hasMethod('__invoke')) {
                             throw new InvalidArgumentException(sprintf('None of the "%s" or "__invoke" methods exist for the service "foo". Please define the "method" attribute on "kernel.event_listener" tags.', $event['method'], $id, $this->listenerTag));
                         }
-                        
+
                         $event['method'] = '__invoke';
                     }
                 }

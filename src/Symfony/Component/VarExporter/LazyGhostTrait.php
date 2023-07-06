@@ -332,6 +332,10 @@ trait LazyGhostTrait
         }
 
         if ((Registry::$parentMethods[self::class] ??= Registry::getParentMethods(self::class))['clone']) {
+            if ($this->lazyObjectState->skippedProperties) {
+                $this->initializeLazyObject();
+            }
+
             parent::__clone();
         }
     }

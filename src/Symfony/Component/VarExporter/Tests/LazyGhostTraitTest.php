@@ -19,6 +19,7 @@ use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ChildStdClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ChildTestClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\LazyClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\MagicClass;
+use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\MagicCloneClassProxy;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ReadOnlyClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\TestClass;
 
@@ -107,6 +108,23 @@ class LazyGhostTraitTest extends TestCase
 
         $clone = clone $clone;
         $this->assertTrue($clone->resetLazyObject());
+    }
+
+    public function testCloneIsInitializedIfNeeded()
+    {
+        $instance = MagicCloneClassProxy::createLazyGhost(function (MagicCloneClassProxy $ghost) {
+            if (1 === $ghost->id) {
+                $ghost->cloned = false;
+            } else {
+                $this->fail('Ghost must be initialized before its __clone method is called.');
+            }
+        }, ['id' => true]);
+        $instance->id = 1;
+
+        $clone = clone $instance;
+
+        $this->assertNull($clone->id);
+        $this->assertTrue($clone->cloned);
     }
 
     public function testSerialize()

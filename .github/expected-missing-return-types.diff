@@ -424,3 +424,13 @@ index fe7da2e8f7..61d3632e2a 100644
 -    public function validate(mixed $value, Constraint $constraint);
 +    public function validate(mixed $value, Constraint $constraint): void;
  }
+diff --git a/src/Symfony/Component/VarDumper/Dumper/DataDumperInterface.php b/src/Symfony/Component/VarDumper/Dumper/DataDumperInterface.php
+index df05b6af57..024fb95d2f 100644
+--- a/src/Symfony/Component/VarDumper/Dumper/DataDumperInterface.php
++++ b/src/Symfony/Component/VarDumper/Dumper/DataDumperInterface.php
+@@ -24,4 +24,4 @@ interface DataDumperInterface
+      * @return string|null
+      */
+-    public function dump(Data $data);
++    public function dump(Data $data): ?string;
+ }

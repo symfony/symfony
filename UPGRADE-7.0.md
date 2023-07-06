@@ -77,6 +77,11 @@ DoctrineBridge
  * DoctrineBridge now requires `doctrine/event-manager:^2`
  * Add parameter `$isSameDatabase` to `DoctrineTokenProvider::configureSchema()`
 
+DomCrawler
+----------
+
+ * Add argument `$normalizeWhitespace` to `Crawler::innerText()`
+
 ExpressionLanguage
 ------------------
 
@@ -129,6 +134,7 @@ HttpFoundation
  * Remove `Request::getContentType()`, use `Request::getContentTypeFormat()` instead
  * Throw an `InvalidArgumentException` when calling `Request::create()` with a malformed URI
  * Require explicit argument when calling `JsonResponse::setCallback()`, `Response::setExpires/setLastModified/setEtag()`, `MockArraySessionStorage/NativeSessionStorage::setMetadataBag()`, `NativeSessionStorage::setSaveHandler()`
+ * Add argument `$statusCode` to `Response::sendHeaders()` and `StreamedResponse::sendHeaders()`
 
 HttpClient
 ----------

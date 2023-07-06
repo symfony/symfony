@@ -333,14 +333,13 @@ class Response
      *
      * @return $this
      */
-    public function sendHeaders(/* int $statusCode = null */): static
+    public function sendHeaders(int $statusCode = null): static
     {
         // headers have already been sent by the developer
         if (headers_sent()) {
             return $this;
         }
 
-        $statusCode = \func_num_args() > 0 ? func_get_arg(0) : null;
         $informationalResponse = $statusCode >= 100 && $statusCode < 200;
         if ($informationalResponse && !\function_exists('headers_send')) {
             // skip informational responses if not supported by the SAPI

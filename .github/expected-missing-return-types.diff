@@ -11876,7 +11876,7 @@ index 513b6494e5..c0211b6e39 100644
      {
          /** @var IsGranted[] $attributes */
 diff --git a/src/Symfony/Component/Security/Http/Firewall.php b/src/Symfony/Component/Security/Http/Firewall.php
-index f22988da13..8538f5f821 100644
+index f2f86a5dfa..bd47629587 100644
 --- a/src/Symfony/Component/Security/Http/Firewall.php
 +++ b/src/Symfony/Component/Security/Http/Firewall.php
 @@ -51,5 +51,5 @@ class Firewall implements EventSubscriberInterface
@@ -11893,7 +11893,14 @@ index f22988da13..8538f5f821 100644
 +    public function onKernelFinishRequest(FinishRequestEvent $event): void
      {
          $request = $event->getRequest();
-@@ -120,5 +120,5 @@ class Firewall implements EventSubscriberInterface
+@@ -112,5 +112,5 @@ class Firewall implements EventSubscriberInterface
+      * @return array
+      */
+-    public static function getSubscribedEvents()
++    public static function getSubscribedEvents(): array
+     {
+         return [
+@@ -123,5 +123,5 @@ class Firewall implements EventSubscriberInterface
       * @return void
       */
 -    protected function callListeners(RequestEvent $event, iterable $listeners)

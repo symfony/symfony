@@ -108,7 +108,10 @@ class Firewall implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents(): array
+    /**
+     * @return array
+     */
+    public static function getSubscribedEvents()
     {
         return [
             KernelEvents::REQUEST => ['onKernelRequest', 8],

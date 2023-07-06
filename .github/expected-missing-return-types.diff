@@ -136,7 +136,7 @@ index 83bfffaf27..acbd7e4bc7 100644
      {
          $this->updateValidatorMappingFiles($container, 'xml', 'xml');
 diff --git a/src/Symfony/Bridge/Doctrine/DependencyInjection/CompilerPass/RegisterEventListenersAndSubscribersPass.php b/src/Symfony/Bridge/Doctrine/DependencyInjection/CompilerPass/RegisterEventListenersAndSubscribersPass.php
-index 43efdd1af7..ee2f6bc2f9 100644
+index 72b4b78676..4878685103 100644
 --- a/src/Symfony/Bridge/Doctrine/DependencyInjection/CompilerPass/RegisterEventListenersAndSubscribersPass.php
 +++ b/src/Symfony/Bridge/Doctrine/DependencyInjection/CompilerPass/RegisterEventListenersAndSubscribersPass.php
 @@ -57,5 +57,5 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
@@ -856,39 +856,6 @@ index bb5560a7b5..be86cbf98e 100644
 +    protected static function getContainer(): Container
      {
          if (!static::$booted) {
-diff --git a/src/Symfony/Bundle/FrameworkBundle/Tests/Functional/app/AppKernel.php b/src/Symfony/Bundle/FrameworkBundle/Tests/Functional/app/AppKernel.php
-index 3f99eff48d..80888c4a71 100644
---- a/src/Symfony/Bundle/FrameworkBundle/Tests/Functional/app/AppKernel.php
-+++ b/src/Symfony/Bundle/FrameworkBundle/Tests/Functional/app/AppKernel.php
-@@ -90,5 +90,5 @@ class AppKernel extends Kernel implements ExtensionInterface, ConfigurationInter
-     }
- 
--    public function __wakeup()
-+    public function __wakeup(): void
-     {
-         foreach ($this as $k => $v) {
-diff --git a/src/Symfony/Bundle/FrameworkBundle/Tests/Kernel/ConcreteMicroKernel.php b/src/Symfony/Bundle/FrameworkBundle/Tests/Kernel/ConcreteMicroKernel.php
-index def880b231..a51078adbb 100644
---- a/src/Symfony/Bundle/FrameworkBundle/Tests/Kernel/ConcreteMicroKernel.php
-+++ b/src/Symfony/Bundle/FrameworkBundle/Tests/Kernel/ConcreteMicroKernel.php
-@@ -69,5 +69,5 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
-     }
- 
--    public function __wakeup()
-+    public function __wakeup(): void
-     {
-         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
-diff --git a/src/Symfony/Bundle/FrameworkBundle/Tests/Kernel/flex-style/src/FlexStyleMicroKernel.php b/src/Symfony/Bundle/FrameworkBundle/Tests/Kernel/flex-style/src/FlexStyleMicroKernel.php
-index bf529a5804..b15729362b 100644
---- a/src/Symfony/Bundle/FrameworkBundle/Tests/Kernel/flex-style/src/FlexStyleMicroKernel.php
-+++ b/src/Symfony/Bundle/FrameworkBundle/Tests/Kernel/flex-style/src/FlexStyleMicroKernel.php
-@@ -70,5 +70,5 @@ class FlexStyleMicroKernel extends Kernel
-     }
- 
--    public function __wakeup()
-+    public function __wakeup(): void
-     {
-         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
 diff --git a/src/Symfony/Bundle/FrameworkBundle/Translation/Translator.php b/src/Symfony/Bundle/FrameworkBundle/Translation/Translator.php
 index dac3b6394f..d319cb0824 100644
 --- a/src/Symfony/Bundle/FrameworkBundle/Translation/Translator.php
@@ -1114,7 +1081,7 @@ index a2c5815e4b..1c9721ccc6 100644
 +    public function addConfiguration(NodeDefinition $builder): void;
  }
 diff --git a/src/Symfony/Bundle/SecurityBundle/DependencyInjection/SecurityExtension.php b/src/Symfony/Bundle/SecurityBundle/DependencyInjection/SecurityExtension.php
-index 8c52a645ea..ba3db6e606 100644
+index 17a869516e..c0f2e4de40 100644
 --- a/src/Symfony/Bundle/SecurityBundle/DependencyInjection/SecurityExtension.php
 +++ b/src/Symfony/Bundle/SecurityBundle/DependencyInjection/SecurityExtension.php
 @@ -82,5 +82,5 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
@@ -1186,7 +1153,7 @@ index 2cbca705f9..42cfdb0ff0 100644
      {
          parent::build($container);
 diff --git a/src/Symfony/Bundle/TwigBundle/DependencyInjection/Compiler/ExtensionPass.php b/src/Symfony/Bundle/TwigBundle/DependencyInjection/Compiler/ExtensionPass.php
-index 63dd68e91b..48889647a1 100644
+index a7d44e53ae..3b8ae9a359 100644
 --- a/src/Symfony/Bundle/TwigBundle/DependencyInjection/Compiler/ExtensionPass.php
 +++ b/src/Symfony/Bundle/TwigBundle/DependencyInjection/Compiler/ExtensionPass.php
 @@ -29,5 +29,5 @@ class ExtensionPass implements CompilerPassInterface
@@ -1461,28 +1428,6 @@ index 7fce4e32b0..a7f192c5e3 100644
 +    public function add(Request $request): void
      {
          $this->stack = \array_slice($this->stack, 0, $this->position + 1);
-diff --git a/src/Symfony/Component/BrowserKit/Tests/TestClient.php b/src/Symfony/Component/BrowserKit/Tests/TestClient.php
-index c98c650298..47c76ad5e5 100644
---- a/src/Symfony/Component/BrowserKit/Tests/TestClient.php
-+++ b/src/Symfony/Component/BrowserKit/Tests/TestClient.php
-@@ -42,5 +42,5 @@ class TestClient extends AbstractBrowser
-     }
- 
--    protected function getScript(object $request)
-+    protected function getScript(object $request): string
-     {
-         $r = new \ReflectionClass(Response::class);
-diff --git a/src/Symfony/Component/BrowserKit/Tests/TestHttpClient.php b/src/Symfony/Component/BrowserKit/Tests/TestHttpClient.php
-index afb0197c91..7a3c9a7ec6 100644
---- a/src/Symfony/Component/BrowserKit/Tests/TestHttpClient.php
-+++ b/src/Symfony/Component/BrowserKit/Tests/TestHttpClient.php
-@@ -65,5 +65,5 @@ class TestHttpClient extends HttpBrowser
-     }
- 
--    protected function getScript(object $request)
-+    protected function getScript(object $request): string
-     {
-         $r = new \ReflectionClass(Response::class);
 diff --git a/src/Symfony/Component/Cache/Adapter/ApcuAdapter.php b/src/Symfony/Component/Cache/Adapter/ApcuAdapter.php
 index 3dc93fd541..8a7df7a19b 100644
 --- a/src/Symfony/Component/Cache/Adapter/ApcuAdapter.php
@@ -1662,10 +1607,10 @@ index db2dd97d87..959a9355d2 100644
      {
          if (!$item->isHit() || null === $message = EarlyExpirationMessage::create($this->reverseContainer, $callback, $item, $pool)) {
 diff --git a/src/Symfony/Component/Cache/Messenger/EarlyExpirationHandler.php b/src/Symfony/Component/Cache/Messenger/EarlyExpirationHandler.php
-index 1b1939a023..edae224e94 100644
+index b7eab8064a..a4a13a18d1 100644
 --- a/src/Symfony/Component/Cache/Messenger/EarlyExpirationHandler.php
 +++ b/src/Symfony/Component/Cache/Messenger/EarlyExpirationHandler.php
-@@ -32,5 +32,5 @@ class EarlyExpirationHandler implements MessageHandlerInterface
+@@ -33,5 +33,5 @@ class EarlyExpirationHandler
       * @return void
       */
 -    public function __invoke(EarlyExpirationMessage $message)
@@ -3707,28 +3652,6 @@ index cecce6c01b..f2e0c7fdf5 100644
 +    public function newLine(int $count = 1): void
      {
          parent::newLine($count);
-diff --git a/src/Symfony/Component/Console/Tests/EventListener/ErrorListenerTest.php b/src/Symfony/Component/Console/Tests/EventListener/ErrorListenerTest.php
-index 6ad89dc522..40020baee7 100644
---- a/src/Symfony/Component/Console/Tests/EventListener/ErrorListenerTest.php
-+++ b/src/Symfony/Component/Console/Tests/EventListener/ErrorListenerTest.php
-@@ -141,5 +141,5 @@ class NonStringInput extends Input
-     }
- 
--    public function parse()
-+    public function parse(): void
-     {
-     }
-diff --git a/src/Symfony/Component/Console/Tests/Output/OutputTest.php b/src/Symfony/Component/Console/Tests/Output/OutputTest.php
-index f337c4ddd5..b7c0a98d9f 100644
---- a/src/Symfony/Component/Console/Tests/Output/OutputTest.php
-+++ b/src/Symfony/Component/Console/Tests/Output/OutputTest.php
-@@ -183,5 +183,5 @@ class TestOutput extends Output
-     }
- 
--    protected function doWrite(string $message, bool $newline)
-+    protected function doWrite(string $message, bool $newline): void
-     {
-         $this->output .= $message.($newline ? "\n" : '');
 diff --git a/src/Symfony/Component/CssSelector/Parser/Reader.php b/src/Symfony/Component/CssSelector/Parser/Reader.php
 index 7f6ae7a600..d79db02567 100644
 --- a/src/Symfony/Component/CssSelector/Parser/Reader.php
@@ -4254,7 +4177,7 @@ index 2d6542660b..20287f9286 100644
      {
          $this->extensionConfig = [];
 diff --git a/src/Symfony/Component/DependencyInjection/Container.php b/src/Symfony/Component/DependencyInjection/Container.php
-index 3ea2228b94..f1d7078383 100644
+index 2b9eeb84cc..29905ed51b 100644
 --- a/src/Symfony/Component/DependencyInjection/Container.php
 +++ b/src/Symfony/Component/DependencyInjection/Container.php
 @@ -83,5 +83,5 @@ class Container implements ContainerInterface, ResetInterface
@@ -4310,7 +4233,7 @@ index 9b3709c965..97b54712c9 100644
 +    public function setContainer(?ContainerInterface $container): void;
  }
 diff --git a/src/Symfony/Component/DependencyInjection/ContainerAwareTrait.php b/src/Symfony/Component/DependencyInjection/ContainerAwareTrait.php
-index 4174fec8d0..f6a7b2da12 100644
+index be6b225a3a..f6108580de 100644
 --- a/src/Symfony/Component/DependencyInjection/ContainerAwareTrait.php
 +++ b/src/Symfony/Component/DependencyInjection/ContainerAwareTrait.php
 @@ -31,5 +31,5 @@ trait ContainerAwareTrait
@@ -5209,7 +5132,7 @@ index f1b982315c..ed8ad1fab4 100644
      {
      }
 diff --git a/src/Symfony/Component/EventDispatcher/DependencyInjection/RegisterListenersPass.php b/src/Symfony/Component/EventDispatcher/DependencyInjection/RegisterListenersPass.php
-index c86f438d41..3bfb39db57 100644
+index 866f4e64ff..388debc256 100644
 --- a/src/Symfony/Component/EventDispatcher/DependencyInjection/RegisterListenersPass.php
 +++ b/src/Symfony/Component/EventDispatcher/DependencyInjection/RegisterListenersPass.php
 @@ -52,5 +52,5 @@ class RegisterListenersPass implements CompilerPassInterface
@@ -10383,7 +10306,7 @@ index 3b6d6b8a39..98bc75ecd7 100644
      {
          $this
 diff --git a/src/Symfony/Component/Messenger/DependencyInjection/MessengerPass.php b/src/Symfony/Component/Messenger/DependencyInjection/MessengerPass.php
-index 86fa255015..08cbde055f 100644
+index 03f48edfcd..c82beaa24c 100644
 --- a/src/Symfony/Component/Messenger/DependencyInjection/MessengerPass.php
 +++ b/src/Symfony/Component/Messenger/DependencyInjection/MessengerPass.php
 @@ -37,5 +37,5 @@ class MessengerPass implements CompilerPassInterface
@@ -12024,7 +11947,7 @@ index 513b6494e5..c0211b6e39 100644
      {
          /** @var IsGranted[] $attributes */
 diff --git a/src/Symfony/Component/Security/Http/Firewall.php b/src/Symfony/Component/Security/Http/Firewall.php
-index f2f86a5dfa..bd47629587 100644
+index f22988da13..8538f5f821 100644
 --- a/src/Symfony/Component/Security/Http/Firewall.php
 +++ b/src/Symfony/Component/Security/Http/Firewall.php
 @@ -51,5 +51,5 @@ class Firewall implements EventSubscriberInterface
@@ -12041,14 +11964,7 @@ index f2f86a5dfa..bd47629587 100644
 +    public function onKernelFinishRequest(FinishRequestEvent $event): void
      {
          $request = $event->getRequest();
-@@ -112,5 +112,5 @@ class Firewall implements EventSubscriberInterface
-      * @return array
-      */
--    public static function getSubscribedEvents()
-+    public static function getSubscribedEvents(): array
-     {
-         return [
-@@ -123,5 +123,5 @@ class Firewall implements EventSubscriberInterface
+@@ -120,5 +120,5 @@ class Firewall implements EventSubscriberInterface
       * @return void
       */
 -    protected function callListeners(RequestEvent $event, iterable $listeners)
@@ -12466,38 +12382,6 @@ index 1835568745..2b98fc11d6 100644
 @@ -25,5 +25,5 @@ trait SerializerAwareTrait
       * @return void
       */
--    public function setSerializer(SerializerInterface $serializer)
-+    public function setSerializer(SerializerInterface $serializer): void
-     {
-         $this->serializer = $serializer;
-diff --git a/src/Symfony/Component/Serializer/Tests/Normalizer/AbstractObjectNormalizerTest.php b/src/Symfony/Component/Serializer/Tests/Normalizer/AbstractObjectNormalizerTest.php
-index 78046229eb..bed7c33cec 100644
---- a/src/Symfony/Component/Serializer/Tests/Normalizer/AbstractObjectNormalizerTest.php
-+++ b/src/Symfony/Component/Serializer/Tests/Normalizer/AbstractObjectNormalizerTest.php
-@@ -764,5 +764,5 @@ class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
-     }
- 
--    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = [])
-+    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = []): void
-     {
-         $object->$attribute = $value;
-@@ -964,5 +964,5 @@ class AbstractObjectNormalizerWithMetadata extends AbstractObjectNormalizer
-     }
- 
--    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = [])
-+    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = []): void
-     {
-         if (property_exists($object, $attribute)) {
-@@ -1085,5 +1085,5 @@ class AbstractObjectNormalizerCollectionDummy extends AbstractObjectNormalizer
-     }
- 
--    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = [])
-+    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = []): void
-     {
-         $object->$attribute = $value;
-@@ -1142,5 +1142,5 @@ class ArrayDenormalizerDummy implements DenormalizerInterface, SerializerAwareIn
-     }
- 
 -    public function setSerializer(SerializerInterface $serializer)
 +    public function setSerializer(SerializerInterface $serializer): void
      {

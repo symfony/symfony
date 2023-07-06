@@ -17,6 +17,7 @@ CHANGELOG
 
  * `BundleInterface` no longer extends `ContainerAwareInterface`
  * Add optional `$className` parameter to `ControllerEvent::getAttributes()`
+ * Add native return types to `TraceableEventDispatcher` and to `MergeExtensionConfigurationPass`
 
 6.3
 ---

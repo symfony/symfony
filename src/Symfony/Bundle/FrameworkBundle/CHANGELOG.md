@@ -12,6 +12,11 @@ CHANGELOG
    `Symfony\Component\Serializer\Normalizer\NormalizerInterface` or implement `NormalizerAwareInterface` instead
  * Remove the `Http\Client\HttpClient` service, use `Psr\Http\Client\ClientInterface` instead
 
+6.4
+---
+
+ * Add native return type to `Translator` and to `Application::reset()`
+
 6.3
 ---
 

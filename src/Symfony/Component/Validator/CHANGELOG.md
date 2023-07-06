@@ -10,6 +10,7 @@ CHANGELOG
  * Deprecate passing an annotation reader to the constructor signature of `AnnotationLoader`
  * Deprecate `ValidatorBuilder::setDoctrineAnnotationReader()`
  * Deprecate `ValidatorBuilder::addDefaultDoctrineAnnotationReader()`
+ * Add `number`, `finite-number` and `finite-float` types to `Type` constraint
 
 6.3
 ---

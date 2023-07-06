@@ -99,8 +99,43 @@ index 2ad4a048ba..719267be1e 100644
 -    public function process(ContainerBuilder $container);
 +    public function process(ContainerBuilder $container): void;
  }
+diff --git a/src/Symfony/Component/DependencyInjection/Extension/ConfigurationExtensionInterface.php b/src/Symfony/Component/DependencyInjection/Extension/ConfigurationExtensionInterface.php
+index a42967f4da..4e86e16f9d 100644
+--- a/src/Symfony/Component/DependencyInjection/Extension/ConfigurationExtensionInterface.php
++++ b/src/Symfony/Component/DependencyInjection/Extension/ConfigurationExtensionInterface.php
+@@ -27,4 +27,4 @@ interface ConfigurationExtensionInterface
+      * @return ConfigurationInterface|null
+      */
+-    public function getConfiguration(array $config, ContainerBuilder $container);
++    public function getConfiguration(array $config, ContainerBuilder $container): ?ConfigurationInterface;
+ }
+diff --git a/src/Symfony/Component/DependencyInjection/Extension/Extension.php b/src/Symfony/Component/DependencyInjection/Extension/Extension.php
+index d0bd05ea4b..f9df65fd7c 100644
+--- a/src/Symfony/Component/DependencyInjection/Extension/Extension.php
++++ b/src/Symfony/Component/DependencyInjection/Extension/Extension.php
+@@ -32,5 +32,5 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
+      * @return string|false
+      */
+-    public function getXsdValidationBasePath()
++    public function getXsdValidationBasePath(): string|false
+     {
+         return false;
+@@ -40,5 +40,5 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
+      * @return string
+      */
+-    public function getNamespace()
++    public function getNamespace(): string
+     {
+         return 'http://example.org/schema/dic/'.$this->getAlias();
+@@ -77,5 +77,5 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
+      * @return ConfigurationInterface|null
+      */
+-    public function getConfiguration(array $config, ContainerBuilder $container)
++    public function getConfiguration(array $config, ContainerBuilder $container): ?ConfigurationInterface
+     {
+         $class = static::class;
 diff --git a/src/Symfony/Component/DependencyInjection/Extension/ExtensionInterface.php b/src/Symfony/Component/DependencyInjection/Extension/ExtensionInterface.php
-index da170567d4..e2ddc68b04 100644
+index bd57eef733..3284e19ede 100644
 --- a/src/Symfony/Component/DependencyInjection/Extension/ExtensionInterface.php
 +++ b/src/Symfony/Component/DependencyInjection/Extension/ExtensionInterface.php
 @@ -30,5 +30,5 @@ interface ExtensionInterface
@@ -110,6 +145,26 @@ index da170567d4..e2ddc68b04 100644
 +    public function load(array $configs, ContainerBuilder $container): void;
  
      /**
+@@ -37,5 +37,5 @@ interface ExtensionInterface
+      * @return string
+      */
+-    public function getNamespace();
++    public function getNamespace(): string;
+ 
+     /**
+@@ -44,5 +44,5 @@ interface ExtensionInterface
+      * @return string|false
+      */
+-    public function getXsdValidationBasePath();
++    public function getXsdValidationBasePath(): string|false;
+ 
+     /**
+@@ -53,4 +53,4 @@ interface ExtensionInterface
+      * @return string
+      */
+-    public function getAlias();
++    public function getAlias(): string;
+ }
 diff --git a/src/Symfony/Component/DependencyInjection/Extension/PrependExtensionInterface.php b/src/Symfony/Component/DependencyInjection/Extension/PrependExtensionInterface.php
 index 0df94e1092..061e7d7fd9 100644
 --- a/src/Symfony/Component/DependencyInjection/Extension/PrependExtensionInterface.php

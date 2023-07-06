@@ -23,6 +23,8 @@ interface ConfigurationExtensionInterface
 {
     /**
      * Returns extension configuration.
+     *
+     * @return ConfigurationInterface|null
      */
-    public function getConfiguration(array $config, ContainerBuilder $container): ?ConfigurationInterface;
+    public function getConfiguration(array $config, ContainerBuilder $container);
 }

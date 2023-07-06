@@ -33,18 +33,24 @@ interface ExtensionInterface
 
     /**
      * Returns the namespace to be used for this extension (XML namespace).
+     *
+     * @return string
      */
-    public function getNamespace(): string;
+    public function getNamespace();
 
     /**
      * Returns the base path for the XSD files.
+     *
+     * @return string|false
      */
-    public function getXsdValidationBasePath(): string|false;
+    public function getXsdValidationBasePath();
 
     /**
      * Returns the recommended alias to use in XML.
      *
      * This alias is also the mandatory prefix to use when using YAML.
+     *
+     * @return string
      */
-    public function getAlias(): string;
+    public function getAlias();
 }

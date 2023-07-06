@@ -6,24 +6,6 @@ head=$(sed '/^diff /Q' .github/expected-missing-return-types.diff)
 (echo "$head" && echo && git diff -U2 src/) > .github/expected-missing-return-types.diff
 git checkout composer.json src/
 
-diff --git a/src/Symfony/Bridge/Doctrine/Tests/Form/ChoiceList/ORMQueryBuilderLoaderTest.php b/src/Symfony/Bridge/Doctrine/Tests/Form/ChoiceList/ORMQueryBuilderLoaderTest.php
-index f52a1ce1e9..1fb72535e1 100644
---- a/src/Symfony/Bridge/Doctrine/Tests/Form/ChoiceList/ORMQueryBuilderLoaderTest.php
-+++ b/src/Symfony/Bridge/Doctrine/Tests/Form/ChoiceList/ORMQueryBuilderLoaderTest.php
-@@ -285,5 +285,5 @@ class QueryMock extends AbstractQuery
-      * @return array|string
-      */
--    public function getSQL()
-+    public function getSQL(): array|string
-     {
-     }
-@@ -292,5 +292,5 @@ class QueryMock extends AbstractQuery
-      * @return Result|int
-      */
--    protected function _doExecute()
-+    protected function _doExecute(): Result|int
-     {
-     }
 diff --git a/src/Symfony/Bundle/FrameworkBundle/Test/KernelTestCase.php b/src/Symfony/Bundle/FrameworkBundle/Test/KernelTestCase.php
 index bb5560a7b5..be86cbf98e 100644
 --- a/src/Symfony/Bundle/FrameworkBundle/Test/KernelTestCase.php
@@ -35,17 +17,6 @@ index bb5560a7b5..be86cbf98e 100644
 +    protected static function getContainer(): Container
      {
          if (!static::$booted) {
-diff --git a/src/Symfony/Bundle/WebProfilerBundle/Tests/Controller/ProfilerControllerTest.php b/src/Symfony/Bundle/WebProfilerBundle/Tests/Controller/ProfilerControllerTest.php
-index 67355d9030..b2006ecd2f 100644
---- a/src/Symfony/Bundle/WebProfilerBundle/Tests/Controller/ProfilerControllerTest.php
-+++ b/src/Symfony/Bundle/WebProfilerBundle/Tests/Controller/ProfilerControllerTest.php
-@@ -449,5 +449,5 @@ class ProfilerControllerTest extends WebTestCase
-      * @return MockObject&DumpDataCollector
-      */
--    private function createDumpDataCollector(): MockObject
-+    private function createDumpDataCollector(): MockObject&DumpDataCollector
-     {
-         $dumpDataCollector = $this->createMock(DumpDataCollector::class);
 diff --git a/src/Symfony/Component/BrowserKit/AbstractBrowser.php b/src/Symfony/Component/BrowserKit/AbstractBrowser.php
 index b27ca37529..5b80175850 100644
 --- a/src/Symfony/Component/BrowserKit/AbstractBrowser.php
@@ -352,7 +323,7 @@ index 895c155e07..3955c902d4 100644
      {
          try {
 diff --git a/src/Symfony/Component/DependencyInjection/Container.php b/src/Symfony/Component/DependencyInjection/Container.php
-index f5d33682ff..e644489097 100644
+index b9a784ec21..a7f252787d 100644
 --- a/src/Symfony/Component/DependencyInjection/Container.php
 +++ b/src/Symfony/Component/DependencyInjection/Container.php
 @@ -110,5 +110,5 @@ class Container implements ContainerInterface, ResetInterface

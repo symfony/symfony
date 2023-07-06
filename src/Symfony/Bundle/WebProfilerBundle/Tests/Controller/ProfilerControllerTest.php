@@ -445,10 +445,7 @@ class ProfilerControllerTest extends WebTestCase
         $this->assertDefaultPanel($dumpDataCollector->getName(), $profile);
     }
 
-    /**
-     * @return MockObject&DumpDataCollector
-     */
-    private function createDumpDataCollector(): MockObject
+    private function createDumpDataCollector(): MockObject&DumpDataCollector
     {
         $dumpDataCollector = $this->createMock(DumpDataCollector::class);
         $dumpDataCollector

@@ -74,8 +74,10 @@ class MockCloner implements ClonerInterface
 
 class MockDumper implements DataDumperInterface
 {
-    public function dump(Data $data)
+    public function dump(Data $data): ?string
     {
         echo '+'.$data->getValue();
+
+        return null;
     }
 }

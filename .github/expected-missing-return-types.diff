@@ -108,7 +108,7 @@ index 83bfffaf27..acbd7e4bc7 100644
      {
          $this->updateValidatorMappingFiles($container, 'xml', 'xml');
 diff --git a/src/Symfony/Bridge/Doctrine/DependencyInjection/CompilerPass/RegisterEventListenersAndSubscribersPass.php b/src/Symfony/Bridge/Doctrine/DependencyInjection/CompilerPass/RegisterEventListenersAndSubscribersPass.php
-index b6946cc4de..5b3ba9f915 100644
+index bf35a95e63..1382eaf666 100644
 --- a/src/Symfony/Bridge/Doctrine/DependencyInjection/CompilerPass/RegisterEventListenersAndSubscribersPass.php
 +++ b/src/Symfony/Bridge/Doctrine/DependencyInjection/CompilerPass/RegisterEventListenersAndSubscribersPass.php
 @@ -54,5 +54,5 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
@@ -1346,28 +1346,6 @@ index 7fce4e32b0..a7f192c5e3 100644
 +    public function add(Request $request): void
      {
          $this->stack = \array_slice($this->stack, 0, $this->position + 1);
-diff --git a/src/Symfony/Component/BrowserKit/Tests/TestClient.php b/src/Symfony/Component/BrowserKit/Tests/TestClient.php
-index c98c650298..47c76ad5e5 100644
---- a/src/Symfony/Component/BrowserKit/Tests/TestClient.php
-+++ b/src/Symfony/Component/BrowserKit/Tests/TestClient.php
-@@ -42,5 +42,5 @@ class TestClient extends AbstractBrowser
-     }
- 
--    protected function getScript(object $request)
-+    protected function getScript(object $request): string
-     {
-         $r = new \ReflectionClass(Response::class);
-diff --git a/src/Symfony/Component/BrowserKit/Tests/TestHttpClient.php b/src/Symfony/Component/BrowserKit/Tests/TestHttpClient.php
-index afb0197c91..7a3c9a7ec6 100644
---- a/src/Symfony/Component/BrowserKit/Tests/TestHttpClient.php
-+++ b/src/Symfony/Component/BrowserKit/Tests/TestHttpClient.php
-@@ -65,5 +65,5 @@ class TestHttpClient extends HttpBrowser
-     }
- 
--    protected function getScript(object $request)
-+    protected function getScript(object $request): string
-     {
-         $r = new \ReflectionClass(Response::class);
 diff --git a/src/Symfony/Component/Cache/Adapter/ApcuAdapter.php b/src/Symfony/Component/Cache/Adapter/ApcuAdapter.php
 index 3dc93fd541..8a7df7a19b 100644
 --- a/src/Symfony/Component/Cache/Adapter/ApcuAdapter.php
@@ -3545,28 +3523,6 @@ index cecce6c01b..f2e0c7fdf5 100644
 +    public function newLine(int $count = 1): void
      {
          parent::newLine($count);
-diff --git a/src/Symfony/Component/Console/Tests/EventListener/ErrorListenerTest.php b/src/Symfony/Component/Console/Tests/EventListener/ErrorListenerTest.php
-index 6ad89dc522..40020baee7 100644
---- a/src/Symfony/Component/Console/Tests/EventListener/ErrorListenerTest.php
-+++ b/src/Symfony/Component/Console/Tests/EventListener/ErrorListenerTest.php
-@@ -141,5 +141,5 @@ class NonStringInput extends Input
-     }
- 
--    public function parse()
-+    public function parse(): void
-     {
-     }
-diff --git a/src/Symfony/Component/Console/Tests/Output/OutputTest.php b/src/Symfony/Component/Console/Tests/Output/OutputTest.php
-index f337c4ddd5..b7c0a98d9f 100644
---- a/src/Symfony/Component/Console/Tests/Output/OutputTest.php
-+++ b/src/Symfony/Component/Console/Tests/Output/OutputTest.php
-@@ -183,5 +183,5 @@ class TestOutput extends Output
-     }
- 
--    protected function doWrite(string $message, bool $newline)
-+    protected function doWrite(string $message, bool $newline): void
-     {
-         $this->output .= $message.($newline ? "\n" : '');
 diff --git a/src/Symfony/Component/CssSelector/Parser/Reader.php b/src/Symfony/Component/CssSelector/Parser/Reader.php
 index 7f6ae7a600..d79db02567 100644
 --- a/src/Symfony/Component/CssSelector/Parser/Reader.php
@@ -4092,7 +4048,7 @@ index 2d6542660b..20287f9286 100644
      {
          $this->extensionConfig = [];
 diff --git a/src/Symfony/Component/DependencyInjection/Container.php b/src/Symfony/Component/DependencyInjection/Container.php
-index 3ea2228b94..f1d7078383 100644
+index 2b9eeb84cc..29905ed51b 100644
 --- a/src/Symfony/Component/DependencyInjection/Container.php
 +++ b/src/Symfony/Component/DependencyInjection/Container.php
 @@ -83,5 +83,5 @@ class Container implements ContainerInterface, ResetInterface
@@ -4148,7 +4104,7 @@ index 084a321ab5..09fb37f3aa 100644
 +    public function setContainer(?ContainerInterface $container): void;
  }
 diff --git a/src/Symfony/Component/DependencyInjection/ContainerAwareTrait.php b/src/Symfony/Component/DependencyInjection/ContainerAwareTrait.php
-index ac67b468c5..bc1e395810 100644
+index 457d967b44..9bb0922052 100644
 --- a/src/Symfony/Component/DependencyInjection/ContainerAwareTrait.php
 +++ b/src/Symfony/Component/DependencyInjection/ContainerAwareTrait.php
 @@ -27,5 +27,5 @@ trait ContainerAwareTrait
@@ -5007,7 +4963,7 @@ index f1b982315c..ed8ad1fab4 100644
      {
      }
 diff --git a/src/Symfony/Component/EventDispatcher/DependencyInjection/RegisterListenersPass.php b/src/Symfony/Component/EventDispatcher/DependencyInjection/RegisterListenersPass.php
-index c86f438d41..3bfb39db57 100644
+index 866f4e64ff..388debc256 100644
 --- a/src/Symfony/Component/EventDispatcher/DependencyInjection/RegisterListenersPass.php
 +++ b/src/Symfony/Component/EventDispatcher/DependencyInjection/RegisterListenersPass.php
 @@ -52,5 +52,5 @@ class RegisterListenersPass implements CompilerPassInterface
@@ -8968,7 +8924,7 @@ index 0f3630e7fe..ddf77b8a19 100644
      {
          return <<<'EOF'
 diff --git a/src/Symfony/Component/HttpKernel/Kernel.php b/src/Symfony/Component/HttpKernel/Kernel.php
-index 9d4c5f22b3..4030ab8b12 100644
+index a9db50cf5a..cfd6374f1d 100644
 --- a/src/Symfony/Component/HttpKernel/Kernel.php
 +++ b/src/Symfony/Component/HttpKernel/Kernel.php
 @@ -107,5 +107,5 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
@@ -10070,7 +10026,7 @@ index 3b6d6b8a39..98bc75ecd7 100644
      {
          $this
 diff --git a/src/Symfony/Component/Messenger/DependencyInjection/MessengerPass.php b/src/Symfony/Component/Messenger/DependencyInjection/MessengerPass.php
-index 86fa255015..08cbde055f 100644
+index 03f48edfcd..c82beaa24c 100644
 --- a/src/Symfony/Component/Messenger/DependencyInjection/MessengerPass.php
 +++ b/src/Symfony/Component/Messenger/DependencyInjection/MessengerPass.php
 @@ -37,5 +37,5 @@ class MessengerPass implements CompilerPassInterface
@@ -12102,38 +12058,6 @@ index 1835568745..2b98fc11d6 100644
 @@ -25,5 +25,5 @@ trait SerializerAwareTrait
       * @return void
       */
--    public function setSerializer(SerializerInterface $serializer)
-+    public function setSerializer(SerializerInterface $serializer): void
-     {
-         $this->serializer = $serializer;
-diff --git a/src/Symfony/Component/Serializer/Tests/Normalizer/AbstractObjectNormalizerTest.php b/src/Symfony/Component/Serializer/Tests/Normalizer/AbstractObjectNormalizerTest.php
-index 78046229eb..bed7c33cec 100644
---- a/src/Symfony/Component/Serializer/Tests/Normalizer/AbstractObjectNormalizerTest.php
-+++ b/src/Symfony/Component/Serializer/Tests/Normalizer/AbstractObjectNormalizerTest.php
-@@ -764,5 +764,5 @@ class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
-     }
- 
--    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = [])
-+    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = []): void
-     {
-         $object->$attribute = $value;
-@@ -964,5 +964,5 @@ class AbstractObjectNormalizerWithMetadata extends AbstractObjectNormalizer
-     }
- 
--    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = [])
-+    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = []): void
-     {
-         if (property_exists($object, $attribute)) {
-@@ -1085,5 +1085,5 @@ class AbstractObjectNormalizerCollectionDummy extends AbstractObjectNormalizer
-     }
- 
--    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = [])
-+    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = []): void
-     {
-         $object->$attribute = $value;
-@@ -1142,5 +1142,5 @@ class ArrayDenormalizerDummy implements DenormalizerInterface, SerializerAwareIn
-     }
- 
 -    public function setSerializer(SerializerInterface $serializer)
 +    public function setSerializer(SerializerInterface $serializer): void
      {

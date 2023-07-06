@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.0
+---
+
+ * Add argument `$normalizeWhitespace` to `Crawler::innerText()`
+
 6.3
 ---
 

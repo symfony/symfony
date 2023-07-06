@@ -30,6 +30,11 @@ Form
  * Deprecate using `DateTime` or `DateTimeImmutable` model data with a different timezone than configured with the
    `model_timezone` option in `DateType`, `DateTimeType`, and `TimeType`
 
+FrameworkBundle
+---------------
+
+ * Add native return type to `Translator` and to `Application::reset()`
+
 HttpFoundation
 --------------
 
@@ -39,6 +44,17 @@ HttpKernel
 ----------
 
  * `BundleInterface` no longer extends `ContainerAwareInterface`
+ * Add native return types to `TraceableEventDispatcher` and to `MergeExtensionConfigurationPass`
+
+MonologBridge
+-------------
+
+ * Add native return type to `Logger::clear()` and to `DebugProcessor::clear()`
+
+Routing
+-------
+
+ * Add native return type to `AnnotationClassLoader::setResolver()`
 
 Security
 --------

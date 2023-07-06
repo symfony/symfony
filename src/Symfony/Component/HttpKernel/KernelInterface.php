@@ -33,20 +33,26 @@ interface KernelInterface extends HttpKernelInterface
 
     /**
      * Loads the container configuration.
+     *
+     * @return void
      */
-    public function registerContainerConfiguration(LoaderInterface $loader): void;
+    public function registerContainerConfiguration(LoaderInterface $loader);
 
     /**
      * Boots the current kernel.
+     *
+     * @return void
      */
-    public function boot(): void;
+    public function boot();
 
     /**
      * Shutdowns the kernel.
      *
      * This method is mainly useful when doing functional testing.
+     *
+     * @return void
      */
-    public function shutdown(): void;
+    public function shutdown();
 
     /**
      * Gets the registered bundle instances.

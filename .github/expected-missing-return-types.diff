@@ -316,6 +316,31 @@ index efa1a4f737..752eb19faf 100644
 -    public function lateCollect();
 +    public function lateCollect(): void;
  }
+diff --git a/src/Symfony/Component/HttpKernel/KernelInterface.php b/src/Symfony/Component/HttpKernel/KernelInterface.php
+index 14a053ab30..737af1b649 100644
+--- a/src/Symfony/Component/HttpKernel/KernelInterface.php
++++ b/src/Symfony/Component/HttpKernel/KernelInterface.php
+@@ -37,5 +37,5 @@ interface KernelInterface extends HttpKernelInterface
+      * @return void
+      */
+-    public function registerContainerConfiguration(LoaderInterface $loader);
++    public function registerContainerConfiguration(LoaderInterface $loader): void;
+ 
+     /**
+@@ -44,5 +44,5 @@ interface KernelInterface extends HttpKernelInterface
+      * @return void
+      */
+-    public function boot();
++    public function boot(): void;
+ 
+     /**
+@@ -53,5 +53,5 @@ interface KernelInterface extends HttpKernelInterface
+      * @return void
+      */
+-    public function shutdown();
++    public function shutdown(): void;
+ 
+     /**
 diff --git a/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php b/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php
 index 8c8667ff0e..e19e185cfb 100644
 --- a/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php

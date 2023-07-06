@@ -15,16 +15,19 @@ use Symfony\Component\Finder\Iterator\RecursiveDirectoryIterator;
 
 class RecursiveDirectoryIteratorTest extends IteratorTestCase
 {
+    protected function setUp(): void
+    {
+        if (!\in_array('ftp', stream_get_wrappers(), true) || !\ini_get('allow_url_fopen')) {
+            $this->markTestSkipped('Unsupported stream "ftp".');
+        }
+    }
+
     /**
      * @group network
      */
     public function testRewindOnFtp()
     {
-        try {
-            $i = new RecursiveDirectoryIterator('ftp://speedtest:speedtest@ftp.otenet.gr/', \RecursiveDirectoryIterator::SKIP_DOTS);
-        } catch (\UnexpectedValueException $e) {
-            $this->markTestSkipped('Unsupported stream "ftp".');
-        }
+        $i = new RecursiveDirectoryIterator('ftp://speedtest:speedtest@ftp.otenet.gr/', \RecursiveDirectoryIterator::SKIP_DOTS);
 
         $i->rewind();
 
@@ -36,11 +39,7 @@ class RecursiveDirectoryIteratorTest extends IteratorTestCase
      */
     public function testSeekOnFtp()
     {
-        try {
-            $i = new RecursiveDirectoryIterator('ftp://speedtest:speedtest@ftp.otenet.gr/', \RecursiveDirectoryIterator::SKIP_DOTS);
-        } catch (\UnexpectedValueException $e) {
-            $this->markTestSkipped('Unsupported stream "ftp".');
-        }
+        $i = new RecursiveDirectoryIterator('ftp://speedtest:speedtest@ftp.otenet.gr/', \RecursiveDirectoryIterator::SKIP_DOTS);
 
         $contains = [
             'ftp://speedtest:speedtest@ftp.otenet.gr'.\DIRECTORY_SEPARATOR.'test100Mb.db',

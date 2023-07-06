@@ -52,10 +52,7 @@ class Application extends BaseApplication
         return $this->kernel;
     }
 
-    /**
-     * @return void
-     */
-    public function reset()
+    public function reset(): void
     {
         if ($this->kernel->getContainer()->has('services_resetter')) {
             $this->kernel->getContainer()->get('services_resetter')->reset();

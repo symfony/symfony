@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Add native return type to `MicroKernelTrait::registerContainerConfiguration()`, to `Translator` and to `Application::reset()`
+
 6.3
 ---
 

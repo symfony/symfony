@@ -375,17 +375,10 @@ index 718be59c13..091f24a8f8 100644
      {
          $this->mailer->send($this->buildMessage($content, $records));
 diff --git a/src/Symfony/Bridge/Monolog/Logger.php b/src/Symfony/Bridge/Monolog/Logger.php
-index 367b3351ff..fb603e74ba 100644
+index 4d4cc8eaf6..2a0a330181 100644
 --- a/src/Symfony/Bridge/Monolog/Logger.php
 +++ b/src/Symfony/Bridge/Monolog/Logger.php
-@@ -44,5 +44,5 @@ class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
-      * @return void
-      */
--    public function clear()
-+    public function clear(): void
-     {
-         if ($logger = $this->getDebugLogger()) {
-@@ -63,5 +63,5 @@ class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
+@@ -60,5 +60,5 @@ class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
       * @return void
       */
 -    public function removeDebugLogger()
@@ -411,17 +404,10 @@ index df2a718720..2ccab3649f 100644
      {
          $this->commandData = [
 diff --git a/src/Symfony/Bridge/Monolog/Processor/DebugProcessor.php b/src/Symfony/Bridge/Monolog/Processor/DebugProcessor.php
-index c1ce2898da..7a9bf04e18 100644
+index 9a16255d8c..a194f3bc1c 100644
 --- a/src/Symfony/Bridge/Monolog/Processor/DebugProcessor.php
 +++ b/src/Symfony/Bridge/Monolog/Processor/DebugProcessor.php
-@@ -94,5 +94,5 @@ class DebugProcessor implements DebugLoggerInterface, ResetInterface
-      * @return void
-      */
--    public function clear()
-+    public function clear(): void
-     {
-         $this->records = [];
-@@ -103,5 +103,5 @@ class DebugProcessor implements DebugLoggerInterface, ResetInterface
+@@ -100,5 +100,5 @@ class DebugProcessor implements DebugLoggerInterface, ResetInterface
       * @return void
       */
 -    public function reset()
@@ -595,17 +581,10 @@ index 94b95e5029..c8a563163e 100644
      {
          if (!$configuration) {
 diff --git a/src/Symfony/Bundle/FrameworkBundle/Console/Application.php b/src/Symfony/Bundle/FrameworkBundle/Console/Application.php
-index 02709ba649..5a3e972793 100644
+index 80ecf288c5..f2e3f086e1 100644
 --- a/src/Symfony/Bundle/FrameworkBundle/Console/Application.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/Console/Application.php
-@@ -56,5 +56,5 @@ class Application extends BaseApplication
-      * @return void
-      */
--    public function reset()
-+    public function reset(): void
-     {
-         if ($this->kernel->getContainer()->has('services_resetter')) {
-@@ -145,5 +145,5 @@ class Application extends BaseApplication
+@@ -142,5 +142,5 @@ class Application extends BaseApplication
       * @return void
       */
 -    protected function registerCommands()
@@ -857,24 +836,10 @@ index bb5560a7b5..be86cbf98e 100644
      {
          if (!static::$booted) {
 diff --git a/src/Symfony/Bundle/FrameworkBundle/Translation/Translator.php b/src/Symfony/Bundle/FrameworkBundle/Translation/Translator.php
-index dac3b6394f..d319cb0824 100644
+index c4d414dfb1..402e646611 100644
 --- a/src/Symfony/Bundle/FrameworkBundle/Translation/Translator.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/Translation/Translator.php
-@@ -122,5 +122,5 @@ class Translator extends BaseTranslator implements WarmableInterface
-      * @return void
-      */
--    public function addResource(string $format, mixed $resource, string $locale, string $domain = null)
-+    public function addResource(string $format, mixed $resource, string $locale, string $domain = null): void
-     {
-         if ($this->resourceFiles) {
-@@ -133,5 +133,5 @@ class Translator extends BaseTranslator implements WarmableInterface
-      * @return void
-      */
--    protected function initializeCatalogue(string $locale)
-+    protected function initializeCatalogue(string $locale): void
-     {
-         $this->initialize();
-@@ -155,5 +155,5 @@ class Translator extends BaseTranslator implements WarmableInterface
+@@ -149,5 +149,5 @@ class Translator extends BaseTranslator implements WarmableInterface
       * @return void
       */
 -    protected function initialize()
@@ -8688,24 +8653,6 @@ index fcb100859f..8bf3ef09d5 100644
 +    public function format(string $file, int $line): string|false
      {
          if ($fmt = $this->getFileLinkFormat()) {
-diff --git a/src/Symfony/Component/HttpKernel/Debug/TraceableEventDispatcher.php b/src/Symfony/Component/HttpKernel/Debug/TraceableEventDispatcher.php
-index 4f6c34bc74..c84198c912 100644
---- a/src/Symfony/Component/HttpKernel/Debug/TraceableEventDispatcher.php
-+++ b/src/Symfony/Component/HttpKernel/Debug/TraceableEventDispatcher.php
-@@ -27,5 +27,5 @@ class TraceableEventDispatcher extends BaseTraceableEventDispatcher
-      * @return void
-      */
--    protected function beforeDispatch(string $eventName, object $event)
-+    protected function beforeDispatch(string $eventName, object $event): void
-     {
-         switch ($eventName) {
-@@ -62,5 +62,5 @@ class TraceableEventDispatcher extends BaseTraceableEventDispatcher
-      * @return void
-      */
--    protected function afterDispatch(string $eventName, object $event)
-+    protected function afterDispatch(string $eventName, object $event): void
-     {
-         switch ($eventName) {
 diff --git a/src/Symfony/Component/HttpKernel/DependencyInjection/AddAnnotatedClassesToCachePass.php b/src/Symfony/Component/HttpKernel/DependencyInjection/AddAnnotatedClassesToCachePass.php
 index 1924b1ddb0..62c58c8e8b 100644
 --- a/src/Symfony/Component/HttpKernel/DependencyInjection/AddAnnotatedClassesToCachePass.php
@@ -8771,17 +8718,6 @@ index 2b6cb00793..6bf9e49796 100644
 +    public function process(ContainerBuilder $container): void
      {
          $container->setAlias(LoggerInterface::class, 'logger')
-diff --git a/src/Symfony/Component/HttpKernel/DependencyInjection/MergeExtensionConfigurationPass.php b/src/Symfony/Component/HttpKernel/DependencyInjection/MergeExtensionConfigurationPass.php
-index cec23e1970..946d9f6802 100644
---- a/src/Symfony/Component/HttpKernel/DependencyInjection/MergeExtensionConfigurationPass.php
-+++ b/src/Symfony/Component/HttpKernel/DependencyInjection/MergeExtensionConfigurationPass.php
-@@ -35,5 +35,5 @@ class MergeExtensionConfigurationPass extends BaseMergeExtensionConfigurationPas
-      * @return void
-      */
--    public function process(ContainerBuilder $container)
-+    public function process(ContainerBuilder $container): void
-     {
-         foreach ($this->extensions as $extension) {
 diff --git a/src/Symfony/Component/HttpKernel/DependencyInjection/RegisterControllerArgumentLocatorsPass.php b/src/Symfony/Component/HttpKernel/DependencyInjection/RegisterControllerArgumentLocatorsPass.php
 index d0e05340d8..18b5beb201 100644
 --- a/src/Symfony/Component/HttpKernel/DependencyInjection/RegisterControllerArgumentLocatorsPass.php
@@ -11077,7 +11013,7 @@ index e3fb17e81c..cd27f3e387 100644
      {
          $this->strictRequirements = $enabled;
 diff --git a/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php b/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php
-index 98af1febc5..eb9b1ae404 100644
+index ca12eb8399..bb3d118dde 100644
 --- a/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php
 +++ b/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php
 @@ -96,5 +96,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
@@ -11094,35 +11030,28 @@ index 98af1febc5..eb9b1ae404 100644
 +    protected function addRoute(RouteCollection $collection, object $annot, array $globals, \ReflectionClass $class, \ReflectionMethod $method): void
      {
          if ($annot->getEnv() && $annot->getEnv() !== $this->env) {
-@@ -257,5 +257,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
-      * @return void
-      */
--    public function setResolver(LoaderResolverInterface $resolver)
-+    public function setResolver(LoaderResolverInterface $resolver): void
-     {
-     }
-@@ -270,5 +270,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
+@@ -267,5 +267,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
       * @return string
       */
 -    protected function getDefaultRouteName(\ReflectionClass $class, \ReflectionMethod $method)
 +    protected function getDefaultRouteName(\ReflectionClass $class, \ReflectionMethod $method): string
      {
          $name = str_replace('\\', '_', $class->name).'_'.$method->name;
-@@ -285,5 +285,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
+@@ -282,5 +282,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
       * @return array
       */
 -    protected function getGlobals(\ReflectionClass $class)
 +    protected function getGlobals(\ReflectionClass $class): array
      {
          $globals = $this->resetGlobals();
-@@ -370,5 +370,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
+@@ -367,5 +367,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
       * @return Route
       */
 -    protected function createRoute(string $path, array $defaults, array $requirements, array $options, ?string $host, array $schemes, array $methods, ?string $condition)
 +    protected function createRoute(string $path, array $defaults, array $requirements, array $options, ?string $host, array $schemes, array $methods, ?string $condition): Route
      {
          return new Route($path, $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
-@@ -378,5 +378,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
+@@ -375,5 +375,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
       * @return void
       */
 -    abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot);

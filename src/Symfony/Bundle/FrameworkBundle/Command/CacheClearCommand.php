@@ -137,7 +137,7 @@ EOF
                 if ($output->isVerbose()) {
                     $io->comment('Warming up optional cache...');
                 }
-                $this->warmupOptionals($realCacheDir);
+                $this->warmupOptionals($realCacheDir, $realBuildDir);
             }
         } else {
             $fs->mkdir($warmupDir);
@@ -152,7 +152,7 @@ EOF
                     if ($output->isVerbose()) {
                         $io->comment('Warming up optional cache...');
                     }
-                    $this->warmupOptionals($realCacheDir);
+                    $this->warmupOptionals($useBuildDir ? $realCacheDir : $warmupDir, $warmupDir);
                 }
             }
 
@@ -247,15 +247,15 @@ EOF
         }
     }
 
-    private function warmupOptionals(string $realCacheDir): void
+    private function warmupOptionals(string $cacheDir, string $warmupDir): void
     {
         $kernel = $this->getApplication()->getKernel();
         $warmer = $kernel->getContainer()->get('cache_warmer');
         // non optional warmers already ran during container compilation
         $warmer->enableOnlyOptionalWarmers();
-        $preload = (array) $warmer->warmUp($realCacheDir);
+        $preload = (array) $warmer->warmUp($cacheDir);
 
-        if ($preload && file_exists($preloadFile = $realCacheDir.'/'.$kernel->getContainer()->getParameter('kernel.container_class').'.preload.php')) {
+        if ($preload && file_exists($preloadFile = $warmupDir.'/'.$kernel->getContainer()->getParameter('kernel.container_class').'.preload.php')) {
             Preloader::append($preloadFile, $preload);
         }
     }

@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by X-Coder264 at 2023-07-06T17:12:39Z
+
+@nicolas-grekas It does fix it, thanks.
+
+Without this fix:
+
+```
+www-data@31ed4ece830c:/srv/app$ time bin/console ca:cl
+
+PHP Fatal error:  Allowed memory size of 1073741824 bytes exhausted (tried to allocate 163840 bytes) in /srv/app/vendor/symfony/dependency-injection/Compiler/DefinitionErrorExceptionPass.php on line 69
+PHP Fatal error:  Uncaught Symfony\Component\ErrorHandler\Error\OutOfMemoryError: Error: Allowed memory size of 1073741824 bytes exhausted (tried to allocate 163840 bytes) in /srv/app/vendor/symfony/dependency-injection/Compiler/DefinitionErrorExceptionPass.php:69
+Stack trace:
+#0 {main}
+  thrown in /srv/app/vendor/symfony/dependency-injection/Compiler/DefinitionErrorExceptionPass.php on line 69
+www-data@31ed4ece830c:/srv/app$ time bin/console ca:cl
+PHP Fatal error:  Allowed memory size of 1073741824 bytes exhausted (tried to allocate 163840 bytes) in /srv/app/vendor/symfony/dependency-injection/Compiler/DefinitionErrorExceptionPass.php on line 69
+PHP Fatal error:  Uncaught Symfony\Component\ErrorHandler\Error\OutOfMemoryError: Error: Allowed memory size of 1073741824 bytes exhausted (tried to allocate 163840 bytes) in /srv/app/vendor/symfony/dependency-injection/Compiler/DefinitionErrorExceptionPass.php:69
+Stack trace:
+#0 {main}
+  thrown in /srv/app/vendor/symfony/dependency-injection/Compiler/DefinitionErrorExceptionPass.php on line 69
+
+real    1m0.200s
+user    0m59.713s
+sys     0m0.464s
+```
+
+With this fix:
+
+```
+www-data@31ed4ece830c:/srv/app$ time bin/console ca:cl
+
+In DefinitionErrorExceptionPass.php line 49:
+
+  Cannot autowire service "foo": argument "$bar" of method "Baz::__construct()" is type-hinted "int", you should confi
+  gure its value explicitly.
+
+real    0m9.052s
+user    0m8.738s
+sys     0m0.308s
+```

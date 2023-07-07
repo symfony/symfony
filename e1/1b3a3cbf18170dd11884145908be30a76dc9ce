@@ -1,0 +1,159 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-08-11T09:08:28Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-08-11T09:08:48Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.2 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-08-28T16:26:45Z
+
+Hey!
+
+I think @l-vo has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-09-28T14:30:16Z
+
+That'd work for me, please add tests :)
+
+---------------------------------------------------------------------------
+
+by ruudk at 2022-10-21T13:27:30Z
+
+@leongersen Thanks for working on fixing this problem. Would you be able to add the failing test? It would be super if this problem could be patched.
+
+You can send me a [Tikkie](https://dutchreview.com/expat/tikkie-netherlands/) for a nice beer / coffee / whatever once this is merged 😉 🙏
+
+---------------------------------------------------------------------------
+
+by leongersen at 2022-10-21T13:54:49Z
+
+I'll try to finish this up next week :)
+
+---------------------------------------------------------------------------
+
+by leongersen at 2022-10-25T08:30:18Z
+
+Alright, I've added tests showing the new behavior and rebased against 5.4. I think I've tricked the pipeline into running the tests using the patched PhpUnit bridge for this PR, but I'm not sure if this is the correct way to do this. It took me a while to figure out how to get the tests to run using the changed bridge locally, too.
+
+---------------------------------------------------------------------------
+
+by leongersen at 2022-11-09T08:05:22Z
+
+@nicolas-grekas / @ruudk  Sorry, I don't mean to nudge, but I'm not sure what the procedure is to report that this is ready for review. I don't think the remaining CI failure is caused by the changes in this PR.
+
+---------------------------------------------------------------------------
+
+by ruudk at 2022-11-11T08:12:11Z
+
+> @nicolas-grekas / @ruudk Sorry, I don't mean to nudge, but I'm not sure what the procedure is to report that this is ready for review. I don't think the remaining CI failure is caused by the changes in this PR.
+
+I don't know either, but maybe @xabbuh or @ogizanagi can help getting this reviewed? 🙏
+
+---------------------------------------------------------------------------
+
+by ruudk at 2023-03-02T12:24:48Z
+
+@leongersen could you rebase this PR so that we can get this merged?
+
+---------------------------------------------------------------------------
+
+by leongersen at 2023-03-02T12:31:06Z
+
+Yes, done.
+
+---------------------------------------------------------------------------
+
+by ruudk at 2023-03-02T12:48:44Z
+
+The failure in appveyor is related to `RedisExtIntegrationTest` and not caused by this PR.
+
+---------------------------------------------------------------------------
+
+by ruudk at 2023-03-02T13:20:23Z
+
+@leongersen Oke, the Psalm errors need to be fixed. Are you able to do it? Or do you rather let me fix it on your branch?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-03-02T14:34:25Z
+
+Regarding the reported Psalm error, the one about `LegacyDebugClassLoader` not being defined is OK (as this is about supporting older Symfony version).
+For DeprecationGroup not being defined, this look really weird.
+
+---------------------------------------------------------------------------
+
+by leongersen at 2023-03-03T06:46:24Z
+
+I don't know what causes the Psalm error on `DeprecationGroup`. It was already `use`d in all classes before this PR.
+
+---------------------------------------------------------------------------
+
+by ruudk at 2023-03-03T10:48:16Z
+
+I tried to run Psalm locally, but that is extremely tedious to do. There is no `psalm.phar` nor an installer instruction. The baseline seems to be generated on the fly in the CI, before running the code from the branch. Why was this done like this? Wouldn't it be easier if the baseline was part of the repository, and that there was a `psalm` script that can be invoked locally?
+
+---------------------------------------------------------------------------
+
+by ruudk at 2023-03-03T10:51:05Z
+
+@nicolas-grekas Could you review this PR? Do you have an idea what could cause the Psalm error?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-04-21T19:36:48Z
+
+@ruudk generating the baseline on the fly is because we want each PR to report only the new things. The codebase is too far from using Psalm for everything to bother about maintaining a committed baseline (we don't always fix all things reported by psalm, depending on what it reports). This CI job is here as an helper, not as a requirement.
+
+---------------------------------------------------------------------------
+
+by ruudk at 2023-06-02T09:03:51Z
+
+It would be really great if we could proceed with this PR. @leongersen sorry to ask, but could you update this PR one more time?
+
+---------------------------------------------------------------------------
+
+by leongersen at 2023-06-02T09:19:38Z
+
+@ruudk, I've rebased on 5.4. Based on the comments by @stof, I'm not taking action on the Psalm failures.

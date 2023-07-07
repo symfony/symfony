@@ -98,6 +98,7 @@ class MainConfiguration implements ConfigurationInterface
         $this->addFirewallsSection($rootNode, $this->factories);
         $this->addAccessControlSection($rootNode);
         $this->addRoleHierarchySection($rootNode);
+        $this->addPasswordPolicySection($rootNode);
 
         return $tb;
     }
@@ -459,6 +460,21 @@ class MainConfiguration implements ConfigurationInterface
                     ->end()
                 ->end()
         ->end();
+    }
+
+    private function addPasswordPolicySection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode
+            ->fixXmlConfig('password_policy')
+            ->children()
+                ->arrayNode('password_policies')
+                    ->treatNullLike([])
+                    ->treatFalseLike([])
+                    ->treatTrueLike([])
+                    ->prototype('scalar')->end()
+                ->end()
+            ->end()
+        ;
     }
 
     private function getAccessDecisionStrategies(): array

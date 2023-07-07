@@ -4,6 +4,7 @@ CHANGELOG
 6.4
 ---
 
+ * Add Password Policy to allow verifying the password using a custom security policy (e.g. password not compromised, change required by IT service, etc.)
  * `UserValueResolver` no longer implements `ArgumentValueResolverInterface`
 
 6.3

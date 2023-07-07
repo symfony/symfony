@@ -45,6 +45,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Security\Http\Controller\SecurityTokenValueResolver;
 use Symfony\Component\Security\Http\Controller\UserValueResolver;
 use Symfony\Component\Security\Http\EventListener\IsGrantedAttributeListener;
+use Symfony\Component\Security\Http\EventListener\PasswordPolicyListener;
 use Symfony\Component\Security\Http\Firewall;
 use Symfony\Component\Security\Http\FirewallMapInterface;
 use Symfony\Component\Security\Http\HttpUtils;
@@ -298,5 +299,11 @@ return static function (ContainerConfigurator $container) {
         ->set('cache.security_is_granted_attribute_expression_language')
             ->parent('cache.system')
             ->tag('cache.pool')
+
+        ->set('security.password_policy_listener', PasswordPolicyListener::class)
+            ->args([
+                [],
+            ])
+            ->tag('kernel.event_subscriber')
     ;
 };

@@ -1,0 +1,51 @@
+imports:
+    - { resource: ./../config/framework.yml }
+
+framework:
+    http_method_override: false
+    serializer: ~
+
+security:
+    password_policies:
+        - 'policy.blocklist'
+        - 'policy.constraint_password'
+
+    password_hashers:
+        Symfony\Component\Security\Core\User\InMemoryUser: plaintext
+
+    providers:
+        in_memory:
+            memory:
+                users:
+                    dunglas: { password: foo, roles: [ROLE_USER] }
+
+    firewalls:
+        main:
+            pattern: ^/
+            json_login:
+                check_path:    /chk
+                username_path: user.login
+                password_path: user.password
+
+    access_control:
+        - { path: ^/foo, roles: ROLE_USER }
+
+
+services:
+    policy.constraint_password.length:
+        class: Symfony\Component\Validator\Constraints\Length
+        arguments:
+            - min: 8
+    policy.constraint_password.strength:
+        class: Symfony\Component\Validator\Constraints\PasswordStrength
+        arguments:
+            - minScore: 2
+
+    policy.constraint_password:
+        class: Symfony\Component\Security\Http\Authenticator\Passport\Policy\PasswordConstraintPolicy
+        arguments:
+            - '@validator'
+            - ['@policy.constraint_password.length', '@policy.constraint_password.strength']
+
+    policy.blocklist:
+        class: Symfony\Bundle\SecurityBundle\Tests\Functional\app\PasswordPolicy\BlocklistPasswordPolicy

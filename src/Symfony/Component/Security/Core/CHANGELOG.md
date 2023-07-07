@@ -22,7 +22,7 @@ CHANGELOG
  * Remove all classes in the `Core\Encoder\`  sub-namespace, use the `PasswordHasher` component instead
  * Remove methods `getPassword()` and `getSalt()` from `UserInterface`, use `PasswordAuthenticatedUserInterface`
    or `LegacyPasswordAuthenticatedUserInterface` instead
-* `AccessDecisionManager` requires the strategy to be passed as in instance of `AccessDecisionStrategyInterface`
+ * `AccessDecisionManager` requires the strategy to be passed as in instance of `AccessDecisionStrategyInterface`
 
 5.4.21
 ------

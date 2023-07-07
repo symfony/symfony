@@ -190,6 +190,13 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $container->getDefinition('security.access_listener')->setArgument(3, false);
         $container->getDefinition('security.authorization_checker')->setArgument(2, false);
         $container->getDefinition('security.authorization_checker')->setArgument(3, false);
+
+        if (!$config['password_policies']) {
+            $container->removeDefinition('security.password_policy_listener');
+        } else {
+            $policyServices = array_map(static fn (string $id) => new Reference($id), $config['password_policies']);
+            $container->getDefinition('security.password_policy_listener')->setArgument(0, $policyServices);
+        }
     }
 
     private function createStrategyDefinition(string $strategy, bool $allowIfAllAbstainDecisions, bool $allowIfEqualGrantedDeniedDecisions): Definition

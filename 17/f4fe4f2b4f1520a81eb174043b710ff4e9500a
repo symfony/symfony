@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-20T21:04:34Z
+
+That's a bit strange as such values are unexpected in these cookies.
+Can you confirm that after this patch the log lines are gone?

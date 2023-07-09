@@ -18,6 +18,7 @@ use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\LockMode;
 use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Platforms\OraclePlatform;
+use Doctrine\DBAL\Query\ForUpdate\ConflictResolutionMode;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\Schema;
@@ -32,6 +33,8 @@ use Symfony\Contracts\Service\ResetInterface;
  *
  * @author Vincent Touzet <vincent.touzet@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Herberto Graca <herberto.graca@gmail.com>
+ * @author Alexander Malyk <shu.rick.ifmo@gmail.com>
  */
 class Connection implements ResetInterface
 {
@@ -178,28 +181,22 @@ class Connection implements ResetInterface
                     ->where('w.id IN ('.str_replace('SELECT a.* FROM', 'SELECT a.id FROM', $sql).')')
                     ->setParameters($query->getParameters());
 
-                if (method_exists(QueryBuilder::class, 'forUpdate')) {
-                    $query->forUpdate();
-                }
-
                 $sql = $query->getSQL();
-            } elseif (method_exists(QueryBuilder::class, 'forUpdate')) {
-                $query->forUpdate();
-                try {
-                    $sql = $query->getSQL();
-                } catch (DBALException $e) {
-                }
-            } elseif (preg_match('/FROM (.+) WHERE/', (string) $sql, $matches)) {
-                $fromClause = $matches[1];
-                $sql = str_replace(
-                    sprintf('FROM %s WHERE', $fromClause),
-                    sprintf('FROM %s WHERE', $this->driverConnection->getDatabasePlatform()->appendLockHint($fromClause, LockMode::PESSIMISTIC_WRITE)),
-                    $sql
-                );
             }
 
-            // use SELECT ... FOR UPDATE to lock table
-            if (!method_exists(QueryBuilder::class, 'forUpdate')) {
+            if (method_exists(QueryBuilder::class, 'forUpdate')) {
+                $sql = $this->addLockMode($query, $sql);
+            } else {
+                if (preg_match('/FROM (.+) WHERE/', (string) $sql, $matches)) {
+                    $fromClause = $matches[1];
+                    $sql = str_replace(
+                        sprintf('FROM %s WHERE', $fromClause),
+                        sprintf('FROM %s WHERE', $this->driverConnection->getDatabasePlatform()->appendLockHint($fromClause, LockMode::PESSIMISTIC_WRITE)),
+                        $sql
+                    );
+                }
+
+                // use SELECT ... FOR UPDATE to lock table
                 $sql .= ' '.$this->driverConnection->getDatabasePlatform()->getWriteLockSQL();
             }
 
@@ -491,6 +488,26 @@ class Connection implements ResetInterface
             foreach ($platform->getAlterTableSQL($tableDiff) as $sql) {
                 $this->driverConnection->executeStatement($sql);
             }
+        }
+    }
+
+    private function addLockMode(QueryBuilder $query, string $sql): string
+    {
+        $query->forUpdate(ConflictResolutionMode::SKIP_LOCKED);
+        try {
+            return $query->getSQL();
+        } catch (DBALException) {
+            return $this->fallBackToForUpdate($query, $sql);
+        }
+    }
+
+    private function fallBackToForUpdate(QueryBuilder $query, string $sql): string
+    {
+        $query->forUpdate();
+        try {
+            return $query->getSQL();
+        } catch (DBALException) {
+            return $sql;
         }
     }
 }

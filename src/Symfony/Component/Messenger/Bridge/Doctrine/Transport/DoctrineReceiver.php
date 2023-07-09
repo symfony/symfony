@@ -25,6 +25,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
  * @author Vincent Touzet <vincent.touzet@gmail.com>
+ * @author Herberto Graca <herberto.graca@gmail.com>
  */
 class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareInterface
 {
@@ -68,7 +69,7 @@ class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareIn
     public function ack(Envelope $envelope): void
     {
         try {
-            $this->connection->ack($this->findDoctrineReceivedStamp($envelope)->getId());
+            $this->connection->ack($this->findMessageIdStamp($envelope)->getId());
         } catch (DBALException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }
@@ -77,7 +78,7 @@ class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareIn
     public function reject(Envelope $envelope): void
     {
         try {
-            $this->connection->reject($this->findDoctrineReceivedStamp($envelope)->getId());
+            $this->connection->reject($this->findMessageIdStamp($envelope)->getId());
         } catch (DBALException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }
@@ -120,16 +121,16 @@ class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareIn
         return $this->createEnvelopeFromData($doctrineEnvelope);
     }
 
-    private function findDoctrineReceivedStamp(Envelope $envelope): DoctrineReceivedStamp
+    private function findMessageIdStamp(Envelope $envelope): TransportMessageIdStamp
     {
-        /** @var DoctrineReceivedStamp|null $doctrineReceivedStamp */
-        $doctrineReceivedStamp = $envelope->last(DoctrineReceivedStamp::class);
+        /** @var TransportMessageIdStamp|null $transportMessageIdStamp */
+        $transportMessageIdStamp = $envelope->last(TransportMessageIdStamp::class);
 
-        if (null === $doctrineReceivedStamp) {
-            throw new LogicException('No DoctrineReceivedStamp found on the Envelope.');
+        if (null === $transportMessageIdStamp) {
+            throw new LogicException('No TransportMessageIdStamp found on the Envelope.');
         }
 
-        return $doctrineReceivedStamp;
+        return $transportMessageIdStamp;
     }
 
     private function createEnvelopeFromData(array $data): Envelope

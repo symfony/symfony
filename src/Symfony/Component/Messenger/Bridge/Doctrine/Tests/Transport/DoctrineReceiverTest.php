@@ -47,11 +47,6 @@ class DoctrineReceiverTest extends TestCase
         $actualEnvelope = $actualEnvelopes[0];
         $this->assertEquals(new DummyMessage('Hi'), $actualEnvelopes[0]->getMessage());
 
-        /** @var DoctrineReceivedStamp $doctrineReceivedStamp */
-        $doctrineReceivedStamp = $actualEnvelope->last(DoctrineReceivedStamp::class);
-        $this->assertNotNull($doctrineReceivedStamp);
-        $this->assertSame('1', $doctrineReceivedStamp->getId());
-
         /** @var TransportMessageIdStamp $transportMessageIdStamp */
         $transportMessageIdStamp = $actualEnvelope->last(TransportMessageIdStamp::class);
         $this->assertNotNull($transportMessageIdStamp);

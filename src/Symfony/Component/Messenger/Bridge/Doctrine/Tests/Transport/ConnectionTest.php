@@ -21,6 +21,7 @@ use Doctrine\DBAL\Platforms\MySQL80Platform;
 use Doctrine\DBAL\Platforms\OraclePlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Platforms\SQLServer2012Platform;
+use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
@@ -38,11 +39,19 @@ class ConnectionTest extends TestCase
     {
         $queryBuilder = $this->getQueryBuilderMock();
         $driverConnection = $this->getDBALConnectionMock();
-        $stmt = $this->getResultMock([
-            'id' => 1,
-            'body' => '{"message":"Hi"}',
-            'headers' => json_encode(['type' => DummyMessage::class]),
-        ]);
+        $resultMock = [
+            [
+                'id' => 1,
+                'body' => '{"message":"Hi"}',
+                'headers' => json_encode(['type' => DummyMessage::class]),
+            ],
+            [
+                'id' => 2,
+                'body' => '{"message":"There"}',
+                'headers' => json_encode(['type' => DummyMessage::class]),
+            ]
+        ];
+        $stmt = $this->getResultMockForGet($resultMock);
 
         $driverConnection
             ->method('createQueryBuilder')
@@ -64,17 +73,19 @@ class ConnectionTest extends TestCase
             ->willReturn(1);
 
         $connection = new Connection([], $driverConnection);
-        $doctrineEnvelope = $connection->get();
-        $this->assertEquals(1, $doctrineEnvelope['id']);
-        $this->assertEquals('{"message":"Hi"}', $doctrineEnvelope['body']);
-        $this->assertEquals(['type' => DummyMessage::class], $doctrineEnvelope['headers']);
+        $doctrineEnvelopeList = $connection->get();
+        foreach ($doctrineEnvelopeList as $key => $doctrineEnvelope) {
+            $this->assertEquals($resultMock[$key]['id'], $doctrineEnvelope['id']);
+            $this->assertEquals($resultMock[$key]['body'], $doctrineEnvelope['body']);
+            $this->assertEquals(json_decode($resultMock[$key]['headers'], true), $doctrineEnvelope['headers']);
+        }
     }
 
-    public function testGetWithNoPendingMessageWillReturnNull()
+    public function testGetWithNoPendingMessageWillReturnEmptyList()
     {
         $queryBuilder = $this->getQueryBuilderMock();
         $driverConnection = $this->getDBALConnectionMock();
-        $stmt = $this->getResultMock(false);
+        $stmt = $this->getResultMockForGet([]);
 
         $queryBuilder
             ->method('getParameters')
@@ -92,8 +103,9 @@ class ConnectionTest extends TestCase
             ->willReturn($stmt);
 
         $connection = new Connection([], $driverConnection);
-        $doctrineEnvelope = $connection->get();
-        $this->assertNull($doctrineEnvelope);
+        $doctrineEnvelopeList = $connection->get();
+        $this->assertIsArray($doctrineEnvelopeList);
+        $this->assertEmpty($doctrineEnvelopeList);
     }
 
     public function testItThrowsATransportExceptionIfItCannotAcknowledgeMessage()
@@ -153,11 +165,27 @@ class ConnectionTest extends TestCase
         $queryBuilder->method('setMaxResults')->willReturn($queryBuilder);
         $queryBuilder->method('setParameter')->willReturn($queryBuilder);
         $queryBuilder->method('setParameters')->willReturn($queryBuilder);
+        $queryBuilder->method('addOrderBy')->willReturn($queryBuilder);
+
+        $expressionBuilderMock = $this->createMock(ExpressionBuilder::class);
+        $expressionBuilderMock->method('in')->willReturn('');
+        $queryBuilder->method('expr')->willReturn($expressionBuilderMock);
 
         return $queryBuilder;
     }
 
-    private function getResultMock($expectedResult)
+    private function getResultMockForGet($expectedResult)
+    {
+        $stmt = $this->createMock(class_exists(Result::class) ? Result::class : ResultStatement::class);
+
+        $stmt->expects($this->once())
+            ->method(class_exists(Result::class) ? 'fetchAllAssociative' : 'fetchAll')
+            ->willReturn($expectedResult);
+
+        return $stmt;
+    }
+
+    private function getResultMockForFind($expectedResult)
     {
         $stmt = $this->createMock(class_exists(Result::class) ? Result::class : ResultStatement::class);
 
@@ -257,14 +285,14 @@ class ConnectionTest extends TestCase
     public function testItThrowsAnExceptionIfAnExtraOptionsInDefined()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unknown option found: [new_option]. Allowed options are [table_name, queue_name, redeliver_timeout, auto_setup]');
+        $this->expectExceptionMessage('Unknown option found: [new_option]. Allowed options are [table_name, queue_name, batch_size, redeliver_timeout, auto_setup]');
         Connection::buildConfiguration('doctrine://default', ['new_option' => 'woops']);
     }
 
     public function testItThrowsAnExceptionIfAnExtraOptionsInDefinedInDSN()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unknown option found in DSN: [new_option]. Allowed options are [table_name, queue_name, redeliver_timeout, auto_setup]');
+        $this->expectExceptionMessage('Unknown option found in DSN: [new_option]. Allowed options are [table_name, queue_name, batch_size, redeliver_timeout, auto_setup]');
         Connection::buildConfiguration('doctrine://default?new_option=woops');
     }
 
@@ -273,7 +301,7 @@ class ConnectionTest extends TestCase
         $queryBuilder = $this->getQueryBuilderMock();
         $driverConnection = $this->getDBALConnectionMock();
         $id = 1;
-        $stmt = $this->getResultMock([
+        $stmt = $this->getResultMockForFind([
             'id' => $id,
             'body' => '{"message":"Hi"}',
             'headers' => json_encode(['type' => DummyMessage::class]),
@@ -357,7 +385,7 @@ class ConnectionTest extends TestCase
     /**
      * @dataProvider providePlatformSql
      */
-    public function testGeneratedSql(AbstractPlatform $platform, string $expectedSql)
+    public function testGeneratedSql(AbstractPlatform $platform, int $batchSize, string $expectedSql)
     {
         $driverConnection = $this->createMock(DBALConnection::class);
         $driverConnection->method('getDatabasePlatform')->willReturn($platform);
@@ -380,42 +408,83 @@ class ConnectionTest extends TestCase
         ;
         $driverConnection->expects($this->once())->method('commit');
 
-        $connection = new Connection([], $driverConnection);
+        $connection = new Connection(['batch_size' => $batchSize], $driverConnection);
         $connection->get();
     }
 
     public static function providePlatformSql(): iterable
     {
-        yield 'MySQL57' => [
+        yield 'MySQL57|batch_size=1' => [
             new MySQL57Platform(),
+            1,
             'SELECT m.* FROM messenger_messages m WHERE (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) AND (m.queue_name = ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE',
         ];
 
-        yield 'MySQL8' => [
+        yield 'MySQL57|batch_size=50' => [
+            new MySQL57Platform(),
+            50,
+            'SELECT m.* FROM messenger_messages m WHERE (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) AND (m.queue_name = ?) ORDER BY available_at ASC LIMIT 50 FOR UPDATE',
+        ];
+
+        yield 'MySQL8|batch_size=1' => [
             new MySQL80Platform(),
+            1,
             'SELECT m.* FROM messenger_messages m WHERE (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) AND (m.queue_name = ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED',
         ];
 
-        yield 'Postgres' => [
+        yield 'MySQL8|batch_size=50' => [
+            new MySQL80Platform(),
+            50,
+            'SELECT m.* FROM messenger_messages m WHERE (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) AND (m.queue_name = ?) ORDER BY available_at ASC LIMIT 50 FOR UPDATE SKIP LOCKED',
+        ];
+
+        yield 'Postgres|batch_size=1' => [
             new PostgreSQLPlatform(),
+            1,
             'SELECT m.* FROM messenger_messages m WHERE (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) AND (m.queue_name = ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED',
+        ];
+
+        yield 'Postgres|batch_size=50' => [
+            new PostgreSQLPlatform(),
+            50,
+            'SELECT m.* FROM messenger_messages m WHERE (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) AND (m.queue_name = ?) ORDER BY available_at ASC LIMIT 50 FOR UPDATE SKIP LOCKED',
         ];
 
         if (class_exists(MariaDBPlatform::class)) {
-            yield 'MariaDB' => [
+            yield 'MariaDB|batch_size=1' => [
                 new MariaDBPlatform(),
+                1,
                 'SELECT m.* FROM messenger_messages m WHERE (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) AND (m.queue_name = ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE',
+            ];
+            yield 'MariaDB|batch_size=50' => [
+                new MariaDBPlatform(),
+                50,
+                'SELECT m.* FROM messenger_messages m WHERE (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) AND (m.queue_name = ?) ORDER BY available_at ASC LIMIT 50 FOR UPDATE',
             ];
         }
 
-        yield 'SQL Server' => [
+        yield 'SQL Server|batch_size=1' => [
             new SQLServer2012Platform(),
-            'SELECT m.* FROM messenger_messages m WITH (UPDLOCK, ROWLOCK, READPAST) WHERE (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) AND (m.queue_name = ?) ORDER BY available_at ASC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY  ',
+            1,
+            'SELECT m.* FROM messenger_messages m WITH (UPDLOCK, ROWLOCK, READPAST) WHERE (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) AND (m.queue_name = ?) ORDER BY available_at ASC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY   ',
         ];
 
-        yield 'Oracle' => [
+        yield 'SQL Server|batch_size=50' => [
+            new SQLServer2012Platform(),
+            50,
+            'SELECT m.* FROM messenger_messages m WITH (UPDLOCK, ROWLOCK, READPAST) WHERE (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) AND (m.queue_name = ?) ORDER BY available_at ASC OFFSET 0 ROWS FETCH NEXT 50 ROWS ONLY  ',
+        ];
+
+        yield 'Oracle|batch_size=1' => [
             new OraclePlatform(),
+            1,
             'SELECT w.id AS "id", w.body AS "body", w.headers AS "headers", w.queue_name AS "queue_name", w.created_at AS "created_at", w.available_at AS "available_at", w.delivered_at AS "delivered_at" FROM messenger_messages w WHERE w.id IN (SELECT a.id FROM (SELECT m.id FROM messenger_messages m WHERE (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) AND (m.queue_name = ?) ORDER BY available_at ASC) a WHERE ROWNUM <= 1) FOR UPDATE',
+        ];
+
+        yield 'Oracle|batch_size=50' => [
+            new OraclePlatform(),
+            50,
+            'SELECT w.id AS "id", w.body AS "body", w.headers AS "headers", w.queue_name AS "queue_name", w.created_at AS "created_at", w.available_at AS "available_at", w.delivered_at AS "delivered_at" FROM messenger_messages w WHERE w.id IN (SELECT a.id FROM (SELECT m.id FROM messenger_messages m WHERE (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) AND (m.queue_name = ?) ORDER BY available_at ASC) a WHERE ROWNUM <= 50) FOR UPDATE',
         ];
     }
 

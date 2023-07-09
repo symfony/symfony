@@ -52,9 +52,9 @@ class DoctrineIntegrationTest extends TestCase
     public function testConnectionSendAndGet()
     {
         $this->connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
-        $encoded = $this->connection->get();
-        $this->assertEquals('{"message": "Hi"}', $encoded['body']);
-        $this->assertEquals(['type' => DummyMessage::class], $encoded['headers']);
+        $encodedList = $this->connection->get()[0];
+        $this->assertEquals('{"message": "Hi"}', $encodedList['body']);
+        $this->assertEquals(['type' => DummyMessage::class], $encodedList['headers']);
     }
 
     public function testSendWithDelay()
@@ -108,7 +108,7 @@ class DoctrineIntegrationTest extends TestCase
             'available_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 12:30:00', new \DateTimeZone('UTC'))),
         ]);
 
-        $encoded = $this->connection->get();
+        $encoded = $this->connection->get()[0];
         $this->assertEquals('{"message": "Hi available"}', $encoded['body']);
     }
 
@@ -173,7 +173,7 @@ class DoctrineIntegrationTest extends TestCase
             'available_at' => $this->formatDateTime(new \DateTimeImmutable('2019-03-15 12:30:00', new \DateTimeZone('UTC'))),
         ]);
 
-        $next = $this->connection->get();
+        $next = $this->connection->get()[0];
         $this->assertEquals('{"message": "Hi requeued"}', $next['body']);
         $this->connection->reject($next['id']);
     }
@@ -181,10 +181,12 @@ class DoctrineIntegrationTest extends TestCase
     public function testTheTransportIsSetupOnGet()
     {
         $this->assertFalse($this->createSchemaManager()->tablesExist(['messenger_messages']));
-        $this->assertNull($this->connection->get());
+        $result = $this->connection->get();
+        $this->assertIsArray($result);
+        $this->assertEmpty($result);
 
         $this->connection->send('the body', ['my' => 'header']);
-        $envelope = $this->connection->get();
+        $envelope = $this->connection->get()[0];
         $this->assertEquals('the body', $envelope['body']);
     }
 

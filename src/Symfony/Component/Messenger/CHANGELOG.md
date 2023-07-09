@@ -4,6 +4,7 @@ CHANGELOG
 6.4
 ---
 
+ * Add support for the doctrine transport to pull a batch of messages in one go (`batch_size` option)
  * Use `SKIP LOCKED` in the doctrine transport for MySQL, PostgreSQL and MSSQL
 
 6.3

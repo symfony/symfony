@@ -57,7 +57,7 @@ final class PostgreSqlConnection extends Connection
         $this->unlisten();
     }
 
-    public function get(): ?array
+    public function get(): array
     {
         if (null === $this->queueEmptiedAt) {
             return parent::get();
@@ -85,7 +85,7 @@ final class PostgreSqlConnection extends Connection
         ) {
             usleep(1000);
 
-            return null;
+            return [];
         }
 
         return parent::get();

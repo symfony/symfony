@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+* Deprecated the bridge, replaced it with Brevo in reaction to their rebranding.
+
 6.2
 ---
 

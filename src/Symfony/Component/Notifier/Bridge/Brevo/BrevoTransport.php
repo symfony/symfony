@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Notifier\Bridge\Sendinblue;
+namespace Symfony\Component\Notifier\Bridge\Brevo;
 
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
@@ -22,28 +22,24 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * @author Pierre Tondereau <pierre.tondereau@gmail.com>
- *
- * @deprecated since Symfony 6.3, use BrevoTransport instead
+ * @author Pierre Tanguy
  */
-final class SendinblueTransport extends AbstractTransport
+final class BrevoTransport extends AbstractTransport
 {
-    protected const HOST = 'api.sendinblue.com';
+    protected const HOST = 'api.brevo.com';
 
-    private string $apiKey;
-    private string $sender;
-
-    public function __construct(#[\SensitiveParameter] string $apiKey, string $sender, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->apiKey = $apiKey;
-        $this->sender = $sender;
-
+    public function __construct(
+        #[\SensitiveParameter] private readonly string $apiKey,
+        private readonly string $sender,
+        HttpClientInterface $client = null,
+        EventDispatcherInterface $dispatcher = null
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        return sprintf('sendinblue://%s?sender=%s', $this->getEndpoint(), $this->sender);
+        return sprintf('brevo://%s?sender=%s', $this->getEndpoint(), $this->sender);
     }
 
     public function supports(MessageInterface $message): bool
@@ -57,9 +53,11 @@ final class SendinblueTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        $sender = $message->getFrom() ?: $this->sender;
+
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/v3/transactionalSMS/sms', [
             'json' => [
-                'sender' => $message->getFrom() ?: $this->sender,
+                'sender' => $sender,
                 'recipient' => $message->getPhone(),
                 'content' => $message->getSubject(),
             ],
@@ -71,7 +69,7 @@ final class SendinblueTransport extends AbstractTransport
         try {
             $statusCode = $response->getStatusCode();
         } catch (TransportExceptionInterface $e) {
-            throw new TransportException('Could not reach the remote Sendinblue server.', $response, 0, $e);
+            throw new TransportException('Could not reach the remote Brevo server.', $response, 0, $e);
         }
 
         if (201 !== $statusCode) {

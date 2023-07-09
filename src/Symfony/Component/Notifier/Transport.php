@@ -31,6 +31,7 @@ final class Transport
         Bridge\AllMySms\AllMySmsTransportFactory::class,
         Bridge\AmazonSns\AmazonSnsTransportFactory::class,
         Bridge\Bandwidth\BandwidthTransportFactory::class,
+        Bridge\Brevo\BrevoTransportFactory::class,
         Bridge\Chatwork\ChatworkTransportFactory::class,
         Bridge\Clickatell\ClickatellTransportFactory::class,
         Bridge\ClickSend\ClickSendTransportFactory::class,

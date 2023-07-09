@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-05-10T17:07:45Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by stof at 2023-05-11T08:33:48Z
+
+@PEtanguy are you also working on the mailer bridge ?
+
+---------------------------------------------------------------------------
+
+by PEtanguy at 2023-05-11T09:55:40Z
+
+@stof yes i am waiting to merge this PR to open the Mailer one.
+Do yo know how I can skip the failing tests by any chance?
+
+The tests are failing because of the deprecation trigger
+
+---------------------------------------------------------------------------
+
+by stof at 2023-05-11T13:57:06Z
+
+You need to mark tests as `@group legacy` when they test deprecated classes.
+
+And maybe the deprecation need to be triggered only if the factory is actually used instead of triggering it as soon as it is autoloaded, in case FrameworkBundle registers all installed factories.

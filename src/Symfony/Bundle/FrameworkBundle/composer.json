@@ -51,7 +51,7 @@
         "symfony/lock": "^5.4|^6.0|^7.0",
         "symfony/mailer": "^5.4|^6.0|^7.0",
         "symfony/messenger": "^6.3|^7.0",
-        "symfony/mime": "^6.2|^7.0",
+        "symfony/mime": "^6.4|^7.0",
         "symfony/notifier": "^5.4|^6.0|^7.0",
         "symfony/process": "^5.4|^6.0|^7.0",
         "symfony/rate-limiter": "^5.4|^6.0|^7.0",

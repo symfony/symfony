@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-05-01T10:11:11Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "5.4" but it seems your PR description refers to branch "6.3 for features / 5.4 or 6.2 for bug fixes".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by johanadivare at 2023-05-01T10:23:16Z
+
+Sorry the labels are incorrect as i posted the pull request before updating the default message.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-05-01T15:43:22Z
+
+Please rebase on 6.3 branch, we can merge this later in 6.4 once the branch is created. Thanks
+
+---------------------------------------------------------------------------
+
+by JohJohan at 2023-05-02T07:24:48Z
+
+> Please rebase on 6.3 branch, we can merge this later in 6.4 once the branch is created. Thanks
+
+Okay will do why can i not target 5.4 as this is still maintained branch? https://symfony.com/doc/current/contributing/code/pull_requests.html#choose-the-right-branch or is it because this is seen as new feature?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-05-02T07:36:00Z
+
+Exactly, this is a new feature and must target the latest branch 👍

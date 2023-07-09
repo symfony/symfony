@@ -9,21 +9,20 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Mailer\Bridge\Sendinblue\Transport;
+namespace Symfony\Component\Mailer\Bridge\Brevo\Transport;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 
 /**
- * @author Yann LUCAS
- *
- * @deprecated since Symfony 6.3, use BrevoApiTransport instead
+ * @author Pierre TANGUY
  */
-final class SendinblueSmtpTransport extends EsmtpTransport
+final class BrevoSmtpTransport extends EsmtpTransport
 {
     public function __construct(string $username, #[\SensitiveParameter] string $password, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
+        // This is not a typo: For now the smtp relay is still under sendinblue.com unlike the api.
         parent::__construct('smtp-relay.sendinblue.com', 465, true, $dispatcher, $logger);
 
         $this->setUsername($username);

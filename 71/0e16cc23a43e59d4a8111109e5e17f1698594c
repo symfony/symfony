@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by PEtanguy at 2023-05-24T20:56:28Z
+
+I will make the documentation once this is merged. I also noticed an error in the doc of another transport.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-06-14T12:06:44Z
+
+I would not touch the other bridge in this PR; let's just add this as a new bridge. No need to deprecate the code IMHO, we can abandon the whole package via packagist.
+
+WDYT @fabpot ?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-06-14T17:36:53Z
+
+Well, triggering a deprecation when someone configures a mailer DSN using the `sendinblue` schemes is needed to help them migrate.
+
+If we only abandon the package, projects removing the old bridge without updating their env variables in prod would get a broken project due to using an unsupported scheme.
+Side note: I would even wait a bit before marking the package as abandoned as FrameworkBundle 5.4 and 6.3 won't support the Brevo bridge (it does not register it as a supported factory) while the SendinblueBridge technically still works thanks to the BC layer of the API itself (where the old domain still works). We cannot mark a package as abandoned only for some versions and not for others.
+
+---------------------------------------------------------------------------
+
+by PEtanguy at 2023-06-20T20:47:28Z
+
+I agree with @stof , we can abandon Sendinblue later. I will keep the deprecations on this PR and on the one of the notifier (https://github.com/symfony/symfony/pull/50296)

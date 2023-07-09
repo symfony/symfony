@@ -153,6 +153,7 @@ class ConnectionTest extends TestCase
         $queryBuilder->method('setMaxResults')->willReturn($queryBuilder);
         $queryBuilder->method('setParameter')->willReturn($queryBuilder);
         $queryBuilder->method('setParameters')->willReturn($queryBuilder);
+        $queryBuilder->method('addOrderBy')->willReturn($queryBuilder);
 
         return $queryBuilder;
     }

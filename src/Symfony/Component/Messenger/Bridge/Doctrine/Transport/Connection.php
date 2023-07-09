@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Transport;
 
 use Doctrine\DBAL\Abstraction\Result as AbstractionResult;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection as DBALConnection;
 use Doctrine\DBAL\Driver\Exception as DriverException;
 use Doctrine\DBAL\Driver\ResultStatement;
@@ -50,6 +51,7 @@ class Connection implements ResetInterface
     protected const DEFAULT_OPTIONS = [
         'table_name' => 'messenger_messages',
         'queue_name' => 'default',
+        'batch_size' => 1,
         'redeliver_timeout' => 3600,
         'auto_setup' => true,
     ];
@@ -72,6 +74,8 @@ class Connection implements ResetInterface
     protected $queueEmptiedAt;
     private ?SchemaSynchronizer $schemaSynchronizer;
     private bool $autoSetup;
+    /** @var array<int> */
+    private array $lastDeliveredButNotYetHandledEnvelopesIds = [];
 
     public function __construct(array $configuration, DBALConnection $driverConnection, SchemaSynchronizer $schemaSynchronizer = null)
     {
@@ -176,7 +180,8 @@ class Connection implements ResetInterface
         try {
             $query = $this->createAvailableMessagesQueryBuilder()
                 ->orderBy('available_at', 'ASC')
-                ->setMaxResults(1);
+                ->addOrderBy('id', 'ASC')
+                ->setMaxResults($this->configuration['batch_size']);
 
             if ($this->driverConnection->getDatabasePlatform() instanceof OraclePlatform) {
                 $query->select('m.id');
@@ -216,9 +221,9 @@ class Connection implements ResetInterface
                 $query->getParameters(),
                 $query->getParameterTypes()
             );
-            $doctrineEnvelope = $stmt instanceof Result ? $stmt->fetchAssociative() : $stmt->fetch();
+            $doctrineEnvelopeList = $stmt instanceof Result ? $stmt->fetchAllAssociative() : $stmt->fetchAll();
 
-            if (false === $doctrineEnvelope) {
+            if (false === $doctrineEnvelopeList) {
                 $this->driverConnection->commit();
                 $this->queueEmptiedAt = microtime(true) * 1000;
 
@@ -228,24 +233,29 @@ class Connection implements ResetInterface
             // We need to be sure to empty the queue before blocking again
             $this->queueEmptiedAt = null;
 
-            $doctrineEnvelope = $this->decodeEnvelopeHeaders($doctrineEnvelope);
+            $this->lastDeliveredButNotYetHandledEnvelopesIds = $this->extractDoctrineEnvelopeListIds($doctrineEnvelopeList);
 
             $queryBuilder = $this->driverConnection->createQueryBuilder()
                 ->update($this->configuration['table_name'])
                 ->set('delivered_at', '?')
-                ->where('id = ?');
-            $now = new \DateTimeImmutable('UTC');
-            $this->executeStatement($queryBuilder->getSQL(), [
-                $now,
-                $doctrineEnvelope['id'],
-            ], [
-                Types::DATETIME_IMMUTABLE,
-            ]);
+                ->where($this->driverConnection->createQueryBuilder()->expr()->in('id', '?'));
+            $this->executeStatement(
+                $queryBuilder->getSQL(),
+                [
+                    new \DateTimeImmutable('UTC'),
+                    $this->lastDeliveredButNotYetHandledEnvelopesIds,
+                ],
+                [
+                    Types::DATETIME_IMMUTABLE,
+                    ArrayParameterType::INTEGER,
+                ]
+            );
 
             $this->driverConnection->commit();
 
-            return $doctrineEnvelope;
+            return $this->decodeDoctrineEnvelopeListHeaders($doctrineEnvelopeList);
         } catch (\Throwable $e) {
+            $this->lastDeliveredButNotYetHandledEnvelopesIds = [];
             $this->driverConnection->rollBack();
 
             if ($this->autoSetup && $e instanceof TableNotFoundException) {
@@ -259,6 +269,7 @@ class Connection implements ResetInterface
 
     public function ack(string $id): bool
     {
+        $this->removeHandledFromDeliveredList($id);
         try {
             if ($this->driverConnection->getDatabasePlatform() instanceof MySQLPlatform) {
                 return $this->driverConnection->update($this->configuration['table_name'], ['delivered_at' => self::FLAGGED_FOR_DELETION], ['id' => $id]) > 0;
@@ -351,6 +362,27 @@ class Connection implements ResetInterface
     public function getExtraSetupSqlForTable(Table $createdTable): array
     {
         return [];
+    }
+
+    public function undeliverNotHandled(): void
+    {
+        if (count($this->lastDeliveredButNotYetHandledEnvelopesIds) === 0) {
+            return;
+        }
+
+        $queryBuilder = $this->driverConnection->createQueryBuilder()
+            ->update($this->configuration['table_name'])
+            ->set('delivered_at', 'NULL')
+            ->where($this->driverConnection->createQueryBuilder()->expr()->in('id', '?'));
+        $this->executeStatement(
+            $queryBuilder->getSQL(),
+            [
+                $this->lastDeliveredButNotYetHandledEnvelopesIds,
+            ],
+            [
+                ArrayParameterType::INTEGER,
+            ]
+        );
     }
 
     private function createAvailableMessagesQueryBuilder(): QueryBuilder
@@ -549,5 +581,53 @@ class Connection implements ResetInterface
         return method_exists($comparator, 'compareSchemas') || method_exists($comparator, 'doCompareSchemas')
             ? $comparator->compareSchemas($from, $to)
             : $comparator->compare($from, $to);
+    }
+
+    /**
+     * @return int[]
+     */
+    public function extractDoctrineEnvelopeListIds(array $doctrineEnvelopeList): array
+    {
+        return array_map(
+            function ($doctrineEnvelopeRow) {
+                return $doctrineEnvelopeRow['id'];
+            },
+            $doctrineEnvelopeList
+        );
+    }
+
+    /**
+     * @param array<array{
+     *     id: int,
+     *     body: string,
+     *     headers: string,
+     *     queue_name: string,
+     *     created_at: string,
+     *     available_at: string,
+     *     delivered_at: string
+     * }> $doctrineEnvelopeList
+     *
+     * @return array<array{
+     *     id: int,
+     *     body: string,
+     *     headers: array,
+     *     queue_name: string,
+     *     created_at: string,
+     *     available_at: string,
+     *     delivered_at: string
+     * }>
+     */
+    public function decodeDoctrineEnvelopeListHeaders(array $doctrineEnvelopeList): array
+    {
+        $doctrineEnvelopeListWithDecodedHeaders = [];
+        foreach ($doctrineEnvelopeList as $doctrineEnvelope) {
+            $doctrineEnvelopeListWithDecodedHeaders[] = $this->decodeEnvelopeHeaders($doctrineEnvelope);
+        }
+        return $doctrineEnvelopeListWithDecodedHeaders;
+    }
+
+    public function removeHandledFromDeliveredList(string $id): void
+    {
+        $this->lastDeliveredButNotYetHandledEnvelopesIds = array_diff($this->lastDeliveredButNotYetHandledEnvelopesIds, [$id]);
     }
 }

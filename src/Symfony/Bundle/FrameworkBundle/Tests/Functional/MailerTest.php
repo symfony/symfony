@@ -104,6 +104,8 @@ class MailerTest extends AbstractWebTestCase
         $this->assertEmailAttachmentCount($email, 1);
 
         $email = $this->getMailerMessage($second);
+        $this->assertEmailSubjectContains($email, 'Foo');
+        $this->assertEmailSubjectNotContains($email, 'Bar');
         $this->assertEmailAddressContains($email, 'To', 'fabien@symfony.com');
         $this->assertEmailAddressContains($email, 'To', 'thomas@symfony.com');
         $this->assertEmailAddressContains($email, 'Reply-To', 'me@symfony.com');

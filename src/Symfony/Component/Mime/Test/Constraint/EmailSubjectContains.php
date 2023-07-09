@@ -29,7 +29,7 @@ final class EmailSubjectContains extends Constraint
     protected function matches($other): bool
     {
         if (!$other instanceof Email) {
-            throw new \LogicException('Can only test a message subject on a Email instance.');
+            throw new \LogicException('Can only test a message subject on an Email instance.');
         }
 
         return str_contains((string) $other->getSubject(), $this->expectedSubjectValue);

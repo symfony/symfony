@@ -127,13 +127,9 @@ final class EsendexTransportTest extends TransportTestCase
 
         $body = json_decode($requestOptions['body'] ?? '');
 
-        $messages = $body->messages;
-        $this->assertIsArray($messages);
-        $this->assertCount(1, $messages);
-
-        $message = $messages[array_key_first($messages)];
-        $this->assertIsObject($message);
-        $this->assertTrue(property_exists($message, 'to'));
-        $this->assertTrue(property_exists($message, 'body'));
+        $this->assertIsArray($body->messages);
+        $this->assertCount(1, $body->messages);
+        $this->assertSame('phone', $body->messages[0]->to);
+        $this->assertSame('testMessage', $body->messages[0]->body);
     }
 }

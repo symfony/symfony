@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Transport;
 
+use Doctrine\DBAL\Connection as DbalConnection;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\Persistence\ConnectionRegistry;
 use Symfony\Component\Messenger\Exception\TransportException;
@@ -20,6 +21,7 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 
 /**
  * @author Vincent Touzet <vincent.touzet@gmail.com>
+ * @author Herberto Graca <herberto.graca@gmail.com>
  */
 class DoctrineTransportFactory implements TransportFactoryInterface
 {
@@ -38,6 +40,7 @@ class DoctrineTransportFactory implements TransportFactoryInterface
         $configuration = PostgreSqlConnection::buildConfiguration($dsn, $options);
 
         try {
+            /** @var DbalConnection $driverConnection */
             $driverConnection = $this->registry->getConnection($configuration['connection']);
         } catch (\InvalidArgumentException $e) {
             throw new TransportException('Could not find Doctrine connection from Messenger DSN.', 0, $e);

@@ -38,6 +38,7 @@ final class InfobipApiTransport extends AbstractApiTransport
         'X-Infobip-NotifyUrl' => 'notifyUrl',
         'X-Infobip-NotifyContentType' => 'notifyContentType',
         'X-Infobip-MessageId' => 'messageId',
+        'X-Infobip-Track' => 'track',
     ];
 
     private string $key;

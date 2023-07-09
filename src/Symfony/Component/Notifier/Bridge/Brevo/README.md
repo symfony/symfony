@@ -1,5 +1,5 @@
 Brevo Notifier
-===============
+==============
 
 Provides [Brevo](https://brevo.com) integration for Symfony Notifier.
 This bridge was created following the rebranding of Sendinblue.

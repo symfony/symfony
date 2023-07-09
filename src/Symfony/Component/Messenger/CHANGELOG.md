@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Use `SKIP LOCKED` in the doctrine transport for MySQL, PostgreSQL and MSSQL
+
 6.3
 ---
 

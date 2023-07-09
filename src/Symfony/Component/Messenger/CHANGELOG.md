@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Deprecate `StopWorkerOnSignalsListener` in favor of using the `SignalableCommandInterface`
+ * Use `SKIP LOCKED` in the doctrine transport for MySQL, PostgreSQL and MSSQL
 
 6.3
 ---

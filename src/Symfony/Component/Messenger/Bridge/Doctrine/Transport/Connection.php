@@ -18,8 +18,11 @@ use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\LockMode;
+use Doctrine\DBAL\Platforms\MySQL80Platform;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\OraclePlatform;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Doctrine\DBAL\Platforms\SQLServerPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
@@ -38,6 +41,8 @@ use Symfony\Contracts\Service\ResetInterface;
  *
  * @author Vincent Touzet <vincent.touzet@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Herberto Graca <herberto.graca@gmail.com>
+ * @author Alexander Malyk <shu.rick.ifmo@gmail.com>
  */
 class Connection implements ResetInterface
 {
@@ -198,8 +203,9 @@ class Connection implements ResetInterface
             }
 
             // use SELECT ... FOR UPDATE to lock table
+            $sql .= ' '.$this->driverConnection->getDatabasePlatform()->getWriteLockSQL();
             $stmt = $this->executeQuery(
-                $sql.' '.$this->driverConnection->getDatabasePlatform()->getWriteLockSQL(),
+                $this->addSkipLocked($sql),// use SELECT ... FOR UPDATE SKIP LOCKED to lock only the relevant rows
                 $query->getParameters(),
                 $query->getParameterTypes()
             );
@@ -536,5 +542,23 @@ class Connection implements ResetInterface
         return method_exists($comparator, 'compareSchemas') || method_exists($comparator, 'doCompareSchemas')
             ? $comparator->compareSchemas($from, $to)
             : $comparator->compare($from, $to);
+    }
+
+    /**
+     * @throws DBALException
+     */
+    public function addSkipLocked(string $sql): string
+    {
+        switch (true) {
+            case $this->driverConnection->getDatabasePlatform() instanceof MySQL80Platform:
+            case $this->driverConnection->getDatabasePlatform() instanceof PostgreSQLPlatform:
+                $sql .= ' SKIP LOCKED'; // use skip locked so workers pulling in parallel don't wait on each other
+                break;
+            case $this->driverConnection->getDatabasePlatform() instanceof SQLServerPlatform:
+                $sql = str_replace('(UPDLOCK, ROWLOCK)', '(UPDLOCK, ROWLOCK, READPAST)', $sql);
+                break;
+        }
+
+        return $sql;
     }
 }

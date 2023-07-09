@@ -18,8 +18,10 @@ use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\LockMode;
+use Doctrine\DBAL\Platforms\MySQL80Platform;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\OraclePlatform;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
@@ -39,6 +41,7 @@ use Symfony\Contracts\Service\ResetInterface;
  * @author Vincent Touzet <vincent.touzet@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Herberto Graca <herberto.graca@gmail.com>
+ * @author Alexander Malyk <shu.rick.ifmo@gmail.com>
  */
 class Connection implements ResetInterface
 {
@@ -201,8 +204,15 @@ class Connection implements ResetInterface
             }
 
             // use SELECT ... FOR UPDATE to lock table
+            $sql .= ' '.$this->driverConnection->getDatabasePlatform()->getWriteLockSQL();
+            if (
+                $this->driverConnection->getDatabasePlatform() instanceof MySQL80Platform
+                || $this->driverConnection->getDatabasePlatform() instanceof PostgreSQLPlatform
+            ) {
+                $sql .= ' SKIP LOCKED'; // use skip locked so workers pulling in parallel don't wait on each other
+            }
             $stmt = $this->executeQuery(
-                $sql.' '.$this->driverConnection->getDatabasePlatform()->getWriteLockSQL(),
+                $sql,
                 $query->getParameters(),
                 $query->getParameterTypes()
             );

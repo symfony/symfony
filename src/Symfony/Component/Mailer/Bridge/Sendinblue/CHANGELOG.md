@@ -1,10 +1,10 @@
 CHANGELOG
 =========
 
-6.3
------
+6.4
+---
 
-* Deprecated the bridge and replaced it with Brevo in reaction to their rebranding.
+* Deprecate the bridge (use Brevo instead)
 
 5.2.0
 -----

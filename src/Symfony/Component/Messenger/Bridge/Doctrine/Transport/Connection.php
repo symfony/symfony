@@ -38,6 +38,7 @@ use Symfony\Contracts\Service\ResetInterface;
  *
  * @author Vincent Touzet <vincent.touzet@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Herberto Graca <herberto.graca@gmail.com>
  */
 class Connection implements ResetInterface
 {
@@ -49,6 +50,8 @@ class Connection implements ResetInterface
         'redeliver_timeout' => 3600,
         'auto_setup' => true,
     ];
+
+    public const FLAGGED_FOR_DELETION = '9999-12-31 23:59:59';
 
     /**
      * Configuration of the connection.
@@ -159,7 +162,7 @@ class Connection implements ResetInterface
     {
         if ($this->driverConnection->getDatabasePlatform() instanceof MySQLPlatform) {
             try {
-                $this->driverConnection->delete($this->configuration['table_name'], ['delivered_at' => '9999-12-31 23:59:59']);
+                $this->driverConnection->delete($this->configuration['table_name'], ['delivered_at' => self::FLAGGED_FOR_DELETION]);
             } catch (DriverException $e) {
                 // Ignore the exception
             }
@@ -248,7 +251,7 @@ class Connection implements ResetInterface
     {
         try {
             if ($this->driverConnection->getDatabasePlatform() instanceof MySQLPlatform) {
-                return $this->driverConnection->update($this->configuration['table_name'], ['delivered_at' => '9999-12-31 23:59:59'], ['id' => $id]) > 0;
+                return $this->driverConnection->update($this->configuration['table_name'], ['delivered_at' => self::FLAGGED_FOR_DELETION], ['id' => $id]) > 0;
             }
 
             return $this->driverConnection->delete($this->configuration['table_name'], ['id' => $id]) > 0;
@@ -261,7 +264,7 @@ class Connection implements ResetInterface
     {
         try {
             if ($this->driverConnection->getDatabasePlatform() instanceof MySQLPlatform) {
-                return $this->driverConnection->update($this->configuration['table_name'], ['delivered_at' => '9999-12-31 23:59:59'], ['id' => $id]) > 0;
+                return $this->driverConnection->update($this->configuration['table_name'], ['delivered_at' => self::FLAGGED_FOR_DELETION], ['id' => $id]) > 0;
             }
 
             return $this->driverConnection->delete($this->configuration['table_name'], ['id' => $id]) > 0;

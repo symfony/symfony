@@ -1,0 +1,112 @@
+---------------------------------------------------------------------------
+
+by javaDeveloperKid at 2023-05-24T20:18:08Z
+
+Historical question: were all the `try..catch` blocks in the Symfony code base modified from `\Exception` to `\Throwable` after the latter had been introduced? I can still see blocks that catch \Exception and I wonder if this is just an oversight or there is a reason behind this.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-06-05T12:24:24Z
+
+Hmm, When using the component directly without the error handler, a command can crash badly :/
+
+What about adding a flag to choose if we should handle throwable or not?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-06-05T12:39:16Z
+
+Sounds like a good idea 👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-05T12:45:26Z
+
+The very lines before the try/catch setup a global error/exception handler, why does this crash badly as you write, while we have this in place?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-06-05T13:53:14Z
+
+@nicolas-grekas let's say you are building a project that run commands, when someone makes an error in the command, it will produces theses outputs:
+
+### Without this patch:
+
+```
+>/tmp/foobar foobar  hello
+PHP Fatal error:  Uncaught Error: Call to undefined function hello2() in /tmp/foobar/foobar.php:9
+Stack trace:
+#0 [internal function]: hello()
+#1 /home/gregoire/dev/github.com/jolicode/foobar/src/Console/Command/TaskCommand.php(152): ReflectionFunction->invoke()
+#2 /home/gregoire/dev/github.com/jolicode/foobar/vendor/symfony/console/Command/Command.php(326): Foobar\Console\Command\TaskCommand->execute()
+#3 /home/gregoire/dev/github.com/jolicode/foobar/vendor/symfony/console/Application.php(1063): Symfony\Component\Console\Command\Command->run()
+#4 /home/gregoire/dev/github.com/jolicode/foobar/src/Console/Application.php(57): Symfony\Component\Console\Application->doRunCommand()
+#5 /home/gregoire/dev/github.com/jolicode/foobar/vendor/symfony/console/Application.php(320): Foobar\Console\Application->doRunCommand()
+#6 /home/gregoire/dev/github.com/jolicode/foobar/src/Console/Application.php(45): Symfony\Component\Console\Application->doRun()
+#7 /home/gregoire/dev/github.com/jolicode/foobar/vendor/symfony/console/Application.php(174): Foobar\Console\Application->doRun()
+#8 /home/gregoire/dev/github.com/jolicode/foobar/src/Console/ApplicationFactory.php(28): Symfony\Component\Console\Application->run()
+#9 /home/gregoire/dev/github.com/jolicode/foobar/bin/foobar(14): Foobar\Console\ApplicationFactory::run()
+#10 {main}
+  thrown in /tmp/foobar/foobar.php on line 9
+
+Fatal error: Uncaught Error: Call to undefined function hello2() in /tmp/foobar/foobar.php:9
+Stack trace:
+#0 [internal function]: hello()
+#1 /home/gregoire/dev/github.com/jolicode/foobar/src/Console/Command/TaskCommand.php(152): ReflectionFunction->invoke()
+#2 /home/gregoire/dev/github.com/jolicode/foobar/vendor/symfony/console/Command/Command.php(326): Foobar\Console\Command\TaskCommand->execute()
+#3 /home/gregoire/dev/github.com/jolicode/foobar/vendor/symfony/console/Application.php(1063): Symfony\Component\Console\Command\Command->run()
+#4 /home/gregoire/dev/github.com/jolicode/foobar/src/Console/Application.php(57): Symfony\Component\Console\Application->doRunCommand()
+#5 /home/gregoire/dev/github.com/jolicode/foobar/vendor/symfony/console/Application.php(320): Foobar\Console\Application->doRunCommand()
+#6 /home/gregoire/dev/github.com/jolicode/foobar/src/Console/Application.php(45): Symfony\Component\Console\Application->doRun()
+#7 /home/gregoire/dev/github.com/jolicode/foobar/vendor/symfony/console/Application.php(174): Foobar\Console\Application->doRun()
+#8 /home/gregoire/dev/github.com/jolicode/foobar/src/Console/ApplicationFactory.php(28): Symfony\Component\Console\Application->run()
+#9 /home/gregoire/dev/github.com/jolicode/foobar/bin/foobar(14): Foobar\Console\ApplicationFactory::run()
+#10 {main}
+  thrown in /tmp/foobar/foobar.php on line 9
+```
+
+### With this patch (there is color, and Symfony styling):
+```
+>/tmp/foobar foobar  hello
+
+In foobar.php line 9:
+
+  Call to undefined function hello2()
+
+hello
+
+```
+
+And if the developer wants more output, they can run the same command with `-v` flags
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-06-05T14:00:09Z
+
+Very simple reproducer :
+
+take only symfony/console, then run:
+
+```php
+<?php
+
+require __DIR__.'/vendor/autoload.php';
+
+use Symfony\Component\Console\SingleCommandApplication;
+
+(new SingleCommandApplication())
+    ->setCode(function () {
+        echo "AAA";
+        foobar();
+    })
+    ->run()
+;
+```
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-07-07T11:23:28Z
+
+I have rebased the PR, restored BC, added a new flag to handle errors, and added some tests.
+
+I think it's ready ✅

@@ -160,7 +160,11 @@ if ($argc >= 3) {
 }
 
 $genrb = $buildDir.'/bin/genrb';
-$genrbEnv = 'LD_LIBRARY_PATH='.$buildDir.'/lib ';
+if (\PHP_OS === 'Darwin') {
+    $genrbEnv = 'DYLD_LIBRARY_PATH='.$buildDir.'/lib ';
+} else {
+    $genrbEnv = 'LD_LIBRARY_PATH='.$buildDir.'/lib ';
+}
 
 echo "Using $genrb.\n";
 

@@ -18,9 +18,9 @@ use Symfony\Component\VarDumper\Cloner\Data;
 
 final class CloneVarDataCollector extends DataCollector
 {
-    private $varToClone;
+    private mixed $varToClone;
 
-    public function __construct($varToClone)
+    public function __construct(mixed $varToClone)
     {
         $this->varToClone = $varToClone;
     }

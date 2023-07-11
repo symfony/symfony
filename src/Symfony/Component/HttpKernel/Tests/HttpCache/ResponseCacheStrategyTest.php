@@ -328,7 +328,7 @@ class ResponseCacheStrategyTest extends TestCase
         }
     }
 
-    public static function cacheControlMergingProvider()
+    public static function cacheControlMergingProvider(): \Generator
     {
         yield 'result is public if all responses are public' => [
             ['private' => false, 'public' => true],

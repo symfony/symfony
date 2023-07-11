@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,9 +23,9 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class ResponseListenerTest extends TestCase
 {
-    private $dispatcher;
+    private ?EventDispatcher $dispatcher;
 
-    private $kernel;
+    private MockObject|HttpKernelInterface|null $kernel;
 
     protected function setUp(): void
     {

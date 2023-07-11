@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -235,7 +236,7 @@ class EsiTest extends TestCase
         $this->assertEquals('', $esi->handle($cache, '/', '/alt', true));
     }
 
-    protected function getCache($request, $response)
+    protected function getCache($request, $response): MockObject|HttpCache
     {
         $cache = $this->getMockBuilder(HttpCache::class)->onlyMethods(['getRequest', 'handle'])->disableOriginalConstructor()->getMock();
         $cache->expects($this->any())

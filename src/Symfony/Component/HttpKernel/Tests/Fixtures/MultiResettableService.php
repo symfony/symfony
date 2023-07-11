@@ -4,15 +4,15 @@ namespace Symfony\Component\HttpKernel\Tests\Fixtures;
 
 class MultiResettableService
 {
-    public static $resetFirstCounter = 0;
-    public static $resetSecondCounter = 0;
+    public static int $resetFirstCounter = 0;
+    public static int $resetSecondCounter = 0;
 
-    public function resetFirst()
+    public function resetFirst(): void
     {
         ++self::$resetFirstCounter;
     }
 
-    public function resetSecond()
+    public function resetSecond(): void
     {
         ++self::$resetSecondCounter;
     }

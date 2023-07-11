@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Fragment;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
@@ -110,7 +111,7 @@ class InlineFragmentRendererTest extends TestCase
         $this->assertEquals('bar', $strategy->render('/', Request::create('/'), ['ignore_errors' => true, 'alt' => '/foo'])->getContent());
     }
 
-    private function getKernel($returnValue)
+    private function getKernel($returnValue): MockObject|HttpKernelInterface
     {
         $kernel = $this->createMock(HttpKernelInterface::class);
         $kernel
@@ -291,7 +292,7 @@ class InlineFragmentRendererTest extends TestCase
     /**
      * Creates a Kernel expecting a request equals to $request.
      */
-    private function getKernelExpectingRequest(Request $expectedRequest)
+    private function getKernelExpectingRequest(Request $expectedRequest): MockObject|HttpKernelInterface
     {
         $kernel = $this->createMock(HttpKernelInterface::class);
         $kernel
@@ -311,9 +312,9 @@ class InlineFragmentRendererTest extends TestCase
 
 class Bar
 {
-    public $bar = 'bar';
+    public string $bar = 'bar';
 
-    public function getBar()
+    public function getBar(): string
     {
         return $this->bar;
     }

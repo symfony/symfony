@@ -110,7 +110,7 @@ class TraceableEventDispatcherTest extends TestCase
         $this->assertCount(1, $eventDispatcher->getListeners('foo'), 'expected listener1 to be removed');
     }
 
-    protected function getHttpKernel($dispatcher)
+    protected function getHttpKernel($dispatcher): HttpKernel
     {
         $controllerResolver = $this->createMock(ControllerResolverInterface::class);
         $controllerResolver->expects($this->once())->method('getController')->willReturn(fn () => new Response());

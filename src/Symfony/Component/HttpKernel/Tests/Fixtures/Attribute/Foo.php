@@ -14,9 +14,9 @@ namespace Symfony\Component\HttpKernel\Tests\Fixtures\Attribute;
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
 class Foo
 {
-    private $foo;
+    private mixed $foo;
 
-    public function __construct($foo)
+    public function __construct(mixed $foo)
     {
         $this->foo = $foo;
     }

@@ -1422,7 +1422,7 @@ class HttpCacheTest extends HttpCacheTestCase
         Request::setTrustedProxies([], -1);
     }
 
-    public static function getTrustedProxyData()
+    public static function getTrustedProxyData(): array
     {
         return [
             [[]],
@@ -1451,7 +1451,7 @@ class HttpCacheTest extends HttpCacheTestCase
         Request::setTrustedProxies([], -1);
     }
 
-    public static function getForwardedData()
+    public static function getForwardedData(): array
     {
         return [
             [null, 'for="10.0.0.1";host="localhost";proto=http'],
@@ -1643,7 +1643,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertTraceContains('stale-if-error');
     }
 
-    public static function getResponseDataThatMayBeServedStaleIfError()
+    public static function getResponseDataThatMayBeServedStaleIfError(): \Generator
     {
         // All data sets assume that a 10s stale-if-error grace period has been configured
         yield 'public, max-age expired' => [['Cache-Control' => 'public, max-age=60'], 65];
@@ -1722,7 +1722,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertFalse($response->headers->has('I-do-Not-Exist'));
     }
 
-    public static function getResponseDataThatMustNotBeServedStaleIfError()
+    public static function getResponseDataThatMustNotBeServedStaleIfError(): \Generator
     {
         // All data sets assume that a 10s stale-if-error grace period has been configured
         yield 'public, no TTL but beyond grace period' => [['Cache-Control' => 'public'], 15];
@@ -1808,9 +1808,9 @@ class HttpCacheTest extends HttpCacheTestCase
 
 class TestKernel implements HttpKernelInterface
 {
-    public $terminateCalled = false;
+    public bool $terminateCalled = false;
 
-    public function terminate(Request $request, Response $response)
+    public function terminate(Request $request, Response $response): void
     {
         $this->terminateCalled = true;
     }

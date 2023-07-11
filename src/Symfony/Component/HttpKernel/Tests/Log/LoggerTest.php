@@ -22,15 +22,9 @@ use Symfony\Component\HttpKernel\Log\Logger;
  */
 class LoggerTest extends TestCase
 {
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private LoggerInterface $logger;
 
-    /**
-     * @var string
-     */
-    private $tmpFile;
+    private string $tmpFile;
 
     protected function setUp(): void
     {
@@ -45,7 +39,7 @@ class LoggerTest extends TestCase
         }
     }
 
-    public static function assertLogsMatch(array $expected, array $given)
+    public static function assertLogsMatch(array $expected, array $given): void
     {
         foreach ($given as $k => $line) {
             self::assertSame(1, preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}[\+-][0-9]{2}:[0-9]{2} '.preg_quote($expected[$k]).'/', $line), "\"$line\" do not match expected pattern \"$expected[$k]\"");
@@ -82,7 +76,7 @@ class LoggerTest extends TestCase
         $this->assertLogsMatch($expected, $this->getLogs());
     }
 
-    public static function provideLevelsAndMessages()
+    public static function provideLevelsAndMessages(): array
     {
         return [
             LogLevel::EMERGENCY => [LogLevel::EMERGENCY, 'message of level emergency with context: {user}'],

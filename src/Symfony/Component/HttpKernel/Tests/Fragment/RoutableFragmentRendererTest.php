@@ -34,7 +34,7 @@ class RoutableFragmentRendererTest extends TestCase
         $this->assertEquals('http://localhost'.$uri, $this->callGenerateFragmentUriMethod($controller, Request::create('/'), true));
     }
 
-    public static function getGenerateFragmentUriData()
+    public static function getGenerateFragmentUriData(): array
     {
         return [
             ['/_fragment?_path=_format%3Dhtml%26_locale%3Den%26_controller%3Dcontroller', new ControllerReference('controller', [], [])],
@@ -65,7 +65,7 @@ class RoutableFragmentRendererTest extends TestCase
         $this->callGenerateFragmentUriMethod($controller, Request::create('/'));
     }
 
-    public static function getGenerateFragmentUriDataWithNonScalar()
+    public static function getGenerateFragmentUriDataWithNonScalar(): array
     {
         return [
             [new ControllerReference('controller', ['foo' => new Foo(), 'bar' => 'bar'], [])],
@@ -85,9 +85,9 @@ class RoutableFragmentRendererTest extends TestCase
 
 class Foo
 {
-    public $foo;
+    public mixed $foo;
 
-    public function getFoo()
+    public function getFoo(): mixed
     {
         return $this->foo;
     }

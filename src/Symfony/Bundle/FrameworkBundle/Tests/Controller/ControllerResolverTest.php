@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Container\ContainerInterface as Psr11ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -104,7 +105,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $this->assertSame($controllerContainer, $controller->getContainer());
     }
 
-    protected function createControllerResolver(LoggerInterface $logger = null, Psr11ContainerInterface $container = null)
+    protected function createControllerResolver(LoggerInterface $logger = null, Psr11ContainerInterface $container = null): ControllerResolver
     {
         if (!$container) {
             $container = $this->createMockContainer();
@@ -113,12 +114,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         return new ControllerResolver($container, $logger);
     }
 
-    protected function createMockParser()
-    {
-        return $this->createMock(ControllerNameParser::class);
-    }
-
-    protected function createMockContainer()
+    protected function createMockContainer(): MockObject|ContainerInterface
     {
         return $this->createMock(ContainerInterface::class);
     }

@@ -33,7 +33,7 @@ class DateTimeValueResolverTest extends TestCase
         date_default_timezone_set($this->defaultTimezone);
     }
 
-    public static function getTimeZones()
+    public static function getTimeZones(): \Generator
     {
         yield ['UTC', false];
         yield ['Pacific/Honolulu', false];
@@ -43,7 +43,7 @@ class DateTimeValueResolverTest extends TestCase
         yield ['America/Toronto', true];
     }
 
-    public static function getClasses()
+    public static function getClasses(): \Generator
     {
         yield [\DateTimeInterface::class];
         yield [\DateTime::class];
@@ -227,7 +227,7 @@ class DateTimeValueResolverTest extends TestCase
         $this->assertEquals('2016-09-08 12:34:56', $results[0]->format('Y-m-d H:i:s'));
     }
 
-    public static function provideInvalidDates()
+    public static function provideInvalidDates(): array
     {
         return [
             'invalid date' => [

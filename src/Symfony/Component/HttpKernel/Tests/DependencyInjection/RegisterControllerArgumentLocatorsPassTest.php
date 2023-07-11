@@ -310,7 +310,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertEquals($expected, $locator->getArgument(0));
     }
 
-    public static function provideBindings()
+    public static function provideBindings(): array
     {
         return [
             [ControllerDummy::class.'$bar'],
@@ -345,7 +345,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertSame('foo_val', $locator->get('foo::fooAction')->get('someArg'));
     }
 
-    public static function provideBindScalarValueToControllerArgument()
+    public static function provideBindScalarValueToControllerArgument(): \Generator
     {
         yield ['$someArg'];
         yield ['string $someArg'];
@@ -595,7 +595,7 @@ class ArgumentWithoutTypeController
 
 class NonNullableEnumArgumentWithDefaultController
 {
-    public function fooAction(Suit $suit = Suit::Spades)
+    public function fooAction(Suit $suit = Suit::Spades): void
     {
     }
 }

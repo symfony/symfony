@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionNotValidBundle\De
 
 class ExtensionNotValidExtension
 {
-    public function getAlias()
+    public function getAlias(): string
     {
         return 'extension_not_valid';
     }

@@ -21,13 +21,13 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class TestHttpKernel extends HttpKernel implements ControllerResolverInterface, ArgumentResolverInterface
 {
-    protected $body;
-    protected $status;
-    protected $headers;
-    protected $called = false;
-    protected $customizer;
-    protected $catch = false;
-    protected $backendRequest;
+    protected string $body;
+    protected int $status;
+    protected array $headers;
+    protected bool $called = false;
+    protected ?\Closure $customizer;
+    protected bool $catch = false;
+    protected array $backendRequest;
 
     public function __construct($body, $status, $headers, \Closure $customizer = null, EventDispatcher $eventDispatcher = null)
     {
@@ -39,7 +39,7 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface, 
         parent::__construct($eventDispatcher ?? new EventDispatcher(), $this, null, $this);
     }
 
-    public function assert(\Closure $callback)
+    public function assert(\Closure $callback): void
     {
         $trustedConfig = [Request::getTrustedProxies(), Request::getTrustedHeaderSet()];
 
@@ -62,7 +62,7 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface, 
         return parent::handle($request, $type, $catch);
     }
 
-    public function isCatchingExceptions()
+    public function isCatchingExceptions(): bool
     {
         return $this->catch;
     }
@@ -77,7 +77,7 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface, 
         return [$request];
     }
 
-    public function callController(Request $request)
+    public function callController(Request $request): Response
     {
         $this->called = true;
 
@@ -90,12 +90,12 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface, 
         return $response;
     }
 
-    public function hasBeenCalled()
+    public function hasBeenCalled(): bool
     {
         return $this->called;
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->called = false;
     }

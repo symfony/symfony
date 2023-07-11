@@ -24,10 +24,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class AddRequestFormatsListenerTest extends TestCase
 {
-    /**
-     * @var AddRequestFormatsListener
-     */
-    private $listener;
+    private ?AddRequestFormatsListener $listener;
 
     protected function setUp(): void
     {

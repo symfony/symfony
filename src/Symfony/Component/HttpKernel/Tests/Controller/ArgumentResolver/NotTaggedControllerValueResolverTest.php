@@ -90,7 +90,7 @@ class NotTaggedControllerValueResolverTest extends TestCase
         $resolver->resolve($request, $argument);
     }
 
-    private function requestWithAttributes(array $attributes)
+    private function requestWithAttributes(array $attributes): Request
     {
         $request = Request::create('/');
         foreach ($attributes as $name => $value) {

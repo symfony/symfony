@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Fragment;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -21,7 +22,7 @@ use Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface;
 
 class FragmentHandlerTest extends TestCase
 {
-    private $requestStack;
+    private MockObject|RequestStack $requestStack;
 
     protected function setUp(): void
     {
@@ -86,7 +87,7 @@ class FragmentHandlerTest extends TestCase
         $this->assertEquals('foo', $handler->render('/', 'foo', ['foo' => 'foo']));
     }
 
-    protected function getHandler($returnValue, $arguments = [])
+    protected function getHandler($returnValue, $arguments = []): FragmentHandler
     {
         $renderer = $this->createMock(FragmentRendererInterface::class);
         $renderer

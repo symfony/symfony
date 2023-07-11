@@ -50,9 +50,9 @@ class_exists(KernelEvents::class);
  */
 class HttpKernel implements HttpKernelInterface, TerminableInterface
 {
-    protected $dispatcher;
-    protected $resolver;
-    protected $requestStack;
+    protected EventDispatcherInterface $dispatcher;
+    protected ControllerResolverInterface $resolver;
+    protected RequestStack $requestStack;
     private ArgumentResolverInterface $argumentResolver;
     private bool $handleAllThrowables;
 

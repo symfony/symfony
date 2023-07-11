@@ -917,7 +917,7 @@ class SessionListenerTest extends TestCase
         $this->assertSame(\PHP_SESSION_NONE, session_status());
     }
 
-    private function createListener(Request $request, SessionStorageFactoryInterface $sessionFactory)
+    private function createListener(Request $request, SessionStorageFactoryInterface $sessionFactory): SessionListener
     {
         $requestStack = new RequestStack();
         $request = new Request();

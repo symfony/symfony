@@ -21,11 +21,11 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class TestMultipleHttpKernel extends HttpKernel implements ControllerResolverInterface, ArgumentResolverInterface
 {
-    protected $bodies = [];
-    protected $statuses = [];
-    protected $headers = [];
-    protected $called = false;
-    protected $backendRequest;
+    protected array $bodies = [];
+    protected array $statuses = [];
+    protected array $headers = [];
+    protected bool $called = false;
+    protected Request $backendRequest;
 
     public function __construct($responses)
     {
@@ -38,7 +38,7 @@ class TestMultipleHttpKernel extends HttpKernel implements ControllerResolverInt
         parent::__construct(new EventDispatcher(), $this, null, $this);
     }
 
-    public function getBackendRequest()
+    public function getBackendRequest(): Request
     {
         return $this->backendRequest;
     }
@@ -60,7 +60,7 @@ class TestMultipleHttpKernel extends HttpKernel implements ControllerResolverInt
         return [$request];
     }
 
-    public function callController(Request $request)
+    public function callController(Request $request): Response
     {
         $this->called = true;
 
@@ -69,12 +69,12 @@ class TestMultipleHttpKernel extends HttpKernel implements ControllerResolverInt
         return $response;
     }
 
-    public function hasBeenCalled()
+    public function hasBeenCalled(): bool
     {
         return $this->called;
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->called = false;
     }

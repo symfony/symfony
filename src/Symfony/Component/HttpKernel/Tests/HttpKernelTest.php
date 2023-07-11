@@ -234,7 +234,7 @@ class HttpKernelTest extends TestCase
         $this->assertEquals('POST', $response->headers->get('Allow'));
     }
 
-    public function getStatusCodes()
+    public function getStatusCodes(): array
     {
         return [
             [200, 404],
@@ -261,7 +261,7 @@ class HttpKernelTest extends TestCase
         $this->assertEquals($expectedStatusCode, $response->getStatusCode());
     }
 
-    public static function getSpecificStatusCodes()
+    public static function getSpecificStatusCodes(): array
     {
         return [
             [200],
@@ -477,7 +477,7 @@ class HttpKernelTest extends TestCase
         Request::setTrustedProxies([], -1);
     }
 
-    private function getHttpKernel(EventDispatcherInterface $eventDispatcher, $controller = null, RequestStack $requestStack = null, array $arguments = [], bool $handleAllThrowables = false)
+    private function getHttpKernel(EventDispatcherInterface $eventDispatcher, $controller = null, RequestStack $requestStack = null, array $arguments = [], bool $handleAllThrowables = false): HttpKernel
     {
         $controller ??= fn () => new Response('Hello');
 
@@ -496,7 +496,7 @@ class HttpKernelTest extends TestCase
         return new HttpKernel($eventDispatcher, $controllerResolver, $requestStack, $argumentResolver, $handleAllThrowables);
     }
 
-    private function assertResponseEquals(Response $expected, Response $actual)
+    private function assertResponseEquals(Response $expected, Response $actual): void
     {
         $expected->setDate($actual->getDate());
         $this->assertEquals($expected, $actual);
@@ -505,12 +505,12 @@ class HttpKernelTest extends TestCase
 
 class TestController
 {
-    public function __invoke()
+    public function __invoke(): Response
     {
         return new Response('foo');
     }
 
-    public function controller()
+    public function controller(): Response
     {
         return new Response('foo');
     }

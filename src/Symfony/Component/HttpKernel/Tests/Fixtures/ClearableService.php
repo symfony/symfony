@@ -4,9 +4,9 @@ namespace Symfony\Component\HttpKernel\Tests\Fixtures;
 
 class ClearableService
 {
-    public static $counter = 0;
+    public static int $counter = 0;
 
-    public function clear()
+    public function clear(): void
     {
         ++self::$counter;
     }

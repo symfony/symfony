@@ -18,11 +18,12 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
 use Symfony\Component\HttpKernel\Profiler\FileProfilerStorage;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
+use Symfony\Component\HttpKernel\Profiler\ProfilerStorageInterface;
 
 class ProfilerTest extends TestCase
 {
-    private $tmp;
-    private $storage;
+    private string $tmp;
+    private ?ProfilerStorageInterface $storage;
 
     public function testCollect()
     {

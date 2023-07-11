@@ -32,7 +32,7 @@ class UidValueResolverTest extends TestCase
         $this->assertCount((int) $expected, (new UidValueResolver())->resolve($request, $argument));
     }
 
-    public static function provideSupports()
+    public static function provideSupports(): array
     {
         return [
             'Variadic argument' => [false, new Request([], [], ['foo' => (string) $uuidV4 = new UuidV4()]), new ArgumentMetadata('foo', UuidV4::class, true, false, null)],
@@ -58,7 +58,7 @@ class UidValueResolverTest extends TestCase
         ));
     }
 
-    public static function provideResolveOK()
+    public static function provideResolveOK(): array
     {
         return [
             [$uuidV1 = new UuidV1(), (string) $uuidV1],
@@ -87,7 +87,7 @@ class UidValueResolverTest extends TestCase
         );
     }
 
-    public static function provideResolveKO()
+    public static function provideResolveKO(): array
     {
         return [
             'Bad value for UUID' => ['ccc', UuidV1::class],

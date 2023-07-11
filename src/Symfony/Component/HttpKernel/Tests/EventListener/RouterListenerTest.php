@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -37,7 +38,7 @@ use Symfony\Component\Routing\RequestContext;
 
 class RouterListenerTest extends TestCase
 {
-    private $requestStack;
+    private MockObject|RequestStack $requestStack;
 
     protected function setUp(): void
     {
@@ -67,7 +68,7 @@ class RouterListenerTest extends TestCase
         $this->assertEquals(str_starts_with($uri, 'https') ? 'https' : 'http', $context->getScheme());
     }
 
-    public static function getPortData()
+    public static function getPortData(): array
     {
         return [
             [80, 443, 'http://localhost/', 80, 443],
@@ -151,7 +152,7 @@ class RouterListenerTest extends TestCase
         $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
-    public static function getLoggingParameterData()
+    public static function getLoggingParameterData(): array
     {
         return [
             [['_route' => 'foo'], 'Matched route "{route}".', ['route' => 'foo', 'route_parameters' => ['_route' => 'foo'], 'request_uri' => 'http://localhost/', 'method' => 'GET']],

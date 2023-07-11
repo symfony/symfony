@@ -20,13 +20,10 @@ use Symfony\Component\HttpKernel\HttpCache\Store;
 
 class StoreTest extends TestCase
 {
-    protected $request;
-    protected $response;
+    protected ?Request $request;
+    protected ?Response $response;
 
-    /**
-     * @var Store
-     */
-    protected $store;
+    protected ?Store $store;
 
     protected function setUp(): void
     {
@@ -357,7 +354,7 @@ class StoreTest extends TestCase
         $this->assertSame($content, $response->getContent());
     }
 
-    protected function storeSimpleEntry($path = null, $headers = [])
+    protected function storeSimpleEntry($path = null, $headers = []): string
     {
         $path ??= '/test';
 

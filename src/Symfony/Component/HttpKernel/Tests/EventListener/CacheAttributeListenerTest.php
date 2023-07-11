@@ -336,12 +336,12 @@ class CacheAttributeListenerTest extends TestCase
 
 class TestEntity
 {
-    public function getDate()
+    public function getDate(): \DateTimeImmutable
     {
         return new \DateTimeImmutable('Fri, 23 Aug 2013 00:00:00 GMT');
     }
 
-    public function getId()
+    public function getId(): string
     {
         return '12345';
     }

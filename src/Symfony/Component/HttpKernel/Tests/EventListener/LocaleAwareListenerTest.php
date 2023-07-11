@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -22,9 +23,9 @@ use Symfony\Contracts\Translation\LocaleAwareInterface;
 
 class LocaleAwareListenerTest extends TestCase
 {
-    private $listener;
-    private $localeAwareService;
-    private $requestStack;
+    private LocaleAwareListener $listener;
+    private MockObject|LocaleAwareInterface $localeAwareService;
+    private RequestStack $requestStack;
 
     protected function setUp(): void
     {
@@ -56,8 +57,7 @@ class LocaleAwareListenerTest extends TestCase
                 }
 
                 $this->assertSame('en', $locale);
-            })
-        ;
+            });
 
         $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $this->createRequest('fr'), HttpKernelInterface::MAIN_REQUEST);
         $this->listener->onKernelRequest($event);
@@ -102,8 +102,7 @@ class LocaleAwareListenerTest extends TestCase
                 }
 
                 $this->assertSame('en', $locale);
-            })
-        ;
+            });
 
         $this->requestStack->push($this->createRequest('fr'));
         $this->requestStack->push($subRequest = $this->createRequest('de'));
@@ -112,7 +111,7 @@ class LocaleAwareListenerTest extends TestCase
         $this->listener->onKernelFinishRequest($event);
     }
 
-    private function createRequest($locale)
+    private function createRequest($locale): Request
     {
         $request = new Request();
         $request->setLocale($locale);

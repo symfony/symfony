@@ -67,7 +67,7 @@ class ControllerEventTest extends TestCase
         $this->assertEquals([], $event->getAttributes(\stdClass::class));
     }
 
-    public static function provideGetAttributes()
+    public static function provideGetAttributes(): \Generator
     {
         yield [[new AttributeController(), '__invoke']];
         yield [new AttributeController()];

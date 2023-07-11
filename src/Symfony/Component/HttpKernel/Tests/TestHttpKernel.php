@@ -35,7 +35,7 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface, 
         return [$request];
     }
 
-    public function callController(Request $request)
+    public function callController(Request $request): Response
     {
         return new Response('Request: '.$request->getRequestUri());
     }

@@ -103,7 +103,7 @@ class ServiceValueResolverTest extends TestCase
         $container->get('argument_resolver.service')->resolve($request, $argument)->current();
     }
 
-    private function requestWithAttributes(array $attributes)
+    private function requestWithAttributes(array $attributes): Request
     {
         $request = Request::create('/');
 

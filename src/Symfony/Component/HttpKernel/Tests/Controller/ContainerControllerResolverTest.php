@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Controller;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Container;
@@ -116,7 +117,7 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $this->assertSame('action', $controller[1]);
     }
 
-    public static function getControllers()
+    public static function getControllers(): array
     {
         return [
             ['\\'.ControllerTestService::class.'::action'],
@@ -195,7 +196,7 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         return $tests;
     }
 
-    protected function createControllerResolver(LoggerInterface $logger = null, ContainerInterface $container = null)
+    protected function createControllerResolver(LoggerInterface $logger = null, ContainerInterface $container = null): ContainerControllerResolver
     {
         if (!$container) {
             $container = $this->createMockContainer();
@@ -204,7 +205,7 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         return new ContainerControllerResolver($container, $logger);
     }
 
-    protected function createMockContainer()
+    protected function createMockContainer(): MockObject|ContainerInterface
     {
         return $this->createMock(ContainerInterface::class);
     }

@@ -23,10 +23,7 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\VariadicController;
 
 class ArgumentMetadataFactoryTest extends TestCase
 {
-    /**
-     * @var ArgumentMetadataFactory
-     */
-    private $factory;
+    private ArgumentMetadataFactory $factory;
 
     protected function setUp(): void
     {

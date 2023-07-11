@@ -36,7 +36,7 @@ class MemoryDataCollectorTest extends TestCase
         $this->assertEquals($bytes, $method->invoke($collector, $limit));
     }
 
-    public static function getBytesConversionTestData()
+    public static function getBytesConversionTestData(): array
     {
         return [
             ['2k', 2048],

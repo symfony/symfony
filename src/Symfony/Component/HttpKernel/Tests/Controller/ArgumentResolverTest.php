@@ -369,19 +369,19 @@ class ArgumentResolverTest extends TestCase
     {
     }
 
-    public function controllerTargetingResolver(#[ValueResolver(DefaultValueResolver::class)] int $foo = 1)
+    public function controllerTargetingResolver(#[ValueResolver(DefaultValueResolver::class)] int $foo = 1): void
     {
     }
 
-    public function controllerTargetingResolverWithDefaultValue(#[ValueResolver(RequestAttributeValueResolver::class)] int $foo = 2)
+    public function controllerTargetingResolverWithDefaultValue(#[ValueResolver(RequestAttributeValueResolver::class)] int $foo = 2): void
     {
     }
 
-    public function controllerTargetingResolverWithNullableValue(#[ValueResolver(RequestAttributeValueResolver::class)] ?int $foo)
+    public function controllerTargetingResolverWithNullableValue(#[ValueResolver(RequestAttributeValueResolver::class)] ?int $foo): void
     {
     }
 
-    public function controllerDisablingResolver(#[ValueResolver(RequestAttributeValueResolver::class, disabled: true)] int $foo = 1)
+    public function controllerDisablingResolver(#[ValueResolver(RequestAttributeValueResolver::class, disabled: true)] int $foo = 1): void
     {
     }
 
@@ -389,7 +389,7 @@ class ArgumentResolverTest extends TestCase
         #[ValueResolver(RequestAttributeValueResolver::class)]
         #[ValueResolver(DefaultValueResolver::class)]
         int $foo
-    ) {
+    ): void {
     }
 
     public function controllerTargetingUnknownResolver(

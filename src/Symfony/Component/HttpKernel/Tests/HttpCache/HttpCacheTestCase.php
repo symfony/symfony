@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpCache\Esi;
 use Symfony\Component\HttpKernel\HttpCache\HttpCache;
 use Symfony\Component\HttpKernel\HttpCache\Store;
@@ -21,20 +22,17 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 abstract class HttpCacheTestCase extends TestCase
 {
-    protected $kernel;
-    protected $cache;
-    protected $caches;
-    protected $cacheConfig;
-    protected $request;
-    protected $response;
-    protected $responses;
-    protected $catch;
-    protected $esi;
+    protected TestHttpKernel|TestMultipleHttpKernel|null $kernel;
+    protected ?HttpCache $cache;
+    protected ?array $caches;
+    protected ?array $cacheConfig;
+    protected ?Request $request;
+    protected ?Response $response;
+    protected ?array $responses;
+    protected ?bool $catch;
+    protected ?Esi $esi;
 
-    /**
-     * @var Store
-     */
-    protected $store;
+    protected Store $store;
 
     protected function setUp(): void
     {
@@ -70,22 +68,22 @@ abstract class HttpCacheTestCase extends TestCase
         $this->clearDirectory(sys_get_temp_dir().'/http_cache');
     }
 
-    public function assertHttpKernelIsCalled()
+    public function assertHttpKernelIsCalled(): void
     {
         $this->assertTrue($this->kernel->hasBeenCalled());
     }
 
-    public function assertHttpKernelIsNotCalled()
+    public function assertHttpKernelIsNotCalled(): void
     {
         $this->assertFalse($this->kernel->hasBeenCalled());
     }
 
-    public function assertResponseOk()
+    public function assertResponseOk(): void
     {
         $this->assertEquals(200, $this->response->getStatusCode());
     }
 
-    public function assertTraceContains($trace)
+    public function assertTraceContains($trace): void
     {
         $traces = $this->cache->getTraces();
         $traces = current($traces);
@@ -93,7 +91,7 @@ abstract class HttpCacheTestCase extends TestCase
         $this->assertMatchesRegularExpression('/'.$trace.'/', implode(', ', $traces));
     }
 
-    public function assertTraceNotContains($trace)
+    public function assertTraceNotContains($trace): void
     {
         $traces = $this->cache->getTraces();
         $traces = current($traces);
@@ -101,17 +99,17 @@ abstract class HttpCacheTestCase extends TestCase
         $this->assertDoesNotMatchRegularExpression('/'.$trace.'/', implode(', ', $traces));
     }
 
-    public function assertExceptionsAreCaught()
+    public function assertExceptionsAreCaught(): void
     {
         $this->assertTrue($this->kernel->isCatchingExceptions());
     }
 
-    public function assertExceptionsAreNotCaught()
+    public function assertExceptionsAreNotCaught(): void
     {
         $this->assertFalse($this->kernel->isCatchingExceptions());
     }
 
-    public function request($method, $uri = '/', $server = [], $cookies = [], $esi = false, $headers = [])
+    public function request($method, $uri = '/', $server = [], $cookies = [], $esi = false, $headers = []): void
     {
         if (null === $this->kernel) {
             throw new \LogicException('You must call setNextResponse() before calling request().');
@@ -139,7 +137,7 @@ abstract class HttpCacheTestCase extends TestCase
         $this->responses[] = $this->response;
     }
 
-    public function getMetaStorageValues()
+    public function getMetaStorageValues(): array
     {
         $values = [];
         foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(sys_get_temp_dir().'/http_cache/md', \RecursiveDirectoryIterator::SKIP_DOTS), \RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
@@ -150,22 +148,22 @@ abstract class HttpCacheTestCase extends TestCase
     }
 
     // A basic response with 200 status code and a tiny body.
-    public function setNextResponse($statusCode = 200, array $headers = [], $body = 'Hello World', \Closure $customizer = null, EventDispatcher $eventDispatcher = null)
+    public function setNextResponse($statusCode = 200, array $headers = [], $body = 'Hello World', \Closure $customizer = null, EventDispatcher $eventDispatcher = null): void
     {
         $this->kernel = new TestHttpKernel($body, $statusCode, $headers, $customizer, $eventDispatcher);
     }
 
-    public function setNextResponses($responses)
+    public function setNextResponses($responses): void
     {
         $this->kernel = new TestMultipleHttpKernel($responses);
     }
 
-    public function catchExceptions($catch = true)
+    public function catchExceptions($catch = true): void
     {
         $this->catch = $catch;
     }
 
-    public static function clearDirectory($directory)
+    public static function clearDirectory($directory): void
     {
         if (!is_dir($directory)) {
             return;

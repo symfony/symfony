@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpKernel\Tests\Fixtures;
 
 class LazyResettableService
 {
-    public static $counter = 0;
+    public static int $counter = 0;
 
     public function foo(): bool
     {

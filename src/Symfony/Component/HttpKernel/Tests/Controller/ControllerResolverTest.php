@@ -139,7 +139,7 @@ class ControllerResolverTest extends TestCase
         $this->assertSame($returnValue, $controller());
     }
 
-    public static function getStaticControllers()
+    public static function getStaticControllers(): array
     {
         return [
             [TestAbstractController::class.'::staticAction', 'foo'],
@@ -163,7 +163,7 @@ class ControllerResolverTest extends TestCase
         $resolver->getController($request);
     }
 
-    public static function getUndefinedControllers()
+    public static function getUndefinedControllers(): array
     {
         $controller = new ControllerTest();
 
@@ -185,7 +185,7 @@ class ControllerResolverTest extends TestCase
         ];
     }
 
-    protected function createControllerResolver(LoggerInterface $logger = null)
+    protected function createControllerResolver(LoggerInterface $logger = null): ControllerResolver
     {
         return new ControllerResolver($logger);
     }
@@ -232,7 +232,7 @@ class InvokableController
 
 abstract class TestAbstractController
 {
-    public static function staticAction()
+    public static function staticAction(): string
     {
         return 'foo';
     }
@@ -244,7 +244,7 @@ class PrivateConstructorController
     {
     }
 
-    public static function staticAction()
+    public static function staticAction(): string
     {
         return 'bar';
     }

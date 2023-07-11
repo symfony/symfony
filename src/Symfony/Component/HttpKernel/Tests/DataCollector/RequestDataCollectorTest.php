@@ -358,7 +358,7 @@ class RequestDataCollectorTest extends TestCase
         $this->assertEquals('_password=******', $c->getContent());
     }
 
-    protected function createRequest($routeParams = ['name' => 'foo'])
+    protected function createRequest($routeParams = ['name' => 'foo']): Request
     {
         $request = Request::create('http://test.com/foo?bar=baz');
         $request->attributes->set('foo', 'bar');
@@ -370,7 +370,7 @@ class RequestDataCollectorTest extends TestCase
         return $request;
     }
 
-    private function createRequestWithSession()
+    private function createRequestWithSession(): Request
     {
         $request = $this->createRequest();
         $request->attributes->set('_controller', 'Foo::bar');
@@ -380,7 +380,7 @@ class RequestDataCollectorTest extends TestCase
         return $request;
     }
 
-    protected function createResponse()
+    protected function createResponse(): Response
     {
         $response = new Response();
         $response->setStatusCode(200);
@@ -396,7 +396,7 @@ class RequestDataCollectorTest extends TestCase
     /**
      * Inject the given controller callable into the data collector.
      */
-    protected function injectController($collector, $controller, $request)
+    protected function injectController($collector, $controller, $request): void
     {
         $resolver = $this->createMock(ControllerResolverInterface::class);
         $httpKernel = new HttpKernel(new EventDispatcher(), $resolver, null, $this->createMock(ArgumentResolverInterface::class));
@@ -404,7 +404,7 @@ class RequestDataCollectorTest extends TestCase
         $collector->onKernelController($event);
     }
 
-    private function getCookieByName(Response $response, $name)
+    private function getCookieByName(Response $response, $name): Cookie
     {
         foreach ($response->headers->getCookies() as $cookie) {
             if ($cookie->getName() == $name) {

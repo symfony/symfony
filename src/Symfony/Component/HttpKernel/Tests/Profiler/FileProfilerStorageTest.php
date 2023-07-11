@@ -17,8 +17,8 @@ use Symfony\Component\HttpKernel\Profiler\Profile;
 
 class FileProfilerStorageTest extends TestCase
 {
-    private $tmpDir;
-    private $storage;
+    private string $tmpDir;
+    private FileProfilerStorage $storage;
 
     protected function setUp(): void
     {
@@ -358,7 +358,7 @@ class FileProfilerStorageTest extends TestCase
         $this->assertSame($expectedOffset, file_get_contents($this->tmpDir.'/index.csv.offset'));
     }
 
-    public static function provideExpiredProfiles()
+    public static function provideExpiredProfiles(): \Generator
     {
         $oneHourAgo = new \DateTimeImmutable('-1 hour');
 
@@ -408,7 +408,7 @@ class FileProfilerStorageTest extends TestCase
         $this->assertEquals('line1', $r->invoke($this->storage, $h));
     }
 
-    protected function cleanDir()
+    protected function cleanDir(): void
     {
         $flags = \FilesystemIterator::SKIP_DOTS;
         $iterator = new \RecursiveDirectoryIterator($this->tmpDir, $flags);

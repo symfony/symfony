@@ -315,7 +315,15 @@ class FileProfilerStorage implements ProfilerStorageInterface
         }
 
         while ($line = fgets($handle)) {
-            [$csvToken, , , , $csvTime] = str_getcsv($line);
+            $values = str_getcsv($line);
+
+            if (7 !== \count($values)) {
+                // skip invalid lines
+                $offset += \strlen($line);
+                continue;
+            }
+
+            [$csvToken, , , , $csvTime] = $values;
 
             if ($csvTime >= $minimalProfileTimestamp) {
                 break;

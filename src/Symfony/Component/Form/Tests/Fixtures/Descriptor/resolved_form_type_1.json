@@ -12,6 +12,7 @@
             "choice_translation_parameters",
             "choice_value",
             "choices",
+            "duplicate_preferred_choices",
             "expanded",
             "group_by",
             "multiple",

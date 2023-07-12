@@ -3,8 +3,8 @@
 return [
     'Entry1' => [
         'Array' => [
-            0 => 'foo',
-            1 => 'bar',
+            'foo',
+            'bar',
         ],
         'Integer' => 5,
         'Boolean' => false,

@@ -398,6 +398,9 @@ if ($components) {
         }
     }
 
+    $lastOutput = null;
+    $lastOutputTime = null;
+
     while ($runningProcs) {
         usleep(300000);
         $terminatedProcs = [];
@@ -407,6 +410,26 @@ if ($components) {
                 $terminatedProcs[$component] = $procStatus['exitcode'];
                 unset($runningProcs[$component]);
                 proc_close($proc);
+            }
+        }
+
+        if (!$terminatedProcs && 1 === count($runningProcs)) {
+            $component = key($runningProcs);
+
+            $output = file_get_contents("$component/phpunit.stdout");
+            $output .= file_get_contents("$component/phpunit.stderr");
+
+            if ($lastOutput !== $output) {
+                $lastOutput = $output;
+                $lastOutputTime = microtime(true);
+            } elseif (microtime(true) - $lastOutputTime > 60) {
+                echo "\033[41mTimeout\033[0m $component\n\n";
+
+                if ('\\' === \DIRECTORY_SEPARATOR) {
+                    exec(sprintf('taskkill /F /T /PID %d 2>&1', $procStatus['pid']), $output, $exitCode);
+                } else {
+                    proc_terminate(current($runningProcs));
+                }
             }
         }
 

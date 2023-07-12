@@ -437,6 +437,5 @@ return [
         'Pacific/Wake' => 'Ueyk Vaxtı (Veyk)',
         'Pacific/Wallis' => 'Uollis və Futuna Vaxtı',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

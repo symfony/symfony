@@ -4,6 +4,5 @@ return [
     'Names' => [
         'gv' => 'Gaelg',
     ],
-    'LocalizedNames' => [
-    ],
+    'LocalizedNames' => [],
 ];

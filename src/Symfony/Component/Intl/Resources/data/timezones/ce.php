@@ -436,6 +436,5 @@ return [
         'Pacific/Wake' => 'Уэйк, гӀ-е',
         'Pacific/Wallis' => 'Уоллис а, Футуна а',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

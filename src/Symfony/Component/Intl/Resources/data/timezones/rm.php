@@ -437,6 +437,5 @@ return [
         'Pacific/Wake' => 'temp: Inslas Pitschnas Perifericas dals Stadis Unids da l’America (Wake)',
         'Pacific/Wallis' => 'temp: Wallis & Futuna (Matāʻutu)',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

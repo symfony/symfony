@@ -437,6 +437,5 @@ return [
         'Pacific/Wake' => 'ويڪ آئي لينڊ جو وقت',
         'Pacific/Wallis' => 'ويلس ۽ فتونا جو وقت',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

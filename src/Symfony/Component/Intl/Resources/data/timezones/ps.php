@@ -437,6 +437,5 @@ return [
         'Pacific/Wake' => 'ويک تاپو وخت (ویک)',
         'Pacific/Wallis' => 'والس او فوتونا وخت',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

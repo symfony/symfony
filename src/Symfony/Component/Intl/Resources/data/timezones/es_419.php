@@ -65,6 +65,5 @@ return [
         'Pacific/Tarawa' => 'hora de Islas Gilbert (Tarawa)',
         'Pacific/Wake' => 'hora de Isla Wake',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

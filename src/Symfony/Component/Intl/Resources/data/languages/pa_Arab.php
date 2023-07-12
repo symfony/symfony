@@ -4,6 +4,5 @@ return [
     'Names' => [
         'pa' => 'پنجابی',
     ],
-    'LocalizedNames' => [
-    ],
+    'LocalizedNames' => [],
 ];

@@ -20,6 +20,8 @@ jobs:
   tests:
     name: Unit Tests
 
+    container: shivammathur/node:latest-${{ matrix.arch }}
+
     env:
       extensions: amqp,apcu,igbinary,intl,mbstring,memcached,redis-5.3.4
 
@@ -27,13 +29,18 @@ jobs:
       matrix:
         include:
           - php: '7.2'
+            arch: i386
           - php: '7.4'
+            arch: amd64
           - php: '8.2'
             mode: high-deps
+            arch: amd64
           - php: '8.2'
             mode: low-deps
+            arch: amd64
           - php: '8.3'
             #mode: experimental
+            arch: amd64
       fail-fast: false
 
     runs-on: ubuntu-20.04

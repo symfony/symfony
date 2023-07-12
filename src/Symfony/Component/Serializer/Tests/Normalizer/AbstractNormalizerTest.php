@@ -21,6 +21,7 @@ use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
@@ -178,6 +179,7 @@ class AbstractNormalizerTest extends TestCase
 
     /**
      * @dataProvider getNormalizer
+     * @dataProvider getNormalizerWithCustomNameConverter
      */
     public function testObjectWithVariadicConstructorTypedArguments(AbstractNormalizer $normalizer)
     {
@@ -249,6 +251,25 @@ class AbstractNormalizerTest extends TestCase
         yield [new PropertyNormalizer(null, null, $extractor)];
         yield [new ObjectNormalizer()];
         yield [new ObjectNormalizer(null, null, null, $extractor)];
+    }
+
+    public static function getNormalizerWithCustomNameConverter()
+    {
+        $extractor = new PhpDocExtractor();
+        $nameConverter = new class() implements NameConverterInterface {
+            public function normalize(string $propertyName): string
+            {
+                return ucfirst($propertyName);
+            }
+
+            public function denormalize(string $propertyName): string
+            {
+                return lcfirst($propertyName);
+            }
+        };
+
+        yield [new PropertyNormalizer(null, $nameConverter, $extractor)];
+        yield [new ObjectNormalizer(null, $nameConverter, null, $extractor)];
     }
 
     public function testIgnore()

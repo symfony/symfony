@@ -28,7 +28,8 @@
     },
     "require-dev": {
         "symfony/filesystem": "^5.4|^6.0",
-        "symfony/finder": "^5.4|^6.0"
+        "symfony/finder": "^5.4|^6.0",
+        "symfony/var-exporter": "^5.4|^6.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Intl\\": "" },

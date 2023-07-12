@@ -437,6 +437,5 @@ return [
         'Pacific/Wake' => 'Tími á Wake-eyju',
         'Pacific/Wallis' => 'Tími á Wallis- og Fútúnaeyjum',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

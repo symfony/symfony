@@ -69,7 +69,7 @@ class RememberMeAuthenticator implements InteractiveAuthenticatorInterface
             return false;
         }
 
-        if (!$request->cookies->has($this->cookieName)) {
+        if (!$request->cookies->has($this->cookieName) || !\is_scalar($request->cookies->all()[$this->cookieName] ?: null)) {
             return false;
         }
 

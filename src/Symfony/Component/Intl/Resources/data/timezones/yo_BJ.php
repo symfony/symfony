@@ -85,6 +85,5 @@ return [
         'Indian/Mauritius' => 'Àkókò Máríshúshì (Mauritius)',
         'Indian/Reunion' => 'Àkókò Rɛ́yúníɔ́nì (Reunion)',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

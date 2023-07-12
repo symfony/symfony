@@ -219,6 +219,5 @@ return [
         'Pacific/Port_Moresby' => '巴布亞新畿內亞時間（莫士比港）',
         'Pacific/Tongatapu' => '湯加時間（湯加塔布島）',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

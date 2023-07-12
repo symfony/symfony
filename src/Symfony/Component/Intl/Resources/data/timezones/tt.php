@@ -434,6 +434,5 @@ return [
         'Pacific/Wake' => 'АКШ Кече Читтәге утраулары вакыты (Wake)',
         'Pacific/Wallis' => 'Уоллис һәм Футуна вакыты (Wallis)',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

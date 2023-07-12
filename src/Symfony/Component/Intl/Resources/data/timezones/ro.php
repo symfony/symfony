@@ -437,6 +437,5 @@ return [
         'Pacific/Wake' => 'Ora Insulei Wake',
         'Pacific/Wallis' => 'Ora din Wallis și Futuna',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

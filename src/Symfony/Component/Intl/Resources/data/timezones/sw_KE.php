@@ -82,6 +82,5 @@ return [
         'Pacific/Noumea' => 'Saa za Kaledonia Mpya (Noumea)',
         'Pacific/Port_Moresby' => 'Saa za Papua (Port Moresby)',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

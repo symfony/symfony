@@ -29,7 +29,8 @@
         "symfony/polyfill-php80": "^1.16"
     },
     "require-dev": {
-        "symfony/filesystem": "^4.4|^5.0|^6.0"
+        "symfony/filesystem": "^4.4|^5.0|^6.0",
+        "symfony/var-exporter": "^5.4|^6.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Intl\\": "" },

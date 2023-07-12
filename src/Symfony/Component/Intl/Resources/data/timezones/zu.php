@@ -437,6 +437,5 @@ return [
         'Pacific/Wake' => 'Isikhathi sase-Wake Island (i-Wake)',
         'Pacific/Wallis' => 'Isikhathi sase-Wallis nase-Futuna (i-Wallis)',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

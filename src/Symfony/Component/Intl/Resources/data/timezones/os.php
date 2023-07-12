@@ -166,6 +166,5 @@ return [
         'Europe/Zurich' => 'Астӕуккаг Европӕйаг рӕстӕг (Zurich)',
         'Pacific/Honolulu' => 'АИШ рӕстӕг (Honolulu)',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

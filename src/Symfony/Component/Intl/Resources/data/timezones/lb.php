@@ -436,6 +436,5 @@ return [
         'Pacific/Wake' => 'Wake-Insel-Zäit',
         'Pacific/Wallis' => 'Wallis-a-Futuna-Zäit',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

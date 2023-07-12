@@ -12,6 +12,5 @@ return [
         'rhg' => 'Rohingya',
         'tgx' => 'Tagisch',
     ],
-    'LocalizedNames' => [
-    ],
+    'LocalizedNames' => [],
 ];

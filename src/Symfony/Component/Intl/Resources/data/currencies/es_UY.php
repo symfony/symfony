@@ -3,16 +3,16 @@
 return [
     'Names' => [
         'USD' => [
-            0 => 'US$',
-            1 => 'dólar estadounidense',
+            'US$',
+            'dólar estadounidense',
         ],
         'UYU' => [
-            0 => '$',
-            1 => 'peso uruguayo',
+            '$',
+            'peso uruguayo',
         ],
         'UYW' => [
-            0 => 'UP',
-            1 => 'unidad previsional uruguayo',
+            'UP',
+            'unidad previsional uruguayo',
         ],
     ],
 ];

@@ -437,6 +437,5 @@ return [
         'Pacific/Wake' => 'Àm Eilean Wake',
         'Pacific/Wallis' => 'Àm Uallas agus Futuna',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

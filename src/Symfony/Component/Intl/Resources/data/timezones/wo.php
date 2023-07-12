@@ -436,6 +436,5 @@ return [
         'Pacific/Wake' => 'Duni Amerig Utar meer (Wake)',
         'Pacific/Wallis' => 'Walis ak Futuna (Wallis)',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

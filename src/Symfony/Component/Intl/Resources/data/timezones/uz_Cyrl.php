@@ -430,6 +430,5 @@ return [
         'Pacific/Wake' => 'Уэйк ороли вақти (Ueyk oroli)',
         'Pacific/Wallis' => 'Уэллис ва Футуна вақти (Uollis)',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

@@ -437,6 +437,5 @@ return [
         'Pacific/Wake' => 'eur Wake Island',
         'Pacific/Wallis' => 'eur Wallis ha Futuna',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

@@ -437,6 +437,5 @@ return [
         'Pacific/Wake' => 'Wakeoyggj tíð',
         'Pacific/Wallis' => 'Wallis- og Futunaoyggjar tíð',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

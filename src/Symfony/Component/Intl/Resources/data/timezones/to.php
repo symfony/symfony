@@ -437,6 +437,5 @@ return [
         'Pacific/Wake' => 'houa fakamotuueke',
         'Pacific/Wallis' => 'houa fakaʻuvea mo futuna',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

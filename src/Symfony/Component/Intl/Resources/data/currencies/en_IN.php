@@ -3,16 +3,16 @@
 return [
     'Names' => [
         'USD' => [
-            0 => '$',
-            1 => 'US Dollar',
+            '$',
+            'US Dollar',
         ],
         'VEF' => [
-            0 => 'VEF',
-            1 => 'Venezuelan Bolívar',
+            'VEF',
+            'Venezuelan Bolívar',
         ],
         'VES' => [
-            0 => 'VES',
-            1 => 'VES',
+            'VES',
+            'VES',
         ],
     ],
 ];

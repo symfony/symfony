@@ -369,6 +369,5 @@ return [
         'Pacific/Tongatapu' => 'טאנגאַ (Tongatapu)',
         'Pacific/Truk' => 'מיקראנעזיע (Chuuk)',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

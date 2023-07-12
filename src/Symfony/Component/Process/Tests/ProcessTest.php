@@ -66,11 +66,11 @@ class ProcessTest extends TestCase
         $cmd->run();
     }
 
+    /**
+     * @group transient-on-windows
+     */
     public function testThatProcessDoesNotThrowWarningDuringRun()
     {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('This test is transient on Windows');
-        }
         @trigger_error('Test Error', \E_USER_NOTICE);
         $process = $this->getProcessForCode('sleep(3)');
         $process->run();
@@ -130,12 +130,11 @@ class ProcessTest extends TestCase
         $this->assertLessThan(15, microtime(true) - $start);
     }
 
+    /**
+     * @group transient-on-windows
+     */
     public function testWaitUntilSpecificOutput()
     {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestIncomplete('This test is too transient on Windows, help wanted to improve it');
-        }
-
         $p = $this->getProcess([self::$phpBin, __DIR__.'/KillableProcessWithOutput.php']);
         $p->start();
 
@@ -1536,6 +1535,9 @@ class ProcessTest extends TestCase
         }
     }
 
+    /**
+     * @group transient-on-windows
+     */
     public function testNotTerminableInputPipe()
     {
         $process = $this->getProcess('echo foo');

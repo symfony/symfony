@@ -3,8 +3,8 @@
 return [
     'Names' => [
         'VUV' => [
-            0 => 'VT',
-            1 => 'vatu vanuatuan',
+            'VT',
+            'vatu vanuatuan',
         ],
     ],
 ];

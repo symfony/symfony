@@ -431,6 +431,5 @@ return [
         'Pacific/Wake' => 'Ħin ta’ Il-Gżejjer Minuri Mbiegħda tal-Istati Uniti (Wake)',
         'Pacific/Wallis' => 'Ħin ta’ Wallis u Futuna (Wallis)',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

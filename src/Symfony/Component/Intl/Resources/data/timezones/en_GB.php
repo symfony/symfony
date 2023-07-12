@@ -6,6 +6,5 @@ return [
         'America/Cancun' => 'Eastern Time (Cancun)',
         'America/Merida' => 'Central Time (Merida)',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

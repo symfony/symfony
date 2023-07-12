@@ -339,6 +339,5 @@ return [
         'Pacific/Wake' => 'USAs ytre småøyar (Wake)',
         'Pacific/Wallis' => 'tidssone for Wallis- og Futunaøyane',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

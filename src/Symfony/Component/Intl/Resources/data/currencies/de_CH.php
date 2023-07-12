@@ -3,20 +3,20 @@
 return [
     'Names' => [
         'BYN' => [
-            0 => 'BYN',
-            1 => 'Weissrussischer Rubel',
+            'BYN',
+            'Weissrussischer Rubel',
         ],
         'BYR' => [
-            0 => 'BYR',
-            1 => 'Weissrussischer Rubel (2000–2016)',
+            'BYR',
+            'Weissrussischer Rubel (2000–2016)',
         ],
         'EUR' => [
-            0 => 'EUR',
-            1 => 'Euro',
+            'EUR',
+            'Euro',
         ],
         'STN' => [
-            0 => 'STN',
-            1 => 'São-toméischer Dobra (2018)',
+            'STN',
+            'São-toméischer Dobra (2018)',
         ],
     ],
 ];

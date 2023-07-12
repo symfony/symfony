@@ -318,6 +318,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         $decorator->setDecoratedService('decorated');
         $decorator->setInstanceofConditionals([
             parent::class => (new ChildDefinition(''))->addTag('tag'),
+            self::class => (new ChildDefinition(''))->addTag('other-tag'),
         ]);
         $decorator->setAutoconfigured(true);
         $decorator->addTag('manual');
@@ -325,11 +326,18 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         $container->registerForAutoconfiguration(parent::class)
             ->addTag('tag')
         ;
+        $container->registerForAutoconfiguration(self::class)
+            ->addTag('last-tag')
+        ;
 
         (new ResolveInstanceofConditionalsPass())->process($container);
         (new ResolveChildDefinitionsPass())->process($container);
 
-        $this->assertSame(['manual' => [[]]], $container->getDefinition('decorator')->getTags());
+        $this->assertSame([
+            'manual' => [[]],
+            'other-tag' => [[]],
+            'last-tag' => [[]],
+        ], $container->getDefinition('decorator')->getTags());
     }
 
     public function testDecoratorsKeepBehaviorDescribingTags()

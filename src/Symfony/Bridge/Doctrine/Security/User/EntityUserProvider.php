@@ -15,6 +15,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
+use Doctrine\Persistence\Proxy;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -95,6 +96,10 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
 
                 throw $e;
             }
+        }
+
+        if ($refreshedUser instanceof Proxy && !$refreshedUser->__isInitialized()) {
+            $refreshedUser->__load();
         }
 
         return $refreshedUser;

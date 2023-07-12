@@ -25,7 +25,6 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
 {
     private bool $ignoreUnreadableDirs;
     private bool $ignoreFirstRewind = true;
-    private ?bool $rewindable = null;
 
     // these 3 properties take part of the performance optimization to avoid redoing the same work in all iterations
     private string $rootPath;

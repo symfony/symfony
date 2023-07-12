@@ -102,4 +102,34 @@ final class EsendexTransportTest extends TransportTestCase
 
         $this->assertSame($messageId, $sentMessage->getMessageId());
     }
+
+    public function testSentMessageContainsAnArrayOfMessages()
+    {
+        $messageId = bin2hex(random_bytes(7));
+        $response = $this->createMock(ResponseInterface::class);
+        $response->expects($this->exactly(2))
+            ->method('getStatusCode')
+            ->willReturn(200);
+        $response->expects($this->once())
+            ->method('getContent')
+            ->willReturn(json_encode(['batch' => ['messageheaders' => [['id' => $messageId]]]]));
+
+        $requestOptions = [];
+        $client = new MockHttpClient(static function ($method, $url, $options) use (&$requestOptions, $response): ResponseInterface {
+            $requestOptions = $options;
+
+            return $response;
+        });
+
+        $transport = self::createTransport($client);
+
+        $transport->send(new SmsMessage('phone', 'testMessage'));
+
+        $body = json_decode($requestOptions['body'] ?? '');
+
+        $this->assertIsArray($body->messages);
+        $this->assertCount(1, $body->messages);
+        $this->assertSame('phone', $body->messages[0]->to);
+        $this->assertSame('testMessage', $body->messages[0]->body);
+    }
 }

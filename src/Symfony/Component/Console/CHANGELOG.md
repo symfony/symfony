@@ -14,6 +14,7 @@ CHANGELOG
 
  * Add `SignalMap` to map signal value to its name
  * Multi-line text in vertical tables is aligned properly
+ * The application can also catch errors with `Application::setCatchErrors(true)`
 
 6.3
 ---

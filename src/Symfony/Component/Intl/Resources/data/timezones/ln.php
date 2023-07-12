@@ -411,6 +411,5 @@ return [
         'Pacific/Truk' => 'Ngonga ya Mikronezi (Chuuk)',
         'Pacific/Wallis' => 'Ngonga ya Walisɛ mpé Futuna (Wallis)',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

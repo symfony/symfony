@@ -436,6 +436,5 @@ return [
         'Pacific/Wake' => 'ۋېيك ئارىلى ۋاقتى (Wake)',
         'Pacific/Wallis' => 'ۋاللىس ۋە فۇتۇنا ۋاقتى (Wallis)',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

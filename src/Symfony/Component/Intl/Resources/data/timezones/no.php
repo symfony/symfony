@@ -437,6 +437,5 @@ return [
         'Pacific/Wake' => 'tidssone for Wake Island',
         'Pacific/Wallis' => 'tidssone for Wallis- og Futunaøyene',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

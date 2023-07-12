@@ -84,7 +84,7 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
                 $instanceofDef->setAbstract(true)->setParent($parent ?: '.abstract.instanceof.'.$id);
                 $parent = '.instanceof.'.$interface.'.'.$key.'.'.$id;
                 $container->setDefinition($parent, $instanceofDef);
-                $instanceofTags[] = $instanceofDef->getTags();
+                $instanceofTags[] = [$interface, $instanceofDef->getTags()];
                 $instanceofBindings = $instanceofDef->getBindings() + $instanceofBindings;
 
                 foreach ($instanceofDef->getMethodCalls() as $methodCall) {
@@ -123,8 +123,9 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
             // Don't add tags to service decorators
             $i = \count($instanceofTags);
             while (0 <= --$i) {
-                foreach ($instanceofTags[$i] as $k => $v) {
-                    if (null === $definition->getDecoratedService() || \in_array($k, $tagsToKeep, true)) {
+                [$interface, $tags] = $instanceofTags[$i];
+                foreach ($tags as $k => $v) {
+                    if (null === $definition->getDecoratedService() || $interface === $definition->getClass() || \in_array($k, $tagsToKeep, true)) {
                         foreach ($v as $v) {
                             if ($definition->hasTag($k) && \in_array($v, $definition->getTag($k))) {
                                 continue;

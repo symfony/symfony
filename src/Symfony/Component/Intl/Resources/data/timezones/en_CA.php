@@ -15,6 +15,5 @@ return [
         'Indian/Kerguelen' => 'French Southern and Antarctic Time (Kerguelen)',
         'Pacific/Wallis' => 'Wallis and Futuna Time',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

@@ -14,6 +14,5 @@ return [
         'Pacific/Marquesas' => 'hora de las islas Marquesas',
         'Pacific/Saipan' => 'hora de Chamorro (Saipán)',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

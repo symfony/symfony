@@ -164,6 +164,5 @@ return [
         'Pacific/Niue' => 'heure de Nioué (Niue)',
         'Pacific/Palau' => 'heure des Palaos (Palau)',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

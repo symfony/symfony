@@ -7,6 +7,5 @@ return [
         'Europe/Skopje' => 'Masedoniya y’Amajyaruguru (Skopje)',
         'Pacific/Tongatapu' => 'Tonga (Tongatapu)',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

@@ -41,6 +41,7 @@ class Deprecation
     private $originClass;
     private $originMethod;
     private $triggeringFile;
+    private $triggeringClass;
 
     /** @var string[] Absolute paths to vendor directories */
     private static $vendors;
@@ -61,6 +62,10 @@ class Deprecation
      */
     public function __construct($message, array $trace, $file, $languageDeprecation = false)
     {
+        if (DebugClassLoader::class === ($trace[2]['class'] ?? '')) {
+            $this->triggeringClass = $trace[2]['args'][0];
+        }
+
         switch ($trace[2]['function'] ?? '') {
             case 'trigger_deprecation':
                 $file = $trace[2]['file'];
@@ -165,6 +170,26 @@ class Deprecation
         $class = $line['class'];
 
         return 'ReflectionMethod' === $class || 0 === strpos($class, 'PHPUnit\\');
+    }
+
+    /**
+     * @return bool
+     */
+    public function originatesFromDebugClassLoader()
+    {
+        return isset($this->triggeringClass);
+    }
+
+    /**
+     * @return string
+     */
+    public function triggeringClass()
+    {
+        if (null === $this->triggeringClass) {
+            throw new \LogicException('Check with originatesFromDebugClassLoader() before calling this method.');
+        }
+
+        return $this->triggeringClass;
     }
 
     /**

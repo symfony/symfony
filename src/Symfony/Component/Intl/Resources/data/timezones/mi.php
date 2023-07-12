@@ -320,6 +320,5 @@ return [
         'Pacific/Galapagos' => 'Ekuatoa Wā (Galapagos)',
         'Pacific/Honolulu' => 'Hononga o Amerika Wā (Honolulu)',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

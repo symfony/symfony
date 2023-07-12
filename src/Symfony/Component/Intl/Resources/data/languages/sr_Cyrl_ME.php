@@ -17,6 +17,5 @@ return [
         'zgh' => 'стандардни марокански тамашек',
         'zu' => 'исизулу',
     ],
-    'LocalizedNames' => [
-    ],
+    'LocalizedNames' => [],
 ];

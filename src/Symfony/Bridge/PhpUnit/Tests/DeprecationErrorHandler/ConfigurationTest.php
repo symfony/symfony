@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\Configuration;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\Deprecation;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\DeprecationGroup;
+use Symfony\Component\ErrorHandler\DebugClassLoader;
 
 class ConfigurationTest extends TestCase
 {
@@ -356,7 +357,7 @@ class ConfigurationTest extends TestCase
         $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 1', $trace, '')));
         $configuration->writeBaseline();
         $this->assertEquals($filename, $configuration->getBaselineFile());
-        $expected_baseline = [
+        $expected = [
             [
                 'location' => 'Symfony\Bridge\PhpUnit\Tests\DeprecationErrorHandler\ConfigurationTest::runTest',
                 'message' => 'Test message 1',
@@ -368,7 +369,7 @@ class ConfigurationTest extends TestCase
                 'count' => 1,
             ],
         ];
-        $this->assertEquals(json_encode($expected_baseline, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES), file_get_contents($filename));
+        $this->assertEquals(json_encode($expected, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES), file_get_contents($filename));
     }
 
     public function testBaselineGenerationNoFile()
@@ -383,7 +384,7 @@ class ConfigurationTest extends TestCase
         $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 1', $trace, '')));
         $configuration->writeBaseline();
         $this->assertEquals($filename, $configuration->getBaselineFile());
-        $expected_baseline = [
+        $expected = [
             [
                 'location' => 'Symfony\Bridge\PhpUnit\Tests\DeprecationErrorHandler\ConfigurationTest::runTest',
                 'message' => 'Test message 1',
@@ -395,7 +396,7 @@ class ConfigurationTest extends TestCase
                 'count' => 2,
             ],
         ];
-        $this->assertEquals(json_encode($expected_baseline, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES), file_get_contents($filename));
+        $this->assertEquals(json_encode($expected, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES), file_get_contents($filename));
     }
 
     public function testExistingBaseline()
@@ -447,7 +448,7 @@ class ConfigurationTest extends TestCase
         $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 3', $trace, '')));
         $configuration->writeBaseline();
         $this->assertEquals($filename, $configuration->getBaselineFile());
-        $expected_baseline = [
+        $expected = [
             [
                 'location' => 'Symfony\Bridge\PhpUnit\Tests\DeprecationErrorHandler\ConfigurationTest::runTest',
                 'message' => 'Test message 2',
@@ -459,7 +460,44 @@ class ConfigurationTest extends TestCase
                 'count' => 1,
             ],
         ];
-        $this->assertEquals(json_encode($expected_baseline, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES), file_get_contents($filename));
+        $this->assertEquals(json_encode($expected, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES), file_get_contents($filename));
+    }
+
+    public function testBaselineGenerationWithDeprecationTriggeredByDebugClassLoader()
+    {
+        $filename = $this->createFile();
+        $configuration = Configuration::fromUrlEncodedString('generateBaseline=true&baselineFile='.urlencode($filename));
+
+        $trace = debug_backtrace();
+        $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Regular deprecation', $trace, '')));
+
+        $trace[2] = [
+            'class' => DebugClassLoader::class,
+            'function' => 'testBaselineGenerationWithDeprecationTriggeredByDebugClassLoader',
+            'args' => [self::class]
+        ];
+
+        $deprecation = new Deprecation('Deprecation by debug class loader', $trace, '');
+
+        $this->assertTrue($deprecation->originatesFromDebugClassLoader());
+
+        $this->assertTrue($configuration->isBaselineDeprecation($deprecation));
+
+        $configuration->writeBaseline();
+        $this->assertEquals($filename, $configuration->getBaselineFile());
+        $expected = [
+            [
+                'location' => 'Symfony\Bridge\PhpUnit\Tests\DeprecationErrorHandler\ConfigurationTest::runTest',
+                'message' => 'Regular deprecation',
+                'count' => 1,
+            ],
+            [
+                'location' => self::class,
+                'message' => 'Deprecation by debug class loader',
+                'count' => 1,
+            ],
+        ];
+        $this->assertEquals(json_encode($expected, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES), file_get_contents($filename));
     }
 
     public function testBaselineArgumentException()

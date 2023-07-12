@@ -437,6 +437,5 @@ return [
         'Pacific/Wake' => 'Wake uharteko ordua',
         'Pacific/Wallis' => 'Wallis eta Futunako ordutegia',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

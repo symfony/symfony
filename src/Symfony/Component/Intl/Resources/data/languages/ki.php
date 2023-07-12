@@ -48,6 +48,5 @@ return [
         'zh' => 'Kĩcaina',
         'zu' => 'Kizulu',
     ],
-    'LocalizedNames' => [
-    ],
+    'LocalizedNames' => [],
 ];

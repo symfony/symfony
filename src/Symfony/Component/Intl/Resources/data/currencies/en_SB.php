@@ -3,8 +3,8 @@
 return [
     'Names' => [
         'SBD' => [
-            0 => '$',
-            1 => 'Solomon Islands Dollar',
+            '$',
+            'Solomon Islands Dollar',
         ],
     ],
 ];

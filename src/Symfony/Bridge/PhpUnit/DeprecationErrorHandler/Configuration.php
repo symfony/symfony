@@ -230,7 +230,9 @@ class Configuration
             return false;
         }
 
-        if ($deprecation->originatesFromAnObject()) {
+        if ($deprecation->originatesFromDebugClassLoader()) {
+            $location = $deprecation->triggeringClass();
+        } elseif ($deprecation->originatesFromAnObject()) {
             $location = $deprecation->originatingClass().'::'.$deprecation->originatingMethod();
         } else {
             $location = 'procedural code';

@@ -3,8 +3,8 @@
 return [
     'Names' => [
         'GBP' => [
-            0 => '£',
-            1 => 'UK Pound',
+            '£',
+            'UK Pound',
         ],
     ],
 ];

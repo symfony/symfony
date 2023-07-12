@@ -6,13 +6,12 @@ putenv('NO_COLOR=1');
 
 $vendor = __DIR__;
 while (!file_exists($vendor.'/vendor')) {
-    $vendor = \dirname($vendor);
+    $vendor = dirname($vendor);
 }
 require $vendor.'/vendor/autoload.php';
 
 use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
-use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\VarDumper;
 
 VarDumper::setHandler(function ($var, string $label = null) {
@@ -30,14 +29,41 @@ VarDumper::setHandler(function ($var, string $label = null) {
     $handler($var, $label);
 });
 
-$schemas = new \ArrayObject();
-dump($schemas);
-$schemas['X'] = new \ArrayObject(['type' => 'object']);
+$arrayObject = new \ArrayObject();
+dump($arrayObject);
+$arrayObject['X'] = 'A';
+$arrayObject['Y'] = new \ArrayObject(['type' => 'object']);
+$arrayObject['Y']['Z'] = 'B';
+
+$arrayIterator = new \ArrayIterator();
+dump($arrayIterator);
+$arrayIterator['X'] = 'A';
+$arrayIterator['Y'] = new \ArrayIterator(['type' => 'object']);
+$arrayIterator['Y']['Z'] = 'B';
+
+$recursiveArrayIterator = new \RecursiveArrayIterator();
+dump($recursiveArrayIterator);
+$recursiveArrayIterator['X'] = 'A';
+$recursiveArrayIterator['Y'] = new \RecursiveArrayIterator(['type' => 'object']);
+$recursiveArrayIterator['Y']['Z'] = 'B';
 
 --EXPECTF--
+%s on line %d:
 ArrayObject {#%d
-  -storage: []
+  storage: []
   flag::STD_PROP_LIST: false
   flag::ARRAY_AS_PROPS: false
   iteratorClass: "ArrayIterator"
+}
+%s on line %d:
+ArrayIterator {#%d
+  storage: []
+  flag::STD_PROP_LIST: false
+  flag::ARRAY_AS_PROPS: false
+}
+%s on line %d:
+RecursiveArrayIterator {#%d
+  storage: []
+  flag::STD_PROP_LIST: false
+  flag::ARRAY_AS_PROPS: false
 }

@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-05-13T09:45:19Z
+
+PR rebased and ready for merge in 6.3 if desired.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-05-13T09:52:54Z
+
+PR ready for 6.3.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-06-03T15:12:15Z
+
+@nicolas-grekas This PR should be adapted for 6.4 instead of 6.3.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-04T14:42:55Z
+
+PR updated, ready for 6.4
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-06-06T07:41:26Z
+
+The low deps failures are related, aren't they?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-06T12:44:47Z
+
+> The low deps failures are related, aren't they?
+
+Right, fixed!

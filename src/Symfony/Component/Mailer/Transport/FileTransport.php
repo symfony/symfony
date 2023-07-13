@@ -15,8 +15,6 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\SentMessage;
 
-use function _PHPStan_690619d82\RingCentral\Psr7\str;
-
 /**
  * Sends the message to a file.
  *
@@ -24,7 +22,7 @@ use function _PHPStan_690619d82\RingCentral\Psr7\str;
  */
 final class FileTransport extends AbstractTransport
 {
-    public function __construct(EventDispatcherInterface $dispatcher = NULL, LoggerInterface $logger = NULL, protected Dsn $dsn)
+    public function __construct(EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null, protected Dsn $dsn)
     {
         parent::__construct($dispatcher, $logger);
     }
@@ -41,6 +39,6 @@ final class FileTransport extends AbstractTransport
 
     private function getFile(): string
     {
-        return $this->dsn->getScheme() . '://' . $this->dsn->getPath();
+        return $this->dsn->getScheme().'://'.$this->dsn->getPath();
     }
 }

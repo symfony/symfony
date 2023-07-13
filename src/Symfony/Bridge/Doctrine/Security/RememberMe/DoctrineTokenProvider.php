@@ -40,6 +40,8 @@ use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
  *         `class`    varchar(100) NOT NULL,
  *         `username` varchar(200) NOT NULL
  *     );
+ *
+ * @final since Symfony 6.4
  */
 class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInterface
 {
@@ -60,7 +62,7 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
         $row = $stmt instanceof Result || $stmt instanceof DriverResult ? $stmt->fetchAssociative() : $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if ($row) {
-            return new PersistentToken($row['class'], $row['username'], $series, $row['value'], new \DateTime($row['last_used']));
+            return new PersistentToken($row['class'], $row['username'], $series, $row['value'], new \DateTimeImmutable($row['last_used']));
         }
 
         throw new TokenNotFoundException('No token found.');
@@ -82,6 +84,8 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
     }
 
     /**
+     * @param \DateTimeInterface $lastUsed Accepting only DateTime is deprecated since Symfony 6.4
+     *
      * @return void
      */
     public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed)

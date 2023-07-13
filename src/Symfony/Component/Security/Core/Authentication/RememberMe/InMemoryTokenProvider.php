@@ -17,6 +17,8 @@ use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
  * This class is used for testing purposes, and is not really suited for production.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @final since Symfony 6.4
  */
 class InMemoryTokenProvider implements TokenProviderInterface
 {
@@ -32,6 +34,8 @@ class InMemoryTokenProvider implements TokenProviderInterface
     }
 
     /**
+     * @param \DateTimeInterface $lastUsed Accepting only DateTime is deprecated since Symfony 6.4
+     *
      * @return void
      */
     public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed)

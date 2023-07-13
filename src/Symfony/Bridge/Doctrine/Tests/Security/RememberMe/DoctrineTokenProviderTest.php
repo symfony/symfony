@@ -29,7 +29,7 @@ class DoctrineTokenProviderTest extends TestCase
     {
         $provider = $this->bootstrapProvider();
 
-        $token = new PersistentToken('someClass', 'someUser', 'someSeries', 'tokenValue', new \DateTime('2013-01-26T18:23:51'));
+        $token = new PersistentToken('someClass', 'someUser', 'someSeries', 'tokenValue', new \DateTimeImmutable('2013-01-26T18:23:51'));
         $provider->createNewToken($token);
 
         $this->assertEquals($provider->loadTokenBySeries('someSeries'), $token);
@@ -47,7 +47,7 @@ class DoctrineTokenProviderTest extends TestCase
     {
         $provider = $this->bootstrapProvider();
 
-        $token = new PersistentToken('someClass', 'someUser', 'someSeries', 'tokenValue', new \DateTime('2013-01-26T18:23:51'));
+        $token = new PersistentToken('someClass', 'someUser', 'someSeries', 'tokenValue', new \DateTimeImmutable('2013-01-26T18:23:51'));
         $provider->createNewToken($token);
         $provider->updateToken('someSeries', 'newValue', $lastUsed = new \DateTime('2014-06-26T22:03:46'));
         $token = $provider->loadTokenBySeries('someSeries');
@@ -59,7 +59,7 @@ class DoctrineTokenProviderTest extends TestCase
     public function testDeleteToken()
     {
         $provider = $this->bootstrapProvider();
-        $token = new PersistentToken('someClass', 'someUser', 'someSeries', 'tokenValue', new \DateTime('2013-01-26T18:23:51'));
+        $token = new PersistentToken('someClass', 'someUser', 'someSeries', 'tokenValue', new \DateTimeImmutable('2013-01-26T18:23:51'));
         $provider->createNewToken($token);
         $provider->deleteTokenBySeries('someSeries');
 
@@ -76,7 +76,7 @@ class DoctrineTokenProviderTest extends TestCase
         $newValue = 'newValue';
 
         // setup existing token
-        $token = new PersistentToken('someClass', 'someUser', $series, $oldValue, new \DateTime('2013-01-26T18:23:51'));
+        $token = new PersistentToken('someClass', 'someUser', $series, $oldValue, new \DateTimeImmutable('2013-01-26T18:23:51'));
         $provider->createNewToken($token);
 
         // new request comes in requiring remember-me auth, which updates the token
@@ -101,7 +101,7 @@ class DoctrineTokenProviderTest extends TestCase
         $newValue = 'newValue';
 
         // setup existing token
-        $token = new PersistentToken('someClass', 'someUser', $series, $oldValue, new \DateTime('2013-01-26T18:23:51'));
+        $token = new PersistentToken('someClass', 'someUser', $series, $oldValue, new \DateTimeImmutable('2013-01-26T18:23:51'));
         $provider->createNewToken($token);
 
         // new request comes in requiring remember-me auth, which updates the token

@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-05-10T18:30:45Z
+
+would the try/catch be possible on the calling side?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-05-11T08:44:37Z
+
+If we go this way, I suggest supporting the auto-cast in both directions. This would make it easier to change the default input mode in the Form component in a future version.
+In 7.0, the Form component should probably be changed to use DateTimeImmutable is its norm data and converting to DateTime when the input needs it rather than working with mutable DateTime for all intermediate layers. But this would make sense if we don't convert twice for projects using DateTimeImmutable and the default input format.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-06T13:57:17Z
+
+> would the try/catch be possible on the calling side?
+> supporting the auto-cast in both directions
+
+Done for both.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-21T08:07:43Z
+
+Now with tests. PR ready for review.

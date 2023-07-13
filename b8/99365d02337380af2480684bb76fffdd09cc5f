@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by RobertMe at 2023-01-23T09:39:23Z
+
+I'm uncertain about the Psalm failure. `return ceil(...)` results in a `float` (while it is an integer value), and the return type is declared as `int`. But the old code also was based on `ceil()` resulting in a `float` return value, while the return type was declared as `int`. So I guess that's fine?
+
+---------------------------------------------------------------------------
+
+by Robert-TelePsy at 2023-02-06T11:19:02Z
+
+@wouterj it seems like you're the original developer of the RateLimiter component. So may I ask you to have a look at this? (as it seems to have gone unnoticed in general)

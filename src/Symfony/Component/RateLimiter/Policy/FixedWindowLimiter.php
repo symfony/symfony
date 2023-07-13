@@ -68,7 +68,7 @@ final class FixedWindowLimiter implements LimiterInterface
 
                 $reservation = new Reservation($now, new RateLimit($window->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U', floor($now)), true, $this->limit));
             } else {
-                $waitDuration = $window->calculateTimeForTokens($tokens);
+                $waitDuration = $window->calculateTimeForTokens($tokens, $now);
 
                 if (null !== $maxTime && $waitDuration > $maxTime) {
                     // process needs to wait longer than set interval

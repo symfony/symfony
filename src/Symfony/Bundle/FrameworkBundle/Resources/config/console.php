@@ -181,9 +181,10 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('Receivers'),
                 service('messenger.routable_message_bus'),
                 service('event_dispatcher'),
-                service('logger'),
+                service('logger')->nullOnInvalid(),
             ])
             ->tag('console.command')
+            ->tag('monolog.logger', ['channel' => 'messenger'])
 
         ->set('console.command.messenger_failed_messages_show', FailedMessagesShowCommand::class)
             ->args([

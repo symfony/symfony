@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by stof at 2023-07-11T12:55:03Z
+
+~shouldn't we also keep fetching them at once for expanded choice fields as well ?~
+
+Forget that. The loop above for expanded fields does not call the choice list in that loop.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-07-11T13:09:46Z
+
+Is there a way to write a test ensuring that a submission of a multiple choice type calls `getChoicesForValues` only once during the processing, to prevent similar regressions ?

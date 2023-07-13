@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2023-07-12T05:50:08Z
+
+Thank you. Please pick a more meaningful PR title and add a test.
+
+---------------------------------------------------------------------------
+
+by radar3301 at 2023-07-12T07:10:38Z
+
+> Thank you. Please pick a more meaningful PR title
+
+Done. No idea how I didn't see that.
+
+> and add a test.
+
+Sorry, but I'm not going to write 50+ lines of code of unit test for such a trivial 2 LoC sanity check...

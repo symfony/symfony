@@ -47,7 +47,14 @@ final class Dsn
             throw new InvalidArgumentException('The mailer DSN must contain a scheme.');
         }
 
-        if (!isset($parsedDsn['host']) && 'file' !== $parsedDsn['scheme']) {
+        if ('file' === $parsedDsn['scheme']) {
+            if (!empty($parsedDsn['host'])) {
+                throw new InvalidArgumentException('The mailer file DNS only works with absolute file paths.');
+            }
+            $parsedDsn['host'] = 'null';
+        }
+
+        if (!isset($parsedDsn['host'])) {
             throw new InvalidArgumentException('The mailer DSN must contain a host (use "default" by default).');
         }
 
@@ -56,7 +63,7 @@ final class Dsn
         $port = $parsedDsn['port'] ?? null;
         parse_str($parsedDsn['query'] ?? '', $query);
 
-        return new self($parsedDsn['scheme'], $parsedDsn['host'] ?? 'default', $user, $password, $port, $query, $parsedDsn['path'] ?? null);
+        return new self($parsedDsn['scheme'], $parsedDsn['host'], $user, $password, $port, $query, $parsedDsn['path'] ?? null);
     }
 
     public function getScheme(): string

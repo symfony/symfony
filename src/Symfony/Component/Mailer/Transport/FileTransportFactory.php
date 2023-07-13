@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Transport;
 
+use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 
 /**
@@ -20,11 +21,16 @@ final class FileTransportFactory extends AbstractTransportFactory
 {
     public function create(Dsn $dsn): TransportInterface
     {
-        if ('file' === $dsn->getScheme()) {
-            return new FileTransport($this->dispatcher, $this->logger, $dsn);
+        if ('file' !== $dsn->getScheme()) {
+            throw new UnsupportedSchemeException($dsn, 'file', $this->getSupportedSchemes());
         }
 
-        throw new UnsupportedSchemeException($dsn, 'file', $this->getSupportedSchemes());
+        $dir = dirname($dsn->getPath());
+        if (!is_dir($dir) || !is_writable($dir)) {
+            throw new InvalidArgumentException("Directory $dir doesn't exist or is not writable");
+        }
+
+        return new FileTransport($dsn, $this->dispatcher, $this->logger);
     }
 
     protected function getSupportedSchemes(): array

@@ -86,6 +86,11 @@ class DsnTest extends TestCase
             'api://u%24er:pa%24s@mailgun?region=eu',
             new Dsn('api', 'mailgun', 'u$er', 'pa$s', null, ['region' => 'eu']),
         ];
+
+        yield 'file with absolute path' => [
+            'file:///absolute/path/to/file.txt',
+            new Dsn('file', 'null', null, null, null, [], '/absolute/path/to/file.txt'),
+        ];
     }
 
     public static function invalidDsnProvider(): iterable
@@ -101,8 +106,8 @@ class DsnTest extends TestCase
         ];
 
         yield [
-            'file:///some/path',
-            'The mailer DSN must contain a host (use "default" by default).',
+            'file://relative/path/to/file.txt',
+            'The mailer file DNS only works with absolute file paths.',
         ];
     }
 }

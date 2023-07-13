@@ -22,14 +22,18 @@ use Symfony\Component\Mailer\SentMessage;
  */
 final class FileTransport extends AbstractTransport
 {
-    public function __construct(EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null, protected Dsn $dsn)
+    public function __construct(protected Dsn $dsn, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
         parent::__construct($dispatcher, $logger);
     }
 
     protected function doSend(SentMessage $message): void
     {
-        file_put_contents($this->getFile(), $message->toString());
+        if (false !== file_put_contents($this->getFile(), $message->toString())) {
+            $this->getLogger()->debug(sprintf('Email sent with "%s" transport', $this->getFile()));
+            return;
+        }
+        $this->getLogger()->error(sprintf('Cannot send email using "%s" transport', $this->getFile()));
     }
 
     public function __toString(): string

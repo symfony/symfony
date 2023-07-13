@@ -24,8 +24,9 @@ final class Dsn
     private ?string $password;
     private ?int $port;
     private array $options;
+    private ?string $path;
 
-    public function __construct(string $scheme, string $host, string $user = null, #[\SensitiveParameter] string $password = null, int $port = null, array $options = [])
+    public function __construct(string $scheme, string $host, string $user = null, #[\SensitiveParameter] string $password = null, int $port = null, array $options = [], string $path = null)
     {
         $this->scheme = $scheme;
         $this->host = $host;
@@ -33,6 +34,7 @@ final class Dsn
         $this->password = $password;
         $this->port = $port;
         $this->options = $options;
+        $this->path = $path;
     }
 
     public static function fromString(#[\SensitiveParameter] string $dsn): self
@@ -45,7 +47,7 @@ final class Dsn
             throw new InvalidArgumentException('The mailer DSN must contain a scheme.');
         }
 
-        if (!isset($parsedDsn['host'])) {
+        if (!isset($parsedDsn['host']) && 'file' !== $parsedDsn['scheme']) {
             throw new InvalidArgumentException('The mailer DSN must contain a host (use "default" by default).');
         }
 
@@ -54,7 +56,7 @@ final class Dsn
         $port = $parsedDsn['port'] ?? null;
         parse_str($parsedDsn['query'] ?? '', $query);
 
-        return new self($parsedDsn['scheme'], $parsedDsn['host'], $user, $password, $port, $query);
+        return new self($parsedDsn['scheme'], $parsedDsn['host'] ?? 'default', $user, $password, $port, $query, $parsedDsn['path'] ?? null);
     }
 
     public function getScheme(): string
@@ -85,5 +87,10 @@ final class Dsn
     public function getOption(string $key, mixed $default = null): mixed
     {
         return $this->options[$key] ?? $default;
+    }
+
+    public function getPath(): ?string
+    {
+        return $this->path;
     }
 }

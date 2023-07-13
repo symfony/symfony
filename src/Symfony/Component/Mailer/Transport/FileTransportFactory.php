@@ -15,7 +15,7 @@ use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 
 /**
- * @author ...
+ * @author Claudiu Cristea <clau.cristea@gmail.com>
  */
 final class FileTransportFactory extends AbstractTransportFactory
 {

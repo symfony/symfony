@@ -18,7 +18,7 @@ use Symfony\Component\Mailer\SentMessage;
 /**
  * Sends the message to a file.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+ * @author Claudiu Cristea <clau.cristea@gmail.com>
  */
 final class FileTransport extends AbstractTransport
 {

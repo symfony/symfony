@@ -4,7 +4,7 @@ CHANGELOG
 6.4
 ---
 
-* Add file DSN used as `file://path/to/relative/file.txt` or `file:///path/to/abolute/file.txt`
+* Add file DSN used as abolute paths (e.g. `file:///path/to/abolute/file.txt`)
 
 6.3
 ---

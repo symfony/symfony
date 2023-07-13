@@ -59,6 +59,54 @@ class HttpUtilsTest extends TestCase
     }
 
     /**
+     * @dataProvider validRequestDomainUrls
+     */
+    public function testCreateRedirectResponse(?string $domainRegexp, string $path, string $expectedRedirectUri)
+    {
+        $utils = new HttpUtils($this->getUrlGenerator(), null, $domainRegexp);
+        $response = $utils->createRedirectResponse($this->getRequest(), $path);
+
+        $this->assertTrue($response->isRedirect($expectedRedirectUri));
+        $this->assertEquals(302, $response->getStatusCode());
+    }
+
+    public static function validRequestDomainUrls()
+    {
+        return [
+            '/foobar' => [
+                null,
+                '/foobar',
+                'http://localhost/foobar',
+            ],
+            'http://symfony.com/ without domain regex' => [
+                null,
+                'http://symfony.com/',
+                'http://symfony.com/',
+            ],
+            'http://localhost/blog with #^https?://symfony\.com$#i' => [
+                '#^https?://symfony\.com$#i',
+                'http://symfony.com/blog',
+                'http://symfony.com/blog',
+            ],
+            'http://localhost/blog with #^https?://%s$#i' => [
+                '#^https?://%s$#i',
+                'http://localhost/blog',
+                'http://localhost/blog',
+            ],
+            'custom scheme' => [
+                null,
+                'android-app://com.google.android.gm/',
+                'android-app://com.google.android.gm/',
+            ],
+            'custom scheme with all URL components' => [
+                null,
+                'android-app://foo:bar@www.example.com:8080/software/index.html?lite=true#section1',
+                'android-app://foo:bar@www.example.com:8080/software/index.html?lite=true#section1',
+            ],
+        ];
+    }
+
+    /**
      * @dataProvider badRequestDomainUrls
      */
     public function testCreateRedirectResponseWithBadRequestsDomain($url)
@@ -77,6 +125,7 @@ class HttpUtilsTest extends TestCase
             ['http:/\\pirate.net/foo'],
             ['http:\\/pirate.net/foo'],
             ['http://////pirate.net/foo'],
+            ['http:///foo'],
         ];
     }
 

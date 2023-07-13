@@ -174,7 +174,7 @@ EOTXT;
         $expected = <<<EOTXT
 ArrayObject@anonymous {
   +"foo": 234
-  -storage: array:1 [
+  storage: array:1 [
     0 => 123
   ]
   flag::STD_PROP_LIST: false
@@ -192,7 +192,7 @@ EOTXT;
         $expected = <<<EOTXT
 Symfony\Component\VarDumper\Tests\Caster\MyArrayIterator {
   -foo: 123
-  -storage: array:1 [
+  storage: array:1 [
     0 => 234
   ]
   flag::STD_PROP_LIST: false

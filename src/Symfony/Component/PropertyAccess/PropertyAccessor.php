@@ -413,7 +413,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                         [$trace] = $e->getTrace();
 
                         // handle uninitialized properties in PHP >= 7
-                        if (__FILE__ === $trace['file']
+                        if (__FILE__ === ($trace['file'] ?? null)
                             && $name === $trace['function']
                             && $object instanceof $trace['class']
                             && preg_match('/Return value (?:of .*::\w+\(\) )?must be of (?:the )?type (\w+), null returned$/', $e->getMessage(), $matches)

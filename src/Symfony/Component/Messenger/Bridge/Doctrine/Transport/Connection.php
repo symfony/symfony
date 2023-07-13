@@ -360,7 +360,7 @@ class Connection implements ResetInterface
 
     public function undeliverNotHandled(): void
     {
-        if (count($this->lastDeliveredButNotYetHandledEnvelopesIds) === 0) {
+        if (0 === \count($this->lastDeliveredButNotYetHandledEnvelopesIds)) {
             return;
         }
 

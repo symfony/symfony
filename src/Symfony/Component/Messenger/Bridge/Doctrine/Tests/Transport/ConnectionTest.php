@@ -49,7 +49,7 @@ class ConnectionTest extends TestCase
                 'id' => 2,
                 'body' => '{"message":"There"}',
                 'headers' => json_encode(['type' => DummyMessage::class]),
-            ]
+            ],
         ];
         $stmt = $this->getResultMockForGet($resultMock);
 

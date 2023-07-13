@@ -61,11 +61,11 @@ class DoctrinePostgreSqlIntegrationTest extends TestCase
     {
         $this->connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
 
-        $encoded = $this->connection->get();
+        $encoded = $this->connection->get()[0];
         $this->assertEquals('{"message": "Hi"}', $encoded['body']);
         $this->assertEquals(['type' => DummyMessage::class], $encoded['headers']);
 
-        $this->assertNull($this->connection->get());
+        $this->assertEmpty($this->connection->get());
     }
 
     private function createSchemaManager(): AbstractSchemaManager

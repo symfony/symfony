@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-07-07T20:45:07Z
+
+> Sometimes lines in index.csv are broken
+
+It looks like you're trying to hide a problem in `FileProfilerStorage`. Do you know why there is invalid rows in the file?
+
+---------------------------------------------------------------------------
+
+by Pelagoss at 2023-07-08T07:48:01Z
+
+I think it only occurs when the file is very big. Or maybe when multiple client requests the backend at same time
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-07-09T16:27:35Z
+
+The root issue seems to be the same as #50816.
+
+---------------------------------------------------------------------------
+
+by Pelagoss at 2023-07-10T07:22:58Z
+
+I will try with 6.3 and let you know
+
+---------------------------------------------------------------------------
+
+by Pelagoss at 2023-07-10T07:40:37Z
+
+![image](https://github.com/symfony/symfony/assets/30167531/5b275b4b-0bc7-472f-8c5f-a2cf5d4bebbe)
+![image](https://github.com/symfony/symfony/assets/30167531/496532ff-665a-4d41-8d02-cdaee2be7649)
+In this exemple (6.2.12), I dump everytime a line is writed in the .csv and look the line with only a "0", it corresponds with neither dump

@@ -16,7 +16,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\SentMessage;
 
 /**
- * Sends the message to a file.
+ * Writes the message to a file.
  *
  * @author Claudiu Cristea <clau.cristea@gmail.com>
  */

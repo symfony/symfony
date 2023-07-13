@@ -14,7 +14,6 @@ namespace Symfony\Component\Mailer\Tests\Transport;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\FileTransport;
-use Symfony\Component\Mailer\Transport\NullTransport;
 
 class FileTransportTest extends TestCase
 {

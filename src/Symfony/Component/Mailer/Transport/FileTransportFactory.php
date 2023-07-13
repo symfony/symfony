@@ -25,9 +25,9 @@ final class FileTransportFactory extends AbstractTransportFactory
             throw new UnsupportedSchemeException($dsn, 'file', $this->getSupportedSchemes());
         }
 
-        $dir = dirname($dsn->getPath());
+        $dir = \dirname($dsn->getPath());
         if (!is_dir($dir) || !is_writable($dir)) {
-            throw new InvalidArgumentException("Directory $dir doesn't exist or is not writable");
+            throw new InvalidArgumentException("Directory $dir doesn't exist or is not writable.");
         }
 
         return new FileTransport($dsn, $this->dispatcher, $this->logger);

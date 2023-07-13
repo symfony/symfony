@@ -31,6 +31,7 @@ final class FileTransport extends AbstractTransport
     {
         if (false !== file_put_contents($this->getFile(), $message->toString())) {
             $this->getLogger()->debug(sprintf('Email sent with "%s" transport', $this->getFile()));
+
             return;
         }
         $this->getLogger()->error(sprintf('Cannot send email using "%s" transport', $this->getFile()));

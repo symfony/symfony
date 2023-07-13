@@ -45,7 +45,7 @@ class FileTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function testDirectoryNotFound(): void
+    public function testDirectoryNotFound()
     {
         $dir = sys_get_temp_dir().'/path/does/not/exist';
         $dsn = new Dsn('file', 'null', null, null, null, [], $dir.'/file.txt');

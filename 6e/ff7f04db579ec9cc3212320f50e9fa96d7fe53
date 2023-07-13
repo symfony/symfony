@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by Spomky at 2023-06-04T18:38:10Z
+
+The support for URNs could be removed. It looks like it is not part of the current best practices (see [RFC8252](https://datatracker.ietf.org/doc/html/rfc8252)); custom scheme like `android-app` is now prefered.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2023-06-06T16:13:05Z
+
+Hi @chalasr,
+
+Many thanks for your comment. I restored the previous tests and keep the one I created. Let me know if you agree with the modifications.
+
+Regarding the behavior of paths starting with `//`, the change is intentional. I took the opportunity of this PR to fix the comment `Protocol-relative redirection should not be supported for security reasons`. There is now reason for a developer to redirect to such path and could be considered as an open redirect in some situation.
+I can revert the change and open another PR if you prefer. At some point, it should be addressed and it seems to be the perfect moment for me.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2023-07-07T17:11:57Z
+
+Agreed. Let's keep it simple and without any BC.

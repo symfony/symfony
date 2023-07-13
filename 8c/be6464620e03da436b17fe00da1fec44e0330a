@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-07-13T07:43:54Z
+
+caused by the changes done in #49539, previously we exited early when the `pcntl_signal()` function was missing
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-07-13T09:21:27Z
+
+Could the failing integration test be related?
+> 1) Symfony\Component\Messenger\Bridge\Amqp\Tests\Transport\AmqpExtIntegrationTest::testItReceivesSignals
+> RuntimeException: Expected output never arrived. Got "" instead.
+
+It's not on the latest 6.3 run.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-07-13T11:07:12Z
+
+I am looking into the failure
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-07-13T12:03:12Z
+
+There is a competitive PR
+
+https://github.com/symfony/symfony/pull/50787
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-07-13T12:52:22Z
+
+@nicolas-grekas tests fixed
+
+@lyrixx This PR fixes an issue when this listener is registered by the FrameworkBundle 5.4, but the pcntl extension is missing. I don't see how this is being fixed by the linked PR.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-07-13T13:03:01Z
+
+ah okay, I confused.

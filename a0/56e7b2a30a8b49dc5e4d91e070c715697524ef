@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-07-11T20:18:19Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.4" but it seems your PR description refers to branch "5.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by oleg-andreyev at 2023-07-11T20:27:21Z
+
+fabbot is failing https://fabbot.io/report/symfony/symfony/50943/a87c5067c97993d87929f8f14fdee7d8c45f9678 trying to change `dum` to `dumb`
+
+---------------------------------------------------------------------------
+
+by oleg-andreyev at 2023-07-11T20:36:42Z
+
+@fabpot @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by oleg-andreyev at 2023-07-12T20:26:17Z
+
+> shouldn't `generateAlpha3Codes` be updated to include them as well ?
+
+I agree with @ro0NL, T codes are preferable, B are considered legacy.
+
+https://github.com/symfony/symfony/pull/50943#discussion_r1260707120
+
+---------------------------------------------------------------------------
+
+by oleg-andreyev at 2023-07-12T20:29:39Z
+
+I'll squash commits before merge.
+
+---------------------------------------------------------------------------
+
+by oleg-andreyev at 2023-07-13T08:28:21Z
+
+> (please squash if you can yes)
+
+One commit is related to update-data on MacOS (fix)
+Second is actually about this ticket.
+
+I hope it's okay (prefer more or less clean and separate history)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-07-13T08:42:02Z
+
+We always squash so that one PR=one commit. This is the same topic :)
+
+---------------------------------------------------------------------------
+
+by oleg-andreyev at 2023-07-13T09:03:39Z
+
+> We always squash so that one PR=one commit. This is the same topic :)
+
+Not a problem, now one commit.

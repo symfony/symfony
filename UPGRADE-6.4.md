@@ -60,3 +60,5 @@ Security
 --------
 
  * `UserValueResolver` no longer implements `ArgumentValueResolverInterface`
+ * Make `PersistentToken` immutable
+ * Deprecate accepting only `DateTime` for `TokenProviderInterface::updateToken()`, use `DateTimeInterface` instead

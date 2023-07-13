@@ -162,8 +162,8 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * You can use patterns (delimited with / sign), globs or simple strings.
      *
-     *     $finder->name('*.php')
-     *     $finder->name('/\.php$/') // same as above
+     *     $finder->name('/\.php$/')
+     *     $finder->name('*.php') // same as above, without dot files
      *     $finder->name('test.php')
      *     $finder->name(['test.py', 'test.php'])
      *

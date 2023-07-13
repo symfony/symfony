@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class InMemoryTokenProvider implements TokenProviderInterface
+final class InMemoryTokenProvider implements TokenProviderInterface
 {
     private array $tokens = [];
 
@@ -31,7 +31,7 @@ class InMemoryTokenProvider implements TokenProviderInterface
         return $this->tokens[$series];
     }
 
-    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed): void
+    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTimeInterface $lastUsed)
     {
         if (!isset($this->tokens[$series])) {
             throw new TokenNotFoundException('No token found.');

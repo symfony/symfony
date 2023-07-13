@@ -1660,9 +1660,11 @@ class ContainerBuilderTest extends TestCase
 
         $container->registerAliasForArgument('Foo.bar_baz', 'Some\FooInterface');
         $this->assertEquals(new Alias('Foo.bar_baz'), $container->getAlias('Some\FooInterface $fooBarBaz'));
+        $this->assertEquals(new Alias('Some\FooInterface $fooBarBaz'), $container->getAlias('.Some\FooInterface $Foo.bar_baz'));
 
         $container->registerAliasForArgument('Foo.bar_baz', 'Some\FooInterface', 'Bar_baz.foo');
         $this->assertEquals(new Alias('Foo.bar_baz'), $container->getAlias('Some\FooInterface $barBazFoo'));
+        $this->assertEquals(new Alias('Some\FooInterface $barBazFoo'), $container->getAlias('.Some\FooInterface $Bar_baz.foo'));
     }
 
     public function testCaseSensitivity()

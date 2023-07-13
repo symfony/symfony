@@ -22,7 +22,7 @@ class InMemoryTokenProviderTest extends TestCase
     {
         $provider = new InMemoryTokenProvider();
 
-        $token = new PersistentToken('foo', 'foo', 'foo', 'foo', new \DateTime());
+        $token = new PersistentToken('foo', 'foo', 'foo', 'foo', new \DateTimeImmutable());
         $provider->createNewToken($token);
 
         $this->assertSame($provider->loadTokenBySeries('foo'), $token);
@@ -39,13 +39,13 @@ class InMemoryTokenProviderTest extends TestCase
     {
         $provider = new InMemoryTokenProvider();
 
-        $token = new PersistentToken('foo', 'foo', 'foo', 'foo', new \DateTime());
+        $token = new PersistentToken('foo', 'foo', 'foo', 'foo', new \DateTimeImmutable());
         $provider->createNewToken($token);
         $provider->updateToken('foo', 'newFoo', $lastUsed = new \DateTime());
         $token = $provider->loadTokenBySeries('foo');
 
         $this->assertEquals('newFoo', $token->getTokenValue());
-        $this->assertSame($token->getLastUsed(), $lastUsed);
+        $this->assertEquals($token->getLastUsed(), $lastUsed);
     }
 
     public function testDeleteToken()
@@ -53,7 +53,7 @@ class InMemoryTokenProviderTest extends TestCase
         $this->expectException(TokenNotFoundException::class);
         $provider = new InMemoryTokenProvider();
 
-        $token = new PersistentToken('foo', 'foo', 'foo', 'foo', new \DateTime());
+        $token = new PersistentToken('foo', 'foo', 'foo', 'foo', new \DateTimeImmutable());
         $provider->createNewToken($token);
         $provider->deleteTokenBySeries('foo');
         $provider->loadTokenBySeries('foo');

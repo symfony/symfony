@@ -39,7 +39,7 @@ use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
  *         `username` varchar(200) NOT NULL
  *     );
  */
-class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInterface
+final class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInterface
 {
     public function __construct(
         private Connection $conn,
@@ -55,7 +55,7 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
         $stmt = $this->conn->executeQuery($sql, $paramValues, $paramTypes);
         $row = $stmt->fetchAssociative() ?: throw new TokenNotFoundException('No token found.');
 
-        return new PersistentToken($row['class'], $row['username'], $series, $row['value'], new \DateTime($row['last_used']));
+        return new PersistentToken($row['class'], $row['username'], $series, $row['value'], new \DateTimeImmutable($row['last_used']));
     }
 
     public function deleteTokenBySeries(string $series): void
@@ -66,7 +66,7 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
         $this->conn->executeStatement($sql, $paramValues, $paramTypes);
     }
 
-    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed): void
+    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTimeInterface $lastUsed): void
     {
         $sql = 'UPDATE rememberme_token SET value=:value, lastUsed=:lastUsed WHERE series=:series';
         $paramValues = [

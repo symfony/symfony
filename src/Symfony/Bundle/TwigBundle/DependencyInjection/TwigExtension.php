@@ -148,8 +148,8 @@ class TwigExtension extends Extension
             }
         }
 
-        if (isset($config['autoescape_service']) && isset($config['autoescape_service_method'])) {
-            $config['autoescape'] = [new Reference($config['autoescape_service']), $config['autoescape_service_method']];
+        if (isset($config['autoescape_service'])) {
+            $config['autoescape'] = [new Reference($config['autoescape_service']), $config['autoescape_service_method'] ?? '__invoke'];
         } else {
             $config['autoescape'] = 'name';
         }

@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Attribute;
 
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 
 /**
  * An attribute to tell how a dependency is used and hint named autowiring aliases.
@@ -21,11 +22,18 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
 final class Target
 {
-    public string $name;
+    public function __construct(
+        public ?string $name = null,
+    ) {
+    }
 
-    public function __construct(string $name)
+    public function getParsedName(): string
     {
-        $this->name = lcfirst(str_replace(' ', '', ucwords(preg_replace('/[^a-zA-Z0-9\x7f-\xff]++/', ' ', $name))));
+        if (null === $this->name) {
+            throw new LogicException(sprintf('Cannot parse the name of a #[Target] attribute that has not been resolved. Did you forget to call "%s::parseName()"?', __CLASS__));
+        }
+
+        return lcfirst(str_replace(' ', '', ucwords(preg_replace('/[^a-zA-Z0-9\x7f-\xff]++/', ' ', $this->name))));
     }
 
     public static function parseName(\ReflectionParameter $parameter, self &$attribute = null): string
@@ -36,9 +44,10 @@ final class Target
         }
 
         $attribute = $target->newInstance();
-        $name = $attribute->name;
+        $name = $attribute->name ??= $parameter->name;
+        $parsedName = $attribute->getParsedName();
 
-        if (!preg_match('/^[a-zA-Z_\x7f-\xff]/', $name)) {
+        if (!preg_match('/^[a-zA-Z_\x7f-\xff]/', $parsedName)) {
             if (($function = $parameter->getDeclaringFunction()) instanceof \ReflectionMethod) {
                 $function = $function->class.'::'.$function->name;
             } else {
@@ -48,6 +57,6 @@ final class Target
             throw new InvalidArgumentException(sprintf('Invalid #[Target] name "%s" on parameter "$%s" of "%s()": the first character must be a letter.', $name, $parameter->name, $function));
         }
 
-        return $name;
+        return $parsedName;
     }
 }

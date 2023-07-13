@@ -18,6 +18,7 @@ CHANGELOG
 6.4
 ---
 
+ * Allow using `#[Target]` with no arguments to state that a parameter must match a named autowiring alias
  * Deprecate `ContainerAwareInterface` and `ContainerAwareTrait`, use dependency injection instead
  * Add `defined` env var processor that returns `true` for defined and neither null nor empty env vars
 

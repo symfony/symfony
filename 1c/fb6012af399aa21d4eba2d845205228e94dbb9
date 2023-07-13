@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-04-24T14:32:37Z
+
+Side note : I noticed `Symfony\Component\ErrorHandler\ErrorHandler::getErrorEnhancers()` feature is not used with the "new" system with the ErrorRendered.
+
+Should I open a new issue to wire it?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-07-07T09:44:30Z
+
+I'll look at it for the enhancers. Which branch should I target?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-07-07T09:46:17Z
+
+6.4 I suppose as that's more an improvement than a bugfix.

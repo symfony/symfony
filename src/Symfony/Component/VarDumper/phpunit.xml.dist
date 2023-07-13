@@ -17,6 +17,7 @@
     <testsuites>
         <testsuite name="Symfony VarDumper Component Test Suite">
             <directory>./Tests/</directory>
+            <directory suffix=".phpt">./Tests/Dumper/functions/</directory>
         </testsuite>
     </testsuites>
 

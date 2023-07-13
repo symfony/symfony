@@ -23,6 +23,7 @@
     "require-dev": {
         "ext-iconv": "*",
         "symfony/console": "^4.4|^5.0|^6.0",
+        "symfony/http-kernel": "^4.4|^5.0|^6.0",
         "symfony/process": "^4.4|^5.0|^6.0",
         "symfony/uid": "^5.1|^6.0",
         "twig/twig": "^2.13|^3.0.4"

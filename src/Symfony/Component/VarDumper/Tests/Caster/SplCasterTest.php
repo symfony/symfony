@@ -174,7 +174,7 @@ EOTXT;
         $expected = <<<EOTXT
 ArrayObject@anonymous {
   +"foo": 234
-  -storage: array:1 [
+  storage: array:1 [
     0 => 123
   ]
   flag::STD_PROP_LIST: false
@@ -182,9 +182,6 @@ ArrayObject@anonymous {
   iteratorClass: "ArrayIterator"
 }
 EOTXT;
-        if (\PHP_VERSION_ID < 70400) {
-            $expected = str_replace('-storage:', 'storage:', $expected);
-        }
         $this->assertDumpEquals($expected, $var);
     }
 
@@ -195,16 +192,13 @@ EOTXT;
         $expected = <<<EOTXT
 Symfony\Component\VarDumper\Tests\Caster\MyArrayIterator {
   -foo: 123
-  -storage: array:1 [
+  storage: array:1 [
     0 => 234
   ]
   flag::STD_PROP_LIST: false
   flag::ARRAY_AS_PROPS: false
 }
 EOTXT;
-        if (\PHP_VERSION_ID < 70400) {
-            $expected = str_replace('-storage:', 'storage:', $expected);
-        }
         $this->assertDumpEquals($expected, $var);
     }
 

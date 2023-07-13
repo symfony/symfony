@@ -229,10 +229,11 @@ class SplCaster
             $a = Caster::castObject($c, \get_class($c), method_exists($c, '__debugInfo'), $stub->class);
             $c->setFlags($flags);
         }
-        if (\PHP_VERSION_ID < 70400) {
-            $a[$prefix.'storage'] = $c->getArrayCopy();
-        }
+
+        unset($a["\0ArrayObject\0storage"], $a["\0ArrayIterator\0storage"]);
+
         $a += [
+            $prefix.'storage' => $c->getArrayCopy(),
             $prefix.'flag::STD_PROP_LIST' => (bool) ($flags & \ArrayObject::STD_PROP_LIST),
             $prefix.'flag::ARRAY_AS_PROPS' => (bool) ($flags & \ArrayObject::ARRAY_AS_PROPS),
         ];

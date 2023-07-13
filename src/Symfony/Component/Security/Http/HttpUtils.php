@@ -135,7 +135,9 @@ class HttpUtils
      */
     public function generateUri(Request $request, string $path): string
     {
-        if (str_starts_with($path, 'http') || !$path) {
+        $url = parse_url($path);
+
+        if ('' === $path || isset($url['scheme'], $url['host'])) {
             return $path;
         }
 

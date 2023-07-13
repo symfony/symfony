@@ -36,7 +36,7 @@ class DebugAutowiringCommandTest extends AbstractWebTestCase
         $tester->run(['command' => 'debug:autowiring']);
 
         $this->assertStringContainsString(HttpKernelInterface::class, $tester->getDisplay());
-        $this->assertStringContainsString('(http_kernel)', $tester->getDisplay());
+        $this->assertStringContainsString('alias:http_kernel', $tester->getDisplay());
     }
 
     public function testSearchArgument()

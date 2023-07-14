@@ -11,35 +11,45 @@
 
 namespace Symfony\Component\Routing\Tests\Loader;
 
+use Doctrine\Common\Annotations\AnnotationReader;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Loader\AnnotationFileLoader;
+use Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\FooClass;
+use Symfony\Component\Routing\Tests\Fixtures\AttributesFixtures\AttributesClassParamAfterCommaController;
+use Symfony\Component\Routing\Tests\Fixtures\AttributesFixtures\AttributesClassParamAfterParenthesisController;
+use Symfony\Component\Routing\Tests\Fixtures\AttributesFixtures\AttributesClassParamInlineAfterCommaController;
+use Symfony\Component\Routing\Tests\Fixtures\AttributesFixtures\AttributesClassParamInlineAfterParenthesisController;
+use Symfony\Component\Routing\Tests\Fixtures\AttributesFixtures\AttributesClassParamInlineQuotedAfterCommaController;
+use Symfony\Component\Routing\Tests\Fixtures\AttributesFixtures\AttributesClassParamInlineQuotedAfterParenthesisController;
+use Symfony\Component\Routing\Tests\Fixtures\AttributesFixtures\AttributesClassParamQuotedAfterCommaController;
+use Symfony\Component\Routing\Tests\Fixtures\AttributesFixtures\AttributesClassParamQuotedAfterParenthesisController;
+use Symfony\Component\Routing\Tests\Fixtures\OtherAnnotatedClasses\VariadicClass;
+use Symfony\Component\Routing\Tests\Fixtures\TraceableAnnotationClassLoader;
 
-class AnnotationFileLoaderTest extends AbstractAnnotationLoaderTestCase
+class AnnotationFileLoaderTest extends TestCase
 {
-    protected $loader;
-    protected $reader;
+    private AnnotationFileLoader $loader;
+    private TraceableAnnotationClassLoader $classLoader;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->reader = $this->getReader();
-        $this->loader = new AnnotationFileLoader(new FileLocator(), $this->getClassLoader($this->reader));
+        $this->classLoader = new TraceableAnnotationClassLoader();
+        $this->loader = new AnnotationFileLoader(new FileLocator(), $this->classLoader);
     }
 
     public function testLoad()
     {
-        $this->reader->expects($this->once())->method('getClassAnnotation');
-
-        $this->loader->load(__DIR__.'/../Fixtures/AnnotatedClasses/FooClass.php');
+        self::assertCount(0, $this->loader->load(__DIR__.'/../Fixtures/AnnotatedClasses/FooClass.php'));
+        self::assertSame([FooClass::class], $this->classLoader->foundClasses);
     }
 
     public function testLoadTraitWithClassConstant()
     {
-        $this->reader->expects($this->never())->method('getClassAnnotation');
-
-        $this->loader->load(__DIR__.'/../Fixtures/AnnotatedClasses/FooTrait.php');
+        self::assertCount(0, $this->loader->load(__DIR__.'/../Fixtures/AnnotatedClasses/FooTrait.php'));
+        self::assertSame([], $this->classLoader->foundClasses);
     }
 
     public function testLoadFileWithoutStartTag()
@@ -51,28 +61,26 @@ class AnnotationFileLoaderTest extends AbstractAnnotationLoaderTestCase
 
     public function testLoadVariadic()
     {
-        $route = new Route('/path/to/{id}');
-        $this->reader->expects($this->once())->method('getClassAnnotation');
-        $this->reader->expects($this->once())->method('getMethodAnnotations')
-            ->willReturn([$route]);
-
-        $this->loader->load(__DIR__.'/../Fixtures/OtherAnnotatedClasses/VariadicClass.php');
+        self::assertCount(1, $this->loader->load(__DIR__.'/../Fixtures/OtherAnnotatedClasses/VariadicClass.php'));
+        self::assertSame([VariadicClass::class], $this->classLoader->foundClasses);
     }
 
+    /**
+     * @group legacy
+     */
     public function testLoadAnonymousClass()
     {
-        $this->reader->expects($this->never())->method('getClassAnnotation');
-        $this->reader->expects($this->never())->method('getMethodAnnotations');
+        $this->classLoader = new TraceableAnnotationClassLoader(new AnnotationReader());
+        $this->loader = new AnnotationFileLoader(new FileLocator(), $this->classLoader);
 
-        $this->loader->load(__DIR__.'/../Fixtures/OtherAnnotatedClasses/AnonymousClassInTrait.php');
+        self::assertCount(0, $this->loader->load(__DIR__.'/../Fixtures/OtherAnnotatedClasses/AnonymousClassInTrait.php'));
+        self::assertSame([], $this->classLoader->foundClasses);
     }
 
     public function testLoadAbstractClass()
     {
-        $this->reader->expects($this->never())->method('getClassAnnotation');
-        $this->reader->expects($this->never())->method('getMethodAnnotations');
-
-        $this->loader->load(__DIR__.'/../Fixtures/AnnotatedClasses/AbstractClass.php');
+        self::assertNull($this->loader->load(__DIR__.'/../Fixtures/AnnotatedClasses/AbstractClass.php'));
+        self::assertSame([], $this->classLoader->foundClasses);
     }
 
     public function testSupports()
@@ -89,57 +97,49 @@ class AnnotationFileLoaderTest extends AbstractAnnotationLoaderTestCase
 
     public function testLoadAttributesClassAfterComma()
     {
-        $this->reader->expects($this->once())->method('getClassAnnotation');
-
-        $this->loader->load(__DIR__.'/../Fixtures/AttributesFixtures/AttributesClassParamAfterCommaController.php');
+        self::assertCount(0, $this->loader->load(__DIR__.'/../Fixtures/AttributesFixtures/AttributesClassParamAfterCommaController.php'));
+        self::assertSame([AttributesClassParamAfterCommaController::class], $this->classLoader->foundClasses);
     }
 
     public function testLoadAttributesInlineClassAfterComma()
     {
-        $this->reader->expects($this->once())->method('getClassAnnotation');
-
-        $this->loader->load(__DIR__.'/../Fixtures/AttributesFixtures/AttributesClassParamInlineAfterCommaController.php');
+        self::assertCount(0, $this->loader->load(__DIR__.'/../Fixtures/AttributesFixtures/AttributesClassParamInlineAfterCommaController.php'));
+        self::assertSame([AttributesClassParamInlineAfterCommaController::class], $this->classLoader->foundClasses);
     }
 
     public function testLoadAttributesQuotedClassAfterComma()
     {
-        $this->reader->expects($this->once())->method('getClassAnnotation');
-
-        $this->loader->load(__DIR__.'/../Fixtures/AttributesFixtures/AttributesClassParamQuotedAfterCommaController.php');
+        self::assertCount(0, $this->loader->load(__DIR__.'/../Fixtures/AttributesFixtures/AttributesClassParamQuotedAfterCommaController.php'));
+        self::assertSame([AttributesClassParamQuotedAfterCommaController::class], $this->classLoader->foundClasses);
     }
 
     public function testLoadAttributesInlineQuotedClassAfterComma()
     {
-        $this->reader->expects($this->once())->method('getClassAnnotation');
-
-        $this->loader->load(__DIR__.'/../Fixtures/AttributesFixtures/AttributesClassParamInlineQuotedAfterCommaController.php');
+        self::assertCount(0, $this->loader->load(__DIR__.'/../Fixtures/AttributesFixtures/AttributesClassParamInlineQuotedAfterCommaController.php'));
+        self::assertSame([AttributesClassParamInlineQuotedAfterCommaController::class], $this->classLoader->foundClasses);
     }
 
     public function testLoadAttributesClassAfterParenthesis()
     {
-        $this->reader->expects($this->once())->method('getClassAnnotation');
-
-        $this->loader->load(__DIR__.'/../Fixtures/AttributesFixtures/AttributesClassParamAfterParenthesisController.php');
+        self::assertCount(0, $this->loader->load(__DIR__.'/../Fixtures/AttributesFixtures/AttributesClassParamAfterParenthesisController.php'));
+        self::assertSame([AttributesClassParamAfterParenthesisController::class], $this->classLoader->foundClasses);
     }
 
     public function testLoadAttributesInlineClassAfterParenthesis()
     {
-        $this->reader->expects($this->once())->method('getClassAnnotation');
-
-        $this->loader->load(__DIR__.'/../Fixtures/AttributesFixtures/AttributesClassParamInlineAfterParenthesisController.php');
+        self::assertCount(0, $this->loader->load(__DIR__.'/../Fixtures/AttributesFixtures/AttributesClassParamInlineAfterParenthesisController.php'));
+        self::assertSame([AttributesClassParamInlineAfterParenthesisController::class], $this->classLoader->foundClasses);
     }
 
     public function testLoadAttributesQuotedClassAfterParenthesis()
     {
-        $this->reader->expects($this->once())->method('getClassAnnotation');
-
-        $this->loader->load(__DIR__.'/../Fixtures/AttributesFixtures/AttributesClassParamQuotedAfterParenthesisController.php');
+        self::assertCount(0, $this->loader->load(__DIR__.'/../Fixtures/AttributesFixtures/AttributesClassParamQuotedAfterParenthesisController.php'));
+        self::assertSame([AttributesClassParamQuotedAfterParenthesisController::class], $this->classLoader->foundClasses);
     }
 
     public function testLoadAttributesInlineQuotedClassAfterParenthesis()
     {
-        $this->reader->expects($this->once())->method('getClassAnnotation');
-
-        $this->loader->load(__DIR__.'/../Fixtures/AttributesFixtures/AttributesClassParamInlineQuotedAfterParenthesisController.php');
+        self::assertCount(0, $this->loader->load(__DIR__.'/../Fixtures/AttributesFixtures/AttributesClassParamInlineQuotedAfterParenthesisController.php'));
+        self::assertSame([AttributesClassParamInlineQuotedAfterParenthesisController::class], $this->classLoader->foundClasses);
     }
 }

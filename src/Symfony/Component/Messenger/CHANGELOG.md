@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Make `HandleMessageMiddleware::callHandler` protected
+
 6.3
 ---
 

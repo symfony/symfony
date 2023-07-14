@@ -79,7 +79,7 @@ class HandleMessageMiddleware implements MiddlewareInterface
                         $ackStamp->ack($envelope, $e);
                     });
 
-                    $result = $this->callHandler($handler, $message, $ack, $envelope->last(HandlerArgumentsStamp::class));
+                    $result = $this->callHandler($handlerDescriptor, $envelope, $ack);
 
                     if (!\is_int($result) || 0 > $result) {
                         throw new LogicException(sprintf('A handler implementing BatchHandlerInterface must return the size of the current batch as a positive integer, "%s" returned from "%s".', \is_int($result) ? $result : get_debug_type($result), get_debug_type($batchHandler)));
@@ -93,7 +93,7 @@ class HandleMessageMiddleware implements MiddlewareInterface
                         $result = $ack->getResult();
                     }
                 } else {
-                    $result = $this->callHandler($handler, $message, null, $envelope->last(HandlerArgumentsStamp::class));
+                    $result = $this->callHandler($handlerDescriptor, $envelope, null);
                 }
 
                 $handledStamp = HandledStamp::fromDescriptor($handlerDescriptor, $result);
@@ -144,16 +144,17 @@ class HandleMessageMiddleware implements MiddlewareInterface
         return false;
     }
 
-    private function callHandler(callable $handler, object $message, ?Acknowledger $ack, ?HandlerArgumentsStamp $handlerArgumentsStamp): mixed
+    protected function callHandler(HandlerDescriptor $handlerDescriptor, Envelope $envelope, ?Acknowledger $ack): mixed
     {
+        $handler = $handlerDescriptor->getHandler();
+        $message = $envelope->getMessage();
+        $additionalArguments = $envelope->last(HandlerArgumentsStamp::class)?->getAdditionalArguments() ?? [];
+
         $arguments = [$message];
         if (null !== $ack) {
             $arguments[] = $ack;
         }
-        if (null !== $handlerArgumentsStamp) {
-            $arguments = [...$arguments, ...$handlerArgumentsStamp->getAdditionalArguments()];
-        }
 
-        return $handler(...$arguments);
+        return $handler(...$arguments, ...$additionalArguments);
     }
 }

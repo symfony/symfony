@@ -900,6 +900,8 @@ EOF;
 
                     if ($asFile) {
                         $code .= "fn () => self::do(\$container);\n\n";
+                    } elseif ($definition->isPublic()) {
+                        $code .= sprintf("fn () => \$this->%s();\n\n", $methodName);
                     } else {
                         $code .= sprintf("\$this->%s(...);\n\n", $methodName);
                     }

@@ -1,47 +1,47 @@
-'Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy':
+'Symfony\Component\Serializer\Tests\Fixtures\Attributes\GroupDummy':
   attributes:
     foo:
       groups: ['group1', 'group2']
     bar:
       groups: ['group2']
-'Symfony\Component\Serializer\Tests\Fixtures\Annotations\MaxDepthDummy':
+'Symfony\Component\Serializer\Tests\Fixtures\Attributes\MaxDepthDummy':
   attributes:
     foo:
       max_depth: 2
     bar:
       max_depth: 3
-'Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedNameDummy':
+'Symfony\Component\Serializer\Tests\Fixtures\Attributes\SerializedNameDummy':
   attributes:
     foo:
       serialized_name: 'baz'
     bar:
       serialized_name: 'qux'
-'Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedPathDummy':
+'Symfony\Component\Serializer\Tests\Fixtures\Attributes\SerializedPathDummy':
   attributes:
     three:
       serialized_path: '[one][two]'
     seven:
       serialized_path: '[three][four]'
-'Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedPathInConstructorDummy':
+'Symfony\Component\Serializer\Tests\Fixtures\Attributes\SerializedPathInConstructorDummy':
   attributes:
     three:
       serialized_path: '[one][two]'
-'Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummy':
+'Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummy':
   discriminator_map:
     type_property: type
     mapping:
-      first: 'Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummyFirstChild'
-      second: 'Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummySecondChild'
+      first: 'Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummyFirstChild'
+      second: 'Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummySecondChild'
   attributes:
     foo: ~
-'Symfony\Component\Serializer\Tests\Fixtures\Annotations\IgnoreDummy':
+'Symfony\Component\Serializer\Tests\Fixtures\Attributes\IgnoreDummy':
   attributes:
     ignored1:
       ignore: true
     ignored2:
       ignore: true
 
-Symfony\Component\Serializer\Tests\Fixtures\Annotations\ContextDummyParent:
+Symfony\Component\Serializer\Tests\Fixtures\Attributes\ContextDummyParent:
   attributes:
     parentProperty:
       contexts:
@@ -50,7 +50,7 @@ Symfony\Component\Serializer\Tests\Fixtures\Annotations\ContextDummyParent:
       contexts:
         - { normalization_context: { prop: dummy_parent_value } }
 
-Symfony\Component\Serializer\Tests\Fixtures\Annotations\ContextDummy:
+Symfony\Component\Serializer\Tests\Fixtures\Attributes\ContextDummy:
   attributes:
     foo:
       contexts:

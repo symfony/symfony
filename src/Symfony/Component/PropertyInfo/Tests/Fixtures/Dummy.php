@@ -42,8 +42,8 @@ class Dummy extends ParentDummy
 
     /**
      * @var \DateTimeImmutable[]
-     * @Groups({"a", "b"})
      */
+    #[Groups(['a', 'b'])]
     public $collection;
 
     /**

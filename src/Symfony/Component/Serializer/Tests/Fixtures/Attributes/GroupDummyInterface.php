@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Serializer\Tests\Fixtures;
+namespace Symfony\Component\Serializer\Tests\Fixtures\Attributes;
 
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -18,8 +18,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
  */
 interface GroupDummyInterface
 {
-    /**
-     * @Groups({"a", "name_converter"})
-     */
+    #[Groups(['a', 'name_converter'])]
     public function getSymfony();
 }

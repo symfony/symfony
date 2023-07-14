@@ -19,10 +19,15 @@ use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
-use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummy;
-use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummyFirstChild;
-use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummySecondChild;
-use Symfony\Component\Serializer\Tests\Fixtures\Annotations\IgnoreDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummyFirstChild;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummySecondChild;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\GroupDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\IgnoreDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\MaxDepthDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SerializedNameDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SerializedPathDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SerializedPathInConstructorDummy;
 use Symfony\Component\Serializer\Tests\Mapping\Loader\Features\ContextMappingTestTrait;
 use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
 
@@ -33,19 +38,13 @@ class YamlFileLoaderTest extends TestCase
 {
     use ContextMappingTestTrait;
 
-    /**
-     * @var YamlFileLoader
-     */
-    private $loader;
-    /**
-     * @var ClassMetadata
-     */
-    private $metadata;
+    private YamlFileLoader $loader;
+    private ClassMetadata $metadata;
 
     protected function setUp(): void
     {
         $this->loader = new YamlFileLoader(__DIR__.'/../../Fixtures/serialization.yml');
-        $this->metadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy');
+        $this->metadata = new ClassMetadata(GroupDummy::class);
     }
 
     public function testInterface()
@@ -80,7 +79,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testMaxDepth()
     {
-        $classMetadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\Annotations\MaxDepthDummy');
+        $classMetadata = new ClassMetadata(MaxDepthDummy::class);
         $this->loader->loadClassMetadata($classMetadata);
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();
@@ -90,7 +89,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testSerializedName()
     {
-        $classMetadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedNameDummy');
+        $classMetadata = new ClassMetadata(SerializedNameDummy::class);
         $this->loader->loadClassMetadata($classMetadata);
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();
@@ -100,7 +99,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testSerializedPath()
     {
-        $classMetadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedPathDummy');
+        $classMetadata = new ClassMetadata(SerializedPathDummy::class);
         $this->loader->loadClassMetadata($classMetadata);
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();
@@ -110,7 +109,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testSerializedPathInConstructor()
     {
-        $classMetadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedPathInConstructorDummy');
+        $classMetadata = new ClassMetadata(SerializedPathInConstructorDummy::class);
         $this->loader->loadClassMetadata($classMetadata);
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();

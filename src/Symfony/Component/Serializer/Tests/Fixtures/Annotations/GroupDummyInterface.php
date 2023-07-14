@@ -9,19 +9,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
+namespace Symfony\Component\Serializer\Tests\Fixtures\Annotations;
 
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Serializer\Annotation\Ignore;
 
 /**
- * @author Vadim Borodavko <vadim.borodavko@gmail.com>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class IgnorePropertyDummy
+interface GroupDummyInterface
 {
-    #[Groups(['a'])]
-    public $visibleProperty;
-
-    #[Groups(['a']), Ignore]
-    private $ignoredProperty;
+    /**
+     * @Groups({"a", "name_converter"})
+     */
+    public function getSymfony();
 }

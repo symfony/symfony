@@ -30,7 +30,7 @@
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/filesystem": "^5.4|^6.0|^7.0",
         "symfony/finder": "^5.4|^6.0|^7.0",
-        "symfony/routing": "^5.4|^6.0|^7.0"
+        "symfony/routing": "^6.1|^7.0"
     },
     "require-dev": {
         "doctrine/annotations": "^1.13.1|^2",

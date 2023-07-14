@@ -1,4 +1,4 @@
 annotated_controller:
     prefix:   /annotated
     resource: "@TestBundle/Controller/AnnotatedController.php"
-    type:     annotation
+    type:     attribute

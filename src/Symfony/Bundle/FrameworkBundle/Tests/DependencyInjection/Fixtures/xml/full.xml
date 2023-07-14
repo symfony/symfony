@@ -32,7 +32,7 @@
             <framework:path>%kernel.project_dir%/Fixtures/translations</framework:path>
         </framework:translator>
         <framework:validation enabled="true" />
-        <framework:annotations cache="file" debug="true" file-cache-dir="%kernel.cache_dir%/annotations" />
+        <framework:annotations enabled="false" />
         <framework:serializer enabled="true" enable-annotations="true" name-converter="serializer.name_converter.camel_case_to_snake_case" circular-reference-handler="my.circular.reference.handler" max-depth-handler="my.max.depth.handler">
             <framework:default-context>
                 <framework:enable_max_depth>true</framework:enable_max_depth>

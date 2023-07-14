@@ -6,6 +6,8 @@
         http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
 
     <framework:config http-method-override="false">
+        <framework:annotations enabled="false" />
+
         <framework:exception
             class="Symfony\Component\HttpKernel\Exception\BadRequestHttpException"
             log-level="info"

@@ -9,6 +9,7 @@
             https://symfony.com/schema/dic/symfony/symfony-1.0.xsd"
 >
     <framework:config http-method-override="false">
+        <framework:annotations enabled="false"/>
         <framework:csrf-protection enabled="false"/>
         <framework:form enabled="true">
             <framework:csrf-protection enabled="true"/>

@@ -34,6 +34,7 @@ class TestAppKernel extends Kernel
     {
         $loader->load(static function (ContainerBuilder $container) {
             $container->loadFromExtension('framework', [
+                'annotations' => false,
                 'http_method_override' => false,
             ]);
         });

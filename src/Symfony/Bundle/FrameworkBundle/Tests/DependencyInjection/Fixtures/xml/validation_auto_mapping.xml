@@ -4,6 +4,7 @@
            xmlns:framework="http://symfony.com/schema/dic/symfony">
 
     <framework:config http-method-override="false">
+        <framework:annotations enabled="false" />
         <framework:property-info enabled="true" />
         <framework:validation>
             <framework:auto-mapping namespace="App\">

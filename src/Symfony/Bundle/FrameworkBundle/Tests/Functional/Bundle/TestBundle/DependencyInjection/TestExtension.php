@@ -25,8 +25,6 @@ class TestExtension extends Extension implements PrependExtensionInterface
     {
         $configuration = $this->getConfiguration($configs, $container);
         $this->processConfiguration($configuration, $configs);
-
-        $container->setAlias('test.annotation_reader', new Alias('annotation_reader', true));
     }
 
     public function prepend(ContainerBuilder $container): void

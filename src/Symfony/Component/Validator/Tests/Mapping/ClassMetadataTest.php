@@ -21,13 +21,14 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\GroupDefinitionException;
 use Symfony\Component\Validator\Mapping\CascadingStrategy;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
-use Symfony\Component\Validator\Tests\Fixtures\Annotation\EntityParent;
-use Symfony\Component\Validator\Tests\Fixtures\Annotation\GroupSequenceProviderEntity;
+use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
+use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\EntityParent;
+use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\GroupSequenceProviderEntity;
 use Symfony\Component\Validator\Tests\Fixtures\CascadingEntity;
 use Symfony\Component\Validator\Tests\Fixtures\ClassConstraint;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
+use Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderChildEntity;
 use Symfony\Component\Validator\Tests\Fixtures\PropertyConstraint;
 
 class ClassMetadataTest extends TestCase
@@ -35,7 +36,7 @@ class ClassMetadataTest extends TestCase
     private const CLASSNAME = Entity::class;
     private const PARENTCLASS = EntityParent::class;
     private const PROVIDERCLASS = GroupSequenceProviderEntity::class;
-    private const PROVIDERCHILDCLASS = 'Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderChildEntity';
+    private const PROVIDERCHILDCLASS = GroupSequenceProviderChildEntity::class;
 
     protected $metadata;
 

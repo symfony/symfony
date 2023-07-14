@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
@@ -25,6 +26,8 @@ use Symfony\Component\Validator\Tests\Constraints\Fixtures\WhenTestWithAttribute
 
 final class WhenTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testMissingOptionsExceptionIsThrown()
     {
         $this->expectException(MissingOptionsException::class);
@@ -42,10 +45,21 @@ final class WhenTest extends TestCase
         ]);
     }
 
+    /**
+     * @group legacy
+     */
     public function testAnnotations()
     {
+        $this->expectDeprecation('Since symfony/validator 6.4: Passing a "Doctrine\Common\Annotations\AnnotationReader" instance as argument 1 to "Symfony\Component\Validator\Mapping\Loader\AnnotationLoader::__construct()" is deprecated, pass null or omit the parameter instead.');
+
         $loader = new AnnotationLoader(new AnnotationReader());
         $metadata = new ClassMetadata(WhenTestWithAnnotations::class);
+
+        $this->expectDeprecation('Since symfony/validator 6.4: Class "Symfony\Component\Validator\Tests\Constraints\WhenTestWithAnnotations" uses Doctrine Annotations to configure validation constraints, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/validator 6.4: Property "Symfony\Component\Validator\Tests\Constraints\WhenTestWithAnnotations::$foo" uses Doctrine Annotations to configure validation constraints, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/validator 6.4: Property "Symfony\Component\Validator\Tests\Constraints\WhenTestWithAnnotations::$bar" uses Doctrine Annotations to configure validation constraints, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/validator 6.4: Property "Symfony\Component\Validator\Tests\Constraints\WhenTestWithAnnotations::$qux" uses Doctrine Annotations to configure validation constraints, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/validator 6.4: Method "Symfony\Component\Validator\Tests\Constraints\WhenTestWithAnnotations::getBaz()" uses Doctrine Annotations to configure validation constraints, which is deprecated. Use PHP attributes instead.');
 
         self::assertTrue($loader->loadClassMetadata($metadata));
 
@@ -114,12 +128,9 @@ final class WhenTest extends TestCase
         self::assertSame(['Default', 'WhenTestWithAnnotations'], $bazConstraint->groups);
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testAttributes()
     {
-        $loader = new AnnotationLoader(new AnnotationReader());
+        $loader = new AnnotationLoader();
         $metadata = new ClassMetadata(WhenTestWithAttributes::class);
 
         self::assertTrue($loader->loadClassMetadata($metadata));

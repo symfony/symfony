@@ -77,3 +77,11 @@ Serializer
 
  * Deprecate Doctrine annotations support in favor of native attributes
  * Deprecate passing an annotation reader to the constructor of `AnnotationLoader`
+
+Validator
+---------
+
+ * Deprecate Doctrine annotations support in favor of native attributes
+ * Deprecate passing an annotation reader to the constructor signature of `AnnotationLoader`
+ * Deprecate `ValidatorBuilder::setDoctrineAnnotationReader()`
+ * Deprecate `ValidatorBuilder::addDefaultDoctrineAnnotationReader()`

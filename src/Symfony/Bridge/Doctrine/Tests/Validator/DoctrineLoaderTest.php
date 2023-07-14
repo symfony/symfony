@@ -28,7 +28,7 @@ use Symfony\Component\Validator\Mapping\CascadingStrategy;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\PropertyMetadata;
 use Symfony\Component\Validator\Mapping\TraversalStrategy;
-use Symfony\Component\Validator\Tests\Fixtures\Entity;
+use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
 use Symfony\Component\Validator\Validation;
 
 /**
@@ -40,7 +40,6 @@ class DoctrineLoaderTest extends TestCase
     {
         $validator = Validation::createValidatorBuilder()
             ->enableAnnotationMapping(true)
-            ->addDefaultDoctrineAnnotationReader()
             ->addLoader(new DoctrineLoader(DoctrineTestHelper::createTestEntityManager(), '{^Symfony\\\\Bridge\\\\Doctrine\\\\Tests\\\\Fixtures\\\\DoctrineLoader}'))
             ->getValidator()
         ;
@@ -144,7 +143,6 @@ class DoctrineLoaderTest extends TestCase
         $validator = Validation::createValidatorBuilder()
             ->addMethodMapping('loadValidatorMetadata')
             ->enableAnnotationMapping(true)
-            ->addDefaultDoctrineAnnotationReader()
             ->addLoader(new DoctrineLoader(DoctrineTestHelper::createTestEntityManager(), '{^Symfony\\\\Bridge\\\\Doctrine\\\\Tests\\\\Fixtures\\\\DoctrineLoader}'))
             ->getValidator()
         ;
@@ -162,7 +160,6 @@ class DoctrineLoaderTest extends TestCase
     {
         $validator = Validation::createValidatorBuilder()
             ->enableAnnotationMapping(true)
-            ->addDefaultDoctrineAnnotationReader()
             ->addXmlMappings([__DIR__.'/../Resources/validator/BaseUser.xml'])
             ->addLoader(
                 new DoctrineLoader(
@@ -204,7 +201,6 @@ class DoctrineLoaderTest extends TestCase
     {
         $validator = Validation::createValidatorBuilder()
             ->enableAnnotationMapping(true)
-            ->addDefaultDoctrineAnnotationReader()
             ->addLoader(new DoctrineLoader(DoctrineTestHelper::createTestEntityManager(), '{.*}'))
             ->getValidator();
 

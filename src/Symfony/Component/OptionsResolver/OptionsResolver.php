@@ -1314,4 +1314,15 @@ class OptionsResolver implements Options
 
         return $type->getName();
     }
+
+    /**
+     * Return default options.
+     *
+     * @return array 
+     *
+     */
+    public function getDefaultOptions(): array
+    {
+        return $this->defaults;
+    }
 }

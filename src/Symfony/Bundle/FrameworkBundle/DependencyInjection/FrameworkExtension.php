@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Composer\InstalledVersions;
-use Doctrine\Common\Annotations\Reader;
 use Http\Client\HttpAsyncClient;
 use Http\Client\HttpClient;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
@@ -54,7 +53,6 @@ use Symfony\Component\Config\ResourceCheckerInterface;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\Alias;
-use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -255,7 +253,6 @@ class FrameworkExtension extends Extension
         $config = $this->processConfiguration($configuration, $configs);
 
         // warmup config enabled
-        $this->readConfigEnabled('annotations', $container, $config['annotations']);
         $this->readConfigEnabled('translator', $container, $config['translator']);
         $this->readConfigEnabled('property_access', $container, $config['property_access']);
         $this->readConfigEnabled('profiler', $container, $config['profiler']);
@@ -363,7 +360,6 @@ class FrameworkExtension extends Extension
         $this->registerWorkflowConfiguration($config['workflows'], $container, $loader);
         $this->registerDebugConfiguration($config['php_errors'], $container, $loader);
         $this->registerRouterConfiguration($config['router'], $container, $loader, $config['enabled_locales']);
-        $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
         $this->registerPropertyAccessConfiguration($config['property_access'], $container, $loader);
         $this->registerSecretsConfiguration($config['secrets'], $container, $loader);
 
@@ -1600,10 +1596,7 @@ class FrameworkExtension extends Extension
         $definition->replaceArgument(0, $config['email_validation_mode']);
 
         if (\array_key_exists('enable_annotations', $config) && $config['enable_annotations']) {
-            $validatorBuilder->addMethodCall('enableAnnotationMapping', [true]);
-            if ($this->isInitializedConfigEnabled('annotations')) {
-                $validatorBuilder->addMethodCall('setDoctrineAnnotationReader', [new Reference('annotation_reader')]);
-            }
+            $validatorBuilder->addMethodCall('enableAnnotationMapping');
         }
 
         if (\array_key_exists('static_method', $config) && $config['static_method']) {
@@ -1696,58 +1689,6 @@ class FrameworkExtension extends Extension
                 throw new \RuntimeException(sprintf('Could not open file or directory "%s".', $path));
             }
         }
-    }
-
-    private function registerAnnotationsConfiguration(array $config, ContainerBuilder $container, LoaderInterface $loader): void
-    {
-        if (!$this->isInitializedConfigEnabled('annotations')) {
-            return;
-        }
-
-        if (!class_exists(\Doctrine\Common\Annotations\Annotation::class)) {
-            throw new LogicException('Annotations cannot be enabled as the Doctrine Annotation library is not installed. Try running "composer require doctrine/annotations".');
-        }
-
-        trigger_deprecation('symfony/framework-bundle', '6.4', 'Enabling the integration of Doctrine annotations is deprecated. Set the "framework.annotations.enabled" config option to false.');
-
-        $loader->load('annotations.php');
-
-        if ('none' === $config['cache']) {
-            $container->removeDefinition('annotations.cached_reader');
-
-            return;
-        }
-
-        if ('php_array' === $config['cache']) {
-            $cacheService = 'annotations.cache_adapter';
-
-            // Enable warmer only if PHP array is used for cache
-            $definition = $container->findDefinition('annotations.cache_warmer');
-            $definition->addTag('kernel.cache_warmer');
-        } else {
-            $cacheService = 'annotations.filesystem_cache_adapter';
-            $cacheDir = $container->getParameterBag()->resolveValue($config['file_cache_dir']);
-
-            if (!is_dir($cacheDir) && false === @mkdir($cacheDir, 0777, true) && !is_dir($cacheDir)) {
-                throw new \RuntimeException(sprintf('Could not create cache directory "%s".', $cacheDir));
-            }
-
-            $container
-                ->getDefinition('annotations.filesystem_cache_adapter')
-                ->replaceArgument(2, $cacheDir)
-            ;
-        }
-
-        $container
-            ->getDefinition('annotations.cached_reader')
-            ->replaceArgument(2, $config['debug'])
-            // reference the cache provider without using it until AddAnnotationsCachedReaderPass runs
-            ->addArgument(new ServiceClosureArgument(new Reference($cacheService)))
-        ;
-
-        $container->setAlias('annotation_reader', 'annotations.cached_reader');
-        $container->setAlias(Reader::class, new Alias('annotations.cached_reader', false));
-        $container->removeDefinition('annotations.psr_cached_reader');
     }
 
     private function registerPropertyAccessConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void

@@ -35,7 +35,6 @@ use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveTaggedIteratorArgumentPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -94,7 +93,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
 {
     use ExpectDeprecationTrait;
 
-    private static $containerCache = [];
+    private static array $containerCache = [];
 
     abstract protected function loadFromFile(ContainerBuilder $container, $file);
 
@@ -1223,19 +1222,16 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertInstanceOf(ValidatorInterface::class, $container->get('validator.alias'));
     }
 
-    /**
-     * @group legacy
-     */
     public function testAnnotations()
     {
-        $this->expectDeprecation('Since symfony/framework-bundle 6.4: Enabling the integration of Doctrine annotations is deprecated. Set the "framework.annotations.enabled" config option to false.');
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Invalid configuration for path "framework.annotations": Enabling the doctrine/annotations integration is not supported anymore.');
 
-        $container = $this->createContainerFromFile('legacy_annotations', [], true, false);
-        $container->addCompilerPass(new TestAnnotationsPass());
-        $container->compile();
-
-        $this->assertEquals($container->getParameter('kernel.cache_dir').'/annotations', $container->getDefinition('annotations.filesystem_cache_adapter')->getArgument(2));
-        $this->assertSame('annotations.filesystem_cache_adapter', (string) $container->getDefinition('annotation_reader')->getArgument(1));
+        $this->createContainerFromClosure(function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'annotations' => true,
+            ]);
+        });
     }
 
     public function testFileLinkFormat()
@@ -1261,28 +1257,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame(['loadValidatorMetadata'], $calls[5][1]);
         $this->assertSame('setMappingCache', $calls[6][0]);
         $this->assertEquals([new Reference('validator.mapping.cache.adapter')], $calls[6][1]);
-        // no cache this time
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testValidationLegacyAnnotations()
-    {
-        $this->expectDeprecation('Since symfony/framework-bundle 6.4: Enabling the integration of Doctrine annotations is deprecated. Set the "framework.annotations.enabled" config option to false.');
-
-        $container = $this->createContainerFromFile('validation_legacy_annotations');
-
-        $calls = $container->getDefinition('validator.builder')->getMethodCalls();
-
-        $this->assertCount(8, $calls);
-        $this->assertSame('enableAnnotationMapping', $calls[4][0]);
-        $this->assertSame('setDoctrineAnnotationReader', $calls[5][0]);
-        $this->assertEquals([new Reference('annotation_reader')], $calls[5][1]);
-        $this->assertSame('addMethodMapping', $calls[6][0]);
-        $this->assertSame(['loadValidatorMetadata'], $calls[6][1]);
-        $this->assertSame('setMappingCache', $calls[7][0]);
-        $this->assertEquals([new Reference('validator.mapping.cache.adapter')], $calls[7][1]);
         // no cache this time
     }
 
@@ -2317,7 +2291,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         ], $data)));
     }
 
-    protected function createContainerFromFile(string $file, array $data = [], bool $resetCompilerPasses = true, bool $compile = true, FrameworkExtension $extension = null)
+    protected function createContainerFromFile(string $file, array $data = [], bool $resetCompilerPasses = true, bool $compile = true, FrameworkExtension $extension = null): ContainerBuilder
     {
         $cacheKey = md5(static::class.$file.serialize($data));
         if ($compile && isset(self::$containerCache[$cacheKey])) {
@@ -2344,7 +2318,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         return self::$containerCache[$cacheKey] = $container;
     }
 
-    protected function createContainerFromClosure($closure, $data = [])
+    protected function createContainerFromClosure($closure, $data = []): ContainerBuilder
     {
         $container = $this->createContainer($data);
         $container->registerExtension(new FrameworkExtension());
@@ -2414,17 +2388,5 @@ abstract class FrameworkExtensionTestCase extends TestCase
             'cache.adapter.array' => $this->assertSame(ArrayAdapter::class, $parentDefinition->getClass()),
             default => $this->fail('Unresolved adapter: '.$adapter),
         };
-    }
-}
-
-/**
- * Simulates ReplaceAliasByActualDefinitionPass.
- */
-class TestAnnotationsPass implements CompilerPassInterface
-{
-    public function process(ContainerBuilder $container): void
-    {
-        $container->setDefinition('annotation_reader', $container->getDefinition('annotations.cached_reader'));
-        $container->removeDefinition('annotations.cached_reader');
     }
 }

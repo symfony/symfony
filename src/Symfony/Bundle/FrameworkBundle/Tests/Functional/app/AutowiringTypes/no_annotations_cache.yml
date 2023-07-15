@@ -1,8 +1,0 @@
-imports:
-    - { resource: config.yml }
-
-framework:
-    http_method_override: false
-    annotations:
-        enabled: true
-        cache: none

@@ -1,0 +1,74 @@
+---------------------------------------------------------------------------
+
+by lugosium at 2023-07-15T10:18:31Z
+
+I confirm your PR fix the issue 👍 🙏
+
+Thanks a lot.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-07-15T10:58:02Z
+
+Did you consider enabling the pass on the command? That'd make more sense to me because if we do this, then we should do the same in PHP dumper, and the pass becomes useless. Also, this misses the check for $class that the pass has. WDYT ?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-07-15T11:32:04Z
+
+TBH I didn’t consider updating the command because it looks like it must work without any compiler pass.
+
+> then we should do the same in PHP dumper
+
+I may have missed something because I don’t understand why :thinking:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-07-15T11:55:51Z
+
+> it looks like it must work without any compiler pass.
+
+It never did before we introduced ResolveFactoryClassPass so I don't think so.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-07-15T12:39:41Z
+
+Is this what you’re asking for?
+
+```diff
+diff --git a/src/Symfony/Bundle/FrameworkBundle/Command/ContainerLintCommand.php b/src/Symfony/Bundle/FrameworkBundle/Command/ContainerLintCommand.php
+--- a/src/Symfony/Bundle/FrameworkBundle/Command/ContainerLintCommand.php	(revision 6f2e603c176724873f92942ea7461150d0e32040)
++++ b/src/Symfony/Bundle/FrameworkBundle/Command/ContainerLintCommand.php	(date 1689424425782)
+@@ -20,6 +20,7 @@
+ use Symfony\Component\Console\Style\SymfonyStyle;
+ use Symfony\Component\DependencyInjection\Compiler\CheckTypeDeclarationsPass;
+ use Symfony\Component\DependencyInjection\Compiler\PassConfig;
++use Symfony\Component\DependencyInjection\Compiler\ResolveFactoryClassPass;
+ use Symfony\Component\DependencyInjection\Container;
+ use Symfony\Component\DependencyInjection\ContainerBuilder;
+ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+@@ -120,7 +121,7 @@
+             }
+
+             $container->getCompilerPassConfig()->setBeforeOptimizationPasses([]);
+-            $container->getCompilerPassConfig()->setOptimizationPasses([]);
++            $container->getCompilerPassConfig()->setOptimizationPasses([new ResolveFactoryClassPass()]);
+             $container->getCompilerPassConfig()->setBeforeRemovingPasses([]);
+         }
+
+```
+
+It feels weird needing this particular pass to build the container from a dump.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-07-15T16:50:29Z
+
+Yes that's what I mean. Dealing with th dumped XML requires special care, this makes sense to me. At least more than making the pass half-needeed. I prefer keeping the symmetry between the dumped container and a compiled container builder.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-07-15T17:42:51Z
+
+Okay PR updated, thanks for the feedback :pray:

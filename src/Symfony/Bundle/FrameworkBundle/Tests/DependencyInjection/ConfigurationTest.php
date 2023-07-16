@@ -739,6 +739,9 @@ class ConfigurationTest extends TestCase
             'remote-event' => [
                 'enabled' => false,
             ],
+            'map_request_payload' => [
+                'status_code_on_error' => null,
+            ],
         ];
     }
 }

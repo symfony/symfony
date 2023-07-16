@@ -349,6 +349,24 @@ class ApiAttributesTest extends AbstractWebTestCase
             'expectedStatusCode' => 422,
         ];
     }
+
+    public function testMapRequestPayloadError400()
+    {
+        $client = self::createClient(['test_case' => 'ApiAttributesTest']);
+
+        $client->request(
+            'POST',
+            '/map-request-body-error-400',
+            [],
+            [],
+            ['HTTP_ACCEPT' => 'application/json', 'CONTENT_TYPE' => 'application/json'],
+            json_encode([]),
+        );
+
+        $response = $client->getResponse();
+
+        self::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+    }
 }
 
 class WithMapQueryStringController
@@ -385,6 +403,16 @@ class WithMapRequestPayloadController
             </response>
             XML
         );
+    }
+}
+
+class WithMapRequestPayloadError400Controller
+{
+    public function __invoke(
+        #[MapRequestPayload(statusCodeOnError: Response::HTTP_BAD_REQUEST)] ?RequestBody $body,
+        Request $request,
+    ): Response {
+        return new Response('', Response::HTTP_NO_CONTENT);
     }
 }
 

@@ -5,3 +5,7 @@ map_query_string:
 map_request_body:
     path: /map-request-body.{_format}
     controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\WithMapRequestPayloadController
+
+map_request_body_error_400:
+    path: /map-request-body-error-400
+    controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\WithMapRequestPayloadError400Controller

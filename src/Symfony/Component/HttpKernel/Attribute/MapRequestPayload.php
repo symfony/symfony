@@ -30,6 +30,7 @@ class MapRequestPayload extends ValueResolver
         public readonly array $serializationContext = [],
         public readonly string|GroupSequence|array|null $validationGroups = null,
         string $resolver = RequestPayloadValueResolver::class,
+        public readonly ?int $statusCodeOnError = null,
     ) {
         parent::__construct($resolver);
     }

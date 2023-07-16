@@ -91,7 +91,7 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
                 $validationFailedCode = Response::HTTP_NOT_FOUND;
             } elseif ($argument instanceof MapRequestPayload) {
                 $payloadMapper = 'mapRequestPayload';
-                $validationFailedCode = Response::HTTP_UNPROCESSABLE_ENTITY;
+                $validationFailedCode = $argument->statusCodeOnError ?? Response::HTTP_UNPROCESSABLE_ENTITY;
             } else {
                 continue;
             }

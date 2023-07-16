@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-07-16T16:15:16Z
+
+Thanks for having a look. I checked why the id could come as first argument and I think the fix we need is this one:
+
+```diff
+--- a/src/Symfony/Component/DependencyInjection/Dumper/PhpDumper.php
++++ b/src/Symfony/Component/DependencyInjection/Dumper/PhpDumper.php
+@@ -900,6 +900,8 @@ EOF;
+
+                     if ($asFile) {
+                         $code .= "fn () => self::do(\$container);\n\n";
++                    } elseif ($definition->isPublic()) {
++                        $code .= sprintf("fn() => \$this->%s();\n\n", $methodName);
+                     } else {
+                         $code .= sprintf("\$this->%s(...);\n\n", $methodName);
+                     }
+```
+
+WDYT?

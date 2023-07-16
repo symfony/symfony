@@ -59,6 +59,7 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
         private readonly SerializerInterface&DenormalizerInterface $serializer,
         private readonly ?ValidatorInterface $validator = null,
         private readonly ?TranslatorInterface $translator = null,
+        private readonly ?int $statusCodeOnError = null,
     ) {
     }
 
@@ -91,7 +92,9 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
                 $validationFailedCode = Response::HTTP_NOT_FOUND;
             } elseif ($argument instanceof MapRequestPayload) {
                 $payloadMapper = 'mapRequestPayload';
-                $validationFailedCode = $argument->statusCodeOnError ?? Response::HTTP_UNPROCESSABLE_ENTITY;
+                $validationFailedCode = $argument->statusCodeOnError
+                    ?? $this->statusCodeOnError
+                    ?? Response::HTTP_UNPROCESSABLE_ENTITY;
             } else {
                 continue;
             }

@@ -139,6 +139,15 @@ class Configuration implements ConfigurationInterface
                     ->defaultValue('error_controller')
                 ->end()
                 ->booleanNode('handle_all_throwables')->info('HttpKernel will handle all kinds of \Throwable')->end()
+                ->arrayNode('map_request_payload')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('status_code_on_error')
+                            ->info('HTTP status code to be returned on error occurred while parsing the request payload.')
+                            ->defaultNull()
+                        ->end()
+                    ->end()
+                ->end()
             ->end()
         ;
 

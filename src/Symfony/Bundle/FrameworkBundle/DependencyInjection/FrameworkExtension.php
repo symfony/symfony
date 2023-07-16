@@ -280,6 +280,7 @@ class FrameworkExtension extends Extension
         $container->getDefinition('locale_listener')->replaceArgument(3, $config['set_locale_from_accept_language']);
         $container->getDefinition('response_listener')->replaceArgument(1, $config['set_content_language_from_locale']);
         $container->getDefinition('http_kernel')->replaceArgument(4, $config['handle_all_throwables'] ?? false);
+        $container->getDefinition('argument_resolver.request_payload')->replaceArgument(3, $config['map_request_payload']['status_code_on_error']);
 
         // If the slugger is used but the String component is not available, we should throw an error
         if (!ContainerBuilder::willBeAvailable('symfony/string', SluggerInterface::class, ['symfony/framework-bundle'])) {

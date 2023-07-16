@@ -68,6 +68,7 @@ return static function (ContainerConfigurator $container) {
                 service('serializer'),
                 service('validator')->nullOnInvalid(),
                 service('translator')->nullOnInvalid(),
+                abstract_arg('The "map_request_payload.status_code_on_error" config value'),
             ])
             ->tag('controller.targeted_value_resolver', ['name' => RequestPayloadValueResolver::class])
             ->tag('kernel.event_subscriber')

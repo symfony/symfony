@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add native return type to `Translator` and to `Application::reset()`
+ * Allow customizing HTTP status code on validation error occurred in `#[MapRequestPayload]`
 
 6.3
 ---

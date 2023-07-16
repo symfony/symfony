@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Deprecate `StopWorkerOnSignalsListener` in favor of using the `SignalableCommandInterface`
+
 6.3
 ---
 

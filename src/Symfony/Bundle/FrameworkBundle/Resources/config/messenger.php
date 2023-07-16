@@ -202,6 +202,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('monolog.logger', ['channel' => 'messenger'])
 
         ->set('messenger.listener.stop_worker_signals_listener', StopWorkerOnSignalsListener::class)
+            ->deprecate('6.4', 'symfony/messenger', 'The "%service_id%" service is deprecated, use the "Symfony\Component\Console\Command\SignalableCommandInterface" instead.')
             ->args([
                 null,
                 service('logger')->ignoreOnInvalid(),
@@ -210,7 +211,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('monolog.logger', ['channel' => 'messenger'])
 
         ->alias('messenger.listener.stop_worker_on_sigterm_signal_listener', 'messenger.listener.stop_worker_signals_listener')
-            ->deprecate('6.3', 'symfony/messenger', 'The "%alias_id%" service is deprecated, use "messenger.listener.stop_worker_signals_listener" instead.')
+            ->deprecate('6.3', 'symfony/messenger', 'The "%alias_id%" service is deprecated, use the "Symfony\Component\Console\Command\SignalableCommandInterface" instead.')
 
         ->set('messenger.listener.stop_worker_on_stop_exception_listener', StopWorkerOnCustomStopExceptionListener::class)
             ->tag('kernel.event_subscriber')

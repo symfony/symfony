@@ -44,14 +44,14 @@ class Symfony_DI_PhpDumper_Service_Non_Shared_Lazy extends Container
     /**
      * Gets the public 'foo' service.
      *
-     * @return \Symfony\Component\DependencyInjection\Tests\Compiler\Foo
+     * @return \Bar\FooLazyClass
      */
     protected static function getFooService($container, $lazyLoad = true)
     {
         $container->factories['foo'] ??= fn () => self::getFooService($container);
 
         if (true === $lazyLoad) {
-            return $container->createProxy('FooGhost80f7cfc', static fn () => \FooGhost80f7cfc::createLazyGhost(static fn ($proxy) => self::getFooService($container, $proxy)));
+            return $container->createProxy('FooLazyClassGhost2108fce', static fn () => \FooLazyClassGhost2108fce::createLazyGhost(static fn ($proxy) => self::getFooService($container, $proxy)));
         }
 
         static $include = true;
@@ -66,7 +66,7 @@ class Symfony_DI_PhpDumper_Service_Non_Shared_Lazy extends Container
     }
 }
 
-class FooGhost80f7cfc extends \Symfony\Component\DependencyInjection\Tests\Compiler\Foo implements \Symfony\Component\VarExporter\LazyObjectInterface
+class FooLazyClassGhost2108fce extends \Bar\FooLazyClass implements \Symfony\Component\VarExporter\LazyObjectInterface
 {
     use \Symfony\Component\VarExporter\LazyGhostTrait;
 

@@ -143,6 +143,10 @@ class AppVariable
             return [];
         }
 
+        if (!method_exists($session, 'getFlashBag')) {
+            return [];
+        }
+
         if (null === $types || '' === $types || [] === $types) {
             return $session->getFlashBag()->all();
         }

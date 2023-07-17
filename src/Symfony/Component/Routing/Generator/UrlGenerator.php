@@ -42,7 +42,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         '%2A' => '*',
     ];
 
-    protected bool $strictRequirements = true;
+    protected ?bool $strictRequirements = true;
 
 
     /**

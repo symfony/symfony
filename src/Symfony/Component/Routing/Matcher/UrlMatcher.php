@@ -32,13 +32,10 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     public const REQUIREMENT_MISMATCH = 1;
     public const ROUTE_MATCH = 2;
 
-    /** @var RequestContext */
-    protected $context;
-
     /**
      * Collects HTTP methods that would be allowed for the request.
      */
-    protected $allow = [];
+    protected array $allow = [];
 
     /**
      * Collects URI schemes that would be allowed for the request.
@@ -47,7 +44,6 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
      */
     protected array $allowSchemes = [];
 
-    protected $routes;
     protected $request;
     protected $expressionLanguage;
 
@@ -56,16 +52,13 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
      */
     protected $expressionLanguageProviders = [];
 
-    public function __construct(RouteCollection $routes, RequestContext $context)
-    {
-        $this->routes = $routes;
-        $this->context = $context;
+    public function __construct(
+        protected RouteCollection $routes,
+        protected RequestContext $context
+    ) {
     }
 
-    /**
-     * @return void
-     */
-    public function setContext(RequestContext $context)
+    public function setContext(RequestContext $context): void
     {
         $this->context = $context;
     }
@@ -101,10 +94,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
         return $ret;
     }
 
-    /**
-     * @return void
-     */
-    public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider)
+    public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider): void
     {
         $this->expressionLanguageProviders[] = $provider;
     }
@@ -255,10 +245,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
         return $defaults;
     }
 
-    /**
-     * @return ExpressionLanguage
-     */
-    protected function getExpressionLanguage()
+    protected function getExpressionLanguage(): ExpressionLanguage
     {
         if (null === $this->expressionLanguage) {
             if (!class_exists(ExpressionLanguage::class)) {

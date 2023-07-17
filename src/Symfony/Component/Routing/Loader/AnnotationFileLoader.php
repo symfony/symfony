@@ -24,17 +24,15 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class AnnotationFileLoader extends FileLoader
 {
-    protected $loader;
-
-    public function __construct(FileLocatorInterface $locator, AnnotationClassLoader $loader)
-    {
+    public function __construct(
+        FileLocatorInterface $locator,
+        protected AnnotationClassLoader $loader
+    ) {
         if (!\function_exists('token_get_all')) {
             throw new \LogicException('The Tokenizer extension is required for the routing annotation loaders.');
         }
 
         parent::__construct($locator);
-
-        $this->loader = $loader;
     }
 
     /**

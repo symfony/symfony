@@ -27,7 +27,7 @@ class AnnotatedRouteControllerLoader extends AnnotationClassLoader
      *
      * @return void
      */
-    protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot)
+    protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void
     {
         if ('__invoke' === $method->getName()) {
             $route->setDefault('_controller', $class->getName());

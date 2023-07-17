@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Messenger\Stamp;
 
-use Symfony\Component\Messenger\Handler\HandlerDescriptor;
+use Symfony\Component\Messenger\Handler\HandlerDescriptorInterface;
 
 /**
  * Marker telling that ack should not be done automatically for this message.
@@ -20,12 +20,12 @@ final class NoAutoAckStamp implements NonSendableStampInterface
 {
     private $handlerDescriptor;
 
-    public function __construct(HandlerDescriptor $handlerDescriptor)
+    public function __construct(HandlerDescriptorInterface $handlerDescriptor)
     {
         $this->handlerDescriptor = $handlerDescriptor;
     }
 
-    public function getHandlerDescriptor(): HandlerDescriptor
+    public function getHandlerDescriptor(): HandlerDescriptorInterface
     {
         return $this->handlerDescriptor;
     }

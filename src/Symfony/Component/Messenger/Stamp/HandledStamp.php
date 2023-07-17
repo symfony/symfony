@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Messenger\Stamp;
 
-use Symfony\Component\Messenger\Handler\HandlerDescriptor;
+use Symfony\Component\Messenger\Handler\HandlerDescriptorInterface;
 
 /**
  * Stamp identifying a message handled by the `HandleMessageMiddleware` middleware
@@ -36,7 +36,7 @@ final class HandledStamp implements StampInterface
         $this->handlerName = $handlerName;
     }
 
-    public static function fromDescriptor(HandlerDescriptor $handler, mixed $result): self
+    public static function fromDescriptor(HandlerDescriptorInterface $handler, mixed $result): self
     {
         return new self($result, $handler->getName());
     }

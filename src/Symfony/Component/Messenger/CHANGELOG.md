@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Introduce `HandlerDescriptorInterface`
+
 6.3
 ---
 

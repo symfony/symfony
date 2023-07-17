@@ -23,7 +23,7 @@ interface HandlersLocatorInterface
     /**
      * Returns the handlers for the given message name.
      *
-     * @return iterable<int, HandlerDescriptor>
+     * @return iterable<int, HandlerDescriptorInterface>
      */
     public function getHandlers(Envelope $envelope): iterable;
 }

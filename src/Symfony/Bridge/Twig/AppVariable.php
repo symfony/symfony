@@ -143,6 +143,8 @@ class AppVariable
             return [];
         }
 
+        // In 7.0 (when symfony/http-foundation: 6.4 is required) this can be updated to
+        // check if the session is an instance of FlashBagAwareSessionInterface
         if (!method_exists($session, 'getFlashBag')) {
             return [];
         }

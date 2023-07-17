@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Handler\HandlerDescriptor;
+use Symfony\Component\Messenger\Handler\HandlerDescriptorInterface;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
@@ -63,6 +64,7 @@ class MessengerPass implements CompilerPassInterface
         $definitions = [];
         $handlersByBusAndMessage = [];
         $handlerToOriginalServiceIdMapping = [];
+        $handlerDescriptorClass = $container->getParameter('.messenger.handler_descriptor_class') ?? HandlerDescriptor::class;
 
         foreach ($container->findTaggedServiceIds('messenger.message_handler', true) as $serviceId => $tags) {
             foreach ($tags as $tag) {
@@ -164,7 +166,7 @@ class MessengerPass implements CompilerPassInterface
             foreach ($handlersByMessage as $message => $handlers) {
                 $handlerDescriptors = [];
                 foreach ($handlers as $handler) {
-                    $definitions[$definitionId = '.messenger.handler_descriptor.'.ContainerBuilder::hash($bus.':'.$message.':'.$handler[0])] = (new Definition(HandlerDescriptor::class))->setArguments([new Reference($handler[0]), $handler[1]]);
+                    $definitions[$definitionId = '.messenger.handler_descriptor.'.ContainerBuilder::hash($bus.':'.$message.':'.$handler[0])] = (new Definition($handlerDescriptorClass))->setArguments([new Reference($handler[0]), $handler[1]]);
                     $handlerDescriptors[] = new Reference($definitionId);
                 }
 

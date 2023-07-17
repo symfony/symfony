@@ -18,7 +18,7 @@ use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\NoHandlerForMessageException;
 use Symfony\Component\Messenger\Handler\Acknowledger;
-use Symfony\Component\Messenger\Handler\HandlerDescriptor;
+use Symfony\Component\Messenger\Handler\HandlerDescriptorInterface;
 use Symfony\Component\Messenger\Handler\HandlersLocatorInterface;
 use Symfony\Component\Messenger\Stamp\AckStamp;
 use Symfony\Component\Messenger\Stamp\FlushBatchHandlersStamp;
@@ -132,7 +132,7 @@ class HandleMessageMiddleware implements MiddlewareInterface
         return $stack->next()->handle($envelope, $stack);
     }
 
-    private function messageHasAlreadyBeenHandled(Envelope $envelope, HandlerDescriptor $handlerDescriptor): bool
+    private function messageHasAlreadyBeenHandled(Envelope $envelope, HandlerDescriptorInterface $handlerDescriptor): bool
     {
         /** @var HandledStamp $stamp */
         foreach ($envelope->all(HandledStamp::class) as $stamp) {

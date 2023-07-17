@@ -425,6 +425,28 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                     throw $e;
                 }
 
+                $message = $e->getMessage();
+
+                if (preg_match('/#\d+ \(\$([^)]+)\) must be of type ([^,]+), ([^,]+) given/', $message, $match)) {
+                    $message = sprintf(
+                        'The type of the "%s" parameter for class "%s" must be of type "%s" ("%s" given).',
+                        $match[1],
+                        $class,
+                        $match[2],
+                        $match[3],
+                    );
+                }
+
+                $exception = NotNormalizableValueException::createForUnexpectedDataType(
+                    $message,
+                    $data,
+                    [$class],
+                    $context['deserialization_path'] ?? null,
+                    true,
+                    previous: $e,
+                );
+                $context['not_normalizable_value_exceptions'][] = $exception;
+
                 return $reflectionClass->newInstanceWithoutConstructor();
             }
         }

@@ -1021,6 +1021,15 @@ class SerializerTest extends TestCase
                 'useMessageForUser' => false,
                 'message' => 'The type of the "something" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\Php74FullWithTypedConstructor" must be one of "float" ("string" given).',
             ],
+            [
+                'currentType' => 'array',
+                'expectedTypes' => [
+                    'Symfony\Component\Serializer\Tests\Fixtures\Php74FullWithTypedConstructor',
+                ],
+                'path' => 'php74FullWithTypedConstructor',
+                'useMessageForUser' => true,
+                'message' => 'The type of the "something" parameter for class "Symfony\Component\Serializer\Tests\Fixtures\Php74FullWithTypedConstructor" must be of type "float" ("string" given).',
+            ],
             $classMetadataFactory ?
                 [
                     'currentType' => 'null',

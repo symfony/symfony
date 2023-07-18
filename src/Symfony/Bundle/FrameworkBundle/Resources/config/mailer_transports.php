@@ -22,6 +22,7 @@ use Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetTransportFactory;
 use Symfony\Component\Mailer\Bridge\MailPace\Transport\MailPaceTransportFactory;
 use Symfony\Component\Mailer\Bridge\OhMySmtp\Transport\OhMySmtpTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
+use Symfony\Component\Mailer\Bridge\Scaleway\Transport\ScalewayTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendinblue\Transport\SendinblueTransportFactory;
 use Symfony\Component\Mailer\Transport\AbstractTransportFactory;
@@ -86,6 +87,10 @@ return static function (ContainerConfigurator $container) {
             ->tag('mailer.transport_factory')
 
         ->set('mailer.transport_factory.null', NullTransportFactory::class)
+            ->parent('mailer.transport_factory.abstract')
+            ->tag('mailer.transport_factory')
+
+        ->set('mailer.transport_factory.scaleway', ScalewayTransportFactory::class)
             ->parent('mailer.transport_factory.abstract')
             ->tag('mailer.transport_factory')
 

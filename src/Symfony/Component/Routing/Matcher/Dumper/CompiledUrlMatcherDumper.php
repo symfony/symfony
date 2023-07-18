@@ -139,8 +139,7 @@ EOF;
         foreach ($staticRoutes as $path => $routes) {
             $code .= sprintf("    %s => [\n", self::export($path));
             foreach ($routes as $route) {
-                $r = array_map([__CLASS__, 'export'], $route);
-                $code .= sprintf("        [%s, %s, %s, %s, %s, %s, %s],\n", $r[0], $r[1], $r[2], $r[3], $r[4], $r[5], $r[6]);
+                $code .= vsprintf("        [%s, %s, %s, %s, %s, %s, %s],\n", array_map([__CLASS__, 'export'], $route));
             }
             $code .= "    ],\n";
         }
@@ -152,8 +151,7 @@ EOF;
         foreach ($dynamicRoutes as $path => $routes) {
             $code .= sprintf("    %s => [\n", self::export($path));
             foreach ($routes as $route) {
-                $r = array_map([__CLASS__, 'export'], $route);
-                $code .= sprintf("        [%s, %s, %s, %s, %s, %s, %s],\n", $r[0], $r[1], $r[2], $r[3], $r[4], $r[5], $r[6]);
+                $code .= vsprintf("        [%s, %s, %s, %s, %s, %s, %s],\n", array_map([__CLASS__, 'export'], $route));
             }
             $code .= "    ],\n";
         }

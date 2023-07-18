@@ -18,6 +18,7 @@ use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\LockMode;
+use Doctrine\DBAL\Platforms\MySQL80Platform;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\OraclePlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -168,11 +169,12 @@ class Connection implements ResetInterface
         get:
         $this->driverConnection->beginTransaction();
         try {
+            $databasePlatform = $this->driverConnection->getDatabasePlatform();
             $query = $this->createAvailableMessagesQueryBuilder()
                 ->orderBy('available_at', 'ASC')
                 ->setMaxResults(1);
 
-            if ($this->driverConnection->getDatabasePlatform() instanceof OraclePlatform) {
+            if ($databasePlatform instanceof OraclePlatform) {
                 $query->select('m.id');
             }
 
@@ -185,21 +187,27 @@ class Connection implements ResetInterface
                 $fromClause = sprintf('%s %s', $table, $alias);
                 $sql = str_replace(
                     sprintf('FROM %s WHERE', $fromClause),
-                    sprintf('FROM %s WHERE', $this->driverConnection->getDatabasePlatform()->appendLockHint($fromClause, LockMode::PESSIMISTIC_WRITE)),
+                    sprintf('FROM %s WHERE', $databasePlatform->appendLockHint($fromClause, LockMode::PESSIMISTIC_WRITE)),
                     $sql
                 );
             }
 
             // Wrap the rownum query in a sub-query to allow writelocks without ORA-02014 error
-            if ($this->driverConnection->getDatabasePlatform() instanceof OraclePlatform) {
+            if ($databasePlatform instanceof OraclePlatform) {
                 $sql = $this->createQueryBuilder('w')
                     ->where('w.id IN ('.str_replace('SELECT a.* FROM', 'SELECT a.id FROM', $sql).')')
                     ->getSQL();
             }
 
             // use SELECT ... FOR UPDATE to lock table
+            $sql .= ' '.$databasePlatform->getWriteLockSQL();
+
+            if ($databasePlatform instanceof MySQL80Platform) {
+                $sql .= ' SKIP LOCKED';
+            }
+
             $stmt = $this->executeQuery(
-                $sql.' '.$this->driverConnection->getDatabasePlatform()->getWriteLockSQL(),
+                $sql,
                 $query->getParameters(),
                 $query->getParameterTypes()
             );

@@ -42,6 +42,9 @@ class Uuid extends AbstractUid
         }
     }
 
+    /**
+     * @psalm-pure
+     */
     public static function fromString(string $uuid): static
     {
         if (22 === \strlen($uuid) && 22 === strspn($uuid, BinaryUtil::BASE58[''])) {
@@ -107,6 +110,9 @@ class Uuid extends AbstractUid
         return new UuidV4();
     }
 
+    /**
+     * @psalm-pure
+     */
     final public static function v5(self $namespace, string $name): UuidV5
     {
         // don't use uuid_generate_sha1(), some versions are buggy
@@ -152,6 +158,9 @@ class Uuid extends AbstractUid
         return uuid_parse($this->uid);
     }
 
+    /**
+     * @psalm-pure
+     */
     public function toRfc4122(): string
     {
         return $this->uid;

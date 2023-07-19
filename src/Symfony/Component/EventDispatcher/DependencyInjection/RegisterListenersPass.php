@@ -22,11 +22,29 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Compiler pass to register tagged services for an event dispatcher.
+ *
+ * @psalm-type BeforeAfterDefinition = string|array{0: string, 1: string}
+ * @psalm-type ListenerDefinition = array{serviceId: string, event: string, method: string, before?: BeforeAfterDefinition, after?: BeforeAfterDefinition, priority?: int, dispatchers: list<string>}
+ * @psalm-type AllListenersDefinition = array<string, list<ListenerDefinition>>
  */
 class RegisterListenersPass implements CompilerPassInterface
 {
     private array $hotPathEvents = [];
     private array $noPreloadEvents = [];
+
+    /**
+     * $allListenersMap['event_name']['listener_service_id']['method'] => $listenerDefinition.
+     *
+     * @var array<string, array<string, array<string, ListenerDefinition>>>
+     */
+    private array $allListenersMap = [];
+
+    /**
+     * $listenerClassesMap['listener_FQCN']['event_name'][] => array{serviceId: string, method:string}.
+     *
+     * @var array<string, array<string, list<array{serviceId: string, method:string}>>>
+     */
+    private array $listenerClassesMap = [];
 
     /**
      * @return $this
@@ -57,20 +75,231 @@ class RegisterListenersPass implements CompilerPassInterface
             return;
         }
 
-        $aliases = [];
+        // collect all listeners, and prevent keys overriding for a very unlikely case where a service is both a listener and a subscriber
+        $allListenerDefinitions = array_merge_recursive(
+            iterator_to_array($this->collectListeners($container)),
+            iterator_to_array($this->collectSubscribers($container)),
+        );
 
-        if ($container->hasParameter('event_dispatcher.event_aliases')) {
-            $aliases = $container->getParameter('event_dispatcher.event_aliases');
+        $this->initializeListenersMaps($container, $allListenerDefinitions);
+
+        $this->handleBeforeAfter($allListenerDefinitions, $container);
+
+        $this->registerListeners($container, $allListenerDefinitions);
+    }
+
+    /**
+     * @param AllListenersDefinition $allListenerDefinitions
+     */
+    private function initializeListenersMaps(ContainerBuilder $container, array $allListenerDefinitions): void
+    {
+        foreach ($allListenerDefinitions as $listenerDefinitions) {
+            foreach ($listenerDefinitions as $listenerDefinition) {
+                $this->allListenersMap[$listenerDefinition['event']][$listenerDefinition['serviceId']][$listenerDefinition['method']] = $listenerDefinition;
+
+                $listenerClass = $container->getDefinition($listenerDefinition['serviceId'])->getClass();
+
+                if ($listenerClass) {
+                    $this->listenerClassesMap[$listenerClass][$listenerDefinition['event']] ??= [];
+                    $this->listenerClassesMap[$listenerClass][$listenerDefinition['event']][] = [
+                        'serviceId' => $listenerDefinition['serviceId'],
+                        'method' => $listenerDefinition['method'],
+                    ];
+                }
+            }
+        }
+    }
+
+    /**
+     * @param AllListenersDefinition $allListenerDefinitions
+     */
+    private function handleBeforeAfter(array &$allListenerDefinitions, ContainerBuilder $container): void
+    {
+        foreach ($allListenerDefinitions as &$listenerDefinitions) {
+            foreach ($listenerDefinitions as &$listenerDefinition) {
+                if (isset($listenerDefinition['before']) && isset($listenerDefinition['after'])) {
+                    throw InvalidBeforeAfterListenerDefinitionException::beforeAndAfterAtSameTime($listenerDefinition['serviceId']);
+                }
+
+                if (isset($listenerDefinition['before']) || isset($listenerDefinition['after'])) {
+                    $listenerDefinition['priority'] = $this->computeBeforeAfterPriorities($container, $listenerDefinition);
+
+                    // register the new priority in listeners map
+                    unset($listenerDefinition['before'], $listenerDefinition['after']);
+                    $this->allListenersMap[$listenerDefinition['event']][$listenerDefinition['serviceId']][$listenerDefinition['method']] = $listenerDefinition;
+                }
+            }
+        }
+    }
+
+    /**
+     * @param ListenerDefinition  $listenerDefinition
+     * @param array<string, bool> $alreadyVisited
+     */
+    private function computeBeforeAfterPriorities(ContainerBuilder $container, array $listenerDefinition, array $alreadyVisited = []): int
+    {
+        // Prevent circular references
+        $listenerName = sprintf('%s::%s', $listenerDefinition['serviceId'], $listenerDefinition['method']);
+        if ($alreadyVisited[$listenerName] ?? false) {
+            throw InvalidBeforeAfterListenerDefinitionException::circularReference($listenerDefinition['serviceId']);
+        }
+        $alreadyVisited[$listenerName] = true;
+
+        if (isset($listenerDefinition['before']) || isset($listenerDefinition['after'])) {
+            ['serviceId' => $beforeAfterServiceId, 'method' => $beforeAfterMethod] = $this->normalizeBeforeAfter($container, $listenerDefinition);
+
+            $beforeAfterListenerDefinition = $this->allListenersMap[$listenerDefinition['event']][$beforeAfterServiceId][$beforeAfterMethod];
+
+            $priority = $this->computeBeforeAfterPriorities($container, $beforeAfterListenerDefinition, $alreadyVisited);
+
+            return isset($listenerDefinition['before']) ? $priority + 1 : $priority - 1;
         }
 
+        return $listenerDefinition['priority'] ?? 0;
+    }
+
+    /**
+     * @param ListenerDefinition $listenerDefinition
+     *
+     * @return array{serviceId: string, method: string}
+     *
+     * before/after can be defined as: class-string, service-id, or array{class?: class-string, service?: service-id, method?: string}
+     * let's normalize it, and resolve the method if not given (or rise an exception if ambiguous)
+     */
+    private function normalizeBeforeAfter(ContainerBuilder $container, array $listenerDefinition): array
+    {
+        $beforeAfterDefinition = $listenerDefinition['before'] ?? $listenerDefinition['after'];
+        $id = $listenerDefinition['serviceId'];
+        $event = $listenerDefinition['event'];
+
+        $listenersForEvent = $this->allListenersMap[$event];
+
+        $beforeAfterMethod = null;
+        $normalizedBeforeAfter = null;
+
+        if (\is_array($beforeAfterDefinition)) {
+            if (!array_is_list($beforeAfterDefinition) || 2 !== \count($beforeAfterDefinition)) {
+                throw InvalidBeforeAfterListenerDefinitionException::arrayDefinitionInvalid($id);
+            }
+
+            $beforeAfterMethod = $beforeAfterDefinition[1];
+            $beforeAfterServiceOrClass = $beforeAfterDefinition[0];
+        } else {
+            $beforeAfterServiceOrClass = $beforeAfterDefinition;
+        }
+
+        if (class_exists($beforeAfterServiceOrClass) && !$container->has($beforeAfterServiceOrClass)) {
+            if (!isset($this->listenerClassesMap[$beforeAfterServiceOrClass])) {
+                throw InvalidBeforeAfterListenerDefinitionException::notAListener($id, $beforeAfterDefinition);
+            }
+
+            if (!isset($this->listenerClassesMap[$beforeAfterServiceOrClass][$event])) {
+                throw InvalidBeforeAfterListenerDefinitionException::notSameEvent($id, $beforeAfterDefinition);
+            }
+
+            $listenersForClassAndEvent = $this->listenerClassesMap[$beforeAfterServiceOrClass][$event];
+
+            if (!$beforeAfterMethod) {
+                if (1 < \count($listenersForClassAndEvent)) {
+                    throw InvalidBeforeAfterListenerDefinitionException::ambiguousDefinition($id, $beforeAfterServiceOrClass);
+                }
+
+                $normalizedBeforeAfter = $listenersForClassAndEvent[0];
+            } else {
+                foreach ($listenersForClassAndEvent as ['serviceId' => $serviceId, 'method' => $methodFromListenerDefinition]) {
+                    if ($methodFromListenerDefinition === $beforeAfterMethod) {
+                        $normalizedBeforeAfter = ['serviceId' => $serviceId, 'method' => $beforeAfterMethod];
+                        break;
+                    }
+                }
+
+                if (!isset($normalizedBeforeAfter)) {
+                    throw InvalidBeforeAfterListenerDefinitionException::notAListener($id, $beforeAfterDefinition);
+                }
+            }
+        } elseif (
+            $container->has($beforeAfterServiceOrClass)
+            && (($def = $container->findDefinition($beforeAfterServiceOrClass))->hasTag('kernel.event_listener') || $def->hasTag('kernel.event_subscriber'))
+        ) {
+            if (!isset($listenersForEvent[$beforeAfterServiceOrClass])) {
+                throw InvalidBeforeAfterListenerDefinitionException::notSameEvent($id, $beforeAfterDefinition);
+            }
+
+            if (!$beforeAfterMethod) {
+                if (1 < \count($listenersForEvent[$beforeAfterServiceOrClass])) {
+                    throw InvalidBeforeAfterListenerDefinitionException::ambiguousDefinition($id, $beforeAfterServiceOrClass);
+                }
+
+                $beforeAfterMethod = array_key_first($listenersForEvent[$beforeAfterServiceOrClass]);
+            } else {
+                if (!isset($listenersForEvent[$beforeAfterServiceOrClass][$beforeAfterMethod])) {
+                    throw InvalidBeforeAfterListenerDefinitionException::notAListener($id, $beforeAfterDefinition);
+                }
+            }
+
+            $normalizedBeforeAfter = ['serviceId' => $beforeAfterServiceOrClass, 'method' => $beforeAfterMethod];
+        } else {
+            throw InvalidBeforeAfterListenerDefinitionException::notAListener($id, $beforeAfterDefinition);
+        }
+
+        if ($listenersForEvent[$normalizedBeforeAfter['serviceId']][$normalizedBeforeAfter['method']]['dispatchers'] !== $listenerDefinition['dispatchers']) {
+            throw InvalidBeforeAfterListenerDefinitionException::notSameDispatchers($id, $beforeAfterDefinition);
+        }
+
+        return $normalizedBeforeAfter;
+    }
+
+    /**
+     * @param AllListenersDefinition $allListenerDefinitions
+     */
+    public function registerListeners(ContainerBuilder $container, array $allListenerDefinitions): void
+    {
         $globalDispatcherDefinition = $container->findDefinition('event_dispatcher');
 
-        foreach ($container->findTaggedServiceIds('kernel.event_listener', true) as $id => $events) {
+        foreach ($allListenerDefinitions as $id => $listenerDefinitions) {
             $noPreload = 0;
 
-            foreach ($events as $event) {
-                $priority = $event['priority'] ?? 0;
+            foreach ($listenerDefinitions as $listenerDefinition) {
+                $dispatcherDefinitions = [];
+                foreach ($listenerDefinition['dispatchers'] as $dispatcher) {
+                    $dispatcherDefinitions[] = 'event_dispatcher' === $dispatcher ? $globalDispatcherDefinition : $container->findDefinition($dispatcher);
+                }
 
+                foreach ($dispatcherDefinitions as $dispatcherDefinition) {
+                    $dispatcherDefinition->addMethodCall(
+                        'addListener',
+                        [
+                            $listenerDefinition['event'],
+                            [new ServiceClosureArgument(new Reference($id)), $listenerDefinition['method']],
+                            $listenerDefinition['priority'] ?? 0,
+                        ]
+                    );
+                }
+
+                if (isset($this->hotPathEvents[$listenerDefinition['event']])) {
+                    $container->getDefinition($id)->addTag('container.hot_path');
+                } elseif (isset($this->noPreloadEvents[$listenerDefinition['event']])) {
+                    ++$noPreload;
+                }
+            }
+
+            if ($noPreload && \count($listenerDefinitions) === $noPreload) {
+                $container->getDefinition($id)->addTag('container.no_preload');
+            }
+        }
+    }
+
+    /**
+     * @return \Generator<string, list<ListenerDefinition>>
+     */
+    private function collectListeners(ContainerBuilder $container): \Generator
+    {
+        $aliases = $this->getEventsAliases($container);
+
+        foreach ($container->findTaggedServiceIds('kernel.event_listener', true) as $id => $events) {
+            $listenersDefinition = [];
+
+            foreach ($events as $event) {
                 if (!isset($event['event'])) {
                     if ($container->getDefinition($id)->hasTag('kernel.event_subscriber')) {
                         continue;
@@ -84,38 +313,36 @@ class RegisterListenersPass implements CompilerPassInterface
 
                 if (!isset($event['method'])) {
                     $event['method'] = 'on'.preg_replace_callback([
-                        '/(?<=\b|_)[a-z]/i',
-                        '/[^a-z0-9]/i',
-                    ], fn ($matches) => strtoupper($matches[0]), $event['event']);
+                            '/(?<=\b|_)[a-z]/i',
+                            '/[^a-z0-9]/i',
+                        ], fn ($matches) => strtoupper($matches[0]), $event['event']);
                     $event['method'] = preg_replace('/[^a-z0-9]/i', '', $event['method']);
 
                     if (null !== ($class = $container->getDefinition($id)->getClass()) && ($r = $container->getReflectionClass($class, false)) && !$r->hasMethod($event['method'])) {
                         if (!$r->hasMethod('__invoke')) {
                             throw new InvalidArgumentException(sprintf('None of the "%s" or "__invoke" methods exist for the service "%s". Please define the "method" attribute on "kernel.event_listener" tags.', $event['method'], $id));
                         }
-
                         $event['method'] = '__invoke';
                     }
                 }
 
-                $dispatcherDefinition = $globalDispatcherDefinition;
-                if (isset($event['dispatcher'])) {
-                    $dispatcherDefinition = $container->findDefinition($event['dispatcher']);
-                }
+                $event['dispatchers'] = [$event['dispatcher'] ?? 'event_dispatcher'];
+                $event['serviceId'] = $id;
+                unset($event['dispatcher']);
 
-                $dispatcherDefinition->addMethodCall('addListener', [$event['event'], [new ServiceClosureArgument(new Reference($id)), $event['method']], $priority]);
-
-                if (isset($this->hotPathEvents[$event['event']])) {
-                    $container->getDefinition($id)->addTag('container.hot_path');
-                } elseif (isset($this->noPreloadEvents[$event['event']])) {
-                    ++$noPreload;
-                }
+                $listenersDefinition[] = $event;
             }
 
-            if ($noPreload && \count($events) === $noPreload) {
-                $container->getDefinition($id)->addTag('container.no_preload');
-            }
+            yield $id => $listenersDefinition;
         }
+    }
+
+    /**
+     * @return \Generator<string, list<ListenerDefinition>>
+     */
+    private function collectSubscribers(ContainerBuilder $container): \Generator
+    {
+        $aliases = $this->getEventsAliases($container);
 
         $extractingDispatcher = new ExtractingEventDispatcher();
 
@@ -133,41 +360,52 @@ class RegisterListenersPass implements CompilerPassInterface
             }
             $class = $r->name;
 
-            $dispatcherDefinitions = [];
+            $dispatchers = [];
             foreach ($tags as $attributes) {
-                if (!isset($attributes['dispatcher']) || isset($dispatcherDefinitions[$attributes['dispatcher']])) {
+                if (!isset($attributes['dispatcher']) || \in_array($attributes['dispatcher'], $dispatchers, true)) {
                     continue;
                 }
 
-                $dispatcherDefinitions[$attributes['dispatcher']] = $container->findDefinition($attributes['dispatcher']);
+                $dispatchers[] = $attributes['dispatcher'];
+            }
+            if (!$dispatchers) {
+                $dispatchers[] = 'event_dispatcher';
             }
 
-            if (!$dispatcherDefinitions) {
-                $dispatcherDefinitions = [$globalDispatcherDefinition];
-            }
+            sort($dispatchers);
 
-            $noPreload = 0;
             ExtractingEventDispatcher::$aliases = $aliases;
             ExtractingEventDispatcher::$subscriber = $class;
             $extractingDispatcher->addSubscriber($extractingDispatcher);
-            foreach ($extractingDispatcher->listeners as $args) {
-                $args[1] = [new ServiceClosureArgument(new Reference($id)), $args[1]];
-                foreach ($dispatcherDefinitions as $dispatcherDefinition) {
-                    $dispatcherDefinition->addMethodCall('addListener', $args);
-                }
 
-                if (isset($this->hotPathEvents[$args[0]])) {
-                    $container->getDefinition($id)->addTag('container.hot_path');
-                } elseif (isset($this->noPreloadEvents[$args[0]])) {
-                    ++$noPreload;
-                }
-            }
-            if ($noPreload && \count($extractingDispatcher->listeners) === $noPreload) {
-                $container->getDefinition($id)->addTag('container.no_preload');
-            }
+            yield $id => array_map(
+                static fn (array $args) => [
+                    'dispatchers' => array_values(array_unique($dispatchers)),
+                    'event' => $args[0],
+                    'method' => $args[1],
+                    'priority' => $args[2],
+                    'serviceId' => $id,
+                ],
+                $extractingDispatcher->listeners
+            );
+
             $extractingDispatcher->listeners = [];
             ExtractingEventDispatcher::$aliases = [];
         }
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function getEventsAliases(ContainerBuilder $container): array
+    {
+        $aliases = [];
+
+        if ($container->hasParameter('event_dispatcher.event_aliases')) {
+            $aliases = $container->getParameter('event_dispatcher.event_aliases');
+        }
+
+        return $aliases;
     }
 
     private function getEventFromTypeDeclaration(ContainerBuilder $container, string $id, string $method): string

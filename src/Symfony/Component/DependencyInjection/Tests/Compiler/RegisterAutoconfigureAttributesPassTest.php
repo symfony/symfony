@@ -35,9 +35,6 @@ class RegisterAutoconfigureAttributesPassTest extends TestCase
         (new RegisterAutoconfigureAttributesPass())->process($container);
 
         $argument = new BoundArgument(1, false, BoundArgument::INSTANCEOF_BINDING, realpath(__DIR__.'/../Fixtures/AutoconfigureAttributed.php'));
-        $values = $argument->getValues();
-        --$values[1];
-        $argument->setValues($values);
 
         $expected = (new ChildDefinition(''))
             ->setLazy(true)

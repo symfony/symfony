@@ -313,7 +313,7 @@ class Connection
         $now = microtime();
         $now = substr($now, 11).substr($now, 2, 3);
 
-        $queuedMessageCount = $this->rawCommand('ZCOUNT', 0, $now);
+        $queuedMessageCount = $this->rawCommand('ZCOUNT', 0, $now) ?? 0;
 
         while ($queuedMessageCount--) {
             if (!$message = $this->rawCommand('ZPOPMIN', 1)) {

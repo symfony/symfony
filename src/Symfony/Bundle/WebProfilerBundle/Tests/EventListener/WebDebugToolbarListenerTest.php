@@ -343,6 +343,20 @@ class WebDebugToolbarListenerTest extends TestCase
         $this->assertEquals("<html><head></head><body>\nWDT\n</body></html>", $response->getContent());
     }
 
+    public function testNullContentTypeWithNoDebugEnv()
+    {
+        $response = new Response('<html><head></head><body></body></html>');
+        $response->headers->set('Content-Type', null);
+        $response->headers->set('X-Debug-Token', 'xxxxxxxx');
+
+        $event = new ResponseEvent($this->createMock(Kernel::class), new Request(), HttpKernelInterface::MAIN_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock(), false, WebDebugToolbarListener::ENABLED, null);
+        $listener->onKernelResponse($event);
+
+        $this->expectNotToPerformAssertions();
+    }
+
     protected function getTwigMock($render = 'WDT')
     {
         $templating = $this->createMock(Environment::class);

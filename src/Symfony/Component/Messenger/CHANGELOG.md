@@ -13,6 +13,11 @@ CHANGELOG
    `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport` and
    `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransportFactory`
 
+6.4
+---
+
+ * Deprecate `StopWorkerOnSignalsListener` in favor of using the `SignalableCommandInterface`
+
 6.3
 ---
 

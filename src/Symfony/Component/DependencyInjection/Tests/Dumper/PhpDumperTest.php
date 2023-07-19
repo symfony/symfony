@@ -337,24 +337,6 @@ class PhpDumperTest extends TestCase
         $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/services9_lazy_inlined_factories.txt', $dump);
     }
 
-    public function testNonSharedLazyDumpAsFiles()
-    {
-        $container = include self::$fixturesPath.'/containers/container_non_shared_lazy.php';
-        $container->register('non_shared_foo', \Bar\FooLazyClass::class)
-            ->setFile(realpath(self::$fixturesPath.'/includes/foo_lazy.php'))
-            ->setShared(false)
-            ->setPublic(true)
-            ->setLazy(true);
-        $container->compile();
-        $dumper = new PhpDumper($container);
-        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'inline_factories' => false, 'inline_class_loader' => false]), true);
-
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
-        }
-        $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/services_non_shared_lazy_as_files.txt', $dump);
-    }
-
     public function testServicesWithAnonymousFactories()
     {
         $container = include self::$fixturesPath.'/containers/container19.php';
@@ -770,7 +752,7 @@ class PhpDumperTest extends TestCase
         $container = new ContainerBuilder();
 
         $container
-            ->register('foo', Foo::class)
+            ->register('foo', \Bar\FooLazyClass::class)
             ->setFile(realpath(self::$fixturesPath.'/includes/foo_lazy.php'))
             ->setShared(false)
             ->setLazy(true)
@@ -796,6 +778,48 @@ class PhpDumperTest extends TestCase
         $this->assertTrue($foo1->resetLazyObject());
 
         $foo2 = $container->get('foo');
+        $this->assertTrue($foo2->resetLazyObject());
+
+        $this->assertNotSame($foo1, $foo2);
+    }
+
+    public function testNonSharedLazyAsFiles()
+    {
+        $container = new ContainerBuilder();
+
+        $container
+            ->register('non_shared_foo', \Bar\FooLazyClass::class)
+            ->setFile(realpath(self::$fixturesPath.'/includes/foo_lazy.php'))
+            ->setShared(false)
+            ->setLazy(true)
+            ->setPublic(true);
+
+        $container->compile();
+        $dumper = new PhpDumper($container);
+        $dumps = $dumper->dump([
+            'class' => 'Symfony_DI_PhpDumper_Service_Non_Shared_Lazy_As_File',
+            'as_files' => true,
+            'inline_factories' => false,
+            'inline_class_loader' => false,
+        ]);
+
+        $stringDump = print_r($dumps, true);
+        $this->assertStringMatchesFormatFile(
+            self::$fixturesPath.'/php/services_non_shared_lazy_as_files.txt',
+            '\\' === \DIRECTORY_SEPARATOR ? str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $stringDump) : $stringDump
+        );
+
+        $lastDump = array_pop($dumps);
+        foreach (array_reverse($dumps) as $dump) {
+            eval('?>'.$dump);
+        }
+
+        $container = eval('?>'.$lastDump);
+
+        $foo1 = $container->get('non_shared_foo');
+        $this->assertTrue($foo1->resetLazyObject());
+
+        $foo2 = $container->get('non_shared_foo');
         $this->assertTrue($foo2->resetLazyObject());
 
         $this->assertNotSame($foo1, $foo2);

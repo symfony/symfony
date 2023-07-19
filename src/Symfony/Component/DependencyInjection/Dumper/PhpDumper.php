@@ -915,12 +915,10 @@ EOF;
                 if (!$definition->isShared()) {
                     $code .= sprintf('        %s ??= ', $factory);
 
-                    if ($asFile) {
-                        $code .= "self::do(...);\n\n";
-                    } elseif ($definition->isPublic()) {
-                        $code .= sprintf("fn () => self::%s(\$container);\n\n", $methodName);
+                    if ($definition->isPublic()) {
+                        $code .= sprintf("fn () => self::%s(\$container);\n\n", $asFile ? 'do' : $methodName);
                     } else {
-                        $code .= sprintf("self::%s(...);\n\n", $methodName);
+                        $code .= sprintf("self::%s(...);\n\n", $asFile ? 'do' : $methodName);
                     }
                 }
                 $lazyLoad = $asGhostObject ? '$proxy' : 'false';

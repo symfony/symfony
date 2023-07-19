@@ -249,6 +249,70 @@ class ClassMetadataTest extends TestCase
         $this->assertEquals($constraints, $members[1]->getConstraints());
     }
 
+    public function testMergeConstraintsKeepsProtectedMembersSeparate()
+    {
+        $this->metadata->addPropertyConstraint('address', new ConstraintA());
+
+        $parent = new ClassMetadata(self::PARENTCLASS);
+        $parent->addPropertyConstraint('address', new ConstraintB());
+
+        $this->metadata->mergeConstraints($parent);
+
+        $constraints = [
+            new ConstraintA(['groups' => [
+                'Default',
+                'Entity',
+            ]]),
+        ];
+        $parentConstraints = [
+            new ConstraintB(['groups' => [
+                'Default',
+                'EntityParent',
+                'Entity',
+            ]]),
+        ];
+
+        $members = $this->metadata->getPropertyMetadata('address');
+
+        $this->assertCount(2, $members);
+        $this->assertEquals(self::CLASSNAME, $members[0]->getClassName());
+        $this->assertEquals($constraints, $members[0]->getConstraints());
+        $this->assertEquals(self::PARENTCLASS, $members[1]->getClassName());
+        $this->assertEquals($parentConstraints, $members[1]->getConstraints());
+    }
+
+    public function testMergeConstraintsKeepsPublicMembersSeparate()
+    {
+        $this->metadata->addPropertyConstraint('nickname', new ConstraintA());
+
+        $parent = new ClassMetadata(self::PARENTCLASS);
+        $parent->addPropertyConstraint('nickname', new ConstraintB());
+
+        $this->metadata->mergeConstraints($parent);
+
+        $constraints = [
+            new ConstraintA(['groups' => [
+                'Default',
+                'Entity',
+            ]]),
+        ];
+        $parentConstraints = [
+            new ConstraintB(['groups' => [
+                'Default',
+                'EntityParent',
+                'Entity',
+            ]]),
+        ];
+
+        $members = $this->metadata->getPropertyMetadata('nickname');
+
+        $this->assertCount(2, $members);
+        $this->assertEquals(self::CLASSNAME, $members[0]->getClassName());
+        $this->assertEquals($constraints, $members[0]->getConstraints());
+        $this->assertEquals(self::PARENTCLASS, $members[1]->getClassName());
+        $this->assertEquals($parentConstraints, $members[1]->getConstraints());
+    }
+
     public function testGetReflectionClass()
     {
         $reflClass = new \ReflectionClass(self::CLASSNAME);

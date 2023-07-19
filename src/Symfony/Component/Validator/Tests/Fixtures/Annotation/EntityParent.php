@@ -20,6 +20,8 @@ class EntityParent implements EntityInterfaceA
     private $internal;
     private $data = 'Data';
     private $child;
+    protected $address;
+    public $nickname;
 
     /**
      * @NotNull

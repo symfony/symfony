@@ -46,6 +46,11 @@ HttpKernel
  * `BundleInterface` no longer extends `ContainerAwareInterface`
  * Add native return types to `TraceableEventDispatcher` and to `MergeExtensionConfigurationPass`
 
+Messenger
+---------
+
+ * Deprecate `StopWorkerOnSignalsListener` in favor of using the `SignalableCommandInterface`
+
 MonologBridge
 -------------
 

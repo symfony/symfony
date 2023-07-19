@@ -72,7 +72,7 @@ class ConfigCacheTest extends TestCase
     {
         $p = (new \ReflectionClass(SelfCheckingResourceChecker::class))->getProperty('cache');
         $p->setAccessible(true);
-        $p->setValue(SelfCheckingResourceChecker::class, []);
+        $p->setValue(null, []);
 
         $freshResource = new ResourceStub();
         $freshResource->setFresh(true);
@@ -87,7 +87,7 @@ class ConfigCacheTest extends TestCase
     {
         $p = (new \ReflectionClass(SelfCheckingResourceChecker::class))->getProperty('cache');
         $p->setAccessible(true);
-        $p->setValue(SelfCheckingResourceChecker::class, []);
+        $p->setValue(null, []);
 
         $staleResource = new ResourceStub();
         $staleResource->setFresh(false);

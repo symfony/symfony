@@ -121,7 +121,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         if (self::DISABLED === $this->mode
             || !$response->headers->has('X-Debug-Token')
             || $response->isRedirection()
-            || ($response->headers->has('Content-Type') && !str_contains($response->headers->get('Content-Type'), 'html'))
+            || ($response->headers->has('Content-Type') && !str_contains($response->headers->get('Content-Type') ?? '', 'html'))
             || 'html' !== $request->getRequestFormat()
             || false !== stripos($response->headers->get('Content-Disposition', ''), 'attachment;')
         ) {

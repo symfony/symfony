@@ -22,6 +22,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
+use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 
 /**
  * @author Ryan Weaver <ryan@symfonycasts.com>
@@ -75,6 +76,8 @@ EOF
 
         if ($input->getOption('stats')) {
             $this->listMessagesPerClass($failureTransportName, $io, $input->getOption('max'));
+        } elseif ($input->getOption('max') === 0 && $receiver instanceof MessageCountAwareInterface && $receiver->getMessageCount() > 0) {
+            $io->comment('Nothing to present.');
         } elseif (null === $id = $input->getArgument('id')) {
             $this->listMessages($failureTransportName, $io, $input->getOption('max'), $input->getOption('class-filter'));
         } else {

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-07-17T07:26:11Z
+
+`StopWorkerOnSigtermSignalListener` should be updated as well. It would currently reference the now deprecated class.
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2023-07-17T08:03:16Z
+
+@xabbuh Done. Not sure about the pslam error, it shouldn't be a problem.

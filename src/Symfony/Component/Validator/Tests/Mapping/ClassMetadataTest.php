@@ -218,6 +218,20 @@ class ClassMetadataTest extends TestCase
         $this->assertFalse($this->metadata->hasPropertyMetadata('non_existent_field'));
     }
 
+    public function testMergeConstraintsKeepsChildConstraintsProperly(): void
+    {
+        $parent = new ClassMetadata(self::PARENTCLASS);
+        $parent->addPropertyConstraint('firstName', new ConstraintA());
+
+        $this->metadata->mergeConstraints($parent);
+        $this->metadata->addPropertyConstraint('firstName', new ConstraintB());
+
+        $members = $this->metadata->getPropertyMetadata('firstName');
+
+        $this->assertCount(1, $members[0]->constraintsByGroup['EntityParent']);
+        $this->assertCount(2, $members[0]->constraintsByGroup['Entity']);
+    }
+
     public function testMergeConstraintsKeepsPrivateMembersSeparate()
     {
         $parent = new ClassMetadata(self::PARENTCLASS);

@@ -548,6 +548,16 @@ class ResponseTest extends ResponseTestCase
         $this->assertEquals('text/css; charset=UTF-8', $response->headers->get('Content-Type'));
     }
 
+    public function testContentTypeIsNull()
+    {
+        $response = new Response('foo');
+        $response->headers->set('Content-Type', null);
+
+        $response->prepare(new Request());
+
+        $this->expectNotToPerformAssertions();
+    }
+
     public function testPrepareDoesNothingIfContentTypeIsSet()
     {
         $response = new Response('foo');

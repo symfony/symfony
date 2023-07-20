@@ -44,7 +44,7 @@ class SymfonyQuestionHelper extends QuestionHelper
                 break;
 
             case $question instanceof ConfirmationQuestion:
-                $text = sprintf(' <info>%s (yes/no)</info> [<comment>%s</comment>]:', $text, $default ? 'yes' : 'no');
+                $text = sprintf(' <info>%s (%s/%s)</info> [<comment>%s</comment>]:', $text, $question->getTrueAnswerText(), $question->getFalseAnswerText(), $default ? $question->getTrueAnswerText() : $question->getFalseAnswerText());
 
                 break;
 

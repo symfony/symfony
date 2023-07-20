@@ -59,4 +59,16 @@ class ConfirmationQuestionTest extends TestCase
             ],
         ];
     }
+
+    public function testDifferentRegex()
+    {
+        $sut = new ConfirmationQuestion('Eine Frage', true, '/^j/i');
+        $answers = ['j', 'J', 'ja', 'JA', 'jA', ''];
+
+        foreach ($answers as $answer) {
+            $normalizer = $sut->getNormalizer();
+            $actual = $normalizer($answer);
+            $this->assertTrue($actual, sprintf('When default is true, the normalizer must return true for "%s"', $answer));
+        }
+    }
 }

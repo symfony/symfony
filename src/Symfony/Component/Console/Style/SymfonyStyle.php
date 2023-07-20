@@ -267,9 +267,9 @@ class SymfonyStyle extends OutputStyle
         return $this->askQuestion($question);
     }
 
-    public function confirm(string $question, bool $default = true): bool
+    public function confirm(string $question, bool $default = true, string $trueAnswerRegex = ConfirmationQuestion::DEFAULT_TRUE_ANSWER_REGEX, string $trueAnswerText = ConfirmationQuestion::DEFAULT_TRUE_ANSWER_TEXT, string $falseAnswerText = ConfirmationQuestion::DEFAULT_FALSE_ANSWER_TEXT): bool
     {
-        return $this->askQuestion(new ConfirmationQuestion($question, $default));
+        return $this->askQuestion(new ConfirmationQuestion($question, $default, $trueAnswerRegex, $trueAnswerText, $falseAnswerText));
     }
 
     public function choice(string $question, array $choices, mixed $default = null, bool $multiSelect = false): mixed

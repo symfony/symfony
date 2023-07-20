@@ -18,19 +18,34 @@ namespace Symfony\Component\Console\Question;
  */
 class ConfirmationQuestion extends Question
 {
+    public const DEFAULT_TRUE_ANSWER_REGEX = '/^y/i';
+    public const DEFAULT_TRUE_ANSWER_TEXT = 'yes';
+    public const DEFAULT_FALSE_ANSWER_TEXT = 'no';
+
     private string $trueAnswerRegex;
 
-    /**
-     * @param string $question        The question to ask to the user
-     * @param bool   $default         The default answer to return, true or false
-     * @param string $trueAnswerRegex A regex to match the "yes" answer
-     */
-    public function __construct(string $question, bool $default = true, string $trueAnswerRegex = '/^y/i')
+    private string $trueAnswerText;
+
+    private string $falseAnswerText;
+
+    public function __construct(string $question, bool $default = true, string $trueAnswerRegex = self::DEFAULT_TRUE_ANSWER_REGEX, string $trueAnswerText = self::DEFAULT_TRUE_ANSWER_TEXT, string $falseAnswerText = self::DEFAULT_FALSE_ANSWER_TEXT)
     {
         parent::__construct($question, $default);
 
         $this->trueAnswerRegex = $trueAnswerRegex;
+        $this->trueAnswerText = $trueAnswerText;
+        $this->falseAnswerText = $falseAnswerText;
         $this->setNormalizer($this->getDefaultNormalizer());
+    }
+
+    public function getTrueAnswerText(): string
+    {
+        return $this->trueAnswerText;
+    }
+
+    public function getFalseAnswerText(): string
+    {
+        return $this->falseAnswerText;
     }
 
     /**

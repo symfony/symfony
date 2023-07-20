@@ -223,4 +223,60 @@ class SymfonyStyleTest extends TestCase
             stream_get_contents($output->getStream())
         );
     }
+
+    public function testConfirm()
+    {
+        $answer = 'yes';
+        $inputStream = fopen('php://memory', 'r+');
+        fwrite($inputStream, $answer.\PHP_EOL);
+        rewind($inputStream);
+        $input = $this->createMock(Input::class);
+        $sections = [];
+        $output = new ConsoleSectionOutput(fopen('php://memory', 'r+'), $sections, StreamOutput::VERBOSITY_NORMAL, true, new OutputFormatter());
+        $input
+            ->method('isInteractive')
+            ->willReturn(true);
+        $input
+            ->method('getStream')
+            ->willReturn($inputStream);
+
+        $io = new SymfonyStyle($input, $output);
+
+        $givenAnswer = $io->confirm('A question');
+
+        rewind($output->getStream());
+        $this->assertTrue($givenAnswer);
+        $this->assertEquals(
+            \PHP_EOL.\PHP_EOL." \033[32mA question (yes/no)\033[39m [\033[33myes\033[39m]:".\PHP_EOL.' > '.\PHP_EOL.\PHP_EOL.\PHP_EOL,
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testConfirmWithGermanLanguage()
+    {
+        $answer = 'ja';
+        $inputStream = fopen('php://memory', 'r+');
+        fwrite($inputStream, $answer.\PHP_EOL);
+        rewind($inputStream);
+        $input = $this->createMock(Input::class);
+        $sections = [];
+        $output = new ConsoleSectionOutput(fopen('php://memory', 'r+'), $sections, StreamOutput::VERBOSITY_NORMAL, true, new OutputFormatter());
+        $input
+            ->method('isInteractive')
+            ->willReturn(true);
+        $input
+            ->method('getStream')
+            ->willReturn($inputStream);
+
+        $io = new SymfonyStyle($input, $output);
+
+        $givenAnswer = $io->confirm('Eine Frage', true, '/^j/i', 'ja', 'nein');
+
+        rewind($output->getStream());
+        $this->assertTrue($givenAnswer);
+        $this->assertEquals(
+            \PHP_EOL.\PHP_EOL." \033[32mEine Frage (ja/nein)\033[39m [\033[33mja\033[39m]:".\PHP_EOL.' > '.\PHP_EOL.\PHP_EOL.\PHP_EOL,
+            stream_get_contents($output->getStream())
+        );
+    }
 }

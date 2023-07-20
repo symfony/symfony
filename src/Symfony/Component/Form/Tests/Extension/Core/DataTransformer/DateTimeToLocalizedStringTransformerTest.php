@@ -124,7 +124,7 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
 
         $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC');
 
-        $this->assertEquals('Feb 3, 2010, 4:05 AM', $transformer->transform($this->dateTime));
+        $this->assertMatchesRegularExpression('/^Feb 3, 2010, 4:05\s+AM$/u', $transformer->transform($this->dateTime));
     }
 
     public function testTransformEmpty()

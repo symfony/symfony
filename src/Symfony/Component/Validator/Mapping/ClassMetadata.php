@@ -346,17 +346,15 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
                     $constraint->addImplicitGroupName($this->getDefaultGroup());
                 }
 
+                $this->addPropertyMetadata($member);
+
                 if ($member instanceof MemberMetadata && !$member->isPrivate($this->name)) {
                     $property = $member->getPropertyName();
-                    $this->members[$property] = [$member];
-
                     if ($member instanceof PropertyMetadata) {
                         $this->properties[$property] = $member;
                     } elseif ($member instanceof GetterMetadata) {
                         $this->getters[$property] = $member;
                     }
-                } else {
-                    $this->addPropertyMetadata($member);
                 }
             }
         }

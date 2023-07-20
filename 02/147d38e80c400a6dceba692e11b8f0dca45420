@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-07-05T15:00:53Z
+
+I don't have the whole thing in my head. Is it necessary to add the `framework.annotations.enabled: false` config when the `doctrine/annotations` package is not detected?
+
+Self-reply: it's documented in FrameworkBundle's changelog.
+Thanks.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-07-05T15:12:48Z
+
+> Is it necessary to add the `framework.annotations.enabled: false` config when the `doctrine/annotations` package is not detected?
+
+No.
+
+Long answer: Unfortunately, we currently enable the annotations integration by default if the `doctrine/annotations` package is installed. However if the package is not installed, FrameworkBundle's default behavior is fine, so you don't have to opt out of anything.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-07-05T16:44:54Z
+
+@derrabus regarding the "unlocking" part, shouldn't we actually first deprecate annotations in components and then deprecate the FrameworkBundle integration configuring a reader only once we don't rely on it anymore ?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-07-05T16:51:47Z
+
+> shouldn't we actually first deprecate annotations in components and then deprecate the FrameworkBundle integration configuring a reader only once we don't rely on it anymore ?
+
+That was my first approach, but I think it's easier this way. This PR is self-contained: If we merge it and remove the integration in 7.0, the components might still support Doctrine annotations, but FrameworkBundle won't have a way to enable them. Removing a feature that FrameworkBundle doesn't use should be easy. 🙂
+
+---------------------------------------------------------------------------
+
+by stof at 2023-07-05T16:55:25Z
+
+@derrabus but the DX would be worse as devs would not get deprecation warnings telling them where they still use annotations, which they should solve *before* disabling them.
+To me, we should first have a component-level deprecation triggered when annotations are actually found (so in the case of the routing component, triggered when you actually have a route defined with annotations).
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-07-14T09:39:35Z
+
+> @derrabus but the DX would be worse as devs would not get deprecation warnings telling them where they still use annotations, which they should solve _before_ disabling them.
+
+#49358, #50982 and #50983 trigger the deprecations you want.
+
+> To me, we should first have a component-level deprecation triggered when annotations are actually found (so in the case of the routing component, triggered when you actually have a route defined with annotations).
+
+This is kinda a chicken-egg problem. I'm working on removing annotations everywhere and I believe we both agree on how the end result should look like. Unless we want to discuss a big all-or-nothing PR, I think we can live with this DX flaw, knowing we will resolve it before 6.4.

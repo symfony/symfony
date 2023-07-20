@@ -6,6 +6,7 @@
         http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
 
     <framework:config http-method-override="false">
+        <framework:annotations enabled="false" />
         <framework:messenger>
             <framework:transport name="transport_1" dsn="null://" failure-transport="failure_transport_1" />
             <framework:transport name="transport_2" dsn="null://" />

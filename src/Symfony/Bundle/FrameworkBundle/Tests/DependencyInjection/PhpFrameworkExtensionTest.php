@@ -31,6 +31,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         $this->expectException(\LogicException::class);
         $this->createContainerFromClosure(function ($container) {
             $container->loadFromExtension('framework', [
+                'annotations' => false,
                 'http_method_override' => false,
                 'assets' => [
                     'base_urls' => 'http://cdn.example.com',
@@ -45,6 +46,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         $this->expectException(\LogicException::class);
         $this->createContainerFromClosure(function ($container) {
             $container->loadFromExtension('framework', [
+                'annotations' => false,
                 'http_method_override' => false,
                 'assets' => [
                     'packages' => [
@@ -64,6 +66,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         $this->expectExceptionMessage('A transition from a place/state must have an unique name. Multiple transitions named "a_to_b" from place/state "a" were found on StateMachine "article".');
         $this->createContainerFromClosure(function ($container) {
             $container->loadFromExtension('framework', [
+                'annotations' => false,
                 'http_method_override' => false,
                 'workflows' => [
                     'article' => [
@@ -92,6 +95,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
     {
         $container = $this->createContainerFromClosure(function ($container) {
             $container->loadFromExtension('framework', [
+                'annotations' => false,
                 'http_method_override' => false,
                 'workflows' => [
                     'workflow_a' => [
@@ -150,6 +154,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         try {
             $this->createContainerFromClosure(function (ContainerBuilder $container) {
                 $container->loadFromExtension('framework', [
+                    'annotations' => false,
                     'http_method_override' => false,
                     'lock' => false,
                     'rate_limiter' => [
@@ -165,6 +170,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
 
         $container = $this->createContainerFromClosure(function (ContainerBuilder $container) {
             $container->loadFromExtension('framework', [
+                'annotations' => false,
                 'http_method_override' => false,
                 'lock' => true,
                 'rate_limiter' => [
@@ -181,6 +187,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
     {
         $container = $this->createContainerFromClosure(function (ContainerBuilder $container) {
             $container->loadFromExtension('framework', [
+                'annotations' => false,
                 'http_method_override' => false,
                 'rate_limiter' => [
                     'without_lock' => ['policy' => 'fixed_window', 'limit' => 10, 'interval' => '1 hour', 'lock_factory' => null],

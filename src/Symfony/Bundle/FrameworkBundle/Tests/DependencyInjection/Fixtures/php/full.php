@@ -56,11 +56,7 @@ $container->loadFromExtension('framework', [
     'validation' => [
         'enabled' => true,
     ],
-    'annotations' => [
-        'cache' => 'file',
-        'debug' => true,
-        'file_cache_dir' => '%kernel.cache_dir%/annotations',
-    ],
+    'annotations' => false,
     'serializer' => [
         'enabled' => true,
         'enable_annotations' => true,

@@ -1716,6 +1716,8 @@ class FrameworkExtension extends Extension
             throw new LogicException('Annotations cannot be enabled as the Doctrine Annotation library is not installed. Try running "composer require doctrine/annotations".');
         }
 
+        trigger_deprecation('symfony/framework-bundle', '6.4', 'Enabling the integration of Doctrine annotations is deprecated. Set the "framework.annotations.enabled" config option to false.');
+
         $loader->load('annotations.php');
 
         if ('none' === $config['cache']) {

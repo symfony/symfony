@@ -25,10 +25,8 @@ use Symfony\Component\Finder\Finder;
 
 class CacheClearCommandTest extends TestCase
 {
-    /** @var TestAppKernel */
-    private $kernel;
-    /** @var Filesystem */
-    private $fs;
+    private TestAppKernel $kernel;
+    private Filesystem $fs;
 
     protected function setUp(): void
     {
@@ -112,7 +110,7 @@ class CacheClearCommandTest extends TestCase
         $application->setCatchExceptions(false);
         $application->doRun($input, new NullOutput());
 
-        $this->assertTrue(is_file($this->kernel->getCacheDir().'/annotations.php'));
+        $this->assertTrue(is_file($this->kernel->getCacheDir().'/dummy.txt'));
     }
 
     public function testCacheIsWarmedWithOldContainer()

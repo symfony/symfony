@@ -16,6 +16,7 @@ CHANGELOG
 ---
 
  * Add native return type to `Translator` and to `Application::reset()`
+ * Deprecate the integration of Doctrine annotations, either uninstall the `doctrine/annotations` package or disable the integration by setting `framework.annotations` to `false`
 
 6.3
 ---

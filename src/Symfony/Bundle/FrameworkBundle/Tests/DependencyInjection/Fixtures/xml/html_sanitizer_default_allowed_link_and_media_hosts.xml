@@ -6,6 +6,7 @@
                         http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
 
     <config xmlns="http://symfony.com/schema/dic/symfony" http-method-override="false">
+        <annotations enabled="false" />
         <html-sanitizer>
             <sanitizer name="custom_default"/>
         </html-sanitizer>

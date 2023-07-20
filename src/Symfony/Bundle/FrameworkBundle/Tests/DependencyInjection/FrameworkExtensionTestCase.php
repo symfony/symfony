@@ -11,9 +11,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
-use Doctrine\Common\Annotations\Annotation;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerAwareInterface;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddAnnotationsCachedReaderPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
@@ -92,6 +92,8 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 abstract class FrameworkExtensionTestCase extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     private static $containerCache = [];
 
     abstract protected function loadFromFile(ContainerBuilder $container, $file);
@@ -1193,9 +1195,9 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
-        $annotations = !class_exists(FullStack::class) && class_exists(Annotation::class);
+        $annotations = !class_exists(FullStack::class);
 
-        $this->assertCount($annotations ? 8 : 6, $calls);
+        $this->assertCount($annotations ? 7 : 6, $calls);
         $this->assertSame('setConstraintValidatorFactory', $calls[0][0]);
         $this->assertEquals([new Reference('validator.validator_factory')], $calls[0][1]);
         $this->assertSame('setTranslator', $calls[1][0]);
@@ -1207,7 +1209,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $i = 3;
         if ($annotations) {
             $this->assertSame('enableAnnotationMapping', $calls[++$i][0]);
-            $this->assertSame('setDoctrineAnnotationReader', $calls[++$i][0]);
         }
         $this->assertSame('addMethodMapping', $calls[++$i][0]);
         $this->assertSame(['loadValidatorMetadata'], $calls[$i][1]);
@@ -1222,9 +1223,14 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertInstanceOf(ValidatorInterface::class, $container->get('validator.alias'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testAnnotations()
     {
-        $container = $this->createContainerFromFile('full', [], true, false);
+        $this->expectDeprecation('Since symfony/framework-bundle 6.4: Enabling the integration of Doctrine annotations is deprecated. Set the "framework.annotations.enabled" config option to false.');
+
+        $container = $this->createContainerFromFile('legacy_annotations', [], true, false);
         $container->addCompilerPass(new TestAnnotationsPass());
         $container->compile();
 
@@ -1246,6 +1252,26 @@ abstract class FrameworkExtensionTestCase extends TestCase
     public function testValidationAnnotations()
     {
         $container = $this->createContainerFromFile('validation_annotations');
+
+        $calls = $container->getDefinition('validator.builder')->getMethodCalls();
+
+        $this->assertCount(7, $calls);
+        $this->assertSame('enableAnnotationMapping', $calls[4][0]);
+        $this->assertSame('addMethodMapping', $calls[5][0]);
+        $this->assertSame(['loadValidatorMetadata'], $calls[5][1]);
+        $this->assertSame('setMappingCache', $calls[6][0]);
+        $this->assertEquals([new Reference('validator.mapping.cache.adapter')], $calls[6][1]);
+        // no cache this time
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testValidationLegacyAnnotations()
+    {
+        $this->expectDeprecation('Since symfony/framework-bundle 6.4: Enabling the integration of Doctrine annotations is deprecated. Set the "framework.annotations.enabled" config option to false.');
+
+        $container = $this->createContainerFromFile('validation_legacy_annotations');
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
@@ -1271,15 +1297,14 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
-        $this->assertCount(9, $calls);
+        $this->assertCount(8, $calls);
         $this->assertSame('addXmlMappings', $calls[3][0]);
         $this->assertSame('addYamlMappings', $calls[4][0]);
         $this->assertSame('enableAnnotationMapping', $calls[5][0]);
-        $this->assertSame('setDoctrineAnnotationReader', $calls[6][0]);
-        $this->assertSame('addMethodMapping', $calls[7][0]);
-        $this->assertSame(['loadValidatorMetadata'], $calls[7][1]);
-        $this->assertSame('setMappingCache', $calls[8][0]);
-        $this->assertEquals([new Reference('validator.mapping.cache.adapter')], $calls[8][1]);
+        $this->assertSame('addMethodMapping', $calls[6][0]);
+        $this->assertSame(['loadValidatorMetadata'], $calls[6][1]);
+        $this->assertSame('setMappingCache', $calls[7][0]);
+        $this->assertEquals([new Reference('validator.mapping.cache.adapter')], $calls[7][1]);
 
         $xmlMappings = $calls[3][1][0];
         $this->assertCount(3, $xmlMappings);
@@ -1330,14 +1355,13 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
-        $annotations = !class_exists(FullStack::class) && class_exists(Annotation::class);
+        $annotations = !class_exists(FullStack::class);
 
-        $this->assertCount($annotations ? 7 : 5, $calls);
+        $this->assertCount($annotations ? 6 : 5, $calls);
         $this->assertSame('addXmlMappings', $calls[3][0]);
         $i = 3;
         if ($annotations) {
             $this->assertSame('enableAnnotationMapping', $calls[++$i][0]);
-            $this->assertSame('setDoctrineAnnotationReader', $calls[++$i][0]);
         }
         $this->assertSame('setMappingCache', $calls[++$i][0]);
         $this->assertEquals([new Reference('validator.mapping.cache.adapter')], $calls[$i][1]);
@@ -1549,11 +1573,10 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     public function testSerializerMapping()
     {
-        $container = $this->createContainerFromFile('serializer_mapping', ['kernel.bundles_metadata' => ['TestBundle' => ['namespace' => 'Symfony\\Bundle\\FrameworkBundle\\Tests', 'path' => __DIR__.'/Fixtures/TestBundle']]]);
+        $container = $this->createContainerFromFile('serializer_mapping_without_annotations', ['kernel.bundles_metadata' => ['TestBundle' => ['namespace' => 'Symfony\\Bundle\\FrameworkBundle\\Tests', 'path' => __DIR__.'/Fixtures/TestBundle']]]);
         $projectDir = $container->getParameter('kernel.project_dir');
         $configDir = __DIR__.'/Fixtures/TestBundle/Resources/config';
         $expectedLoaders = [
-            new Definition(AnnotationLoader::class, [new Reference('annotation_reader', ContainerInterface::NULL_ON_INVALID_REFERENCE)]),
             new Definition(XmlFileLoader::class, [$configDir.'/serialization.xml']),
             new Definition(YamlFileLoader::class, [$configDir.'/serialization.yml']),
             new Definition(YamlFileLoader::class, [$projectDir.'/config/serializer/foo.yml']),
@@ -1806,11 +1829,11 @@ abstract class FrameworkExtensionTestCase extends TestCase
     public function testRemovesResourceCheckerConfigCacheFactoryArgumentOnlyIfNoDebug()
     {
         $container = $this->createContainer(['kernel.debug' => true]);
-        (new FrameworkExtension())->load([['http_method_override' => false]], $container);
+        (new FrameworkExtension())->load([['annotations' => false, 'http_method_override' => false]], $container);
         $this->assertCount(1, $container->getDefinition('config_cache_factory')->getArguments());
 
         $container = $this->createContainer(['kernel.debug' => false]);
-        (new FrameworkExtension())->load([['http_method_override' => false]], $container);
+        (new FrameworkExtension())->load([['annotations' => false, 'http_method_override' => false]], $container);
         $this->assertEmpty($container->getDefinition('config_cache_factory')->getArguments());
     }
 
@@ -1841,21 +1864,21 @@ abstract class FrameworkExtensionTestCase extends TestCase
     public function testRobotsTagListenerIsRegisteredInDebugMode()
     {
         $container = $this->createContainer(['kernel.debug' => true]);
-        (new FrameworkExtension())->load([['http_method_override' => false]], $container);
+        (new FrameworkExtension())->load([['annotations' => false, 'http_method_override' => false]], $container);
         $this->assertTrue($container->has('disallow_search_engine_index_response_listener'), 'DisallowRobotsIndexingListener should be registered');
 
         $definition = $container->getDefinition('disallow_search_engine_index_response_listener');
         $this->assertTrue($definition->hasTag('kernel.event_subscriber'), 'DisallowRobotsIndexingListener should have the correct tag');
 
         $container = $this->createContainer(['kernel.debug' => true]);
-        (new FrameworkExtension())->load([['http_method_override' => false, 'disallow_search_engine_index' => false]], $container);
+        (new FrameworkExtension())->load([['annotations' => false, 'http_method_override' => false, 'disallow_search_engine_index' => false]], $container);
         $this->assertFalse(
             $container->has('disallow_search_engine_index_response_listener'),
             'DisallowRobotsIndexingListener should not be registered when explicitly disabled'
         );
 
         $container = $this->createContainer(['kernel.debug' => false]);
-        (new FrameworkExtension())->load([['http_method_override' => false]], $container);
+        (new FrameworkExtension())->load([['annotations' => false, 'http_method_override' => false]], $container);
         $this->assertFalse($container->has('disallow_search_engine_index_response_listener'), 'DisallowRobotsIndexingListener should NOT be registered');
     }
 
@@ -2294,7 +2317,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         ], $data)));
     }
 
-    protected function createContainerFromFile($file, $data = [], $resetCompilerPasses = true, $compile = true, FrameworkExtension $extension = null)
+    protected function createContainerFromFile(string $file, array $data = [], bool $resetCompilerPasses = true, bool $compile = true, FrameworkExtension $extension = null)
     {
         $cacheKey = md5(static::class.$file.serialize($data));
         if ($compile && isset(self::$containerCache[$cacheKey])) {

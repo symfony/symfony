@@ -11,6 +11,7 @@
     </parameters>
 
     <framework:config http-method-override="false">
+        <framework:annotations enabled="false" />
         <framework:lock>
             <framework:resource name="foo">semaphore</framework:resource>
             <framework:resource name="bar">flock</framework:resource>

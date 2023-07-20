@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by rmikalkenas at 2023-06-27T13:53:41Z
+
+`Unit Tests / Unit Tests (8.2, high-deps)` - looks like failing `TimezoneValidatorTest::testValidTimezones with data set #9 ('America/Montreal')` is unrelated with the changes.
+
+`Unit Tests / Unit Tests (8.2, low-deps)` - `DoctrineLoaderTest::testLoadClassMetadata` failing, because [doctrineMetadata->fieldMappings](https://github.com/symfony/symfony/pull/50788/files#diff-6104ea4469946639bfc73e0b040e9a5ff857e4a9452d2ddb605140fc955b786cR75) does not contain DoctrineLoaderParentEntity::publicParentMaxLength field. Could it be due to some doctrine bug in lower versions..? Need some help with this one
+
+cc @nicolas-grekas

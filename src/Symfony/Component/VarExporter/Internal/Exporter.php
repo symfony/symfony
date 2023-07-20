@@ -75,20 +75,29 @@ class Exporter
 
             $class = $value::class;
             $reflector = Registry::$reflectors[$class] ??= Registry::getClassReflector($class);
+            $properties = [];
 
             if ($reflector->hasMethod('__serialize')) {
                 if (!$reflector->getMethod('__serialize')->isPublic()) {
                     throw new \Error(sprintf('Call to %s method "%s::__serialize()".', $reflector->getMethod('__serialize')->isProtected() ? 'protected' : 'private', $class));
                 }
 
-                if (!\is_array($properties = $value->__serialize())) {
+                if (!\is_array($serializeProperties = $value->__serialize())) {
                     throw new \TypeError($class.'::__serialize() must return an array');
+                }
+
+                if ($reflector->hasMethod('__unserialize')) {
+                    $properties = $serializeProperties;
+                } else {
+                    foreach ($serializeProperties as $n => $v) {
+                        $c = \PHP_VERSION_ID >= 80100 && $reflector->hasProperty($n) && ($p = $reflector->getProperty($n))->isReadOnly() ? $p->class : 'stdClass';
+                        $properties[$c][$n] = $v;
+                    }
                 }
 
                 goto prepare_value;
             }
 
-            $properties = [];
             $sleep = null;
             $proto = Registry::$prototypes[$class];
 

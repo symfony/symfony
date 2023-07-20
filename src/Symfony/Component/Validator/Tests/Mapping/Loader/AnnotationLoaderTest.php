@@ -27,6 +27,7 @@ use Symfony\Component\Validator\Constraints\Optional;
 use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\Required;
 use Symfony\Component\Validator\Constraints\Sequentially;
+use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
@@ -98,6 +99,7 @@ class AnnotationLoaderTest extends TestCase
         $expected->addGetterConstraint('lastName', new NotNull());
         $expected->addGetterMethodConstraint('valid', 'isValid', new IsTrue());
         $expected->addGetterConstraint('permissions', new IsTrue());
+        $expected->addPropertyConstraint('other', new Type('integer'));
 
         // load reflection class so that the comparison passes
         $expected->getReflectionClass();
@@ -139,18 +141,16 @@ class AnnotationLoaderTest extends TestCase
         $loader->loadClassMetadata($parent_metadata);
 
         $metadata = new ClassMetadata($namespace.'\Entity');
+        $loader->loadClassMetadata($metadata);
 
         // Merge parent metaData.
         $metadata->mergeConstraints($parent_metadata);
-
-        $loader->loadClassMetadata($metadata);
 
         $expected_parent = new ClassMetadata($namespace.'\EntityParent');
         $expected_parent->addPropertyConstraint('other', new NotNull());
         $expected_parent->getReflectionClass();
 
         $expected = new ClassMetadata($namespace.'\Entity');
-        $expected->mergeConstraints($expected_parent);
 
         $expected->setGroupSequence(['Foo', 'Entity']);
         $expected->addConstraint(new ConstraintA());
@@ -187,11 +187,18 @@ class AnnotationLoaderTest extends TestCase
         $expected->addGetterConstraint('lastName', new NotNull());
         $expected->addGetterMethodConstraint('valid', 'isValid', new IsTrue());
         $expected->addGetterConstraint('permissions', new IsTrue());
+        $expected->addPropertyConstraint('other', new Type('integer'));
 
         // load reflection class so that the comparison passes
         $expected->getReflectionClass();
+        $expected->mergeConstraints($expected_parent);
 
         $this->assertEquals($expected, $metadata);
+
+        $otherMetadata = $metadata->getPropertyMetadata('other');
+        $this->assertCount(2, $otherMetadata);
+        $this->assertInstanceOf(Type::class, $otherMetadata[0]->getConstraints()[0]);
+        $this->assertInstanceOf(NotNull::class, $otherMetadata[1]->getConstraints()[0]);
     }
 
     /**

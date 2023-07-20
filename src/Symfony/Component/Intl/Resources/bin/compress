@@ -17,8 +17,15 @@ if (!extension_loaded('zlib')) {
     throw new Exception('This script requires the zlib extension.');
 }
 
-foreach (glob(dirname(__DIR__).'/data/*/*.php') as $file) {
-    if ('meta.php' === basename($file)) {
+$iterator = new RecursiveIteratorIterator(
+    new RecursiveDirectoryIterator(
+        dirname(__DIR__).'/data',
+        FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::SKIP_DOTS
+    )
+);
+
+foreach ($iterator as $file) {
+    if ('php' !== $file->getExtension() || 'meta.php' === $file->getFilename()) {
         continue;
     }
 

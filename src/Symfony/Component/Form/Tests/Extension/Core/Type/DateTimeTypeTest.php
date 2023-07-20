@@ -539,7 +539,7 @@ class DateTimeTypeTest extends BaseTypeTestCase
         ]);
         $view = $form->createView();
 
-        $this->assertSame('2/13/19, 7:12:13 PM', $view->vars['value']);
+        $this->assertMatchesRegularExpression('#^2/13/19, 7:12:13\s+PM$#u', $view->vars['value']);
     }
 
     public function testDateTypeChoiceErrorsBubbleUp()

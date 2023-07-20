@@ -348,11 +348,11 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
 
                 if ($member instanceof MemberMetadata && !$member->isPrivate($this->name)) {
                     $property = $member->getPropertyName();
-                    $this->members[$property] = [$member];
+                    $this->members[$property][] = $member;
 
-                    if ($member instanceof PropertyMetadata) {
+                    if ($member instanceof PropertyMetadata && !isset($this->properties[$property])) {
                         $this->properties[$property] = $member;
-                    } elseif ($member instanceof GetterMetadata) {
+                    } elseif ($member instanceof GetterMetadata && !isset($this->getters[$property])) {
                         $this->getters[$property] = $member;
                     }
                 } else {

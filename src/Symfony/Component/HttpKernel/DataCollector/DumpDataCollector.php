@@ -116,11 +116,11 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         if (!$this->requestStack
             || !$response->headers->has('X-Debug-Token')
             || $response->isRedirection()
-            || ($response->headers->has('Content-Type') && !str_contains($response->headers->get('Content-Type'), 'html'))
+            || ($response->headers->has('Content-Type') && !str_contains($response->headers->get('Content-Type') ?? '', 'html'))
             || 'html' !== $request->getRequestFormat()
             || false === strripos($response->getContent(), '</body>')
         ) {
-            if ($response->headers->has('Content-Type') && str_contains($response->headers->get('Content-Type'), 'html')) {
+            if ($response->headers->has('Content-Type') && str_contains($response->headers->get('Content-Type') ?? '', 'html')) {
                 $dumper = new HtmlDumper('php://output', $this->charset);
                 $dumper->setDisplayOptions(['fileLinkFormat' => $this->fileLinkFormat]);
             } else {

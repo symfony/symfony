@@ -247,6 +247,8 @@ class VarExporterTest extends TestCase
 
         yield ['__unserialize-but-no-__serialize', new __UnserializeButNo__Serialize()];
 
+        yield ['__serialize-but-no-__unserialize', new __SerializeButNo__Unserialize()];
+
         if (\PHP_VERSION_ID < 80100) {
             return;
         }
@@ -468,5 +470,22 @@ class __UnserializeButNo__Serialize
     public function __unserialize(array $data): void
     {
         $this->foo = $data['foo'];
+    }
+}
+
+class __SerializeButNo__Unserialize
+{
+    public $foo;
+
+    public function __construct()
+    {
+        $this->foo = 'ccc';
+    }
+
+    public function __serialize(): array
+    {
+        return [
+            'foo' => $this->foo,
+        ];
     }
 }

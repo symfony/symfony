@@ -47,9 +47,9 @@ class FormThemeTest extends TestCase
     {
         $form = new NameExpression('form', 0);
         $resources = new ArrayExpression([
-            new ConstantExpression(0, 0),
-            new ConstantExpression('tpl1', 0),
             new ConstantExpression(1, 0),
+            new ConstantExpression('tpl1', 0),
+            new ConstantExpression(0, 0),
             new ConstantExpression('tpl2', 0),
         ], 0);
 
@@ -62,7 +62,7 @@ class FormThemeTest extends TestCase
 
         $this->assertEquals(
             sprintf(
-                '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, [0 => "tpl1", 1 => "tpl2"], true);',
+                '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, [1 => "tpl1", 0 => "tpl2"], true);',
                 $this->getVariableGetter('form')
             ),
             trim($compiler->compile($node)->getSource())
@@ -72,7 +72,7 @@ class FormThemeTest extends TestCase
 
         $this->assertEquals(
             sprintf(
-                '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, [0 => "tpl1", 1 => "tpl2"], false);',
+                '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, [1 => "tpl1", 0 => "tpl2"], false);',
                 $this->getVariableGetter('form')
             ),
             trim($compiler->compile($node)->getSource())

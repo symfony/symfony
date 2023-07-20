@@ -72,6 +72,12 @@ Security
  * Make `PersistentToken` immutable
  * Deprecate accepting only `DateTime` for `TokenProviderInterface::updateToken()`, use `DateTimeInterface` instead
 
+Serializer
+----------
+
+ * Deprecate Doctrine annotations support in favor of native attributes
+ * Deprecate passing an annotation reader to the constructor of `AnnotationLoader`
+
 Validator
 ---------
 

@@ -13,9 +13,9 @@ namespace Symfony\Component\Serializer\Tests\Mapping;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
-use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummyFirstChild;
-use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummySecondChild;
-use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummyThirdChild;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummyFirstChild;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummySecondChild;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummyThirdChild;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>

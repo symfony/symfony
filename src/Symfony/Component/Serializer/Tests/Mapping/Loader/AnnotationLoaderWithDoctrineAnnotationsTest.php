@@ -12,10 +12,207 @@
 namespace Symfony\Component\Serializer\Tests\Mapping\Loader;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 
 class AnnotationLoaderWithDoctrineAnnotationsTest extends AnnotationLoaderTestCase
 {
+    use ExpectDeprecationTrait;
+
+    protected function setUp(): void
+    {
+        $this->expectDeprecation('Since symfony/validator 6.4: Passing a "Doctrine\Common\Annotations\AnnotationReader" instance as argument 1 to "Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader::__construct()" is deprecated, pass null or omit the parameter instead.');
+
+        parent::setUp();
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testInterface()
+    {
+        parent::testInterface();
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLoadClassMetadataReturnsTrueIfSuccessful()
+    {
+        $this->expectDeprecation('Since symfony/serializer 6.4: Property "Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy::$foo" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/serializer 6.4: Property "Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy::$bar" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/serializer 6.4: Property "Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy::$quux" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/serializer 6.4: Method "Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy::setBar()" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/serializer 6.4: Method "Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy::getBar()" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/serializer 6.4: Method "Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy::isFooBar()" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+
+        parent::testLoadClassMetadataReturnsTrueIfSuccessful();
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLoadGroups()
+    {
+        $this->expectDeprecation('Since symfony/serializer 6.4: Property "Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy::$foo" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/serializer 6.4: Property "Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy::$bar" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/serializer 6.4: Property "Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy::$quux" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/serializer 6.4: Method "Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy::setBar()" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/serializer 6.4: Method "Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy::getBar()" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/serializer 6.4: Method "Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy::isFooBar()" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+
+        parent::testLoadGroups();
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLoadDiscriminatorMap()
+    {
+        $this->expectDeprecation('Since symfony/serializer 6.4: Class "Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummy" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+
+        parent::testLoadDiscriminatorMap();
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLoadMaxDepth()
+    {
+        $this->expectDeprecation('Since symfony/serializer 6.4: Property "Symfony\Component\Serializer\Tests\Fixtures\Annotations\MaxDepthDummy::$foo" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/serializer 6.4: Method "Symfony\Component\Serializer\Tests\Fixtures\Annotations\MaxDepthDummy::getBar()" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+
+        parent::testLoadMaxDepth();
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLoadSerializedName()
+    {
+        $this->expectDeprecation('Since symfony/serializer 6.4: Property "Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedNameDummy::$foo" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/serializer 6.4: Method "Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedNameDummy::getBar()" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+
+        parent::testLoadSerializedName();
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLoadSerializedPath()
+    {
+        $this->expectDeprecation('Since symfony/serializer 6.4: Property "Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedPathDummy::$three" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/serializer 6.4: Method "Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedPathDummy::getSeven()" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+
+        parent::testLoadSerializedPath();
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLoadSerializedPathInConstructor()
+    {
+        $this->expectDeprecation('Since symfony/serializer 6.4: Property "Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedPathInConstructorDummy::$three" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+
+        parent::testLoadSerializedPathInConstructor();
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLoadClassMetadataAndMerge()
+    {
+        $this->expectDeprecation('Since symfony/serializer 6.4: Property "Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummyParent::$kevin" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/serializer 6.4: Method "Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummyParent::getCoopTilleuls()" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/serializer 6.4: Property "Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy::$foo" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/serializer 6.4: Property "Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy::$bar" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/serializer 6.4: Property "Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy::$quux" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/serializer 6.4: Method "Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy::setBar()" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/serializer 6.4: Method "Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy::getBar()" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/serializer 6.4: Method "Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy::isFooBar()" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+
+        parent::testLoadClassMetadataAndMerge();
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLoadIgnore()
+    {
+        $this->expectDeprecation('Since symfony/serializer 6.4: Property "Symfony\Component\Serializer\Tests\Fixtures\Annotations\IgnoreDummy::$ignored1" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/serializer 6.4: Method "Symfony\Component\Serializer\Tests\Fixtures\Annotations\IgnoreDummy::getIgnored2()" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+
+        parent::testLoadIgnore();
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLoadContexts()
+    {
+        $this->expectDeprecation('Since symfony/serializer 6.4: Property "Symfony\Component\Serializer\Tests\Fixtures\Annotations\ContextDummyParent::$parentProperty" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/serializer 6.4: Property "Symfony\Component\Serializer\Tests\Fixtures\Annotations\ContextDummyParent::$overriddenParentProperty" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/serializer 6.4: Property "Symfony\Component\Serializer\Tests\Fixtures\Annotations\ContextDummy::$foo" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/serializer 6.4: Property "Symfony\Component\Serializer\Tests\Fixtures\Annotations\ContextDummy::$bar" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/serializer 6.4: Property "Symfony\Component\Serializer\Tests\Fixtures\Annotations\ContextDummy::$overriddenParentProperty" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/serializer 6.4: Method "Symfony\Component\Serializer\Tests\Fixtures\Annotations\ContextDummy::getMethodWithContext()" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+
+        parent::testLoadContexts();
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLoadContextsPropertiesPromoted()
+    {
+        $this->expectDeprecation('Since symfony/serializer 6.4: Property "Symfony\Component\Serializer\Tests\Fixtures\Annotations\ContextDummyParent::$parentProperty" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/serializer 6.4: Property "Symfony\Component\Serializer\Tests\Fixtures\Annotations\ContextDummyParent::$overriddenParentProperty" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/serializer 6.4: Property "Symfony\Component\Serializer\Tests\Fixtures\Annotations\ContextDummyPromotedProperties::$foo" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/serializer 6.4: Property "Symfony\Component\Serializer\Tests\Fixtures\Annotations\ContextDummyPromotedProperties::$bar" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/serializer 6.4: Property "Symfony\Component\Serializer\Tests\Fixtures\Annotations\ContextDummyPromotedProperties::$overriddenParentProperty" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+        $this->expectDeprecation('Since symfony/serializer 6.4: Method "Symfony\Component\Serializer\Tests\Fixtures\Annotations\ContextDummyPromotedProperties::getMethodWithContext()" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+
+        parent::testLoadContextsPropertiesPromoted();
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testThrowsOnContextOnInvalidMethod()
+    {
+        $this->expectDeprecation('Since symfony/serializer 6.4: Method "Symfony\Component\Serializer\Tests\Fixtures\Annotations\BadMethodContextDummy::badMethod()" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+
+        parent::testThrowsOnContextOnInvalidMethod();
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testCanHandleUnrelatedIgnoredMethods()
+    {
+        $this->expectDeprecation('Since symfony/serializer 6.4: Method "Symfony\Component\Serializer\Tests\Fixtures\Annotations\Entity45016::badIgnore()" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+
+        parent::testCanHandleUnrelatedIgnoredMethods();
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testIgnoreGetterWithRequiredParameterIfIgnoreAnnotationIsUsed()
+    {
+        $this->expectDeprecation('Since symfony/serializer 6.4: Method "Symfony\Component\Serializer\Tests\Fixtures\Annotations\IgnoreDummyAdditionalGetter::getMyValue()" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.');
+
+        parent::testIgnoreGetterWithRequiredParameterIfIgnoreAnnotationIsUsed();
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testIgnoreGetterWithRequiredParameterIfIgnoreAnnotationIsNotUsed()
+    {
+        parent::testIgnoreGetterWithRequiredParameterIfIgnoreAnnotationIsNotUsed();
+    }
+
     protected function createLoader(): AnnotationLoader
     {
         return new AnnotationLoader(new AnnotationReader());

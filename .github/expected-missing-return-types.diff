@@ -407,8 +407,19 @@ index 8c8667ff0e..e19e185cfb 100644
 +    abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void;
  
      /**
+diff --git a/src/Symfony/Component/Security/Core/Authentication/RememberMe/InMemoryTokenProvider.php b/src/Symfony/Component/Security/Core/Authentication/RememberMe/InMemoryTokenProvider.php
+index 0aef6a2caa..5a1f5865ad 100644
+--- a/src/Symfony/Component/Security/Core/Authentication/RememberMe/InMemoryTokenProvider.php
++++ b/src/Symfony/Component/Security/Core/Authentication/RememberMe/InMemoryTokenProvider.php
+@@ -32,5 +32,5 @@ final class InMemoryTokenProvider implements TokenProviderInterface
+     }
+ 
+-    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTimeInterface $lastUsed)
++    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTimeInterface $lastUsed): void
+     {
+         if (!isset($this->tokens[$series])) {
 diff --git a/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php b/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php
-index cf41e0c507..61f7397734 100644
+index d2f0c8cbe0..713ac78c4e 100644
 --- a/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php
 +++ b/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php
 @@ -28,5 +28,5 @@ interface TokenProviderInterface
@@ -425,14 +436,14 @@ index cf41e0c507..61f7397734 100644
 +    public function deleteTokenBySeries(string $series): void;
  
      /**
-@@ -44,5 +44,5 @@ interface TokenProviderInterface
+@@ -46,5 +46,5 @@ interface TokenProviderInterface
       * @throws TokenNotFoundException if the token is not found
       */
 -    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed);
 +    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed): void;
  
      /**
-@@ -51,4 +51,4 @@ interface TokenProviderInterface
+@@ -53,4 +53,4 @@ interface TokenProviderInterface
       * @return void
       */
 -    public function createNewToken(PersistentTokenInterface $token);

@@ -135,11 +135,16 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
             }
 
             if (null === $payload) {
-                $payload = match (true) {
-                    $argument->metadata->hasDefaultValue() => $argument->metadata->getDefaultValue(),
-                    $argument->metadata->isNullable() => null,
-                    default => throw new HttpException($validationFailedCode)
-                };
+                try {
+                    $payload = match (true) {
+                        $argument->metadata->hasDefaultValue() => $argument->metadata->getDefaultValue(),
+                        !$argument->metadata->hasDefaultValue() && $argument->metadata->getType() !== null => new ($argument->metadata->getType())(),
+                        $argument->metadata->isNullable() => null,
+                        default => throw new HttpException($validationFailedCode),
+                    };
+                } catch (\Throwable) {
+                    throw new HttpException($validationFailedCode);
+                }
             }
 
             $arguments[$i] = $payload;

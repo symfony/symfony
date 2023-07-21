@@ -32,6 +32,7 @@ class ContainerAwareEventManager extends EventManager
     private $subscribers;
     private $initialized = [];
     private $initializedSubscribers = false;
+    private $initializedHashMapping = [];
     private $methods = [];
     private $container;
 
@@ -138,6 +139,7 @@ class ContainerAwareEventManager extends EventManager
 
             if (\is_string($listener)) {
                 unset($this->initialized[$event]);
+                unset($this->initializedHashMapping[$event][$hash]);
             } else {
                 $this->methods[$event][$hash] = $this->getMethod($listener, $event);
             }
@@ -158,6 +160,11 @@ class ContainerAwareEventManager extends EventManager
         $hash = $this->getHash($listener);
 
         foreach ((array) $events as $event) {
+            if (isset($this->initializedHashMapping[$event][$hash])) {
+                $hash = $this->initializedHashMapping[$event][$hash];
+                unset($this->initializedHashMapping[$event][$hash]);
+            }
+
             // Check if we actually have this listener associated
             if (isset($this->listeners[$event][$hash])) {
                 unset($this->listeners[$event][$hash]);
@@ -190,13 +197,25 @@ class ContainerAwareEventManager extends EventManager
     private function initializeListeners(string $eventName)
     {
         $this->initialized[$eventName] = true;
+
+        // We'll refill the whole array in order to keep the same order
+        $listeners = [];
         foreach ($this->listeners[$eventName] as $hash => $listener) {
             if (\is_string($listener)) {
-                $this->listeners[$eventName][$hash] = $listener = $this->container->get($listener);
+                $listener = $this->container->get($listener);
+                $newHash = $this->getHash($listener);
 
-                $this->methods[$eventName][$hash] = $this->getMethod($listener, $eventName);
+                $this->initializedHashMapping[$eventName][$hash] = $newHash;
+
+                $listeners[$newHash] = $listener;
+
+                $this->methods[$eventName][$newHash] = $this->getMethod($listener, $eventName);
+            } else {
+                $listeners[$hash] = $listener;
             }
         }
+
+        $this->listeners[$eventName] = $listeners;
     }
 
     private function initializeSubscribers()

@@ -234,4 +234,22 @@ class JsDelivrEsmResolverTest extends TestCase
             ],
         ];
     }
+
+    public function testImportRegex()
+    {
+        $subject = 'import{Color as t}from"/npm/@kurkle/color@0.3.2/+esm";import t from"/npm/jquery@3.7.0/+esm";import e from"/npm/popper.js@1.16.1/+esm";console.log("yo");';
+        preg_match_all(JsDelivrEsmResolver::IMPORT_REGEX, $subject, $matches);
+
+        $this->assertCount(3, $matches[0]);
+        $this->assertSame([
+            '@kurkle/color',
+            'jquery',
+            'popper.js',
+        ], $matches[1]);
+        $this->assertSame([
+            '0.3.2',
+            '3.7.0',
+            '1.16.1',
+        ], $matches[2]);
+    }
 }

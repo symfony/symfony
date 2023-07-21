@@ -19,7 +19,7 @@ use Symfony\Component\Templating\TemplateReference;
 
 class FilesystemLoaderTest extends TestCase
 {
-    protected static $fixturesPath;
+    protected static string $fixturesPath;
 
     public static function setUpBeforeClass(): void
     {

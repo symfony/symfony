@@ -21,10 +21,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\ScalarDummy;
 
 class CustomNormalizerTest extends TestCase
 {
-    /**
-     * @var CustomNormalizer
-     */
-    private $normalizer;
+    private CustomNormalizer $normalizer;
 
     protected function setUp(): void
     {

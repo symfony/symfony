@@ -19,7 +19,7 @@ class NumberTypeTest extends BaseTypeTestCase
 {
     public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\NumberType';
 
-    private $defaultLocale;
+    private string $defaultLocale;
 
     protected function setUp(): void
     {

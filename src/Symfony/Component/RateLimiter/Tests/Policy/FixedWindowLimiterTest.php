@@ -25,7 +25,7 @@ use Symfony\Component\RateLimiter\Util\TimeUtil;
  */
 class FixedWindowLimiterTest extends TestCase
 {
-    private $storage;
+    private InMemoryStorage $storage;
 
     protected function setUp(): void
     {

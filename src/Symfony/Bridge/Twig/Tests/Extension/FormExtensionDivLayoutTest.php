@@ -26,10 +26,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
 {
     use RuntimeLoaderProvider;
 
-    /**
-     * @var FormRenderer
-     */
-    private $renderer;
+    private FormRenderer $renderer;
 
     protected function setUp(): void
     {

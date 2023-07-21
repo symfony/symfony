@@ -26,9 +26,9 @@ use Symfony\Component\Security\Http\EventListener\CheckRememberMeConditionsListe
 
 class CheckRememberMeConditionsListenerTest extends TestCase
 {
-    private $listener;
-    private $request;
-    private $response;
+    private CheckRememberMeConditionsListener $listener;
+    private Request $request;
+    private Response $response;
 
     protected function setUp(): void
     {
@@ -59,6 +59,7 @@ class CheckRememberMeConditionsListenerTest extends TestCase
     public function testSuccessfulLoginWithoutRequestParameter()
     {
         $this->request = Request::create('/login');
+        $this->response = new Response();
         $passport = $this->createPassport([new RememberMeBadge()]);
 
         $this->listener->onSuccessfulLogin($this->createLoginSuccessfulEvent($passport));

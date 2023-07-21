@@ -20,18 +20,11 @@ class StateMachineGraphvizDumperTest extends TestCase
 {
     use WorkflowBuilderTrait;
 
-    private $dumper;
-
-    protected function setUp(): void
-    {
-        $this->dumper = new StateMachineGraphvizDumper();
-    }
-
     public function testDumpWithoutMarking()
     {
         $definition = $this->createComplexStateMachineDefinition();
 
-        $dump = $this->dumper->dump($definition);
+        $dump = (new StateMachineGraphvizDumper())->dump($definition);
 
         $expected = <<<'EOGRAPH'
 digraph workflow {
@@ -79,7 +72,7 @@ label 3" style="solid" fontcolor="Grey" color="Red"];
 
 EOGRAPH;
 
-        $dump = $this->dumper->dump($definition, $marking);
+        $dump = (new StateMachineGraphvizDumper())->dump($definition, $marking);
 
         $this->assertEquals($expected, $dump);
     }

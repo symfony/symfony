@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing\Tests;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,11 +26,9 @@ use Symfony\Component\Routing\Router;
 
 class RouterTest extends TestCase
 {
-    private $router;
-
-    private $loader;
-
-    private $cacheDir;
+    private Router $router;
+    private MockObject&LoaderInterface $loader;
+    private string $cacheDir;
 
     protected function setUp(): void
     {
@@ -45,10 +44,6 @@ class RouterTest extends TestCase
             array_map('unlink', glob($this->cacheDir.\DIRECTORY_SEPARATOR.'*'));
             @rmdir($this->cacheDir);
         }
-
-        $this->loader = null;
-        $this->router = null;
-        $this->cacheDir = null;
     }
 
     public function testSetOptionsWithSupportedOptions()

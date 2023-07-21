@@ -20,17 +20,9 @@ use Symfony\Component\Intl\Data\Bundle\Writer\PhpBundleWriter;
  */
 class PhpBundleWriterTest extends TestCase
 {
-    /**
-     * @var PhpBundleWriter
-     */
-    private $writer;
-
-    private $directory;
-
-    /**
-     * @var Filesystem
-     */
-    private $filesystem;
+    private PhpBundleWriter $writer;
+    private string $directory;
+    private Filesystem $filesystem;
 
     protected function setUp(): void
     {

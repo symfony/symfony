@@ -21,10 +21,7 @@ use Symfony\Component\Intl\Exception\RuntimeException;
  */
 class PhpBundleReaderTest extends TestCase
 {
-    /**
-     * @var PhpBundleReader
-     */
-    private $reader;
+    private PhpBundleReader $reader;
 
     protected function setUp(): void
     {

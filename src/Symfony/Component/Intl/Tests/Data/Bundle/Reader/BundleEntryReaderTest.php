@@ -25,15 +25,8 @@ class BundleEntryReaderTest extends TestCase
 {
     private const RES_DIR = '/res/dir';
 
-    /**
-     * @var BundleEntryReader
-     */
-    private $reader;
-
-    /**
-     * @var MockObject&BundleEntryReaderInterface
-     */
-    private $readerImpl;
+    private BundleEntryReader $reader;
+    private MockObject&BundleEntryReaderInterface $readerImpl;
 
     private const DATA = [
         'Entries' => [

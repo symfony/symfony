@@ -244,13 +244,13 @@ if (interface_exists(MessageSubscriberInterface::class)) {
     }
     class TestMessageSubscriberConfigHolder
     {
-        public static $handledMessages = [];
+        public static array $handledMessages = [];
     }
 }
 
 class TestServiceSubscriber implements ServiceSubscriberInterface
 {
-    public static $subscribedServices = [];
+    public static array $subscribedServices = [];
 
     public static function getSubscribedServices(): array
     {
@@ -260,5 +260,5 @@ class TestServiceSubscriber implements ServiceSubscriberInterface
 
 class TestServiceWithStaticProperty
 {
-    public static $initializedObject;
+    public static object $initializedObject;
 }

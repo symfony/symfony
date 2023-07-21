@@ -41,12 +41,9 @@ class MailerTest extends AbstractWebTestCase
         $logger = self::getContainer()->get('logger');
 
         $testTransport = new class($eventDispatcher, $logger, $onDoSend) extends AbstractTransport {
-            /**
-             * @var callable
-             */
-            private $onDoSend;
+            private \Closure $onDoSend;
 
-            public function __construct(EventDispatcherInterface $eventDispatcher, LoggerInterface $logger, callable $onDoSend)
+            public function __construct(EventDispatcherInterface $eventDispatcher, LoggerInterface $logger, \Closure $onDoSend)
             {
                 parent::__construct($eventDispatcher, $logger);
                 $this->onDoSend = $onDoSend;

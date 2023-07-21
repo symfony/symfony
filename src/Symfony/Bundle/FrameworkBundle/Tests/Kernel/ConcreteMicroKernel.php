@@ -27,7 +27,7 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
 {
     use MicroKernelTrait;
 
-    private $cacheDir;
+    private string $cacheDir;
 
     public function onKernelException(ExceptionEvent $event)
     {

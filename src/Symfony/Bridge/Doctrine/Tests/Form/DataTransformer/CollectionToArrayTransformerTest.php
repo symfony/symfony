@@ -21,10 +21,7 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class CollectionToArrayTransformerTest extends TestCase
 {
-    /**
-     * @var CollectionToArrayTransformer
-     */
-    private $transformer;
+    private CollectionToArrayTransformer $transformer;
 
     protected function setUp(): void
     {

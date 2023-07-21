@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Encoder;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Encoder\ChainDecoder;
 use Symfony\Component\Serializer\Encoder\ContextAwareDecoderInterface;
@@ -23,9 +24,9 @@ class ChainDecoderTest extends TestCase
     private const FORMAT_2 = 'format2';
     private const FORMAT_3 = 'format3';
 
-    private $chainDecoder;
-    private $decoder1;
-    private $decoder2;
+    private ChainDecoder $chainDecoder;
+    private MockObject&ContextAwareDecoderInterface $decoder1;
+    private MockObject&DecoderInterface $decoder2;
 
     protected function setUp(): void
     {

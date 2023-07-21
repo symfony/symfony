@@ -17,10 +17,7 @@ use Symfony\Component\WebLink\Link;
 
 class HttpHeaderSerializerTest extends TestCase
 {
-    /**
-     * @var HttpHeaderSerializer
-     */
-    private $serializer;
+    private HttpHeaderSerializer $serializer;
 
     protected function setUp(): void
     {

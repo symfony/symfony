@@ -26,7 +26,7 @@ use Symfony\Component\Translation\Command\XliffLintCommand;
  */
 class XliffLintCommandTest extends TestCase
 {
-    private $files;
+    private array $files;
 
     public function testLintCorrectFile()
     {

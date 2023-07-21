@@ -30,7 +30,7 @@ use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
  */
 class FailedMessagesShowCommandTest extends TestCase
 {
-    private $colSize;
+    private string|false $colSize;
 
     protected function setUp(): void
     {

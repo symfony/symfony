@@ -26,7 +26,7 @@ use Symfony\Component\Validator\Tests\Fixtures\PropertyConstraint;
 
 class MemberMetadataTest extends TestCase
 {
-    protected $metadata;
+    protected MemberMetadata $metadata;
 
     protected function setUp(): void
     {
@@ -35,11 +35,6 @@ class MemberMetadataTest extends TestCase
             'getLastName',
             'lastName'
         );
-    }
-
-    protected function tearDown(): void
-    {
-        $this->metadata = null;
     }
 
     public function testAddConstraintRequiresClassConstraints()

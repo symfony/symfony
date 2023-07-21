@@ -132,7 +132,7 @@ class EarlyExpirationDispatcherTest extends TestCase
 
 final class TestLogger extends AbstractLogger
 {
-    public $records = [];
+    public array $records = [];
 
     public function log($level, $message, array $context = []): void
     {

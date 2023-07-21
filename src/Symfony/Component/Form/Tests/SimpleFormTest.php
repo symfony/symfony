@@ -38,7 +38,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 class SimpleFormTest_Countable implements \Countable
 {
-    private $count;
+    private int $count;
 
     public function __construct($count)
     {
@@ -53,7 +53,7 @@ class SimpleFormTest_Countable implements \Countable
 
 class SimpleFormTest_Traversable implements \IteratorAggregate
 {
-    private $iterator;
+    private \ArrayIterator $iterator;
 
     public function __construct($count)
     {
@@ -68,7 +68,7 @@ class SimpleFormTest_Traversable implements \IteratorAggregate
 
 class SimpleFormTest extends TestCase
 {
-    private $form;
+    private Form $form;
 
     protected function setUp(): void
     {

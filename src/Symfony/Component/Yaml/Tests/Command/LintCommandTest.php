@@ -26,7 +26,7 @@ use Symfony\Component\Yaml\Command\LintCommand;
  */
 class LintCommandTest extends TestCase
 {
-    private $files;
+    private array $files;
 
     public function testLintCorrectFile()
     {

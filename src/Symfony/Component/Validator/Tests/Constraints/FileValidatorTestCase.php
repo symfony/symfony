@@ -20,8 +20,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
 {
-    protected $path;
-
+    protected string $path;
     protected $file;
 
     protected function createValidator(): FileValidator
@@ -50,7 +49,6 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
             @unlink($this->path);
         }
 
-        $this->path = null;
         $this->file = null;
     }
 

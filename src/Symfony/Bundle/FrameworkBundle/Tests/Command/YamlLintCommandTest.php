@@ -28,7 +28,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class YamlLintCommandTest extends TestCase
 {
-    private $files;
+    private array $files;
 
     public function testLintCorrectFile()
     {

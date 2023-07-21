@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Translation\Tests\DependencyInjection\fixtures;
+namespace Symfony\Component\Translation\Tests\DependencyInjection\Fixtures;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;

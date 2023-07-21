@@ -31,7 +31,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class YamlDumperTest extends TestCase
 {
-    protected static $fixturesPath;
+    protected static string $fixturesPath;
 
     public static function setUpBeforeClass(): void
     {

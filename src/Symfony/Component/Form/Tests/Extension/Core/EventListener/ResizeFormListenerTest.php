@@ -21,11 +21,13 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormFactoryBuilder;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 
 class ResizeFormListenerTest extends TestCase
 {
-    private $factory;
-    private $form;
+    private FormFactoryInterface $factory;
+    private FormInterface $form;
 
     protected function setUp(): void
     {
@@ -34,12 +36,6 @@ class ResizeFormListenerTest extends TestCase
             ->setCompound(true)
             ->setDataMapper(new DataMapper())
             ->getForm();
-    }
-
-    protected function tearDown(): void
-    {
-        $this->factory = null;
-        $this->form = null;
     }
 
     protected function getBuilder($name = 'name')

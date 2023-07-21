@@ -42,15 +42,8 @@ use Symfony\Component\Serializer\Tests\Fixtures\VariadicConstructorTypedArgsDumm
  */
 class AbstractNormalizerTest extends TestCase
 {
-    /**
-     * @var AbstractNormalizerDummy
-     */
-    private $normalizer;
-
-    /**
-     * @var MockObject&ClassMetadataFactoryInterface
-     */
-    private $classMetadata;
+    private AbstractNormalizerDummy $normalizer;
+    private MockObject&ClassMetadataFactoryInterface $classMetadata;
 
     protected function setUp(): void
     {

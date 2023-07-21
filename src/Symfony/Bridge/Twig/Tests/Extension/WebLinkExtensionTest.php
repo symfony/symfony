@@ -22,15 +22,8 @@ use Symfony\Component\WebLink\Link;
  */
 class WebLinkExtensionTest extends TestCase
 {
-    /**
-     * @var Request
-     */
-    private $request;
-
-    /**
-     * @var WebLinkExtension
-     */
-    private $extension;
+    private Request $request;
+    private WebLinkExtension $extension;
 
     protected function setUp(): void
     {

@@ -26,10 +26,8 @@ use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
  */
 class DoctrineIntegrationTest extends TestCase
 {
-    /** @var \Doctrine\DBAL\Connection */
-    private $driverConnection;
-    /** @var Connection */
-    private $connection;
+    private \Doctrine\DBAL\Connection $driverConnection;
+    private Connection $connection;
 
     protected function setUp(): void
     {

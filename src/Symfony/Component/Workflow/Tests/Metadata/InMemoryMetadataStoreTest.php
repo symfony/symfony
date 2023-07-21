@@ -20,8 +20,8 @@ use Symfony\Component\Workflow\Transition;
  */
 class InMemoryMetadataStoreTest extends TestCase
 {
-    private $store;
-    private $transition;
+    private InMemoryMetadataStore $store;
+    private Transition $transition;
 
     protected function setUp(): void
     {

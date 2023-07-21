@@ -31,7 +31,7 @@ use Symfony\Component\Security\Http\SecurityEvents;
 
 class RegisterGlobalSecurityEventListenersPassTest extends TestCase
 {
-    private $container;
+    private ContainerBuilder $container;
 
     protected function setUp(): void
     {

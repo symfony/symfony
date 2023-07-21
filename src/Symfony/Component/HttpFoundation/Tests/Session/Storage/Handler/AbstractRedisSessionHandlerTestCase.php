@@ -24,15 +24,8 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
 {
     protected const PREFIX = 'prefix_';
 
-    /**
-     * @var RedisSessionHandler
-     */
-    protected $storage;
-
-    /**
-     * @var \Redis|\RedisArray|\RedisCluster|\Predis\Client
-     */
-    protected $redisClient;
+    protected RedisSessionHandler $storage;
+    protected \Redis|Relay|\RedisArray|\RedisCluster|\Predis\Client $redisClient;
 
     abstract protected function createRedisClient(string $host): \Redis|Relay|\RedisArray|\RedisCluster|\Predis\Client;
 
@@ -56,14 +49,6 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
             $this->redisClient,
             ['prefix' => self::PREFIX]
         );
-    }
-
-    protected function tearDown(): void
-    {
-        $this->redisClient = null;
-        $this->storage = null;
-
-        parent::tearDown();
     }
 
     public function testOpenSession()

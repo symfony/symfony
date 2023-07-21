@@ -38,16 +38,11 @@ class ClassMetadataTest extends TestCase
     private const PROVIDERCLASS = GroupSequenceProviderEntity::class;
     private const PROVIDERCHILDCLASS = GroupSequenceProviderChildEntity::class;
 
-    protected $metadata;
+    protected ClassMetadata $metadata;
 
     protected function setUp(): void
     {
         $this->metadata = new ClassMetadata(self::CLASSNAME);
-    }
-
-    protected function tearDown(): void
-    {
-        $this->metadata = null;
     }
 
     public function testAddConstraintDoesNotAcceptValid()

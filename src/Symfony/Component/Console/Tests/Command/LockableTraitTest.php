@@ -19,7 +19,7 @@ use Symfony\Component\Lock\Store\SemaphoreStore;
 
 class LockableTraitTest extends TestCase
 {
-    protected static $fixturesPath;
+    protected static string $fixturesPath;
 
     public static function setUpBeforeClass(): void
     {

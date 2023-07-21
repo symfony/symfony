@@ -24,10 +24,8 @@ use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
  */
 class LogoutUrlGeneratorTest extends TestCase
 {
-    /** @var TokenStorage */
-    private $tokenStorage;
-    /** @var LogoutUrlGenerator */
-    private $generator;
+    private TokenStorage $tokenStorage;
+    private LogoutUrlGenerator $generator;
 
     protected function setUp(): void
     {

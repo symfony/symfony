@@ -322,7 +322,7 @@ class EscapedDefaultsFromPhpCommand extends Command
 #[AsCommand(name: '|cmdname|cmdalias', description: 'Just testing')]
 class DescribedCommand extends Command
 {
-    public static $initCounter = 0;
+    public static int $initCounter = 0;
 
     public function __construct()
     {

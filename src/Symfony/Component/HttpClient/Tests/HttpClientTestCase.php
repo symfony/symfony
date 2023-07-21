@@ -31,7 +31,7 @@ The vulcain binary can be found at https://github.com/symfony/binary-utils/relea
 
 abstract class HttpClientTestCase extends BaseHttpClientTestCase
 {
-    private static $vulcainStarted = false;
+    private static bool $vulcainStarted = false;
 
     public function testTimeoutOnDestruct()
     {

@@ -21,30 +21,11 @@ use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
  */
 class CallbackChoiceLoaderTest extends TestCase
 {
-    /**
-     * @var \Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader
-     */
-    private static $loader;
-
-    /**
-     * @var callable
-     */
-    private static $value;
-
-    /**
-     * @var array
-     */
-    private static $choices;
-
-    /**
-     * @var string[]
-     */
-    private static $choiceValues;
-
-    /**
-     * @var \Symfony\Component\Form\ChoiceList\LazyChoiceList
-     */
-    private static $lazyChoiceList;
+    private static CallbackChoiceLoader $loader;
+    private static \Closure $value;
+    private static array $choices;
+    private static array $choiceValues = ['choice_one', 'choice_two'];
+    private static LazyChoiceList $lazyChoiceList;
 
     public static function setUpBeforeClass(): void
     {
@@ -54,7 +35,6 @@ class CallbackChoiceLoaderTest extends TestCase
             (object) ['value' => 'choice_one'],
             (object) ['value' => 'choice_two'],
         ];
-        self::$choiceValues = ['choice_one', 'choice_two'];
         self::$lazyChoiceList = new LazyChoiceList(self::$loader, self::$value);
     }
 
@@ -105,14 +85,5 @@ class CallbackChoiceLoaderTest extends TestCase
             self::$lazyChoiceList->getValuesForChoices(self::$choices),
             'Choice list should not be reloaded.'
         );
-    }
-
-    public static function tearDownAfterClass(): void
-    {
-        self::$loader = null;
-        self::$value = null;
-        self::$choices = [];
-        self::$choiceValues = [];
-        self::$lazyChoiceList = null;
     }
 }

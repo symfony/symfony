@@ -26,10 +26,7 @@ use Symfony\Component\Console\Tests\Fixtures\DummyOutput;
  */
 class ConsoleLoggerTest extends TestCase
 {
-    /**
-     * @var DummyOutput
-     */
-    protected $output;
+    protected DummyOutput $output;
 
     public function getLogger(): LoggerInterface
     {

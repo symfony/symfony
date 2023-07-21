@@ -371,8 +371,8 @@ class ConfigurationWithArrayNodeRequiringOneElement implements ConfigurationInte
 
 class EnvExtension extends Extension
 {
-    private $configuration;
-    private $config;
+    private ConfigurationInterface $configuration;
+    private array $config;
 
     public function __construct(ConfigurationInterface $configuration = null)
     {

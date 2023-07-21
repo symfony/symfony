@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class SubRequestHandlerTest extends TestCase
 {
-    private static $globalState;
+    private static array $globalState;
 
     protected function setUp(): void
     {
@@ -131,7 +131,7 @@ class SubRequestHandlerTest extends TestCase
         $this->assertSame($globalState, $this->getGlobalState());
     }
 
-    private function getGlobalState()
+    private function getGlobalState(): array
     {
         return [
             Request::getTrustedProxies(),

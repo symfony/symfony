@@ -106,7 +106,7 @@ class ServiceLocatorTest extends ServiceLocatorTestCase
 
 class SomeServiceSubscriber implements ServiceSubscriberInterface
 {
-    public $container;
+    public ContainerInterface $container;
 
     public function getFoo()
     {

@@ -130,7 +130,7 @@ trait TesterTrait
      */
     private function initOutput(array $options): void
     {
-        $this->captureStreamsIndependently = \array_key_exists('capture_stderr_separately', $options) && $options['capture_stderr_separately'];
+        $this->captureStreamsIndependently = $options['capture_stderr_separately'] ?? false;
         if (!$this->captureStreamsIndependently) {
             $this->output = new StreamOutput(fopen('php://memory', 'w', false));
             if (isset($options['decorated'])) {

@@ -24,10 +24,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\UnitEnumDummy;
  */
 class BackedEnumNormalizerTest extends TestCase
 {
-    /**
-     * @var BackedEnumNormalizer
-     */
-    private $normalizer;
+    private BackedEnumNormalizer $normalizer;
 
     protected function setUp(): void
     {

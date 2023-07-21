@@ -95,7 +95,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
 {
     use ExpectDeprecationTrait;
 
-    private static $containerCache = [];
+    private static array $containerCache = [];
 
     abstract protected function loadFromFile(ContainerBuilder $container, $file);
 

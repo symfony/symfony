@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\File\File as OrigFile;
 
 class FakeFile extends OrigFile
 {
-    private $realpath;
+    private string $realpath;
 
     public function __construct(string $realpath, string $path)
     {

@@ -20,8 +20,8 @@ use Symfony\Component\Security\Http\Authenticator\X509Authenticator;
 
 class X509AuthenticatorTest extends TestCase
 {
-    private $userProvider;
-    private $authenticator;
+    private InMemoryUserProvider $userProvider;
+    private X509Authenticator $authenticator;
 
     protected function setUp(): void
     {

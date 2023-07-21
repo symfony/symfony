@@ -21,8 +21,8 @@ class ContainerAwareEventManagerTest extends TestCase
 {
     use ExpectDeprecationTrait;
 
-    private $container;
-    private $evm;
+    private Container $container;
+    private ContainerAwareEventManager $evm;
 
     protected function setUp(): void
     {
@@ -299,8 +299,8 @@ class ContainerAwareEventManagerTest extends TestCase
 
 class MyListener
 {
-    public $calledByInvokeCount = 0;
-    public $calledByEventNameCount = 0;
+    public int $calledByInvokeCount = 0;
+    public int $calledByEventNameCount = 0;
 
     public function __invoke()
     {
@@ -315,8 +315,8 @@ class MyListener
 
 class MySubscriber extends MyListener implements EventSubscriber
 {
-    public $calledSubscribedEventsCount = 0;
-    private $listenedEvents;
+    public int $calledSubscribedEventsCount = 0;
+    private array $listenedEvents;
 
     public function __construct(array $listenedEvents)
     {

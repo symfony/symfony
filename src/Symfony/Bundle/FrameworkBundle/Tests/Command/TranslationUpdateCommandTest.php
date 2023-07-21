@@ -26,8 +26,8 @@ use Symfony\Component\Translation\Writer\TranslationWriter;
 
 class TranslationUpdateCommandTest extends TestCase
 {
-    private $fs;
-    private $translationDir;
+    private Filesystem $fs;
+    private string $translationDir;
 
     public function testDumpMessagesAndCleanWithDeprecatedCommandName()
     {

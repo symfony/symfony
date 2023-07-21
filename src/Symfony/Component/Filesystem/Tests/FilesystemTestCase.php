@@ -16,29 +16,14 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class FilesystemTestCase extends TestCase
 {
-    private $umask;
+    protected array $longPathNamesWindows = [];
+    protected Filesystem $filesystem;
+    protected string $workspace;
 
-    protected $longPathNamesWindows = [];
+    private int $umask;
 
-    /**
-     * @var Filesystem
-     */
-    protected $filesystem;
-
-    /**
-     * @var string
-     */
-    protected $workspace;
-
-    /**
-     * @var bool|null Flag for hard links on Windows
-     */
-    private static $linkOnWindows;
-
-    /**
-     * @var bool|null Flag for symbolic links on Windows
-     */
-    private static $symlinkOnWindows;
+    private static ?bool $linkOnWindows = null;
+    private static ?bool $symlinkOnWindows = null;
 
     public static function setUpBeforeClass(): void
     {

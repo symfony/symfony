@@ -32,15 +32,8 @@ require_once __DIR__.'/../Fixtures/Extractor/DummyNamespace.php';
  */
 class PhpStanExtractorTest extends TestCase
 {
-    /**
-     * @var PhpStanExtractor
-     */
-    private $extractor;
-
-    /**
-     * @var PhpDocExtractor
-     */
-    private $phpDocExtractor;
+    private PhpStanExtractor $extractor;
+    private PhpDocExtractor $phpDocExtractor;
 
     protected function setUp(): void
     {

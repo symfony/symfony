@@ -51,7 +51,7 @@ class AuditTrailListenerTest extends TestCase
 
 class Logger extends AbstractLogger
 {
-    public $logs = [];
+    public array $logs = [];
 
     public function log($level, $message, array $context = []): void
     {

@@ -25,7 +25,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class CachePoolPassTest extends TestCase
 {
-    private $cachePoolPass;
+    private CachePoolPass $cachePoolPass;
 
     protected function setUp(): void
     {

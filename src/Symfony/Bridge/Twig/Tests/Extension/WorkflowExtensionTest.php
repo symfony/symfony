@@ -25,8 +25,8 @@ use Symfony\Component\Workflow\Workflow;
 
 class WorkflowExtensionTest extends TestCase
 {
-    private $extension;
-    private $t1;
+    private WorkflowExtension $extension;
+    private Transition $t1;
 
     protected function setUp(): void
     {
@@ -127,19 +127,19 @@ class WorkflowExtensionTest extends TestCase
 
 final class Subject
 {
-    private $marking;
+    private array $marking;
 
-    public function __construct($marking = null)
+    public function __construct(array $marking = [])
     {
         $this->marking = $marking;
     }
 
-    public function getMarking()
+    public function getMarking(): array
     {
         return $this->marking;
     }
 
-    public function setMarking($marking)
+    public function setMarking($marking): void
     {
         $this->marking = $marking;
     }

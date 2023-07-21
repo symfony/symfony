@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,17 +33,12 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class SwitchUserListenerTest extends TestCase
 {
-    private $tokenStorage;
-
-    private $userProvider;
-
-    private $userChecker;
-
-    private $accessDecisionManager;
-
-    private $request;
-
-    private $event;
+    private TokenStorage $tokenStorage;
+    private InMemoryUserProvider $userProvider;
+    private MockObject&UserCheckerInterface $userChecker;
+    private MockObject&AccessDecisionManagerInterface $accessDecisionManager;
+    private Request $request;
+    private RequestEvent $event;
 
     protected function setUp(): void
     {

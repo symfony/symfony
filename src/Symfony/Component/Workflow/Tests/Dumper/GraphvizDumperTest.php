@@ -20,19 +20,12 @@ class GraphvizDumperTest extends TestCase
 {
     use WorkflowBuilderTrait;
 
-    private $dumper;
-
-    protected function setUp(): void
-    {
-        $this->dumper = new GraphvizDumper();
-    }
-
     /**
      * @dataProvider provideWorkflowDefinitionWithoutMarking
      */
     public function testDumpWithoutMarking($definition, $expected, $withMetadata)
     {
-        $dump = $this->dumper->dump($definition, null, ['with-metadata' => $withMetadata]);
+        $dump = (new GraphvizDumper())->dump($definition, null, ['with-metadata' => $withMetadata]);
 
         $this->assertEquals($expected, $dump);
     }
@@ -42,7 +35,7 @@ class GraphvizDumperTest extends TestCase
      */
     public function testDumpWithMarking($definition, $marking, $expected, $withMetadata)
     {
-        $dump = $this->dumper->dump($definition, $marking, ['with-metadata' => $withMetadata]);
+        $dump = (new GraphvizDumper())->dump($definition, $marking, ['with-metadata' => $withMetadata]);
 
         $this->assertEquals($expected, $dump);
     }

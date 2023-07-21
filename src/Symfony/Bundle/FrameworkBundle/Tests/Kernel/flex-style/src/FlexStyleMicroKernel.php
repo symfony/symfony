@@ -27,7 +27,7 @@ class FlexStyleMicroKernel extends Kernel
         configureRoutes as traitConfigureRoutes;
     }
 
-    private $cacheDir;
+    private string $cacheDir;
 
     public function halloweenAction(\stdClass $o)
     {

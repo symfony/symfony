@@ -52,7 +52,7 @@ class FragmentController
 
 class Bar
 {
-    private $bar = 'bar';
+    private string $bar = 'bar';
 
     public function getBar()
     {

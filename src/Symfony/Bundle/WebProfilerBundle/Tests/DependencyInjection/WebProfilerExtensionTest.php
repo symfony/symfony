@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Tests\DependencyInjection;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\WebProfilerBundle\DependencyInjection\WebProfilerExtension;
 use Symfony\Bundle\WebProfilerBundle\Tests\TestCase;
 use Symfony\Component\DependencyInjection\Container;
@@ -30,11 +31,8 @@ use Twig\Loader\ArrayLoader;
 
 class WebProfilerExtensionTest extends TestCase
 {
-    private $kernel;
-    /**
-     * @var \Symfony\Component\DependencyInjection\Container
-     */
-    private $container;
+    private MockObject&KernelInterface $kernel;
+    private ?ContainerBuilder $container;
 
     public static function assertSaneContainer(Container $container)
     {
@@ -93,7 +91,6 @@ class WebProfilerExtensionTest extends TestCase
         parent::tearDown();
 
         $this->container = null;
-        $this->kernel = null;
     }
 
     /**

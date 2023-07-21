@@ -19,6 +19,9 @@ use Symfony\Component\Serializer\Annotation\Ignore;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Serializer\Annotation\SerializedPath;
+use Symfony\Component\Serializer\Annotation\Version;
+use Symfony\Component\Serializer\Annotation\VersionConstraint;
+use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\MappingException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
@@ -37,6 +40,8 @@ class AnnotationLoader implements LoaderInterface
         DiscriminatorMap::class,
         Groups::class,
         Ignore::class,
+        Version::class,
+        VersionConstraint::class,
         MaxDepth::class,
         SerializedName::class,
         SerializedPath::class,
@@ -65,6 +70,7 @@ class AnnotationLoader implements LoaderInterface
             }
         }
 
+        $hasVersionProperty = false;
         foreach ($reflectionClass->getProperties() as $property) {
             if (!isset($attributesMetadata[$property->name])) {
                 $attributesMetadata[$property->name] = new AttributeMetadata($property->name);
@@ -85,6 +91,17 @@ class AnnotationLoader implements LoaderInterface
                         $attributesMetadata[$property->name]->setSerializedPath($annotation->getSerializedPath());
                     } elseif ($annotation instanceof Ignore) {
                         $attributesMetadata[$property->name]->setIgnore(true);
+                    } elseif ($annotation instanceof VersionConstraint) {
+                        if (!($property->getType() === null || $property->getType()->allowsNull())) {
+                            throw new LogicException(sprintf('VersionConstraint on "%s::%s()" cannot be added. Property should either have no typehint either be declared as nullable.', $className, $property->name));
+                        }
+                        $attributesMetadata[$property->name]->setVersionConstraint($annotation);
+                    } elseif ($annotation instanceof Version) {
+                        if ($hasVersionProperty) {
+                            throw new LogicException(sprintf('Version on "%s::%s()" cannot be added. Version holder property can only be set once.', $className, $property->name));
+                        }
+                        $attributesMetadata[$property->name]->setVersion(true);
+                        $hasVersionProperty = true;
                     } elseif ($annotation instanceof Context) {
                         $this->setAttributeContextsForGroups($annotation, $attributesMetadata[$property->name]);
                     }
@@ -114,7 +131,7 @@ class AnnotationLoader implements LoaderInterface
                     $classMetadata->addAttributeMetadata($attributeMetadata);
                 }
             }
-
+            $hasVersionProperty = false;
             foreach ($this->loadAnnotations($method) as $annotation) {
                 if ($annotation instanceof Groups) {
                     if (!$accessorOrMutator) {
@@ -148,6 +165,23 @@ class AnnotationLoader implements LoaderInterface
                     }
 
                     $attributeMetadata->setIgnore(true);
+                } elseif ($annotation instanceof VersionConstraint) {
+                    if (!$accessorOrMutator) {
+                        throw new MappingException(sprintf('Ignore on "%s::%s()" cannot be added. Ignore can only be added on methods beginning with "get", "is", "has" or "set".', $className, $method->name));
+                    }
+
+                    $attributeMetadata->setVersionConstraint($annotation);
+                } elseif ($annotation instanceof Version) {
+                    if (!$accessorOrMutator) {
+                        throw new MappingException(sprintf('Ignore on "%s::%s()" cannot be added. Ignore can only be added on methods beginning with "get", "is", "has" or "set".', $className, $method->name));
+                    }
+
+                    if ($hasVersionProperty) {
+                        throw new LogicException(sprintf('Version on "%s::%s()" cannot be added. Version holder property can only be set once.', $className, $method->name));
+                    }
+
+                    $attributeMetadata->setVersion(true);
+                    $hasVersionProperty = true;
                 } elseif ($annotation instanceof Context) {
                     if (!$accessorOrMutator) {
                         throw new MappingException(sprintf('Context on "%s::%s()" cannot be added. Context can only be added on methods beginning with "get", "is", "has" or "set".', $className, $method->name));

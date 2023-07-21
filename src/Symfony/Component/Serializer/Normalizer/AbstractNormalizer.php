@@ -552,4 +552,16 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
 
         return $this->classMetadataFactory->getMetadataFor($objectOrClass)->getAttributesMetadata()[$attribute] ?? null;
     }
+
+    /**
+     * @param array<string, AttributeMetadataInterface> $attributesMetadata
+     */
+    protected function isVersionCompatible(string $version, array $attributesMetadata, string $attributeName): bool
+    {
+        if (!isset($attributesMetadata[$attributeName])) {
+            return true;
+        }
+
+        return $attributesMetadata[$attributeName]->isVersionCompatible($version);
+    }
 }

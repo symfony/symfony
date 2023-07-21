@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Mapping;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\Serializer\Annotation\VersionConstraint;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -78,6 +79,27 @@ class AttributeMetadata implements AttributeMetadataInterface
      */
     public array $denormalizationContexts = [];
 
+    /**
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link isVersion()} instead.
+     */
+    public bool $version = false;
+
+    /**
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getVersionConstraint()} instead.
+     */
+    public ?VersionConstraint $versionConstraint = null;
+
+    /**
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link isVersionCompatible()} instead.
+     */
+    public ?\Closure $versionConstraintCallable = null;
+
     public function __construct(string $name)
     {
         $this->name = $name;
@@ -142,6 +164,31 @@ class AttributeMetadata implements AttributeMetadataInterface
     public function isIgnored(): bool
     {
         return $this->ignore;
+    }
+
+    public function setVersion(bool $version): void
+    {
+        $this->version = $version;
+    }
+
+    public function isVersion(): bool
+    {
+        return $this->version;
+    }
+
+    public function setVersionConstraint(VersionConstraint $versionConstraint): void
+    {
+        $this->versionConstraint = $versionConstraint;
+    }
+
+    public function getVersionConstraint(): ?VersionConstraint
+    {
+        return $this->versionConstraint;
+    }
+
+    public function isVersionCompatible(string $version): bool
+    {
+        return !$this->versionConstraint || $this->versionConstraint->isVersionCompatible($version);
     }
 
     public function getNormalizationContexts(): array
@@ -225,6 +272,6 @@ class AttributeMetadata implements AttributeMetadataInterface
      */
     public function __sleep(): array
     {
-        return ['name', 'groups', 'maxDepth', 'serializedName', 'serializedPath', 'ignore', 'normalizationContexts', 'denormalizationContexts'];
+        return ['name', 'groups', 'maxDepth', 'serializedName', 'serializedPath', 'ignore', 'normalizationContexts', 'denormalizationContexts', 'version', 'versionConstraint'];
     }
 }

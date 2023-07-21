@@ -135,6 +135,41 @@ abstract class AnnotationLoaderTestCase extends TestCase
         $this->assertTrue($attributesMetadata['ignored2']->isIgnored());
     }
 
+    public function testLoadVersionConstraint()
+    {
+        $classMetadata = new ClassMetadata($this->getNamespace().'\VersionDummy');
+        $this->loader->loadClassMetadata($classMetadata);
+
+        $attributesMetadata = $classMetadata->getAttributesMetadata();
+        $this->assertTrue($attributesMetadata['versionedProperty']->isVersionCompatible('1.2'));
+        $this->assertFalse($attributesMetadata['versionedProperty']->isVersionCompatible('0.9'));
+        $this->assertFalse($attributesMetadata['versionedProperty']->isVersionCompatible('2.1'));
+    }
+
+    public function testLoadVersionConstraintWithNonNullableField()
+    {
+        $this->expectExceptionMessageMatches('!VersionDummyWithNonNullableField::versionedProperty\(\)" cannot be added\. Property should either have no typehint either be declared as nullable\.!');
+        $classMetadata = new ClassMetadata($this->getNamespace().'\VersionDummyWithNonNullableField');
+        $this->loader->loadClassMetadata($classMetadata);
+    }
+
+    public function testLoadVersion()
+    {
+        $classMetadata = new ClassMetadata($this->getNamespace().'\VersionDummy');
+        $this->loader->loadClassMetadata($classMetadata);
+
+        $attributesMetadata = $classMetadata->getAttributesMetadata();
+        $this->assertTrue($attributesMetadata['objectVersion']->isVersion());
+        $this->assertFalse($attributesMetadata['foo']->isVersion());
+    }
+
+    public function testLoadVersionWithError()
+    {
+        $this->expectExceptionMessageMatches('!DoubleVersionDummy::objectVersion2\(\)" cannot be added\. Version holder property can only be set once\.!');
+        $classMetadata = new ClassMetadata($this->getNamespace().'\DoubleVersionDummy');
+        $this->loader->loadClassMetadata($classMetadata);
+    }
+
     public function testLoadContexts()
     {
         $this->assertLoadedContexts($this->getNamespace().'\ContextDummy', $this->getNamespace().'\ContextDummyParent');

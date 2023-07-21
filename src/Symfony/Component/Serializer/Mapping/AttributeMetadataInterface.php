@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Mapping;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\Serializer\Annotation\VersionConstraint;
 
 /**
  * Stores metadata needed for serializing and deserializing attributes.
@@ -74,6 +75,20 @@ interface AttributeMetadataInterface
      * Gets if this attribute is ignored or not.
      */
     public function isIgnored(): bool;
+
+    /**
+     * Sets if this attribute is holding the version. Only one attribute can hold version at once.
+     */
+    public function setVersion(bool $version): void;
+
+    /**
+     * Gets if this attribute is holding the version.
+     */
+    public function isVersion(): bool;
+
+    public function setVersionConstraint(VersionConstraint $versionConstraint): void;
+
+    public function isVersionCompatible(string $version): bool;
 
     /**
      * Merges an {@see AttributeMetadataInterface} with in the current one.

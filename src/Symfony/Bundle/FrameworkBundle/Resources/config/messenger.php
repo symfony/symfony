@@ -147,6 +147,13 @@ return static function (ContainerConfigurator $container) {
 
         ->set('messenger.transport.beanstalkd.factory', BeanstalkdTransportFactory::class)
 
+        ->set('messenger.transport.kafka.factory', KafkaTransportFactory::class)
+            ->args([
+                service('logger')->ignoreOnInvalid(),
+                service(KafkaFactory::class)->ignoreOnInvalid(),
+            ])
+            ->tag('monolog.logger', ['channel' => 'messenger'])
+
         // retry
         ->set('messenger.retry_strategy_locator', ServiceLocator::class)
             ->args([

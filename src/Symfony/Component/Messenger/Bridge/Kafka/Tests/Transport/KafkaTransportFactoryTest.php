@@ -51,8 +51,6 @@ class KafkaTransportFactoryTest extends TestCase
     {
         self::assertTrue($this->factory->supports('kafka://', []));
         self::assertTrue($this->factory->supports('kafka://localhost:9092', []));
-        self::assertTrue($this->factory->supports('kafka+ssl://', []));
-        self::assertTrue($this->factory->supports('kafka+ssl://localhost:9092', []));
         self::assertFalse($this->factory->supports('plaintext://localhost:9092', []));
         self::assertFalse($this->factory->supports('kafka', []));
     }

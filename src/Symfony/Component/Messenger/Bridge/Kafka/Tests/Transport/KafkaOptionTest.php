@@ -19,7 +19,7 @@ use Symfony\Component\Messenger\Bridge\Kafka\Transport\KafkaOption;
  */
 class KafkaOptionTest extends TestCase
 {
-    public function testProducer(): void
+    public function testProducer()
     {
         self::assertIsArray(KafkaOption::producer());
 
@@ -28,7 +28,7 @@ class KafkaOptionTest extends TestCase
         }
     }
 
-    public function testConsumer(): void
+    public function testConsumer()
     {
         self::assertIsArray(KafkaOption::consumer());
 
@@ -37,7 +37,7 @@ class KafkaOptionTest extends TestCase
         }
     }
 
-    public function testGlobal(): void
+    public function testGlobal()
     {
         self::assertIsArray(KafkaOption::global());
 

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the Symfony package.
  *
@@ -24,7 +22,7 @@ use Symfony\Component\Messenger\Bridge\Kafka\Callback\LoggingRebalanceCallback;
  */
 final class LoggingRebalanceCallbackTest extends TestCase
 {
-    public function testInvokeWithAssignPartitions(): void
+    public function testInvokeWithAssignPartitions()
     {
         $topic = 'topic1';
         $partition = 1;
@@ -54,7 +52,7 @@ final class LoggingRebalanceCallbackTest extends TestCase
         $callback($consumer, \RD_KAFKA_RESP_ERR__ASSIGN_PARTITIONS, [$topicPartition]);
     }
 
-    public function testInvokeWithRevokePartitions(): void
+    public function testInvokeWithRevokePartitions()
     {
         $topic = 'topic1';
         $partition = 1;
@@ -80,7 +78,7 @@ final class LoggingRebalanceCallbackTest extends TestCase
         $callback($consumer, \RD_KAFKA_RESP_ERR__REVOKE_PARTITIONS, [$topicPartition]);
     }
 
-    public function testInvokeWithUnknownReason(): void
+    public function testInvokeWithUnknownReason()
     {
         $topic = 'topic1';
         $partition = 1;
@@ -107,7 +105,7 @@ final class LoggingRebalanceCallbackTest extends TestCase
         $callback($consumer, $errorCode, [$topicPartition]);
     }
 
-    public function testInvokeWithUnknownReasonWithoutTopics(): void
+    public function testInvokeWithUnknownReasonWithoutTopics()
     {
         $errorCode = 99;
 

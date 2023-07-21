@@ -46,7 +46,7 @@ class KafkaReceiverTest extends TestCase
         );
     }
 
-    public function testGetDecodedMessage(): void
+    public function testGetDecodedMessage()
     {
         $kafkaMessage = new Message();
         $kafkaMessage->headers = ['type' => FakeMessage::class];
@@ -60,7 +60,7 @@ class KafkaReceiverTest extends TestCase
         self::assertEquals(new FakeMessage('Hello'), $envelopes[0]->getMessage());
     }
 
-    public function testNoMoreMessages(): void
+    public function testNoMoreMessages()
     {
         $kafkaMessage = new Message();
         $kafkaMessage->payload = 'No more messages';
@@ -72,7 +72,7 @@ class KafkaReceiverTest extends TestCase
         self::assertCount(0, $envelopes);
     }
 
-    public function testTimeOut(): void
+    public function testTimeOut()
     {
         $kafkaMessage = new Message();
         $kafkaMessage->payload = 'Timeout';
@@ -84,7 +84,7 @@ class KafkaReceiverTest extends TestCase
         self::assertCount(0, $envelopes);
     }
 
-    public function testUnknownTopic(): void
+    public function testUnknownTopic()
     {
         $kafkaMessage = new Message();
         $kafkaMessage->payload = 'Unknown topic';
@@ -99,7 +99,7 @@ class KafkaReceiverTest extends TestCase
         self::assertCount(0, $envelopes);
     }
 
-    public function testExceptionConnection(): void
+    public function testExceptionConnection()
     {
         $this->connection->method('get')->willThrowException(
             new Exception('Connection exception', 1),

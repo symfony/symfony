@@ -44,7 +44,7 @@ class KafkaSenderTest extends TestCase
         );
     }
 
-    public function testSend(): void
+    public function testSend()
     {
         $envelope = new Envelope(new FakeMessage('Hello'));
         $this->connection
@@ -61,7 +61,7 @@ class KafkaSenderTest extends TestCase
         self::assertSame($envelope, $this->kafkaSender->send($envelope));
     }
 
-    public function testSendWithStamp(): void
+    public function testSendWithStamp()
     {
         $partition = 1;
         $messageFlags = 0;
@@ -87,7 +87,7 @@ class KafkaSenderTest extends TestCase
         self::assertSame($envelope, $this->kafkaSender->send($envelope));
     }
 
-    public function testExceptionConnection(): void
+    public function testExceptionConnection()
     {
         $envelope = new Envelope(new FakeMessage('Hello'));
         $this->connection

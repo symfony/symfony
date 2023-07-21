@@ -131,15 +131,15 @@ class Connection
         );
 
         if (!\is_bool($options['commit_async'])) {
-            throw new LogicException(sprintf('The "commit_async" option type must be boolean, %s given in the Kafka Messenger transport consumer.', \gettype($options['commit_async'])));
+            throw new LogicException(sprintf('The "commit_async" option type must be boolean, "%s" given in the Kafka Messenger transport consumer.', \gettype($options['commit_async'])));
         }
 
         if (!\is_int($options['consume_timeout_ms'])) {
-            throw new LogicException(sprintf('The "consume_timeout_ms" option type must be integer, %s given in the Kafka Messenger transport consumer.', \gettype($options['consume_timeout_ms'])));
+            throw new LogicException(sprintf('The "consume_timeout_ms" option type must be integer, "%s" given in the Kafka Messenger transport consumer.', \gettype($options['consume_timeout_ms'])));
         }
 
         if (!\is_array($options['topics'])) {
-            throw new LogicException(sprintf('The "topics" option type must be array, %s given in the Kafka Messenger transport consumer.', \gettype($options['topics'])));
+            throw new LogicException(sprintf('The "topics" option type must be array, "%s" given in the Kafka Messenger transport consumer.', \gettype($options['topics'])));
         }
 
         $options['conf_options']['metadata.broker.list'] = $brokerList;

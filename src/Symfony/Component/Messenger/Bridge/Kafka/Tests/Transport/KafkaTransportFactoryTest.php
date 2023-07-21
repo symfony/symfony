@@ -31,7 +31,7 @@ class KafkaTransportFactoryTest extends TestCase
         $this->factory = new KafkaTransportFactory(new NullLogger());
     }
 
-    public function testCreateTransport(): void
+    public function testCreateTransport()
     {
         self::assertInstanceOf(
             KafkaTransport::class,
@@ -47,7 +47,7 @@ class KafkaTransportFactoryTest extends TestCase
         );
     }
 
-    public function testSupports(): void
+    public function testSupports()
     {
         self::assertTrue($this->factory->supports('kafka://', []));
         self::assertTrue($this->factory->supports('kafka://localhost:9092', []));

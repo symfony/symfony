@@ -42,7 +42,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testFromDsnWithMinimumConfig(): void
+    public function testFromDsnWithMinimumConfig()
     {
         self::assertInstanceOf(
             Connection::class,
@@ -65,7 +65,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testFromDsnWithInvalidOption(): void
+    public function testFromDsnWithInvalidOption()
     {
         self::expectException(\InvalidArgumentException::class);
         self::expectExceptionMessage('Invalid option(s) "invalid" passed to the Kafka Messenger transport.');
@@ -80,7 +80,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testFromDsnWithNoConsumerOrProducerOption(): void
+    public function testFromDsnWithNoConsumerOrProducerOption()
     {
         self::expectException(LogicException::class);
         self::expectExceptionMessage('At least one of "consumer" or "producer" options is required for the Kafka Messenger transport.');
@@ -93,7 +93,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testFromDsnWithInvalidConsumerOption(): void
+    public function testFromDsnWithInvalidConsumerOption()
     {
         self::expectException(\InvalidArgumentException::class);
         self::expectExceptionMessage('Invalid option(s) "invalid" passed to the Kafka Messenger transport consumer.');
@@ -110,10 +110,10 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testFromDsnWithConsumeTopicsNotArray(): void
+    public function testFromDsnWithConsumeTopicsNotArray()
     {
         self::expectException(LogicException::class);
-        self::expectExceptionMessage('The "topics" option type must be array, string given in the Kafka Messenger transport consumer.');
+        self::expectExceptionMessage('The "topics" option type must be array, "string" given in the Kafka Messenger transport consumer.');
         self::expectExceptionCode(0);
         Connection::fromDsn(
             'kafka://localhost:9092',
@@ -130,10 +130,10 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testFromDsnWithConsumeTimeoutNonInteger(): void
+    public function testFromDsnWithConsumeTimeoutNonInteger()
     {
         self::expectException(LogicException::class);
-        self::expectExceptionMessage('The "consume_timeout_ms" option type must be integer, string given in the Kafka Messenger transport consumer.');
+        self::expectExceptionMessage('The "consume_timeout_ms" option type must be integer, "string" given in the Kafka Messenger transport consumer.');
         self::expectExceptionCode(0);
         Connection::fromDsn(
             'kafka://localhost:9092',
@@ -151,7 +151,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testFromDsnWithInvalidConsumerKafkaConfOption(): void
+    public function testFromDsnWithInvalidConsumerKafkaConfOption()
     {
         self::expectException(\InvalidArgumentException::class);
         self::expectExceptionMessage('Invalid conf_options option "invalid" passed to the Kafka Messenger transport.');
@@ -170,7 +170,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testFromDsnWithKafkaConfGroupIdMissing(): void
+    public function testFromDsnWithKafkaConfGroupIdMissing()
     {
         self::expectException(LogicException::class);
         self::expectExceptionMessage('The conf_option(s) "group.id", "metadata.broker.list" are required for the Kafka Messenger transport consumer.');
@@ -190,7 +190,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testFromDsnWithInvalidConsumerKafkaConfOptionNotAString(): void
+    public function testFromDsnWithInvalidConsumerKafkaConfOptionNotAString()
     {
         self::expectException(LogicException::class);
         self::expectExceptionMessage('Kafka config value "client.id" must be a string, got "bool".');
@@ -210,7 +210,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testFromDsnWithInvalidProducerOption(): void
+    public function testFromDsnWithInvalidProducerOption()
     {
         self::expectException(\InvalidArgumentException::class);
         self::expectExceptionMessage('Invalid option(s) "invalid" passed to the Kafka Messenger transport producer.');
@@ -227,7 +227,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testFromDsnWithInvalidProducerKafkaConfOption(): void
+    public function testFromDsnWithInvalidProducerKafkaConfOption()
     {
         self::expectException(\InvalidArgumentException::class);
         self::expectExceptionMessage('Invalid conf_options option "invalid" passed to the Kafka Messenger transport.');
@@ -246,7 +246,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testFromDsnWithInvalidProducerKafkaConfOptionNotAString(): void
+    public function testFromDsnWithInvalidProducerKafkaConfOptionNotAString()
     {
         self::expectException(LogicException::class);
         self::expectExceptionMessage('Kafka config value "client.id" must be a string, got "bool".');
@@ -265,7 +265,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testFromDsnWithProducerPollTimeoutNonInteger(): void
+    public function testFromDsnWithProducerPollTimeoutNonInteger()
     {
         self::expectException(LogicException::class);
         self::expectExceptionMessage('The "poll_timeout_ms" option type must be integer, "string" given in the Kafka Messenger transport producer.');
@@ -284,7 +284,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testFromDsnWithFlushTimeoutNonInteger(): void
+    public function testFromDsnWithFlushTimeoutNonInteger()
     {
         self::expectException(LogicException::class);
         self::expectExceptionMessage('The "flush_timeout_ms" option type must be integer, "string" given in the Kafka Messenger transport producer.');
@@ -302,7 +302,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testPublish(): void
+    public function testPublish()
     {
         $connection = Connection::fromDsn(
             'kafka://localhost:9092',
@@ -331,7 +331,7 @@ class ConnectionTest extends TestCase
         $connection->publish(\RD_KAFKA_PARTITION_UA, \RD_KAFKA_MSG_F_BLOCK, 'body', null, ['type' => FakeMessage::class]);
     }
 
-    public function testPublishWithTopicMissingException(): void
+    public function testPublishWithTopicMissingException()
     {
         $connection = Connection::fromDsn(
             'kafka://localhost:9092',
@@ -353,7 +353,7 @@ class ConnectionTest extends TestCase
         $connection->publish(\RD_KAFKA_PARTITION_UA, \RD_KAFKA_MSG_F_BLOCK, 'body', null, ['type' => FakeMessage::class]);
     }
 
-    public function testPublishWithCustomOptions(): void
+    public function testPublishWithCustomOptions()
     {
         $connection = Connection::fromDsn(
             'kafka://localhost:9092',
@@ -395,7 +395,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testGet(): void
+    public function testGet()
     {
         $connection = Connection::fromDsn(
             'kafka://localhost:9092',
@@ -422,7 +422,7 @@ class ConnectionTest extends TestCase
         $connection->get();
     }
 
-    public function testGetWithConsumeException(): void
+    public function testGetWithConsumeException()
     {
         $connection = Connection::fromDsn(
             'kafka://localhost:9092',
@@ -450,7 +450,7 @@ class ConnectionTest extends TestCase
         $connection->get();
     }
 
-    public function testGetWithCustomOptions(): void
+    public function testGetWithCustomOptions()
     {
         $connection = Connection::fromDsn(
             'kafka://localhost:9092',

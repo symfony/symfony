@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the Symfony package.
  *
@@ -23,7 +21,7 @@ use Symfony\Component\Messenger\Bridge\Kafka\Callback\LoggingLogCallback;
  */
 final class LoggingLogCallbackTest extends TestCase
 {
-    public function testInvoke(): void
+    public function testInvoke()
     {
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects(self::once())

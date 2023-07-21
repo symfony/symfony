@@ -51,7 +51,7 @@ class ServerBag extends ParameterBag
              * RewriteCond %{HTTP:Authorization} .+
              * RewriteRule ^ - [E=HTTP_AUTHORIZATION:%0]
              * RewriteCond %{REQUEST_FILENAME} !-f
-             * RewriteRule ^(.*)$ app.php [QSA,L]
+             * RewriteRule ^(.*)$ index.php [QSA,L]
              */
 
             $authorizationHeader = null;

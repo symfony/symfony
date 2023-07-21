@@ -28,8 +28,8 @@ final class Sms77Transport extends AbstractTransport
 {
     protected const HOST = 'gateway.sms77.io';
 
-    private $apiKey;
-    private $from;
+    private string $apiKey;
+    private ?string $from;
 
     public function __construct(#[\SensitiveParameter] string $apiKey, string $from = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {

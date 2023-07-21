@@ -57,30 +57,17 @@ class PropertyAccessor implements PropertyAccessorInterface
     private const CACHE_PREFIX_READ = 'r';
     private const CACHE_PREFIX_WRITE = 'w';
     private const CACHE_PREFIX_PROPERTY_PATH = 'p';
-
-    private $magicMethodsFlags;
-    private $ignoreInvalidIndices;
-    private $ignoreInvalidProperty;
-
-    /**
-     * @var CacheItemPoolInterface
-     */
-    private $cacheItemPool;
-
-    private $propertyPathCache = [];
-
-    /**
-     * @var PropertyReadInfoExtractorInterface
-     */
-    private $readInfoExtractor;
-
-    /**
-     * @var PropertyWriteInfoExtractorInterface
-     */
-    private $writeInfoExtractor;
-    private $readPropertyCache = [];
-    private $writePropertyCache = [];
     private const RESULT_PROTO = [self::VALUE => null];
+
+    private int $magicMethodsFlags;
+    private bool $ignoreInvalidIndices;
+    private bool $ignoreInvalidProperty;
+    private ?CacheItemPoolInterface $cacheItemPool;
+    private array $propertyPathCache = [];
+    private PropertyReadInfoExtractorInterface $readInfoExtractor;
+    private PropertyWriteInfoExtractorInterface $writeInfoExtractor;
+    private array $readPropertyCache = [];
+    private array $writePropertyCache = [];
 
     /**
      * Should not be used by application code. Use

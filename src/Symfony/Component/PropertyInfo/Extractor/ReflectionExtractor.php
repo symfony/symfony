@@ -66,17 +66,16 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         'double' => Type::BUILTIN_TYPE_FLOAT,
     ];
 
-    private $mutatorPrefixes;
-    private $accessorPrefixes;
-    private $arrayMutatorPrefixes;
-    private $enableConstructorExtraction;
-    private $methodReflectionFlags;
-    private $magicMethodsFlags;
-    private $propertyReflectionFlags;
-    private $inflector;
-
-    private $arrayMutatorPrefixesFirst;
-    private $arrayMutatorPrefixesLast;
+    private array $mutatorPrefixes;
+    private array $accessorPrefixes;
+    private array $arrayMutatorPrefixes;
+    private bool $enableConstructorExtraction;
+    private int $methodReflectionFlags;
+    private int $magicMethodsFlags;
+    private int $propertyReflectionFlags;
+    private InflectorInterface $inflector;
+    private array $arrayMutatorPrefixesFirst;
+    private array $arrayMutatorPrefixesLast;
 
     /**
      * @param string[]|null $mutatorPrefixes

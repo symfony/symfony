@@ -65,7 +65,7 @@ class Container implements ContainerInterface, ResetInterface
     private bool $compiled = false;
     private \Closure $getEnv;
 
-    private static $make;
+    private static \Closure $make;
 
     public function __construct(ParameterBagInterface $parameterBag = null)
     {

@@ -19,9 +19,9 @@ use Symfony\Component\Notifier\Event\NotificationEvents;
  */
 final class NotificationCount extends Constraint
 {
-    private $expectedValue;
-    private $transport;
-    private $queued;
+    private int $expectedValue;
+    private ?string $transport;
+    private bool $queued;
 
     public function __construct(int $expectedValue, string $transport = null, bool $queued = false)
     {

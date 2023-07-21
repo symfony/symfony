@@ -21,7 +21,7 @@ use Symfony\Component\Mime\RawMessage;
  */
 class MessagePart extends DataPart
 {
-    private $message;
+    private RawMessage $message;
 
     public function __construct(RawMessage $message)
     {

@@ -33,8 +33,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
      */
     protected const NS_SEPARATOR = ':';
 
-    private static $apcuSupported;
-    private static $phpFilesSupported;
+    private static bool $apcuSupported;
 
     protected function __construct(string $namespace = '', int $defaultLifetime = 0)
     {

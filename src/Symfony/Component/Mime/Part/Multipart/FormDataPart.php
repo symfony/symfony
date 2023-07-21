@@ -23,7 +23,7 @@ use Symfony\Component\Mime\Part\TextPart;
  */
 final class FormDataPart extends AbstractMultipartPart
 {
-    private $fields = [];
+    private array $fields = [];
 
     /**
      * @param array<string|array|DataPart> $fields

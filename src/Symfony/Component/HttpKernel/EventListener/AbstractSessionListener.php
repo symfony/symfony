@@ -42,13 +42,13 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
 {
     public const NO_AUTO_CACHE_CONTROL_HEADER = 'Symfony-Session-NoAutoCacheControl';
 
-    protected $container;
+    protected ?ContainerInterface $container;
     private bool $debug;
 
     /**
      * @var array<string, mixed>
      */
-    private $sessionOptions;
+    private array $sessionOptions;
 
     public function __construct(ContainerInterface $container = null, bool $debug = false, array $sessionOptions = [])
     {

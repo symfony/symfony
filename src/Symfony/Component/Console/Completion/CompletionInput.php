@@ -31,11 +31,11 @@ final class CompletionInput extends ArgvInput
     public const TYPE_OPTION_NAME = 'option_name';
     public const TYPE_NONE = 'none';
 
-    private $tokens;
-    private $currentIndex;
-    private $completionType;
-    private $completionName;
-    private $completionValue = '';
+    private array $tokens;
+    private int $currentIndex;
+    private string $completionType;
+    private ?string $completionName = null;
+    private string $completionValue = '';
 
     /**
      * Converts a terminal string into tokens.

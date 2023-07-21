@@ -34,7 +34,7 @@ final class TwitterTransport extends AbstractTransport
 {
     protected const HOST = 'api.twitter.com';
 
-    private static $nonce;
+    private static string $nonce;
 
     private string $apiKey;
     private string $apiSecret;

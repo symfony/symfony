@@ -96,6 +96,7 @@ class ErrorHandler
 
     private bool $isRecursive = false;
     private bool $isRoot = false;
+    /** @var callable|null */
     private $exceptionHandler;
     private ?BufferingLogger $bootstrappingLogger = null;
 

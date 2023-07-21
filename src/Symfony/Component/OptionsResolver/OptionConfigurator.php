@@ -15,8 +15,8 @@ use Symfony\Component\OptionsResolver\Exception\AccessException;
 
 final class OptionConfigurator
 {
-    private $name;
-    private $resolver;
+    private string $name;
+    private OptionsResolver $resolver;
 
     public function __construct(string $name, OptionsResolver $resolver)
     {

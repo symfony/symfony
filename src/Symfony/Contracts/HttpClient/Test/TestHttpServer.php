@@ -16,7 +16,7 @@ use Symfony\Component\Process\Process;
 
 class TestHttpServer
 {
-    private static $process = [];
+    private static array $process = [];
 
     /**
      * @param string|null $workingDirectory

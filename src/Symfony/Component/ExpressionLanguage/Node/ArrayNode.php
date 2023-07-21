@@ -20,7 +20,7 @@ use Symfony\Component\ExpressionLanguage\Compiler;
  */
 class ArrayNode extends Node
 {
-    protected $index;
+    protected int $index;
 
     public function __construct()
     {

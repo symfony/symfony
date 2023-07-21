@@ -23,7 +23,6 @@ use Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTransportListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnCustomStopExceptionListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnRestartSignalListener;
-use Symfony\Component\Messenger\EventListener\StopWorkerOnSignalsListener;
 use Symfony\Component\Messenger\Handler\RedispatchMessageHandler;
 use Symfony\Component\Messenger\Middleware\AddBusNameStampMiddleware;
 use Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware;
@@ -196,15 +195,6 @@ return static function (ContainerConfigurator $container) {
         ->set('messenger.listener.stop_worker_on_restart_signal_listener', StopWorkerOnRestartSignalListener::class)
             ->args([
                 service('cache.messenger.restart_workers_signal'),
-                service('logger')->ignoreOnInvalid(),
-            ])
-            ->tag('kernel.event_subscriber')
-            ->tag('monolog.logger', ['channel' => 'messenger'])
-
-        ->set('messenger.listener.stop_worker_signals_listener', StopWorkerOnSignalsListener::class)
-            ->deprecate('6.4', 'symfony/messenger', 'The "%service_id%" service is deprecated, use the "Symfony\Component\Console\Command\SignalableCommandInterface" instead.')
-            ->args([
-                null,
                 service('logger')->ignoreOnInvalid(),
             ])
             ->tag('kernel.event_subscriber')

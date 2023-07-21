@@ -25,6 +25,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Antonio J. García Lagar <aj@garcialagar.es>
+ * @author Aurélien Pillevesse <aurelienpillevesse@hotmail.fr>
  */
 class PsrHttpFactoryTest extends TestCase
 {
@@ -242,5 +243,53 @@ class PsrHttpFactoryTest extends TestCase
 
         $this->assertSame(\UPLOAD_ERR_NO_FILE, $uploadedFiles['f1']->getError());
         $this->assertSame(\UPLOAD_ERR_NO_FILE, $uploadedFiles['f2']->getError());
+    }
+
+    public function testJsonContent()
+    {
+        if (!method_exists(Request::class, 'getPayload')) {
+            $this->markTestSkipped();
+        }
+
+        $headers = [
+            'HTTP_HOST' => 'http_host.fr',
+            'CONTENT_TYPE' => 'application/json',
+        ];
+        $request = new Request([], [], [], [], [], $headers, '{"city":"Paris","country":"France"}');
+        $psrRequest = $this->factory->createRequest($request);
+
+        $this->assertSame(['city' => 'Paris', 'country' => 'France'], $psrRequest->getParsedBody());
+    }
+
+    public function testEmptyJsonContent()
+    {
+        if (!method_exists(Request::class, 'getPayload')) {
+            $this->markTestSkipped();
+        }
+
+        $headers = [
+            'HTTP_HOST' => 'http_host.fr',
+            'CONTENT_TYPE' => 'application/json',
+        ];
+        $request = new Request([], [], [], [], [], $headers, '{}');
+        $psrRequest = $this->factory->createRequest($request);
+
+        $this->assertSame([], $psrRequest->getParsedBody());
+    }
+
+    public function testWrongJsonContent()
+    {
+        if (!method_exists(Request::class, 'getPayload')) {
+            $this->markTestSkipped();
+        }
+
+        $headers = [
+            'HTTP_HOST' => 'http_host.fr',
+            'CONTENT_TYPE' => 'application/json',
+        ];
+        $request = new Request([], [], [], [], [], $headers, '{"city":"Paris"');
+        $psrRequest = $this->factory->createRequest($request);
+
+        $this->assertSame([], $psrRequest->getParsedBody());
     }
 }

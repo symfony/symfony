@@ -21,7 +21,7 @@ namespace Symfony\Component\Templating\Helper;
  */
 abstract class Helper implements HelperInterface
 {
-    protected $charset = 'UTF-8';
+    protected string $charset = 'UTF-8';
 
     /**
      * Sets the default charset.

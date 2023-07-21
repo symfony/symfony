@@ -32,7 +32,7 @@ class_exists(SessionBagProxy::class);
  */
 class Session implements FlashBagAwareSessionInterface, \IteratorAggregate, \Countable
 {
-    protected $storage;
+    protected SessionStorageInterface $storage;
 
     private string $flashName;
     private string $attributeName;

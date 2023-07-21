@@ -28,7 +28,7 @@ class Currency extends Constraint
         self::NO_SUCH_CURRENCY_ERROR => 'NO_SUCH_CURRENCY_ERROR',
     ];
 
-    public $message = 'This value is not a valid currency.';
+    public string $message = 'This value is not a valid currency.';
 
     public function __construct(array $options = null, string $message = null, array $groups = null, mixed $payload = null)
     {

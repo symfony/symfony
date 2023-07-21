@@ -32,13 +32,12 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     public const REQUIREMENT_MISMATCH = 1;
     public const ROUTE_MATCH = 2;
 
-    /** @var RequestContext */
-    protected $context;
+    protected RequestContext $context;
 
     /**
      * Collects HTTP methods that would be allowed for the request.
      */
-    protected $allow = [];
+    protected array $allow = [];
 
     /**
      * Collects URI schemes that would be allowed for the request.
@@ -47,14 +46,14 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
      */
     protected array $allowSchemes = [];
 
-    protected $routes;
-    protected $request;
-    protected $expressionLanguage;
+    protected RouteCollection $routes;
+    protected ?Request $request = null;
+    protected ExpressionLanguage $expressionLanguage;
 
     /**
      * @var ExpressionFunctionProviderInterface[]
      */
-    protected $expressionLanguageProviders = [];
+    protected array $expressionLanguageProviders = [];
 
     public function __construct(RouteCollection $routes, RequestContext $context)
     {

@@ -23,10 +23,7 @@ use Symfony\Component\CssSelector\CssSelectorConverter;
  */
 class Crawler implements \Countable, \IteratorAggregate
 {
-    /**
-     * @var string|null
-     */
-    protected $uri;
+    protected ?string $uri;
 
     /**
      * The default namespace prefix to be used with XPath and CSS expressions.

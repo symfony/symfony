@@ -18,7 +18,7 @@ namespace Symfony\Component\ErrorHandler\Exception;
  */
 class SilencedErrorContext implements \JsonSerializable
 {
-    public $count = 1;
+    public int $count = 1;
 
     private int $severity;
     private string $file;

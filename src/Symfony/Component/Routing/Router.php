@@ -37,47 +37,15 @@ use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
  */
 class Router implements RouterInterface, RequestMatcherInterface
 {
-    /**
-     * @var UrlMatcherInterface|null
-     */
-    protected $matcher;
-
-    /**
-     * @var UrlGeneratorInterface|null
-     */
-    protected $generator;
-
-    /**
-     * @var RequestContext
-     */
-    protected $context;
-
-    /**
-     * @var LoaderInterface
-     */
-    protected $loader;
-
-    /**
-     * @var RouteCollection|null
-     */
-    protected $collection;
-
-    protected $resource;
-
-    /**
-     * @var array
-     */
-    protected $options = [];
-
-    /**
-     * @var LoggerInterface|null
-     */
-    protected $logger;
-
-    /**
-     * @var string|null
-     */
-    protected $defaultLocale;
+    protected UrlMatcherInterface|RequestMatcherInterface $matcher;
+    protected UrlGeneratorInterface $generator;
+    protected RequestContext $context;
+    protected LoaderInterface $loader;
+    protected RouteCollection $collection;
+    protected mixed $resource;
+    protected array $options = [];
+    protected ?LoggerInterface $logger;
+    protected ?string $defaultLocale;
 
     private ConfigCacheFactoryInterface $configCacheFactory;
 

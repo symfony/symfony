@@ -23,8 +23,8 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  */
 class ParameterBag implements ParameterBagInterface
 {
-    protected $parameters = [];
-    protected $resolved = false;
+    protected array $parameters = [];
+    protected bool $resolved = false;
     protected array $deprecatedParameters = [];
 
     public function __construct(array $parameters = [])

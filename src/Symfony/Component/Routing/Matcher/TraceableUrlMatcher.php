@@ -27,7 +27,7 @@ class TraceableUrlMatcher extends UrlMatcher
     public const ROUTE_ALMOST_MATCHES = 1;
     public const ROUTE_MATCHES = 2;
 
-    protected $traces;
+    protected array $traces;
 
     public function getTraces(string $pathinfo): array
     {

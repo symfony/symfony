@@ -30,8 +30,8 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterface
 {
-    protected $logger;
-    protected $stopwatch;
+    protected ?LoggerInterface $logger;
+    protected Stopwatch $stopwatch;
 
     /**
      * @var \SplObjectStorage<WrappedListener, array{string, string}>|null

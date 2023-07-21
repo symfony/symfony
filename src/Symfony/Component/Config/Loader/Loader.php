@@ -20,8 +20,8 @@ use Symfony\Component\Config\Exception\LoaderLoadException;
  */
 abstract class Loader implements LoaderInterface
 {
-    protected $resolver;
-    protected $env;
+    protected LoaderResolverInterface $resolver;
+    protected ?string $env;
 
     public function __construct(string $env = null)
     {

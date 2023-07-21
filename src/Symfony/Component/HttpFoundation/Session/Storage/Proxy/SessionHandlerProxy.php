@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\StrictSessionHandle
  */
 class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterface, \SessionUpdateTimestampHandlerInterface
 {
-    protected $handler;
+    protected \SessionHandlerInterface $handler;
 
     public function __construct(\SessionHandlerInterface $handler)
     {

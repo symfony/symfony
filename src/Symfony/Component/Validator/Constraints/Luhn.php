@@ -31,7 +31,7 @@ class Luhn extends Constraint
         self::CHECKSUM_FAILED_ERROR => 'CHECKSUM_FAILED_ERROR',
     ];
 
-    public $message = 'Invalid card number.';
+    public string $message = 'Invalid card number.';
 
     public function __construct(
         array $options = null,

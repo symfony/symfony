@@ -26,10 +26,10 @@ class Regex extends Constraint
         self::REGEX_FAILED_ERROR => 'REGEX_FAILED_ERROR',
     ];
 
-    public $message = 'This value is not valid.';
-    public $pattern;
-    public $htmlPattern;
-    public $match = true;
+    public string $message = 'This value is not valid.';
+    public ?string $pattern = null;
+    public ?string $htmlPattern = null;
+    public bool $match = true;
     /** @var callable|null */
     public $normalizer;
 

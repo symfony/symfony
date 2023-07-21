@@ -26,9 +26,9 @@ class XmlFileLoader extends FileLoader
     /**
      * The XML nodes of the mapping file.
      *
-     * @var \SimpleXMLElement[]|null
+     * @var \SimpleXMLElement[]
      */
-    protected $classes;
+    protected array $classes;
 
     public function __construct(string $file)
     {

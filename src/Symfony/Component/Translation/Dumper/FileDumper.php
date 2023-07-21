@@ -27,10 +27,8 @@ abstract class FileDumper implements DumperInterface
 {
     /**
      * A template for the relative paths to files.
-     *
-     * @var string
      */
-    protected $relativePathTemplate = '%domain%.%locale%.%extension%';
+    protected string $relativePathTemplate = '%domain%.%locale%.%extension%';
 
     /**
      * Sets the template for the relative paths to files.

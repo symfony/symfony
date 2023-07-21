@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Constraint;
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Valid extends Constraint
 {
-    public $traverse = true;
+    public bool $traverse = true;
 
     public function __construct(array $options = null, array $groups = null, $payload = null, bool $traverse = null)
     {

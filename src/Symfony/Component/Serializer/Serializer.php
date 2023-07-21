@@ -58,15 +58,9 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
         'string' => true,
     ];
 
-    /**
-     * @var ChainEncoder
-     */
-    protected $encoder;
+    protected ChainEncoder $encoder;
 
-    /**
-     * @var ChainDecoder
-     */
-    protected $decoder;
+    protected ChainDecoder $decoder;
 
     /**
      * @var array<string, array<string, array<bool>>>

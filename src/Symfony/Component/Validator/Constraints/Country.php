@@ -27,8 +27,8 @@ class Country extends Constraint
         self::NO_SUCH_COUNTRY_ERROR => 'NO_SUCH_COUNTRY_ERROR',
     ];
 
-    public $message = 'This value is not a valid country.';
-    public $alpha3 = false;
+    public string $message = 'This value is not a valid country.';
+    public bool $alpha3 = false;
 
     public function __construct(
         array $options = null,

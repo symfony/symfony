@@ -21,7 +21,7 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
     /**
      * @var EngineInterface[]
      */
-    protected $engines = [];
+    protected array $engines = [];
 
     /**
      * @param EngineInterface[] $engines An array of EngineInterface instances to add

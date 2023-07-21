@@ -19,5 +19,5 @@ class PositiveOrZero extends GreaterThanOrEqual
 {
     use ZeroComparisonConstraintTrait;
 
-    public $message = 'This value should be either positive or zero.';
+    public string $message = 'This value should be either positive or zero.';
 }

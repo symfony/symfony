@@ -30,7 +30,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class HttpKernelBrowser extends AbstractBrowser
 {
-    protected $kernel;
+    protected HttpKernelInterface $kernel;
     private bool $catchExceptions = true;
 
     /**

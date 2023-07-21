@@ -27,12 +27,12 @@ use Symfony\Component\Console\Exception\RuntimeException;
  */
 abstract class Input implements InputInterface, StreamableInputInterface
 {
-    protected $definition;
+    protected InputDefinition $definition;
     /** @var resource */
     protected $stream;
-    protected $options = [];
-    protected $arguments = [];
-    protected $interactive = true;
+    protected array $options = [];
+    protected array $arguments = [];
+    protected bool $interactive = true;
 
     public function __construct(InputDefinition $definition = null)
     {

@@ -29,17 +29,17 @@ abstract class BaseNode implements NodeInterface
     private static array $placeholderUniquePrefixes = [];
     private static array $placeholders = [];
 
-    protected $name;
-    protected $parent;
-    protected $normalizationClosures = [];
-    protected $normalizedTypes = [];
-    protected $finalValidationClosures = [];
-    protected $allowOverwrite = true;
-    protected $required = false;
-    protected $deprecation = [];
-    protected $equivalentValues = [];
-    protected $attributes = [];
-    protected $pathSeparator;
+    protected string $name;
+    protected ?NodeInterface $parent;
+    protected array $normalizationClosures = [];
+    protected array $normalizedTypes = [];
+    protected array $finalValidationClosures = [];
+    protected bool $allowOverwrite = true;
+    protected bool $required = false;
+    protected array $deprecation = [];
+    protected array $equivalentValues = [];
+    protected array $attributes = [];
+    protected string $pathSeparator;
 
     private mixed $handlingPlaceholder = null;
 

@@ -27,7 +27,7 @@ class Time extends Constraint
         self::INVALID_TIME_ERROR => 'INVALID_TIME_ERROR',
     ];
 
-    public $message = 'This value is not a valid time.';
+    public string $message = 'This value is not a valid time.';
 
     public function __construct(
         array $options = null,

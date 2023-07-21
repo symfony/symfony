@@ -21,13 +21,13 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class CliDumper extends AbstractDumper
 {
-    public static $defaultColors;
+    public static bool $defaultColors;
     /** @var callable|resource|string|null */
     public static $defaultOutput = 'php://stdout';
 
-    protected $colors;
-    protected $maxStringWidth = 0;
-    protected $styles = [
+    protected bool $colors;
+    protected int $maxStringWidth = 0;
+    protected array $styles = [
         // See http://en.wikipedia.org/wiki/ANSI_escape_code#graphics
         'default' => '0;38;5;208',
         'num' => '1;38;5;38',
@@ -43,8 +43,8 @@ class CliDumper extends AbstractDumper
         'index' => '38;5;38',
     ];
 
-    protected static $controlCharsRx = '/[\x00-\x1F\x7F]+/';
-    protected static $controlCharsMap = [
+    protected static string $controlCharsRx = '/[\x00-\x1F\x7F]+/';
+    protected static array $controlCharsMap = [
         "\t" => '\t',
         "\n" => '\n',
         "\v" => '\v',
@@ -52,10 +52,10 @@ class CliDumper extends AbstractDumper
         "\r" => '\r',
         "\033" => '\e',
     ];
-    protected static $unicodeCharsRx = "/[\u{00A0}\u{00AD}\u{034F}\u{061C}\u{115F}\u{1160}\u{17B4}\u{17B5}\u{180E}\u{2000}-\u{200F}\u{202F}\u{205F}\u{2060}-\u{2064}\u{206A}-\u{206F}\u{3000}\u{2800}\u{3164}\u{FEFF}\u{FFA0}\u{1D159}\u{1D173}-\u{1D17A}]/u";
+    protected static string $unicodeCharsRx = "/[\u{00A0}\u{00AD}\u{034F}\u{061C}\u{115F}\u{1160}\u{17B4}\u{17B5}\u{180E}\u{2000}-\u{200F}\u{202F}\u{205F}\u{2060}-\u{2064}\u{206A}-\u{206F}\u{3000}\u{2800}\u{3164}\u{FEFF}\u{FFA0}\u{1D159}\u{1D173}-\u{1D17A}]/u";
 
-    protected $collapseNextHash = false;
-    protected $expandNextHash = false;
+    protected bool $collapseNextHash = false;
+    protected bool $expandNextHash = false;
 
     private array $displayOptions = [
         'fileLinkFormat' => null,

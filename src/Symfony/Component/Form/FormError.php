@@ -20,9 +20,9 @@ use Symfony\Component\Form\Exception\BadMethodCallException;
  */
 class FormError
 {
-    protected $messageTemplate;
-    protected $messageParameters;
-    protected $messagePluralization;
+    protected string $messageTemplate;
+    protected array $messageParameters;
+    protected ?int $messagePluralization;
 
     private string $message;
     private mixed $cause;

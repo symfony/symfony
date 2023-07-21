@@ -16,10 +16,7 @@ namespace Symfony\Component\Serializer;
  */
 trait SerializerAwareTrait
 {
-    /**
-     * @var SerializerInterface
-     */
-    protected $serializer;
+    protected SerializerInterface $serializer;
 
     public function setSerializer(SerializerInterface $serializer): void
     {

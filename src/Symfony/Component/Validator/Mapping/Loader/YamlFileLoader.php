@@ -24,12 +24,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 class YamlFileLoader extends FileLoader
 {
-    /**
-     * An array of YAML class descriptions.
-     *
-     * @var array
-     */
-    protected $classes;
+    protected array $classes;
 
     public function __construct(string $file)
     {

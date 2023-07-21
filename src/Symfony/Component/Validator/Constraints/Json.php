@@ -25,7 +25,7 @@ class Json extends Constraint
         self::INVALID_JSON_ERROR => 'INVALID_JSON_ERROR',
     ];
 
-    public $message = 'This value should be valid JSON.';
+    public string $message = 'This value should be valid JSON.';
 
     public function __construct(array $options = null, string $message = null, array $groups = null, mixed $payload = null)
     {

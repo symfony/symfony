@@ -22,9 +22,9 @@ use Symfony\Component\Validator\Exception\LogicException;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class When extends Composite
 {
-    public $expression;
-    public $constraints = [];
-    public $values = [];
+    public string|Expression $expression;
+    public array|Constraint $constraints = [];
+    public array $values = [];
 
     public function __construct(string|Expression|array $expression, array|Constraint $constraints = null, array $values = null, array $groups = null, $payload = null, array $options = [])
     {

@@ -23,9 +23,9 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
  */
 class VariableNode extends BaseNode implements PrototypeNodeInterface
 {
-    protected $defaultValueSet = false;
-    protected $defaultValue;
-    protected $allowEmptyValue = true;
+    protected bool $defaultValueSet = false;
+    protected mixed $defaultValue = null;
+    protected bool $allowEmptyValue = true;
 
     public function setDefaultValue(mixed $value): void
     {

@@ -45,6 +45,16 @@ diff --git a/src/Symfony/Component/BrowserKit/AbstractBrowser.php b/src/Symfony/
 +    protected function filterResponse(object $response): Response
      {
          return $response;
+diff --git a/src/Symfony/Component/Config/Definition/Builder/NodeDefinition.php b/src/Symfony/Component/Config/Definition/Builder/NodeDefinition.php
+--- a/src/Symfony/Component/Config/Definition/Builder/NodeDefinition.php
++++ b/src/Symfony/Component/Config/Definition/Builder/NodeDefinition.php
+@@ -94,5 +94,5 @@ abstract class NodeDefinition implements NodeParentInterface
+      * @return NodeParentInterface|NodeBuilder|NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition
+      */
+-    public function end(): NodeParentInterface
++    public function end(): NodeParentInterface|NodeBuilder|NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition
+     {
+         return $this->parent;
 diff --git a/src/Symfony/Component/Console/Command/Command.php b/src/Symfony/Component/Console/Command/Command.php
 --- a/src/Symfony/Component/Console/Command/Command.php
 +++ b/src/Symfony/Component/Console/Command/Command.php
@@ -72,14 +82,14 @@ diff --git a/src/Symfony/Component/Console/Command/Command.php b/src/Symfony/Com
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/AbstractRecursivePass.php b/src/Symfony/Component/DependencyInjection/Compiler/AbstractRecursivePass.php
 --- a/src/Symfony/Component/DependencyInjection/Compiler/AbstractRecursivePass.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/AbstractRecursivePass.php
-@@ -41,5 +41,5 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
+@@ -38,5 +38,5 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
       * @return void
       */
 -    public function process(ContainerBuilder $container)
 +    public function process(ContainerBuilder $container): void
      {
          $this->container = $container;
-@@ -72,5 +72,5 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
+@@ -69,5 +69,5 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
       * @return mixed
       */
 -    protected function processValue(mixed $value, bool $isRoot = false)
@@ -278,28 +288,28 @@ diff --git a/src/Symfony/Component/Form/FormTypeInterface.php b/src/Symfony/Comp
 diff --git a/src/Symfony/Component/HttpKernel/Bundle/Bundle.php b/src/Symfony/Component/HttpKernel/Bundle/Bundle.php
 --- a/src/Symfony/Component/HttpKernel/Bundle/Bundle.php
 +++ b/src/Symfony/Component/HttpKernel/Bundle/Bundle.php
-@@ -38,5 +38,5 @@ abstract class Bundle implements BundleInterface
+@@ -35,5 +35,5 @@ abstract class Bundle implements BundleInterface
       * @return void
       */
 -    public function boot()
 +    public function boot(): void
      {
      }
-@@ -45,5 +45,5 @@ abstract class Bundle implements BundleInterface
+@@ -42,5 +42,5 @@ abstract class Bundle implements BundleInterface
       * @return void
       */
 -    public function shutdown()
 +    public function shutdown(): void
      {
      }
-@@ -55,5 +55,5 @@ abstract class Bundle implements BundleInterface
+@@ -52,5 +52,5 @@ abstract class Bundle implements BundleInterface
       * @return void
       */
 -    public function build(ContainerBuilder $container)
 +    public function build(ContainerBuilder $container): void
      {
      }
-@@ -125,5 +125,5 @@ abstract class Bundle implements BundleInterface
+@@ -122,5 +122,5 @@ abstract class Bundle implements BundleInterface
       * @return void
       */
 -    public function registerCommands(Application $application)

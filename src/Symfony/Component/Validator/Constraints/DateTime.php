@@ -29,8 +29,8 @@ class DateTime extends Constraint
         self::INVALID_TIME_ERROR => 'INVALID_TIME_ERROR',
     ];
 
-    public $format = 'Y-m-d H:i:s';
-    public $message = 'This value is not a valid datetime.';
+    public string $format = 'Y-m-d H:i:s';
+    public string $message = 'This value is not a valid datetime.';
 
     public function __construct(string|array $format = null, string $message = null, array $groups = null, mixed $payload = null, array $options = [])
     {

@@ -24,7 +24,7 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class AnnotationFileLoader extends FileLoader
 {
-    protected $loader;
+    protected AnnotationClassLoader $loader;
 
     public function __construct(FileLocatorInterface $locator, AnnotationClassLoader $loader)
     {

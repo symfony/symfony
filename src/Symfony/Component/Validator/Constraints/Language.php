@@ -27,8 +27,8 @@ class Language extends Constraint
         self::NO_SUCH_LANGUAGE_ERROR => 'NO_SUCH_LANGUAGE_ERROR',
     ];
 
-    public $message = 'This value is not a valid language.';
-    public $alpha3 = false;
+    public string $message = 'This value is not a valid language.';
+    public bool $alpha3 = false;
 
     public function __construct(
         array $options = null,

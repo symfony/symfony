@@ -29,14 +29,14 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
     /** @var callable|resource|string|null */
     public static $defaultOutput = 'php://output';
 
-    protected $line = '';
+    protected string $line = '';
     /** @var callable|null */
     protected $lineDumper;
     /** @var resource|null */
     protected $outputStream;
-    protected $decimalPoint = '.';
-    protected $indentPad = '  ';
-    protected $flags;
+    protected string $decimalPoint = '.';
+    protected string $indentPad = '  ';
+    protected int $flags;
 
     private string $charset = '';
 

@@ -52,14 +52,14 @@ abstract class Constraint
     /**
      * Domain-specific data attached to a constraint.
      */
-    public $payload;
+    public mixed $payload;
 
     /**
      * The groups that the constraint belongs to.
      *
      * @var string[]
      */
-    public $groups;
+    public ?array $groups = null;
 
     /**
      * Returns the name of the given error code.

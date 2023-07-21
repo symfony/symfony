@@ -37,14 +37,14 @@ abstract class FileLoader extends BaseFileLoader
 {
     public const ANONYMOUS_ID_REGEXP = '/^\.\d+_[^~]*+~[._a-zA-Z\d]{7}$/';
 
-    protected $container;
-    protected $isLoadingInstanceof = false;
-    protected $instanceof = [];
-    protected $interfaces = [];
-    protected $singlyImplemented = [];
+    protected ContainerBuilder $container;
+    protected bool $isLoadingInstanceof = false;
+    protected array $instanceof = [];
+    protected array $interfaces = [];
+    protected array $singlyImplemented = [];
     /** @var array<string, Alias> */
-    protected $aliases = [];
-    protected $autoRegisterAliasesForSinglyImplementedInterfaces = true;
+    protected array $aliases = [];
+    protected bool $autoRegisterAliasesForSinglyImplementedInterfaces = true;
 
     public function __construct(ContainerBuilder $container, FileLocatorInterface $locator, string $env = null)
     {

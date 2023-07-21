@@ -30,6 +30,7 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Context\ExecutionContext;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Mapping\MetadataInterface;
 use Symfony\Component\Validator\Mapping\PropertyMetadata;
 use Symfony\Component\Validator\Validator\ContextualValidatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -44,24 +45,22 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 abstract class ConstraintValidatorTestCase extends TestCase
 {
-    /**
-     * @var ExecutionContextInterface
-     */
-    protected $context;
+    protected ExecutionContextInterface $context;
 
     /**
      * @var T
      */
-    protected $validator;
+    protected ConstraintValidatorInterface $validator;
 
-    protected $group;
-    protected $metadata;
-    protected $object;
-    protected $value;
-    protected $root;
-    protected $propertyPath;
-    protected $constraint;
-    protected $defaultTimezone;
+    protected string $group;
+    protected ?MetadataInterface $metadata;
+    protected mixed $object;
+    protected mixed $value;
+    protected mixed $root;
+    protected string $propertyPath;
+    protected Constraint $constraint;
+    protected ?string $defaultTimezone = null;
+
     private string $defaultLocale;
     private array $expectedViolations;
     private int $call;

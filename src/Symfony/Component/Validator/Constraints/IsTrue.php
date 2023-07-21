@@ -25,7 +25,7 @@ class IsTrue extends Constraint
         self::NOT_TRUE_ERROR => 'NOT_TRUE_ERROR',
     ];
 
-    public $message = 'This value should be true.';
+    public string $message = 'This value should be true.';
 
     public function __construct(array $options = null, string $message = null, array $groups = null, mixed $payload = null)
     {

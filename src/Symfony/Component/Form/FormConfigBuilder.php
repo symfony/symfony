@@ -26,13 +26,12 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  */
 class FormConfigBuilder implements FormConfigBuilderInterface
 {
+    protected bool $locked = false;
+
     /**
      * Caches a globally unique {@link NativeRequestHandler} instance.
      */
     private static NativeRequestHandler $nativeRequestHandler;
-
-    /** @var bool */
-    protected $locked = false;
 
     private EventDispatcherInterface $dispatcher;
     private string $name;

@@ -18,20 +18,9 @@ namespace Symfony\Component\DomCrawler;
  */
 abstract class AbstractUriElement
 {
-    /**
-     * @var \DOMElement
-     */
-    protected $node;
-
-    /**
-     * @var string|null The method to use for the element
-     */
-    protected $method;
-
-    /**
-     * @var string The URI of the page where the element is embedded (or the base href)
-     */
-    protected $currentUri;
+    protected \DOMElement $node;
+    protected ?string $method;
+    protected ?string $currentUri;
 
     /**
      * @param \DOMElement $node       A \DOMElement instance

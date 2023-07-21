@@ -26,9 +26,9 @@ use Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface;
  */
 class ControllerReference
 {
-    public $controller;
-    public $attributes = [];
-    public $query = [];
+    public string $controller;
+    public array $attributes = [];
+    public array $query = [];
 
     /**
      * @param string $controller The controller name

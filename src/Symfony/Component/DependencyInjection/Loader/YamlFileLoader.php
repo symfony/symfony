@@ -110,12 +110,12 @@ class YamlFileLoader extends FileLoader
         'bind' => 'bind',
     ];
 
-    private YamlParser $yamlParser;
+    protected bool $autoRegisterAliasesForSinglyImplementedInterfaces = false;
 
+    private YamlParser $yamlParser;
     private int $anonymousServicesCount;
     private string $anonymousServicesSuffix;
 
-    protected $autoRegisterAliasesForSinglyImplementedInterfaces = false;
 
     public function load(mixed $resource, string $type = null): mixed
     {

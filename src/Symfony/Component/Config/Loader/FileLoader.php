@@ -25,9 +25,9 @@ use Symfony\Component\Config\Resource\GlobResource;
  */
 abstract class FileLoader extends Loader
 {
-    protected static $loading = [];
+    protected static array $loading = [];
 
-    protected $locator;
+    protected FileLocatorInterface $locator;
 
     private ?string $currentDir = null;
 

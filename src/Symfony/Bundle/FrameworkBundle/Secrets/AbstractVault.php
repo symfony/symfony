@@ -16,7 +16,7 @@ namespace Symfony\Bundle\FrameworkBundle\Secrets;
  */
 abstract class AbstractVault
 {
-    protected $lastMessage;
+    protected ?string $lastMessage = null;
 
     public function getLastMessage(): ?string
     {

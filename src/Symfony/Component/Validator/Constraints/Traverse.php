@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class Traverse extends Constraint
 {
-    public $traverse = true;
+    public bool $traverse = true;
 
     public function __construct(bool|array $traverse = null)
     {

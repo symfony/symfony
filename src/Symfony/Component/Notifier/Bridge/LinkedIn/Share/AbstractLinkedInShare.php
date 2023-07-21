@@ -16,7 +16,7 @@ namespace Symfony\Component\Notifier\Bridge\LinkedIn\Share;
  */
 abstract class AbstractLinkedInShare
 {
-    protected $options = [];
+    protected array $options = [];
 
     public function toArray(): array
     {

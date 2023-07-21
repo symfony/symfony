@@ -29,17 +29,17 @@ class Choice extends Constraint
         self::TOO_MANY_ERROR => 'TOO_MANY_ERROR',
     ];
 
-    public $choices;
+    public ?array $choices = null;
     /** @var callable|string|null */
     public $callback;
-    public $multiple = false;
-    public $strict = true;
-    public $min;
-    public $max;
-    public $message = 'The value you selected is not a valid choice.';
-    public $multipleMessage = 'One or more of the given values is invalid.';
-    public $minMessage = 'You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.';
-    public $maxMessage = 'You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.';
+    public bool $multiple = false;
+    public bool $strict = true;
+    public ?int $min = null;
+    public ?int $max = null;
+    public string $message = 'The value you selected is not a valid choice.';
+    public string $multipleMessage = 'One or more of the given values is invalid.';
+    public string $minMessage = 'You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.';
+    public string $maxMessage = 'You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.';
     public bool $match = true;
 
     public function getDefaultOption(): ?string

@@ -23,7 +23,8 @@ use Symfony\Contracts\EventDispatcher\Event as BaseEvent;
  */
 class Event extends BaseEvent
 {
-    protected $context;
+    protected array $context;
+
     private object $subject;
     private Marking $marking;
     private ?Transition $transition;

@@ -21,7 +21,7 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class DataTransformerChain implements DataTransformerInterface
 {
-    protected $transformers;
+    protected array $transformers;
 
     /**
      * Uses the given value transformers to transform values.

@@ -35,15 +35,15 @@ class Range extends Constraint
         self::TOO_LOW_ERROR => 'TOO_LOW_ERROR',
     ];
 
-    public $notInRangeMessage = 'This value should be between {{ min }} and {{ max }}.';
-    public $minMessage = 'This value should be {{ limit }} or more.';
-    public $maxMessage = 'This value should be {{ limit }} or less.';
-    public $invalidMessage = 'This value should be a valid number.';
-    public $invalidDateTimeMessage = 'This value should be a valid datetime.';
-    public $min;
-    public $minPropertyPath;
-    public $max;
-    public $maxPropertyPath;
+    public string $notInRangeMessage = 'This value should be between {{ min }} and {{ max }}.';
+    public string $minMessage = 'This value should be {{ limit }} or more.';
+    public string $maxMessage = 'This value should be {{ limit }} or less.';
+    public string $invalidMessage = 'This value should be a valid number.';
+    public string $invalidDateTimeMessage = 'This value should be a valid datetime.';
+    public mixed $min = null;
+    public ?string $minPropertyPath = null;
+    public mixed $max = null;
+    public ?string $maxPropertyPath = null;
 
     public function __construct(
         array $options = null,

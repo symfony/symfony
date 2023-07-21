@@ -33,7 +33,7 @@ abstract class AbstractLoader implements LoaderInterface
      */
     public const DEFAULT_NAMESPACE = '\\Symfony\\Component\\Validator\\Constraints\\';
 
-    protected $namespaces = [];
+    protected array $namespaces = [];
 
     /**
      * @var array<class-string, bool>

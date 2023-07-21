@@ -28,7 +28,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 final class ObjectNormalizer extends AbstractObjectNormalizer
 {
-    protected $propertyAccessor;
+    protected PropertyAccessorInterface $propertyAccessor;
 
     /** @var array<string, string|null> */
     private array $discriminatorCache = [];

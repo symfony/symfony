@@ -18,7 +18,7 @@ namespace Symfony\Component\Templating\Storage;
  */
 abstract class Storage
 {
-    protected $template;
+    protected string $template;
 
     /**
      * @param string $template The template name

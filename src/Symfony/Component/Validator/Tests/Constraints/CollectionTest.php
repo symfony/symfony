@@ -24,22 +24,6 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  */
 class CollectionTest extends TestCase
 {
-    public function testRejectInvalidFieldsOption()
-    {
-        $this->expectException(ConstraintDefinitionException::class);
-        new Collection([
-            'fields' => 'foo',
-        ]);
-    }
-
-    public function testRejectNonConstraints()
-    {
-        $this->expectException(ConstraintDefinitionException::class);
-        new Collection([
-            'foo' => 'bar',
-        ]);
-    }
-
     public function testRejectValidConstraint()
     {
         $this->expectException(ConstraintDefinitionException::class);

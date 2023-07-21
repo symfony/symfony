@@ -29,7 +29,7 @@ abstract class AbstractConfigurator
     /**
      * @var \Closure(mixed, bool):mixed|null
      */
-    public static $valuePreProcessor;
+    public static ?\Closure $valuePreProcessor = null;
 
     /** @internal */
     protected Definition|Alias|null $definition = null;

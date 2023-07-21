@@ -23,12 +23,12 @@ use Symfony\Component\Config\Definition\Exception\UnsetKeyException;
  */
 class PrototypedArrayNode extends ArrayNode
 {
-    protected $prototype;
-    protected $keyAttribute;
-    protected $removeKeyAttribute = false;
-    protected $minNumberOfElements = 0;
-    protected $defaultValue = [];
-    protected $defaultChildren;
+    protected PrototypeNodeInterface $prototype;
+    protected ?string $keyAttribute = null;
+    protected bool $removeKeyAttribute = false;
+    protected int $minNumberOfElements = 0;
+    protected array $defaultValue = [];
+    protected ?array $defaultChildren = null;
     /**
      * @var NodeInterface[] An array of the prototypes of the simplified value children
      */

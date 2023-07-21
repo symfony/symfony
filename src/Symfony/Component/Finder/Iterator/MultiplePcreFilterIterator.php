@@ -23,8 +23,8 @@ namespace Symfony\Component\Finder\Iterator;
  */
 abstract class MultiplePcreFilterIterator extends \FilterIterator
 {
-    protected $matchRegexps = [];
-    protected $noMatchRegexps = [];
+    protected array $matchRegexps = [];
+    protected array $noMatchRegexps = [];
 
     /**
      * @param \Iterator<TKey, TValue> $iterator        The Iterator to filter

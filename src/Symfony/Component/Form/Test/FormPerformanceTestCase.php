@@ -25,10 +25,7 @@ abstract class FormPerformanceTestCase extends FormIntegrationTestCase
 {
     use VersionAwareTest;
 
-    /**
-     * @var int
-     */
-    protected $maxRunningTime = 0;
+    protected int $maxRunningTime = 0;
 
     protected function runTest()
     {

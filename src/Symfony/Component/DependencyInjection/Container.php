@@ -50,16 +50,16 @@ class_exists(ArgumentServiceLocator::class);
  */
 class Container implements ContainerInterface, ResetInterface
 {
-    protected $parameterBag;
-    protected $services = [];
-    protected $privates = [];
-    protected $fileMap = [];
-    protected $methodMap = [];
-    protected $factories = [];
-    protected $aliases = [];
-    protected $loading = [];
-    protected $resolving = [];
-    protected $syntheticIds = [];
+    protected ParameterBagInterface $parameterBag;
+    protected array $services = [];
+    protected array $privates = [];
+    protected array $fileMap = [];
+    protected array $methodMap = [];
+    protected array $factories = [];
+    protected array $aliases = [];
+    protected array $loading = [];
+    protected array $resolving = [];
+    protected array $syntheticIds = [];
 
     private array $envCache = [];
     private bool $compiled = false;

@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 abstract class Dumper implements DumperInterface
 {
-    protected $container;
+    protected ContainerBuilder $container;
 
     public function __construct(ContainerBuilder $container)
     {

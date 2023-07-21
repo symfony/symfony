@@ -21,7 +21,7 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
  */
 class ChainLoader extends Loader
 {
-    protected $loaders = [];
+    protected array $loaders = [];
 
     /**
      * @param LoaderInterface[] $loaders

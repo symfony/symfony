@@ -58,13 +58,13 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     /**
      * @var array<string, BundleInterface>
      */
-    protected $bundles = [];
+    protected array $bundles = [];
 
-    protected $container;
-    protected $environment;
-    protected $debug;
-    protected $booted = false;
-    protected $startTime;
+    protected ?ContainerInterface $container = null;
+    protected string $environment;
+    protected bool $debug;
+    protected bool $booted = false;
+    protected ?float $startTime = null;
 
     private string $projectDir;
     private ?string $warmupDir = null;

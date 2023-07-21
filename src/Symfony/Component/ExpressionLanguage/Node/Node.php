@@ -20,8 +20,8 @@ use Symfony\Component\ExpressionLanguage\Compiler;
  */
 class Node
 {
-    public $nodes = [];
-    public $attributes = [];
+    public array $nodes = [];
+    public array $attributes = [];
 
     /**
      * @param array $nodes      An array of nodes

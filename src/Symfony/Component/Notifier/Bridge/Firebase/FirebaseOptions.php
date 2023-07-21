@@ -25,7 +25,7 @@ abstract class FirebaseOptions implements MessageOptionsInterface
     /**
      * @see https://firebase.google.com/docs/cloud-messaging/xmpp-server-ref.html#notification-payload-support
      */
-    protected $options;
+    protected array $options;
 
     private array $data;
 

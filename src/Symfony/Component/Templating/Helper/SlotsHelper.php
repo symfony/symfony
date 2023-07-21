@@ -18,8 +18,8 @@ namespace Symfony\Component\Templating\Helper;
  */
 class SlotsHelper extends Helper
 {
-    protected $slots = [];
-    protected $openSlots = [];
+    protected array $slots = [];
+    protected array $openSlots = [];
 
     /**
      * Starts a new slot.

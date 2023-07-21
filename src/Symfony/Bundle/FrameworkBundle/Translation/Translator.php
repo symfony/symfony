@@ -24,10 +24,9 @@ use Symfony\Component\Translation\Translator as BaseTranslator;
  */
 class Translator extends BaseTranslator implements WarmableInterface
 {
-    protected $container;
-    protected $loaderIds;
-
-    protected $options = [
+    protected ContainerInterface $container;
+    protected array $loaderIds;
+    protected array $options = [
         'cache_dir' => null,
         'debug' => false,
         'resource_files' => [],

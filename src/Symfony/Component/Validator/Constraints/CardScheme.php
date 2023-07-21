@@ -43,8 +43,8 @@ class CardScheme extends Constraint
         self::INVALID_FORMAT_ERROR => 'INVALID_FORMAT_ERROR',
     ];
 
-    public $message = 'Unsupported card type or invalid card number.';
-    public $schemes;
+    public string $message = 'Unsupported card type or invalid card number.';
+    public array|string|null $schemes = null;
 
     public function __construct(array|string|null $schemes, string $message = null, array $groups = null, mixed $payload = null, array $options = [])
     {

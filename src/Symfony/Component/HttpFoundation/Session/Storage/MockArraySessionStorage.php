@@ -27,40 +27,17 @@ use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
  */
 class MockArraySessionStorage implements SessionStorageInterface
 {
-    /**
-     * @var string
-     */
-    protected $id = '';
+    protected string $id = '';
+    protected string $name;
+    protected bool $started = false;
+    protected bool $closed = false;
+    protected array $data = [];
+    protected MetadataBag $metadataBag;
 
     /**
-     * @var string
+     * @var SessionBagInterface[]
      */
-    protected $name;
-
-    /**
-     * @var bool
-     */
-    protected $started = false;
-
-    /**
-     * @var bool
-     */
-    protected $closed = false;
-
-    /**
-     * @var array
-     */
-    protected $data = [];
-
-    /**
-     * @var MetadataBag
-     */
-    protected $metadataBag;
-
-    /**
-     * @var array|SessionBagInterface[]
-     */
-    protected $bags = [];
+    protected array $bags = [];
 
     public function __construct(string $name = 'MOCKSESSID', MetadataBag $metaBag = null)
     {

@@ -58,7 +58,7 @@ class Entity extends EntityParent implements EntityInterfaceB
     /**
      * @Assert\Type("integer")
      */
-    protected $other;
+    protected ?int $other;
 
     public function __construct($internal = null)
     {

@@ -37,17 +37,11 @@ class KafkaTransportFactory implements TransportFactoryInterface
         }
     }
 
-    /**
-     * @psalm-param array<string, bool|float|int|string|array<string>> $options
-     */
     public function createTransport(#[\SensitiveParameter] string $dsn, array $options, SerializerInterface $serializer): TransportInterface
     {
         return new KafkaTransport(Connection::fromDsn($dsn, $options, $this->logger, $this->kafkaFactory), $serializer);
     }
 
-    /**
-     * @psalm-param array<string, bool|float|int|string|array<string>> $options
-     */
     public function supports(#[\SensitiveParameter] string $dsn, array $options): bool
     {
         return str_starts_with($dsn, 'kafka://');

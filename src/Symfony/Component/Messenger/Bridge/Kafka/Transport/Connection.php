@@ -74,7 +74,6 @@ class Connection
         $this->kafkaFactory = $kafkaFactory ?? new KafkaFactory($logger);
     }
 
-    /** @psalm-param array<string, bool|float|int|string|array<string>> $options */
     public static function fromDsn(string $dsn, array $options, LoggerInterface $logger, KafkaFactory $kafkaFactory): self
     {
         $options = self::setupOptions($dsn, $options);
@@ -109,7 +108,6 @@ class Connection
         ];
     }
 
-    /** @psalm-param array<string, bool|float|int|string|array<string>> $options */
     private static function setupConsumerOptions(string $brokerList, array $configOptions): array
     {
         if (0 === \count($configOptions)) {
@@ -152,7 +150,6 @@ class Connection
         return $options;
     }
 
-    /** @psalm-param array<string, bool|float|int|string|array<string>> $options */
     private static function setupProducerOptions(string $brokerList, array $configOptions): array
     {
         if (0 === \count($configOptions)) {

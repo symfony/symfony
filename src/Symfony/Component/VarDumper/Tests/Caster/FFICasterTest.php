@@ -213,7 +213,7 @@ class FFICasterTest extends TestCase
         \FFI::memcpy($pointer, $actualMessage, $actualLength);
 
         // Remove automatically addition of the trailing "\0" and remove trailing "\0"
-        $pointer = \FFI::cdef()->cast('char*', \FFI::cast('void*', $pointer));
+        $pointer = \FFI::cdef()->cast('char*', \FFI::cdef()->cast('void*', $pointer));
         $pointer[$actualLength] = "\x01";
 
         $this->assertDumpMatchesFormat(<<<PHP

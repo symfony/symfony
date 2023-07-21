@@ -53,6 +53,7 @@ final class CachePoolClearCommand extends Command
                 new InputArgument('pools', InputArgument::IS_ARRAY | InputArgument::OPTIONAL, 'A list of cache pools or cache pool clearers'),
             ])
             ->addOption('all', null, InputOption::VALUE_NONE, 'Clear all cache pools')
+            ->addOption('exclude', null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'A list of cache pools or cache pool clearers to exclude')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command clears the given cache pools or cache pool clearers.
 
@@ -70,16 +71,22 @@ EOF
         $clearers = [];
 
         $poolNames = $input->getArgument('pools');
+        $excludedPoolNames = $input->getOption('exclude');
         if ($input->getOption('all')) {
             if (!$this->poolNames) {
                 throw new InvalidArgumentException('Could not clear all cache pools, try specifying a specific pool or cache clearer.');
             }
 
-            $io->comment('Clearing all cache pools...');
+            if (!$excludedPoolNames) {
+                $io->comment('Clearing all cache pools...');
+            }
+
             $poolNames = $this->poolNames;
         } elseif (!$poolNames) {
             throw new InvalidArgumentException('Either specify at least one pool name, or provide the --all option to clear all pools.');
         }
+
+        $poolNames = array_diff($poolNames, $excludedPoolNames);
 
         foreach ($poolNames as $id) {
             if ($this->poolClearer->hasPool($id)) {

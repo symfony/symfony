@@ -8,6 +8,7 @@ CHANGELOG
  * Allow an array of `pattern` in firewall configuration
  * Add `$badges` argument to `Security::login`
  * Deprecate the `require_previous_session` config option. Setting it has no effect anymore
+ * Add `LogoutRouteLoader`
 
 6.3
 ---

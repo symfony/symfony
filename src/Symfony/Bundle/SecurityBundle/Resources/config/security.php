@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Bundle\SecurityBundle\CacheWarmer\ExpressionCacheWarmer;
 use Symfony\Bundle\SecurityBundle\EventListener\FirewallListener;
+use Symfony\Bundle\SecurityBundle\Routing\LogoutRouteLoader;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
@@ -228,6 +229,13 @@ return static function (ContainerConfigurator $container) {
                 service('router')->nullOnInvalid(),
                 service('security.token_storage')->nullOnInvalid(),
             ])
+
+        ->set('security.route_loader.logout', LogoutRouteLoader::class)
+            ->args([
+                '%security.logout_uris%',
+                'security.logout_uris',
+            ])
+            ->tag('routing.route_loader')
 
         // Provisioning
         ->set('security.user.provider.missing', MissingUserProvider::class)

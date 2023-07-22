@@ -49,6 +49,7 @@ use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\Pbkdf2PasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\PlaintextPasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
+use Symfony\Component\Routing\Loader\ContainerLoader;
 use Symfony\Component\Security\Core\Authorization\Strategy\AffirmativeStrategy;
 use Symfony\Component\Security\Core\Authorization\Strategy\ConsensusStrategy;
 use Symfony\Component\Security\Core\Authorization\Strategy\PriorityStrategy;
@@ -170,6 +171,13 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
 
         $this->createFirewalls($config, $container);
+
+        if ($container::willBeAvailable('symfony/routing', ContainerLoader::class, ['symfony/security-bundle'])) {
+            $this->createLogoutUrisParameter($config['firewalls'] ?? [], $container);
+        } else {
+            $container->removeDefinition('security.route_loader.logout');
+        }
+
         $this->createAuthorization($config, $container);
         $this->createRoleHierarchy($config, $container);
 
@@ -1094,5 +1102,21 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
 
         return $this->sortedFactories;
+    }
+
+    private function createLogoutUrisParameter(array $firewallsConfig, ContainerBuilder $container): void
+    {
+        $logoutUris = [];
+        foreach ($firewallsConfig as $name => $config) {
+            if (!$logoutPath = $config['logout']['path'] ?? null) {
+                continue;
+            }
+
+            if ('/' === $logoutPath[0]) {
+                $logoutUris[$name] = $logoutPath;
+            }
+        }
+
+        $container->setParameter('security.logout_uris', $logoutUris);
     }
 }

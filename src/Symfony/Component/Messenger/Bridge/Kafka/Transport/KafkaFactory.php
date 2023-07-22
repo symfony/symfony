@@ -31,7 +31,7 @@ class KafkaFactory
     ) {
     }
 
-    /** @psalm-param array<string, bool|float|int|string|array<string>> $kafkaConfig */
+    /** @psalm-param array<string, string> $kafkaConfig */
     public function createConsumer(array $kafkaConfig): KafkaConsumer
     {
         $conf = $this->getBaseConf();
@@ -55,7 +55,7 @@ class KafkaFactory
         return new KafkaConsumer($conf);
     }
 
-    /** @psalm-param array<string, bool|float|int|string|array<string>> $kafkaConfig */
+    /** @psalm-param array<string, string> $kafkaConfig */
     public function createProducer(array $kafkaConfig): Producer
     {
         $conf = $this->getBaseConf();

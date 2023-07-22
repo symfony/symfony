@@ -58,8 +58,8 @@ class Connection
     private KafkaFactory $kafkaFactory;
 
     /**
-     * @psalm-param array<string, bool|float|int|string|array<string>> $consumerConfig
-     * @psalm-param array<string, bool|float|int|string|array<string>> $producerConfig
+     * @psalm-param array{topics: list<string>, consume_timeout_ms: int, commit_async: bool, conf_options: array<string, string>} $consumerConfig
+     * @psalm-param array{topic: string, poll_timeout_ms: int, flush_timeout_ms: int, conf_options: array<string, string>} $producerConfig
      */
     private function __construct(
         private readonly array $consumerConfig,
@@ -293,6 +293,7 @@ class Connection
 
         $producer = $this->getProducer();
 
+        /** @psalm-var \RdKafka\ProducerTopic $topic */
         $topic = $producer->newTopic($this->producerConfig['topic']);
         $topic->producev(
             $partition,

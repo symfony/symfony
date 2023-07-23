@@ -25,6 +25,8 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
     public const URL_PATTERN_VERSION = 'https://data.jsdelivr.com/v1/packages/npm/%s/resolved?specifier=%s';
     public const URL_PATTERN_DIST = 'https://cdn.jsdelivr.net/npm/%s@%s%s/+esm';
 
+    public const IMPORT_REGEX = '{from"/npm/([^@]*@?[\S]+)@([^/]+)/\+esm"}';
+
     private HttpClientInterface $httpClient;
 
     public function __construct(
@@ -129,8 +131,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
     private function parseJsDelivrImports(string $content, array &$dependencies, bool $download, bool $preload): string
     {
         // imports from jsdelivr follow a predictable format
-        $regex = '{from"/npm/([^@]*@?[^@]+)@([^/]+)/\+esm"}';
-        $content = preg_replace_callback($regex, function ($matches) use (&$dependencies, $download, $preload) {
+        $content = preg_replace_callback(self::IMPORT_REGEX, function ($matches) use (&$dependencies, $download, $preload) {
             $packageName = $matches[1];
             $version = $matches[2];
 

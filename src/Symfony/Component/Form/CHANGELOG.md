@@ -14,6 +14,8 @@ CHANGELOG
 
  * Deprecate using `DateTime` or `DateTimeImmutable` model data with a different timezone than configured with the
    `model_timezone` option in `DateType`, `DateTimeType`, and `TimeType`
+ * Deprecate `PostSetDataEvent::setData()`, use `PreSetDataEvent::setData()` instead
+ * Deprecate `PostSubmitEvent::setData()`, use `PreSubmitDataEvent::setData()` or `SubmitDataEvent::setData()` instead
 
 6.3
 ---

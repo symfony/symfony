@@ -81,10 +81,6 @@ EOF
         $type = $workflow instanceof StateMachine ? 'state_machine' : 'workflow';
         $definition = $workflow->getDefinition();
 
-        if (null === $definition) {
-            throw new InvalidArgumentException(sprintf('No service found for "workflow.%1$s" nor "state_machine.%1$s".', $workflowName));
-        }
-
         switch ($input->getOption('dump-format')) {
             case 'puml':
                 $transitionType = 'workflow' === $type ? PlantUmlDumper::WORKFLOW_TRANSITION : PlantUmlDumper::STATEMACHINE_TRANSITION;

@@ -36,10 +36,10 @@ class RouteProcessor implements EventSubscriberInterface, ResetInterface
         $this->reset();
     }
 
-    public function __invoke(array|LogRecord $record): array|LogRecord
+    public function __invoke(LogRecord $record): LogRecord
     {
-        if ($this->routeData && !isset($record['extra']['requests'])) {
-            $record['extra']['requests'] = array_values($this->routeData);
+        if ($this->routeData && !isset($record->extra['requests'])) {
+            $record->extra['requests'] = array_values($this->routeData);
         }
 
         return $record;

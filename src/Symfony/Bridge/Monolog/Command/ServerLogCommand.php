@@ -13,7 +13,8 @@ namespace Symfony\Bridge\Monolog\Command;
 
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Handler\HandlerInterface;
-use Monolog\Logger;
+use Monolog\Level;
+use Monolog\LogRecord;
 use Symfony\Bridge\Monolog\Formatter\ConsoleFormatter;
 use Symfony\Bridge\Monolog\Handler\ConsoleHandler;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -86,7 +87,7 @@ EOF
         }
 
         $this->handler = new ConsoleHandler($output, true, [
-            OutputInterface::VERBOSITY_NORMAL => Logger::DEBUG,
+            OutputInterface::VERBOSITY_NORMAL => Level::Debug,
         ]);
 
         $this->handler->setFormatter(new ConsoleFormatter([
@@ -152,6 +153,18 @@ EOF
         }
         $logBlock = sprintf('<bg=%s> </>', self::BG_COLOR[$clientId % 8]);
         $output->write($logBlock);
+
+        $record = new LogRecord(
+            $record['datetime'],
+            $record['channel'],
+            Level::fromValue($record['level']),
+            $record['message'],
+            // We wrap context and extra, because they have been already dumped.
+            // So they are instance of Symfony\Component\VarDumper\Cloner\Data
+            // But LogRecord expects array
+            ['data' => $record['context']],
+            ['data' => $record['extra']],
+        );
 
         $this->handler->handle($record);
     }

@@ -78,7 +78,7 @@ class LoggerTest extends TestCase
         [$record] = $logger->getLogs();
 
         $this->assertEquals('test', $record['message']);
-        $this->assertEquals(Logger::INFO, $record['priority']);
+        $this->assertEquals(200, $record['priority']);
     }
 
     public function testGetLogsWithDebugProcessor3()

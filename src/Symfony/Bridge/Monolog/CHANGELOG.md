@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.0
+---
+
+ * Drop support for monolog < 3.0
+
 6.4
 ---
 

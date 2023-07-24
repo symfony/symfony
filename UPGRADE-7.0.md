@@ -99,6 +99,8 @@ Form
    `model_timezone` option in `DateType`, `DateTimeType`, and `TimeType`
  * Make the "widget" option of date/time form types default to "single_text"
  * Require explicit argument when calling `Button/Form::setParent()`, `ButtonBuilder/FormConfigBuilder::setDataMapper()`, `TransformationFailedException::setInvalidMessage()`
+ * `PostSetDataEvent::setData()` throws an exception, use `PreSetDataEvent::setData()` instead
+ * `PostSubmitEvent::setData()` throws an exception, use `PreSubmitDataEvent::setData()` or `SubmitDataEvent::setData()` instead
 
 FrameworkBundle
 ---------------

@@ -117,7 +117,7 @@ final class DebugCommand extends Command
         return [
             $messageName,
             $triggerName,
-            $recurringMessage->getTrigger()->getNextRunDate(now())->format(\DateTimeInterface::ATOM),
+            $recurringMessage->getTrigger()->getNextRunDate(now())?->format(\DateTimeInterface::ATOM) ?? '-',
         ];
     }
 }

@@ -26,6 +26,7 @@
     "require-dev": {
         "dragonmantank/cron-expression": "^3.1",
         "symfony/cache": "^5.4|^6.0",
+        "symfony/console": "^5.4|^6.0",
         "symfony/dependency-injection": "^5.4|^6.0",
         "symfony/lock": "^5.4|^6.0",
         "symfony/messenger": "^6.3"

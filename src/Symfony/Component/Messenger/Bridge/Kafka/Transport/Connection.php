@@ -74,15 +74,7 @@ class Connection
         $this->kafkaFactory = $kafkaFactory ?? new KafkaFactory($logger);
     }
 
-    public static function fromDsn(string $dsn, array $options, LoggerInterface $logger, KafkaFactory $kafkaFactory): self
-    {
-        $options = self::setupOptions($dsn, $options);
-
-        return new self($options['consumer'], $options['producer'], $logger, $kafkaFactory);
-    }
-
-    /** @psalm-param array<string, bool|float|int|string|array<string>> $options */
-    private static function setupOptions(string $dsn, array $options): array
+    public static function fromDsn(#[\SensitiveParameter] string $dsn, array $options, LoggerInterface $logger, KafkaFactory $kafkaFactory): self
     {
         $invalidOptions = array_diff(
             array_keys($options),
@@ -100,14 +92,23 @@ class Connection
             throw new LogicException('At least one of "consumer" or "producer" options is required for the Kafka Messenger transport.');
         }
 
-        $brokerList = implode(',', self::stripProtocol($dsn));
+        if (false === $parsedUrl = parse_url($dsn)) {
+            throw new \InvalidArgumentException(sprintf('The given Kafka DSN "%s" is invalid.', $dsn));
+        }
 
-        return [
-            'consumer' => self::setupConsumerOptions($brokerList, $options['consumer'] ?? []),
-            'producer' => self::setupProducerOptions($brokerList, $options['producer'] ?? []),
-        ];
+        if ('kafka' !== $parsedUrl['scheme']) {
+            throw new \InvalidArgumentException(sprintf('The given Kafka DSN "%s" must start with "kafka://".', $dsn));
+        }
+
+        return new self(
+            self::setupConsumerOptions($parsedUrl['host'], $options['consumer'] ?? []),
+            self::setupProducerOptions($parsedUrl['host'], $options['producer'] ?? []),
+            $logger,
+            $kafkaFactory,
+        );
     }
 
+    /** @psalm-param array<string, bool|float|int|string|array<string>> $configOptions */
     private static function setupConsumerOptions(string $brokerList, array $configOptions): array
     {
         if (0 === \count($configOptions)) {
@@ -150,6 +151,7 @@ class Connection
         return $options;
     }
 
+    /** @psalm-param array<string, bool|float|int|string|array<string>> $configOptions */
     private static function setupProducerOptions(string $brokerList, array $configOptions): array
     {
         if (0 === \count($configOptions)) {
@@ -203,16 +205,6 @@ class Connection
                 throw new LogicException(sprintf('Kafka config value "%s" must be a string, got "%s".', $key, get_debug_type($value)));
             }
         }
-    }
-
-    private static function stripProtocol(string $dsn): array
-    {
-        $brokers = [];
-        foreach (explode(',', $dsn) as $currentBroker) {
-            $brokers[] = str_replace(self::DSN_PROTOCOL_KAFKA, '', $currentBroker);
-        }
-
-        return $brokers;
     }
 
     public function get(): Message

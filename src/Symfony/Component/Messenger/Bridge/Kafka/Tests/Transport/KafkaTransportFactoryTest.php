@@ -36,7 +36,23 @@ class KafkaTransportFactoryTest extends TestCase
         self::assertInstanceOf(
             KafkaTransport::class,
             $this->factory->createTransport(
-                'kafka://',
+                'kafka://test',
+                [
+                    'producer' => [
+                        'topic' => 'messages',
+                    ],
+                ],
+                $this->serializer,
+            ),
+        );
+    }
+
+    public function testCreateTransportWithMultipleHosts()
+    {
+        self::assertInstanceOf(
+            KafkaTransport::class,
+            $this->factory->createTransport(
+                'kafka://test1,test2',
                 [
                     'producer' => [
                         'topic' => 'messages',

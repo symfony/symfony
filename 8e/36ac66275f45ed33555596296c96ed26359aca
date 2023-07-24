@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2023-07-22T23:26:20Z
+
+> please mind fabbot, it has useful hints
+
+The fact that it does not want me to fully qualify a `method_exists()` call always puzzles me. 🤷🏻‍♂️

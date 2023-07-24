@@ -11,10 +11,13 @@
 
 namespace Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses;
 
+use Symfony\Component\Routing\Annotation\Route;
+
 abstract class AbstractClass
 {
     abstract public function abstractRouteAction();
 
+    #[Route('/path/to/route/{arg1}')]
     public function routeAction($arg1, $arg2 = 'defaultValue2', $arg3 = 'defaultValue3')
     {
     }

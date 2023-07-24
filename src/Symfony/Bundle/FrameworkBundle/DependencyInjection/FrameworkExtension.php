@@ -140,6 +140,7 @@ use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\RateLimiter\Storage\CacheStorage;
 use Symfony\Component\RemoteEvent\Attribute\AsRemoteEventConsumer;
 use Symfony\Component\RemoteEvent\RemoteEvent;
+use Symfony\Component\Routing\Loader\AnnotationClassLoader;
 use Symfony\Component\Routing\Loader\Psr4DirectoryLoader;
 use Symfony\Component\Scheduler\Attribute\AsSchedule;
 use Symfony\Component\Scheduler\Messenger\SchedulerTransportFactory;
@@ -1167,6 +1168,13 @@ class FrameworkExtension extends Extension
 
         if (!class_exists(Psr4DirectoryLoader::class)) {
             $container->removeDefinition('routing.loader.psr4');
+        }
+
+        if ($this->isInitializedConfigEnabled('annotations') && (new \ReflectionClass(AnnotationClassLoader::class))->hasProperty('reader')) {
+            $container->getDefinition('routing.loader.annotation')->setArguments([
+                new Reference('annotation_reader'),
+                '%kernel.environment%',
+            ]);
         }
     }
 

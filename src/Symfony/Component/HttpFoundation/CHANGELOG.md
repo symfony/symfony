@@ -11,6 +11,7 @@ CHANGELOG
  * Throw an `InvalidArgumentException` when calling `Request::create()` with a malformed URI
  * Require explicit argument when calling `JsonResponse::setCallback()`, `Response::setExpires/setLastModified/setEtag()`, `MockArraySessionStorage/NativeSessionStorage::setMetadataBag()`, `NativeSessionStorage::setSaveHandler()`
  * Add argument `$statusCode` to `Response::sendHeaders()` and `StreamedResponse::sendHeaders()`
+ * Fixed float numbers in JSON string of JsonResponse - now it serialized to float even if it has no decimal part, e.g 1.0 became 1.0 and not just a 1 as integer
 
 6.4
 ---

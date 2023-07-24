@@ -12,9 +12,6 @@
 namespace Symfony\Component\Validator\Constraints;
 
 /**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
- *
  * @author Przemysław Bogusz <przemyslaw.bogusz@tubotax.pl>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]

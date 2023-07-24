@@ -17,9 +17,6 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\LogicException;
 
 /**
- * @Annotation
- * @Target({"CLASS", "PROPERTY", "METHOD", "ANNOTATION"})
- *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
  */

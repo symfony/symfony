@@ -15,9 +15,6 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
- *
  * @author Javier Spagnoletti <phansys@gmail.com>
  * @author Hugo Hamon <hugohamon@neuf.fr>
  */

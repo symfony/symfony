@@ -15,8 +15,6 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
- * @Annotation
- *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]

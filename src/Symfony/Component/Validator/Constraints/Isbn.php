@@ -14,9 +14,6 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
- *
  * @author The Whole Life To Learn <thewholelifetolearn@gmail.com>
  * @author Manuel Reinhard <manu@sprain.ch>
  * @author Bernhard Schussek <bschussek@gmail.com>

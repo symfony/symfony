@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Tests\Fixtures;
 
 use Symfony\Component\Validator\Constraint;
 
-/** @Annotation */
 class ConstraintB extends Constraint
 {
     public function getTargets(): string|array

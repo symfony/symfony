@@ -23,7 +23,6 @@
         <xsd:attribute name="hide-user-not-found" type="xsd:boolean" />
         <xsd:attribute name="always-authenticate-before-granting" type="xsd:boolean" />
         <xsd:attribute name="erase-credentials" type="xsd:boolean" />
-        <xsd:attribute name="enable-authenticator-manager" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="password_hashers">
@@ -177,7 +176,6 @@
             <xsd:element name="clear-site-data" type="clear_site_data" minOccurs="0" maxOccurs="unbounded" />
         </xsd:choice>
         <xsd:attribute name="csrf-parameter" type="xsd:string" />
-        <xsd:attribute name="csrf-token-generator" type="xsd:string" />
         <xsd:attribute name="csrf-token-manager" type="xsd:string" />
         <xsd:attribute name="csrf-token-id" type="xsd:string" />
         <xsd:attribute name="enable-csrf" type="xsd:boolean" />

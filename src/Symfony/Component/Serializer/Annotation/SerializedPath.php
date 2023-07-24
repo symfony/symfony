@@ -16,12 +16,6 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 /**
- * Annotation class for @SerializedPath().
- *
- * @Annotation
- * @NamedArgumentConstructor
- * @Target({"PROPERTY", "METHOD"})
- *
  * @author Tobias Bönner <tobi@boenner.family>
  */
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY)]

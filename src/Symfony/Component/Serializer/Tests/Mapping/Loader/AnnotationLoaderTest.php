@@ -19,21 +19,39 @@ use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummyFirstChild;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummySecondChild;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummyThirdChild;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\BadAttributeDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\BadMethodContextDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\ContextDummyParent;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\ContextDummyPromotedProperties;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\Entity45016;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\GroupDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\GroupDummyParent;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\IgnoreDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\IgnoreDummyAdditionalGetter;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\IgnoreDummyAdditionalGetterWithoutIgnoreAnnotations;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\MaxDepthDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SerializedNameDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SerializedPathDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SerializedPathInConstructorDummy;
 use Symfony\Component\Serializer\Tests\Mapping\Loader\Features\ContextMappingTestTrait;
 use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-abstract class AnnotationLoaderTestCase extends TestCase
+class AnnotationLoaderTest extends TestCase
 {
     use ContextMappingTestTrait;
 
-    protected AnnotationLoader $loader;
+    private AnnotationLoader $loader;
 
     protected function setUp(): void
     {
-        $this->loader = $this->createLoader();
+        $this->loader = new AnnotationLoader();
     }
 
     public function testInterface()
@@ -43,28 +61,28 @@ abstract class AnnotationLoaderTestCase extends TestCase
 
     public function testLoadClassMetadataReturnsTrueIfSuccessful()
     {
-        $classMetadata = new ClassMetadata($this->getNamespace().'\GroupDummy');
+        $classMetadata = new ClassMetadata(GroupDummy::class);
 
         $this->assertTrue($this->loader->loadClassMetadata($classMetadata));
     }
 
     public function testLoadGroups()
     {
-        $classMetadata = new ClassMetadata($this->getNamespace().'\GroupDummy');
+        $classMetadata = new ClassMetadata(GroupDummy::class);
         $this->loader->loadClassMetadata($classMetadata);
 
-        $this->assertEquals(TestClassMetadataFactory::createClassMetadata($this->getNamespace()), $classMetadata);
+        $this->assertEquals(TestClassMetadataFactory::createClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\Attributes'), $classMetadata);
     }
 
     public function testLoadDiscriminatorMap()
     {
-        $classMetadata = new ClassMetadata($this->getNamespace().'\AbstractDummy');
+        $classMetadata = new ClassMetadata(AbstractDummy::class);
         $this->loader->loadClassMetadata($classMetadata);
 
-        $expected = new ClassMetadata($this->getNamespace().'\AbstractDummy', new ClassDiscriminatorMapping('type', [
-            'first' => $this->getNamespace().'\AbstractDummyFirstChild',
-            'second' => $this->getNamespace().'\AbstractDummySecondChild',
-            'third' => $this->getNamespace().'\AbstractDummyThirdChild',
+        $expected = new ClassMetadata(AbstractDummy::class, new ClassDiscriminatorMapping('type', [
+            'first' => AbstractDummyFirstChild::class,
+            'second' => AbstractDummySecondChild::class,
+            'third' => AbstractDummyThirdChild::class,
         ]));
 
         $expected->addAttributeMetadata(new AttributeMetadata('foo'));
@@ -75,7 +93,7 @@ abstract class AnnotationLoaderTestCase extends TestCase
 
     public function testLoadMaxDepth()
     {
-        $classMetadata = new ClassMetadata($this->getNamespace().'\MaxDepthDummy');
+        $classMetadata = new ClassMetadata(MaxDepthDummy::class);
         $this->loader->loadClassMetadata($classMetadata);
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();
@@ -85,7 +103,7 @@ abstract class AnnotationLoaderTestCase extends TestCase
 
     public function testLoadSerializedName()
     {
-        $classMetadata = new ClassMetadata($this->getNamespace().'\SerializedNameDummy');
+        $classMetadata = new ClassMetadata(SerializedNameDummy::class);
         $this->loader->loadClassMetadata($classMetadata);
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();
@@ -95,7 +113,7 @@ abstract class AnnotationLoaderTestCase extends TestCase
 
     public function testLoadSerializedPath()
     {
-        $classMetadata = new ClassMetadata($this->getNamespace().'\SerializedPathDummy');
+        $classMetadata = new ClassMetadata(SerializedPathDummy::class);
         $this->loader->loadClassMetadata($classMetadata);
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();
@@ -105,7 +123,7 @@ abstract class AnnotationLoaderTestCase extends TestCase
 
     public function testLoadSerializedPathInConstructor()
     {
-        $classMetadata = new ClassMetadata($this->getNamespace().'\SerializedPathInConstructorDummy');
+        $classMetadata = new ClassMetadata(SerializedPathInConstructorDummy::class);
         $this->loader->loadClassMetadata($classMetadata);
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();
@@ -114,20 +132,20 @@ abstract class AnnotationLoaderTestCase extends TestCase
 
     public function testLoadClassMetadataAndMerge()
     {
-        $classMetadata = new ClassMetadata($this->getNamespace().'\GroupDummy');
-        $parentClassMetadata = new ClassMetadata($this->getNamespace().'\GroupDummyParent');
+        $classMetadata = new ClassMetadata(GroupDummy::class);
+        $parentClassMetadata = new ClassMetadata(GroupDummyParent::class);
 
         $this->loader->loadClassMetadata($parentClassMetadata);
         $classMetadata->merge($parentClassMetadata);
 
         $this->loader->loadClassMetadata($classMetadata);
 
-        $this->assertEquals(TestClassMetadataFactory::createClassMetadata($this->getNamespace(), true), $classMetadata);
+        $this->assertEquals(TestClassMetadataFactory::createClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\Attributes', true), $classMetadata);
     }
 
     public function testLoadIgnore()
     {
-        $classMetadata = new ClassMetadata($this->getNamespace().'\IgnoreDummy');
+        $classMetadata = new ClassMetadata(IgnoreDummy::class);
         $this->loader->loadClassMetadata($classMetadata);
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();
@@ -135,38 +153,29 @@ abstract class AnnotationLoaderTestCase extends TestCase
         $this->assertTrue($attributesMetadata['ignored2']->isIgnored());
     }
 
-    public function testLoadContexts()
-    {
-        $this->assertLoadedContexts($this->getNamespace().'\ContextDummy', $this->getNamespace().'\ContextDummyParent');
-    }
-
     public function testLoadContextsPropertiesPromoted()
     {
-        $this->assertLoadedContexts($this->getNamespace().'\ContextDummyPromotedProperties', $this->getNamespace().'\ContextDummyParent');
+        $this->assertLoadedContexts(ContextDummyPromotedProperties::class, ContextDummyParent::class);
     }
 
     public function testThrowsOnContextOnInvalidMethod()
     {
-        $class = $this->getNamespace().'\BadMethodContextDummy';
-
         $this->expectException(MappingException::class);
-        $this->expectExceptionMessage(sprintf('Context on "%s::badMethod()" cannot be added', $class));
+        $this->expectExceptionMessage(sprintf('Context on "%s::badMethod()" cannot be added', BadMethodContextDummy::class));
 
         $loader = $this->getLoaderForContextMapping();
 
-        $classMetadata = new ClassMetadata($class);
+        $classMetadata = new ClassMetadata(BadMethodContextDummy::class);
 
         $loader->loadClassMetadata($classMetadata);
     }
 
     public function testCanHandleUnrelatedIgnoredMethods()
     {
-        $class = $this->getNamespace().'\Entity45016';
-
         $this->expectException(MappingException::class);
-        $this->expectExceptionMessage(sprintf('Ignore on "%s::badIgnore()" cannot be added', $class));
+        $this->expectExceptionMessage(sprintf('Ignore on "%s::badIgnore()" cannot be added', Entity45016::class));
 
-        $metadata = new ClassMetadata($class);
+        $metadata = new ClassMetadata(Entity45016::class);
         $loader = $this->getLoaderForContextMapping();
 
         $loader->loadClassMetadata($metadata);
@@ -174,7 +183,7 @@ abstract class AnnotationLoaderTestCase extends TestCase
 
     public function testIgnoreGetterWithRequiredParameterIfIgnoreAnnotationIsUsed()
     {
-        $classMetadata = new ClassMetadata($this->getNamespace().'\IgnoreDummyAdditionalGetter');
+        $classMetadata = new ClassMetadata(IgnoreDummyAdditionalGetter::class);
         $this->getLoaderForContextMapping()->loadClassMetadata($classMetadata);
 
         $attributes = $classMetadata->getAttributesMetadata();
@@ -184,7 +193,7 @@ abstract class AnnotationLoaderTestCase extends TestCase
 
     public function testIgnoreGetterWithRequiredParameterIfIgnoreAnnotationIsNotUsed()
     {
-        $classMetadata = new ClassMetadata($this->getNamespace().'\IgnoreDummyAdditionalGetterWithoutIgnoreAnnotations');
+        $classMetadata = new ClassMetadata(IgnoreDummyAdditionalGetterWithoutIgnoreAnnotations::class);
         $this->getLoaderForContextMapping()->loadClassMetadata($classMetadata);
 
         $attributes = $classMetadata->getAttributesMetadata();
@@ -192,11 +201,17 @@ abstract class AnnotationLoaderTestCase extends TestCase
         self::assertArrayHasKey('extraValue2', $attributes);
     }
 
-    abstract protected function createLoader(): AnnotationLoader;
+    public function testLoadWithInvalidAttribute()
+    {
+        $this->expectException(MappingException::class);
+        $this->expectExceptionMessage('Could not instantiate attribute "Symfony\Component\Serializer\Annotation\Groups" on "Symfony\Component\Serializer\Tests\Fixtures\Attributes\BadAttributeDummy::myMethod()".');
 
-    abstract protected function getNamespace(): string;
+        $classMetadata = new ClassMetadata(BadAttributeDummy::class);
 
-    protected function getLoaderForContextMapping(): LoaderInterface
+        $this->loader->loadClassMetadata($classMetadata);
+    }
+
+    protected function getLoaderForContextMapping(): AnnotationLoader
     {
         return $this->loader;
     }

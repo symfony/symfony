@@ -217,12 +217,14 @@ abstract class AnnotationClassLoaderTestCase extends TestCase
     public function testMissingPrefixLocale()
     {
         $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(sprintf('Route to "action" with locale "en" is missing a corresponding prefix in class "%s\LocalizedPrefixMissingLocaleActionController".', $this->getNamespace()));
         $this->loader->load($this->getNamespace().'\LocalizedPrefixMissingLocaleActionController');
     }
 
     public function testMissingRouteLocale()
     {
         $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(sprintf('Route to "%s\LocalizedPrefixMissingRouteLocaleActionController::action" is missing paths for locale(s) "en".', $this->getNamespace()));
         $this->loader->load($this->getNamespace().'\LocalizedPrefixMissingRouteLocaleActionController');
     }
 

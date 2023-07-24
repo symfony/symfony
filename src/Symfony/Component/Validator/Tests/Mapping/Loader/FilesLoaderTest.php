@@ -14,8 +14,8 @@ namespace Symfony\Component\Validator\Tests\Mapping\Loader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
-use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\FilesLoader;
+use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
 
 class FilesLoaderTest extends TestCase
 {

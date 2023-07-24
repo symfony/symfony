@@ -81,6 +81,7 @@ use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Validator\ValidatorBuilder;
 use Symfony\Component\Webhook\Client\RequestParser;
 use Symfony\Component\Webhook\Controller\WebhookController;
 use Symfony\Component\Workflow;
@@ -1308,12 +1309,17 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $this->assertCount(8, $calls);
         $this->assertSame('enableAnnotationMapping', $calls[4][0]);
-        $this->assertSame('setDoctrineAnnotationReader', $calls[5][0]);
-        $this->assertEquals([new Reference('annotation_reader')], $calls[5][1]);
-        $this->assertSame('addMethodMapping', $calls[6][0]);
-        $this->assertSame(['loadValidatorMetadata'], $calls[6][1]);
-        $this->assertSame('setMappingCache', $calls[7][0]);
-        $this->assertEquals([new Reference('validator.mapping.cache.adapter')], $calls[7][1]);
+        if (method_exists(ValidatorBuilder::class, 'setDoctrineAnnotationReader')) {
+            $this->assertSame('setDoctrineAnnotationReader', $calls[5][0]);
+            $this->assertEquals([new Reference('annotation_reader')], $calls[5][1]);
+            $i = 6;
+        } else {
+            $i = 5;
+        }
+        $this->assertSame('addMethodMapping', $calls[$i][0]);
+        $this->assertSame(['loadValidatorMetadata'], $calls[$i][1]);
+        $this->assertSame('setMappingCache', $calls[++$i][0]);
+        $this->assertEquals([new Reference('validator.mapping.cache.adapter')], $calls[$i][1]);
         // no cache this time
     }
 

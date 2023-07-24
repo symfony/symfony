@@ -10,8 +10,6 @@ class Category
 
     public $id;
 
-    /**
-     * @Assert\Type("string")
-     */
+    #[Assert\Type('string')]
     public $name;
 }

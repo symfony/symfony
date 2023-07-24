@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Tests\Fixtures\NestedAttribute;
 
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Tests\Fixtures\Attribute\EntityParent;
 use Symfony\Component\Validator\Tests\Fixtures\EntityInterfaceB;
 use Symfony\Component\Validator\Tests\Fixtures\CallbackClass;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
@@ -67,7 +66,7 @@ class Entity extends EntityParent implements EntityInterfaceB
             new Assert\Range(min: 5),
         ]),
     ]
-    public string $firstName;
+    public $firstName;
     #[Assert\Valid]
     public $childA;
     #[Assert\Valid]

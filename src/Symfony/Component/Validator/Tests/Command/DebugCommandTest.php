@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests\Command;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Validator\Command\DebugCommand;
@@ -27,7 +26,7 @@ class DebugCommandTest extends TestCase
 {
     public function testOutputWithClassArgument()
     {
-        $command = new DebugCommand(new LazyLoadingMetadataFactory(new AnnotationLoader(new AnnotationReader())));
+        $command = new DebugCommand(new LazyLoadingMetadataFactory(new AnnotationLoader()));
 
         $tester = new CommandTester($command);
         $tester->execute(['class' => DummyClassOne::class], ['decorated' => false]);
@@ -68,7 +67,7 @@ TXT
 
     public function testOutputWithPathArgument()
     {
-        $command = new DebugCommand(new LazyLoadingMetadataFactory(new AnnotationLoader(new AnnotationReader())));
+        $command = new DebugCommand(new LazyLoadingMetadataFactory(new AnnotationLoader()));
 
         $tester = new CommandTester($command);
         $tester->execute(['class' => __DIR__.'/../Dummy'], ['decorated' => false]);

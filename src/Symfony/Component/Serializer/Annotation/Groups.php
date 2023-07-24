@@ -14,12 +14,6 @@ namespace Symfony\Component\Serializer\Annotation;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 /**
- * Annotation class for @Groups().
- *
- * @Annotation
- * @NamedArgumentConstructor
- * @Target({"PROPERTY", "METHOD"})
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY)]

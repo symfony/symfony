@@ -12,11 +12,6 @@
 namespace Symfony\Component\Serializer\Annotation;
 
 /**
- * Annotation class for @Ignore().
- *
- * @Annotation
- * @Target({"PROPERTY", "METHOD"})
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY)]

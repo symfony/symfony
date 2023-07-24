@@ -121,6 +121,8 @@ FrameworkBundle
    $this->render(..., ['form' => $form]);
    ```
 
+ * Remove the integration of Doctrine annotations, use native attributes instead
+
 HttpFoundation
 --------------
 

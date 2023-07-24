@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
-use Doctrine\Common\Annotations\Annotation;
 use Doctrine\DBAL\Connection;
 use Psr\Log\LogLevel;
 use Symfony\Bundle\FullStack;
@@ -155,7 +154,7 @@ class Configuration implements ConfigurationInterface
         $this->addAssetMapperSection($rootNode, $enableIfStandalone);
         $this->addTranslatorSection($rootNode, $enableIfStandalone);
         $this->addValidationSection($rootNode, $enableIfStandalone);
-        $this->addAnnotationsSection($rootNode, $willBeAvailable);
+        $this->addAnnotationsSection($rootNode);
         $this->addSerializerSection($rootNode, $enableIfStandalone);
         $this->addPropertyAccessSection($rootNode, $willBeAvailable);
         $this->addPropertyInfoSection($rootNode, $enableIfStandalone);
@@ -1057,21 +1056,15 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addAnnotationsSection(ArrayNodeDefinition $rootNode, callable $willBeAvailable): void
+    private function addAnnotationsSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
                 ->arrayNode('annotations')
-                    ->info('annotation configuration')
-                    ->{$willBeAvailable('doctrine/annotations', Annotation::class) ? 'canBeDisabled' : 'canBeEnabled'}()
-                    ->children()
-                        ->enumNode('cache')
-                            ->values(['none', 'php_array', 'file'])
-                            ->defaultValue('php_array')
-                        ->end()
-                        ->scalarNode('file_cache_dir')->defaultValue('%kernel.cache_dir%/annotations')->end()
-                        ->booleanNode('debug')->defaultValue($this->debug)->end()
-                    ->end()
+                    ->canBeEnabled()
+                    ->validate()
+                        ->ifTrue(static fn (array $v) => $v['enabled'])
+                        ->thenInvalid('Enabling the doctrine/annotations integration is not supported anymore.')
                 ->end()
             ->end()
         ;

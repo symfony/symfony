@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2023-02-13T14:43:48Z
+
+Failing tests are related. I'm looking into those later today.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-07-20T15:48:54Z
+
+PR is ready
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-07-20T18:32:02Z
+
+The failing tests on the high-deps run can be ignored. Those tests will pass as soon as the change hits 7.0.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-07-24T06:38:21Z
+
+deps=high failure is related isn't it?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-07-24T10:14:25Z
+
+> deps=high failure is related isn't it?
+
+https://github.com/symfony/symfony/pull/49358#issuecomment-1644402937
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2023-07-24T11:06:47Z
+
+> The failing tests on the high-deps run can be ignored. Those tests will pass as soon as the change hits 7.0.
+
+Does it mean that the high-deps tests will fail for all the PRs until the release of 7.0 in November?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-07-24T11:14:40Z
+
+> Does it mean that the high-deps tests will fail for all the PRs until the release of 7.0 in November?
+
+No, they fail until 6.4 has been merged into 7.0. We can do that right after merging this PR.

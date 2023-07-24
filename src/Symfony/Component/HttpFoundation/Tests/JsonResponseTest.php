@@ -190,6 +190,12 @@ class JsonResponseTest extends TestCase
 
         new JsonResponse(new \stdClass(), 200, [], true);
     }
+
+    public function testFloatNumbers()
+    {
+        $response = new JsonResponse(['data' => 1.0]);
+        $this->assertEquals('{"data":1.0}', $response->getContent());
+    }
 }
 
 class JsonSerializableObject implements \JsonSerializable

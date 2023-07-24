@@ -11,49 +11,19 @@
 
 namespace Symfony\Component\Routing\Tests\Annotation;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\FooController;
-use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\FooController as FooAttributesController;
+use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\FooController;
 
 class RouteTest extends TestCase
 {
-    private function getMethodAnnotation(string $method, bool $attributes): Route
-    {
-        $class = $attributes ? FooAttributesController::class : FooController::class;
-        $reflection = new \ReflectionMethod($class, $method);
-
-        if ($attributes) {
-            $attributes = $reflection->getAttributes(Route::class);
-            $route = $attributes[0]->newInstance();
-        } else {
-            $reader = new AnnotationReader();
-            $route = $reader->getMethodAnnotation($reflection, Route::class);
-        }
-
-        if (!$route instanceof Route) {
-            throw new \Exception('Can\'t parse annotation');
-        }
-
-        return $route;
-    }
-
     /**
      * @dataProvider getValidParameters
      */
-    public function testLoadFromAttribute(string $methodName, string $getter, $expectedReturn)
+    public function testLoadFromAttribute(string $methodName, string $getter, mixed $expectedReturn)
     {
-        $route = $this->getMethodAnnotation($methodName, true);
-        $this->assertEquals($route->$getter(), $expectedReturn);
-    }
+        $route = (new \ReflectionMethod(FooController::class, $methodName))->getAttributes(Route::class)[0]->newInstance();
 
-    /**
-     * @dataProvider getValidParameters
-     */
-    public function testLoadFromDoctrineAnnotation(string $methodName, string $getter, $expectedReturn)
-    {
-        $route = $this->getMethodAnnotation($methodName, false);
         $this->assertEquals($route->$getter(), $expectedReturn);
     }
 

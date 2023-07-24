@@ -126,7 +126,6 @@
         "async-aws/sqs": "^1.0",
         "async-aws/sns": "^1.0",
         "cache/integration-tests": "dev-master",
-        "doctrine/annotations": "^1.13.1|^2",
         "doctrine/collections": "^1.0|^2.0",
         "doctrine/data-fixtures": "^1.1",
         "doctrine/dbal": "^3.6",
@@ -159,7 +158,6 @@
     "conflict": {
         "ext-psr": "<1.1|>=2",
         "async-aws/core": "<1.5",
-        "doctrine/annotations": "<1.13.1",
         "doctrine/dbal": "<3.6",
         "doctrine/orm": "<2.15",
         "egulias/email-validator": "~3.0.0",

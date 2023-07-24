@@ -17,9 +17,6 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 /**
  * Validates that a value is a valid CIDR notation.
  *
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
- *
  * @author Sorin Pop <popsorin15@gmail.com>
  * @author Calin Bolea <calin.bolea@gmail.com>
  */

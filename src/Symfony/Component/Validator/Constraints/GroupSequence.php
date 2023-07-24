@@ -44,10 +44,6 @@ namespace Symfony\Component\Validator\Constraints;
  *
  *     $validator->validate($address, null, "Address")
  *
- * @Annotation
- *
- * @Target({"CLASS", "ANNOTATION"})
- *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]

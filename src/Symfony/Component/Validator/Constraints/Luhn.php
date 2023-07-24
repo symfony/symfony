@@ -16,9 +16,6 @@ use Symfony\Component\Validator\Constraint;
 /**
  * Metadata for the LuhnValidator.
  *
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
- *
  * @author Tim Nagel <t.nagel@infinite.net.au>
  * @author Greg Knapp http://gregk.me/2011/php-implementation-of-bank-card-luhn-algorithm/
  * @author Bernhard Schussek <bschussek@gmail.com>

@@ -316,6 +316,10 @@ Validator
  * Remove static property `$errorNames` from all constraints, use const `ERROR_NAMES` instead
  * Remove `VALIDATION_MODE_LOOSE` from `Email` constraint, use `VALIDATION_MODE_HTML5` instead
  * Remove constraint `ExpressionLanguageSyntax`, use `ExpressionSyntax` instead
+ * Remove Doctrine annotations support in favor of native attributes
+ * Remove the annotation reader parameter from the constructor signature of `AnnotationLoader`
+ * Remove `ValidatorBuilder::setDoctrineAnnotationReader()`
+ * Remove `ValidatorBuilder::addDefaultDoctrineAnnotationReader()`
 
 VarDumper
 ---------

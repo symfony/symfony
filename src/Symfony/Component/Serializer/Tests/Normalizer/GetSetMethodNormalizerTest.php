@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
-use Doctrine\Common\Annotations\AnnotationReader;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
@@ -28,8 +28,8 @@ use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\ClassWithIgnoreAttribute;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\GroupDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\SiblingHolder;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\CacheableObjectAttributesTestTrait;
@@ -57,21 +57,15 @@ class GetSetMethodNormalizerTest extends TestCase
     use SkipUninitializedValuesTestTrait;
     use TypeEnforcementTestTrait;
 
-    /**
-     * @var GetSetMethodNormalizer
-     */
-    private $normalizer;
-    /**
-     * @var SerializerInterface
-     */
-    private $serializer;
+    private GetSetMethodNormalizer $normalizer;
+    private SerializerInterface&NormalizerInterface&MockObject $serializer;
 
     protected function setUp(): void
     {
         $this->createNormalizer();
     }
 
-    private function createNormalizer(array $defaultContext = [])
+    private function createNormalizer(array $defaultContext = []): void
     {
         $this->serializer = $this->createMock(SerializerNormalizer::class);
         $this->normalizer = new GetSetMethodNormalizer(null, null, null, null, null, $defaultContext);
@@ -233,21 +227,21 @@ class GetSetMethodNormalizerTest extends TestCase
 
     protected function getNormalizerForCallbacksWithPropertyTypeExtractor(): GetSetMethodNormalizer
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
 
         return new GetSetMethodNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory), $this->getCallbackPropertyTypeExtractor());
     }
 
     protected function getNormalizerForCallbacks(): GetSetMethodNormalizer
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
 
         return new GetSetMethodNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
     }
 
     protected function getNormalizerForCircularReference(array $defaultContext): GetSetMethodNormalizer
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
         $normalizer = new GetSetMethodNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory), null, null, null, $defaultContext);
         new Serializer([$normalizer]);
 
@@ -261,7 +255,7 @@ class GetSetMethodNormalizerTest extends TestCase
 
     protected function getDenormalizerForConstructArguments(): GetSetMethodNormalizer
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
         $denormalizer = new GetSetMethodNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
         new Serializer([$denormalizer]);
 
@@ -270,21 +264,21 @@ class GetSetMethodNormalizerTest extends TestCase
 
     protected function getNormalizerForGroups(): GetSetMethodNormalizer
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
 
         return new GetSetMethodNormalizer($classMetadataFactory);
     }
 
     protected function getDenormalizerForGroups(): GetSetMethodNormalizer
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
 
         return new GetSetMethodNormalizer($classMetadataFactory);
     }
 
     public function testGroupsNormalizeWithNameConverter()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
         $this->normalizer = new GetSetMethodNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
         $this->normalizer->setSerializer($this->serializer);
 
@@ -305,7 +299,7 @@ class GetSetMethodNormalizerTest extends TestCase
 
     public function testGroupsDenormalizeWithNameConverter()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
         $this->normalizer = new GetSetMethodNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
         $this->normalizer->setSerializer($this->serializer);
 
@@ -320,13 +314,13 @@ class GetSetMethodNormalizerTest extends TestCase
                 'foo_bar' => '@dunglas',
                 'symfony' => '@coopTilleuls',
                 'coop_tilleuls' => 'les-tilleuls.coop',
-            ], 'Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy', null, [GetSetMethodNormalizer::GROUPS => ['name_converter']])
+            ], GroupDummy::class, null, [GetSetMethodNormalizer::GROUPS => ['name_converter']])
         );
     }
 
     protected function getNormalizerForMaxDepth(): NormalizerInterface
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
         $normalizer = new GetSetMethodNormalizer($classMetadataFactory);
         $serializer = new Serializer([$normalizer]);
         $normalizer->setSerializer($serializer);
@@ -336,7 +330,7 @@ class GetSetMethodNormalizerTest extends TestCase
 
     protected function getDenormalizerForObjectToPopulate(): DenormalizerInterface
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
         $normalizer = new GetSetMethodNormalizer($classMetadataFactory, null, new PhpDocExtractor());
         new Serializer([$normalizer]);
 
@@ -360,7 +354,7 @@ class GetSetMethodNormalizerTest extends TestCase
 
     protected function getNormalizerForIgnoredAttributes(): GetSetMethodNormalizer
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
         $normalizer = new GetSetMethodNormalizer($classMetadataFactory, null, new PhpDocExtractor());
         new Serializer([$normalizer]);
 
@@ -369,7 +363,7 @@ class GetSetMethodNormalizerTest extends TestCase
 
     protected function getDenormalizerForIgnoredAttributes(): GetSetMethodNormalizer
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
         $normalizer = new GetSetMethodNormalizer($classMetadataFactory, null, new PhpDocExtractor());
         new Serializer([$normalizer]);
 
@@ -493,7 +487,7 @@ class GetSetMethodNormalizerTest extends TestCase
 
     protected function getNormalizerForSkipUninitializedValues(): NormalizerInterface
     {
-        return new GetSetMethodNormalizer(new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())));
+        return new GetSetMethodNormalizer(new ClassMetadataFactory(new AnnotationLoader()));
     }
 }
 

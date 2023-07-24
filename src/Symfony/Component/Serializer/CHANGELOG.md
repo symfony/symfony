@@ -13,6 +13,12 @@ CHANGELOG
  * Require explicit argument when calling `AttributeMetadata::setSerializedName()` and `ClassMetadata::setClassDiscriminatorMapping()`
  * Add argument `$context` to `NormalizerInterface::supportsNormalization()` and `DenormalizerInterface::supportsDenormalization()`
 
+6.4
+---
+
+ * Deprecate Doctrine annotations support in favor of native attributes
+ * Deprecate passing an annotation reader to the constructor of `AnnotationLoader`
+
 6.3
 ---
 

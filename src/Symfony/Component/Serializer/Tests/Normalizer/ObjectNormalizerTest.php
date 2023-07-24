@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
@@ -34,7 +34,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\GroupDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyPrivatePropertyWithoutGetter;
 use Symfony\Component\Serializer\Tests\Fixtures\OtherSerializedNameDummy;
@@ -78,21 +78,15 @@ class ObjectNormalizerTest extends TestCase
     use SkipUninitializedValuesTestTrait;
     use TypeEnforcementTestTrait;
 
-    /**
-     * @var ObjectNormalizer
-     */
-    private $normalizer;
-    /**
-     * @var SerializerInterface
-     */
-    private $serializer;
+    private ObjectNormalizer $normalizer;
+    private SerializerInterface&NormalizerInterface&MockObject $serializer;
 
     protected function setUp(): void
     {
         $this->createNormalizer();
     }
 
-    private function createNormalizer(array $defaultContext = [], ClassMetadataFactoryInterface $classMetadataFactory = null)
+    private function createNormalizer(array $defaultContext = [], ClassMetadataFactoryInterface $classMetadataFactory = null): void
     {
         $this->serializer = $this->createMock(ObjectSerializerNormalizer::class);
         $this->normalizer = new ObjectNormalizer($classMetadataFactory, null, null, null, null, null, $defaultContext);
@@ -341,7 +335,7 @@ class ObjectNormalizerTest extends TestCase
 
     protected function getDenormalizerForAttributes(): ObjectNormalizer
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
         $normalizer = new ObjectNormalizer($classMetadataFactory, null, null, new ReflectionExtractor());
         new Serializer([$normalizer]);
 
@@ -367,7 +361,7 @@ class ObjectNormalizerTest extends TestCase
 
     public function testNormalizeSameObjectWithDifferentAttributes()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
         $this->normalizer = new ObjectNormalizer($classMetadataFactory);
         $serializer = new Serializer([$this->normalizer]);
         $this->normalizer->setSerializer($serializer);
@@ -442,7 +436,7 @@ class ObjectNormalizerTest extends TestCase
 
     protected function getDenormalizerForConstructArguments(): ObjectNormalizer
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
         $denormalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
         $serializer = new Serializer([$denormalizer]);
         $denormalizer->setSerializer($serializer);
@@ -454,7 +448,7 @@ class ObjectNormalizerTest extends TestCase
 
     protected function getNormalizerForGroups(): ObjectNormalizer
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
         $normalizer = new ObjectNormalizer($classMetadataFactory);
         // instantiate a serializer with the normalizer to handle normalizing recursive structures
         new Serializer([$normalizer]);
@@ -464,14 +458,14 @@ class ObjectNormalizerTest extends TestCase
 
     protected function getDenormalizerForGroups(): ObjectNormalizer
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
 
         return new ObjectNormalizer($classMetadataFactory);
     }
 
     public function testGroupsNormalizeWithNameConverter()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
         $this->normalizer = new ObjectNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
         $this->normalizer->setSerializer($this->serializer);
 
@@ -492,7 +486,7 @@ class ObjectNormalizerTest extends TestCase
 
     public function testGroupsDenormalizeWithNameConverter()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
         $this->normalizer = new ObjectNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
         $this->normalizer->setSerializer($this->serializer);
 
@@ -507,13 +501,13 @@ class ObjectNormalizerTest extends TestCase
                 'foo_bar' => '@dunglas',
                 'symfony' => '@coopTilleuls',
                 'coop_tilleuls' => 'les-tilleuls.coop',
-            ], 'Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy', null, [ObjectNormalizer::GROUPS => ['name_converter']])
+            ], GroupDummy::class, null, [ObjectNormalizer::GROUPS => ['name_converter']])
         );
     }
 
     public function testGroupsDenormalizeWithMetaDataNameConverter()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
         $this->normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
         $this->normalizer->setSerializer($this->serializer);
 
@@ -541,7 +535,7 @@ class ObjectNormalizerTest extends TestCase
 
     protected function getDenormalizerForIgnoredAttributes(): ObjectNormalizer
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
         $normalizer = new ObjectNormalizer($classMetadataFactory, null, null, new ReflectionExtractor());
         new Serializer([$normalizer]);
 
@@ -552,7 +546,7 @@ class ObjectNormalizerTest extends TestCase
 
     protected function getNormalizerForMaxDepth(): ObjectNormalizer
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
         $normalizer = new ObjectNormalizer($classMetadataFactory);
         $serializer = new Serializer([$normalizer]);
         $normalizer->setSerializer($serializer);
@@ -564,7 +558,7 @@ class ObjectNormalizerTest extends TestCase
 
     protected function getDenormalizerForObjectToPopulate(): ObjectNormalizer
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
         $normalizer = new ObjectNormalizer($classMetadataFactory, null, null, new PhpDocExtractor());
         new Serializer([$normalizer]);
 
@@ -582,7 +576,7 @@ class ObjectNormalizerTest extends TestCase
 
     protected function getNormalizerForSkipUninitializedValues(): ObjectNormalizer
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
 
         return new ObjectNormalizer($classMetadataFactory);
     }

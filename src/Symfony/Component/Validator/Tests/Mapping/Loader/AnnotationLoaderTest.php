@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests\Mapping\Loader;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\AtLeastOneOf;
@@ -31,34 +30,31 @@ use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
-use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 
 class AnnotationLoaderTest extends TestCase
 {
     public function testLoadClassMetadataReturnsTrueIfSuccessful()
     {
-        $reader = new AnnotationReader();
-        $loader = new AnnotationLoader($reader);
-        $metadata = new ClassMetadata(Entity::class);
+        $loader = $this->createAnnotationLoader();
+        $metadata = new ClassMetadata($this->getFixtureNamespace().'\Entity');
 
         $this->assertTrue($loader->loadClassMetadata($metadata));
     }
 
     public function testLoadClassMetadataReturnsFalseIfNotSuccessful()
     {
-        $loader = new AnnotationLoader(new AnnotationReader());
+        $loader = $this->createAnnotationLoader();
         $metadata = new ClassMetadata('\stdClass');
 
         $this->assertFalse($loader->loadClassMetadata($metadata));
     }
 
-    /**
-     * @dataProvider provideNamespaces
-     */
-    public function testLoadClassMetadata(string $namespace)
+    public function testLoadClassMetadata()
     {
-        $loader = new AnnotationLoader(new AnnotationReader());
+        $loader = $this->createAnnotationLoader();
+        $namespace = $this->getFixtureNamespace();
+
         $metadata = new ClassMetadata($namespace.'\Entity');
 
         $loader->loadClassMetadata($metadata);
@@ -109,12 +105,11 @@ class AnnotationLoaderTest extends TestCase
 
     /**
      * Test MetaData merge with parent annotation.
-     *
-     * @dataProvider provideNamespaces
      */
-    public function testLoadParentClassMetadata(string $namespace)
+    public function testLoadParentClassMetadata()
     {
-        $loader = new AnnotationLoader(new AnnotationReader());
+        $loader = $this->createAnnotationLoader();
+        $namespace = $this->getFixtureNamespace();
 
         // Load Parent MetaData
         $parent_metadata = new ClassMetadata($namespace.'\EntityParent');
@@ -129,12 +124,11 @@ class AnnotationLoaderTest extends TestCase
 
     /**
      * Test MetaData merge with parent annotation.
-     *
-     * @dataProvider provideNamespaces
      */
-    public function testLoadClassMetadataAndMerge(string $namespace)
+    public function testLoadClassMetadataAndMerge()
     {
-        $loader = new AnnotationLoader(new AnnotationReader());
+        $loader = $this->createAnnotationLoader();
+        $namespace = $this->getFixtureNamespace();
 
         // Load Parent MetaData
         $parent_metadata = new ClassMetadata($namespace.'\EntityParent');
@@ -201,12 +195,10 @@ class AnnotationLoaderTest extends TestCase
         $this->assertInstanceOf(NotNull::class, $otherMetadata[1]->getConstraints()[0]);
     }
 
-    /**
-     * @dataProvider provideNamespaces
-     */
-    public function testLoadGroupSequenceProviderAnnotation(string $namespace)
+    public function testLoadGroupSequenceProviderAnnotation()
     {
-        $loader = new AnnotationLoader(new AnnotationReader());
+        $loader = $this->createAnnotationLoader();
+        $namespace = $this->getFixtureNamespace();
 
         $metadata = new ClassMetadata($namespace.'\GroupSequenceProviderEntity');
         $loader->loadClassMetadata($metadata);
@@ -218,10 +210,13 @@ class AnnotationLoaderTest extends TestCase
         $this->assertEquals($expected, $metadata);
     }
 
-    public static function provideNamespaces(): iterable
+    protected function createAnnotationLoader(): AnnotationLoader
     {
-        yield 'annotations' => ['Symfony\Component\Validator\Tests\Fixtures\Annotation'];
-        yield 'attributes' => ['Symfony\Component\Validator\Tests\Fixtures\Attribute'];
-        yield 'nested_attributes' => ['Symfony\Component\Validator\Tests\Fixtures\NestedAttribute'];
+        return new AnnotationLoader();
+    }
+
+    protected function getFixtureNamespace(): string
+    {
+        return 'Symfony\Component\Validator\Tests\Fixtures\NestedAttribute';
     }
 }

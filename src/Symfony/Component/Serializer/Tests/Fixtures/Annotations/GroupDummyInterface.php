@@ -9,18 +9,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Validator\Tests\Fixtures;
+namespace Symfony\Component\Serializer\Tests\Fixtures\Annotations;
 
-use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-#[Assert\DisableAutoMapping]
-class PropertyInfoLoaderNoAutoMappingEntity
+interface GroupDummyInterface
 {
-    public $string;
-
-    #[Assert\EnableAutoMapping]
-    public $autoMappingExplicitlyEnabled;
+    /**
+     * @Groups({"a", "name_converter"})
+     */
+    public function getSymfony();
 }

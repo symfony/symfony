@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Serializer\Tests;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
@@ -49,9 +48,9 @@ use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Normalizer\UidNormalizer;
 use Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer;
 use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummy;
-use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummyFirstChild;
-use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummySecondChild;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummyFirstChild;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummySecondChild;
 use Symfony\Component\Serializer\Tests\Fixtures\DenormalizableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyFirstChildQuux;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageInterface;
@@ -720,7 +719,7 @@ class SerializerTest extends TestCase
 
     public function testUnionTypeDeserializable()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
         $serializer = new Serializer(
             [
@@ -752,7 +751,7 @@ class SerializerTest extends TestCase
 
     public function testUnionTypeDeserializableWithoutAllowedExtraAttributes()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
         $serializer = new Serializer(
             [
@@ -807,7 +806,7 @@ class SerializerTest extends TestCase
 
     private function serializerWithClassDiscriminator()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
 
         return new Serializer([new ObjectNormalizer($classMetadataFactory, null, null, new ReflectionExtractor(), new ClassDiscriminatorFromClassMetadata($classMetadataFactory))], ['json' => new JsonEncoder()]);
     }
@@ -1273,11 +1272,11 @@ class SerializerTest extends TestCase
         }
     }
 
-    public static function provideCollectDenormalizationErrors()
+    public static function provideCollectDenormalizationErrors(): array
     {
         return [
             [null],
-            [new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()))],
+            [new ClassMetadataFactory(new AnnotationLoader())],
         ];
     }
 

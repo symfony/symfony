@@ -16,6 +16,10 @@ CHANGELOG
 
  * Allow single integer for the `versions` option of the `Uuid` constraint
  * Allow single constraint to be passed to the `constraints` option of the `When` constraint
+ * Deprecate Doctrine annotations support in favor of native attributes
+ * Deprecate passing an annotation reader to the constructor signature of `AnnotationLoader`
+ * Deprecate `ValidatorBuilder::setDoctrineAnnotationReader()`
+ * Deprecate `ValidatorBuilder::addDefaultDoctrineAnnotationReader()`
 
 6.3
 ---

@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Tests\Mapping;
 
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\GroupDummy;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -70,7 +71,7 @@ class TestClassMetadataFactory
 
     public static function createXmlCLassMetadata(): ClassMetadata
     {
-        $expected = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy');
+        $expected = new ClassMetadata(GroupDummy::class);
 
         $foo = new AttributeMetadata('foo');
         $foo->addGroup('group1');

@@ -11,8 +11,11 @@
 
 namespace Symfony\Component\Routing\Tests\Fixtures\OtherAnnotatedClasses;
 
+use Symfony\Component\Routing\Annotation\Route;
+
 class VariadicClass
 {
+    #[Route('/path/to/{id}')]
     public function routeAction(...$params)
     {
     }

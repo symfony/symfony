@@ -64,6 +64,8 @@ Routing
 -------
 
  * Add native return type to `AnnotationClassLoader::setResolver()`
+ * Deprecate Doctrine annotations support in favor of native attributes
+ * Change the constructor signature of `AnnotationClassLoader` to `__construct(?string $env = null)`, passing an annotation reader as first argument is deprecated
 
 Security
 --------

@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Make `HeaderBag::getDate()`, `Response::getDate()`, `getExpires()` and `getLastModified()` return a `DateTimeImmutable`
+ * Fixed float numbers in JSON string of JsonResponse - now it serialized to float even if it has no decimal part, e.g 1.0 became 1.0 and not just a 1 as integer
 
 6.3
 ---

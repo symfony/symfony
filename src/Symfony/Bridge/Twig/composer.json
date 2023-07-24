@@ -21,7 +21,6 @@
         "twig/twig": "^2.13|^3.0.4"
     },
     "require-dev": {
-        "doctrine/annotations": "^1.12|^2",
         "egulias/email-validator": "^2.1.10|^3|^4",
         "league/html-to-markdown": "^5.0",
         "phpdocumentor/reflection-docblock": "^3.0|^4.0|^5.0",
@@ -62,6 +61,7 @@
         "symfony/http-foundation": "<5.4",
         "symfony/http-kernel": "<6.2",
         "symfony/mime": "<6.2",
+        "symfony/serializer": "<6.2",
         "symfony/translation": "<5.4",
         "symfony/workflow": "<5.4"
     },

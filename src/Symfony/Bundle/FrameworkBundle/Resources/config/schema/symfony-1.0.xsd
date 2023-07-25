@@ -402,8 +402,6 @@
 
     <xsd:simpleType name="marking_store_type">
         <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="multiple_state" />
-            <xsd:enumeration value="single_state" />
             <xsd:enumeration value="method" />
         </xsd:restriction>
     </xsd:simpleType>

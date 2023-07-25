@@ -88,7 +88,7 @@ trait ServerLogHandlerTrait
             return false;
         }
 
-        set_error_handler(self::class.'::nullErrorHandler');
+        set_error_handler(static fn () => null);
 
         try {
             if (!$this->socket = $this->socket ?: $this->createSocket()) {
@@ -105,7 +105,7 @@ trait ServerLogHandlerTrait
     {
         $recordFormatted = $this->formatRecord($record);
 
-        set_error_handler(self::class.'::nullErrorHandler');
+        set_error_handler(static fn () => null);
 
         try {
             if (-1 === stream_socket_sendto($this->socket, $recordFormatted)) {
@@ -124,10 +124,6 @@ trait ServerLogHandlerTrait
     protected function getDefaultFormatter(): FormatterInterface
     {
         return new VarDumperFormatter();
-    }
-
-    private static function nullErrorHandler(): void
-    {
     }
 
     /**

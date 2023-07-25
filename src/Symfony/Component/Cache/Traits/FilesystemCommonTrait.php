@@ -87,7 +87,7 @@ trait FilesystemCommonTrait
 
     private function write(string $file, string $data, int $expiresAt = null): bool
     {
-        set_error_handler(__CLASS__.'::throwError');
+        set_error_handler(self::throwError(...));
         try {
             $tmp = $this->directory.$this->tmpSuffix ??= str_replace('/', '-', base64_encode(random_bytes(6)));
             try {

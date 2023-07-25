@@ -154,7 +154,7 @@ final class LockRegistry
         if (null !== $h = self::$openedFiles[$key] ?? null) {
             return $h;
         }
-        set_error_handler(function () {});
+        set_error_handler(static fn () => null);
         try {
             $h = fopen(self::$files[$key], 'r+');
         } finally {

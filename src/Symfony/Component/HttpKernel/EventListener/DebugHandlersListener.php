@@ -85,7 +85,7 @@ class DebugHandlersListener implements EventSubscriberInterface
             }
         }
         if ($this->exceptionHandler) {
-            $handler = set_exception_handler('is_int');
+            $handler = set_exception_handler(static fn () => null);
             $handler = \is_array($handler) ? $handler[0] : null;
             restore_exception_handler();
 

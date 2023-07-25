@@ -11,7 +11,6 @@
         <framework:workflow name="article" type="workflow">
             <framework:audit-trail enabled="true"/>
             <framework:initial-marking>draft</framework:initial-marking>
-            <framework:marking-store type="method" property="state" />
             <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTestCase</framework:support>
             <framework:place name="draft" />
             <framework:place name="wait_for_journalist" />

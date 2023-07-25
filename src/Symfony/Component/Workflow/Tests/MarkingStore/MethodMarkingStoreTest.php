@@ -12,7 +12,6 @@
 namespace Symfony\Component\Workflow\Tests\MarkingStore;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\MarkingStore\MethodMarkingStore;
 use Symfony\Component\Workflow\Tests\Subject;
 
@@ -26,7 +25,6 @@ class MethodMarkingStoreTest extends TestCase
 
         $marking = $markingStore->getMarking($subject);
 
-        $this->assertInstanceOf(Marking::class, $marking);
         $this->assertCount(0, $marking->getPlaces());
 
         $marking->mark('first_place');
@@ -48,7 +46,6 @@ class MethodMarkingStoreTest extends TestCase
 
         $marking = $markingStore->getMarking($subject);
 
-        $this->assertInstanceOf(Marking::class, $marking);
         $this->assertCount(0, $marking->getPlaces());
 
         $marking->mark('first_place');
@@ -70,7 +67,6 @@ class MethodMarkingStoreTest extends TestCase
 
         $marking = $markingStore->getMarking($subject);
 
-        $this->assertInstanceOf(Marking::class, $marking);
         $this->assertCount(1, $marking->getPlaces());
     }
 
@@ -82,7 +78,6 @@ class MethodMarkingStoreTest extends TestCase
 
         $marking = $markingStore->getMarking($subject);
 
-        $this->assertInstanceOf(Marking::class, $marking);
         $this->assertCount(1, $marking->getPlaces());
         $this->assertSame('first_place', (string) $subject->getMarking());
     }
@@ -95,7 +90,6 @@ class MethodMarkingStoreTest extends TestCase
 
         $marking = $markingStore->getMarking($subject);
 
-        $this->assertInstanceOf(Marking::class, $marking);
         $this->assertCount(0, $marking->getPlaces());
     }
 

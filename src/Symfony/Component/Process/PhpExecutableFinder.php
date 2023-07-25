@@ -19,7 +19,7 @@ namespace Symfony\Component\Process;
  */
 class PhpExecutableFinder
 {
-    private $executableFinder;
+    private ExecutableFinder $executableFinder;
 
     public function __construct()
     {

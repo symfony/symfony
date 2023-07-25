@@ -500,12 +500,6 @@ class Response
             return $this;
         }
 
-        if (false === $text) {
-            $this->statusText = '';
-
-            return $this;
-        }
-
         $this->statusText = $text;
 
         return $this;

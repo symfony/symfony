@@ -29,8 +29,8 @@ use Symfony\Component\Dotenv\Dotenv;
 #[AsCommand(name: 'debug:dotenv', description: 'Lists all dotenv files with variables and values')]
 final class DebugCommand extends Command
 {
-    private $kernelEnvironment;
-    private $projectDirectory;
+    private string $kernelEnvironment;
+    private string $projectDirectory;
 
     public function __construct(string $kernelEnvironment, string $projectDirectory)
     {

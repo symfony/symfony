@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpClient;
 
 use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\Response\AsyncContext;
 use Symfony\Component\HttpClient\Response\AsyncResponse;
 use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
@@ -34,7 +33,7 @@ class RetryableHttpClient implements HttpClientInterface, ResetInterface
 
     private RetryStrategyInterface $strategy;
     private int $maxRetries;
-    private LoggerInterface $logger;
+    private ?LoggerInterface $logger;
     private array $baseUris = [];
 
     /**
@@ -45,7 +44,7 @@ class RetryableHttpClient implements HttpClientInterface, ResetInterface
         $this->client = $client;
         $this->strategy = $strategy ?? new GenericRetryStrategy();
         $this->maxRetries = $maxRetries;
-        $this->logger = $logger ?? new NullLogger();
+        $this->logger = $logger;
     }
 
     public function withOptions(array $options): static
@@ -149,7 +148,7 @@ class RetryableHttpClient implements HttpClientInterface, ResetInterface
             $content = '';
             $firstChunk = null;
 
-            $this->logger->info('Try #{count} after {delay}ms'.($exception ? ': '.$exception->getMessage() : ', status code: '.$context->getStatusCode()), [
+            $this->logger?->info('Try #{count} after {delay}ms'.($exception ? ': '.$exception->getMessage() : ', status code: '.$context->getStatusCode()), [
                 'count' => $retryCount,
                 'delay' => $delay,
             ]);

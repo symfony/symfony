@@ -55,9 +55,10 @@ class Connection implements ResetInterface
      * * redeliver_timeout: Timeout before redeliver messages still in handling state (i.e: delivered_at is not null and message is still in table). Default: 3600
      * * auto_setup: Whether the table should be created automatically during send / get. Default: true
      */
-    protected $configuration = [];
-    protected $driverConnection;
-    protected $queueEmptiedAt;
+    protected array $configuration;
+    protected DBALConnection $driverConnection;
+    protected ?float $queueEmptiedAt = null;
+
     private bool $autoSetup;
 
     public function __construct(array $configuration, DBALConnection $driverConnection)

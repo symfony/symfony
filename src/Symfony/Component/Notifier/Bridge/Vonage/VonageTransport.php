@@ -29,9 +29,9 @@ final class VonageTransport extends AbstractTransport
     // see https://developer.vonage.com/messaging/sms/overview
     protected const HOST = 'rest.nexmo.com';
 
-    private $apiKey;
-    private $apiSecret;
-    private $from;
+    private string $apiKey;
+    private string $apiSecret;
+    private string $from;
 
     public function __construct(string $apiKey, #[\SensitiveParameter] string $apiSecret, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {

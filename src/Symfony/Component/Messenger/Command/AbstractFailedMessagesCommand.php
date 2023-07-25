@@ -45,7 +45,7 @@ abstract class AbstractFailedMessagesCommand extends Command
 {
     protected const DEFAULT_TRANSPORT_OPTION = 'choose';
 
-    protected $failureTransports;
+    protected ServiceProviderInterface $failureTransports;
     protected ?PhpSerializer $phpSerializer;
 
     private ?string $globalFailureReceiverName;

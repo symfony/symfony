@@ -22,25 +22,12 @@ use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
  */
 class PropertyAccessorBuilder
 {
-    /** @var int */
-    private $magicMethods = PropertyAccessor::MAGIC_GET | PropertyAccessor::MAGIC_SET;
-    private $throwExceptionOnInvalidIndex = false;
-    private $throwExceptionOnInvalidPropertyPath = true;
-
-    /**
-     * @var CacheItemPoolInterface|null
-     */
-    private $cacheItemPool;
-
-    /**
-     * @var PropertyReadInfoExtractorInterface|null
-     */
-    private $readInfoExtractor;
-
-    /**
-     * @var PropertyWriteInfoExtractorInterface|null
-     */
-    private $writeInfoExtractor;
+    private int $magicMethods = PropertyAccessor::MAGIC_GET | PropertyAccessor::MAGIC_SET;
+    private bool $throwExceptionOnInvalidIndex = false;
+    private bool $throwExceptionOnInvalidPropertyPath = true;
+    private ?CacheItemPoolInterface $cacheItemPool = null;
+    private ?PropertyReadInfoExtractorInterface $readInfoExtractor = null;
+    private ?PropertyWriteInfoExtractorInterface $writeInfoExtractor = null;
 
     /**
      * Enables the use of all magic methods by the PropertyAccessor.

@@ -37,9 +37,7 @@ class Connection extends AbstractConnection
     ];
 
     private bool $bound = false;
-
-    /** @var resource|LDAPConnection */
-    private $connection;
+    private ?LDAPConnection $connection = null;
 
     public function __sleep(): array
     {
@@ -87,11 +85,9 @@ class Connection extends AbstractConnection
     }
 
     /**
-     * @return resource|LDAPConnection
-     *
      * @internal
      */
-    public function getResource()
+    public function getResource(): ?LDAPConnection
     {
         return $this->connection;
     }

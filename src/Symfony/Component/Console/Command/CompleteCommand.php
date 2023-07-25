@@ -34,9 +34,8 @@ final class CompleteCommand extends Command
 {
     public const COMPLETION_API_VERSION = '1';
 
-    private $completionOutputs;
-
-    private $isDebug = false;
+    private array $completionOutputs;
+    private bool $isDebug = false;
 
     /**
      * @param array<string, class-string<CompletionOutputInterface>> $completionOutputs A list of additional completion outputs, with shell name as key and FQCN as value

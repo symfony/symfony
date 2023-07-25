@@ -750,7 +750,7 @@ class Request
      */
     public function setSessionFactory(callable $factory): void
     {
-        $this->session = $factory;
+        $this->session = $factory(...);
     }
 
     /**

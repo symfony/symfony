@@ -29,8 +29,7 @@ final class ExpoTransport extends AbstractTransport
 {
     protected const HOST = 'exp.host/--/api/v2/push/send';
 
-    /** @var string|null */
-    private $token;
+    private ?string $token;
 
     public function __construct(#[\SensitiveParameter] string $token = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {

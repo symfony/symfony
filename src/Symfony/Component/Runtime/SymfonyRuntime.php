@@ -66,10 +66,10 @@ class_exists(MissingDotenv::class, false) || class_exists(Dotenv::class) || clas
  */
 class SymfonyRuntime extends GenericRuntime
 {
-    private $input;
-    private $output;
-    private $console;
-    private $command;
+    private readonly ArgvInput $input;
+    private readonly ConsoleOutput $output;
+    private readonly Application $console;
+    private readonly Command $command;
 
     /**
      * @param array {
@@ -165,7 +165,7 @@ class SymfonyRuntime extends GenericRuntime
             return new ConsoleApplicationRunner($application, $defaultEnv, $this->getInput(), $output);
         }
 
-        if ($this->command) {
+        if (isset($this->command)) {
             $this->getInput()->bind($this->command->getDefinition());
         }
 
@@ -203,7 +203,7 @@ class SymfonyRuntime extends GenericRuntime
 
     private function getInput(): ArgvInput
     {
-        if (null !== $this->input) {
+        if (isset($this->input)) {
             return $this->input;
         }
 

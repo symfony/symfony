@@ -21,13 +21,10 @@ use Symfony\Component\Runtime\RunnerInterface;
  */
 class HttpKernelRunner implements RunnerInterface
 {
-    private $kernel;
-    private $request;
-
-    public function __construct(HttpKernelInterface $kernel, Request $request)
-    {
-        $this->kernel = $kernel;
-        $this->request = $request;
+    public function __construct(
+        private readonly HttpKernelInterface $kernel,
+        private readonly Request $request,
+    ) {
     }
 
     public function run(): int

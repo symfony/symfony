@@ -34,21 +34,21 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
      *           class' serialized representation. Do not access it. Use
      *           {@link getClassName()} instead.
      */
-    public $class;
+    public string $class;
 
     /**
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
      *           {@link getName()} instead.
      */
-    public $name;
+    public string $name;
 
     /**
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
      *           {@link getPropertyName()} instead.
      */
-    public $property;
+    public string $property;
 
     /**
      * @var \ReflectionMethod[]|\ReflectionProperty[]

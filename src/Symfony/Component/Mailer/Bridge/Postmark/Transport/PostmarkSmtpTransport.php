@@ -27,7 +27,7 @@ use Symfony\Component\Mime\RawMessage;
  */
 class PostmarkSmtpTransport extends EsmtpTransport
 {
-    private $messageStream;
+    private ?string $messageStream = null;
 
     public function __construct(string $id, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {

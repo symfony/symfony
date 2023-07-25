@@ -36,7 +36,7 @@ use Symfony\Component\Serializer\Annotation\Ignore;
  */
 final class GetSetMethodNormalizer extends AbstractObjectNormalizer
 {
-    private static $setterAccessibleCache = [];
+    private static array $setterAccessibleCache = [];
 
     public function getSupportedTypes(?string $format): array
     {

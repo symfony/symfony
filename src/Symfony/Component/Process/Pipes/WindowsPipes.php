@@ -26,14 +26,14 @@ use Symfony\Component\Process\Process;
  */
 class WindowsPipes extends AbstractPipes
 {
-    private $files = [];
-    private $fileHandles = [];
-    private $lockHandles = [];
-    private $readBytes = [
+    private array $files = [];
+    private array $fileHandles = [];
+    private array $lockHandles = [];
+    private array $readBytes = [
         Process::STDOUT => 0,
         Process::STDERR => 0,
     ];
-    private $haveReadSupport;
+    private bool $haveReadSupport;
 
     public function __construct(mixed $input, bool $haveReadSupport)
     {

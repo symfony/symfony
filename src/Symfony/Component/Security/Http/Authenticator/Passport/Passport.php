@@ -33,7 +33,7 @@ class Passport
     private array $attributes = [];
 
     /**
-     * @param CredentialsInterface $credentials the credentials to check for this authentication, use
+     * @param CredentialsInterface $credentials The credentials to check for this authentication, use
      *                                          SelfValidatingPassport if no credentials should be checked
      * @param BadgeInterface[]     $badges
      */
@@ -48,7 +48,7 @@ class Passport
 
     public function getUser(): UserInterface
     {
-        if (null === $this->user) {
+        if (!isset($this->user)) {
             if (!$this->hasBadge(UserBadge::class)) {
                 throw new \LogicException('Cannot get the Security user, no username or UserBadge configured for this passport.');
             }

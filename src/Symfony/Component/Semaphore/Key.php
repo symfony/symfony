@@ -21,11 +21,11 @@ use Symfony\Component\Semaphore\Exception\InvalidArgumentException;
  */
 final class Key
 {
-    private $resource;
-    private $limit;
-    private $weight;
-    private $expiringTime;
-    private $state = [];
+    private string $resource;
+    private int $limit;
+    private int $weight;
+    private ?float $expiringTime = null;
+    private array $state = [];
 
     public function __construct(string $resource, int $limit, int $weight = 1)
     {

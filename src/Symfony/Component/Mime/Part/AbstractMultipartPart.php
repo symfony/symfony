@@ -18,8 +18,8 @@ use Symfony\Component\Mime\Header\Headers;
  */
 abstract class AbstractMultipartPart extends AbstractPart
 {
-    private $boundary;
-    private $parts = [];
+    private ?string $boundary = null;
+    private array $parts = [];
 
     public function __construct(AbstractPart ...$parts)
     {

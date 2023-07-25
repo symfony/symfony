@@ -20,14 +20,12 @@ use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
  */
 final class ConstructorExtractor implements PropertyTypeExtractorInterface
 {
-    private $extractors;
-
     /**
      * @param iterable<int, ConstructorArgumentTypeExtractorInterface> $extractors
      */
-    public function __construct(iterable $extractors = [])
-    {
-        $this->extractors = $extractors;
+    public function __construct(
+        private readonly iterable $extractors = [],
+    ) {
     }
 
     public function getTypes(string $class, string $property, array $context = []): ?array

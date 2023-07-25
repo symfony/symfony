@@ -18,7 +18,7 @@ use Symfony\Component\Mime\Exception\LogicException;
  */
 class RawMessage
 {
-    private $message;
+    private iterable|string|null $message = null;
 
     public function __construct(iterable|string $message)
     {

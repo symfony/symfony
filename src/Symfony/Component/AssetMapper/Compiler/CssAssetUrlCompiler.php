@@ -12,7 +12,6 @@
 namespace Symfony\Component\AssetMapper\Compiler;
 
 use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 use Symfony\Component\AssetMapper\AssetDependency;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\Exception\RuntimeException;
@@ -29,16 +28,13 @@ final class CssAssetUrlCompiler implements AssetCompilerInterface
 {
     use AssetCompilerPathResolverTrait;
 
-    private readonly LoggerInterface $logger;
-
     // https://regex101.com/r/BOJ3vG/1
     public const ASSET_URL_PATTERN = '/url\(\s*["\']?(?!(?:\/|\#|%23|data|http|\/\/))([^"\'\s?#)]+)([#?][^"\')]+)?\s*["\']?\)/';
 
     public function __construct(
         private readonly string $missingImportMode = self::MISSING_IMPORT_WARN,
-        LoggerInterface $logger = null,
+        private readonly ?LoggerInterface $logger = null,
     ) {
-        $this->logger = $logger ?? new NullLogger();
     }
 
     public function compile(string $content, MappedAsset $asset, AssetMapperInterface $assetMapper): string
@@ -76,7 +72,7 @@ final class CssAssetUrlCompiler implements AssetCompilerInterface
     {
         match ($this->missingImportMode) {
             AssetCompilerInterface::MISSING_IMPORT_IGNORE => null,
-            AssetCompilerInterface::MISSING_IMPORT_WARN => $this->logger->warning($message),
+            AssetCompilerInterface::MISSING_IMPORT_WARN => $this->logger?->warning($message),
             AssetCompilerInterface::MISSING_IMPORT_STRICT => throw new RuntimeException($message, 0, $e),
         };
     }

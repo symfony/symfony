@@ -30,20 +30,16 @@ final class PropertyWriteInfo
     public const VISIBILITY_PROTECTED = 'protected';
     public const VISIBILITY_PRIVATE = 'private';
 
-    private $type;
-    private $name;
-    private $visibility;
-    private $static;
-    private $adderInfo;
-    private $removerInfo;
-    private $errors = [];
+    private ?self $adderInfo = null;
+    private ?self $removerInfo = null;
+    private array $errors = [];
 
-    public function __construct(string $type = self::TYPE_NONE, string $name = null, string $visibility = null, bool $static = null)
-    {
-        $this->type = $type;
-        $this->name = $name;
-        $this->visibility = $visibility;
-        $this->static = $static;
+    public function __construct(
+        private readonly string $type = self::TYPE_NONE,
+        private readonly ?string $name = null,
+        private readonly ?string $visibility = null,
+        private readonly ?bool $static = null,
+    ) {
     }
 
     public function getType(): string

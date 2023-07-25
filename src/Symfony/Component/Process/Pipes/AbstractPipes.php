@@ -22,10 +22,10 @@ abstract class AbstractPipes implements PipesInterface
 {
     public array $pipes = [];
 
-    private $inputBuffer = '';
+    private string $inputBuffer = '';
     private $input;
-    private $blocked = true;
-    private $lastError;
+    private bool $blocked = true;
+    private ?string $lastError = null;
 
     /**
      * @param resource|string|int|float|bool|\Iterator|null $input

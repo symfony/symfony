@@ -68,7 +68,7 @@ class Passport
      *
      * @param string|null $badgeFqcn A FQCN to which the badge should be mapped to.
      *                               This allows replacing a built-in badge by a custom one using
-     *.                              e.g. addBadge(new MyCustomUserBadge(), UserBadge::class)
+     *                               e.g. addBadge(new MyCustomUserBadge(), UserBadge::class)
      *
      * @return $this
      */

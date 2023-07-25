@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-07-21T16:44:47Z
+
+The failures look related.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-07-25T08:49:59Z
+
+the following failure looks related this PR:
+```
+
+1) Symfony\Bundle\FrameworkBundle\Tests\Functional\DebugAutowiringCommandTest::testBasicFunctionality
+Failed asserting that '\n
+In ArrayInput.php line 191:\n
+                                                                  \n
+  [Symfony\Component\Console\Exception\InvalidArgumentException]  \n
+  The "decorated" argument does not exist.                        \n
+                                                                  \n
+\n
+```
+I have the same error locally, I also tried to rebase your PR (not pushed), and got the same error
+
+On 6.4 (up to date), I don't get the error

@@ -429,8 +429,7 @@ class ContextListenerTest extends TestCase
 
 class NotSupportingUserProvider implements UserProviderInterface
 {
-    /** @var bool */
-    private $throwsUnsupportedException;
+    private bool $throwsUnsupportedException;
 
     public function __construct($throwsUnsupportedException)
     {
@@ -464,7 +463,7 @@ class NotSupportingUserProvider implements UserProviderInterface
 
 class SupportingUserProvider implements UserProviderInterface
 {
-    private $refreshedUser;
+    private ?InMemoryUser $refreshedUser;
 
     public function __construct(InMemoryUser $refreshedUser = null)
     {
@@ -500,8 +499,8 @@ class SupportingUserProvider implements UserProviderInterface
 
 class CustomToken implements TokenInterface
 {
-    private $user;
-    private $roles;
+    private UserInterface $user;
+    private array $roles;
 
     public function __construct(UserInterface $user, array $roles)
     {

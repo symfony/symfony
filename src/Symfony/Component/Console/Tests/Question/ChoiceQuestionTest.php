@@ -152,7 +152,7 @@ class ChoiceQuestionTest extends TestCase
 
 class StringChoice
 {
-    private $string;
+    private string $string;
 
     public function __construct(string $string)
     {

@@ -26,25 +26,10 @@ class CompiledUrlGeneratorDumperTest extends TestCase
 {
     use ExpectDeprecationTrait;
 
-    /**
-     * @var RouteCollection
-     */
-    private $routeCollection;
-
-    /**
-     * @var CompiledUrlGeneratorDumper
-     */
-    private $generatorDumper;
-
-    /**
-     * @var string
-     */
-    private $testTmpFilepath;
-
-    /**
-     * @var string
-     */
-    private $largeTestTmpFilepath;
+    private RouteCollection $routeCollection;
+    private CompiledUrlGeneratorDumper $generatorDumper;
+    private string $testTmpFilepath;
+    private string $largeTestTmpFilepath;
 
     protected function setUp(): void
     {
@@ -63,10 +48,6 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         parent::tearDown();
 
         @unlink($this->testTmpFilepath);
-
-        $this->routeCollection = null;
-        $this->generatorDumper = null;
-        $this->testTmpFilepath = null;
     }
 
     public function testDumpWithRoutes()
@@ -166,7 +147,6 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $this->routeCollection->add('Test2', new Route('/testing2'));
 
         file_put_contents($this->largeTestTmpFilepath, $this->generatorDumper->dump());
-        $this->routeCollection = $this->generatorDumper = null;
 
         $projectUrlGenerator = new CompiledUrlGenerator(require $this->largeTestTmpFilepath, new RequestContext('/app.php'));
 

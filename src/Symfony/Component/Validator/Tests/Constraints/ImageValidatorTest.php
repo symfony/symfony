@@ -23,14 +23,14 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 class ImageValidatorTest extends ConstraintValidatorTestCase
 {
-    protected $path;
-    protected $image;
-    protected $imageLandscape;
-    protected $imagePortrait;
-    protected $image4By3;
-    protected $image16By9;
-    protected $imageCorrupted;
-    protected $notAnImage;
+    protected string $path;
+    protected string $image;
+    protected string $imageLandscape;
+    protected string $imagePortrait;
+    protected string $image4By3;
+    protected string $image16By9;
+    protected string $imageCorrupted;
+    protected string $notAnImage;
 
     protected function createValidator(): ImageValidator
     {

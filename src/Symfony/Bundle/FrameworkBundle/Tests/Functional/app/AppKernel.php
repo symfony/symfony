@@ -28,9 +28,9 @@ use Symfony\Component\HttpKernel\Kernel;
  */
 class AppKernel extends Kernel implements ExtensionInterface, ConfigurationInterface
 {
-    private $varDir;
-    private $testCase;
-    private $rootConfig;
+    private string $varDir;
+    private string $testCase;
+    private string $rootConfig;
 
     public function __construct($varDir, $testCase, $rootConfig, $environment, $debug)
     {

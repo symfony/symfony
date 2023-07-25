@@ -24,9 +24,9 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class CompleteCommandTest extends TestCase
 {
-    private $command;
-    private $application;
-    private $tester;
+    private CompleteCommand $command;
+    private Application $application;
+    private CommandTester $tester;
 
     protected function setUp(): void
     {

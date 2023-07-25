@@ -114,8 +114,7 @@ class MethodMarkingStoreTest extends TestCase
     private function createValueObject(string $markingValue): object
     {
         return new class($markingValue) {
-            /** @var string */
-            private $markingValue;
+            private string $markingValue;
 
             public function __construct(string $markingValue)
             {

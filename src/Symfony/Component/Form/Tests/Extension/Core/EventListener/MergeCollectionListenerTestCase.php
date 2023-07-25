@@ -14,23 +14,20 @@ namespace Symfony\Component\Form\Tests\Extension\Core\EventListener;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\EventListener\MergeCollectionListener;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormInterface;
 
 abstract class MergeCollectionListenerTestCase extends TestCase
 {
-    protected $form;
+    protected FormInterface $form;
 
     protected function setUp(): void
     {
         $this->form = $this->getForm('axes');
     }
 
-    protected function tearDown(): void
-    {
-        $this->form = null;
-    }
-
-    abstract protected function getBuilder($name = 'name');
+    abstract protected function getBuilder($name = 'name'): FormBuilderInterface;
 
     protected function getForm($name = 'name', $propertyPath = null)
     {

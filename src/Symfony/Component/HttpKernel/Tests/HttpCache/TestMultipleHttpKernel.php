@@ -21,11 +21,11 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class TestMultipleHttpKernel extends HttpKernel implements ControllerResolverInterface, ArgumentResolverInterface
 {
-    protected $bodies = [];
-    protected $statuses = [];
-    protected $headers = [];
-    protected $called = false;
-    protected $backendRequest;
+    protected array $bodies = [];
+    protected array $statuses = [];
+    protected array $headers = [];
+    protected bool $called = false;
+    protected Request $backendRequest;
 
     public function __construct($responses)
     {

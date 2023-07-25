@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\DependencyInjection;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\DependencyInjection\AbstractDoctrineExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -23,10 +24,7 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
  */
 class DoctrineExtensionTest extends TestCase
 {
-    /**
-     * @var AbstractDoctrineExtension
-     */
-    private $extension;
+    private MockObject&AbstractDoctrineExtension $extension;
 
     protected function setUp(): void
     {

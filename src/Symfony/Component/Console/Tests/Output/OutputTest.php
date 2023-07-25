@@ -175,7 +175,7 @@ class OutputTest extends TestCase
 
 class TestOutput extends Output
 {
-    public $output = '';
+    public string $output = '';
 
     public function clear()
     {

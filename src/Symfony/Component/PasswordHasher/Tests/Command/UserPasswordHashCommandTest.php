@@ -24,9 +24,8 @@ use Symfony\Component\Security\Core\User\InMemoryUser;
 
 class UserPasswordHashCommandTest extends TestCase
 {
-    /** @var CommandTester */
-    private $passwordHasherCommandTester;
-    private $colSize;
+    private ?CommandTester $passwordHasherCommandTester = null;
+    private string|false $colSize;
 
     public function testEncodePasswordEmptySalt()
     {

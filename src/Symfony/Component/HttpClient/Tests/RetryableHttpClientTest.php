@@ -208,7 +208,7 @@ class RetryableHttpClientTest extends TestCase
             new GenericRetryStrategy(),
             1,
             $logger = new class() extends TestLogger {
-                public $context = [];
+                public array $context = [];
 
                 public function log($level, $message, array $context = []): void
                 {

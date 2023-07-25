@@ -16,8 +16,7 @@ use Symfony\Component\Mime\Header\ParameterizedHeader;
 
 class ParameterizedHeaderTest extends TestCase
 {
-    private $charset = 'utf-8';
-    private $lang = 'en-us';
+    private string $lang = 'en-us';
 
     public function testValueIsReturnedVerbatim()
     {

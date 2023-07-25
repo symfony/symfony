@@ -24,7 +24,7 @@ use Symfony\Component\Translation\Translator;
 
 class TranslatorTest extends TestCase
 {
-    private $defaultLocale;
+    private string $defaultLocale;
 
     protected function setUp(): void
     {

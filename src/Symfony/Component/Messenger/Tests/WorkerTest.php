@@ -582,11 +582,11 @@ class WorkerTest extends TestCase
 
 class DummyReceiver implements ReceiverInterface
 {
-    private $deliveriesOfEnvelopes;
-    private $acknowledgedEnvelopes;
-    private $rejectedEnvelopes;
-    private $acknowledgeCount = 0;
-    private $rejectCount = 0;
+    private array $deliveriesOfEnvelopes;
+    private array $acknowledgedEnvelopes = [];
+    private array $rejectedEnvelopes = [];
+    private int $acknowledgeCount = 0;
+    private int $rejectCount = 0;
 
     /**
      * @param Envelope[][] $deliveriesOfEnvelopes
@@ -643,7 +643,7 @@ class DummyBatchHandler implements BatchHandlerInterface
 {
     use BatchHandlerTrait;
 
-    public $processedMessages;
+    public array $processedMessages;
 
     public function __invoke(DummyMessage $message, Acknowledger $ack = null)
     {
@@ -667,7 +667,7 @@ class DummyBatchHandler implements BatchHandlerInterface
 
 class ResettableDummyReceiver extends DummyReceiver implements ResetInterface
 {
-    private $hasBeenReset = false;
+    private bool $hasBeenReset = false;
 
     public function reset(): void
     {

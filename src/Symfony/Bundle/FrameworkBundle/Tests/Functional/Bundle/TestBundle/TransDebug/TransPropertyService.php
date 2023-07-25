@@ -15,8 +15,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TransPropertyService
 {
-    /** @var TranslatorInterface */
-    public $translator;
+    public TranslatorInterface $translator;
 
     public function hello(): string
     {

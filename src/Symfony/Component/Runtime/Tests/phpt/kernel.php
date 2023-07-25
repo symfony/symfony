@@ -17,7 +17,7 @@ require __DIR__.'/autoload.php';
 
 class TestKernel implements HttpKernelInterface
 {
-    private $var;
+    private string $var;
 
     public function __construct(string $var)
     {

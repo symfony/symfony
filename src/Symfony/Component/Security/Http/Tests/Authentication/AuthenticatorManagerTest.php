@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\Authentication;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
@@ -37,12 +38,12 @@ use Symfony\Component\Security\Http\Tests\Fixtures\DummySupportsAuthenticator;
 
 class AuthenticatorManagerTest extends TestCase
 {
-    private $tokenStorage;
-    private $eventDispatcher;
-    private $request;
-    private $user;
-    private $token;
-    private $response;
+    private MockObject&TokenStorageInterface $tokenStorage;
+    private EventDispatcher $eventDispatcher;
+    private Request $request;
+    private InMemoryUser $user;
+    private MockObject&TokenInterface $token;
+    private Response $response;
 
     protected function setUp(): void
     {
@@ -343,7 +344,7 @@ class AuthenticatorManagerTest extends TestCase
             ->willReturn($this->response);
 
         $logger = new class() extends AbstractLogger {
-            public $logContexts = [];
+            public array $logContexts = [];
 
             public function log($level, $message, array $context = []): void
             {

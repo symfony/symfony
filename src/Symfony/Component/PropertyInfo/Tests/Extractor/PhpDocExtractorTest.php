@@ -26,10 +26,7 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class PhpDocExtractorTest extends TestCase
 {
-    /**
-     * @var PhpDocExtractor
-     */
-    private $extractor;
+    private PhpDocExtractor $extractor;
 
     protected function setUp(): void
     {

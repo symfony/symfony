@@ -23,10 +23,7 @@ use Symfony\Component\Intl\Exception\RuntimeException;
  */
 class IntlBundleReaderTest extends TestCase
 {
-    /**
-     * @var IntlBundleReader
-     */
-    private $reader;
+    private IntlBundleReader $reader;
 
     protected function setUp(): void
     {

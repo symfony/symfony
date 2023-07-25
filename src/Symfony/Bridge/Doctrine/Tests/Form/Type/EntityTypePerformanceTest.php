@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Form\Type;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
@@ -26,10 +27,7 @@ class EntityTypePerformanceTest extends FormPerformanceTestCase
 {
     private const ENTITY_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity';
 
-    /**
-     * @var \Doctrine\ORM\EntityManager
-     */
-    private $em;
+    private EntityManager $em;
 
     protected function getExtensions()
     {

@@ -24,14 +24,13 @@ use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Uid\Ulid;
 
 // DBAL 2 compatibility
-class_exists('Doctrine\DBAL\Platforms\PostgreSqlPlatform');
+class_exists(\Doctrine\DBAL\Platforms\PostgreSqlPlatform::class);
 
 final class UlidTypeTest extends TestCase
 {
     private const DUMMY_ULID = '01EEDQEK6ZAZE93J8KG5B4MBJC';
 
-    /** @var UlidType */
-    private $type;
+    private UlidType $type;
 
     public static function setUpBeforeClass(): void
     {

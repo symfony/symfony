@@ -19,29 +19,13 @@ use Symfony\Component\EventDispatcher\GenericEvent;
  */
 class GenericEventTest extends TestCase
 {
-    /**
-     * @var GenericEvent
-     */
-    private $event;
+    private GenericEvent $event;
+    private \stdClass $subject;
 
-    private $subject;
-
-    /**
-     * Prepares the environment before running a test.
-     */
     protected function setUp(): void
     {
         $this->subject = new \stdClass();
         $this->event = new GenericEvent($this->subject, ['name' => 'Event']);
-    }
-
-    /**
-     * Cleans up the environment after running a test.
-     */
-    protected function tearDown(): void
-    {
-        $this->subject = null;
-        $this->event = null;
     }
 
     public function testConstruct()

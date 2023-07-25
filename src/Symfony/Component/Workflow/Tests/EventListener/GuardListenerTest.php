@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Workflow\Tests\EventListener;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -32,10 +33,10 @@ use Symfony\Component\Workflow\WorkflowInterface;
 
 class GuardListenerTest extends TestCase
 {
-    private $authenticationChecker;
-    private $validator;
-    private $listener;
-    private $configuration;
+    private MockObject&AuthorizationCheckerInterface $authenticationChecker;
+    private MockObject&ValidatorInterface $validator;
+    private GuardListener $listener;
+    private array $configuration;
 
     protected function setUp(): void
     {
@@ -56,13 +57,6 @@ class GuardListenerTest extends TestCase
         $this->validator = $this->createMock(ValidatorInterface::class);
         $roleHierarchy = new RoleHierarchy([]);
         $this->listener = new GuardListener($this->configuration, $expressionLanguage, $tokenStorage, $this->authenticationChecker, $trustResolver, $roleHierarchy, $this->validator);
-    }
-
-    protected function tearDown(): void
-    {
-        $this->authenticationChecker = null;
-        $this->validator = null;
-        $this->listener = null;
     }
 
     public function testWithNotSupportedEvent()

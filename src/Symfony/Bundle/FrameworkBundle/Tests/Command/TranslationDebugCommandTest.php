@@ -28,8 +28,8 @@ use Symfony\Component\Translation\Translator;
 
 class TranslationDebugCommandTest extends TestCase
 {
-    private $fs;
-    private $translationDir;
+    private Filesystem $fs;
+    private string $translationDir;
 
     public function testDebugMissingMessages()
     {

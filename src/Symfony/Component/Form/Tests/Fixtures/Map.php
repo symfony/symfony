@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Tests\Fixtures;
 
 class Map implements \ArrayAccess
 {
-    private $data = [];
+    private array $data = [];
 
     public function offsetExists($offset): bool
     {

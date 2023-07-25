@@ -17,7 +17,7 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\ArrayToPartsTransforme
 
 class ArrayToPartsTransformerTest extends TestCase
 {
-    private $transformer;
+    private ArrayToPartsTransformer $transformer;
 
     protected function setUp(): void
     {
@@ -25,11 +25,6 @@ class ArrayToPartsTransformerTest extends TestCase
             'first' => ['a', 'b', 'c'],
             'second' => ['d', 'e', 'f'],
         ]);
-    }
-
-    protected function tearDown(): void
-    {
-        $this->transformer = null;
     }
 
     public function testTransform()

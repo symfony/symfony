@@ -20,7 +20,7 @@ use Symfony\Component\Cache\Adapter\PdoAdapter;
  */
 class PdoAdapterTest extends AdapterTestCase
 {
-    protected static $dbFile;
+    protected static string $dbFile;
 
     public static function setUpBeforeClass(): void
     {

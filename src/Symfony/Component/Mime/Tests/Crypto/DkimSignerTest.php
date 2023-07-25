@@ -25,7 +25,7 @@ use Symfony\Component\Mime\Message;
  */
 class DkimSignerTest extends TestCase
 {
-    private static $pk = <<<EOF
+    private static string $pk = <<<EOF
 -----BEGIN RSA PRIVATE KEY-----
 MIICXAIBAAKBgQC6lQYNOMaboSOE/c2KNl8Rwk61zoMXrEmXC926an3/jHrtj9wB
 ndP2DY2nUyz0vpmJlcDOjDwTGs8U/C7zn7PDdZ8EuuxlAa7oNo/38YYV+5Oki93m

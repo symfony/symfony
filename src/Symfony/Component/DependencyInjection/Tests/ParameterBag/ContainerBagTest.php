@@ -22,10 +22,8 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class ContainerBagTest extends TestCase
 {
-    /** @var ParameterBag */
-    private $parameterBag;
-    /** @var ContainerBag */
-    private $containerBag;
+    private ParameterBag $parameterBag;
+    private ContainerBag $containerBag;
 
     protected function setUp(): void
     {

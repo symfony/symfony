@@ -27,8 +27,8 @@ use Symfony\Component\Translation\Writer\TranslationWriter;
 
 class TranslationUpdateCommandCompletionTest extends TestCase
 {
-    private $fs;
-    private $translationDir;
+    private Filesystem $fs;
+    private string $translationDir;
 
     /**
      * @dataProvider provideCompletionSuggestions

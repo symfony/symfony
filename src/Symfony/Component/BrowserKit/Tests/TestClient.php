@@ -16,8 +16,8 @@ use Symfony\Component\BrowserKit\Response;
 
 class TestClient extends AbstractBrowser
 {
-    protected $nextResponse;
-    protected $nextScript;
+    protected ?Response $nextResponse = null;
+    protected string $nextScript;
 
     public function setNextResponse(Response $response)
     {

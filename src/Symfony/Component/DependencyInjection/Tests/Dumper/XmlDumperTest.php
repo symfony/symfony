@@ -28,7 +28,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument
 
 class XmlDumperTest extends TestCase
 {
-    protected static $fixturesPath;
+    protected static string $fixturesPath;
 
     public static function setUpBeforeClass(): void
     {

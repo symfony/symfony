@@ -4,7 +4,7 @@ namespace Symfony\Component\Messenger\Tests\Fixtures;
 
 class DummyMessage implements DummyMessageInterface
 {
-    private $message;
+    private string $message;
 
     public function __construct(string $message)
     {

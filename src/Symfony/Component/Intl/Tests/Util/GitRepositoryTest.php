@@ -21,7 +21,7 @@ use Symfony\Component\Intl\Util\GitRepository;
  */
 class GitRepositoryTest extends TestCase
 {
-    private $targetDir;
+    private ?string $targetDir = null;
 
     private const REPO_URL = 'https://github.com/symfony/intl.git';
 

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Composite;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
@@ -20,7 +21,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 class ConcreteComposite extends Composite
 {
-    public $constraints = [];
+    public array|Constraint $constraints = [];
 
     protected function getCompositeOption(): string
     {

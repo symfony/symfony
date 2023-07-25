@@ -32,10 +32,7 @@ class FormExtensionBootstrap5LayoutTest extends AbstractBootstrap5LayoutTestCase
 {
     use RuntimeLoaderProvider;
 
-    /**
-     * @var FormRenderer
-     */
-    private $renderer;
+    private FormRenderer $renderer;
 
     protected function setUp(): void
     {

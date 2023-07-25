@@ -30,8 +30,7 @@ class CouchbaseBucketAdapterTest extends AdapterTestCase
         'testClearPrefix' => 'Couchbase cannot clear by prefix',
     ];
 
-    /** @var \CouchbaseBucket */
-    protected static $client;
+    protected static \CouchbaseBucket $client;
 
     public static function setupBeforeClass(): void
     {

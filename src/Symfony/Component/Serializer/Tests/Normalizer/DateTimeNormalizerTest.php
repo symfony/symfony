@@ -21,10 +21,7 @@ use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
  */
 class DateTimeNormalizerTest extends TestCase
 {
-    /**
-     * @var DateTimeNormalizer
-     */
-    private $normalizer;
+    private DateTimeNormalizer $normalizer;
 
     protected function setUp(): void
     {

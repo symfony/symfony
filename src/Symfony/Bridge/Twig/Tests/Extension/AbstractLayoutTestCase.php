@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
-use PHPUnit\Framework\SkippedTestError;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\PercentType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
@@ -28,9 +28,10 @@ abstract class AbstractLayoutTestCase extends FormIntegrationTestCase
 {
     use VersionAwareTest;
 
-    protected $csrfTokenManager;
-    protected $testableFeatures = [];
-    private $defaultLocale;
+    protected MockObject&CsrfTokenManagerInterface $csrfTokenManager;
+    protected array $testableFeatures = [];
+
+    private string $defaultLocale;
 
     protected function setUp(): void
     {
@@ -55,7 +56,6 @@ abstract class AbstractLayoutTestCase extends FormIntegrationTestCase
 
     protected function tearDown(): void
     {
-        $this->csrfTokenManager = null;
         \Locale::setDefault($this->defaultLocale);
 
         parent::tearDown();

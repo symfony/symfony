@@ -21,7 +21,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 class ArrayUserProvider implements UserProviderInterface
 {
     /** @var UserInterface[] */
-    private $users = [];
+    private array $users = [];
 
     public function addUser(UserInterface $user)
     {

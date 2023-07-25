@@ -27,24 +27,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DefaultChoiceListFactoryTest extends TestCase
 {
-    private $obj1;
-
-    private $obj2;
-
-    private $obj3;
-
-    private $obj4;
-
-    private $obj5;
-
-    private $obj6;
-
-    private $list;
-
-    /**
-     * @var DefaultChoiceListFactory
-     */
-    private $factory;
+    private \stdClass $obj1;
+    private \stdClass $obj2;
+    private \stdClass $obj3;
+    private \stdClass $obj4;
+    private ArrayChoiceList $list;
+    private DefaultChoiceListFactory $factory;
 
     public function getValue($object)
     {
@@ -208,9 +196,9 @@ class DefaultChoiceListFactoryTest extends TestCase
     public function testCreateFromFilteredChoices()
     {
         $list = $this->factory->createListFromChoices(
-            ['A' => $this->obj1, 'B' => $this->obj2, 'C' => $this->obj3, 'D' => $this->obj4, 'E' => $this->obj5, 'F' => $this->obj6],
+            ['A' => $this->obj1, 'B' => $this->obj2, 'C' => $this->obj3, 'D' => $this->obj4, 'E' => null, 'F' => null],
             null,
-            fn ($choice) => $choice !== $this->obj5 && $choice !== $this->obj6
+            fn ($choice) => null !== $choice
         );
 
         $this->assertObjectListWithGeneratedValues($list);
@@ -222,11 +210,11 @@ class DefaultChoiceListFactoryTest extends TestCase
             [
                 'Group 1' => ['A' => $this->obj1, 'B' => $this->obj2],
                 'Group 2' => ['C' => $this->obj3, 'D' => $this->obj4],
-                'Group 3' => ['E' => $this->obj5, 'F' => $this->obj6],
+                'Group 3' => ['E' => null, 'F' => null],
                 'Group 4' => [/* empty group should be filtered */],
             ],
             null,
-            fn ($choice) => $choice !== $this->obj5 && $choice !== $this->obj6
+            fn ($choice) => null !== $choice
         );
 
         $this->assertObjectListWithGeneratedValues($list);
@@ -238,11 +226,11 @@ class DefaultChoiceListFactoryTest extends TestCase
             new \ArrayIterator([
                 'Group 1' => ['A' => $this->obj1, 'B' => $this->obj2],
                 'Group 2' => ['C' => $this->obj3, 'D' => $this->obj4],
-                'Group 3' => ['E' => $this->obj5, 'F' => $this->obj6],
+                'Group 3' => ['E' => null, 'F' => null],
                 'Group 4' => [/* empty group should be filtered */],
             ]),
             null,
-            fn ($choice) => $choice !== $this->obj5 && $choice !== $this->obj6
+            fn ($choice) => null !== $choice
         );
 
         $this->assertObjectListWithGeneratedValues($list);
@@ -1026,7 +1014,7 @@ class DefaultChoiceListFactoryTest extends TestCase
 
 class DefaultChoiceListFactoryTest_Castable
 {
-    private $property;
+    private string $property;
 
     public function __construct($property)
     {

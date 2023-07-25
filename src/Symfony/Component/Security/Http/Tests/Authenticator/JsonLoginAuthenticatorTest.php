@@ -29,9 +29,8 @@ class JsonLoginAuthenticatorTest extends TestCase
 {
     use ExpectDeprecationTrait;
 
-    private $userProvider;
-    /** @var JsonLoginAuthenticator */
-    private $authenticator;
+    private InMemoryUserProvider $userProvider;
+    private JsonLoginAuthenticator $authenticator;
 
     protected function setUp(): void
     {

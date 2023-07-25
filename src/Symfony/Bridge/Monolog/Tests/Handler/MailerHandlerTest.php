@@ -24,8 +24,7 @@ use Symfony\Component\Mime\Email;
 
 class MailerHandlerTest extends TestCase
 {
-    /** @var MockObject|MailerInterface */
-    private $mailer;
+    private MockObject&MailerInterface $mailer;
 
     protected function setUp(): void
     {

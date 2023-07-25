@@ -56,7 +56,7 @@ abstract class AbstractRedisStoreTestCase extends AbstractStoreTestCase
 
 class Symfony51Store
 {
-    private $redis;
+    private \Redis|Relay|\RedisCluster|\RedisArray|\Predis\ClientInterface $redis;
 
     public function __construct($redis)
     {

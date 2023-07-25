@@ -19,7 +19,7 @@ use Symfony\Component\Process\ExecutableFinder;
  */
 class ExecutableFinderTest extends TestCase
 {
-    private $path;
+    private string|false $path = false;
 
     protected function tearDown(): void
     {

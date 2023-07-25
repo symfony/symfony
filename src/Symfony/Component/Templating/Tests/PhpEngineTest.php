@@ -24,16 +24,11 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
 
 class PhpEngineTest extends TestCase
 {
-    protected $loader;
+    protected ProjectTemplateLoader $loader;
 
     protected function setUp(): void
     {
         $this->loader = new ProjectTemplateLoader();
-    }
-
-    protected function tearDown(): void
-    {
-        $this->loader = null;
     }
 
     public function testConstructor()
@@ -204,7 +199,7 @@ class ProjectTemplateEngine extends PhpEngine
 
 class ProjectTemplateLoader extends Loader
 {
-    public $templates = [];
+    public array $templates = [];
 
     public function setTemplate($name, $content)
     {

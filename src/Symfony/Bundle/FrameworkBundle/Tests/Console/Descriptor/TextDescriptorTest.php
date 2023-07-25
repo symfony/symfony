@@ -17,7 +17,7 @@ use Symfony\Component\Routing\Route;
 
 class TextDescriptorTest extends AbstractDescriptorTestCase
 {
-    private static $fileLinkFormatter;
+    private static ?FileLinkFormatter $fileLinkFormatter = null;
 
     protected static function getDescriptor()
     {

@@ -19,11 +19,8 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactory;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormRegistry;
-use Symfony\Component\Form\FormTypeExtensionInterface;
-use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\ResolvedFormType;
 use Symfony\Component\Form\ResolvedFormTypeFactory;
@@ -36,42 +33,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ResolvedFormTypeTest extends TestCase
 {
-    private $calls;
-
-    /**
-     * @var FormTypeInterface
-     */
-    private $parentType;
-
-    /**
-     * @var FormTypeInterface
-     */
-    private $type;
-
-    /**
-     * @var FormTypeExtensionInterface
-     */
-    private $extension1;
-
-    /**
-     * @var FormTypeExtensionInterface
-     */
-    private $extension2;
-
-    /**
-     * @var ResolvedFormType
-     */
-    private $parentResolvedType;
-
-    /**
-     * @var ResolvedFormType
-     */
-    private $resolvedType;
-
-    /**
-     * @var FormFactoryInterface
-     */
-    private $formFactory;
+    private array $calls;
+    private UsageTrackingParentFormType $parentType;
+    private UsageTrackingFormType $type;
+    private UsageTrackingFormTypeExtension $extension1;
+    private UsageTrackingFormTypeExtension $extension2;
+    private ResolvedFormType $parentResolvedType;
+    private ResolvedFormType $resolvedType;
+    private FormFactory $formFactory;
 
     protected function setUp(): void
     {
@@ -246,7 +215,7 @@ class UsageTrackingFormTypeExtension extends AbstractTypeExtension
 {
     use UsageTrackingTrait;
 
-    private $defaultOptions;
+    private array $defaultOptions;
 
     public function __construct(array &$calls, array $defaultOptions)
     {
@@ -267,7 +236,7 @@ class UsageTrackingFormTypeExtension extends AbstractTypeExtension
 
 trait UsageTrackingTrait
 {
-    private $calls;
+    private array $calls;
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

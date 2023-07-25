@@ -13,13 +13,12 @@ namespace Symfony\Component\Workflow\Tests;
 
 final class Subject
 {
-    private $marking;
-    private $context;
+    private string|array|null $marking;
+    private array $context = [];
 
     public function __construct($marking = null)
     {
         $this->marking = $marking;
-        $this->context = [];
     }
 
     public function getMarking(): string|array|null

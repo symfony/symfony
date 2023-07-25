@@ -17,9 +17,9 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class AutowiredServices
 {
-    private $annotationReader;
-    private $dispatcher;
-    private $cachePool;
+    private ?Reader $annotationReader;
+    private EventDispatcherInterface $dispatcher;
+    private CacheItemPoolInterface $cachePool;
 
     public function __construct(Reader $annotationReader = null, EventDispatcherInterface $dispatcher, CacheItemPoolInterface $cachePool)
     {

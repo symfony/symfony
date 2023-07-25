@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\Authentication;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -26,13 +27,13 @@ use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 class DefaultAuthenticationFailureHandlerTest extends TestCase
 {
-    private $httpKernel;
-    private $httpUtils;
-    private $logger;
-    private $request;
-    private $response;
-    private $session;
-    private $exception;
+    private MockObject&HttpKernelInterface $httpKernel;
+    private MockObject&HttpUtils $httpUtils;
+    private MockObject&LoggerInterface $logger;
+    private Request $request;
+    private Response $response;
+    private MockObject&SessionInterface $session;
+    private AuthenticationException $exception;
 
     protected function setUp(): void
     {

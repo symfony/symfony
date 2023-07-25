@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\Authenticator;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -28,11 +29,10 @@ use Symfony\Component\Security\Http\Tests\Authenticator\Fixtures\PasswordUpgrade
 
 class FormLoginAuthenticatorTest extends TestCase
 {
-    private $userProvider;
-    private $successHandler;
-    private $failureHandler;
-    /** @var FormLoginAuthenticator */
-    private $authenticator;
+    private InMemoryUserProvider $userProvider;
+    private MockObject&AuthenticationSuccessHandlerInterface $successHandler;
+    private MockObject&AuthenticationFailureHandlerInterface $failureHandler;
+    private FormLoginAuthenticator $authenticator;
 
     protected function setUp(): void
     {

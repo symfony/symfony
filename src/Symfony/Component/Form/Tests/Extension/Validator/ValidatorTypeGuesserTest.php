@@ -42,23 +42,15 @@ use Symfony\Component\Validator\Tests\Fixtures\FakeMetadataFactory;
 class ValidatorTypeGuesserTest extends TestCase
 {
     public const TEST_CLASS = 'Symfony\Component\Form\Tests\Extension\Validator\ValidatorTypeGuesserTest_TestClass';
-
     public const TEST_PROPERTY = 'property';
 
-    /**
-     * @var ValidatorTypeGuesser
-     */
-    private $guesser;
-
-    /**
-     * @var ClassMetadata
-     */
-    private $metadata;
+    private ValidatorTypeGuesser $guesser;
+    private ClassMetadata $metadata;
 
     /**
      * @var MetadataFactoryInterface
      */
-    private $metadataFactory;
+    private \Symfony\Component\Validator\Tests\Fixtures\FakeMetadataFactory $metadataFactory;
 
     protected function setUp(): void
     {

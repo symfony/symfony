@@ -27,10 +27,7 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class AbstractPropertyInfoExtractorTest extends TestCase
 {
-    /**
-     * @var PropertyInfoExtractor
-     */
-    protected $propertyInfo;
+    protected PropertyInfoExtractorInterface $propertyInfo;
 
     protected function setUp(): void
     {

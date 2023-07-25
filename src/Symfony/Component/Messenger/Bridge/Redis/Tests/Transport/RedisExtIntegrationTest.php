@@ -28,8 +28,8 @@ use Symfony\Component\Messenger\Transport\Serialization\Serializer;
  */
 class RedisExtIntegrationTest extends TestCase
 {
-    private $redis;
-    private $connection;
+    private \Redis|Relay|null $redis = null;
+    private ?Connection $connection = null;
 
     protected function setUp(): void
     {

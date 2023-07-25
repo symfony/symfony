@@ -19,10 +19,7 @@ use Symfony\Component\ExpressionLanguage\TokenStream;
 
 class LexerTest extends TestCase
 {
-    /**
-     * @var Lexer
-     */
-    private $lexer;
+    private Lexer $lexer;
 
     protected function setUp(): void
     {

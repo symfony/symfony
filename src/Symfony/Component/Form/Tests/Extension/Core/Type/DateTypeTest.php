@@ -24,8 +24,8 @@ class DateTypeTest extends BaseTypeTestCase
 
     public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\DateType';
 
-    private $defaultTimezone;
-    private $defaultLocale;
+    private string $defaultTimezone;
+    private string $defaultLocale;
 
     protected function setUp(): void
     {

@@ -17,9 +17,9 @@ use Symfony\Component\Console\Terminal;
 
 class TerminalTest extends TestCase
 {
-    private $colSize;
-    private $lineSize;
-    private $ansiCon;
+    private string|false $colSize;
+    private string|false $lineSize;
+    private string|false $ansiCon;
 
     protected function setUp(): void
     {

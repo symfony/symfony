@@ -17,7 +17,7 @@ use Symfony\Component\Dotenv\Dotenv;
 
 class DotenvVaultTest extends TestCase
 {
-    private $envFile;
+    private string $envFile;
 
     protected function setUp(): void
     {

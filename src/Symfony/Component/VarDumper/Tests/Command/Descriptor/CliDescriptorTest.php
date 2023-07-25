@@ -20,8 +20,8 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
 
 class CliDescriptorTest extends TestCase
 {
-    private static $timezone;
-    private static $prevTerminalEmulator;
+    private static string $timezone;
+    private static string|false $prevTerminalEmulator;
 
     public static function setUpBeforeClass(): void
     {

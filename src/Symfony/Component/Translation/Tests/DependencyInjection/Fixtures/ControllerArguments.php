@@ -9,13 +9,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Translation\Tests\DependencyInjection\fixtures;
+namespace Symfony\Component\Translation\Tests\DependencyInjection\Fixtures;
 
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ServiceMethodCalls
+class ControllerArguments
 {
-    public function setTranslator(TranslatorInterface $translator)
+    public function __invoke(TranslatorInterface $translator)
+    {
+    }
+
+    public function index(TranslatorInterface $translator)
     {
     }
 }

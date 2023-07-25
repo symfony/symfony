@@ -16,8 +16,8 @@ use Symfony\Component\Finder\Tests\FinderTest;
 
 abstract class RealIteratorTestCase extends IteratorTestCase
 {
-    protected static $tmpDir;
-    protected static $files;
+    protected static string $tmpDir;
+    protected static array $files;
 
     public static function setUpBeforeClass(): void
     {
@@ -126,9 +126,7 @@ abstract class RealIteratorTestCase extends IteratorTestCase
         /*
          * Without the call to setUpBeforeClass() property can be null.
          */
-        if (!self::$tmpDir) {
-            self::$tmpDir = realpath(sys_get_temp_dir()).\DIRECTORY_SEPARATOR.'symfony_finder';
-        }
+        self::$tmpDir ??= realpath(sys_get_temp_dir()).\DIRECTORY_SEPARATOR.'symfony_finder';
 
         if (\is_array($files)) {
             $f = [];

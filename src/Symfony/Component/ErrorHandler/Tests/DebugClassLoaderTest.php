@@ -17,9 +17,9 @@ use Symfony\Component\ErrorHandler\DebugClassLoader;
 
 class DebugClassLoaderTest extends TestCase
 {
-    private $patchTypes;
-    private $errorReporting;
-    private $loader;
+    private string|false $patchTypes;
+    private int $errorReporting;
+    private array $loader;
 
     protected function setUp(): void
     {

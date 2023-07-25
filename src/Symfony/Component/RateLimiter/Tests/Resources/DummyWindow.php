@@ -15,8 +15,8 @@ use Symfony\Component\RateLimiter\LimiterStateInterface;
 
 class DummyWindow implements LimiterStateInterface
 {
-    private $id;
-    private $expirationTime;
+    private string $id;
+    private ?int $expirationTime;
 
     public function __construct(string $id = 'test', ?int $expirationTime = 10)
     {

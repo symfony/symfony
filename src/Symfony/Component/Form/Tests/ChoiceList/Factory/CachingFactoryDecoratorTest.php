@@ -28,10 +28,7 @@ use Symfony\Component\Form\Tests\Fixtures\ArrayChoiceLoader;
  */
 class CachingFactoryDecoratorTest extends TestCase
 {
-    /**
-     * @var CachingFactoryDecorator
-     */
-    private $factory;
+    private CachingFactoryDecorator $factory;
 
     protected function setUp(): void
     {

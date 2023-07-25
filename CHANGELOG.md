@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+# 2.3.0 (2023-07-25)
+
+* Leverage `Request::getPayload()` to populate the parsed body of PSR-7 requests
+* Implement `ValueResolverInterface` introduced with Symfony 6.2
+
 # 2.2.0 (2023-04-21)
 
 * Drop support for Symfony 4

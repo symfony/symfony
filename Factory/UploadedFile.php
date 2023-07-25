@@ -52,7 +52,7 @@ class UploadedFile extends BaseUploadedFile
     /**
      * {@inheritdoc}
      */
-    public function move($directory, $name = null): File
+    public function move(string $directory, string $name = null): File
     {
         if (!$this->isValid() || $this->test) {
             return parent::move($directory, $name);

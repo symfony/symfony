@@ -98,7 +98,7 @@ class CovertTest extends TestCase
         }
     }
 
-    public function requestProvider()
+    public static function requestProvider(): array
     {
         $sfRequest = new Request(
             [
@@ -120,8 +120,8 @@ class CovertTest extends TestCase
                 'c2' => ['c3' => 'bar'],
             ],
             [
-                'f1' => $this->createUploadedFile('F1', 'f1.txt', 'text/plain', \UPLOAD_ERR_OK),
-                'foo' => ['f2' => $this->createUploadedFile('F2', 'f2.txt', 'text/plain', \UPLOAD_ERR_OK)],
+                'f1' => self::createUploadedFile('F1', 'f1.txt', 'text/plain', \UPLOAD_ERR_OK),
+                'foo' => ['f2' => self::createUploadedFile('F2', 'f2.txt', 'text/plain', \UPLOAD_ERR_OK)],
             ],
             [
                 'REQUEST_METHOD' => 'POST',
@@ -195,7 +195,7 @@ class CovertTest extends TestCase
         }
     }
 
-    public function responseProvider()
+    public static function responseProvider(): array
     {
         $sfResponse = new Response(
             'Response content.',
@@ -227,7 +227,7 @@ class CovertTest extends TestCase
         ];
     }
 
-    private function createUploadedFile($content, $originalName, $mimeType, $error)
+    private static function createUploadedFile(string $content, string $originalName, string $mimeType, int $error): UploadedFile
     {
         $path = tempnam(sys_get_temp_dir(), uniqid());
         file_put_contents($path, $content);

@@ -25,7 +25,7 @@ class Message implements MessageInterface
     private $headers = [];
     private $body;
 
-    public function __construct($version = '1.1', array $headers = [], StreamInterface $body = null)
+    public function __construct(string $version = '1.1', array $headers = [], StreamInterface $body = null)
     {
         $this->version = $version;
         $this->headers = $headers;

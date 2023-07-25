@@ -41,6 +41,8 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return Request
      */
     public function createRequest(ServerRequestInterface $psrRequest, bool $streamed = false)
     {
@@ -121,6 +123,8 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return Response
      */
     public function createResponse(ResponseInterface $psrResponse, bool $streamed = false)
     {

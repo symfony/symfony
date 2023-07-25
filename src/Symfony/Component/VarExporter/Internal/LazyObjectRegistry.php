@@ -141,7 +141,7 @@ class LazyObjectRegistry
         if (\ReflectionProperty::class === $scope = $frame['class'] ?? \Closure::class) {
             $scope = $frame['object']->class;
         }
-        if (null === $readonlyScope && '*' === $k[1] && ($class === $scope || is_subclass_of($class, $scope))) {
+        if (null === $readonlyScope && '*' === $k[1] && ($class === $scope || (is_subclass_of($class, $scope) && !isset($propertyScopes["\0$scope\0$property"])))) {
             return null;
         }
 

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Ldap\Adapter\ExtLdap;
 
-use LDAP\Connection as LDAPConnection;
 use LDAP\Result;
 use Symfony\Component\Ldap\Adapter\AbstractQuery;
 use Symfony\Component\Ldap\Adapter\CollectionInterface;
@@ -26,7 +25,7 @@ class Query extends AbstractQuery
 {
     public const PAGINATION_OID = \LDAP_CONTROL_PAGEDRESULTS;
 
-    /** @var resource[]|Result[] */
+    /** @var Result[] */
     private array $results;
 
     private array $serverctrls = [];
@@ -102,7 +101,7 @@ class Query extends AbstractQuery
                 if ($pageSize > 0 && $sizeLimit >= $pageSize) {
                     $sizeLimit = 0;
                 }
-                $search = $this->callSearchFunction($con, $func, $sizeLimit);
+                $search = @$func($con, $this->dn, $this->query, $this->options['filter'], $this->options['attrsOnly'], $sizeLimit, $this->options['timeout'], $this->options['deref'], $this->serverctrls);
 
                 if (false === $search) {
                     $ldapError = '';
@@ -123,7 +122,9 @@ class Query extends AbstractQuery
                     break;
                 }
                 if ($pageControl) {
-                    $cookie = $this->controlPagedResultResponse($con, $search);
+                    ldap_parse_result($con, $search, $errcode, $matcheddn, $errmsg, $referrals, $controls);
+
+                    $cookie = $controls[\LDAP_CONTROL_PAGEDRESULTS]['value']['cookie'] ?? '';
                 }
             } while (null !== $cookie && '' !== $cookie);
 
@@ -139,11 +140,9 @@ class Query extends AbstractQuery
      * Returns an LDAP search resource. If this query resulted in multiple searches, only the first
      * page will be returned.
      *
-     * @return resource|Result|null
-     *
      * @internal
      */
-    public function getResource(int $idx = 0)
+    public function getResource(int $idx = 0): ?Result
     {
         return $this->results[$idx] ?? null;
     }
@@ -151,7 +150,7 @@ class Query extends AbstractQuery
     /**
      * Returns all LDAP search resources.
      *
-     * @return resource[]|Result[]
+     * @return Result[]
      *
      * @internal
      */
@@ -208,30 +207,5 @@ class Query extends AbstractQuery
         ];
 
         return true;
-    }
-
-    /**
-     * Retrieve LDAP pagination cookie.
-     *
-     * @param resource|LDAPConnection $con
-     * @param resource|Result         $result
-     */
-    private function controlPagedResultResponse($con, $result): string
-    {
-        ldap_parse_result($con, $result, $errcode, $matcheddn, $errmsg, $referrals, $controls);
-
-        return $controls[\LDAP_CONTROL_PAGEDRESULTS]['value']['cookie'] ?? '';
-    }
-
-    /**
-     * Calls actual LDAP search function with the prepared options and parameters.
-     *
-     * @param resource|LDAPConnection $con
-     *
-     * @return resource|Result|false
-     */
-    private function callSearchFunction($con, callable $func, int $sizeLimit)
-    {
-        return @$func($con, $this->dn, $this->query, $this->options['filter'], $this->options['attrsOnly'], $sizeLimit, $this->options['timeout'], $this->options['deref'], $this->serverctrls);
     }
 }

@@ -24,10 +24,10 @@ final class AttributeAutoconfigurationPass extends AbstractRecursivePass
 {
     protected bool $skipScalars = true;
 
-    private $classAttributeConfigurators = [];
-    private $methodAttributeConfigurators = [];
-    private $propertyAttributeConfigurators = [];
-    private $parameterAttributeConfigurators = [];
+    private array $classAttributeConfigurators = [];
+    private array $methodAttributeConfigurators = [];
+    private array $propertyAttributeConfigurators = [];
+    private array $parameterAttributeConfigurators = [];
 
     public function process(ContainerBuilder $container): void
     {

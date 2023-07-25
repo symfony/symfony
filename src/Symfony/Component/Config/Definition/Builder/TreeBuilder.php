@@ -44,11 +44,7 @@ class TreeBuilder implements NodeParentInterface
      */
     public function buildTree(): NodeInterface
     {
-        if (null !== $this->tree) {
-            return $this->tree;
-        }
-
-        return $this->tree = $this->root->getNode(true);
+        return $this->tree ??= $this->root->getNode(true);
     }
 
     /**

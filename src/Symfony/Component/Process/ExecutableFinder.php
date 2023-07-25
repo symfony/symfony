@@ -19,7 +19,7 @@ namespace Symfony\Component\Process;
  */
 class ExecutableFinder
 {
-    private $suffixes = ['.exe', '.bat', '.cmd', '.com'];
+    private array $suffixes = ['.exe', '.bat', '.cmd', '.com'];
 
     /**
      * Replaces default suffixes of executable.

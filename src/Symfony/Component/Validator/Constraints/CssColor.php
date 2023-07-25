@@ -49,7 +49,7 @@ class CssColor extends Constraint
     /**
      * @var string[]
      */
-    private static $validationModes = [
+    private static array $validationModes = [
         self::HEX_LONG,
         self::HEX_LONG_WITH_ALPHA,
         self::HEX_SHORT,

@@ -24,11 +24,9 @@ use Symfony\Component\Ldap\Exception\UpdateOperationException;
  */
 class EntryManager implements EntryManagerInterface
 {
-    private Connection $connection;
-
-    public function __construct(Connection $connection)
-    {
-        $this->connection = $connection;
+    public function __construct(
+        private Connection $connection,
+    ) {
     }
 
     /**
@@ -135,8 +133,8 @@ class EntryManager implements EntryManagerInterface
      */
     public function move(Entry $entry, string $newParent)
     {
-        $con = $this->getConnectionResource();
         $rdn = $this->parseRdnFromEntry($entry);
+        $con = $this->getConnectionResource();
         // deleteOldRdn does not matter here, since the Rdn will not be changing in the move.
         if (!@ldap_rename($con, $entry->getDn(), $rdn, $newParent, true)) {
             throw new LdapException(sprintf('Could not move entry "%s" to "%s": ', $entry->getDn(), $newParent).ldap_error($con), ldap_errno($con));
@@ -147,10 +145,8 @@ class EntryManager implements EntryManagerInterface
 
     /**
      * Get the connection resource, but first check if the connection is bound.
-     *
-     * @return resource|LDAPConnection
      */
-    private function getConnectionResource()
+    private function getConnectionResource(): LDAPConnection
     {
         // If the connection is not bound, throw an exception. Users should use an explicit bind call first.
         if (!$this->connection->isBound()) {

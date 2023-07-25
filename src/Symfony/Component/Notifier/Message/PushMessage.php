@@ -18,11 +18,11 @@ use Symfony\Component\Notifier\Notification\Notification;
  */
 class PushMessage implements MessageInterface, FromNotificationInterface
 {
-    private $transport;
-    private $subject;
-    private $content;
-    private $options;
-    private $notification;
+    private ?string $transport = null;
+    private string $subject;
+    private string $content;
+    private ?MessageOptionsInterface $options;
+    private ?Notification $notification = null;
 
     public function __construct(string $subject, string $content, MessageOptionsInterface $options = null)
     {

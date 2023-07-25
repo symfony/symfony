@@ -19,17 +19,15 @@ use Symfony\Component\Mime\Header\Headers;
 class SMimePart extends AbstractPart
 {
     /** @internal */
-    protected $_headers;
+    protected Headers $_headers;
 
-    private $body;
-    private $type;
-    private $subtype;
-    private $parameters;
+    private iterable|string $body;
+    private string $type;
+    private string $subtype;
+    private array $parameters;
 
     public function __construct(iterable|string $body, string $type, string $subtype, array $parameters)
     {
-        unset($this->_headers);
-
         parent::__construct();
 
         $this->body = $body;

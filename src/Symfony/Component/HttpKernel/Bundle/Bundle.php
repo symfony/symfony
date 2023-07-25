@@ -65,7 +65,7 @@ abstract class Bundle implements BundleInterface
      */
     public function getContainerExtension(): ?ExtensionInterface
     {
-        if (null === $this->extension) {
+        if (!isset($this->extension)) {
             $extension = $this->createContainerExtension();
 
             if (null !== $extension) {
@@ -101,7 +101,7 @@ abstract class Bundle implements BundleInterface
 
     public function getPath(): string
     {
-        if (null === $this->path) {
+        if (!isset($this->path)) {
             $reflected = new \ReflectionObject($this);
             $this->path = \dirname($reflected->getFileName());
         }
@@ -114,7 +114,7 @@ abstract class Bundle implements BundleInterface
      */
     final public function getName(): string
     {
-        if (null === $this->name) {
+        if (!isset($this->name)) {
             $this->parseClassName();
         }
 

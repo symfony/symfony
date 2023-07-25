@@ -25,9 +25,6 @@ class EntryManagerTest extends TestCase
         $this->expectException(LdapException::class);
         $this->expectExceptionMessage('Entry "$$$$$$" malformed, could not parse RDN.');
         $connection = $this->createMock(Connection::class);
-        $connection
-            ->expects($this->once())
-            ->method('isBound')->willReturn(true);
 
         $entry = new Entry('$$$$$$');
         $entryManager = new EntryManager($connection);

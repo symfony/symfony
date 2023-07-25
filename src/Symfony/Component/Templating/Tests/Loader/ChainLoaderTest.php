@@ -18,8 +18,8 @@ use Symfony\Component\Templating\TemplateReference;
 
 class ChainLoaderTest extends TestCase
 {
-    protected $loader1;
-    protected $loader2;
+    protected FilesystemLoader $loader1;
+    protected FilesystemLoader $loader2;
 
     protected function setUp(): void
     {

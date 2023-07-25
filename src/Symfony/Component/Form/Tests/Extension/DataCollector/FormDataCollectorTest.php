@@ -28,35 +28,12 @@ use Symfony\Component\Form\ResolvedFormTypeFactory;
 
 class FormDataCollectorTest extends TestCase
 {
-    /**
-     * @var FormDataCollector
-     */
-    private $dataCollector;
-
-    /**
-     * @var FormFactory
-     */
-    private $factory;
-
-    /**
-     * @var Form
-     */
-    private $form;
-
-    /**
-     * @var Form
-     */
-    private $childForm;
-
-    /**
-     * @var FormView
-     */
-    private $view;
-
-    /**
-     * @var FormView
-     */
-    private $childView;
+    private FormDataCollector $dataCollector;
+    private FormFactory $factory;
+    private FormInterface $form;
+    private FormInterface $childForm;
+    private FormView $view;
+    private FormView $childView;
 
     protected function setUp(): void
     {

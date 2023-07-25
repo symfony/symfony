@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,9 +23,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class ResponseListenerTest extends TestCase
 {
-    private $dispatcher;
-
-    private $kernel;
+    private EventDispatcher $dispatcher;
+    private MockObject&HttpKernelInterface $kernel;
 
     protected function setUp(): void
     {
@@ -33,12 +33,6 @@ class ResponseListenerTest extends TestCase
         $this->dispatcher->addListener(KernelEvents::RESPONSE, $listener->onKernelResponse(...));
 
         $this->kernel = $this->createMock(HttpKernelInterface::class);
-    }
-
-    protected function tearDown(): void
-    {
-        $this->dispatcher = null;
-        $this->kernel = null;
     }
 
     public function testFilterDoesNothingForSubRequests()

@@ -52,9 +52,9 @@ use Symfony\Component\Process\Process;
 
 class ApplicationTest extends TestCase
 {
-    protected static $fixturesPath;
+    protected static string $fixturesPath;
 
-    private $colSize;
+    private string|false $colSize;
 
     protected function setUp(): void
     {
@@ -2267,12 +2267,12 @@ class DisabledCommand extends Command
 #[AsCommand(name: 'signal')]
 class BaseSignableCommand extends Command
 {
-    public $signaled = false;
-    public $exitCode = 1;
-    public $signalHandlers = [];
-    public $loop = 1000;
-    private $emitsSignal;
-    private $signal;
+    public bool $signaled = false;
+    public int $exitCode = 1;
+    public array $signalHandlers = [];
+    public int $loop = 1000;
+    private bool $emitsSignal;
+    private int $signal;
 
     public function __construct(bool $emitsSignal = true, int $signal = \SIGUSR1)
     {
@@ -2383,7 +2383,7 @@ class TerminatableWithEventCommand extends Command implements SignalableCommandI
 
 class SignalEventSubscriber implements EventSubscriberInterface
 {
-    public $signaled = false;
+    public bool $signaled = false;
 
     public function onSignal(ConsoleSignalEvent $event): void
     {

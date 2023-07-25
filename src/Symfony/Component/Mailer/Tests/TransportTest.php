@@ -102,7 +102,7 @@ class TransportTest extends TestCase
 
 class DummyTransport implements Transport\TransportInterface
 {
-    private $host;
+    private string $host;
 
     public function __construct(string $host)
     {

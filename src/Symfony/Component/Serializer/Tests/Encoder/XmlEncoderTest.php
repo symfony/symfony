@@ -29,12 +29,8 @@ use Symfony\Component\Serializer\Tests\Fixtures\ScalarDummy;
 
 class XmlEncoderTest extends TestCase
 {
-    /**
-     * @var XmlEncoder
-     */
-    private $encoder;
-
-    private $exampleDateTimeString = '2017-02-19T15:16:08+0300';
+    private XmlEncoder $encoder;
+    private string $exampleDateTimeString = '2017-02-19T15:16:08+0300';
 
     protected function setUp(): void
     {

@@ -27,10 +27,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 class PasswordTypePasswordHasherExtensionTest extends TypeTestCase
 {
-    /**
-     * @var MockObject&UserPasswordHasherInterface
-     */
-    protected $passwordHasher;
+    protected MockObject&UserPasswordHasherInterface $passwordHasher;
 
     protected function setUp(): void
     {

@@ -25,20 +25,11 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  */
 class InMemoryTransportTest extends TestCase
 {
-    /**
-     * @var InMemoryTransport
-     */
-    private $transport;
+    private InMemoryTransport $transport;
 
-    /**
-     * @var InMemoryTransport
-     */
-    private $serializeTransport;
+    private InMemoryTransport $serializeTransport;
 
-    /**
-     * @var SerializerInterface
-     */
-    private $serializer;
+    private SerializerInterface $serializer;
 
     protected function setUp(): void
     {

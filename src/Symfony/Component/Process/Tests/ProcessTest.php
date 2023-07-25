@@ -28,9 +28,9 @@ use Symfony\Component\Process\Process;
  */
 class ProcessTest extends TestCase
 {
-    private static $phpBin;
-    private static $process;
-    private static $sigchild;
+    private static string $phpBin;
+    private static ?Process $process = null;
+    private static bool $sigchild;
 
     public static function setUpBeforeClass(): void
     {

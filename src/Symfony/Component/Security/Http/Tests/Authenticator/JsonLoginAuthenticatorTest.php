@@ -26,9 +26,8 @@ use Symfony\Component\Translation\Translator;
 
 class JsonLoginAuthenticatorTest extends TestCase
 {
-    private $userProvider;
-    /** @var JsonLoginAuthenticator */
-    private $authenticator;
+    private InMemoryUserProvider $userProvider;
+    private JsonLoginAuthenticator $authenticator;
 
     protected function setUp(): void
     {

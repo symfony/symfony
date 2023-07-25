@@ -17,11 +17,11 @@ class MockSplFileInfo extends \SplFileInfo
     public const TYPE_FILE = 2;
     public const TYPE_UNKNOWN = 3;
 
-    private $contents;
-    private $mode;
-    private $type;
-    private $relativePath;
-    private $relativePathname;
+    private ?string $contents = null;
+    private ?string $mode = null;
+    private ?int $type = null;
+    private ?string $relativePath = null;
+    private ?string $relativePathname = null;
 
     public function __construct($param)
     {

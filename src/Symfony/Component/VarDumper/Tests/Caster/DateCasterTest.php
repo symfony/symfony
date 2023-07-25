@@ -25,7 +25,7 @@ class DateCasterTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    private $previousTimezone;
+    private string $previousTimezone;
 
     protected function setUp(): void
     {

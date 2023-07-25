@@ -33,10 +33,7 @@ class FormTypeCsrfExtensionTest_ChildType extends AbstractType
 
 class FormTypeCsrfExtensionTest extends TypeTestCase
 {
-    /**
-     * @var MockObject&CsrfTokenManagerInterface
-     */
-    protected $tokenManager;
+    protected MockObject&CsrfTokenManagerInterface $tokenManager;
 
     protected function setUp(): void
     {

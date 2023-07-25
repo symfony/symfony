@@ -170,7 +170,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
     public function testBatchHandler()
     {
         $handler = new class() implements BatchHandlerInterface {
-            public $processedMessages;
+            public array $processedMessages;
 
             use BatchHandlerTrait;
 

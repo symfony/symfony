@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Ldap\Tests\Security;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -36,7 +37,7 @@ use Symfony\Contracts\Service\ServiceLocatorTrait;
 
 class CheckLdapCredentialsListenerTest extends TestCase
 {
-    private $ldap;
+    private MockObject&LdapInterface $ldap;
 
     protected function setUp(): void
     {

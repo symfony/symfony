@@ -24,7 +24,7 @@ use Symfony\Component\Validator\ConstraintViolationList;
  */
 class ConstraintViolationListNormalizerTest extends TestCase
 {
-    private $normalizer;
+    private ConstraintViolationListNormalizer $normalizer;
 
     protected function setUp(): void
     {

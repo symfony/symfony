@@ -15,6 +15,7 @@ use Symfony\Component\HttpClient\AsyncDecoratorTrait;
 use Symfony\Component\HttpClient\DecoratorTrait;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\Response\AsyncContext;
 use Symfony\Component\HttpClient\Response\AsyncResponse;
 use Symfony\Contracts\HttpClient\ChunkInterface;
@@ -40,7 +41,7 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
         return new class($decoratedClient ?? parent::getHttpClient($testCase), $chunkFilter) implements HttpClientInterface {
             use AsyncDecoratorTrait;
 
-            private $chunkFilter;
+            private ?\Closure $chunkFilter;
 
             public function __construct(HttpClientInterface $client, \Closure $chunkFilter = null)
             {

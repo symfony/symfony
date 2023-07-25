@@ -25,7 +25,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 
 class ApiAuthenticator extends AbstractAuthenticator
 {
-    private $selfLoadingUser = false;
+    private bool $selfLoadingUser;
 
     public function __construct(bool $selfLoadingUser = false)
     {

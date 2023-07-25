@@ -19,10 +19,7 @@ class RepeatedTypeTest extends BaseTypeTestCase
 {
     public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\RepeatedType';
 
-    /**
-     * @var Form
-     */
-    protected $form;
+    protected Form $form;
 
     protected function setUp(): void
     {

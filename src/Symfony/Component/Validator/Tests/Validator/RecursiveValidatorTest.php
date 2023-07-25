@@ -63,25 +63,10 @@ class RecursiveValidatorTest extends TestCase
     private const ENTITY_CLASS = Entity::class;
     private const REFERENCE_CLASS = Reference::class;
 
-    /**
-     * @var FakeMetadataFactory
-     */
-    private $metadataFactory;
-
-    /**
-     * @var ClassMetadata
-     */
-    private $metadata;
-
-    /**
-     * @var ClassMetadata
-     */
-    private $referenceMetadata;
-
-    /**
-     * @var ValidatorInterface
-     */
-    private $validator;
+    private FakeMetadataFactory $metadataFactory;
+    private ClassMetadata $metadata;
+    private ClassMetadata $referenceMetadata;
+    private ValidatorInterface $validator;
 
     protected function setUp(): void
     {
@@ -93,13 +78,6 @@ class RecursiveValidatorTest extends TestCase
         $this->metadataFactory->addMetadata(new ClassMetadata(LazyProperty::class));
 
         $this->validator = $this->createValidator($this->metadataFactory);
-    }
-
-    protected function tearDown(): void
-    {
-        $this->metadataFactory = null;
-        $this->metadata = null;
-        $this->referenceMetadata = null;
     }
 
     protected function validate($value, $constraints = null, $groups = null)

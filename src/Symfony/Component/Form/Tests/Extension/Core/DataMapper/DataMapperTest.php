@@ -13,7 +13,6 @@ namespace Symfony\Component\Form\Tests\Extension\Core\DataMapper;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Core\DataAccessor\PropertyPathAccessor;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -26,15 +25,8 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 class DataMapperTest extends TestCase
 {
-    /**
-     * @var DataMapper
-     */
-    private $mapper;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private DataMapper $mapper;
+    private EventDispatcher $dispatcher;
 
     protected function setUp(): void
     {
@@ -431,7 +423,7 @@ class NotSynchronizedForm extends SubmittedForm
 
 class DummyPerson
 {
-    private $name;
+    private string $name;
 
     public function __construct(string $name)
     {

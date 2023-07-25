@@ -26,15 +26,8 @@ class SessionTokenStorageTest extends TestCase
 {
     private const SESSION_NAMESPACE = 'foobar';
 
-    /**
-     * @var Session
-     */
-    private $session;
-
-    /**
-     * @var SessionTokenStorage
-     */
-    private $storage;
+    private Session $session;
+    private SessionTokenStorage $storage;
 
     protected function setUp(): void
     {

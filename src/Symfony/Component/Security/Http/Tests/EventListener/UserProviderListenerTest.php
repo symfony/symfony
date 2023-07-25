@@ -22,8 +22,8 @@ use Symfony\Component\Security\Http\EventListener\UserProviderListener;
 
 class UserProviderListenerTest extends TestCase
 {
-    private $userProvider;
-    private $listener;
+    private InMemoryUserProvider $userProvider;
+    private UserProviderListener $listener;
 
     protected function setUp(): void
     {

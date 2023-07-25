@@ -27,10 +27,8 @@ use Symfony\Component\Messenger\Bridge\Doctrine\Transport\PostgreSqlConnection;
  */
 class DoctrinePostgreSqlIntegrationTest extends TestCase
 {
-    /** @var Connection */
-    private $driverConnection;
-    /** @var PostgreSqlConnection */
-    private $connection;
+    private Connection $driverConnection;
+    private PostgreSqlConnection $connection;
 
     protected function setUp(): void
     {

@@ -15,7 +15,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 class User implements PasswordAuthenticatedUserInterface
 {
-    private $password;
+    private ?string $password = null;
 
     public function getPassword(): ?string
     {

@@ -19,8 +19,8 @@ use Symfony\Component\Form\Tests\Fixtures\NullFormTypeGuesser;
 
 class FormFactoryBuilderTest extends TestCase
 {
-    private $registry;
-    private $type;
+    private \ReflectionProperty $registry;
+    private FooType $type;
 
     protected function setUp(): void
     {

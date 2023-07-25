@@ -21,10 +21,7 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class ConstructorExtractorTest extends TestCase
 {
-    /**
-     * @var ConstructorExtractor
-     */
-    private $extractor;
+    private ConstructorExtractor $extractor;
 
     protected function setUp(): void
     {

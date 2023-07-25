@@ -23,7 +23,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 class MakeFirewallsEventDispatcherTraceablePassTest extends TestCase
 {
-    private $container;
+    private ContainerBuilder $container;
 
     protected function setUp(): void
     {

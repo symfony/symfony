@@ -686,7 +686,7 @@ EOF
 
 class TestKernel implements HttpKernelInterface
 {
-    public $terminateCalled = false;
+    public bool $terminateCalled = false;
 
     public function terminate(): void
     {
@@ -705,8 +705,7 @@ class TestKernel implements HttpKernelInterface
 
 class CustomProjectDirKernel extends Kernel implements WarmableInterface
 {
-    public $warmedUp = false;
-    private $baseDir;
+    public bool $warmedUp = false;
 
     public function __construct(
         private readonly ?\Closure $buildContainer = null,

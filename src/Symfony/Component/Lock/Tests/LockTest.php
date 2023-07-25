@@ -469,8 +469,8 @@ class LockTest extends TestCase
         $key = new Key(uniqid(__METHOD__, true));
         $store = new class() implements PersistingStoreInterface {
             use ExpiringStoreTrait;
-            private $keys = [];
-            private $initialTtl = 30;
+            private array $keys = [];
+            private int $initialTtl = 30;
 
             public function save(Key $key): void
             {
@@ -513,8 +513,8 @@ class LockTest extends TestCase
         $key = new Key(uniqid(__METHOD__, true));
         $store = new class() implements PersistingStoreInterface {
             use ExpiringStoreTrait;
-            private $keys = [];
-            private $initialTtl = 30;
+            private array $keys = [];
+            private int $initialTtl = 30;
 
             public function save(Key $key): void
             {

@@ -20,10 +20,7 @@ use Symfony\Component\Intl\Exception\OutOfBoundsException;
  */
 class RingBufferTest extends TestCase
 {
-    /**
-     * @var RingBuffer
-     */
-    private $buffer;
+    private RingBuffer $buffer;
 
     protected function setUp(): void
     {

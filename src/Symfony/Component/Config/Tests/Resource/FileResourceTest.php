@@ -16,9 +16,9 @@ use Symfony\Component\Config\Resource\FileResource;
 
 class FileResourceTest extends TestCase
 {
-    protected $resource;
-    protected $file;
-    protected $time;
+    protected FileResource $resource;
+    protected string $file;
+    protected int $time;
 
     protected function setUp(): void
     {

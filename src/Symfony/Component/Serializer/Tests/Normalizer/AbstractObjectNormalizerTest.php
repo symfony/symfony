@@ -996,7 +996,7 @@ class DummyChild
 
 class SerializerCollectionDummy implements SerializerInterface, DenormalizerInterface
 {
-    private $normalizers;
+    private array $normalizers;
 
     /**
      * @param DenormalizerInterface[] $normalizers

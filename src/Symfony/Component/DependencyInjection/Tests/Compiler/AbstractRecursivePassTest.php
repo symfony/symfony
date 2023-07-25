@@ -36,7 +36,7 @@ class AbstractRecursivePassTest extends TestCase
             ->setFactory([new Reference('child'), 'createFactory']);
 
         $pass = new class() extends AbstractRecursivePass {
-            public $actual;
+            public \ReflectionMethod $actual;
 
             protected function processValue($value, $isRoot = false): mixed
             {
@@ -62,7 +62,7 @@ class AbstractRecursivePassTest extends TestCase
         $container->setDefinition('foo', new ChildDefinition('parent'));
 
         $pass = new class() extends AbstractRecursivePass {
-            public $actual;
+            public \ReflectionMethod $actual;
 
             protected function processValue($value, $isRoot = false): mixed
             {
@@ -88,7 +88,7 @@ class AbstractRecursivePassTest extends TestCase
         $container->setDefinition('foo', new ChildDefinition('parent'));
 
         $pass = new class() extends AbstractRecursivePass {
-            public $actual;
+            public \ReflectionMethod $actual;
 
             protected function processValue($value, $isRoot = false): mixed
             {

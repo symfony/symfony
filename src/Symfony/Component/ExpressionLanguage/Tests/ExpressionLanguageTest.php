@@ -170,10 +170,10 @@ class ExpressionLanguageTest extends TestCase
 
     public static function shortCircuitProviderEvaluate()
     {
-        $object = new class(\Closure::fromCallable([static::class, 'fail'])) {
-            private $fail;
+        $object = new class(static::fail(...)) {
+            private \Closure $fail;
 
-            public function __construct(callable $fail)
+            public function __construct(\Closure $fail)
             {
                 $this->fail = $fail;
             }

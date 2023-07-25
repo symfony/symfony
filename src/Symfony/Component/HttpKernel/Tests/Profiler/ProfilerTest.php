@@ -21,8 +21,8 @@ use Symfony\Component\HttpKernel\Profiler\Profiler;
 
 class ProfilerTest extends TestCase
 {
-    private $tmp;
-    private $storage;
+    private string $tmp;
+    private ?FileProfilerStorage $storage = null;
 
     public function testCollect()
     {

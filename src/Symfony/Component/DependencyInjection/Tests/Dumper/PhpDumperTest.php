@@ -74,7 +74,7 @@ class PhpDumperTest extends TestCase
 {
     use ExpectDeprecationTrait;
 
-    protected static $fixturesPath;
+    protected static string $fixturesPath;
 
     public static function setUpBeforeClass(): void
     {

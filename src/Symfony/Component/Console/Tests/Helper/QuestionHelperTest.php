@@ -952,7 +952,7 @@ EOD;
 
 class AutocompleteValues implements \IteratorAggregate
 {
-    private $values;
+    private array $values;
 
     public function __construct(array $values)
     {

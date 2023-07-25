@@ -22,11 +22,8 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 
 class TexterTest extends TestCase
 {
-    /** @var MockObject&TransportInterface */
-    private $transport;
-
-    /** @var MockObject&MessageBusInterface */
-    private $bus;
+    private MockObject&TransportInterface $transport;
+    private MockObject&MessageBusInterface $bus;
 
     protected function setUp(): void
     {

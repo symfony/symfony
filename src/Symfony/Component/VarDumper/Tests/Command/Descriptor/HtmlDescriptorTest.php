@@ -19,7 +19,7 @@ use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 
 class HtmlDescriptorTest extends TestCase
 {
-    private static $timezone;
+    private static string $timezone;
 
     public static function setUpBeforeClass(): void
     {

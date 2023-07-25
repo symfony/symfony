@@ -23,10 +23,9 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 class LoaderResolverTest extends TestCase
 {
-    private static $fixturesPath;
+    private static string $fixturesPath;
 
-    /** @var LoaderResolver */
-    private $resolver;
+    private LoaderResolver $resolver;
 
     protected function setUp(): void
     {

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\Authenticator;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,9 +26,9 @@ use Symfony\Component\Security\Http\RememberMe\ResponseListener;
 
 class RememberMeAuthenticatorTest extends TestCase
 {
-    private $rememberMeHandler;
-    private $tokenStorage;
-    private $authenticator;
+    private MockObject&RememberMeHandlerInterface $rememberMeHandler;
+    private TokenStorage $tokenStorage;
+    private RememberMeAuthenticator $authenticator;
 
     protected function setUp(): void
     {

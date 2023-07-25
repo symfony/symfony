@@ -19,7 +19,7 @@ use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
  */
 class ArrayChoiceListTest extends AbstractChoiceListTestCase
 {
-    private $object;
+    private \stdClass $object;
 
     protected function setUp(): void
     {

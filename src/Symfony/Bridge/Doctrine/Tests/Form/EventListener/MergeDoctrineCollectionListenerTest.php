@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Doctrine\Tests\Form\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\EventListener\MergeDoctrineCollectionListener;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -22,28 +23,15 @@ use Symfony\Component\Form\FormFactoryInterface;
 
 class MergeDoctrineCollectionListenerTest extends TestCase
 {
-    /** @var \Doctrine\Common\Collections\ArrayCollection */
-    private $collection;
-    /** @var \Symfony\Component\EventDispatcher\EventDispatcher */
-    private $dispatcher;
-    private $factory;
-    private $form;
+    private ArrayCollection $collection;
+    private EventDispatcher $dispatcher;
+    private MockObject&FormFactoryInterface $factory;
 
     protected function setUp(): void
     {
         $this->collection = new ArrayCollection(['test']);
         $this->dispatcher = new EventDispatcher();
         $this->factory = $this->createMock(FormFactoryInterface::class);
-        $this->form = $this->getBuilder()
-            ->getForm();
-    }
-
-    protected function tearDown(): void
-    {
-        $this->collection = null;
-        $this->dispatcher = null;
-        $this->factory = null;
-        $this->form = null;
     }
 
     protected function getBuilder()

@@ -22,8 +22,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DataCollectorTranslatorPassTest extends TestCase
 {
-    private $container;
-    private $dataCollectorTranslatorPass;
+    private ContainerBuilder $container;
+    private DataCollectorTranslatorPass $dataCollectorTranslatorPass;
 
     protected function setUp(): void
     {

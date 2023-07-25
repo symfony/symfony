@@ -18,7 +18,7 @@ use Symfony\Component\Mime\RawMessage;
 
 abstract class SMimeTestCase extends TestCase
 {
-    protected $samplesDir;
+    protected string $samplesDir;
 
     protected function setUp(): void
     {

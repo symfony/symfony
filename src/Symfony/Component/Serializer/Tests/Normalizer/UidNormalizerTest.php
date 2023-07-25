@@ -25,10 +25,7 @@ use Symfony\Component\Uid\UuidV6;
 
 class UidNormalizerTest extends TestCase
 {
-    /**
-     * @var UidNormalizer
-     */
-    private $normalizer;
+    private UidNormalizer $normalizer;
 
     protected function setUp(): void
     {

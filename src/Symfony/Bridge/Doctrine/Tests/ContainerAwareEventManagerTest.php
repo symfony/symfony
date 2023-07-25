@@ -18,8 +18,8 @@ use Symfony\Component\DependencyInjection\Container;
 
 class ContainerAwareEventManagerTest extends TestCase
 {
-    private $container;
-    private $evm;
+    private Container $container;
+    private ContainerAwareEventManager $evm;
 
     protected function setUp(): void
     {

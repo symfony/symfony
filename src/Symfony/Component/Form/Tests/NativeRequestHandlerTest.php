@@ -19,7 +19,7 @@ use Symfony\Component\Form\NativeRequestHandler;
  */
 class NativeRequestHandlerTest extends AbstractRequestHandlerTestCase
 {
-    private static $serverBackup;
+    private static array $serverBackup;
 
     public static function setUpBeforeClass(): void
     {

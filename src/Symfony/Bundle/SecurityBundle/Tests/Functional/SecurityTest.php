@@ -164,13 +164,13 @@ class SecurityTest extends AbstractWebTestCase
 
 final class UserWithoutEquatable implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    private $username;
-    private $password;
-    private $enabled;
-    private $accountNonExpired;
-    private $credentialsNonExpired;
-    private $accountNonLocked;
-    private $roles;
+    private ?string $username;
+    private ?string $password;
+    private bool $enabled;
+    private bool $accountNonExpired;
+    private bool $credentialsNonExpired;
+    private bool $accountNonLocked;
+    private array $roles;
 
     public function __construct(?string $username, ?string $password, array $roles = [], bool $enabled = true, bool $userNonExpired = true, bool $credentialsNonExpired = true, bool $userNonLocked = true)
     {
@@ -244,7 +244,7 @@ final class UserWithoutEquatable implements UserInterface, PasswordAuthenticated
 
 class ForceLoginController
 {
-    public $authenticator = 'form_login';
+    public string $authenticator = 'form_login';
 
     public function __construct(private Security $security)
     {
@@ -261,7 +261,7 @@ class ForceLoginController
 
 class LogoutController
 {
-    public $checkCsrf = false;
+    public bool $checkCsrf = false;
 
     public function __construct(private Security $security)
     {

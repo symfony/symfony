@@ -21,10 +21,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConstraintViolationBuilderTest extends TestCase
 {
-    private $root;
-    private $violations;
-    private $messageTemplate = '%value% is invalid';
-    private $builder;
+    private array $root;
+    private ConstraintViolationList $violations;
+    private string $messageTemplate = '%value% is invalid';
+    private ConstraintViolationBuilder $builder;
 
     protected function setUp(): void
     {

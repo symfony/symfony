@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\RememberMe;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,11 +29,11 @@ use Symfony\Component\Security\Http\RememberMe\ResponseListener;
 
 class PersistentRememberMeHandlerTest extends TestCase
 {
-    private $tokenProvider;
-    private $userProvider;
-    private $requestStack;
-    private $request;
-    private $handler;
+    private MockObject&TokenProviderInterface $tokenProvider;
+    private InMemoryUserProvider $userProvider;
+    private RequestStack $requestStack;
+    private Request $request;
+    private PersistentRememberMeHandler $handler;
 
     protected function setUp(): void
     {

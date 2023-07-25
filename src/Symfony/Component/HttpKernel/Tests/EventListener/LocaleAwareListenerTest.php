@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -22,9 +23,9 @@ use Symfony\Contracts\Translation\LocaleAwareInterface;
 
 class LocaleAwareListenerTest extends TestCase
 {
-    private $listener;
-    private $localeAwareService;
-    private $requestStack;
+    private LocaleAwareListener $listener;
+    private MockObject&LocaleAwareInterface $localeAwareService;
+    private RequestStack $requestStack;
 
     protected function setUp(): void
     {

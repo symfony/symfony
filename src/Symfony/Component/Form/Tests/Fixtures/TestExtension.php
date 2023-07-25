@@ -18,11 +18,9 @@ use Symfony\Component\Form\FormTypeInterface;
 
 class TestExtension implements FormExtensionInterface
 {
-    private $types = [];
-
-    private $extensions = [];
-
-    private $guesser;
+    private array $types = [];
+    private array $extensions = [];
+    private FormTypeGuesserInterface $guesser;
 
     public function __construct(FormTypeGuesserInterface $guesser)
     {

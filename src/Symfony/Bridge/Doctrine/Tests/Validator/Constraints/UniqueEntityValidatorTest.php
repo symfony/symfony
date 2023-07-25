@@ -48,22 +48,10 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 {
     private const EM_NAME = 'foo';
 
-    /**
-     * @var ObjectManager
-     */
-    protected $em;
-
-    /**
-     * @var ManagerRegistry
-     */
-    protected $registry;
-
-    /**
-     * @var MockObject&EntityRepository
-     */
-    protected $repository;
-
-    protected $repositoryFactory;
+    protected ?ObjectManager $em;
+    protected ManagerRegistry $registry;
+    protected MockObject&EntityRepository $repository;
+    protected TestRepositoryFactory $repositoryFactory;
 
     protected function setUp(): void
     {

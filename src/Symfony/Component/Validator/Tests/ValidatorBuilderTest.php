@@ -28,11 +28,6 @@ class ValidatorBuilderTest extends TestCase
         $this->builder = new ValidatorBuilder();
     }
 
-    protected function tearDown(): void
-    {
-        unset($this->builder);
-    }
-
     public function testAddObjectInitializer()
     {
         $this->assertSame($this->builder, $this->builder->addObjectInitializer(

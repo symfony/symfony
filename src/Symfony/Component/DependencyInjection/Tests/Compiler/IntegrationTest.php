@@ -1089,7 +1089,7 @@ class IntegrationTest extends TestCase
 
 class ServiceSubscriberStub implements ServiceSubscriberInterface
 {
-    public $container;
+    public ContainerInterface $container;
 
     public function __construct(ContainerInterface $container)
     {
@@ -1109,10 +1109,7 @@ class DecoratedServiceSubscriber
 
 class DecoratedServiceLocator implements ServiceProviderInterface
 {
-    /**
-     * @var ServiceLocator
-     */
-    private $locator;
+    private ServiceLocator $locator;
 
     public function __construct(ServiceLocator $locator)
     {
@@ -1153,7 +1150,7 @@ class IntegrationTestStubParent
 
 final class TagCollector implements CompilerPassInterface
 {
-    public $collectedTags;
+    public array $collectedTags;
 
     public function process(ContainerBuilder $container): void
     {

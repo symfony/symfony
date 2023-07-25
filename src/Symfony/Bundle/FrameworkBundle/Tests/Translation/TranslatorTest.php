@@ -26,7 +26,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TranslatorTest extends TestCase
 {
-    protected $tmpDir;
+    protected string $tmpDir;
 
     protected function setUp(): void
     {

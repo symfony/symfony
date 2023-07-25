@@ -64,7 +64,7 @@ class PostgreSqlConnectionTest extends TestCase
             ->willReturn(new QueryBuilder($driverConnection));
 
         $wrappedConnection = new class() {
-            private $notifyCalls = 0;
+            private int $notifyCalls = 0;
 
             public function pgsqlGetNotify()
             {

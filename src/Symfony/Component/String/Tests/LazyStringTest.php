@@ -49,7 +49,7 @@ class LazyStringTest extends TestCase
         $count = 0;
         $s = LazyString::fromCallable([function () use (&$count) {
             return new class($count) {
-                private $count;
+                private int $count;
 
                 public function __construct(int &$count)
                 {

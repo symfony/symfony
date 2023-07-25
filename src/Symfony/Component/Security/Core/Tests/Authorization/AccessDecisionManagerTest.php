@@ -255,7 +255,7 @@ class AccessDecisionManagerTest extends TestCase
     protected static function getVoter($vote)
     {
         return new class($vote) implements VoterInterface {
-            private $vote;
+            private int $vote;
 
             public function __construct(int $vote)
             {

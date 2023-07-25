@@ -20,7 +20,7 @@ class InMemoryAccessTokenHandler implements AccessTokenHandlerInterface
     /**
      * @var array<string, UserBadge>
      */
-    private $accessTokens = [];
+    private array $accessTokens = [];
 
     public function getUserBadgeFrom(string $accessToken): UserBadge
     {

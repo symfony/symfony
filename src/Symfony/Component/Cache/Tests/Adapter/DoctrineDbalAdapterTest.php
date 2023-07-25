@@ -29,7 +29,7 @@ use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
  */
 class DoctrineDbalAdapterTest extends AdapterTestCase
 {
-    protected static $dbFile;
+    protected static string $dbFile;
 
     public static function setUpBeforeClass(): void
     {

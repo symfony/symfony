@@ -30,25 +30,10 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class AmazonSqsTransportTest extends TestCase
 {
-    /**
-     * @var MockObject|Connection
-     */
-    private $connection;
-
-    /**
-     * @var MockObject|ReceiverInterface
-     */
-    private $receiver;
-
-    /**
-     * @var MockObject|SenderInterface|MessageCountAwareInterface
-     */
-    private $sender;
-
-    /**
-     * @var AmazonSqsTransport
-     */
-    private $transport;
+    private MockObject&Connection $connection;
+    private MockObject&ReceiverInterface $receiver;
+    private MockObject&SenderInterface $sender;
+    private AmazonSqsTransport $transport;
 
     protected function setUp(): void
     {

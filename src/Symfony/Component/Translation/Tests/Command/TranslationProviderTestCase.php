@@ -22,10 +22,10 @@ use Symfony\Component\Translation\Provider\TranslationProviderCollection;
  */
 abstract class TranslationProviderTestCase extends TestCase
 {
-    protected $fs;
-    protected $translationAppDir;
-    protected $files;
-    protected $defaultLocale;
+    protected Filesystem $fs;
+    protected string $translationAppDir;
+    protected array $files;
+    protected string $defaultLocale;
 
     protected function setUp(): void
     {

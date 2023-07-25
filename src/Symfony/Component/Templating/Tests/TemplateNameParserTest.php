@@ -17,16 +17,11 @@ use Symfony\Component\Templating\TemplateReference;
 
 class TemplateNameParserTest extends TestCase
 {
-    protected $parser;
+    protected TemplateNameParser $parser;
 
     protected function setUp(): void
     {
         $this->parser = new TemplateNameParser();
-    }
-
-    protected function tearDown(): void
-    {
-        $this->parser = null;
     }
 
     /**

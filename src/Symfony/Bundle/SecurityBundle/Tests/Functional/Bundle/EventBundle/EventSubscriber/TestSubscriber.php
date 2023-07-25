@@ -19,7 +19,7 @@ use Symfony\Component\Security\Http\Event\SwitchUserEvent;
 
 final class TestSubscriber implements EventSubscriberInterface
 {
-    public $calledMethods = [];
+    public array $calledMethods = [];
 
     public static function getSubscribedEvents(): array
     {

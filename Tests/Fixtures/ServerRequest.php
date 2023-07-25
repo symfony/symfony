@@ -31,7 +31,11 @@ class ServerRequest extends Message implements ServerRequestInterface
     private $data;
     private $attributes;
 
-    public function __construct($version = '1.1', array $headers = [], StreamInterface $body = null, $requestTarget = '/', $method = 'GET', $uri = null, array $server = [], array $cookies = [], array $query = [], array $uploadedFiles = [], $data = null, array $attributes = [])
+    /**
+     * @param UriInterface|string|null $uri
+     * @param array|object|null        $data
+     */
+    public function __construct(string $version = '1.1', array $headers = [], StreamInterface $body = null, string $requestTarget = '/', string $method = 'GET', $uri = null, array $server = [], array $cookies = [], array $query = [], array $uploadedFiles = [], $data = null, array $attributes = [])
     {
         parent::__construct($version, $headers, $body);
 

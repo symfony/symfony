@@ -21,7 +21,7 @@ class Stream implements StreamInterface
     private $stringContent;
     private $eof = true;
 
-    public function __construct($stringContent = '')
+    public function __construct(string $stringContent = '')
     {
         $this->stringContent = $stringContent;
     }

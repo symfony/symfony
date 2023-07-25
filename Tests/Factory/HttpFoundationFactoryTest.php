@@ -196,7 +196,7 @@ class HttpFoundationFactoryTest extends TestCase
         $symfonyUploadedFile->move($this->tmpDir, 'shouldFail.txt');
     }
 
-    private function createUploadedFile($content, $error, $clientFileName, $clientMediaType): UploadedFile
+    private function createUploadedFile(string $content, int $error, string $clientFileName, string $clientMediaType): UploadedFile
     {
         $filePath = tempnam($this->tmpDir, uniqid());
         file_put_contents($filePath, $content);

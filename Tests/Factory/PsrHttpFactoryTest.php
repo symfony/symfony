@@ -28,7 +28,10 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 class PsrHttpFactoryTest extends TestCase
 {
+    /** @var HttpMessageFactoryInterface */
     private $factory;
+
+    /** @var string */
     private $tmpDir;
 
     protected function buildHttpMessageFactory(): HttpMessageFactoryInterface
@@ -135,7 +138,7 @@ class PsrHttpFactoryTest extends TestCase
         $this->assertSame('Content', $request->getContent());
     }
 
-    private function createUploadedFile($content, $originalName, $mimeType, $error)
+    private function createUploadedFile(string $content, string $originalName, string $mimeType, int $error): UploadedFile
     {
         $path = tempnam($this->tmpDir, uniqid());
         file_put_contents($path, $content);

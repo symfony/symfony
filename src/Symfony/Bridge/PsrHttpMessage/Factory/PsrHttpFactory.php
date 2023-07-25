@@ -46,12 +46,7 @@ class PsrHttpFactory implements HttpMessageFactoryInterface
         $this->responseFactory = $responseFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return ServerRequestInterface
-     */
-    public function createRequest(Request $symfonyRequest)
+    public function createRequest(Request $symfonyRequest): ServerRequestInterface
     {
         $uri = $symfonyRequest->server->get('QUERY_STRING', '');
         $uri = $symfonyRequest->getSchemeAndHttpHost().$symfonyRequest->getBaseUrl().$symfonyRequest->getPathInfo().('' !== $uri ? '?'.$uri : '');
@@ -141,12 +136,7 @@ class PsrHttpFactory implements HttpMessageFactoryInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return ResponseInterface
-     */
-    public function createResponse(Response $symfonyResponse)
+    public function createResponse(Response $symfonyResponse): ResponseInterface
     {
         $response = $this->responseFactory->createResponse($symfonyResponse->getStatusCode(), Response::$statusTexts[$symfonyResponse->getStatusCode()] ?? '');
 

@@ -41,9 +41,6 @@ final class PsrServerRequestResolver implements ArgumentValueResolverInterface, 
         $this->httpMessageFactory = $httpMessageFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(Request $request, ArgumentMetadata $argument): bool
     {
         if ($this instanceof BaseValueResolverInterface) {
@@ -53,9 +50,6 @@ final class PsrServerRequestResolver implements ArgumentValueResolverInterface, 
         return self::SUPPORTED_TYPES[$argument->getType()] ?? false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resolve(Request $request, ArgumentMetadata $argument): \Traversable
     {
         if (!isset(self::SUPPORTED_TYPES[$argument->getType()])) {

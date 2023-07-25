@@ -23,8 +23,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
- * {@inheritdoc}
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class HttpFoundationFactory implements HttpFoundationFactoryInterface
@@ -39,12 +37,7 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
         $this->responseBufferMaxLength = $responseBufferMaxLength;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return Request
-     */
-    public function createRequest(ServerRequestInterface $psrRequest, bool $streamed = false)
+    public function createRequest(ServerRequestInterface $psrRequest, bool $streamed = false): Request
     {
         $server = [];
         $uri = $psrRequest->getUri();
@@ -113,20 +106,13 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
 
     /**
      * Gets a temporary file path.
-     *
-     * @return string
      */
-    protected function getTemporaryPath()
+    protected function getTemporaryPath(): string
     {
         return tempnam(sys_get_temp_dir(), uniqid('symfony', true));
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return Response
-     */
-    public function createResponse(ResponseInterface $psrResponse, bool $streamed = false)
+    public function createResponse(ResponseInterface $psrResponse, bool $streamed = false): Response
     {
         $cookies = $psrResponse->getHeader('Set-Cookie');
         $psrResponse = $psrResponse->withoutHeader('Set-Cookie');

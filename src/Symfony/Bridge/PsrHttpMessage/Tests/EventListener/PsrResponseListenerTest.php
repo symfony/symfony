@@ -46,10 +46,7 @@ class PsrResponseListenerTest extends TestCase
         self::assertFalse($event->hasResponse());
     }
 
-    /**
-     * @param mixed $controllerResult
-     */
-    private function createEventMock($controllerResult): ViewEvent
+    private function createEventMock(mixed $controllerResult): ViewEvent
     {
         return new ViewEvent($this->createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST, $controllerResult);
     }

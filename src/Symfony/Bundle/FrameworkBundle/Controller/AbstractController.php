@@ -44,7 +44,6 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\WebLink\EventListener\AddLinkHeaderListener;
 use Symfony\Component\WebLink\GenericLinkProvider;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
-use Symfony\Component\WebLink\Link;
 use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Environment;
@@ -64,7 +63,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     #[Required]
     public function setContainer(ContainerInterface $container): ?ContainerInterface
     {
-        $previous = $this->container;
+        $previous = $this->container ?? null;
         $this->container = $container;
 
         return $previous;

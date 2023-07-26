@@ -293,7 +293,7 @@ class BinaryFileResponse extends Response
     {
         try {
             if (!$this->isSuccessful()) {
-                return parent::sendContent();
+                return $this;
             }
 
             if (0 === $this->maxlen) {

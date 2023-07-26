@@ -19,7 +19,7 @@ use Symfony\Component\Cache\PruneableInterface;
 
 class PdoAdapter extends AbstractAdapter implements PruneableInterface
 {
-    protected $maxIdLength = 255;
+    private const MAX_KEY_LENGTH = 255;
 
     private MarshallerInterface $marshaller;
     private \PDO|Connection $conn;
@@ -75,6 +75,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
             $this->dsn = $connOrDsn;
         }
 
+        $this->maxIdLength = self::MAX_KEY_LENGTH;
         $this->table = $options['db_table'] ?? $this->table;
         $this->idCol = $options['db_id_col'] ?? $this->idCol;
         $this->dataCol = $options['db_data_col'] ?? $this->dataCol;

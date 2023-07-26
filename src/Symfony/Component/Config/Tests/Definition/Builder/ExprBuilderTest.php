@@ -198,7 +198,7 @@ class ExprBuilderTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('You must specify a then part.');
         $builder = $this->getTestBuilder();
-        $builder->ifPart = 'test';
+        $builder->ifPart = static fn () => false;
         $builder->end();
     }
 

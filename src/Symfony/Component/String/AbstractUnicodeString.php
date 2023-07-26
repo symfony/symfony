@@ -228,7 +228,7 @@ abstract class AbstractUnicodeString extends AbstractString
             $regexp .= 'i';
         }
 
-        set_error_handler(static function ($t, $m) { throw new InvalidArgumentException($m); });
+        set_error_handler(static fn ($t, $m) => throw new InvalidArgumentException($m));
 
         try {
             if (false === $match($regexp.'u', $this->string, $matches, $flags | \PREG_UNMATCHED_AS_NULL, $offset)) {
@@ -312,7 +312,7 @@ abstract class AbstractUnicodeString extends AbstractString
             $replace = 'preg_replace';
         }
 
-        set_error_handler(static function ($t, $m) { throw new InvalidArgumentException($m); });
+        set_error_handler(static fn ($t, $m) => throw new InvalidArgumentException($m));
 
         try {
             if (null === $string = $replace($fromRegexp.'u', $to, $this->string)) {

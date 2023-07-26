@@ -59,7 +59,7 @@ class Length extends Constraint
     public $min;
     public $charset = 'UTF-8';
     public $normalizer;
-    /* @var self::COUNT_* */
+    /** @var self::COUNT_* */
     public string $countUnit = self::COUNT_CODEPOINTS;
 
     /**

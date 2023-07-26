@@ -56,7 +56,7 @@ class WrappedListenerTest extends TestCase
 
         $dispatcher = $this->createStub(EventDispatcherInterface::class);
 
-        $wrappedListener = new WrappedListener(function () { throw new \Exception(); }, null, $stopwatch, $dispatcher);
+        $wrappedListener = new WrappedListener(static fn () => throw new \Exception(), null, $stopwatch, $dispatcher);
 
         try {
             $wrappedListener(new \stdClass(), 'foo', $dispatcher);

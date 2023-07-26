@@ -44,7 +44,6 @@ class SerializerTest extends AbstractWebTestCase
 
         $reflectionObject = new \ReflectionObject($normalizer);
         $property = $reflectionObject->getProperty('defaultContext');
-        $property->setAccessible(true);
 
         $defaultContext = $property->getValue($normalizer);
 

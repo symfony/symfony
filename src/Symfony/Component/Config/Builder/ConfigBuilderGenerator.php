@@ -589,7 +589,6 @@ public function NAME(string $key, mixed $value): static
         } catch (\ReflectionException) {
             return false;
         }
-        $r->setAccessible(true);
 
         return [] !== $r->getValue($node);
     }

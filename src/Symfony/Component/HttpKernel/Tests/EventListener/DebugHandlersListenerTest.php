@@ -34,7 +34,7 @@ class DebugHandlersListenerTest extends TestCase
 {
     public function testConfigure()
     {
-        $userHandler = function () {};
+        $userHandler = static fn () => null;
         $listener = new DebugHandlersListener($userHandler);
         $eHandler = new ErrorHandler();
 

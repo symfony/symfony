@@ -19,6 +19,7 @@ use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\FinalPublicClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\ReadOnlyClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\StringMagicGetClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\TestClass;
+use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\TestOverwritePropClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\TestUnserializeClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\TestWakeupClass;
 
@@ -188,6 +189,14 @@ class LazyProxyTraitTest extends TestCase
         $this->assertSame(1, $proxy->increment());
         $this->assertSame(2, $proxy->increment());
         $this->assertSame(1, $proxy->decrement());
+    }
+
+    public function testOverwritePropClass()
+    {
+        $proxy = $this->createLazyProxy(TestOverwritePropClass::class, fn () => new TestOverwritePropClass('123', 5));
+
+        $this->assertSame('123', $proxy->getDep());
+        $this->assertSame(1, $proxy->increment());
     }
 
     public function testWither()

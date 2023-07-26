@@ -406,6 +406,26 @@
                 <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
                 <target>Der Dateiname ist zu lang. Er sollte nicht länger als {{ filename_max_length }} Zeichen sein.|Der Dateiname ist zu lang. Er sollte nicht länger als {{ filename_max_length }} Zeichen sein.</target>
             </trans-unit>
+            <trans-unit id="105">
+                <source>The password strength is too low. Please use a stronger password.</source>
+                <target>Das Passwort ist zu schwach.</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>This value contains characters that are not allowed by the current restriction-level.</source>
+                <target>Der Wert enthält Zeichen, die auf der aktuellen Einschränkungsstufe nicht erlaubt sind.</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Using invisible characters is not allowed.</source>
+                <target>Unsichtbare Zeichen sind nicht erlaubt.</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Mixing numbers from different scripts is not allowed.</source>
+                <target>Das Mischen von Zahlen aus verschiedenen Skripten ist nicht erlaubt.</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Using hidden overlay characters is not allowed.</source>
+                <target>Verstecke Overlay-Zeichen sind nicht erlaubt.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

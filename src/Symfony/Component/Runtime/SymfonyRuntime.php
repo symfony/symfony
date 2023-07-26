@@ -106,7 +106,7 @@ class SymfonyRuntime extends GenericRuntime
                 ->usePutenv($options['use_putenv'] ?? false)
                 ->bootEnv($options['project_dir'].'/'.($options['dotenv_path'] ?? '.env'), 'dev', (array) ($options['test_envs'] ?? ['test']), $options['dotenv_overload'] ?? false);
 
-            if ($this->input && ($options['dotenv_overload'] ?? false)) {
+            if (isset($this->input) && ($options['dotenv_overload'] ?? false)) {
                 if ($this->input->getParameterOption(['--env', '-e'], $_SERVER[$envKey], true) !== $_SERVER[$envKey]) {
                     throw new \LogicException(sprintf('Cannot use "--env" or "-e" when the "%s" file defines "%s" and the "dotenv_overload" runtime option is true.', $options['dotenv_path'] ?? '.env', $envKey));
                 }

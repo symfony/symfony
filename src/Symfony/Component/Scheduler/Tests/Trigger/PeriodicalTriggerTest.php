@@ -30,7 +30,6 @@ class PeriodicalTriggerTest extends TestCase
         if ($optimizable) {
             // test that we are using the fast algorithm for short period of time
             $p = new \ReflectionProperty($trigger, 'intervalInSeconds');
-            $p->setAccessible(true);
             $this->assertNotSame(0, $p->getValue($trigger));
         }
     }

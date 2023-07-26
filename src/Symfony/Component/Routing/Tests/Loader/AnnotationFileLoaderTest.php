@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Routing\Tests\Loader;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Routing\Loader\AnnotationFileLoader;
@@ -63,18 +62,6 @@ class AnnotationFileLoaderTest extends TestCase
     {
         self::assertCount(1, $this->loader->load(__DIR__.'/../Fixtures/OtherAnnotatedClasses/VariadicClass.php'));
         self::assertSame([VariadicClass::class], $this->classLoader->foundClasses);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLoadAnonymousClass()
-    {
-        $this->classLoader = new TraceableAnnotationClassLoader(new AnnotationReader());
-        $this->loader = new AnnotationFileLoader(new FileLocator(), $this->classLoader);
-
-        self::assertCount(0, $this->loader->load(__DIR__.'/../Fixtures/OtherAnnotatedClasses/AnonymousClassInTrait.php'));
-        self::assertSame([], $this->classLoader->foundClasses);
     }
 
     public function testLoadAbstractClass()

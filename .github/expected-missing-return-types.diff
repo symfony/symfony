@@ -270,24 +270,24 @@ index 38618fc15e..eb599eb0b4 100644
      {
          $this->clearEntityManagers();
 diff --git a/src/Symfony/Bridge/Doctrine/Security/RememberMe/DoctrineTokenProvider.php b/src/Symfony/Bridge/Doctrine/Security/RememberMe/DoctrineTokenProvider.php
-index 3af51ffd60..2743b97f31 100644
+index 28eb228629..ce625e05db 100644
 --- a/src/Symfony/Bridge/Doctrine/Security/RememberMe/DoctrineTokenProvider.php
 +++ b/src/Symfony/Bridge/Doctrine/Security/RememberMe/DoctrineTokenProvider.php
-@@ -70,5 +70,5 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
+@@ -72,5 +72,5 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
       * @return void
       */
 -    public function deleteTokenBySeries(string $series)
 +    public function deleteTokenBySeries(string $series): void
      {
          $sql = 'DELETE FROM rememberme_token WHERE series=:series';
-@@ -85,5 +85,5 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
+@@ -89,5 +89,5 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
       * @return void
       */
 -    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed)
 +    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed): void
      {
          $sql = 'UPDATE rememberme_token SET value=:value, lastUsed=:lastUsed WHERE series=:series';
-@@ -111,5 +111,5 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
+@@ -115,5 +115,5 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
       * @return void
       */
 -    public function createNewToken(PersistentTokenInterface $token)
@@ -552,10 +552,10 @@ index cecce87c4a..7c6d738481 100644
      {
          if (!$container->hasDefinition('data_collector.dump')) {
 diff --git a/src/Symfony/Bundle/DebugBundle/DependencyInjection/DebugExtension.php b/src/Symfony/Bundle/DebugBundle/DependencyInjection/DebugExtension.php
-index eadeafba55..4f1ca3bfef 100644
+index 726b181bea..abf6270498 100644
 --- a/src/Symfony/Bundle/DebugBundle/DependencyInjection/DebugExtension.php
 +++ b/src/Symfony/Bundle/DebugBundle/DependencyInjection/DebugExtension.php
-@@ -33,5 +33,5 @@ class DebugExtension extends Extension
+@@ -34,5 +34,5 @@ class DebugExtension extends Extension
       * @return void
       */
 -    public function load(array $configs, ContainerBuilder $container)
@@ -731,7 +731,7 @@ index bda9ca9515..c0d1f91339 100644
      {
          if (!$container->hasParameter('workflow.has_guard_listeners')) {
 diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
-index cb855a9c2c..a935ea8307 100644
+index 56a4363aba..37d07b848f 100644
 --- a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
 @@ -212,5 +212,5 @@ class FrameworkExtension extends Extension
@@ -741,7 +741,7 @@ index cb855a9c2c..a935ea8307 100644
 +    public function load(array $configs, ContainerBuilder $container): void
      {
          $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));
-@@ -2904,5 +2904,5 @@ class FrameworkExtension extends Extension
+@@ -2908,5 +2908,5 @@ class FrameworkExtension extends Extension
       * @return void
       */
 -    public static function registerRateLimiter(ContainerBuilder $container, string $name, array $limiterConfig)
@@ -1173,7 +1173,7 @@ index b3eec9ff60..742be71a64 100644
      {
          $environment->getExtension(CoreExtension::class)->setDateFormat($this->dateFormat, $this->intervalFormat);
 diff --git a/src/Symfony/Bundle/TwigBundle/DependencyInjection/TwigExtension.php b/src/Symfony/Bundle/TwigBundle/DependencyInjection/TwigExtension.php
-index f257f60298..b76392370a 100644
+index deac87b8b6..f7846f99c4 100644
 --- a/src/Symfony/Bundle/TwigBundle/DependencyInjection/TwigExtension.php
 +++ b/src/Symfony/Bundle/TwigBundle/DependencyInjection/TwigExtension.php
 @@ -40,5 +40,5 @@ class TwigExtension extends Extension
@@ -2229,129 +2229,129 @@ index cc024da461..00b79e915f 100644
      {
          $errors = [];
 diff --git a/src/Symfony/Component/Console/Application.php b/src/Symfony/Component/Console/Application.php
-index b7aaa6a29e..dd14cf2c5c 100644
+index 842ef19070..0a24bcedee 100644
 --- a/src/Symfony/Component/Console/Application.php
 +++ b/src/Symfony/Component/Console/Application.php
-@@ -114,5 +114,5 @@ class Application implements ResetInterface
+@@ -115,5 +115,5 @@ class Application implements ResetInterface
       * @return void
       */
 -    public function setCommandLoader(CommandLoaderInterface $commandLoader)
 +    public function setCommandLoader(CommandLoaderInterface $commandLoader): void
      {
          $this->commandLoader = $commandLoader;
-@@ -131,5 +131,5 @@ class Application implements ResetInterface
+@@ -132,5 +132,5 @@ class Application implements ResetInterface
       * @return void
       */
 -    public function setSignalsToDispatchEvent(int ...$signalsToDispatchEvent)
 +    public function setSignalsToDispatchEvent(int ...$signalsToDispatchEvent): void
      {
          $this->signalsToDispatchEvent = $signalsToDispatchEvent;
-@@ -221,5 +221,5 @@ class Application implements ResetInterface
+@@ -225,5 +225,5 @@ class Application implements ResetInterface
       * @return int 0 if everything went fine, or an error code
       */
 -    public function doRun(InputInterface $input, OutputInterface $output)
 +    public function doRun(InputInterface $input, OutputInterface $output): int
      {
          if (true === $input->hasParameterOption(['--version', '-V'], true)) {
-@@ -327,5 +327,5 @@ class Application implements ResetInterface
+@@ -331,5 +331,5 @@ class Application implements ResetInterface
       * @return void
       */
 -    public function reset()
 +    public function reset(): void
      {
      }
-@@ -334,5 +334,5 @@ class Application implements ResetInterface
+@@ -338,5 +338,5 @@ class Application implements ResetInterface
       * @return void
       */
 -    public function setHelperSet(HelperSet $helperSet)
 +    public function setHelperSet(HelperSet $helperSet): void
      {
          $this->helperSet = $helperSet;
-@@ -350,5 +350,5 @@ class Application implements ResetInterface
+@@ -354,5 +354,5 @@ class Application implements ResetInterface
       * @return void
       */
 -    public function setDefinition(InputDefinition $definition)
 +    public function setDefinition(InputDefinition $definition): void
      {
          $this->definition = $definition;
-@@ -423,5 +423,5 @@ class Application implements ResetInterface
+@@ -427,5 +427,5 @@ class Application implements ResetInterface
       * @return void
       */
 -    public function setCatchExceptions(bool $boolean)
 +    public function setCatchExceptions(bool $boolean): void
      {
          $this->catchExceptions = $boolean;
-@@ -441,5 +441,5 @@ class Application implements ResetInterface
+@@ -453,5 +453,5 @@ class Application implements ResetInterface
       * @return void
       */
 -    public function setAutoExit(bool $boolean)
 +    public function setAutoExit(bool $boolean): void
      {
          $this->autoExit = $boolean;
-@@ -459,5 +459,5 @@ class Application implements ResetInterface
+@@ -471,5 +471,5 @@ class Application implements ResetInterface
       * @return void
       */
 -    public function setName(string $name)
 +    public function setName(string $name): void
      {
          $this->name = $name;
-@@ -477,5 +477,5 @@ class Application implements ResetInterface
+@@ -489,5 +489,5 @@ class Application implements ResetInterface
       * @return void
       */
 -    public function setVersion(string $version)
 +    public function setVersion(string $version): void
      {
          $this->version = $version;
-@@ -487,5 +487,5 @@ class Application implements ResetInterface
+@@ -499,5 +499,5 @@ class Application implements ResetInterface
       * @return string
       */
 -    public function getLongVersion()
 +    public function getLongVersion(): string
      {
          if ('UNKNOWN' !== $this->getName()) {
-@@ -517,5 +517,5 @@ class Application implements ResetInterface
+@@ -529,5 +529,5 @@ class Application implements ResetInterface
       * @return void
       */
 -    public function addCommands(array $commands)
 +    public function addCommands(array $commands): void
      {
          foreach ($commands as $command) {
-@@ -532,5 +532,5 @@ class Application implements ResetInterface
+@@ -544,5 +544,5 @@ class Application implements ResetInterface
       * @return Command|null
       */
 -    public function add(Command $command)
 +    public function add(Command $command): ?Command
      {
          $this->init();
-@@ -569,5 +569,5 @@ class Application implements ResetInterface
+@@ -581,5 +581,5 @@ class Application implements ResetInterface
       * @throws CommandNotFoundException When given command name does not exist
       */
 -    public function get(string $name)
 +    public function get(string $name): Command
      {
          $this->init();
-@@ -676,5 +676,5 @@ class Application implements ResetInterface
+@@ -688,5 +688,5 @@ class Application implements ResetInterface
       * @throws CommandNotFoundException When command name is incorrect or ambiguous
       */
 -    public function find(string $name)
 +    public function find(string $name): Command
      {
          $this->init();
-@@ -784,5 +784,5 @@ class Application implements ResetInterface
+@@ -796,5 +796,5 @@ class Application implements ResetInterface
       * @return Command[]
       */
 -    public function all(string $namespace = null)
 +    public function all(string $namespace = null): array
      {
          $this->init();
-@@ -928,5 +928,5 @@ class Application implements ResetInterface
+@@ -940,5 +940,5 @@ class Application implements ResetInterface
       * @return void
       */
 -    protected function configureIO(InputInterface $input, OutputInterface $output)
 +    protected function configureIO(InputInterface $input, OutputInterface $output): void
      {
          if (true === $input->hasParameterOption(['--ansi'], true)) {
-@@ -993,5 +993,5 @@ class Application implements ResetInterface
+@@ -1005,5 +1005,5 @@ class Application implements ResetInterface
       * @return int 0 if everything went fine, or an error code
       */
 -    protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output)
@@ -3730,7 +3730,7 @@ index 3f070dcc0c..aa0e5186bf 100644
      {
          foreach ($container->findTaggedServiceIds('auto_alias') as $serviceId => $tags) {
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php b/src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php
-index e28b60c6ea..a5b3d3d00b 100644
+index 51076036dc..3ec20ef17e 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php
 @@ -73,5 +73,5 @@ class AutowirePass extends AbstractRecursivePass
@@ -3820,10 +3820,10 @@ index 92e1e2de4b..aa3e55d492 100644
      {
          $definitions = new \SplPriorityQueue();
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/DefinitionErrorExceptionPass.php b/src/Symfony/Component/DependencyInjection/Compiler/DefinitionErrorExceptionPass.php
-index dfba7fe3e1..3f05e2d35f 100644
+index b6a2cf907e..7940b85cc7 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/DefinitionErrorExceptionPass.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/DefinitionErrorExceptionPass.php
-@@ -35,5 +35,5 @@ class DefinitionErrorExceptionPass extends AbstractRecursivePass
+@@ -34,5 +34,5 @@ class DefinitionErrorExceptionPass extends AbstractRecursivePass
       * @return void
       */
 -    public function process(ContainerBuilder $container)
@@ -4051,7 +4051,7 @@ index 705bb837b9..1c66600cfa 100644
      {
          try {
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/ResolveInstanceofConditionalsPass.php b/src/Symfony/Component/DependencyInjection/Compiler/ResolveInstanceofConditionalsPass.php
-index 88d6fa01fd..d057c13802 100644
+index fbce044e36..350ccfd696 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/ResolveInstanceofConditionalsPass.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/ResolveInstanceofConditionalsPass.php
 @@ -28,5 +28,5 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
@@ -4209,7 +4209,7 @@ index be6b225a3a..f6108580de 100644
      {
          if (1 > \func_num_args()) {
 diff --git a/src/Symfony/Component/DependencyInjection/ContainerBuilder.php b/src/Symfony/Component/DependencyInjection/ContainerBuilder.php
-index a7a9c145aa..bd16e937ca 100644
+index f56072a356..5bd4844ade 100644
 --- a/src/Symfony/Component/DependencyInjection/ContainerBuilder.php
 +++ b/src/Symfony/Component/DependencyInjection/ContainerBuilder.php
 @@ -177,5 +177,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
@@ -4550,7 +4550,7 @@ index fa44784caf..cf589be28d 100644
      {
          throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
 diff --git a/src/Symfony/Component/DependencyInjection/Loader/FileLoader.php b/src/Symfony/Component/DependencyInjection/Loader/FileLoader.php
-index 86543c1e85..4772c08c3d 100644
+index 4b56c17881..d49b71149d 100644
 --- a/src/Symfony/Component/DependencyInjection/Loader/FileLoader.php
 +++ b/src/Symfony/Component/DependencyInjection/Loader/FileLoader.php
 @@ -99,5 +99,5 @@ abstract class FileLoader extends BaseFileLoader
@@ -4560,14 +4560,14 @@ index 86543c1e85..4772c08c3d 100644
 +    public function registerClasses(Definition $prototype, string $namespace, string $resource, string|array $exclude = null/* , string $source = null */): void
      {
          if (!str_ends_with($namespace, '\\')) {
-@@ -195,5 +195,5 @@ abstract class FileLoader extends BaseFileLoader
+@@ -213,5 +213,5 @@ abstract class FileLoader extends BaseFileLoader
       * @return void
       */
 -    public function registerAliasesForSinglyImplementedInterfaces()
 +    public function registerAliasesForSinglyImplementedInterfaces(): void
      {
          foreach ($this->interfaces as $interface) {
-@@ -211,5 +211,5 @@ abstract class FileLoader extends BaseFileLoader
+@@ -229,5 +229,5 @@ abstract class FileLoader extends BaseFileLoader
       * @return void
       */
 -    protected function setDefinition(string $id, Definition $definition)
@@ -5532,7 +5532,7 @@ index a379ce1863..e2035fb337 100644
      {
          if (\is_array($content)) {
 diff --git a/src/Symfony/Component/Finder/Finder.php b/src/Symfony/Component/Finder/Finder.php
-index 62c3f9e24f..f5055abd0c 100644
+index a3bf9a1a7c..38b6968d6b 100644
 --- a/src/Symfony/Component/Finder/Finder.php
 +++ b/src/Symfony/Component/Finder/Finder.php
 @@ -400,5 +400,5 @@ class Finder implements \IteratorAggregate, \Countable
@@ -6129,7 +6129,7 @@ index 291ede93ef..a4128a3880 100644
      {
          $emptyData = static fn (FormInterface $form, $viewData) => $viewData;
 diff --git a/src/Symfony/Component/Form/Extension/Core/Type/ChoiceType.php b/src/Symfony/Component/Form/Extension/Core/Type/ChoiceType.php
-index 4dcd3b6877..16e18de555 100644
+index e31d810df1..d002e96f9d 100644
 --- a/src/Symfony/Component/Form/Extension/Core/Type/ChoiceType.php
 +++ b/src/Symfony/Component/Form/Extension/Core/Type/ChoiceType.php
 @@ -66,5 +66,5 @@ class ChoiceType extends AbstractType
@@ -6139,21 +6139,21 @@ index 4dcd3b6877..16e18de555 100644
 +    public function buildForm(FormBuilderInterface $builder, array $options): void
      {
          $unknownValues = [];
-@@ -222,5 +222,5 @@ class ChoiceType extends AbstractType
+@@ -221,5 +221,5 @@ class ChoiceType extends AbstractType
       * @return void
       */
 -    public function buildView(FormView $view, FormInterface $form, array $options)
 +    public function buildView(FormView $view, FormInterface $form, array $options): void
      {
          $choiceTranslationDomain = $options['choice_translation_domain'];
-@@ -279,5 +279,5 @@ class ChoiceType extends AbstractType
+@@ -278,5 +278,5 @@ class ChoiceType extends AbstractType
       * @return void
       */
 -    public function finishView(FormView $view, FormInterface $form, array $options)
 +    public function finishView(FormView $view, FormInterface $form, array $options): void
      {
          if ($options['expanded']) {
-@@ -299,5 +299,5 @@ class ChoiceType extends AbstractType
+@@ -298,5 +298,5 @@ class ChoiceType extends AbstractType
       * @return void
       */
 -    public function configureOptions(OptionsResolver $resolver)
@@ -9205,17 +9205,17 @@ index 1940c80a90..5f28605ada 100644
 +    public function clear(): void;
  }
 diff --git a/src/Symfony/Component/HttpKernel/Profiler/FileProfilerStorage.php b/src/Symfony/Component/HttpKernel/Profiler/FileProfilerStorage.php
-index 0fdbfc44ba..67ad8c64c1 100644
+index 33a3f4242d..e91d2862ab 100644
 --- a/src/Symfony/Component/HttpKernel/Profiler/FileProfilerStorage.php
 +++ b/src/Symfony/Component/HttpKernel/Profiler/FileProfilerStorage.php
-@@ -91,5 +91,5 @@ class FileProfilerStorage implements ProfilerStorageInterface
+@@ -97,5 +97,5 @@ class FileProfilerStorage implements ProfilerStorageInterface
       * @return void
       */
 -    public function purge()
 +    public function purge(): void
      {
          $flags = \FilesystemIterator::SKIP_DOTS;
-@@ -249,5 +249,5 @@ class FileProfilerStorage implements ProfilerStorageInterface
+@@ -255,5 +255,5 @@ class FileProfilerStorage implements ProfilerStorageInterface
       * @return Profile
       */
 -    protected function createProfileFromData(string $token, array $data, Profile $parent = null)
@@ -10668,7 +10668,7 @@ index f330d405af..7299f09a22 100644
      {
          if (self::STATUS_STARTED !== $this->status) {
 diff --git a/src/Symfony/Component/PropertyAccess/PropertyAccessor.php b/src/Symfony/Component/PropertyAccess/PropertyAccessor.php
-index 0bf5c0afa9..dc0f2eae19 100644
+index 579b13452d..f73ce8e990 100644
 --- a/src/Symfony/Component/PropertyAccess/PropertyAccessor.php
 +++ b/src/Symfony/Component/PropertyAccess/PropertyAccessor.php
 @@ -123,5 +123,5 @@ class PropertyAccessor implements PropertyAccessorInterface
@@ -11347,24 +11347,24 @@ index 6912f8a15b..caf18c886a 100644
 +    public function getRouteCollection(): RouteCollection;
  }
 diff --git a/src/Symfony/Component/Security/Core/Authentication/RememberMe/InMemoryTokenProvider.php b/src/Symfony/Component/Security/Core/Authentication/RememberMe/InMemoryTokenProvider.php
-index 341883f3c5..d508e0ce1e 100644
+index 1bd5234f50..493969ebef 100644
 --- a/src/Symfony/Component/Security/Core/Authentication/RememberMe/InMemoryTokenProvider.php
 +++ b/src/Symfony/Component/Security/Core/Authentication/RememberMe/InMemoryTokenProvider.php
-@@ -35,5 +35,5 @@ class InMemoryTokenProvider implements TokenProviderInterface
+@@ -39,5 +39,5 @@ class InMemoryTokenProvider implements TokenProviderInterface
       * @return void
       */
 -    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed)
 +    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed): void
      {
          if (!isset($this->tokens[$series])) {
-@@ -54,5 +54,5 @@ class InMemoryTokenProvider implements TokenProviderInterface
+@@ -58,5 +58,5 @@ class InMemoryTokenProvider implements TokenProviderInterface
       * @return void
       */
 -    public function deleteTokenBySeries(string $series)
 +    public function deleteTokenBySeries(string $series): void
      {
          unset($this->tokens[$series]);
-@@ -62,5 +62,5 @@ class InMemoryTokenProvider implements TokenProviderInterface
+@@ -66,5 +66,5 @@ class InMemoryTokenProvider implements TokenProviderInterface
       * @return void
       */
 -    public function createNewToken(PersistentTokenInterface $token)
@@ -11372,7 +11372,7 @@ index 341883f3c5..d508e0ce1e 100644
      {
          $this->tokens[$token->getSeries()] = $token;
 diff --git a/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php b/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php
-index cf41e0c507..61f7397734 100644
+index d2f0c8cbe0..713ac78c4e 100644
 --- a/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php
 +++ b/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php
 @@ -28,5 +28,5 @@ interface TokenProviderInterface
@@ -11389,14 +11389,14 @@ index cf41e0c507..61f7397734 100644
 +    public function deleteTokenBySeries(string $series): void;
  
      /**
-@@ -44,5 +44,5 @@ interface TokenProviderInterface
+@@ -46,5 +46,5 @@ interface TokenProviderInterface
       * @throws TokenNotFoundException if the token is not found
       */
 -    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed);
 +    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed): void;
  
      /**
-@@ -51,4 +51,4 @@ interface TokenProviderInterface
+@@ -53,4 +53,4 @@ interface TokenProviderInterface
       * @return void
       */
 -    public function createNewToken(PersistentTokenInterface $token);
@@ -12107,7 +12107,7 @@ index b684fddb2f..ade2242791 100644
      {
          return $this->data;
 diff --git a/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php
-index 079b1e7a9e..e3cfe43e67 100644
+index fc5322fa29..b9a563e013 100644
 --- a/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php
 @@ -221,5 +221,5 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
@@ -14671,7 +14671,7 @@ index f3bbf3be4f..4941d9cd41 100644
      {
          $stub->cut = -1;
 diff --git a/src/Symfony/Component/VarDumper/Caster/SplCaster.php b/src/Symfony/Component/VarDumper/Caster/SplCaster.php
-index ea86cb4988..9b84f08439 100644
+index 814d824d19..f68410f9ea 100644
 --- a/src/Symfony/Component/VarDumper/Caster/SplCaster.php
 +++ b/src/Symfony/Component/VarDumper/Caster/SplCaster.php
 @@ -33,5 +33,5 @@ class SplCaster
@@ -14884,17 +14884,17 @@ index 6a746b88e3..4c0940bd31 100644
      {
          $this->minDepth = $minDepth;
 diff --git a/src/Symfony/Component/VarDumper/Cloner/Data.php b/src/Symfony/Component/VarDumper/Cloner/Data.php
-index 493d7dff5e..0fcc122596 100644
+index dd5b7c60a6..4c792ba8c5 100644
 --- a/src/Symfony/Component/VarDumper/Cloner/Data.php
 +++ b/src/Symfony/Component/VarDumper/Cloner/Data.php
-@@ -125,5 +125,5 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
+@@ -127,5 +127,5 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
       * @return mixed
       */
 -    public function __get(string $key)
 +    public function __get(string $key): mixed
      {
          if (null !== $data = $this->seek($key)) {
-@@ -269,5 +269,5 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
+@@ -271,5 +271,5 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
       * @return void
       */
 -    public function dump(DumperInterface $dumper)
@@ -15145,14 +15145,14 @@ index 98c2149330..2e85547efb 100644
      {
          if (!$this->connection->write($data) && $this->wrappedDumper) {
 diff --git a/src/Symfony/Component/VarDumper/VarDumper.php b/src/Symfony/Component/VarDumper/VarDumper.php
-index 2e1dad116c..abe2b0b229 100644
+index 9fa8ad4f89..a14de4c07c 100644
 --- a/src/Symfony/Component/VarDumper/VarDumper.php
 +++ b/src/Symfony/Component/VarDumper/VarDumper.php
-@@ -43,5 +43,5 @@ class VarDumper
+@@ -54,5 +54,5 @@ class VarDumper
       * @return mixed
       */
--    public static function dump(mixed $var/* , string $label = null */)
-+    public static function dump(mixed $var/* , string $label = null */): mixed
+-    public static function dump(mixed $var/* , string $label = null, VarDumperOptions|array $options = [] */)
++    public static function dump(mixed $var/* , string $label = null, VarDumperOptions|array $options = [] */): mixed
      {
          $label = 2 <= \func_num_args() ? func_get_arg(1) : null;
 diff --git a/src/Symfony/Component/VarExporter/Internal/Hydrator.php b/src/Symfony/Component/VarExporter/Internal/Hydrator.php

@@ -22,6 +22,7 @@ use Symfony\Component\VarDumper\Command\Descriptor\CliDescriptor;
 use Symfony\Component\VarDumper\Command\Descriptor\HtmlDescriptor;
 use Symfony\Component\VarDumper\Command\ServerDumpCommand;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
+use Symfony\Component\VarDumper\Dumper\ContextProvider\BacktraceContextProvider;
 use Symfony\Component\VarDumper\Dumper\ContextProvider\CliContextProvider;
 use Symfony\Component\VarDumper\Dumper\ContextProvider\RequestContextProvider;
 use Symfony\Component\VarDumper\Dumper\ContextProvider\SourceContextProvider;
@@ -87,6 +88,10 @@ return static function (ContainerConfigurator $container) {
                         param('kernel.project_dir'),
                         service('debug.file_link_formatter')->nullOnInvalid(),
                     ]),
+                    'backtrace' => inline_service(BacktraceContextProvider::class)->args([
+                        0,
+                        service('var_dump.cloner')->nullOnInvalid(),
+                    ]),
                 ],
             ])
 
@@ -111,6 +116,10 @@ return static function (ContainerConfigurator $container) {
                     ]),
                     'request' => inline_service(RequestContextProvider::class)->args([service('request_stack')]),
                     'cli' => inline_service(CliContextProvider::class),
+                    'backtrace' => inline_service(BacktraceContextProvider::class)->args([
+                        0,
+                        service('var_dump.cloner')->nullOnInvalid(),
+                    ]),
                 ],
             ])
 

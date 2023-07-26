@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by vtsykun at 2023-07-22T19:09:10Z
+
+I found another type of error related to this bug
+
+```php
+class FinalPublicClass
+{
+    private $count = 0;
+
+    final public function increment(): int
+    {
+        return $this->count += 1;
+    }
+
+    public function decrement(): int
+    {
+        return $this->count -= 1;
+    }
+}
+
+class TestOverwritePropClass extends FinalPublicClass
+{
+    public function __construct(
+        protected string $dep,
+        protected int $count
+    ) {
+    }
+
+    public function getDep(): string
+    {
+        return $this->dep;
+    }
+}
+```
+
+```yml
+TestOverwritePropClass:
+    lazy: true
+    arguments: ['123', 5]
+```
+
+`$class->increment()` // return 1,
+`$proxy->increment()` // return 6, but must be 1
+
+![Selection_1646](https://github.com/symfony/symfony/assets/21358010/fbe1cdf9-709e-44c7-add5-c5c6205ee0df)

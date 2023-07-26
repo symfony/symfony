@@ -6,8 +6,8 @@ CHANGELOG
 
  * Add parameter `$isSameDatabase` to `DoctrineTransport::configureSchema()`
  * Remove `MessageHandlerInterface` and `MessageSubscriberInterface`, use `#[AsMessageHandler]` instead
- * Remove `StopWorkerOnSigtermSignalListener` in favor of
-   `StopWorkerOnSignalsListener` and make it configurable with SIGINT and
+ * Remove `StopWorkerOnSigtermSignalListener` in favor of using the `SignalableCommandInterface`
+ * Remove `StopWorkerOnSignalsListener` in favor of using the `SignalableCommandInterface`
  * Remove `Symfony\Component\Messenger\Transport\InMemoryTransport` and
    `Symfony\Component\Messenger\Transport\InMemoryTransportFactory` in favor of
    `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport` and

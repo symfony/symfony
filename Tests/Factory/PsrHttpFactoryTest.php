@@ -293,6 +293,6 @@ class PsrHttpFactoryTest extends TestCase
         $request = new Request([], [], [], [], [], $headers, '{"city":"Paris"');
         $psrRequest = $this->factory->createRequest($request);
 
-        $this->assertSame([], $psrRequest->getParsedBody());
+        $this->assertNull($psrRequest->getParsedBody());
     }
 }

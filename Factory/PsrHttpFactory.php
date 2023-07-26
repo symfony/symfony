@@ -20,7 +20,6 @@ use Psr\Http\Message\UploadedFileFactoryInterface;
 use Psr\Http\Message\UploadedFileInterface;
 use Symfony\Bridge\PsrHttpMessage\HttpMessageFactoryInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\Exception\JsonException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -79,11 +78,11 @@ class PsrHttpFactory implements HttpMessageFactoryInterface
             $format = $symfonyRequest->getContentType();
         }
 
-        if (method_exists(Request::class, 'getPayload') && 'json' === $format) {
-            try {
-                $parsedBody = $symfonyRequest->getPayload()->all();
-            } catch (JsonException $e) {
-                $parsedBody = [];
+        if ('json' === $format) {
+            $parsedBody = json_decode($symfonyRequest->getContent(), true, 512, \JSON_BIGINT_AS_STRING);
+
+            if (!\is_array($parsedBody)) {
+                $parsedBody = null;
             }
         } else {
             $parsedBody = $symfonyRequest->request->all();

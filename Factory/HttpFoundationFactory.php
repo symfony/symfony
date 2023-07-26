@@ -221,13 +221,13 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
         return new Cookie(
             $cookieName,
             $cookieValue,
-            isset($cookieExpire) ? $cookieExpire : 0,
-            isset($cookiePath) ? $cookiePath : '/',
-            isset($cookieDomain) ? $cookieDomain : null,
+            $cookieExpire ?? 0,
+            $cookiePath ?? '/',
+            $cookieDomain ?? null,
             isset($cookieSecure),
             isset($cookieHttpOnly),
             true,
-            isset($samesite) ? $samesite : null
+            $samesite ?? null
         );
     }
 

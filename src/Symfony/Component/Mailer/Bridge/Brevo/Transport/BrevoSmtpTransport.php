@@ -22,8 +22,7 @@ final class BrevoSmtpTransport extends EsmtpTransport
 {
     public function __construct(string $username, #[\SensitiveParameter] string $password, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
-        // This is not a typo: For now the smtp relay is still under sendinblue.com unlike the api.
-        parent::__construct('smtp-relay.sendinblue.com', 465, true, $dispatcher, $logger);
+        parent::__construct('smtp-relay.brevo.com', 465, true, $dispatcher, $logger);
 
         $this->setUsername($username);
         $this->setPassword($password);

@@ -20,13 +20,13 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
 /**
  * @author Yann LUCAS
  *
- * @deprecated since Symfony 6.3, use BrevoTransportFactory instead
+ * @deprecated since Symfony 6.4, use BrevoTransportFactory instead
  */
 final class SendinblueTransportFactory extends AbstractTransportFactory
 {
     public function create(Dsn $dsn): TransportInterface
     {
-        trigger_deprecation('symfony/sendinblue-mailer', '6.3', 'The "%s" class is deprecated, use "%s" instead.', self::class, BrevoTransportFactory::class);
+        trigger_deprecation('symfony/sendinblue-mailer', '6.4', 'The "%s" class is deprecated, use "%s" instead.', self::class, BrevoTransportFactory::class);
 
         if (!\in_array($dsn->getScheme(), $this->getSupportedSchemes(), true)) {
             throw new UnsupportedSchemeException($dsn, 'sendinblue', $this->getSupportedSchemes());

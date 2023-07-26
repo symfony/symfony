@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+# 2.3.1 (2023-07-26)
+
+* Don't rely on `Request::getPayload()` to populate the parsed body
+
 # 2.3.0 (2023-07-25)
 
 * Leverage `Request::getPayload()` to populate the parsed body of PSR-7 requests

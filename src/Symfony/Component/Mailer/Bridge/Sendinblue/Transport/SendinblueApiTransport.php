@@ -30,7 +30,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @author Yann LUCAS
  *
- * @deprecated since Symfony 6.3, use BrevoApiTransport instead
+ * @deprecated since Symfony 6.4, use BrevoApiTransport instead
  */
 final class SendinblueApiTransport extends AbstractApiTransport
 {

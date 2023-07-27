@@ -142,11 +142,9 @@ class SubRequestHandlerTest extends TestCase
 
 class TestSubRequestHandlerKernel implements HttpKernelInterface
 {
-    private $assertCallback;
-
-    public function __construct(\Closure $assertCallback)
-    {
-        $this->assertCallback = $assertCallback;
+    public function __construct(
+        private \Closure $assertCallback,
+    ) {
     }
 
     public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = true): Response

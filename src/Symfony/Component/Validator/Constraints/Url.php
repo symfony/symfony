@@ -37,6 +37,7 @@ class Url extends Constraint
     public $message = 'This value is not a valid URL.';
     public $protocols = ['http', 'https'];
     public $relativeProtocol = false;
+    /** @var callable|null */
     public $normalizer;
 
     public function __construct(

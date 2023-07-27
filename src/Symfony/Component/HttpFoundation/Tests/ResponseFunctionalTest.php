@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 
 class ResponseFunctionalTest extends TestCase
 {
+    /** @var resource|false */
     private static $server;
 
     public static function setUpBeforeClass(): void

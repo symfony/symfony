@@ -38,6 +38,7 @@ class Choice extends Constraint
     protected static $errorNames = self::ERROR_NAMES;
 
     public $choices;
+    /** @var callable|string|null */
     public $callback;
     public $multiple = false;
     public $strict = true;

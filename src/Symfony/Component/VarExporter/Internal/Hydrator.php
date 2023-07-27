@@ -20,9 +20,9 @@ use Symfony\Component\VarExporter\Exception\ClassNotFoundException;
  */
 class Hydrator
 {
-    public static $hydrators = [];
-    public static $simpleHydrators = [];
-    public static $propertyScopes = [];
+    public static array $hydrators = [];
+    public static array $simpleHydrators = [];
+    public static array $propertyScopes = [];
 
     public $registry;
     public $values;

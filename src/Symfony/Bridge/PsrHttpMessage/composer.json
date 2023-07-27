@@ -1,0 +1,48 @@
+{
+    "name": "symfony/psr-http-message-bridge",
+    "type": "symfony-bridge",
+    "description": "PSR HTTP message bridge",
+    "keywords": ["http", "psr-7", "psr-17", "http-message"],
+    "homepage": "http://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=7.2.5",
+        "psr/http-message": "^1.0 || ^2.0",
+        "symfony/deprecation-contracts": "^2.5 || ^3.0",
+        "symfony/http-foundation": "^5.4 || ^6.0"
+    },
+    "require-dev": {
+        "symfony/browser-kit": "^5.4 || ^6.0",
+        "symfony/config": "^5.4 || ^6.0",
+        "symfony/event-dispatcher": "^5.4 || ^6.0",
+        "symfony/framework-bundle": "^5.4 || ^6.0",
+        "symfony/http-kernel": "^5.4 || ^6.0",
+        "symfony/phpunit-bridge": "^6.2",
+        "nyholm/psr7": "^1.1",
+        "psr/log": "^1.1 || ^2 || ^3"
+    },
+    "suggest": {
+        "nyholm/psr7": "For a super lightweight PSR-7/17 implementation"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Bridge\\PsrHttpMessage\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "2.3-dev"
+        }
+    }
+}

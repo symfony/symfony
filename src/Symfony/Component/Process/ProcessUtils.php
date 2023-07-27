@@ -43,9 +43,6 @@ class ProcessUtils
             if (\is_resource($input)) {
                 return $input;
             }
-            if (\is_string($input)) {
-                return $input;
-            }
             if (\is_scalar($input)) {
                 return (string) $input;
             }

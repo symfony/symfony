@@ -31,7 +31,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
 {
     protected RequestHandlerInterface $requestHandler;
     protected FormFactory $factory;
-    protected $request;
+    protected mixed $request = null;
     protected ServerParams $serverParams;
 
     protected function setUp(): void

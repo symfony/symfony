@@ -148,7 +148,7 @@ class PhpArrayAdapterTest extends AdapterTestCase
 
 class PhpArrayAdapterWrapper extends PhpArrayAdapter
 {
-    protected $data = [];
+    protected array $data = [];
 
     public function save(CacheItemInterface $item): bool
     {

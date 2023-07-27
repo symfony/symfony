@@ -306,7 +306,7 @@ class TestLoginLinkHandlerUser implements UserInterface
 
 class TestLoginLinkHandlerUserProvider implements UserProviderInterface
 {
-    private $users = [];
+    private array $users = [];
 
     public function createUser(TestLoginLinkHandlerUser $user): void
     {

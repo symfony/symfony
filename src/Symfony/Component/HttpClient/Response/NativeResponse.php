@@ -34,8 +34,8 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
      */
     private $context;
     private string $url;
-    private $resolver;
-    private $onProgress;
+    private \Closure $resolver;
+    private ?\Closure $onProgress;
     private ?int $remaining = null;
 
     /**
@@ -58,8 +58,8 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
         $this->logger = $logger;
         $this->timeout = $options['timeout'];
         $this->info = &$info;
-        $this->resolver = $resolver;
-        $this->onProgress = $onProgress;
+        $this->resolver = $resolver(...);
+        $this->onProgress = $onProgress ? $onProgress(...) : null;
         $this->inflate = !isset($options['normalized_headers']['accept-encoding']);
         $this->shouldBuffer = $options['buffer'] ?? true;
 
@@ -177,7 +177,7 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
         }
 
         stream_set_blocking($h, false);
-        $this->context = $this->resolver = null;
+        unset($this->context, $this->resolver);
 
         // Create dechunk buffers
         if (isset($this->headers['content-length'])) {

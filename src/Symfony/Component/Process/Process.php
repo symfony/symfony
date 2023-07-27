@@ -54,6 +54,7 @@ class Process implements \IteratorAggregate
     private array|string $commandline;
     private ?string $cwd;
     private array $env = [];
+    /** @var resource|string|\Iterator|null */
     private $input;
     private ?float $starttime = null;
     private ?float $lastOutputTime = null;
@@ -63,8 +64,11 @@ class Process implements \IteratorAggregate
     private array $fallbackStatus = [];
     private array $processInformation;
     private bool $outputDisabled = false;
+    /** @var resource */
     private $stdout;
+    /** @var resource */
     private $stderr;
+    /** @var resource|null */
     private $process;
     private string $status = self::STATUS_READY;
     private int $incrementalOutputOffset = 0;
@@ -345,11 +349,12 @@ class Process implements \IteratorAggregate
             throw new RuntimeException(sprintf('The provided cwd "%s" does not exist.', $this->cwd));
         }
 
-        $this->process = @proc_open($commandline, $descriptors, $this->processPipes->pipes, $this->cwd, $envPairs, $this->options);
+        $process = @proc_open($commandline, $descriptors, $this->processPipes->pipes, $this->cwd, $envPairs, $this->options);
 
-        if (!\is_resource($this->process)) {
+        if (!\is_resource($process)) {
             throw new RuntimeException('Unable to launch a new process.');
         }
+        $this->process = $process;
         $this->status = self::STATUS_STARTED;
 
         if (isset($descriptors[3])) {
@@ -1118,7 +1123,7 @@ class Process implements \IteratorAggregate
      *
      * This content will be passed to the underlying process standard input.
      *
-     * @param string|int|float|bool|resource|\Traversable|null $input The content
+     * @param string|resource|\Traversable|self|null $input The content
      *
      * @return $this
      *

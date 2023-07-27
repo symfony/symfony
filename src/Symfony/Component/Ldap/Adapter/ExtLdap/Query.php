@@ -43,7 +43,6 @@ class Query extends AbstractQuery
     public function __destruct()
     {
         $con = $this->connection->getResource();
-        $this->connection = null;
 
         if (!isset($this->results)) {
             return;
@@ -57,7 +56,6 @@ class Query extends AbstractQuery
                 throw new LdapException('Could not free results: '.ldap_error($con));
             }
         }
-        unset($this->results);
     }
 
     public function execute(): CollectionInterface

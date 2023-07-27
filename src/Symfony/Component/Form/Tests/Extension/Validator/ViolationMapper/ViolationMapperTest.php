@@ -72,8 +72,8 @@ class ViolationMapperTest extends TestCase
 
         if (!$synchronized) {
             $config->addViewTransformer(new CallbackTransformer(
-                fn ($normData) => $normData,
-                function () { throw new TransformationFailedException(); }
+                static fn ($normData) => $normData,
+                static fn () => throw new TransformationFailedException()
             ));
         }
 

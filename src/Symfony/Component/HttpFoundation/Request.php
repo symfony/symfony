@@ -277,16 +277,16 @@ class Request
         $this->headers = new HeaderBag($this->server->getHeaders());
 
         $this->content = $content;
-        $this->languages = null;
-        $this->charsets = null;
-        $this->encodings = null;
-        $this->acceptableContentTypes = null;
-        $this->pathInfo = null;
-        $this->requestUri = null;
-        $this->baseUrl = null;
-        $this->basePath = null;
-        $this->method = null;
-        $this->format = null;
+        unset($this->languages);
+        unset($this->charsets);
+        unset($this->encodings);
+        unset($this->acceptableContentTypes);
+        unset($this->pathInfo);
+        unset($this->requestUri);
+        unset($this->baseUrl);
+        unset($this->basePath);
+        unset($this->method);
+        unset($this->format);
     }
 
     /**
@@ -460,16 +460,16 @@ class Request
             $dup->server = new ServerBag($server);
             $dup->headers = new HeaderBag($dup->server->getHeaders());
         }
-        $dup->languages = null;
-        $dup->charsets = null;
-        $dup->encodings = null;
-        $dup->acceptableContentTypes = null;
-        $dup->pathInfo = null;
-        $dup->requestUri = null;
-        $dup->baseUrl = null;
-        $dup->basePath = null;
-        $dup->method = null;
-        $dup->format = null;
+        unset($dup->languages);
+        unset($dup->charsets);
+        unset($dup->encodings);
+        unset($dup->acceptableContentTypes);
+        unset($dup->pathInfo);
+        unset($dup->requestUri);
+        unset($dup->baseUrl);
+        unset($dup->basePath);
+        unset($dup->method);
+        unset($dup->format);
 
         if (!$dup->get('_format') && $this->get('_format')) {
             $dup->attributes->set('_format', $this->get('_format'));
@@ -1161,7 +1161,7 @@ class Request
      */
     public function setMethod(string $method): void
     {
-        $this->method = null;
+        unset($this->method);
         $this->server->set('REQUEST_METHOD', $method);
     }
 
@@ -1180,7 +1180,7 @@ class Request
      */
     public function getMethod(): string
     {
-        if (null !== $this->method) {
+        if (isset($this->method)) {
             return $this->method;
         }
 
@@ -1228,7 +1228,7 @@ class Request
      */
     public function getMimeType(string $format): ?string
     {
-        if (null === static::$formats) {
+        if (!isset(static::$formats)) {
             static::initializeFormats();
         }
 
@@ -1242,7 +1242,7 @@ class Request
      */
     public static function getMimeTypes(string $format): array
     {
-        if (null === static::$formats) {
+        if (!isset(static::$formats)) {
             static::initializeFormats();
         }
 
@@ -1259,7 +1259,7 @@ class Request
             $canonicalMimeType = trim(substr($mimeType, 0, $pos));
         }
 
-        if (null === static::$formats) {
+        if (!isset(static::$formats)) {
             static::initializeFormats();
         }
 
@@ -1282,7 +1282,7 @@ class Request
      */
     public function setFormat(?string $format, string|array $mimeTypes): void
     {
-        if (null === static::$formats) {
+        if (!isset(static::$formats)) {
             static::initializeFormats();
         }
 
@@ -1545,13 +1545,13 @@ class Request
      */
     public function getPreferredFormat(?string $default = 'html'): ?string
     {
-        if (null !== $this->preferredFormat || null !== $this->preferredFormat = $this->getRequestFormat(null)) {
-            return $this->preferredFormat;
+        if (isset($this->preferredFormat) || null !== $preferredFormat = $this->getRequestFormat(null)) {
+            return $this->preferredFormat ??= $preferredFormat;
         }
 
         foreach ($this->getAcceptableContentTypes() as $mimeType) {
-            if ($this->preferredFormat = $this->getFormat($mimeType)) {
-                return $this->preferredFormat;
+            if ($preferredFormat = $this->getFormat($mimeType)) {
+                return $this->preferredFormat = $preferredFormat;
             }
         }
 
@@ -1598,7 +1598,7 @@ class Request
      */
     public function getLanguages(): array
     {
-        if (null !== $this->languages) {
+        if (isset($this->languages)) {
             return $this->languages;
         }
 
@@ -1639,11 +1639,7 @@ class Request
      */
     public function getCharsets(): array
     {
-        if (null !== $this->charsets) {
-            return $this->charsets;
-        }
-
-        return $this->charsets = array_map('strval', array_keys(AcceptHeader::fromString($this->headers->get('Accept-Charset'))->all()));
+        return $this->charsets ??= array_map('strval', array_keys(AcceptHeader::fromString($this->headers->get('Accept-Charset'))->all()));
     }
 
     /**
@@ -1653,11 +1649,7 @@ class Request
      */
     public function getEncodings(): array
     {
-        if (null !== $this->encodings) {
-            return $this->encodings;
-        }
-
-        return $this->encodings = array_map('strval', array_keys(AcceptHeader::fromString($this->headers->get('Accept-Encoding'))->all()));
+        return $this->encodings ??= array_map('strval', array_keys(AcceptHeader::fromString($this->headers->get('Accept-Encoding'))->all()));
     }
 
     /**
@@ -1667,11 +1659,7 @@ class Request
      */
     public function getAcceptableContentTypes(): array
     {
-        if (null !== $this->acceptableContentTypes) {
-            return $this->acceptableContentTypes;
-        }
-
-        return $this->acceptableContentTypes = array_map('strval', array_keys(AcceptHeader::fromString($this->headers->get('Accept'))->all()));
+        return $this->acceptableContentTypes ??= array_map('strval', array_keys(AcceptHeader::fromString($this->headers->get('Accept'))->all()));
     }
 
     /**

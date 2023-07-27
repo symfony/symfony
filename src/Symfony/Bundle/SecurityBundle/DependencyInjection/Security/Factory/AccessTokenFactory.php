@@ -68,19 +68,19 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
 
                 ->beforeNormalization()
                     ->ifString()
-                    ->then(static function (string $v): array { return ['id' => $v]; })
+                    ->then(static fn ($v) => ['id' => $v])
                 ->end()
 
                 ->beforeNormalization()
-                    ->ifTrue(static function ($v) { return \is_array($v) && 1 < \count($v); })
-                    ->then(static function () { throw new InvalidConfigurationException('You cannot configure multiple token handlers.'); })
+                    ->ifTrue(static fn ($v) => \is_array($v) && 1 < \count($v))
+                    ->then(static fn () => throw new InvalidConfigurationException('You cannot configure multiple token handlers.'))
                 ->end()
 
                 // "isRequired" must be set otherwise the following custom validation is not called
                 ->isRequired()
                 ->beforeNormalization()
-                    ->ifTrue(static function ($v) { return \is_array($v) && !$v; })
-                    ->then(static function () { throw new InvalidConfigurationException('You must set a token handler.'); })
+                    ->ifTrue(static fn ($v) => \is_array($v) && !$v)
+                    ->then(static fn () => throw new InvalidConfigurationException('You must set a token handler.'))
                 ->end()
 
                 ->children()

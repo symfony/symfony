@@ -168,6 +168,7 @@ EOF;
             ),
             new DataPart('text data', 'text.txt')
         );
+        $body->getHeaders()->addHeader('foo', 'bar');
         $e = new Message((new Headers())->addMailboxListHeader('To', ['you@example.com']), $body);
         $expected = clone $e;
 
@@ -232,7 +233,17 @@ EOF;
                 "class": "Symfony\\\\Component\\\\Mime\\\\Part\\\\DataPart"
             }
         ],
-        "headers": [],
+        "headers": {
+            "foo": [
+                {
+                    "value": "bar",
+                    "name": "foo",
+                    "lineLength": 76,
+                    "lang": null,
+                    "charset": "utf-8"
+                }
+            ]
+        },
         "class": "Symfony\\\\Component\\\\Mime\\\\Part\\\\Multipart\\\\MixedPart"
     },
     "message": null
@@ -252,7 +263,7 @@ EOF;
         $this->assertStringMatchesFormat($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
 
         $n = $serializer->deserialize($serialized, Message::class, 'json');
-        $this->assertEquals($expected->getHeaders(), $n->getHeaders());
+        $this->assertEquals($expected, $n);
 
         $serialized = $serializer->serialize($e, 'json');
         $this->assertStringMatchesFormat($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));

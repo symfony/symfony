@@ -6,5 +6,6 @@
 
     <route id="_webhook_controller" path="/{type}">
         <default key="_controller">webhook.controller::handle</default>
+        <requirement key="type">.+</requirement>
     </route>
 </routes>

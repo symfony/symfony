@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by HypeMC at 2023-07-27T15:31:41Z
+
+> Can you check the follow patch please?
+
+@nicolas-grekas The following part won't work:
+
+```diff
+-        $builtinTypes = array_map(static function (Type $keyType) {
+-            return $keyType->getBuiltinType();
+-        }, \is_array($keyType = $context['key_type'] ?? []) ? $keyType : [$keyType]);
++        $builtinTypes = array_map(static function ($keyType) { return $keyType->getBuiltinType(); }, (array) ($context['key_type'] ?? []));
+ ```
+
+`$context['key_type']` is not a scalar but an instance of `\Symfony\Component\PropertyInfo\Type`.

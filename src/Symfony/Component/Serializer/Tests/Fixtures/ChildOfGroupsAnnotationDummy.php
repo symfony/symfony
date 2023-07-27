@@ -4,10 +4,6 @@ namespace Symfony\Component\Serializer\Tests\Fixtures;
 
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @Annotation
- * @Target({"PROPERTY", "METHOD"})
- */
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY)]
 final class ChildOfGroupsAnnotationDummy extends Groups
 {

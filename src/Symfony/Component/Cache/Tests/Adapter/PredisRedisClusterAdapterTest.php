@@ -27,9 +27,4 @@ class PredisRedisClusterAdapterTest extends AbstractRedisAdapterTestCase
 
         self::$redis = RedisAdapter::createConnection('redis:?host['.str_replace(' ', ']&host[', $hosts).']', ['class' => \Predis\Client::class, 'redis_cluster' => true, 'prefix' => 'prefix_']);
     }
-
-    public static function tearDownAfterClass(): void
-    {
-        self::$redis = null;
-    }
 }

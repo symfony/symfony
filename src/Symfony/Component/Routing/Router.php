@@ -193,10 +193,10 @@ class Router implements RouterInterface, RequestMatcherInterface
     {
         $this->context = $context;
 
-        if (null !== $this->matcher) {
+        if (isset($this->matcher)) {
             $this->getMatcher()->setContext($context);
         }
-        if (null !== $this->generator) {
+        if (isset($this->generator)) {
             $this->getGenerator()->setContext($context);
         }
     }
@@ -242,7 +242,7 @@ class Router implements RouterInterface, RequestMatcherInterface
      */
     public function getMatcher(): UrlMatcherInterface|RequestMatcherInterface
     {
-        if (null !== $this->matcher) {
+        if (isset($this->matcher)) {
             return $this->matcher;
         }
 
@@ -283,7 +283,7 @@ class Router implements RouterInterface, RequestMatcherInterface
      */
     public function getGenerator(): UrlGeneratorInterface
     {
-        if (null !== $this->generator) {
+        if (isset($this->generator)) {
             return $this->generator;
         }
 

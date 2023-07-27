@@ -20,6 +20,9 @@ use Symfony\Component\Serializer\Exception\NotEncodableValueException;
  */
 class JsonDecode implements DecoderInterface
 {
+    /**
+     * @deprecated since Symfony 6.4, to be removed in 7.0
+     */
     protected $serializer;
 
     /**

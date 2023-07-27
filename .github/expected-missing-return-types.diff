@@ -1343,7 +1343,7 @@ diff --git a/src/Symfony/Component/Cache/Adapter/ChainAdapter.php b/src/Symfony/
 diff --git a/src/Symfony/Component/Cache/Adapter/MemcachedAdapter.php b/src/Symfony/Component/Cache/Adapter/MemcachedAdapter.php
 --- a/src/Symfony/Component/Cache/Adapter/MemcachedAdapter.php
 +++ b/src/Symfony/Component/Cache/Adapter/MemcachedAdapter.php
-@@ -71,5 +71,5 @@ class MemcachedAdapter extends AbstractAdapter
+@@ -72,5 +72,5 @@ class MemcachedAdapter extends AbstractAdapter
       * @return bool
       */
 -    public static function isSupported()
@@ -1353,7 +1353,7 @@ diff --git a/src/Symfony/Component/Cache/Adapter/MemcachedAdapter.php b/src/Symf
 diff --git a/src/Symfony/Component/Cache/Adapter/PdoAdapter.php b/src/Symfony/Component/Cache/Adapter/PdoAdapter.php
 --- a/src/Symfony/Component/Cache/Adapter/PdoAdapter.php
 +++ b/src/Symfony/Component/Cache/Adapter/PdoAdapter.php
-@@ -101,5 +101,5 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
+@@ -102,5 +102,5 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
       * @throws \DomainException When an unsupported PDO driver is used
       */
 -    public function createTable()
@@ -1505,7 +1505,7 @@ diff --git a/src/Symfony/Component/Cache/Traits/FilesystemCommonTrait.php b/src/
 +    protected function doUnlink(string $file): bool
      {
          return @unlink($file);
-@@ -175,5 +175,5 @@ trait FilesystemCommonTrait
+@@ -167,5 +167,5 @@ trait FilesystemCommonTrait
       * @return void
       */
 -    public function __wakeup()
@@ -7313,14 +7313,14 @@ diff --git a/src/Symfony/Component/HttpFoundation/Request.php b/src/Symfony/Comp
 -    public function setMethod(string $method)
 +    public function setMethod(string $method): void
      {
-         $this->method = null;
+         unset($this->method);
 @@ -1301,5 +1301,5 @@ class Request
       * @return void
       */
 -    public function setFormat(?string $format, string|array $mimeTypes)
 +    public function setFormat(?string $format, string|array $mimeTypes): void
      {
-         if (null === static::$formats) {
+         if (!isset(static::$formats)) {
 @@ -1333,5 +1333,5 @@ class Request
       * @return void
       */
@@ -7342,14 +7342,14 @@ diff --git a/src/Symfony/Component/HttpFoundation/Request.php b/src/Symfony/Comp
 +    public function setLocale(string $locale): void
      {
          $this->setPhpDefaultLocale($this->locale = $locale);
-@@ -1756,5 +1756,5 @@ class Request
+@@ -1744,5 +1744,5 @@ class Request
       * @return string
       */
 -    protected function prepareRequestUri()
 +    protected function prepareRequestUri(): string
      {
          $requestUri = '';
-@@ -1927,5 +1927,5 @@ class Request
+@@ -1915,5 +1915,5 @@ class Request
       * @return void
       */
 -    protected static function initializeFormats()
@@ -11059,14 +11059,14 @@ diff --git a/src/Symfony/Component/Security/Core/Exception/AccountStatusExceptio
 diff --git a/src/Symfony/Component/Security/Core/Exception/AuthenticationException.php b/src/Symfony/Component/Security/Core/Exception/AuthenticationException.php
 --- a/src/Symfony/Component/Security/Core/Exception/AuthenticationException.php
 +++ b/src/Symfony/Component/Security/Core/Exception/AuthenticationException.php
-@@ -43,5 +43,5 @@ class AuthenticationException extends RuntimeException
+@@ -34,5 +34,5 @@ class AuthenticationException extends RuntimeException
       * @return void
       */
 -    public function setToken(TokenInterface $token)
 +    public function setToken(TokenInterface $token): void
      {
          $this->token = $token;
-@@ -94,5 +94,5 @@ class AuthenticationException extends RuntimeException
+@@ -85,5 +85,5 @@ class AuthenticationException extends RuntimeException
       * @return string
       */
 -    public function getMessageKey()
@@ -11778,7 +11778,7 @@ diff --git a/src/Symfony/Component/String/Slugger/AsciiSlugger.php b/src/Symfony
 diff --git a/src/Symfony/Component/String/UnicodeString.php b/src/Symfony/Component/String/UnicodeString.php
 --- a/src/Symfony/Component/String/UnicodeString.php
 +++ b/src/Symfony/Component/String/UnicodeString.php
-@@ -342,5 +342,5 @@ class UnicodeString extends AbstractUnicodeString
+@@ -366,5 +366,5 @@ class UnicodeString extends AbstractUnicodeString
       * @return void
       */
 -    public function __wakeup()
@@ -12075,14 +12075,14 @@ diff --git a/src/Symfony/Component/Translation/Dumper/DumperInterface.php b/src/
 diff --git a/src/Symfony/Component/Translation/Dumper/FileDumper.php b/src/Symfony/Component/Translation/Dumper/FileDumper.php
 --- a/src/Symfony/Component/Translation/Dumper/FileDumper.php
 +++ b/src/Symfony/Component/Translation/Dumper/FileDumper.php
-@@ -40,5 +40,5 @@ abstract class FileDumper implements DumperInterface
+@@ -38,5 +38,5 @@ abstract class FileDumper implements DumperInterface
       * @return void
       */
 -    public function setRelativePathTemplate(string $relativePathTemplate)
 +    public function setRelativePathTemplate(string $relativePathTemplate): void
      {
          $this->relativePathTemplate = $relativePathTemplate;
-@@ -48,5 +48,5 @@ abstract class FileDumper implements DumperInterface
+@@ -46,5 +46,5 @@ abstract class FileDumper implements DumperInterface
       * @return void
       */
 -    public function dump(MessageCatalogue $messages, array $options = [])

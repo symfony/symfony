@@ -561,7 +561,7 @@ class AutowirePass extends AbstractRecursivePass
 
     private function createTypeNotFoundMessageCallback(TypedReference $reference, string $label): \Closure
     {
-        if (null === $this->typesClone->container) {
+        if (!isset($this->typesClone->container)) {
             $this->typesClone->container = new ContainerBuilder($this->container->getParameterBag());
             $this->typesClone->container->setAliases($this->container->getAliases());
             $this->typesClone->container->setDefinitions($this->container->getDefinitions());

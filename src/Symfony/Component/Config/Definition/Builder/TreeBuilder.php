@@ -53,7 +53,7 @@ class TreeBuilder implements NodeParentInterface
     public function setPathSeparator(string $separator)
     {
         // unset last built as changing path separator changes all nodes
-        $this->tree = null;
+        unset($this->tree);
 
         $this->root->setPathSeparator($separator);
     }

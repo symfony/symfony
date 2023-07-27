@@ -61,7 +61,7 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
 
     public function getRouteCollection(): RouteCollection
     {
-        if (null === $this->collection) {
+        if (!isset($this->collection)) {
             $this->collection = $this->container->get('routing.loader')->load($this->resource, $this->options['resource_type']);
             $this->resolveParameters($this->collection);
             $this->collection->addResource(new ContainerParametersResource($this->collectedParameters));

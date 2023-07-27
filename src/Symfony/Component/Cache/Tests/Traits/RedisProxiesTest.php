@@ -15,12 +15,11 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarExporter\LazyProxyTrait;
 use Symfony\Component\VarExporter\ProxyHelper;
 
-/**
- * @requires extension redis
- */
 class RedisProxiesTest extends TestCase
 {
     /**
+     * @requires extension redis < 6
+     *
      * @testWith ["Redis"]
      *           ["RedisCluster"]
      */
@@ -50,24 +49,31 @@ class RedisProxiesTest extends TestCase
     }
 
     /**
+     * @requires extension redis
+     *
      * @testWith ["Redis", "redis"]
      *           ["RedisCluster", "redis_cluster"]
      */
     public function testRedis6Proxy($class, $stub)
     {
-        $this->markTestIncomplete('To be re-enabled when phpredis v6 becomes stable');
+        if (version_compare(phpversion('redis'), '6.0.0', '<')) {
+            $this->markTestIncomplete('To be re-enabled when phpredis v6 becomes stable');
 
-        $stub = file_get_contents("https://raw.githubusercontent.com/phpredis/phpredis/develop/{$stub}.stub.php");
-        $stub = preg_replace('/^class /m', 'return; \0', $stub);
-        $stub = preg_replace('/^return; class ([a-zA-Z]++)/m', 'interface \1StubInterface', $stub, 1);
-        $stub = preg_replace('/^    public const .*/m', '', $stub);
-        eval(substr($stub, 5));
+            $stub = file_get_contents("https://raw.githubusercontent.com/phpredis/phpredis/develop/{$stub}.stub.php");
+            $stub = preg_replace('/^class /m', 'return; \0', $stub);
+            $stub = preg_replace('/^return; class ([a-zA-Z]++)/m', 'interface \1StubInterface', $stub, 1);
+            $stub = preg_replace('/^    public const .*/m', '', $stub);
+            eval(substr($stub, 5));
+            $r = new \ReflectionClass($class.'StubInterface');
+        } else {
+            $r = new \ReflectionClass($class);
+        }
 
         $proxy = file_get_contents(\dirname(__DIR__, 2)."/Traits/{$class}6Proxy.php");
         $proxy = substr($proxy, 0, 4 + strpos($proxy, '[];'));
         $methods = [];
 
-        foreach ((new \ReflectionClass($class.'StubInterface'))->getMethods() as $method) {
+        foreach ($r->getMethods() as $method) {
             if ('reset' === $method->name || method_exists(LazyProxyTrait::class, $method->name)) {
                 continue;
             }

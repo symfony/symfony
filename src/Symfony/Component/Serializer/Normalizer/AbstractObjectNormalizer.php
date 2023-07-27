@@ -501,7 +501,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                     $class = $collectionValueType->getClassName().'[]';
 
                     if (\count($collectionKeyType = $type->getCollectionKeyTypes()) > 0) {
-                        [$context['key_type']] = $collectionKeyType;
+                        $context['key_type'] = \count($collectionKeyType) > 1 ? $collectionKeyType : $collectionKeyType[0];
                     }
 
                     $context['value_type'] = $collectionValueType;

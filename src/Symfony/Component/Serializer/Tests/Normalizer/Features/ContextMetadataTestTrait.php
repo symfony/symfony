@@ -121,12 +121,12 @@ class ContextChildMetadataDummy
      * @var \DateTime
      */
     #[Groups(['extended', 'simple'])]
-    #[Context([DateTimeNormalizer::FORMAT_KEY => \DateTimeInterface::RFC3339])]
-    #[Context(
+    #[DummyContextChild([DateTimeNormalizer::FORMAT_KEY => \DateTimeInterface::RFC3339])]
+    #[DummyContextChild(
         normalizationContext: [DateTimeNormalizer::FORMAT_KEY => \DateTimeInterface::RFC3339_EXTENDED],
         groups: ['extended'],
     )]
-    #[Context(
+    #[DummyContextChild(
         denormalizationContext: [DateTimeNormalizer::FORMAT_KEY => 'd/m/Y'],
         groups: ['simple'],
     )]

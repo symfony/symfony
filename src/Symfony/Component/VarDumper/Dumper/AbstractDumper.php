@@ -26,10 +26,13 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
     public const DUMP_COMMA_SEPARATOR = 4;
     public const DUMP_TRAILING_COMMA = 8;
 
+    /** @var callable|resource|string|null */
     public static $defaultOutput = 'php://output';
 
     protected $line = '';
+    /** @var callable|null */
     protected $lineDumper;
+    /** @var resource|null */
     protected $outputStream;
     protected $decimalPoint = '.';
     protected $indentPad = '  ';
@@ -55,9 +58,9 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
     /**
      * Sets the output destination of the dumps.
      *
-     * @param callable|resource|string $output A line dumper callable, an opened stream or an output path
+     * @param callable|resource|string|null $output A line dumper callable, an opened stream or an output path
      *
-     * @return callable|resource|string The previous output destination
+     * @return callable|resource|string|null The previous output destination
      */
     public function setOutput($output)
     {

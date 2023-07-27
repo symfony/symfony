@@ -30,6 +30,7 @@ class Choice extends Constraint
     ];
 
     public $choices;
+    /** @var callable|string|null */
     public $callback;
     public $multiple = false;
     public $strict = true;

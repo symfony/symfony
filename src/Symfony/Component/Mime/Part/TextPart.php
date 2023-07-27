@@ -28,6 +28,7 @@ class TextPart extends AbstractPart
 
     private static array $encoders = [];
 
+    /** @var resource|string|File */
     private $body;
     private ?string $charset;
     private string $subtype;

@@ -38,7 +38,7 @@ trait TransportResponseTrait
         'canceled' => false,
     ];
 
-    /** @var object|resource */
+    /** @var object|resource|null */
     private $handle;
     private int|string $id;
     private ?float $timeout = 0;

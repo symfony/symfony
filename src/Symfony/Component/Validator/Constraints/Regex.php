@@ -30,6 +30,7 @@ class Regex extends Constraint
     public $pattern;
     public $htmlPattern;
     public $match = true;
+    /** @var callable|null */
     public $normalizer;
 
     public function __construct(

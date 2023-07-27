@@ -17,6 +17,7 @@ use Symfony\Component\Console\Output\StreamOutput;
 
 class CursorTest extends TestCase
 {
+    /** @var resource */
     protected $stream;
 
     protected function setUp(): void
@@ -26,8 +27,7 @@ class CursorTest extends TestCase
 
     protected function tearDown(): void
     {
-        fclose($this->stream);
-        $this->stream = null;
+        unset($this->stream);
     }
 
     public function testMoveUpOneLine()

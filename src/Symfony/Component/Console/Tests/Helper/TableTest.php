@@ -25,6 +25,7 @@ use Symfony\Component\Console\Output\StreamOutput;
 
 class TableTest extends TestCase
 {
+    /** @var resource */
     protected $stream;
 
     protected function setUp(): void
@@ -34,8 +35,7 @@ class TableTest extends TestCase
 
     protected function tearDown(): void
     {
-        fclose($this->stream);
-        $this->stream = null;
+        unset($this->stream);
     }
 
     /**

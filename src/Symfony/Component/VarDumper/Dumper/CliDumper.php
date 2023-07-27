@@ -22,6 +22,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 class CliDumper extends AbstractDumper
 {
     public static $defaultColors;
+    /** @var callable|resource|string|null */
     public static $defaultOutput = 'php://stdout';
 
     protected $colors;
@@ -510,7 +511,7 @@ class CliDumper extends AbstractDumper
         if ($this->outputStream !== static::$defaultOutput) {
             return $this->hasColorSupport($this->outputStream);
         }
-        if (null !== static::$defaultColors) {
+        if (isset(static::$defaultColors)) {
             return static::$defaultColors;
         }
         if (isset($_SERVER['argv'][1])) {

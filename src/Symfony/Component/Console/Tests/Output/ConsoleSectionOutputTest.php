@@ -22,6 +22,7 @@ use Symfony\Component\Console\Question\Question;
 
 class ConsoleSectionOutputTest extends TestCase
 {
+    /** @var resource */
     private $stream;
 
     protected function setUp(): void
@@ -31,7 +32,7 @@ class ConsoleSectionOutputTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->stream = null;
+        unset($this->stream);
     }
 
     public function testClearAll()

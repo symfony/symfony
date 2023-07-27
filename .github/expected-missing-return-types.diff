@@ -4,42 +4,41 @@ composer u -o
 SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.1' php .github/patch-types.php
 head=$(sed '/^diff /Q' .github/expected-missing-return-types.diff)
 git checkout src/Symfony/Contracts/Service/ResetInterface.php
-(echo "$head" && echo && git diff -U2 src/) > .github/expected-missing-return-types.diff
+(echo "$head" && echo && git diff -U2 src/ | grep '^index ' -v) > .github/expected-missing-return-types.diff
 git checkout composer.json src/
 
 diff --git a/src/Symfony/Component/BrowserKit/AbstractBrowser.php b/src/Symfony/Component/BrowserKit/AbstractBrowser.php
-index 35650bc90d..645d6e73a5 100644
 --- a/src/Symfony/Component/BrowserKit/AbstractBrowser.php
 +++ b/src/Symfony/Component/BrowserKit/AbstractBrowser.php
-@@ -429,5 +429,5 @@ abstract class AbstractBrowser
+@@ -404,5 +404,5 @@ abstract class AbstractBrowser
       * @throws \RuntimeException When processing returns exit code
       */
 -    protected function doRequestInProcess(object $request)
 +    protected function doRequestInProcess(object $request): object
      {
          $deprecationsFile = tempnam(sys_get_temp_dir(), 'deprec');
-@@ -462,5 +462,5 @@ abstract class AbstractBrowser
+@@ -437,5 +437,5 @@ abstract class AbstractBrowser
       * @return object
       */
 -    abstract protected function doRequest(object $request);
 +    abstract protected function doRequest(object $request): object;
  
      /**
-@@ -473,5 +473,5 @@ abstract class AbstractBrowser
+@@ -448,5 +448,5 @@ abstract class AbstractBrowser
       * @throws LogicException When this abstract class is not implemented
       */
 -    protected function getScript(object $request)
 +    protected function getScript(object $request): string
      {
          throw new LogicException('To insulate requests, you need to override the getScript() method.');
-@@ -483,5 +483,5 @@ abstract class AbstractBrowser
+@@ -458,5 +458,5 @@ abstract class AbstractBrowser
       * @return object
       */
 -    protected function filterRequest(Request $request)
 +    protected function filterRequest(Request $request): object
      {
          return $request;
-@@ -493,5 +493,5 @@ abstract class AbstractBrowser
+@@ -468,5 +468,5 @@ abstract class AbstractBrowser
       * @return Response
       */
 -    protected function filterResponse(object $response)
@@ -47,7 +46,6 @@ index 35650bc90d..645d6e73a5 100644
      {
          return $response;
 diff --git a/src/Symfony/Component/Console/Command/Command.php b/src/Symfony/Component/Console/Command/Command.php
-index c49891777a..ab4881dd78 100644
 --- a/src/Symfony/Component/Console/Command/Command.php
 +++ b/src/Symfony/Component/Console/Command/Command.php
 @@ -163,5 +163,5 @@ class Command
@@ -72,7 +70,6 @@ index c49891777a..ab4881dd78 100644
      {
      }
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/AbstractRecursivePass.php b/src/Symfony/Component/DependencyInjection/Compiler/AbstractRecursivePass.php
-index a2c98a86a7..fc22838da0 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/AbstractRecursivePass.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/AbstractRecursivePass.php
 @@ -41,5 +41,5 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
@@ -90,7 +87,6 @@ index a2c98a86a7..fc22838da0 100644
      {
          if (\is_array($value)) {
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/CompilerPassInterface.php b/src/Symfony/Component/DependencyInjection/Compiler/CompilerPassInterface.php
-index 2ad4a048ba..719267be1e 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/CompilerPassInterface.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/CompilerPassInterface.php
 @@ -26,4 +26,4 @@ interface CompilerPassInterface
@@ -100,7 +96,6 @@ index 2ad4a048ba..719267be1e 100644
 +    public function process(ContainerBuilder $container): void;
  }
 diff --git a/src/Symfony/Component/DependencyInjection/Extension/ConfigurationExtensionInterface.php b/src/Symfony/Component/DependencyInjection/Extension/ConfigurationExtensionInterface.php
-index a42967f4da..4e86e16f9d 100644
 --- a/src/Symfony/Component/DependencyInjection/Extension/ConfigurationExtensionInterface.php
 +++ b/src/Symfony/Component/DependencyInjection/Extension/ConfigurationExtensionInterface.php
 @@ -27,4 +27,4 @@ interface ConfigurationExtensionInterface
@@ -110,7 +105,6 @@ index a42967f4da..4e86e16f9d 100644
 +    public function getConfiguration(array $config, ContainerBuilder $container): ?ConfigurationInterface;
  }
 diff --git a/src/Symfony/Component/DependencyInjection/Extension/Extension.php b/src/Symfony/Component/DependencyInjection/Extension/Extension.php
-index d0bd05ea4b..f9df65fd7c 100644
 --- a/src/Symfony/Component/DependencyInjection/Extension/Extension.php
 +++ b/src/Symfony/Component/DependencyInjection/Extension/Extension.php
 @@ -32,5 +32,5 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
@@ -135,7 +129,6 @@ index d0bd05ea4b..f9df65fd7c 100644
      {
          $class = static::class;
 diff --git a/src/Symfony/Component/DependencyInjection/Extension/ExtensionInterface.php b/src/Symfony/Component/DependencyInjection/Extension/ExtensionInterface.php
-index bd57eef733..3284e19ede 100644
 --- a/src/Symfony/Component/DependencyInjection/Extension/ExtensionInterface.php
 +++ b/src/Symfony/Component/DependencyInjection/Extension/ExtensionInterface.php
 @@ -30,5 +30,5 @@ interface ExtensionInterface
@@ -166,7 +159,6 @@ index bd57eef733..3284e19ede 100644
 +    public function getAlias(): string;
  }
 diff --git a/src/Symfony/Component/DependencyInjection/Extension/PrependExtensionInterface.php b/src/Symfony/Component/DependencyInjection/Extension/PrependExtensionInterface.php
-index 0df94e1092..061e7d7fd9 100644
 --- a/src/Symfony/Component/DependencyInjection/Extension/PrependExtensionInterface.php
 +++ b/src/Symfony/Component/DependencyInjection/Extension/PrependExtensionInterface.php
 @@ -21,4 +21,4 @@ interface PrependExtensionInterface
@@ -176,7 +168,6 @@ index 0df94e1092..061e7d7fd9 100644
 +    public function prepend(ContainerBuilder $container): void;
  }
 diff --git a/src/Symfony/Component/EventDispatcher/EventSubscriberInterface.php b/src/Symfony/Component/EventDispatcher/EventSubscriberInterface.php
-index 2085e428e9..ca0d6964e5 100644
 --- a/src/Symfony/Component/EventDispatcher/EventSubscriberInterface.php
 +++ b/src/Symfony/Component/EventDispatcher/EventSubscriberInterface.php
 @@ -46,4 +46,4 @@ interface EventSubscriberInterface
@@ -186,7 +177,6 @@ index 2085e428e9..ca0d6964e5 100644
 +    public static function getSubscribedEvents(): array;
  }
 diff --git a/src/Symfony/Component/ExpressionLanguage/ExpressionLanguage.php b/src/Symfony/Component/ExpressionLanguage/ExpressionLanguage.php
-index e8200d9b64..34ad94ceef 100644
 --- a/src/Symfony/Component/ExpressionLanguage/ExpressionLanguage.php
 +++ b/src/Symfony/Component/ExpressionLanguage/ExpressionLanguage.php
 @@ -139,5 +139,5 @@ class ExpressionLanguage
@@ -197,7 +187,6 @@ index e8200d9b64..34ad94ceef 100644
      {
          $this->addFunction(ExpressionFunction::fromPhp('constant'));
 diff --git a/src/Symfony/Component/Form/AbstractType.php b/src/Symfony/Component/Form/AbstractType.php
-index ad4b195696..ba4cf5c85b 100644
 --- a/src/Symfony/Component/Form/AbstractType.php
 +++ b/src/Symfony/Component/Form/AbstractType.php
 @@ -24,5 +24,5 @@ abstract class AbstractType implements FormTypeInterface
@@ -243,7 +232,6 @@ index ad4b195696..ba4cf5c85b 100644
      {
          return FormType::class;
 diff --git a/src/Symfony/Component/Form/FormTypeInterface.php b/src/Symfony/Component/Form/FormTypeInterface.php
-index 0c586d3f71..6c625cf403 100644
 --- a/src/Symfony/Component/Form/FormTypeInterface.php
 +++ b/src/Symfony/Component/Form/FormTypeInterface.php
 @@ -31,5 +31,5 @@ interface FormTypeInterface
@@ -288,7 +276,6 @@ index 0c586d3f71..6c625cf403 100644
 +    public function getParent(): ?string;
  }
 diff --git a/src/Symfony/Component/HttpKernel/Bundle/Bundle.php b/src/Symfony/Component/HttpKernel/Bundle/Bundle.php
-index af21469b1c..7b024368c5 100644
 --- a/src/Symfony/Component/HttpKernel/Bundle/Bundle.php
 +++ b/src/Symfony/Component/HttpKernel/Bundle/Bundle.php
 @@ -38,5 +38,5 @@ abstract class Bundle implements BundleInterface
@@ -320,7 +307,6 @@ index af21469b1c..7b024368c5 100644
      {
      }
 diff --git a/src/Symfony/Component/HttpKernel/Bundle/BundleInterface.php b/src/Symfony/Component/HttpKernel/Bundle/BundleInterface.php
-index 36502e8962..73733eb0ef 100644
 --- a/src/Symfony/Component/HttpKernel/Bundle/BundleInterface.php
 +++ b/src/Symfony/Component/HttpKernel/Bundle/BundleInterface.php
 @@ -28,5 +28,5 @@ interface BundleInterface
@@ -345,7 +331,6 @@ index 36502e8962..73733eb0ef 100644
  
      /**
 diff --git a/src/Symfony/Component/HttpKernel/DataCollector/DataCollectorInterface.php b/src/Symfony/Component/HttpKernel/DataCollector/DataCollectorInterface.php
-index 8df94ccb8f..42288d8a02 100644
 --- a/src/Symfony/Component/HttpKernel/DataCollector/DataCollectorInterface.php
 +++ b/src/Symfony/Component/HttpKernel/DataCollector/DataCollectorInterface.php
 @@ -28,5 +28,5 @@ interface DataCollectorInterface extends ResetInterface
@@ -362,7 +347,6 @@ index 8df94ccb8f..42288d8a02 100644
 +    public function getName(): string;
  }
 diff --git a/src/Symfony/Component/HttpKernel/DataCollector/LateDataCollectorInterface.php b/src/Symfony/Component/HttpKernel/DataCollector/LateDataCollectorInterface.php
-index efa1a4f737..752eb19faf 100644
 --- a/src/Symfony/Component/HttpKernel/DataCollector/LateDataCollectorInterface.php
 +++ b/src/Symfony/Component/HttpKernel/DataCollector/LateDataCollectorInterface.php
 @@ -24,4 +24,4 @@ interface LateDataCollectorInterface
@@ -372,7 +356,6 @@ index efa1a4f737..752eb19faf 100644
 +    public function lateCollect(): void;
  }
 diff --git a/src/Symfony/Component/HttpKernel/KernelInterface.php b/src/Symfony/Component/HttpKernel/KernelInterface.php
-index 14a053ab30..737af1b649 100644
 --- a/src/Symfony/Component/HttpKernel/KernelInterface.php
 +++ b/src/Symfony/Component/HttpKernel/KernelInterface.php
 @@ -37,5 +37,5 @@ interface KernelInterface extends HttpKernelInterface
@@ -397,10 +380,9 @@ index 14a053ab30..737af1b649 100644
  
      /**
 diff --git a/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php b/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php
-index 8c8667ff0e..e19e185cfb 100644
 --- a/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php
 +++ b/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php
-@@ -363,5 +363,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
+@@ -324,5 +324,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
       * @return void
       */
 -    abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot);
@@ -408,7 +390,6 @@ index 8c8667ff0e..e19e185cfb 100644
  
      /**
 diff --git a/src/Symfony/Component/Security/Core/Authentication/RememberMe/InMemoryTokenProvider.php b/src/Symfony/Component/Security/Core/Authentication/RememberMe/InMemoryTokenProvider.php
-index 0aef6a2caa..5a1f5865ad 100644
 --- a/src/Symfony/Component/Security/Core/Authentication/RememberMe/InMemoryTokenProvider.php
 +++ b/src/Symfony/Component/Security/Core/Authentication/RememberMe/InMemoryTokenProvider.php
 @@ -32,5 +32,5 @@ final class InMemoryTokenProvider implements TokenProviderInterface
@@ -419,7 +400,6 @@ index 0aef6a2caa..5a1f5865ad 100644
      {
          if (!isset($this->tokens[$series])) {
 diff --git a/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php b/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php
-index d2f0c8cbe0..713ac78c4e 100644
 --- a/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php
 +++ b/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php
 @@ -28,5 +28,5 @@ interface TokenProviderInterface
@@ -450,7 +430,6 @@ index d2f0c8cbe0..713ac78c4e 100644
 +    public function createNewToken(PersistentTokenInterface $token): void;
  }
 diff --git a/src/Symfony/Component/Security/Http/Firewall.php b/src/Symfony/Component/Security/Http/Firewall.php
-index f2f86a5dfa..bd47629587 100644
 --- a/src/Symfony/Component/Security/Http/Firewall.php
 +++ b/src/Symfony/Component/Security/Http/Firewall.php
 @@ -51,5 +51,5 @@ class Firewall implements EventSubscriberInterface
@@ -482,7 +461,6 @@ index f2f86a5dfa..bd47629587 100644
      {
          foreach ($listeners as $listener) {
 diff --git a/src/Symfony/Component/Translation/Extractor/ExtractorInterface.php b/src/Symfony/Component/Translation/Extractor/ExtractorInterface.php
-index 642130af75..c9ae2693a4 100644
 --- a/src/Symfony/Component/Translation/Extractor/ExtractorInterface.php
 +++ b/src/Symfony/Component/Translation/Extractor/ExtractorInterface.php
 @@ -29,5 +29,5 @@ interface ExtractorInterface
@@ -499,7 +477,6 @@ index 642130af75..c9ae2693a4 100644
 +    public function setPrefix(string $prefix): void;
  }
 diff --git a/src/Symfony/Component/Validator/ConstraintValidatorInterface.php b/src/Symfony/Component/Validator/ConstraintValidatorInterface.php
-index fe7da2e8f7..61d3632e2a 100644
 --- a/src/Symfony/Component/Validator/ConstraintValidatorInterface.php
 +++ b/src/Symfony/Component/Validator/ConstraintValidatorInterface.php
 @@ -24,5 +24,5 @@ interface ConstraintValidatorInterface
@@ -516,7 +493,6 @@ index fe7da2e8f7..61d3632e2a 100644
 +    public function validate(mixed $value, Constraint $constraint): void;
  }
 diff --git a/src/Symfony/Component/VarDumper/Dumper/DataDumperInterface.php b/src/Symfony/Component/VarDumper/Dumper/DataDumperInterface.php
-index df05b6af57..024fb95d2f 100644
 --- a/src/Symfony/Component/VarDumper/Dumper/DataDumperInterface.php
 +++ b/src/Symfony/Component/VarDumper/Dumper/DataDumperInterface.php
 @@ -24,4 +24,4 @@ interface DataDumperInterface

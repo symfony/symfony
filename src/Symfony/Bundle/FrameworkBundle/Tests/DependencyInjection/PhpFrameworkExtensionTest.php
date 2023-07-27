@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
@@ -54,6 +55,36 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
                             'base_urls' => 'http://cdn.example.com',
                             'base_path' => '/foo',
                         ],
+                    ],
+                ],
+            ]);
+        });
+    }
+
+    public function testWorkflowValidationPlacesIsArray()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "places" option must be an array in workflow configuration.');
+        $this->createContainerFromClosure(function ($container) {
+            $container->loadFromExtension('framework', [
+                'workflows' => [
+                    'article' => [
+                        'places' => null,
+                    ],
+                ],
+            ]);
+        });
+    }
+
+    public function testWorkflowValidationTransitonsIsArray()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "transitions" option must be an array in workflow configuration.');
+        $this->createContainerFromClosure(function ($container) {
+            $container->loadFromExtension('framework', [
+                'workflows' => [
+                    'article' => [
+                        'transitions' => null,
                     ],
                 ],
             ]);

@@ -160,7 +160,6 @@ class TranslationUpdateCommandTest extends TestCase
         $command = $this->createMock(TranslationUpdateCommand::class);
 
         $method = new \ReflectionMethod(TranslationUpdateCommand::class, 'filterDuplicateTransPaths');
-        $method->setAccessible(true);
 
         $filteredTransPaths = $method->invoke($command, $transPaths);
 

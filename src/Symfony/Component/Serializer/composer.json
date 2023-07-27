@@ -32,7 +32,7 @@
         "symfony/http-kernel": "^5.4|^6.0",
         "symfony/mime": "^5.4|^6.0",
         "symfony/property-access": "^5.4|^6.0",
-        "symfony/property-info": "^5.4|^6.0",
+        "symfony/property-info": "^5.4.24|^6.2.11",
         "symfony/uid": "^5.4|^6.0",
         "symfony/validator": "^5.4|^6.0",
         "symfony/var-dumper": "^5.4|^6.0",
@@ -45,7 +45,7 @@
         "phpdocumentor/type-resolver": "<1.4.0",
         "symfony/dependency-injection": "<5.4",
         "symfony/property-access": "<5.4",
-        "symfony/property-info": "<5.4",
+        "symfony/property-info": "<5.4.24|>=6,<6.2.11",
         "symfony/uid": "<5.4",
         "symfony/yaml": "<5.4"
     },

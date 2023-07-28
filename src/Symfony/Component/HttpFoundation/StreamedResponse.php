@@ -57,6 +57,14 @@ class StreamedResponse extends Response
     }
 
     /**
+     * Decorates the PHP callback associated with this Response.
+     */
+    public function getCallback(): callable
+    {
+        return $this->callback;
+    }
+
+    /**
      * This method only sends the headers once.
      *
      * @param null|positive-int $statusCode The status code to use, override the statusCode property if set and not null

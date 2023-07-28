@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
@@ -70,8 +71,12 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         $request->headers->set('X-Php-Ob-Level', (string) ob_get_level());
 
         $this->requestStack->push($request);
+        $response = null;
         try {
-            return $this->handleRaw($request, $type);
+            $response = $this->handleRaw($request, $type);
+            $response = $this->decorateWhenStreamedResponse($response);
+
+            return $response;
         } catch (\Throwable $e) {
             if ($e instanceof \Error && !$this->handleAllThrowables) {
                 throw $e;
@@ -88,7 +93,9 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
             return $this->handleThrowable($e, $request, $type);
         } finally {
-            $this->requestStack->pop();
+            if (!$response instanceof StreamedResponse) {
+                $this->requestStack->pop();
+            }
         }
     }
 
@@ -255,6 +262,22 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
             return $response;
         }
+    }
+
+    private function decorateWhenStreamedResponse(Response $response): Response
+    {
+        if ($response instanceof StreamedResponse) {
+            $streamedResponseCallback = $response->getCallback();
+            $response->setCallback(function () use ($streamedResponseCallback) {
+                try {
+                    $streamedResponseCallback();
+                } finally {
+                    $this->requestStack->pop();
+                }
+            });
+        }
+
+        return $response;
     }
 
     /**

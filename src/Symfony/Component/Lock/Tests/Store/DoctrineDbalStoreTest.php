@@ -240,7 +240,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
     public function testConfigureSchemaDifferentDatabase()
     {
         $conn = $this->createMock(Connection::class);
-        $someFunction = function () { return false; };
+        $someFunction = fn () => false;
         $schema = new Schema();
 
         $dbalStore = new DoctrineDbalStore($conn);
@@ -251,7 +251,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
     public function testConfigureSchemaSameDatabase()
     {
         $conn = $this->createMock(Connection::class);
-        $someFunction = function () { return true; };
+        $someFunction = fn () => true;
         $schema = new Schema();
 
         $dbalStore = new DoctrineDbalStore($conn);
@@ -266,7 +266,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
         $schema->createTable('lock_keys');
 
         $dbalStore = new DoctrineDbalStore($conn);
-        $someFunction = function () { return true; };
+        $someFunction = fn () => true;
         $dbalStore->configureSchema($schema, $someFunction);
         $table = $schema->getTable('lock_keys');
         $this->assertEmpty($table->getColumns(), 'The table was not overwritten');

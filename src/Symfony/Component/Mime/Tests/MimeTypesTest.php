@@ -49,6 +49,7 @@ class MimeTypesTest extends AbstractMimeTypeGuesserTestCase
         $this->assertSame(['ai', 'eps', 'ps'], $mt->getExtensions('application/postscript'));
         $this->assertContains('svg', $mt->getExtensions('image/svg+xml'));
         $this->assertContains('svg', $mt->getExtensions('image/svg'));
+        $this->assertContains('php', $mt->getExtensions('text/x-php'));
         $this->assertSame([], $mt->getExtensions('application/whatever-symfony'));
     }
 

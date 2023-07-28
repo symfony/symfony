@@ -1670,6 +1670,7 @@ final class MimeTypes implements MimeTypesInterface
         'text/x-pascal' => ['p', 'pas'],
         'text/x-patch' => ['diff', 'patch'],
         'text/x-perl' => ['pl', 'PL', 'pm', 'al', 'perl', 'pod', 't'],
+        'text/x-php' => ['php'],
         'text/x-po' => ['po'],
         'text/x-pot' => ['pot'],
         'text/x-processing' => ['pde'],

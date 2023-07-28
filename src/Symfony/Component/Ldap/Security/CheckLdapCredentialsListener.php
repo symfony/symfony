@@ -13,11 +13,13 @@ namespace Symfony\Component\Ldap\Security;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Ldap\Attribute\WithLdapPassword;
 use Symfony\Component\Ldap\Exception\InvalidCredentialsException;
 use Symfony\Component\Ldap\Exception\InvalidSearchCredentialsException;
 use Symfony\Component\Ldap\LdapInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\LogicException;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
@@ -48,9 +50,6 @@ class CheckLdapCredentialsListener implements EventSubscriberInterface
 
         /** @var LdapBadge $ldapBadge */
         $ldapBadge = $passport->getBadge(LdapBadge::class);
-        if ($ldapBadge->isResolved()) {
-            return;
-        }
 
         if (!$passport->hasBadge(PasswordCredentials::class)) {
             throw new \LogicException(sprintf('LDAP authentication requires a passport containing password credentials, authenticator "%s" does not fulfill these requirements.', $event->getAuthenticator()::class));
@@ -72,6 +71,16 @@ class CheckLdapCredentialsListener implements EventSubscriberInterface
         }
 
         $user = $passport->getUser();
+        $nonLdapUserWithoutLdapPasswordAttribute = false;
+        if (!$user instanceof LdapUser) {
+            $reflectionClass = new \ReflectionClass($user);
+            $attr = $reflectionClass->getAttributes(WithLdapPassword::class);
+
+            $nonLdapUserWithoutLdapPasswordAttribute = count($attr) === 0;
+            if (!$nonLdapUserWithoutLdapPasswordAttribute && !$attr[0]->newInstance()->enabled) {
+                return;
+            }
+        }
 
         /** @var LdapInterface $ldap */
         $ldap = $this->ldapLocator->get($ldapBadge->getLdapServiceId());
@@ -104,8 +113,11 @@ class CheckLdapCredentialsListener implements EventSubscriberInterface
             throw new BadCredentialsException('The presented password is invalid.');
         }
 
+        if ($nonLdapUserWithoutLdapPasswordAttribute) {
+            trigger_deprecation('symfony/ldap', '6.4', 'Authenticate a user that is not an instance of %s is deprecated and won\'t be the default behavior anymore in 7.0. Use the %s attribute to keep this behavior.', LdapUser::class, WithLdapPassword::class);
+        }
+
         $passwordCredentials->markResolved();
-        $ldapBadge->markResolved();
     }
 
     public static function getSubscribedEvents(): array

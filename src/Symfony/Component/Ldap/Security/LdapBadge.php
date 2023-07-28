@@ -24,14 +24,14 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
  */
 class LdapBadge implements BadgeInterface
 {
-    private bool $resolved = false;
+    private bool $resolved = true;
     private string $ldapServiceId;
     private string $dnString;
     private string $searchDn;
     private string $searchPassword;
     private ?string $queryString;
 
-    public function __construct(string $ldapServiceId, string $dnString = '{user_identifier}', string $searchDn = '', string $searchPassword = '', string $queryString = null)
+    public function __construct(string $ldapServiceId, string $dnString = '{user_identifier}', string $searchDn = '', string $searchPassword = '', string $queryString = null, bool $resolved = false)
     {
         $this->ldapServiceId = $ldapServiceId;
         $dnString = str_replace('{username}', '{user_identifier}', $dnString, $replaceCount);
@@ -46,6 +46,10 @@ class LdapBadge implements BadgeInterface
             trigger_deprecation('symfony/ldap', '6.2', 'Using "{username}" parameter in LDAP configuration is deprecated, consider using "{user_identifier}" instead.');
         }
         $this->queryString = $queryString;
+        $this->resolved = $resolved;
+        if (false === $this->resolved) {
+            trigger_deprecation('symfony/ldap', '6.4', 'Passing "false" as resolved initial value is deprecated, use "true" instead.');
+        }
     }
 
     public function getLdapServiceId(): string
@@ -75,6 +79,8 @@ class LdapBadge implements BadgeInterface
 
     public function markResolved(): void
     {
+        trigger_deprecation('symfony/ldap', '6.4', '%s is deprecated and will be removed in 7.0. %s is intended to bear LDAP information and doesn\'t need to be resolved anymore.', __METHOD__, __CLASS__);
+
         $this->resolved = true;
     }
 

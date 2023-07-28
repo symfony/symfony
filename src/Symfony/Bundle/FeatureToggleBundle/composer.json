@@ -1,0 +1,38 @@
+{
+    "name": "symfony/feature-toggle-bundle",
+    "type": "symfony-bundle",
+    "description": "Provides a tight integration of the Symfony FeatureToggle component into the Symfony full-stack framework",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "symfony/contracts": "^3.3",
+        "symfony/config": "^6.3",
+        "symfony/dependency-injection": "^6.3",
+        "symfony/options-resolver": "^6.3",
+        "symfony/http-kernel": "^6.3"
+    },
+    "require-dev": {
+        "symfony/expression-language": "^6.3",
+        "symfony/http-foundation": "^6.3",
+        "symfony/twig-bridge": "^6.3"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Bundle\\FeatureToggle\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

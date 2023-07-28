@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Give current locale to `LocaleSwitcher::runWithLocale()`'s callback
+ * Add `--as-tree` option to `translation:pull` command to write YAML messages as a tree-like structure
 
 6.3
 ---

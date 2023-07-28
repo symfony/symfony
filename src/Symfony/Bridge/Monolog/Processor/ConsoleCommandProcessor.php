@@ -24,8 +24,6 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 final class ConsoleCommandProcessor implements EventSubscriberInterface, ResetInterface
 {
-    use CompatibilityProcessor;
-
     private array $commandData;
     private bool $includeArguments;
     private bool $includeOptions;
@@ -36,10 +34,10 @@ final class ConsoleCommandProcessor implements EventSubscriberInterface, ResetIn
         $this->includeOptions = $includeOptions;
     }
 
-    private function doInvoke(array|LogRecord $record): array|LogRecord
+    public function __invoke(LogRecord $record): LogRecord
     {
-        if (isset($this->commandData) && !isset($record['extra']['command'])) {
-            $record['extra']['command'] = $this->commandData;
+        if (isset($this->commandData) && !isset($record->extra['command'])) {
+            $record->extra['command'] = $this->commandData;
         }
 
         return $record;

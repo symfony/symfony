@@ -14,7 +14,7 @@ namespace Symfony\Bridge\Monolog\Handler;
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\AbstractProcessingHandler;
-use Monolog\Logger;
+use Monolog\Level;
 use Monolog\LogRecord;
 use Symfony\Bridge\Monolog\Formatter\ConsoleFormatter;
 use Symfony\Component\Console\ConsoleEvents;
@@ -24,42 +24,6 @@ use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
-
-if (Logger::API >= 3) {
-    /**
-     * The base class for compatibility between Monolog 3 LogRecord and Monolog 1/2 array records.
-     *
-     * @author Jordi Boggiano <j.boggiano@seld.be>
-     *
-     * @internal
-     */
-    trait CompatibilityIsHandlingHandler
-    {
-        abstract private function doIsHandling(array|LogRecord $record): bool;
-
-        public function isHandling(LogRecord $record): bool
-        {
-            return $this->doIsHandling($record);
-        }
-    }
-} else {
-    /**
-     * The base class for compatibility between Monolog 3 LogRecord and Monolog 1/2 array records.
-     *
-     * @author Jordi Boggiano <j.boggiano@seld.be>
-     *
-     * @internal
-     */
-    trait CompatibilityIsHandlingHandler
-    {
-        abstract private function doIsHandling(array|LogRecord $record): bool;
-
-        public function isHandling(array $record): bool
-        {
-            return $this->doIsHandling($record);
-        }
-    }
-}
 
 /**
  * Writes logs to the console output depending on its verbosity setting.
@@ -80,17 +44,13 @@ if (Logger::API >= 3) {
  */
 final class ConsoleHandler extends AbstractProcessingHandler implements EventSubscriberInterface
 {
-    use CompatibilityHandler;
-    use CompatibilityIsHandlingHandler;
-    use CompatibilityProcessingHandler;
-
     private ?OutputInterface $output;
     private array $verbosityLevelMap = [
-        OutputInterface::VERBOSITY_QUIET => Logger::ERROR,
-        OutputInterface::VERBOSITY_NORMAL => Logger::WARNING,
-        OutputInterface::VERBOSITY_VERBOSE => Logger::NOTICE,
-        OutputInterface::VERBOSITY_VERY_VERBOSE => Logger::INFO,
-        OutputInterface::VERBOSITY_DEBUG => Logger::DEBUG,
+        OutputInterface::VERBOSITY_QUIET => Level::Error,
+        OutputInterface::VERBOSITY_NORMAL => Level::Warning,
+        OutputInterface::VERBOSITY_VERBOSE => Level::Notice,
+        OutputInterface::VERBOSITY_VERY_VERBOSE => Level::Info,
+        OutputInterface::VERBOSITY_DEBUG => Level::Debug,
     ];
     private array $consoleFormatterOptions;
 
@@ -103,7 +63,7 @@ final class ConsoleHandler extends AbstractProcessingHandler implements EventSub
      */
     public function __construct(OutputInterface $output = null, bool $bubble = true, array $verbosityLevelMap = [], array $consoleFormatterOptions = [])
     {
-        parent::__construct(Logger::DEBUG, $bubble);
+        parent::__construct(Level::Debug, $bubble);
         $this->output = $output;
 
         if ($verbosityLevelMap) {
@@ -113,12 +73,12 @@ final class ConsoleHandler extends AbstractProcessingHandler implements EventSub
         $this->consoleFormatterOptions = $consoleFormatterOptions;
     }
 
-    private function doIsHandling(array|LogRecord $record): bool
+    public function isHandling(LogRecord $record): bool
     {
         return $this->updateLevel() && parent::isHandling($record);
     }
 
-    private function doHandle(array|LogRecord $record): bool
+    public function handle(LogRecord $record): bool
     {
         // we have to update the logging level each time because the verbosity of the
         // console output might have changed in the meantime (it is not immutable)
@@ -173,10 +133,10 @@ final class ConsoleHandler extends AbstractProcessingHandler implements EventSub
         ];
     }
 
-    private function doWrite(array|LogRecord $record): void
+    protected function write(LogRecord $record): void
     {
         // at this point we've determined for sure that we want to output the record, so use the output's own verbosity
-        $this->output->write((string) $record['formatted'], false, $this->output->getVerbosity());
+        $this->output->write((string) $record->formatted, false, $this->output->getVerbosity());
     }
 
     protected function getDefaultFormatter(): FormatterInterface
@@ -209,7 +169,7 @@ final class ConsoleHandler extends AbstractProcessingHandler implements EventSub
         if (isset($this->verbosityLevelMap[$verbosity])) {
             $this->setLevel($this->verbosityLevelMap[$verbosity]);
         } else {
-            $this->setLevel(Logger::DEBUG);
+            $this->setLevel(Level::Debug);
         }
 
         return true;

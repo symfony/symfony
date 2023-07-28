@@ -185,6 +185,11 @@ Mime
  * Remove `Email::attachPart()` method, use `Email::addPart()` instead
  * Require explicit argument when calling `Message::setBody()`
 
+MonologBridge
+-------------
+
+ * Drop support for monolog < 3.0
+
 PropertyAccess
 --------------
 

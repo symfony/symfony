@@ -135,7 +135,7 @@
         "guzzlehttp/promises": "^1.4",
         "league/html-to-markdown": "^5.0",
         "masterminds/html5": "^2.7.2",
-        "monolog/monolog": "^1.25.1|^2",
+        "monolog/monolog": "^3.0",
         "nyholm/psr7": "^1.0",
         "pda/pheanstalk": "^4.0",
         "php-http/discovery": "^1.15",

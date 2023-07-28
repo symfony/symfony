@@ -17,6 +17,9 @@ use Symfony\Component\Templating\Loader\Loader;
 use Symfony\Component\Templating\Storage\Storage;
 use Symfony\Component\Templating\TemplateReferenceInterface;
 
+/**
+ * @group legacy
+ */
 class LoaderTest extends TestCase
 {
     public function testGetSetLogger()

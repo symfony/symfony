@@ -17,6 +17,9 @@ use Symfony\Component\Templating\Loader\FilesystemLoader;
 use Symfony\Component\Templating\Storage\FileStorage;
 use Symfony\Component\Templating\TemplateReference;
 
+/**
+ * @group legacy
+ */
 class FilesystemLoaderTest extends TestCase
 {
     protected static string $fixturesPath;

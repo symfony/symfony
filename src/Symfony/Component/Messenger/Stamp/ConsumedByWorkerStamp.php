@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Stamp;
 /**
  * A marker that this message was consumed by a worker process.
  */
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 class ConsumedByWorkerStamp implements NonSendableStampInterface
 {
 }

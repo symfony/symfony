@@ -25,6 +25,7 @@ use Symfony\Component\Messenger\Handler\HandlerDescriptor;
  *
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class HandledStamp implements StampInterface
 {
     private mixed $result;

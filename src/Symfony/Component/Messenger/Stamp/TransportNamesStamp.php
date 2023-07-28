@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Stamp;
 /**
  * Stamp used to override the transport names specified in the Messenger routing configuration file.
  */
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class TransportNamesStamp implements StampInterface
 {
     private array $transportNames;

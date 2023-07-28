@@ -16,6 +16,7 @@ use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 /**
  * Stamp applied when a message is received from Amqp.
  */
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 class AmqpReceivedStamp implements NonSendableStampInterface
 {
     private \AMQPEnvelope $amqpEnvelope;

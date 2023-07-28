@@ -16,6 +16,7 @@ use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 /**
  * @author Vincent Touzet <vincent.touzet@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 class DoctrineReceivedStamp implements NonSendableStampInterface
 {
     private string $id;

@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Stamp;
 /**
  * Marker telling that any batch handlers bound to the envelope should be flushed.
  */
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class FlushBatchHandlersStamp implements NonSendableStampInterface
 {
     private bool $force;

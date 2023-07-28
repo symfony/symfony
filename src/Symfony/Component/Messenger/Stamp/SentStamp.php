@@ -18,6 +18,7 @@ namespace Symfony\Component\Messenger\Stamp;
  *
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class SentStamp implements NonSendableStampInterface
 {
     private string $senderClass;

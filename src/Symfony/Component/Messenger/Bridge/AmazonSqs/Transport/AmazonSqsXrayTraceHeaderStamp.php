@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Transport;
 
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class AmazonSqsXrayTraceHeaderStamp implements NonSendableStampInterface
 {
     private string $traceId;

@@ -16,6 +16,7 @@ use Symfony\Component\Validator\Constraints\GroupSequence;
 /**
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class ValidationStamp implements StampInterface
 {
     private array|GroupSequence $groups;

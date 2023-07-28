@@ -16,6 +16,7 @@ use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 /**
  * Marker telling that ack should not be done automatically for this message.
  */
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class NoAutoAckStamp implements NonSendableStampInterface
 {
     private HandlerDescriptor $handlerDescriptor;

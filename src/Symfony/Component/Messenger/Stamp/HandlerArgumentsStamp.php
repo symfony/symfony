@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Stamp;
 /**
  * @author Jáchym Toušek <enumag@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class HandlerArgumentsStamp implements NonSendableStampInterface
 {
     public function __construct(

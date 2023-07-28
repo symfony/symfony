@@ -21,6 +21,7 @@ CHANGELOG
    SIGTERM by default
  * Add `RedispatchMessage` and `RedispatchMessageHandler`
  * Add optional parameter `$isSameDatabase` to `DoctrineTransport::configureSchema()`
+ * Add `AutoStampMiddleware` that register envelope stamps from message attributes
 
 6.2
 ---

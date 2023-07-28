@@ -17,6 +17,7 @@ use Symfony\Component\Messenger\Exception\HandlerFailedException;
 /**
  * Stamp applied when a messages fails due to an exception in the handler.
  */
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class ErrorDetailsStamp implements StampInterface
 {
     private string $exceptionClass;

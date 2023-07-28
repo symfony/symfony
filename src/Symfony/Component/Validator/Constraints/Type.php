@@ -25,8 +25,8 @@ class Type extends Constraint
         self::INVALID_TYPE_ERROR => 'INVALID_TYPE_ERROR',
     ];
 
-    public $message = 'This value should be of type {{ type }}.';
-    public $type;
+    public string $message = 'This value should be of type {{ type }}.';
+    public string|array|null $type = null;
 
     public function __construct(string|array|null $type, string $message = null, array $groups = null, mixed $payload = null, array $options = [])
     {

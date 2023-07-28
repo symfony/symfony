@@ -26,11 +26,8 @@ use Symfony\Component\ExpressionLanguage\Expression;
  */
 abstract class AbstractRecursivePass implements CompilerPassInterface
 {
-    /**
-     * @var ContainerBuilder
-     */
-    protected $container;
-    protected $currentId;
+    protected ?ContainerBuilder $container;
+    protected ?string $currentId = null;
     protected bool $skipScalars = false;
 
     private bool $processExpressions = false;

@@ -24,7 +24,7 @@ class RouterDataCollector extends DataCollector
     /**
      * @var \SplObjectStorage<Request, callable>
      */
-    protected $controllers;
+    protected \SplObjectStorage $controllers;
 
     public function __construct()
     {

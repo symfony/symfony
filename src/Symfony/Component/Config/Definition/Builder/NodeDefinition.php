@@ -22,21 +22,21 @@ use Symfony\Component\Config\Definition\NodeInterface;
  */
 abstract class NodeDefinition implements NodeParentInterface
 {
-    protected $name;
-    protected $normalization;
-    protected $validation;
-    protected $defaultValue;
-    protected $default = false;
-    protected $required = false;
-    protected $deprecation = [];
-    protected $merge;
-    protected $allowEmptyValue = true;
-    protected $nullEquivalent;
-    protected $trueEquivalent = true;
-    protected $falseEquivalent = false;
-    protected $pathSeparator = BaseNode::DEFAULT_PATH_SEPARATOR;
-    protected $parent;
-    protected $attributes = [];
+    protected ?string $name = null;
+    protected NormalizationBuilder $normalization;
+    protected ValidationBuilder $validation;
+    protected mixed $defaultValue;
+    protected bool $default = false;
+    protected bool $required = false;
+    protected array $deprecation = [];
+    protected MergeBuilder $merge;
+    protected bool $allowEmptyValue = true;
+    protected mixed $nullEquivalent = null;
+    protected mixed $trueEquivalent = true;
+    protected mixed $falseEquivalent = false;
+    protected string $pathSeparator = BaseNode::DEFAULT_PATH_SEPARATOR;
+    protected NodeParentInterface|NodeInterface|null $parent;
+    protected array $attributes = [];
 
     public function __construct(?string $name, NodeParentInterface $parent = null)
     {
@@ -90,8 +90,10 @@ abstract class NodeDefinition implements NodeParentInterface
 
     /**
      * Returns the parent node.
+     *
+     * @return NodeParentInterface|NodeBuilder|NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition
      */
-    public function end(): NodeParentInterface|NodeBuilder|NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition|null
+    public function end(): NodeParentInterface
     {
         return $this->parent;
     }

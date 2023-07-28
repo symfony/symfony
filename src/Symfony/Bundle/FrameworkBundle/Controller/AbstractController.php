@@ -55,10 +55,7 @@ use Twig\Environment;
  */
 abstract class AbstractController implements ServiceSubscriberInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
+    protected ContainerInterface $container;
 
     #[Required]
     public function setContainer(ContainerInterface $container): ?ContainerInterface

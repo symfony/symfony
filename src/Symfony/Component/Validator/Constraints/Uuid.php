@@ -67,19 +67,15 @@ class Uuid extends Constraint
 
     /**
      * Message to display when validation fails.
-     *
-     * @var string
      */
-    public $message = 'This is not a valid UUID.';
+    public string $message = 'This is not a valid UUID.';
 
     /**
      * Strict mode only allows UUIDs that meet the formal definition and formatting per RFC 4122.
      *
      * Set this to `false` to allow legacy formats with different dash positioning or wrapping characters
-     *
-     * @var bool
      */
-    public $strict = true;
+    public bool $strict = true;
 
     /**
      * Array of allowed versions (see version constants above).
@@ -88,7 +84,7 @@ class Uuid extends Constraint
      *
      * @var int[]
      */
-    public $versions = self::ALL_VERSIONS;
+    public array $versions = self::ALL_VERSIONS;
 
     /** @var callable|null */
     public $normalizer;

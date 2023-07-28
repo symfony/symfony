@@ -24,5 +24,5 @@ class IdenticalTo extends AbstractComparison
         self::NOT_IDENTICAL_ERROR => 'NOT_IDENTICAL_ERROR',
     ];
 
-    public $message = 'This value should be identical to {{ compared_value_type }} {{ compared_value }}.';
+    public string $message = 'This value should be identical to {{ compared_value_type }} {{ compared_value }}.';
 }

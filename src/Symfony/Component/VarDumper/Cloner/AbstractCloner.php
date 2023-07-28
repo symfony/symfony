@@ -21,7 +21,7 @@ use Symfony\Component\VarDumper\Exception\ThrowingCasterException;
  */
 abstract class AbstractCloner implements ClonerInterface
 {
-    public static $defaultCasters = [
+    public static array $defaultCasters = [
         '__PHP_Incomplete_Class' => ['Symfony\Component\VarDumper\Caster\Caster', 'castPhpIncompleteClass'],
 
         'Symfony\Component\VarDumper\Caster\CutStub' => ['Symfony\Component\VarDumper\Caster\StubCaster', 'castStub'],
@@ -197,9 +197,9 @@ abstract class AbstractCloner implements ClonerInterface
         'FFI\CType' => ['Symfony\Component\VarDumper\Caster\FFICaster', 'castCTypeOrCData'],
     ];
 
-    protected $maxItems = 2500;
-    protected $maxString = -1;
-    protected $minDepth = 1;
+    protected int $maxItems = 2500;
+    protected int $maxString = -1;
+    protected int $minDepth = 1;
 
     /**
      * @var array<string, list<callable>>

@@ -24,11 +24,11 @@ use Symfony\Component\Form\FormInterface;
  */
 class ResizeFormListener implements EventSubscriberInterface
 {
-    protected $type;
-    protected $options;
-    protected $prototypeOptions;
-    protected $allowAdd;
-    protected $allowDelete;
+    protected string $type;
+    protected array $options;
+    protected array $prototypeOptions;
+    protected bool $allowAdd;
+    protected bool $allowDelete;
 
     private \Closure|bool $deleteEmpty;
 

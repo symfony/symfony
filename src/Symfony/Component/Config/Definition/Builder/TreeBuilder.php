@@ -20,8 +20,8 @@ use Symfony\Component\Config\Definition\NodeInterface;
  */
 class TreeBuilder implements NodeParentInterface
 {
-    protected $tree;
-    protected $root;
+    protected NodeInterface $tree;
+    protected NodeDefinition $root;
 
     public function __construct(string $name, string $type = 'array', NodeBuilder $builder = null)
     {

@@ -28,12 +28,12 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Used inside metadata driver method to simplify aggregation of data.
      */
-    protected $aliasMap = [];
+    protected array $aliasMap = [];
 
     /**
      * Used inside metadata driver method to simplify aggregation of data.
      */
-    protected $drivers = [];
+    protected array $drivers = [];
 
     /**
      * @param array $objectManager A configured object manager

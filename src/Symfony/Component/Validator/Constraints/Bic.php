@@ -38,10 +38,10 @@ class Bic extends Constraint
         self::INVALID_CASE_ERROR => 'INVALID_CASE_ERROR',
     ];
 
-    public $message = 'This is not a valid Business Identifier Code (BIC).';
-    public $ibanMessage = 'This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.';
-    public $iban;
-    public $ibanPropertyPath;
+    public string $message = 'This is not a valid Business Identifier Code (BIC).';
+    public string $ibanMessage = 'This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.';
+    public ?string $iban = null;
+    public ?string $ibanPropertyPath = null;
 
     public function __construct(array $options = null, string $message = null, string $iban = null, string $ibanPropertyPath = null, string $ibanMessage = null, array $groups = null, mixed $payload = null)
     {

@@ -39,7 +39,7 @@ class XmlFileLoader extends FileLoader
 {
     public const NS = 'http://symfony.com/schema/dic/services';
 
-    protected $autoRegisterAliasesForSinglyImplementedInterfaces = false;
+    protected bool $autoRegisterAliasesForSinglyImplementedInterfaces = false;
 
     public function load(mixed $resource, string $type = null): mixed
     {

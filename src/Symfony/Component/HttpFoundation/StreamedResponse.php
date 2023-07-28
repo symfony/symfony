@@ -26,9 +26,10 @@ namespace Symfony\Component\HttpFoundation;
  */
 class StreamedResponse extends Response
 {
-    protected $callback;
-    protected $streamed;
-    private bool $headersSent;
+    protected \Closure $callback;
+    protected bool $streamed = false;
+
+    private bool $headersSent = false;
 
     /**
      * @param int $status The HTTP status code (200 "OK" by default)

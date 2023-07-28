@@ -27,9 +27,9 @@ class NotCompromisedPassword extends Constraint
         self::COMPROMISED_PASSWORD_ERROR => 'COMPROMISED_PASSWORD_ERROR',
     ];
 
-    public $message = 'This password has been leaked in a data breach, it must not be used. Please use another password.';
-    public $threshold = 1;
-    public $skipOnError = false;
+    public string $message = 'This password has been leaked in a data breach, it must not be used. Please use another password.';
+    public int $threshold = 1;
+    public bool $skipOnError = false;
 
     public function __construct(
         array $options = null,

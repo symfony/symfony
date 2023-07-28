@@ -24,5 +24,5 @@ class NotEqualTo extends AbstractComparison
         self::IS_EQUAL_ERROR => 'IS_EQUAL_ERROR',
     ];
 
-    public $message = 'This value should not be equal to {{ compared_value }}.';
+    public string $message = 'This value should not be equal to {{ compared_value }}.';
 }

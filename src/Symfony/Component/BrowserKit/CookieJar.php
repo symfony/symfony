@@ -20,7 +20,7 @@ use Symfony\Component\BrowserKit\Exception\InvalidArgumentException;
  */
 class CookieJar
 {
-    protected $cookieJar = [];
+    protected array $cookieJar = [];
 
     public function set(Cookie $cookie): void
     {

@@ -18,7 +18,7 @@ namespace Symfony\Component\ExpressionLanguage;
  */
 class TokenStream
 {
-    public $current;
+    public Token $current;
 
     private array $tokens;
     private int $position = 0;

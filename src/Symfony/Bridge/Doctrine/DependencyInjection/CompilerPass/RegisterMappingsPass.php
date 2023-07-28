@@ -35,17 +35,15 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
     /**
      * DI object for the driver to use, either a service definition for a
      * private service or a reference for a public service.
-     *
-     * @var Definition|Reference
      */
-    protected $driver;
+    protected Definition|Reference $driver;
 
     /**
      * List of namespaces handled by the driver.
      *
      * @var string[]
      */
-    protected $namespaces;
+    protected array $namespaces;
 
     /**
      * List of potential container parameters that hold the object manager name
@@ -54,24 +52,20 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      *
      * @var string[]
      */
-    protected $managerParameters;
+    protected array $managerParameters;
 
     /**
      * Naming pattern of the metadata chain driver service ids, for example
      * 'doctrine.orm.%s_metadata_driver'.
-     *
-     * @var string
      */
-    protected $driverPattern;
+    protected string $driverPattern;
 
     /**
      * A name for a parameter in the container. If set, this compiler pass will
      * only do anything if the parameter is present. (But regardless of the
      * value of that parameter.
-     *
-     * @var string|false
      */
-    protected $enabledParameter;
+    protected string|false $enabledParameter;
 
     /**
      * Naming pattern for the configuration service id, for example

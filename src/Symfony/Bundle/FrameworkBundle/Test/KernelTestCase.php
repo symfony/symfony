@@ -27,14 +27,9 @@ abstract class KernelTestCase extends TestCase
     use MailerAssertionsTrait;
     use NotificationAssertionsTrait;
 
-    protected static $class;
-
-    /**
-     * @var KernelInterface
-     */
-    protected static $kernel;
-
-    protected static $booted = false;
+    protected static ?string $class = null;
+    protected static ?KernelInterface $kernel = null;
+    protected static bool $booted = false;
 
     protected function tearDown(): void
     {

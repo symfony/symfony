@@ -36,7 +36,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
     /**
      * @var MessageCatalogueInterface[]
      */
-    protected $catalogues = [];
+    protected array $catalogues = [];
 
     private string $locale;
 

@@ -31,27 +31,11 @@ class NativeSessionStorage implements SessionStorageInterface
     /**
      * @var SessionBagInterface[]
      */
-    protected $bags = [];
-
-    /**
-     * @var bool
-     */
-    protected $started = false;
-
-    /**
-     * @var bool
-     */
-    protected $closed = false;
-
-    /**
-     * @var AbstractProxy|\SessionHandlerInterface
-     */
-    protected $saveHandler;
-
-    /**
-     * @var MetadataBag
-     */
-    protected $metadataBag;
+    protected array $bags = [];
+    protected bool $started = false;
+    protected bool $closed = false;
+    protected AbstractProxy|\SessionHandlerInterface $saveHandler;
+    protected MetadataBag $metadataBag;
 
     /**
      * Depending on how you want the storage driver to behave you probably

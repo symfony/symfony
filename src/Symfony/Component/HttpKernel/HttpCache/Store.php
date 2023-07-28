@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class Store implements StoreInterface
 {
-    protected $root;
+    protected string $root;
     /** @var \SplObjectStorage<Request, string> */
     private \SplObjectStorage $keyCache;
     /** @var array<string, resource> */

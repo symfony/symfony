@@ -23,7 +23,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class ConsoleEvent extends Event
 {
-    protected $command;
+    protected ?Command $command;
 
     private InputInterface $input;
     private OutputInterface $output;

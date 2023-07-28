@@ -26,20 +26,21 @@ use Symfony\Component\Templating\Storage\StringStorage;
  */
 class PhpEngine implements EngineInterface, \ArrayAccess
 {
-    protected $loader;
-    protected $current;
+    protected LoaderInterface $loader;
+    protected string $current;
     /**
      * @var HelperInterface[]
      */
-    protected $helpers = [];
-    protected $parents = [];
-    protected $stack = [];
-    protected $charset = 'UTF-8';
-    protected $cache = [];
-    protected $escapers = [];
-    protected static $escaperCache = [];
-    protected $globals = [];
-    protected $parser;
+    protected array $helpers = [];
+    protected array $parents = [];
+    protected array $stack = [];
+    protected string $charset = 'UTF-8';
+    protected array $cache = [];
+    protected array $escapers = [];
+    protected array $globals = [];
+    protected TemplateNameParserInterface $parser;
+
+    protected static array $escaperCache = [];
 
     private Storage $evalTemplate;
     private array $evalParameters;

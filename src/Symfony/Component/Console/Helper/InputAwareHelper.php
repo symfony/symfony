@@ -21,7 +21,7 @@ use Symfony\Component\Console\Input\InputInterface;
  */
 abstract class InputAwareHelper extends Helper implements InputAwareInterface
 {
-    protected $input;
+    protected InputInterface $input;
 
     public function setInput(InputInterface $input): void
     {

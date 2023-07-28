@@ -43,9 +43,9 @@ trait AbstractAdapterTrait
     private array $ids = [];
 
     /**
-     * @var int|null The maximum length to enforce for identifiers or null when no limit applies
+     * The maximum length to enforce for identifiers or null when no limit applies.
      */
-    protected $maxIdLength;
+    protected ?int $maxIdLength = null;
 
     /**
      * Fetches several cache items.

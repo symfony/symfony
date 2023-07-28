@@ -43,13 +43,13 @@ class Length extends Constraint
         self::COUNT_GRAPHEMES,
     ];
 
-    public $maxMessage = 'This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.';
-    public $minMessage = 'This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.';
-    public $exactMessage = 'This value should have exactly {{ limit }} character.|This value should have exactly {{ limit }} characters.';
-    public $charsetMessage = 'This value does not match the expected {{ charset }} charset.';
-    public $max;
-    public $min;
-    public $charset = 'UTF-8';
+    public string $maxMessage = 'This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.';
+    public string $minMessage = 'This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.';
+    public string $exactMessage = 'This value should have exactly {{ limit }} character.|This value should have exactly {{ limit }} characters.';
+    public string $charsetMessage = 'This value does not match the expected {{ charset }} charset.';
+    public ?int $max = null;
+    public ?int $min = null;
+    public string $charset = 'UTF-8';
     /** @var callable|null */
     public $normalizer;
     /** @var self::COUNT_* */

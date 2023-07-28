@@ -25,8 +25,8 @@ class Hostname extends Constraint
         self::INVALID_HOSTNAME_ERROR => 'INVALID_HOSTNAME_ERROR',
     ];
 
-    public $message = 'This value is not a valid hostname.';
-    public $requireTld = true;
+    public string $message = 'This value is not a valid hostname.';
+    public bool $requireTld = true;
 
     public function __construct(
         array $options = null,

@@ -26,7 +26,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class CardSchemeValidator extends ConstraintValidator
 {
-    protected $schemes = [
+    protected array $schemes = [
         // American Express card numbers start with 34 or 37 and have 15 digits.
         CardScheme::AMEX => [
             '/^3[47][0-9]{13}$/',

@@ -22,7 +22,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class MoneyType extends AbstractType
 {
-    protected static $patterns = [];
+    protected static array $patterns = [];
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

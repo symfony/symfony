@@ -20,19 +20,19 @@ use Symfony\Contracts\Translation\TranslatableInterface;
  */
 class ChoiceView
 {
-    public $label;
-    public $value;
-    public $data;
+    public string|TranslatableInterface|false $label;
+    public string $value;
+    public mixed $data;
 
     /**
      * Additional attributes for the HTML tag.
      */
-    public $attr;
+    public array $attr;
 
     /**
      * Additional parameters used to translate the label.
      */
-    public $labelTranslationParameters;
+    public array $labelTranslationParameters;
 
     /**
      * Creates a new choice view.

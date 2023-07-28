@@ -38,8 +38,8 @@ class Email extends Constraint
         self::INVALID_FORMAT_ERROR => 'STRICT_CHECK_FAILED_ERROR',
     ];
 
-    public $message = 'This value is not a valid email address.';
-    public $mode;
+    public string $message = 'This value is not a valid email address.';
+    public ?string $mode = null;
     /** @var callable|null */
     public $normalizer;
 

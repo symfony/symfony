@@ -29,9 +29,9 @@ class Expression extends Constraint
         self::EXPRESSION_FAILED_ERROR => 'EXPRESSION_FAILED_ERROR',
     ];
 
-    public $message = 'This value is not valid.';
-    public $expression;
-    public $values = [];
+    public string $message = 'This value is not valid.';
+    public string|ExpressionObject|null $expression = null;
+    public array $values = [];
     public bool $negate = true;
 
     public function __construct(

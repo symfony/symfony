@@ -67,10 +67,8 @@ class Ip extends Constraint
         self::INVALID_IP_ERROR => 'INVALID_IP_ERROR',
     ];
 
-    public $version = self::V4;
-
-    public $message = 'This is not a valid IP address.';
-
+    public string $version = self::V4;
+    public string $message = 'This is not a valid IP address.';
     /** @var callable|null */
     public $normalizer;
 

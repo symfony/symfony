@@ -32,13 +32,13 @@ class Count extends Constraint
         self::NOT_DIVISIBLE_BY_ERROR => 'NOT_DIVISIBLE_BY_ERROR',
     ];
 
-    public $minMessage = 'This collection should contain {{ limit }} element or more.|This collection should contain {{ limit }} elements or more.';
-    public $maxMessage = 'This collection should contain {{ limit }} element or less.|This collection should contain {{ limit }} elements or less.';
-    public $exactMessage = 'This collection should contain exactly {{ limit }} element.|This collection should contain exactly {{ limit }} elements.';
-    public $divisibleByMessage = 'The number of elements in this collection should be a multiple of {{ compared_value }}.';
-    public $min;
-    public $max;
-    public $divisibleBy;
+    public string $minMessage = 'This collection should contain {{ limit }} element or more.|This collection should contain {{ limit }} elements or more.';
+    public string $maxMessage = 'This collection should contain {{ limit }} element or less.|This collection should contain {{ limit }} elements or less.';
+    public string $exactMessage = 'This collection should contain exactly {{ limit }} element.|This collection should contain exactly {{ limit }} elements.';
+    public string $divisibleByMessage = 'The number of elements in this collection should be a multiple of {{ compared_value }}.';
+    public ?int $min = null;
+    public ?int $max = null;
+    public ?int $divisibleBy = null;
 
     public function __construct(
         int|array $exactly = null,

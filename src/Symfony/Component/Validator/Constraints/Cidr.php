@@ -37,15 +37,11 @@ class Cidr extends Constraint
         Ip::V6 => 128,
     ];
 
-    public $version = Ip::ALL;
-
-    public $message = 'This value is not a valid CIDR notation.';
-
-    public $netmaskRangeViolationMessage = 'The value of the netmask should be between {{ min }} and {{ max }}.';
-
-    public $netmaskMin = 0;
-
-    public $netmaskMax;
+    public string $version = Ip::ALL;
+    public string $message = 'This value is not a valid CIDR notation.';
+    public string $netmaskRangeViolationMessage = 'The value of the netmask should be between {{ min }} and {{ max }}.';
+    public int $netmaskMin = 0;
+    public int $netmaskMax;
 
     public function __construct(
         array $options = null,

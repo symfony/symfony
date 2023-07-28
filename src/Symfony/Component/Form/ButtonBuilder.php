@@ -25,7 +25,7 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  */
 class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 {
-    protected $locked = false;
+    protected bool $locked = false;
 
     private bool $disabled = false;
     private ResolvedFormTypeInterface $type;

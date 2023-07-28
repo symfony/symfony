@@ -30,11 +30,11 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
 {
     use TargetPathTrait;
 
-    protected $httpUtils;
-    protected $logger;
-    protected $options;
-    protected $firewallName;
-    protected $defaultOptions = [
+    protected HttpUtils $httpUtils;
+    protected array $options;
+    protected ?LoggerInterface $logger;
+    protected ?string $firewallName = null;
+    protected array $defaultOptions = [
         'always_use_default_target_path' => false,
         'default_target_path' => '/',
         'login_path' => '/login',

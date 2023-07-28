@@ -31,10 +31,7 @@ use Symfony\Contracts\Service\ResetInterface;
 
 abstract class DoctrineType extends AbstractType implements ResetInterface
 {
-    /**
-     * @var ManagerRegistry
-     */
-    protected $registry;
+    protected ManagerRegistry $registry;
 
     /**
      * @var IdReader[]

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Constraint;
+
 /**
  * Use this constraint to sequentially validate nested constraints.
  * Validation for the nested constraints collection will stop at first violation.
@@ -20,7 +22,7 @@ namespace Symfony\Component\Validator\Constraints;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Sequentially extends Composite
 {
-    public $constraints = [];
+    public array|Constraint $constraints = [];
 
     public function __construct(mixed $constraints = null, array $groups = null, mixed $payload = null)
     {

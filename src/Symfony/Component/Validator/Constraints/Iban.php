@@ -35,7 +35,7 @@ class Iban extends Constraint
         self::NOT_SUPPORTED_COUNTRY_CODE_ERROR => 'NOT_SUPPORTED_COUNTRY_CODE_ERROR',
     ];
 
-    public $message = 'This is not a valid International Bank Account Number (IBAN).';
+    public string $message = 'This is not a valid International Bank Account Number (IBAN).';
 
     public function __construct(array $options = null, string $message = null, array $groups = null, mixed $payload = null)
     {

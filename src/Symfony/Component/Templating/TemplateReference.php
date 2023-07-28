@@ -18,7 +18,7 @@ namespace Symfony\Component\Templating;
  */
 class TemplateReference implements TemplateReferenceInterface
 {
-    protected $parameters;
+    protected array $parameters;
 
     public function __construct(string $name = null, string $engine = null)
     {

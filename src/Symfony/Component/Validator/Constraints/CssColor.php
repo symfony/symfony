@@ -56,13 +56,13 @@ class CssColor extends Constraint
         self::HSLA,
     ];
 
-    public $message = 'This value is not a valid CSS color.';
-    public $formats;
+    public string $message = 'This value is not a valid CSS color.';
+    public array|string $formats;
 
     /**
      * @param array|string $formats The types of CSS colors allowed (e.g. hexadecimal only, RGB and HSL only, etc.).
      */
-    public function __construct($formats = [], string $message = null, array $groups = null, $payload = null, array $options = null)
+    public function __construct(array|string $formats = [], string $message = null, array $groups = null, $payload = null, array $options = null)
     {
         $validationModesAsString = implode(', ', self::$validationModes);
 

@@ -18,8 +18,8 @@ namespace Symfony\Component\Config\Definition\Builder;
  */
 class NodeBuilder implements NodeParentInterface
 {
-    protected $parent;
-    protected $nodeMapping;
+    protected (NodeDefinition&ParentNodeDefinitionInterface)|null $parent = null;
+    protected array $nodeMapping;
 
     public function __construct()
     {
@@ -39,7 +39,7 @@ class NodeBuilder implements NodeParentInterface
      *
      * @return $this
      */
-    public function setParent(?ParentNodeDefinitionInterface $parent): static
+    public function setParent((NodeDefinition&ParentNodeDefinitionInterface)|null $parent): static
     {
         $this->parent = $parent;
 

@@ -24,9 +24,9 @@ class ResponseHeaderBag extends HeaderBag
     public const DISPOSITION_ATTACHMENT = 'attachment';
     public const DISPOSITION_INLINE = 'inline';
 
-    protected $computedCacheControl = [];
-    protected $cookies = [];
-    protected $headerNames = [];
+    protected array $computedCacheControl = [];
+    protected array $cookies = [];
+    protected array $headerNames = [];
 
     public function __construct(array $headers = [])
     {

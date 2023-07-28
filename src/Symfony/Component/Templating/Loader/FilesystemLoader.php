@@ -22,7 +22,7 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
  */
 class FilesystemLoader extends Loader
 {
-    protected $templatePathPatterns;
+    protected array $templatePathPatterns;
 
     /**
      * @param string|string[] $templatePathPatterns An array of path patterns to look for templates

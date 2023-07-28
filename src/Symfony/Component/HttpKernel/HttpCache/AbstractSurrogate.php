@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 abstract class AbstractSurrogate implements SurrogateInterface
 {
-    protected $contentTypes;
+    protected array $contentTypes;
 
     /**
      * @param array $contentTypes An array of content-type that should be parsed for Surrogate information

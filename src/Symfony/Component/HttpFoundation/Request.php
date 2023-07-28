@@ -65,70 +65,56 @@ class Request
     /**
      * @var string[]
      */
-    protected static $trustedProxies = [];
+    protected static array $trustedProxies = [];
 
     /**
      * @var string[]
      */
-    protected static $trustedHostPatterns = [];
+    protected static array $trustedHostPatterns = [];
 
     /**
      * @var string[]
      */
-    protected static $trustedHosts = [];
+    protected static array $trustedHosts = [];
 
-    protected static $httpMethodParameterOverride = false;
+    protected static bool $httpMethodParameterOverride = false;
 
     /**
      * Custom parameters.
-     *
-     * @var ParameterBag
      */
-    public $attributes;
+    public ParameterBag $attributes;
 
     /**
      * Request body parameters ($_POST).
      *
      * @see getPayload() for portability between content types
-     *
-     * @var InputBag
      */
-    public $request;
+    public InputBag $request;
 
     /**
      * Query string parameters ($_GET).
-     *
-     * @var InputBag
      */
-    public $query;
+    public InputBag $query;
 
     /**
      * Server and execution environment parameters ($_SERVER).
-     *
-     * @var ServerBag
      */
-    public $server;
+    public ServerBag $server;
 
     /**
      * Uploaded files ($_FILES).
-     *
-     * @var FileBag
      */
-    public $files;
+    public FileBag $files;
 
     /**
      * Cookies ($_COOKIE).
-     *
-     * @var InputBag
      */
-    public $cookies;
+    public InputBag $cookies;
 
     /**
      * Headers (taken from the $_SERVER).
-     *
-     * @var HeaderBag
      */
-    public $headers;
+    public HeaderBag $headers;
 
     /**
      * @var string|resource|false|null
@@ -138,76 +124,41 @@ class Request
     /**
      * @var string[]
      */
-    protected $languages;
+    protected array $languages;
 
     /**
      * @var string[]
      */
-    protected $charsets;
+    protected array $charsets;
 
     /**
      * @var string[]
      */
-    protected $encodings;
+    protected array $encodings;
 
     /**
      * @var string[]
      */
-    protected $acceptableContentTypes;
+    protected array $acceptableContentTypes;
 
-    /**
-     * @var string
-     */
-    protected $pathInfo;
-
-    /**
-     * @var string
-     */
-    protected $requestUri;
-
-    /**
-     * @var string
-     */
-    protected $baseUrl;
-
-    /**
-     * @var string
-     */
-    protected $basePath;
-
-    /**
-     * @var string
-     */
-    protected $method;
-
-    /**
-     * @var string
-     */
-    protected $format;
-
-    /**
-     * @var SessionInterface|callable(): SessionInterface
-     */
-    protected $session;
-
-    /**
-     * @var string|null
-     */
-    protected $locale;
-
-    /**
-     * @var string
-     */
-    protected $defaultLocale = 'en';
+    protected string $pathInfo;
+    protected string $requestUri;
+    protected string $baseUrl;
+    protected string $basePath;
+    protected string $method;
+    protected ?string $format;
+    protected SessionInterface|\Closure|null $session = null;
+    protected ?string $locale = null;
+    protected string $defaultLocale = 'en';
 
     /**
      * @var array<string, string[]>
      */
-    protected static $formats;
+    protected static array $formats;
 
-    protected static $requestFactory;
+    protected static ?\Closure $requestFactory = null;
 
-    private ?string $preferredFormat = null;
+    private string $preferredFormat;
     private bool $isHostValid = true;
     private bool $isForwardedValid = true;
     private bool $isSafeContentPreferred;

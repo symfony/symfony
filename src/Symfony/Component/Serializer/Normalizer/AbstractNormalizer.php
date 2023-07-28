@@ -123,22 +123,14 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      */
     protected const CIRCULAR_REFERENCE_LIMIT_COUNTERS = 'circular_reference_limit_counters';
 
-    protected $defaultContext = [
+    protected array $defaultContext = [
         self::ALLOW_EXTRA_ATTRIBUTES => true,
         self::CIRCULAR_REFERENCE_HANDLER => null,
         self::CIRCULAR_REFERENCE_LIMIT => 1,
         self::IGNORED_ATTRIBUTES => [],
     ];
-
-    /**
-     * @var ClassMetadataFactoryInterface|null
-     */
-    protected $classMetadataFactory;
-
-    /**
-     * @var NameConverterInterface|null
-     */
-    protected $nameConverter;
+    protected ?ClassMetadataFactoryInterface $classMetadataFactory;
+    protected ?NameConverterInterface $nameConverter;
 
     /**
      * Sets the {@link ClassMetadataFactoryInterface} to use.

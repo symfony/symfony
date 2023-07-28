@@ -32,13 +32,13 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
  */
 class ErrorListener implements EventSubscriberInterface
 {
-    protected $controller;
-    protected $logger;
-    protected $debug;
+    protected string|object|array|null $controller;
+    protected ?\Psr\Log\LoggerInterface $logger;
+    protected bool $debug;
     /**
      * @var array<class-string, array{log_level: string|null, status_code: int<100,599>|null}>
      */
-    protected $exceptionsMapping;
+    protected array $exceptionsMapping;
 
     /**
      * @param array<class-string, array{log_level: string|null, status_code: int<100,599>|null}> $exceptionsMapping

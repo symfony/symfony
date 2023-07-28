@@ -27,7 +27,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\Credentia
  */
 class Passport
 {
-    protected $user;
+    protected UserInterface $user;
 
     private array $badges = [];
     private array $attributes = [];

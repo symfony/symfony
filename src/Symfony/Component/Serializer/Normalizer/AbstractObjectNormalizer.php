@@ -105,14 +105,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     public const PRESERVE_EMPTY_OBJECTS = 'preserve_empty_objects';
 
+    protected ?ClassDiscriminatorResolverInterface $classDiscriminatorResolver;
+
     private array $typesCache = [];
     private array $attributesCache = [];
     private readonly \Closure $objectClassResolver;
-
-    /**
-     * @var ClassDiscriminatorResolverInterface|null
-     */
-    protected $classDiscriminatorResolver;
 
     public function __construct(
         ClassMetadataFactoryInterface $classMetadataFactory = null,

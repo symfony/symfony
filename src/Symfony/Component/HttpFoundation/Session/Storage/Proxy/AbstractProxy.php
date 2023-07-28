@@ -16,17 +16,9 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Proxy;
  */
 abstract class AbstractProxy
 {
-    /**
-     * Flag if handler wraps an internal PHP session handler (using \SessionHandler).
-     *
-     * @var bool
-     */
-    protected $wrapper = false;
+    protected bool $wrapper = false;
 
-    /**
-     * @var string
-     */
-    protected $saveHandlerName;
+    protected ?string $saveHandlerName = null;
 
     /**
      * Gets the session.save_handler name.

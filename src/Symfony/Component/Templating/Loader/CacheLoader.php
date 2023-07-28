@@ -26,8 +26,8 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
  */
 class CacheLoader extends Loader
 {
-    protected $loader;
-    protected $dir;
+    protected LoaderInterface $loader;
+    protected string $dir;
 
     /**
      * @param string $dir The directory where to store the cache files

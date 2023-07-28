@@ -22,15 +22,15 @@ use Symfony\Component\Config\Definition\Exception\UnsetKeyException;
  */
 class ArrayNode extends BaseNode implements PrototypeNodeInterface
 {
-    protected $xmlRemappings = [];
-    protected $children = [];
-    protected $allowFalse = false;
-    protected $allowNewKeys = true;
-    protected $addIfNotSet = false;
-    protected $performDeepMerging = true;
-    protected $ignoreExtraKeys = false;
-    protected $removeExtraKeys = true;
-    protected $normalizeKeys = true;
+    protected array $xmlRemappings = [];
+    protected array $children = [];
+    protected bool $allowFalse = false;
+    protected bool $allowNewKeys = true;
+    protected bool $addIfNotSet = false;
+    protected bool $performDeepMerging = true;
+    protected bool $ignoreExtraKeys = false;
+    protected bool $removeExtraKeys = true;
+    protected bool $normalizeKeys = true;
 
     public function setNormalizeKeys(bool $normalizeKeys): void
     {

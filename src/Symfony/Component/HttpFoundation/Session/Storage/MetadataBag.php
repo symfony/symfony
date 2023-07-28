@@ -26,19 +26,11 @@ class MetadataBag implements SessionBagInterface
     public const UPDATED = 'u';
     public const LIFETIME = 'l';
 
+    protected array $meta = [self::CREATED => 0, self::UPDATED => 0, self::LIFETIME => 0];
+
     private string $name = '__metadata';
     private string $storageKey;
-
-    /**
-     * @var array
-     */
-    protected $meta = [self::CREATED => 0, self::UPDATED => 0, self::LIFETIME => 0];
-
-    /**
-     * Unix timestamp.
-     */
     private int $lastUsed;
-
     private int $updateThreshold;
 
     /**

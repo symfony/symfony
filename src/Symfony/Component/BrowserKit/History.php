@@ -20,8 +20,8 @@ use Symfony\Component\BrowserKit\Exception\LogicException;
  */
 class History
 {
-    protected $stack = [];
-    protected $position = -1;
+    protected array $stack = [];
+    protected int $position = -1;
 
     /**
      * Clears the history.

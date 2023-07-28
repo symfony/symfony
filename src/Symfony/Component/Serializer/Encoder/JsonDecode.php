@@ -21,11 +21,6 @@ use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 class JsonDecode implements DecoderInterface
 {
     /**
-     * @deprecated since Symfony 6.4, to be removed in 7.0
-     */
-    protected $serializer;
-
-    /**
      * True to return the result as an associative array, false for a nested stdClass hierarchy.
      */
     public const ASSOCIATIVE = 'json_decode_associative';

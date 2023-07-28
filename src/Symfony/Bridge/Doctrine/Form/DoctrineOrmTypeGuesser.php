@@ -36,7 +36,7 @@ use Symfony\Component\Form\Guess\ValueGuess;
 
 class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
 {
-    protected $registry;
+    protected ManagerRegistry $registry;
 
     private array $cache = [];
 

@@ -19,7 +19,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 abstract class AbstractConnection implements ConnectionInterface
 {
-    protected $config;
+    protected array $config;
 
     public function __construct(array $config = [])
     {

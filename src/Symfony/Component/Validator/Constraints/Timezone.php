@@ -26,10 +26,10 @@ class Timezone extends Constraint
     public const TIMEZONE_IDENTIFIER_IN_COUNTRY_ERROR = 'c4a22222-dc92-4fc0-abb0-d95b268c7d0b';
     public const TIMEZONE_IDENTIFIER_INTL_ERROR = '45863c26-88dc-41ba-bf53-c73bd1f7e90d';
 
-    public $zone = \DateTimeZone::ALL;
-    public $countryCode;
-    public $intlCompatible = false;
-    public $message = 'This value is not a valid timezone.';
+    public int $zone = \DateTimeZone::ALL;
+    public ?string $countryCode = null;
+    public bool $intlCompatible = false;
+    public string $message = 'This value is not a valid timezone.';
 
     protected const ERROR_NAMES = [
         self::TIMEZONE_IDENTIFIER_ERROR => 'TIMEZONE_IDENTIFIER_ERROR',

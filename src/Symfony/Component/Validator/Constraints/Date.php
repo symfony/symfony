@@ -27,7 +27,7 @@ class Date extends Constraint
         self::INVALID_DATE_ERROR => 'INVALID_DATE_ERROR',
     ];
 
-    public $message = 'This value is not a valid date.';
+    public string $message = 'This value is not a valid date.';
 
     public function __construct(array $options = null, string $message = null, array $groups = null, mixed $payload = null)
     {

@@ -23,7 +23,7 @@
         "symfony/polyfill-intl-icu": "^1.21",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/property-access": "^6.4|^7.0",
-        "symfony/service-contracts": "^2.5|^3"
+        "symfony/service-contracts": "^2.5|^3.0|^4.0"
     },
     "require-dev": {
         "doctrine/collections": "^1.0|^2.0",

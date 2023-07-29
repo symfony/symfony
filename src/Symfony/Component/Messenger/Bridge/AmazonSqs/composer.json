@@ -20,11 +20,11 @@
         "async-aws/core": "^1.7",
         "async-aws/sqs": "^1.0",
         "symfony/messenger": "^6.4|^7.0",
-        "symfony/service-contracts": "^2.5|^3",
+        "symfony/service-contracts": "^2.5|^3.0|^4.0",
         "psr/log": "^1|^2|^3"
     },
     "require-dev": {
-        "symfony/http-client-contracts": "^2.5|^3",
+        "symfony/http-client-contracts": "^2.5|^3.0|^4.0",
         "symfony/property-access": "^6.4|^7.0",
         "symfony/serializer": "^6.4|^7.0"
     },

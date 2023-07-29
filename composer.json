@@ -45,7 +45,7 @@
         "psr/event-dispatcher": "^1.0",
         "psr/link": "^1.1|^2.0",
         "psr/log": "^1|^2|^3",
-        "symfony/contracts": "^2.5|^3.0",
+        "symfony/contracts": "^2.5|^3.0|^4.0",
         "symfony/polyfill-ctype": "~1.8",
         "symfony/polyfill-intl-grapheme": "~1.0",
         "symfony/polyfill-intl-icu": "~1.0",
@@ -202,7 +202,7 @@
             "url": "src/Symfony/Contracts",
             "options": {
                 "versions": {
-                    "symfony/contracts": "3.4.x-dev"
+                    "symfony/contracts": "4.0.x-dev"
                 }
             }
         },

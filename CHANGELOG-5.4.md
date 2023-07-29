@@ -7,6 +7,38 @@ in 5.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.4.0...v5.4.1
 
+* 5.4.26 (2023-07-29)
+
+ * bug #50933 [Serializer] Fix deserializing nested arrays of objects with mixed keys (HypeMC)
+ * bug #51078 [FrameworkBundle][Workflow] Throw exception is workflow.xxx.transitions is not an array (lyrixx)
+ * bug #51114 [Serializer] Fix denormalizing abstract part headers in MimeMessageNormalizer (fancyweb)
+ * bug #50788 [Validator] Fix regression with class metadatada on parent classes (rmikalkenas)
+ * bug #51017 [VarExporter] Fix exporting classes with __serialize() but not __unserialize() (fancyweb)
+ * bug #51031 Fix deprecations on PHP 8.3 (nicolas-grekas)
+ * bug #51000 [WebProfilerBundle] Fix error in case of 'Content-Type' set null in dev environment with no debug (alexbuyanow)
+ * bug #50994 [ErrorHandler][Runtime] Don't mess with ini_set('assert.warning') (nicolas-grekas)
+ * bug #50968 [PropertyAccess] Fix access to undefined "file" key when checking stack frames (nicolas-grekas)
+ * bug #50552 [Security] Allow custom scheme to be used as redirection URIs (Spomky)
+ * bug #50945 [DebugBundle][FrameworkBundle] Fix using the framework without the Console component (HypeMC)
+ * bug #50913 [HttpKernel][WebProfilerBundle] Fix search feature (Cyril HERRERA)
+ * bug #50937 [Form] fetch all known ChoiceType values at once (xabbuh)
+ * bug #50944 [FrameworkBundle] Add missing monolog channel tag to the `messenger:failed:retry` command (HypeMC)
+ * bug #49070 [RateLimiter] fix incorrect retryAfter of FixedWindow (RobertMe)
+ * bug #50960 [VarDumper] Fix dumping `ArrayObject` with `DumpDataCollector` (lyrixx, HypeMC)
+ * bug #50943 [Intl] Taking into account bibliographic + overlong (oleg-andreyev)
+ * bug #50954 [PhpUnitBridge] Kill the last concurrent process when it stales for more than 60s (nicolas-grekas)
+ * bug #50475 [FrameworkBundle] Prevent `cache:clear` to lose files on subsequent runs (Okhoshi)
+ * bug #47252 [PhpUnitBridge] Use triggering class to generate baseline for deprecation messages from DebugClassLoader (leongersen)
+ * bug #50582 [Security/Http] Fix false-string handling in `RememberMeAuthenticator` (ossinkine)
+ * bug #50595 [DependencyInjection] Don't ignore attributes on the actual decorator (HypeMC)
+ * bug #50804 [Serializer] Fix Normalizer not utilizing converted name for index variadic param (DidierLmn)
+ * bug #50813 [DoctrineBridge] Load refreshed user proxy (MatTheCat)
+ * bug #50905 [DepdencyInjection] Fix costly logic when checking errored definitions (nicolas-grekas)
+ * bug #50884 [Finder] Fix initial directory is opened twice (mvorisek)
+ * bug #50881 [Messenger] Fix passing options set via tags to handler descriptors (nicolas-grekas)
+ * bug #50837 [DependencyInjection] Fix autocasting null env values to empty string (fancyweb)
+ * bug #50810 [String] Fix Inflector for 'status' (evertharmeling)
+
 * 5.4.25 (2023-06-26)
 
  * bug #50763 [DependencyInjection] Skip errored definitions deep-referenced as runtime exceptions (nicolas-grekas)

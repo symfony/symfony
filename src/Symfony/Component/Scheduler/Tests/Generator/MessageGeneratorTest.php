@@ -18,6 +18,7 @@ use Symfony\Component\Scheduler\Generator\MessageContext;
 use Symfony\Component\Scheduler\Generator\MessageGenerator;
 use Symfony\Component\Scheduler\RecurringMessage;
 use Symfony\Component\Scheduler\Schedule;
+use Symfony\Component\Scheduler\ScheduleProviderInterface;
 use Symfony\Component\Scheduler\Trigger\TriggerInterface;
 
 class MessageGeneratorTest extends TestCase
@@ -25,7 +26,7 @@ class MessageGeneratorTest extends TestCase
     /**
      * @dataProvider messagesProvider
      */
-    public function testGetMessages(string $startTime, array $runs, array $schedule)
+    public function testGetMessagesFromSchedule(string $startTime, array $runs, array $schedule)
     {
         // for referencing
         $now = self::makeDateTime($startTime);
@@ -43,7 +44,49 @@ class MessageGeneratorTest extends TestCase
 
         $scheduler = new MessageGenerator($schedule, 'dummy', $clock);
 
-        // Warmup. The first run is always returns nothing.
+        // Warmup. The first run always returns nothing.
+        $this->assertSame([], iterator_to_array($scheduler->getMessages(), false));
+
+        foreach ($runs as $time => $expected) {
+            $now = self::makeDateTime($time);
+            $this->assertSame($expected, iterator_to_array($scheduler->getMessages(), false));
+        }
+    }
+
+    /**
+     * @dataProvider messagesProvider
+     */
+    public function testGetMessagesFromScheduleProvider(string $startTime, array $runs, array $schedule)
+    {
+        // for referencing
+        $now = self::makeDateTime($startTime);
+
+        $clock = $this->createMock(ClockInterface::class);
+        $clock->method('now')->willReturnReference($now);
+
+        foreach ($schedule as $i => $s) {
+            if (\is_array($s)) {
+                $schedule[$i] = $this->createMessage(...$s);
+            }
+        }
+
+        $scheduleProvider = new class($schedule) implements ScheduleProviderInterface {
+            public function __construct(private readonly array $schedule)
+            {
+            }
+
+            public function getSchedule(): Schedule
+            {
+                $schedule = (new Schedule())->add(...$this->schedule);
+                $schedule->stateful(new ArrayAdapter());
+
+                return $schedule;
+            }
+        };
+
+        $scheduler = new MessageGenerator($scheduleProvider, 'dummy', $clock);
+
+        // Warmup. The first run always returns nothing.
         $this->assertSame([], iterator_to_array($scheduler->getMessages(), false));
 
         foreach ($runs as $time => $expected) {

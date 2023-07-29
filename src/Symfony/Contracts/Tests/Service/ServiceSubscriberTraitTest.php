@@ -141,7 +141,8 @@ class Service3
 
 class ParentTestService2
 {
-    protected ContainerInterface $container;
+    /** @var ContainerInterface */
+    protected $container;
 
     public function setContainer(ContainerInterface $container)
     {

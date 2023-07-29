@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by kbond at 2023-03-25T17:45:42Z
+
+Looking for feedback before proceeding further.
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-03-27T15:02:29Z
+
+~Pending a resolution to https://github.com/symfony/symfony/pull/49813#discussion_r1148413168, I think this is ready.~
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-07-28T12:32:49Z
+
+I've renamed the classes per the review.
+
+I've also added a `RunProcessContext` that's returned from the handler and a `RunProcessFailedException` that's thrown by the handler on failure. These will allow the message/exception to be serialized while still giving access to the result.
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-07-28T13:40:07Z
+
+Comments addressed and PR description updated to show usage.

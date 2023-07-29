@@ -91,7 +91,8 @@ final class CronExpressionTrigger implements TriggerInterface
             return $expression;
         }
 
-        $hashEngine = self::hashEngine($context);
+        $randomizer = new Randomizer(new Xoshiro256StarStar(hash('sha256', $context, true)));
+        $hashEngine = static fn ($start, $end) => $randomizer->getInt($start, $end);
 
         foreach ($parts as $position => $part) {
             if (preg_match('#^\#(\((\d+)-(\d+)\))?$#', $part, $matches)) {
@@ -103,26 +104,5 @@ final class CronExpressionTrigger implements TriggerInterface
         }
 
         return implode(' ', $parts);
-    }
-
-    /**
-     * @return callable(int,int):int
-     */
-    private static function hashEngine(string $context): callable
-    {
-        if (class_exists(Randomizer::class)) {
-            $randomizer = new Randomizer(new Xoshiro256StarStar(hash('sha256', $context, true)));
-
-            return static fn ($start, $end) => $randomizer->getInt($start, $end);
-        }
-
-        $counter = 0;
-
-        return static function ($start, $end) use ($context, &$counter) {
-            $possibleValues = range($start, $end);
-            ++$counter;
-
-            return $possibleValues[(int) fmod(hexdec(substr(md5($context.'-'.$counter), 0, 10)), \count($possibleValues))];
-        };
     }
 }

@@ -48,7 +48,7 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface, 
     /**
      * @return void
      */
-    public function setLocale(string $locale)
+    public function setLocale(string $locale): void
     {
         $prev = $this->translator->getLocale();
         $this->translator->setLocale($locale);

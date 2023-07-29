@@ -51,7 +51,7 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
     /**
      * @return void
      */
-    public function setLocale(string $locale)
+    public function setLocale(string $locale): void
     {
         $this->translator->setLocale($locale);
     }

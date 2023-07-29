@@ -406,7 +406,7 @@ class Configuration implements ConfigurationInterface
                                                 ->values(['method'])
                                             ->end()
                                             ->scalarNode('property')
-                                                ->defaultValue('marking')
+                                                ->cannotBeEmpty()
                                             ->end()
                                             ->scalarNode('service')
                                                 ->cannotBeEmpty()

@@ -327,6 +327,14 @@ class SymfonyStyle extends OutputStyle
 
     /**
      * @see ProgressBar::iterate()
+     *
+     * @template TKey
+     * @template TValue
+     *
+     * @param iterable<TKey, TValue> $iterable
+     * @param int|null               $max      Number of steps to complete the bar (0 if indeterminate), if null it will be inferred from $iterable
+     *
+     * @return iterable<TKey, TValue>
      */
     public function progressIterate(iterable $iterable, int $max = null): iterable
     {

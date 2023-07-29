@@ -141,6 +141,7 @@
         "monolog/monolog": "^1.25.1|^2",
         "nyholm/psr7": "^1.0",
         "pda/pheanstalk": "^4.0",
+        "pear/crypt_gpg": "^1.6",
         "php-http/discovery": "^1.15",
         "php-http/httplug": "^1.0|^2.0",
         "php-http/message-factory": "^1.0",

@@ -17,6 +17,7 @@
     ],
     "require": {
         "php": ">=8.1",
+        "pear/crypt_gpg": "^1.6",
         "symfony/polyfill-intl-idn": "^1.10",
         "symfony/polyfill-mbstring": "^1.0"
     },

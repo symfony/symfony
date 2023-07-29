@@ -511,3 +511,23 @@ diff --git a/src/Symfony/Component/VarDumper/Dumper/DataDumperInterface.php b/sr
 -    public function dump(Data $data);
 +    public function dump(Data $data): ?string;
  }
+diff --git a/src/Symfony/Contracts/Translation/LocaleAwareInterface.php b/src/Symfony/Contracts/Translation/LocaleAwareInterface.php
+--- a/src/Symfony/Contracts/Translation/LocaleAwareInterface.php
++++ b/src/Symfony/Contracts/Translation/LocaleAwareInterface.php
+@@ -21,5 +21,5 @@ interface LocaleAwareInterface
+      * @throws \InvalidArgumentException If the locale contains invalid characters
+      */
+-    public function setLocale(string $locale);
++    public function setLocale(string $locale): void;
+ 
+     /**
+diff --git a/src/Symfony/Contracts/Translation/TranslatorTrait.php b/src/Symfony/Contracts/Translation/TranslatorTrait.php
+--- a/src/Symfony/Contracts/Translation/TranslatorTrait.php
++++ b/src/Symfony/Contracts/Translation/TranslatorTrait.php
+@@ -26,5 +26,5 @@ trait TranslatorTrait
+      * @return void
+      */
+-    public function setLocale(string $locale)
++    public function setLocale(string $locale): void
+     {
+         $this->locale = $locale;

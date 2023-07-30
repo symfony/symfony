@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by kbond at 2023-03-25T18:29:33Z
+
+Like https://github.com/symfony/symfony/pull/49813#discussion_r1148413168, maybe `CommandMessage` and `CommandMessageHandler` would be better names?
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-03-28T13:36:28Z
+
+One thing I think is missing: making the output available if there's an exception. Consider a system that tracks messages and emails an admin on failure. I can attest that this is valuable information.
+
+What about wrapping the caught exception in a new `CommandFailedException` that contains the output?
+
+In #49813 this is possible because the thrown exception (`ProcessFailedException`) includes the `Process` instance which makes the output available.
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-07-28T13:25:24Z
+
+I've updated this PR:
+1. Renamed the message to `RunCommandMessage`.
+2. Added `RunCommandContext` to be returned from the handler
+3. Added `RunCommandFailedException` that's thrown on failure that wraps the original exception and contains `RunCommandContext`
+4. Configuration for throwing `RunCommandFailedException` on non-successful exit codes
+
+(updated PR description to show usage)

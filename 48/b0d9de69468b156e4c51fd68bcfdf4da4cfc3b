@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-07-08T08:36:01Z
+
+I really wonder if the controller is the best place to do that
+
+* If one use a custom controller, it won't work
+* I should also add support for the console components, right?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-07-09T12:11:31Z
+
+I updated the PR
+
+* Introduced `ErrorHandler::enchanceError()`
+* Move the call from the ErrorController to the ErrorListener (this is more global like this)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-07-10T11:56:56Z
+
+```
+There were 15 errors:
+
+1) Symfony\Component\HttpKernel\Tests\EventListener\ErrorListenerTest::testHandleWithoutLogger with data set #0 (Symfony\Component\HttpKernel\Event\ExceptionEvent Object (...), Symfony\Component\HttpKernel\Event\ExceptionEvent Object (...))
+Error: Call to undefined method Symfony\Component\ErrorHandler\ErrorHandler::enhanceError()
+```
+
+tests are KO because the new code does not exist yet in 7.0?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2023-07-11T00:13:55Z
+
+> tests are KO because the new code does not exist yet in 7.0?
+
+I think after synchronizing with 7.0 it should be fixed

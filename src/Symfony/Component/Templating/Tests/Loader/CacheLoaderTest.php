@@ -20,6 +20,9 @@ use Symfony\Component\Templating\Storage\StringStorage;
 use Symfony\Component\Templating\TemplateReference;
 use Symfony\Component\Templating\TemplateReferenceInterface;
 
+/**
+ * @group legacy
+ */
 class CacheLoaderTest extends TestCase
 {
     public function testConstructor()

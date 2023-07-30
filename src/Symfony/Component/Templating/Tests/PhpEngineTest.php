@@ -22,6 +22,9 @@ use Symfony\Component\Templating\TemplateNameParser;
 use Symfony\Component\Templating\TemplateReference;
 use Symfony\Component\Templating\TemplateReferenceInterface;
 
+/**
+ * @group legacy
+ */
 class PhpEngineTest extends TestCase
 {
     protected ProjectTemplateLoader $loader;

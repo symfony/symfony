@@ -16,6 +16,9 @@ use Symfony\Component\Templating\DelegatingEngine;
 use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\Templating\StreamingEngineInterface;
 
+/**
+ * @group legacy
+ */
 class DelegatingEngineTest extends TestCase
 {
     public function testRenderDelegatesToSupportedEngine()

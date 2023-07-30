@@ -85,6 +85,11 @@ Serializer
  * Deprecate Doctrine annotations support in favor of native attributes
  * Deprecate passing an annotation reader to the constructor of `AnnotationLoader`
 
+Templating
+----------
+
+ * The component is deprecated and will be removed in 7.0. Use Twig instead.
+
 Validator
 ---------
 

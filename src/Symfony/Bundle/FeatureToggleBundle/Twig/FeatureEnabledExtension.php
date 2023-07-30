@@ -25,7 +25,7 @@ final class FeatureEnabledExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('isFeatureEnabled', $this->featureEnabledChecker->isEnabled(...)),
+            new TwigFunction('is_feature_enabled', $this->featureEnabledChecker->isEnabled(...)),
         ];
     }
 }

@@ -92,11 +92,10 @@ final class CronExpressionTrigger implements TriggerInterface
         }
 
         $randomizer = new Randomizer(new Xoshiro256StarStar(hash('sha256', $context, true)));
-        $hashEngine = static fn ($start, $end) => $randomizer->getInt($start, $end);
 
         foreach ($parts as $position => $part) {
             if (preg_match('#^\#(\((\d+)-(\d+)\))?$#', $part, $matches)) {
-                $parts[$position] = $hashEngine(
+                $parts[$position] = $randomizer->getInt(
                     (int) ($matches[2] ?? self::HASH_RANGES[$position][0]),
                     (int) ($matches[3] ?? self::HASH_RANGES[$position][1]),
                 );

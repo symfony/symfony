@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2023-07-28T15:35:53Z
+
+All branches are impacted so I'll fix them one by one after each one is ok and merged up?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-07-28T17:30:19Z
+
+I think we should drop this change when merging up. All deprecations have been resolved in 6.0, so we need to re-evaluate this topic on 6.2 anyway.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2023-07-29T10:43:02Z
+
+I agree, I already prepared all PRs and it's easier to just drop the changes when merging up since each maintained branch is a little different :sweat_smile:

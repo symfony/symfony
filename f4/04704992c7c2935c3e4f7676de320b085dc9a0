@@ -1,0 +1,140 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2023-07-07T16:38:21Z
+
+@guillaume-a Can you fix fabbot errors?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-07-08T07:19:39Z
+
+> Contraint `Type(['float'])` can produce false positives.
+
+No, actually that constraint works as advertised because NaN and infinity are valid `float` values.
+
+We should change the PR description.
+
+---------------------------------------------------------------------------
+
+by guillaume-a at 2023-07-08T08:37:00Z
+
+Fixed fabbot errors.
+Check against `is_numeric()` in the validator (in case of string, array, object `$value`)
+Added tests scenarios for all thoses last checks.
+
+`null` was allready checked (considered as valid)
+`empty` is now checked and considered as invalid
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-07-13T14:20:12Z
+
+What about adding new types to the Type constraint instead?
+```php
+#[Assert\Type(['finite-float'])]
+#[Assert\Type(['number'])] # this would be (is_int || is_float) && is_finite
+```
+
+---------------------------------------------------------------------------
+
+by guillaume-a at 2023-07-13T15:42:07Z
+
+Renamed `Finite` to `IsFinite` to match existing validators `IsTrue` `IsNull` ...
+
+@nicolas-grekas originally I looked that way, but IMO it will add lots of complexity to `Type` validator since `$types` are considered in a global 'OR' condition. And we should then check againts `is_finite()` only in some cases only which may be hard to deterime.
+
+But i'm open to discussion.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-07-13T15:55:08Z
+
+It looks like this would be enough to support my proposal. Not too much complexity IMHO.
+
+```patch
+--- a/src/Symfony/Component/Validator/Constraints/TypeValidator.php
++++ b/src/Symfony/Component/Validator/Constraints/TypeValidator.php
+@@ -26,9 +26,11 @@ class TypeValidator extends ConstraintValidator
+         'int' => 'is_int',
+         'integer' => 'is_int',
+         'long' => 'is_int',
++        'finite-float' => 'is_float && is_finite',
+         'float' => 'is_float',
+         'double' => 'is_float',
+         'real' => 'is_float',
++        'number' => 'is_int || is_float && is_finite',
+         'numeric' => 'is_numeric',
+         'string' => 'is_string',
+         'scalar' => 'is_scalar',
+@@ -69,7 +71,13 @@ class TypeValidator extends ConstraintValidator
+
+         foreach ($types as $type) {
+             $type = strtolower($type);
+-            if (isset(self::VALIDATION_FUNCTIONS[$type]) && self::VALIDATION_FUNCTIONS[$type]($value)) {
++            if (isset(self::VALIDATION_FUNCTIONS[$type]) && match (self::VALIDATION_FUNCTIONS[$type]) {
++                'finite-float' => \is_float($value) && \is_finite($value),
++                'number' => \is_int($value) || \is_float($value) && \is_finite($value),
++                default => self::VALIDATION_FUNCTIONS[$type]($value),
++            }) {
+                 return;
+             }
+```
+
+---------------------------------------------------------------------------
+
+by guillaume-a at 2023-07-13T16:00:16Z
+
+I agree. And I love your code, (always forget about `match` and love to re-discover it again and again)
+
+But do we define `finite` as a type, or as an additional condition like `null`, `true` or `false` ?
+
+(Real question, I'm not trying to push my proposal)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-07-13T16:03:53Z
+
+I'm not sure I'd add `finite`. `finite-float` and `number` look just fine to me. We might want to split `number` in two possibly: `finite-number` (=int|float&finite) and `number` (=int|float).
+
+---------------------------------------------------------------------------
+
+by guillaume-a at 2023-07-13T16:08:17Z
+
+Ok, sounds good to me.
+Could we add
+
+`finite-int` and `finite-float` : to match existing types checking
+And a new `number` check with its finite twin `finite-number` ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-07-13T16:10:50Z
+
+`finite-int` doesn't make sense since an int is always finite. But good to me for the others.
+
+---------------------------------------------------------------------------
+
+by guillaume-a at 2023-07-17T07:28:39Z
+
+Can someone explain me why we must write `\is_float` but we must write `is_nan` or `is_finite` without ?
+What are the exact rules ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-07-20T07:47:19Z
+
+@guillaume-a check https://github.com/FriendsOfPHP/PHP-CS-Fixer/issues/3048
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-07-20T07:53:54Z
+
+(can you have a look at the test failure?)
+
+---------------------------------------------------------------------------
+
+by guillaume-a at 2023-07-24T15:21:32Z
+
+> (can you have a look at the test failure?)
+
+Done. (And rebased too.)

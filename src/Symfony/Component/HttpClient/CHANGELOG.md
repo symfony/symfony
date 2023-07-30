@@ -12,6 +12,7 @@ CHANGELOG
 
  * Add `HarFileResponseFactory` testing utility, allow to replay responses from `.har` files
  * Add `max_retries` option to `RetryableHttpClient` to adjust the retry logic on a per request level
+ * Add `PingWehookMessage` and `PingWebhookMessageHandler`
 
 6.3
 ---

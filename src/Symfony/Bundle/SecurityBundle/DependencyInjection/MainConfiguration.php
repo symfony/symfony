@@ -190,7 +190,12 @@ class MainConfiguration implements ConfigurationInterface
         ;
 
         $firewallNodeBuilder
-            ->scalarNode('pattern')->end()
+            ->scalarNode('pattern')
+                ->beforeNormalization()
+                    ->ifArray()
+                    ->then(fn ($v) => sprintf('(?:%s)', implode('|', $v)))
+                ->end()
+            ->end()
             ->scalarNode('host')->end()
             ->arrayNode('methods')
                 ->beforeNormalization()->ifString()->then(function ($v) { return preg_split('/\s*,\s*/', $v); })->end()

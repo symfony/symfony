@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Add `RunProcessMessage` and `RunProcessMessageHandler`
+
 5.2.0
 -----
 

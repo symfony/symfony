@@ -11,6 +11,7 @@ CHANGELOG
 ---
 
  * Deprecate `Security::ACCESS_DENIED_ERROR`, `AUTHENTICATION_ERROR` and `LAST_USERNAME` constants, use the ones on `SecurityRequestAttributes` instead
+ * Allow an array of `pattern` in firewall configuration
 
 6.3
 ---

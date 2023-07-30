@@ -18,7 +18,7 @@ namespace Symfony\Component\PropertyAccess;
  *
  * @extends \Traversable<int, string>
  */
-interface PropertyPathInterface extends \Traversable
+interface PropertyPathInterface extends \Traversable, \Stringable
 {
     /**
      * Returns the string representation of the property path.

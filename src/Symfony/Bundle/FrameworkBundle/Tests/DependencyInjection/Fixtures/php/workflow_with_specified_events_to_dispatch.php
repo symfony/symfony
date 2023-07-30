@@ -9,7 +9,6 @@ $container->loadFromExtension('framework', [
         'my_workflow' => [
             'type' => 'state_machine',
             'marking_store' => [
-                'type' => 'method',
                 'property' => 'state',
             ],
             'supports' => [

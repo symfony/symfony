@@ -16,7 +16,7 @@ namespace Symfony\Component\Templating;
  *
  * @author Victor Berchet <victor@suumit.com>
  */
-interface TemplateReferenceInterface
+interface TemplateReferenceInterface extends \Stringable
 {
     /**
      * Gets the template parameters.

@@ -17,7 +17,7 @@ use Symfony\Component\VarDumper\Dumper\ContextProvider\SourceContextProvider;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class Data implements \ArrayAccess, \Countable, \IteratorAggregate
+class Data implements \ArrayAccess, \Countable, \IteratorAggregate, \Stringable
 {
     private array $data;
     private int $position = 0;

@@ -18,12 +18,11 @@ use Psr\Http\Message\StreamInterface;
  */
 class Stream implements StreamInterface
 {
-    private $stringContent;
-    private $eof = true;
+    private bool $eof = true;
 
-    public function __construct(string $stringContent = '')
-    {
-        $this->stringContent = $stringContent;
+    public function __construct(
+        private readonly string $stringContent = '',
+    ) {
     }
 
     public function __toString(): string
@@ -96,12 +95,7 @@ class Stream implements StreamInterface
         return $this->stringContent;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return mixed
-     */
-    public function getMetadata($key = null)
+    public function getMetadata($key = null): mixed
     {
         return null;
     }

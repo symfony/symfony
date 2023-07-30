@@ -33,17 +33,12 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 class PsrHttpFactory implements HttpMessageFactoryInterface
 {
-    private $serverRequestFactory;
-    private $streamFactory;
-    private $uploadedFileFactory;
-    private $responseFactory;
-
-    public function __construct(ServerRequestFactoryInterface $serverRequestFactory, StreamFactoryInterface $streamFactory, UploadedFileFactoryInterface $uploadedFileFactory, ResponseFactoryInterface $responseFactory)
-    {
-        $this->serverRequestFactory = $serverRequestFactory;
-        $this->streamFactory = $streamFactory;
-        $this->uploadedFileFactory = $uploadedFileFactory;
-        $this->responseFactory = $responseFactory;
+    public function __construct(
+        private readonly ServerRequestFactoryInterface $serverRequestFactory,
+        private readonly StreamFactoryInterface $streamFactory,
+        private readonly UploadedFileFactoryInterface $uploadedFileFactory,
+        private readonly ResponseFactoryInterface $responseFactory,
+    ) {
     }
 
     public function createRequest(Request $symfonyRequest): ServerRequestInterface

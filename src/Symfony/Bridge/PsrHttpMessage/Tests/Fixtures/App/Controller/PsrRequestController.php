@@ -11,13 +11,10 @@ use Psr\Http\Message\StreamFactoryInterface;
 
 final class PsrRequestController
 {
-    private $responseFactory;
-    private $streamFactory;
-
-    public function __construct(ResponseFactoryInterface $responseFactory, StreamFactoryInterface $streamFactory)
-    {
-        $this->responseFactory = $responseFactory;
-        $this->streamFactory = $streamFactory;
+    public function __construct(
+        private readonly ResponseFactoryInterface $responseFactory,
+        private readonly StreamFactoryInterface $streamFactory,
+    ) {
     }
 
     public function serverRequestAction(ServerRequestInterface $request): ResponseInterface

@@ -22,6 +22,7 @@ use Symfony\Component\Mailer\Bridge\MailerSend\Transport\MailerSendTransportFact
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
+use Symfony\Component\Mailer\Bridge\Scaleway\Transport\ScalewayTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
@@ -52,6 +53,7 @@ final class Transport
         MailjetTransportFactory::class,
         MandrillTransportFactory::class,
         PostmarkTransportFactory::class,
+        ScalewayTransportFactory::class,
         SendgridTransportFactory::class,
         SesTransportFactory::class,
     ];

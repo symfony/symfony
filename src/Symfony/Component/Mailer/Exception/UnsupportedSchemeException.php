@@ -52,6 +52,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Postmark\Transport\PostmarkTransportFactory::class,
             'package' => 'symfony/postmark-mailer',
         ],
+        'scaleway' => [
+            'class' => Bridge\Scaleway\Transport\ScalewayTransportFactory::class,
+            'package' => 'symfony/scaleway-mailer',
+        ],
         'sendgrid' => [
             'class' => Bridge\Sendgrid\Transport\SendgridTransportFactory::class,
             'package' => 'symfony/sendgrid-mailer',

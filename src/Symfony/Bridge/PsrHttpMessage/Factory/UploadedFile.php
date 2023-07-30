@@ -21,11 +21,12 @@ use Symfony\Component\HttpFoundation\File\UploadedFile as BaseUploadedFile;
  */
 class UploadedFile extends BaseUploadedFile
 {
-    private $psrUploadedFile;
-    private $test = false;
+    private bool $test = false;
 
-    public function __construct(UploadedFileInterface $psrUploadedFile, callable $getTemporaryPath)
-    {
+    public function __construct(
+        private readonly UploadedFileInterface $psrUploadedFile,
+        callable $getTemporaryPath,
+    ) {
         $error = $psrUploadedFile->getError();
         $path = '';
 
@@ -45,8 +46,6 @@ class UploadedFile extends BaseUploadedFile
             $psrUploadedFile->getError(),
             $this->test
         );
-
-        $this->psrUploadedFile = $psrUploadedFile;
     }
 
     public function move(string $directory, string $name = null): File

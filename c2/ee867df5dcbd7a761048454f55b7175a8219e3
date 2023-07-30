@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by kbond at 2023-07-28T11:40:12Z
+
+I'm not sure how to suppress the deprecations. I've added `@group legacy` to the test classes but I guess the deprecations are triggered earlier?
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-07-28T11:46:09Z
+
+The component is [still downloaded 30K/day](https://packagist.org/packages/symfony/templating/stats). Not on legacy projects since there is 6.4K daily installs for the v6.
+<img width="803" alt="image" src="https://github.com/symfony/symfony/assets/400034/0c972a5e-1997-4457-a201-bdfc4ae39521">
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-07-28T11:54:10Z
+
+I think a good chunk of the downloads are transient. For instance, [knplabs/knp-time-bundle](https://packagist.org/packages/knplabs/knp-time-bundle) requires it and has ~4k daily downloads.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-07-28T14:25:20Z
+
+:+1: for the proposal. Deprecating it will still mean maintaining it for the duration of the LTS, so 3 more years.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-07-28T14:27:27Z
+
+Any corresponding config tree in frameworkbundle that should also be deprecated?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-07-28T14:30:04Z
+
+> Any corresponding config tree in frameworkbundle that should also be deprecated?
+
+Didn't this happen in #32267 already?

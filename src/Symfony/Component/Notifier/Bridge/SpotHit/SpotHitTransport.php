@@ -35,6 +35,8 @@ final class SpotHitTransport extends AbstractTransport
 
     private string $token;
     private ?string $from;
+    private ?bool $smsLong = null;
+    private ?int $smsLongNBr = null;
 
     public function __construct(#[\SensitiveParameter] string $token, string $from = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
@@ -46,7 +48,27 @@ final class SpotHitTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('spothit://%s%s', $this->getEndpoint(), null !== $this->from ? '?from='.$this->from : '');
+        $query = http_build_query([
+            'from' => $this->from,
+            'smslong' => $this->smsLong,
+            'smslongnbr' => $this->smsLongNBr,
+        ]);
+
+        return sprintf('spothit://%s', $this->getEndpoint()).('' !== $query ? '?'.$query : '');
+    }
+
+    public function setSmsLong(?bool $smsLong): self
+    {
+        $this->smsLong = $smsLong;
+
+        return $this;
+    }
+
+    public function setLongNBr(?int $smsLongNBr): self
+    {
+        $this->smsLongNBr = $smsLongNBr;
+
+        return $this;
     }
 
     public function supports(MessageInterface $message): bool
@@ -76,6 +98,8 @@ final class SpotHitTransport extends AbstractTransport
                 'type' => 'premium',
                 'message' => $message->getSubject(),
                 'expediteur' => $message->getFrom() ?: $this->from,
+                'smslong' => $this->smsLong,
+                'smslongnbr' => $this->smsLongNBr,
             ],
         ]);
 

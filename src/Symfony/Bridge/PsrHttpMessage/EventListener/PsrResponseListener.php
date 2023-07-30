@@ -26,7 +26,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 final class PsrResponseListener implements EventSubscriberInterface
 {
-    private $httpFoundationFactory;
+    private readonly HttpFoundationFactoryInterface $httpFoundationFactory;
 
     public function __construct(HttpFoundationFactoryInterface $httpFoundationFactory = null)
     {

@@ -43,12 +43,8 @@ class CovertTest extends TestCase
 
     /**
      * @dataProvider requestProvider
-     *
-     * @param Request|ServerRequestInterface                             $request
-     * @param HttpFoundationFactoryInterface|HttpMessageFactoryInterface $firstFactory
-     * @param HttpFoundationFactoryInterface|HttpMessageFactoryInterface $secondFactory
      */
-    public function testConvertRequestMultipleTimes($request, $firstFactory, $secondFactory)
+    public function testConvertRequestMultipleTimes(ServerRequestInterface|Request $request, HttpMessageFactoryInterface|HttpFoundationFactoryInterface $firstFactory, HttpMessageFactoryInterface|HttpFoundationFactoryInterface $secondFactory)
     {
         $temporaryRequest = $firstFactory->createRequest($request);
         $finalRequest = $secondFactory->createRequest($temporaryRequest);
@@ -157,12 +153,8 @@ class CovertTest extends TestCase
 
     /**
      * @dataProvider responseProvider
-     *
-     * @param Response|ResponseInterface                                 $response
-     * @param HttpFoundationFactoryInterface|HttpMessageFactoryInterface $firstFactory
-     * @param HttpFoundationFactoryInterface|HttpMessageFactoryInterface $secondFactory
      */
-    public function testConvertResponseMultipleTimes($response, $firstFactory, $secondFactory)
+    public function testConvertResponseMultipleTimes(ResponseInterface|Response $response, HttpMessageFactoryInterface|HttpFoundationFactoryInterface $firstFactory, HttpMessageFactoryInterface|HttpFoundationFactoryInterface $secondFactory)
     {
         $temporaryResponse = $firstFactory->createResponse($response);
         $finalResponse = $secondFactory->createResponse($temporaryResponse);

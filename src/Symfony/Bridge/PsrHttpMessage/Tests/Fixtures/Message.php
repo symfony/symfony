@@ -21,15 +21,11 @@ use Psr\Http\Message\StreamInterface;
  */
 class Message implements MessageInterface
 {
-    private $version = '1.1';
-    private $headers = [];
-    private $body;
-
-    public function __construct(string $version = '1.1', array $headers = [], StreamInterface $body = null)
-    {
-        $this->version = $version;
-        $this->headers = $headers;
-        $this->body = $body ?? new Stream();
+    public function __construct(
+        private readonly string $version = '1.1',
+        private array $headers = [],
+        private readonly StreamInterface $body = new Stream(),
+    ) {
     }
 
     public function getProtocolVersion(): string
@@ -37,12 +33,7 @@ class Message implements MessageInterface
         return $this->version;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return static
-     */
-    public function withProtocolVersion($version): MessageInterface
+    public function withProtocolVersion($version): never
     {
         throw new \BadMethodCallException('Not implemented.');
     }
@@ -67,34 +58,19 @@ class Message implements MessageInterface
         return $this->hasHeader($name) ? implode(',', $this->headers[$name]) : '';
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return static
-     */
-    public function withHeader($name, $value): MessageInterface
+    public function withHeader($name, $value): static
     {
         $this->headers[$name] = (array) $value;
 
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return static
-     */
-    public function withAddedHeader($name, $value): MessageInterface
+    public function withAddedHeader($name, $value): never
     {
         throw new \BadMethodCallException('Not implemented.');
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return static
-     */
-    public function withoutHeader($name): MessageInterface
+    public function withoutHeader($name): static
     {
         unset($this->headers[$name]);
 
@@ -108,10 +84,8 @@ class Message implements MessageInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return static
      */
-    public function withBody(StreamInterface $body): MessageInterface
+    public function withBody(StreamInterface $body): never
     {
         throw new \BadMethodCallException('Not implemented.');
     }

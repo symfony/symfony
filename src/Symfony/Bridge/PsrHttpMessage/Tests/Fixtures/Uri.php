@@ -18,18 +18,18 @@ use Psr\Http\Message\UriInterface;
  */
 class Uri implements UriInterface
 {
-    private $scheme = '';
-    private $userInfo = '';
-    private $host = '';
-    private $port;
-    private $path = '';
-    private $query = '';
-    private $fragment = '';
-    private $uriString;
+    private readonly string $scheme;
+    private readonly string $userInfo;
+    private readonly string $host;
+    private readonly ?string $port;
+    private readonly string $path;
+    private readonly string $query;
+    private readonly string $fragment;
 
-    public function __construct(string $uri = '')
-    {
-        $parts = parse_url($uri);
+    public function __construct(
+        private readonly string $uriString,
+    ) {
+        $parts = parse_url($uriString);
 
         $this->scheme = $parts['scheme'] ?? '';
         $this->userInfo = $parts['user'] ?? '';
@@ -38,7 +38,6 @@ class Uri implements UriInterface
         $this->path = $parts['path'] ?? '';
         $this->query = $parts['query'] ?? '';
         $this->fragment = $parts['fragment'] ?? '';
-        $this->uriString = $uri;
     }
 
     public function getScheme(): string
@@ -93,72 +92,37 @@ class Uri implements UriInterface
         return $this->fragment;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return static
-     */
-    public function withScheme($scheme): UriInterface
+    public function withScheme($scheme): never
     {
         throw new \BadMethodCallException('Not implemented.');
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return static
-     */
-    public function withUserInfo($user, $password = null): UriInterface
+    public function withUserInfo($user, $password = null): never
     {
         throw new \BadMethodCallException('Not implemented.');
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return static
-     */
-    public function withHost($host): UriInterface
+    public function withHost($host): never
     {
         throw new \BadMethodCallException('Not implemented.');
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return static
-     */
-    public function withPort($port): UriInterface
+    public function withPort($port): never
     {
         throw new \BadMethodCallException('Not implemented.');
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return static
-     */
-    public function withPath($path): UriInterface
+    public function withPath($path): never
     {
         throw new \BadMethodCallException('Not implemented.');
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return static
-     */
-    public function withQuery($query): UriInterface
+    public function withQuery($query): never
     {
         throw new \BadMethodCallException('Not implemented.');
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return static
-     */
-    public function withFragment($fragment): UriInterface
+    public function withFragment($fragment): never
     {
         throw new \BadMethodCallException('Not implemented.');
     }

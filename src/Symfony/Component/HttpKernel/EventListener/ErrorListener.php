@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\EventListener;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use Symfony\Component\ErrorHandler\ErrorHandler;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -102,6 +103,14 @@ class ErrorListener implements EventSubscriberInterface
         }
 
         $throwable = $event->getThrowable();
+
+        if ($exceptionHandler = set_exception_handler(var_dump(...))) {
+            restore_exception_handler();
+            if (\is_array($exceptionHandler) && $exceptionHandler[0] instanceof ErrorHandler) {
+                $throwable = $exceptionHandler[0]->enhanceError($event->getThrowable());
+            }
+        }
+
         $request = $this->duplicateRequest($throwable, $event->getRequest());
 
         try {

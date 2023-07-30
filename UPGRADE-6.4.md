@@ -60,6 +60,11 @@ MonologBridge
 
  * Add native return type to `Logger::clear()` and to `DebugProcessor::clear()`
 
+PsrHttpMessageBridge
+--------------------
+
+ * Remove `ArgumentValueResolverInterface` from `PsrServerRequestResolver`
+
 Routing
 -------
 

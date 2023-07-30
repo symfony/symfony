@@ -11,10 +11,14 @@
 
 namespace Symfony\Component\Templating\Storage;
 
+trigger_deprecation('symfony/templating', '6.4', '"%s" is deprecated since version 6.4 and will be removed in 7.0. Use Twig instead.', Storage::class);
+
 /**
  * Storage is the base class for all storage classes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 6.4, use Twig instead
  */
 abstract class Storage
 {

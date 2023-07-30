@@ -22,6 +22,7 @@
     },
     "require-dev": {
         "doctrine/annotations": "^1.12|^2",
+        "seld/jsonlint": "^1.10",
         "phpdocumentor/reflection-docblock": "^3.2|^4.0|^5.0",
         "symfony/cache": "^5.4|^6.0|^7.0",
         "symfony/config": "^5.4|^6.0|^7.0",

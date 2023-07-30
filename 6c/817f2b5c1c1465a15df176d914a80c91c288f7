@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-07-28T14:24:08Z
+
+Missing : FormErrorIterator, HeaderBag, InMemoryUser, AbstractUid and Data.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2023-07-28T14:38:17Z
+
+> It's strictly equivalent, but why not :)
+
+Sure, but according to
+https://www.php.net/manual/en/class.stringable.php
+Unlike most interfaces, Stringable is implicitly present on any class that has the magic [__toString()](https://www.php.net/manual/en/language.oop5.magic.php#object.tostring) method defined, __although it can and should be declared explicitly.__
+
+> Missing : FormErrorIterator, HeaderBag, InMemoryUser, AbstractUid and Data.
+
+I focused on interface but added these class too then.

@@ -28,13 +28,11 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class HttpFoundationFactory implements HttpFoundationFactoryInterface
 {
     /**
-     * @var int The maximum output buffering size for each iteration when sending the response
+     * @param int $responseBufferMaxLength The maximum output buffering size for each iteration when sending the response
      */
-    private $responseBufferMaxLength;
-
-    public function __construct(int $responseBufferMaxLength = 16372)
-    {
-        $this->responseBufferMaxLength = $responseBufferMaxLength;
+    public function __construct(
+        private readonly int $responseBufferMaxLength = 16372,
+    ) {
     }
 
     public function createRequest(ServerRequestInterface $psrRequest, bool $streamed = false): Request

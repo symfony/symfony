@@ -19,13 +19,13 @@ use Psr\Http\Message\StreamInterface;
  */
 class Response extends Message implements ResponseInterface
 {
-    private $statusCode;
-
-    public function __construct(string $version = '1.1', array $headers = [], StreamInterface $body = null, int $statusCode = 200)
-    {
+    public function __construct(
+        string $version = '1.1',
+        array $headers = [],
+        StreamInterface $body = new Stream(),
+        private readonly int $statusCode = 200,
+    ) {
         parent::__construct($version, $headers, $body);
-
-        $this->statusCode = $statusCode;
     }
 
     public function getStatusCode(): int
@@ -33,15 +33,12 @@ class Response extends Message implements ResponseInterface
         return $this->statusCode;
     }
 
-    /**
-     * @return static
-     */
-    public function withStatus($code, $reasonPhrase = ''): ResponseInterface
+    public function withStatus($code, $reasonPhrase = ''): never
     {
         throw new \BadMethodCallException('Not implemented.');
     }
 
-    public function getReasonPhrase(): string
+    public function getReasonPhrase(): never
     {
         throw new \BadMethodCallException('Not implemented.');
     }

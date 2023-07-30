@@ -19,19 +19,13 @@ use Psr\Http\Message\UploadedFileInterface;
  */
 class UploadedFile implements UploadedFileInterface
 {
-    private $filePath;
-    private $size;
-    private $error;
-    private $clientFileName;
-    private $clientMediaType;
-
-    public function __construct(string $filePath, int $size = null, int $error = \UPLOAD_ERR_OK, string $clientFileName = null, string $clientMediaType = null)
-    {
-        $this->filePath = $filePath;
-        $this->size = $size;
-        $this->error = $error;
-        $this->clientFileName = $clientFileName;
-        $this->clientMediaType = $clientMediaType;
+    public function __construct(
+        private readonly string $filePath,
+        private readonly ?int $size = null,
+        private readonly int $error = \UPLOAD_ERR_OK,
+        private readonly ?string $clientFileName = null,
+        private readonly ?string $clientMediaType = null,
+    ) {
     }
 
     public function getStream(): StreamInterface

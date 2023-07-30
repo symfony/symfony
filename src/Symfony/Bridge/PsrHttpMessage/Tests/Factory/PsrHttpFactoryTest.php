@@ -29,11 +29,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 class PsrHttpFactoryTest extends TestCase
 {
-    /** @var HttpMessageFactoryInterface */
-    private $factory;
-
-    /** @var string */
-    private $tmpDir;
+    private HttpMessageFactoryInterface $factory;
+    private string $tmpDir;
 
     protected function buildHttpMessageFactory(): HttpMessageFactoryInterface
     {

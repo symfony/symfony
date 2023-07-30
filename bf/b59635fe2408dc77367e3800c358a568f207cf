@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by kbond at 2023-03-25T18:26:52Z
+
+Perhaps this would make more sense in the Webhook component? I wasn't sure if this would be in the same scope.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-04-10T05:43:23Z
+
+The main idea here is to make the ping retry-able, isn't it?
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-04-10T12:04:11Z
+
+> The main idea here is to make the ping retry-able, isn't it?
+
+You mean the logic for catching/throwing exceptions? The main idea was to know if a ping failed.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-04-10T13:25:56Z
+
+all messages are already retry-able https://symfony.com/doc/current/messenger.html#retries-failures
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-04-10T13:37:09Z
+
+> all messages are already retry-able https://symfony.com/doc/current/messenger.html#retries-failures
+
+The scheduler transport does not support retries.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-09T09:31:14Z
+
+Please improve the PR description a bit so that it's easier to start the doc. :pray:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-28T19:29:48Z
+
+(rebase needed + comments pending)
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-06-28T19:40:58Z
+
+Yep, this is on my list!
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-07-28T12:05:52Z
+
+Comments addressed, I think this is ready.

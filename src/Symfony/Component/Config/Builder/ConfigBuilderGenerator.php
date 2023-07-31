@@ -478,8 +478,8 @@ public function NAME($value): static
             if (null !== $p->getType()) {
                 if ($p->isArray()) {
                     $code = $p->areScalarsAllowed()
-                        ? 'array_map(function ($v) { return $v instanceof CLASS ? $v->toArray() : $v; }, $this->PROPERTY)'
-                        : 'array_map(function ($v) { return $v->toArray(); }, $this->PROPERTY)'
+                        ? 'array_map(fn ($v) => $v instanceof CLASS ? $v->toArray() : $v, $this->PROPERTY)'
+                        : 'array_map(fn ($v) => $v->toArray(), $this->PROPERTY)'
                     ;
                 } else {
                     $code = $p->areScalarsAllowed()
@@ -514,8 +514,8 @@ public function NAME(): array
             if (null !== $p->getType()) {
                 if ($p->isArray()) {
                     $code = $p->areScalarsAllowed()
-                        ? 'array_map(function ($v) { return \is_array($v) ? new '.$p->getType().'($v) : $v; }, $value[\'ORG_NAME\'])'
-                        : 'array_map(function ($v) { return new '.$p->getType().'($v); }, $value[\'ORG_NAME\'])'
+                        ? 'array_map(fn ($v) => \is_array($v) ? new '.$p->getType().'($v) : $v, $value[\'ORG_NAME\'])'
+                        : 'array_map(fn ($v) => new '.$p->getType().'($v), $value[\'ORG_NAME\'])'
                     ;
                 } else {
                     $code = $p->areScalarsAllowed()

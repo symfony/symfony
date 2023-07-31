@@ -90,7 +90,7 @@ class Exporter
                     $properties = $serializeProperties;
                 } else {
                     foreach ($serializeProperties as $n => $v) {
-                        $c = \PHP_VERSION_ID >= 80100 && $reflector->hasProperty($n) && ($p = $reflector->getProperty($n))->isReadOnly() ? $p->class : 'stdClass';
+                        $c = $reflector->hasProperty($n) && ($p = $reflector->getProperty($n))->isReadOnly() ? $p->class : 'stdClass';
                         $properties[$c][$n] = $v;
                     }
                 }

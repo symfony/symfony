@@ -517,14 +517,7 @@ class ErrorHandler
             }
         }
 
-        if (!$exception instanceof OutOfMemoryError) {
-            foreach ($this->getErrorEnhancers() as $errorEnhancer) {
-                if ($e = $errorEnhancer->enhance($exception)) {
-                    $exception = $e;
-                    break;
-                }
-            }
-        }
+        $exception = $this->enhanceError($exception);
 
         $exceptionHandler = $this->exceptionHandler;
         $this->exceptionHandler = [$this, 'renderException'];
@@ -660,6 +653,21 @@ class ErrorHandler
         }
 
         echo $exception->getAsString();
+    }
+
+    public function enhanceError(\Throwable $exception): \Throwable
+    {
+        if ($exception instanceof OutOfMemoryError) {
+            return $exception;
+        }
+
+        foreach ($this->getErrorEnhancers() as $errorEnhancer) {
+            if ($e = $errorEnhancer->enhance($exception)) {
+                return $e;
+            }
+        }
+
+        return $exception;
     }
 
     /**

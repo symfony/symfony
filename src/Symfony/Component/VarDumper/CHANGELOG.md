@@ -7,6 +7,11 @@ CHANGELOG
  * Add argument `$label` to `VarDumper::dump()`
  * Require explicit argument when calling `VarDumper::setHandler()`
 
+6.4
+---
+
+ * Dump uninitialized properties
+
 6.3
 ---
 

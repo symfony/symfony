@@ -363,13 +363,14 @@ class ErrorHandlerTest extends TestCase
     /**
      * @dataProvider handleExceptionProvider
      */
-    public function testHandleException(string $expectedMessage, \Throwable $exception)
+    public function testHandleException(string $expectedMessage, \Throwable $exception, string $enhancedMessage = null)
     {
         try {
             $logger = $this->createMock(LoggerInterface::class);
             $handler = ErrorHandler::register();
 
             $logArgCheck = function ($level, $message, $context) use ($expectedMessage, $exception) {
+                $this->assertSame('critical', $level);
                 $this->assertSame($expectedMessage, $message);
                 $this->assertArrayHasKey('exception', $context);
                 $this->assertInstanceOf($exception::class, $context['exception']);
@@ -388,11 +389,13 @@ class ErrorHandlerTest extends TestCase
                 $handler->handleException($exception);
                 $this->fail('Exception expected');
             } catch (\Throwable $e) {
-                $this->assertSame($exception, $e);
+                $this->assertInstanceOf($exception::class, $e);
+                $this->assertSame($enhancedMessage ?? $exception->getMessage(), $e->getMessage());
             }
 
-            $handler->setExceptionHandler(function ($e) use ($exception) {
-                $this->assertSame($exception, $e);
+            $handler->setExceptionHandler(function ($e) use ($exception, $enhancedMessage) {
+                $this->assertInstanceOf($exception::class, $e);
+                $this->assertSame($enhancedMessage ?? $exception->getMessage(), $e->getMessage());
             });
 
             $handler->handleException($exception);
@@ -412,6 +415,11 @@ class ErrorHandlerTest extends TestCase
             })::class.' bar')],
             ['Uncaught Error: bar', new \Error('bar')],
             ['Uncaught ccc', new \ErrorException('ccc')],
+            [
+                'Uncaught Error: Class "App\Controller\ClassDoesNotExist" not found',
+                new \Error('Class "App\Controller\ClassDoesNotExist" not found'),
+                "Attempted to load class \"ClassDoesNotExist\" from namespace \"App\Controller\".\nDid you forget a \"use\" statement for another namespace?",
+            ],
         ];
     }
 

@@ -17,6 +17,7 @@ CHANGELOG
 ---
 
  * Deprecate `StopWorkerOnSignalsListener` in favor of using the `SignalableCommandInterface`
+ * Add `HandlerDescriptor::getOptions`
 
 6.3
 ---

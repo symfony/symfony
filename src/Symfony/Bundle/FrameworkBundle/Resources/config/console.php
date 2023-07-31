@@ -38,8 +38,10 @@ use Symfony\Bundle\FrameworkBundle\Command\TranslationDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Command\TranslationUpdateCommand;
 use Symfony\Bundle\FrameworkBundle\Command\WorkflowDumpCommand;
 use Symfony\Bundle\FrameworkBundle\Command\YamlLintCommand;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\EventListener\SuggestMissingPackageSubscriber;
 use Symfony\Component\Console\EventListener\ErrorListener;
+use Symfony\Component\Console\Messenger\RunCommandMessageHandler;
 use Symfony\Component\Dotenv\Command\DebugCommand as DotenvDebugCommand;
 use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
 use Symfony\Component\Messenger\Command\DebugCommand as MessengerDebugCommand;
@@ -364,5 +366,18 @@ return static function (ContainerConfigurator $container) {
                 service('secrets.local_vault')->ignoreOnInvalid(),
             ])
             ->tag('console.command')
+
+        ->set('console.messenger.application', Application::class)
+            ->share(false)
+            ->call('setAutoExit', [false])
+            ->args([
+                service('kernel'),
+            ])
+
+        ->set('console.messenger.execute_command_handler', RunCommandMessageHandler::class)
+            ->args([
+                service('console.messenger.application'),
+            ])
+            ->tag('messenger.message_handler')
     ;
 };

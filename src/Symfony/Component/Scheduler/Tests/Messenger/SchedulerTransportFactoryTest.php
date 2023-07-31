@@ -36,13 +36,13 @@ class SchedulerTransportFactoryTest extends TestCase
         $defaultRecurringMessage = RecurringMessage::trigger($trigger, (object) ['id' => 'default']);
         $customRecurringMessage = RecurringMessage::trigger($trigger, (object) ['id' => 'custom']);
 
-        $default = new SchedulerTransport(new MessageGenerator((new SomeScheduleProvider([$defaultRecurringMessage]))->getSchedule(), 'default', $clock));
-        $custom = new SchedulerTransport(new MessageGenerator((new SomeScheduleProvider([$customRecurringMessage]))->getSchedule(), 'custom', $clock));
+        $default = new SchedulerTransport(new MessageGenerator(new SomeScheduleProvider([$defaultRecurringMessage]), 'default', $clock));
+        $custom = new SchedulerTransport(new MessageGenerator(new SomeScheduleProvider([$customRecurringMessage]), 'custom', $clock));
 
         $factory = new SchedulerTransportFactory(
             new Container([
-                'default' => fn () => (new SomeScheduleProvider([$defaultRecurringMessage]))->getSchedule(),
-                'custom' => fn () => (new SomeScheduleProvider([$customRecurringMessage]))->getSchedule(),
+                'default' => fn () => new SomeScheduleProvider([$defaultRecurringMessage]),
+                'custom' => fn () => new SomeScheduleProvider([$customRecurringMessage]),
             ]),
             $clock,
         );

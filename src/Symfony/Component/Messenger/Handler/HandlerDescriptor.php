@@ -73,4 +73,9 @@ final class HandlerDescriptor
     {
         return $this->options[$option] ?? null;
     }
+
+    public function getOptions(): array
+    {
+        return $this->options;
+    }
 }

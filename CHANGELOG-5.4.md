@@ -7,6 +7,10 @@ in 5.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.4.0...v5.4.1
 
+* 5.4.27 (2023-07-31)
+
+ * bug #51178 [Finder] Revert "Fix children condition in ExcludeDirectoryFilterIterator" (derrabus)
+
 * 5.4.26 (2023-07-29)
 
  * bug #50933 [Serializer] Fix deserializing nested arrays of objects with mixed keys (HypeMC)

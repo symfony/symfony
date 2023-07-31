@@ -22,6 +22,7 @@
         "symfony/clock": "^6.3",
         "symfony/config": "^6.1",
         "symfony/dependency-injection": "^6.2",
+        "symfony/deprecation-contracts": "^2.5|^3",
         "symfony/event-dispatcher": "^5.4|^6.0",
         "symfony/http-kernel": "^6.2",
         "symfony/http-foundation": "^6.2",

@@ -95,7 +95,6 @@
         "symfony/property-access": "self.version",
         "symfony/property-info": "self.version",
         "symfony/proxy-manager-bridge": "self.version",
-        "symfony/psr-http-message-bridge": "self.version",
         "symfony/rate-limiter": "self.version",
         "symfony/remote-event": "self.version",
         "symfony/routing": "self.version",

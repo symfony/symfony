@@ -59,7 +59,7 @@ class ExcludeDirectoryFilterIterator extends \FilterIterator implements \Recursi
      */
     public function accept(): bool
     {
-        if (isset($this->excludedDirs[$this->getFilename()]) && $this->hasChildren()) {
+        if ($this->isRecursive && isset($this->excludedDirs[$this->getFilename()]) && $this->isDir()) {
             return false;
         }
 

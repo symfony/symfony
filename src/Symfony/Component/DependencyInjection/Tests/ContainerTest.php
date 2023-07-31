@@ -14,11 +14,13 @@ namespace Symfony\Component\DependencyInjection\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\EnvVarProcessor;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Contracts\Service\ResetInterface;
 
 class ContainerTest extends TestCase
@@ -404,6 +406,33 @@ class ContainerTest extends TestCase
         $c = new ProjectServiceContainer();
         $c->get('internal_dependency');
         $c->get('internal');
+    }
+
+    public function testGetEnvDoesNotAutoCastNullWithDefaultEnvVarProcessor()
+    {
+        $container = new Container();
+        $container->setParameter('env(FOO)', null);
+        $container->compile();
+
+        $r = new \ReflectionMethod($container, 'getEnv');
+        $r->setAccessible(true);
+        $this->assertNull($r->invoke($container, 'FOO'));
+    }
+
+    public function testGetEnvDoesNotAutoCastNullWithEnvVarProcessorsLocatorReturningDefaultEnvVarProcessor()
+    {
+        $container = new Container();
+        $container->setParameter('env(FOO)', null);
+        $container->set('container.env_var_processors_locator', new ServiceLocator([
+            'string' => static function () use ($container): EnvVarProcessor {
+                return new EnvVarProcessor($container);
+            },
+        ]));
+        $container->compile();
+
+        $r = new \ReflectionMethod($container, 'getEnv');
+        $r->setAccessible(true);
+        $this->assertNull($r->invoke($container, 'FOO'));
     }
 }
 

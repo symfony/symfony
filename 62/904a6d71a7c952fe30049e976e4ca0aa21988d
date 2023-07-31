@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2023-07-29T11:23:48Z
+
+Can you tell use more about your use case?
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-07-29T14:41:41Z
+
+Sure!
+
+1. I'm building a scheduler dashboard and would like to translate cron strings to a human readable format. I need to find the inner-most trigger to do this.
+2. A scheduler monitoring service I'm building an integration for only supports cron expressions. It's ok to use with a jitter wrapped cron, but not an exclude time wrapped cron.

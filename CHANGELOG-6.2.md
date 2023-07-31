@@ -7,6 +7,10 @@ in 6.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.2.0...v6.2.1
 
+* 6.2.14 (2023-07-31)
+
+ * bug #51178 [Finder] Revert "Fix children condition in ExcludeDirectoryFilterIterator" (derrabus)
+
 * 6.2.13 (2023-07-30)
 
  * bug #50933 [Serializer] Fix deserializing nested arrays of objects with mixed keys (HypeMC)

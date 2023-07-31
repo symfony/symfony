@@ -39,7 +39,7 @@ class ConfigDumpReferenceCommand extends AbstractConfigCommand
 {
     protected function configure(): void
     {
-        $commentedHelpFormats = array_map(static fn (string $format): string => sprintf('<comment>%s</comment>', $format), $this->getAvailableFormatOptions());
+        $commentedHelpFormats = array_map(fn ($format) => sprintf('<comment>%s</comment>', $format), $this->getAvailableFormatOptions());
         $helpFormats = implode('", "', $commentedHelpFormats);
 
         $this

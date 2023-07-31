@@ -775,7 +775,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container = $this->createContainerFromFile('messenger_disabled');
         $messengerDefinitions = array_filter(
             $container->getDefinitions(),
-            static fn ($name) => str_starts_with($name, 'messenger.'),
+            fn ($name) => str_starts_with($name, 'messenger.'),
             \ARRAY_FILTER_USE_KEY
         );
 

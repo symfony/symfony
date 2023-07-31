@@ -75,7 +75,7 @@ EOF
         $rows = [];
 
         $dump = new Dumper($output);
-        $dump = static fn (?string $v) => null === $v ? '******' : $dump($v);
+        $dump = fn ($v) => null === $v ? '******' : $dump($v);
 
         foreach ($secrets as $name => $value) {
             $rows[$name] = [$name, $dump($value)];

@@ -44,7 +44,7 @@ class UnusedTagsPassTest extends TestCase
     private function getKnownTags(): array
     {
         $tags = \Closure::bind(
-            static fn () => UnusedTagsPass::KNOWN_TAGS,
+            fn () => UnusedTagsPass::KNOWN_TAGS,
             null,
             UnusedTagsPass::class
         )();

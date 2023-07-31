@@ -13,9 +13,15 @@ namespace Symfony\Component\Uid\Factory;
 
 use Symfony\Component\Uid\TimeBasedUidInterface;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Uid\UuidV1;
+use Symfony\Component\Uid\UuidV6;
+use Symfony\Component\Uid\UuidV7;
 
 class TimeBasedUuidFactory
 {
+    /**
+     * @var class-string<UuidV1|UuidV6|UuidV7>
+     */
     private string $class;
     private ?Uuid $node;
 

@@ -302,6 +302,11 @@ Serializer
  * Remove Doctrine annotations support in favor of native attributes
  * Remove the annotation reader parameter from the constructor of `AnnotationLoader`
 
+Templating
+----------
+
+ * Remove the component; use Twig instead
+
 Translation
 -----------
 

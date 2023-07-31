@@ -106,7 +106,6 @@
         "symfony/serializer": "self.version",
         "symfony/stopwatch": "self.version",
         "symfony/string": "self.version",
-        "symfony/templating": "self.version",
         "symfony/translation": "self.version",
         "symfony/twig-bridge": "self.version",
         "symfony/twig-bundle": "self.version",

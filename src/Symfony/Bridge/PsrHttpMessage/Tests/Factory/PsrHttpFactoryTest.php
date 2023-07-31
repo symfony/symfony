@@ -14,7 +14,6 @@ namespace Symfony\Bridge\PsrHttpMessage\Tests\Factory;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
-use Symfony\Bridge\PsrHttpMessage\HttpMessageFactoryInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -29,23 +28,17 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 class PsrHttpFactoryTest extends TestCase
 {
-    private HttpMessageFactoryInterface $factory;
     private string $tmpDir;
-
-    protected function buildHttpMessageFactory(): HttpMessageFactoryInterface
-    {
-        $factory = new Psr17Factory();
-
-        return new PsrHttpFactory($factory, $factory, $factory, $factory);
-    }
 
     protected function setUp(): void
     {
-        $this->factory = $this->buildHttpMessageFactory();
         $this->tmpDir = sys_get_temp_dir();
     }
 
-    public function testCreateRequest()
+    /**
+     * @dataProvider provideFactories
+     */
+    public function testCreateRequest(PsrHttpFactory $factory)
     {
         $stdClass = new \stdClass();
         $request = new Request(
@@ -83,7 +76,7 @@ class PsrHttpFactoryTest extends TestCase
         );
         $request->headers->set(' X-Broken', 'abc');
 
-        $psrRequest = $this->factory->createRequest($request);
+        $psrRequest = $factory->createRequest($request);
 
         $this->assertSame('Content', $psrRequest->getBody()->__toString());
 
@@ -130,7 +123,7 @@ class PsrHttpFactoryTest extends TestCase
         $header = ['HTTP_HOST' => 'dunglas.fr'];
         $request = new Request([], [], [], [], [], $header, 'Content');
 
-        $psrRequest = $this->factory->createRequest($request);
+        $psrRequest = self::buildHttpMessageFactory()->createRequest($request);
 
         $this->assertSame('Content', $psrRequest->getBody()->__toString());
         $this->assertSame('Content', $request->getContent());
@@ -144,7 +137,10 @@ class PsrHttpFactoryTest extends TestCase
         return new UploadedFile($path, $originalName, $mimeType, $error, true);
     }
 
-    public function testCreateResponse()
+    /**
+     * @dataProvider provideFactories
+     */
+    public function testCreateResponse(PsrHttpFactory $factory)
     {
         $response = new Response(
             'Response content.',
@@ -156,7 +152,7 @@ class PsrHttpFactoryTest extends TestCase
         );
         $response->headers->setCookie(new Cookie('city', 'Lille', new \DateTime('Wed, 13 Jan 2021 22:23:01 GMT'), '/', null, false, true, false, 'lax'));
 
-        $psrResponse = $this->factory->createResponse($response);
+        $psrResponse = $factory->createResponse($response);
         $this->assertSame('Response content.', $psrResponse->getBody()->__toString());
         $this->assertSame(202, $psrResponse->getStatusCode());
         $this->assertSame(['3.4'], $psrResponse->getHeader('x-symfony'));
@@ -179,7 +175,7 @@ class PsrHttpFactoryTest extends TestCase
             flush();
         });
 
-        $psrResponse = $this->factory->createResponse($response);
+        $psrResponse = self::buildHttpMessageFactory()->createResponse($response);
 
         $this->assertSame("Line 1\nLine 2\n", $psrResponse->getBody()->__toString());
     }
@@ -191,7 +187,7 @@ class PsrHttpFactoryTest extends TestCase
 
         $response = new BinaryFileResponse($path);
 
-        $psrResponse = $this->factory->createResponse($response);
+        $psrResponse = self::buildHttpMessageFactory()->createResponse($response);
 
         $this->assertSame('Binary', $psrResponse->getBody()->__toString());
     }
@@ -207,7 +203,7 @@ class PsrHttpFactoryTest extends TestCase
         $response = new BinaryFileResponse($path, 200, ['Content-Type' => 'plain/text']);
         $response->prepare($request);
 
-        $psrResponse = $this->factory->createResponse($response);
+        $psrResponse = self::buildHttpMessageFactory()->createResponse($response);
 
         $this->assertSame('inar', $psrResponse->getBody()->__toString());
         $this->assertSame('bytes 1-4/6', $psrResponse->getHeaderLine('Content-Range'));
@@ -237,7 +233,7 @@ class PsrHttpFactoryTest extends TestCase
             'Content'
         );
 
-        $psrRequest = $this->factory->createRequest($request);
+        $psrRequest = self::buildHttpMessageFactory()->createRequest($request);
 
         $uploadedFiles = $psrRequest->getUploadedFiles();
 
@@ -256,7 +252,7 @@ class PsrHttpFactoryTest extends TestCase
             'CONTENT_TYPE' => 'application/json',
         ];
         $request = new Request([], [], [], [], [], $headers, '{"city":"Paris","country":"France"}');
-        $psrRequest = $this->factory->createRequest($request);
+        $psrRequest = self::buildHttpMessageFactory()->createRequest($request);
 
         $this->assertSame(['city' => 'Paris', 'country' => 'France'], $psrRequest->getParsedBody());
     }
@@ -272,7 +268,7 @@ class PsrHttpFactoryTest extends TestCase
             'CONTENT_TYPE' => 'application/json',
         ];
         $request = new Request([], [], [], [], [], $headers, '{}');
-        $psrRequest = $this->factory->createRequest($request);
+        $psrRequest = self::buildHttpMessageFactory()->createRequest($request);
 
         $this->assertSame([], $psrRequest->getParsedBody());
     }
@@ -288,8 +284,22 @@ class PsrHttpFactoryTest extends TestCase
             'CONTENT_TYPE' => 'application/json',
         ];
         $request = new Request([], [], [], [], [], $headers, '{"city":"Paris"');
-        $psrRequest = $this->factory->createRequest($request);
+        $psrRequest = self::buildHttpMessageFactory()->createRequest($request);
 
         $this->assertNull($psrRequest->getParsedBody());
+    }
+
+    public static function provideFactories(): \Generator
+    {
+        yield 'Discovery' => [new PsrHttpFactory()];
+        yield 'incomplete dependencies' => [new PsrHttpFactory(responseFactory: new Psr17Factory())];
+        yield 'Nyholm' => [self::buildHttpMessageFactory()];
+    }
+
+    private static function buildHttpMessageFactory(): PsrHttpFactory
+    {
+        $factory = new Psr17Factory();
+
+        return new PsrHttpFactory($factory, $factory, $factory, $factory);
     }
 }

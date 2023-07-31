@@ -6,6 +6,7 @@ CHANGELOG
 
  * Import the bridge into the Symfony monorepo and synchronize releases
  * Remove `ArgumentValueResolverInterface` from `PsrServerRequestResolver`
+ * Support `php-http/discovery` for auto-detecting PSR-17 factories
 
 2.3.1
 -----

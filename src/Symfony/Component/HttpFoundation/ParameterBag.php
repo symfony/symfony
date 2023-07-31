@@ -184,7 +184,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
         try {
             return $class::from($value);
         } catch (\ValueError|\TypeError $e) {
-            throw new BadRequestException(sprintf('Parameter "%s" cannot be converted to enum: %s.', $key, $e->getMessage()), $e->getCode(), $e);
+            throw new BadRequestException(sprintf('Parameter "%s" cannot be converted to enum: "%s".', $key, $e->getMessage()), $e->getCode(), $e);
         }
     }
 

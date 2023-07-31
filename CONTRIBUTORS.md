@@ -163,6 +163,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - marc.weistroff
  - lenar
  - Jesse Rushlow (geeshoe)
+ - Jacob Dreesen (jdreesen)
  - Théo FIDRY
  - Jeroen Spee (jeroens)
  - Michael Babker (mbabker)
@@ -170,7 +171,6 @@ The Symfony Connect username in parenthesis allows to get more information
  - Hugo Alliaume (kocal)
  - Christian Scheb
  - Guillaume (guill)
- - Jacob Dreesen (jdreesen)
  - Olivier Dolbeau (odolbeau)
  - Florian Voutzinos (florianv)
  - zairig imad (zairigimad)

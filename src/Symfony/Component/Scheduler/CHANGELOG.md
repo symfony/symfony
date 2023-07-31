@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Allow setting timezone of next run date in CronExpressionTrigger
+ * Add `AbstractTriggerDecorator`
 
 6.3
 ---

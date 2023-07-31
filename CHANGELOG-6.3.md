@@ -7,6 +7,10 @@ in 6.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.3.0...v6.3.1
 
+* 6.3.3 (2023-07-31)
+
+ * bug #51178 [Finder] Revert "Fix children condition in ExcludeDirectoryFilterIterator" (derrabus)
+
 * 6.3.2 (2023-07-30)
 
  * bug #51138 [Scheduler] Postpone schedule creation (HypeMC)

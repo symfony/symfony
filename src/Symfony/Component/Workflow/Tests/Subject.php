@@ -21,7 +21,7 @@ final class Subject
         $this->marking = $marking;
     }
 
-    public function getMarking(): string|array|null
+    public function getMarking(): string|array|null|MarkingEnum
     {
         return $this->marking;
     }

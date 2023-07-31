@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-07-31T14:30:07Z
+
+we should figure out a proper fix before the stable release
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-07-31T14:45:32Z
+
+> we should figure out a proper fix before the stable release
+
+Indeed, otherwise projects requiring `symfony/symfony` and `symfony/psr-http-message-bridge` will run into interesting problems.

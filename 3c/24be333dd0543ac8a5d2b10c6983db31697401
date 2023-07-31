@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by mvorisek at 2023-07-31T08:15:50Z
+
+A test with 1 symlink to file and 1 symlink to directory should be added and tested with these 6 combinations:
+
+- default
+- `Finder::followSymlinks()`
+
+x
+
+- default
+- `Finder::files()`
+- `Finder::directories()`
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-07-31T08:17:22Z
+
+> A test with 1 symlink to file and 1 symlink to directory should be added
+
+PR welcome for 5.4!

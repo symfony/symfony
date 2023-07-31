@@ -200,7 +200,7 @@ $chatter->send($chatMessage);
 Updating a Slack Message
 ------------------------
 
-First, save the full message ID when sending a message:
+First, save the message ID and channel ID when sending a message:
 
 ```php
 use Symfony\Component\Notifier\Bridge\Slack\SlackSentMessage;
@@ -210,18 +210,19 @@ $sentMessage = $chatter->send(new ChatMessage('Original message'));
 
 // Make sure that Slack transport was used
 if ($sentMessage instanceOf SlackSentMessage) {
-    $fullMessageId = $sentMessage->getFullMessageId();
+    $messageId = $sentMessage->getMessageId();
+    $channelId = $sentMessage->getChannelId();
 }
 ```
 
-Then, use that full message ID to create a new
+Then, use that message ID and channel ID to create a new
 ``UpdateMessageSlackOptions`` class:
 
 ```php
 use Symfony\Component\Notifier\Bridge\Slack\UpdateMessageSlackOptions;
 use Symfony\Component\Notifier\Message\ChatMessage;
 
-$options = new UpdateMessageSlackOptions($fullMessageId);
+$options = new UpdateMessageSlackOptions($channelId, $messageId);
 $chatter->send(new ChatMessage('Updated message', $options));
 ```
 

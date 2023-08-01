@@ -18,11 +18,11 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  *
  * @Annotation
  * @NamedArgumentConstructor
- * @Target({"PROPERTY", "METHOD"})
+ * @Target({"PROPERTY", "METHOD", "CLASS"})
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-#[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY)]
+#[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY | \Attribute::TARGET_CLASS)]
 class Groups
 {
     /**

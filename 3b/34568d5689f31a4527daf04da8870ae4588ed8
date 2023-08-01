@@ -1,0 +1,92 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2023-07-30T21:36:46Z
+
+Do we have any number regarding the performance penalty introduced by this check? As this class is often used to create web APId, we should be careful to not introduce a way to amplify DOS attacks.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2023-07-30T21:53:45Z
+
+Don't we already have this problem when signing in, which is very expensive in Symfony because of password encoding? I wouldn't be too harsh on that point here.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2023-07-31T07:50:24Z
+
+In prod, you'll likely set up some rate limiting for the login endpoint. Having a way to easily consume many resources on every endpoint is a different story.
+
+Also, this feature is only useful during development. In production, it should be disabled as clients should never send invalid JSON anyway, and if they do it's easy to debug using client-side tools (most API development tools, such as Hoppscotch or Postman, include a JSON linter for instance).
+
+I would at least make this feature opt-in through a context flag.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2023-07-31T08:05:47Z
+
+Problem I got inspired by is precisely Postman showing no issues with payload and PHP's json_decode refusing it (because of some invisible leading characters). And frontend dev was connecting to Prod API there. But I guess I could have reported issue to postman instead. Let's close here, I guess it's not too hard to decorate this class anyways.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2023-07-31T08:08:51Z
+
+To clarify I'm not against merging this feature as long as it's opt-in!
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2023-07-31T20:45:48Z
+
+Addressed
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-08-01T05:17:30Z
+
+Just a thought: Can/should we have FrameworkBundle enable this feature if the jsonlint packe is available and debug mode is on?
+
+Alternatively, we could also do this in a recipe.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-08-01T07:15:10Z
+
+> Just a thought: Can/should we have FrameworkBundle enable this feature if the jsonlint packe is available and debug mode is on?
+>
+> Alternatively, we could also do this in a recipe.
+
+@ostrolucky Do you want to implement that in that PR or in a future one?
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2023-08-01T07:32:40Z
+
+> Also, this feature is only useful during development. In production, it should be disabled as clients should never send invalid JSON anyway
+
+Famous last words 😉
+
+In my experience with consumer facing APIs you get quite often amateur level devs integrating things, sometimes writing json by hand, and for them having an API that returns helpful errors can save a bunch of time.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2023-08-01T08:40:48Z
+
+> > Just a thought: Can/should we have FrameworkBundle enable this feature if the jsonlint packe is available and debug mode is on?
+> > Alternatively, we could also do this in a recipe.
+>
+> @ostrolucky Do you want to implement that in that PR or in a future one?
+
+Let's do it in next PR. Do you prefer recipe, or frameworkbundle doing this automatically on kernel.debug + when lib is installed?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-08-01T08:41:39Z
+
+> > > Just a thought: Can/should we have FrameworkBundle enable this feature if the jsonlint packe is available and debug mode is on?
+> > > Alternatively, we could also do this in a recipe.
+> >
+> >
+> > @ostrolucky Do you want to implement that in that PR or in a future one?
+>
+> Let's do it in next PR. Do you prefer recipe, or frameworkbundle doing this automatically on kernel.debug + when lib is installed?
+
+I think I would prefer a framework bundle integration.

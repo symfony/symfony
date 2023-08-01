@@ -208,7 +208,9 @@ class PlantUmlDumper implements DumperInterface
 
         $description = $workflowMetadata->getMetadata('description', $place);
         if (null !== $description) {
-            $output .= \PHP_EOL.$placeEscaped.' : '.str_replace("\n", ' ', $description);
+            foreach (array_filter(explode("\n", $description)) as $line) {
+                $output .= "\n".$placeEscaped.' : '.$line;
+            }
         }
 
         return $output;

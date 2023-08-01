@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by BlackbitDevs at 2022-09-13T08:39:40Z
+
+@nicolas-grekas
+> There's a related failure on Windows, see appveyor.
+Please add a test case also.
+
+Can you point me where the error occurs? Have bit of a problem interprerting https://ci.appveyor.com/project/fabpot/symfony/builds/44759158 - I only see `Command exited with code 1` at the end but not where there is a failing test.
+
+---------------------------------------------------------------------------
+
+by stof at 2022-09-13T08:46:37Z
+
+@BlackbitNeueMedien This is because this URL was showing only the end of the logs, as explained in the banner on top.
+
+Looking at the full logs, I see an issue: https://ci.appveyor.com/project/fabpot/symfony/builds/44759158?fullLog=true#L1706 shows that your new code leaks to stderr
+
+However, I'm still not sure what changes the exit code to a failure one.

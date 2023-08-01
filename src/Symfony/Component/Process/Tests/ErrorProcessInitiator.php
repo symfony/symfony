@@ -14,12 +14,12 @@ namespace Symfony\Component\Process\Tests;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 
-require \dirname(__DIR__).'/vendor/autoload.php';
+require is_file(\dirname(__DIR__).'/vendor/autoload.php') ? \dirname(__DIR__).'/vendor/autoload.php' : \dirname(__DIR__, 5).'/vendor/autoload.php';
 
 ['e' => $php] = getopt('e:') + ['e' => 'php'];
 
 try {
-    $process = new Process("exec $php -r \"echo 'ready'; trigger_error('error', E_USER_ERROR);\"");
+    $process = new Process([$php, '-r', "echo 'ready'; trigger_error('error', E_USER_ERROR);"]);
     $process->start();
     $process->setTimeout(0.5);
     while (!str_contains($process->getOutput(), 'ready')) {

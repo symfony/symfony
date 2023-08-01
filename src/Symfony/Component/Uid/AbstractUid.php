@@ -140,7 +140,7 @@ abstract class AbstractUid implements \JsonSerializable, \Stringable
     /**
      * Returns the identifier as a prefixed hexadecimal case insensitive string.
      *
-     * @example 09748193048a4bfbb8258528cf74fdc1 (len=34)
+     * @example 0x09748193048a4bfbb8258528cf74fdc1 (len=34)
      */
     public function toHex(): string
     {

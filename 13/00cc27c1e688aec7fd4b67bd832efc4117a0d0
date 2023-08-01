@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by stof at 2023-08-01T13:43:41Z
+
+This panel does not collect any info related to the request. It only collect info about the configuration of the project, which will be the same for all requests. In the past, we removed some panels like that.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-08-01T14:24:54Z
+
+I thought about doing everything at runtime (I mean without all the collector stuff). But I changed my mind because the workflow can evolve between 2 requests. And we collect already some information about listener, doctrine entities. API-P does the same with the resources, and so on
+
+And this panel is **really** useful. I'm working on a new projet, with a huge workflow, and it helped me a lot to build the configuration.
+
+And I plan to add more information to it, like the list of all event listeners. This features has been requested in #50976
+
+So I would **be very happy** to get this merged, it'll be a game changer for everyone using the workflow component
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-08-01T14:44:06Z
+
+We already one such panel: "configuration"
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-08-01T14:47:17Z
+
+Note: In future version, this panal will also display more things
+
+* The current marking of the subject (if a call has been made to the workflow obliviously)
+* Current content of `TransitionBlockerList`
+* Perf metrics about all listeners
+
+---
+
+So it could not fit in the configuration panel
+
+It will be something like the security panel : some configuration + some request related content
+
+---------------------------------------------------------------------------
+
+by 94noni at 2023-08-01T15:26:08Z
+
+i also find it useful even if not linked to request/response flow
+reminds me https://github.com/symfony/symfony/issues/39114

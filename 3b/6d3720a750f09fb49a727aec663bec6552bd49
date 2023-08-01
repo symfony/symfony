@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-06-25T10:32:29Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by javaDeveloperKid at 2023-06-25T13:44:33Z
+
+Please modify tests to check it's a status code from the attribute that is thrown.
+
+---------------------------------------------------------------------------
+
+by zim32 at 2023-06-25T17:26:24Z
+
+> Please modify tests to check it's a status code from the attribute that is thrown.
+
+Two tests added, for query and request payload.

@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-07-16T15:43:18Z
+
+It'd be great to not have to configure anything to store using either a property or a method. We're able to do so in the form component. Maybe add an ObjectMarkingStore that relies on property-access? Or if we really want to have standalone logic, implement all this in one single class that can do both?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-07-16T18:44:46Z
+
+It cannot work since we have two things : the marking and a context. The property access component can only work with one value
+
+So we need to recode everything. Add some cache etc. I'm not sure it really worth it. And anyway, we cannot guess the context property so we Will need to have some convention or configuration anyway
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-07-27T11:35:10Z
+
+What about something like that (no need for the "type" option when property is set):
+
+```yaml
+marking_store:
+    property: foo
+```
+
+Then:
+- we use `getFoo()` if it exists, and we use `$obj->foo` otherwise (one of them must be avail).
+- we use `setFoo()` if it exists, and we use `$obj->foo = $state` otherwise (one of them must be avail).
+
+If people want to get the context, we offer only one option: implementing the setter. This enforces an API that legitimately correlates state+context.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-07-27T11:45:07Z
+
+It make sens to me 👍🏼 we can check everything during the compilation
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-07-27T17:27:05Z
+
+I pushed a whole new implementation. There is no change in the bundle configuration.
+
+The current MethodMarkingStore has been updated to support methods or property
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-07-28T09:35:01Z
+
+Thanks for your review. I addressed your comments

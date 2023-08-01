@@ -1272,6 +1272,28 @@ class SerializerTest extends TestCase
         }
     }
 
+    public function testGroupsOnClassSerialization()
+    {
+        $obj = new Fixtures\Attributes\GroupClassDummy();
+        $obj->setFoo('foo');
+        $obj->setBar('bar');
+        $obj->setBaz('baz');
+
+        $serializer = new Serializer(
+            [
+                new ObjectNormalizer(),
+            ],
+            [
+                'json' => new JsonEncoder(),
+            ]
+        );
+
+        $this->assertSame(
+            '{"foo":"foo","bar":"bar","baz":"baz"}',
+            $serializer->serialize($obj, 'json', ['groups' => ['a']])
+        );
+    }
+
     public static function provideCollectDenormalizationErrors(): array
     {
         return [

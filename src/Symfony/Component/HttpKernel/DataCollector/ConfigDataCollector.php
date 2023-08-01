@@ -73,11 +73,6 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
         }
     }
 
-    public function reset(): void
-    {
-        $this->data = [];
-    }
-
     public function lateCollect(): void
     {
         $this->data = $this->cloneVar($this->data);

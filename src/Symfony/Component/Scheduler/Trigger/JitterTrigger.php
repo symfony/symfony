@@ -14,13 +14,14 @@ namespace Symfony\Component\Scheduler\Trigger;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class JitterTrigger implements TriggerInterface
+final class JitterTrigger extends AbstractDecoratedTrigger
 {
     /**
      * @param positive-int $maxSeconds
      */
     public function __construct(private readonly TriggerInterface $trigger, private readonly int $maxSeconds = 60)
     {
+        parent::__construct($trigger);
     }
 
     public function __toString(): string

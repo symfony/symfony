@@ -89,7 +89,7 @@ class MandrillApiTransport extends AbstractApiTransport
                 'text' => $email->getTextBody(),
                 'subject' => $email->getSubject(),
                 'from_email' => $envelope->getSender()->getAddress(),
-                'to' => $this->getRecipients($email, $envelope),
+                'to' => $this->getRecipientsPayload($email, $envelope),
             ],
         ];
 
@@ -144,7 +144,7 @@ class MandrillApiTransport extends AbstractApiTransport
         return $payload;
     }
 
-    protected function getRecipients(Email $email, Envelope $envelope): array
+    private function getRecipientsPayload(Email $email, Envelope $envelope): array
     {
         $recipients = [];
         foreach ($envelope->getRecipients() as $recipient) {

@@ -48,9 +48,9 @@ class MermaidDumperTest extends TestCase
     }
 
     /**
-     * @dataProvider provideStatemachine
+     * @dataProvider provideStateMachine
      */
-    public function testDumpAsStatemachine(Definition $definition, string $expected)
+    public function testDumpAsStateMachine(Definition $definition, string $expected)
     {
         $dumper = new MermaidDumper(MermaidDumper::TRANSITION_TYPE_STATEMACHINE);
 
@@ -71,82 +71,82 @@ class MermaidDumperTest extends TestCase
         $this->assertEquals($expected, $dump);
     }
 
-    public static function provideWorkflowDefinitionWithoutMarking(): array
+    public static function provideWorkflowDefinitionWithoutMarking(): iterable
     {
-        return [
-            [
-                self::createComplexWorkflowDefinition(),
-                "graph LR\n"
-               ."a0([\"a\"])\n"
-               ."b1((\"b\"))\n"
-               ."c2((\"c\"))\n"
-               ."d3((\"d\"))\n"
-               ."e4((\"e\"))\n"
-               ."f5((\"f\"))\n"
-               ."g6((\"g\"))\n"
-               ."transition0[\"t1\"]\n"
-               ."a0-->transition0\n"
-               ."transition0-->b1\n"
-               ."transition0-->c2\n"
-               ."transition1[\"t2\"]\n"
-               ."b1-->transition1\n"
-               ."transition1-->d3\n"
-               ."c2-->transition1\n"
-               ."transition2[\"My custom transition label 1\"]\n"
-               ."d3-->transition2\n"
-               ."linkStyle 6 stroke:Red\n"
-               ."transition2-->e4\n"
-               ."linkStyle 7 stroke:Red\n"
-               ."transition3[\"t4\"]\n"
-               ."d3-->transition3\n"
-               ."transition3-->f5\n"
-               ."transition4[\"t5\"]\n"
-               ."e4-->transition4\n"
-               ."transition4-->g6\n"
-               ."transition5[\"t6\"]\n"
-               ."f5-->transition5\n"
-               .'transition5-->g6',
-            ],
-            [
-                self::createWorkflowWithSameNameTransition(),
-                "graph LR\n"
-               ."a0([\"a\"])\n"
-               ."b1((\"b\"))\n"
-               ."c2((\"c\"))\n"
-               ."transition0[\"a_to_bc\"]\n"
-               ."a0-->transition0\n"
-               ."transition0-->b1\n"
-               ."transition0-->c2\n"
-               ."transition1[\"b_to_c\"]\n"
-               ."b1-->transition1\n"
-               ."transition1-->c2\n"
-               ."transition2[\"to_a\"]\n"
-               ."b1-->transition2\n"
-               ."transition2-->a0\n"
-               ."transition3[\"to_a\"]\n"
-               ."c2-->transition3\n"
-               .'transition3-->a0',
-            ],
-            [
-                self::createSimpleWorkflowDefinition(),
-                "graph LR\n"
-               ."a0([\"a\"])\n"
-               ."b1((\"b\"))\n"
-               ."c2((\"c\"))\n"
-               ."style c2 fill:DeepSkyBlue\n"
-               ."transition0[\"My custom transition label 2\"]\n"
-               ."a0-->transition0\n"
-               ."linkStyle 0 stroke:Grey\n"
-               ."transition0-->b1\n"
-               ."linkStyle 1 stroke:Grey\n"
-               ."transition1[\"t2\"]\n"
-               ."b1-->transition1\n"
-               .'transition1-->c2',
-            ],
+        yield [
+            self::createComplexWorkflowDefinition(),
+            "graph LR\n"
+            ."place0([\"a\"])\n"
+            ."place1((\"b\"))\n"
+            ."place2((\"c\"))\n"
+            ."place3((\"d\"))\n"
+            ."place4((\"e\"))\n"
+            ."place5((\"f\"))\n"
+            ."place6((\"g\"))\n"
+            ."transition0[\"t1\"]\n"
+            ."place0-->transition0\n"
+            ."transition0-->place1\n"
+            ."transition0-->place2\n"
+            ."transition1[\"t2\"]\n"
+            ."place1-->transition1\n"
+            ."transition1-->place3\n"
+            ."place2-->transition1\n"
+            ."transition2[\"My custom transition label 1\"]\n"
+            ."place3-->transition2\n"
+            ."linkStyle 6 stroke:Red\n"
+            ."transition2-->place4\n"
+            ."linkStyle 7 stroke:Red\n"
+            ."transition3[\"t4\"]\n"
+            ."place3-->transition3\n"
+            ."transition3-->place5\n"
+            ."transition4[\"t5\"]\n"
+            ."place4-->transition4\n"
+            ."transition4-->place6\n"
+            ."transition5[\"t6\"]\n"
+            ."place5-->transition5\n"
+            ."transition5-->place6"
+
+        ];
+        yield [
+            self::createWorkflowWithSameNameTransition(),
+            "graph LR\n"
+            ."place0([\"a\"])\n"
+            ."place1((\"b\"))\n"
+            ."place2((\"c\"))\n"
+            ."transition0[\"a_to_bc\"]\n"
+            ."place0-->transition0\n"
+            ."transition0-->place1\n"
+            ."transition0-->place2\n"
+            ."transition1[\"b_to_c\"]\n"
+            ."place1-->transition1\n"
+            ."transition1-->place2\n"
+            ."transition2[\"to_a\"]\n"
+            ."place1-->transition2\n"
+            ."transition2-->place0\n"
+            ."transition3[\"to_a\"]\n"
+            ."place2-->transition3\n"
+            ."transition3-->place0"
+
+        ];
+        yield [
+            self::createSimpleWorkflowDefinition(),
+            "graph LR\n"
+            ."place0([\"a\"])\n"
+            ."place1((\"b\"))\n"
+            ."place2((\"c\"))\n"
+            ."style place2 fill:DeepSkyBlue\n"
+            ."transition0[\"My custom transition label 2\"]\n"
+            ."place0-->transition0\n"
+            ."linkStyle 0 stroke:Grey\n"
+            ."transition0-->place1\n"
+            ."linkStyle 1 stroke:Grey\n"
+            ."transition1[\"t2\"]\n"
+            ."place1-->transition1\n"
+            ."transition1-->place2"
         ];
     }
 
-    public static function provideWorkflowWithReservedWords(): array
+    public static function provideWorkflowWithReservedWords(): iterable
     {
         $builder = new DefinitionBuilder();
 
@@ -158,69 +158,66 @@ class MermaidDumperTest extends TestCase
 
         $definition = $builder->build();
 
-        return [
-            [
-                $definition,
-                "graph LR\n"
-               ."start0([\"start\"])\n"
-               ."subgraph1((\"subgraph\"))\n"
-               ."end2((\"end\"))\n"
-               ."finis3((\"finis\"))\n"
-               ."transition0[\"t0\"]\n"
-               ."start0-->transition0\n"
-               ."transition0-->end2\n"
-               ."subgraph1-->transition0\n"
-               ."transition1[\"t1\"]\n"
-               ."end2-->transition1\n"
-               .'transition1-->finis3',
-            ],
+        yield [
+            $definition,
+            "graph LR\n"
+            ."place0([\"start\"])\n"
+            ."place1((\"subgraph\"))\n"
+            ."place2((\"end\"))\n"
+            ."place3((\"finis\"))\n"
+            ."transition0[\"t0\"]\n"
+            ."place0-->transition0\n"
+            ."transition0-->place2\n"
+            ."place1-->transition0\n"
+            ."transition1[\"t1\"]\n"
+            ."place2-->transition1\n"
+            ."transition1-->place3"
+
         ];
     }
 
-    public static function provideStatemachine(): array
+    public static function provideStateMachine(): iterable
     {
-        return [
-            [
-                self::createComplexStateMachineDefinition(),
-                "graph LR\n"
-               ."a0([\"a\"])\n"
-               ."b1((\"b\"))\n"
-               ."c2((\"c\"))\n"
-               ."d3((\"d\"))\n"
-               ."a0-->|\"t1\"|b1\n"
-               ."d3-->|\"My custom transition label 3\"|b1\n"
-               ."linkStyle 1 stroke:Grey\n"
-               ."b1-->|\"t2\"|c2\n"
-               .'b1-->|"t3"|d3',
-            ],
+        yield [
+            self::createComplexStateMachineDefinition(),
+            "graph LR\n"
+            ."place0([\"a\"])\n"
+            ."place1((\"b\"))\n"
+            ."place2((\"c\"))\n"
+            ."place3((\"d\"))\n"
+            ."place0-->|\"t1\"|place1\n"
+            ."place3-->|\"My custom transition label 3\"|place1\n"
+            ."linkStyle 1 stroke:Grey\n"
+            ."place1-->|\"t2\"|place2\n"
+            ."place1-->|\"t3\"|place3"
+
         ];
     }
 
-    public static function provideWorkflowWithMarking(): array
+    public static function provideWorkflowWithMarking(): iterable
     {
         $marking = new Marking();
         $marking->mark('b');
         $marking->mark('c');
 
-        return [
-            [
-                self::createSimpleWorkflowDefinition(),
-                $marking,
-                "graph LR\n"
-                ."a0([\"a\"])\n"
-                ."b1((\"b\"))\n"
-                ."style b1 stroke-width:4px\n"
-                ."c2((\"c\"))\n"
-                ."style c2 fill:DeepSkyBlue,stroke-width:4px\n"
-                ."transition0[\"My custom transition label 2\"]\n"
-                ."a0-->transition0\n"
-                ."linkStyle 0 stroke:Grey\n"
-                ."transition0-->b1\n"
-                ."linkStyle 1 stroke:Grey\n"
-                ."transition1[\"t2\"]\n"
-                ."b1-->transition1\n"
-                .'transition1-->c2',
-            ],
+        yield [
+            self::createSimpleWorkflowDefinition(),
+            $marking,
+            "graph LR\n"
+            ."place0([\"a\"])\n"
+            ."place1((\"b\"))\n"
+            ."style place1 stroke-width:4px\n"
+            ."place2((\"c\"))\n"
+            ."style place2 fill:DeepSkyBlue,stroke-width:4px\n"
+            ."transition0[\"My custom transition label 2\"]\n"
+            ."place0-->transition0\n"
+            ."linkStyle 0 stroke:Grey\n"
+            ."transition0-->place1\n"
+            ."linkStyle 1 stroke:Grey\n"
+            ."transition1[\"t2\"]\n"
+            ."place1-->transition1\n"
+            ."transition1-->place2"
+
         ];
     }
 }

@@ -124,7 +124,7 @@ class RequestPayloadValueResolverTest extends TestCase
 
         $resolver->onKernelControllerArguments($event);
 
-        $this->assertEquals([null], $event->getArguments());
+        $this->assertSame([null], $event->getArguments());
     }
 
     public function testQueryNullableValueArgument()
@@ -251,6 +251,7 @@ class RequestPayloadValueResolverTest extends TestCase
             $this->fail(sprintf('Expected "%s" to be thrown.', HttpException::class));
         } catch (HttpException $e) {
             $validationFailedException = $e->getPrevious();
+            $this->assertSame(404, $e->getStatusCode());
             $this->assertInstanceOf(ValidationFailedException::class, $validationFailedException);
             $this->assertSame('This value should be of type unknown.', $validationFailedException->getViolations()[0]->getMessage());
             $this->assertSame('Test', $validationFailedException->getViolations()[1]->getMessage());
@@ -601,6 +602,73 @@ class RequestPayloadValueResolverTest extends TestCase
             new MapQueryString(validationGroups: new Assert\GroupSequence(['strict'])),
         ];
     }
+
+    public function testQueryValidationErrorCustomStatusCode()
+    {
+        $serializer = new Serializer([new ObjectNormalizer()], []);
+
+        $validator = $this->createMock(ValidatorInterface::class);
+
+        $validator->expects($this->once())
+            ->method('validate')
+            ->willReturn(new ConstraintViolationList([new ConstraintViolation('Page is invalid', null, [], '', null, '')]));
+
+        $resolver = new RequestPayloadValueResolver($serializer, $validator);
+
+        $argument = new ArgumentMetadata('page', QueryPayload::class, false, false, null, false, [
+            MapQueryString::class => new MapQueryString(validationFailedStatusCode: 400),
+        ]);
+        $request = Request::create('/?page=123');
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        try {
+            $resolver->onKernelControllerArguments($event);
+            $this->fail(sprintf('Expected "%s" to be thrown.', HttpException::class));
+        } catch (HttpException $e) {
+            $validationFailedException = $e->getPrevious();
+            $this->assertSame(400, $e->getStatusCode());
+            $this->assertInstanceOf(ValidationFailedException::class, $validationFailedException);
+            $this->assertSame('Page is invalid', $validationFailedException->getViolations()[0]->getMessage());
+        }
+    }
+
+    public function testRequestPayloadValidationErrorCustomStatusCode()
+    {
+        $content = '{"price": 50, "title": ["not a string"]}';
+        $payload = new RequestPayload(50);
+        $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+
+        $validator = $this->createMock(ValidatorInterface::class);
+        $validator->expects($this->once())
+            ->method('validate')
+            ->with($payload)
+            ->willReturn(new ConstraintViolationList([new ConstraintViolation('Test', null, [], '', null, '')]));
+
+        $resolver = new RequestPayloadValueResolver($serializer, $validator);
+
+        $argument = new ArgumentMetadata('invalid', RequestPayload::class, false, false, null, false, [
+            MapRequestPayload::class => new MapRequestPayload(validationFailedStatusCode: 400),
+        ]);
+        $request = Request::create('/', 'POST', server: ['CONTENT_TYPE' => 'application/json'], content: $content);
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        try {
+            $resolver->onKernelControllerArguments($event);
+            $this->fail(sprintf('Expected "%s" to be thrown.', HttpException::class));
+        } catch (HttpException $e) {
+            $validationFailedException = $e->getPrevious();
+            $this->assertSame(400, $e->getStatusCode());
+            $this->assertInstanceOf(ValidationFailedException::class, $validationFailedException);
+            $this->assertSame('This value should be of type unknown.', $validationFailedException->getViolations()[0]->getMessage());
+            $this->assertSame('Test', $validationFailedException->getViolations()[1]->getMessage());
+        }
+    }
 }
 
 class RequestPayload
@@ -609,6 +677,13 @@ class RequestPayload
     public string $title;
 
     public function __construct(public readonly float $price)
+    {
+    }
+}
+
+class QueryPayload
+{
+    public function __construct(public readonly float $page)
     {
     }
 }

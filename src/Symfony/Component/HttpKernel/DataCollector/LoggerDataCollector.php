@@ -51,7 +51,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         if (isset($this->logger)) {
             $this->logger->clear();
         }
-        $this->data = [];
+        parent::reset();
     }
 
     public function lateCollect(): void

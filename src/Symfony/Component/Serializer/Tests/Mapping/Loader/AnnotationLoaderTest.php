@@ -201,6 +201,24 @@ class AnnotationLoaderTest extends TestCase
         self::assertArrayHasKey('extraValue2', $attributes);
     }
 
+    public function testLoadGroupsOnClass()
+    {
+        $classMetadata = new ClassMetadata($this->getNamespace().'\GroupClassDummy');
+        $this->loader->loadClassMetadata($classMetadata);
+
+        $attributesMetadata = $classMetadata->getAttributesMetadata();
+
+        self::assertCount(3, $classMetadata->getAttributesMetadata());
+
+        self::assertArrayHasKey('foo', $attributesMetadata);
+        self::assertArrayHasKey('bar', $attributesMetadata);
+        self::assertArrayHasKey('baz', $attributesMetadata);
+
+        self::assertSame(['a', 'b'], $attributesMetadata['foo']->getGroups());
+        self::assertSame(['a', 'c', 'd'], $attributesMetadata['bar']->getGroups());
+        self::assertSame(['a'], $attributesMetadata['baz']->getGroups());
+    }
+
     public function testLoadWithInvalidAttribute()
     {
         $this->expectException(MappingException::class);

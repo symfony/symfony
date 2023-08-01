@@ -1,6 +1,11 @@
 UPGRADE FROM 6.3 to 6.4
 =======================
 
+BrowserKit
+----------
+
+ * Add argument `$serverParameters` to `AbstractBrowser::click()` and `AbstractBrowser::clickLink()`
+
 Cache
 -----
 

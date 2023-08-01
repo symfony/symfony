@@ -7,6 +7,11 @@ CHANGELOG
  * Remove `PhpStringTokenParser`
  * Remove `PhpExtractor` in favor of `PhpAstExtractor`
 
+6.3
+---
+
+ * Add `PhraseTranslationProvider`
+
 6.2.7
 -----
 

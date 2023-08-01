@@ -88,10 +88,10 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
         foreach ($arguments as $i => $argument) {
             if ($argument instanceof MapQueryString) {
                 $payloadMapper = 'mapQueryString';
-                $validationFailedCode = Response::HTTP_NOT_FOUND;
+                $validationFailedCode = $argument->validationFailedStatusCode;
             } elseif ($argument instanceof MapRequestPayload) {
                 $payloadMapper = 'mapRequestPayload';
-                $validationFailedCode = Response::HTTP_UNPROCESSABLE_ENTITY;
+                $validationFailedCode = $argument->validationFailedStatusCode;
             } else {
                 continue;
             }

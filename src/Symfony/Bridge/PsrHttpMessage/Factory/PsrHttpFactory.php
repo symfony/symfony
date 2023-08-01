@@ -11,6 +11,8 @@
 
 namespace Symfony\Bridge\PsrHttpMessage\Factory;
 
+use Http\Discovery\Psr17Factory as DiscoveryPsr17Factory;
+use Nyholm\Psr7\Factory\Psr17Factory as NyholmPsr17Factory;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
@@ -33,12 +35,34 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 class PsrHttpFactory implements HttpMessageFactoryInterface
 {
+    private readonly ServerRequestFactoryInterface $serverRequestFactory;
+    private readonly StreamFactoryInterface $streamFactory;
+    private readonly UploadedFileFactoryInterface $uploadedFileFactory;
+    private readonly ResponseFactoryInterface $responseFactory;
+
     public function __construct(
-        private readonly ServerRequestFactoryInterface $serverRequestFactory,
-        private readonly StreamFactoryInterface $streamFactory,
-        private readonly UploadedFileFactoryInterface $uploadedFileFactory,
-        private readonly ResponseFactoryInterface $responseFactory,
+        ServerRequestFactoryInterface $serverRequestFactory = null,
+        StreamFactoryInterface $streamFactory = null,
+        UploadedFileFactoryInterface $uploadedFileFactory = null,
+        ResponseFactoryInterface $responseFactory = null,
     ) {
+        if (null === $serverRequestFactory || null === $streamFactory || null === $uploadedFileFactory || null === $responseFactory) {
+            $psr17Factory = match (true) {
+                class_exists(DiscoveryPsr17Factory::class) => new DiscoveryPsr17Factory(),
+                class_exists(NyholmPsr17Factory::class) => new NyholmPsr17Factory(),
+                default => throw new \LogicException(sprintf('You cannot use the "%s" as no PSR-17 factories have been provided. Try running "composer require php-http/discovery psr/http-factory-implementation:*".', self::class)),
+            };
+
+            $serverRequestFactory ??= $psr17Factory;
+            $streamFactory ??= $psr17Factory;
+            $uploadedFileFactory ??= $psr17Factory;
+            $responseFactory ??= $psr17Factory;
+        }
+
+        $this->serverRequestFactory = $serverRequestFactory;
+        $this->streamFactory = $streamFactory;
+        $this->uploadedFileFactory = $uploadedFileFactory;
+        $this->responseFactory = $responseFactory;
     }
 
     public function createRequest(Request $symfonyRequest): ServerRequestInterface

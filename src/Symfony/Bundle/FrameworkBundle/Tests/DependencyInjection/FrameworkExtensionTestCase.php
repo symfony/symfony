@@ -74,6 +74,7 @@ use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\FormErrorNormalizer;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\TranslatableNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Translation\LocaleSwitcher;
@@ -1522,6 +1523,18 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertEquals(ConstraintViolationListNormalizer::class, $definition->getClass());
         $this->assertEquals(-915, $tag[0]['priority']);
         $this->assertEquals(new Reference('serializer.name_converter.metadata_aware'), $definition->getArgument(1));
+    }
+
+    public function testTranslatableNormalizerRegistered()
+    {
+        $container = $this->createContainerFromFile('full');
+
+        $definition = $container->getDefinition('serializer.normalizer.translatable');
+        $tag = $definition->getTag('serializer.normalizer');
+
+        $this->assertSame(TranslatableNormalizer::class, $definition->getClass());
+        $this->assertSame(-890, $tag[0]['priority']);
+        $this->assertEquals(new Reference('translator'), $definition->getArgument('$translator'));
     }
 
     public function testSerializerCacheActivated()

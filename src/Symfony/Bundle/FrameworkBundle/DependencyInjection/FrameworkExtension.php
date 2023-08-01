@@ -271,6 +271,7 @@ class FrameworkExtension extends Extension
         $this->readConfigEnabled('translator', $container, $config['translator']);
         $this->readConfigEnabled('property_access', $container, $config['property_access']);
         $this->readConfigEnabled('profiler', $container, $config['profiler']);
+        $this->readConfigEnabled('workflows', $container, $config['workflows']);
 
         // A translator must always be registered (as support is included by
         // default in the Form and Validator component). If disabled, an identity
@@ -860,6 +861,10 @@ class FrameworkExtension extends Extension
 
         if ($this->isInitializedConfigEnabled('mailer')) {
             $loader->load('mailer_debug.php');
+        }
+
+        if ($this->isInitializedConfigEnabled('workflows')) {
+            $loader->load('workflow_debug.php');
         }
 
         if ($this->isInitializedConfigEnabled('http_client')) {
@@ -1531,6 +1536,7 @@ class FrameworkExtension extends Extension
             TranslationBridge\Crowdin\CrowdinProviderFactory::class => 'translation.provider_factory.crowdin',
             TranslationBridge\Loco\LocoProviderFactory::class => 'translation.provider_factory.loco',
             TranslationBridge\Lokalise\LokaliseProviderFactory::class => 'translation.provider_factory.lokalise',
+            PhraseProviderFactory::class => 'translation.provider_factory.phrase',
         ];
 
         $parentPackages = ['symfony/framework-bundle', 'symfony/translation', 'symfony/http-client'];
@@ -1815,6 +1821,10 @@ class FrameworkExtension extends Extension
 
         if (!class_exists(Headers::class)) {
             $container->removeDefinition('serializer.normalizer.mime_message');
+        }
+
+        if (!class_exists(Translator::class)) {
+            $container->removeDefinition('serializer.normalizer.translatable');
         }
 
         // compat with Symfony < 6.3

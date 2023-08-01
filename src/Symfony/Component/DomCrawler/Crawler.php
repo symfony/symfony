@@ -564,7 +564,7 @@ class Crawler implements \Countable, \IteratorAggregate
     public function innerText(bool $normalizeWhitespace = true): string
     {
         foreach ($this->getNode(0)->childNodes as $childNode) {
-            if (\XML_TEXT_NODE !== $childNode->nodeType) {
+            if (\XML_TEXT_NODE !== $childNode->nodeType && \XML_CDATA_SECTION_NODE !== $childNode->nodeType) {
                 continue;
             }
             if (!$normalizeWhitespace) {

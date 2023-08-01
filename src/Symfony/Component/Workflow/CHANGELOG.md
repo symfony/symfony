@@ -11,6 +11,8 @@ CHANGELOG
 
  * Add `with-metadata` option to the `workflow:dump` command to include places,
    transitions and workflow's metadata into dumped graph
+ * Add support for storing marking in a property
+ * Add a profiler
 
 6.2
 ---

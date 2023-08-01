@@ -29,9 +29,10 @@ class MethodMarkingStoreTest extends TestCase
 
         $marking->mark('first_place');
 
-        $markingStore->setMarking($subject, $marking);
+        $markingStore->setMarking($subject, $marking, ['foo' => 'bar']);
 
         $this->assertSame(['first_place' => 1], $subject->getMarking());
+        $this->assertSame(['foo' => 'bar'], $subject->getContext());
 
         $marking2 = $markingStore->getMarking($subject);
 
@@ -50,11 +51,12 @@ class MethodMarkingStoreTest extends TestCase
 
         $marking->mark('first_place');
 
-        $markingStore->setMarking($subject, $marking);
+        $markingStore->setMarking($subject, $marking, ['foo' => 'bar']);
 
         $this->assertSame('first_place', $subject->getMarking());
 
         $marking2 = $markingStore->getMarking($subject);
+        $this->assertSame(['foo' => 'bar'], $subject->getContext());
 
         $this->assertEquals($marking, $marking2);
     }

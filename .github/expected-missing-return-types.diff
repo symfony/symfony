@@ -7,38 +7,40 @@ git checkout src/Symfony/Contracts/Service/ResetInterface.php
 (echo "$head" && echo && git diff -U2 src/ | grep '^index ' -v) > .github/expected-missing-return-types.diff
 git checkout composer.json src/
 
+<<<<<<< HEAD
+
 diff --git a/src/Symfony/Component/BrowserKit/AbstractBrowser.php b/src/Symfony/Component/BrowserKit/AbstractBrowser.php
 --- a/src/Symfony/Component/BrowserKit/AbstractBrowser.php
 +++ b/src/Symfony/Component/BrowserKit/AbstractBrowser.php
-@@ -404,5 +404,5 @@ abstract class AbstractBrowser
+@@ -411,5 +411,5 @@ abstract class AbstractBrowser
       * @throws \RuntimeException When processing returns exit code
       */
 -    protected function doRequestInProcess(object $request)
 +    protected function doRequestInProcess(object $request): object
      {
          $deprecationsFile = tempnam(sys_get_temp_dir(), 'deprec');
-@@ -437,5 +437,5 @@ abstract class AbstractBrowser
+@@ -444,5 +444,5 @@ abstract class AbstractBrowser
       * @return object
       */
 -    abstract protected function doRequest(object $request);
 +    abstract protected function doRequest(object $request): object;
  
      /**
-@@ -448,5 +448,5 @@ abstract class AbstractBrowser
+@@ -455,5 +455,5 @@ abstract class AbstractBrowser
       * @throws LogicException When this abstract class is not implemented
       */
 -    protected function getScript(object $request)
 +    protected function getScript(object $request): string
      {
          throw new LogicException('To insulate requests, you need to override the getScript() method.');
-@@ -458,5 +458,5 @@ abstract class AbstractBrowser
+@@ -465,5 +465,5 @@ abstract class AbstractBrowser
       * @return object
       */
 -    protected function filterRequest(Request $request)
 +    protected function filterRequest(Request $request): object
      {
          return $request;
-@@ -468,5 +468,5 @@ abstract class AbstractBrowser
+@@ -475,5 +475,5 @@ abstract class AbstractBrowser
       * @return Response
       */
 -    protected function filterResponse(object $response)
@@ -340,6 +342,16 @@ diff --git a/src/Symfony/Component/HttpKernel/Bundle/BundleInterface.php b/src/S
 +    public function build(ContainerBuilder $container): void;
  
      /**
+diff --git a/src/Symfony/Component/HttpKernel/DataCollector/DataCollector.php b/src/Symfony/Component/HttpKernel/DataCollector/DataCollector.php
+--- a/src/Symfony/Component/HttpKernel/DataCollector/DataCollector.php
++++ b/src/Symfony/Component/HttpKernel/DataCollector/DataCollector.php
+@@ -101,5 +101,5 @@ abstract class DataCollector implements DataCollectorInterface
+      * @return void
+      */
+-    public function reset()
++    public function reset(): void
+     {
+         $this->data = [];
 diff --git a/src/Symfony/Component/HttpKernel/DataCollector/DataCollectorInterface.php b/src/Symfony/Component/HttpKernel/DataCollector/DataCollectorInterface.php
 --- a/src/Symfony/Component/HttpKernel/DataCollector/DataCollectorInterface.php
 +++ b/src/Symfony/Component/HttpKernel/DataCollector/DataCollectorInterface.php

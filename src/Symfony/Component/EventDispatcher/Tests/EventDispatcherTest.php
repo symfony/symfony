@@ -189,6 +189,42 @@ class EventDispatcherTest extends TestCase
         $this->assertEquals(['3', '2', '1'], $invoked);
     }
 
+    public function testAddListenerDuringAddListener()
+    {
+        $listener1 = new CallableClass();
+        $listener2 = new CallableClass();
+        $listener3 = new CallableClass();
+        $listener4 = new CallableClass();
+
+        $dispatcher = $this->dispatcher;
+        $listener3Callback = function () use ($dispatcher, $listener4, $listener3) {
+            // Child event dispatcher use sorting: This callback is executed in the nested foreach in sortListeners and resets the $sorted-array during that loop.
+            // I.e. listener1 and listener2 that were already added get discarded. listener3 is added, and so is the newly added listener4.
+            // At the end of sortListeners, $sorted[$eventName] only contains listener3 and listener4.
+
+            // Regular event dispatcher uses optimizing: This callback is executed during the first time of callListeners.
+            // addListener unsets $optimized[$eventName], but that does not seem to have any effect. As such listener4 is never executed.
+
+            $dispatcher->addListener(self::preFoo, $listener4);
+
+            return $listener3;
+        };
+
+        $this->dispatcher->addListener(self::preFoo, $listener1);
+        $this->dispatcher->addListener(self::preFoo, $listener2);
+        $this->dispatcher->addListener(self::preFoo, [$listener3Callback, '__invoke']);
+
+        $this->dispatcher->dispatch(new Event(), self::preFoo);
+        $this->dispatcher->dispatch(new Event(), self::preFoo);
+
+        $this->assertEquals(2, $listener3->invokeCount, 'Listener 3 should have been called twice');
+        $this->assertEquals(2, $listener2->invokeCount, 'Listener 2 should have been called twice');
+        $this->assertEquals(2, $listener1->invokeCount, 'Listener 1 should have been called twice');
+
+        // It is debatable whether listener 4 should be called once or twice since it is only added when listener 3 is created
+        $this->assertGreaterThanOrEqual(1, $listener4->invokeCount, 'Listener 4 should have been called at least once');
+    }
+
     public function testRemoveListener()
     {
         $this->dispatcher->addListener('pre.bar', $this->listener);
@@ -439,8 +475,11 @@ class EventDispatcherTest extends TestCase
 
 class CallableClass
 {
+    public $invokeCount = 0;
+
     public function __invoke()
     {
+        $this->invokeCount++;
     }
 }
 

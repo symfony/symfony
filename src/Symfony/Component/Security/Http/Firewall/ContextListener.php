@@ -302,10 +302,6 @@ class ContextListener extends AbstractListener
 
         $userRoles = array_map('strval', (array) $refreshedUser->getRoles());
 
-        if ($refreshedToken instanceof SwitchUserToken) {
-            $userRoles[] = 'ROLE_PREVIOUS_ADMIN';
-        }
-
         if (
             \count($userRoles) !== \count($refreshedToken->getRoleNames())
             || \count($userRoles) !== \count(array_intersect($userRoles, $refreshedToken->getRoleNames()))

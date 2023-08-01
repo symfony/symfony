@@ -1523,6 +1523,10 @@ class ProcessTest extends TestCase
         $process->setTimeout(2);
         $process->wait();
         $this->assertFalse($process->isRunning());
+
+        if ('\\' !== \DIRECTORY_SEPARATOR) {
+            $this->assertSame(0, $process->getExitCode());
+        }
     }
 
     public function testEnvCaseInsensitiveOnWindows()

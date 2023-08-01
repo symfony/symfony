@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by maxbeckers at 2022-10-29T06:43:09Z
+
+Hi @ThomasLandauer, did you see, there are failed a lot of related tests. And there is a space before the ` >` what's not needed i guess.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-12-09T08:08:05Z
+
+@ThomasLandauer Do you have time to fix the tests?
+
+---------------------------------------------------------------------------
+
+by ThomasLandauer at 2022-12-09T12:35:43Z
+
+I'm not sure. The tests are based on `DOMDocument::loadXML()`, which probably needs to be switched to `::loadHTML()`?! But there's some stuff going on that I don't understand, e.g.:
+```php
+// Wrap in <root> node so we can load HTML with multiple tags at
+// the top level
+$dom->loadXML('<root>'.$html.'</root>');
+```
+
+So if I should do it, I'd need somebody to take me by the hand...

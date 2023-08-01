@@ -60,6 +60,7 @@ class SerializerTest extends AbstractWebTestCase
             ['serializer.normalizer.json_serializable.alias'],
             ['serializer.normalizer.problem.alias'],
             ['serializer.normalizer.uid.alias'],
+            ['serializer.normalizer.translatable.alias'],
             ['serializer.normalizer.object.alias'],
             ['serializer.encoder.xml.alias'],
             ['serializer.encoder.yaml.alias'],

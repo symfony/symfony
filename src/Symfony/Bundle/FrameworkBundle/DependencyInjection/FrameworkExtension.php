@@ -1894,6 +1894,10 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('serializer.normalizer.mime_message');
         }
 
+        if (!class_exists(Translator::class)) {
+            $container->removeDefinition('serializer.normalizer.translatable');
+        }
+
         // compat with Symfony < 6.3
         if (!is_subclass_of(ProblemNormalizer::class, SerializerAwareInterface::class)) {
             $container->getDefinition('serializer.normalizer.problem')

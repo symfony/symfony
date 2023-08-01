@@ -39,6 +39,10 @@ services:
         alias: serializer.normalizer.uid
         public: true
 
+    serializer.normalizer.translatable.alias:
+        alias: serializer.normalizer.translatable
+        public: true
+
     serializer.normalizer.property.alias:
         alias: serializer.normalizer.property
         public: true

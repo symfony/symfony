@@ -1,0 +1,74 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-03-03T21:01:25Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-03-03T21:01:49Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.3 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2023-07-10T11:00:31Z
+
+I suggest to not support the annotation `@Groups({"a"})`, and only support the attribute `#[Groups('a')]`.
+
+See:
+
+- #49369
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-07-26T18:58:45Z
+
+Open to finish this PR?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-07-27T09:46:35Z
+
+> I suggest to not support the annotation `@Groups({"a"})`, and only support the attribute `#[Groups('a')]`.
+
+Because of the way we merge annotations and attributes on the reader level already, it might be more complicated to exclude Doctrine Annotations from this feature than to just support them.
+
+---------------------------------------------------------------------------
+
+by Brajk19 at 2023-07-27T11:15:15Z
+
+> > I suggest to not support the annotation `@Groups({"a"})`, and only support the attribute `#[Groups('a')]`.
+>
+> Because of the way we merge annotations and attributes on the reader level already, it might be more complicated to exclude Doctrine Annotations from this feature than to just support them.
+
+Agreed. I'll leave it as is then.

@@ -16,7 +16,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Symfony\Component\Workflow\Dumper\MermaidDumper;
-use Symfony\Component\Workflow\StateMachine;
 
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
@@ -35,8 +34,9 @@ final class WorkflowDataCollector extends DataCollector implements LateDataColle
     public function lateCollect(): void
     {
         foreach ($this->workflows as $workflow) {
-            $type = $workflow instanceof StateMachine ? MermaidDumper::TRANSITION_TYPE_STATEMACHINE : MermaidDumper::TRANSITION_TYPE_WORKFLOW;
-            $dumper = new MermaidDumper($type);
+            // We always use a workflow type because we want to mermaid to
+            // create a node for transitions
+            $dumper = new MermaidDumper(MermaidDumper::TRANSITION_TYPE_WORKFLOW);
             $this->data['workflows'][$workflow->getName()] = [
                 'dump' => $dumper->dump($workflow->getDefinition()),
             ];

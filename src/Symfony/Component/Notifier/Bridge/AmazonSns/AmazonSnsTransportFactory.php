@@ -31,8 +31,7 @@ final class AmazonSnsTransportFactory extends AbstractTransportFactory
 
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
-        $sslmode = $dsn->getOption('sslmode', 'enable');
-        $protocol = $sslmode === 'disable' ? 'http' : 'https';
+        $protocol = 'disable' === $dsn->getOption('sslmode') ? 'http' : 'https';
 
         $options = null === $host ? [] : ['endpoint' => $protocol.'://'.$host.($port ? ':'.$port : '')];
 

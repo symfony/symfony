@@ -11,6 +11,7 @@ CHANGELOG
  * Deprecate `ValidatorBuilder::setDoctrineAnnotationReader()`
  * Deprecate `ValidatorBuilder::addDefaultDoctrineAnnotationReader()`
  * Add `number`, `finite-number` and `finite-float` types to `Type` constraint
+ * Add the `withSeconds` option to the `Time` constraint that allows to pass time without seconds
 
 6.3
 ---

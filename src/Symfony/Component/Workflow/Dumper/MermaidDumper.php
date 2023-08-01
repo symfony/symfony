@@ -77,7 +77,7 @@ class MermaidDumper implements DumperInterface
         $meta = $definition->getMetadataStore();
 
         foreach ($definition->getPlaces() as $place) {
-            [$placeNode, $placeStyle] = $this->preparePlace(
+            [$placeNodeName, $placeNode, $placeStyle] = $this->preparePlace(
                 $placeId,
                 $place,
                 $meta->getPlaceMetadata($place),
@@ -91,7 +91,7 @@ class MermaidDumper implements DumperInterface
                 $output[] = $placeStyle;
             }
 
-            $placeNameMap[$place] = $place.$placeId;
+            $placeNameMap[$place] = $placeNodeName;
 
             ++$placeId;
         }
@@ -161,13 +161,13 @@ class MermaidDumper implements DumperInterface
             $labelShape = '([%s])';
         }
 
-        $placeNodeName = $placeName.$placeId;
+        $placeNodeName = 'place'.$placeId;
         $placeNodeFormat = '%s'.$labelShape;
         $placeNode = sprintf($placeNodeFormat, $placeNodeName, $placeLabel);
 
         $placeStyle = $this->styleNode($meta, $placeNodeName, $hasMarking);
 
-        return [$placeNode, $placeStyle];
+        return [$placeNodeName, $placeNode, $placeStyle];
     }
 
     private function styleNode(array $meta, string $nodeName, bool $hasMarking = false): string

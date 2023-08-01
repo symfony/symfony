@@ -1,0 +1,178 @@
+---------------------------------------------------------------------------
+
+by wickedOne at 2023-02-04T05:39:30Z
+
+not sure what's wrong with the license file... and the possible typo according to fabbot.io appears to be an unrelated false positive
+
+---------------------------------------------------------------------------
+
+by wickedOne at 2023-02-04T10:40:03Z
+
+thanks @xabbuh for the hint: fixed the licence problem
+nevertheless now some unit tests fail which appear to be flaky / unrelated
+
+---------------------------------------------------------------------------
+
+by wickedOne at 2023-02-04T10:45:47Z
+
+out of curiosity: why is the `declare(strict_types=1);` enforced out of the classes, is that a compatibility thing or am i missing something obvious?
+
+---------------------------------------------------------------------------
+
+by chr-hertel at 2023-02-04T10:55:41Z
+
+Nice one @wickedOne!
+
+Just tested it with the Symfony demo and initial push and pull works quite well with the recipe & docs, but when I update something in Phrase and do a pull again, there is no change in local files.
+
+do i miss something?
+
+btw, see #28423 for strict_type
+
+---------------------------------------------------------------------------
+
+by wickedOne at 2023-02-04T11:11:37Z
+
+hmmm, @chr-hertel that's weird,
+with a push it basically uploads a xliff file with stuff to be updated so perhaps you were a bit too eager (i.e. the upload was still polling) but i'll have a look into that.
+
+and thanks for linking the stric types discussion, revealed some things i wasn't aware of. nevertheless i think this mr has things covered regardless
+
+---------------------------------------------------------------------------
+
+by chr-hertel at 2023-02-04T12:08:08Z
+
+Okay, tried it again. what I did:
+
+1. Fresh Phrase project
+2. This changes in demo: https://github.com/symfony/demo/commit/9132ce9c016eddaaaa2dbe67786b9b93154cd7eb (DSN in .env.local)
+3. manually created the tags `validators`, `messages` and `security`
+4. push - works well :+1:
+![image](https://user-images.githubusercontent.com/2852185/216764732-6858ca0b-6cbc-4804-8430-96320c1d0f6d.png)
+5. pull
+![image](https://user-images.githubusercontent.com/2852185/216765116-45422ce0-f74f-4a50-809a-2a2cbb89be84.png)
+
+With explicit locales/messages on pull it works, at least for other locales than tr. don't get it. it's available in phrase...
+![image](https://user-images.githubusercontent.com/2852185/216766770-a3463c17-3d70-4798-9025-3267eb2a87ad.png)
+
+---------------------------------------------------------------------------
+
+by wickedOne at 2023-02-04T12:40:20Z
+
+yes, looks like the --force is needed to do the intesect
+<img width="840" alt="image" src="https://user-images.githubusercontent.com/343850/216768119-d5231c60-da12-453e-9ad6-4b0bbfb767b1.png">
+not sure whether this is intended behaviour, @welcoMattic  any insights?
+
+---------------------------------------------------------------------------
+
+by wickedOne at 2023-02-04T12:52:00Z
+
+@chr-hertel sorry, completely misread your initial question where you were talking about a pull rather than a push.
+it seems that the same issue applies for both: nothing happens without the `--force` option...
+
+---------------------------------------------------------------------------
+
+by wickedOne at 2023-02-08T03:38:47Z
+
+[deleted some of my comments to remove the noise]
+
+@chr-hertel it appears this is intended behaviour:
+for messages which don't exist in your application, but _do_ exist in phrase (make sure they're tagged with the corresponding translation domain), one can use the `bin/console translation:pull phrase` command to synchronise to your application.
+
+in order to overwrite your application's messages with changes done in phrase the `--force` option has to be used (also described in the command's option description):
+> --force              Override existing translations with provider ones (it will delete not synchronized messages).
+
+similar behaviour for the push command where the `--force` option updates messages on phrase with modifications done locally.
+
+checking this behaviour however, i did notice a bug in the delete routine (`--delete-missing` option). i will update this pull request with a fix for that
+
+---------------------------------------------------------------------------
+
+by wickedOne at 2023-02-08T04:11:28Z
+
+ok, added fix for the `--delete-missing` option.
+keep in mind that this option deletes the translation keys on phrase so it will be deleted for all locales.
+
+---------------------------------------------------------------------------
+
+by wickedOne at 2023-02-08T19:54:18Z
+
+fixed the locale initialisation which caused the error message mentioned in [#issuecomment-1416735752](https://github.com/symfony/symfony/pull/49231#issuecomment-1416735752)
+
+---------------------------------------------------------------------------
+
+by chr-hertel at 2023-02-09T19:56:03Z
+
+Nice, yes, now it works for me with the demo! :+1:
+
+---------------------------------------------------------------------------
+
+by wickedOne at 2023-02-17T05:08:38Z
+
+@chr-hertel resolved the event setter discussion and the readme one, also added a bit about locale matching in phrase (which indeed is intended behaviour from phrase's side, also see [their](https://support.phrase.com/hc/en-us/articles/6111362119196--XLIFF-Symfony-Strings-) updated documentation on that)
+
+still like to have your thoughts about the concurrency bit...
+
+---------------------------------------------------------------------------
+
+by wickedOne at 2023-02-24T05:10:16Z
+
+> I feel like we don't really need classes for PhraseCachedResponse, Read+WriteConfig and that simple arrays would do it.
+
+not sure whether i agree for the read & write config as the read config contains logic regarding for phrase fallback locales as well removing the class would result in array operations in the provider. for consistency i'd keep the write config around.
+
+for the cached response an array might suffice
+
+---------------------------------------------------------------------------
+
+by wickedOne at 2023-03-25T22:00:38Z
+
+@fabpot that would be great and yes i'm able to allocate some time to it this week.
+
+this probably would exclude https://github.com/symfony/symfony/issues/49520 which i willingly put on the backburner until this one got resolved so have to look into it and a week might be a little short for that
+
+however, i think some discussions are still unresolved (and the reason there has been little to no activity):
+- i'm fine with moving the cached response to an array, but still unconvinved doing the same for the config classes as i fail to see added benefits, but do see added complexity especially for testing purposes
+-  i think the biggest unresolved issue is caching for this provider. i do acknowledge the added complexity, nevertheless i think that feature is essential for this provider. so even though the impact might seem minimal and the added complexity might seem unproportional, removing it renders this provider, i'd say not useless, but should come with a warning sign
+
+github comments might not be the most efficient way to get these resolved in a week so feel free propose an alternative; i'm open to it
+
+---------------------------------------------------------------------------
+
+by wickedOne at 2023-03-28T03:17:59Z
+
+replaced `PhraseCachedResponse` with an array...
+
+---------------------------------------------------------------------------
+
+by wickedOne at 2023-03-29T03:31:40Z
+
+thanks for the review @welcoMattic!
+i've applied most of the requested changes, for others please see my comments
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2023-04-13T13:20:45Z
+
+@wickedOne We would love to merge this feature for 6.3. The last point to fix is the removal of `ReadConfig` and `WriteConfig` classes, and re-integrate those into the Provider class itself. Do you think you will be able to achieve it soon?
+
+---------------------------------------------------------------------------
+
+by wickedOne at 2023-04-13T18:34:48Z
+
+> @wickedOne We would love to merge this feature for 6.3. The last point to fix is the removal of `ReadConfig` and `WriteConfig` classes, and re-integrate those into the Provider class itself. Do you think you will be able to achieve it soon?
+
+yes sorry, had some other priorities and wasn't able to get back to this. should be able to give this a go over the weekend and if it turns out to be too much work in regards to time at least to state so
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-08-01T07:40:34Z
+
+@welcoMattic Can we merge it as is? Or do you think that your last change suggestion is a blocker?
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2023-08-01T08:00:19Z
+
+@fabpot It is not a blocker, as it works, but it not follows the same way to do as all other providers.
+I guess we can merge it and refactor the 2 config classes later (I could do it)

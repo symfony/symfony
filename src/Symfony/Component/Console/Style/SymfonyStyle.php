@@ -272,14 +272,14 @@ class SymfonyStyle extends OutputStyle
         return $this->askQuestion(new ConfirmationQuestion($question, $default));
     }
 
-    public function choice(string $question, array $choices, mixed $default = null, bool $multiSelect = false): mixed
+    public function choice(string $question, array $choices, mixed $default = null, bool $multiSelect = false, bool $choiceKeys = false): mixed
     {
         if (null !== $default) {
             $values = array_flip($choices);
             $default = $values[$default] ?? $default;
         }
 
-        $questionChoice = new ChoiceQuestion($question, $choices, $default);
+        $questionChoice = new ChoiceQuestion($question, $choices, $default, $choiceKeys);
         $questionChoice->setMultiselect($multiSelect);
 
         return $this->askQuestion($questionChoice);

@@ -25,7 +25,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\Console\Tests\Command\CommandTest;
 
 class SymfonyStyleTest extends TestCase
 {
@@ -219,5 +218,213 @@ class SymfonyStyleTest extends TestCase
             "\033[12A\033[0J", // clear 12 lines (11 output lines and one from the answer input return)
             stream_get_contents($output->getStream())
         );
+    }
+
+    /**
+     * @group tty
+     *
+     * @dataProvider choiceDataProvider
+     */
+    public function testChoice(bool $multiple, bool $choiceKeys, array $choices, mixed $default, string $answer, string|array $givenAnswer, string $consoleString)
+    {
+        $inputStream = fopen('php://memory', 'r+');
+        fwrite($inputStream, $answer.\PHP_EOL);
+        rewind($inputStream);
+        $input = $this->createMock(Input::class);
+        $sections = [];
+        $output = new ConsoleSectionOutput(fopen('php://memory', 'r+', false), $sections, StreamOutput::VERBOSITY_NORMAL, true, new OutputFormatter());
+        $input
+            ->method('isInteractive')
+            ->willReturn(true);
+        $input
+            ->method('getStream')
+            ->willReturn($inputStream);
+
+        $style = new SymfonyStyle($input, $output);
+
+        $result = $style->choice('Select choices', $choices, $default, $multiple, $choiceKeys);
+
+        rewind($output->getStream());
+
+        $this->assertEquals($givenAnswer, $result);
+        $this->assertEquals(
+            $consoleString,
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public static function choiceDataProvider()
+    {
+        return [
+            [ // single choice with key input and value result
+                false,
+                false,
+                [
+                    0 => 'red',
+                    1 => 'blue',
+                    2 => 'orange',
+                ],
+                null,
+                '1',
+                'blue',
+                \PHP_EOL.\PHP_EOL." \033[32mSelect choices\033[39m:".\PHP_EOL.
+                "  [\033[33m0\033[39m] red".\PHP_EOL."  [\033[33m1\033[39m] blue".\PHP_EOL."  [\033[33m2\033[39m] orange".\PHP_EOL.
+                implode(\PHP_EOL."\033[1A\033[0J", [
+                    ' > ',
+                    ' > 1',
+                    " > 1\033[K",
+                    " > 1\033[K\n",
+                ]).\PHP_EOL.\PHP_EOL.\PHP_EOL,
+            ],
+            [ // single choice with default and key result
+                false,
+                true,
+                [
+                    0 => 'red',
+                    1 => 'blue',
+                    2 => 'orange',
+                ],
+                'orange',
+                \PHP_EOL,
+                '2',
+                \PHP_EOL.\PHP_EOL." \033[32mSelect choices\033[39m [\033[33morange\033[39m]:".\PHP_EOL.
+                "  [\033[33m0\033[39m] red".\PHP_EOL."  [\033[33m1\033[39m] blue".\PHP_EOL."  [\033[33m2\033[39m] orange".\PHP_EOL.
+                implode(\PHP_EOL."\033[1A\033[0J", [
+                    ' > ',
+                    " > \n",
+                ]).\PHP_EOL.\PHP_EOL.\PHP_EOL,
+            ],
+            [ // single choice with value input and value result
+                false,
+                false,
+                [
+                    0 => 'red',
+                    1 => 'blue',
+                    2 => 'orange',
+                ],
+                null,
+                'red',
+                'red',
+                \PHP_EOL.\PHP_EOL." \033[32mSelect choices\033[39m:".\PHP_EOL.
+                "  [\033[33m0\033[39m] red".\PHP_EOL."  [\033[33m1\033[39m] blue".\PHP_EOL."  [\033[33m2\033[39m] orange".\PHP_EOL.
+                implode(\PHP_EOL."\033[1A\033[0J", [
+                    ' > ',
+                    ' > r',
+                    " > r\033[K",
+                    " > r\033[K\0337",
+                    " > r\033[K\0337\033[30;47med\033[39;49m",
+                    " > r\033[K\0337\033[30;47med\033[39;49m\0338",
+                    " > r\033[K\0337\033[30;47med\033[39;49m\0338e",
+                    " > r\033[K\0337\033[30;47med\033[39;49m\0338e\033[K",
+                    " > r\033[K\0337\033[30;47med\033[39;49m\0338e\033[K\0337",
+                    " > r\033[K\0337\033[30;47med\033[39;49m\0338e\033[K\0337\033[30;47md\033[39;49m",
+                    " > r\033[K\0337\033[30;47med\033[39;49m\0338e\033[K\0337\033[30;47md\033[39;49m\0338",
+                    " > r\033[K\0337\033[30;47med\033[39;49m\0338e\033[K\0337\033[30;47md\033[39;49m\0338d",
+                    " > r\033[K\0337\033[30;47med\033[39;49m\0338e\033[K\0337\033[30;47md\033[39;49m\0338d\033[K",
+                    " > r\033[K\0337\033[30;47med\033[39;49m\0338e\033[K\0337\033[30;47md\033[39;49m\0338d\033[K\0337",
+                    " > r\033[K\0337\033[30;47med\033[39;49m\0338e\033[K\0337\033[30;47md\033[39;49m\0338d\033[K\0337",
+                    " > r\033[K\0337\033[30;47med\033[39;49m\0338e\033[K\0337\033[30;47md\033[39;49m\0338d\033[K\0337\0338",
+                    " > r\033[K\0337\033[30;47med\033[39;49m\0338e\033[K\0337\033[30;47md\033[39;49m\0338d\033[K\0337\0338",
+                    " > r\033[K\0337\033[30;47med\033[39;49m\0338e\033[K\0337\033[30;47md\033[39;49m\0338d\033[K\0337\0338\n",
+                ]).\PHP_EOL.\PHP_EOL.\PHP_EOL,
+            ],
+            [ // single choice with key input and key result
+                false,
+                true,
+                [
+                    0 => 'red',
+                    1 => 'blue',
+                    2 => 'orange',
+                ],
+                null,
+                '1',
+                '1',
+                \PHP_EOL.\PHP_EOL." \033[32mSelect choices\033[39m:".\PHP_EOL.
+                "  [\033[33m0\033[39m] red".\PHP_EOL."  [\033[33m1\033[39m] blue".\PHP_EOL."  [\033[33m2\033[39m] orange".\PHP_EOL.
+                implode(\PHP_EOL."\033[1A\033[0J", [
+                    ' > ',
+                    ' > 1',
+                    " > 1\033[K",
+                    " > 1\033[K\n",
+                ]).\PHP_EOL.\PHP_EOL.\PHP_EOL,
+            ],
+            [ // multi choice with key input and value result
+                true,
+                false,
+                [
+                    0 => 'red',
+                    1 => 'blue',
+                    2 => 'orange',
+                ],
+                null,
+                '1,2',
+                ['blue', 'orange'],
+                \PHP_EOL.\PHP_EOL." \033[32mSelect choices\033[39m:".\PHP_EOL.
+                "  [\033[33m0\033[39m] red".\PHP_EOL."  [\033[33m1\033[39m] blue".\PHP_EOL."  [\033[33m2\033[39m] orange".\PHP_EOL.
+                implode(\PHP_EOL."\033[1A\033[0J", [
+                    ' > ',
+                    ' > 1',
+                    " > 1\033[K",
+                    " > 1\033[K,",
+                    " > 1\033[K,\033[K",
+                    " > 1\033[K,\033[K2",
+                    " > 1\033[K,\033[K2\033[K",
+                    " > 1\033[K,\033[K2\033[K\n",
+                ]).\PHP_EOL.\PHP_EOL.\PHP_EOL,
+            ],
+            [ // multi choice with key input and key result
+                true,
+                true,
+                [
+                    0 => 'red',
+                    1 => 'blue',
+                    2 => 'orange',
+                ],
+                null,
+                '1,2',
+                [1, 2],
+                \PHP_EOL.\PHP_EOL." \033[32mSelect choices\033[39m:".\PHP_EOL.
+                "  [\033[33m0\033[39m] red".\PHP_EOL."  [\033[33m1\033[39m] blue".\PHP_EOL."  [\033[33m2\033[39m] orange".\PHP_EOL.
+                implode(\PHP_EOL."\033[1A\033[0J", [
+                    ' > ',
+                    ' > 1',
+                    " > 1\033[K",
+                    " > 1\033[K,",
+                    " > 1\033[K,\033[K",
+                    " > 1\033[K,\033[K2",
+                    " > 1\033[K,\033[K2\033[K",
+                    " > 1\033[K,\033[K2\033[K\n",
+                ]).\PHP_EOL.\PHP_EOL.\PHP_EOL,
+            ],
+            [ // single choice with association always returns the key
+                false,
+                false,
+                [
+                    'k0' => 'value_0',
+                    'k1' => 'value_1',
+                    'k2' => 'value_2',
+                ],
+                null,
+                'k1',
+                'k1',
+                \PHP_EOL.\PHP_EOL." \033[32mSelect choices\033[39m:".\PHP_EOL.
+                "  [\033[33mk0\033[39m] value_0".\PHP_EOL."  [\033[33mk1\033[39m] value_1".\PHP_EOL."  [\033[33mk2\033[39m] value_2".\PHP_EOL.
+                implode(\PHP_EOL."\033[1A\033[0J", [
+                    ' > ',
+                    ' > k',
+                    " > k\033[K",
+                    " > k\033[K\0337",
+                    " > k\033[K\0337\033[30;47m0\033[39;49m",
+                    " > k\033[K\0337\033[30;47m0\033[39;49m\0338",
+                    " > k\033[K\0337\033[30;47m0\033[39;49m\03381",
+                    " > k\033[K\0337\033[30;47m0\033[39;49m\03381\033[K",
+                    " > k\033[K\0337\033[30;47m0\033[39;49m\03381\033[K\0337",
+                    " > k\033[K\0337\033[30;47m0\033[39;49m\03381\033[K\0337",
+                    " > k\033[K\0337\033[30;47m0\033[39;49m\03381\033[K\0337\0338",
+                    " > k\033[K\0337\033[30;47m0\033[39;49m\03381\033[K\0337\0338",
+                    " > k\033[K\0337\033[30;47m0\033[39;49m\03381\033[K\0337\0338\n",
+                ]).\PHP_EOL.\PHP_EOL.\PHP_EOL,
+            ],
+        ];
     }
 }

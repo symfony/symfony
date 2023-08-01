@@ -96,6 +96,44 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $this->assertEquals('Superman', $questionHelper->ask($this->createStreamableInputInterfaceMock($inputStream, true), $this->createOutputInterface(), $question));
     }
 
+    public function testAskChoiceDefaultWithKey()
+    {
+        $questionHelper = new QuestionHelper();
+
+        $helperSet = new HelperSet([new FormatterHelper()]);
+        $questionHelper->setHelperSet($helperSet);
+
+        $heroes = ['Superman', 'Batman', 'Spiderman'];
+
+        $inputStream = $this->getInputStream("\n");
+
+        $question = new ChoiceQuestion('What is your favorite superhero?', $heroes, '2', true);
+        $question->setMaxAttempts(1);
+        // empty answer, we're supposed to receive the default value
+        $this->assertEquals('2', $questionHelper->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+    }
+
+    public function testAskChoiceDefaultWithAssoc()
+    {
+        $questionHelper = new QuestionHelper();
+
+        $helperSet = new HelperSet([new FormatterHelper()]);
+        $questionHelper->setHelperSet($helperSet);
+
+        $heroes = [
+            'k0' => 'Superman',
+            'k1' => 'Batman',
+            'k2' => 'Spiderman',
+        ];
+
+        $inputStream = $this->getInputStream("\n");
+
+        $question = new ChoiceQuestion('What is your favorite superhero?', $heroes, 'Spiderman');
+        $question->setMaxAttempts(1);
+        // empty answer, we're supposed to receive the default value
+        $this->assertEquals('k2', $questionHelper->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+    }
+
     public function testAskChoiceNonInteractive()
     {
         $questionHelper = new QuestionHelper();

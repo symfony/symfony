@@ -174,14 +174,18 @@ class QuestionHelper extends Helper
         } elseif ($question instanceof ChoiceQuestion) {
             $choices = $question->getChoices();
 
-            if (!$question->isMultiselect()) {
-                return $choices[$default] ?? $default;
-            }
+            if ($question->isChoiceKeys()) {
+                return $question->isMultiselect() ? array_map(fn ($v) => trim($v), explode(',', $default)) : $default;
+            } else {
+                if (!$question->isMultiselect()) {
+                    return $choices[$default] ?? $default;
+                }
 
-            $default = explode(',', $default);
-            foreach ($default as $k => $v) {
-                $v = $question->isTrimmable() ? trim($v) : $v;
-                $default[$k] = $choices[$v] ?? $v;
+                $default = explode(',', $default);
+                foreach ($default as $k => $v) {
+                    $v = $question->isTrimmable() ? trim($v) : $v;
+                    $default[$k] = $choices[$v] ?? $v;
+                }
             }
         }
 

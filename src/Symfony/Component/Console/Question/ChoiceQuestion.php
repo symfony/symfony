@@ -21,16 +21,18 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
 class ChoiceQuestion extends Question
 {
     private array $choices;
+    private bool $choiceKeys;
     private bool $multiselect = false;
     private string $prompt = ' > ';
     private string $errorMessage = 'Value "%s" is invalid';
 
     /**
-     * @param string $question The question to ask to the user
-     * @param array  $choices  The list of available choices
-     * @param mixed  $default  The default answer to return
+     * @param string $question   The question to ask to the user
+     * @param array  $choices    The list of available choices
+     * @param mixed  $default    The default answer to return
+     * @param bool   $choiceKeys By default the choice value(s) are returned when it's not an association, setting this to true will return the selected key(s)
      */
-    public function __construct(string $question, array $choices, mixed $default = null)
+    public function __construct(string $question, array $choices, mixed $default = null, bool $choiceKeys = false)
     {
         if (!$choices) {
             throw new \LogicException('Choice question must have at least 1 choice available.');
@@ -39,6 +41,7 @@ class ChoiceQuestion extends Question
         parent::__construct($question, $default);
 
         $this->choices = $choices;
+        $this->choiceKeys = $choiceKeys;
         $this->setValidator($this->getDefaultValidator());
         $this->setAutocompleterValues($choices);
     }
@@ -49,6 +52,14 @@ class ChoiceQuestion extends Question
     public function getChoices(): array
     {
         return $this->choices;
+    }
+
+    /**
+     * Returns if the key(s) or the value(s) should be returned.
+     */
+    public function isChoiceKeys(): bool
+    {
+        return $this->choiceKeys;
     }
 
     /**
@@ -165,6 +176,10 @@ class ChoiceQuestion extends Question
 
                 // For associative choices, consistently return the key as string:
                 $multiselectChoices[] = $isAssoc ? (string) $result : $result;
+            }
+
+            if (!$isAssoc && $this->isChoiceKeys()) {
+                $multiselectChoices = array_map(fn ($v) => array_search($v, $choices), $multiselectChoices);
             }
 
             if ($multiselect) {

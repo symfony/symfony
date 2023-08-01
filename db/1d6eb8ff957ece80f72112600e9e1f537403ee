@@ -1,0 +1,72 @@
+---------------------------------------------------------------------------
+
+by ostrolucky at 2022-07-04T08:41:13Z
+
+That's a bit more complicated solution, but sure we could that too if you think it's better. Any other opinions?
+
+edit: Also I think that's a bit more error prone too, because I don't think there is a guarantee kernel.project_dir will always resolve to a real path and not a symlink.
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2022-07-07T11:17:12Z
+
+Could you please provide an example before and after the file path has been *cleaned*?
+
+What if users have classes with the same name (`src/GitHub/Client.php` and `src/GitLab/Client.php`) and an error is reported in `Client.php`? Will they have to dig more in the logs to see the path of the class?
+
+> This causes error deduplication of 3rd parties like NewRelic and other APM solutions to not trigger, which means we are getting alerts for same old errors after every release.
+
+We use Sentry and it doesn't have this issue, it looks like it groups errors by the relative path, e.g. `src/Form/Upload/Uploader.php`. We can still see the real path of the file with the numbered release `/releases/20220630…/` in the stacktrace.
+
+Maybe this can be configured on the side of NewRelic?
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2022-07-07T11:34:04Z
+
+> Could you please provide an example before and after the file path has been cleaned?
+
+Before: `Uncaught PHP Exception Exception: "foo" at /home/application/deployer/releases/123/src/ErrorListenerTest.php line 123`
+After: `Uncaught PHP Exception Exception: "foo" at ErrorListenerTest.php line 123`
+
+> What if users have classes with the same name (src/GitHub/Client.php and src/GitLab/Client.php) and an error is reported in Client.php?
+
+This can happen, but is very unlikely, especially at the same line
+
+> Will they have to dig more in the logs to see the path of the class?
+
+What does this mean? Same log entry that's having that message also has full context and trace. No log digging is necessary, you just expand current log.
+
+And for that matter, I don't see why is symfony even putting file and line in log message at all. Other logs that don't go through this listener don't have this info and I haven't seen anyone complaining. If people think this is good idea in general, monolog should do this itself via processor.
+
+> Maybe this can be configured on the side of NewRelic?
+
+No, their support told me this
+
+> The grouping indeed is going to be taking the error message into consideration and when the message has a changing attribute (like your release number) the error groups might appear as a completely different error.
+>
+> This behaviour is however expected from our product and we are currently not in a position to offer a pattern detection such that we could replace your deployment ID with a placeholder for all the similar errors.
+>
+> In relation to your suggestion on using the symlink path instead of the physical path I believe this isn't something that we can control in this particular use case. The path appears to be a part of the message, that is passed to our 'newrelic_notice_error()' function using the ekino bundle. The message, I believe, is constructed by PHP and Symfony so you would have to adjust the path resolution there in order for the message string to include symlink path. This in turn would cause our error recording function to receive same message allowing the Error Inbox to correctly group them together.
+
+> We use Sentry and it doesn't have this issue
+
+You probably use Sentry bundle which uses error listener. In our case, we hook into Monolog handler and send all error logs to NR, not only errors caught by error listener.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2023-08-01T15:32:24Z
+
+Any update? Or shall we simply stop adding file path and line in the log message?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-08-01T15:34:35Z
+
+Works for me, but please keep the CS: we prefer one liners (they help with grep)
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2023-08-01T15:38:23Z
+
+CS adjusted, rebased

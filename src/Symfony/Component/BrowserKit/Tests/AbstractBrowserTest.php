@@ -279,6 +279,19 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame('http://www.example.com/foo', $client->getRequest()->getUri(), '->click() clicks on links');
     }
 
+    public function testClickPreserveHeaders()
+    {
+        $client = $this->getBrowser();
+        $client->setNextResponse(new Response('<html><a href="/foo">foo</a></html>'));
+        $crawler = $client->request('GET', 'http://www.example.com/foo/foobar');
+
+        $client->click($crawler->filter('a')->link(), ['X-Special-Header' => 'Special Header Value']);
+
+        $server = $client->getRequest()->getServer();
+        $this->assertArrayHasKey('X-Special-Header', $server);
+        $this->assertSame('Special Header Value', $server['X-Special-Header']);
+    }
+
     public function testClickLink()
     {
         $client = $this->getBrowser();
@@ -299,6 +312,18 @@ class AbstractBrowserTest extends TestCase
         $client->clickLink('foo');
     }
 
+    public function testClickLinkPreserveHeaders()
+    {
+        $client = $this->getBrowser();
+        $client->setNextResponse(new Response('<html><a href="/foo">foo</a></html>'));
+        $client->request('GET', 'http://www.example.com/foo/foobar');
+        $client->clickLink('foo', ['X-Special-Header' => 'Special Header Value']);
+
+        $server = $client->getRequest()->getServer();
+        $this->assertArrayHasKey('X-Special-Header', $server);
+        $this->assertSame('Special Header Value', $server['X-Special-Header']);
+    }
+
     public function testClickForm()
     {
         $client = $this->getBrowser();
@@ -308,6 +333,19 @@ class AbstractBrowserTest extends TestCase
         $client->click($crawler->filter('input')->form());
 
         $this->assertSame('http://www.example.com/foo', $client->getRequest()->getUri(), '->click() Form submit forms');
+    }
+
+    public function testClickFormPreserveHeaders()
+    {
+        $client = $this->getBrowser();
+        $client->setNextResponse(new Response('<html><form action="/foo"><input type="submit" /></form></html>'));
+        $crawler = $client->request('GET', 'http://www.example.com/foo/foobar');
+
+        $client->click($crawler->filter('input')->form(), ['X-Special-Header' => 'Special Header Value']);
+
+        $server = $client->getRequest()->getServer();
+        $this->assertArrayHasKey('X-Special-Header', $server);
+        $this->assertSame('Special Header Value', $server['X-Special-Header']);
     }
 
     public function testSubmit()

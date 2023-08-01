@@ -588,7 +588,7 @@ class Crawler implements \Countable, \IteratorAggregate
         $normalizeWhitespace = 1 <= \func_num_args() ? func_get_arg(0) : true;
 
         foreach ($this->getNode(0)->childNodes as $childNode) {
-            if (\XML_TEXT_NODE !== $childNode->nodeType) {
+            if (\XML_TEXT_NODE !== $childNode->nodeType && \XML_CDATA_SECTION_NODE !== $childNode->nodeType) {
                 continue;
             }
             if (!$normalizeWhitespace) {

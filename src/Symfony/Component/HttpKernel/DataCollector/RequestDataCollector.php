@@ -180,7 +180,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
 
     public function reset(): void
     {
-        $this->data = [];
+        parent::reset();
         $this->controllers = new \SplObjectStorage();
         $this->sessionUsages = [];
     }

@@ -136,7 +136,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
     public function reset(): void
     {
         $this->stopwatch?->reset();
-        $this->data = [];
+        parent::reset();
         $this->dataCount = 0;
         $this->isCollected = true;
         $this->clonesCount = 0;

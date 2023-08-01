@@ -55,7 +55,7 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
 
     public function reset(): void
     {
-        $this->data = [];
+        parent::reset();
 
         foreach ($this->dispatchers as $dispatcher) {
             if ($dispatcher instanceof ResetInterface) {

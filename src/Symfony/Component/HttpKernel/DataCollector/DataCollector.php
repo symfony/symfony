@@ -102,4 +102,12 @@ abstract class DataCollector implements DataCollectorInterface
     final protected function unserialize(string $data): void
     {
     }
+
+    /**
+     * @return void
+     */
+    public function reset()
+    {
+        $this->data = [];
+    }
 }

@@ -7,6 +7,7 @@ CHANGELOG
  * `BundleInterface` no longer extends `ContainerAwareInterface`
  * Add optional `$className` parameter to `ControllerEvent::getAttributes()`
  * Add native return types to `TraceableEventDispatcher` and to `MergeExtensionConfigurationPass`
+ * Add argument `$validationFailedStatusCode` to `#[MapQueryString]` and `#[MapRequestPayload]`
 
 6.3
 ---

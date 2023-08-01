@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2023-07-31T11:12:43Z
+
+I'm not sure this qualifies as a bug fix.
+In any case, I suppose we would need to run tests for both v1 and v2?

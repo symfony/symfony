@@ -7,6 +7,7 @@ CHANGELOG
  * Deprecate Doctrine annotations support in favor of native attributes
  * Deprecate passing an annotation reader to the constructor of `AnnotationLoader`
  * Allow the `Groups` attribute/annotation on classes
+ * JsonDecode: Add `json_decode_detailed_errors` option
 
 6.3
 ---

@@ -7,8 +7,14 @@ DSN example
 -----------
 
 ```
-AMAZON_SNS_DSN=sns://ACCESS_ID:ACCESS_KEY@default?region=REGION
+AMAZON_SNS_DSN=sns://ACCESS_ID:ACCESS_KEY@default?region=REGION&profile=PROFILE
 ```
+
+where:
+ - `ACCESS_ID` is your AWS access key id
+ - `ACCESS_KEY` is your AWS access key secret
+ - `REGION` is the AWS region targeted (optional, default: `us-east-1`)
+ - `PROFILE` is the name of your AWS configured profile (optional, default: `default`)
 
 Adding Options to a Chat Message
 --------------------------------

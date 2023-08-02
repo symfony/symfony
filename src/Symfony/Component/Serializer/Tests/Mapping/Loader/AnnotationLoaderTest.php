@@ -28,6 +28,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\Attributes\BadMethodContextDummy
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\ContextDummyParent;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\ContextDummyPromotedProperties;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\Entity45016;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\GroupClassDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\GroupDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\GroupDummyParent;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\IgnoreDummy;
@@ -203,7 +204,7 @@ class AnnotationLoaderTest extends TestCase
 
     public function testLoadGroupsOnClass()
     {
-        $classMetadata = new ClassMetadata($this->getNamespace().'\GroupClassDummy');
+        $classMetadata = new ClassMetadata(GroupClassDummy::class);
         $this->loader->loadClassMetadata($classMetadata);
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();

@@ -694,7 +694,7 @@ diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExt
 +    public function load(array $configs, ContainerBuilder $container): void
      {
          $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));
-@@ -2941,5 +2941,5 @@ class FrameworkExtension extends Extension
+@@ -2951,5 +2951,5 @@ class FrameworkExtension extends Extension
       * @return void
       */
 -    public static function registerRateLimiter(ContainerBuilder $container, string $name, array $limiterConfig)
@@ -5315,76 +5315,76 @@ diff --git a/src/Symfony/Component/Form/AbstractType.php b/src/Symfony/Component
 --- a/src/Symfony/Component/Form/AbstractType.php
 +++ b/src/Symfony/Component/Form/AbstractType.php
 @@ -24,5 +24,5 @@ abstract class AbstractType implements FormTypeInterface
-      * @return void
-      */
--    public function buildForm(FormBuilderInterface $builder, array $options)
-+    public function buildForm(FormBuilderInterface $builder, array $options): void
-     {
-     }
-@@ -31,5 +31,5 @@ abstract class AbstractType implements FormTypeInterface
-      * @return void
-      */
--    public function buildView(FormView $view, FormInterface $form, array $options)
-+    public function buildView(FormView $view, FormInterface $form, array $options): void
-     {
-     }
-@@ -38,5 +38,5 @@ abstract class AbstractType implements FormTypeInterface
-      * @return void
-      */
--    public function finishView(FormView $view, FormInterface $form, array $options)
-+    public function finishView(FormView $view, FormInterface $form, array $options): void
-     {
-     }
-@@ -45,5 +45,5 @@ abstract class AbstractType implements FormTypeInterface
-      * @return void
-      */
--    public function configureOptions(OptionsResolver $resolver)
-+    public function configureOptions(OptionsResolver $resolver): void
-     {
-     }
-@@ -52,5 +52,5 @@ abstract class AbstractType implements FormTypeInterface
-      * @return string
-      */
--    public function getBlockPrefix()
-+    public function getBlockPrefix(): string
-     {
-         return StringUtil::fqcnToBlockPrefix(static::class) ?: '';
-@@ -60,5 +60,5 @@ abstract class AbstractType implements FormTypeInterface
       * @return string|null
       */
 -    public function getParent()
 +    public function getParent(): ?string
      {
          return FormType::class;
-diff --git a/src/Symfony/Component/Form/AbstractTypeExtension.php b/src/Symfony/Component/Form/AbstractTypeExtension.php
---- a/src/Symfony/Component/Form/AbstractTypeExtension.php
-+++ b/src/Symfony/Component/Form/AbstractTypeExtension.php
-@@ -22,5 +22,5 @@ abstract class AbstractTypeExtension implements FormTypeExtensionInterface
+@@ -32,5 +32,5 @@ abstract class AbstractType implements FormTypeInterface
+      * @return void
+      */
+-    public function configureOptions(OptionsResolver $resolver)
++    public function configureOptions(OptionsResolver $resolver): void
+     {
+     }
+@@ -39,5 +39,5 @@ abstract class AbstractType implements FormTypeInterface
       * @return void
       */
 -    public function buildForm(FormBuilderInterface $builder, array $options)
 +    public function buildForm(FormBuilderInterface $builder, array $options): void
      {
      }
-@@ -29,5 +29,5 @@ abstract class AbstractTypeExtension implements FormTypeExtensionInterface
+@@ -46,5 +46,5 @@ abstract class AbstractType implements FormTypeInterface
       * @return void
       */
 -    public function buildView(FormView $view, FormInterface $form, array $options)
 +    public function buildView(FormView $view, FormInterface $form, array $options): void
      {
      }
-@@ -36,5 +36,5 @@ abstract class AbstractTypeExtension implements FormTypeExtensionInterface
+@@ -53,5 +53,5 @@ abstract class AbstractType implements FormTypeInterface
       * @return void
       */
 -    public function finishView(FormView $view, FormInterface $form, array $options)
 +    public function finishView(FormView $view, FormInterface $form, array $options): void
      {
      }
-@@ -43,5 +43,5 @@ abstract class AbstractTypeExtension implements FormTypeExtensionInterface
+@@ -60,5 +60,5 @@ abstract class AbstractType implements FormTypeInterface
+      * @return string
+      */
+-    public function getBlockPrefix()
++    public function getBlockPrefix(): string
+     {
+         return StringUtil::fqcnToBlockPrefix(static::class) ?: '';
+diff --git a/src/Symfony/Component/Form/AbstractTypeExtension.php b/src/Symfony/Component/Form/AbstractTypeExtension.php
+--- a/src/Symfony/Component/Form/AbstractTypeExtension.php
++++ b/src/Symfony/Component/Form/AbstractTypeExtension.php
+@@ -22,5 +22,5 @@ abstract class AbstractTypeExtension implements FormTypeExtensionInterface
       * @return void
       */
 -    public function configureOptions(OptionsResolver $resolver)
 +    public function configureOptions(OptionsResolver $resolver): void
+     {
+     }
+@@ -29,5 +29,5 @@ abstract class AbstractTypeExtension implements FormTypeExtensionInterface
+      * @return void
+      */
+-    public function buildForm(FormBuilderInterface $builder, array $options)
++    public function buildForm(FormBuilderInterface $builder, array $options): void
+     {
+     }
+@@ -36,5 +36,5 @@ abstract class AbstractTypeExtension implements FormTypeExtensionInterface
+      * @return void
+      */
+-    public function buildView(FormView $view, FormInterface $form, array $options)
++    public function buildView(FormView $view, FormInterface $form, array $options): void
+     {
+     }
+@@ -43,5 +43,5 @@ abstract class AbstractTypeExtension implements FormTypeExtensionInterface
+      * @return void
+      */
+-    public function finishView(FormView $view, FormInterface $form, array $options)
++    public function finishView(FormView $view, FormInterface $form, array $options): void
      {
      }
 diff --git a/src/Symfony/Component/Form/ButtonBuilder.php b/src/Symfony/Component/Form/ButtonBuilder.php
@@ -6862,33 +6862,33 @@ diff --git a/src/Symfony/Component/Form/FormRendererInterface.php b/src/Symfony/
 diff --git a/src/Symfony/Component/Form/FormTypeExtensionInterface.php b/src/Symfony/Component/Form/FormTypeExtensionInterface.php
 --- a/src/Symfony/Component/Form/FormTypeExtensionInterface.php
 +++ b/src/Symfony/Component/Form/FormTypeExtensionInterface.php
-@@ -31,5 +31,5 @@ interface FormTypeExtensionInterface
-      * @see FormTypeInterface::buildForm()
-      */
--    public function buildForm(FormBuilderInterface $builder, array $options);
-+    public function buildForm(FormBuilderInterface $builder, array $options): void;
- 
-     /**
-@@ -45,5 +45,5 @@ interface FormTypeExtensionInterface
-      * @see FormTypeInterface::buildView()
-      */
--    public function buildView(FormView $view, FormInterface $form, array $options);
-+    public function buildView(FormView $view, FormInterface $form, array $options): void;
- 
-     /**
-@@ -59,10 +59,10 @@ interface FormTypeExtensionInterface
-      * @see FormTypeInterface::finishView()
-      */
--    public function finishView(FormView $view, FormInterface $form, array $options);
-+    public function finishView(FormView $view, FormInterface $form, array $options): void;
- 
-     /**
+@@ -29,5 +29,5 @@ interface FormTypeExtensionInterface
       * @return void
       */
 -    public function configureOptions(OptionsResolver $resolver);
 +    public function configureOptions(OptionsResolver $resolver): void;
  
      /**
+@@ -43,5 +43,5 @@ interface FormTypeExtensionInterface
+      * @see FormTypeInterface::buildForm()
+      */
+-    public function buildForm(FormBuilderInterface $builder, array $options);
++    public function buildForm(FormBuilderInterface $builder, array $options): void;
+ 
+     /**
+@@ -57,5 +57,5 @@ interface FormTypeExtensionInterface
+      * @see FormTypeInterface::buildView()
+      */
+-    public function buildView(FormView $view, FormInterface $form, array $options);
++    public function buildView(FormView $view, FormInterface $form, array $options): void;
+ 
+     /**
+@@ -71,4 +71,4 @@ interface FormTypeExtensionInterface
+      * @see FormTypeInterface::finishView()
+      */
+-    public function finishView(FormView $view, FormInterface $form, array $options);
++    public function finishView(FormView $view, FormInterface $form, array $options): void;
+ }
 diff --git a/src/Symfony/Component/Form/FormTypeGuesserInterface.php b/src/Symfony/Component/Form/FormTypeGuesserInterface.php
 --- a/src/Symfony/Component/Form/FormTypeGuesserInterface.php
 +++ b/src/Symfony/Component/Form/FormTypeGuesserInterface.php
@@ -6922,46 +6922,46 @@ diff --git a/src/Symfony/Component/Form/FormTypeGuesserInterface.php b/src/Symfo
 diff --git a/src/Symfony/Component/Form/FormTypeInterface.php b/src/Symfony/Component/Form/FormTypeInterface.php
 --- a/src/Symfony/Component/Form/FormTypeInterface.php
 +++ b/src/Symfony/Component/Form/FormTypeInterface.php
-@@ -31,5 +31,5 @@ interface FormTypeInterface
-      * @see FormTypeExtensionInterface::buildForm()
+@@ -27,5 +27,5 @@ interface FormTypeInterface
+      * @return string|null
       */
--    public function buildForm(FormBuilderInterface $builder, array $options);
-+    public function buildForm(FormBuilderInterface $builder, array $options): void;
+-    public function getParent();
++    public function getParent(): ?string;
  
      /**
-@@ -49,5 +49,5 @@ interface FormTypeInterface
-      * @see FormTypeExtensionInterface::buildView()
-      */
--    public function buildView(FormView $view, FormInterface $form, array $options);
-+    public function buildView(FormView $view, FormInterface $form, array $options): void;
- 
-     /**
-@@ -68,5 +68,5 @@ interface FormTypeInterface
-      * @see FormTypeExtensionInterface::finishView()
-      */
--    public function finishView(FormView $view, FormInterface $form, array $options);
-+    public function finishView(FormView $view, FormInterface $form, array $options): void;
- 
-     /**
-@@ -75,5 +75,5 @@ interface FormTypeInterface
+@@ -34,5 +34,5 @@ interface FormTypeInterface
       * @return void
       */
 -    public function configureOptions(OptionsResolver $resolver);
 +    public function configureOptions(OptionsResolver $resolver): void;
  
      /**
+@@ -48,5 +48,5 @@ interface FormTypeInterface
+      * @see FormTypeExtensionInterface::buildForm()
+      */
+-    public function buildForm(FormBuilderInterface $builder, array $options);
++    public function buildForm(FormBuilderInterface $builder, array $options): void;
+ 
+     /**
+@@ -66,5 +66,5 @@ interface FormTypeInterface
+      * @see FormTypeExtensionInterface::buildView()
+      */
+-    public function buildView(FormView $view, FormInterface $form, array $options);
++    public function buildView(FormView $view, FormInterface $form, array $options): void;
+ 
+     /**
 @@ -85,5 +85,5 @@ interface FormTypeInterface
+      * @see FormTypeExtensionInterface::finishView()
+      */
+-    public function finishView(FormView $view, FormInterface $form, array $options);
++    public function finishView(FormView $view, FormInterface $form, array $options): void;
+ 
+     /**
+@@ -95,4 +95,4 @@ interface FormTypeInterface
       * @return string
       */
 -    public function getBlockPrefix();
 +    public function getBlockPrefix(): string;
- 
-     /**
-@@ -92,4 +92,4 @@ interface FormTypeInterface
-      * @return string|null
-      */
--    public function getParent();
-+    public function getParent(): ?string;
  }
 diff --git a/src/Symfony/Component/Form/FormView.php b/src/Symfony/Component/Form/FormView.php
 --- a/src/Symfony/Component/Form/FormView.php
@@ -8320,7 +8320,7 @@ diff --git a/src/Symfony/Component/HttpKernel/DependencyInjection/LoggerPass.php
 diff --git a/src/Symfony/Component/HttpKernel/DependencyInjection/RegisterControllerArgumentLocatorsPass.php b/src/Symfony/Component/HttpKernel/DependencyInjection/RegisterControllerArgumentLocatorsPass.php
 --- a/src/Symfony/Component/HttpKernel/DependencyInjection/RegisterControllerArgumentLocatorsPass.php
 +++ b/src/Symfony/Component/HttpKernel/DependencyInjection/RegisterControllerArgumentLocatorsPass.php
-@@ -37,5 +37,5 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
+@@ -38,5 +38,5 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
       * @return void
       */
 -    public function process(ContainerBuilder $container)
@@ -13056,7 +13056,7 @@ diff --git a/src/Symfony/Component/Validator/Constraints/SequentiallyValidator.p
 diff --git a/src/Symfony/Component/Validator/Constraints/TimeValidator.php b/src/Symfony/Component/Validator/Constraints/TimeValidator.php
 --- a/src/Symfony/Component/Validator/Constraints/TimeValidator.php
 +++ b/src/Symfony/Component/Validator/Constraints/TimeValidator.php
-@@ -37,5 +37,5 @@ class TimeValidator extends ConstraintValidator
+@@ -38,5 +38,5 @@ class TimeValidator extends ConstraintValidator
       * @return void
       */
 -    public function validate(mixed $value, Constraint $constraint)

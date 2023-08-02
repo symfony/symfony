@@ -19,6 +19,23 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 interface FormTypeInterface
 {
     /**
+     * Returns the name of the parent type.
+     *
+     * The parent type and its extensions will configure the form with the
+     * following methods before the current implementation.
+     *
+     * @return string|null
+     */
+    public function getParent();
+
+    /**
+     * Configures the options for this type.
+     *
+     * @return void
+     */
+    public function configureOptions(OptionsResolver $resolver);
+
+    /**
      * Builds the form.
      *
      * This method is called for each type in the hierarchy starting from the
@@ -70,13 +87,6 @@ interface FormTypeInterface
     public function finishView(FormView $view, FormInterface $form, array $options);
 
     /**
-     * Configures the options for this type.
-     *
-     * @return void
-     */
-    public function configureOptions(OptionsResolver $resolver);
-
-    /**
      * Returns the prefix of the template block name for this type.
      *
      * The block prefix defaults to the underscored short class name with
@@ -85,11 +95,4 @@ interface FormTypeInterface
      * @return string
      */
     public function getBlockPrefix();
-
-    /**
-     * Returns the name of the parent type.
-     *
-     * @return string|null
-     */
-    public function getParent();
 }

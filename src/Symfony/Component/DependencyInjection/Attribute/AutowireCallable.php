@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Attribute;
 
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -37,5 +38,13 @@ class AutowireCallable extends Autowire
         }
 
         parent::__construct($callable ?? [new Reference($service), $method ?? '__invoke'], lazy: $lazy);
+    }
+
+    public function buildDefinition(mixed $value, ?string $type, \ReflectionParameter $parameter): Definition
+    {
+        return (new Definition($type = \is_string($this->lazy) ? $this->lazy : ($type ?: 'Closure')))
+            ->setFactory(['Closure', 'fromCallable'])
+            ->setArguments([\is_array($value) ? $value + [1 => '__invoke'] : $value])
+            ->setLazy($this->lazy || 'Closure' !== $type && 'callable' !== (string) $parameter->getType());
     }
 }

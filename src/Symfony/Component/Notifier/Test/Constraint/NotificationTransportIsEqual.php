@@ -19,9 +19,9 @@ use Symfony\Component\Notifier\Message\MessageInterface;
  */
 final class NotificationTransportIsEqual extends Constraint
 {
-    private $expectedText;
+    private ?string $expectedText;
 
-    public function __construct(string $expectedText)
+    public function __construct(?string $expectedText)
     {
         $this->expectedText = $expectedText;
     }

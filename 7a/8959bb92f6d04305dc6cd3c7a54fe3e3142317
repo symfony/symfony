@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-07-21T16:31:17Z
+
+Since this is not a bug fix, this should go on 6.4.
+Conflicts don't happen if we follow this policy :)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2023-07-28T15:00:26Z
+
+Rebased on 6.4.

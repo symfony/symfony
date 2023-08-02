@@ -11,9 +11,10 @@
 
 namespace Symfony\Bridge\Monolog\Tests\Handler;
 
+use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Handler\FirePHPHandler;
-use Symfony\Bridge\Monolog\Logger;
+use Symfony\Bridge\Monolog\Monolog;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,7 +27,11 @@ class FirePHPHandlerTest extends TestCase
     public function testLogHandling()
     {
         $handler = $this->createHandler();
-        $logger = new Logger('my_logger', [$handler]);
+        if (Logger::API >= 3) {
+            $logger = new Monolog('my_logger', [$handler]);
+        } else {
+            $logger = new Logger('my_logger', [$handler]);
+        }
 
         $logger->warning('This does not look right.');
 
@@ -75,7 +80,11 @@ class FirePHPHandlerTest extends TestCase
     public function testNoFirePhpClient()
     {
         $handler = $this->createHandler();
-        $logger = new Logger('my_logger', [$handler]);
+        if (Logger::API >= 3) {
+            $logger = new Monolog('my_logger', [$handler]);
+        } else {
+            $logger = new Logger('my_logger', [$handler]);
+        }
 
         $logger->warning('This does not look right.');
 

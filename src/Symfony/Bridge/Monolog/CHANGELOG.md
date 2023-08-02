@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add native return type to `Logger::clear()` and to `DebugProcessor::clear()`
+ * Deprecate `Logger` class in favor of `Symfony\Bridge\Monolog\Monolog`
 
 6.1
 ---

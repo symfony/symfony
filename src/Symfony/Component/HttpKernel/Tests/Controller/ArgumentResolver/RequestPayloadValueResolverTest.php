@@ -251,7 +251,7 @@ class RequestPayloadValueResolverTest extends TestCase
             $this->fail(sprintf('Expected "%s" to be thrown.', HttpException::class));
         } catch (HttpException $e) {
             $validationFailedException = $e->getPrevious();
-            $this->assertSame(404, $e->getStatusCode());
+            $this->assertSame(422, $e->getStatusCode());
             $this->assertInstanceOf(ValidationFailedException::class, $validationFailedException);
             $this->assertSame('This value should be of type unknown.', $validationFailedException->getViolations()[0]->getMessage());
             $this->assertSame('Test', $validationFailedException->getViolations()[1]->getMessage());

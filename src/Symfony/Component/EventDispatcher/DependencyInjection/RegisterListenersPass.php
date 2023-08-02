@@ -22,29 +22,11 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Compiler pass to register tagged services for an event dispatcher.
- *
- * @psalm-type BeforeAfterDefinition = string|array{0: string, 1: string}
- * @psalm-type ListenerDefinition = array{serviceId: string, event: string, method: string, before?: BeforeAfterDefinition, after?: BeforeAfterDefinition, priority?: int, dispatchers: list<string>}
- * @psalm-type AllListenersDefinition = array<string, list<ListenerDefinition>>
  */
 class RegisterListenersPass implements CompilerPassInterface
 {
     private array $hotPathEvents = [];
     private array $noPreloadEvents = [];
-
-    /**
-     * $allListenersMap['event_name']['listener_service_id']['method'] => $listenerDefinition.
-     *
-     * @var array<string, array<string, array<string, ListenerDefinition>>>
-     */
-    private array $allListenersMap = [];
-
-    /**
-     * $listenerClassesMap['listener_FQCN']['event_name'][] => array{serviceId: string, method:string}.
-     *
-     * @var array<string, array<string, list<array{serviceId: string, method:string}>>>
-     */
-    private array $listenerClassesMap = [];
 
     /**
      * @return $this
@@ -81,76 +63,106 @@ class RegisterListenersPass implements CompilerPassInterface
             iterator_to_array($this->collectSubscribers($container)),
         );
 
-        $this->initializeListenersMaps($container, $allListenerDefinitions);
+        // $allListenersMap['event_name']['listener_service_id']['method'] => $listenerDefinition.
+        $allListenersMap = $this->initializeAllListenersMaps($allListenerDefinitions);
 
-        $this->handleBeforeAfter($allListenerDefinitions, $container);
+        // $listenerClassesMap['listener_FQCN']['event_name'][] => array{serviceId: string, method:string}.
+        $listenerClassesMap = $this->initializeListenersClassesMap($container, $allListenerDefinitions);
+
+        $this->handleBeforeAfter($allListenerDefinitions, $container, $allListenersMap, $listenerClassesMap);
 
         $this->registerListeners($container, $allListenerDefinitions);
     }
 
     /**
-     * @param AllListenersDefinition $allListenerDefinitions
+     * @param array<string, list<array{serviceId: string, event: string, method: string, before?: string|array{0: string, 1: string}, after?: string|array{0: string, 1: string}, priority?: int, dispatchers: list<string>}>> $allListenerDefinitions
+     *
+     * @return array<string, array<string, array<string, array{serviceId: string, event: string, method: string, before?: string|array{0: string, 1: string}, after?: string|array{0: string, 1: string}, priority?: int, dispatchers: list<string>}>>>
      */
-    private function initializeListenersMaps(ContainerBuilder $container, array $allListenerDefinitions): void
+    private function initializeAllListenersMaps(array $allListenerDefinitions): array
     {
+        $allListenersMap = [];
+
         foreach ($allListenerDefinitions as $listenerDefinitions) {
             foreach ($listenerDefinitions as $listenerDefinition) {
-                $this->allListenersMap[$listenerDefinition['event']][$listenerDefinition['serviceId']][$listenerDefinition['method']] = $listenerDefinition;
+                $allListenersMap[$listenerDefinition['event']][$listenerDefinition['serviceId']][$listenerDefinition['method']] = $listenerDefinition;
+            }
+        }
 
+        return $allListenersMap;
+    }
+
+    /**
+     * @param array<string, list<array{serviceId: string, event: string, method: string, before?: string|array{0: string, 1: string}, after?: string|array{0: string, 1: string}, priority?: int, dispatchers: list<string>}>> $allListenerDefinitions
+     *
+     * @return array<string, array<string, list<array{serviceId: string, method:string}>>>
+     */
+    private function initializeListenersClassesMap(ContainerBuilder $container, array $allListenerDefinitions): array
+    {
+        $listenerClassesMap = [];
+
+        foreach ($allListenerDefinitions as $listenerDefinitions) {
+            foreach ($listenerDefinitions as $listenerDefinition) {
                 $listenerClass = $container->getDefinition($listenerDefinition['serviceId'])->getClass();
 
                 if ($listenerClass) {
-                    $this->listenerClassesMap[$listenerClass][$listenerDefinition['event']] ??= [];
-                    $this->listenerClassesMap[$listenerClass][$listenerDefinition['event']][] = [
+                    $listenerClassesMap[$listenerClass][$listenerDefinition['event']] ??= [];
+                    $listenerClassesMap[$listenerClass][$listenerDefinition['event']][] = [
                         'serviceId' => $listenerDefinition['serviceId'],
                         'method' => $listenerDefinition['method'],
                     ];
                 }
             }
         }
+
+        return $listenerClassesMap;
     }
 
     /**
-     * @param AllListenersDefinition $allListenerDefinitions
+     * @param array<string, list<array{serviceId: string, event: string, method: string, before?: string|array{0: string, 1: string}, after?: string|array{0: string, 1: string}, priority?: int, dispatchers: list<string>}>>                         $allListenerDefinitions
+     * @param array<string, array<string, array<string, array{serviceId: string, event: string, method: string, before?: string|array{0: string, 1: string}, after?: string|array{0: string, 1: string}, priority?: int, dispatchers: list<string>}>>> $allListenersMap
+     * @param array<string, array<string, list<array{serviceId: string, method:string}>>>                                                                                                                                                              $listenerClassesMap
      */
-    private function handleBeforeAfter(array &$allListenerDefinitions, ContainerBuilder $container): void
+    private function handleBeforeAfter(array &$allListenerDefinitions, ContainerBuilder $container, array $allListenersMap, array $listenerClassesMap): void
     {
         foreach ($allListenerDefinitions as &$listenerDefinitions) {
             foreach ($listenerDefinitions as &$listenerDefinition) {
                 if (isset($listenerDefinition['before']) && isset($listenerDefinition['after'])) {
-                    throw InvalidBeforeAfterListenerDefinitionException::beforeAndAfterAtSameTime($listenerDefinition['serviceId']);
+                    throw new InvalidArgumentException(sprintf('Invalid before/after definition for service "%s": cannot use "after" and "before" at the same time.', $listenerDefinition['serviceId']));
                 }
 
                 if (isset($listenerDefinition['before']) || isset($listenerDefinition['after'])) {
-                    $listenerDefinition['priority'] = $this->computeBeforeAfterPriorities($container, $listenerDefinition);
+                    $listenerDefinition['priority'] = $this->computeBeforeAfterPriorities($container, $listenerDefinition, $allListenersMap, $listenerClassesMap);
 
                     // register the new priority in listeners map
                     unset($listenerDefinition['before'], $listenerDefinition['after']);
-                    $this->allListenersMap[$listenerDefinition['event']][$listenerDefinition['serviceId']][$listenerDefinition['method']] = $listenerDefinition;
+                    $allListenersMap[$listenerDefinition['event']][$listenerDefinition['serviceId']][$listenerDefinition['method']] = $listenerDefinition;
                 }
             }
         }
     }
 
     /**
-     * @param ListenerDefinition  $listenerDefinition
-     * @param array<string, bool> $alreadyVisited
+     * @param array{serviceId: string, event: string, method: string, before?: string|array{0: string, 1: string}, after?: string|array{0: string, 1: string}, priority?: int, dispatchers: list<string>}                                              $listenerDefinition
+     * @param array<string, array<string, array<string, array{serviceId: string, event: string, method: string, before?: string|array{0: string, 1: string}, after?: string|array{0: string, 1: string}, priority?: int, dispatchers: list<string>}>>> $allListenersMap
+     * @param array<string, array<string, list<array{serviceId: string, method:string}>>>                                                                                                                                                              $listenerClassesMap
+     * @param array<string, bool>                                                                                                                                                                                                                      $alreadyVisited
      */
-    private function computeBeforeAfterPriorities(ContainerBuilder $container, array $listenerDefinition, array $alreadyVisited = []): int
+    private function computeBeforeAfterPriorities(ContainerBuilder $container, array $listenerDefinition, array $allListenersMap, array $listenerClassesMap, array $alreadyVisited = []): int
     {
         // Prevent circular references
         $listenerName = sprintf('%s::%s', $listenerDefinition['serviceId'], $listenerDefinition['method']);
         if ($alreadyVisited[$listenerName] ?? false) {
-            throw InvalidBeforeAfterListenerDefinitionException::circularReference($listenerDefinition['serviceId']);
+            throw new InvalidArgumentException(sprintf('Invalid before/after definition for service "%s": circular reference detected.', $listenerDefinition['serviceId']));
         }
         $alreadyVisited[$listenerName] = true;
 
         if (isset($listenerDefinition['before']) || isset($listenerDefinition['after'])) {
-            ['serviceId' => $beforeAfterServiceId, 'method' => $beforeAfterMethod] = $this->normalizeBeforeAfter($container, $listenerDefinition);
+            ['serviceId' => $beforeAfterServiceId, 'method' => $beforeAfterMethod] = $this->normalizeBeforeAfter($container, $listenerDefinition, $allListenersMap, $listenerClassesMap);
 
-            $beforeAfterListenerDefinition = $this->allListenersMap[$listenerDefinition['event']][$beforeAfterServiceId][$beforeAfterMethod];
+            $beforeAfterListenerDefinition = $allListenersMap[$listenerDefinition['event']][$beforeAfterServiceId][$beforeAfterMethod];
 
-            $priority = $this->computeBeforeAfterPriorities($container, $beforeAfterListenerDefinition, $alreadyVisited);
+            $priority = $this->computeBeforeAfterPriorities($container, $beforeAfterListenerDefinition, $allListenersMap, $listenerClassesMap, $alreadyVisited);
 
             return isset($listenerDefinition['before']) ? $priority + 1 : $priority - 1;
         }
@@ -159,27 +171,29 @@ class RegisterListenersPass implements CompilerPassInterface
     }
 
     /**
-     * @param ListenerDefinition $listenerDefinition
+     * @param array{serviceId: string, event: string, method: string, before?: string|array{0: string, 1: string}, after?: string|array{0: string, 1: string}, priority?: int, dispatchers: list<string>}                                              $listenerDefinition
+     * @param array<string, array<string, array<string, array{serviceId: string, event: string, method: string, before?: string|array{0: string, 1: string}, after?: string|array{0: string, 1: string}, priority?: int, dispatchers: list<string>}>>> $allListenersMap
+     * @param array<string, array<string, list<array{serviceId: string, method:string}>>>                                                                                                                                                              $listenerClassesMap
      *
      * @return array{serviceId: string, method: string}
      *
      * before/after can be defined as: class-string, service-id, or array{class?: class-string, service?: service-id, method?: string}
      * let's normalize it, and resolve the method if not given (or rise an exception if ambiguous)
      */
-    private function normalizeBeforeAfter(ContainerBuilder $container, array $listenerDefinition): array
+    private function normalizeBeforeAfter(ContainerBuilder $container, array $listenerDefinition, array $allListenersMap, array $listenerClassesMap): array
     {
         $beforeAfterDefinition = $listenerDefinition['before'] ?? $listenerDefinition['after'];
         $id = $listenerDefinition['serviceId'];
         $event = $listenerDefinition['event'];
 
-        $listenersForEvent = $this->allListenersMap[$event];
+        $listenersForEvent = $allListenersMap[$event];
 
         $beforeAfterMethod = null;
         $normalizedBeforeAfter = null;
 
         if (\is_array($beforeAfterDefinition)) {
             if (!array_is_list($beforeAfterDefinition) || 2 !== \count($beforeAfterDefinition)) {
-                throw InvalidBeforeAfterListenerDefinitionException::arrayDefinitionInvalid($id);
+                throw new InvalidArgumentException(sprintf('Invalid before/after definition for service "%s": when declaring as an array, first item must be a service id or a class and second item must be the method.', $id));
             }
 
             $beforeAfterMethod = $beforeAfterDefinition[1];
@@ -188,20 +202,22 @@ class RegisterListenersPass implements CompilerPassInterface
             $beforeAfterServiceOrClass = $beforeAfterDefinition;
         }
 
+        $beforeAfterDefinitionAsString = \is_string($beforeAfterDefinition) ? $beforeAfterDefinition : sprintf('%s::%s()', $beforeAfterDefinition[0], $beforeAfterDefinition[1]);
+
         if (class_exists($beforeAfterServiceOrClass) && !$container->has($beforeAfterServiceOrClass)) {
-            if (!isset($this->listenerClassesMap[$beforeAfterServiceOrClass])) {
-                throw InvalidBeforeAfterListenerDefinitionException::notAListener($id, $beforeAfterDefinition);
+            if (!isset($listenerClassesMap[$beforeAfterServiceOrClass])) {
+                throw new InvalidArgumentException(sprintf('Invalid before/after definition for service "%s": given definition "%s" is not a listener.', $id, $beforeAfterDefinitionAsString));
             }
 
-            if (!isset($this->listenerClassesMap[$beforeAfterServiceOrClass][$event])) {
-                throw InvalidBeforeAfterListenerDefinitionException::notSameEvent($id, $beforeAfterDefinition);
+            if (!isset($listenerClassesMap[$beforeAfterServiceOrClass][$event])) {
+                throw new InvalidArgumentException(sprintf('Invalid before/after definition for service "%s": given definition "%s" does not listen to the same event.', $id, $beforeAfterDefinitionAsString));
             }
 
-            $listenersForClassAndEvent = $this->listenerClassesMap[$beforeAfterServiceOrClass][$event];
+            $listenersForClassAndEvent = $listenerClassesMap[$beforeAfterServiceOrClass][$event];
 
             if (!$beforeAfterMethod) {
                 if (1 < \count($listenersForClassAndEvent)) {
-                    throw InvalidBeforeAfterListenerDefinitionException::ambiguousDefinition($id, $beforeAfterServiceOrClass);
+                    throw new InvalidArgumentException(sprintf('Invalid before/after definition for service "%s": given definition "%s" is ambiguous. Please specify the "method" attribute.', $id, $beforeAfterServiceOrClass));
                 }
 
                 $normalizedBeforeAfter = $listenersForClassAndEvent[0];
@@ -214,7 +230,7 @@ class RegisterListenersPass implements CompilerPassInterface
                 }
 
                 if (!isset($normalizedBeforeAfter)) {
-                    throw InvalidBeforeAfterListenerDefinitionException::notAListener($id, $beforeAfterDefinition);
+                    throw new InvalidArgumentException(sprintf('Invalid before/after definition for service "%s": given definition "%s" is not a listener.', $id, $beforeAfterDefinitionAsString));
                 }
             }
         } elseif (
@@ -222,35 +238,35 @@ class RegisterListenersPass implements CompilerPassInterface
             && (($def = $container->findDefinition($beforeAfterServiceOrClass))->hasTag('kernel.event_listener') || $def->hasTag('kernel.event_subscriber'))
         ) {
             if (!isset($listenersForEvent[$beforeAfterServiceOrClass])) {
-                throw InvalidBeforeAfterListenerDefinitionException::notSameEvent($id, $beforeAfterDefinition);
+                throw new InvalidArgumentException(sprintf('Invalid before/after definition for service "%s": given definition "%s" does not listen to the same event.', $id, $beforeAfterDefinitionAsString));
             }
 
             if (!$beforeAfterMethod) {
                 if (1 < \count($listenersForEvent[$beforeAfterServiceOrClass])) {
-                    throw InvalidBeforeAfterListenerDefinitionException::ambiguousDefinition($id, $beforeAfterServiceOrClass);
+                    throw new InvalidArgumentException(sprintf('Invalid before/after definition for service "%s": given definition "%s" is ambiguous. Please specify the "method" attribute.', $id, $beforeAfterServiceOrClass));
                 }
 
                 $beforeAfterMethod = array_key_first($listenersForEvent[$beforeAfterServiceOrClass]);
             } else {
                 if (!isset($listenersForEvent[$beforeAfterServiceOrClass][$beforeAfterMethod])) {
-                    throw InvalidBeforeAfterListenerDefinitionException::notAListener($id, $beforeAfterDefinition);
+                    throw new InvalidArgumentException(sprintf('Invalid before/after definition for service "%s": given definition "%s" is not a listener.', $id, $beforeAfterDefinitionAsString));
                 }
             }
 
             $normalizedBeforeAfter = ['serviceId' => $beforeAfterServiceOrClass, 'method' => $beforeAfterMethod];
         } else {
-            throw InvalidBeforeAfterListenerDefinitionException::notAListener($id, $beforeAfterDefinition);
+            throw new InvalidArgumentException(sprintf('Invalid before/after definition for service "%s": given definition "%s" is not a listener.', $id, $beforeAfterDefinitionAsString));
         }
 
         if ($listenersForEvent[$normalizedBeforeAfter['serviceId']][$normalizedBeforeAfter['method']]['dispatchers'] !== $listenerDefinition['dispatchers']) {
-            throw InvalidBeforeAfterListenerDefinitionException::notSameDispatchers($id, $beforeAfterDefinition);
+            throw new InvalidArgumentException(sprintf('Invalid before/after definition for service "%s": given definition "%s" is not handled by the same dispatchers.', $id, $beforeAfterDefinitionAsString));
         }
 
         return $normalizedBeforeAfter;
     }
 
     /**
-     * @param AllListenersDefinition $allListenerDefinitions
+     * @param array<string, list<array{serviceId: string, event: string, method: string, before?: string|array{0: string, 1: string}, after?: string|array{0: string, 1: string}, priority?: int, dispatchers: list<string>}>> $allListenerDefinitions
      */
     public function registerListeners(ContainerBuilder $container, array $allListenerDefinitions): void
     {
@@ -313,9 +329,9 @@ class RegisterListenersPass implements CompilerPassInterface
 
                 if (!isset($event['method'])) {
                     $event['method'] = 'on'.preg_replace_callback([
-                            '/(?<=\b|_)[a-z]/i',
-                            '/[^a-z0-9]/i',
-                        ], fn ($matches) => strtoupper($matches[0]), $event['event']);
+                        '/(?<=\b|_)[a-z]/i',
+                        '/[^a-z0-9]/i',
+                    ], fn ($matches) => strtoupper($matches[0]), $event['event']);
                     $event['method'] = preg_replace('/[^a-z0-9]/i', '', $event['method']);
 
                     if (null !== ($class = $container->getDefinition($id)->getClass()) && ($r = $container->getReflectionClass($class, false)) && !$r->hasMethod($event['method'])) {
@@ -338,7 +354,7 @@ class RegisterListenersPass implements CompilerPassInterface
     }
 
     /**
-     * @return \Generator<string, list<ListenerDefinition>>
+     * @return \Generator<string, list<array{serviceId: string, event: string, method: string, before?: string|array{0: string, 1: string}, after?: string|array{0: string, 1: string}, priority?: int, dispatchers: list<string>}>>
      */
     private function collectSubscribers(ContainerBuilder $container): \Generator
     {
@@ -402,7 +418,7 @@ class RegisterListenersPass implements CompilerPassInterface
         $aliases = [];
 
         if ($container->hasParameter('event_dispatcher.event_aliases')) {
-            $aliases = $container->getParameter('event_dispatcher.event_aliases');
+            $aliases = $container->getParameter('event_dispatcher.event_aliases') ?? [];
         }
 
         return $aliases;

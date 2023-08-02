@@ -21,7 +21,6 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\DependencyInjection\AddEventAliasesPass;
-use Symfony\Component\EventDispatcher\DependencyInjection\InvalidBeforeAfterListenerDefinitionException;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\EventDispatcher\Tests\Fixtures\CustomEvent;
@@ -657,7 +656,7 @@ class RegisterListenersPassTest extends TestCase
      */
     public function testBeforeAfterErrors(string $expectedErrorMessage, array $erroneousTagDefinition)
     {
-        $this->expectException(InvalidBeforeAfterListenerDefinitionException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedErrorMessage);
 
         $container = new ContainerBuilder();
@@ -722,7 +721,7 @@ class RegisterListenersPassTest extends TestCase
      */
     public function testBeforeAfterAmbiguous(string $expectedErrorMessage, array $ambiguousTagDefinition)
     {
-        $this->expectException(InvalidBeforeAfterListenerDefinitionException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedErrorMessage);
 
         $container = new ContainerBuilder();
@@ -753,7 +752,7 @@ class RegisterListenersPassTest extends TestCase
 
     public function testBeforeAfterCircularError()
     {
-        $this->expectException(InvalidBeforeAfterListenerDefinitionException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid before/after definition for service "listener_1": circular reference detected.');
 
         $container = new ContainerBuilder();

@@ -13,6 +13,7 @@ CHANGELOG
    transitions and workflow's metadata into dumped graph
  * Add support for storing marking in a property
  * Add a profiler
+ * Add support for multiline descriptions in PlantUML diagrams
 
 6.2
 ---

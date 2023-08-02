@@ -36,11 +36,11 @@
 
 {% block menu %}
     <span class="label {{ collector.totals.calls == 0 ? 'disabled' }}">
-    <span class="icon">
-        {{ source('@WebProfiler/Icon/cache.svg') }}
+        <span class="icon">
+            {{ source('@WebProfiler/Icon/cache.svg') }}
+        </span>
+        <strong>Cache</strong>
     </span>
-    <strong>Cache</strong>
-</span>
 {% endblock %}
 
 {% block panel %}

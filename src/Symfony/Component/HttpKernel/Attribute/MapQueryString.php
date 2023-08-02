@@ -25,13 +25,17 @@ use Symfony\Component\Validator\Constraints\GroupSequence;
 class MapQueryString extends ValueResolver
 {
     public ArgumentMetadata $metadata;
+    public readonly string|\Closure|null $validationGroupsResolver;
 
     public function __construct(
         public readonly array $serializationContext = [],
         public readonly string|GroupSequence|array|null $validationGroups = null,
         string $resolver = RequestPayloadValueResolver::class,
         public readonly int $validationFailedStatusCode = Response::HTTP_NOT_FOUND,
+        string|callable $validationGroupsResolver = null,
     ) {
         parent::__construct($resolver);
+
+        $this->validationGroupsResolver = \is_callable($validationGroupsResolver) ? $validationGroupsResolver(...) : $validationGroupsResolver;
     }
 }

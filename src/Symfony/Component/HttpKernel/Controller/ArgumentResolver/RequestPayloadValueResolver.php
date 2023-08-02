@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 
+use Psr\Container\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,16 +21,19 @@ use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\ResolverNotFoundException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Exception\UnsupportedFormatException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Service\ServiceProviderInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -59,6 +63,7 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
         private readonly SerializerInterface&DenormalizerInterface $serializer,
         private readonly ?ValidatorInterface $validator = null,
         private readonly ?TranslatorInterface $translator = null,
+        private readonly ?ContainerInterface $validationGroupsResolvers = null,
     ) {
     }
 
@@ -120,7 +125,11 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
                 }
 
                 if (null !== $payload) {
-                    $violations->addAll($this->validator->validate($payload, null, $argument->validationGroups ?? null));
+                    $violations->addAll($this->validator->validate(
+                        $payload,
+                        null,
+                        $argument->validationGroups ?? $this->resolveValidationGroups($argument->validationGroupsResolver, $payload, $request),
+                    ));
                 }
 
                 if (\count($violations)) {
@@ -153,6 +162,25 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
         return [
             KernelEvents::CONTROLLER_ARGUMENTS => 'onKernelControllerArguments',
         ];
+    }
+
+    private function resolveValidationGroups(string|\Closure|null $validationGroupsResolver, mixed $payload, Request $request): string|GroupSequence|array|null
+    {
+        if (null === $validationGroupsResolver) {
+            return null;
+        }
+
+        if ($validationGroupsResolver instanceof \Closure) {
+            return $validationGroupsResolver($payload, $request);
+        }
+
+        if (!$this->validationGroupsResolvers || !$this->validationGroupsResolvers->has($validationGroupsResolver)) {
+            throw new ResolverNotFoundException($validationGroupsResolver, $this->validationGroupsResolvers instanceof ServiceProviderInterface ? array_keys($this->validationGroupsResolvers->getProvidedServices()) : []);
+        } elseif (!\is_callable($validationGroupsResolver = $this->validationGroupsResolvers->get($resolverId = $validationGroupsResolver))) {
+            throw new \RuntimeException(sprintf('The service "%s" must be a callable.', $resolverId));
+        }
+
+        return $validationGroupsResolver($payload, $request);
     }
 
     private function mapQueryString(Request $request, string $type, MapQueryString $attribute): ?object

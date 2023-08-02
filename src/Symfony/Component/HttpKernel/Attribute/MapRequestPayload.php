@@ -25,6 +25,7 @@ use Symfony\Component\Validator\Constraints\GroupSequence;
 class MapRequestPayload extends ValueResolver
 {
     public ArgumentMetadata $metadata;
+    public readonly string|\Closure|null $validationGroupsResolver;
 
     public function __construct(
         public readonly array|string|null $acceptFormat = null,
@@ -32,7 +33,10 @@ class MapRequestPayload extends ValueResolver
         public readonly string|GroupSequence|array|null $validationGroups = null,
         string $resolver = RequestPayloadValueResolver::class,
         public readonly int $validationFailedStatusCode = Response::HTTP_UNPROCESSABLE_ENTITY,
+        string|callable $validationGroupsResolver = null,
     ) {
         parent::__construct($resolver);
+
+        $this->validationGroupsResolver = \is_callable($validationGroupsResolver) ? $validationGroupsResolver(...) : $validationGroupsResolver;
     }
 }

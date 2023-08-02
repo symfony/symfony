@@ -68,6 +68,7 @@ return static function (ContainerConfigurator $container) {
                 service('serializer'),
                 service('validator')->nullOnInvalid(),
                 service('translator')->nullOnInvalid(),
+                tagged_locator('controller.request_payload.validation_groups_resolver'),
             ])
             ->tag('controller.targeted_value_resolver', ['name' => RequestPayloadValueResolver::class])
             ->tag('kernel.event_subscriber')

@@ -12,6 +12,9 @@
 namespace Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolver;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
@@ -20,6 +23,7 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestPayloadValue
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\ResolverNotFoundException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
@@ -522,7 +526,10 @@ class RequestPayloadValueResolverTest extends TestCase
 
         $serializer = new Serializer([new ObjectNormalizer()]);
         $validator = (new ValidatorBuilder())->enableAnnotationMapping()->getValidator();
-        $resolver = new RequestPayloadValueResolver($serializer, $validator);
+        $locator = new ServiceLocator([
+            'validation_groups_resolver' => fn () => new ValidationGroupsResolver(),
+        ]);
+        $resolver = new RequestPayloadValueResolver($serializer, $validator, null, $locator);
 
         $request = Request::create('/', $method, $input);
 
@@ -548,7 +555,10 @@ class RequestPayloadValueResolverTest extends TestCase
 
         $serializer = new Serializer([new ObjectNormalizer()]);
         $validator = (new ValidatorBuilder())->enableAnnotationMapping()->getValidator();
-        $resolver = new RequestPayloadValueResolver($serializer, $validator);
+        $locator = new ServiceLocator([
+            'validation_groups_resolver' => fn () => new ValidationGroupsResolver(),
+        ]);
+        $resolver = new RequestPayloadValueResolver($serializer, $validator, null, $locator);
 
         $argument = new ArgumentMetadata('valid', RequestPayload::class, false, false, null, false, [
             $attribute::class => $attribute,
@@ -587,6 +597,16 @@ class RequestPayloadValueResolverTest extends TestCase
             new MapRequestPayload(validationGroups: new Assert\GroupSequence(['strict'])),
         ];
 
+        yield 'request payload with validation groups resolver' => [
+            'POST',
+            new MapRequestPayload(validationGroupsResolver: new ValidationGroupsResolver()),
+        ];
+
+        yield 'request payload with validation groups resolver as service' => [
+            'POST',
+            new MapRequestPayload(validationGroupsResolver: 'validation_groups_resolver'),
+        ];
+
         yield 'query with validation group as string' => [
             'GET',
             new MapQueryString(validationGroups: 'strict'),
@@ -601,6 +621,90 @@ class RequestPayloadValueResolverTest extends TestCase
             'GET',
             new MapQueryString(validationGroups: new Assert\GroupSequence(['strict'])),
         ];
+
+        yield 'query with validation groups resolver' => [
+            'GET',
+            new MapQueryString(validationGroupsResolver: new ValidationGroupsResolver()),
+        ];
+
+        yield 'query with validation groups resolver as service' => [
+            'GET',
+            new MapQueryString(validationGroupsResolver: 'validation_groups_resolver'),
+        ];
+    }
+
+    /**
+     * @dataProvider provideValidationGroupsResolverLocator
+     */
+    public function testExceptionIsThrownIfValidationGroupsResolverIsNotFound(?ContainerInterface $locator, string $exceptionMessage)
+    {
+        $input = ['price' => '50', 'title' => 'A long title, so the validation passes'];
+
+        $serializer = new Serializer([new ObjectNormalizer()]);
+        $validator = (new ValidatorBuilder())->enableAnnotationMapping()->getValidator();
+        $resolver = new RequestPayloadValueResolver($serializer, $validator, null, $locator);
+
+        $request = Request::create('/', 'POST', $input);
+
+        $argument = new ArgumentMetadata('valid', RequestPayload::class, false, false, null, false, [
+            MapRequestPayload::class => new MapRequestPayload(validationGroupsResolver: 'validation_groups_resolver'),
+        ]);
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $this->expectException(ResolverNotFoundException::class);
+        $this->expectExceptionMessage($exceptionMessage);
+
+        $resolver->onKernelControllerArguments($event);
+    }
+
+    public static function provideValidationGroupsResolverLocator(): iterable
+    {
+        $message = 'You have requested a non-existent resolver "validation_groups_resolver".';
+
+        yield 'No locator' => [null, $message];
+
+        yield 'Empty locator' => [new ServiceLocator([]), $message];
+
+        yield 'Non-empty locator' => [new ServiceLocator([
+            'foo' => fn () => new \stdClass(),
+            'bar' => fn () => new \stdClass(),
+        ]), $message.' Did you mean one of these: "foo", "bar"?'];
+
+        $container = new ContainerBuilder();
+        $container->register('foo', \stdClass::class);
+        $container->register('bar', \stdClass::class);
+
+        yield 'Container' => [$container, $message];
+    }
+
+    public function testExceptionIsThrownIfValidationGroupsResolverIsNotACallable()
+    {
+        $input = ['price' => '50', 'title' => 'A long title, so the validation passes'];
+
+        $serializer = new Serializer([new ObjectNormalizer()]);
+        $validator = (new ValidatorBuilder())->enableAnnotationMapping()->getValidator();
+        $locator = new ServiceLocator([
+            'validation_groups_resolver' => fn () => new \stdClass(),
+        ]);
+        $resolver = new RequestPayloadValueResolver($serializer, $validator, null, $locator);
+
+        $request = Request::create('/', 'POST', $input);
+
+        $argument = new ArgumentMetadata('valid', RequestPayload::class, false, false, null, false, [
+            MapRequestPayload::class => new MapRequestPayload(validationGroupsResolver: 'validation_groups_resolver'),
+        ]);
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The service "validation_groups_resolver" must be a callable.');
+
+        $resolver->onKernelControllerArguments($event);
     }
 
     public function testQueryValidationErrorCustomStatusCode()
@@ -685,5 +789,13 @@ class QueryPayload
 {
     public function __construct(public readonly float $page)
     {
+    }
+}
+
+class ValidationGroupsResolver
+{
+    public function __invoke(mixed $payload, Request $request)
+    {
+        return 'strict';
     }
 }

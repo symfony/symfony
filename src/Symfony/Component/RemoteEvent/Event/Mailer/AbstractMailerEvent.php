@@ -15,8 +15,6 @@ use Symfony\Component\RemoteEvent\RemoteEvent;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 6.3
  */
 abstract class AbstractMailerEvent extends RemoteEvent
 {

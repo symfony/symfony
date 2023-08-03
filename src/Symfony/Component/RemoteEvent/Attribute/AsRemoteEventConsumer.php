@@ -13,8 +13,6 @@ namespace Symfony\Component\RemoteEvent\Attribute;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 6.3
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class AsRemoteEventConsumer

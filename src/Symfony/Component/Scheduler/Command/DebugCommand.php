@@ -113,21 +113,10 @@ final class DebugCommand extends Command
             $message = $message->getMessage();
         }
 
-        $messageName = (new \ReflectionClass($message))->getShortName();
-        $triggerName = (new \ReflectionClass($trigger))->getShortName();
-
-        if ($message instanceof \Stringable) {
-            $messageName .= ": {$message}";
-        }
-
-        if ($trigger instanceof \Stringable) {
-            $triggerName .= ": {$trigger}";
-        }
-
         return [
-            $messageName,
-            $triggerName,
-            $recurringMessage->getTrigger()->getNextRunDate($date)?->format(\DateTimeInterface::ATOM) ?? '-',
+            $message instanceof \Stringable ? (string) $message : (new \ReflectionClass($message))->getShortName(),
+            (string) $trigger,
+            $trigger->getNextRunDate($date)?->format(\DateTimeInterface::ATOM) ?? '-',
         ];
     }
 }

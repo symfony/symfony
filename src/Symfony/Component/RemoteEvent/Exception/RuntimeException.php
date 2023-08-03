@@ -13,8 +13,6 @@ namespace Symfony\Component\RemoteEvent\Exception;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 6.3
  */
 class RuntimeException extends \RuntimeException implements ExceptionInterface
 {

@@ -17,9 +17,6 @@ use Symfony\Component\Scheduler\RecurringMessage;
 use Symfony\Component\Scheduler\Schedule;
 use Symfony\Component\Scheduler\ScheduleProviderInterface;
 
-/**
- * @experimental
- */
 final class MessageGenerator implements MessageGeneratorInterface
 {
     private Schedule $schedule;

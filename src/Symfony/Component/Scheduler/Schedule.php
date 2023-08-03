@@ -15,9 +15,6 @@ use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Scheduler\Exception\LogicException;
 use Symfony\Contracts\Cache\CacheInterface;
 
-/**
- * @experimental
- */
 final class Schedule implements ScheduleProviderInterface
 {
     /** @var array<string,RecurringMessage> */

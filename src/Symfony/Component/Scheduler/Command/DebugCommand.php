@@ -28,8 +28,6 @@ use function Symfony\Component\Clock\now;
  * Command to list/debug schedules.
  *
  * @author Kevin Bond <kevinbond@gmail.com>
- *
- * @experimental
  */
 #[AsCommand(name: 'debug:scheduler', description: 'List schedules and their recurring messages')]
 final class DebugCommand extends Command

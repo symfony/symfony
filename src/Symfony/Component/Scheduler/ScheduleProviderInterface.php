@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Scheduler;
 
-/**
- * @experimental
- */
 interface ScheduleProviderInterface
 {
     public function getSchedule(): Schedule;

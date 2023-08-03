@@ -17,9 +17,6 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Scheduler\Exception\LogicException;
 use Symfony\Component\Scheduler\Generator\MessageGeneratorInterface;
 
-/**
- * @experimental
- */
 class SchedulerTransport implements TransportInterface
 {
     public function __construct(

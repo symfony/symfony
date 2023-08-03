@@ -27,6 +27,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
 use Symfony\Component\Scheduler\Messenger\SchedulerTransportFactory;
+use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Uid\Factory\UuidFactory;
 
 class ConfigurationTest extends TestCase
@@ -34,7 +35,7 @@ class ConfigurationTest extends TestCase
     public function testDefaultConfig()
     {
         $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(true), [['http_method_override' => false, 'secret' => 's3cr3t']]);
+        $config = $processor->processConfiguration(new Configuration(true), [['http_method_override' => false, 'secret' => 's3cr3t', 'serializer' => ['default_context' => ['foo' => 'bar']]]]);
 
         $this->assertEquals(self::getBundleDefaultConfig(), $config);
     }
@@ -563,8 +564,8 @@ class ConfigurationTest extends TestCase
                 'enabled' => true,
             ],
             'serializer' => [
-                'default_context' => [],
-                'enabled' => !class_exists(FullStack::class),
+                'default_context' => ['foo' => 'bar', JsonDecode::DETAILED_ERROR_MESSAGES => true],
+                'enabled' => true,
                 'enable_annotations' => !class_exists(FullStack::class),
                 'mapping' => ['paths' => []],
             ],

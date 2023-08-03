@@ -18,6 +18,11 @@ where:
  - `ACCESS_KEY` is your Mailjet access key
  - `SECRET_KEY` is your Mailjet secret key
 
+Webhook
+-------
+
+When you [setup your webhook URL](https://app.mailjet.com/account/triggers) on Mailjet you must not group events by unchecking the checkboxes.
+
 Resources
 ---------
 

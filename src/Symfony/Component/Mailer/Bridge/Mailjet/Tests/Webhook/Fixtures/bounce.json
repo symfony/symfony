@@ -1,0 +1,17 @@
+{
+    "event": "bounce",
+    "time": 1685525050,
+    "MessageID": 104427216766056450,
+    "Message_GUID": "5577705c-024a-472d-8918-29ef81a64738",
+    "email": "event-bounce@yahoo.fr",
+    "mj_campaign_id": 0,
+    "mj_contact_id": 1000,
+    "customcampaign": "",
+    "blocked": false,
+    "hard_bounce": false,
+    "error_related_to": "policy issue",
+    "error": "",
+    "comment": "421 4.7.0 [TSS04] Messages from 87.253.233.123 temporarily deferred due to unexpected volume or user complaints - 4.16.55.1; see https://postmaster.yahooinc.com/error-codes",
+    "CustomID": "helloworld",
+    "Payload": ""
+}

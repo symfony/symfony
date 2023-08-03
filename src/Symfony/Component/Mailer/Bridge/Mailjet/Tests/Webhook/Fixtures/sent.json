@@ -1,0 +1,13 @@
+{
+    "event": "sent",
+    "time": 1685518742,
+    "MessageID": 92042317804662640,
+    "Message_GUID": "5b4de5f5-63d0-44f3-b4bd-a34f222cb8af",
+    "email": "event-sent@gmail.com",
+    "mj_campaign_id": 0,
+    "mj_contact_id": 1000,
+    "customcampaign": "",
+    "CustomID": "helloworld",
+    "Payload": "",
+    "smtp_reply": "250 2.0.0 OK  1685518742 k22-20020a05600c0b5600b003f6020d9976si8376621wmr.181 - gsmtp"
+}

@@ -17,9 +17,6 @@ use Symfony\Component\Scheduler\Trigger\JitterTrigger;
 use Symfony\Component\Scheduler\Trigger\PeriodicalTrigger;
 use Symfony\Component\Scheduler\Trigger\TriggerInterface;
 
-/**
- * @experimental
- */
 final class RecurringMessage
 {
     private string $id;

@@ -47,6 +47,7 @@ final class DebugCommand extends Command
     {
         $this
             ->addArgument('schedule', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, sprintf('The schedule name (one of "%s")', implode('", "', $this->scheduleNames)), null, $this->scheduleNames)
+            ->addOption('date', null, InputArgument::OPTIONAL, 'The date to use for the next run date', 'now')
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</info> lists schedules and their recurring messages:
 
@@ -55,6 +56,10 @@ final class DebugCommand extends Command
                 Or for a specific schedule only:
 
                   <info>php %command.full_name% default</info>
+
+                You can also specify a date to use for the next run date:
+
+                  <info>php %command.full_name% --date=2025-10-18</info>
 
                 EOF
             )
@@ -72,6 +77,11 @@ final class DebugCommand extends Command
             return 2;
         }
 
+        $date = new \DateTimeImmutable($input->getOption('date'));
+        if ('now' !== $input->getOption('date')) {
+            $io->comment(sprintf('All next run dates computed from %s.', $date->format(\DateTimeInterface::ATOM)));
+        }
+
         foreach ($names as $name) {
             $io->section($name);
 
@@ -84,7 +94,7 @@ final class DebugCommand extends Command
             }
             $io->table(
                 ['Message', 'Trigger', 'Next Run'],
-                array_map(self::renderRecurringMessage(...), $messages),
+                array_map(self::renderRecurringMessage(...), $messages, array_fill(0, count($messages), $date)),
             );
         }
 
@@ -94,7 +104,7 @@ final class DebugCommand extends Command
     /**
      * @return array{0:string,1:string,2:string}
      */
-    private static function renderRecurringMessage(RecurringMessage $recurringMessage): array
+    private static function renderRecurringMessage(RecurringMessage $recurringMessage, \DateTimeImmutable $date): array
     {
         $message = $recurringMessage->getMessage();
         $trigger = $recurringMessage->getTrigger();
@@ -117,7 +127,7 @@ final class DebugCommand extends Command
         return [
             $messageName,
             $triggerName,
-            $recurringMessage->getTrigger()->getNextRunDate(now())?->format(\DateTimeInterface::ATOM) ?? '-',
+            $recurringMessage->getTrigger()->getNextRunDate($date)?->format(\DateTimeInterface::ATOM) ?? '-',
         ];
     }
 }

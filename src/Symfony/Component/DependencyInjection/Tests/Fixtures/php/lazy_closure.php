@@ -20,7 +20,8 @@ class Symfony_DI_PhpDumper_Test_Lazy_Closure extends Container
     {
         $this->services = $this->privates = [];
         $this->methodMap = [
-            'closure' => 'getClosureService',
+            'closure1' => 'getClosure1Service',
+            'closure2' => 'getClosure2Service',
         ];
 
         $this->aliases = [];
@@ -40,6 +41,7 @@ class Symfony_DI_PhpDumper_Test_Lazy_Closure extends Container
     {
         return [
             'foo' => true,
+            'foo_void' => true,
         ];
     }
 
@@ -49,12 +51,22 @@ class Symfony_DI_PhpDumper_Test_Lazy_Closure extends Container
     }
 
     /**
-     * Gets the public 'closure' shared service.
+     * Gets the public 'closure1' shared service.
      *
      * @return \Closure
      */
-    protected static function getClosureService($container, $lazyLoad = true)
+    protected static function getClosure1Service($container, $lazyLoad = true)
     {
-        return $container->services['closure'] = (new class(fn () => new \Symfony\Component\DependencyInjection\Tests\Compiler\Foo()) extends \Symfony\Component\DependencyInjection\Argument\LazyClosure { public function cloneFoo(?\stdClass $bar = null): \Symfony\Component\DependencyInjection\Tests\Compiler\Foo { return $this->service->cloneFoo(...\func_get_args()); } })->cloneFoo(...);
+        return $container->services['closure1'] = (new class(fn () => new \Symfony\Component\DependencyInjection\Tests\Compiler\Foo()) extends \Symfony\Component\DependencyInjection\Argument\LazyClosure { public function cloneFoo(?\stdClass $bar = null): \Symfony\Component\DependencyInjection\Tests\Compiler\Foo { return $this->service->cloneFoo(...\func_get_args()); } })->cloneFoo(...);
+    }
+
+    /**
+     * Gets the public 'closure2' shared service.
+     *
+     * @return \Closure
+     */
+    protected static function getClosure2Service($container, $lazyLoad = true)
+    {
+        return $container->services['closure2'] = (new class(fn () => new \Symfony\Component\DependencyInjection\Tests\Compiler\FooVoid()) extends \Symfony\Component\DependencyInjection\Argument\LazyClosure { public function __invoke(string $name): void { $this->service->__invoke(...\func_get_args()); } })->__invoke(...);
     }
 }

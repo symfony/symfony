@@ -15,8 +15,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 6.3
  */
 class RejectWebhookException extends HttpException
 {

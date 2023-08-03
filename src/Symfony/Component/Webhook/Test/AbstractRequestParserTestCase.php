@@ -18,8 +18,6 @@ use Symfony\Component\Webhook\Client\RequestParserInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 6.3
  */
 abstract class AbstractRequestParserTestCase extends TestCase
 {

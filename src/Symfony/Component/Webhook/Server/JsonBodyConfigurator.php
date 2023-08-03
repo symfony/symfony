@@ -17,8 +17,6 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 6.3
  */
 final class JsonBodyConfigurator implements RequestConfiguratorInterface
 {

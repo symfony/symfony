@@ -4,6 +4,7 @@ CHANGELOG
 6.4
 ---
 
+ * Add `--date` to `schedule:debug`
  * Allow setting timezone of next run date in CronExpressionTrigger
  * Add `AbstractTriggerDecorator`
  * Make `ScheduledStamp` "send-able"

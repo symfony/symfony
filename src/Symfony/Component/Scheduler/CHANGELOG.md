@@ -4,7 +4,7 @@ CHANGELOG
 6.4
 ---
 
- * Make component non experimental
+ * Mark the component as non experimental
  * Add `--date` to `schedule:debug`
  * Allow setting timezone of next run date in CronExpressionTrigger
  * Add `AbstractTriggerDecorator`

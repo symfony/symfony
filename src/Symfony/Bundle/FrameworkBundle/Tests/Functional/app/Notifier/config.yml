@@ -13,6 +13,8 @@ framework:
             urgent: ['chat/mercure']
         admin_recipients:
             - { email: admin@example.com }
+        texter_transports:
+            smsbiuras: 'null://null'
     profiler: ~
 
 mercure:

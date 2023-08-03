@@ -13,8 +13,6 @@ namespace Symfony\Component\Security\Core\User;
 
 /**
  * UserInterface implementation used by the access-token security workflow with an OIDC server.
- *
- * @experimental
  */
 class OidcUser implements UserInterface
 {

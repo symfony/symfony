@@ -20,8 +20,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * Configures a token handler for an OIDC server.
- *
- * @experimental
  */
 class OidcUserInfoTokenHandlerFactory implements TokenHandlerFactoryInterface
 {

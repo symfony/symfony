@@ -48,6 +48,7 @@ use Symfony\Component\DependencyInjection\Tests\Compiler\AAndIInterfaceConsumer;
 use Symfony\Component\DependencyInjection\Tests\Compiler\AInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Foo;
 use Symfony\Component\DependencyInjection\Tests\Compiler\FooAnnotation;
+use Symfony\Component\DependencyInjection\Tests\Compiler\FooVoid;
 use Symfony\Component\DependencyInjection\Tests\Compiler\IInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\MyCallable;
 use Symfony\Component\DependencyInjection\Tests\Compiler\SingleMethodInterface;
@@ -1874,12 +1875,18 @@ PHP
     public function testLazyClosure()
     {
         $container = new ContainerBuilder();
-        $container->register('closure', 'Closure')
+        $container->register('closure1', 'Closure')
             ->setPublic('true')
             ->setFactory(['Closure', 'fromCallable'])
             ->setLazy(true)
             ->setArguments([[new Reference('foo'), 'cloneFoo']]);
+        $container->register('closure2', 'Closure')
+            ->setPublic('true')
+            ->setFactory(['Closure', 'fromCallable'])
+            ->setLazy(true)
+            ->setArguments([[new Reference('foo_void'), '__invoke']]);
         $container->register('foo', Foo::class);
+        $container->register('foo_void', FooVoid::class);
         $container->compile();
         $dumper = new PhpDumper($container);
 
@@ -1890,11 +1897,18 @@ PHP
         $container = new \Symfony_DI_PhpDumper_Test_Lazy_Closure();
 
         $cloned = Foo::$counter;
-        $this->assertInstanceOf(\Closure::class, $container->get('closure'));
+        $this->assertInstanceOf(\Closure::class, $container->get('closure1'));
         $this->assertSame($cloned, Foo::$counter);
-        $this->assertInstanceOf(Foo::class, $container->get('closure')());
+        $this->assertInstanceOf(Foo::class, $container->get('closure1')());
         $this->assertSame(1 + $cloned, Foo::$counter);
-        $this->assertSame(1, (new \ReflectionFunction($container->get('closure')))->getNumberOfParameters());
+        $this->assertSame(1, (new \ReflectionFunction($container->get('closure1')))->getNumberOfParameters());
+
+        $counter = FooVoid::$counter;
+        $this->assertInstanceOf(\Closure::class, $container->get('closure2'));
+        $this->assertSame($counter, FooVoid::$counter);
+        $container->get('closure2')('Hello');
+        $this->assertSame(1 + $counter, FooVoid::$counter);
+        $this->assertSame(1, (new \ReflectionFunction($container->get('closure2')))->getNumberOfParameters());
     }
 
     public function testLazyAutowireAttribute()

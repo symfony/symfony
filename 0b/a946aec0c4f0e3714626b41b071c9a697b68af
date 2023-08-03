@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by Seldaek at 2022-12-05T20:20:43Z
+
+Pinging @johnstevenson as he authored most of the xdebug-handler code. Feel free to ignore if not interested though :)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2022-12-06T13:27:06Z
+
+For the record:
+
+Fabien documented how to write CHANGELOG.md files here: https://github.com/symfony/symfony-docs/pull/14830
+
+---------------------------------------------------------------------------
+
+by johnstevenson at 2022-12-06T14:23:35Z
+
+I guess this will work as well as `composer/xdebug-handler` does (which seems to be pretty well) with its limitation of not being able to detect extensions loaded on the command line.
+
+Proper attribution for the `writeTmpIni` and `mergeLoadedConfig` methods would be useful, in my opinion.
+
+---------------------------------------------------------------------------
+
+by Toflar at 2022-12-06T14:34:00Z
+
+> Proper attribution for the `writeTmpIni` and `mergeLoadedConfig` methods would be useful, in my opinion.
+
+Sure, would you mind adding a code review/suggestion as to how you'd like to have this being done? Might also just add yourself as an `@author`?
+
+---------------------------------------------------------------------------
+
+by Toflar at 2023-08-03T07:38:57Z
+
+Rebased and addressed the remaining reviews.

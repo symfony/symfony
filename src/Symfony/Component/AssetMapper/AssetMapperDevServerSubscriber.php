@@ -21,8 +21,6 @@ use Symfony\Component\HttpKernel\KernelEvents;
 /**
  * Functions like a controller that returns assets from the asset mapper.
  *
- * @experimental
- *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
 final class AssetMapperDevServerSubscriber implements EventSubscriberInterface

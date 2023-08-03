@@ -14,8 +14,6 @@ namespace Symfony\Component\AssetMapper;
 /**
  * Represents a single asset in the asset mapper system.
  *
- * @experimental
- *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
 final class MappedAsset

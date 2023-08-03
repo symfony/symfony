@@ -20,8 +20,6 @@ use Symfony\Component\AssetMapper\MappedAsset;
 /**
  * Resolves import paths in JS files.
  *
- * @experimental
- *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
 final class JavaScriptImportPathCompiler implements AssetCompilerInterface

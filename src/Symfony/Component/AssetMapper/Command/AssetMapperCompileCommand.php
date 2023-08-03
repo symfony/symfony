@@ -28,8 +28,6 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * This command is intended to be used during deployment.
  *
- * @experimental
- *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
 #[AsCommand(name: 'asset-map:compile', description: 'Compiles all mapped assets and writes them to the final public output directory.')]

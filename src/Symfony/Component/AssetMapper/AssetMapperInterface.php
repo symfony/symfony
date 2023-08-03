@@ -14,8 +14,6 @@ namespace Symfony\Component\AssetMapper;
 /**
  * Finds and returns assets in the pipeline.
  *
- * @experimental
- *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
 interface AssetMapperInterface

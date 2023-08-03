@@ -13,9 +13,6 @@ namespace Symfony\Component\AssetMapper\ImportMap\Resolver;
 
 use Symfony\Component\AssetMapper\ImportMap\PackageRequireOptions;
 
-/**
- * @experimental
- */
 interface PackageResolverInterface
 {
     /**

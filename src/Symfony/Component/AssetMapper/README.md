@@ -6,11 +6,6 @@ then moved to a public directory with digested (i.e. versioned) filenames. It
 also allows you to dump an [importmap](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap)
 to allow writing modern JavaScript without a build system.
 
-**This Component is experimental**.
-[Experimental features](https://symfony.com/doc/current/contributing/code/experimental.html)
-are not covered by Symfony's
-[Backward Compatibility Promise](https://symfony.com/doc/current/contributing/code/bc.html).
-
 Resources
 ---------
 

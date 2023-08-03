@@ -20,8 +20,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * The token handler validates the token on the OIDC server and retrieves the user identifier.
- *
- * @experimental
  */
 final class OidcUserInfoTokenHandler implements AccessTokenHandlerInterface
 {

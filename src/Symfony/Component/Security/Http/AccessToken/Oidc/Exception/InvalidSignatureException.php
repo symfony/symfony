@@ -15,8 +15,6 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
  * This exception is thrown when the token signature is invalid.
- *
- * @experimental
  */
 class InvalidSignatureException extends AuthenticationException
 {

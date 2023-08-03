@@ -17,8 +17,6 @@ use Symfony\Component\Security\Core\Exception\UserNotFoundException;
  * Overrides UserProviderInterface to add an "attributes" argument on loadUserByIdentifier.
  * This is particularly useful with self-contained access tokens.
  *
- * @experimental
- *
  * @template-covariant TUser of UserInterface
  *
  * @template-extends UserProviderInterface<TUser>

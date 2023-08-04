@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
+use Symfony\Component\HttpFoundation\Exception\UnexpectedValueException;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Tests\Fixtures\FooEnum;
 
@@ -125,7 +126,7 @@ class ParameterBagTest extends TestCase
     {
         $bag = new ParameterBag(['word' => ['foo_BAR_012']]);
 
-        $this->expectException(\UnexpectedValueException::class);
+        $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('Parameter value "word" cannot be converted to "string".');
 
         $bag->getAlpha('word');
@@ -146,7 +147,7 @@ class ParameterBagTest extends TestCase
     {
         $bag = new ParameterBag(['word' => ['foo_BAR_012']]);
 
-        $this->expectException(\UnexpectedValueException::class);
+        $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('Parameter value "word" cannot be converted to "string".');
 
         $bag->getAlnum('word');
@@ -167,7 +168,7 @@ class ParameterBagTest extends TestCase
     {
         $bag = new ParameterBag(['word' => ['foo_BAR_012']]);
 
-        $this->expectException(\UnexpectedValueException::class);
+        $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('Parameter value "word" cannot be converted to "string".');
 
         $bag->getDigits('word');
@@ -225,7 +226,7 @@ class ParameterBagTest extends TestCase
     {
         $bag = new ParameterBag(['key' => ['abc']]);
 
-        $this->expectException(\UnexpectedValueException::class);
+        $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('Parameter value "key" cannot be converted to "string".');
 
         $bag->getString('key');
@@ -235,7 +236,7 @@ class ParameterBagTest extends TestCase
     {
         $bag = new ParameterBag(['object' => $this]);
 
-        $this->expectException(\UnexpectedValueException::class);
+        $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('Parameter value "object" cannot be converted to "string".');
 
         $bag->getString('object');
@@ -360,7 +361,7 @@ class ParameterBagTest extends TestCase
     {
         $bag = new ParameterBag(['invalid-value' => ['foo']]);
 
-        $this->expectException(\UnexpectedValueException::class);
+        $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('Parameter "invalid-value" cannot be converted to enum: Symfony\Component\HttpFoundation\Tests\Fixtures\FooEnum::from(): Argument #1 ($value) must be of type int, array given.');
 
         $this->assertNull($bag->getEnum('invalid-value', FooEnum::class));

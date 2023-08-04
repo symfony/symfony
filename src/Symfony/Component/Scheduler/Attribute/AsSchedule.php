@@ -15,8 +15,6 @@ namespace Symfony\Component\Scheduler\Attribute;
  * Service tag to autoconfigure schedules.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class AsSchedule

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Cache\Traits;
 
-use Relay\Relay;
 use Symfony\Component\VarExporter\LazyObjectInterface;
 use Symfony\Component\VarExporter\LazyProxyTrait;
 use Symfony\Contracts\Service\ResetInterface;
@@ -24,7 +23,7 @@ class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectState::class);
 /**
  * @internal
  */
-class RelayProxy extends Relay implements ResetInterface, LazyObjectInterface
+class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInterface
 {
     use LazyProxyTrait {
         resetLazyObject as reset;

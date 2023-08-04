@@ -18,8 +18,6 @@ use Symfony\Component\Webhook\Exception\RejectWebhookException;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 6.3
  */
 interface RequestParserInterface
 {

@@ -210,12 +210,8 @@ return static function (ContainerConfigurator $container) {
                     ->factory([HtmlErrorRenderer::class, 'isDebug'])
                     ->args([service('request_stack'), param('kernel.debug')]),
             ])
-    ;
 
-    if (interface_exists(\BackedEnum::class)) {
-        $container->services()
-            ->set('serializer.normalizer.backed_enum', BackedEnumNormalizer::class)
+        ->set('serializer.normalizer.backed_enum', BackedEnumNormalizer::class)
             ->tag('serializer.normalizer', ['priority' => -915])
-        ;
-    }
+    ;
 };

@@ -20,8 +20,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Configures a token handler for decoding and validating an OIDC token.
- *
- * @experimental
  */
 class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
 {

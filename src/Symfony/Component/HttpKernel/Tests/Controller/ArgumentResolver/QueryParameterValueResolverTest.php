@@ -18,6 +18,7 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolver\QueryParameterValue
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Tests\Fixtures\Suit;
 
 class QueryParameterValueResolverTest extends TestCase
 {
@@ -63,6 +64,13 @@ class QueryParameterValueResolverTest extends TestCase
             new ArgumentMetadata('ids', 'array', true, false, false, attributes: [new MapQueryParameter()]),
             [['1', '2'], ['2']],
             null,
+        ];
+        yield 'parameter found and array variadic with parameter not array failure' => [
+            Request::create('/', 'GET', ['ids' => [['1', '2'], 1]]),
+            new ArgumentMetadata('ids', 'array', true, false, false, attributes: [new MapQueryParameter()]),
+            [],
+            NotFoundHttpException::class,
+            'Invalid query parameter "ids".',
         ];
         yield 'parameter found and string' => [
             Request::create('/', 'GET', ['firstName' => 'John']),
@@ -176,6 +184,71 @@ class QueryParameterValueResolverTest extends TestCase
             'Invalid query parameter "isVerified".',
         ];
 
+        yield 'parameter found and backing value' => [
+            Request::create('/', 'GET', ['suit' => 'H']),
+            new ArgumentMetadata('suit', Suit::class, false, false, false, attributes: [new MapQueryParameter()]),
+            [Suit::Hearts],
+            null,
+        ];
+        yield 'parameter found and backing value variadic' => [
+            Request::create('/', 'GET', ['suits' => ['H', 'D']]),
+            new ArgumentMetadata('suits', Suit::class, true, false, false, attributes: [new MapQueryParameter()]),
+            [Suit::Hearts, Suit::Diamonds],
+            null,
+        ];
+        yield 'parameter found and backing value not int nor string' => [
+            Request::create('/', 'GET', ['suit' => 1]),
+            new ArgumentMetadata('suit', Suit::class, false, false, false, attributes: [new MapQueryParameter(filter: \FILTER_VALIDATE_BOOL)]),
+            [],
+            NotFoundHttpException::class,
+            'Invalid query parameter "suit".',
+        ];
+        yield 'parameter found and backing value not int nor string that fallbacks to null on failure' => [
+            Request::create('/', 'GET', ['suit' => 1]),
+            new ArgumentMetadata('suit', Suit::class, false, false, false, attributes: [new MapQueryParameter(filter: \FILTER_VALIDATE_BOOL, flags: \FILTER_NULL_ON_FAILURE)]),
+            [null],
+            null,
+        ];
+        yield 'parameter found and value not valid backing value' => [
+            Request::create('/', 'GET', ['suit' => 'B']),
+            new ArgumentMetadata('suit', Suit::class, false, false, false, attributes: [new MapQueryParameter()]),
+            [],
+            NotFoundHttpException::class,
+            'Invalid query parameter "suit".',
+        ];
+        yield 'parameter found and value not valid backing value that falls back to null on failure' => [
+            Request::create('/', 'GET', ['suit' => 'B']),
+            new ArgumentMetadata('suit', Suit::class, false, false, false, attributes: [new MapQueryParameter(flags: \FILTER_NULL_ON_FAILURE)]),
+            [null],
+            null,
+        ];
+        yield 'parameter found and backing type variadic and at least one backing value not int nor string' => [
+            Request::create('/', 'GET', ['suits' => [1, 'D']]),
+            new ArgumentMetadata('suits', Suit::class, false, false, false, attributes: [new MapQueryParameter(filter: \FILTER_VALIDATE_BOOL)]),
+            [],
+            NotFoundHttpException::class,
+            'Invalid query parameter "suits".',
+        ];
+        yield 'parameter found and backing type variadic and at least one backing value not int nor string that fallbacks to null on failure' => [
+            Request::create('/', 'GET', ['suits' => [1, 'D']]),
+            new ArgumentMetadata('suits', Suit::class, false, false, false, attributes: [new MapQueryParameter(flags: \FILTER_NULL_ON_FAILURE)]),
+            [null],
+            null,
+        ];
+        yield 'parameter found and backing type variadic and at least one value not valid backing value' => [
+            Request::create('/', 'GET', ['suits' => ['B', 'D']]),
+            new ArgumentMetadata('suits', Suit::class, false, false, false, attributes: [new MapQueryParameter()]),
+            [],
+            NotFoundHttpException::class,
+            'Invalid query parameter "suits".',
+        ];
+        yield 'parameter found and backing type variadic and at least one value not valid backing value that falls back to null on failure' => [
+            Request::create('/', 'GET', ['suits' => ['B', 'D']]),
+            new ArgumentMetadata('suits', Suit::class, false, false, false, attributes: [new MapQueryParameter(flags: \FILTER_NULL_ON_FAILURE)]),
+            [null],
+            null,
+        ];
+
         yield 'parameter not found but nullable' => [
             Request::create('/', 'GET'),
             new ArgumentMetadata('firstName', 'string', false, false, false, true, [new MapQueryParameter()]),
@@ -203,14 +276,14 @@ class QueryParameterValueResolverTest extends TestCase
             new ArgumentMetadata('standardClass', \stdClass::class, false, false, false, attributes: [new MapQueryParameter()]),
             [],
             \LogicException::class,
-            '#[MapQueryParameter] cannot be used on controller argument "$standardClass" of type "stdClass"; one of array, string, int, float or bool should be used.',
+            '#[MapQueryParameter] cannot be used on controller argument "$standardClass" of type "stdClass"; one of array, string, int, float, bool or \BackedEnum should be used.',
         ];
         yield 'unsupported type variadic' => [
             Request::create('/', 'GET', ['standardClass' => 'test']),
             new ArgumentMetadata('standardClass', \stdClass::class, true, false, false, attributes: [new MapQueryParameter()]),
             [],
             \LogicException::class,
-            '#[MapQueryParameter] cannot be used on controller argument "...$standardClass" of type "stdClass"; one of array, string, int, float or bool should be used.',
+            '#[MapQueryParameter] cannot be used on controller argument "...$standardClass" of type "stdClass"; one of array, string, int, float, bool or \BackedEnum should be used.',
         ];
     }
 

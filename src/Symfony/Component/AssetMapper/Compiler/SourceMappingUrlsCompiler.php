@@ -19,8 +19,6 @@ use Symfony\Component\AssetMapper\MappedAsset;
  * Rewrites already-existing source map URLs to their final digested path.
  *
  * Originally sourced from https://github.com/rails/propshaft/blob/main/lib/propshaft/compilers/source_mapping_urls.rb
- *
- * @experimental
  */
 final class SourceMappingUrlsCompiler implements AssetCompilerInterface
 {

@@ -20,8 +20,6 @@ use Symfony\Component\Scheduler\Exception\LogicException;
  * Use cron expressions to describe a periodical trigger.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental
  */
 final class CronExpressionTrigger implements TriggerInterface
 {

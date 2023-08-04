@@ -28,6 +28,8 @@ use Symfony\Component\Security\Core\Exception\UserNotFoundException;
  * information is submitted or what the UserInterface object looks like.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @template-covariant TUser of UserInterface
  */
 interface UserProviderInterface
 {
@@ -38,6 +40,8 @@ interface UserProviderInterface
      * totally reloaded (e.g. from the database), or if the UserInterface
      * object can just be merged into some internal array of users / identity
      * map.
+     *
+     * @psalm-return TUser
      *
      * @throws UnsupportedUserException if the user is not supported
      * @throws UserNotFoundException    if the user is not found
@@ -53,6 +57,8 @@ interface UserProviderInterface
      * Loads the user for the given user identifier (e.g. username or email).
      *
      * This method must throw UserNotFoundException if the user is not found.
+     *
+     * @return TUser
      *
      * @throws UserNotFoundException
      */

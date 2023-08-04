@@ -19,6 +19,18 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 interface FormTypeExtensionInterface
 {
     /**
+     * Gets the extended types.
+     *
+     * @return string[]
+     */
+    public static function getExtendedTypes(): iterable;
+
+    /**
+     * @return void
+     */
+    public function configureOptions(OptionsResolver $resolver): void;
+
+    /**
      * Builds the form.
      *
      * This method is called after the extended type has built the form to
@@ -53,13 +65,4 @@ interface FormTypeExtensionInterface
      * @see FormTypeInterface::finishView()
      */
     public function finishView(FormView $view, FormInterface $form, array $options): void;
-
-    public function configureOptions(OptionsResolver $resolver): void;
-
-    /**
-     * Gets the extended types.
-     *
-     * @return string[]
-     */
-    public static function getExtendedTypes(): iterable;
 }

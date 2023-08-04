@@ -14,8 +14,6 @@ namespace Symfony\Component\AssetMapper\ImportMap;
 /**
  * Represents an item that should be in the importmap.
  *
- * @experimental
- *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
 final class ImportMapEntry

@@ -13,9 +13,6 @@ namespace Symfony\Component\AssetMapper\ImportMap\Resolver;
 
 use Psr\Container\ContainerInterface;
 
-/**
- * @experimental
- */
 final class PackageResolver implements PackageResolverInterface
 {
     public function __construct(

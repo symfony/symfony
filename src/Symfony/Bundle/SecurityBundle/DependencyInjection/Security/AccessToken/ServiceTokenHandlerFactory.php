@@ -19,8 +19,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * Configures a token handler from a service id.
  *
  * @see \Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Security\Factory\AccessTokenFactoryTest
- *
- * @experimental
  */
 class ServiceTokenHandlerFactory implements TokenHandlerFactoryInterface
 {

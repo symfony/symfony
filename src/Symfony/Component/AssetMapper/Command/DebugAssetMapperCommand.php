@@ -22,8 +22,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Outputs all the assets in the asset mapper.
  *
- * @experimental
- *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
 #[AsCommand(name: 'debug:asset-map', description: 'Outputs all mapped assets.')]

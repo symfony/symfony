@@ -21,6 +21,8 @@ use Symfony\Component\Security\Core\Exception\UserNotFoundException;
  * (a backend with a unique admin for instance)
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @template-implements UserProviderInterface<InMemoryUser>
  */
 class InMemoryUserProvider implements UserProviderInterface
 {

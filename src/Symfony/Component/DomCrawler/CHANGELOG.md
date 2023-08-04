@@ -6,6 +6,12 @@ CHANGELOG
 
  * Add argument `$normalizeWhitespace` to `Crawler::innerText()`
 
+6.4
+---
+
+* Add `CrawlerAnySelectorTextContains` test constraint
+* Add `CrawlerAnySelectorTextSame` test constraint
+
 6.3
 ---
 

@@ -114,6 +114,15 @@ trait MicroKernelTrait
         return parent::getCacheDir();
     }
 
+    public function getBuildDir(): string
+    {
+        if (isset($_SERVER['APP_BUILD_DIR'])) {
+            return $_SERVER['APP_BUILD_DIR'].'/'.$this->environment;
+        }
+
+        return parent::getBuildDir();
+    }
+
     public function getLogDir(): string
     {
         return $_SERVER['APP_LOG_DIR'] ?? parent::getLogDir();

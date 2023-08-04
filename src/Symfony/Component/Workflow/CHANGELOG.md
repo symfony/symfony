@@ -14,6 +14,7 @@ CHANGELOG
  * Add support for storing marking in a property
  * Add a profiler
  * Add support for multiline descriptions in PlantUML diagrams
+ * Add PHP attributes to register listeners and guards
 
 6.2
 ---

@@ -18,6 +18,10 @@ CHANGELOG
 
  * Add native return type to `Translator` and to `Application::reset()`
  * Deprecate the integration of Doctrine annotations, either uninstall the `doctrine/annotations` package or disable the integration by setting `framework.annotations` to `false`
+ * Enable `json_decode_detailed_errors` context for Serializer by default if `kernel.debug` is true and the `seld/jsonlint` package is installed
+ * Add `DomCrawlerAssertionsTrait::assertAnySelectorTextContains(string $selector, string $text)`
+ * Add `DomCrawlerAssertionsTrait::assertAnySelectorTextSame(string $selector, string $text)`
+ * Add `DomCrawlerAssertionsTrait::assertAnySelectorTextNotContains(string $selector, string $text)`
 
 6.3
 ---

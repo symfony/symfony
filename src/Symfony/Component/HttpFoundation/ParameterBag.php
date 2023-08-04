@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
+use Symfony\Component\HttpFoundation\Exception\UnexpectedValueException;
 
 /**
  * ParameterBag is a container for key/value pairs.
@@ -128,7 +129,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
     {
         $value = $this->get($key, $default);
         if (!\is_scalar($value) && !$value instanceof \Stringable) {
-            throw new \UnexpectedValueException(sprintf('Parameter value "%s" cannot be converted to "string".', $key));
+            throw new UnexpectedValueException(sprintf('Parameter value "%s" cannot be converted to "string".', $key));
         }
 
         return (string) $value;
@@ -171,7 +172,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
         try {
             return $class::from($value);
         } catch (\ValueError|\TypeError $e) {
-            throw new \UnexpectedValueException(sprintf('Parameter "%s" cannot be converted to enum: %s.', $key, $e->getMessage()), $e->getCode(), $e);
+            throw new UnexpectedValueException(sprintf('Parameter "%s" cannot be converted to enum: %s.', $key, $e->getMessage()), $e->getCode(), $e);
         }
     }
 
@@ -198,7 +199,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
         }
 
         if (\is_object($value) && !$value instanceof \Stringable) {
-            throw new \UnexpectedValueException(sprintf('Parameter value "%s" cannot be filtered.', $key));
+            throw new UnexpectedValueException(sprintf('Parameter value "%s" cannot be filtered.', $key));
         }
 
         if ((\FILTER_CALLBACK & $filter) && !(($options['options'] ?? null) instanceof \Closure)) {

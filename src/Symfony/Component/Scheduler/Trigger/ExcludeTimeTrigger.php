@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Scheduler\Trigger;
 
-/**
- * @experimental
- */
 final class ExcludeTimeTrigger extends AbstractDecoratedTrigger
 {
     public function __construct(

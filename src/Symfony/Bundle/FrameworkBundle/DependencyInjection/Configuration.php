@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Doctrine\DBAL\Connection;
 use Psr\Log\LogLevel;
+use Seld\JsonLint\JsonParser;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\Asset\Package;
 use Symfony\Component\AssetMapper\AssetMapper;
@@ -40,6 +41,7 @@ use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
 use Symfony\Component\RemoteEvent\RemoteEvent;
 use Symfony\Component\Scheduler\Schedule;
 use Symfony\Component\Semaphore\Semaphore;
+use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Uid\Factory\UuidFactory;
@@ -1102,6 +1104,10 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('default_context')
                             ->normalizeKeys(false)
                             ->useAttributeAsKey('name')
+                            ->beforeNormalization()
+                                ->ifTrue(fn () => $this->debug && class_exists(JsonParser::class))
+                                ->then(fn (array $v) => $v + [JsonDecode::DETAILED_ERROR_MESSAGES => true])
+                            ->end()
                             ->defaultValue([])
                             ->prototype('variable')->end()
                         ->end()

@@ -42,7 +42,7 @@ class DebugCommandTest extends TestCase
         $this->assertSame("\nScheduler\n=========\n\n [ERROR] No schedules found.{$filler}\n\n", $tester->getDisplay(true));
     }
 
-    public function testExecuteWithScheduleWithoutTriggerShowingNoNextRun()
+    public function testExecuteWithScheduleWithoutTriggerDoesNotDisplayMessage()
     {
         $schedule = new Schedule();
         $schedule->add(RecurringMessage::trigger(new CallbackTrigger(fn () => null, 'test'), new \stdClass()));
@@ -63,6 +63,41 @@ class DebugCommandTest extends TestCase
         $tester = new CommandTester($command);
 
         $tester->execute([], ['decorated' => false]);
+
+        $this->assertSame("\n".
+            "Scheduler\n".
+            "=========\n".
+            "\n".
+            "schedule_name\n".
+            "-------------\n".
+            "\n".
+            " --------- --------- ---------- \n".
+            "  Message   Trigger   Next Run  \n".
+            " --------- --------- ---------- \n".
+            "\n", $tester->getDisplay(true));
+    }
+
+    public function testExecuteWithScheduleWithoutTriggerShowingNoNextRunWithAllOption()
+    {
+        $schedule = new Schedule();
+        $schedule->add(RecurringMessage::trigger(new CallbackTrigger(fn () => null, 'test'), new \stdClass()));
+
+        $schedules = $this->createMock(ServiceProviderInterface::class);
+        $schedules
+            ->expects($this->once())
+            ->method('getProvidedServices')
+            ->willReturn(['schedule_name' => $schedule])
+        ;
+        $schedules
+            ->expects($this->once())
+            ->method('get')
+            ->willReturn($schedule)
+        ;
+
+        $command = new DebugCommand($schedules);
+        $tester = new CommandTester($command);
+
+        $tester->execute(['--all' => true], ['decorated' => false]);
 
         $this->assertSame("\n".
             "Scheduler\n".

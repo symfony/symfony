@@ -1,0 +1,15 @@
+{
+    "event": "soft_bounce",
+    "email": "example@gmail.com",
+    "id": 81205,
+    "date": "2020-10-09 00:00:00",
+    "ts": 1604933619,
+    "message-id": "<201798300811.5787683@smtp-relay.mailin.fr>",
+    "ts_event": 1604933654,
+    "subject": "My first Transactional",
+    "X-Mailin-custom": "some_custom_header",
+    "sending_ip": "127.0.0.1",
+    "template_id": 22,
+    "tags": ["transac_messages"],
+    "reason": "server is down"
+}

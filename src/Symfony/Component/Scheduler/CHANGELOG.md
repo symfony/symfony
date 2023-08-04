@@ -5,7 +5,7 @@ CHANGELOG
 ---
 
  * Mark the component as non experimental
- * Add `--date` to `schedule:debug`
+ * Add `--date` and `--all` options to the `schedule:debug` command
  * Allow setting timezone of next run date in CronExpressionTrigger
  * Add `AbstractTriggerDecorator`
  * Make `ScheduledStamp` "send-able"

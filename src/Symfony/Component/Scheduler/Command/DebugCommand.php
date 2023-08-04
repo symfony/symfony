@@ -77,7 +77,7 @@ final class DebugCommand extends Command
 
         $date = new \DateTimeImmutable($input->getOption('date'));
         if ('now' !== $input->getOption('date')) {
-            $io->comment(sprintf('All next run dates computed from %s.', $date->format(\DateTimeInterface::ATOM)));
+            $io->comment(sprintf('All next run dates computed from %s.', $date->format('r')));
         }
 
         foreach ($names as $name) {
@@ -114,7 +114,7 @@ final class DebugCommand extends Command
         return [
             $message instanceof \Stringable ? (string) $message : (new \ReflectionClass($message))->getShortName(),
             (string) $trigger,
-            $trigger->getNextRunDate($date)?->format(\DateTimeInterface::ATOM) ?? '-',
+            $trigger->getNextRunDate($date)?->format('r') ?? '-',
         ];
     }
 }

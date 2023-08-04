@@ -36,5 +36,14 @@
                 <referencedClass name="UnitEnum"/>
             </errorLevel>
         </UndefinedDocblockClass>
+        <UnusedConstructor>
+            <errorLevel type="suppress">
+                <!--
+                    We use private constructors to avoid instantiation.
+                    This kind of error is bogus in most cases.
+                -->
+                <directory name="src/Symfony" />
+            </errorLevel>
+        </UnusedConstructor>
     </issueHandlers>
 </psalm>

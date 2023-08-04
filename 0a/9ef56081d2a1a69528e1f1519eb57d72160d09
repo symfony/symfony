@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-07-12T10:24:48Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.4" but it seems your PR description refers to branch "6.4 for features / 5.4, 6.2, or 6.3 for bug fixes".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-07-13T07:20:12Z
+
+in github CI we want to persist the build dir, but not the cache dir + log dir, eg.
+
+```
+if [[ "${CI}" = true ]]; then
+    export APP_BUILD_DIR=/app/var/sf-cache
+    export APP_CACHE_DIR=/tmp/app-cache
+    export APP_LOG_DIR=/tmp/app-logs
+fi
+```

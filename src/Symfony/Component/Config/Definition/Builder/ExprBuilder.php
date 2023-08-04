@@ -77,7 +77,7 @@ class ExprBuilder
     public function ifString(): static
     {
         $this->ifPart = \is_string(...);
-        $this->allowedTypes = self::TYPE_STRING;
+        $this->allowedTypes = self::TYPE_STRING; // XXX why is this used by ConfigBuilderGenerator instead of the prototype?
 
         return $this;
     }

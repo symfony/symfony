@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by SVillette at 2023-05-12T20:03:22Z
+
+The failing tests seems unrelated to this PR (related to the Notifier component).
+However, Psalm fails with the 2 same errors:
+- The first one is because phpunit defines method `\PHPUnit\Framework\Constraint\Constraint::matches($other)` and the signature of the first argument is changed (renamed to `$crawler`). Should I fix this error as all other constraints have the same naming ?
+- The second error happens because of the type of `$crawler` argument. As the previous error, all other constraints have the same signature on `matches()` method.
+
+What is the correct fix here ? Should this errors be added to the Psalm baseline ?
+Thanks
+
+---------------------------------------------------------------------------
+
+by stof at 2023-05-15T07:44:56Z
+
+Instead of `@param Crawler`, the argument should have the same type than in the parent class, with a first check inside the class about unsupported type for the asserted value.
+
+---------------------------------------------------------------------------
+
+by SVillette at 2023-05-15T08:29:58Z
+
+> Instead of `@param Crawler`, the argument should have the same type than in the parent class, with a first check inside the class about unsupported type for the asserted value.
+
+Sure, I get what you meant here.
+My question was about consistency with the other `Constraint` classes. For example, the class [CrawlerSelectorCount](https://github.com/symfony/symfony/blob/6.3/src/Symfony/Component/DomCrawler/Test/Constraint/CrawlerSelectorCount.php) has been added "recently" (5 months ago) and all methods of this class have the same signature than the methods of the constraints I added in this PR. I think other constraints throw Psalm errors too but this errors have been added to the baseline.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-05-15T08:32:06Z
+
+Our CI generates a baseline automatically for each run, so that it complains only about new issues.
+
+---------------------------------------------------------------------------
+
+by SVillette at 2023-05-15T08:34:31Z
+
+Ok, so I guess you want it to be fixed for this PR and another PR can fix it for the other constraints ?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-05-15T08:40:09Z
+
+indeed
+
+---------------------------------------------------------------------------
+
+by SVillette at 2023-05-19T13:56:49Z
+
+@stof Psalm errors are fixed now, let me now if you want me to make other changes.

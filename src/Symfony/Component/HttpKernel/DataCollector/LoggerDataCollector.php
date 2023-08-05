@@ -15,6 +15,7 @@ use Symfony\Component\ErrorHandler\Exception\SilencedErrorContext;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Log\DebugLoggerConfigurator;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Component\VarDumper\Cloner\Data;
 
@@ -25,7 +26,7 @@ use Symfony\Component\VarDumper\Cloner\Data;
  */
 class LoggerDataCollector extends DataCollector implements LateDataCollectorInterface
 {
-    private DebugLoggerInterface $logger;
+    private ?DebugLoggerInterface $logger;
     private ?string $containerPathPrefix;
     private ?Request $currentRequest = null;
     private ?RequestStack $requestStack;
@@ -33,10 +34,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
 
     public function __construct(object $logger = null, string $containerPathPrefix = null, RequestStack $requestStack = null)
     {
-        if ($logger instanceof DebugLoggerInterface) {
-            $this->logger = $logger;
-        }
-
+        $this->logger = DebugLoggerConfigurator::getDebugLogger($logger);
         $this->containerPathPrefix = $containerPathPrefix;
         $this->requestStack = $requestStack;
     }
@@ -46,17 +44,9 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         $this->currentRequest = $this->requestStack && $this->requestStack->getMainRequest() !== $request ? $request : null;
     }
 
-    public function reset(): void
-    {
-        if (isset($this->logger)) {
-            $this->logger->clear();
-        }
-        parent::reset();
-    }
-
     public function lateCollect(): void
     {
-        if (isset($this->logger)) {
+        if ($this->logger) {
             $containerDeprecationLogs = $this->getContainerDeprecationLogs();
             $this->data = $this->computeErrorsCount($containerDeprecationLogs);
             // get compiler logs later (only when they are needed) to improve performance

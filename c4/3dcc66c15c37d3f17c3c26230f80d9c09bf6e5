@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-08-05T08:39:10Z
+
+let's update the .github/expected file instead, it's a sign that it's out of sync ;)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-08-05T08:59:11Z
+
+I am not sure which file you want to update, but the difference here I guess is coming from backup files being created in the pipeline. Locally the test already passes without the changes.

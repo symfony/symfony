@@ -38,7 +38,16 @@
                 <referencedClass name="ReflectionIntersectionType"/>
                 <referencedClass name="UnitEnum"/>
             </errorLevel>
-        </UndefinedDocblockClass>
+       </UndefinedDocblockClass>
+        <UnusedConstructor>
+            <errorLevel type="suppress">
+                <!--
+                    We use private constructors to avoid instantiation.
+                    This kind of error is bogus in most cases.
+                -->
+                <directory name="src/Symfony" />
+            </errorLevel>
+        </UnusedConstructor>
         <UndefinedAttributeClass>
             <errorLevel type="suppress">
                 <!-- These classes have been added in PHP 8.2 -->

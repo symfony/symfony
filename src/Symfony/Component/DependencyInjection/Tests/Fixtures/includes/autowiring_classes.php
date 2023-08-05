@@ -38,6 +38,16 @@ class Foo
     }
 }
 
+class FooVoid
+{
+    public static int $counter = 0;
+
+    public function __invoke(string $name): void
+    {
+        ++self::$counter;
+    }
+}
+
 class Bar
 {
     public function __construct(Foo $foo)

@@ -10,6 +10,7 @@ CHANGELOG
 ---
 
  * Add native return type to `Logger::clear()` and to `DebugProcessor::clear()`
+ * Deprecate class `Logger`, use HttpKernel's `DebugLoggerConfigurator` instead
 
 6.1
 ---

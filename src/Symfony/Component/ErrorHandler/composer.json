@@ -26,7 +26,8 @@
         "symfony/deprecation-contracts": "^2.5|^3"
     },
     "conflict": {
-        "symfony/deprecation-contracts": "<2.5"
+        "symfony/deprecation-contracts": "<2.5",
+        "symfony/http-kernel": "<6.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\ErrorHandler\\": "" },

@@ -26,7 +26,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
+use Symfony\Component\HttpKernel\Log\DebugLoggerConfigurator;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -231,7 +231,7 @@ class ErrorListener implements EventSubscriberInterface
         $attributes = [
             '_controller' => $this->controller,
             'exception' => $exception,
-            'logger' => $this->logger instanceof DebugLoggerInterface ? $this->logger : null,
+            'logger' => DebugLoggerConfigurator::getDebugLogger($this->logger),
         ];
         $request = $request->duplicate(null, null, $attributes);
         $request->setMethod('GET');

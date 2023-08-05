@@ -9,6 +9,8 @@ CHANGELOG
  * Add optional `$className` parameter to `ControllerEvent::getAttributes()`
  * Add native return types to `TraceableEventDispatcher` and to `MergeExtensionConfigurationPass`
  * Add argument `$validationFailedStatusCode` to `#[MapQueryString]` and `#[MapRequestPayload]`
+ * Add argument `$debug` to `Logger`
+ * Add class `DebugLoggerConfigurator`
 
 6.3
 ---

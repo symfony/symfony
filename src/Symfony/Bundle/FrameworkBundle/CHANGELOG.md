@@ -10,6 +10,8 @@ CHANGELOG
  * Add `DomCrawlerAssertionsTrait::assertAnySelectorTextContains(string $selector, string $text)`
  * Add `DomCrawlerAssertionsTrait::assertAnySelectorTextSame(string $selector, string $text)`
  * Add `DomCrawlerAssertionsTrait::assertAnySelectorTextNotContains(string $selector, string $text)`
+ * Deprecate `EnableLoggerDebugModePass`, use argument `$debug` of HttpKernel's `Logger` instead
+ * Deprecate `AddDebugLogProcessorPass::configureLogger()`, use HttpKernel's `DebugLoggerConfigurator` instead
 
 6.3
 ---

@@ -357,7 +357,7 @@ diff --git a/src/Symfony/Bridge/Monolog/Handler/MailerHandler.php b/src/Symfony/
 diff --git a/src/Symfony/Bridge/Monolog/Logger.php b/src/Symfony/Bridge/Monolog/Logger.php
 --- a/src/Symfony/Bridge/Monolog/Logger.php
 +++ b/src/Symfony/Bridge/Monolog/Logger.php
-@@ -60,5 +60,5 @@ class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
+@@ -62,5 +62,5 @@ class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
       * @return void
       */
 -    public function removeDebugLogger()
@@ -567,13 +567,13 @@ diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/Add
 +    public function process(ContainerBuilder $container): void
      {
          if (!$container->hasDefinition('profiler')) {
-@@ -41,5 +41,5 @@ class AddDebugLogProcessorPass implements CompilerPassInterface
+@@ -42,5 +42,5 @@ class AddDebugLogProcessorPass implements CompilerPassInterface
       * @return void
       */
 -    public static function configureLogger(mixed $logger)
 +    public static function configureLogger(mixed $logger): void
      {
-         if (\is_object($logger) && method_exists($logger, 'removeDebugLogger') && \in_array(\PHP_SAPI, ['cli', 'phpdbg'], true)) {
+         trigger_deprecation('symfony/framework-bundle', '6.4', 'The "%s()" method is deprecated, use HttpKernel\'s DebugLoggerConfigurator instead.', __METHOD__);
 diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/AddExpressionLanguageProvidersPass.php b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/AddExpressionLanguageProvidersPass.php
 --- a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/AddExpressionLanguageProvidersPass.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/AddExpressionLanguageProvidersPass.php
@@ -687,14 +687,14 @@ diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/Wor
 diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
 --- a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
-@@ -218,5 +218,5 @@ class FrameworkExtension extends Extension
+@@ -219,5 +219,5 @@ class FrameworkExtension extends Extension
       * @throws LogicException
       */
 -    public function load(array $configs, ContainerBuilder $container)
 +    public function load(array $configs, ContainerBuilder $container): void
      {
          $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));
-@@ -2974,5 +2974,5 @@ class FrameworkExtension extends Extension
+@@ -2979,5 +2979,5 @@ class FrameworkExtension extends Extension
       * @return void
       */
 -    public static function registerRateLimiter(ContainerBuilder $container, string $name, array $limiterConfig)
@@ -704,14 +704,14 @@ diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExt
 diff --git a/src/Symfony/Bundle/FrameworkBundle/FrameworkBundle.php b/src/Symfony/Bundle/FrameworkBundle/FrameworkBundle.php
 --- a/src/Symfony/Bundle/FrameworkBundle/FrameworkBundle.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/FrameworkBundle.php
-@@ -94,5 +94,5 @@ class FrameworkBundle extends Bundle
+@@ -93,5 +93,5 @@ class FrameworkBundle extends Bundle
       * @return void
       */
 -    public function boot()
 +    public function boot(): void
      {
          $_ENV['DOCTRINE_DEPRECATIONS'] = $_SERVER['DOCTRINE_DEPRECATIONS'] ??= 'trigger';
-@@ -119,5 +119,5 @@ class FrameworkBundle extends Bundle
+@@ -118,5 +118,5 @@ class FrameworkBundle extends Bundle
       * @return void
       */
 -    public function build(ContainerBuilder $container)
@@ -8310,7 +8310,7 @@ diff --git a/src/Symfony/Component/HttpKernel/DependencyInjection/FragmentRender
 diff --git a/src/Symfony/Component/HttpKernel/DependencyInjection/LoggerPass.php b/src/Symfony/Component/HttpKernel/DependencyInjection/LoggerPass.php
 --- a/src/Symfony/Component/HttpKernel/DependencyInjection/LoggerPass.php
 +++ b/src/Symfony/Component/HttpKernel/DependencyInjection/LoggerPass.php
-@@ -29,5 +29,5 @@ class LoggerPass implements CompilerPassInterface
+@@ -30,5 +30,5 @@ class LoggerPass implements CompilerPassInterface
       * @return void
       */
 -    public function process(ContainerBuilder $container)

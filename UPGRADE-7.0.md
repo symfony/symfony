@@ -61,6 +61,43 @@ DependencyInjection
  * Remove `PhpDumper` options `inline_factories_parameter` and `inline_class_loader_parameter`, use options `inline_factories` and `inline_class_loader` instead
  * Parameter names of `ParameterBag` cannot be numerics
  * Remove `ContainerAwareInterface` and `ContainerAwareTrait`, use dependency injection instead
+
+   *Before*
+   ```php
+   class MailingListService implements ContainerAwareInterface
+   {
+       use ContainerAwareTrait;
+
+       public function sendMails()
+       {
+           $mailer = $this->container->get('mailer');
+
+           // ...
+       }
+   }
+   ```
+
+   *After*
+   ```php
+   use Symfony\Component\Mailer\MailerInterface;
+
+   class MailingListService
+   {
+       public function __construct(
+           private MailerInterface $mailer,
+       ) {
+       }
+
+       public function sendMails()
+       {
+           $mailer = $this->mailer;
+
+           // ...
+       }
+   }
+   ```
+
+   To fetch services lazily, you can use a [service subscriber](https://symfony.com/doc/6.4/service_container/service_subscribers_locators.html#defining-a-service-subscriber).
  * Add argument `$id` and `$asGhostObject` to `DumperInterface::isProxyCandidate()` and `getProxyCode()`
  * Add argument `$source` to `FileLoader::registerClasses()`
 
@@ -76,6 +113,44 @@ DoctrineBridge
  * `ContainerAwareEventManager::getListeners()` must be called with an event name
  * DoctrineBridge now requires `doctrine/event-manager:^2`
  * Add parameter `$isSameDatabase` to `DoctrineTokenProvider::configureSchema()`
+ * Remove support for Doctrine subscribers in `ContainerAwareEventManager`, use listeners instead
+
+   *Before*
+   ```php
+   use Doctrine\Bundle\DoctrineBundle\EventSubscriber\EventSubscriberInterface;
+   use Doctrine\ORM\Event\PostFlushEventArgs;
+   use Doctrine\ORM\Events;
+
+   class InvalidateCacheSubscriber implements EventSubscriberInterface
+   {
+        public function getSubscribedEvents(): array
+        {
+            return [Events::postFlush];
+        }
+
+        public function postFlush(PostFlushEventArgs $args): void
+        {
+            // ...
+        }
+   }
+   ```
+
+   *After*
+   ```php
+   use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
+   use Doctrine\ORM\Event\PostFlushEventArgs;
+   use Doctrine\ORM\Events;
+
+   // Instead of PHP attributes, you can also tag this service with "doctrine.event_listener"
+   #[AsDoctrineListener(event: Events::postFlush)]
+   class InvalidateCacheSubscriber
+   {
+        public function postFlush(PostFlushEventArgs $args): void
+        {
+            // ...
+        }
+   }
+   ```
 
 DomCrawler
 ----------
@@ -301,6 +376,58 @@ Serializer
  * Add argument `$context` to `NormalizerInterface::supportsNormalization()` and `DenormalizerInterface::supportsDenormalization()`
  * Remove Doctrine annotations support in favor of native attributes
  * Remove the annotation reader parameter from the constructor of `AnnotationLoader`
+ * The following Normalizer classes have become final, use decoration instead of inheritance:
+   * `ConstraintViolationListNormalizer`
+   * `CustomNormalizer`
+   * `DataUriNormalizer`
+   * `DateIntervalNormalizer`
+   * `DateTimeNormalizer`
+   * `DateTimeZoneNormalizer`
+   * `GetSetMethodNormalizer`
+   * `JsonSerializableNormalizer`
+   * `ObjectNormalizer`
+   * `PropertyNormalizer`
+
+   *Before*
+   ```php
+   use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+
+   class TopicNormalizer extends ObjectNormalizer
+   {
+       // ...
+
+       public function normalize($topic, string $format = null, array $context = []): array
+       {
+           $data = parent::normalize($topic, $format, $context);
+
+           // ...
+       }
+   }
+   ```
+
+   *After*
+   ```php
+   use Symfony\Component\DependencyInjection\Attribute\Autowire;
+   use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+   use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+
+   class TopicNormalizer implements NormalizerInterface
+   {
+       public function __construct(
+           #[Autowire(service: 'serializer.normalizer.object')] private NormalizerInterface&DenormalizerInterface $objectNormalizer,
+       ) {
+       }
+
+       public function normalize($topic, string $format = null, array $context = []): array
+       {
+           $data = $this->objectNormalizer->normalize($topic, $format, $context);
+
+           // ...
+       }
+
+       // ...
+   }
+   ```
 
 Templating
 ----------

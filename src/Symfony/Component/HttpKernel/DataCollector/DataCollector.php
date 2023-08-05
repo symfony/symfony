@@ -97,10 +97,7 @@ abstract class DataCollector implements DataCollectorInterface
     {
     }
 
-    /**
-     * @return void
-     */
-    public function reset()
+    public function reset(): void
     {
         $this->data = [];
     }

@@ -340,16 +340,6 @@ diff --git a/src/Symfony/Component/HttpKernel/Bundle/BundleInterface.php b/src/S
 +    public function build(ContainerBuilder $container): void;
  
      /**
-diff --git a/src/Symfony/Component/HttpKernel/DataCollector/DataCollector.php b/src/Symfony/Component/HttpKernel/DataCollector/DataCollector.php
---- a/src/Symfony/Component/HttpKernel/DataCollector/DataCollector.php
-+++ b/src/Symfony/Component/HttpKernel/DataCollector/DataCollector.php
-@@ -101,5 +101,5 @@ abstract class DataCollector implements DataCollectorInterface
-      * @return void
-      */
--    public function reset()
-+    public function reset(): void
-     {
-         $this->data = [];
 diff --git a/src/Symfony/Component/HttpKernel/DataCollector/DataCollectorInterface.php b/src/Symfony/Component/HttpKernel/DataCollector/DataCollectorInterface.php
 --- a/src/Symfony/Component/HttpKernel/DataCollector/DataCollectorInterface.php
 +++ b/src/Symfony/Component/HttpKernel/DataCollector/DataCollectorInterface.php
@@ -409,16 +399,6 @@ diff --git a/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php b/sr
 +    abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void;
  
      /**
-diff --git a/src/Symfony/Component/Security/Core/Authentication/RememberMe/InMemoryTokenProvider.php b/src/Symfony/Component/Security/Core/Authentication/RememberMe/InMemoryTokenProvider.php
---- a/src/Symfony/Component/Security/Core/Authentication/RememberMe/InMemoryTokenProvider.php
-+++ b/src/Symfony/Component/Security/Core/Authentication/RememberMe/InMemoryTokenProvider.php
-@@ -32,5 +32,5 @@ final class InMemoryTokenProvider implements TokenProviderInterface
-     }
- 
--    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTimeInterface $lastUsed)
-+    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTimeInterface $lastUsed): void
-     {
-         if (!isset($this->tokens[$series])) {
 diff --git a/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php b/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php
 --- a/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php
 +++ b/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php

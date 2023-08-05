@@ -8165,7 +8165,7 @@ diff --git a/src/Symfony/Component/HttpKernel/DependencyInjection/MergeExtension
 diff --git a/src/Symfony/Component/HttpKernel/DependencyInjection/RegisterControllerArgumentLocatorsPass.php b/src/Symfony/Component/HttpKernel/DependencyInjection/RegisterControllerArgumentLocatorsPass.php
 --- a/src/Symfony/Component/HttpKernel/DependencyInjection/RegisterControllerArgumentLocatorsPass.php
 +++ b/src/Symfony/Component/HttpKernel/DependencyInjection/RegisterControllerArgumentLocatorsPass.php
-@@ -37,5 +37,5 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
+@@ -38,5 +38,5 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
       * @return void
       */
 -    public function process(ContainerBuilder $container)

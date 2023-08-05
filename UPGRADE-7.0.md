@@ -199,6 +199,8 @@ FrameworkBundle
    ```
 
  * Remove the integration of Doctrine annotations, use native attributes instead
+ * Remove `EnableLoggerDebugModePass`, use argument `$debug` of HttpKernel's `Logger` instead
+ * Remove `AddDebugLogProcessorPass::configureLogger()`, use HttpKernel's `DebugLoggerConfigurator` instead
 
 HttpFoundation
 --------------
@@ -264,6 +266,7 @@ MonologBridge
 -------------
 
  * Drop support for monolog < 3.0
+ * Remove class `Logger`, use HttpKernel's `DebugLoggerConfigurator` instead
 
 PropertyAccess
 --------------

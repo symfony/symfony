@@ -12,6 +12,8 @@ CHANGELOG
    `Symfony\Component\Serializer\Normalizer\NormalizerInterface` or implement `NormalizerAwareInterface` instead
  * Remove the `Http\Client\HttpClient` service, use `Psr\Http\Client\ClientInterface` instead
  * Remove the integration of Doctrine annotations, use native attributes instead
+ * Remove `EnableLoggerDebugModePass`, use argument `$debug` of HttpKernel's `Logger` instead
+ * Remove `AddDebugLogProcessorPass::configureLogger()`, use HttpKernel's `DebugLoggerConfigurator` instead
 
 6.4
 ---

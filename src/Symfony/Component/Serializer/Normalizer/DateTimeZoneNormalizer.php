@@ -27,7 +27,7 @@ class DateTimeZoneNormalizer implements NormalizerInterface, DenormalizerInterfa
     public function getSupportedTypes(?string $format): array
     {
         return [
-            \DateTimeZone::class => __CLASS__ === static::class || $this->hasCacheableSupportsMethod(),
+            \DateTimeZone::class => __CLASS__ === static::class || $this->hasCacheableSupportsMethod(false),
         ];
     }
 
@@ -78,9 +78,11 @@ class DateTimeZoneNormalizer implements NormalizerInterface, DenormalizerInterfa
     /**
      * @deprecated since Symfony 6.3, use "getSupportedTypes()" instead
      */
-    public function hasCacheableSupportsMethod(): bool
+    public function hasCacheableSupportsMethod(/* bool $triggerDeprecation = true */): bool
     {
-        trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
+        if (0 === func_num_args() || func_get_arg(0)) {
+            trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
+        }
 
         return __CLASS__ === static::class;
     }

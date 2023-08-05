@@ -133,7 +133,7 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
     {
         // @deprecated remove condition in 7.0
         if (!method_exists($this->serializer, 'getSupportedTypes')) {
-            return ['*' => $this->serializer instanceof CacheableSupportsMethodInterface && $this->serializer->hasCacheableSupportsMethod()];
+            return ['*' => $this->serializer instanceof CacheableSupportsMethodInterface && $this->serializer->hasCacheableSupportsMethod(false)];
         }
 
         return $this->serializer->getSupportedTypes($format);

@@ -91,7 +91,7 @@ class ArrayDenormalizer implements ContextAwareDenormalizerInterface, Denormaliz
     {
         trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
 
-        return $this->denormalizer instanceof CacheableSupportsMethodInterface && $this->denormalizer->hasCacheableSupportsMethod();
+        return $this->denormalizer instanceof CacheableSupportsMethodInterface && $this->denormalizer->hasCacheableSupportsMethod(false);
     }
 
     /**

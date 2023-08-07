@@ -1524,7 +1524,7 @@ class ProcessTest extends TestCase
         $process->wait();
         $this->assertFalse($process->isRunning());
 
-        if ('\\' !== \DIRECTORY_SEPARATOR) {
+        if ('\\' !== \DIRECTORY_SEPARATOR && !\Closure::bind(function () { return $this->isSigchildEnabled(); }, $process, $process)()) {
             $this->assertSame(0, $process->getExitCode());
         }
     }

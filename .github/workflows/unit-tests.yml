@@ -237,4 +237,6 @@ jobs:
           tar -xjf php-8.2.0-pcntl-sigchild.tar.bz2
           cd ..
 
+          mkdir -p /opt/php/lib
+          echo memory_limit=-1 > /opt/php/lib/php.ini
           ./build/php/bin/php ./phpunit --colors=always src/Symfony/Component/Process

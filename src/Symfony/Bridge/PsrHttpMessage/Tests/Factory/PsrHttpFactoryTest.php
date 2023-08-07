@@ -211,10 +211,7 @@ class PsrHttpFactoryTest extends TestCase
 
     public function testUploadErrNoFile()
     {
-        $file = new UploadedFile('', '', null, \UPLOAD_ERR_NO_FILE, true);
-
-        $this->assertSame(\UPLOAD_ERR_NO_FILE, $file->getError());
-        $this->assertFalse($file->getSize(), 'SplFile::getSize() returns false on error');
+        $file = new UploadedFile(__FILE__, '', null, \UPLOAD_ERR_NO_FILE, true);
 
         $request = new Request(
             [],

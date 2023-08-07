@@ -152,7 +152,7 @@ EOF
 
         $helper = new DescriptorHelper();
         $options['format'] = $input->getOption('format');
-        $options['show_arguments'] = $input->getOption('show-arguments');
+        $options['show_arguments'] = $input->getOption('show-arguments') || $output->isVerbose();
         $options['show_hidden'] = $input->getOption('show-hidden');
         $options['raw_text'] = $input->getOption('raw');
         $options['output'] = $io;

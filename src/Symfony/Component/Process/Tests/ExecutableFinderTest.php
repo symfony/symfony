@@ -98,30 +98,11 @@ class ExecutableFinderTest extends TestCase
             $this->markTestSkipped('Cannot test when open_basedir is set');
         }
 
+        putenv('PATH='.\dirname(\PHP_BINARY));
         $this->iniSet('open_basedir', \dirname(\PHP_BINARY).\PATH_SEPARATOR.'/');
 
         $finder = new ExecutableFinder();
         $result = $finder->find($this->getPhpBinaryName());
-
-        $this->assertSamePath(\PHP_BINARY, $result);
-    }
-
-    /**
-     * @runInSeparateProcess
-     */
-    public function testFindProcessInOpenBasedir()
-    {
-        if (\ini_get('open_basedir')) {
-            $this->markTestSkipped('Cannot test when open_basedir is set');
-        }
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Cannot run test on windows');
-        }
-
-        $this->iniSet('open_basedir', \PHP_BINARY.\PATH_SEPARATOR.'/');
-
-        $finder = new ExecutableFinder();
-        $result = $finder->find($this->getPhpBinaryName(), false);
 
         $this->assertSamePath(\PHP_BINARY, $result);
     }

@@ -243,10 +243,6 @@ class PsrHttpFactoryTest extends TestCase
 
     public function testJsonContent()
     {
-        if (!method_exists(Request::class, 'getPayload')) {
-            $this->markTestSkipped();
-        }
-
         $headers = [
             'HTTP_HOST' => 'http_host.fr',
             'CONTENT_TYPE' => 'application/json',
@@ -259,10 +255,6 @@ class PsrHttpFactoryTest extends TestCase
 
     public function testEmptyJsonContent()
     {
-        if (!method_exists(Request::class, 'getPayload')) {
-            $this->markTestSkipped();
-        }
-
         $headers = [
             'HTTP_HOST' => 'http_host.fr',
             'CONTENT_TYPE' => 'application/json',
@@ -275,10 +267,6 @@ class PsrHttpFactoryTest extends TestCase
 
     public function testWrongJsonContent()
     {
-        if (!method_exists(Request::class, 'getPayload')) {
-            $this->markTestSkipped();
-        }
-
         $headers = [
             'HTTP_HOST' => 'http_host.fr',
             'CONTENT_TYPE' => 'application/json',

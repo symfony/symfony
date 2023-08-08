@@ -1064,7 +1064,7 @@ class OptionsResolver implements Options
             if (!$success) {
                 $message = sprintf(
                     'The option "%s" with value %s is invalid.',
-                    $option,
+                    $this->formatOptions([$option]),
                     $this->formatValue($value)
                 );
 

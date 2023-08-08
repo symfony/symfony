@@ -111,7 +111,7 @@ abstract class KernelTestCase extends TestCase
     protected static function createKernel(array $options = []): KernelInterface
     {
         static::$class ??= static::getKernelClass();
-        
+
         $env = $options['environment'] ?? $_ENV['APP_ENV'] ?? $_SERVER['APP_ENV'] ?? 'test';
         $debug = $options['debug'] ?? $_ENV['APP_DEBUG'] ?? $_SERVER['APP_DEBUG'] ?? true;
 

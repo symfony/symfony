@@ -8,5 +8,150 @@
         "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrinePostgreSqlIntegrationTest::setUp",
         "message": "Connection::query() is deprecated, use Connection::executeQuery() instead. (Connection.php:1436 called by AbstractPostgreSQLDriver.php:149, https://github.com/doctrine/dbal/pull/4163, package doctrine/dbal)",
         "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\ChoiceList\\ORMQueryBuilderLoaderTest::testIdentifierTypeIsStringArray",
+        "message": "Not enabling lazy ghost objects is deprecated and will not be supported in Doctrine ORM 3.0. Ensure Doctrine\\ORM\\Configuration::setLazyGhostObjectEnabled(true) is called to enable them. (ProxyFactory.php:166 called by EntityManager.php:178, https://github.com/doctrine/orm/pull/10837/, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\ChoiceList\\ORMQueryBuilderLoaderTest::testIdentifierTypeIsIntegerArray",
+        "message": "Not enabling lazy ghost objects is deprecated and will not be supported in Doctrine ORM 3.0. Ensure Doctrine\\ORM\\Configuration::setLazyGhostObjectEnabled(true) is called to enable them. (ProxyFactory.php:166 called by EntityManager.php:178, https://github.com/doctrine/orm/pull/10837/, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\ChoiceList\\ORMQueryBuilderLoaderTest::testFilterNonIntegerValues",
+        "message": "Not enabling lazy ghost objects is deprecated and will not be supported in Doctrine ORM 3.0. Ensure Doctrine\\ORM\\Configuration::setLazyGhostObjectEnabled(true) is called to enable them. (ProxyFactory.php:166 called by EntityManager.php:178, https://github.com/doctrine/orm/pull/10837/, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\ChoiceList\\ORMQueryBuilderLoaderTest::testFilterEmptyUuids",
+        "message": "Not enabling lazy ghost objects is deprecated and will not be supported in Doctrine ORM 3.0. Ensure Doctrine\\ORM\\Configuration::setLazyGhostObjectEnabled(true) is called to enable them. (ProxyFactory.php:166 called by EntityManager.php:178, https://github.com/doctrine/orm/pull/10837/, package doctrine/orm)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\ChoiceList\\ORMQueryBuilderLoaderTest::testFilterUid",
+        "message": "Not enabling lazy ghost objects is deprecated and will not be supported in Doctrine ORM 3.0. Ensure Doctrine\\ORM\\Configuration::setLazyGhostObjectEnabled(true) is called to enable them. (ProxyFactory.php:166 called by EntityManager.php:178, https://github.com/doctrine/orm/pull/10837/, package doctrine/orm)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\ChoiceList\\ORMQueryBuilderLoaderTest::testUidThrowProperException",
+        "message": "Not enabling lazy ghost objects is deprecated and will not be supported in Doctrine ORM 3.0. Ensure Doctrine\\ORM\\Configuration::setLazyGhostObjectEnabled(true) is called to enable them. (ProxyFactory.php:166 called by EntityManager.php:178, https://github.com/doctrine/orm/pull/10837/, package doctrine/orm)",
+        "count": 2
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\ChoiceList\\ORMQueryBuilderLoaderTest::testEmbeddedIdentifierName",
+        "message": "Not enabling lazy ghost objects is deprecated and will not be supported in Doctrine ORM 3.0. Ensure Doctrine\\ORM\\Configuration::setLazyGhostObjectEnabled(true) is called to enable them. (ProxyFactory.php:166 called by EntityManager.php:178, https://github.com/doctrine/orm/pull/10837/, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Form\\Type\\EntityTypeTest::setUp",
+        "message": "Not enabling lazy ghost objects is deprecated and will not be supported in Doctrine ORM 3.0. Ensure Doctrine\\ORM\\Configuration::setLazyGhostObjectEnabled(true) is called to enable them. (ProxyFactory.php:166 called by EntityManager.php:178, https://github.com/doctrine/orm/pull/10837/, package doctrine/orm)",
+        "count": 83
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testGetProperties",
+        "message": "Not enabling lazy ghost objects is deprecated and will not be supported in Doctrine ORM 3.0. Ensure Doctrine\\ORM\\Configuration::setLazyGhostObjectEnabled(true) is called to enable them. (ProxyFactory.php:166 called by EntityManager.php:178, https://github.com/doctrine/orm/pull/10837/, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testTestGetPropertiesWithEmbedded",
+        "message": "Not enabling lazy ghost objects is deprecated and will not be supported in Doctrine ORM 3.0. Ensure Doctrine\\ORM\\Configuration::setLazyGhostObjectEnabled(true) is called to enable them. (ProxyFactory.php:166 called by EntityManager.php:178, https://github.com/doctrine/orm/pull/10837/, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testExtract",
+        "message": "Not enabling lazy ghost objects is deprecated and will not be supported in Doctrine ORM 3.0. Ensure Doctrine\\ORM\\Configuration::setLazyGhostObjectEnabled(true) is called to enable them. (ProxyFactory.php:166 called by EntityManager.php:178, https://github.com/doctrine/orm/pull/10837/, package doctrine/orm)",
+        "count": 25
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testExtractWithEmbedded",
+        "message": "Not enabling lazy ghost objects is deprecated and will not be supported in Doctrine ORM 3.0. Ensure Doctrine\\ORM\\Configuration::setLazyGhostObjectEnabled(true) is called to enable them. (ProxyFactory.php:166 called by EntityManager.php:178, https://github.com/doctrine/orm/pull/10837/, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testExtractEnum",
+        "message": "Not enabling lazy ghost objects is deprecated and will not be supported in Doctrine ORM 3.0. Ensure Doctrine\\ORM\\Configuration::setLazyGhostObjectEnabled(true) is called to enable them. (ProxyFactory.php:166 called by EntityManager.php:178, https://github.com/doctrine/orm/pull/10837/, package doctrine/orm)",
+        "count": 5
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testGetPropertiesCatchException",
+        "message": "Not enabling lazy ghost objects is deprecated and will not be supported in Doctrine ORM 3.0. Ensure Doctrine\\ORM\\Configuration::setLazyGhostObjectEnabled(true) is called to enable them. (ProxyFactory.php:166 called by EntityManager.php:178, https://github.com/doctrine/orm/pull/10837/, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testGetTypesCatchException",
+        "message": "Not enabling lazy ghost objects is deprecated and will not be supported in Doctrine ORM 3.0. Ensure Doctrine\\ORM\\Configuration::setLazyGhostObjectEnabled(true) is called to enable them. (ProxyFactory.php:166 called by EntityManager.php:178, https://github.com/doctrine/orm/pull/10837/, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\PropertyInfo\\DoctrineExtractorTest::testGeneratedValueNotWritable",
+        "message": "Not enabling lazy ghost objects is deprecated and will not be supported in Doctrine ORM 3.0. Ensure Doctrine\\ORM\\Configuration::setLazyGhostObjectEnabled(true) is called to enable them. (ProxyFactory.php:166 called by EntityManager.php:178, https://github.com/doctrine/orm/pull/10837/, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testRefreshUserGetsUserByPrimaryKey",
+        "message": "Not enabling lazy ghost objects is deprecated and will not be supported in Doctrine ORM 3.0. Ensure Doctrine\\ORM\\Configuration::setLazyGhostObjectEnabled(true) is called to enable them. (ProxyFactory.php:166 called by EntityManager.php:178, https://github.com/doctrine/orm/pull/10837/, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testLoadUserByUsername",
+        "message": "Not enabling lazy ghost objects is deprecated and will not be supported in Doctrine ORM 3.0. Ensure Doctrine\\ORM\\Configuration::setLazyGhostObjectEnabled(true) is called to enable them. (ProxyFactory.php:166 called by EntityManager.php:178, https://github.com/doctrine/orm/pull/10837/, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testLoadUserByUsernameWithNonUserLoaderRepositoryAndWithoutProperty",
+        "message": "Not enabling lazy ghost objects is deprecated and will not be supported in Doctrine ORM 3.0. Ensure Doctrine\\ORM\\Configuration::setLazyGhostObjectEnabled(true) is called to enable them. (ProxyFactory.php:166 called by EntityManager.php:178, https://github.com/doctrine/orm/pull/10837/, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testRefreshUserRequiresId",
+        "message": "Not enabling lazy ghost objects is deprecated and will not be supported in Doctrine ORM 3.0. Ensure Doctrine\\ORM\\Configuration::setLazyGhostObjectEnabled(true) is called to enable them. (ProxyFactory.php:166 called by EntityManager.php:178, https://github.com/doctrine/orm/pull/10837/, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testRefreshInvalidUser",
+        "message": "Not enabling lazy ghost objects is deprecated and will not be supported in Doctrine ORM 3.0. Ensure Doctrine\\ORM\\Configuration::setLazyGhostObjectEnabled(true) is called to enable them. (ProxyFactory.php:166 called by EntityManager.php:178, https://github.com/doctrine/orm/pull/10837/, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testSupportProxy",
+        "message": "Not enabling lazy ghost objects is deprecated and will not be supported in Doctrine ORM 3.0. Ensure Doctrine\\ORM\\Configuration::setLazyGhostObjectEnabled(true) is called to enable them. (ProxyFactory.php:166 called by EntityManager.php:178, https://github.com/doctrine/orm/pull/10837/, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Security\\User\\EntityUserProviderTest::testRefreshedUserProxyIsLoaded",
+        "message": "Not enabling lazy ghost objects is deprecated and will not be supported in Doctrine ORM 3.0. Ensure Doctrine\\ORM\\Configuration::setLazyGhostObjectEnabled(true) is called to enable them. (ProxyFactory.php:166 called by EntityManager.php:178, https://github.com/doctrine/orm/pull/10837/, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\Constraints\\UniqueEntityValidatorTest::setUp",
+        "message": "Not enabling lazy ghost objects is deprecated and will not be supported in Doctrine ORM 3.0. Ensure Doctrine\\ORM\\Configuration::setLazyGhostObjectEnabled(true) is called to enable them. (ProxyFactory.php:166 called by EntityManager.php:178, https://github.com/doctrine/orm/pull/10837/, package doctrine/orm)",
+        "count": 36
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\DoctrineLoaderTest::testLoadClassMetadata",
+        "message": "Not enabling lazy ghost objects is deprecated and will not be supported in Doctrine ORM 3.0. Ensure Doctrine\\ORM\\Configuration::setLazyGhostObjectEnabled(true) is called to enable them. (ProxyFactory.php:166 called by EntityManager.php:178, https://github.com/doctrine/orm/pull/10837/, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\DoctrineLoaderTest::testExtractEnum",
+        "message": "Not enabling lazy ghost objects is deprecated and will not be supported in Doctrine ORM 3.0. Ensure Doctrine\\ORM\\Configuration::setLazyGhostObjectEnabled(true) is called to enable them. (ProxyFactory.php:166 called by EntityManager.php:178, https://github.com/doctrine/orm/pull/10837/, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\DoctrineLoaderTest::testFieldMappingsConfiguration",
+        "message": "Not enabling lazy ghost objects is deprecated and will not be supported in Doctrine ORM 3.0. Ensure Doctrine\\ORM\\Configuration::setLazyGhostObjectEnabled(true) is called to enable them. (ProxyFactory.php:166 called by EntityManager.php:178, https://github.com/doctrine/orm/pull/10837/, package doctrine/orm)",
+        "count": 1
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\DoctrineLoaderTest::testClassValidator",
+        "message": "Not enabling lazy ghost objects is deprecated and will not be supported in Doctrine ORM 3.0. Ensure Doctrine\\ORM\\Configuration::setLazyGhostObjectEnabled(true) is called to enable them. (ProxyFactory.php:166 called by EntityManager.php:178, https://github.com/doctrine/orm/pull/10837/, package doctrine/orm)",
+        "count": 4
+    },
+    {
+        "location": "Symfony\\Bridge\\Doctrine\\Tests\\Validator\\DoctrineLoaderTest::testClassNoAutoMapping",
+        "message": "Not enabling lazy ghost objects is deprecated and will not be supported in Doctrine ORM 3.0. Ensure Doctrine\\ORM\\Configuration::setLazyGhostObjectEnabled(true) is called to enable them. (ProxyFactory.php:166 called by EntityManager.php:178, https://github.com/doctrine/orm/pull/10837/, package doctrine/orm)",
+        "count": 1
     }
 ]

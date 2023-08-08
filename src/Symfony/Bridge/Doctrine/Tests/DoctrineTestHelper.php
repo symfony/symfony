@@ -59,7 +59,7 @@ final class DoctrineTestHelper
 
     public static function createTestConfiguration(): Configuration
     {
-        $config = class_exists(ORMSetup::class) ? ORMSetup::createConfiguration(true) : new Configuration();
+        $config = ORMSetup::createConfiguration(true);
         $config->setEntityNamespaces(['SymfonyTestsDoctrine' => 'Symfony\Bridge\Doctrine\Tests\Fixtures']);
         $config->setAutoGenerateProxyClasses(true);
         $config->setProxyDir(sys_get_temp_dir());
@@ -72,8 +72,7 @@ final class DoctrineTestHelper
         if (class_exists(DefaultSchemaManagerFactory::class)) {
             $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
         }
-
-        if (method_exists(Configuration::class, 'setLazyGhostObjectEnabled')) {
+        if (method_exists($config, 'setLazyGhostObjectEnabled')) {
             $config->setLazyGhostObjectEnabled(true);
         }
 

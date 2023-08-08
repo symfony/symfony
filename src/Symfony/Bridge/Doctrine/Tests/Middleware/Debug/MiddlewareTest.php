@@ -11,7 +11,6 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Middleware\Debug;
 
-use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Middleware as MiddlewareInterface;
 use Doctrine\DBAL\DriverManager;
@@ -51,9 +50,12 @@ class MiddlewareTest extends TestCase
     {
         $this->stopwatch = $withStopwatch ? new Stopwatch() : null;
 
-        $config = class_exists(ORMSetup::class) ? ORMSetup::createConfiguration(true) : new Configuration();
+        $config = ORMSetup::createConfiguration(true);
         if (class_exists(DefaultSchemaManagerFactory::class)) {
             $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
+        }
+        if (method_exists($config, 'setLazyGhostObjectEnabled')) {
+            $config->setLazyGhostObjectEnabled(true);
         }
         $this->debugDataHolder = new DebugDataHolder();
         $config->setMiddlewares([new Middleware($this->debugDataHolder, $this->stopwatch)]);

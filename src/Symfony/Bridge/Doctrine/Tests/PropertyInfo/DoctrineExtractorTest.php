@@ -43,6 +43,10 @@ class DoctrineExtractorTest extends TestCase
             $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
         }
 
+        if (method_exists($config, 'setLazyGhostObjectEnabled')) {
+            $config->setLazyGhostObjectEnabled(true);
+        }
+
         if (!(new \ReflectionMethod(EntityManager::class, '__construct'))->isPublic()) {
             $entityManager = EntityManager::create(['driver' => 'pdo_sqlite'], $config);
         } else {

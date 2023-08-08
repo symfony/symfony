@@ -59,7 +59,6 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
 
         $container
             ->register('a', 'stdClass')
-            ->setPublic(false)
             ->addTag('doctrine.event_listener', [
                 'event' => 'bar',
             ])
@@ -389,7 +388,6 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
         ;
         $container
             ->register('f', 'stdClass')
-            ->setPublic(false)
             ->addTag('doctrine.event_listener', [
                 'event' => 'bar',
             ])
@@ -460,7 +458,6 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
 
         $container
             ->register('a', 'stdClass')
-            ->setPublic(false)
             ->addTag('doctrine.event_listener', [
                 'event' => 'bar',
                 'priority' => 3,
@@ -468,7 +465,6 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
         ;
         $container
             ->register('b', 'stdClass')
-            ->setPublic(false)
             ->addTag('doctrine.event_listener', [
                 'event' => 'bar',
             ])

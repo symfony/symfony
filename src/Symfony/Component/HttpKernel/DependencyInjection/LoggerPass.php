@@ -31,8 +31,7 @@ class LoggerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $container->setAlias(LoggerInterface::class, 'logger')
-            ->setPublic(false);
+        $container->setAlias(LoggerInterface::class, 'logger');
 
         if ($container->has('logger')) {
             return;
@@ -52,7 +51,6 @@ class LoggerPass implements CompilerPassInterface
         }
 
         $container->register('logger', Logger::class)
-            ->setArguments([null, null, null, new Reference(RequestStack::class), $debug])
-            ->setPublic(false);
+            ->setArguments([null, null, null, new Reference(RequestStack::class), $debug]);
     }
 }

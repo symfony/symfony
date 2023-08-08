@@ -280,7 +280,6 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $container->register('argument_resolver.service')->addArgument([]);
 
         $container->register('foo', ArgumentWithoutTypeController::class)
-            ->setPublic(false)
             ->addTag('controller.service_arguments');
 
         $pass = new RegisterControllerArgumentLocatorsPass();

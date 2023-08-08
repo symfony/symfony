@@ -64,9 +64,8 @@ class CheckDefinitionValidityPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->register('a', 'class');
-        $container->register('b', 'class')->setSynthetic(true)->setPublic(true);
+        $container->register('b', 'class')->setSynthetic(true);
         $container->register('c', 'class')->setAbstract(true);
-        $container->register('d', 'class')->setSynthetic(true);
 
         $this->process($container);
 

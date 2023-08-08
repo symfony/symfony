@@ -1640,7 +1640,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
             if (is_file($arg = $definition->getArgument(0))) {
                 $definition->replaceArgument(0, strtr($arg, '/', \DIRECTORY_SEPARATOR));
             }
-            $definition->setPublic(false);
         }
 
         $loaders = $container->getDefinition('serializer.mapping.chain_loader')->getArgument(0);

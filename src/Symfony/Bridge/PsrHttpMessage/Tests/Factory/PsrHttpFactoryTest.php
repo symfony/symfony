@@ -211,10 +211,7 @@ class PsrHttpFactoryTest extends TestCase
 
     public function testUploadErrNoFile()
     {
-        $file = new UploadedFile('', '', null, \UPLOAD_ERR_NO_FILE, true);
-
-        $this->assertSame(\UPLOAD_ERR_NO_FILE, $file->getError());
-        $this->assertFalse($file->getSize(), 'SplFile::getSize() returns false on error');
+        $file = new UploadedFile(__FILE__, '', null, \UPLOAD_ERR_NO_FILE, true);
 
         $request = new Request(
             [],
@@ -243,10 +240,6 @@ class PsrHttpFactoryTest extends TestCase
 
     public function testJsonContent()
     {
-        if (!method_exists(Request::class, 'getPayload')) {
-            $this->markTestSkipped();
-        }
-
         $headers = [
             'HTTP_HOST' => 'http_host.fr',
             'CONTENT_TYPE' => 'application/json',
@@ -259,10 +252,6 @@ class PsrHttpFactoryTest extends TestCase
 
     public function testEmptyJsonContent()
     {
-        if (!method_exists(Request::class, 'getPayload')) {
-            $this->markTestSkipped();
-        }
-
         $headers = [
             'HTTP_HOST' => 'http_host.fr',
             'CONTENT_TYPE' => 'application/json',
@@ -275,10 +264,6 @@ class PsrHttpFactoryTest extends TestCase
 
     public function testWrongJsonContent()
     {
-        if (!method_exists(Request::class, 'getPayload')) {
-            $this->markTestSkipped();
-        }
-
         $headers = [
             'HTTP_HOST' => 'http_host.fr',
             'CONTENT_TYPE' => 'application/json',

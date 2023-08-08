@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by flohw at 2023-08-04T09:11:31Z
+
+Some unrelated tests fail on local environment and here. :thinking:
+
+[edit]: I removed the latest commit as it make a lot of test fail. But fabbot is not happy anymore... Let me know if I need to update them.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2023-08-04T15:55:37Z
+
+> Some unrelated tests fail on local environment and here.
+
+Nothing to do in your side, unless you want to fix them in a separate PR ;-)
+
+> I removed the latest commit as it make a lot of test fail. But fabbot is not happy anymore... Let me know if I need to update them.
+
+They seem unrelated to your changes here and should be ignored, in my opinion.
+
+---------------------------------------------------------------------------
+
+by flohw at 2023-08-04T18:52:08Z
+
+Thanks for your review @yceruto :-)
+And the difference between nested and lazy options.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2023-08-05T13:06:09Z
+
+It seems something is wrong with the tests. Could you please squash your commits so that the tests are triggered again?
+
+---------------------------------------------------------------------------
+
+by flohw at 2023-08-06T09:22:20Z
+
+I have squashed my two last commits.
+
+I won't be available the next two weeks because of holidays. But I will be able to make any required changes when I come back. :-)

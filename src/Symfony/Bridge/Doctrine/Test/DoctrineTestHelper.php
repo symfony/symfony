@@ -24,6 +24,7 @@ use Doctrine\ORM\ORMSetup;
 use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Doctrine\Persistence\Mapping\Driver\SymfonyFileLocator;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\VarExporter\LazyGhostTrait;
 
 /**
  * Provides utility functions needed in tests.
@@ -88,6 +89,10 @@ class DoctrineTestHelper
         }
         if (class_exists(DefaultSchemaManagerFactory::class)) {
             $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
+        }
+
+        if (\PHP_VERSION_ID >= 80100 && method_exists(Configuration::class, 'setLazyGhostObjectEnabled') && trait_exists(LazyGhostTrait::class)) {
+            $config->setLazyGhostObjectEnabled(true);
         }
 
         return $config;

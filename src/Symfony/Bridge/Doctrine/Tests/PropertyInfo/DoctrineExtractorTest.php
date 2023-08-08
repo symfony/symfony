@@ -39,6 +39,9 @@ class DoctrineExtractorTest extends TestCase
         $config = ORMSetup::createConfiguration(true);
         $config->setMetadataDriverImpl(new AttributeDriver([__DIR__.'/../Tests/Fixtures' => 'Symfony\Bridge\Doctrine\Tests\Fixtures'], true));
         $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
+        if (method_exists($config, 'setLazyGhostObjectEnabled')) {
+            $config->setLazyGhostObjectEnabled(true);
+        }
 
         $eventManager = new EventManager();
         $entityManager = new EntityManager(DriverManager::getConnection(['driver' => 'pdo_sqlite'], $config, $eventManager), $config, $eventManager);

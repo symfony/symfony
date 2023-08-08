@@ -11,7 +11,6 @@
 
 namespace Security\RememberMe;
 
-use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\ORM\ORMSetup;
@@ -120,8 +119,12 @@ class DoctrineTokenProviderTest extends TestCase
 
     private function bootstrapProvider(): DoctrineTokenProvider
     {
-        $config = class_exists(ORMSetup::class) ? ORMSetup::createConfiguration(true) : new Configuration();
+        $config = ORMSetup::createConfiguration(true);
         $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
+
+        if (method_exists($config, 'setLazyGhostObjectEnabled')) {
+            $config->setLazyGhostObjectEnabled(true);
+        }
 
         $connection = DriverManager::getConnection([
             'driver' => 'pdo_sqlite',

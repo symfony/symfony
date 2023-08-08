@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+* Improve message with full path on invalid type in nested option
+
 6.3
 ---
 

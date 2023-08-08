@@ -212,13 +212,16 @@ class AutowirePass extends AbstractRecursivePass
                     unset($arguments[$j]);
                     $arguments[$namedArguments[$j]] = $value;
                 }
-                if ($namedArguments || !$value instanceof $this->defaultArgument) {
+                if (!$value instanceof $this->defaultArgument) {
                     continue;
                 }
 
                 if (\PHP_VERSION_ID >= 80100 && (\is_array($value->value) ? $value->value : \is_object($value->value))) {
-                    unset($arguments[$j]);
                     $namedArguments = $value->names;
+                }
+
+                if ($namedArguments) {
+                    unset($arguments[$j]);
                 } else {
                     $arguments[$j] = $value->value;
                 }

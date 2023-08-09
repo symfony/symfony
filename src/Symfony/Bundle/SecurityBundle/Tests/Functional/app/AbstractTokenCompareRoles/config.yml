@@ -20,7 +20,6 @@ security:
       form_login:
         check_path: login
         remember_me: true
-        require_previous_session: false
       logout: ~
       stateless: false
 

@@ -121,6 +121,11 @@ Security
  * [BC break] Make `PersistentToken` immutable
  * Deprecate accepting only `DateTime` for `TokenProviderInterface::updateToken()`, use `DateTimeInterface` instead
 
+SecurityBundle
+--------------
+
+ * Deprecate the `require_previous_session` config option. Setting it has no effect anymore
+
 Serializer
 ----------
 

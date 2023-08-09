@@ -103,7 +103,7 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
         }
 
         $firewallName = $this->getFirewallName();
-        if (null !== $firewallName && $targetUrl = $this->getTargetPath($request->getSession(), $firewallName)) {
+        if (null !== $firewallName && $request->hasPreviousSession() && $targetUrl = $this->getTargetPath($request->getSession(), $firewallName)) {
             $this->removeTargetPath($request->getSession(), $firewallName);
 
             return $targetUrl;

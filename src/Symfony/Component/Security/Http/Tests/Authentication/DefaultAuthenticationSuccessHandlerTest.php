@@ -56,6 +56,25 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
         $this->assertSame('http://localhost/admin/dashboard', $handler->onAuthenticationSuccess($requestWithSession, $token)->getTargetUrl());
     }
 
+    public function testStatelessRequestRedirections()
+    {
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects($this->never())->method('get')->with('_security.admin.target_path');
+        $session->expects($this->never())->method('remove')->with('_security.admin.target_path');
+        $statelessRequest = Request::create('/');
+        $statelessRequest->setSession($session);
+        $statelessRequest->attributes->set('_stateless', true);
+
+        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+        $urlGenerator->expects($this->any())->method('generate')->willReturn('http://localhost/login');
+        $httpUtils = new HttpUtils($urlGenerator);
+        $token = $this->createMock(TokenInterface::class);
+        $handler = new DefaultAuthenticationSuccessHandler($httpUtils);
+        $handler->setFirewallName('admin');
+
+        $this->assertSame('http://localhost/', $handler->onAuthenticationSuccess($statelessRequest, $token)->getTargetUrl());
+    }
+
     public static function getRequestRedirections()
     {
         return [

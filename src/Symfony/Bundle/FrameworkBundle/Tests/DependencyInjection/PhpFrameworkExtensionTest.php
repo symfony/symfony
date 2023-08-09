@@ -34,6 +34,8 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
             $container->loadFromExtension('framework', [
                 'annotations' => false,
                 'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'assets' => [
                     'base_urls' => 'http://cdn.example.com',
                     'base_path' => '/foo',
@@ -49,6 +51,8 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
             $container->loadFromExtension('framework', [
                 'annotations' => false,
                 'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'assets' => [
                     'packages' => [
                         'impossible' => [
@@ -99,6 +103,8 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
             $container->loadFromExtension('framework', [
                 'annotations' => false,
                 'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'workflows' => [
                     'article' => [
                         'type' => 'state_machine',
@@ -128,6 +134,8 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
             $container->loadFromExtension('framework', [
                 'annotations' => false,
                 'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'workflows' => [
                     'workflow_a' => [
                         'type' => 'state_machine',
@@ -187,6 +195,8 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
                 $container->loadFromExtension('framework', [
                     'annotations' => false,
                     'http_method_override' => false,
+                    'handle_all_throwables' => true,
+                    'php_errors' => ['log' => true],
                     'lock' => false,
                     'rate_limiter' => [
                         'with_lock' => ['policy' => 'fixed_window', 'limit' => 10, 'interval' => '1 hour'],
@@ -203,6 +213,8 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
             $container->loadFromExtension('framework', [
                 'annotations' => false,
                 'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'lock' => true,
                 'rate_limiter' => [
                     'with_lock' => ['policy' => 'fixed_window', 'limit' => 10, 'interval' => '1 hour'],
@@ -220,6 +232,8 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
             $container->loadFromExtension('framework', [
                 'annotations' => false,
                 'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'rate_limiter' => [
                     'without_lock' => ['policy' => 'fixed_window', 'limit' => 10, 'interval' => '1 hour', 'lock_factory' => null],
                 ],

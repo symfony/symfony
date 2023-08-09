@@ -62,13 +62,20 @@ class NoTemplatingEntryKernel extends Kernel
     public function registerContainerConfiguration(LoaderInterface $loader): void
     {
         $loader->load(function (ContainerBuilder $container) {
+            $config = [
+                'annotations' => false,
+                'http_method_override' => false,
+                'php_errors' => ['log' => true],
+                'secret' => '$ecret',
+                'form' => ['enabled' => false],
+            ];
+
+            if (Kernel::VERSION_ID >= 60400) {
+                $config['handle_all_throwables'] = true;
+            }
+
             $container
-                ->loadFromExtension('framework', [
-                    'annotations' => false,
-                    'http_method_override' => false,
-                    'secret' => '$ecret',
-                    'form' => ['enabled' => false],
-                ])
+                ->loadFromExtension('framework', $config)
                 ->loadFromExtension('twig', [
                     'default_path' => __DIR__.'/templates',
                 ])

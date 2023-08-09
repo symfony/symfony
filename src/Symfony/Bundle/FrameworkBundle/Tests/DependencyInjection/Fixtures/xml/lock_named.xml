@@ -10,8 +10,9 @@
         <parameter key="env(REDIS_URL)">redis://paas.com</parameter>
     </parameters>
 
-    <framework:config http-method-override="false">
+    <framework:config http-method-override="false" handle-all-throwables="true">
         <framework:annotations enabled="false" />
+        <framework:php-errors log="true" />
         <framework:lock>
             <framework:resource name="foo">semaphore</framework:resource>
             <framework:resource name="bar">flock</framework:resource>

@@ -11,6 +11,8 @@ $container->loadFromExtension('framework', [
         ],
     ],
     'http_method_override' => false,
+    'handle_all_throwables' => true,
+    'php_errors' => ['log' => true],
     'trust_x_sendfile_type_header' => true,
     'esi' => [
         'enabled' => true,
@@ -35,6 +37,7 @@ $container->loadFromExtension('framework', [
         'cookie_path' => '/',
         'cookie_domain' => 'example.com',
         'cookie_secure' => true,
+        'cookie_samesite' => 'lax',
         'cookie_httponly' => false,
         'use_cookies' => true,
         'gc_maxlifetime' => 90000,

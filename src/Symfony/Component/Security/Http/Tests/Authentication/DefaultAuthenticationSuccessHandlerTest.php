@@ -43,8 +43,10 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
         $session = $this->createMock(SessionInterface::class);
         $session->expects($this->once())->method('get')->with('_security.admin.target_path')->willReturn('/admin/dashboard');
         $session->expects($this->once())->method('remove')->with('_security.admin.target_path');
+        $session->expects($this->once())->method('getName')->willReturn('test_session_name');
         $requestWithSession = Request::create('/');
         $requestWithSession->setSession($session);
+        $requestWithSession->cookies->set('test_session_name', 'session_cookie_val');
 
         $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
         $urlGenerator->expects($this->any())->method('generate')->willReturn('http://localhost/login');

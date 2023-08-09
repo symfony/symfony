@@ -85,6 +85,10 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $this->session->expects($this->once())
             ->method('set')->with(SecurityRequestAttributes::AUTHENTICATION_ERROR, $this->exception);
 
+        // hasPreviousSession
+        $this->session->expects($this->once())->method('getName')->willReturn('test_session_name');
+        $this->request->cookies->set('test_session_name', 'session_cookie_val');
+
         $handler = new DefaultAuthenticationFailureHandler($this->httpKernel, $this->httpUtils, [], $this->logger);
         $handler->onAuthenticationFailure($this->request, $this->exception);
     }

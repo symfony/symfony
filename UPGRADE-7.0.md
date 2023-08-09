@@ -297,6 +297,7 @@ SecurityBundle
 --------------
 
  * Enabling SecurityBundle and not configuring it is not allowed, either remove the bundle or configure at least one firewall
+ * Remove the `require_previous_session` config option
 
 Serializer
 ----------

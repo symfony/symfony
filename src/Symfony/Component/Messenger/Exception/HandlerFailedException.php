@@ -20,7 +20,7 @@ class HandlerFailedException extends RuntimeException implements WrappedExceptio
     private Envelope $envelope;
 
     /**
-     * @param \Throwable[] $exceptions
+     * @param \Throwable[] $exceptions The name of the handler should be given as key
      */
     public function __construct(Envelope $envelope, array $exceptions)
     {
@@ -55,7 +55,7 @@ class HandlerFailedException extends RuntimeException implements WrappedExceptio
     {
         trigger_deprecation('symfony/messenger', '6.4', 'The "%s()" method is deprecated, use "%s::getWrappedExceptions()" instead.', __METHOD__, self::class);
 
-        return $this->exceptions;
+        return array_values($this->exceptions);
     }
 
     /**

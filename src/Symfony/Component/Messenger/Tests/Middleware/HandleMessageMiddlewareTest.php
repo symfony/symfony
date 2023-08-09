@@ -47,6 +47,36 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         $middleware->handle($envelope, $this->getStackMock());
     }
 
+    public function testItKeysTheHandlerFailedNestedExceptionsByHandlerDescription()
+    {
+        $message = new DummyMessage('Hey');
+        $envelope = new Envelope($message);
+        $handler = new class() {
+            public function __invoke()
+            {
+                throw new \Exception('failed');
+            }
+        };
+
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [$handler],
+        ]));
+
+        try {
+            $middleware->handle($envelope, $this->getStackMock(false));
+        } catch (HandlerFailedException $e) {
+            $key = (new HandlerDescriptor($handler))->getName();
+
+            $this->assertCount(1, $e->getWrappedExceptions());
+            $this->assertArrayHasKey($key, $e->getWrappedExceptions());
+            $this->assertSame('failed', $e->getWrappedExceptions()[$key]->getMessage());
+
+            return;
+        }
+
+        $this->fail('Exception not thrown.');
+    }
+
     /**
      * @dataProvider itAddsHandledStampsProvider
      */

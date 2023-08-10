@@ -13,8 +13,6 @@ namespace Symfony\Component\RemoteEvent\Event\Mailer;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 6.3
  */
 final class MailerEngagementEvent extends AbstractMailerEvent
 {

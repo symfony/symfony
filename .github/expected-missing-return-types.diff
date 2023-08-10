@@ -357,7 +357,7 @@ diff --git a/src/Symfony/Bridge/Monolog/Handler/MailerHandler.php b/src/Symfony/
 diff --git a/src/Symfony/Bridge/Monolog/Logger.php b/src/Symfony/Bridge/Monolog/Logger.php
 --- a/src/Symfony/Bridge/Monolog/Logger.php
 +++ b/src/Symfony/Bridge/Monolog/Logger.php
-@@ -60,5 +60,5 @@ class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
+@@ -62,5 +62,5 @@ class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
       * @return void
       */
 -    public function removeDebugLogger()
@@ -567,13 +567,13 @@ diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/Add
 +    public function process(ContainerBuilder $container): void
      {
          if (!$container->hasDefinition('profiler')) {
-@@ -41,5 +41,5 @@ class AddDebugLogProcessorPass implements CompilerPassInterface
+@@ -42,5 +42,5 @@ class AddDebugLogProcessorPass implements CompilerPassInterface
       * @return void
       */
 -    public static function configureLogger(mixed $logger)
 +    public static function configureLogger(mixed $logger): void
      {
-         if (\is_object($logger) && method_exists($logger, 'removeDebugLogger') && \in_array(\PHP_SAPI, ['cli', 'phpdbg'], true)) {
+         trigger_deprecation('symfony/framework-bundle', '6.4', 'The "%s()" method is deprecated, use HttpKernel\'s DebugLoggerConfigurator instead.', __METHOD__);
 diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/AddExpressionLanguageProvidersPass.php b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/AddExpressionLanguageProvidersPass.php
 --- a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/AddExpressionLanguageProvidersPass.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/AddExpressionLanguageProvidersPass.php
@@ -687,14 +687,14 @@ diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/Wor
 diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
 --- a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
-@@ -218,5 +218,5 @@ class FrameworkExtension extends Extension
+@@ -219,5 +219,5 @@ class FrameworkExtension extends Extension
       * @throws LogicException
       */
 -    public function load(array $configs, ContainerBuilder $container)
 +    public function load(array $configs, ContainerBuilder $container): void
      {
          $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));
-@@ -2951,5 +2951,5 @@ class FrameworkExtension extends Extension
+@@ -2979,5 +2979,5 @@ class FrameworkExtension extends Extension
       * @return void
       */
 -    public static function registerRateLimiter(ContainerBuilder $container, string $name, array $limiterConfig)
@@ -704,14 +704,14 @@ diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExt
 diff --git a/src/Symfony/Bundle/FrameworkBundle/FrameworkBundle.php b/src/Symfony/Bundle/FrameworkBundle/FrameworkBundle.php
 --- a/src/Symfony/Bundle/FrameworkBundle/FrameworkBundle.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/FrameworkBundle.php
-@@ -94,5 +94,5 @@ class FrameworkBundle extends Bundle
+@@ -93,5 +93,5 @@ class FrameworkBundle extends Bundle
       * @return void
       */
 -    public function boot()
 +    public function boot(): void
      {
          $_ENV['DOCTRINE_DEPRECATIONS'] = $_SERVER['DOCTRINE_DEPRECATIONS'] ??= 'trigger';
-@@ -119,5 +119,5 @@ class FrameworkBundle extends Bundle
+@@ -118,5 +118,5 @@ class FrameworkBundle extends Bundle
       * @return void
       */
 -    public function build(ContainerBuilder $container)
@@ -721,7 +721,7 @@ diff --git a/src/Symfony/Bundle/FrameworkBundle/FrameworkBundle.php b/src/Symfon
 diff --git a/src/Symfony/Bundle/FrameworkBundle/Kernel/MicroKernelTrait.php b/src/Symfony/Bundle/FrameworkBundle/Kernel/MicroKernelTrait.php
 --- a/src/Symfony/Bundle/FrameworkBundle/Kernel/MicroKernelTrait.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/Kernel/MicroKernelTrait.php
-@@ -133,5 +133,5 @@ trait MicroKernelTrait
+@@ -142,5 +142,5 @@ trait MicroKernelTrait
       * @return void
       */
 -    public function registerContainerConfiguration(LoaderInterface $loader)
@@ -1353,7 +1353,7 @@ diff --git a/src/Symfony/Component/Cache/Adapter/MemcachedAdapter.php b/src/Symf
 diff --git a/src/Symfony/Component/Cache/Adapter/PdoAdapter.php b/src/Symfony/Component/Cache/Adapter/PdoAdapter.php
 --- a/src/Symfony/Component/Cache/Adapter/PdoAdapter.php
 +++ b/src/Symfony/Component/Cache/Adapter/PdoAdapter.php
-@@ -102,5 +102,5 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
+@@ -101,5 +101,5 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
       * @throws \DomainException When an unsupported PDO driver is used
       */
 -    public function createTable()
@@ -7227,28 +7227,28 @@ diff --git a/src/Symfony/Component/HttpFoundation/HeaderBag.php b/src/Symfony/Co
 diff --git a/src/Symfony/Component/HttpFoundation/ParameterBag.php b/src/Symfony/Component/HttpFoundation/ParameterBag.php
 --- a/src/Symfony/Component/HttpFoundation/ParameterBag.php
 +++ b/src/Symfony/Component/HttpFoundation/ParameterBag.php
-@@ -64,5 +64,5 @@ class ParameterBag implements \IteratorAggregate, \Countable
+@@ -65,5 +65,5 @@ class ParameterBag implements \IteratorAggregate, \Countable
       * @return void
       */
 -    public function replace(array $parameters = [])
 +    public function replace(array $parameters = []): void
      {
          $this->parameters = $parameters;
-@@ -74,5 +74,5 @@ class ParameterBag implements \IteratorAggregate, \Countable
+@@ -75,5 +75,5 @@ class ParameterBag implements \IteratorAggregate, \Countable
       * @return void
       */
 -    public function add(array $parameters = [])
 +    public function add(array $parameters = []): void
      {
          $this->parameters = array_replace($this->parameters, $parameters);
-@@ -87,5 +87,5 @@ class ParameterBag implements \IteratorAggregate, \Countable
+@@ -88,5 +88,5 @@ class ParameterBag implements \IteratorAggregate, \Countable
       * @return void
       */
 -    public function set(string $key, mixed $value)
 +    public function set(string $key, mixed $value): void
      {
          $this->parameters[$key] = $value;
-@@ -105,5 +105,5 @@ class ParameterBag implements \IteratorAggregate, \Countable
+@@ -106,5 +106,5 @@ class ParameterBag implements \IteratorAggregate, \Countable
       * @return void
       */
 -    public function remove(string $key)
@@ -8310,7 +8310,7 @@ diff --git a/src/Symfony/Component/HttpKernel/DependencyInjection/FragmentRender
 diff --git a/src/Symfony/Component/HttpKernel/DependencyInjection/LoggerPass.php b/src/Symfony/Component/HttpKernel/DependencyInjection/LoggerPass.php
 --- a/src/Symfony/Component/HttpKernel/DependencyInjection/LoggerPass.php
 +++ b/src/Symfony/Component/HttpKernel/DependencyInjection/LoggerPass.php
-@@ -29,5 +29,5 @@ class LoggerPass implements CompilerPassInterface
+@@ -30,5 +30,5 @@ class LoggerPass implements CompilerPassInterface
       * @return void
       */
 -    public function process(ContainerBuilder $container)
@@ -11130,14 +11130,14 @@ diff --git a/src/Symfony/Component/Security/Core/User/InMemoryUserChecker.php b/
 diff --git a/src/Symfony/Component/Security/Core/User/InMemoryUserProvider.php b/src/Symfony/Component/Security/Core/User/InMemoryUserProvider.php
 --- a/src/Symfony/Component/Security/Core/User/InMemoryUserProvider.php
 +++ b/src/Symfony/Component/Security/Core/User/InMemoryUserProvider.php
-@@ -55,5 +55,5 @@ class InMemoryUserProvider implements UserProviderInterface
+@@ -57,5 +57,5 @@ class InMemoryUserProvider implements UserProviderInterface
       * @throws \LogicException
       */
 -    public function createUser(UserInterface $user)
 +    public function createUser(UserInterface $user): void
      {
          if (!$user instanceof InMemoryUser) {
-@@ -100,5 +100,5 @@ class InMemoryUserProvider implements UserProviderInterface
+@@ -102,5 +102,5 @@ class InMemoryUserProvider implements UserProviderInterface
       * @throws UserNotFoundException if user whose given username does not exist
       */
 -    private function getUser(string $username): UserInterface
@@ -11173,14 +11173,14 @@ diff --git a/src/Symfony/Component/Security/Core/User/UserInterface.php b/src/Sy
 diff --git a/src/Symfony/Component/Security/Core/User/UserProviderInterface.php b/src/Symfony/Component/Security/Core/User/UserProviderInterface.php
 --- a/src/Symfony/Component/Security/Core/User/UserProviderInterface.php
 +++ b/src/Symfony/Component/Security/Core/User/UserProviderInterface.php
-@@ -45,5 +45,5 @@ interface UserProviderInterface
+@@ -49,5 +49,5 @@ interface UserProviderInterface
       * @throws UserNotFoundException    if the user is not found
       */
 -    public function refreshUser(UserInterface $user);
 +    public function refreshUser(UserInterface $user): UserInterface;
  
      /**
-@@ -52,5 +52,5 @@ interface UserProviderInterface
+@@ -56,5 +56,5 @@ interface UserProviderInterface
       * @return bool
       */
 -    public function supportsClass(string $class);

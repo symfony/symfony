@@ -38,7 +38,7 @@
         "ext-xml": "*",
         "friendsofphp/proxy-manager-lts": "^1.0.2",
         "doctrine/event-manager": "^1.2|^2",
-        "doctrine/persistence": "^2|^3",
+        "doctrine/persistence": "^3.1",
         "twig/twig": "^2.13|^3.0.4",
         "psr/cache": "^2.0|^3.0",
         "psr/clock": "^1.0",

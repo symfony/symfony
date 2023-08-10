@@ -208,6 +208,30 @@ class WebTestCaseTest extends TestCase
         $this->getCrawlerTester(new Crawler('<html><body><h1>Foo'))->assertSelectorTextNotContains('body > h1', 'Foo');
     }
 
+    public function testAssertAnySelectorTextContains()
+    {
+        $this->getCrawlerTester(new Crawler('<ul><li>Bar</li><li>Foo Baz'))->assertAnySelectorTextContains('ul li', 'Foo');
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('matches selector "ul li" and the text of any node matching selector "ul li" contains "Foo".');
+        $this->getCrawlerTester(new Crawler('<ul><li>Bar</li><li>Baz'))->assertAnySelectorTextContains('ul li', 'Foo');
+    }
+
+    public function testAssertAnySelectorTextSame()
+    {
+        $this->getCrawlerTester(new Crawler('<ul><li>Bar</li><li>Foo'))->assertAnySelectorTextSame('ul li', 'Foo');
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('matches selector "ul li" and has at least a node matching selector "ul li" with content "Foo".');
+        $this->getCrawlerTester(new Crawler('<ul><li>Bar</li><li>Baz'))->assertAnySelectorTextSame('ul li', 'Foo');
+    }
+
+    public function testAssertAnySelectorTextNotContains()
+    {
+        $this->getCrawlerTester(new Crawler('<ul><li>Bar</li><li>Baz'))->assertAnySelectorTextNotContains('ul li', 'Foo');
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('matches selector "ul li" and the text of any node matching selector "ul li" does not contain "Foo".');
+        $this->getCrawlerTester(new Crawler('<ul><li>Bar</li><li>Foo'))->assertAnySelectorTextNotContains('ul li', 'Foo');
+    }
+
     public function testAssertPageTitleSame()
     {
         $this->getCrawlerTester(new Crawler('<html><head><title>Foo'))->assertPageTitleSame('Foo');

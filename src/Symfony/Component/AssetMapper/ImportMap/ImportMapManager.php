@@ -18,8 +18,6 @@ use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
 use Symfony\Component\VarExporter\VarExporter;
 
 /**
- * @experimental
- *
  * @author Kévin Dunglas <kevin@dunglas.dev>
  * @author Ryan Weaver <ryan@symfonycasts.com>
  *

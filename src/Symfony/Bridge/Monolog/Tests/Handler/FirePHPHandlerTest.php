@@ -11,9 +11,9 @@
 
 namespace Symfony\Bridge\Monolog\Tests\Handler;
 
+use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Handler\FirePHPHandler;
-use Symfony\Bridge\Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

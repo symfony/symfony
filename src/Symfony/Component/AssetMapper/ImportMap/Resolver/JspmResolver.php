@@ -17,9 +17,6 @@ use Symfony\Component\AssetMapper\ImportMap\PackageRequireOptions;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-/**
- * @experimental
- */
 final class JspmResolver implements PackageResolverInterface
 {
     public const BASE_URI = 'https://api.jspm.io/';

@@ -15,6 +15,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Messenger\Envelope;
@@ -22,14 +23,10 @@ use Symfony\Component\Scheduler\RecurringMessage;
 use Symfony\Component\Scheduler\ScheduleProviderInterface;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 
-use function Symfony\Component\Clock\now;
-
 /**
  * Command to list/debug schedules.
  *
  * @author Kevin Bond <kevinbond@gmail.com>
- *
- * @experimental
  */
 #[AsCommand(name: 'debug:scheduler', description: 'List schedules and their recurring messages')]
 final class DebugCommand extends Command
@@ -47,7 +44,8 @@ final class DebugCommand extends Command
     {
         $this
             ->addArgument('schedule', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, sprintf('The schedule name (one of "%s")', implode('", "', $this->scheduleNames)), null, $this->scheduleNames)
-            ->addOption('date', null, InputArgument::OPTIONAL, 'The date to use for the next run date', 'now')
+            ->addOption('date', null, InputOption::VALUE_REQUIRED, 'The date to use for the next run date', 'now')
+            ->addOption('all', null, InputOption::VALUE_NONE, 'Display all recurring messages, including the terminated ones')
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</info> lists schedules and their recurring messages:
 
@@ -60,6 +58,10 @@ final class DebugCommand extends Command
                 You can also specify a date to use for the next run date:
 
                   <info>php %command.full_name% --date=2025-10-18</info>
+
+                To also display the terminated recurring messages, use the <info>--all</info> option:
+
+                  <info>php %command.full_name% --all</info>
 
                 EOF
             )
@@ -79,7 +81,7 @@ final class DebugCommand extends Command
 
         $date = new \DateTimeImmutable($input->getOption('date'));
         if ('now' !== $input->getOption('date')) {
-            $io->comment(sprintf('All next run dates computed from %s.', $date->format(\DateTimeInterface::ATOM)));
+            $io->comment(sprintf('All next run dates computed from %s.', $date->format('r')));
         }
 
         foreach ($names as $name) {
@@ -94,7 +96,7 @@ final class DebugCommand extends Command
             }
             $io->table(
                 ['Message', 'Trigger', 'Next Run'],
-                array_map(self::renderRecurringMessage(...), $messages, array_fill(0, count($messages), $date)),
+                array_filter(array_map(self::renderRecurringMessage(...), $messages, array_fill(0, count($messages), $date), array_fill(0, count($messages), $input->getOption('all')))),
             );
         }
 
@@ -102,9 +104,9 @@ final class DebugCommand extends Command
     }
 
     /**
-     * @return array{0:string,1:string,2:string}
+     * @return array{0:string,1:string,2:string}|null
      */
-    private static function renderRecurringMessage(RecurringMessage $recurringMessage, \DateTimeImmutable $date): array
+    private static function renderRecurringMessage(RecurringMessage $recurringMessage, \DateTimeImmutable $date, bool $all): ?array
     {
         $message = $recurringMessage->getMessage();
         $trigger = $recurringMessage->getTrigger();
@@ -113,10 +115,12 @@ final class DebugCommand extends Command
             $message = $message->getMessage();
         }
 
-        return [
-            $message instanceof \Stringable ? (string) $message : (new \ReflectionClass($message))->getShortName(),
-            (string) $trigger,
-            $trigger->getNextRunDate($date)?->format(\DateTimeInterface::ATOM) ?? '-',
-        ];
+        $next = $trigger->getNextRunDate($date)?->format('r') ?? '-';
+        if ('-' === $next && !$all) {
+            return null;
+        }
+        $name = $message instanceof \Stringable ? (string) $message : (new \ReflectionClass($message))->getShortName();
+
+        return [$name, (string) $trigger, $next];
     }
 }

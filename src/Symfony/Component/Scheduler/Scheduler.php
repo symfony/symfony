@@ -15,9 +15,6 @@ use Symfony\Component\Clock\Clock;
 use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\Scheduler\Generator\MessageGenerator;
 
-/**
- * @experimental
- */
 final class Scheduler
 {
     /**

@@ -13,11 +13,11 @@ namespace Symfony\Bridge\Monolog\Tests\Handler;
 
 use Monolog\Formatter\HtmlFormatter;
 use Monolog\Formatter\LineFormatter;
+use Monolog\Logger;
 use Monolog\LogRecord;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Handler\MailerHandler;
-use Symfony\Bridge\Monolog\Logger;
 use Symfony\Bridge\Monolog\Tests\RecordFactory;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;

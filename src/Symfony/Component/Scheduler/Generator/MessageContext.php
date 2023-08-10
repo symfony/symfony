@@ -15,8 +15,6 @@ use Symfony\Component\Scheduler\Trigger\TriggerInterface;
 
 /**
  * @author Tugdual Saunier <tugdual@saunier.tech>
- *
- * @experimental
  */
 final class MessageContext
 {

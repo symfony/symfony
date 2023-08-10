@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Scheduler\Generator;
 
-/**
- * @experimental
- */
 interface CheckpointInterface
 {
     public function acquire(\DateTimeImmutable $now): bool;

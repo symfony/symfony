@@ -16,8 +16,6 @@ use Symfony\Component\AssetMapper\Exception\RuntimeException;
 /**
  * Helps resolve "../" and "./" in paths.
  *
- * @experimental
- *
  * @internal
  */
 trait AssetCompilerPathResolverTrait

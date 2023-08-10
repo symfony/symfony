@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpFoundation\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
+use Symfony\Component\HttpFoundation\Exception\UnexpectedValueException;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Tests\Fixtures\FooEnum;
 
@@ -128,7 +129,7 @@ class ParameterBagTest extends TestCase
     {
         $bag = new ParameterBag(['word' => ['foo_BAR_012']]);
 
-        $this->expectException(\UnexpectedValueException::class);
+        $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('Parameter value "word" cannot be converted to "string".');
 
         $bag->getAlpha('word');
@@ -149,7 +150,7 @@ class ParameterBagTest extends TestCase
     {
         $bag = new ParameterBag(['word' => ['foo_BAR_012']]);
 
-        $this->expectException(\UnexpectedValueException::class);
+        $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('Parameter value "word" cannot be converted to "string".');
 
         $bag->getAlnum('word');
@@ -170,7 +171,7 @@ class ParameterBagTest extends TestCase
     {
         $bag = new ParameterBag(['word' => ['foo_BAR_012']]);
 
-        $this->expectException(\UnexpectedValueException::class);
+        $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('Parameter value "word" cannot be converted to "string".');
 
         $bag->getDigits('word');
@@ -191,7 +192,7 @@ class ParameterBagTest extends TestCase
      */
     public function testGetIntExceptionWithArray()
     {
-        $this->expectDeprecation('Since symfony/http-foundation 6.3: Ignoring invalid values when using "Symfony\Component\HttpFoundation\ParameterBag::getInt(\'digits\')" is deprecated and will throw an "UnexpectedValueException" in 7.0; use method "filter()" with flag "FILTER_NULL_ON_FAILURE" to keep ignoring them.');
+        $this->expectDeprecation(sprintf('Since symfony/http-foundation 6.3: Ignoring invalid values when using "%s::getInt(\'digits\')" is deprecated and will throw an "%s" in 7.0; use method "filter()" with flag "FILTER_NULL_ON_FAILURE" to keep ignoring them.', ParameterBag::class, UnexpectedValueException::class));
 
         $bag = new ParameterBag(['digits' => ['123']]);
         $result = $bag->getInt('digits', 0);
@@ -203,7 +204,7 @@ class ParameterBagTest extends TestCase
      */
     public function testGetIntExceptionWithInvalid()
     {
-        $this->expectDeprecation('Since symfony/http-foundation 6.3: Ignoring invalid values when using "Symfony\Component\HttpFoundation\ParameterBag::getInt(\'word\')" is deprecated and will throw an "UnexpectedValueException" in 7.0; use method "filter()" with flag "FILTER_NULL_ON_FAILURE" to keep ignoring them.');
+        $this->expectDeprecation(sprintf('Since symfony/http-foundation 6.3: Ignoring invalid values when using "%s::getInt(\'word\')" is deprecated and will throw an "%s" in 7.0; use method "filter()" with flag "FILTER_NULL_ON_FAILURE" to keep ignoring them.', ParameterBag::class, UnexpectedValueException::class));
 
         $bag = new ParameterBag(['word' => 'foo_BAR_012']);
         $result = $bag->getInt('word', 0);
@@ -232,7 +233,7 @@ class ParameterBagTest extends TestCase
     {
         $bag = new ParameterBag(['key' => ['abc']]);
 
-        $this->expectException(\UnexpectedValueException::class);
+        $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('Parameter value "key" cannot be converted to "string".');
 
         $bag->getString('key');
@@ -242,7 +243,7 @@ class ParameterBagTest extends TestCase
     {
         $bag = new ParameterBag(['object' => $this]);
 
-        $this->expectException(\UnexpectedValueException::class);
+        $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('Parameter value "object" cannot be converted to "string".');
 
         $bag->getString('object');
@@ -338,7 +339,7 @@ class ParameterBagTest extends TestCase
      */
     public function testGetBooleanExceptionWithInvalid()
     {
-        $this->expectDeprecation('Since symfony/http-foundation 6.3: Ignoring invalid values when using "Symfony\Component\HttpFoundation\ParameterBag::getBoolean(\'invalid\')" is deprecated and will throw an "UnexpectedValueException" in 7.0; use method "filter()" with flag "FILTER_NULL_ON_FAILURE" to keep ignoring them.');
+        $this->expectDeprecation(sprintf('Since symfony/http-foundation 6.3: Ignoring invalid values when using "%s::getBoolean(\'invalid\')" is deprecated and will throw an "%s" in 7.0; use method "filter()" with flag "FILTER_NULL_ON_FAILURE" to keep ignoring them.', ParameterBag::class, UnexpectedValueException::class));
 
         $bag = new ParameterBag(['invalid' => 'foo']);
         $result = $bag->getBoolean('invalid', 0);
@@ -359,7 +360,7 @@ class ParameterBagTest extends TestCase
     {
         $bag = new ParameterBag(['invalid-value' => 2]);
 
-        $this->expectException(\UnexpectedValueException::class);
+        $this->expectException(UnexpectedValueException::class);
         if (\PHP_VERSION_ID >= 80200) {
             $this->expectExceptionMessage('Parameter "invalid-value" cannot be converted to enum: 2 is not a valid backing value for enum Symfony\Component\HttpFoundation\Tests\Fixtures\FooEnum.');
         } else {
@@ -373,7 +374,7 @@ class ParameterBagTest extends TestCase
     {
         $bag = new ParameterBag(['invalid-value' => ['foo']]);
 
-        $this->expectException(\UnexpectedValueException::class);
+        $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('Parameter "invalid-value" cannot be converted to enum: Symfony\Component\HttpFoundation\Tests\Fixtures\FooEnum::from(): Argument #1 ($value) must be of type int, array given.');
 
         $this->assertNull($bag->getEnum('invalid-value', FooEnum::class));

@@ -16,8 +16,6 @@ use Symfony\Component\Webhook\Subscriber;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 6.3
  */
 class SendWebhookMessage
 {

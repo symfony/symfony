@@ -1009,6 +1009,32 @@ class OptionsResolverTest extends TestCase
         $this->resolver->resolve();
     }
 
+    public function testResolveFailsIfInvalidValueFromNestedOption()
+    {
+        $this->expectException(InvalidOptionsException::class);
+        $this->expectExceptionMessage('The option "foo[bar]" with value "invalid value" is invalid. Accepted values are: "valid value".');
+        $this->resolver->setDefault('foo', function (OptionsResolver $resolver) {
+            $resolver
+                ->setDefined('bar')
+                ->setAllowedValues('bar', 'valid value');
+        });
+
+        $this->resolver->resolve(['foo' => ['bar' => 'invalid value']]);
+    }
+
+    public function testResolveFailsIfInvalidTypeFromNestedOption()
+    {
+        $this->expectException(InvalidOptionsException::class);
+        $this->expectExceptionMessage('The option "foo[bar]" with value 1 is expected to be of type "string", but is of type "int".');
+        $this->resolver->setDefault('foo', function (OptionsResolver $resolver) {
+            $resolver
+                ->setDefined('bar')
+                ->setAllowedTypes('bar', 'string');
+        });
+
+        $this->resolver->resolve(['foo' => ['bar' => 1]]);
+    }
+
     public function testResolveFailsIfInvalidValue()
     {
         $this->expectException(InvalidOptionsException::class);

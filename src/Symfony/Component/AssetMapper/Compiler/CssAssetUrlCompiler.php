@@ -21,8 +21,6 @@ use Symfony\Component\AssetMapper\MappedAsset;
  * Resolves url() paths in CSS files.
  *
  * Originally sourced from https://github.com/rails/propshaft/blob/main/lib/propshaft/compilers/css_asset_urls.rb
- *
- * @experimental
  */
 final class CssAssetUrlCompiler implements AssetCompilerInterface
 {

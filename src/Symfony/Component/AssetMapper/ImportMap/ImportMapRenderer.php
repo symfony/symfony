@@ -12,8 +12,6 @@
 namespace Symfony\Component\AssetMapper\ImportMap;
 
 /**
- * @experimental
- *
  * @author Kévin Dunglas <kevin@dunglas.dev>
  * @author Ryan Weaver <ryan@symfonycasts.com>
  *

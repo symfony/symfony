@@ -61,6 +61,9 @@ final class DoctrineTestHelper
         if (class_exists(DefaultSchemaManagerFactory::class)) {
             $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
         }
+        if (method_exists($config, 'setLazyGhostObjectEnabled')) {
+            $config->setLazyGhostObjectEnabled(true);
+        }
 
         return $config;
     }

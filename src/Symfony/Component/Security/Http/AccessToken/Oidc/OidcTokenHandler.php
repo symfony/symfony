@@ -31,8 +31,6 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 
 /**
  * The token handler decodes and validates the token, and retrieves the user identifier from it.
- *
- * @experimental
  */
 final class OidcTokenHandler implements AccessTokenHandlerInterface
 {

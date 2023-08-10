@@ -13,8 +13,6 @@ namespace Symfony\Component\Scheduler\Trigger;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental
  */
 final class CallbackTrigger implements TriggerInterface
 {

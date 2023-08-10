@@ -17,8 +17,6 @@ use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
 /**
  * Finds and returns assets in the pipeline.
  *
- * @experimental
- *
  * @final
  */
 class AssetMapper implements AssetMapperInterface

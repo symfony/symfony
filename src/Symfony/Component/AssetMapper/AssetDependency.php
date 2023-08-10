@@ -13,8 +13,6 @@ namespace Symfony\Component\AssetMapper;
 
 /**
  * Represents a dependency that a MappedAsset has.
- *
- * @experimental
  */
 final class AssetDependency
 {

@@ -16,8 +16,6 @@ use Symfony\Component\AssetMapper\Compiler\AssetCompilerInterface;
 /**
  * Runs a chain of compiles intended to adjust the source of assets.
  *
- * @experimental
- *
  * @final
  */
 class AssetMapperCompiler

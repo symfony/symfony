@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Scheduler\Trigger;
 
-/**
- * @experimental
- */
 interface TriggerInterface extends \Stringable
 {
     /**

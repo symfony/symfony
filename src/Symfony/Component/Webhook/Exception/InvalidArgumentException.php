@@ -13,8 +13,6 @@ namespace Symfony\Component\Webhook\Exception;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 6.3
  */
 class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
 {

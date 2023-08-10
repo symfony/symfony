@@ -350,6 +350,7 @@
         <xsd:attribute name="default-redis-provider" type="xsd:string" />
         <xsd:attribute name="default-memcached-provider" type="xsd:string" />
         <xsd:attribute name="default-pdo-provider" type="xsd:string" />
+        <xsd:attribute name="default-doctrine-dbal-provider" type="xsd:string" />
         <xsd:attribute name="prefix-seed" type="xsd:string" />
     </xsd:complexType>
 

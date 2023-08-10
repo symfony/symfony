@@ -13,6 +13,7 @@ namespace Symfony\Component\AssetMapper\ImportMap;
 
 use Symfony\Component\AssetMapper\AssetDependency;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
+use Symfony\Component\AssetMapper\Exception\RuntimeException;
 use Symfony\Component\AssetMapper\ImportMap\Resolver\PackageResolverInterface;
 use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
 use Symfony\Component\VarExporter\VarExporter;
@@ -106,6 +107,36 @@ class ImportMapManager
     public function update(): array
     {
         return $this->updateImportMapConfig(true, [], []);
+    }
+
+    /**
+     * Downloads all missing downloaded packages.
+     *
+     * @return ImportMapEntry[] The downloaded packages
+     */
+    public function downloadMissingPackages(): array
+    {
+        $entries = $this->loadImportMapEntries();
+        $packagesToDownload = [];
+
+        foreach ($entries as $entry) {
+            if (!$entry->isDownloaded || $this->assetMapper->getAsset($entry->path)) {
+                continue;
+            }
+
+            $parts = self::parsePackageName($entry->url);
+
+            $packagesToDownload[] = new PackageRequireOptions(
+                $parts['package'],
+                $parts['version'] ?? throw new RuntimeException(sprintf('Cannot get a version for the "%s" package.', $parts['package'])),
+                true,
+                $entry->preload,
+                $parts['alias'] ?? $parts['package'],
+                isset($parts['registry']) && $parts['registry'] ? $parts['registry'] : null,
+            );
+        }
+
+        return $this->require($packagesToDownload);
     }
 
     /**

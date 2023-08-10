@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\Compiler\AssetCompilerInterface;
 use Symfony\Component\AssetMapper\Compiler\JavaScriptImportPathCompiler;
+use Symfony\Component\AssetMapper\Exception\CircularAssetsException;
 use Symfony\Component\AssetMapper\Exception\RuntimeException;
 use Symfony\Component\AssetMapper\MappedAsset;
 
@@ -275,6 +276,31 @@ class JavaScriptImportPathCompilerTest extends TestCase
             'input' => "import 'https://example.com/other.js';",
             'expectedExceptionMessage' => null,
         ];
+    }
+
+    public function testErrorMessageAvoidsCircularException()
+    {
+        $assetMapper = $this->createMock(AssetMapperInterface::class);
+        $assetMapper->expects($this->any())
+            ->method('getAsset')
+            ->willReturnCallback(function ($logicalPath) {
+                if ('htmx' === $logicalPath) {
+                    return null;
+                }
+
+                if ('htmx.js' === $logicalPath) {
+                    throw new CircularAssetsException();
+                }
+            });
+
+        $asset = new MappedAsset('htmx.js', '/path/to/app.js');
+        $compiler = new JavaScriptImportPathCompiler();
+        $content = '//** @type {import("./htmx").HtmxApi} */';
+        $compiled = $compiler->compile($content, $asset, $assetMapper);
+        // To form a good exception message, the compiler will check for the
+        // htmx.js asset, which will throw a CircularAssetsException. This
+        // should not be caught.
+        $this->assertSame($content, $compiled);
     }
 
     private function createAssetMapper(): AssetMapperInterface

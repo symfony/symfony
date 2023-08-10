@@ -77,7 +77,7 @@ final class PushoverTransport extends AbstractTransport
         $result = $response->toArray(false);
 
         if (!isset($result['request'])) {
-            throw new TransportException(sprintf('Unable to send the Pushover push notification: "%s".', $result->getContent(false)), $response);
+            throw new TransportException(sprintf('Unable to find the message id within the Pushover response: "%s".', $response->getContent(false)), $response);
         }
 
         $sentMessage = new SentMessage($message, (string) $this);

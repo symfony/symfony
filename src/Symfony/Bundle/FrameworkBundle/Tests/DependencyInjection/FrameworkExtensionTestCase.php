@@ -1230,16 +1230,18 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $annotations = !class_exists(FullStack::class);
 
-        $this->assertCount($annotations ? 7 : 6, $calls);
+        $this->assertCount($annotations ? 8 : 7, $calls);
         $this->assertSame('setConstraintValidatorFactory', $calls[0][0]);
         $this->assertEquals([new Reference('validator.validator_factory')], $calls[0][1]);
-        $this->assertSame('setTranslator', $calls[1][0]);
-        $this->assertEquals([new Reference('translator', ContainerBuilder::IGNORE_ON_INVALID_REFERENCE)], $calls[1][1]);
-        $this->assertSame('setTranslationDomain', $calls[2][0]);
-        $this->assertSame(['%validator.translation_domain%'], $calls[2][1]);
-        $this->assertSame('addXmlMappings', $calls[3][0]);
-        $this->assertSame([$xmlMappings], $calls[3][1]);
-        $i = 3;
+        $this->assertSame('setGroupProviderLocator', $calls[1][0]);
+        $this->assertInstanceOf(ServiceLocatorArgument::class, $calls[1][1][0]);
+        $this->assertSame('setTranslator', $calls[2][0]);
+        $this->assertEquals([new Reference('translator', ContainerBuilder::IGNORE_ON_INVALID_REFERENCE)], $calls[2][1]);
+        $this->assertSame('setTranslationDomain', $calls[3][0]);
+        $this->assertSame(['%validator.translation_domain%'], $calls[3][1]);
+        $this->assertSame('addXmlMappings', $calls[4][0]);
+        $this->assertSame([$xmlMappings], $calls[4][1]);
+        $i = 4;
         if ($annotations) {
             $this->assertSame('enableAttributeMapping', $calls[++$i][0]);
         }
@@ -1288,12 +1290,12 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
-        $this->assertCount(7, $calls);
-        $this->assertSame('enableAttributeMapping', $calls[4][0]);
-        $this->assertSame('addMethodMapping', $calls[5][0]);
-        $this->assertSame(['loadValidatorMetadata'], $calls[5][1]);
-        $this->assertSame('setMappingCache', $calls[6][0]);
-        $this->assertEquals([new Reference('validator.mapping.cache.adapter')], $calls[6][1]);
+        $this->assertCount(8, $calls);
+        $this->assertSame('enableAttributeMapping', $calls[5][0]);
+        $this->assertSame('addMethodMapping', $calls[6][0]);
+        $this->assertSame(['loadValidatorMetadata'], $calls[6][1]);
+        $this->assertSame('setMappingCache', $calls[7][0]);
+        $this->assertEquals([new Reference('validator.mapping.cache.adapter')], $calls[7][1]);
         // no cache this time
     }
 
@@ -1308,14 +1310,14 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
-        $this->assertCount(8, $calls);
-        $this->assertSame('enableAttributeMapping', $calls[4][0]);
+        $this->assertCount(9, $calls);
+        $this->assertSame('enableAttributeMapping', $calls[5][0]);
         if (method_exists(ValidatorBuilder::class, 'setDoctrineAnnotationReader')) {
-            $this->assertSame('setDoctrineAnnotationReader', $calls[5][0]);
-            $this->assertEquals([new Reference('annotation_reader')], $calls[5][1]);
-            $i = 6;
+            $this->assertSame('setDoctrineAnnotationReader', $calls[6][0]);
+            $this->assertEquals([new Reference('annotation_reader')], $calls[6][1]);
+            $i = 7;
         } else {
-            $i = 5;
+            $i = 6;
         }
         $this->assertSame('addMethodMapping', $calls[$i][0]);
         $this->assertSame(['loadValidatorMetadata'], $calls[$i][1]);
@@ -1335,16 +1337,16 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
-        $this->assertCount(8, $calls);
-        $this->assertSame('addXmlMappings', $calls[3][0]);
-        $this->assertSame('addYamlMappings', $calls[4][0]);
-        $this->assertSame('enableAttributeMapping', $calls[5][0]);
-        $this->assertSame('addMethodMapping', $calls[6][0]);
-        $this->assertSame(['loadValidatorMetadata'], $calls[6][1]);
-        $this->assertSame('setMappingCache', $calls[7][0]);
-        $this->assertEquals([new Reference('validator.mapping.cache.adapter')], $calls[7][1]);
+        $this->assertCount(9, $calls);
+        $this->assertSame('addXmlMappings', $calls[4][0]);
+        $this->assertSame('addYamlMappings', $calls[5][0]);
+        $this->assertSame('enableAttributeMapping', $calls[6][0]);
+        $this->assertSame('addMethodMapping', $calls[7][0]);
+        $this->assertSame(['loadValidatorMetadata'], $calls[7][1]);
+        $this->assertSame('setMappingCache', $calls[8][0]);
+        $this->assertEquals([new Reference('validator.mapping.cache.adapter')], $calls[8][1]);
 
-        $xmlMappings = $calls[3][1][0];
+        $xmlMappings = $calls[4][1][0];
         $this->assertCount(3, $xmlMappings);
         try {
             // Testing symfony/symfony
@@ -1355,7 +1357,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         }
         $this->assertStringEndsWith('TestBundle/Resources/config/validation.xml', $xmlMappings[1]);
 
-        $yamlMappings = $calls[4][1][0];
+        $yamlMappings = $calls[5][1][0];
         $this->assertCount(1, $yamlMappings);
         $this->assertStringEndsWith('TestBundle/Resources/config/validation.yml', $yamlMappings[0]);
     }
@@ -1370,7 +1372,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         ]);
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
-        $xmlMappings = $calls[3][1][0];
+        $xmlMappings = $calls[4][1][0];
         $this->assertCount(3, $xmlMappings);
 
         try {
@@ -1382,7 +1384,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         }
         $this->assertStringEndsWith('CustomPathBundle/Resources/config/validation.xml', $xmlMappings[1]);
 
-        $yamlMappings = $calls[4][1][0];
+        $yamlMappings = $calls[5][1][0];
         $this->assertCount(1, $yamlMappings);
         $this->assertStringEndsWith('CustomPathBundle/Resources/config/validation.yml', $yamlMappings[0]);
     }
@@ -1395,9 +1397,9 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $annotations = !class_exists(FullStack::class);
 
-        $this->assertCount($annotations ? 6 : 5, $calls);
-        $this->assertSame('addXmlMappings', $calls[3][0]);
-        $i = 3;
+        $this->assertCount($annotations ? 7 : 6, $calls);
+        $this->assertSame('addXmlMappings', $calls[4][0]);
+        $i = 4;
         if ($annotations) {
             $this->assertSame('enableAttributeMapping', $calls[++$i][0]);
         }
@@ -1426,14 +1428,14 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
-        $this->assertSame('addXmlMappings', $calls[3][0]);
-        $this->assertCount(3, $calls[3][1][0]);
-
-        $this->assertSame('addYamlMappings', $calls[4][0]);
+        $this->assertSame('addXmlMappings', $calls[4][0]);
         $this->assertCount(3, $calls[4][1][0]);
-        $this->assertStringContainsString('foo.yml', $calls[4][1][0][0]);
-        $this->assertStringContainsString('validation.yml', $calls[4][1][0][1]);
-        $this->assertStringContainsString('validation.yaml', $calls[4][1][0][2]);
+
+        $this->assertSame('addYamlMappings', $calls[5][0]);
+        $this->assertCount(3, $calls[5][1][0]);
+        $this->assertStringContainsString('foo.yml', $calls[5][1][0][0]);
+        $this->assertStringContainsString('validation.yml', $calls[5][1][0][1]);
+        $this->assertStringContainsString('validation.yaml', $calls[5][1][0][2]);
     }
 
     public function testValidationAutoMapping()

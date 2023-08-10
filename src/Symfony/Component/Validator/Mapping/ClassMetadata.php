@@ -87,6 +87,13 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
     public bool $groupSequenceProvider = false;
 
     /**
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getGroupProvider()} instead.
+     */
+    public ?string $groupProvider = null;
+
+    /**
      * The strategy for traversing traversable objects.
      *
      * By default, only instances of {@link \Traversable} are traversed.
@@ -123,6 +130,7 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
             'getters',
             'groupSequence',
             'groupSequenceProvider',
+            'groupProvider',
             'members',
             'name',
             'properties',
@@ -319,6 +327,7 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
     public function mergeConstraints(self $source)
     {
         if ($source->isGroupSequenceProvider()) {
+            $this->setGroupProvider($source->getGroupProvider());
             $this->setGroupSequenceProvider(true);
         }
 
@@ -432,7 +441,7 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
             throw new GroupDefinitionException('Defining a group sequence provider is not allowed with a static group sequence.');
         }
 
-        if (!$this->getReflectionClass()->implementsInterface(GroupSequenceProviderInterface::class)) {
+        if (null === $this->groupProvider && !$this->getReflectionClass()->implementsInterface(GroupSequenceProviderInterface::class)) {
             throw new GroupDefinitionException(sprintf('Class "%s" must implement GroupSequenceProviderInterface.', $this->name));
         }
 
@@ -442,6 +451,16 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
     public function isGroupSequenceProvider(): bool
     {
         return $this->groupSequenceProvider;
+    }
+
+    public function setGroupProvider(?string $provider): void
+    {
+        $this->groupProvider = $provider;
+    }
+
+    public function getGroupProvider(): ?string
+    {
+        return $this->groupProvider;
     }
 
     public function getCascadingStrategy(): int

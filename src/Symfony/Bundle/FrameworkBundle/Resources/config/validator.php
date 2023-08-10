@@ -42,6 +42,9 @@ return static function (ContainerConfigurator $container) {
             ->call('setConstraintValidatorFactory', [
                 service('validator.validator_factory'),
             ])
+            ->call('setGroupProviderLocator', [
+                tagged_locator('validator.group_provider'),
+            ])
             ->call('setTranslator', [
                 service('translator')->ignoreOnInvalid(),
             ])

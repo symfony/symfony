@@ -92,6 +92,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Gitter\GitterTransportFactory::class,
             'package' => 'symfony/gitter-notifier',
         ],
+        'goip' => [
+            'class' => Bridge\GoIP\GoIPTransportFactory::class,
+            'package' => 'symfony/goip-notifier',
+        ],
         'googlechat' => [
             'class' => Bridge\GoogleChat\GoogleChatTransportFactory::class,
             'package' => 'symfony/google-chat-notifier',

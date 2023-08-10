@@ -91,7 +91,7 @@ EOF
                 $helper->describe($io, $this->findRouteContaining($name, $routes), [
                     'format' => $input->getOption('format'),
                     'raw_text' => $input->getOption('raw'),
-                    'show_controllers' => $input->getOption('show-controllers'),
+                    'show_controllers' => $input->getOption('show-controllers') || $output->isVerbose(),
                     'output' => $io,
                 ]);
 
@@ -119,7 +119,7 @@ EOF
             $helper->describe($io, $routes, [
                 'format' => $input->getOption('format'),
                 'raw_text' => $input->getOption('raw'),
-                'show_controllers' => $input->getOption('show-controllers'),
+                'show_controllers' => $input->getOption('show-controllers') || $output->isVerbose(),
                 'output' => $io,
                 'container' => $container,
             ]);

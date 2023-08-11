@@ -1505,7 +1505,6 @@ class ContainerBuilderTest extends TestCase
 
         $container = new ContainerBuilder();
         $container->register('child_service', \stdClass::class)
-            ->setPublic(false)
             ->addArgument([
                 'non_existent' => new Reference('non_existent_service'),
             ])
@@ -1524,7 +1523,6 @@ class ContainerBuilderTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->register('service', \stdClass::class)
-            ->setPublic(false)
             ->addArgument([
                 'non_existent_service' => new Reference('non_existent_service'),
             ])

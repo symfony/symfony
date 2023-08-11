@@ -93,8 +93,7 @@ class ProxyDumperTest extends TestCase
     {
         return [
             [
-                (new Definition(__CLASS__))
-                    ->setPublic(false),
+                (new Definition(__CLASS__)),
                 'privates',
             ],
             [

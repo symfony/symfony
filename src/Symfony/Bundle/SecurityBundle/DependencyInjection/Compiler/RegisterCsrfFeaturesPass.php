@@ -40,8 +40,7 @@ class RegisterCsrfFeaturesPass implements CompilerPassInterface
 
         $container->register('security.listener.csrf_protection', CsrfProtectionListener::class)
             ->addArgument(new Reference('security.csrf.token_manager'))
-            ->addTag('kernel.event_subscriber')
-            ->setPublic(false);
+            ->addTag('kernel.event_subscriber');
     }
 
     protected function registerLogoutHandler(ContainerBuilder $container): void
@@ -59,7 +58,6 @@ class RegisterCsrfFeaturesPass implements CompilerPassInterface
 
         $container->register('security.logout.listener.csrf_token_clearing', CsrfTokenClearingLogoutListener::class)
             ->addArgument(new Reference('security.csrf.token_storage'))
-            ->addTag('kernel.event_subscriber')
-            ->setPublic(false);
+            ->addTag('kernel.event_subscriber');
     }
 }

@@ -15,6 +15,8 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportFactory;
+use Symfony\Component\Messenger\Bridge\Kafka\Callback\CallbackManager;
+use Symfony\Component\Messenger\Bridge\Kafka\Callback\CallbackProcessorInterface;
 use Symfony\Component\Messenger\Bridge\Kafka\Transport\KafkaFactory;
 use Symfony\Component\Messenger\Bridge\Kafka\Transport\KafkaTransportFactory;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
@@ -149,12 +151,18 @@ return static function (ContainerConfigurator $container) {
 
         ->set('messenger.transport.beanstalkd.factory', BeanstalkdTransportFactory::class)
 
+        ->set(CallbackManager::class)
+            ->args([
+                tagged_iterator('messenger.transport.kafka.callback_processor'),
+            ])
+        ->set(KafkaFactory::class)
+            ->args([
+                service(CallbackProcessorInterface::class),
+            ])
         ->set('messenger.transport.kafka.factory', KafkaTransportFactory::class)
             ->args([
-                service('logger')->ignoreOnInvalid(),
-                service(KafkaFactory::class)->ignoreOnInvalid(),
+                service(KafkaFactory::class),
             ])
-            ->tag('monolog.logger', ['channel' => 'messenger'])
 
         // retry
         ->set('messenger.retry_strategy_locator', ServiceLocator::class)

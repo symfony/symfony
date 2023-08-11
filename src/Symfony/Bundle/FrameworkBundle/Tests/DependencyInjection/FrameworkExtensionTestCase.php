@@ -59,6 +59,7 @@ use Symfony\Component\HttpKernel\Fragment\FragmentUriGeneratorInterface;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportFactory;
+use Symfony\Component\Messenger\Bridge\Kafka\Callback\CallbackManager;
 use Symfony\Component\Messenger\Bridge\Kafka\Transport\KafkaTransportFactory;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
 use Symfony\Component\Messenger\Transport\TransportFactory;
@@ -844,6 +845,8 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         if (class_exists(KafkaTransportFactory::class)) {
             $expectedFactories[] = 'messenger.transport.kafka.factory';
+
+            $this->assertTrue($container->hasDefinition(CallbackManager::class));
         }
 
         $this->assertTrue($container->hasDefinition('messenger.receiver_locator'));

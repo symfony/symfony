@@ -113,6 +113,7 @@ use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Bridge as MessengerBridge;
+use Symfony\Component\Messenger\Bridge\Kafka\Callback\CallbackProcessorInterface;
 use Symfony\Component\Messenger\Command\StatsCommand;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnSignalsListener;
 use Symfony\Component\Messenger\Handler\BatchHandlerInterface;
@@ -2153,6 +2154,9 @@ class FrameworkExtension extends Extension
 
         if (ContainerBuilder::willBeAvailable('symfony/kafka-messenger', MessengerBridge\Kafka\Transport\KafkaTransportFactory::class, ['symfony/framework-bundle', 'symfony/messenger'])) {
             $container->getDefinition('messenger.transport.kafka.factory')->addTag('messenger.transport_factory');
+
+            $container->registerForAutoconfiguration(CallbackProcessorInterface::class)
+                ->addTag('messenger.transport.kafka.callback_processor');
         }
 
         if (!class_exists(StopWorkerOnSignalsListener::class)) {

@@ -28,27 +28,6 @@ class KafkaReceiver implements ReceiverInterface
 
     public function get(): iterable
     {
-        yield from $this->getEnvelope();
-    }
-
-    /** @SuppressWarnings(PHPMD.UnusedFormalParameter) */
-    public function ack(Envelope $envelope): void
-    {
-        /** @var KafkaReceivedMessageStamp $transportStamp */
-        $transportStamp = $envelope->last(KafkaReceivedMessageStamp::class);
-
-        $this->connection->ack($transportStamp->message);
-    }
-
-    /** @SuppressWarnings(PHPMD.UnusedFormalParameter) */
-    public function reject(Envelope $envelope): void
-    {
-        // no reject method for kafka transport
-    }
-
-    /** @psalm-return iterable<Envelope> */
-    private function getEnvelope(): iterable
-    {
         try {
             $kafkaMessage = $this->connection->get();
         } catch (\RdKafka\Exception $exception) {
@@ -59,7 +38,7 @@ class KafkaReceiver implements ReceiverInterface
             switch ($kafkaMessage->err) {
                 case \RD_KAFKA_RESP_ERR__PARTITION_EOF: // No more messages
                 case \RD_KAFKA_RESP_ERR__TIMED_OUT: // Attempt to connect again
-                    return [];
+                    return;
                 default:
                     throw new TransportException($kafkaMessage->errstr(), $kafkaMessage->err);
             }
@@ -69,5 +48,20 @@ class KafkaReceiver implements ReceiverInterface
             'body' => $kafkaMessage->payload,
             'headers' => $kafkaMessage->headers,
         ])->with(new KafkaReceivedMessageStamp($kafkaMessage));
+    }
+
+    public function ack(Envelope $envelope): void
+    {
+        $transportStamp = $envelope->last(KafkaReceivedMessageStamp::class);
+
+        if ($transportStamp instanceof KafkaReceivedMessageStamp) {
+            $this->connection->ack($transportStamp->message);
+        }
+    }
+
+    /** @SuppressWarnings(PHPMD.UnusedFormalParameter) */
+    public function reject(Envelope $envelope): void
+    {
+        // no reject method for kafka transport
     }
 }

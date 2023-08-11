@@ -68,6 +68,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'messenger.bus',
         'messenger.message_handler',
         'messenger.receiver',
+        'messenger.transport.kafka.callback_processor',
         'messenger.transport_factory',
         'mime.mime_type_guesser',
         'monolog.logger',

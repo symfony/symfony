@@ -6,6 +6,7 @@ $container->loadFromExtension('framework', [
     'handle_all_throwables' => true,
     'php_errors' => ['log' => true],
     'validation' => [
+        'email_validation_mode' => 'html5',
         'translation_domain' => 'messages',
     ],
 ]);

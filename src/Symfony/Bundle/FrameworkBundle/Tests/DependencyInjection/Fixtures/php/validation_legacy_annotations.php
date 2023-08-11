@@ -11,6 +11,7 @@ $container->loadFromExtension('framework', [
     'validation' => [
         'enabled' => true,
         'enable_annotations' => true,
+        'email_validation_mode' => 'html5',
     ],
 ]);
 

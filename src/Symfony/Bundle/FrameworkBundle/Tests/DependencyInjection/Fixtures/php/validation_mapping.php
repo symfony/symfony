@@ -6,6 +6,7 @@ $container->loadFromExtension('framework', [
     'handle_all_throwables' => true,
     'php_errors' => ['log' => true],
     'validation' => [
+        'email_validation_mode' => 'html5',
         'mapping' => [
             'paths' => [
                 '%kernel.project_dir%/Fixtures/TestBundle/Resources/config/validation_mapping/files',

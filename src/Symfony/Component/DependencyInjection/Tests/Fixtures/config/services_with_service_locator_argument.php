@@ -26,4 +26,10 @@ return function (ContainerConfigurator $configurator) {
             'foo' => service('foo_service'),
             service('bar_service'),
         ])]);
+
+    $services->set('locator_dependent_inline_service', \ArrayObject::class)
+        ->args([service_locator([
+            'foo' => inline_service(\stdClass::class),
+            'bar' => inline_service(\stdClass::class),
+        ])]);
 };

@@ -16,7 +16,6 @@ use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFac
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportFactory;
 use Symfony\Component\Messenger\Bridge\Kafka\Callback\CallbackManager;
-use Symfony\Component\Messenger\Bridge\Kafka\Callback\CallbackProcessorInterface;
 use Symfony\Component\Messenger\Bridge\Kafka\Transport\KafkaFactory;
 use Symfony\Component\Messenger\Bridge\Kafka\Transport\KafkaTransportFactory;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
@@ -157,7 +156,7 @@ return static function (ContainerConfigurator $container) {
             ])
         ->set(KafkaFactory::class)
             ->args([
-                service(CallbackProcessorInterface::class),
+                service(CallbackManager::class),
             ])
         ->set('messenger.transport.kafka.factory', KafkaTransportFactory::class)
             ->args([

@@ -12,12 +12,16 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Security\Factory;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AbstractFactory;
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class AbstractFactoryTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     private ContainerBuilder $container;
 
     protected function setUp(): void
@@ -105,6 +109,27 @@ class AbstractFactoryTest extends TestCase
             $this->assertEquals($expectedSuccessHandlerOptions, $successHandlerArguments['index_1']);
             $this->assertEquals($expectedFirewallName, $successHandlerArguments['index_2']);
         }
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testRequirePreviousSessionOptionLegacy()
+    {
+        $this->expectDeprecation('Since symfony/security-bundle 6.4: Option "require_previous_session" at "root" is deprecated, it will be removed in version 7.0. Setting it has no effect anymore.');
+
+        $options = [
+            'require_previous_session' => true,
+        ];
+
+        $factory = new StubFactory();
+        $nodeDefinition = new ArrayNodeDefinition('root');
+        $factory->addConfiguration($nodeDefinition);
+
+        $node = $nodeDefinition->getNode();
+        $normalizedConfig = $node->normalize($options);
+
+        $node->finalize($normalizedConfig);
     }
 
     public static function getSuccessHandlers()

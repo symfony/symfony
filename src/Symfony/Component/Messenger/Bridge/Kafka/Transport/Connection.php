@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Messenger\Bridge\Kafka\Transport;
 
-use Psr\Log\LoggerInterface;
+use RdKafka\Exception;
 use RdKafka\KafkaConsumer;
 use RdKafka\Message;
 use RdKafka\Producer;
@@ -20,8 +20,6 @@ use Symfony\Component\Messenger\Exception\TransportException;
 
 class Connection
 {
-    private const DSN_PROTOCOL_KAFKA = 'kafka://';
-
     private const AVAILABLE_OPTIONS = [
         'consumer',
         'producer',
@@ -62,7 +60,6 @@ class Connection
     private function __construct(
         private readonly array $consumerConfig,
         private readonly array $producerConfig,
-        private readonly LoggerInterface $logger,
         private readonly KafkaFactory $kafkaFactory,
     ) {
         if (!\extension_loaded('rdkafka')) {
@@ -70,7 +67,7 @@ class Connection
         }
     }
 
-    public static function fromDsn(#[\SensitiveParameter] string $dsn, array $options, LoggerInterface $logger, KafkaFactory $kafkaFactory): self
+    public static function fromDsn(#[\SensitiveParameter] string $dsn, array $options, KafkaFactory $kafkaFactory): self
     {
         $invalidOptions = array_diff(
             array_keys($options),
@@ -99,7 +96,6 @@ class Connection
         return new self(
             self::setupConsumerOptions($parsedUrl['host'], $options['consumer'] ?? []),
             self::setupProducerOptions($parsedUrl['host'], $options['producer'] ?? []),
-            $logger,
             $kafkaFactory,
         );
     }
@@ -217,36 +213,8 @@ class Connection
         }
 
         try {
-            $message = $consumer->consume($this->consumerConfig['consume_timeout_ms']);
-
-            match ($message->err) {
-                \RD_KAFKA_RESP_ERR_NO_ERROR => $this->logger->debug(sprintf(
-                    'Message consumed from Kafka on partition %s: %s',
-                    $message->partition,
-                    $message->payload,
-                )),
-                \RD_KAFKA_RESP_ERR__PARTITION_EOF => $this->logger->info(
-                    'No more messages; Waiting for more'
-                ),
-                \RD_KAFKA_RESP_ERR__TIMED_OUT => $this->logger->debug(
-                    'Timed out waiting for message'
-                ),
-                \RD_KAFKA_RESP_ERR__TRANSPORT => $this->logger->warning(
-                    'Kafka: Broker transport failure.',
-                ),
-                default => $this->logger->error(sprintf(
-                    'Error occurred while consuming message from Kafka: %s',
-                    $message->errstr(),
-                )),
-            };
-
-            return $message;
-        } catch (\RdKafka\Exception $e) {
-            $this->logger->error(sprintf(
-                'Error occurred while consuming message from Kafka: %s',
-                $e->getMessage(),
-            ));
-
+            return $consumer->consume($this->consumerConfig['consume_timeout_ms']);
+        } catch (Exception $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
     }
@@ -257,22 +225,8 @@ class Connection
 
         if ($this->consumerConfig['commit_async']) {
             $consumer->commitAsync($message);
-
-            $this->logger->info(sprintf(
-                'Offset topic=%s partition=%s offset=%s to be committed asynchronously.',
-                $message->topic_name,
-                $message->partition,
-                $message->offset,
-            ));
         } else {
             $consumer->commit($message);
-
-            $this->logger->info(sprintf(
-                'Offset topic=%s partition=%s offset=%s successfully committed.',
-                $message->topic_name,
-                $message->partition,
-                $message->offset,
-            ));
         }
     }
 

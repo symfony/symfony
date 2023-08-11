@@ -12,7 +12,6 @@
 namespace Symfony\Component\Messenger\Bridge\Kafka\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
-use Psr\Log\NullLogger;
 use RdKafka\Exception;
 use RdKafka\KafkaConsumer;
 use RdKafka\Message;
@@ -59,7 +58,6 @@ class ConnectionTest extends TestCase
                         'topic' => 'producer-topic',
                     ],
                 ],
-                new NullLogger(),
                 $this->factory,
             ),
         );
@@ -75,7 +73,6 @@ class ConnectionTest extends TestCase
             [
                 'invalid' => true,
             ],
-            new NullLogger(),
             $this->factory,
         );
     }
@@ -88,7 +85,6 @@ class ConnectionTest extends TestCase
         Connection::fromDsn(
             'kafka://localhost:1000',
             [],
-            new NullLogger(),
             $this->factory,
         );
     }
@@ -105,7 +101,6 @@ class ConnectionTest extends TestCase
                     'invalid' => true,
                 ],
             ],
-            new NullLogger(),
             $this->factory,
         );
     }
@@ -125,7 +120,6 @@ class ConnectionTest extends TestCase
                     ],
                 ],
             ],
-            new NullLogger(),
             $this->factory,
         );
     }
@@ -146,7 +140,6 @@ class ConnectionTest extends TestCase
                     ],
                 ],
             ],
-            new NullLogger(),
             $this->factory,
         );
     }
@@ -165,7 +158,6 @@ class ConnectionTest extends TestCase
                     ],
                 ],
             ],
-            new NullLogger(),
             $this->factory,
         );
     }
@@ -185,7 +177,6 @@ class ConnectionTest extends TestCase
                     ],
                 ],
             ],
-            new NullLogger(),
             $this->factory,
         );
     }
@@ -205,7 +196,6 @@ class ConnectionTest extends TestCase
                     ],
                 ],
             ],
-            new NullLogger(),
             $this->factory,
         );
     }
@@ -222,7 +212,6 @@ class ConnectionTest extends TestCase
                     'invalid' => true,
                 ],
             ],
-            new NullLogger(),
             $this->factory,
         );
     }
@@ -241,7 +230,6 @@ class ConnectionTest extends TestCase
                     ],
                 ],
             ],
-            new NullLogger(),
             $this->factory,
         );
     }
@@ -260,7 +248,6 @@ class ConnectionTest extends TestCase
                     ],
                 ],
             ],
-            new NullLogger(),
             $this->factory,
         );
     }
@@ -279,7 +266,6 @@ class ConnectionTest extends TestCase
                     'poll_timeout_ms' => 'poll',
                 ],
             ],
-            new NullLogger(),
             $this->factory,
         );
     }
@@ -297,7 +283,6 @@ class ConnectionTest extends TestCase
                     'flush_timeout_ms' => 'flush',
                 ],
             ],
-            new NullLogger(),
             $this->factory,
         );
     }
@@ -311,7 +296,6 @@ class ConnectionTest extends TestCase
                     'topic' => 'php-unit-producer-topic',
                 ],
             ],
-            new NullLogger(),
             $this->factory,
         );
 
@@ -338,7 +322,6 @@ class ConnectionTest extends TestCase
             [
                 'producer' => [],
             ],
-            new NullLogger(),
             $this->factory,
         );
 
@@ -364,7 +347,6 @@ class ConnectionTest extends TestCase
                     'flush_timeout_ms' => 20000,
                 ],
             ],
-            new NullLogger(),
             $this->factory,
         );
 
@@ -407,7 +389,6 @@ class ConnectionTest extends TestCase
                     ],
                 ],
             ],
-            new NullLogger(),
             $this->factory,
         );
 
@@ -435,7 +416,6 @@ class ConnectionTest extends TestCase
                     ],
                 ],
             ],
-            new NullLogger(),
             $this->factory,
         );
 
@@ -463,7 +443,6 @@ class ConnectionTest extends TestCase
                     ],
                 ],
             ],
-            new NullLogger(),
             $this->factory,
         );
 

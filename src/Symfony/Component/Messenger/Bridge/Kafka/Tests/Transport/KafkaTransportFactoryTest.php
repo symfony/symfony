@@ -12,7 +12,8 @@
 namespace Symfony\Component\Messenger\Bridge\Kafka\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
-use Psr\Log\NullLogger;
+use Symfony\Component\Messenger\Bridge\Kafka\Callback\CallbackManager;
+use Symfony\Component\Messenger\Bridge\Kafka\Transport\KafkaFactory;
 use Symfony\Component\Messenger\Bridge\Kafka\Transport\KafkaTransport;
 use Symfony\Component\Messenger\Bridge\Kafka\Transport\KafkaTransportFactory;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -28,7 +29,7 @@ class KafkaTransportFactoryTest extends TestCase
     protected function setUp(): void
     {
         $this->serializer = $this->createMock(SerializerInterface::class);
-        $this->factory = new KafkaTransportFactory(new NullLogger());
+        $this->factory = new KafkaTransportFactory(new KafkaFactory(new CallbackManager([])));
     }
 
     public function testCreateTransport()

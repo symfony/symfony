@@ -14,20 +14,12 @@ namespace Symfony\Component\Messenger\Bridge\Kafka\Transport;
 use RdKafka\Conf;
 use RdKafka\KafkaConsumer;
 use RdKafka\Producer;
+use Symfony\Component\Messenger\Bridge\Kafka\Callback\CallbackManager;
 
-/**
- * @see https://arnaud.le-blanc.net/php-rdkafka-doc/phpdoc/class.rdkafka-conf.html for more information on callback parameters.
- */
 class KafkaFactory
 {
     public function __construct(
-        private readonly mixed $logCb = null,
-        private readonly mixed $errorCb = null,
-        private readonly mixed $rebalanceCb = null,
-        private readonly mixed $deliveryReportMessageCb = null,
-        private readonly mixed $offsetCommitCb = null,
-        private readonly mixed $statsCb = null,
-        private readonly mixed $consumeCb = null,
+        private readonly CallbackManager $callbackManager,
     ) {
     }
 
@@ -37,18 +29,10 @@ class KafkaFactory
     public function createConsumer(array $kafkaConfig): KafkaConsumer
     {
         $conf = $this->getBaseConf();
-
-        if (\is_callable($this->rebalanceCb)) {
-            $conf->setRebalanceCb($this->rebalanceCb);
-        }
-
-        if (\is_callable($this->consumeCb)) {
-            $conf->setConsumeCb($this->consumeCb);
-        }
-
-        if (\is_callable($this->offsetCommitCb)) {
-            $conf->setOffsetCommitCb($this->offsetCommitCb);
-        }
+        $conf->setErrorCb([$this->callbackManager, 'consumerError']);
+        $conf->setRebalanceCb([$this->callbackManager, 'rebalance']);
+        $conf->setConsumeCb([$this->callbackManager, 'consume']);
+        $conf->setOffsetCommitCb([$this->callbackManager, 'offsetCommit']);
 
         foreach ($kafkaConfig as $key => $value) {
             $conf->set($key, $value);
@@ -63,10 +47,8 @@ class KafkaFactory
     public function createProducer(array $kafkaConfig): Producer
     {
         $conf = $this->getBaseConf();
-
-        if (\is_callable($this->deliveryReportMessageCb)) {
-            $conf->setDrMsgCb($this->deliveryReportMessageCb);
-        }
+        $conf->setErrorCb([$this->callbackManager, 'producerError']);
+        $conf->setDrMsgCb([$this->callbackManager, 'deliveryReport']);
 
         foreach ($kafkaConfig as $key => $value) {
             $conf->set($key, $value);
@@ -78,18 +60,8 @@ class KafkaFactory
     private function getBaseConf(): Conf
     {
         $conf = new Conf();
-
-        if (\is_callable($this->logCb)) {
-            $conf->setLogCb($this->logCb);
-        }
-
-        if (\is_callable($this->errorCb)) {
-            $conf->setErrorCb($this->errorCb);
-        }
-
-        if (\is_callable($this->statsCb)) {
-            $conf->setStatsCb($this->statsCb);
-        }
+        $conf->setLogCb([$this->callbackManager, 'log']);
+        $conf->setStatsCb([$this->callbackManager, 'stats']);
 
         return $conf;
     }

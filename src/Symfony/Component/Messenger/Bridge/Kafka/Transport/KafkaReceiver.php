@@ -26,7 +26,6 @@ class KafkaReceiver implements ReceiverInterface
     ) {
     }
 
-    /** @psalm-return \Traversable<Envelope> */
     public function get(): iterable
     {
         yield from $this->getEnvelope();

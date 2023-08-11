@@ -58,8 +58,8 @@ class Connection
     private KafkaFactory $kafkaFactory;
 
     /**
-     * @psalm-param array{topics: list<string>, consume_timeout_ms: int, commit_async: bool, conf_options: array<string, string>} $consumerConfig
-     * @psalm-param array{topic: string, poll_timeout_ms: int, flush_timeout_ms: int, conf_options: array<string, string>} $producerConfig
+     * @param array{topics: list<string>, consume_timeout_ms: int, commit_async: bool, conf_options: array<string, string>} $consumerConfig
+     * @param array{topic: string, poll_timeout_ms: int, flush_timeout_ms: int, conf_options: array<string, string>}        $producerConfig
      */
     private function __construct(
         private readonly array $consumerConfig,
@@ -108,7 +108,9 @@ class Connection
         );
     }
 
-    /** @psalm-param array<string, bool|float|int|string|array<string>> $configOptions */
+    /**
+     * @param array<string, bool|float|int|string|array<string>> $configOptions
+     */
     private static function setupConsumerOptions(string $brokerList, array $configOptions): array
     {
         if (0 === \count($configOptions)) {
@@ -151,7 +153,9 @@ class Connection
         return $options;
     }
 
-    /** @psalm-param array<string, bool|float|int|string|array<string>> $configOptions */
+    /**
+     * @param array<string, bool|float|int|string|array<string>> $configOptions
+     */
     private static function setupProducerOptions(string $brokerList, array $configOptions): array
     {
         if (0 === \count($configOptions)) {
@@ -276,7 +280,9 @@ class Connection
         }
     }
 
-    /** @psalm-param array<string, string> $headers */
+    /**
+     * @param array<string, string> $headers
+     */
     public function publish(int $partition, int $messageFlags, string $body, string $key = null, array $headers = []): void
     {
         if (!$this->producerConfig['topic']) {
@@ -285,7 +291,6 @@ class Connection
 
         $producer = $this->getProducer();
 
-        /** @psalm-var \RdKafka\ProducerTopic $topic */
         $topic = $producer->newTopic($this->producerConfig['topic']);
         $topic->producev(
             $partition,

@@ -28,7 +28,6 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
     protected array $options = [
         'check_path' => '/login_check',
         'use_forward' => false,
-        'require_previous_session' => false,
         'login_path' => '/login',
     ];
 

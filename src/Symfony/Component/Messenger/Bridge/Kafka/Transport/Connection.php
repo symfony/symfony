@@ -55,8 +55,6 @@ class Connection
     private ?KafkaConsumer $consumer = null;
     private ?Producer $producer = null;
 
-    private KafkaFactory $kafkaFactory;
-
     /**
      * @param array{topics: list<string>, consume_timeout_ms: int, commit_async: bool, conf_options: array<string, string>} $consumerConfig
      * @param array{topic: string, poll_timeout_ms: int, flush_timeout_ms: int, conf_options: array<string, string>}        $producerConfig
@@ -65,13 +63,11 @@ class Connection
         private readonly array $consumerConfig,
         private readonly array $producerConfig,
         private readonly LoggerInterface $logger,
-        KafkaFactory $kafkaFactory = null,
+        private readonly KafkaFactory $kafkaFactory,
     ) {
         if (!\extension_loaded('rdkafka')) {
             throw new LogicException(sprintf('You cannot use the "%s" as the "rdkafka" extension is not installed.', __CLASS__));
         }
-
-        $this->kafkaFactory = $kafkaFactory ?? new KafkaFactory($logger);
     }
 
     public static function fromDsn(#[\SensitiveParameter] string $dsn, array $options, LoggerInterface $logger, KafkaFactory $kafkaFactory): self

@@ -28,13 +28,11 @@ class KafkaTransportFactory implements TransportFactoryInterface
         private LoggerInterface $logger = new NullLogger(),
         KafkaFactory $kafkaFactory = null,
     ) {
-        if (!$kafkaFactory instanceof KafkaFactory) {
-            $this->kafkaFactory = new KafkaFactory(
-                new LoggingLogCallback($logger),
-                new LoggingErrorCallback($logger),
-                new LoggingRebalanceCallback($logger),
-            );
-        }
+        $this->kafkaFactory = $kafkaFactory ?? new KafkaFactory(
+            new LoggingLogCallback($logger),
+            new LoggingErrorCallback($logger),
+            new LoggingRebalanceCallback($logger),
+        );
     }
 
     public function createTransport(#[\SensitiveParameter] string $dsn, array $options, SerializerInterface $serializer): TransportInterface

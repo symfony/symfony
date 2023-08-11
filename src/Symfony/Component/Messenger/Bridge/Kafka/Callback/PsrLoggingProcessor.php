@@ -76,7 +76,7 @@ final class PsrLoggingProcessor extends AbstractCallbackProcessor
                 'Timed out waiting for message'
             ),
             \RD_KAFKA_RESP_ERR__TRANSPORT => $this->logger->warning(
-                'Kafka: Broker transport failure.',
+                'Kafka Broker transport failure',
             ),
             default => $this->logger->error(sprintf(
                 'Error occurred while consuming message from Kafka: %s',
@@ -88,13 +88,21 @@ final class PsrLoggingProcessor extends AbstractCallbackProcessor
     public function offsetCommit(object $kafka, int $err, $partitions): void
     {
         foreach ($partitions as $partition) {
-            $this->logger->info(sprintf(
-                'Offset topic=%s partition=%s offset=%s code=%d successfully committed.',
-                $partition->getTopic(),
-                $partition->getPartition(),
-                $partition->getOffset(),
-                $err,
-            ));
+            $this->logger->info(
+                sprintf(
+                    'Offset topic=%s partition=%s offset=%s code=%d successfully committed.',
+                    $partition->getTopic(),
+                    $partition->getPartition(),
+                    $partition->getOffset(),
+                    $err,
+                ),
+                [
+                    'topic' => $partition->getTopic(),
+                    'partition' => $partition->getPartition(),
+                    'offset' => $partition->getOffset(),
+                    'error_code' => $err,
+                ],
+            );
         }
     }
 
@@ -102,18 +110,18 @@ final class PsrLoggingProcessor extends AbstractCallbackProcessor
     {
         switch ($err) {
             case \RD_KAFKA_RESP_ERR__ASSIGN_PARTITIONS:
-                foreach ($partitions as $topicPartition) {
+                foreach ($partitions as $partition) {
                     $this->logger->info(
                         sprintf(
                             'Rebalancing %s %s %s as the assignment changed',
-                            $topicPartition->getTopic(),
-                            $topicPartition->getPartition(),
-                            $topicPartition->getOffset(),
+                            $partition->getTopic(),
+                            $partition->getPartition(),
+                            $partition->getOffset(),
                         ),
                         [
-                            'topic' => $topicPartition->getTopic(),
-                            'partition' => $topicPartition->getPartition(),
-                            'offset' => $topicPartition->getOffset(),
+                            'topic' => $partition->getTopic(),
+                            'partition' => $partition->getPartition(),
+                            'offset' => $partition->getOffset(),
                             'error_code' => $err,
                         ],
                     );
@@ -122,18 +130,18 @@ final class PsrLoggingProcessor extends AbstractCallbackProcessor
                 break;
 
             case \RD_KAFKA_RESP_ERR__REVOKE_PARTITIONS:
-                foreach ($partitions as $topicPartition) {
+                foreach ($partitions as $partition) {
                     $this->logger->info(
                         sprintf(
                             'Rebalancing %s %s %s as the assignment was revoked',
-                            $topicPartition->getTopic(),
-                            $topicPartition->getPartition(),
-                            $topicPartition->getOffset(),
+                            $partition->getTopic(),
+                            $partition->getPartition(),
+                            $partition->getOffset(),
                         ),
                         [
-                            'topic' => $topicPartition->getTopic(),
-                            'partition' => $topicPartition->getPartition(),
-                            'offset' => $topicPartition->getOffset(),
+                            'topic' => $partition->getTopic(),
+                            'partition' => $partition->getPartition(),
+                            'offset' => $partition->getOffset(),
                             'error_code' => $err,
                         ],
                     );
@@ -142,19 +150,19 @@ final class PsrLoggingProcessor extends AbstractCallbackProcessor
                 break;
 
             default:
-                foreach ($partitions as $topicPartition) {
+                foreach ($partitions as $partition) {
                     $this->logger->error(
                         sprintf(
                             'Rebalancing %s %s %s due to error code %d',
-                            $topicPartition->getTopic(),
-                            $topicPartition->getPartition(),
-                            $topicPartition->getOffset(),
+                            $partition->getTopic(),
+                            $partition->getPartition(),
+                            $partition->getOffset(),
                             $err,
                         ),
                         [
-                            'topic' => $topicPartition->getTopic(),
-                            'partition' => $topicPartition->getPartition(),
-                            'offset' => $topicPartition->getOffset(),
+                            'topic' => $partition->getTopic(),
+                            'partition' => $partition->getPartition(),
+                            'offset' => $partition->getOffset(),
                             'error_code' => $err,
                         ],
                     );

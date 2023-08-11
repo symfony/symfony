@@ -17,6 +17,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use RdKafka\KafkaConsumer;
+use RdKafka\Message;
 use RdKafka\Producer;
 use RdKafka\TopicPartition;
 use Symfony\Component\Messenger\Bridge\Kafka\Callback\PsrLoggingProcessor;
@@ -84,7 +85,7 @@ final class PsrLoggingProcessorTest extends TestCase
         $this->processor->log($consumer, $level, 'facility-value', 'test error message');
     }
 
-    public function testInvokeWithAssignPartitions()
+    public function testRebalanceWithAssignPartitions()
     {
         $topic = 'topic1';
         $partition = 1;
@@ -112,7 +113,7 @@ final class PsrLoggingProcessorTest extends TestCase
         $this->processor->rebalance($consumer, \RD_KAFKA_RESP_ERR__ASSIGN_PARTITIONS, [$topicPartition]);
     }
 
-    public function testInvokeWithRevokePartitions()
+    public function testRebalanceWithRevokePartitions()
     {
         $topic = 'topic1';
         $partition = 1;
@@ -136,7 +137,7 @@ final class PsrLoggingProcessorTest extends TestCase
         $this->processor->rebalance($consumer, \RD_KAFKA_RESP_ERR__REVOKE_PARTITIONS, [$topicPartition]);
     }
 
-    public function testInvokeWithUnknownReason()
+    public function testRebalanceWithUnknownReason()
     {
         $topic = 'topic1';
         $partition = 1;
@@ -159,5 +160,122 @@ final class PsrLoggingProcessorTest extends TestCase
         $topicPartition = new TopicPartition($topic, $partition, $offset);
 
         $this->processor->rebalance($consumer, $errorCode, [$topicPartition]);
+    }
+
+    public function testConsumeWithNoError()
+    {
+        $partition = 1;
+        $payload = 'test payload';
+
+        $message = new Message();
+        $message->err = \RD_KAFKA_RESP_ERR_NO_ERROR;
+        $message->partition = $partition;
+        $message->payload = $payload;
+
+        $this->logger->expects(self::once())
+            ->method('debug')
+            ->with(
+                sprintf(
+                    'Message consumed from Kafka on partition %s: %s',
+                    $partition,
+                    $payload,
+                )
+            );
+
+        $this->processor->consume($message);
+    }
+
+    public function testConsumeWithPartitionEofError()
+    {
+        $partition = 1;
+        $payload = 'test payload';
+
+        $message = new Message();
+        $message->err = \RD_KAFKA_RESP_ERR__PARTITION_EOF;
+        $message->partition = $partition;
+        $message->payload = $payload;
+
+        $this->logger->expects(self::once())
+            ->method('info')
+            ->with('No more messages; Waiting for more');
+
+        $this->processor->consume($message);
+    }
+
+    public function testConsumeWithTimedOutError()
+    {
+        $partition = 1;
+        $payload = 'test payload';
+
+        $message = new Message();
+        $message->err = \RD_KAFKA_RESP_ERR__TIMED_OUT;
+        $message->partition = $partition;
+        $message->payload = $payload;
+
+        $this->logger->expects(self::once())
+            ->method('debug')
+            ->with('Timed out waiting for message');
+
+        $this->processor->consume($message);
+    }
+
+    public function testConsumeWithTransportError()
+    {
+        $partition = 1;
+        $payload = 'test payload';
+
+        $message = new Message();
+        $message->err = \RD_KAFKA_RESP_ERR__TRANSPORT;
+        $message->partition = $partition;
+        $message->payload = $payload;
+
+        $this->logger->expects(self::once())
+            ->method('warning')
+            ->with('Kafka Broker transport failure');
+
+        $this->processor->consume($message);
+    }
+
+    public function testConsumeWithGenericError()
+    {
+        $partition = 1;
+        $payload = 'test payload';
+
+        $message = new Message();
+        $message->err = \RD_KAFKA_RESP_ERR__RESOLVE;
+        $message->partition = $partition;
+        $message->payload = $payload;
+
+        $this->logger->expects(self::once())
+            ->method('error')
+            ->with('Error occurred while consuming message from Kafka: Local: Host resolution failure');
+
+        $this->processor->consume($message);
+    }
+
+    public function testOffsetCommit()
+    {
+        $topic = 'topic1';
+        $partition = 1;
+        $offset = 2;
+
+        $kafka = new \stdClass();
+        $err = 1;
+
+        $this->logger->expects(self::once())
+            ->method('info')
+            ->with(
+                'Offset topic=topic1 partition=1 offset=2 code=1 successfully committed.',
+                [
+                    'topic' => $topic,
+                    'partition' => $partition,
+                    'offset' => $offset,
+                    'error_code' => $err,
+                ],
+            );
+
+        $topicPartition = new TopicPartition($topic, $partition, $offset);
+
+        $this->processor->offsetCommit($kafka, $err, [$topicPartition]);
     }
 }

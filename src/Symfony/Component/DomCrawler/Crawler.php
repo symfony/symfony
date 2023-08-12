@@ -522,11 +522,17 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Returns the attribute value of the first node of the list.
      *
+     * @param string|null $default When not null: the value to return when the attribute is empty
+     *
      * @throws \InvalidArgumentException When current node is empty
      */
-    public function attr(string $attribute): ?string
+    public function attr(string $attribute, string $default = null): ?string
     {
         if (!$this->nodes) {
+            if (null !== $default) {
+                return $default;
+            }
+
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 

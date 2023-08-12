@@ -47,6 +47,7 @@ final class Transport
         Bridge\FreeMobile\FreeMobileTransportFactory::class,
         Bridge\GatewayApi\GatewayApiTransportFactory::class,
         Bridge\Gitter\GitterTransportFactory::class,
+        Bridge\GoIP\GoIPTransportFactory::class,
         Bridge\GoogleChat\GoogleChatTransportFactory::class,
         Bridge\Infobip\InfobipTransportFactory::class,
         Bridge\Iqsms\IqsmsTransportFactory::class,

@@ -45,7 +45,6 @@ class CachePoolClearerPassTest extends TestCase
         $container->setDefinition('public.pool2', $publicPool);
 
         $privatePool = new Definition();
-        $privatePool->setPublic(false);
         $privatePool->addArgument('namespace');
         $privatePool->addTag('cache.pool', ['clearer' => 'clearer_alias']);
         $container->setDefinition('private.pool', $privatePool);

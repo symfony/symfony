@@ -42,7 +42,6 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
 
         $container
             ->register('a', 'stdClass')
-            ->setPublic(false)
             ->addTag('doctrine.event_listener', [
                 'event' => 'bar',
             ])
@@ -178,6 +177,42 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
                 'd' => new ServiceClosureArgument(new Reference('d')),
             ],
             $serviceLocatorDef->getArgument(0)
+        );
+    }
+
+    public function testSubscribersAreSkippedIfListenerDefinedForSameDefinition()
+    {
+        $container = $this->createBuilder();
+
+        $container
+            ->register('a', 'stdClass')
+            ->addTag('doctrine.event_listener', [
+                'event' => 'bar',
+                'priority' => 3,
+            ])
+        ;
+        $container
+            ->register('b', 'stdClass')
+            ->addTag('doctrine.event_listener', [
+                'event' => 'bar',
+            ])
+            ->addTag('doctrine.event_listener', [
+                'event' => 'foo',
+                'priority' => -5,
+            ])
+            ->addTag('doctrine.event_subscriber')
+        ;
+        $this->process($container);
+
+        $eventManagerDef = $container->getDefinition('doctrine.dbal.default_connection.event_manager');
+
+        $this->assertEquals(
+            [
+                [['bar'], 'a'],
+                [['bar'], 'b'],
+                [['foo'], 'b'],
+            ],
+            $eventManagerDef->getArgument(1)
         );
     }
 

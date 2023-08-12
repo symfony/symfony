@@ -20,6 +20,9 @@
         "symfony/http-client": "^6.4|^7.0",
         "symfony/notifier": "^6.4|^7.0"
     },
+    "require-dev": {
+        "symfony/webhook": "^6.4|^7.0"
+    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Vonage\\": "" },
         "exclude-from-classmap": [

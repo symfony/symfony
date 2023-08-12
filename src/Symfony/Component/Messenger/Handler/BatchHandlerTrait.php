@@ -66,7 +66,7 @@ trait BatchHandlerTrait
     /**
      * Completes the jobs in the list.
      *
-     * @list<array{0: object, 1: Acknowledger}> $jobs A list of pairs of messages and their corresponding acknowledgers
+     * @param list<array{0: object, 1: Acknowledger}> $jobs A list of pairs of messages and their corresponding acknowledgers
      */
     private function process(array $jobs): void
     {

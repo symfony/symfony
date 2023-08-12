@@ -6,6 +6,7 @@ CHANGELOG
 
 * Add `CrawlerAnySelectorTextContains` test constraint
 * Add `CrawlerAnySelectorTextSame` test constraint
+* Added argument `$default` to `Crawler::attr()`
 
 6.3
 ---

@@ -20,6 +20,9 @@ use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
 use Symfony\Component\Scheduler\Generator\MessageGenerator;
 use Symfony\Component\Scheduler\ScheduleProviderInterface;
 
+/**
+ * @implements TransportFactoryInterface<SchedulerTransport>
+ */
 class SchedulerTransportFactory implements TransportFactoryInterface
 {
     public function __construct(

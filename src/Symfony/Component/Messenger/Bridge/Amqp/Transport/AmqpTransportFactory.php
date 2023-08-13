@@ -17,6 +17,8 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
+ *
+ * @implements TransportFactoryInterface<AmqpTransport>
  */
 class AmqpTransportFactory implements TransportFactoryInterface
 {

@@ -18,6 +18,8 @@ use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * @author Gary PEGEOT <garypegeot@gmail.com>
+ *
+ * @implements TransportFactoryInterface<InMemoryTransport>
  */
 class InMemoryTransportFactory implements TransportFactoryInterface, ResetInterface
 {

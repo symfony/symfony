@@ -9,15 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Notifier\Bridge\GoIP\Tests;
+namespace Symfony\Component\Notifier\Bridge\GoIp\Tests;
 
-use Symfony\Component\Notifier\Bridge\GoIP\GoIPTransportFactory;
+use Symfony\Component\Notifier\Bridge\GoIp\GoIpTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 
 /**
  * @author Ahmed Ghanem <ahmedghanem7361@gmail.com>
  */
-final class GoIPTransportFactoryTest extends TransportFactoryTestCase
+final class GoIpTransportFactoryTest extends TransportFactoryTestCase
 {
     public static function createProvider(): iterable
     {
@@ -48,8 +48,8 @@ final class GoIPTransportFactoryTest extends TransportFactoryTestCase
         yield 'missing required option: sim_slot' => ['goip://user:pass@host.test'];
     }
 
-    public function createFactory(): GoIPTransportFactory
+    public function createFactory(): GoIpTransportFactory
     {
-        return new GoIPTransportFactory();
+        return new GoIpTransportFactory();
     }
 }

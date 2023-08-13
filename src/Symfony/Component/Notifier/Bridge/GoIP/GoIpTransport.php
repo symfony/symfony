@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Notifier\Bridge\GoIP;
+namespace Symfony\Component\Notifier\Bridge\GoIp;
 
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
@@ -28,7 +28,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Ahmed Ghanem <ahmedghanem7361@gmail.com>
  */
-final class GoIPTransport extends AbstractTransport
+final class GoIpTransport extends AbstractTransport
 {
     public function __construct(
         private readonly string $username,
@@ -48,7 +48,7 @@ final class GoIPTransport extends AbstractTransport
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof SmsMessage && (null === $message->getOptions() || $message->getOptions() instanceof GoIPOptions);
+        return $message instanceof SmsMessage && (null === $message->getOptions() || $message->getOptions() instanceof GoIpOptions);
     }
 
     /**
@@ -63,8 +63,8 @@ final class GoIPTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        if (($options = $message->getOptions()) && !$options instanceof GoIPOptions) {
-            throw new LogicException(sprintf('The "%s" transport only supports an instance of the "%s" as an option class.', __CLASS__, GoIPOptions::class));
+        if (($options = $message->getOptions()) && !$options instanceof GoIpOptions) {
+            throw new LogicException(sprintf('The "%s" transport only supports an instance of the "%s" as an option class.', __CLASS__, GoIpOptions::class));
         }
 
         if ('' !== $message->getFrom()) {

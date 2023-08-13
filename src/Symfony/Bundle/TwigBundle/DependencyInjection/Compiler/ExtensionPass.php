@@ -128,7 +128,7 @@ class ExtensionPass implements CompilerPassInterface
             $container->getDefinition('twig.extension.expression')->addTag('twig.extension');
         }
 
-        if (!class_exists(Workflow::class) || !$container->has('workflow.registry')) {
+        if (!class_exists(Workflow::class) || !$container->has('.workflow.registry')) {
             $container->removeDefinition('workflow.twig_extension');
         } else {
             $container->getDefinition('workflow.twig_extension')->addTag('twig.extension');

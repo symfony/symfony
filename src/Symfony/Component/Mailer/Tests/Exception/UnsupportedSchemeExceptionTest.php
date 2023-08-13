@@ -14,6 +14,7 @@ namespace Symfony\Component\Mailer\Tests\Exception;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClassExistsMock;
 use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
+use Symfony\Component\Mailer\Bridge\Brevo\Transport\BrevoTransportFactory;
 use Symfony\Component\Mailer\Bridge\Google\Transport\GmailTransportFactory;
 use Symfony\Component\Mailer\Bridge\Infobip\Transport\InfobipTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillTransportFactory;
@@ -22,6 +23,7 @@ use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetTransportFactory;
 use Symfony\Component\Mailer\Bridge\OhMySmtp\Transport\OhMySmtpTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
+use Symfony\Component\Mailer\Bridge\Scaleway\Transport\ScalewayTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendinblue\Transport\SendinblueTransportFactory;
 use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
@@ -36,6 +38,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
     {
         ClassExistsMock::register(__CLASS__);
         ClassExistsMock::withMockedClasses([
+            BrevoTransportFactory::class => false,
             GmailTransportFactory::class => false,
             InfobipTransportFactory::class => false,
             MailerSendTransportFactory::class => false,
@@ -44,6 +47,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             MandrillTransportFactory::class => false,
             OhMySmtpTransportFactory::class => false,
             PostmarkTransportFactory::class => false,
+            ScalewayTransportFactory::class => false,
             SendgridTransportFactory::class => false,
             SendinblueTransportFactory::class => false,
             SesTransportFactory::class => false,
@@ -65,6 +69,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
 
     public static function messageWhereSchemeIsPartOfSchemeToPackageMapProvider(): \Generator
     {
+        yield ['brevo', 'symfony/brevo-mailer'];
         yield ['gmail', 'symfony/google-mailer'];
         yield ['infobip', 'symfony/infobip-mailer'];
         yield ['mailersend', 'symfony/mailersend-mailer'];
@@ -73,6 +78,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['mandrill', 'symfony/mailchimp-mailer'];
         yield ['ohmysmtp', 'symfony/oh-my-smtp-mailer'];
         yield ['postmark', 'symfony/postmark-mailer'];
+        yield ['scaleway', 'symfony/scaleway-mailer'];
         yield ['sendgrid', 'symfony/sendgrid-mailer'];
         yield ['sendinblue', 'symfony/sendinblue-mailer'];
         yield ['ses', 'symfony/amazon-mailer'];

@@ -42,23 +42,15 @@ use Symfony\Component\Validator\Tests\Fixtures\FakeMetadataFactory;
 class ValidatorTypeGuesserTest extends TestCase
 {
     public const TEST_CLASS = 'Symfony\Component\Form\Tests\Extension\Validator\ValidatorTypeGuesserTest_TestClass';
-
     public const TEST_PROPERTY = 'property';
 
-    /**
-     * @var ValidatorTypeGuesser
-     */
-    private $guesser;
-
-    /**
-     * @var ClassMetadata
-     */
-    private $metadata;
+    private ValidatorTypeGuesser $guesser;
+    private ClassMetadata $metadata;
 
     /**
      * @var MetadataFactoryInterface
      */
-    private $metadataFactory;
+    private \Symfony\Component\Validator\Tests\Fixtures\FakeMetadataFactory $metadataFactory;
 
     protected function setUp(): void
     {
@@ -93,6 +85,7 @@ class ValidatorTypeGuesserTest extends TestCase
             [new Type('long'), new TypeGuess(IntegerType::class, [], Guess::MEDIUM_CONFIDENCE)],
             [new Type('string'), new TypeGuess(TextType::class, [], Guess::LOW_CONFIDENCE)],
             [new Type(\DateTime::class), new TypeGuess(DateType::class, [], Guess::MEDIUM_CONFIDENCE)],
+            [new Type(\DateTimeImmutable::class), new TypeGuess(DateType::class, ['input' => 'datetime_immutable'], Guess::MEDIUM_CONFIDENCE)],
             [new Type('\DateTime'), new TypeGuess(DateType::class, [], Guess::MEDIUM_CONFIDENCE)],
         ];
     }

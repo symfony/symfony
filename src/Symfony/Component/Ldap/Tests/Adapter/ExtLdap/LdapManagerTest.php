@@ -27,8 +27,7 @@ use Symfony\Component\Ldap\Tests\LdapTestCase;
  */
 class LdapManagerTest extends LdapTestCase
 {
-    /** @var Adapter */
-    private $adapter;
+    private Adapter $adapter;
 
     protected function setUp(): void
     {

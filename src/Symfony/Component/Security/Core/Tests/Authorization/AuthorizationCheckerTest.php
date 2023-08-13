@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authorization;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
@@ -21,9 +22,9 @@ use Symfony\Component\Security\Core\User\InMemoryUser;
 
 class AuthorizationCheckerTest extends TestCase
 {
-    private $accessDecisionManager;
-    private $authorizationChecker;
-    private $tokenStorage;
+    private MockObject&AccessDecisionManagerInterface $accessDecisionManager;
+    private AuthorizationChecker $authorizationChecker;
+    private TokenStorage $tokenStorage;
 
     protected function setUp(): void
     {

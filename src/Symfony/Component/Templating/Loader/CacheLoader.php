@@ -15,6 +15,8 @@ use Symfony\Component\Templating\Storage\FileStorage;
 use Symfony\Component\Templating\Storage\Storage;
 use Symfony\Component\Templating\TemplateReferenceInterface;
 
+trigger_deprecation('symfony/templating', '6.4', '"%s" is deprecated since version 6.4 and will be removed in 7.0. Use Twig instead.', CacheLoader::class);
+
 /**
  * CacheLoader is a loader that caches other loaders responses
  * on the filesystem.
@@ -23,6 +25,8 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
  * All other mechanism would imply the use of `eval()`.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 6.4, use Twig instead
  */
 class CacheLoader extends Loader
 {

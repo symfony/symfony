@@ -25,8 +25,7 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
  */
 class MessengerDataCollectorTest extends TestCase
 {
-    /** @var CliDumper */
-    private $dumper;
+    private CliDumper $dumper;
 
     protected function setUp(): void
     {

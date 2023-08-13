@@ -13,21 +13,17 @@ namespace Fixtures\Bundles\FullEmbeddableAnnotationsBundle\Entity;
 
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Embeddable;
-use Doctrine\ORM\Mapping\Id;
 
-/**
- * @Embeddable
- */
+#[Embeddable]
 class Address
 {
-
-    /** @Column(type="string") */
+    #[Column(type: 'string')]
     public $street;
 
-    /** @Column(type="string") */
+    #[Column(type: 'string')]
     public $zipCode;
 
-    /** @Column(type="string") */
+    #[Column(type: 'string')]
     public $city;
 
     public function __construct($street, $zipCode, $city)

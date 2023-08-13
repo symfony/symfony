@@ -22,6 +22,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 class CliDumper extends AbstractDumper
 {
     public static $defaultColors;
+    /** @var callable|resource|string|null */
     public static $defaultOutput = 'php://stdout';
 
     protected $colors;
@@ -141,6 +142,11 @@ class CliDumper extends AbstractDumper
         switch ($type) {
             case 'default':
                 $style = 'default';
+                break;
+
+            case 'label':
+                $this->styles += ['label' => $this->styles['default']];
+                $style = 'label';
                 break;
 
             case 'integer':
@@ -487,7 +493,7 @@ class CliDumper extends AbstractDumper
             }, $value);
         }
 
-        if ($this->colors) {
+        if ($this->colors && '' !== $value) {
             if ($cchrCount && "\033" === $value[0]) {
                 $value = substr($value, \strlen($startCchr));
             } else {
@@ -510,10 +516,15 @@ class CliDumper extends AbstractDumper
                 }
             }
             if (isset($attr['href'])) {
+                if ('label' === $style) {
+                    $value .= '^';
+                }
                 $value = "\033]8;;{$attr['href']}\033\\{$value}\033]8;;\033\\";
             }
-        } elseif ($attr['if_links'] ?? false) {
-            return '';
+        }
+
+        if ('label' === $style && '' !== $value) {
+            $value .= ' ';
         }
 
         return $value;
@@ -524,7 +535,7 @@ class CliDumper extends AbstractDumper
         if ($this->outputStream !== static::$defaultOutput) {
             return $this->hasColorSupport($this->outputStream);
         }
-        if (null !== static::$defaultColors) {
+        if (isset(static::$defaultColors)) {
             return static::$defaultColors;
         }
         if (isset($_SERVER['argv'][1])) {

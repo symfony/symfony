@@ -25,14 +25,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Console\Tests\Command\CommandTest;
 
 class SymfonyStyleTest extends TestCase
 {
-    /** @var Command */
-    protected $command;
-    /** @var CommandTester */
-    protected $tester;
-    private $colSize;
+    protected Command $command;
+    protected CommandTester $tester;
+    private string|false $colSize;
 
     protected function setUp(): void
     {
@@ -45,8 +44,6 @@ class SymfonyStyleTest extends TestCase
     protected function tearDown(): void
     {
         putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
-        $this->command = null;
-        $this->tester = null;
     }
 
     /**

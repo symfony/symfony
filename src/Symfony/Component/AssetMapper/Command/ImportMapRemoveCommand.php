@@ -20,8 +20,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * @experimental
- *
  * @author Kévin Dunglas <kevin@dunglas.dev>
  */
 #[AsCommand(name: 'importmap:remove', description: 'Removes JavaScript packages')]
@@ -35,7 +33,18 @@ final class ImportMapRemoveCommand extends Command
 
     protected function configure(): void
     {
-        $this->addArgument('packages', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'The packages to remove');
+        $this
+            ->addArgument('packages', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'The packages to remove')
+            ->setHelp(<<<'EOT'
+The <info>%command.name%</info> command removes packages from the <comment>importmap.php</comment>.
+If a package was downloaded into your app, the downloaded file will also be removed.
+
+For example:
+
+    <info>php %command.full_name% lodash</info>
+EOT
+            )
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

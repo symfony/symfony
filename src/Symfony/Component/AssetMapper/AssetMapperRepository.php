@@ -17,8 +17,6 @@ use Symfony\Component\Finder\Iterator\RecursiveDirectoryIterator;
 /**
  * Finds assets in the asset mapper.
  *
- * @experimental
- *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  *
  * @final
@@ -76,7 +74,7 @@ class AssetMapperRepository
         }
 
         foreach ($this->getDirectories() as $path => $namespace) {
-            if (!str_starts_with($filesystemPath, $path)) {
+            if (!str_starts_with($filesystemPath, $path.\DIRECTORY_SEPARATOR)) {
                 continue;
             }
 

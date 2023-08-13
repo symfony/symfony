@@ -24,10 +24,7 @@ use Symfony\Component\Translation\LocaleSwitcher;
 
 class AppVariableTest extends TestCase
 {
-    /**
-     * @var AppVariable
-     */
-    protected $appVariable;
+    protected AppVariable $appVariable;
 
     protected function setUp(): void
     {

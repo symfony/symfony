@@ -17,12 +17,14 @@ use Symfony\Component\AssetMapper\MappedAsset;
 /**
  * An asset compiler is responsible for applying any changes to the contents of an asset.
  *
- * @experimental
- *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
 interface AssetCompilerInterface
 {
+    public const MISSING_IMPORT_STRICT = 'strict';
+    public const MISSING_IMPORT_WARN = 'warn';
+    public const MISSING_IMPORT_IGNORE = 'ignore';
+
     public function supports(MappedAsset $asset): bool;
 
     /**

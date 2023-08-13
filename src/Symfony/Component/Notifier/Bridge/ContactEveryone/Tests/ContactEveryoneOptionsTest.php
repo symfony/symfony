@@ -20,11 +20,11 @@ class ContactEveryoneOptionsTest extends TestCase
     {
         $contactEveryoneOptions = (new ContactEveryoneOptions())
             ->category('test_category')
-            ->diffusionName(123);
+            ->diffusionName('test_diffusion_name');
 
         self::assertSame([
             'category' => 'test_category',
-            'diffusion_name' => 123,
+            'diffusionname' => 'test_diffusion_name',
         ], $contactEveryoneOptions->toArray());
     }
 }

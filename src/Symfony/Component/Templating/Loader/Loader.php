@@ -13,10 +13,14 @@ namespace Symfony\Component\Templating\Loader;
 
 use Psr\Log\LoggerInterface;
 
+trigger_deprecation('symfony/templating', '6.4', '"%s" is deprecated since version 6.4 and will be removed in 7.0. Use Twig instead.', Loader::class);
+
 /**
  * Loader is the base class for all template loader classes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 6.4, use Twig instead
  */
 abstract class Loader implements LoaderInterface
 {

@@ -96,4 +96,19 @@ class CronExpressionTriggerTest extends TestCase
         $this->assertSame('56 20 1 9 0', (string) CronExpressionTrigger::fromSpec('56 20 1 9 0', 'some context'));
         $this->assertSame('0 0 * * *', (string) CronExpressionTrigger::fromSpec('@daily'));
     }
+
+    public function testDefaultTimezone()
+    {
+        $now = new \DateTimeImmutable('Europe/Paris');
+        $trigger = CronExpressionTrigger::fromSpec('0 12 * * *');
+        $this->assertSame('Europe/Paris', $trigger->getNextRunDate($now)->getTimezone()->getName());
+    }
+
+    public function testTimezoneIsUsed()
+    {
+        $now = new \DateTimeImmutable('Europe/Paris');
+        $timezone = new \DateTimeZone('UTC');
+        $trigger = CronExpressionTrigger::fromSpec('0 12 * * *', null, $timezone);
+        $this->assertSame('UTC', $trigger->getNextRunDate($now)->getTimezone()->getName());
+    }
 }

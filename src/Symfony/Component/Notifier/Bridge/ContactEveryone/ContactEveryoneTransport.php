@@ -73,7 +73,9 @@ final class ContactEveryoneTransport extends AbstractTransport
         }
 
         $options = $message->getOptions()?->toArray() ?? [];
-        $options['xcharset'] = 'true';
+        $options['category'] ??= $this->category;
+        $options['diffusionname'] ??= $this->diffusionName;
+        $options['xcharset'] ??= 'true';
         $options['token'] = $this->token;
         $options['to'] = $message->getPhone();
         $options['msg'] = $message->getSubject();

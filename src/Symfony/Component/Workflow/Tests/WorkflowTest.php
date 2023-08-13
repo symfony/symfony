@@ -780,7 +780,7 @@ class WorkflowTest extends TestCase
 
 class EventDispatcherMock implements \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
 {
-    public $dispatchedEvents = [];
+    public array $dispatchedEvents = [];
 
     public function dispatch($event, string $eventName = null): object
     {

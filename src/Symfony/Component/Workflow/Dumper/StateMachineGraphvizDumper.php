@@ -27,16 +27,19 @@ class StateMachineGraphvizDumper extends GraphvizDumper
      */
     public function dump(Definition $definition, Marking $marking = null, array $options = []): string
     {
-        $places = $this->findPlaces($definition, $marking);
+        $withMetadata = $options['with-metadata'] ?? false;
+
+        $places = $this->findPlaces($definition, $withMetadata, $marking);
         $edges = $this->findEdges($definition);
 
         $options = array_replace_recursive(self::$defaultOptions, $options);
 
-        return $this->startDot($options)
-            .$this->addPlaces($places)
+        $label = $this->formatLabel($definition, $withMetadata, $options);
+
+        return $this->startDot($options, $label)
+            .$this->addPlaces($places, $withMetadata)
             .$this->addEdges($edges)
-            .$this->endDot()
-        ;
+            .$this->endDot();
     }
 
     /**

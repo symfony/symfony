@@ -30,11 +30,7 @@ abstract class HttpCacheTestCase extends TestCase
     protected $responses;
     protected $catch;
     protected $esi;
-
-    /**
-     * @var Store
-     */
-    protected $store;
+    protected Store $store;
 
     protected function setUp(): void
     {

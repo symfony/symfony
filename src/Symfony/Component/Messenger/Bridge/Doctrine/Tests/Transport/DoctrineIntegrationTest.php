@@ -11,9 +11,12 @@
 
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Tests\Transport;
 
+use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
+use Doctrine\DBAL\Tools\DsnParser;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
@@ -23,15 +26,19 @@ use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
  */
 class DoctrineIntegrationTest extends TestCase
 {
-    /** @var \Doctrine\DBAL\Connection */
-    private $driverConnection;
-    /** @var Connection */
-    private $connection;
+    private \Doctrine\DBAL\Connection $driverConnection;
+    private Connection $connection;
 
     protected function setUp(): void
     {
-        $dsn = getenv('MESSENGER_DOCTRINE_DSN') ?: 'sqlite://:memory:';
-        $this->driverConnection = DriverManager::getConnection(['url' => $dsn]);
+        $dsn = getenv('MESSENGER_DOCTRINE_DSN') ?: 'pdo-sqlite://:memory:';
+        $params = class_exists(DsnParser::class) ? (new DsnParser())->parse($dsn) : ['url' => $dsn];
+        $config = new Configuration();
+        if (class_exists(DefaultSchemaManagerFactory::class)) {
+            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
+        }
+
+        $this->driverConnection = DriverManager::getConnection($params, $config);
         $this->connection = new Connection([], $this->driverConnection);
     }
 
@@ -56,8 +63,12 @@ class DoctrineIntegrationTest extends TestCase
             ->select('m.available_at')
             ->from('messenger_messages', 'm')
             ->where('m.body = :body')
-            ->setParameter('body', '{"message": "Hi i am delayed"}')
-            ->execute();
+            ->setParameter('body', '{"message": "Hi i am delayed"}');
+        if (method_exists($stmt, 'executeQuery')) {
+            $stmt = $stmt->executeQuery();
+        } else {
+            $stmt = $stmt->execute();
+        }
 
         $available_at = new \DateTimeImmutable($stmt instanceof Result ? $stmt->fetchOne() : $stmt->fetchColumn());
 
@@ -167,7 +178,7 @@ class DoctrineIntegrationTest extends TestCase
 
     public function testTheTransportIsSetupOnGet()
     {
-        $this->assertFalse($this->createSchemaManager()->tablesExist('messenger_messages'));
+        $this->assertFalse($this->createSchemaManager()->tablesExist(['messenger_messages']));
         $this->assertNull($this->connection->get());
 
         $this->connection->send('the body', ['my' => 'header']);

@@ -40,7 +40,7 @@ class OidcTokenHandlerTest extends TestCase
             'iat' => $time,
             'nbf' => $time,
             'exp' => $time + 3600,
-            'iss' => 'https://www.example.com/',
+            'iss' => 'https://www.example.com',
             'aud' => self::AUDIENCE,
             'sub' => 'e21bf182-1538-406e-8ccb-e25a17aba39f',
             'email' => 'foo@example.com',
@@ -54,9 +54,10 @@ class OidcTokenHandlerTest extends TestCase
         $userBadge = (new OidcTokenHandler(
             new ES256(),
             $this->getJWK(),
-            $loggerMock,
+            self::AUDIENCE,
+            ['https://www.example.com'],
             $claim,
-            self::AUDIENCE
+            $loggerMock,
         ))->getUserBadgeFrom($token);
         $actualUser = $userBadge->getUserLoader()();
 
@@ -87,9 +88,10 @@ class OidcTokenHandlerTest extends TestCase
         (new OidcTokenHandler(
             new ES256(),
             $this->getJWK(),
-            $loggerMock,
+            self::AUDIENCE,
+            ['https://www.example.com'],
             'sub',
-            self::AUDIENCE
+            $loggerMock,
         ))->getUserBadgeFrom($token);
     }
 
@@ -103,7 +105,7 @@ class OidcTokenHandlerTest extends TestCase
                 'iat' => time() - 3600,
                 'nbf' => time() - 3600,
                 'exp' => time() - 3590,
-                'iss' => 'https://www.example.com/',
+                'iss' => 'https://www.example.com',
                 'aud' => self::AUDIENCE,
                 'sub' => 'e21bf182-1538-406e-8ccb-e25a17aba39f',
                 'email' => 'foo@example.com',
@@ -115,7 +117,7 @@ class OidcTokenHandlerTest extends TestCase
                 'iat' => time(),
                 'nbf' => time(),
                 'exp' => time() + 3590,
-                'iss' => 'https://www.example.com/',
+                'iss' => 'https://www.example.com',
                 'aud' => 'invalid',
                 'sub' => 'e21bf182-1538-406e-8ccb-e25a17aba39f',
                 'email' => 'foo@example.com',
@@ -136,7 +138,7 @@ class OidcTokenHandlerTest extends TestCase
             'iat' => $time,
             'nbf' => $time,
             'exp' => $time + 3600,
-            'iss' => 'https://www.example.com/',
+            'iss' => 'https://www.example.com',
             'aud' => self::AUDIENCE,
             'sub' => 'e21bf182-1538-406e-8ccb-e25a17aba39f',
         ];
@@ -145,9 +147,10 @@ class OidcTokenHandlerTest extends TestCase
         (new OidcTokenHandler(
             new ES256(),
             self::getJWK(),
-            $loggerMock,
+            self::AUDIENCE,
+            ['https://www.example.com'],
             'email',
-            self::AUDIENCE
+            $loggerMock,
         ))->getUserBadgeFrom($token);
     }
 

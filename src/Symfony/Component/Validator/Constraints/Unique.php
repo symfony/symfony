@@ -37,6 +37,7 @@ class Unique extends Constraint
     protected static $errorNames = self::ERROR_NAMES;
 
     public $message = 'This collection should contain only unique elements.';
+    /** @var callable|null */
     public $normalizer;
 
     /**

@@ -14,8 +14,6 @@ namespace Symfony\Component\AssetMapper\ImportMap;
 /**
  * Represents a package that should be installed or updated.
  *
- * @experimental
- *
  * @author Kévin Dunglas <kevin@dunglas.dev>
  */
 final class PackageRequireOptions
@@ -27,6 +25,7 @@ final class PackageRequireOptions
         public readonly bool $preload = false,
         public readonly ?string $importName = null,
         public readonly ?string $registryName = null,
+        public readonly ?string $path = null,
     ) {
     }
 }

@@ -62,7 +62,6 @@ class RoundRobinTransportTest extends TestCase
         $t2->expects($this->once())->method('send')->will($this->throwException(new TransportException()));
         $t = new RoundRobinTransport([$t1, $t2]);
         $p = new \ReflectionProperty($t, 'cursor');
-        $p->setAccessible(true);
         $p->setValue($t, 0);
 
         try {

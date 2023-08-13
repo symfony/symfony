@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler;
  */
 class PdoSessionHandlerTest extends TestCase
 {
-    private $dbFile;
+    private ?string $dbFile = null;
 
     protected function tearDown(): void
     {
@@ -404,9 +404,9 @@ class PdoSessionHandlerTest extends TestCase
 
 class MockPdo extends \PDO
 {
-    public $prepareResult;
-    private $driverName;
-    private $errorMode;
+    public \Closure|\PDOStatement|false $prepareResult;
+    private ?string $driverName;
+    private bool|int $errorMode;
 
     public function __construct(string $driverName = null, int $errorMode = null)
     {

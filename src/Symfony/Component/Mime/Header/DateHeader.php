@@ -52,15 +52,11 @@ final class DateHeader extends AbstractHeader
      */
     public function setDateTime(\DateTimeInterface $dateTime): void
     {
-        if ($dateTime instanceof \DateTime) {
-            $immutable = new \DateTimeImmutable('@'.$dateTime->getTimestamp());
-            $dateTime = $immutable->setTimezone($dateTime->getTimezone());
-        }
-        $this->dateTime = $dateTime;
+        $this->dateTime = \DateTimeImmutable::createFromInterface($dateTime);
     }
 
     public function getBodyAsString(): string
     {
-        return $this->dateTime->format(\DateTime::RFC2822);
+        return $this->dateTime->format(\DateTimeInterface::RFC2822);
     }
 }

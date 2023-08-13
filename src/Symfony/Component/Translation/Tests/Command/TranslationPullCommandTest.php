@@ -28,7 +28,7 @@ use Symfony\Component\Translation\Writer\TranslationWriter;
  */
 class TranslationPullCommandTest extends TranslationProviderTestCase
 {
-    private $colSize;
+    private string|false $colSize;
 
     protected function setUp(): void
     {

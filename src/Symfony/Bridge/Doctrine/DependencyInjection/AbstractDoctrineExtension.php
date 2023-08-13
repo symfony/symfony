@@ -188,7 +188,6 @@ abstract class AbstractDoctrineExtension extends Extension
             $chainDriverDef = $container->getDefinition($this->getObjectManagerElementName($objectManager['name'].'_metadata_driver'));
         } else {
             $chainDriverDef = new Definition($this->getMetadataDriverClass('driver_chain'));
-            $chainDriverDef->setPublic(false);
         }
 
         foreach ($this->drivers as $driverType => $driverPaths) {
@@ -216,7 +215,6 @@ abstract class AbstractDoctrineExtension extends Extension
                     array_values($driverPaths),
                 ]);
             }
-            $mappingDriverDef->setPublic(false);
             if (str_contains($mappingDriverDef->getClass(), 'yml') || str_contains($mappingDriverDef->getClass(), 'xml')) {
                 $mappingDriverDef->setArguments([array_flip($driverPaths)]);
                 $mappingDriverDef->addMethodCall('setGlobalBasename', ['mapping']);
@@ -385,8 +383,6 @@ abstract class AbstractDoctrineExtension extends Extension
             default:
                 throw new \InvalidArgumentException(sprintf('"%s" is an unrecognized Doctrine cache driver.', $cacheDriver['type']));
         }
-
-        $cacheDef->setPublic(false);
 
         if (!isset($cacheDriver['namespace'])) {
             // generate a unique namespace for the given application

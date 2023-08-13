@@ -16,7 +16,7 @@ use Symfony\Component\Console\Question\Question;
 
 class QuestionTest extends TestCase
 {
-    private $question;
+    private Question $question;
 
     protected function setUp(): void
     {

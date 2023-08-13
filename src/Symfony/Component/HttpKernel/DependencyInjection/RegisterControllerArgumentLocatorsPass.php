@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\AutowireCallable;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -160,7 +161,12 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                     }
 
                     if ($autowireAttributes) {
-                        $value = $autowireAttributes[0]->newInstance()->value;
+                        $attribute = $autowireAttributes[0]->newInstance();
+                        $value = $parameterBag->resolveValue($attribute->value);
+
+                        if ($attribute instanceof AutowireCallable) {
+                            $value = $attribute->buildDefinition($value, $type, $p);
+                        }
 
                         if ($value instanceof Reference) {
                             $args[$p->name] = $type ? new TypedReference($value, $type, $invalidBehavior, $p->name) : new Reference($value, $invalidBehavior);

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\AssetMapper\Tests\ImportMap;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\AssetMapper;
 use Symfony\Component\AssetMapper\AssetMapperCompiler;
@@ -20,17 +21,17 @@ use Symfony\Component\AssetMapper\Compiler\JavaScriptImportPathCompiler;
 use Symfony\Component\AssetMapper\Factory\MappedAssetFactory;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\AssetMapper\ImportMap\PackageRequireOptions;
+use Symfony\Component\AssetMapper\ImportMap\Resolver\PackageResolverInterface;
+use Symfony\Component\AssetMapper\ImportMap\Resolver\ResolvedImportMapPackage;
 use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolver;
 use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpClient\MockHttpClient;
-use Symfony\Component\HttpClient\Response\MockResponse;
 
 class ImportMapManagerTest extends TestCase
 {
-    private MockHttpClient $httpClient;
     private Filesystem $filesystem;
     private AssetMapperInterface $assetMapper;
+    private PackageResolverInterface&MockObject $packageResolver;
 
     protected function setUp(): void
     {
@@ -38,6 +39,10 @@ class ImportMapManagerTest extends TestCase
         if (!file_exists(__DIR__.'/../fixtures/importmaps_for_writing')) {
             $this->filesystem->mkdir(__DIR__.'/../fixtures/importmaps_for_writing');
         }
+        if (!file_exists(__DIR__.'/../fixtures/importmaps_for_writing/assets')) {
+            $this->filesystem->mkdir(__DIR__.'/../fixtures/importmaps_for_writing/assets');
+        }
+        file_put_contents(__DIR__.'/../fixtures/importmaps_for_writing/assets/some_file.js', '// some_file.js contents');
     }
 
     protected function tearDown(): void
@@ -73,7 +78,8 @@ class ImportMapManagerTest extends TestCase
             '/assets/pizza/index.js' => '/assets/pizza/index-b3fb5ee31adaf5e1b32d28edf1ab8e7a.js',
             '/assets/popcorn.js' => '/assets/popcorn-c0778b84ef9893592385aebc95a2896e.js',
             '/assets/imported_async.js' => '/assets/imported_async-8f0cd418bfeb0cf63826e09a4474a81c.js',
-            'other_app' => '/assets/namespaced_assets2/app2-344d0d513d424647e7d8a394ffe5e4b5.js',
+            'other_app' => '/assets/namespaced_assets2/app2-d5bf10c20bf9a0b77e67d78fcac301c5.js',
+            '/assets/namespaced_assets2/imported.js' => '/assets/namespaced_assets2/imported-9ab37dabcfe317fba77123a4e573d53b.js',
         ]], json_decode($manager->getImportMapJson(), true));
     }
 
@@ -97,42 +103,26 @@ class ImportMapManagerTest extends TestCase
     /**
      * @dataProvider getRequirePackageTests
      */
-    public function testRequire(array $packages, array $expectedInstallRequest, array $responseMap, array $expectedImportMap, array $expectedDownloadedFiles)
+    public function testRequire(array $packages, int $expectedProviderPackageArgumentCount, array $resolvedPackages, array $expectedImportMap, array $expectedDownloadedFiles)
     {
         $rootDir = __DIR__.'/../fixtures/importmaps_for_writing';
         $manager = $this->createImportMapManager(['assets' => ''], $rootDir);
 
-        $expectedRequestBody = [
-            'install' => $expectedInstallRequest,
-            'flattenScope' => true,
-            'env' => ['browser', 'module', 'production'],
-        ];
-        $responseData = [
-            'map' => [
-                'imports' => $responseMap,
-            ],
-        ];
-        $responses = [];
-        $responses[] = function ($method, $url, $options) use ($responseData, $expectedRequestBody) {
-            $this->assertSame('POST', $method);
-            $this->assertSame('https://example.com/generate', $url);
-            $this->assertSame($expectedRequestBody, json_decode($options['body'], true));
-
-            return new MockResponse(json_encode($responseData));
-        };
-        // mock the "file download" requests
-        foreach ($expectedDownloadedFiles as $file) {
-            $responses[] = new MockResponse(sprintf('contents of %s', $file));
-        }
-        $this->httpClient->setResponseFactory($responses);
+        $this->packageResolver->expects($this->exactly(0 === $expectedProviderPackageArgumentCount ? 0 : 1))
+            ->method('resolvePackages')
+            ->with($this->callback(function (array $packages) use ($expectedProviderPackageArgumentCount) {
+                return \count($packages) === $expectedProviderPackageArgumentCount;
+            }))
+            ->willReturn($resolvedPackages)
+        ;
 
         $manager->require($packages);
         $actualImportMap = require $rootDir.'/importmap.php';
         $this->assertEquals($expectedImportMap, $actualImportMap);
-        foreach ($expectedDownloadedFiles as $file) {
+        foreach ($expectedDownloadedFiles as $file => $expectedContents) {
             $this->assertFileExists($rootDir.'/'.$file);
             $actualContents = file_get_contents($rootDir.'/'.$file);
-            $this->assertSame(sprintf('contents of %s', $file), $actualContents);
+            $this->assertSame($expectedContents, $actualContents);
         }
     }
 
@@ -140,9 +130,9 @@ class ImportMapManagerTest extends TestCase
     {
         yield 'require single lodash package' => [
             'packages' => [new PackageRequireOptions('lodash')],
-            'expectedInstallRequest' => ['lodash'],
-            'responseMap' => [
-                'lodash' => 'https://ga.jspm.io/npm:lodash@1.2.3/lodash.js',
+            'expectedProviderPackageArgumentCount' => 1,
+            'resolvedPackages' => [
+                self::resolvedPackage('lodash', 'https://ga.jspm.io/npm:lodash@1.2.3/lodash.js'),
             ],
             'expectedImportMap' => [
                 'lodash' => [
@@ -154,10 +144,10 @@ class ImportMapManagerTest extends TestCase
 
         yield 'require two packages' => [
             'packages' => [new PackageRequireOptions('lodash'), new PackageRequireOptions('cowsay')],
-            'expectedInstallRequest' => ['lodash', 'cowsay'],
-            'responseMap' => [
-                'lodash' => 'https://ga.jspm.io/npm:lodash@1.2.3/lodash.js',
-                'cowsay' => 'https://ga.jspm.io/npm:cowsay@4.5.6/cowsay.js',
+            'expectedProviderPackageArgumentCount' => 2,
+            'resolvedPackages' => [
+                self::resolvedPackage('lodash', 'https://ga.jspm.io/npm:lodash@1.2.3/lodash.js'),
+                self::resolvedPackage('cowsay', 'https://ga.jspm.io/npm:cowsay@4.5.6/cowsay.js'),
             ],
             'expectedImportMap' => [
                 'lodash' => [
@@ -172,10 +162,10 @@ class ImportMapManagerTest extends TestCase
 
         yield 'single_package_that_returns_as_two' => [
             'packages' => [new PackageRequireOptions('lodash')],
-            'expectedInstallRequest' => ['lodash'],
-            'responseMap' => [
-                'lodash' => 'https://ga.jspm.io/npm:lodash@1.2.3/lodash.js',
-                'lodash-dependency' => 'https://ga.jspm.io/npm:lodash-dependency@9.8.7/lodash-dependency.js',
+            'expectedProviderPackageArgumentCount' => 1,
+            'resolvedPackages' => [
+                self::resolvedPackage('lodash', 'https://ga.jspm.io/npm:lodash@1.2.3/lodash.js'),
+                self::resolvedPackage('lodash-dependency', 'https://ga.jspm.io/npm:lodash-dependency@9.8.7/lodash-dependency.js'),
             ],
             'expectedImportMap' => [
                 'lodash' => [
@@ -190,9 +180,9 @@ class ImportMapManagerTest extends TestCase
 
         yield 'single_package_with_version_constraint' => [
             'packages' => [new PackageRequireOptions('lodash', '^1.2.3')],
-            'expectedInstallRequest' => ['lodash@^1.2.3'],
-            'responseMap' => [
-                'lodash' => 'https://ga.jspm.io/npm:lodash@1.2.7/lodash.js',
+            'expectedProviderPackageArgumentCount' => 1,
+            'resolvedPackages' => [
+                self::resolvedPackage('lodash', 'https://ga.jspm.io/npm:lodash@1.2.7/lodash.js'),
             ],
             'expectedImportMap' => [
                 'lodash' => [
@@ -204,9 +194,9 @@ class ImportMapManagerTest extends TestCase
 
         yield 'single_package_that_downloads' => [
             'packages' => [new PackageRequireOptions('lodash', download: true)],
-            'expectedInstallRequest' => ['lodash'],
-            'responseMap' => [
-                'lodash' => 'https://ga.jspm.io/npm:lodash@1.2.3/lodash.js',
+            'expectedProviderPackageArgumentCount' => 1,
+            'resolvedPackages' => [
+                self::resolvedPackage('lodash', 'https://ga.jspm.io/npm:lodash@1.2.3/lodash.js', download: true, content: 'the code in lodash.js'),
             ],
             'expectedImportMap' => [
                 'lodash' => [
@@ -215,15 +205,15 @@ class ImportMapManagerTest extends TestCase
                 ],
             ],
             'expectedDownloadedFiles' => [
-                'assets/vendor/lodash.js',
+                'assets/vendor/lodash.js' => 'the code in lodash.js',
             ],
         ];
 
         yield 'single_package_that_preloads' => [
             'packages' => [new PackageRequireOptions('lodash', preload: true)],
-            'expectedInstallRequest' => ['lodash'],
-            'responseMap' => [
-                'lodash' => 'https://ga.jspm.io/npm:lodash@1.2.3/lodash.js',
+            'expectedProviderPackageArgumentCount' => 1,
+            'resolvedPackages' => [
+                self::resolvedPackage('lodash', 'https://ga.jspm.io/npm:lodash@1.2.3/lodash.js', preload: true),
             ],
             'expectedImportMap' => [
                 'lodash' => [
@@ -236,9 +226,9 @@ class ImportMapManagerTest extends TestCase
 
         yield 'single_package_with_custom_import_name' => [
             'packages' => [new PackageRequireOptions('lodash', importName: 'lodash-es')],
-            'expectedInstallRequest' => ['lodash'],
-            'responseMap' => [
-                'lodash' => 'https://ga.jspm.io/npm:lodash@1.2.3/lodash.js',
+            'expectedProviderPackageArgumentCount' => 1,
+            'resolvedPackages' => [
+                self::resolvedPackage('lodash', 'https://ga.jspm.io/npm:lodash@1.2.3/lodash.js', importName: 'lodash-es'),
             ],
             'expectedImportMap' => [
                 'lodash-es' => [
@@ -248,15 +238,13 @@ class ImportMapManagerTest extends TestCase
             'expectedDownloadedFiles' => [],
         ];
 
-        yield 'single_package_with_jspm_custom_registry' => [
-            'packages' => [new PackageRequireOptions('lodash', registryName: 'jspm')],
-            'expectedInstallRequest' => ['jspm:lodash'],
-            'responseMap' => [
-                'lodash' => 'https://ga.jspm.io/npm:lodash@1.2.3/lodash.js',
-            ],
+        yield 'single_package_with_a_path' => [
+            'packages' => [new PackageRequireOptions('some/module', path: __DIR__.'/../fixtures/importmaps_for_writing/assets/some_file.js')],
+            'expectedProviderPackageArgumentCount' => 0,
+            'resolvedPackages' => [],
             'expectedImportMap' => [
-                'lodash' => [
-                    'url' => 'https://ga.jspm.io/npm:lodash@1.2.3/lodash.js',
+                'some/module' => [
+                    'path' => 'some_file.js',
                 ],
             ],
             'expectedDownloadedFiles' => [],
@@ -319,8 +307,8 @@ class ImportMapManagerTest extends TestCase
                 'url' => 'https://ga.jspm.io/npm:cowsay@4.5.6/cowsay.umd.js',
                 'downloaded_to' => 'vendor/moo.js',
             ],
-            'canvas-confetti' => [
-                'url' => 'https://cdn.skypack.dev/pin/canvas-confetti@v1.5.0-t438JJTXIbBReqvLtDua/mode=imports,min/optimized/canvas-confetti.js',
+            'bootstrap' => [
+                'url' => 'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.esm.js',
                 'preload' => true,
             ],
             'app' => [
@@ -333,24 +321,31 @@ class ImportMapManagerTest extends TestCase
         file_put_contents($rootDir.'/assets/vendor/moo.js', 'moo.js contents');
         file_put_contents($rootDir.'/assets/app.js', 'app.js contents');
 
-        $responses = [];
-        $responses[] = function ($method, $url, $options) {
-            $this->assertSame('POST', $method);
-            $this->assertSame('https://example.com/generate', $url);
+        $this->packageResolver->expects($this->once())
+            ->method('resolvePackages')
+            ->with($this->callback(function ($packages) {
+                $this->assertInstanceOf(PackageRequireOptions::class, $packages[0]);
+                /* @var PackageRequireOptions[] $packages */
+                $this->assertCount(3, $packages);
 
-            return new MockResponse(json_encode([
-                'map' => [
-                    'imports' => [
-                        'lodash' => 'https://ga.jspm.io/npm:lodash@1.2.9/lodash.js',
-                        'cowsay' => 'https://ga.jspm.io/npm:cowsay@4.5.9/cowsay.umd.js',
-                        'canvas-confetti' => 'https://cdn.skypack.dev/pin/canvas-confetti@v1.6.0-t438JJTXIbBReqvLtDua/mode=imports,min/optimized/canvas-confetti.js',
-                    ],
-                ],
-            ]));
-        };
-        // 1 file will be downloaded
-        $responses[] = new MockResponse('contents of cowsay.js');
-        $this->httpClient->setResponseFactory($responses);
+                $this->assertSame('lodash', $packages[0]->packageName);
+                $this->assertFalse($packages[0]->download);
+                $this->assertFalse($packages[0]->preload);
+
+                $this->assertSame('cowsay', $packages[1]->packageName);
+                $this->assertTrue($packages[1]->download);
+
+                $this->assertSame('bootstrap', $packages[2]->packageName);
+                $this->assertTrue($packages[2]->preload);
+
+                return true;
+            }))
+            ->willReturn([
+                self::resolvedPackage('lodash', 'https://ga.jspm.io/npm:lodash@1.2.9/lodash.js'),
+                self::resolvedPackage('cowsay', 'https://ga.jspm.io/npm:cowsay@4.5.9/cowsay.umd.js', download: true, content: 'contents of cowsay.js'),
+                self::resolvedPackage('bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.esm.js', preload: true),
+            ])
+        ;
 
         $manager->update();
         $actualImportMap = require $rootDir.'/importmap.php';
@@ -363,8 +358,8 @@ class ImportMapManagerTest extends TestCase
                 'downloaded_to' => 'vendor/cowsay.js',
             ],
             // a non-jspm URL so we can make sure it updates
-            'canvas-confetti' => [
-                'url' => 'https://cdn.skypack.dev/pin/canvas-confetti@v1.6.0-t438JJTXIbBReqvLtDua/mode=imports,min/optimized/canvas-confetti.js',
+            'bootstrap' => [
+                'url' => 'https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.esm.js',
                 'preload' => true,
             ],
             'app' => [
@@ -384,14 +379,17 @@ class ImportMapManagerTest extends TestCase
     public function testParsePackageName(string $packageName, array $expectedReturn)
     {
         $parsed = ImportMapManager::parsePackageName($packageName);
-        // remove integer keys - they're noise
+        $this->assertIsArray($parsed);
 
-        if (\is_array($parsed)) {
-            $parsed = array_filter($parsed, function ($key) {
-                return !\is_int($key);
-            }, \ARRAY_FILTER_USE_KEY);
-        }
+        // remove integer keys - they're noise
+        $parsed = array_filter($parsed, fn ($key) => !\is_int($key), \ARRAY_FILTER_USE_KEY);
         $this->assertEquals($expectedReturn, $parsed);
+
+        $parsedWithAlias = ImportMapManager::parsePackageName($packageName.'=some_alias');
+        $this->assertIsArray($parsedWithAlias);
+        $parsedWithAlias = array_filter($parsedWithAlias, fn ($key) => !\is_int($key), \ARRAY_FILTER_USE_KEY);
+        $expectedReturnWithAlias = $expectedReturn + ['alias' => 'some_alias'];
+        $this->assertEquals($expectedReturnWithAlias, $parsedWithAlias, 'Asserting with alias');
     }
 
     public static function getPackageNameTests(): iterable
@@ -447,7 +445,7 @@ class ImportMapManagerTest extends TestCase
             ],
         ];
 
-        yield 'namespaced_package_with_registry' => [
+        yield 'namespaced_package_with_registry_no_version' => [
             'npm:@hotwired/stimulus',
             [
                 'package' => '@hotwired/stimulus',
@@ -470,15 +468,14 @@ class ImportMapManagerTest extends TestCase
         $pathResolver = new PublicAssetsPathResolver($rootDir, $publicPrefix, $publicDirName);
 
         $mapper = $this->createAssetMapper($pathResolver, $dirs, $rootDir);
-        $this->httpClient = new MockHttpClient();
+        $this->packageResolver = $this->createMock(PackageResolverInterface::class);
 
         return new ImportMapManager(
             $mapper,
             $pathResolver,
             $rootDir.'/importmap.php',
             $rootDir.'/assets/vendor',
-            ImportMapManager::PROVIDER_JSPM,
-            $this->httpClient
+            $this->packageResolver,
         );
     }
 
@@ -499,5 +496,14 @@ class ImportMapManagerTest extends TestCase
         );
 
         return $this->assetMapper;
+    }
+
+    private static function resolvedPackage(string $packageName, string $url, bool $download = false, bool $preload = false, string $importName = null, string $content = null)
+    {
+        return new ResolvedImportMapPackage(
+            new PackageRequireOptions($packageName, download: $download, preload: $preload, importName: $importName),
+            $url,
+            $content,
+        );
     }
 }

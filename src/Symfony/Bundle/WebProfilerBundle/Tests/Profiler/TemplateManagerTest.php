@@ -24,20 +24,9 @@ use Twig\Loader\LoaderInterface;
  */
 class TemplateManagerTest extends TestCase
 {
-    /**
-     * @var Environment
-     */
-    protected $twigEnvironment;
-
-    /**
-     * @var Profiler
-     */
-    protected $profiler;
-
-    /**
-     * @var TemplateManager
-     */
-    protected $templateManager;
+    protected Environment $twigEnvironment;
+    protected Profiler $profiler;
+    protected TemplateManager $templateManager;
 
     protected function setUp(): void
     {

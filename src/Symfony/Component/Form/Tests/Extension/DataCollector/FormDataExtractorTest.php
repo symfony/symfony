@@ -36,10 +36,7 @@ class FormDataExtractorTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    /**
-     * @var FormDataExtractor
-     */
-    private $dataExtractor;
+    private FormDataExtractor $dataExtractor;
 
     protected function setUp(): void
     {

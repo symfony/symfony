@@ -18,11 +18,8 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
 use Symfony\Component\Scheduler\Generator\MessageGenerator;
-use Symfony\Component\Scheduler\Schedule;
+use Symfony\Component\Scheduler\ScheduleProviderInterface;
 
-/**
- * @experimental
- */
 class SchedulerTransportFactory implements TransportFactoryInterface
 {
     public function __construct(
@@ -43,10 +40,10 @@ class SchedulerTransportFactory implements TransportFactoryInterface
             throw new InvalidArgumentException(sprintf('The schedule "%s" is not found.', $scheduleName));
         }
 
-        /** @var Schedule $schedule */
-        $schedule = $this->scheduleProviders->get($scheduleName)->getSchedule();
+        /** @var ScheduleProviderInterface $scheduleProvider */
+        $scheduleProvider = $this->scheduleProviders->get($scheduleName);
 
-        return new SchedulerTransport(new MessageGenerator($schedule, $scheduleName, $this->clock));
+        return new SchedulerTransport(new MessageGenerator($scheduleProvider, $scheduleName, $this->clock));
     }
 
     public function supports(string $dsn, array $options): bool

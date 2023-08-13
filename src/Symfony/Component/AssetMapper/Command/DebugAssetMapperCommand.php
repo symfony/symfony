@@ -22,8 +22,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Outputs all the assets in the asset mapper.
  *
- * @experimental
- *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
 #[AsCommand(name: 'debug:asset-map', description: 'Outputs all mapped assets.')]
@@ -70,8 +68,8 @@ EOT
 
         $rows = [];
         foreach ($allAssets as $asset) {
-            $logicalPath = $asset->getLogicalPath();
-            $sourcePath = $this->relativizePath($asset->getSourcePath());
+            $logicalPath = $asset->logicalPath;
+            $sourcePath = $this->relativizePath($asset->sourcePath);
 
             if (!$input->getOption('full')) {
                 $logicalPath = $this->shortenPath($logicalPath);

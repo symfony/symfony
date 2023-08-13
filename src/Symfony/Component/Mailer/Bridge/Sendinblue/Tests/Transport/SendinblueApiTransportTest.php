@@ -24,6 +24,9 @@ use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
+/**
+ * @group legacy
+ */
 class SendinblueApiTransportTest extends TestCase
 {
     /**

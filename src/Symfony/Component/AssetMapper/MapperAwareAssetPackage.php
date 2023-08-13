@@ -16,8 +16,6 @@ use Symfony\Component\Asset\PackageInterface;
 /**
  * Decorates asset packages to support resolving assets from the asset mapper.
  *
- * @experimental
- *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
 final class MapperAwareAssetPackage implements PackageInterface

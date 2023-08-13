@@ -19,8 +19,8 @@ use Symfony\Component\Serializer\Serializer;
 
 class JsonEncoderTest extends TestCase
 {
-    private $encoder;
-    private $serializer;
+    private JsonEncoder $encoder;
+    private Serializer $serializer;
 
     protected function setUp(): void
     {

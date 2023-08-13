@@ -27,20 +27,14 @@ use Twig\TwigFunction;
  */
 class WebProfilerExtension extends ProfilerExtension
 {
-    /**
-     * @var HtmlDumper
-     */
-    private $dumper;
+    private HtmlDumper $dumper;
 
     /**
      * @var resource
      */
     private $output;
 
-    /**
-     * @var int
-     */
-    private $stackLevel = 0;
+    private int $stackLevel = 0;
 
     public function __construct(HtmlDumper $dumper = null)
     {

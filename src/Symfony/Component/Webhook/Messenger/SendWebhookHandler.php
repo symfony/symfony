@@ -15,8 +15,6 @@ use Symfony\Component\Webhook\Server\TransportInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 6.3
  */
 class SendWebhookHandler
 {

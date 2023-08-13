@@ -16,8 +16,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Allows creating configurable token handlers.
- *
- * @experimental
  */
 interface TokenHandlerFactoryInterface
 {

@@ -43,7 +43,7 @@ class EmailTest extends TestCase
     {
         $e = new Email();
         $e->date($d = new \DateTimeImmutable());
-        $this->assertSame($d, $e->getDate());
+        $this->assertEquals($d, $e->getDate());
     }
 
     public function testReturnPath()

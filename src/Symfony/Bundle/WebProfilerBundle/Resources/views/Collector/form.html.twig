@@ -37,7 +37,7 @@
     </span>
 {% endblock %}
 
-{% block head %}
+{% block stylesheets %}
     {{ parent() }}
 
     <style>
@@ -192,6 +192,187 @@
     </style>
 {% endblock %}
 
+{% block javascripts %}
+    {{  parent() }}
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            new SymfonyProfilerFormPanel();
+        });
+
+        class SymfonyProfilerFormPanel {
+            #activeTreeItem;
+            #activeTreePanel;
+            #storage;
+            #storageKey = 'sf_toggle_data';
+            #togglerStates = {};
+
+            constructor() {
+                this.#storage = sessionStorage;
+                this.#initTrees();
+                this.#initTogglerButtons();
+            }
+
+            #initTrees() {
+                const treeItems = document.querySelectorAll('.tree .tree-inner');
+                treeItems.forEach((treeItem) => {
+                    var targetId = treeItem.getAttribute('data-tab-target-id');
+                    const target = document.getElementById(targetId);
+
+                    if (!target) {
+                        throw `Tab target ${targetId} does not exist`;
+                    }
+
+                    treeItem.addEventListener('click', (e) => {
+                        this.#selectTreeItem(treeItem);
+
+                        e.stopPropagation();
+                        return false;
+                    });
+
+                    target.classList.add('hidden');
+                });
+
+                if (treeItems.length > 0) {
+                    this.#selectTreeItem(treeItems[0]);
+                }
+            };
+
+            #selectTreeItem(treeItem) {
+                const treePanelId = treeItem.getAttribute('data-tab-target-id');
+                const treePanel = document.getElementById(treePanelId);
+
+                if (!treePanel) {
+                    throw `The tree panel ${treePanelId} does not exist`;
+                }
+
+                if (this.#activeTreeItem) {
+                    this.#activeTreeItem.classList.remove('active');
+                }
+
+                if (this.#activeTreePanel) {
+                    this.#activeTreePanel.classList.add('hidden');
+                }
+
+                treeItem.classList.add('active');
+                treePanel.classList.remove('hidden');
+
+                this.#activeTreeItem = treeItem;
+                this.#activeTreePanel = treePanel;
+            }
+
+            #initTogglerButtons() {
+                this.#togglerStates = this.#getTogglerStates();
+                if (!this.#isObject(this.#togglerStates)) {
+                    this.#togglerStates = {};
+                }
+
+                const buttons = document.querySelectorAll('.toggle-button');
+                buttons.forEach((button) => {
+                    const targetId = button.getAttribute('data-toggle-target-id');
+                    const target = document.getElementById(targetId);
+
+                    if (!target) {
+                        throw `Toggle target ${targetId} does not exist`;
+                    }
+
+                    // correct the initial state of the button
+                    if (target.classList.contains('hidden')) {
+                        button.classList.add('closed');
+                    }
+
+                    button.addEventListener('click', (e) => {
+                        this.#toggleToggler(button);
+
+                        e.stopPropagation();
+                        return false;
+                    });
+
+                    if (this.#togglerStates.hasOwnProperty(targetId)) {
+                        // open or collapse based on stored data
+                        if (0 === this.#togglerStates[targetId]) {
+                            this.#collapseToggler(button);
+                        } else {
+                            this.#expandToggler(button);
+                        }
+                    }
+                });
+            };
+
+            #isTogglerCollapsed(button) {
+                return button.classList.contains('closed');
+            }
+
+            #isTogglerExpanded(button) {
+                return !this.#isTogglerCollapsed(button);
+            }
+
+            #expandToggler(button) {
+                const targetId = button.getAttribute('data-toggle-target-id');
+                const target = document.getElementById(targetId);
+
+                if (!target) {
+                    throw "Toggle target " + targetId + " does not exist";
+                }
+
+                if (this.#isTogglerCollapsed(button)) {
+                    button.classList.remove('closed');
+                    target.classList.remove('hidden');
+
+                    this.#togglerStates[targetId] = 1;
+                    this.#saveTogglerStates();
+                }
+            }
+
+            #collapseToggler(button) {
+                const targetId = button.getAttribute('data-toggle-target-id');
+                const target = document.getElementById(targetId);
+
+                if (!target) {
+                    throw `Toggle target ${targetId} does not exist`;
+                }
+
+                if (this.#isTogglerExpanded(button)) {
+                    button.classList.add('closed');
+                    target.classList.add('hidden');
+
+                    this.#togglerStates[targetId] = 0;
+                    this.#saveTogglerStates();
+                }
+            }
+
+            #toggleToggler(button) {
+                if (button.classList.contains('closed')) {
+                    this.#expandToggler(button);
+                } else {
+                    this.#collapseToggler(button);
+                }
+            }
+
+            #saveTogglerStates() {
+                this.#storage.setItem(this.#storageKey, JSON.stringify(this.#togglerStates));
+            }
+
+            #getTogglerStates() {
+                const data = this.#storage.getItem(this.#storageKey);
+
+                if (null !== data) {
+                    try {
+                        return JSON.parse(data);
+                    } catch(e) {
+                    }
+                }
+
+                return {};
+            }
+
+            #isObject(variable) {
+                return null !== variable && 'object' === typeof variable && !Array.isArray(variable);
+            }
+        }
+    </script>
+{% endblock %}
+
 {% block panel %}
     <h2>Forms</h2>
 
@@ -214,224 +395,6 @@
             <p>No forms were submitted for this request.</p>
         </div>
     {% endif %}
-
-    <script>
-    function Toggler(storage) {
-        "use strict";
-
-        var STORAGE_KEY = 'sf_toggle_data',
-
-            states = {},
-
-            isCollapsed = function (button) {
-                return Sfjs.hasClass(button, 'closed');
-            },
-
-            isExpanded = function (button) {
-                return !isCollapsed(button);
-            },
-
-            expand = function (button) {
-                var targetId = button.dataset.toggleTargetId,
-                    target = document.getElementById(targetId);
-
-                if (!target) {
-                    throw "Toggle target " + targetId + " does not exist";
-                }
-
-                if (isCollapsed(button)) {
-                    Sfjs.removeClass(button, 'closed');
-                    Sfjs.removeClass(target, 'hidden');
-
-                    states[targetId] = 1;
-                    storage.setItem(STORAGE_KEY, states);
-                }
-            },
-
-            collapse = function (button) {
-                var targetId = button.dataset.toggleTargetId,
-                    target = document.getElementById(targetId);
-
-                if (!target) {
-                    throw "Toggle target " + targetId + " does not exist";
-                }
-
-                if (isExpanded(button)) {
-                    Sfjs.addClass(button, 'closed');
-                    Sfjs.addClass(target, 'hidden');
-
-                    states[targetId] = 0;
-                    storage.setItem(STORAGE_KEY, states);
-                }
-            },
-
-            toggle = function (button) {
-                if (Sfjs.hasClass(button, 'closed')) {
-                    expand(button);
-                } else {
-                    collapse(button);
-                }
-            },
-
-            initButtons = function (buttons) {
-                states = storage.getItem(STORAGE_KEY, {});
-
-                // must be an object, not an array or anything else
-                // `typeof` returns "object" also for arrays, so the following
-                // check must be done
-                // see http://stackoverflow.com/questions/4775722/check-if-object-is-array
-                if ('[object Object]' !== Object.prototype.toString.call(states)) {
-                    states = {};
-                }
-
-                for (var i = 0, l = buttons.length; i < l; ++i) {
-                    var targetId = buttons[i].dataset.toggleTargetId,
-                        target = document.getElementById(targetId);
-
-                    if (!target) {
-                        throw "Toggle target " + targetId + " does not exist";
-                    }
-
-                    // correct the initial state of the button
-                    if (Sfjs.hasClass(target, 'hidden')) {
-                        Sfjs.addClass(buttons[i], 'closed');
-                    }
-
-                    // attach listener for expanding/collapsing the target
-                    clickHandler(buttons[i], toggle);
-
-                    if (states.hasOwnProperty(targetId)) {
-                        // open or collapse based on stored data
-                        if (0 === states[targetId]) {
-                            collapse(buttons[i]);
-                        } else {
-                            expand(buttons[i]);
-                        }
-                    }
-                }
-            };
-
-        return {
-            initButtons: initButtons,
-
-            toggle: toggle,
-
-            isExpanded: isExpanded,
-
-            isCollapsed: isCollapsed,
-
-            expand: expand,
-
-            collapse: collapse
-        };
-    }
-
-    function JsonStorage(storage) {
-        var setItem = function (key, data) {
-                storage.setItem(key, JSON.stringify(data));
-            },
-
-            getItem = function (key, defaultValue) {
-                var data = storage.getItem(key);
-
-                if (null !== data) {
-                    try {
-                        return JSON.parse(data);
-                    } catch(e) {
-                    }
-                }
-
-                return defaultValue;
-            };
-
-        return {
-            setItem: setItem,
-
-            getItem: getItem
-        };
-    }
-
-    function TabView() {
-        "use strict";
-
-        var activeTab = null,
-
-            activeTarget = null,
-
-            select = function (tab) {
-                var targetId = tab.dataset.tabTargetId,
-                    target = document.getElementById(targetId);
-
-                if (!target) {
-                    throw "Tab target " + targetId + " does not exist";
-                }
-
-                if (activeTab) {
-                    Sfjs.removeClass(activeTab, 'active');
-                }
-
-                if (activeTarget) {
-                    Sfjs.addClass(activeTarget, 'hidden');
-                }
-
-                Sfjs.addClass(tab, 'active');
-                Sfjs.removeClass(target, 'hidden');
-
-                activeTab = tab;
-                activeTarget = target;
-            },
-
-            initTabs = function (tabs) {
-                for (var i = 0, l = tabs.length; i < l; ++i) {
-                    var targetId = tabs[i].dataset.tabTargetId,
-                        target = document.getElementById(targetId);
-
-                    if (!target) {
-                        throw "Tab target " + targetId + " does not exist";
-                    }
-
-                    clickHandler(tabs[i], select);
-
-                    Sfjs.addClass(target, 'hidden');
-                }
-
-                if (tabs.length > 0) {
-                    select(tabs[0]);
-                }
-            };
-
-        return {
-            initTabs: initTabs,
-
-            select: select
-        };
-    }
-
-    var tabTarget = new TabView(),
-        toggler = new Toggler(new JsonStorage(sessionStorage)),
-        clickHandler = function (element, callback) {
-            Sfjs.addEventListener(element, 'click', function (e) {
-                if (!e) {
-                    e = window.event;
-                }
-
-                callback(this);
-
-                if (e.preventDefault) {
-                    e.preventDefault();
-                } else {
-                    e.returnValue = false;
-                }
-
-                e.stopPropagation();
-
-                return false;
-            });
-        };
-
-    tabTarget.initTabs(document.querySelectorAll('.tree .tree-inner'));
-    toggler.initButtons(document.querySelectorAll('.toggle-button'));
-    </script>
 {% endblock %}
 
 {% macro form_tree_entry(name, data, is_root) %}

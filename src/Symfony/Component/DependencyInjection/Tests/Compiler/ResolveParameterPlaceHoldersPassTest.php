@@ -14,13 +14,14 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\ResolveParameterPlaceHoldersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 
 class ResolveParameterPlaceHoldersPassTest extends TestCase
 {
-    private $compilerPass;
-    private $container;
-    private $fooDefinition;
+    private ResolveParameterPlaceHoldersPass $compilerPass;
+    private ContainerBuilder $container;
+    private Definition $fooDefinition;
 
     protected function setUp(): void
     {

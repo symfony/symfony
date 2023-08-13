@@ -28,6 +28,7 @@ class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, Se
     {
         return [
             NormalizableInterface::class => __CLASS__ === static::class || $this->hasCacheableSupportsMethod(),
+            DenormalizableInterface::class => __CLASS__ === static::class || $this->hasCacheableSupportsMethod(),
         ];
     }
 
@@ -74,7 +75,7 @@ class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, Se
      */
     public function hasCacheableSupportsMethod(): bool
     {
-        trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
+        trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, implement "%s::getSupportedTypes()" instead.', __METHOD__, get_debug_type($this));
 
         return __CLASS__ === static::class;
     }

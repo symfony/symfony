@@ -35,7 +35,7 @@ use Symfony\Component\Validator\ConstraintViolation;
  * @implements \RecursiveIterator<int, T>
  * @implements \SeekableIterator<int, T>
  */
-class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \ArrayAccess, \Countable
+class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \ArrayAccess, \Countable, \Stringable
 {
     /**
      * The prefix used for indenting nested error messages.

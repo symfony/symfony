@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\EventListener;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,10 +28,10 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeHandlerInterface;
 
 class RememberMeListenerTest extends TestCase
 {
-    private $rememberMeHandler;
-    private $listener;
-    private $request;
-    private $response;
+    private MockObject&RememberMeHandlerInterface $rememberMeHandler;
+    private RememberMeListener $listener;
+    private Request $request;
+    private Response $response;
 
     protected function setUp(): void
     {

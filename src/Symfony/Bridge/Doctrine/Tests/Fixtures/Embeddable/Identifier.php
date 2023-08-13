@@ -13,16 +13,12 @@ namespace Symfony\Bridge\Doctrine\Tests\Fixtures\Embeddable;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Embeddable
- */
+#[ORM\Embeddable]
 class Identifier
 {
     /**
      * @var int
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer")
      */
+    #[ORM\Id, ORM\Column(type: 'integer')]
     protected $value;
 }

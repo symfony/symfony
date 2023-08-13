@@ -43,30 +43,11 @@ class ViolationMapperTest extends TestCase
     private const LEVEL_1B = 2;
     private const LEVEL_2 = 3;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
-     * @var ViolationMapper
-     */
-    private $mapper;
-
-    /**
-     * @var string
-     */
-    private $message;
-
-    /**
-     * @var string
-     */
-    private $messageTemplate;
-
-    /**
-     * @var array
-     */
-    private $params;
+    private EventDispatcher $dispatcher;
+    private ViolationMapper $mapper;
+    private string $message;
+    private string $messageTemplate;
+    private array $params;
 
     protected function setUp(): void
     {
@@ -91,8 +72,8 @@ class ViolationMapperTest extends TestCase
 
         if (!$synchronized) {
             $config->addViewTransformer(new CallbackTransformer(
-                fn ($normData) => $normData,
-                function () { throw new TransformationFailedException(); }
+                static fn ($normData) => $normData,
+                static fn () => throw new TransformationFailedException()
             ));
         }
 

@@ -437,6 +437,5 @@ return [
         'Pacific/Wake' => 'Wake Island Time',
         'Pacific/Wallis' => 'Wallis & Futuna Time',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

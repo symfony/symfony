@@ -1,6 +1,18 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Allow single integer for the `versions` option of the `Uuid` constraint
+ * Allow single constraint to be passed to the `constraints` option of the `When` constraint
+ * Deprecate Doctrine annotations support in favor of native attributes
+ * Deprecate passing an annotation reader to the constructor signature of `AnnotationLoader`
+ * Deprecate `ValidatorBuilder::setDoctrineAnnotationReader()`
+ * Deprecate `ValidatorBuilder::addDefaultDoctrineAnnotationReader()`
+ * Add `number`, `finite-number` and `finite-float` types to `Type` constraint
+ * Add the `withSeconds` option to the `Time` constraint that allows to pass time without seconds
+
 6.3
 ---
 
@@ -13,6 +25,7 @@ CHANGELOG
  * Add the `filenameMaxLength` option to the `File` constraint
  * Add the `exclude` option to the `Cascade` constraint
  * Add the `value_length` parameter to `Length` constraint
+ * Allow to disable the translation domain for `ConstraintViolationInterface` messages
 
 6.2
 ---

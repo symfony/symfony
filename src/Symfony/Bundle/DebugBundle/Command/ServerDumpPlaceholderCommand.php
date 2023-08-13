@@ -29,7 +29,7 @@ use Symfony\Component\VarDumper\Server\DumpServer;
 #[AsCommand(name: 'server:dump', description: 'Start a dump server that collects and displays dumps in a single place')]
 class ServerDumpPlaceholderCommand extends Command
 {
-    private $replacedCommand;
+    private ServerDumpCommand $replacedCommand;
 
     public function __construct(DumpServer $server = null, array $descriptors = [])
     {

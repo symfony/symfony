@@ -71,7 +71,18 @@ final class TurboSmsTransportTest extends TransportTestCase
             ]))
         ;
 
-        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
+        $client = new MockHttpClient(static function (string $method, string $url, array $options) use ($response): ResponseInterface {
+            $body = json_decode($options['body'], true);
+            self::assertSame([
+                'sms' => [
+                    'sender' => 'sender',
+                    'recipients' => ['380931234567'],
+                    'text' => 'Тест/Test',
+                ],
+            ], $body);
+
+            return $response;
+        });
 
         $message = new SmsMessage('380931234567', 'Тест/Test');
 

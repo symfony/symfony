@@ -27,10 +27,19 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  */
 class AnnotationLoader implements LoaderInterface
 {
+    /**
+     * @deprecated since Symfony 6.4, this property will be removed in 7.0
+     *
+     * @var Reader|null
+     */
     protected $reader;
 
     public function __construct(Reader $reader = null)
     {
+        if ($reader) {
+            trigger_deprecation('symfony/validator', '6.4', 'Passing a "%s" instance as argument 1 to "%s()" is deprecated, pass null or omit the parameter instead.', get_debug_type($reader), __METHOD__);
+        }
+
         $this->reader = $reader;
     }
 
@@ -87,32 +96,51 @@ class AnnotationLoader implements LoaderInterface
         return $success;
     }
 
-    /**
-     * @param \ReflectionClass|\ReflectionMethod|\ReflectionProperty $reflection
-     */
-    private function getAnnotations(object $reflection): iterable
+    private function getAnnotations(\ReflectionMethod|\ReflectionClass|\ReflectionProperty $reflection): iterable
     {
+        $dedup = [];
+
         foreach ($reflection->getAttributes(GroupSequence::class) as $attribute) {
+            $dedup[] = $attribute->newInstance();
             yield $attribute->newInstance();
         }
         foreach ($reflection->getAttributes(GroupSequenceProvider::class) as $attribute) {
+            $dedup[] = $attribute->newInstance();
             yield $attribute->newInstance();
         }
         foreach ($reflection->getAttributes(Constraint::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+            $dedup[] = $attribute->newInstance();
             yield $attribute->newInstance();
         }
         if (!$this->reader) {
             return;
         }
 
-        if ($reflection instanceof \ReflectionClass) {
-            yield from $this->reader->getClassAnnotations($reflection);
+        $annotations = [];
+
+        if ($reflection instanceof \ReflectionClass && $annotations = $this->reader->getClassAnnotations($reflection)) {
+            trigger_deprecation('symfony/validator', '6.4', 'Class "%s" uses Doctrine Annotations to configure validation constraints, which is deprecated. Use PHP attributes instead.', $reflection->getName());
         }
-        if ($reflection instanceof \ReflectionMethod) {
-            yield from $this->reader->getMethodAnnotations($reflection);
+        if ($reflection instanceof \ReflectionMethod && $annotations = $this->reader->getMethodAnnotations($reflection)) {
+            trigger_deprecation('symfony/validator', '6.4', 'Method "%s::%s()" uses Doctrine Annotations to configure validation constraints, which is deprecated. Use PHP attributes instead.', $reflection->getDeclaringClass()->getName(), $reflection->getName());
         }
-        if ($reflection instanceof \ReflectionProperty) {
-            yield from $this->reader->getPropertyAnnotations($reflection);
+        if ($reflection instanceof \ReflectionProperty && $annotations = $this->reader->getPropertyAnnotations($reflection)) {
+            trigger_deprecation('symfony/validator', '6.4', 'Property "%s::$%s" uses Doctrine Annotations to configure validation constraints, which is deprecated. Use PHP attributes instead.', $reflection->getDeclaringClass()->getName(), $reflection->getName());
+        }
+
+        foreach ($dedup as $annotation) {
+            if ($annotation instanceof Constraint) {
+                $annotation->groups; // trigger initialization of the "groups" property
+            }
+        }
+
+        foreach ($annotations as $annotation) {
+            if ($annotation instanceof Constraint) {
+                $annotation->groups; // trigger initialization of the "groups" property
+            }
+            if (!\in_array($annotation, $dedup, false)) {
+                yield $annotation;
+            }
         }
     }
 }

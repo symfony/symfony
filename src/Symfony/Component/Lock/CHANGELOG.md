@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Create migration for lock table when DoctrineDbalStore is used
+ * Add optional parameter `$isSameDatabase` to `DoctrineDbalStore::configureSchema()`
  * Add support for Relay PHP extension for Redis
  * Renamed the `gcProbablity` option to `gcProbability` to fix a typo in its name
 

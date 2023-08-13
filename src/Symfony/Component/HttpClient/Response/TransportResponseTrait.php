@@ -38,7 +38,7 @@ trait TransportResponseTrait
         'canceled' => false,
     ];
 
-    /** @var object|resource */
+    /** @var object|resource|null */
     private $handle;
     private int|string $id;
     private ?float $timeout = 0;
@@ -147,7 +147,7 @@ trait TransportResponseTrait
             self::schedule($response, $runningResponses);
         }
 
-        $lastActivity = microtime(true);
+        $lastActivity = hrtime(true) / 1E9;
         $elapsedTimeout = 0;
 
         if ($fromLastTimeout = 0.0 === $timeout && '-0' === (string) $timeout) {
@@ -172,7 +172,7 @@ trait TransportResponseTrait
                     $chunk = false;
 
                     if ($fromLastTimeout && null !== $multi->lastTimeout) {
-                        $elapsedTimeout = microtime(true) - $multi->lastTimeout;
+                        $elapsedTimeout = hrtime(true) / 1E9 - $multi->lastTimeout;
                     }
 
                     if (isset($multi->handlesActivity[$j])) {
@@ -291,7 +291,7 @@ trait TransportResponseTrait
             }
 
             if ($hasActivity) {
-                $lastActivity = microtime(true);
+                $lastActivity = hrtime(true) / 1E9;
                 continue;
             }
 
@@ -299,7 +299,7 @@ trait TransportResponseTrait
                 usleep(min(500, 1E6 * $timeoutMin));
             }
 
-            $elapsedTimeout = microtime(true) - $lastActivity;
+            $elapsedTimeout = hrtime(true) / 1E9 - $lastActivity;
         }
     }
 }

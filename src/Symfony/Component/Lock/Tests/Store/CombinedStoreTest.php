@@ -50,14 +50,10 @@ class CombinedStoreTest extends AbstractStoreTestCase
         return new CombinedStore([new RedisStore($redis)], new UnanimousStrategy());
     }
 
-    /** @var MockObject&StrategyInterface */
-    private $strategy;
-    /** @var MockObject&BlockingStoreInterface */
-    private $store1;
-    /** @var MockObject&BlockingStoreInterface */
-    private $store2;
-    /** @var CombinedStore */
-    private $store;
+    private MockObject&StrategyInterface $strategy;
+    private MockObject&BlockingStoreInterface $store1;
+    private MockObject&BlockingStoreInterface $store2;
+    private CombinedStore $store;
 
     protected function setUp(): void
     {

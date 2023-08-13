@@ -14,9 +14,6 @@ namespace Symfony\Component\Scheduler\Generator;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 
-/**
- * @experimental
- */
 final class Checkpoint implements CheckpointInterface
 {
     private \DateTimeImmutable $time;

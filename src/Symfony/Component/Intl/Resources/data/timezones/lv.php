@@ -437,6 +437,5 @@ return [
         'Pacific/Wake' => 'Veika salas laiks',
         'Pacific/Wallis' => 'Volisas un Futunas laiks',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

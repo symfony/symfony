@@ -5,6 +5,7 @@
     xmlns:framework="http://symfony.com/schema/dic/symfony">
 
     <framework:config http-method-override="false">
+        <framework:annotations enabled="false" />
         <framework:validation>
             <framework:mapping>
                 <framework:path>%kernel.project_dir%/Fixtures/TestBundle/Resources/config/validation_mapping/files</framework:path>

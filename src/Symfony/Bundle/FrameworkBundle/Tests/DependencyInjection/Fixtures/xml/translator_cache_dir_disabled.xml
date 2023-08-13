@@ -7,6 +7,7 @@
                         http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
 
     <framework:config secret="s3cr3t" http-method-override="false">
+        <framework:annotations enabled="false" />
         <framework:translator enabled="true" fallback="fr" logging="true" cache-dir="null" />
     </framework:config>
 </container>

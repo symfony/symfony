@@ -29,7 +29,7 @@ class BooksConfig
     {
         if (array_key_exists('page', $value)) {
             $this->_usedProperties['page'] = true;
-            $this->page = array_map(function ($v) { return new \Symfony\Config\AddToList\Translator\Books\PageConfig($v); }, $value['page']);
+            $this->page = array_map(fn ($v) => new \Symfony\Config\AddToList\Translator\Books\PageConfig($v), $value['page']);
             unset($value['page']);
         }
 
@@ -42,7 +42,7 @@ class BooksConfig
     {
         $output = [];
         if (isset($this->_usedProperties['page'])) {
-            $output['page'] = array_map(function ($v) { return $v->toArray(); }, $this->page);
+            $output['page'] = array_map(fn ($v) => $v->toArray(), $this->page);
         }
 
         return $output;

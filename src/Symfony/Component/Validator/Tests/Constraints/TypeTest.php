@@ -27,7 +27,7 @@ class TypeTest extends TestCase
         self::assertSame('integer', $aConstraint->type);
 
         [$bConstraint] = $metadata->properties['b']->getConstraints();
-        self::assertSame(\DateTime::class, $bConstraint->type);
+        self::assertSame(\DateTimeImmutable::class, $bConstraint->type);
         self::assertSame('myMessage', $bConstraint->message);
         self::assertSame(['Default', 'TypeDummy'], $bConstraint->groups);
 
@@ -43,7 +43,7 @@ class TypeDummy
     #[Type('integer')]
     private $a;
 
-    #[Type(type: \DateTime::class, message: 'myMessage')]
+    #[Type(type: \DateTimeImmutable::class, message: 'myMessage')]
     private $b;
 
     #[Type(type: ['string', 'array'], groups: ['my_group'], payload: 'some attached data')]

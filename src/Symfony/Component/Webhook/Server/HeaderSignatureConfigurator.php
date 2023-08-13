@@ -17,8 +17,6 @@ use Symfony\Component\Webhook\Exception\LogicException;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 6.3
  */
 final class HeaderSignatureConfigurator implements RequestConfiguratorInterface
 {

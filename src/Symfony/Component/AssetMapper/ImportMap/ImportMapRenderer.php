@@ -12,8 +12,6 @@
 namespace Symfony\Component\AssetMapper\ImportMap;
 
 /**
- * @experimental
- *
  * @author Kévin Dunglas <kevin@dunglas.dev>
  * @author Ryan Weaver <ryan@symfonycasts.com>
  *
@@ -29,15 +27,16 @@ class ImportMapRenderer
     ) {
     }
 
-    public function render(string $entryPoint = null): string
+    public function render(string $entryPoint = null, array $attributes = []): string
     {
         $attributeString = '';
 
-        if (isset($this->scriptAttributes['src']) || isset($this->scriptAttributes['type'])) {
+        $attributes += $this->scriptAttributes;
+        if (isset($attributes['src']) || isset($attributes['type'])) {
             throw new \InvalidArgumentException(sprintf('The "src" and "type" attributes are not allowed on the <script> tag rendered by "%s".', self::class));
         }
 
-        foreach ($this->scriptAttributes as $name => $value) {
+        foreach ($attributes as $name => $value) {
             $attributeString .= ' ';
             if (true === $value) {
                 $attributeString .= $name;
@@ -70,7 +69,7 @@ class ImportMapRenderer
         }
 
         if (null !== $entryPoint) {
-            $output .= "\n<script type=\"module\">import '".str_replace("'", "\\'", $entryPoint)."';</script>";
+            $output .= "\n<script type=\"module\"$attributeString>import '".str_replace("'", "\\'", $entryPoint)."';</script>";
         }
 
         return $output;

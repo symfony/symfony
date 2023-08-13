@@ -35,7 +35,7 @@ class GenericMetadata implements MetadataInterface
      *           class' serialized representation. Do not access it. Use
      *           {@link getConstraints()} and {@link findConstraints()} instead.
      */
-    public $constraints = [];
+    public array $constraints = [];
 
     /**
      * @var array
@@ -44,50 +44,44 @@ class GenericMetadata implements MetadataInterface
      *           class' serialized representation. Do not access it. Use
      *           {@link findConstraints()} instead.
      */
-    public $constraintsByGroup = [];
+    public array $constraintsByGroup = [];
 
     /**
      * The strategy for cascading objects.
      *
      * By default, objects are not cascaded.
      *
-     * @var int
-     *
-     * @see CascadingStrategy
+     * @var CascadingStrategy::*
      *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
      *           {@link getCascadingStrategy()} instead.
      */
-    public $cascadingStrategy = CascadingStrategy::NONE;
+    public int $cascadingStrategy = CascadingStrategy::NONE;
 
     /**
      * The strategy for traversing traversable objects.
      *
      * By default, traversable objects are not traversed.
      *
-     * @var int
-     *
-     * @see TraversalStrategy
+     * @var TraversalStrategy::*
      *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
      *           {@link getTraversalStrategy()} instead.
      */
-    public $traversalStrategy = TraversalStrategy::NONE;
+    public int $traversalStrategy = TraversalStrategy::NONE;
 
     /**
      * Is auto-mapping enabled?
      *
-     * @var int
-     *
-     * @see AutoMappingStrategy
+     * @var AutoMappingStrategy::*
      *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
      *           {@link getAutoMappingStrategy()} instead.
      */
-    public $autoMappingStrategy = AutoMappingStrategy::NONE;
+    public int $autoMappingStrategy = AutoMappingStrategy::NONE;
 
     /**
      * Returns the names of the properties that should be serialized.

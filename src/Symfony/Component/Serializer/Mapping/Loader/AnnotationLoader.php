@@ -46,6 +46,9 @@ class AnnotationLoader implements LoaderInterface
     public function __construct(
         private readonly ?Reader $reader = null,
     ) {
+        if ($reader) {
+            trigger_deprecation('symfony/validator', '6.4', 'Passing a "%s" instance as argument 1 to "%s()" is deprecated, pass null or omit the parameter instead.', get_debug_type($reader), __METHOD__);
+        }
     }
 
     public function loadClassMetadata(ClassMetadataInterface $classMetadata): bool
@@ -53,6 +56,7 @@ class AnnotationLoader implements LoaderInterface
         $reflectionClass = $classMetadata->getReflectionClass();
         $className = $reflectionClass->name;
         $loaded = false;
+        $classGroups = [];
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();
 
@@ -62,6 +66,11 @@ class AnnotationLoader implements LoaderInterface
                     $annotation->getTypeProperty(),
                     $annotation->getMapping()
                 ));
+                continue;
+            }
+
+            if ($annotation instanceof Groups) {
+                $classGroups = $annotation->getGroups();
             }
         }
 
@@ -72,6 +81,10 @@ class AnnotationLoader implements LoaderInterface
             }
 
             if ($property->getDeclaringClass()->name === $className) {
+                foreach ($classGroups as $group) {
+                    $attributesMetadata[$property->name]->addGroup($group);
+                }
+
                 foreach ($this->loadAnnotations($property) as $annotation) {
                     if ($annotation instanceof Groups) {
                         foreach ($annotation->getGroups() as $group) {
@@ -163,10 +176,7 @@ class AnnotationLoader implements LoaderInterface
         return $loaded;
     }
 
-    /**
-     * @param \ReflectionClass|\ReflectionMethod|\ReflectionProperty $reflector
-     */
-    public function loadAnnotations(object $reflector): iterable
+    public function loadAnnotations(\ReflectionMethod|\ReflectionClass|\ReflectionProperty $reflector): iterable
     {
         foreach ($reflector->getAttributes() as $attribute) {
             if ($this->isKnownAttribute($attribute->getName())) {
@@ -193,13 +203,13 @@ class AnnotationLoader implements LoaderInterface
         }
 
         if ($reflector instanceof \ReflectionClass) {
-            yield from $this->reader->getClassAnnotations($reflector);
+            yield from $this->getClassAnnotations($reflector);
         }
         if ($reflector instanceof \ReflectionMethod) {
-            yield from $this->reader->getMethodAnnotations($reflector);
+            yield from $this->getMethodAnnotations($reflector);
         }
         if ($reflector instanceof \ReflectionProperty) {
-            yield from $this->reader->getPropertyAnnotations($reflector);
+            yield from $this->getPropertyAnnotations($reflector);
         }
     }
 
@@ -228,5 +238,50 @@ class AnnotationLoader implements LoaderInterface
         }
 
         return false;
+    }
+
+    /**
+     * @return object[]
+     */
+    private function getClassAnnotations(\ReflectionClass $reflector): array
+    {
+        if ($annotations = array_filter(
+            $this->reader->getClassAnnotations($reflector),
+            fn (object $annotation): bool => $this->isKnownAttribute($annotation::class),
+        )) {
+            trigger_deprecation('symfony/serializer', '6.4', 'Class "%s" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.', $reflector->getName());
+        }
+
+        return $annotations;
+    }
+
+    /**
+     * @return object[]
+     */
+    private function getMethodAnnotations(\ReflectionMethod $reflector): array
+    {
+        if ($annotations = array_filter(
+            $this->reader->getMethodAnnotations($reflector),
+            fn (object $annotation): bool => $this->isKnownAttribute($annotation::class),
+        )) {
+            trigger_deprecation('symfony/serializer', '6.4', 'Method "%s::%s()" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.', $reflector->getDeclaringClass()->getName(), $reflector->getName());
+        }
+
+        return $annotations;
+    }
+
+    /**
+     * @return object[]
+     */
+    private function getPropertyAnnotations(\ReflectionProperty $reflector): array
+    {
+        if ($annotations = array_filter(
+            $this->reader->getPropertyAnnotations($reflector),
+            fn (object $annotation): bool => $this->isKnownAttribute($annotation::class),
+        )) {
+            trigger_deprecation('symfony/serializer', '6.4', 'Property "%s::$%s" uses Doctrine Annotations to configure serialization, which is deprecated. Use PHP attributes instead.', $reflector->getDeclaringClass()->getName(), $reflector->getName());
+        }
+
+        return $annotations;
     }
 }

@@ -24,7 +24,7 @@ class EntityParent implements EntityInterfaceA
     /**
      * @NotNull
      */
-    protected $other;
+    protected ?int $other;
 
     public function getData()
     {

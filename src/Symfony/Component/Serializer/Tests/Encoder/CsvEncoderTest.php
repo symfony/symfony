@@ -20,10 +20,7 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
  */
 class CsvEncoderTest extends TestCase
 {
-    /**
-     * @var CsvEncoder
-     */
-    private $encoder;
+    private CsvEncoder $encoder;
 
     protected function setUp(): void
     {

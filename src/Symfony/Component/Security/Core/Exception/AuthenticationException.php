@@ -23,16 +23,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 #[WithHttpStatus(401)]
 class AuthenticationException extends RuntimeException
 {
-    /** @internal */
-    protected $serialized;
-
     private ?TokenInterface $token = null;
-
-    public function __construct(string $message = '', int $code = 0, \Throwable $previous = null)
-    {
-        unset($this->serialized);
-        parent::__construct($message, $code, $previous);
-    }
 
     public function getToken(): ?TokenInterface
     {
@@ -104,24 +95,5 @@ class AuthenticationException extends RuntimeException
     public function getMessageData(): array
     {
         return [];
-    }
-
-    /**
-     * @internal
-     */
-    public function __sleep(): array
-    {
-        $this->serialized = $this->__serialize();
-
-        return ['serialized'];
-    }
-
-    /**
-     * @internal
-     */
-    public function __wakeup(): void
-    {
-        $this->__unserialize($this->serialized);
-        unset($this->serialized);
     }
 }

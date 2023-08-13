@@ -86,6 +86,5 @@ return [
         'Europe/Volgograd' => 'Russia (Volgograd)',
         'Pacific/Honolulu' => 'United States (Honolulu)',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

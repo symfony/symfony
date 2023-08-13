@@ -14,36 +14,29 @@ namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * Configures a token handler for an OIDC server.
- *
- * @experimental
  */
 class OidcUserInfoTokenHandlerFactory implements TokenHandlerFactoryInterface
 {
     public function create(ContainerBuilder $container, string $id, array|string $config): void
     {
-        $tokenHandlerDefinition = $container->setDefinition($id, new ChildDefinition('security.access_token_handler.oidc_user_info'));
-        $tokenHandlerDefinition->replaceArgument(2, $config['claim']);
+        $clientDefinition = (new ChildDefinition('security.access_token_handler.oidc_user_info.http_client'))
+            ->replaceArgument(0, ['base_uri' => $config['base_uri']]);
 
-        // Create the client service
-        if (!isset($config['client']['id'])) {
-            $clientDefinitionId = 'http_client.security.access_token_handler.oidc_user_info';
-            if (!ContainerBuilder::willBeAvailable('symfony/http-client', HttpClient::class, ['symfony/security-bundle'])) {
-                $container->register($clientDefinitionId, 'stdClass')
-                    ->addError('You cannot use the "oidc_user_info" token handler since the HttpClient component is not installed. Try running "composer require symfony/http-client".');
-            } else {
-                $container->register($clientDefinitionId, HttpClient::class)
-                    ->setFactory([HttpClient::class, 'create'])
-                    ->setArguments([$config['client']])
-                    ->addTag('http_client.client');
-            }
+        if (isset($config['client'])) {
+            $clientDefinition->setFactory([new Reference($config['client']), 'withOptions']);
+        } elseif (!ContainerBuilder::willBeAvailable('symfony/http-client', HttpClientInterface::class, ['symfony/security-bundle'])) {
+            throw new LogicException('You cannot use the "oidc_user_info" token handler since the HttpClient component is not installed. Try running "composer require symfony/http-client".');
         }
 
-        $tokenHandlerDefinition->replaceArgument(0, new Reference($config['client']['id'] ?? $clientDefinitionId));
+        $container->setDefinition($id, new ChildDefinition('security.access_token_handler.oidc_user_info'))
+            ->replaceArgument(0, $clientDefinition)
+            ->replaceArgument(2, $config['claim']);
     }
 
     public function getKey(): string
@@ -56,19 +49,23 @@ class OidcUserInfoTokenHandlerFactory implements TokenHandlerFactoryInterface
         $node
             ->arrayNode($this->getKey())
                 ->fixXmlConfig($this->getKey())
+                ->beforeNormalization()
+                    ->ifString()
+                    ->then(fn ($v) => ['claim' => 'sub', 'base_uri' => $v])
+                ->end()
                 ->children()
-                    ->scalarNode('claim')
-                        ->info('Claim which contains the user identifier (e.g.: sub, email..).')
-                        ->defaultValue('sub')
-                    ->end()
-                    ->arrayNode('client')
-                        ->info('HttpClient to call the OIDC server.')
+                    ->scalarNode('base_uri')
+                        ->info('Base URI of the userinfo endpoint on the OIDC server.')
                         ->isRequired()
-                        ->beforeNormalization()
-                            ->ifString()
-                            ->then(static function ($v): array { return ['id' => $v]; })
-                        ->end()
-                        ->prototype('scalar')->end()
+                        ->cannotBeEmpty()
+                    ->end()
+                    ->scalarNode('claim')
+                        ->info('Claim which contains the user identifier (e.g. sub, email, etc.).')
+                        ->defaultValue('sub')
+                        ->cannotBeEmpty()
+                    ->end()
+                    ->scalarNode('client')
+                        ->info('HttpClient service id to use to call the OIDC server.')
                     ->end()
                 ->end()
             ->end()

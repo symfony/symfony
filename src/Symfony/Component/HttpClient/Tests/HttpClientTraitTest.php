@@ -269,12 +269,13 @@ class HttpClientTraitTest extends TestCase
         yield [['http:', '//example.com', null, null, null], 'http://Example.coM:80'];
         yield [['https:', '//xn--dj-kia8a.example.com:8000', '/', null, null], 'https://DÉjà.Example.com:8000/'];
         yield [[null, null, '/f%20o.o', '?a=b', '#c'], '/f o%2Eo?a=b#c'];
+        yield [[null, null, '/custom%7C2010-01-01%2000:00:00%7C2023-06-15%2005:50:35', '?a=b', '#c'], '/custom|2010-01-01 00:00:00|2023-06-15 05:50:35?a=b#c'];
         yield [[null, '//a:b@foo', '/bar', null, null], '//a:b@foo/bar'];
         yield [[null, '//a:b@foo', '/b{}', null, null], '//a:b@foo/b{}'];
         yield [['http:', null, null, null, null], 'http:'];
         yield [['http:', null, 'bar', null, null], 'http:bar'];
         yield [[null, null, 'bar', '?a=1&c=c', null], 'bar?a=a&b=b', ['b' => null, 'c' => 'c', 'a' => 1]];
-        yield [[null, null, 'bar', '?a=b+c&b=b-._~!$%26/%27()[]*%2B%2C;%3D:@%25\\^`%7B|%7D', null], 'bar?a=b+c', ['b' => 'b-._~!$&/\'()[]*+,;=:@%\\^`{|}']];
+        yield [[null, null, 'bar', '?a=b+c&b=b-._~!$%26/%27()[]*%2B%2C;%3D:@%25%5C%5E%60%7B%7C%7D', null], 'bar?a=b+c', ['b' => 'b-._~!$&/\'()[]*+,;=:@%\\^`{|}']];
         yield [[null, null, 'bar', '?a=b%2B%20c', null], 'bar?a=b+c', ['a' => 'b+ c']];
         yield [[null, null, 'bar', '?a[b]=c', null], 'bar', ['a' => ['b' => 'c']]];
         yield [[null, null, 'bar', '?a[b[c]=d', null], 'bar?a[b[c]=d', []];

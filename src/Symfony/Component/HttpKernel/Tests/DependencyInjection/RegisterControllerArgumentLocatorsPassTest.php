@@ -12,15 +12,15 @@
 namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Argument\LazyClosure;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\AutowireCallable;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\DependencyInjection\ChildDefinition;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -280,7 +280,6 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $container->register('argument_resolver.service')->addArgument([]);
 
         $container->register('foo', ArgumentWithoutTypeController::class)
-            ->setPublic(false)
             ->addTag('controller.service_arguments');
 
         $pass = new RegisterControllerArgumentLocatorsPass();
@@ -481,7 +480,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
 
         $locator = $container->get($locatorId)->get('foo::fooAction');
 
-        $this->assertCount(8, $locator->getProvidedServices());
+        $this->assertCount(9, $locator->getProvidedServices());
         $this->assertInstanceOf(\stdClass::class, $locator->get('service1'));
         $this->assertSame('foo/bar', $locator->get('value'));
         $this->assertSame('foo', $locator->get('expression'));
@@ -490,6 +489,9 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertSame('bar', $locator->get('rawValue'));
         $this->assertSame('@bar', $locator->get('escapedRawValue'));
         $this->assertSame('foo', $locator->get('customAutowire'));
+        $this->assertInstanceOf(FooInterface::class, $autowireCallable = $locator->get('autowireCallable'));
+        $this->assertInstanceOf(LazyClosure::class, $autowireCallable);
+        $this->assertInstanceOf(\stdClass::class, $autowireCallable->service);
         $this->assertFalse($locator->has('service2'));
     }
 
@@ -545,9 +547,14 @@ class RegisterTestController
     }
 }
 
-class ContainerAwareRegisterTestController implements ContainerAwareInterface
+class ContainerAwareRegisterTestController
 {
-    use ContainerAwareTrait;
+    protected ?ContainerInterface $container;
+
+    public function setContainer(ContainerInterface $container = null): void
+    {
+        $this->container = $container;
+    }
 
     public function fooAction(ControllerDummy $bar)
     {
@@ -625,6 +632,11 @@ class CustomAutowire extends Autowire
     }
 }
 
+interface FooInterface
+{
+    public function foo();
+}
+
 class WithAutowireAttribute
 {
     public function fooAction(
@@ -644,6 +656,8 @@ class WithAutowireAttribute
         string $escapedRawValue,
         #[CustomAutowire('some.parameter')]
         string $customAutowire,
+        #[AutowireCallable(service: 'some.id', method: 'bar')]
+        FooInterface $autowireCallable,
         #[Autowire(service: 'invalid.id')]
         \stdClass $service2 = null,
     ) {

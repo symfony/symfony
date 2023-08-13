@@ -103,7 +103,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
                 }
 
                 $lastExpiry = end($multi->pauseExpiries);
-                $multi->pauseExpiries[(int) $ch] = $duration += microtime(true);
+                $multi->pauseExpiries[(int) $ch] = $duration += hrtime(true) / 1E9;
                 if (false !== $lastExpiry && $lastExpiry > $duration) {
                     asort($multi->pauseExpiries);
                 }
@@ -242,7 +242,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
 
             $this->doDestruct();
         } finally {
-            if (\is_resource($this->handle) || $this->handle instanceof \CurlHandle) {
+            if ($this->handle instanceof \CurlHandle) {
                 curl_setopt($this->handle, \CURLOPT_VERBOSE, false);
             }
         }
@@ -326,7 +326,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
     private static function select(ClientState $multi, float $timeout): int
     {
         if ($multi->pauseExpiries) {
-            $now = microtime(true);
+            $now = hrtime(true) / 1E9;
 
             foreach ($multi->pauseExpiries as $id => $pauseExpiry) {
                 if ($now < $pauseExpiry) {
@@ -344,7 +344,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
             return $selected;
         }
 
-        if ($multi->pauseExpiries && 0 < $timeout -= microtime(true) - $now) {
+        if ($multi->pauseExpiries && 0 < $timeout -= hrtime(true) / 1E9 - $now) {
             usleep((int) (1E6 * $timeout));
         }
 

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Cache\Adapter;
 
-use Doctrine\DBAL\Connection;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
@@ -19,10 +18,10 @@ use Symfony\Component\Cache\PruneableInterface;
 
 class PdoAdapter extends AbstractAdapter implements PruneableInterface
 {
-    protected $maxIdLength = 255;
+    private const MAX_KEY_LENGTH = 255;
 
     private MarshallerInterface $marshaller;
-    private \PDO|Connection $conn;
+    private \PDO $conn;
     private string $dsn;
     private string $driver;
     private string $serverVersion;
@@ -75,6 +74,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
             $this->dsn = $connOrDsn;
         }
 
+        $this->maxIdLength = self::MAX_KEY_LENGTH;
         $this->table = $options['db_table'] ?? $this->table;
         $this->idCol = $options['db_id_col'] ?? $this->idCol;
         $this->dataCol = $options['db_data_col'] ?? $this->dataCol;

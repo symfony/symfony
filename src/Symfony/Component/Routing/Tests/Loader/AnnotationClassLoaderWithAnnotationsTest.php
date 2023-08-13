@@ -12,19 +12,17 @@
 namespace Symfony\Component\Routing\Tests\Loader;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Symfony\Component\Routing\Loader\AnnotationClassLoader;
-use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\Tests\Fixtures\TraceableAnnotationClassLoader;
 
+/**
+ * @group legacy
+ */
 class AnnotationClassLoaderWithAnnotationsTest extends AnnotationClassLoaderTestCase
 {
     protected function setUp(string $env = null): void
     {
         $reader = new AnnotationReader();
-        $this->loader = new class($reader, $env) extends AnnotationClassLoader {
-            protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void
-            {
-            }
-        };
+        $this->loader = new TraceableAnnotationClassLoader($reader, $env);
     }
 
     public function testDefaultRouteName()

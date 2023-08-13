@@ -15,16 +15,16 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
 
-/** @Entity */
+#[Entity]
 class DoubleNameEntity
 {
-    /** @Id @Column(type="integer") */
+    #[Id, Column(type: 'integer')]
     protected $id;
 
-    /** @Column(type="string") */
+    #[Column(type: 'string')]
     public $name;
 
-    /** @Column(type="string", nullable=true) */
+    #[Column(type: 'string', nullable: true)]
     public $name2;
 
     public function __construct($id, $name, $name2)

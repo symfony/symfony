@@ -1,6 +1,6 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
-{% block head %}
+{% block stylesheets %}
     {{ parent() }}
 
     <style>
@@ -235,6 +235,91 @@
     </style>
 {% endblock %}
 
+{% block javascripts %}
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            new SymfonyProfilerLoggerPanel();
+        });
+
+        class SymfonyProfilerLoggerPanel {
+            constructor() {
+                this.#initializeLogsTable();
+            }
+
+            #initializeLogsTable() {
+                this.#updateLogsTable();
+
+                document.querySelectorAll('.log-filter input').forEach((input) => {
+                    input.addEventListener('change', () => { this.#updateLogsTable(); });
+                });
+
+                document.querySelectorAll('.filter-select-all-or-none button').forEach((link) => {
+                    link.addEventListener('click', () => {
+                        const selectAll = link.classList.contains('select-all');
+                        link.closest('.log-filter-content').querySelectorAll('input').forEach((input) => {
+                            input.checked = selectAll;
+                        });
+
+                        this.#updateLogsTable();
+                    });
+                });
+
+                document.body.addEventListener('click', (event) => {
+                    document.querySelectorAll('details.log-filter').forEach((filterElement) => {
+                        if (!filterElement.contains(event.target) && filterElement.open) {
+                            filterElement.open = false;
+                        }
+                    });
+                });
+            }
+
+            #updateLogsTable() {
+                const logs = document.querySelector('table.logs');
+                if (null === logs) {
+                    return;
+                }
+
+                const selectedType = document.querySelector('#log-filter-type input:checked').value;
+                const priorities = document.querySelectorAll('#log-filter-priority input');
+                const allPriorities = Array.from(priorities).map((input) => input.value);
+                const selectedPriorities = Array.from(priorities).filter((input) => input.checked).map((input) => input.value);
+                const channels = document.querySelectorAll('#log-filter-channel input');
+                const selectedChannels = Array.from(channels).filter((input) => input.checked).map((input) => input.value);
+
+                /* hide rows that don't match the current filters */
+                let numVisibleRows = 0;
+                logs.querySelectorAll('tbody tr').forEach((row) => {
+                    if ('all' !== selectedType && selectedType !== row.getAttribute('data-type')) {
+                        row.style.display = 'none';
+                        return;
+                    }
+
+                    const priority = row.getAttribute('data-priority');
+                    if (false === selectedPriorities.includes(priority) && true === allPriorities.includes(priority)) {
+                        row.style.display = 'none';
+                        return;
+                    }
+
+                    if ('' !== row.getAttribute('data-channel') && false === selectedChannels.includes(row.getAttribute('data-channel'))) {
+                        row.style.display = 'none';
+                        return;
+                    }
+
+                    row.style.display = 'table-row';
+                    numVisibleRows++;
+                });
+
+                document.querySelector('table.logs').style.display = 0 === numVisibleRows ? 'none' : 'table';
+                document.querySelector('.no-logs-message').style.display = 0 === numVisibleRows ? 'block' : 'none';
+
+                /* update the selected totals of all filters */
+                document.querySelector('#log-filter-priority .filter-active-num').innerText = (priorities.length === selectedPriorities.length) ? 'All' : selectedPriorities.length;
+                document.querySelector('#log-filter-channel .filter-active-num').innerText = (channels.length === selectedChannels.length) ? 'All' : selectedChannels.length;
+            }
+        }
+    </script>
+{% endblock %}
+
 {% block toolbar %}
     {% if collector.counterrors or collector.countdeprecations or collector.countwarnings %}
         {% set icon %}
@@ -375,7 +460,7 @@
                     %}
                     <tr class="log-status-{{ css_class }}" data-type="{{ log.type }}" data-priority="{{ log.priority }}" data-channel="{{ log.channel }}" style="{{ 'event' == log.channel or 'DEBUG' == log.priorityName ? 'display: none' }}">
                         <td class="log-timestamp">
-                            <time class="newline" title="{{ log.timestamp|date('r') }}" datetime="{{ log.timestamp|date(constant('\DateTime::RFC3339_EXTENDED')) }}" data-convert-to-user-timezone data-render-as-time data-render-with-millisecond-precision>
+                            <time class="newline" title="{{ log.timestamp|date('r') }}" datetime="{{ log.timestamp|date(constant('DateTimeInterface::RFC3339_EXTENDED')) }}" data-convert-to-user-timezone data-render-as-time data-render-with-millisecond-precision>
                                 {{ log.timestamp|date('H:i:s.v') }}
                             </time>
 
@@ -405,8 +490,6 @@
         <div class="no-logs-message empty">
             <p>There are no log messages.</p>
         </div>
-
-        <script>Sfjs.initializeLogsTable();</script>
     {% endif %}
 
     {% set compilerLogTotal = collector.compilerLogs|reduce((total, logs) => total + logs|length, 0) %}

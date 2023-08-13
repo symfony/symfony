@@ -15,8 +15,6 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
  * This exception is thrown when the user is invalid on the OIDC server (e.g.: "email" property is not in the scope).
- *
- * @experimental
  */
 class MissingClaimException extends AuthenticationException
 {

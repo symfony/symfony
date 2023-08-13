@@ -200,10 +200,20 @@ class RegisterListenersPassTest extends TestCase
     public function testInvokableEventListener()
     {
         $container = new ContainerBuilder();
-        $container->register('foo', \stdClass::class)->addTag('kernel.event_listener', ['event' => 'foo.bar']);
+        $container->setParameter('event_dispatcher.event_aliases', [AliasedEvent::class => 'aliased_event']);
+
+        $container->register('foo', \get_class(new class() {
+            public function onFooBar()
+            {
+            }
+        }))->addTag('kernel.event_listener', ['event' => 'foo.bar']);
         $container->register('bar', InvokableListenerService::class)->addTag('kernel.event_listener', ['event' => 'foo.bar']);
         $container->register('baz', InvokableListenerService::class)->addTag('kernel.event_listener', ['event' => 'event']);
-        $container->register('zar', \stdClass::class)->addTag('kernel.event_listener', ['event' => 'foo.bar_zar']);
+        $container->register('zar', \get_class(new class() {
+            public function onFooBarZar()
+            {
+            }
+        }))->addTag('kernel.event_listener', ['event' => 'foo.bar_zar']);
         $container->register('event_dispatcher', \stdClass::class);
 
         $registerListenersPass = new RegisterListenersPass();
@@ -245,6 +255,20 @@ class RegisterListenersPassTest extends TestCase
             ],
         ];
         $this->assertEquals($expectedCalls, $definition->getMethodCalls());
+    }
+
+    public function testItThrowsAnExceptionIfTagIsMissingMethodAndClassHasNoValidMethod()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('None of the "onFooBar" or "__invoke" methods exist for the service "foo". Please define the "method" attribute on "kernel.event_listener" tags.');
+
+        $container = new ContainerBuilder();
+
+        $container->register('foo', \stdClass::class)->addTag('kernel.event_listener', ['event' => 'foo.bar']);
+        $container->register('event_dispatcher', \stdClass::class);
+
+        $registerListenersPass = new RegisterListenersPass();
+        $registerListenersPass->process($container);
     }
 
     public function testTaggedInvokableEventListener()

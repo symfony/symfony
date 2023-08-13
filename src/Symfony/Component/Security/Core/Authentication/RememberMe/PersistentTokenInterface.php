@@ -36,6 +36,8 @@ interface PersistentTokenInterface
 
     /**
      * Returns the time the token was last used.
+     *
+     * Each call SHOULD return a new distinct DateTime instance.
      */
     public function getLastUsed(): \DateTime;
 

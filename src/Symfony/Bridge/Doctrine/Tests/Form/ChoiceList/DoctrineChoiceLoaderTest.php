@@ -19,9 +19,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\IdReader;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
-use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
 use Symfony\Component\Form\Exception\LogicException;
 
 /**
@@ -29,56 +27,17 @@ use Symfony\Component\Form\Exception\LogicException;
  */
 class DoctrineChoiceLoaderTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
-    /**
-     * @var MockObject&ChoiceListFactoryInterface
-     */
-    private $factory;
-
-    /**
-     * @var MockObject&ObjectManager
-     */
-    private $om;
-
-    /**
-     * @var MockObject&ObjectRepository
-     */
-    private $repository;
-
-    /**
-     * @var string
-     */
-    private $class;
-
-    /**
-     * @var MockObject&IdReader
-     */
-    private $idReader;
-
-    /**
-     * @var MockObject&EntityLoaderInterface
-     */
-    private $objectLoader;
-
-    /**
-     * @var \stdClass
-     */
-    private $obj1;
-
-    /**
-     * @var \stdClass
-     */
-    private $obj2;
-
-    /**
-     * @var \stdClass
-     */
-    private $obj3;
+    private MockObject&ObjectManager $om;
+    private MockObject&ObjectRepository $repository;
+    private string $class;
+    private MockObject&IdReader $idReader;
+    private MockObject&EntityLoaderInterface $objectLoader;
+    private \stdClass $obj1;
+    private \stdClass $obj2;
+    private \stdClass $obj3;
 
     protected function setUp(): void
     {
-        $this->factory = $this->createMock(ChoiceListFactoryInterface::class);
         $this->om = $this->createMock(ObjectManager::class);
         $this->repository = $this->createMock(ObjectRepository::class);
         $this->class = 'stdClass';

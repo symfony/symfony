@@ -25,6 +25,7 @@ use Symfony\Component\Console\Output\StreamOutput;
 
 class TableTest extends TestCase
 {
+    /** @var resource */
     protected $stream;
 
     protected function setUp(): void
@@ -34,8 +35,7 @@ class TableTest extends TestCase
 
     protected function tearDown(): void
     {
-        fclose($this->stream);
-        $this->stream = null;
+        unset($this->stream);
     }
 
     /**
@@ -1720,7 +1720,7 @@ EOTXT
 |-------------------------|
 |   ISBN: 9971-5-0210-0   |
 |  Title: A Tale          |
-| of Two Cities           |
+|         of Two Cities   |
 | Author: Charles Dickens |
 |  Price: 139.25          |
 +-------------------------+

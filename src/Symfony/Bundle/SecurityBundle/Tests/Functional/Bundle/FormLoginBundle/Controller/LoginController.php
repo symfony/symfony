@@ -22,7 +22,7 @@ use Twig\Environment;
 
 class LoginController implements ServiceSubscriberInterface
 {
-    private $container;
+    private ContainerInterface $container;
 
     public function __construct(ContainerInterface $container)
     {

@@ -13,7 +13,7 @@ namespace Symfony\Component\Finder\Tests\Iterator;
 
 class Iterator implements \Iterator
 {
-    protected $values = [];
+    protected array $values = [];
 
     public function __construct(array $values = [])
     {

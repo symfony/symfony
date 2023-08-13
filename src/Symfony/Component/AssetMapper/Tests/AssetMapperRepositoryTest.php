@@ -70,6 +70,7 @@ class AssetMapperRepositoryTest extends TestCase
     public function testFindLogicalPath()
     {
         $repository = new AssetMapperRepository([
+            'dir' => '',
             'dir1' => 'some_namespace',
             'dir2' => '',
         ], __DIR__.'/fixtures');

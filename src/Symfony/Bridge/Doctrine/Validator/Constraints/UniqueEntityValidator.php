@@ -87,7 +87,7 @@ class UniqueEntityValidator extends ConstraintValidator
         $class = $em->getClassMetadata($entity::class);
 
         $criteria = [];
-        $hasNullValue = false;
+        $hasIgnorableNullValue = false;
 
         foreach ($fields as $fieldName) {
             if (!$class->hasField($fieldName) && !$class->hasAssociation($fieldName)) {
@@ -96,11 +96,9 @@ class UniqueEntityValidator extends ConstraintValidator
 
             $fieldValue = $class->reflFields[$fieldName]->getValue($entity);
 
-            if (null === $fieldValue) {
-                $hasNullValue = true;
-            }
+            if (null === $fieldValue && $this->ignoreNullForField($constraint, $fieldName)) {
+                $hasIgnorableNullValue = true;
 
-            if ($constraint->ignoreNull && null === $fieldValue) {
                 continue;
             }
 
@@ -116,7 +114,7 @@ class UniqueEntityValidator extends ConstraintValidator
         }
 
         // validation doesn't fail if one of the fields is null and if null values should be ignored
-        if ($hasNullValue && $constraint->ignoreNull) {
+        if ($hasIgnorableNullValue) {
             return;
         }
 
@@ -193,6 +191,15 @@ class UniqueEntityValidator extends ConstraintValidator
             ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
             ->setCause($result)
             ->addViolation();
+    }
+
+    private function ignoreNullForField(UniqueEntity $constraint, string $fieldName): bool
+    {
+        if (\is_bool($constraint->ignoreNull)) {
+            return $constraint->ignoreNull;
+        }
+
+        return \in_array($fieldName, (array) $constraint->ignoreNull, true);
     }
 
     private function formatWithIdentifiers(ObjectManager $em, ClassMetadata $class, mixed $value): string

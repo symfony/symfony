@@ -13,11 +13,12 @@ namespace Symfony\Bridge\Doctrine\Tests\Validator\Constraints;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
-use Doctrine\Persistence\ObjectRepository;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bridge\Doctrine\Tests\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity2;
@@ -47,22 +48,10 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 {
     private const EM_NAME = 'foo';
 
-    /**
-     * @var ObjectManager
-     */
-    protected $em;
-
-    /**
-     * @var ManagerRegistry
-     */
-    protected $registry;
-
-    /**
-     * @var ObjectRepository
-     */
-    protected $repository;
-
-    protected $repositoryFactory;
+    protected ?ObjectManager $em;
+    protected ManagerRegistry $registry;
+    protected MockObject&EntityRepository $repository;
+    protected TestRepositoryFactory $repositoryFactory;
 
     protected function setUp(): void
     {
@@ -95,7 +84,8 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
     protected function createRepositoryMock()
     {
-        $repository = $this->getMockBuilder(ObjectRepository::class)
+        $repository = $this->getMockBuilder(EntityRepository::class)
+            ->disableOriginalConstructor()
             ->onlyMethods(['find', 'findAll', 'findOneBy', 'findBy', 'getClassName'])
             ->addMethods(['findByCustom'])
             ->getMock()
@@ -251,8 +241,9 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @dataProvider provideConstraintsWithIgnoreNullDisabled
+     * @dataProvider provideConstraintsWithIgnoreNullEnabledOnFirstField
      */
-    public function testValidateUniquenessWithIgnoreNullDisabled(UniqueEntity $constraint)
+    public function testValidateUniquenessWithIgnoreNullDisableOnSecondField(UniqueEntity $constraint)
     {
         $entity1 = new DoubleNameEntity(1, 'Foo', null);
         $entity2 = new DoubleNameEntity(2, 'Foo', null);
@@ -304,6 +295,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @dataProvider provideConstraintsWithIgnoreNullEnabled
+     * @dataProvider provideConstraintsWithIgnoreNullEnabledOnFirstField
      */
     public function testNoValidationIfFirstFieldIsNullAndNullValuesAreIgnored(UniqueEntity $constraint)
     {
@@ -336,6 +328,18 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         ])];
 
         yield 'Named arguments' => [new UniqueEntity(message: 'myMessage', fields: ['name', 'name2'], em: 'foo', ignoreNull: true)];
+    }
+
+    public static function provideConstraintsWithIgnoreNullEnabledOnFirstField(): iterable
+    {
+        yield 'Doctrine style (name field)' => [new UniqueEntity([
+            'message' => 'myMessage',
+            'fields' => ['name', 'name2'],
+            'em' => self::EM_NAME,
+            'ignoreNull' => 'name',
+        ])];
+
+        yield 'Named arguments (name field)' => [new UniqueEntity(message: 'myMessage', fields: ['name', 'name2'], em: 'foo', ignoreNull: 'name')];
     }
 
     public function testValidateUniquenessWithValidCustomErrorPath()

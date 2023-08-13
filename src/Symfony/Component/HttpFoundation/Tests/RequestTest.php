@@ -1309,6 +1309,9 @@ class RequestTest extends TestCase
 
         $req = new Request([], ['foo' => 'bar'], [], [], [], [], json_encode(['baz' => 'qux']));
         $this->assertSame(['foo' => 'bar'], $req->getPayload()->all());
+
+        $req = new Request([], [], [], [], [], [], '');
+        $this->assertSame([], $req->getPayload()->all());
     }
 
     /**
@@ -1910,7 +1913,7 @@ class RequestTest extends TestCase
     {
         $class = new \ReflectionClass(Request::class);
         $property = $class->getProperty('httpMethodParameterOverride');
-        $property->setValue(false);
+        $property->setValue(null, false);
     }
 
     private function getRequestInstanceForClientIpTests(string $remoteAddr, ?string $httpForwardedFor, ?array $trustedProxies): Request

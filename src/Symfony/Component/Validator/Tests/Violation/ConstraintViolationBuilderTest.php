@@ -17,13 +17,14 @@ use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilder;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConstraintViolationBuilderTest extends TestCase
 {
-    private $root;
-    private $violations;
-    private $messageTemplate = '%value% is invalid';
-    private $builder;
+    private array $root;
+    private ConstraintViolationList $violations;
+    private string $messageTemplate = '%value% is invalid';
+    private ConstraintViolationBuilder $builder;
 
     protected function setUp(): void
     {
@@ -81,6 +82,18 @@ class ConstraintViolationBuilderTest extends TestCase
             ->addViolation();
 
         $this->assertViolationEquals(new ConstraintViolation($this->messageTemplate, $this->messageTemplate, [], $this->root, 'data', 'foo', null, null, new Valid(), $cause));
+    }
+
+    public function testTranslationDomainFalse()
+    {
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects(self::once())->method('trans')->willReturn('');
+
+        $builder = new ConstraintViolationBuilder($this->violations, new Valid(), $this->messageTemplate, [], $this->root, 'data', 'foo', $translator);
+        $builder->addViolation();
+
+        $builder->disableTranslation();
+        $builder->addViolation();
     }
 
     private function assertViolationEquals(ConstraintViolation $expectedViolation)

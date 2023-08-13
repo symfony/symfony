@@ -14,61 +14,68 @@ namespace Symfony\Component\AssetMapper;
 /**
  * Represents a single asset in the asset mapper system.
  *
- * @experimental
- *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
 final class MappedAsset
 {
-    private string $publicPath;
-    private string $publicPathWithoutDigest;
+    public readonly string $sourcePath;
+    public readonly string $publicPath;
+    public readonly string $publicPathWithoutDigest;
+    public readonly string $publicExtension;
+    public readonly string $content;
+    public readonly string $digest;
+    public readonly bool $isPredigested;
+
     /**
-     * @var string the filesystem path to the source file
+     * @var AssetDependency[]
      */
-    private string $sourcePath;
-    private string $content;
-    private string $digest;
-    private bool $isPredigested;
-    /** @var AssetDependency[] */
     private array $dependencies = [];
 
-    public function __construct(private readonly string $logicalPath)
-    {
-    }
+    /**
+     * @var string[]
+     */
+    private array $fileDependencies = [];
 
-    public function getLogicalPath(): string
-    {
-        return $this->logicalPath;
-    }
-
-    public function getPublicPath(): string
-    {
-        return $this->publicPath;
-    }
-
-    public function getPublicExtension(): string
-    {
-        return pathinfo($this->publicPathWithoutDigest, \PATHINFO_EXTENSION);
-    }
-
-    public function getSourcePath(): string
-    {
-        return $this->sourcePath;
-    }
-
-    public function getContent(): string
-    {
-        return $this->content;
-    }
-
-    public function getDigest(): string
-    {
-        return $this->digest;
-    }
-
-    public function isPredigested(): bool
-    {
-        return $this->isPredigested;
+    /**
+     * @param AssetDependency[] $dependencies
+     * @param string[]          $fileDependencies
+     */
+    public function __construct(
+        public readonly string $logicalPath,
+        string $sourcePath = null,
+        string $publicPathWithoutDigest = null,
+        string $publicPath = null,
+        string $content = null,
+        string $digest = null,
+        bool $isPredigested = null,
+        array $dependencies = [],
+        array $fileDependencies = [],
+    ) {
+        if (null !== $sourcePath) {
+            $this->sourcePath = $sourcePath;
+        }
+        if (null !== $publicPath) {
+            $this->publicPath = $publicPath;
+        }
+        if (null !== $publicPathWithoutDigest) {
+            $this->publicPathWithoutDigest = $publicPathWithoutDigest;
+            $this->publicExtension = pathinfo($publicPathWithoutDigest, \PATHINFO_EXTENSION);
+        }
+        if (null !== $content) {
+            $this->content = $content;
+        }
+        if (null !== $digest) {
+            $this->digest = $digest;
+        }
+        if (null !== $isPredigested) {
+            $this->isPredigested = $isPredigested;
+        }
+        foreach ($dependencies as $dependency) {
+            $this->addDependency($dependency);
+        }
+        foreach ($fileDependencies as $fileDependency) {
+            $this->addFileDependency($fileDependency);
+        }
     }
 
     /**
@@ -79,59 +86,21 @@ final class MappedAsset
         return $this->dependencies;
     }
 
-    public function setPublicPath(string $publicPath): void
-    {
-        if (isset($this->publicPath)) {
-            throw new \LogicException('Cannot set public path: it was already set on the asset.');
-        }
-
-        $this->publicPath = $publicPath;
-    }
-
-    public function setPublicPathWithoutDigest(string $publicPathWithoutDigest): void
-    {
-        if (isset($this->publicPathWithoutDigest)) {
-            throw new \LogicException('Cannot set public path without digest: it was already set on the asset.');
-        }
-
-        $this->publicPathWithoutDigest = $publicPathWithoutDigest;
-    }
-
-    public function setSourcePath(string $sourcePath): void
-    {
-        if (isset($this->sourcePath)) {
-            throw new \LogicException('Cannot set source path: it was already set on the asset.');
-        }
-
-        $this->sourcePath = $sourcePath;
-    }
-
-    public function setDigest(string $digest, bool $isPredigested): void
-    {
-        if (isset($this->digest)) {
-            throw new \LogicException('Cannot set digest: it was already set on the asset.');
-        }
-
-        $this->digest = $digest;
-        $this->isPredigested = $isPredigested;
-    }
-
-    public function setContent(string $content): void
-    {
-        if (isset($this->content)) {
-            throw new \LogicException('Cannot set content: it was already set on the asset.');
-        }
-
-        $this->content = $content;
-    }
-
     public function addDependency(AssetDependency $assetDependency): void
     {
         $this->dependencies[] = $assetDependency;
     }
 
-    public function getPublicPathWithoutDigest(): string
+    /**
+     * @return string[]
+     */
+    public function getFileDependencies(): array
     {
-        return $this->publicPathWithoutDigest;
+        return $this->fileDependencies;
+    }
+
+    public function addFileDependency(string $sourcePath): void
+    {
+        $this->fileDependencies[] = $sourcePath;
     }
 }

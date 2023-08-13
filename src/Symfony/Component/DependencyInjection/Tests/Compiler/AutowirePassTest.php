@@ -36,6 +36,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\BarInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\includes\FooVariadic;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\WithTarget;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\WithTargetAnonymous;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\ExpressionLanguage\Expression;
 
@@ -1240,12 +1241,27 @@ class AutowirePassTest extends TestCase
         $container = new ContainerBuilder();
 
         $container->register(BarInterface::class, BarInterface::class);
-        $container->register(BarInterface::class.' $iamgeStorage', BarInterface::class);
+        $container->registerAliasForArgument('images.storage', BarInterface::class);
         $container->register('with_target', WithTarget::class)
             ->setAutowired(true);
 
         $this->expectException(AutowiringFailedException::class);
-        $this->expectExceptionMessage('Cannot autowire service "with_target": "#[Target(\'imageStorage\')" on argument "$bar" of method "Symfony\Component\DependencyInjection\Tests\Fixtures\WithTarget::__construct()"');
+        $this->expectExceptionMessage('Cannot autowire service "with_target": argument "$bar" of method "Symfony\Component\DependencyInjection\Tests\Fixtures\WithTarget::__construct()" has "#[Target(\'image.storage\')]" but no such target exists. Did you mean to target "images.storage" instead?');
+
+        (new AutowirePass())->process($container);
+    }
+
+    public function testArgumentWithTypoTargetAnonymous()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register(BarInterface::class, BarInterface::class);
+        $container->registerAliasForArgument('bar', BarInterface::class);
+        $container->register('with_target', WithTargetAnonymous::class)
+            ->setAutowired(true);
+
+        $this->expectException(AutowiringFailedException::class);
+        $this->expectExceptionMessage('Cannot autowire service "with_target": argument "$baz" of method "Symfony\Component\DependencyInjection\Tests\Fixtures\WithTargetAnonymous::__construct()" has "#[Target(\'baz\')]" but no such target exists. Did you mean to target "bar" instead?');
 
         (new AutowirePass())->process($container);
     }
@@ -1282,6 +1298,19 @@ class AutowirePassTest extends TestCase
         (new AutowirePass())->process($container);
 
         $this->assertEquals([new TypedReference(A::class, A::class), 'abc'], $container->getDefinition('foo')->getArguments());
+    }
+
+    public function testAutowireDefaultValueParametersLike()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', ParametersLikeDefaultValue::class)
+            ->setAutowired(true)
+            ->setArgument(1, 'ok');
+
+        (new AutowirePass())->process($container);
+
+        $this->assertSame('%%not%%one%%parameter%%here%%', $container->getDefinition('foo')->getArgument(0));
     }
 
     public function testAutowireAttribute()

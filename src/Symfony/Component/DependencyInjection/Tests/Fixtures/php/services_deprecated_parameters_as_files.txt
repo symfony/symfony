@@ -47,11 +47,9 @@ class ProjectServiceContainer extends Container
 
     protected $targetDir;
     protected $parameters = [];
-    protected readonly \WeakReference $ref;
 
     public function __construct(private array $buildParameters = [], protected string $containerDir = __DIR__)
     {
-        $this->ref = \WeakReference::create($this);
         $this->targetDir = \dirname($containerDir);
         $this->parameters = $this->getDefaultParameters();
 
@@ -126,7 +124,7 @@ class ProjectServiceContainer extends Container
 
     public function getParameterBag(): ParameterBagInterface
     {
-        if (null === $this->parameterBag) {
+        if (!isset($this->parameterBag)) {
             $parameters = $this->parameters;
             foreach ($this->loadedDynamicParameters as $name => $loaded) {
                 $parameters[$name] = $loaded ? $this->dynamicParameters[$name] : $this->getDynamicParameter($name);

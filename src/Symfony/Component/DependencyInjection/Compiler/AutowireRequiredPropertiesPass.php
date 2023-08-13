@@ -24,6 +24,8 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 class AutowireRequiredPropertiesPass extends AbstractRecursivePass
 {
+    protected bool $skipScalars = true;
+
     protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         $value = parent::processValue($value, $isRoot);

@@ -11,12 +11,16 @@
 
 namespace Symfony\Component\Templating;
 
+trigger_deprecation('symfony/templating', '6.4', '"%s" is deprecated since version 6.4 and will be removed in 7.0. Use Twig instead.', TemplateReferenceInterface::class);
+
 /**
  * Interface to be implemented by all templates.
  *
  * @author Victor Berchet <victor@suumit.com>
+ *
+ * @deprecated since Symfony 6.4, use Twig instead
  */
-interface TemplateReferenceInterface
+interface TemplateReferenceInterface extends \Stringable
 {
     /**
      * Gets the template parameters.

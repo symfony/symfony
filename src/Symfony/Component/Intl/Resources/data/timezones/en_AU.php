@@ -33,6 +33,5 @@ return [
         'Indian/Mayotte' => 'Eastern Africa Time (Mayotte)',
         'Pacific/Rarotonga' => 'Cook Island Time (Rarotonga)',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

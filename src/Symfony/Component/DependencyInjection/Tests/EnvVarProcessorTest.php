@@ -60,6 +60,67 @@ class EnvVarProcessorTest extends TestCase
     }
 
     /**
+     * @dataProvider validRealEnvValues
+     */
+    public function testGetEnvRealEnv($value, $processed)
+    {
+        $_ENV['FOO'] = $value;
+
+        $processor = new EnvVarProcessor(new Container());
+
+        $result = $processor->getEnv('string', 'FOO', function () {
+            $this->fail('Should not be called');
+        });
+
+        $this->assertSame($processed, $result);
+
+        unset($_ENV['FOO']);
+    }
+
+    public static function validRealEnvValues()
+    {
+        return [
+            ['hello', 'hello'],
+            [true, '1'],
+            [false, ''],
+            [1, '1'],
+            [0, '0'],
+            [1.1, '1.1'],
+            [10, '10'],
+        ];
+    }
+
+    public function testGetEnvRealEnvInvalid()
+    {
+        $_ENV['FOO'] = null;
+        $this->expectException(EnvNotFoundException::class);
+        $this->expectExceptionMessage('Environment variable not found: "FOO".');
+
+        $processor = new EnvVarProcessor(new Container());
+
+        $processor->getEnv('string', 'FOO', function () {
+            $this->fail('Should not be called');
+        });
+
+        unset($_ENV['FOO']);
+    }
+
+    public function testGetEnvRealEnvNonScalar()
+    {
+        $_ENV['FOO'] = [];
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Non-scalar env var "FOO" cannot be cast to "string".');
+
+        $processor = new EnvVarProcessor(new Container());
+
+        $processor->getEnv('string', 'FOO', function () {
+            $this->fail('Should not be called');
+        });
+
+        unset($_ENV['FOO']);
+    }
+
+    /**
      * @dataProvider validBools
      */
     public function testGetEnvBool($value, $processed)
@@ -97,6 +158,7 @@ class EnvVarProcessorTest extends TestCase
             ['true', true],
             ['false', false],
             ['null', false],
+            ['', false],
             ['1', true],
             ['0', false],
             ['1.1', true],
@@ -844,5 +906,54 @@ CSV;
             ['blog/', 'https://symfony.com/blog/'],
             ['blog//', 'https://symfony.com/blog//'],
         ];
+    }
+
+    /**
+     * @testWith    ["", "string"]
+     *              [null, ""]
+     *              [false, "bool"]
+     *              [true, "not"]
+     *              [0, "int"]
+     *              [0.0, "float"]
+     */
+    public function testGetEnvCastsNullBehavior($expected, string $prefix)
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $this->assertSame($expected, $processor->getEnv($prefix, 'default::FOO', static function () use ($processor) {
+            return $processor->getEnv('default', ':FOO', static function () {
+                return null;
+            });
+        }));
+    }
+
+    public function testGetEnvWithEmptyStringPrefixCastsToString()
+    {
+        $processor = new EnvVarProcessor(new Container());
+        unset($_ENV['FOO']);
+        $_ENV['FOO'] = 4;
+
+        try {
+            $this->assertSame('4', $processor->getEnv('', 'FOO', function () { $this->fail('Should not be called'); }));
+        } finally {
+            unset($_ENV['FOO']);
+        }
+    }
+
+    /**
+     * @dataProvider provideGetEnvDefined
+     */
+    public function testGetEnvDefined(bool $expected, callable $callback)
+    {
+        $this->assertSame($expected, (new EnvVarProcessor(new Container()))->getEnv('defined', 'NO_SOMETHING', $callback));
+    }
+
+    public static function provideGetEnvDefined(): iterable
+    {
+        yield 'Defined' => [true, fn () => 'foo'];
+        yield 'Falsy but defined' => [true, fn () => '0'];
+        yield 'Empty string' => [false, fn () => ''];
+        yield 'Null' => [false, fn () => null];
+        yield 'Env var not defined' => [false, fn () => throw new EnvNotFoundException()];
     }
 }

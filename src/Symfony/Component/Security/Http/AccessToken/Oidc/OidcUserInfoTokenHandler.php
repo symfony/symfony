@@ -20,8 +20,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * The token handler validates the token on the OIDC server and retrieves the user identifier.
- *
- * @experimental
  */
 final class OidcUserInfoTokenHandler implements AccessTokenHandlerInterface
 {
@@ -49,7 +47,7 @@ final class OidcUserInfoTokenHandler implements AccessTokenHandlerInterface
 
             // UserLoader argument can be overridden by a UserProvider on AccessTokenAuthenticator::authenticate
             return new UserBadge($claims[$this->claim], fn () => $this->createUser($claims), $claims);
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
             $this->logger?->error('An error occurred on OIDC server.', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),

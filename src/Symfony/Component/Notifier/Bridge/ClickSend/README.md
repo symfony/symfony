@@ -19,6 +19,34 @@ where:
  - `LIST_ID` is your recipient list ID (optional)
  - `FROM_EMAIL` is your from email where replies must be emailed (optional)
 
+Adding Options to a Message
+---------------------------
+
+With a ClickSend Message, you can use the `ClickSendOptions` class to add
+[message options](https://developers.clicksend.com/docs/rest/v3/#send-sms/).
+
+```php
+use Symfony\Component\Notifier\Message\SmsMessage;
+use Symfony\Component\Notifier\Bridge\ClickSend\ClickSendOptions;
+
+$sms = new SmsMessage('+1411111111', 'My message');
+
+$options = (new ClickSendOptions())
+    ->country('country')
+    ->customString('custom_string')
+    ->fromEmail('from_email')
+    ->listId('list_id')
+    ->schedule(999)
+    ->source('source')
+    // ...
+    ;
+
+// Add the custom options to the sms message and send the message
+$sms->options($options);
+
+$texter->send($sms);
+```
+
 Resources
 ---------
 

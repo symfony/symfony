@@ -28,8 +28,6 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * This command is intended to be used during deployment.
  *
- * @experimental
- *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
 #[AsCommand(name: 'asset-map:compile', description: 'Compiles all mapped assets and writes them to the final public output directory.')]
@@ -118,20 +116,21 @@ EOT
     {
         $allAssets = $this->assetMapper->allAssets();
 
-        $io->comment(sprintf('Compiling <info>%d</info> assets to <info>%s%s</info>', \count($allAssets), $publicDir, $this->publicAssetsPathResolver->resolvePublicPath('')));
+        $io->comment(sprintf('Compiling assets to <info>%s%s</info>', $publicDir, $this->publicAssetsPathResolver->resolvePublicPath('')));
         $manifest = [];
         foreach ($allAssets as $asset) {
             // $asset->getPublicPath() will start with a "/"
-            $targetPath = $publicDir.$asset->getPublicPath();
+            $targetPath = $publicDir.$asset->publicPath;
 
             if (!is_dir($dir = \dirname($targetPath))) {
                 $this->filesystem->mkdir($dir);
             }
 
-            $this->filesystem->dumpFile($targetPath, $asset->getContent());
-            $manifest[$asset->getLogicalPath()] = $asset->getPublicPath();
+            $this->filesystem->dumpFile($targetPath, $asset->content);
+            $manifest[$asset->logicalPath] = $asset->publicPath;
         }
         ksort($manifest);
+        $io->comment(sprintf('Compiled <info>%d</info> assets', \count($manifest)));
 
         return $manifest;
     }

@@ -24,20 +24,19 @@ use Symfony\Component\Security\Http\Tests\Authenticator\Fixtures\PasswordUpgrade
 
 class HttpBasicAuthenticatorTest extends TestCase
 {
-    private $userProvider;
-    private $hasherFactory;
-    private $hasher;
-    private $authenticator;
+    private InMemoryUserProvider $userProvider;
+    private HttpBasicAuthenticator $authenticator;
 
     protected function setUp(): void
     {
         $this->userProvider = new InMemoryUserProvider();
-        $this->hasherFactory = $this->createMock(PasswordHasherFactoryInterface::class);
-        $this->hasher = $this->createMock(PasswordHasherInterface::class);
-        $this->hasherFactory
+
+        $hasherFactory = $this->createMock(PasswordHasherFactoryInterface::class);
+        $hasher = $this->createMock(PasswordHasherInterface::class);
+        $hasherFactory
             ->expects($this->any())
             ->method('getPasswordHasher')
-            ->willReturn($this->hasher);
+            ->willReturn($hasher);
 
         $this->authenticator = new HttpBasicAuthenticator('test', $this->userProvider);
     }

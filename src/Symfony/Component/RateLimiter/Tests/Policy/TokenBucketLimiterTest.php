@@ -26,7 +26,7 @@ use Symfony\Component\RateLimiter\Tests\Resources\DummyWindow;
  */
 class TokenBucketLimiterTest extends TestCase
 {
-    private $storage;
+    private InMemoryStorage $storage;
 
     protected function setUp(): void
     {

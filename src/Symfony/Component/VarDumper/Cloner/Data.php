@@ -17,7 +17,7 @@ use Symfony\Component\VarDumper\Dumper\ContextProvider\SourceContextProvider;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class Data implements \ArrayAccess, \Countable, \IteratorAggregate
+class Data implements \ArrayAccess, \Countable, \IteratorAggregate, \Stringable
 {
     private array $data;
     private int $position = 0;
@@ -121,6 +121,9 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
         yield from $value;
     }
 
+    /**
+     * @return mixed
+     */
     public function __get(string $key)
     {
         if (null !== $data = $this->seek($key)) {
@@ -269,17 +272,14 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     {
         $refs = [0];
         $cursor = new Cursor();
+        $cursor->hashType = -1;
+        $cursor->attr = $this->context[SourceContextProvider::class] ?? [];
         $label = $this->context['label'] ?? '';
 
-        if ($cursor->attr = $this->context[SourceContextProvider::class] ?? []) {
-            $cursor->attr['if_links'] = true;
-            $cursor->hashType = -1;
-            $dumper->dumpScalar($cursor, 'default', $label.'^');
-            $cursor->attr = ['if_links' => true];
-            $dumper->dumpScalar($cursor, 'default', ' ');
-            $cursor->hashType = 0;
+        if ($cursor->attr || '' !== $label) {
+            $dumper->dumpScalar($cursor, 'label', $label);
         }
-
+        $cursor->hashType = 0;
         $this->dumpItem($dumper, $cursor, $refs, $this->data[$this->position][$this->key]);
     }
 

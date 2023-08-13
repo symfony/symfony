@@ -27,10 +27,7 @@ use Symfony\Component\DependencyInjection\Definition;
  */
 class RuntimeInstantiatorTest extends TestCase
 {
-    /**
-     * @var RuntimeInstantiator
-     */
-    protected $instantiator;
+    protected RuntimeInstantiator $instantiator;
 
     protected function setUp(): void
     {

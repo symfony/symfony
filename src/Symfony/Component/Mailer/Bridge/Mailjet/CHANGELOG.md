@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Add `RemoteEvent` and `Webhook` support
+
 6.3
 ---
 

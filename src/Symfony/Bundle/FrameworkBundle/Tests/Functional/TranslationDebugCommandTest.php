@@ -20,7 +20,7 @@ use Symfony\Component\Console\Tester\CommandTester;
  */
 class TranslationDebugCommandTest extends AbstractWebTestCase
 {
-    private $application;
+    private Application $application;
 
     protected function setUp(): void
     {

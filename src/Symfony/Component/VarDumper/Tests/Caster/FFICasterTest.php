@@ -40,7 +40,7 @@ class FFICasterTest extends TestCase
         FFI\CData<struct <anonymous>> size 4 align 4 {
           uint32_t x: 0
         }
-        PHP, \FFI::new('struct { uint32_t x; }'));
+        PHP, \FFI::cdef()->new('struct { uint32_t x; }'));
     }
 
     public function testCastNamedStruct()
@@ -49,7 +49,7 @@ class FFICasterTest extends TestCase
         FFI\CData<struct Example> size 4 align 4 {
           uint32_t x: 0
         }
-        PHP, \FFI::new('struct Example { uint32_t x; }'));
+        PHP, \FFI::cdef()->new('struct Example { uint32_t x; }'));
     }
 
     public function testCastAnonymousUnion()
@@ -59,7 +59,7 @@ class FFICasterTest extends TestCase
           uint32_t x: 0
           uint32_t y: 0
         }
-        PHP, \FFI::new('union { uint32_t x; uint32_t y; }'));
+        PHP, \FFI::cdef()->new('union { uint32_t x; uint32_t y; }'));
     }
 
     public function testCastNamedUnion()
@@ -69,7 +69,7 @@ class FFICasterTest extends TestCase
           uint32_t x: 0
           uint32_t y: 0
         }
-        PHP, \FFI::new('union Example { uint32_t x; uint32_t y; }'));
+        PHP, \FFI::cdef()->new('union Example { uint32_t x; uint32_t y; }'));
     }
 
     public function testCastAnonymousEnum()
@@ -78,7 +78,7 @@ class FFICasterTest extends TestCase
         FFI\CData<enum <anonymous>> size 4 align 4 {
           cdata: 0
         }
-        PHP, \FFI::new('enum { a, b }'));
+        PHP, \FFI::cdef()->new('enum { a, b }'));
     }
 
     public function testCastNamedEnum()
@@ -87,7 +87,7 @@ class FFICasterTest extends TestCase
         FFI\CData<enum Example> size 4 align 4 {
           cdata: 0
         }
-        PHP, \FFI::new('enum Example { a, b }'));
+        PHP, \FFI::cdef()->new('enum Example { a, b }'));
     }
 
     public static function scalarsDataProvider(): array
@@ -118,7 +118,7 @@ class FFICasterTest extends TestCase
         FFI\CData<$type> size $size align $align {
           cdata: $value
         }
-        PHP, \FFI::new($type));
+        PHP, \FFI::cdef()->new($type));
     }
 
     public function testCastVoidFunction()
@@ -129,7 +129,7 @@ class FFICasterTest extends TestCase
         $abi callable(): void {
           returnType: FFI\CType<void> size 1 align 1 {}
         }
-        PHP, \FFI::new('void (*)(void)'));
+        PHP, \FFI::cdef()->new('void (*)(void)'));
     }
 
     public function testCastIntFunction()
@@ -140,7 +140,7 @@ class FFICasterTest extends TestCase
         $abi callable(): uint64_t {
           returnType: FFI\CType<uint64_t> size 8 align 8 {}
         }
-        PHP, \FFI::new('unsigned long long (*)(void)'));
+        PHP, \FFI::cdef()->new('unsigned long long (*)(void)'));
     }
 
     public function testCastFunctionWithArguments()
@@ -151,14 +151,14 @@ class FFICasterTest extends TestCase
         $abi callable(int32_t, char*): void {
           returnType: FFI\CType<void> size 1 align 1 {}
         }
-        PHP, \FFI::new('void (*)(int a, const char* b)'));
+        PHP, \FFI::cdef()->new('void (*)(int a, const char* b)'));
     }
 
     public function testCastNonCuttedPointerToChar()
     {
         $actualMessage = "Hello World!\0";
 
-        $string = \FFI::new('char[100]');
+        $string = \FFI::cdef()->new('char[100]');
         $pointer = \FFI::addr($string[0]);
         \FFI::memcpy($pointer, $actualMessage, \strlen($actualMessage));
 
@@ -180,7 +180,7 @@ class FFICasterTest extends TestCase
             .'World!Hello World!Hello World!Hello World!Hello World!Hello Wor'
             .'ld!Hello World!Hel';
 
-        $string = \FFI::new('char['.$actualLength.']');
+        $string = \FFI::cdef()->new('char['.$actualLength.']');
         $pointer = \FFI::addr($string[0]);
         \FFI::memcpy($pointer, $actualMessage, $actualLength);
 
@@ -207,13 +207,13 @@ class FFICasterTest extends TestCase
         $actualMessage = 'Hello World!';
         $actualLength = \strlen($actualMessage);
 
-        $string = \FFI::new('char['.$actualLength.']');
+        $string = \FFI::cdef()->new('char['.$actualLength.']');
         $pointer = \FFI::addr($string[0]);
 
         \FFI::memcpy($pointer, $actualMessage, $actualLength);
 
         // Remove automatically addition of the trailing "\0" and remove trailing "\0"
-        $pointer = \FFI::cast('char*', \FFI::cast('void*', $pointer));
+        $pointer = \FFI::cdef()->cast('char*', \FFI::cdef()->cast('void*', $pointer));
         $pointer[$actualLength] = "\x01";
 
         $this->assertDumpMatchesFormat(<<<PHP
@@ -328,24 +328,24 @@ class FFICasterTest extends TestCase
         CPP);
 
         // Create values
-        $int = \FFI::new('int64_t');
+        $int = \FFI::cdef()->new('int64_t');
         $int->cdata = 42;
-        $float = \FFI::new('float');
+        $float = \FFI::cdef()->new('float');
         $float->cdata = 42.0;
-        $double = \FFI::new('double');
+        $double = \FFI::cdef()->new('double');
         $double->cdata = 42.2;
-        $bool = \FFI::new('bool');
+        $bool = \FFI::cdef()->new('bool');
         $bool->cdata = true;
 
         // Fill struct
         $struct = $ffi->new('Example');
-        $struct->a = \FFI::addr(\FFI::cast('int8_t', $int));
-        $struct->b = \FFI::addr(\FFI::cast('uint8_t', $int));
-        $struct->c = \FFI::addr(\FFI::cast('int64_t', $int));
-        $struct->d = \FFI::addr(\FFI::cast('uint64_t', $int));
-        $struct->e = \FFI::addr(\FFI::cast('float', $float));
-        $struct->f = \FFI::addr(\FFI::cast('double', $double));
-        $struct->g = \FFI::addr(\FFI::cast('bool', $bool));
+        $struct->a = \FFI::addr(\FFI::cdef()->cast('int8_t', $int));
+        $struct->b = \FFI::addr(\FFI::cdef()->cast('uint8_t', $int));
+        $struct->c = \FFI::addr(\FFI::cdef()->cast('int64_t', $int));
+        $struct->d = \FFI::addr(\FFI::cdef()->cast('uint64_t', $int));
+        $struct->e = \FFI::addr(\FFI::cdef()->cast('float', $float));
+        $struct->f = \FFI::addr(\FFI::cdef()->cast('double', $double));
+        $struct->g = \FFI::addr(\FFI::cdef()->cast('bool', $bool));
 
         $this->assertDumpEquals(<<<'OUTPUT'
         FFI\CData<struct <anonymous>> size 56 align 8 {
@@ -441,7 +441,7 @@ class FFICasterTest extends TestCase
         $var->func = (static fn (object $p) => 42);
 
         $abi = \PHP_OS_FAMILY === 'Windows' ? '[cdecl]' : '[fastcall]';
-        $longSize = \FFI::type('long')->getSize();
+        $longSize = \FFI::cdef()->type('long')->getSize();
         $longType = 8 === $longSize ? 'int64_t' : 'int32_t';
         $structSize = 56 + $longSize * 2;
 

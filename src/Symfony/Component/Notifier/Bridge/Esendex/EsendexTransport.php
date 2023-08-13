@@ -60,8 +60,10 @@ final class EsendexTransport extends AbstractTransport
         $options = $message->getOptions()?->toArray() ?? [];
         $options['from'] = $message->getFrom() ?: $this->from;
         $options['messages'] = [
-            'to' => $message->getPhone(),
-            'body' => $message->getSubject(),
+            [
+                'to' => $message->getPhone(),
+                'body' => $message->getSubject(),
+            ],
         ];
         $options['accountreference'] ??= $this->accountReference;
 

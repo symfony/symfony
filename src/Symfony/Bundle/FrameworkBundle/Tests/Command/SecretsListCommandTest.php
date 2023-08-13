@@ -14,16 +14,22 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Command\SecretsListCommand;
 use Symfony\Bundle\FrameworkBundle\Secrets\AbstractVault;
+use Symfony\Bundle\FrameworkBundle\Secrets\DotenvVault;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class SecretsListCommandTest extends TestCase
 {
+    /**
+     * @backupGlobals enabled
+     */
     public function testExecute()
     {
         $vault = $this->createMock(AbstractVault::class);
         $vault->method('list')->willReturn(['A' => 'a', 'B' => 'b', 'C' => null, 'D' => null, 'E' => null]);
-        $localVault = $this->createMock(AbstractVault::class);
-        $localVault->method('list')->willReturn(['A' => '', 'B' => 'A', 'C' => '', 'D' => false, 'E' => null]);
+
+        $_ENV = ['A' => '', 'B' => 'A', 'C' => '', 'D' => false, 'E' => null];
+        $localVault = new DotenvVault('/not/a/path');
+
         $command = new SecretsListCommand($vault, $localVault);
         $tester = new CommandTester($command);
         $this->assertSame(0, $tester->execute([]));
@@ -37,9 +43,9 @@ class SecretsListCommandTest extends TestCase
               Secret   Value    Local Value
              -------- -------- -------------
               A        "a"
-              B        "b"      "A"
+              B        "b"      ******
               C        ******
-              D        ******
+              D        ******   ******
               E        ******
              -------- -------- -------------
 

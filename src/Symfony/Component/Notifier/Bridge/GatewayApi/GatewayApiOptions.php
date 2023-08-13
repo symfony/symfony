@@ -33,7 +33,7 @@ final class GatewayApiOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function class(int $class): static
+    public function class(string $class): static
     {
         $this->options['class'] = $class;
 

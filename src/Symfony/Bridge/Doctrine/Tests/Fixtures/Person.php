@@ -18,18 +18,13 @@ use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\InheritanceType;
 
-/**
- * @Entity
- * @InheritanceType("SINGLE_TABLE")
- * @DiscriminatorColumn(name="discr", type="string")
- * @DiscriminatorMap({"person" = "Person", "employee" = "Employee"})
- */
+#[Entity, InheritanceType('SINGLE_TABLE'), DiscriminatorColumn(name: 'discr', type: 'string'), DiscriminatorMap(['person' => 'Person', 'employee' => 'Employee'])]
 class Person
 {
-    /** @Id @Column(type="integer") */
+    #[Id, Column(type: 'integer')]
     protected $id;
 
-    /** @Column(type="string") */
+    #[Column(type: 'string')]
     public $name;
 
     public function __construct($id, $name)

@@ -18,7 +18,11 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\Servi
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AccessTokenFactory;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class AccessTokenFactoryTest extends TestCase
 {
@@ -76,7 +80,12 @@ class AccessTokenFactoryTest extends TestCase
     {
         $container = new ContainerBuilder();
         $config = [
-            'token_handler' => ['oidc_user_info' => ['client' => 'oidc.client']],
+            'token_handler' => [
+                'oidc_user_info' => [
+                    'base_uri' => 'https://www.example.com/realms/demo/protocol/openid-connect/userinfo',
+                    'client' => 'oidc.client',
+                ],
+            ],
         ];
 
         $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
@@ -86,14 +95,24 @@ class AccessTokenFactoryTest extends TestCase
 
         $this->assertTrue($container->hasDefinition('security.authenticator.access_token.firewall1'));
         $this->assertTrue($container->hasDefinition('security.access_token_handler.firewall1'));
-        $this->assertFalse($container->hasDefinition('http_client.security.access_token_handler.oidc_user_info'));
+
+        $expected = [
+            'index_0' => (new ChildDefinition('security.access_token_handler.oidc_user_info.http_client'))
+                ->setFactory([new Reference('oidc.client'), 'withOptions'])
+                ->replaceArgument(0, ['base_uri' => 'https://www.example.com/realms/demo/protocol/openid-connect/userinfo']),
+            'index_2' => 'sub',
+        ];
+        $this->assertEquals($expected, $container->getDefinition('security.access_token_handler.firewall1')->getArguments());
     }
 
-    public function testOidcUserInfoTokenHandlerConfigurationWithClientCreation()
+    /**
+     * @dataProvider getOidcUserInfoConfiguration
+     */
+    public function testOidcUserInfoTokenHandlerConfigurationWithBaseUri(array|string $configuration)
     {
         $container = new ContainerBuilder();
         $config = [
-            'token_handler' => ['oidc_user_info' => ['client' => ['base_uri' => 'https://www.example.com/realms/demo/protocol/openid-connect/userinfo']]],
+            'token_handler' => ['oidc_user_info' => $configuration],
         ];
 
         $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
@@ -103,7 +122,25 @@ class AccessTokenFactoryTest extends TestCase
 
         $this->assertTrue($container->hasDefinition('security.authenticator.access_token.firewall1'));
         $this->assertTrue($container->hasDefinition('security.access_token_handler.firewall1'));
-        $this->assertTrue($container->hasDefinition('http_client.security.access_token_handler.oidc_user_info'));
+
+        $expected = [
+            'index_0' => (new ChildDefinition('security.access_token_handler.oidc_user_info.http_client'))
+                ->replaceArgument(0, ['base_uri' => 'https://www.example.com/realms/demo/protocol/openid-connect/userinfo']),
+            'index_2' => 'sub',
+        ];
+
+        if (!interface_exists(HttpClientInterface::class)) {
+            $this->expectException(LogicException::class);
+            $this->expectExceptionMessage('You cannot use the "oidc_user_info" token handler since the HttpClient component is not installed. Try running "composer require symfony/http-client".');
+        }
+
+        $this->assertEquals($expected, $container->getDefinition('security.access_token_handler.firewall1')->getArguments());
+    }
+
+    public static function getOidcUserInfoConfiguration(): iterable
+    {
+        yield [['base_uri' => 'https://www.example.com/realms/demo/protocol/openid-connect/userinfo']];
+        yield ['https://www.example.com/realms/demo/protocol/openid-connect/userinfo'];
     }
 
     public function testMultipleTokenHandlersSet()
@@ -114,7 +151,7 @@ class AccessTokenFactoryTest extends TestCase
         $config = [
             'token_handler' => [
                 'id' => 'in_memory_token_handler_service_id',
-                'oidc_user_info' => ['client' => 'oidc.client'],
+                'oidc_user_info' => 'https://www.example.com/realms/demo/protocol/openid-connect/userinfo',
             ],
         ];
 

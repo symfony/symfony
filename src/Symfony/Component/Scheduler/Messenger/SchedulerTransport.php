@@ -12,13 +12,11 @@
 namespace Symfony\Component\Scheduler\Messenger;
 
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Message\RedispatchMessage;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Scheduler\Exception\LogicException;
 use Symfony\Component\Scheduler\Generator\MessageGeneratorInterface;
 
-/**
- * @experimental
- */
 class SchedulerTransport implements TransportInterface
 {
     public function __construct(
@@ -29,7 +27,16 @@ class SchedulerTransport implements TransportInterface
     public function get(): iterable
     {
         foreach ($this->messageGenerator->getMessages() as $context => $message) {
-            yield Envelope::wrap($message, [new ScheduledStamp($context)]);
+            $stamp = new ScheduledStamp($context);
+
+            if ($message instanceof RedispatchMessage) {
+                $message = new RedispatchMessage(
+                    Envelope::wrap($message->envelope, [$stamp]),
+                    $message->transportNames,
+                );
+            }
+
+            yield Envelope::wrap($message, [$stamp]);
         }
     }
 

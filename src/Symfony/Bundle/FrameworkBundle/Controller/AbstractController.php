@@ -14,7 +14,6 @@ namespace Symfony\Bundle\FrameworkBundle\Controller;
 use Psr\Container\ContainerInterface;
 use Psr\Link\EvolvableLinkInterface;
 use Psr\Link\LinkInterface;
-use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -45,7 +44,6 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\WebLink\EventListener\AddLinkHeaderListener;
 use Symfony\Component\WebLink\GenericLinkProvider;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
-use Symfony\Component\WebLink\Link;
 use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Environment;
@@ -65,7 +63,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     #[Required]
     public function setContainer(ContainerInterface $container): ?ContainerInterface
     {
-        $previous = $this->container;
+        $previous = $this->container ?? null;
         $this->container = $container;
 
         return $previous;
@@ -97,7 +95,6 @@ abstract class AbstractController implements ServiceSubscriberInterface
             'security.csrf.token_manager' => '?'.CsrfTokenManagerInterface::class,
             'parameter_bag' => '?'.ContainerBagInterface::class,
             'web_link.http_header_serializer' => '?'.HttpHeaderSerializer::class,
-            'asset_mapper.importmap.manager' => '?'.ImportMapManager::class,
         ];
     }
 
@@ -412,7 +409,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     /**
      * @param LinkInterface[] $links
      */
-    protected function sendEarlyHints(iterable $links = [], Response $response = null, bool $preloadJavaScriptModules = false): Response
+    protected function sendEarlyHints(iterable $links = [], Response $response = null): Response
     {
         if (!$this->container->has('web_link.http_header_serializer')) {
             throw new \LogicException('You cannot use the "sendEarlyHints" method if the WebLink component is not available. Try running "composer require symfony/web-link".');
@@ -421,17 +418,6 @@ abstract class AbstractController implements ServiceSubscriberInterface
         $response ??= new Response();
 
         $populatedLinks = [];
-
-        if ($preloadJavaScriptModules) {
-            if (!$this->container->has('asset_mapper.importmap.manager')) {
-                throw new \LogicException('You cannot use the JavaScript modules method if the AssetMapper component is not available. Try running "composer require symfony/asset-mapper".');
-            }
-
-            foreach ($this->container->get('asset_mapper.importmap.manager')->getModulesToPreload() as $url) {
-                $populatedLinks[] = new Link('modulepreload', $url);
-            }
-        }
-
         foreach ($links as $link) {
             if ($link instanceof EvolvableLinkInterface && !$link->getRels()) {
                 $link = $link->withRel('preload');

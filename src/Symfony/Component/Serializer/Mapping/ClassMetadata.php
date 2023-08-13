@@ -39,7 +39,7 @@ class ClassMetadata implements ClassMetadataInterface
      *           class' serialized representation. Do not access it. Use
      *           {@link getClassDiscriminatorMapping()} instead.
      */
-    public ?ClassDiscriminatorMapping $classDiscriminatorMapping;
+    public ?ClassDiscriminatorMapping $classDiscriminatorMapping = null;
 
     /**
      * Constructs a metadata for the given class.

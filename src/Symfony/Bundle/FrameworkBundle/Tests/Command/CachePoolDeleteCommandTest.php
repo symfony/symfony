@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class CachePoolDeleteCommandTest extends TestCase
 {
-    private $cachePool;
+    private MockObject&CacheItemPoolInterface $cachePool;
 
     protected function setUp(): void
     {

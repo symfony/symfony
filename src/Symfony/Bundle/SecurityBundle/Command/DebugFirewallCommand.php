@@ -216,9 +216,7 @@ EOF
         $io->table(
             ['Classname'],
             array_map(
-                static fn ($authenticator) => [
-                    $authenticator::class,
-                ],
+                fn ($authenticator) => [$authenticator::class],
                 $authenticators
             )
         );

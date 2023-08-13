@@ -437,6 +437,5 @@ return [
         'Pacific/Wake' => 'Vejk ostrvo vreme',
         'Pacific/Wallis' => 'Valis i Futuna Ostrva vreme',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

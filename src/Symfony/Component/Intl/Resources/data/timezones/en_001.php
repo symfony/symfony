@@ -12,6 +12,5 @@ return [
         'Asia/Aqtau' => 'West Kazakhstan Time (Aktau)',
         'Atlantic/St_Helena' => 'Greenwich Mean Time (St Helena)',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

@@ -16,7 +16,7 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 
 class FixedDataTransformer implements DataTransformerInterface
 {
-    private $mapping;
+    private array $mapping;
 
     public function __construct(array $mapping)
     {

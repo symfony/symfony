@@ -32,7 +32,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
  */
 class NativeSessionStorageTest extends TestCase
 {
-    private $savePath;
+    private string $savePath;
 
     protected function setUp(): void
     {
@@ -50,8 +50,6 @@ class NativeSessionStorageTest extends TestCase
         if (is_dir($this->savePath)) {
             @rmdir($this->savePath);
         }
-
-        $this->savePath = null;
     }
 
     protected function getStorage(array $options = []): NativeSessionStorage

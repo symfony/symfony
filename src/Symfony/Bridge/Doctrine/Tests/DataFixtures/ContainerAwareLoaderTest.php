@@ -16,6 +16,9 @@ use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\ContainerAwareFixture;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * @group legacy
+ */
 class ContainerAwareLoaderTest extends TestCase
 {
     public function testShouldSetContainerOnContainerAwareFixture()

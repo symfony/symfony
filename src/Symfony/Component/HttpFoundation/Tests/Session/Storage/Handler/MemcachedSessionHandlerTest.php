@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcachedSessionHandler;
 
@@ -24,12 +25,8 @@ class MemcachedSessionHandlerTest extends TestCase
     private const PREFIX = 'prefix_';
     private const TTL = 1000;
 
-    /**
-     * @var MemcachedSessionHandler
-     */
-    protected $storage;
-
-    protected $memcached;
+    protected MemcachedSessionHandler $storage;
+    protected MockObject&\Memcached $memcached;
 
     protected function setUp(): void
     {
@@ -52,13 +49,6 @@ class MemcachedSessionHandlerTest extends TestCase
             $this->memcached,
             ['prefix' => self::PREFIX, 'expiretime' => self::TTL]
         );
-    }
-
-    protected function tearDown(): void
-    {
-        $this->memcached = null;
-        $this->storage = null;
-        parent::tearDown();
     }
 
     public function testOpenSession()

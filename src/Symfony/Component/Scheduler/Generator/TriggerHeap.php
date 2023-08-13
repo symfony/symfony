@@ -17,8 +17,6 @@ use Symfony\Component\Scheduler\RecurringMessage;
  * @internal
  *
  * @extends \SplHeap<array{\DateTimeImmutable, int, RecurringMessage}>
- *
- * @experimental
  */
 final class TriggerHeap extends \SplHeap
 {

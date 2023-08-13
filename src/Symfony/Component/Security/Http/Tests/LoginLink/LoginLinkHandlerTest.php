@@ -32,16 +32,11 @@ use Symfony\Component\Security\Http\LoginLink\LoginLinkHandler;
 
 class LoginLinkHandlerTest extends TestCase
 {
-    /** @var MockObject|UrlGeneratorInterface */
-    private $router;
-    /** @var TestLoginLinkHandlerUserProvider */
-    private $userProvider;
-    /** @var PropertyAccessorInterface */
-    private $propertyAccessor;
-    /** @var MockObject|ExpiredSignatureStorage */
-    private $expiredLinkStorage;
-    /** @var CacheItemPoolInterface */
-    private $expiredLinkCache;
+    private MockObject&UrlGeneratorInterface $router;
+    private TestLoginLinkHandlerUserProvider $userProvider;
+    private PropertyAccessorInterface $propertyAccessor;
+    private ExpiredSignatureStorage $expiredLinkStorage;
+    private CacheItemPoolInterface $expiredLinkCache;
 
     protected function setUp(): void
     {
@@ -121,7 +116,7 @@ class LoginLinkHandlerTest extends TestCase
         ];
 
         yield [
-            new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash', new \DateTime('2020-06-01 00:00:00', new \DateTimeZone('+0000'))),
+            new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash', new \DateTimeImmutable('2020-06-01 00:00:00', new \DateTimeZone('+0000'))),
             ['lastAuthenticatedAt' => '2020-06-01T00:00:00+00:00'],
         ];
     }
@@ -266,10 +261,10 @@ class LoginLinkHandlerTest extends TestCase
 
 class TestLoginLinkHandlerUser implements UserInterface
 {
-    public $username;
-    public $emailProperty;
-    public $passwordProperty;
-    public $lastAuthenticatedAt;
+    public string $username;
+    public string $emailProperty;
+    public string $passwordProperty;
+    public \DateTimeImmutable|string|null $lastAuthenticatedAt;
 
     public function __construct($username, $emailProperty, $passwordProperty, $lastAuthenticatedAt = null)
     {
@@ -311,7 +306,7 @@ class TestLoginLinkHandlerUser implements UserInterface
 
 class TestLoginLinkHandlerUserProvider implements UserProviderInterface
 {
-    private $users = [];
+    private array $users = [];
 
     public function createUser(TestLoginLinkHandlerUser $user): void
     {

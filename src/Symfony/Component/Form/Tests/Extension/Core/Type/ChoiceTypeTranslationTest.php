@@ -19,7 +19,7 @@ class ChoiceTypeTranslationTest extends TypeTestCase
 {
     public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\ChoiceType';
 
-    private $choices = [
+    private array $choices = [
         'Bernhard' => 'a',
         'Fabien' => 'b',
         'Kris' => 'c',

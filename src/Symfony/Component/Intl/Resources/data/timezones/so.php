@@ -437,6 +437,5 @@ return [
         'Pacific/Wake' => 'Waqtiga Wayk Iylaanis (Wake)',
         'Pacific/Wallis' => 'Waqtiga Walis & Futuna',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

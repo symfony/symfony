@@ -30,7 +30,7 @@ require_once __DIR__.'/flex-style/src/FlexStyleMicroKernel.php';
 
 class MicroKernelTraitTest extends TestCase
 {
-    private $kernel;
+    private ?Kernel $kernel = null;
 
     protected function tearDown(): void
     {
@@ -120,6 +120,7 @@ class MicroKernelTraitTest extends TestCase
             protected function configureContainer(ContainerConfigurator $c): void
             {
                 $c->extension('framework', [
+                    'annotations' => false,
                     'http_method_override' => false,
                     'router' => ['utf8' => true],
                 ]);
@@ -143,7 +144,7 @@ abstract class MinimalKernel extends Kernel
 {
     use MicroKernelTrait;
 
-    private $cacheDir;
+    private string $cacheDir;
 
     public function __construct(string $cacheDir)
     {

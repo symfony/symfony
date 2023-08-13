@@ -30,6 +30,19 @@ class StreamedJsonResponseTest extends TestCase
         $this->assertSame('{"_embedded":{"articles":["Article 1","Article 2","Article 3"],"news":["News 1","News 2","News 3"]}}', $content);
     }
 
+    public function testResponseEmptyList()
+    {
+        $content = $this->createSendResponse(
+            [
+                '_embedded' => [
+                    'articles' => $this->generatorSimple('Article', 0),
+                ],
+            ],
+        );
+
+        $this->assertSame('{"_embedded":{"articles":[]}}', $content);
+    }
+
     public function testResponseObjectsList()
     {
         $content = $this->createSendResponse(
@@ -222,20 +235,20 @@ class StreamedJsonResponseTest extends TestCase
     /**
      * @return \Generator<int, string>
      */
-    private function generatorSimple(string $test): \Generator
+    private function generatorSimple(string $test, int $length = 3): \Generator
     {
-        yield $test.' 1';
-        yield $test.' 2';
-        yield $test.' 3';
+        for ($i = 1; $i <= $length; ++$i) {
+            yield $test.' '.$i;
+        }
     }
 
     /**
      * @return \Generator<int, array{title: string}>
      */
-    private function generatorArray(string $test): \Generator
+    private function generatorArray(string $test, int $length = 3): \Generator
     {
-        yield ['title' => $test.' 1'];
-        yield ['title' => $test.' 2'];
-        yield ['title' => $test.' 3'];
+        for ($i = 1; $i <= $length; ++$i) {
+            yield ['title' => $test.' '.$i];
+        }
     }
 }

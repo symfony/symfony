@@ -15,13 +15,13 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
 
-/** @Entity */
+#[Entity]
 class SingleIntIdStringWrapperNameEntity
 {
-    /** @Id @Column(type="integer") */
+    #[Id, Column(type: 'integer')]
     protected $id;
 
-    /** @Column(type="string_wrapper", nullable=true) */
+    #[Column(type: 'string_wrapper', nullable: true)]
     public $name;
 
     public function __construct($id, $name)

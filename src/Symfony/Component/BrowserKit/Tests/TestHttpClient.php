@@ -20,8 +20,8 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 
 class TestHttpClient extends HttpBrowser
 {
-    protected $nextResponse;
-    protected $nextScript;
+    protected ?Response $nextResponse = null;
+    protected string $nextScript;
 
     public function __construct(array $server = [], History $history = null, CookieJar $cookieJar = null)
     {
@@ -64,7 +64,7 @@ class TestHttpClient extends HttpBrowser
         return $response;
     }
 
-    protected function getScript(object $request)
+    protected function getScript(object $request): string
     {
         $r = new \ReflectionClass(Response::class);
         $path = $r->getFileName();

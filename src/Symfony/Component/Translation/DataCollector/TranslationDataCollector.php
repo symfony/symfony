@@ -73,7 +73,7 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
         return $this->data[DataCollectorTranslator::MESSAGE_DEFINED] ?? 0;
     }
 
-    public function getLocale()
+    public function getLocale(): ?string
     {
         return !empty($this->data['locale']) ? $this->data['locale'] : null;
     }
@@ -81,7 +81,7 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
     /**
      * @internal
      */
-    public function getFallbackLocales()
+    public function getFallbackLocales(): Data|array
     {
         return (isset($this->data['fallback_locales']) && \count($this->data['fallback_locales']) > 0) ? $this->data['fallback_locales'] : [];
     }

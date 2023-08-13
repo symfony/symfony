@@ -27,8 +27,8 @@ use Symfony\Component\Form\SubmitButtonBuilder;
 
 class FormBuilderTest extends TestCase
 {
-    private $factory;
-    private $builder;
+    private FormFactory $factory;
+    private FormBuilder $builder;
 
     protected function setUp(): void
     {

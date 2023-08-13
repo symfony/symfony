@@ -11,18 +11,14 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 use Symfony\Component\HttpKernel\Fragment\FragmentUriGeneratorInterface;
 use Twig\Environment;
 
-class FragmentController implements ContainerAwareInterface
+class FragmentController
 {
-    use ContainerAwareTrait;
-
     public function indexAction(Environment $twig)
     {
         return new Response($twig->render('fragment.html.twig', ['bar' => new Bar()]));
@@ -56,7 +52,7 @@ class FragmentController implements ContainerAwareInterface
 
 class Bar
 {
-    private $bar = 'bar';
+    private string $bar = 'bar';
 
     public function getBar()
     {

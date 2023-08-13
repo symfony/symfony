@@ -28,7 +28,7 @@ class MemcachedAdapterTest extends AdapterTestCase
         'testClearPrefix' => 'Memcached cannot clear by prefix',
     ];
 
-    protected static $client;
+    protected static \Memcached $client;
 
     public static function setUpBeforeClass(): void
     {

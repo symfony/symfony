@@ -6,6 +6,5 @@ return [
         'pdc' => 'allemand de Pennsylvanie',
         'sdh' => 'kurde méridional',
     ],
-    'LocalizedNames' => [
-    ],
+    'LocalizedNames' => [],
 ];

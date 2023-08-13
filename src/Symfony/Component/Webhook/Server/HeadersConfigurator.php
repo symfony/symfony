@@ -16,8 +16,6 @@ use Symfony\Component\RemoteEvent\RemoteEvent;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 6.3
  */
 final class HeadersConfigurator implements RequestConfiguratorInterface
 {

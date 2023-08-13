@@ -11,13 +11,15 @@
 
 namespace Symfony\Component\Clock;
 
-/**
- * Returns the current time as a DateTimeImmutable.
- *
- * Note that you should prefer injecting a ClockInterface or using
- * ClockAwareTrait when possible instead of using this function.
- */
-function now(): \DateTimeImmutable
-{
-    return Clock::get()->now();
+if (!\function_exists(now::class)) {
+    /**
+     * Returns the current time as a DateTimeImmutable.
+     *
+     * Note that you should prefer injecting a ClockInterface or using
+     * ClockAwareTrait when possible instead of using this function.
+     */
+    function now(): \DateTimeImmutable
+    {
+        return Clock::get()->now();
+    }
 }

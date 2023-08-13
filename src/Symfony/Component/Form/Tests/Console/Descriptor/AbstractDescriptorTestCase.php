@@ -28,7 +28,7 @@ use Symfony\Component\Security\Csrf\CsrfTokenManager;
 
 abstract class AbstractDescriptorTestCase extends TestCase
 {
-    private $colSize;
+    private string|false $colSize;
 
     protected function setUp(): void
     {

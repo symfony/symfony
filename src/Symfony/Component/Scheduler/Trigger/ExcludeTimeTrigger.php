@@ -11,16 +11,14 @@
 
 namespace Symfony\Component\Scheduler\Trigger;
 
-/**
- * @experimental
- */
-final class ExcludeTimeTrigger implements TriggerInterface
+final class ExcludeTimeTrigger extends AbstractDecoratedTrigger
 {
     public function __construct(
         private readonly TriggerInterface $inner,
         private readonly \DateTimeImmutable $from,
         private readonly \DateTimeImmutable $until,
     ) {
+        parent::__construct($inner);
     }
 
     public function __toString(): string

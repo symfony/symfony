@@ -22,7 +22,7 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
 
 final class NativeTransportFactoryTest extends TestCase
 {
-    public static $fakeConfiguration = [];
+    public static array $fakeConfiguration = [];
 
     public static function setUpBeforeClass(): void
     {

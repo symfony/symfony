@@ -13,7 +13,7 @@ namespace Symfony\Component\Serializer\Tests\Fixtures\Annotations;
 
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Tests\Fixtures\ChildOfGroupsAnnotationDummy;
-use Symfony\Component\Serializer\Tests\Fixtures\GroupDummyInterface;
+use Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummyInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>

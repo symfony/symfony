@@ -12,6 +12,7 @@
 namespace Symfony\Component\AssetMapper\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\AssetMapper\AssetDependency;
 use Symfony\Component\AssetMapper\MappedAsset;
 
 class MappedAssetTest extends TestCase
@@ -20,23 +21,7 @@ class MappedAssetTest extends TestCase
     {
         $asset = new MappedAsset('foo.css');
 
-        $this->assertSame('foo.css', $asset->getLogicalPath());
-    }
-
-    public function testGetPublicPath()
-    {
-        $asset = new MappedAsset('anything');
-        $asset->setPublicPath('/assets/foo.1234567.css');
-
-        $this->assertSame('/assets/foo.1234567.css', $asset->getPublicPath());
-    }
-
-    public function testGetPublicPathWithoutDigest()
-    {
-        $asset = new MappedAsset('anything');
-        $asset->setPublicPathWithoutDigest('/assets/foo.css');
-
-        $this->assertSame('/assets/foo.css', $asset->getPublicPathWithoutDigest());
+        $this->assertSame('foo.css', $asset->logicalPath);
     }
 
     /**
@@ -44,10 +29,9 @@ class MappedAssetTest extends TestCase
      */
     public function testGetExtension(string $filename, string $expectedExtension)
     {
-        $asset = new MappedAsset('anything');
-        $asset->setPublicPathWithoutDigest($filename);
+        $asset = new MappedAsset('anything', publicPathWithoutDigest: $filename);
 
-        $this->assertSame($expectedExtension, $asset->getPublicExtension());
+        $this->assertSame($expectedExtension, $asset->publicExtension);
     }
 
     public static function getExtensionTests(): iterable
@@ -57,25 +41,16 @@ class MappedAssetTest extends TestCase
         yield 'with_directory' => ['foo/bar.css', 'css'];
     }
 
-    public function testGetSourcePath()
+    public function testAddDependencies()
     {
-        $asset = new MappedAsset('foo.css');
-        $asset->setSourcePath('/path/to/source.css');
-        $this->assertSame('/path/to/source.css', $asset->getSourcePath());
-    }
+        $mainAsset = new MappedAsset('file.js');
 
-    public function testGetDigest()
-    {
-        $asset = new MappedAsset('foo.css');
-        $asset->setDigest('1234567', false);
-        $this->assertSame('1234567', $asset->getDigest());
-        $this->assertFalse($asset->isPredigested());
-    }
+        $assetFoo = new MappedAsset('foo.js');
+        $dependency = new AssetDependency($assetFoo, false, false);
+        $mainAsset->addDependency($dependency);
+        $mainAsset->addFileDependency('/path/to/foo.js');
 
-    public function testGetContent()
-    {
-        $asset = new MappedAsset('foo.css');
-        $asset->setContent('body { color: red; }');
-        $this->assertSame('body { color: red; }', $asset->getContent());
+        $this->assertSame([$dependency], $mainAsset->getDependencies());
+        $this->assertSame(['/path/to/foo.js'], $mainAsset->getFileDependencies());
     }
 }

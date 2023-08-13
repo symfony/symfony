@@ -28,6 +28,11 @@ class TypeHinted
         $this->date = $date;
     }
 
+    public function setDateMutable(\DateTime $date)
+    {
+        $this->date = $date;
+    }
+
     public function getDate()
     {
         return $this->date;

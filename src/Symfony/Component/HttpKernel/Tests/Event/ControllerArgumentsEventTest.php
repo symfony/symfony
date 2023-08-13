@@ -17,6 +17,7 @@ use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Attribute\Bar;
+use Symfony\Component\HttpKernel\Tests\Fixtures\Attribute\Baz;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\AttributeController;
 use Symfony\Component\HttpKernel\Tests\TestHttpKernel;
 
@@ -51,6 +52,9 @@ class ControllerArgumentsEventTest extends TestCase
                 new Bar('class'),
                 new Bar('method'),
             ],
+            Baz::class => [
+                new Baz(),
+            ],
         ];
 
         $this->assertEquals($expected, $event->getAttributes());
@@ -60,5 +64,28 @@ class ControllerArgumentsEventTest extends TestCase
 
         $this->assertEquals($expected, $event->getAttributes());
         $this->assertSame($controllerEvent->getAttributes(), $event->getAttributes());
+    }
+
+    public function testGetAttributesByClassName()
+    {
+        $controller = new AttributeController();
+        $request = new Request();
+
+        $controllerEvent = new ControllerEvent(new TestHttpKernel(), $controller, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $event = new ControllerArgumentsEvent(new TestHttpKernel(), $controllerEvent, ['test'], new Request(), HttpKernelInterface::MAIN_REQUEST);
+
+        $expected = [
+            new Bar('class'),
+            new Bar('method'),
+        ];
+
+        $this->assertEquals($expected, $event->getAttributes(Bar::class));
+
+        $expected[] = new Bar('foo');
+        $event->setController($controller, [Bar::class => $expected]);
+
+        $this->assertEquals($expected, $event->getAttributes(Bar::class));
+        $this->assertSame($controllerEvent->getAttributes(Bar::class), $event->getAttributes(Bar::class));
     }
 }

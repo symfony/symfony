@@ -21,8 +21,7 @@ class XmlReaderCasterTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    /** @var \XmlReader */
-    private $reader;
+    private \XmlReader $reader;
 
     protected function setUp(): void
     {

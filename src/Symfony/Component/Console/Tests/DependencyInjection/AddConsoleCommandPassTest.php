@@ -64,7 +64,6 @@ class AddConsoleCommandPassTest extends TestCase
         $container = new ContainerBuilder();
         $command = $container
             ->register('my-command', MyCommand::class)
-            ->setPublic(false)
             ->addTag('console.command', ['command' => 'my:command'])
             ->addTag('console.command', ['command' => 'my:alias'])
         ;
@@ -86,7 +85,6 @@ class AddConsoleCommandPassTest extends TestCase
         $container = new ContainerBuilder();
         $container
             ->register('with-default-name', NamedCommand::class)
-            ->setPublic(false)
             ->addTag('console.command')
         ;
 
@@ -104,7 +102,6 @@ class AddConsoleCommandPassTest extends TestCase
         $container = new ContainerBuilder();
         $container
             ->register('with-default-name', NamedCommand::class)
-            ->setPublic(false)
             ->addTag('console.command', ['command' => 'new-name'])
         ;
 
@@ -218,10 +215,10 @@ class AddConsoleCommandPassTest extends TestCase
         $className = 'Symfony\Component\Console\Tests\DependencyInjection\MyCommand';
 
         $definition1 = new Definition($className);
-        $definition1->addTag('console.command')->setPublic(false);
+        $definition1->addTag('console.command');
 
         $definition2 = new Definition($className);
-        $definition2->addTag('console.command')->setPublic(false);
+        $definition2->addTag('console.command');
 
         $container->setDefinition('my-command1', $definition1);
         $container->setDefinition('my-command2', $definition2);
@@ -243,7 +240,7 @@ class AddConsoleCommandPassTest extends TestCase
         $childId = 'my-child-command';
 
         $parentDefinition = new Definition(/* no class */);
-        $parentDefinition->setAbstract(true)->setPublic(false);
+        $parentDefinition->setAbstract(true);
 
         $childDefinition = new ChildDefinition($parentId);
         $childDefinition->addTag('console.command')->setPublic(true);
@@ -268,7 +265,7 @@ class AddConsoleCommandPassTest extends TestCase
         $childId = 'my-child-command';
 
         $parentDefinition = new Definition($className);
-        $parentDefinition->setAbstract(true)->setPublic(false);
+        $parentDefinition->setAbstract(true);
 
         $childDefinition = new ChildDefinition($parentId);
         $childDefinition->addTag('console.command')->setPublic(true);
@@ -293,7 +290,7 @@ class AddConsoleCommandPassTest extends TestCase
         $childId = 'my-child-command';
 
         $parentDefinition = new Definition();
-        $parentDefinition->setAbstract(true)->setPublic(false);
+        $parentDefinition->setAbstract(true);
 
         $childDefinition = new ChildDefinition($parentId);
         $childDefinition->addTag('console.command')->setPublic(true);
@@ -322,7 +319,7 @@ class EscapedDefaultsFromPhpCommand extends Command
 #[AsCommand(name: '|cmdname|cmdalias', description: 'Just testing')]
 class DescribedCommand extends Command
 {
-    public static $initCounter = 0;
+    public static int $initCounter = 0;
 
     public function __construct()
     {

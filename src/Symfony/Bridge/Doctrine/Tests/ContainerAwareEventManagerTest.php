@@ -21,8 +21,8 @@ class ContainerAwareEventManagerTest extends TestCase
 {
     use ExpectDeprecationTrait;
 
-    private $container;
-    private $evm;
+    private Container $container;
+    private ContainerAwareEventManager $evm;
 
     protected function setUp(): void
     {
@@ -50,7 +50,7 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->container->set('sub1', $subscriber1 = new MySubscriber(['foo']));
         $this->container->set('sub2', $subscriber2 = new MySubscriber(['foo']));
 
-        $this->expectDeprecation('Since symfony/doctrine-bridge 6.3: Using Doctrine subscribers as services is deprecated, declare listeners instead');
+        $this->expectDeprecation('Since symfony/doctrine-bridge 6.3: Registering "Symfony\Bridge\Doctrine\Tests\MySubscriber" as a Doctrine subscriber is deprecated. Register it as a listener instead, using e.g. the #[AsDoctrineListener] attribute.');
         $this->assertSame([$subscriber1,  $subscriber2], array_values($this->evm->getListeners('foo')));
     }
 
@@ -92,7 +92,7 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->assertSame(0, $subscriber1->calledSubscribedEventsCount);
 
         $this->container->set('lazy1', $listener1 = new MyListener());
-        $this->expectDeprecation('Since symfony/doctrine-bridge 6.3: Using Doctrine subscribers as services is deprecated, declare listeners instead');
+        $this->expectDeprecation('Since symfony/doctrine-bridge 6.3: Registering "Symfony\Bridge\Doctrine\Tests\MySubscriber" as a Doctrine subscriber is deprecated. Register it as a listener instead, using e.g. the #[AsDoctrineListener] attribute.');
         $this->evm->addEventListener('foo', 'lazy1');
         $this->evm->addEventListener('foo', $listener2 = new MyListener());
         $this->evm->addEventSubscriber($subscriber2 = new MySubscriber(['bar']));
@@ -177,7 +177,7 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->assertSame(0, $subscriber1->calledSubscribedEventsCount);
 
         $this->container->set('lazy1', $listener1 = new MyListener());
-        $this->expectDeprecation('Since symfony/doctrine-bridge 6.3: Using Doctrine subscribers as services is deprecated, declare listeners instead');
+        $this->expectDeprecation('Since symfony/doctrine-bridge 6.3: Registering "Symfony\Bridge\Doctrine\Tests\MySubscriber" as a Doctrine subscriber is deprecated. Register it as a listener instead, using e.g. the #[AsDoctrineListener] attribute.');
         $this->evm->addEventListener('foo', 'lazy1');
         $this->assertSame(1, $subscriber1->calledSubscribedEventsCount);
 
@@ -238,7 +238,7 @@ class ContainerAwareEventManagerTest extends TestCase
 
         $this->container->set('lazy', $listener1 = new MyListener());
         $this->container->set('lazy2', $subscriber1 = new MySubscriber(['foo']));
-        $this->expectDeprecation('Since symfony/doctrine-bridge 6.3: Using Doctrine subscribers as services is deprecated, declare listeners instead');
+        $this->expectDeprecation('Since symfony/doctrine-bridge 6.3: Registering "Symfony\Bridge\Doctrine\Tests\MySubscriber" as a Doctrine subscriber is deprecated. Register it as a listener instead, using e.g. the #[AsDoctrineListener] attribute.');
         $this->evm->addEventListener('foo', 'lazy');
         $this->evm->addEventListener('foo', $listener2 = new MyListener());
 
@@ -281,6 +281,21 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->assertSame([], $this->evm->getListeners('foo'));
     }
 
+    public function testRemoveAllEventListener()
+    {
+        $this->container->set('lazy', new MyListener());
+        $this->evm->addEventListener('foo', 'lazy');
+        $this->evm->addEventListener('foo', new MyListener());
+
+        foreach ($this->evm->getAllListeners() as $event => $listeners) {
+            foreach ($listeners as $listener) {
+                $this->evm->removeEventListener($event, $listener);
+            }
+        }
+
+        $this->assertSame([], $this->evm->getListeners('foo'));
+    }
+
     public function testRemoveEventListenerAfterDispatchEvent()
     {
         $this->container->set('lazy', $listener1 = new MyListener());
@@ -299,8 +314,8 @@ class ContainerAwareEventManagerTest extends TestCase
 
 class MyListener
 {
-    public $calledByInvokeCount = 0;
-    public $calledByEventNameCount = 0;
+    public int $calledByInvokeCount = 0;
+    public int $calledByEventNameCount = 0;
 
     public function __invoke()
     {
@@ -315,8 +330,8 @@ class MyListener
 
 class MySubscriber extends MyListener implements EventSubscriber
 {
-    public $calledSubscribedEventsCount = 0;
-    private $listenedEvents;
+    public int $calledSubscribedEventsCount = 0;
+    private array $listenedEvents;
 
     public function __construct(array $listenedEvents)
     {

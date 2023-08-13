@@ -11,22 +11,19 @@
 
 namespace Symfony\Component\Serializer\Tests\Mapping\Factory;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryCompiler;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
-use Symfony\Component\Serializer\Tests\Fixtures\Annotations\MaxDepthDummy;
-use Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedNameDummy;
-use Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedPathDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\MaxDepthDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SerializedNameDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SerializedPathDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SerializedPathInConstructorDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
 
 final class ClassMetadataFactoryCompilerTest extends TestCase
 {
-    /**
-     * @var string
-     */
-    private $dumpPath;
+    private string $dumpPath;
 
     protected function setUp(): void
     {
@@ -40,24 +37,26 @@ final class ClassMetadataFactoryCompilerTest extends TestCase
 
     public function testItDumpMetadata()
     {
-        $classMetatadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetatadataFactory = new ClassMetadataFactory(new AnnotationLoader());
 
         $dummyMetadata = $classMetatadataFactory->getMetadataFor(Dummy::class);
         $maxDepthDummyMetadata = $classMetatadataFactory->getMetadataFor(MaxDepthDummy::class);
         $serializedNameDummyMetadata = $classMetatadataFactory->getMetadataFor(SerializedNameDummy::class);
         $serializedPathDummyMetadata = $classMetatadataFactory->getMetadataFor(SerializedPathDummy::class);
+        $serializedPathInConstructorDummyMetadata = $classMetatadataFactory->getMetadataFor(SerializedPathInConstructorDummy::class);
 
         $code = (new ClassMetadataFactoryCompiler())->compile([
             $dummyMetadata,
             $maxDepthDummyMetadata,
             $serializedNameDummyMetadata,
             $serializedPathDummyMetadata,
+            $serializedPathInConstructorDummyMetadata,
         ]);
 
         file_put_contents($this->dumpPath, $code);
         $compiledMetadata = require $this->dumpPath;
 
-        $this->assertCount(4, $compiledMetadata);
+        $this->assertCount(5, $compiledMetadata);
 
         $this->assertArrayHasKey(Dummy::class, $compiledMetadata);
         $this->assertEquals([
@@ -99,5 +98,13 @@ final class ClassMetadataFactoryCompilerTest extends TestCase
             ],
             null,
         ], $compiledMetadata[SerializedPathDummy::class]);
+
+        $this->assertArrayHasKey(SerializedPathInConstructorDummy::class, $compiledMetadata);
+        $this->assertEquals([
+            [
+                'three' => [[], null, null, '[one][two]'],
+            ],
+            null,
+        ], $compiledMetadata[SerializedPathInConstructorDummy::class]);
     }
 }

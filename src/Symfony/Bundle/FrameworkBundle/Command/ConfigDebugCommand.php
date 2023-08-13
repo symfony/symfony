@@ -41,7 +41,7 @@ class ConfigDebugCommand extends AbstractConfigCommand
 {
     protected function configure(): void
     {
-        $commentedHelpFormats = array_map(static fn (string $format): string => sprintf('<comment>%s</comment>', $format), $this->getAvailableFormatOptions());
+        $commentedHelpFormats = array_map(fn ($format) => sprintf('<comment>%s</comment>', $format), $this->getAvailableFormatOptions());
         $helpFormats = implode('", "', $commentedHelpFormats);
 
         $this
@@ -49,7 +49,7 @@ class ConfigDebugCommand extends AbstractConfigCommand
                 new InputArgument('name', InputArgument::OPTIONAL, 'The bundle name or the extension alias'),
                 new InputArgument('path', InputArgument::OPTIONAL, 'The configuration option path'),
                 new InputOption('resolve-env', null, InputOption::VALUE_NONE, 'Display resolved environment variable values instead of placeholders'),
-                new InputOption('format', null, InputOption::VALUE_REQUIRED, sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), class_exists(Yaml::class) ? 'yaml' : 'json'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), class_exists(Yaml::class) ? 'txt' : 'json'),
             ])
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command dumps the current configuration for an
@@ -81,14 +81,7 @@ EOF
 
         if (null === $name = $input->getArgument('name')) {
             $this->listBundles($errorIo);
-
-            $kernel = $this->getApplication()->getKernel();
-            if ($kernel instanceof ExtensionInterface
-                && ($kernel instanceof ConfigurationInterface || $kernel instanceof ConfigurationExtensionInterface)
-                && $kernel->getAlias()
-            ) {
-                $errorIo->table(['Kernel Extension'], [[$kernel->getAlias()]]);
-            }
+            $this->listNonBundleExtensions($errorIo);
 
             $errorIo->comment('Provide the name of a bundle as the first argument of this command to dump its configuration. (e.g. <comment>debug:config FrameworkBundle</comment>)');
             $errorIo->comment('For dumping a specific option, add its path as the second argument of this command. (e.g. <comment>debug:config FrameworkBundle serializer</comment> to dump the <comment>framework.serializer</comment> configuration)');
@@ -104,16 +97,18 @@ EOF
 
         $format = $input->getOption('format');
 
-        if ('yaml' === $format && !class_exists(Yaml::class)) {
-            $errorIo->error('Setting the "format" option to "yaml" requires the Symfony Yaml component. Try running "composer install symfony/yaml" or use "--format=json" instead.');
+        if (\in_array($format, ['txt', 'yml'], true) && !class_exists(Yaml::class)) {
+            $errorIo->error('Setting the "format" option to "txt" or "yaml" requires the Symfony Yaml component. Try running "composer install symfony/yaml" or use "--format=json" instead.');
 
             return 1;
         }
 
         if (null === $path = $input->getArgument('path')) {
-            $io->title(
-                sprintf('Current configuration for %s', $name === $extensionAlias ? sprintf('extension with alias "%s"', $extensionAlias) : sprintf('"%s"', $name))
-            );
+            if ('txt' === $input->getOption('format')) {
+                $io->title(
+                    sprintf('Current configuration for %s', $name === $extensionAlias ? sprintf('extension with alias "%s"', $extensionAlias) : sprintf('"%s"', $name))
+                );
+            }
 
             $io->writeln($this->convertToFormat([$extensionAlias => $config], $format));
 
@@ -138,7 +133,7 @@ EOF
     private function convertToFormat(mixed $config, string $format): string
     {
         return match ($format) {
-            'yaml' => Yaml::dump($config, 10),
+            'txt', 'yaml' => Yaml::dump($config, 10),
             'json' => json_encode($config, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE),
             default => throw new InvalidArgumentException(sprintf('Supported formats are "%s".', implode('", "', $this->getAvailableFormatOptions()))),
         };
@@ -194,12 +189,12 @@ EOF
 
         // Fall back to default config if the extension has one
 
-        if (!$extension instanceof ConfigurationExtensionInterface) {
+        if (!$extension instanceof ConfigurationExtensionInterface && !$extension instanceof ConfigurationInterface) {
             throw new \LogicException(sprintf('The extension with alias "%s" does not have configuration.', $extensionAlias));
         }
 
         $configs = $container->getExtensionConfig($extensionAlias);
-        $configuration = $extension->getConfiguration($configs, $container);
+        $configuration = $extension instanceof ConfigurationInterface ? $extension : $extension->getConfiguration($configs, $container);
         $this->validateConfiguration($extension, $configuration);
 
         return (new Processor())->processConfiguration($configuration, $configs);
@@ -208,7 +203,8 @@ EOF
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
     {
         if ($input->mustSuggestArgumentValuesFor('name')) {
-            $suggestions->suggestValues($this->getAvailableBundles(!preg_match('/^[A-Z]/', $input->getCompletionValue())));
+            $suggestions->suggestValues($this->getAvailableExtensions());
+            $suggestions->suggestValues($this->getAvailableBundles());
 
             return;
         }
@@ -227,11 +223,23 @@ EOF
         }
     }
 
-    private function getAvailableBundles(bool $alias): array
+    private function getAvailableExtensions(): array
+    {
+        $kernel = $this->getApplication()->getKernel();
+
+        $extensions = [];
+        foreach ($this->getContainerBuilder($kernel)->getExtensions() as $alias => $extension) {
+            $extensions[] = $alias;
+        }
+
+        return $extensions;
+    }
+
+    private function getAvailableBundles(): array
     {
         $availableBundles = [];
         foreach ($this->getApplication()->getKernel()->getBundles() as $bundle) {
-            $availableBundles[] = $alias ? $bundle->getContainerExtension()->getAlias() : $bundle->getName();
+            $availableBundles[] = $bundle->getName();
         }
 
         return $availableBundles;
@@ -262,6 +270,6 @@ EOF
 
     private function getAvailableFormatOptions(): array
     {
-        return ['yaml', 'json'];
+        return ['txt', 'yaml', 'json'];
     }
 }

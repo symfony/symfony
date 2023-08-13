@@ -311,7 +311,7 @@ class InlineFragmentRendererTest extends TestCase
 
 class Bar
 {
-    public $bar = 'bar';
+    public string $bar = 'bar';
 
     public function getBar()
     {

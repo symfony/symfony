@@ -1,6 +1,11 @@
 UPGRADE FROM 6.2 to 6.3
 =======================
 
+Cache
+-----
+
+ * `DoctrineDbalAdapter` now takes an optional `$isSameDatabase` parameter
+
 Console
 -------
 
@@ -19,9 +24,49 @@ DoctrineBridge
 --------------
 
  * Deprecate passing Doctrine subscribers to `ContainerAwareEventManager` class, use listeners instead
+
+   *Before*
+   ```php
+   use Doctrine\Bundle\DoctrineBundle\EventSubscriber\EventSubscriberInterface;
+   use Doctrine\ORM\Event\PostFlushEventArgs;
+   use Doctrine\ORM\Events;
+
+   class InvalidateCacheSubscriber implements EventSubscriberInterface
+   {
+        public function getSubscribedEvents(): array
+        {
+            return [Events::postFlush];
+        }
+
+        public function postFlush(PostFlushEventArgs $args): void
+        {
+            // ...
+        }
+   }
+   ```
+
+   *After*
+   ```php
+   use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
+   use Doctrine\ORM\Event\PostFlushEventArgs;
+   use Doctrine\ORM\Events;
+
+   // Instead of PHP attributes, you can also tag this service with "doctrine.event_listener"
+   #[AsDoctrineListener(event: Events::postFlush)]
+   class InvalidateCacheSubscriber
+   {
+        public function postFlush(PostFlushEventArgs $args): void
+        {
+            // ...
+        }
+   }
+   ```
+
  * Deprecate `DoctrineDbalCacheAdapterSchemaSubscriber` in favor of `DoctrineDbalCacheAdapterSchemaListener`
  * Deprecate `MessengerTransportDoctrineSchemaSubscriber` in favor of `MessengerTransportDoctrineSchemaListener`
  * Deprecate `RememberMeTokenProviderDoctrineSchemaSubscriber` in favor of `RememberMeTokenProviderDoctrineSchemaListener`
+ * `DoctrineTransport` now takes an optional `$isSameDatabase` parameter
+ * `DoctrineTokenProvider` now takes an optional `$isSameDatabase` parameter
 
 Form
 ----
@@ -58,10 +103,6 @@ FrameworkBundle
        />
    </framework:config>
    ```
-
-FrameworkBundle
----------------
-
  * Deprecate the `notifier.logger_notification_listener` service, use the `notifier.notification_logger_listener` service instead
  * Deprecate the `Http\Client\HttpClient` service, use `Psr\Http\Client\ClientInterface` instead
 
@@ -94,6 +135,7 @@ Lock
 ----
 
  * Deprecate the `gcProbablity` option to fix a typo in its name, use the `gcProbability` option instead
+ * Add optional parameter `$isSameDatabase` to `DoctrineDbalStore::configureSchema()`
 
 Messenger
 ---------
@@ -118,19 +160,57 @@ Security
 SecurityBundle
 --------------
 
- * Deprecate enabling bundle and not configuring it
+ * Deprecate enabling bundle and not configuring it, either remove the bundle or configure at least one firewall
  * Deprecate the `security.firewalls.logout.csrf_token_generator` config option, use `security.firewalls.logout.csrf_token_manager` instead
-
-Validator
----------
-
- * Implementing the `ConstraintViolationInterface` without implementing the `getConstraint()` method is deprecated
 
 Serializer
 ----------
 
  * Deprecate `CacheableSupportsMethodInterface` in favor of the new `getSupportedTypes(?string $format)` methods
- * The following Normalizer classes will become final in 7.0:
+
+   *Before*
+   ```php
+   use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+   use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
+
+   class TopicNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
+   {
+       public function supportsNormalization($data, string $format = null, array $context = []): bool
+       {
+           return $data instanceof Topic;
+       }
+
+       public function hasCacheableSupportsMethod(): bool
+       {
+           return true;
+       }
+
+       // ...
+   }
+   ```
+
+   *After*
+   ```php
+   use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+
+   class TopicNormalizer implements NormalizerInterface
+   {
+       public function supportsNormalization($data, string $format = null, array $context = []): bool
+       {
+           return $data instanceof Topic;
+       }
+
+       public function getSupportedTypes(?string $format): array
+       {
+           return [
+               Topic::class => true,
+           ];
+       }
+
+       // ...
+   }
+   ```
+ * The following Normalizer classes will become final in 7.0, use decoration instead of inheritance:
    * `ConstraintViolationListNormalizer`
    * `CustomNormalizer`
    * `DataUriNormalizer`
@@ -141,3 +221,49 @@ Serializer
    * `JsonSerializableNormalizer`
    * `ObjectNormalizer`
    * `PropertyNormalizer`
+
+   *Before*
+   ```php
+   use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+
+   class TopicNormalizer extends ObjectNormalizer
+   {
+       // ...
+
+       public function normalize($topic, string $format = null, array $context = []): array
+       {
+           $data = parent::normalize($topic, $format, $context);
+
+           // ...
+       }
+   }
+   ```
+
+   *After*
+   ```php
+   use Symfony\Component\DependencyInjection\Attribute\Autowire;
+   use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+   use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+
+   class TopicNormalizer implements NormalizerInterface
+   {
+       public function __construct(
+           #[Autowire(service: 'serializer.normalizer.object')] private NormalizerInterface&DenormalizerInterface $objectNormalizer,
+       ) {
+       }
+
+       public function normalize($topic, string $format = null, array $context = []): array
+       {
+           $data = $this->objectNormalizer->normalize($topic, $format, $context);
+
+           // ...
+       }
+
+       // ...
+   }
+   ```
+
+Validator
+---------
+
+ * Implementing the `ConstraintViolationInterface` without implementing the `getConstraint()` method is deprecated

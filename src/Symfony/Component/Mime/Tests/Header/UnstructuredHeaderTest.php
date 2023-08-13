@@ -16,8 +16,6 @@ use Symfony\Component\Mime\Header\UnstructuredHeader;
 
 class UnstructuredHeaderTest extends TestCase
 {
-    private $charset = 'utf-8';
-
     public function testGetNameReturnsNameVerbatim()
     {
         $header = new UnstructuredHeader('Subject', '');

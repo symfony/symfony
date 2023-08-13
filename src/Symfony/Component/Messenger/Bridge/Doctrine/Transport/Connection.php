@@ -61,9 +61,10 @@ class Connection implements ResetInterface
      * * redeliver_timeout: Timeout before redeliver messages still in handling state (i.e: delivered_at is not null and message is still in table). Default: 3600
      * * auto_setup: Whether the table should be created automatically during send / get. Default: true
      */
-    protected $configuration = [];
-    protected $driverConnection;
-    protected $queueEmptiedAt;
+    protected array $configuration;
+    protected DBALConnection $driverConnection;
+    protected ?float $queueEmptiedAt = null;
+
     private ?SchemaSynchronizer $schemaSynchronizer;
     private bool $autoSetup;
 
@@ -145,9 +146,9 @@ class Connection implements ResetInterface
             $now,
             $availableAt,
         ], [
-            null,
-            null,
-            null,
+            Types::STRING,
+            Types::STRING,
+            Types::STRING,
             Types::DATETIME_IMMUTABLE,
             Types::DATETIME_IMMUTABLE,
         ]);
@@ -274,7 +275,7 @@ class Connection implements ResetInterface
     {
         $configuration = $this->driverConnection->getConfiguration();
         $assetFilter = $configuration->getSchemaAssetsFilter();
-        $configuration->setSchemaAssetsFilter(null);
+        $configuration->setSchemaAssetsFilter(static fn () => true);
         $this->updateSchema();
         $configuration->setSchemaAssetsFilter($assetFilter);
         $this->autoSetup = false;
@@ -478,13 +479,41 @@ class Connection implements ResetInterface
 
         $schemaManager = $this->createSchemaManager();
         $comparator = $this->createComparator($schemaManager);
-        $schemaDiff = $this->compareSchemas($comparator, $schemaManager->createSchema(), $this->getSchema());
+        $schemaDiff = $this->compareSchemas($comparator, method_exists($schemaManager, 'introspectSchema') ? $schemaManager->introspectSchema() : $schemaManager->createSchema(), $this->getSchema());
+        $platform = $this->driverConnection->getDatabasePlatform();
+        $exec = method_exists($this->driverConnection, 'executeStatement') ? 'executeStatement' : 'exec';
 
-        foreach ($schemaDiff->toSaveSql($this->driverConnection->getDatabasePlatform()) as $sql) {
-            if (method_exists($this->driverConnection, 'executeStatement')) {
-                $this->driverConnection->executeStatement($sql);
-            } else {
-                $this->driverConnection->exec($sql);
+        if (!method_exists(SchemaDiff::class, 'getCreatedSchemas')) {
+            foreach ($schemaDiff->toSaveSql($platform) as $sql) {
+                $this->driverConnection->$exec($sql);
+            }
+
+            return;
+        }
+
+        if ($platform->supportsSchemas()) {
+            foreach ($schemaDiff->getCreatedSchemas() as $schema) {
+                $this->driverConnection->$exec($platform->getCreateSchemaSQL($schema));
+            }
+        }
+
+        if ($platform->supportsSequences()) {
+            foreach ($schemaDiff->getAlteredSequences() as $sequence) {
+                $this->driverConnection->$exec($platform->getAlterSequenceSQL($sequence));
+            }
+
+            foreach ($schemaDiff->getCreatedSequences() as $sequence) {
+                $this->driverConnection->$exec($platform->getCreateSequenceSQL($sequence));
+            }
+        }
+
+        foreach ($platform->getCreateTablesSQL($schemaDiff->getCreatedTables()) as $sql) {
+            $this->driverConnection->$exec($sql);
+        }
+
+        foreach ($schemaDiff->getAlteredTables() as $tableDiff) {
+            foreach ($platform->getAlterTableSQL($tableDiff) as $sql) {
+                $this->driverConnection->$exec($sql);
             }
         }
     }
@@ -505,7 +534,7 @@ class Connection implements ResetInterface
 
     private function compareSchemas(Comparator $comparator, Schema $from, Schema $to): SchemaDiff
     {
-        return method_exists($comparator, 'compareSchemas')
+        return method_exists($comparator, 'compareSchemas') || method_exists($comparator, 'doCompareSchemas')
             ? $comparator->compareSchemas($from, $to)
             : $comparator->compare($from, $to);
     }

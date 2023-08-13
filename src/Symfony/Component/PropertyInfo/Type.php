@@ -63,12 +63,12 @@ class Type
         self::BUILTIN_TYPE_ITERABLE,
     ];
 
-    private $builtinType;
-    private $nullable;
-    private $class;
-    private $collection;
-    private $collectionKeyType;
-    private $collectionValueType;
+    private string $builtinType;
+    private bool $nullable;
+    private ?string $class;
+    private bool $collection;
+    private array $collectionKeyType;
+    private array $collectionValueType;
 
     /**
      * @param Type[]|Type|null $collectionKeyType

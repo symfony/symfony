@@ -21,9 +21,9 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
 {
     use DateTimeEqualsTrait;
 
-    protected $dateTime;
-    protected $dateTimeWithoutSeconds;
-    private $defaultLocale;
+    protected \DateTime $dateTime;
+    protected \DateTime $dateTimeWithoutSeconds;
+    private string $defaultLocale;
 
     protected function setUp(): void
     {
@@ -47,8 +47,6 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
 
     protected function tearDown(): void
     {
-        $this->dateTime = null;
-        $this->dateTimeWithoutSeconds = null;
         \Locale::setDefault($this->defaultLocale);
     }
 
@@ -124,7 +122,7 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
 
         $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC');
 
-        $this->assertEquals('Feb 3, 2010, 4:05 AM', $transformer->transform($this->dateTime));
+        $this->assertMatchesRegularExpression('/^Feb 3, 2010, 4:05\s+AM$/u', $transformer->transform($this->dateTime));
     }
 
     public function testTransformEmpty()

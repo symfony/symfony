@@ -55,7 +55,7 @@ class ©
         return [$pack => $this->value] + ($this->metadata['tags'] ?? []);
     }
 
-    public function __unserialize(array $data)
+    public function __unserialize(array $data): void
     {
         $pack = array_key_first($data);
         $this->value = $data[$pack];

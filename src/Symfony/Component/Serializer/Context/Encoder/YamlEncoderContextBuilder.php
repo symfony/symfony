@@ -59,7 +59,7 @@ final class YamlEncoderContextBuilder implements ContextBuilderInterface
     }
 
     /**
-     * Configures whether to perserve empty objects "{}" or to convert them to null.
+     * Configures whether to preserve empty objects "{}" or to convert them to null.
      */
     public function withPreservedEmptyObjects(?bool $preserveEmptyObjects): static
     {

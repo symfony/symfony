@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Tests\DataCollector;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
 use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
@@ -28,6 +29,7 @@ class DumpDataCollectorTest extends TestCase
     public function testDump()
     {
         $data = new Data([[123]]);
+        $data = $data->withContext(['label' => 'foo']);
 
         $collector = new DumpDataCollector(null, new FileLinkFormatter([]));
 
@@ -49,11 +51,12 @@ class DumpDataCollectorTest extends TestCase
                 'file' => __FILE__,
                 'line' => $line,
                 'fileExcerpt' => false,
+                'label' => 'foo',
             ],
         ];
         $this->assertEquals($xDump, $dump);
 
-        $this->assertStringMatchesFormat('%a;a:%d:{i:0;a:5:{s:4:"data";%c:39:"Symfony\Component\VarDumper\Cloner\Data":%a', serialize($collector));
+        $this->assertStringMatchesFormat('%a;a:%d:{i:0;a:6:{s:4:"data";%c:39:"Symfony\Component\VarDumper\Cloner\Data":%a', serialize($collector));
         $this->assertSame(0, $collector->getDumpsCount());
 
         $serialized = serialize($collector);
@@ -77,7 +80,7 @@ class DumpDataCollectorTest extends TestCase
         ob_start();
         $collector->collect(new Request(), new Response());
         $this->assertEmpty(ob_get_clean());
-        $this->assertStringMatchesFormat('%a;a:%d:{i:0;a:5:{s:4:"data";%c:39:"Symfony\Component\VarDumper\Cloner\Data":%a', serialize($collector));
+        $this->assertStringMatchesFormat('%a;a:%d:{i:0;a:6:{s:4:"data";%c:39:"Symfony\Component\VarDumper\Cloner\Data":%a', serialize($collector));
     }
 
     public function testCollectDefault()
@@ -151,6 +154,24 @@ EOTXT;
         $output = preg_replace("/\033\[[^m]*m/", '', ob_get_clean());
 
         $this->assertSame("DumpDataCollectorTest.php on line {$line}:\n456\n", $output);
+
+        ob_start();
+        $collector->__destruct();
+        $this->assertEmpty(ob_get_clean());
+    }
+
+    public function testNullContentTypeWithNoDebugEnv()
+    {
+        $request = new Request();
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        $response = new Response('<html><head></head><body></body></html>');
+        $response->headers->set('Content-Type', null);
+        $response->headers->set('X-Debug-Token', 'xxxxxxxx');
+
+        $collector = new DumpDataCollector(null, null, null, $requestStack);
+        $collector->collect($request, $response);
 
         ob_start();
         $collector->__destruct();

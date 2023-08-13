@@ -17,8 +17,8 @@ use Symfony\Component\HttpKernel\Profiler\Profile;
 
 class FileProfilerStorageTest extends TestCase
 {
-    private $tmpDir;
-    private $storage;
+    private string $tmpDir;
+    private FileProfilerStorage $storage;
 
     protected function setUp(): void
     {

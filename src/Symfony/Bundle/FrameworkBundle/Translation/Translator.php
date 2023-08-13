@@ -118,10 +118,7 @@ class Translator extends BaseTranslator implements WarmableInterface
         return [];
     }
 
-    /**
-     * @return void
-     */
-    public function addResource(string $format, mixed $resource, string $locale, string $domain = null)
+    public function addResource(string $format, mixed $resource, string $locale, string $domain = null): void
     {
         if ($this->resourceFiles) {
             $this->addResourceFiles();
@@ -129,10 +126,7 @@ class Translator extends BaseTranslator implements WarmableInterface
         $this->resources[] = [$format, $resource, $locale, $domain];
     }
 
-    /**
-     * @return void
-     */
-    protected function initializeCatalogue(string $locale)
+    protected function initializeCatalogue(string $locale): void
     {
         $this->initialize();
         parent::initializeCatalogue($locale);

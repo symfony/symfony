@@ -30,7 +30,7 @@ class DateCaster
     public static function castDateTime(\DateTimeInterface $d, array $a, Stub $stub, bool $isNested, int $filter)
     {
         $prefix = Caster::PREFIX_VIRTUAL;
-        $location = $d->getTimezone()->getLocation();
+        $location = $d->getTimezone() ? $d->getTimezone()->getLocation() : null;
         $fromNow = (new \DateTimeImmutable())->diff($d);
 
         $title = $d->format('l, F j, Y')

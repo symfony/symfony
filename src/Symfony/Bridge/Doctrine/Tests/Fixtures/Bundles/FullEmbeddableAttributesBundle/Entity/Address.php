@@ -13,7 +13,6 @@ namespace Fixtures\Bundles\FullEmbeddableAttributesBundle\Entity;
 
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Embeddable;
-use Doctrine\ORM\Mapping\Id;
 
 #[Embeddable]
 class Address

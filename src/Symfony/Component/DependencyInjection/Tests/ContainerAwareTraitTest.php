@@ -13,17 +13,16 @@ namespace Symfony\Component\DependencyInjection\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\ContainerAwareDummy;
 
+/**
+ * @group legacy
+ */
 class ContainerAwareTraitTest extends TestCase
 {
     use ExpectDeprecationTrait;
 
-    /**
-     * @group legacy
-     */
     public function testSetContainerLegacy()
     {
         $container = $this->createMock(ContainerInterface::class);
@@ -33,7 +32,7 @@ class ContainerAwareTraitTest extends TestCase
 
         self::assertSame($container, $dummy->getContainer());
 
-        $this->expectDeprecation('Since symfony/dependency-injection 6.2: Calling "Symfony\Component\DependencyInjection\Tests\ContainerAwareDummy::setContainer()" without any arguments is deprecated, pass null explicitly instead.');
+        $this->expectDeprecation('Since symfony/dependency-injection 6.2: Calling "Symfony\Component\DependencyInjection\Tests\Fixtures\ContainerAwareDummy::setContainer()" without any arguments is deprecated, pass null explicitly instead.');
 
         $dummy->setContainer();
         self::assertNull($dummy->getContainer());
@@ -50,15 +49,5 @@ class ContainerAwareTraitTest extends TestCase
 
         $dummy->setContainer(null);
         self::assertNull($dummy->getContainer());
-    }
-}
-
-class ContainerAwareDummy implements ContainerAwareInterface
-{
-    use ContainerAwareTrait;
-
-    public function getContainer(): ?ContainerInterface
-    {
-        return $this->container;
     }
 }

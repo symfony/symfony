@@ -437,6 +437,5 @@ return [
         'Pacific/Wake' => 'Wake-eiland-tyd',
         'Pacific/Wallis' => 'Wallis en Futuna-tyd (Mata-Utu)',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

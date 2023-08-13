@@ -11,13 +11,10 @@
 
 namespace Symfony\Component\Scheduler\Messenger;
 
-use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
+use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Scheduler\Generator\MessageContext;
 
-/**
- * @experimental
- */
-final class ScheduledStamp implements NonSendableStampInterface
+final class ScheduledStamp implements StampInterface
 {
     public function __construct(public readonly MessageContext $messageContext)
     {

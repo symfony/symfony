@@ -25,10 +25,7 @@ use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface;
  */
 class ProxyDumperTest extends TestCase
 {
-    /**
-     * @var ProxyDumper
-     */
-    protected $dumper;
+    protected ProxyDumper $dumper;
 
     protected function setUp(): void
     {
@@ -96,8 +93,7 @@ class ProxyDumperTest extends TestCase
     {
         return [
             [
-                (new Definition(__CLASS__))
-                    ->setPublic(false),
+                (new Definition(__CLASS__)),
                 'privates',
             ],
             [
@@ -130,7 +126,6 @@ return new class
     public function getFooService(\$lazyLoad = true)
     {
         \$container = \$this;
-        \$containerRef = \\WeakReference::create(\$this);
 
 {$factory}        return new {$class}();
     }

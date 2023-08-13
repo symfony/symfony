@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation;
 
 use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\RequestContextAwareInterface;
 
 /**
  * A helper service for manipulating URLs within and outside the request scope.
@@ -20,13 +21,11 @@ use Symfony\Component\Routing\RequestContext;
  */
 final class UrlHelper
 {
-    private RequestStack $requestStack;
-    private ?RequestContext $requestContext;
 
-    public function __construct(RequestStack $requestStack, RequestContext $requestContext = null)
-    {
-        $this->requestStack = $requestStack;
-        $this->requestContext = $requestContext;
+    public function __construct(
+        private RequestStack $requestStack,
+        private RequestContextAwareInterface|RequestContext|null $requestContext = null,
+    ) {
     }
 
     public function getAbsoluteUrl(string $path): string
@@ -73,28 +72,36 @@ final class UrlHelper
 
     private function getAbsoluteUrlFromContext(string $path): string
     {
-        if (null === $this->requestContext || '' === $host = $this->requestContext->getHost()) {
+        if (null === $context = $this->requestContext) {
             return $path;
         }
 
-        $scheme = $this->requestContext->getScheme();
+        if ($context instanceof RequestContextAwareInterface) {
+            $context = $context->getContext();
+        }
+
+        if ('' === $host = $context->getHost()) {
+            return $path;
+        }
+
+        $scheme = $context->getScheme();
         $port = '';
 
-        if ('http' === $scheme && 80 !== $this->requestContext->getHttpPort()) {
-            $port = ':'.$this->requestContext->getHttpPort();
-        } elseif ('https' === $scheme && 443 !== $this->requestContext->getHttpsPort()) {
-            $port = ':'.$this->requestContext->getHttpsPort();
+        if ('http' === $scheme && 80 !== $context->getHttpPort()) {
+            $port = ':'.$context->getHttpPort();
+        } elseif ('https' === $scheme && 443 !== $context->getHttpsPort()) {
+            $port = ':'.$context->getHttpsPort();
         }
 
         if ('#' === $path[0]) {
-            $queryString = $this->requestContext->getQueryString();
-            $path = $this->requestContext->getPathInfo().($queryString ? '?'.$queryString : '').$path;
+            $queryString = $context->getQueryString();
+            $path = $context->getPathInfo().($queryString ? '?'.$queryString : '').$path;
         } elseif ('?' === $path[0]) {
-            $path = $this->requestContext->getPathInfo().$path;
+            $path = $context->getPathInfo().$path;
         }
 
         if ('/' !== $path[0]) {
-            $path = rtrim($this->requestContext->getBaseUrl(), '/').'/'.$path;
+            $path = rtrim($context->getBaseUrl(), '/').'/'.$path;
         }
 
         return $scheme.'://'.$host.$port.$path;

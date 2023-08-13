@@ -57,6 +57,148 @@ class RequestPayloadValueResolverTest extends TestCase
         $resolver->onKernelControllerArguments($event);
     }
 
+    public function testDefaultValueArgument()
+    {
+        $payload = new RequestPayload(50);
+
+        $validator = $this->createMock(ValidatorInterface::class);
+        $validator->expects($this->never())
+           ->method('validate');
+
+        $resolver = new RequestPayloadValueResolver(new Serializer(), $validator);
+
+        $argument = new ArgumentMetadata('valid', RequestPayload::class, false, true, $payload, false, [
+            MapRequestPayload::class => new MapRequestPayload(),
+        ]);
+        $request = Request::create('/', 'POST', server: ['CONTENT_TYPE' => 'application/json']);
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, fn () => null, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $resolver->onKernelControllerArguments($event);
+
+        $this->assertEquals([$payload], $event->getArguments());
+    }
+
+    public function testQueryDefaultValueArgument()
+    {
+        $payload = new RequestPayload(50);
+
+        $validator = $this->createMock(ValidatorInterface::class);
+        $validator->expects($this->never())
+            ->method('validate');
+
+        $resolver = new RequestPayloadValueResolver(new Serializer(), $validator);
+
+        $argument = new ArgumentMetadata('valid', RequestPayload::class, false, true, $payload, false, [
+            MapQueryString::class => new MapQueryString(),
+        ]);
+        $request = Request::create('/', 'GET');
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, fn () => null, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $resolver->onKernelControllerArguments($event);
+
+        $this->assertEquals([$payload], $event->getArguments());
+    }
+
+    public function testNullableValueArgument()
+    {
+        $validator = $this->createMock(ValidatorInterface::class);
+        $validator->expects($this->never())
+            ->method('validate');
+
+        $resolver = new RequestPayloadValueResolver(new Serializer(), $validator);
+
+        $argument = new ArgumentMetadata('valid', RequestPayload::class, false, false, null, true, [
+            MapRequestPayload::class => new MapRequestPayload(),
+        ]);
+        $request = Request::create('/', 'POST', server: ['CONTENT_TYPE' => 'application/json']);
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, fn () => null, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $resolver->onKernelControllerArguments($event);
+
+        $this->assertSame([null], $event->getArguments());
+    }
+
+    public function testQueryNullableValueArgument()
+    {
+        $validator = $this->createMock(ValidatorInterface::class);
+        $validator->expects($this->never())
+            ->method('validate');
+
+        $resolver = new RequestPayloadValueResolver(new Serializer(), $validator);
+
+        $argument = new ArgumentMetadata('valid', RequestPayload::class, false, false, null, true, [
+            MapQueryString::class => new MapQueryString(),
+        ]);
+        $request = Request::create('/', 'GET');
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, fn () => null, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $resolver->onKernelControllerArguments($event);
+
+        $this->assertSame([null], $event->getArguments());
+    }
+
+    public function testNullPayloadAndNotDefaultOrNullableArgument()
+    {
+        $validator = $this->createMock(ValidatorInterface::class);
+        $validator->expects($this->never())
+            ->method('validate');
+
+        $resolver = new RequestPayloadValueResolver(new Serializer(), $validator);
+
+        $argument = new ArgumentMetadata('valid', RequestPayload::class, false, false, null, false, [
+            MapRequestPayload::class => new MapRequestPayload(),
+        ]);
+        $request = Request::create('/', 'POST', server: ['CONTENT_TYPE' => 'application/json']);
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, fn () => null, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        try {
+            $resolver->onKernelControllerArguments($event);
+            $this->fail(sprintf('Expected "%s" to be thrown.', HttpException::class));
+        } catch (HttpException $e) {
+            $this->assertSame(422, $e->getStatusCode());
+        }
+    }
+
+    public function testQueryNullPayloadAndNotDefaultOrNullableArgument()
+    {
+        $validator = $this->createMock(ValidatorInterface::class);
+        $validator->expects($this->never())
+            ->method('validate');
+
+        $resolver = new RequestPayloadValueResolver(new Serializer(), $validator);
+
+        $argument = new ArgumentMetadata('valid', RequestPayload::class, false, false, null, false, [
+            MapQueryString::class => new MapQueryString(),
+        ]);
+        $request = Request::create('/', 'GET');
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, fn () => null, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        try {
+            $resolver->onKernelControllerArguments($event);
+            $this->fail(sprintf('Expected "%s" to be thrown.', HttpException::class));
+        } catch (HttpException $e) {
+            $this->assertSame(404, $e->getStatusCode());
+        }
+    }
+
     public function testWithoutValidatorAndCouldNotDenormalize()
     {
         $content = '{"price": 50, "title": ["not a string"]}';
@@ -109,6 +251,7 @@ class RequestPayloadValueResolverTest extends TestCase
             $this->fail(sprintf('Expected "%s" to be thrown.', HttpException::class));
         } catch (HttpException $e) {
             $validationFailedException = $e->getPrevious();
+            $this->assertSame(422, $e->getStatusCode());
             $this->assertInstanceOf(ValidationFailedException::class, $validationFailedException);
             $this->assertSame('This value should be of type unknown.', $validationFailedException->getViolations()[0]->getMessage());
             $this->assertSame('Test', $validationFailedException->getViolations()[1]->getMessage());
@@ -219,6 +362,22 @@ class RequestPayloadValueResolverTest extends TestCase
         $resolver->onKernelControllerArguments($event);
 
         $this->assertEquals([$payload], $event->getArguments());
+    }
+
+    public function testItThrowsOnVariadicArgument()
+    {
+        $serializer = new Serializer();
+        $validator = $this->createMock(ValidatorInterface::class);
+        $resolver = new RequestPayloadValueResolver($serializer, $validator);
+
+        $argument = new ArgumentMetadata('variadic', RequestPayload::class, true, false, null, false, [
+            MapRequestPayload::class => new MapRequestPayload(),
+        ]);
+        $request = Request::create('/', 'POST');
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Mapping variadic argument "$variadic" is not supported.');
+        $resolver->resolve($request, $argument);
     }
 
     /**
@@ -443,6 +602,73 @@ class RequestPayloadValueResolverTest extends TestCase
             new MapQueryString(validationGroups: new Assert\GroupSequence(['strict'])),
         ];
     }
+
+    public function testQueryValidationErrorCustomStatusCode()
+    {
+        $serializer = new Serializer([new ObjectNormalizer()], []);
+
+        $validator = $this->createMock(ValidatorInterface::class);
+
+        $validator->expects($this->once())
+            ->method('validate')
+            ->willReturn(new ConstraintViolationList([new ConstraintViolation('Page is invalid', null, [], '', null, '')]));
+
+        $resolver = new RequestPayloadValueResolver($serializer, $validator);
+
+        $argument = new ArgumentMetadata('page', QueryPayload::class, false, false, null, false, [
+            MapQueryString::class => new MapQueryString(validationFailedStatusCode: 400),
+        ]);
+        $request = Request::create('/?page=123');
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        try {
+            $resolver->onKernelControllerArguments($event);
+            $this->fail(sprintf('Expected "%s" to be thrown.', HttpException::class));
+        } catch (HttpException $e) {
+            $validationFailedException = $e->getPrevious();
+            $this->assertSame(400, $e->getStatusCode());
+            $this->assertInstanceOf(ValidationFailedException::class, $validationFailedException);
+            $this->assertSame('Page is invalid', $validationFailedException->getViolations()[0]->getMessage());
+        }
+    }
+
+    public function testRequestPayloadValidationErrorCustomStatusCode()
+    {
+        $content = '{"price": 50, "title": ["not a string"]}';
+        $payload = new RequestPayload(50);
+        $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+
+        $validator = $this->createMock(ValidatorInterface::class);
+        $validator->expects($this->once())
+            ->method('validate')
+            ->with($payload)
+            ->willReturn(new ConstraintViolationList([new ConstraintViolation('Test', null, [], '', null, '')]));
+
+        $resolver = new RequestPayloadValueResolver($serializer, $validator);
+
+        $argument = new ArgumentMetadata('invalid', RequestPayload::class, false, false, null, false, [
+            MapRequestPayload::class => new MapRequestPayload(validationFailedStatusCode: 400),
+        ]);
+        $request = Request::create('/', 'POST', server: ['CONTENT_TYPE' => 'application/json'], content: $content);
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        try {
+            $resolver->onKernelControllerArguments($event);
+            $this->fail(sprintf('Expected "%s" to be thrown.', HttpException::class));
+        } catch (HttpException $e) {
+            $validationFailedException = $e->getPrevious();
+            $this->assertSame(400, $e->getStatusCode());
+            $this->assertInstanceOf(ValidationFailedException::class, $validationFailedException);
+            $this->assertSame('This value should be of type unknown.', $validationFailedException->getViolations()[0]->getMessage());
+            $this->assertSame('Test', $validationFailedException->getViolations()[1]->getMessage());
+        }
+    }
 }
 
 class RequestPayload
@@ -451,6 +677,13 @@ class RequestPayload
     public string $title;
 
     public function __construct(public readonly float $price)
+    {
+    }
+}
+
+class QueryPayload
+{
+    public function __construct(public readonly float $page)
     {
     }
 }

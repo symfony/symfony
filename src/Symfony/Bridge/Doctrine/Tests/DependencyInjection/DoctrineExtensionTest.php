@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\DependencyInjection;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\DependencyInjection\AbstractDoctrineExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -23,10 +24,7 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
  */
 class DoctrineExtensionTest extends TestCase
 {
-    /**
-     * @var AbstractDoctrineExtension
-     */
-    private $extension;
+    private MockObject&AbstractDoctrineExtension $extension;
 
     protected function setUp(): void
     {
@@ -185,7 +183,7 @@ class DoctrineExtensionTest extends TestCase
 
         // The ordinary fixtures contain annotation
         $mappingType = $method->invoke($this->extension, __DIR__.'/../Fixtures', $container);
-        $this->assertSame($mappingType, 'annotation');
+        $this->assertSame($mappingType, 'attribute');
 
         // In the attribute folder, attributes are used
         $mappingType = $method->invoke($this->extension, __DIR__.'/../Fixtures/Attribute', $container);
@@ -273,9 +271,9 @@ class DoctrineExtensionTest extends TestCase
 
     public static function providerBundles()
     {
-        yield ['AnnotationsBundle', 'annotation', '/Entity'];
-        yield ['AnnotationsOneLineBundle', 'annotation', '/Entity'];
-        yield ['FullEmbeddableAnnotationsBundle', 'annotation', '/Entity'];
+        yield ['AnnotationsBundle', 'attribute', '/Entity'];
+        yield ['AnnotationsOneLineBundle', 'attribute', '/Entity'];
+        yield ['FullEmbeddableAnnotationsBundle', 'attribute', '/Entity'];
         yield ['AttributesBundle', 'attribute', '/Entity'];
         yield ['FullEmbeddableAttributesBundle', 'attribute', '/Entity'];
         yield ['XmlBundle', 'xml', '/Resources/config/doctrine'];
@@ -284,7 +282,7 @@ class DoctrineExtensionTest extends TestCase
 
         yield ['SrcXmlBundle', 'xml', '/Resources/config/doctrine'];
 
-        yield ['NewAnnotationsBundle', 'annotation', \DIRECTORY_SEPARATOR.'src/Entity'];
+        yield ['NewAnnotationsBundle', 'attribute', \DIRECTORY_SEPARATOR.'src/Entity'];
         yield ['NewXmlBundle', 'xml', '/config/doctrine'];
     }
 

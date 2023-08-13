@@ -22,15 +22,8 @@ use Symfony\Component\HttpKernel\Log\Logger;
  */
 class LoggerTest extends TestCase
 {
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var string
-     */
-    private $tmpFile;
+    private Logger $logger;
+    private string $tmpFile;
 
     protected function setUp(): void
     {

@@ -16,8 +16,6 @@ use Symfony\Component\AssetMapper\Compiler\AssetCompilerInterface;
 /**
  * Runs a chain of compiles intended to adjust the source of assets.
  *
- * @experimental
- *
  * @final
  */
 class AssetMapperCompiler
@@ -32,14 +30,14 @@ class AssetMapperCompiler
     {
     }
 
-    public function compile(string $content, MappedAsset $mappedAsset): string
+    public function compile(string $content, MappedAsset $asset): string
     {
         foreach ($this->assetCompilers as $compiler) {
-            if (!$compiler->supports($mappedAsset)) {
+            if (!$compiler->supports($asset)) {
                 continue;
             }
 
-            $content = $compiler->compile($content, $mappedAsset, $this->assetMapper ??= ($this->assetMapperFactory)());
+            $content = $compiler->compile($content, $asset, $this->assetMapper ??= ($this->assetMapperFactory)());
         }
 
         return $content;

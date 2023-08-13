@@ -50,73 +50,73 @@ class OptionsResolver implements Options
     /**
      * The names of all defined options.
      */
-    private $defined = [];
+    private array $defined = [];
 
     /**
      * The default option values.
      */
-    private $defaults = [];
+    private array $defaults = [];
 
     /**
      * A list of closure for nested options.
      *
      * @var \Closure[][]
      */
-    private $nested = [];
+    private array $nested = [];
 
     /**
      * The names of required options.
      */
-    private $required = [];
+    private array $required = [];
 
     /**
      * The resolved option values.
      */
-    private $resolved = [];
+    private array $resolved = [];
 
     /**
      * A list of normalizer closures.
      *
      * @var \Closure[][]
      */
-    private $normalizers = [];
+    private array $normalizers = [];
 
     /**
      * A list of accepted values for each option.
      */
-    private $allowedValues = [];
+    private array $allowedValues = [];
 
     /**
      * A list of accepted types for each option.
      */
-    private $allowedTypes = [];
+    private array $allowedTypes = [];
 
     /**
      * A list of info messages for each option.
      */
-    private $info = [];
+    private array $info = [];
 
     /**
      * A list of closures for evaluating lazy options.
      */
-    private $lazy = [];
+    private array $lazy = [];
 
     /**
      * A list of lazy options whose closure is currently being called.
      *
      * This list helps detecting circular dependencies between lazy options.
      */
-    private $calling = [];
+    private array $calling = [];
 
     /**
      * A list of deprecated options.
      */
-    private $deprecated = [];
+    private array $deprecated = [];
 
     /**
      * The list of options provided by the user.
      */
-    private $given = [];
+    private array $given = [];
 
     /**
      * Whether the instance is locked for reading.
@@ -126,19 +126,19 @@ class OptionsResolver implements Options
      * process. If any option is changed after being read, all evaluated
      * lazy options that depend on this option would become invalid.
      */
-    private $locked = false;
+    private bool $locked = false;
 
-    private $parentsOptions = [];
+    private array $parentsOptions = [];
 
     /**
      * Whether the whole options definition is marked as array prototype.
      */
-    private $prototype;
+    private ?bool $prototype = null;
 
     /**
      * The prototype array's index that is being read.
      */
-    private $prototypeIndex;
+    private int|string|null $prototypeIndex = null;
 
     /**
      * Whether to ignore undefined options.
@@ -1064,7 +1064,7 @@ class OptionsResolver implements Options
             if (!$success) {
                 $message = sprintf(
                     'The option "%s" with value %s is invalid.',
-                    $option,
+                    $this->formatOptions([$option]),
                     $this->formatValue($value)
                 );
 

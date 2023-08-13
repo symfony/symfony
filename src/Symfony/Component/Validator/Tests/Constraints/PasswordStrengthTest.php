@@ -25,9 +25,10 @@ class PasswordStrengthTest extends TestCase
 
     public function testConstructorWithParameters()
     {
-        $constraint = new PasswordStrength(minScore: PasswordStrength::STRENGTH_STRONG);
+        $constraint = new PasswordStrength(minScore: PasswordStrength::STRENGTH_STRONG, message: 'This password should be strong.');
 
         $this->assertSame(PasswordStrength::STRENGTH_STRONG, $constraint->minScore);
+        $this->assertSame('This password should be strong.', $constraint->message);
     }
 
     public function testInvalidScoreOfZero()

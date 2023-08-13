@@ -26,14 +26,14 @@ use Symfony\Component\Process\Process;
  */
 class WindowsPipes extends AbstractPipes
 {
-    private $files = [];
-    private $fileHandles = [];
-    private $lockHandles = [];
-    private $readBytes = [
+    private array $files = [];
+    private array $fileHandles = [];
+    private array $lockHandles = [];
+    private array $readBytes = [
         Process::STDOUT => 0,
         Process::STDERR => 0,
     ];
-    private $haveReadSupport;
+    private bool $haveReadSupport;
 
     public function __construct(mixed $input, bool $haveReadSupport)
     {
@@ -93,7 +93,7 @@ class WindowsPipes extends AbstractPipes
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
 
-    public function __wakeup()
+    public function __wakeup(): void
     {
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
     }

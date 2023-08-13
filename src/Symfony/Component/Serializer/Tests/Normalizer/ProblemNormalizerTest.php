@@ -25,10 +25,7 @@ use Symfony\Component\Validator\Exception\ValidationFailedException;
 
 class ProblemNormalizerTest extends TestCase
 {
-    /**
-     * @var ProblemNormalizer
-     */
-    private $normalizer;
+    private ProblemNormalizer $normalizer;
 
     protected function setUp(): void
     {

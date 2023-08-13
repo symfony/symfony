@@ -180,17 +180,17 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
 
     public function reset(): void
     {
-        $this->data = [];
+        parent::reset();
         $this->controllers = new \SplObjectStorage();
         $this->sessionUsages = [];
     }
 
-    public function getMethod()
+    public function getMethod(): string
     {
         return $this->data['method'];
     }
 
-    public function getPathInfo()
+    public function getPathInfo(): string
     {
         return $this->data['path_info'];
     }
@@ -267,31 +267,34 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         return new ParameterBag($this->data['response_cookies']->getValue());
     }
 
-    public function getSessionMetadata()
+    public function getSessionMetadata(): array
     {
         return $this->data['session_metadata']->getValue();
     }
 
-    public function getSessionAttributes()
+    public function getSessionAttributes(): array
     {
         return $this->data['session_attributes']->getValue();
     }
 
-    public function getStatelessCheck()
+    public function getStatelessCheck(): bool
     {
         return $this->data['stateless_check'];
     }
 
-    public function getSessionUsages()
+    public function getSessionUsages(): Data|array
     {
         return $this->data['session_usages'];
     }
 
-    public function getFlashes()
+    public function getFlashes(): array
     {
         return $this->data['flashes']->getValue();
     }
 
+    /**
+     * @return string|resource
+     */
     public function getContent()
     {
         return $this->data['content'];
@@ -315,27 +318,27 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         return \JSON_ERROR_NONE === json_last_error() ? json_encode($decoded, \JSON_PRETTY_PRINT) : null;
     }
 
-    public function getContentType()
+    public function getContentType(): string
     {
         return $this->data['content_type'];
     }
 
-    public function getStatusText()
+    public function getStatusText(): string
     {
         return $this->data['status_text'];
     }
 
-    public function getStatusCode()
+    public function getStatusCode(): int
     {
         return $this->data['status_code'];
     }
 
-    public function getFormat()
+    public function getFormat(): string
     {
         return $this->data['format'];
     }
 
-    public function getLocale()
+    public function getLocale(): string
     {
         return $this->data['locale'];
     }
@@ -358,7 +361,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         return $this->data['route'];
     }
 
-    public function getIdentifier()
+    public function getIdentifier(): string
     {
         return $this->data['identifier'];
     }
@@ -395,7 +398,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         return $this->data['redirect'] ?? false;
     }
 
-    public function getForwardToken()
+    public function getForwardToken(): ?string
     {
         return $this->data['forward_token'] ?? null;
     }

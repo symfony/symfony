@@ -245,6 +245,5 @@ return [
         'Pacific/Galapagos' => 'Waktu Galapagos',
         'Pacific/Honolulu' => 'Amérika Sarikat (Honolulu)',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

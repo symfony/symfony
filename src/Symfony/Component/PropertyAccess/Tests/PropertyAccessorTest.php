@@ -573,10 +573,26 @@ class PropertyAccessorTest extends TestCase
         yield [(object) ['foo' => null], 'foo?.bar.baz', null];
         yield [(object) ['foo' => (object) ['bar' => null]], 'foo?.bar?.baz', null];
         yield [(object) ['foo' => (object) ['bar' => null]], 'foo.bar?.baz', null];
+
+        yield from self::getNullSafeIndexPaths();
+    }
+
+    public static function getNullSafeIndexPaths(): iterable
+    {
         yield [(object) ['foo' => ['bar' => null]], 'foo[bar?].baz', null];
         yield [[], '[foo?]', null];
         yield [['foo' => ['firstName' => 'Bernhard']], '[foo][bar?]', null];
         yield [['foo' => ['firstName' => 'Bernhard']], '[foo][bar?][baz?]', null];
+    }
+
+    /**
+     * @dataProvider getNullSafeIndexPaths
+     */
+    public function testNullSafeIndexWithThrowOnInvalidIndex($objectOrArray, $path, $value)
+    {
+        $this->propertyAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS, PropertyAccessor::THROW_ON_INVALID_INDEX | PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH);
+
+        $this->assertSame($value, $this->propertyAccessor->getValue($objectOrArray, $path));
     }
 
     public function testTicket5755()
@@ -923,5 +939,23 @@ class PropertyAccessorTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Expected argument of type "float", "string" given at property path "publicProperty"');
         $this->propertyAccessor->setValue($object, 'publicProperty', 'string');
+    }
+
+    public function testCastDateTime()
+    {
+        $object = new TypeHinted();
+
+        $this->propertyAccessor->setValue($object, 'date', new \DateTime());
+
+        $this->assertInstanceOf(\DateTimeImmutable::class, $object->getDate());
+    }
+
+    public function testCastDateTimeImmutable()
+    {
+        $object = new TypeHinted();
+
+        $this->propertyAccessor->setValue($object, 'date_mutable', new \DateTimeImmutable());
+
+        $this->assertInstanceOf(\DateTime::class, $object->getDate());
     }
 }

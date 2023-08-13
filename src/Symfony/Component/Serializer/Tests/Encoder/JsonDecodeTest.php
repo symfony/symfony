@@ -18,8 +18,7 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 class JsonDecodeTest extends TestCase
 {
-    /** @var \Symfony\Component\Serializer\Encoder\JsonDecode */
-    private $decode;
+    private JsonDecode $decode;
 
     protected function setUp(): void
     {
@@ -59,17 +58,20 @@ class JsonDecodeTest extends TestCase
     /**
      * @dataProvider decodeProviderException
      */
-    public function testDecodeWithException($value)
+    public function testDecodeWithException(string $value, string $expectedExceptionMessage, array $context)
     {
         $this->expectException(UnexpectedValueException::class);
-        $this->decode->decode($value, JsonEncoder::FORMAT);
+        $this->expectExceptionMessage($expectedExceptionMessage);
+        $this->decode->decode($value, JsonEncoder::FORMAT, $context);
     }
 
     public static function decodeProviderException()
     {
         return [
-            ["{'foo': 'bar'}"],
-            ['kaboom!'],
+            ["{'foo': 'bar'}", 'Syntax error', []],
+            ["{'foo': 'bar'}", 'single quotes instead of double quotes', ['json_decode_detailed_errors' => true]],
+            ['kaboom!', 'Syntax error', ['json_decode_detailed_errors' => false]],
+            ['kaboom!', "Expected one of: 'STRING', 'NUMBER', 'NULL',", ['json_decode_detailed_errors' => true]],
         ];
     }
 }

@@ -324,6 +324,9 @@ class XmlDumper extends Dumper
                         }
                     }
                 }
+                if (!$tag->excludeSelf()) {
+                    $element->setAttribute('exclude-self', 'false');
+                }
             } elseif ($value instanceof IteratorArgument) {
                 $element->setAttribute('type', 'iterator');
                 $this->convertParameters($value->getValues(), $type, $element, 'key');

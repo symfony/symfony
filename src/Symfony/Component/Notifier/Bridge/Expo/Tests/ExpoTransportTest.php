@@ -13,10 +13,10 @@ namespace Symfony\Component\Notifier\Bridge\Expo\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\Expo\ExpoTransport;
+use Symfony\Component\Notifier\Bridge\Expo\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Notifier\Message\PushMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
-use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 

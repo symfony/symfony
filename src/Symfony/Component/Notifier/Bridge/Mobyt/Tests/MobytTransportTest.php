@@ -14,10 +14,10 @@ namespace Symfony\Component\Notifier\Bridge\Mobyt\Tests;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\Mobyt\MobytOptions;
 use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransport;
+use Symfony\Component\Notifier\Bridge\Mobyt\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
-use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 

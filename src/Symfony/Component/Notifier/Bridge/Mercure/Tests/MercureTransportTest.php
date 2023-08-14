@@ -20,13 +20,13 @@ use Symfony\Component\Mercure\Update;
 use Symfony\Component\Notifier\Bridge\Mercure\MercureOptions;
 use Symfony\Component\Notifier\Bridge\Mercure\MercureTransport;
 use Symfony\Component\Notifier\Bridge\Mercure\Tests\Fixtures\DummyHub;
+use Symfony\Component\Notifier\Bridge\Mercure\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\RuntimeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
-use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 

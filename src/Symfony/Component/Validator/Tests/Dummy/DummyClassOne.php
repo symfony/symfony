@@ -30,8 +30,7 @@ class DummyClassOne
 
     /**
      * @var DummyClassTwo|null
-     *
-     * @Assert\Valid()
      */
+    #[Assert\Valid]
     public $dummyClassTwo;
 }

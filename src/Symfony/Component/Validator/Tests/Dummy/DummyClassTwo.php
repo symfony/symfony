@@ -30,8 +30,7 @@ class DummyClassTwo
 
     /**
      * @var DummyClassOne|null
-     *
-     * @Assert\DisableAutoMapping()
      */
+    #[Assert\DisableAutoMapping]
     public $dummyClassOne;
 }

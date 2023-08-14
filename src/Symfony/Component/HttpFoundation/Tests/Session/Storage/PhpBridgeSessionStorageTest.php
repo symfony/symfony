@@ -28,7 +28,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\PhpBridgeSessionStorage;
  */
 class PhpBridgeSessionStorageTest extends TestCase
 {
-    private $savePath;
+    private string $savePath;
 
     protected function setUp(): void
     {
@@ -46,8 +46,6 @@ class PhpBridgeSessionStorageTest extends TestCase
         if (is_dir($this->savePath)) {
             @rmdir($this->savePath);
         }
-
-        $this->savePath = null;
     }
 
     protected function getStorage(): PhpBridgeSessionStorage

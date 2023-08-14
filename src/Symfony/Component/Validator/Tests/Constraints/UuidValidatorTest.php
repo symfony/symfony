@@ -296,4 +296,13 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
         yield Uuid::V7_MONOTONIC => ['0184c292-b133-7e10-a3b4-d49c1ab49b2a', true];
         yield Uuid::V8_CUSTOM => ['00112233-4455-8677-8899-aabbccddeeff', false];
     }
+
+    public function testAcceptsSingleIntegerAsVersion()
+    {
+        $constraint = new Uuid(versions: 7);
+
+        $this->validator->validate('0184c292-b133-7e10-a3b4-d49c1ab49b2a', $constraint);
+
+        $this->assertNoViolation();
+    }
 }

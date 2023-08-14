@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\BackslashClass;
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ContainerExcluded;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -97,6 +98,19 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
 
         $tester->run(['command' => 'debug:container', 'name' => 'deprecated_alias', '--format' => 'txt']);
         $this->assertStringContainsString('[WARNING] The "deprecated_alias" alias is deprecated since foo/bar 1.9 and will be removed in 2.0', $tester->getDisplay());
+    }
+
+    public function testExcludedService()
+    {
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
+
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+
+        $tester->run(['command' => 'debug:container']);
+        $this->assertStringNotContainsString(ContainerExcluded::class, $tester->getDisplay());
     }
 
     /**

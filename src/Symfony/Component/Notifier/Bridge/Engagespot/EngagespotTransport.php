@@ -29,8 +29,8 @@ final class EngagespotTransport extends AbstractTransport
 {
     protected const HOST = 'api.engagespot.co/2/campaigns';
 
-    private $apiKey;
-    private $campaignName;
+    private string $apiKey;
+    private string $campaignName;
 
     public function __construct(#[\SensitiveParameter] string $apiKey, string $campaignName, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {

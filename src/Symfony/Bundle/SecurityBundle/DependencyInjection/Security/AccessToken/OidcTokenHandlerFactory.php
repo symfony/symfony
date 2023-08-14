@@ -13,41 +13,42 @@ namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken
 
 use Jose\Component\Core\Algorithm;
 use Jose\Component\Core\JWK;
-use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SignatureAlgorithmFactory;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Configures a token handler for decoding and validating an OIDC token.
- *
- * @experimental
  */
 class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
 {
     public function create(ContainerBuilder $container, string $id, array|string $config): void
     {
-        $tokenHandlerDefinition = $container->setDefinition($id, new ChildDefinition('security.access_token_handler.oidc'));
-        $tokenHandlerDefinition->replaceArgument(3, $config['claim']);
-        $tokenHandlerDefinition->replaceArgument(4, $config['audience']);
+        $tokenHandlerDefinition = $container->setDefinition($id, (new ChildDefinition('security.access_token_handler.oidc'))
+            ->replaceArgument(2, $config['audience'])
+            ->replaceArgument(3, $config['issuers'])
+            ->replaceArgument(4, $config['claim'])
+        );
 
-        // Create the signature algorithm and the JWK
         if (!ContainerBuilder::willBeAvailable('web-token/jwt-core', Algorithm::class, ['symfony/security-bundle'])) {
-            $container->register('security.access_token_handler.oidc.signature', 'stdClass')
-                ->addError('You cannot use the "oidc" token handler since "web-token/jwt-core" is not installed. Try running "web-token/jwt-core".');
-            $container->register('security.access_token_handler.oidc.jwk', 'stdClass')
-                ->addError('You cannot use the "oidc" token handler since "web-token/jwt-core" is not installed. Try running "web-token/jwt-core".');
-        } else {
-            $container->register('security.access_token_handler.oidc.signature', Algorithm::class)
-                ->setFactory([SignatureAlgorithmFactory::class, 'create'])
-                ->setArguments([$config['signature']['algorithm']]);
-            $container->register('security.access_token_handler.oidc.jwk', JWK::class)
-                ->setFactory([JWK::class, 'createFromJson'])
-                ->setArguments([$config['signature']['key']]);
+            throw new LogicException('You cannot use the "oidc" token handler since "web-token/jwt-core" is not installed. Try running "composer require web-token/jwt-core".');
         }
-        $tokenHandlerDefinition->replaceArgument(0, new Reference('security.access_token_handler.oidc.signature'));
-        $tokenHandlerDefinition->replaceArgument(1, new Reference('security.access_token_handler.oidc.jwk'));
+
+        // @see Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SignatureAlgorithmFactory
+        // for supported algorithms
+        if (\in_array($config['algorithm'], ['ES256', 'ES384', 'ES512'], true)) {
+            $tokenHandlerDefinition->replaceArgument(0, new Reference('security.access_token_handler.oidc.signature.'.$config['algorithm']));
+        } else {
+            $tokenHandlerDefinition->replaceArgument(0, (new ChildDefinition('security.access_token_handler.oidc.signature'))
+                ->replaceArgument(0, $config['algorithm'])
+            );
+        }
+
+        $tokenHandlerDefinition->replaceArgument(1, (new ChildDefinition('security.access_token_handler.oidc.jwk'))
+            ->replaceArgument(0, $config['key'])
+        );
     }
 
     public function getKey(): string
@@ -67,20 +68,20 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
                     ->end()
                     ->scalarNode('audience')
                         ->info('Audience set in the token, for validation purpose.')
-                        ->defaultNull()
-                    ->end()
-                    ->arrayNode('signature')
                         ->isRequired()
-                        ->children()
-                            ->scalarNode('algorithm')
-                                ->info('Algorithm used to sign the token.')
-                                ->isRequired()
-                            ->end()
-                            ->scalarNode('key')
-                                ->info('JSON-encoded JWK used to sign the token (must contain a "kty" key).')
-                                ->isRequired()
-                            ->end()
-                        ->end()
+                    ->end()
+                    ->arrayNode('issuers')
+                        ->info('Issuers allowed to generate the token, for validation purpose.')
+                        ->isRequired()
+                        ->prototype('scalar')->end()
+                    ->end()
+                    ->scalarNode('algorithm')
+                        ->info('Algorithm used to sign the token.')
+                        ->isRequired()
+                    ->end()
+                    ->scalarNode('key')
+                        ->info('JSON-encoded JWK used to sign the token (must contain a "kty" key).')
+                        ->isRequired()
                     ->end()
                 ->end()
             ->end()

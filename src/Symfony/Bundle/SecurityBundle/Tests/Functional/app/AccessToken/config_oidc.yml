@@ -23,10 +23,10 @@ security:
                     oidc:
                         claim: 'username'
                         audience: 'Symfony OIDC'
-                        signature:
-                            algorithm: 'ES256'
-                            # tip: use https://mkjwk.org/ to generate a JWK
-                            key: '{"kty":"EC","d":"iA_TV2zvftni_9aFAQwFO_9aypfJFCSpcCyevDvz220","crv":"P-256","x":"0QEAsI1wGI-dmYatdUZoWSRWggLEpyzopuhwk-YUnA4","y":"KYl-qyZ26HobuYwlQh-r0iHX61thfP82qqEku7i0woo"}'
+                        issuers: [ 'https://www.example.com' ]
+                        algorithm: 'ES256'
+                        # tip: use https://mkjwk.org/ to generate a JWK
+                        key: '{"kty":"EC","d":"iA_TV2zvftni_9aFAQwFO_9aypfJFCSpcCyevDvz220","crv":"P-256","x":"0QEAsI1wGI-dmYatdUZoWSRWggLEpyzopuhwk-YUnA4","y":"KYl-qyZ26HobuYwlQh-r0iHX61thfP82qqEku7i0woo"}'
                 token_extractors: 'header'
                 realm: 'My API'
 

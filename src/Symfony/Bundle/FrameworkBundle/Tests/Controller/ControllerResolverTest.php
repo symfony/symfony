@@ -13,22 +13,29 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
 use Psr\Container\ContainerInterface as Psr11ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver;
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ContainerAwareController;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Tests\Controller\ContainerControllerResolverTest;
 
 class ControllerResolverTest extends ContainerControllerResolverTest
 {
+    use ExpectDeprecationTrait;
+
+    /**
+     * @group legacy
+     */
     public function testGetControllerOnContainerAware()
     {
         $resolver = $this->createControllerResolver();
         $request = Request::create('/');
-        $request->attributes->set('_controller', 'Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController::testAction');
+        $request->attributes->set('_controller', sprintf('%s::testAction', ContainerAwareController::class));
 
+        $this->expectDeprecation(sprintf('Since symfony/dependency-injection 6.4: Relying on "Symfony\Component\DependencyInjection\ContainerAwareInterface" to get the container in "%s" is deprecated, register the controller as a service and use dependency injection instead.', ContainerAwareController::class));
         $controller = $resolver->getController($request);
 
         $this->assertInstanceOf(ContainerAwareController::class, $controller[0]);
@@ -36,18 +43,25 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $this->assertSame('testAction', $controller[1]);
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetControllerOnContainerAwareInvokable()
     {
         $resolver = $this->createControllerResolver();
         $request = Request::create('/');
-        $request->attributes->set('_controller', 'Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController');
+        $request->attributes->set('_controller', ContainerAwareController::class);
 
+        $this->expectDeprecation(sprintf('Since symfony/dependency-injection 6.4: Relying on "Symfony\Component\DependencyInjection\ContainerAwareInterface" to get the container in "%s" is deprecated, register the controller as a service and use dependency injection instead.', ContainerAwareController::class));
         $controller = $resolver->getController($request);
 
         $this->assertInstanceOf(ContainerAwareController::class, $controller);
         $this->assertInstanceOf(ContainerInterface::class, $controller->getContainer());
     }
 
+    /**
+     * @group legacy
+     */
     public function testContainerAwareControllerGetsContainerWhenNotSet()
     {
         class_exists(AbstractControllerTest::class);
@@ -62,6 +76,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $request = Request::create('/');
         $request->attributes->set('_controller', TestAbstractController::class.'::testAction');
 
+        $this->expectDeprecation(sprintf('Since symfony/dependency-injection 6.4: Relying on "Symfony\Component\DependencyInjection\ContainerAwareInterface" to get the container in "%s" is deprecated, register the controller as a service and use dependency injection instead.', ContainerAwareController::class));
         $this->assertSame([$controller, 'testAction'], $resolver->getController($request));
         $this->assertSame($container, $controller->getContainer());
     }
@@ -165,29 +180,6 @@ class ControllerResolverTest extends ContainerControllerResolverTest
     protected function createMockContainer()
     {
         return $this->createMock(ContainerInterface::class);
-    }
-}
-
-class ContainerAwareController implements ContainerAwareInterface
-{
-    private ?ContainerInterface $container = null;
-
-    public function setContainer(?ContainerInterface $container): void
-    {
-        $this->container = $container;
-    }
-
-    public function getContainer(): ?ContainerInterface
-    {
-        return $this->container;
-    }
-
-    public function testAction()
-    {
-    }
-
-    public function __invoke()
-    {
     }
 }
 

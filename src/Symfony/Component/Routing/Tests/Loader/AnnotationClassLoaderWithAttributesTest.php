@@ -11,18 +11,13 @@
 
 namespace Symfony\Component\Routing\Tests\Loader;
 
-use Symfony\Component\Routing\Loader\AnnotationClassLoader;
-use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\Tests\Fixtures\TraceableAnnotationClassLoader;
 
 class AnnotationClassLoaderWithAttributesTest extends AnnotationClassLoaderTestCase
 {
     protected function setUp(string $env = null): void
     {
-        $this->loader = new class(null, $env) extends AnnotationClassLoader {
-            protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void
-            {
-            }
-        };
+        $this->loader = new TraceableAnnotationClassLoader($env);
     }
 
     public function testDefaultRouteName()

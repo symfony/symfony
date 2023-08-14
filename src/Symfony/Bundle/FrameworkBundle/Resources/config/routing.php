@@ -94,7 +94,6 @@ return static function (ContainerConfigurator $container) {
 
         ->set('routing.loader.annotation', AnnotatedRouteControllerLoader::class)
             ->args([
-                service('annotation_reader')->nullOnInvalid(),
                 '%kernel.environment%',
             ])
             ->tag('routing.loader', ['priority' => -10])

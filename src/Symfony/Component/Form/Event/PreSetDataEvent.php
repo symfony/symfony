@@ -16,9 +16,7 @@ use Symfony\Component\Form\FormEvent;
 /**
  * This event is dispatched at the beginning of the Form::setData() method.
  *
- * It can be used to:
- *  - Modify the data given during pre-population;
- *  - Modify a form depending on the pre-populated data (adding or removing fields dynamically).
+ * It can be used to modify the data given during pre-population.
  */
 final class PreSetDataEvent extends FormEvent
 {

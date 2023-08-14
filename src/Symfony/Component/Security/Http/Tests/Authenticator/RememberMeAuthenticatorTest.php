@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\Authenticator;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,9 +26,9 @@ use Symfony\Component\Security\Http\RememberMe\ResponseListener;
 
 class RememberMeAuthenticatorTest extends TestCase
 {
-    private $rememberMeHandler;
-    private $tokenStorage;
-    private $authenticator;
+    private MockObject&RememberMeHandlerInterface $rememberMeHandler;
+    private TokenStorage $tokenStorage;
+    private RememberMeAuthenticator $authenticator;
 
     protected function setUp(): void
     {
@@ -60,6 +61,9 @@ class RememberMeAuthenticatorTest extends TestCase
 
         $request = Request::create('/', 'GET', [], ['_remember_me_cookie' => 'rememberme']);
         $request->attributes->set(ResponseListener::COOKIE_ATTR_NAME, new Cookie('_remember_me_cookie', null));
+        yield [$request, false];
+
+        $request = Request::create('/', 'GET', [], ['_remember_me_cookie' => '0']);
         yield [$request, false];
     }
 

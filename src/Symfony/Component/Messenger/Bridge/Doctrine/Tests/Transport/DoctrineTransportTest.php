@@ -64,9 +64,9 @@ class DoctrineTransportTest extends TestCase
 
         $connection->expects($this->once())
             ->method('configureSchema')
-            ->with($schema, $dbalConnection);
+            ->with($schema, $dbalConnection, static fn () => true);
 
-        $transport->configureSchema($schema, $dbalConnection);
+        $transport->configureSchema($schema, $dbalConnection, static fn () => true);
     }
 
     private function getTransport(SerializerInterface $serializer = null, Connection $connection = null): DoctrineTransport

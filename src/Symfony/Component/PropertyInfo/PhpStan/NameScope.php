@@ -22,10 +22,10 @@ namespace Symfony\Component\PropertyInfo\PhpStan;
  */
 final class NameScope
 {
-    private $calledClassName;
-    private $namespace;
+    private string $calledClassName;
+    private string $namespace;
     /** @var array<string, string> alias(string) => fullName(string) */
-    private $uses;
+    private array $uses;
 
     public function __construct(string $calledClassName, string $namespace, array $uses = [])
     {

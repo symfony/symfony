@@ -140,7 +140,7 @@ class NonStringInput extends Input
     {
     }
 
-    public function parse()
+    public function parse(): void
     {
     }
 

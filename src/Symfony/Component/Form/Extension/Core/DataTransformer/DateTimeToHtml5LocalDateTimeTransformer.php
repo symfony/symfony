@@ -53,10 +53,7 @@ class DateTimeToHtml5LocalDateTimeTransformer extends BaseDateTimeTransformer
         }
 
         if ($this->inputTimezone !== $this->outputTimezone) {
-            if (!$dateTime instanceof \DateTimeImmutable) {
-                $dateTime = clone $dateTime;
-            }
-
+            $dateTime = \DateTimeImmutable::createFromInterface($dateTime);
             $dateTime = $dateTime->setTimezone(new \DateTimeZone($this->outputTimezone));
         }
 

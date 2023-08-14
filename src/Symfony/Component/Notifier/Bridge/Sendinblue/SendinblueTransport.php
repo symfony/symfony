@@ -23,6 +23,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Pierre Tondereau <pierre.tondereau@gmail.com>
+ *
+ * @deprecated since Symfony 6.3, use BrevoTransport instead
  */
 final class SendinblueTransport extends AbstractTransport
 {

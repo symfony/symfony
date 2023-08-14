@@ -24,7 +24,7 @@ use Twig\TwigFilter;
 
 class LintCommandTest extends TestCase
 {
-    private $files;
+    private array $files;
 
     public function testLintCorrectFile()
     {

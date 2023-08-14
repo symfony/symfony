@@ -16,8 +16,11 @@ use Symfony\Component\Form\Tests\Extension\Core\Type\BaseTypeTestCase;
 use Symfony\Component\Form\Tests\Fixtures\Answer;
 use Symfony\Component\Form\Tests\Fixtures\Number;
 use Symfony\Component\Form\Tests\Fixtures\Suit;
+use Symfony\Component\Form\Tests\Fixtures\TranslatableTextAlign;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
+use Symfony\Component\Translation\IdentityTranslator;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
 class EnumTypeTest extends BaseTypeTestCase
 {
@@ -255,6 +258,20 @@ class EnumTypeTest extends BaseTypeTestCase
         $view = $form->createView();
 
         $this->assertSame('Yes', $view->children[0]->vars['label']);
+    }
+
+    public function testChoiceLabelTranslatable()
+    {
+        $form = $this->factory->create($this->getTestedType(), null, [
+            'multiple' => false,
+            'expanded' => true,
+            'class' => TranslatableTextAlign::class,
+        ]);
+
+        $view = $form->createView();
+
+        $this->assertInstanceOf(TranslatableInterface::class, $view->children[0]->vars['label']);
+        $this->assertEquals('Left', $view->children[0]->vars['label']->trans(new IdentityTranslator()));
     }
 
     protected function getTestOptions(): array

@@ -4,6 +4,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\SecondMessage;
 
 $container->loadFromExtension('framework', [
+    'annotations' => false,
     'http_method_override' => false,
     'serializer' => true,
     'messenger' => [

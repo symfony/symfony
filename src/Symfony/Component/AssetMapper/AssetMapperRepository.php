@@ -17,8 +17,6 @@ use Symfony\Component\Finder\Iterator\RecursiveDirectoryIterator;
 /**
  * Finds assets in the asset mapper.
  *
- * @experimental
- *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  *
  * @final

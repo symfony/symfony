@@ -192,6 +192,8 @@ abstract class Constraint
      * this method will be called at most once per constraint instance and
      * option name.
      *
+     * @return void
+     *
      * @throws InvalidOptionsException If an invalid option name is given
      */
     public function __set(string $option, mixed $value)

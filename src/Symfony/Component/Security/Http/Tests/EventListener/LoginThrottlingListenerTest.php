@@ -28,8 +28,8 @@ use Symfony\Component\Security\Http\RateLimiter\DefaultLoginRateLimiter;
 
 class LoginThrottlingListenerTest extends TestCase
 {
-    private $requestStack;
-    private $listener;
+    private RequestStack $requestStack;
+    private LoginThrottlingListener $listener;
 
     protected function setUp(): void
     {

@@ -41,8 +41,8 @@ class SerializerCacheWarmer extends AbstractPhpFileCacheWarmer
 
     protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter): bool
     {
-        if (!class_exists(CacheClassMetadataFactory::class) || !method_exists(XmlFileLoader::class, 'getMappedClasses') || !method_exists(YamlFileLoader::class, 'getMappedClasses')) {
-            return false;
+        if (!$this->loaders) {
+            return true;
         }
 
         $metadataFactory = new CacheClassMetadataFactory(new ClassMetadataFactory(new LoaderChain($this->loaders)), $arrayAdapter);

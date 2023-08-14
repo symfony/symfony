@@ -24,7 +24,7 @@ use Symfony\Component\Finder\SplFileInfo;
 class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
 {
     private bool $ignoreUnreadableDirs;
-    private ?bool $rewindable = null;
+    private bool $ignoreFirstRewind = true;
 
     // these 3 properties take part of the performance optimization to avoid redoing the same work in all iterations
     private string $rootPath;
@@ -102,7 +102,6 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
                 $children->ignoreUnreadableDirs = $this->ignoreUnreadableDirs;
 
                 // performance optimization to avoid redoing the same work in all children
-                $children->rewindable = &$this->rewindable;
                 $children->rootPath = $this->rootPath;
             }
 
@@ -112,36 +111,23 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
         }
     }
 
-    /**
-     * Do nothing for non rewindable stream.
-     */
+    public function next(): void
+    {
+        $this->ignoreFirstRewind = false;
+
+        parent::next();
+    }
+
     public function rewind(): void
     {
-        if (false === $this->isRewindable()) {
+        // some streams like FTP are not rewindable, ignore the first rewind after creation,
+        // as newly created DirectoryIterator does not need to be rewound
+        if ($this->ignoreFirstRewind) {
+            $this->ignoreFirstRewind = false;
+
             return;
         }
 
         parent::rewind();
-    }
-
-    /**
-     * Checks if the stream is rewindable.
-     */
-    public function isRewindable(): bool
-    {
-        if (null !== $this->rewindable) {
-            return $this->rewindable;
-        }
-
-        if (false !== $stream = @opendir($this->getPath())) {
-            $infos = stream_get_meta_data($stream);
-            closedir($stream);
-
-            if ($infos['seekable']) {
-                return $this->rewindable = true;
-            }
-        }
-
-        return $this->rewindable = false;
     }
 }

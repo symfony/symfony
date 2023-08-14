@@ -4,8 +4,8 @@ namespace Symfony\Component\Messenger\Bridge\Redis\Tests\Fixtures;
 
 class ExternalMessage
 {
-    private $foo;
-    private $bar = [];
+    private string $foo;
+    private array $bar = [];
 
     public function __construct(string $foo)
     {

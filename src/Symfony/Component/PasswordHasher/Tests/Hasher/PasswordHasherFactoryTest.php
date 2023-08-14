@@ -218,7 +218,7 @@ class SomeChildUser extends SomeUser
 
 class HasherAwareUser extends SomeUser implements PasswordHasherAwareInterface
 {
-    public $hasherName = 'hasher_name';
+    public ?string $hasherName = 'hasher_name';
 
     public function getPasswordHasherName(): ?string
     {

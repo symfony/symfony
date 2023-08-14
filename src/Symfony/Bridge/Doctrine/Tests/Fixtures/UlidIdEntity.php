@@ -15,10 +15,10 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
 
-/** @Entity */
+#[Entity]
 class UlidIdEntity
 {
-    /** @Id @Column(type="ulid") */
+    #[Id, Column(type: 'ulid')]
     protected $id;
 
     public function __construct($id)

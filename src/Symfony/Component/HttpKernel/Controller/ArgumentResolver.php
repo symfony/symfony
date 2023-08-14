@@ -71,7 +71,10 @@ final class ArgumentResolver implements ArgumentResolverInterface
                         throw new ResolverNotFoundException($resolverName, $this->namedResolvers instanceof ServiceProviderInterface ? array_keys($this->namedResolvers->getProvidedServices()) : []);
                     }
 
-                    $argumentValueResolvers = [$this->namedResolvers->get($resolverName)];
+                    $argumentValueResolvers = [
+                        $this->namedResolvers->get($resolverName),
+                        new DefaultValueResolver(),
+                    ];
                 }
             }
 
@@ -103,7 +106,7 @@ final class ArgumentResolver implements ArgumentResolverInterface
                 }
             }
 
-            throw new \RuntimeException(sprintf('Controller "%s" requires that you provide a value for the "$%s" argument. Either the argument is nullable and no null value has been provided, no default value has been provided or because there is a non optional argument after this one.', $this->getPrettyName($controller), $metadata->getName()));
+            throw new \RuntimeException(sprintf('Controller "%s" requires that you provide a value for the "$%s" argument. Either the argument is nullable and no null value has been provided, no default value has been provided or there is a non-optional argument after this one.', $this->getPrettyName($controller), $metadata->getName()));
         }
 
         return $arguments;
@@ -126,7 +129,11 @@ final class ArgumentResolver implements ArgumentResolverInterface
     private function getPrettyName($controller): string
     {
         if (\is_array($controller)) {
-            return $controller[0]::class.'::'.$controller[1];
+            if (\is_object($controller[0])) {
+                $controller[0] = get_debug_type($controller[0]);
+            }
+
+            return $controller[0].'::'.$controller[1];
         }
 
         if (\is_object($controller)) {

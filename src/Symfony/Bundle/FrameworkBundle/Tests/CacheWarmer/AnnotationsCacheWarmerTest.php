@@ -15,6 +15,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\PsrCachedReader;
 use Doctrine\Common\Annotations\Reader;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\AnnotationsCacheWarmer;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -22,9 +23,14 @@ use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * @group legacy
+ */
 class AnnotationsCacheWarmerTest extends TestCase
 {
-    private $cacheDir;
+    use ExpectDeprecationTrait;
+
+    private string $cacheDir;
 
     protected function setUp(): void
     {
@@ -46,7 +52,10 @@ class AnnotationsCacheWarmerTest extends TestCase
         file_put_contents($this->cacheDir.'/annotations.map', sprintf('<?php return %s;', var_export([__CLASS__], true)));
         $cacheFile = tempnam($this->cacheDir, __FUNCTION__);
         $reader = new AnnotationReader();
+
+        $this->expectDeprecation('Since symfony/framework-bundle 6.4: The "Symfony\Bundle\FrameworkBundle\CacheWarmer\AnnotationsCacheWarmer" class is deprecated without replacement.');
         $warmer = new AnnotationsCacheWarmer($reader, $cacheFile);
+
         $warmer->warmUp($this->cacheDir);
         $this->assertFileExists($cacheFile);
 
@@ -66,7 +75,10 @@ class AnnotationsCacheWarmerTest extends TestCase
         file_put_contents($this->cacheDir.'/annotations.map', sprintf('<?php return %s;', var_export([__CLASS__], true)));
         $cacheFile = tempnam($this->cacheDir, __FUNCTION__);
         $reader = new AnnotationReader();
+
+        $this->expectDeprecation('Since symfony/framework-bundle 6.4: The "Symfony\Bundle\FrameworkBundle\CacheWarmer\AnnotationsCacheWarmer" class is deprecated without replacement.');
         $warmer = new AnnotationsCacheWarmer($reader, $cacheFile, null, true);
+
         $warmer->warmUp($this->cacheDir);
         $this->assertFileExists($cacheFile);
 
@@ -92,6 +104,8 @@ class AnnotationsCacheWarmerTest extends TestCase
         $this->assertFalse(class_exists($annotatedClass = 'C\C\C', false));
 
         file_put_contents($this->cacheDir.'/annotations.map', sprintf('<?php return %s;', var_export([$annotatedClass], true)));
+
+        $this->expectDeprecation('Since symfony/framework-bundle 6.4: The "Symfony\Bundle\FrameworkBundle\CacheWarmer\AnnotationsCacheWarmer" class is deprecated without replacement.');
         $warmer = new AnnotationsCacheWarmer(new AnnotationReader(), tempnam($this->cacheDir, __FUNCTION__));
 
         spl_autoload_register($classLoader = function ($class) use ($annotatedClass) {
@@ -117,6 +131,7 @@ class AnnotationsCacheWarmerTest extends TestCase
         $this->assertFalse(class_exists($annotatedClass = 'AClassThatDoesNotExist_FWB_CacheWarmer_AnnotationsCacheWarmerTest', false));
 
         file_put_contents($this->cacheDir.'/annotations.map', sprintf('<?php return %s;', var_export([$annotatedClass], true)));
+        $this->expectDeprecation('Since symfony/framework-bundle 6.4: The "Symfony\Bundle\FrameworkBundle\CacheWarmer\AnnotationsCacheWarmer" class is deprecated without replacement.');
         $warmer = new AnnotationsCacheWarmer(new AnnotationReader(), tempnam($this->cacheDir, __FUNCTION__));
 
         spl_autoload_register($classLoader = function ($class) use ($annotatedClass) {
@@ -134,6 +149,7 @@ class AnnotationsCacheWarmerTest extends TestCase
     public function testWarmupRemoveCacheMisses()
     {
         $cacheFile = tempnam($this->cacheDir, __FUNCTION__);
+        $this->expectDeprecation('Since symfony/framework-bundle 6.4: The "Symfony\Bundle\FrameworkBundle\CacheWarmer\AnnotationsCacheWarmer" class is deprecated without replacement.');
         $warmer = $this->getMockBuilder(AnnotationsCacheWarmer::class)
             ->setConstructorArgs([new AnnotationReader(), $cacheFile])
             ->onlyMethods(['doWarmUp'])

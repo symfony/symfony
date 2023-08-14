@@ -89,5 +89,8 @@ class XmlFrameworkExtensionTest extends FrameworkExtensionTestCase
 
         $definition = $container->getDefinition('asset_mapper.repository');
         $this->assertSame(['assets/' => '', 'assets2/' => 'my_namespace'], $definition->getArgument(0));
+
+        $definition = $container->getDefinition('asset_mapper.compiler.css_asset_url_compiler');
+        $this->assertSame('strict', $definition->getArgument(0));
     }
 }

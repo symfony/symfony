@@ -12,8 +12,10 @@
 namespace Symfony\Component\AssetMapper\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\AssetMapper\AssetDependency;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
+use Symfony\Component\AssetMapper\Compiler\AssetCompilerInterface;
 use Symfony\Component\AssetMapper\Compiler\CssAssetUrlCompiler;
 use Symfony\Component\AssetMapper\MappedAsset;
 
@@ -24,11 +26,10 @@ class CssAssetUrlCompilerTest extends TestCase
      */
     public function testCompile(string $sourceLogicalName, string $input, string $expectedOutput, array $expectedDependencies)
     {
-        $compiler = new CssAssetUrlCompiler(false);
-        $asset = new MappedAsset($sourceLogicalName);
-        $asset->setPublicPathWithoutDigest('/assets/'.$sourceLogicalName);
+        $compiler = new CssAssetUrlCompiler(AssetCompilerInterface::MISSING_IMPORT_IGNORE, $this->createMock(LoggerInterface::class));
+        $asset = new MappedAsset($sourceLogicalName, 'anything', '/assets/'.$sourceLogicalName);
         $this->assertSame($expectedOutput, $compiler->compile($input, $asset, $this->createAssetMapper()));
-        $assetDependencyLogicalPaths = array_map(fn (AssetDependency $dependency) => $dependency->asset->getLogicalPath(), $asset->getDependencies());
+        $assetDependencyLogicalPaths = array_map(fn (AssetDependency $dependency) => $dependency->asset->logicalPath, $asset->getDependencies());
         $this->assertSame($expectedDependencies, $assetDependencyLogicalPaths);
         if ($expectedDependencies) {
             $this->assertTrue($asset->getDependencies()[0]->isContentDependency);
@@ -114,10 +115,9 @@ class CssAssetUrlCompilerTest extends TestCase
             $this->expectExceptionMessage($expectedExceptionMessage);
         }
 
-        $asset = new MappedAsset($sourceLogicalName);
-        $asset->setSourcePath('/path/to/styles.css');
+        $asset = new MappedAsset($sourceLogicalName, '/path/to/styles.css');
 
-        $compiler = new CssAssetUrlCompiler(true);
+        $compiler = new CssAssetUrlCompiler(AssetCompilerInterface::MISSING_IMPORT_STRICT, $this->createMock(LoggerInterface::class));
         $this->assertSame($input, $compiler->compile($input, $asset, $this->createAssetMapper()));
     }
 
@@ -154,22 +154,17 @@ class CssAssetUrlCompilerTest extends TestCase
         $assetMapper->expects($this->any())
             ->method('getAsset')
             ->willReturnCallback(function ($path) {
-                switch ($path) {
-                    case 'images/foo.png':
-                        $asset = new MappedAsset('images/foo.png');
-                        $asset->setPublicPathWithoutDigest('/assets/images/foo.png');
-                        $asset->setPublicPath('/assets/images/foo.123456.png');
-
-                        return $asset;
-                    case 'more-styles.css':
-                        $asset = new MappedAsset('more-styles.css');
-                        $asset->setPublicPathWithoutDigest('/assets/more-styles.css');
-                        $asset->setPublicPath('/assets/more-styles.abcd123.css');
-
-                        return $asset;
-                    default:
-                        return null;
-                }
+                return match ($path) {
+                    'images/foo.png' => new MappedAsset('images/foo.png',
+                        publicPathWithoutDigest: '/assets/images/foo.png',
+                        publicPath: '/assets/images/foo.123456.png',
+                    ),
+                    'more-styles.css' => new MappedAsset('more-styles.css',
+                        publicPathWithoutDigest: '/assets/more-styles.css',
+                        publicPath: '/assets/more-styles.abcd123.css',
+                    ),
+                    default => null,
+                };
             });
 
         return $assetMapper;

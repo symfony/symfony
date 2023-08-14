@@ -13,16 +13,16 @@ namespace Symfony\Component\Messenger\Transport\Serialization\Normalizer;
 
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
-use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * This normalizer is only used in Debug/Dev/Messenger contexts.
  *
  * @author Pascal Luna <skalpa@zetareticuli.org>
  */
-final class FlattenExceptionNormalizer implements DenormalizerInterface, ContextAwareNormalizerInterface
+final class FlattenExceptionNormalizer implements DenormalizerInterface, NormalizerInterface
 {
     use NormalizerAwareTrait;
 

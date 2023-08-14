@@ -87,7 +87,7 @@ trait FilesystemCommonTrait
 
     private function write(string $file, string $data, int $expiresAt = null): bool
     {
-        set_error_handler(__CLASS__.'::throwError');
+        set_error_handler(static fn ($type, $message, $file, $line) => throw new \ErrorException($message, 0, $type, $file, $line));
         try {
             $tmp = $this->directory.$this->tmpSuffix ??= str_replace('/', '-', base64_encode(random_bytes(6)));
             try {
@@ -158,19 +158,14 @@ trait FilesystemCommonTrait
         }
     }
 
-    /**
-     * @internal
-     */
-    public static function throwError(int $type, string $message, string $file, int $line): never
-    {
-        throw new \ErrorException($message, 0, $type, $file, $line);
-    }
-
     public function __sleep(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
 
+    /**
+     * @return void
+     */
     public function __wakeup()
     {
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);

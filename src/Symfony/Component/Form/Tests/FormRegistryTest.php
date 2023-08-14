@@ -35,20 +35,9 @@ use Symfony\Component\Form\Tests\Fixtures\TestExtension;
  */
 class FormRegistryTest extends TestCase
 {
-    /**
-     * @var FormRegistry
-     */
-    private $registry;
-
-    /**
-     * @var TestExtension
-     */
-    private $extension1;
-
-    /**
-     * @var TestExtension
-     */
-    private $extension2;
+    private FormRegistry $registry;
+    private TestExtension $extension1;
+    private TestExtension $extension2;
 
     protected function setUp(): void
     {

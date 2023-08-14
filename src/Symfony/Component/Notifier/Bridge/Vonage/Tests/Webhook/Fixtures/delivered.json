@@ -1,0 +1,19 @@
+{
+    "message_uuid": "aaaaaaaa-bbbb-cccc-dddd-0123456789ab",
+    "to": "447700900000",
+    "from": "447700900001",
+    "timestamp": {},
+    "status": "delivered",
+    "usage": {
+        "currency": "EUR",
+        "price": "0.0333"
+    },
+    "client_ref": "string",
+    "channel": "sms",
+    "destination": {
+        "network_code": "12345"
+    },
+    "sms": {
+        "count_total": "2"
+    }
+}

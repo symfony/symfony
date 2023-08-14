@@ -23,15 +23,10 @@ class UriSafeTokenGeneratorTest extends TestCase
 
     /**
      * A non alpha-numeric byte string.
-     *
-     * @var string
      */
-    private static $bytes;
+    private static string $bytes;
 
-    /**
-     * @var UriSafeTokenGenerator
-     */
-    private $generator;
+    private UriSafeTokenGenerator $generator;
 
     public static function setUpBeforeClass(): void
     {
@@ -43,11 +38,6 @@ class UriSafeTokenGeneratorTest extends TestCase
         $this->generator = new UriSafeTokenGenerator(self::ENTROPY);
     }
 
-    protected function tearDown(): void
-    {
-        $this->generator = null;
-    }
-
     public function testGenerateToken()
     {
         $token = $this->generator->generateToken();
@@ -56,5 +46,29 @@ class UriSafeTokenGeneratorTest extends TestCase
         $this->assertStringNotMatchesFormat('%S+%S', $token, 'is URI safe');
         $this->assertStringNotMatchesFormat('%S/%S', $token, 'is URI safe');
         $this->assertStringNotMatchesFormat('%S=%S', $token, 'is URI safe');
+    }
+
+    /**
+     * @dataProvider validDataProvider
+     */
+    public function testValidLength(int $entropy, int $length)
+    {
+        $generator = new UriSafeTokenGenerator($entropy);
+        $token = $generator->generateToken();
+        $this->assertSame($length, \strlen($token));
+    }
+
+    public static function validDataProvider(): \Iterator
+    {
+        yield [24, 4];
+        yield 'Float length' => [20, 3];
+    }
+
+    public function testInvalidLength()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Entropy should be greater than 7.');
+
+        new UriSafeTokenGenerator(7);
     }
 }

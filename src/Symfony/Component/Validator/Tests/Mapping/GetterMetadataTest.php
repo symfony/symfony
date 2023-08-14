@@ -14,7 +14,7 @@ namespace Symfony\Component\Validator\Tests\Mapping;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Mapping\GetterMetadata;
-use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
+use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
 
 class GetterMetadataTest extends TestCase
 {
@@ -62,7 +62,7 @@ class GetterMetadataTest extends TestCase
     public function testUndefinedMethodNameThrowsException()
     {
         $this->expectException(ValidatorException::class);
-        $this->expectExceptionMessage('The "hasLastName()" method does not exist in class "Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity".');
+        $this->expectExceptionMessage('The "hasLastName()" method does not exist in class "Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity".');
         new GetterMetadata(self::CLASSNAME, 'lastName', 'hasLastName');
     }
 }

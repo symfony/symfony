@@ -178,7 +178,6 @@ class FormType extends BaseType
             // According to RFC 2396 (http://www.ietf.org/rfc/rfc2396.txt)
             // section 4.2., empty URIs are considered same-document references
             'action' => '',
-            'attr' => [],
             'post_max_size_message' => 'The uploaded file was too large. Please try to upload a smaller file.',
             'upload_max_size_message' => $uploadMaxSizeMessage, // internal
             'allow_file_upload' => false,

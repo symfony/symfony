@@ -20,8 +20,6 @@ use Symfony\Component\Scheduler\Exception\LogicException;
  * Use cron expressions to describe a periodical trigger.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental
  */
 final class CronExpressionTrigger implements TriggerInterface
 {
@@ -46,9 +44,13 @@ final class CronExpressionTrigger implements TriggerInterface
         [0, 6],
     ];
 
+    private readonly ?string $timezone;
+
     public function __construct(
         private readonly CronExpression $expression = new CronExpression('* * * * *'),
+        \DateTimeZone|string $timezone = null,
     ) {
+        $this->timezone = $timezone instanceof \DateTimeZone ? $timezone->getName() : $timezone;
     }
 
     public function __toString(): string
@@ -56,26 +58,26 @@ final class CronExpressionTrigger implements TriggerInterface
         return $this->expression->getExpression();
     }
 
-    public static function fromSpec(string $expression = '* * * * *', string $context = null): self
+    public static function fromSpec(string $expression = '* * * * *', string $context = null, \DateTimeZone|string $timezone = null): self
     {
         if (!class_exists(CronExpression::class)) {
             throw new LogicException(sprintf('You cannot use "%s" as the "cron expression" package is not installed. Try running "composer require dragonmantank/cron-expression".', __CLASS__));
         }
 
         if (!str_contains($expression, '#')) {
-            return new self(new CronExpression($expression));
+            return new self(new CronExpression($expression), $timezone);
         }
 
         if (null === $context) {
             throw new LogicException('A context must be provided to use "hashed" cron expressions.');
         }
 
-        return new self(new CronExpression(self::parseHashed($expression, $context)));
+        return new self(new CronExpression(self::parseHashed($expression, $context)), $timezone);
     }
 
     public function getNextRunDate(\DateTimeImmutable $run): ?\DateTimeImmutable
     {
-        return \DateTimeImmutable::createFromMutable($this->expression->getNextRunDate($run));
+        return \DateTimeImmutable::createFromInterface($this->expression->getNextRunDate($run, timeZone: $this->timezone));
     }
 
     private static function parseHashed(string $expression, string $context): string

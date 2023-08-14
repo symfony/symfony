@@ -1,0 +1,25 @@
+{
+    "message_uuid": "aaaaaaaa-bbbb-cccc-dddd-0123456789ab",
+    "to": "447700900000",
+    "from": "447700900001",
+    "timestamp": {},
+    "status": "undeliverable",
+    "error": {
+        "type": "https://developer.nexmo.com/api-errors/messages-olympus#1260",
+        "title": 1260,
+        "detail": "Destination unreachable - The message could not be delivered to the phone number. If using Viber Business Messages your account might not be enabled for this country.",
+        "instance": "bf0ca0bf927b3b52e3cb03217e1a1ddf"
+    },
+    "usage": {
+        "currency": "EUR",
+        "price": "0.0333"
+    },
+    "client_ref": "string",
+    "channel": "sms",
+    "destination": {
+        "network_code": "12345"
+    },
+    "sms": {
+        "count_total": "2"
+    }
+}

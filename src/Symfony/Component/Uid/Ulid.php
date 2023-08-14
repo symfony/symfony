@@ -114,6 +114,13 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
         return hex2bin($ulid);
     }
 
+    /**
+     * Returns the identifier as a base32 case insensitive string.
+     *
+     * @see https://tools.ietf.org/html/rfc4648#section-6
+     *
+     * @example 09EJ0S614A9FXVG9C5537Q9ZE1 (len=26)
+     */
     public function toBase32(): string
     {
         return $this->uid;

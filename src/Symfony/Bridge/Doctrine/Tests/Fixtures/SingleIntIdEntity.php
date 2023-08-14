@@ -15,16 +15,16 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
 
-/** @Entity */
+#[Entity]
 class SingleIntIdEntity
 {
-    /** @Id @Column(type="integer") */
+    #[Id, Column(type: 'integer')]
     protected $id;
 
-    /** @Column(type="string", nullable=true) */
+    #[Column(type: 'string', nullable: true)]
     public $name;
 
-    /** @Column(type="array", nullable=true) */
+    #[Column(type: 'array', nullable: true)]
     public $phoneNumbers = [];
 
     public function __construct($id, $name)

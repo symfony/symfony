@@ -734,8 +734,8 @@ abstract class ResourceBundleTestCase extends TestCase
         'zh_TW' => 'zh_Hant_TW',
     ];
 
-    private static $rootLocales;
-    private $defaultLocale;
+    private static ?array $rootLocales = null;
+    private string $defaultLocale;
 
     protected function setUp(): void
     {

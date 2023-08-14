@@ -20,13 +20,9 @@ use Symfony\Component\HttpKernel\HttpCache\Store;
 
 class StoreTest extends TestCase
 {
-    protected $request;
-    protected $response;
-
-    /**
-     * @var Store
-     */
-    protected $store;
+    protected Request $request;
+    protected Response $response;
+    protected Store $store;
 
     protected function setUp(): void
     {
@@ -40,10 +36,6 @@ class StoreTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->store = null;
-        $this->request = null;
-        $this->response = null;
-
         HttpCacheTestCase::clearDirectory(sys_get_temp_dir().'/http_cache');
     }
 

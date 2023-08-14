@@ -13,27 +13,20 @@ namespace Symfony\Component\Templating\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Templating\Helper\SlotsHelper;
-use Symfony\Component\Templating\Loader\Loader;
-use Symfony\Component\Templating\Loader\LoaderInterface;
-use Symfony\Component\Templating\PhpEngine;
-use Symfony\Component\Templating\Storage\Storage;
-use Symfony\Component\Templating\Storage\StringStorage;
 use Symfony\Component\Templating\TemplateNameParser;
-use Symfony\Component\Templating\TemplateReference;
-use Symfony\Component\Templating\TemplateReferenceInterface;
+use Symfony\Component\Templating\Tests\Fixtures\ProjectTemplateEngine;
+use Symfony\Component\Templating\Tests\Fixtures\ProjectTemplateEngineLoader;
 
+/**
+ * @group legacy
+ */
 class PhpEngineTest extends TestCase
 {
-    protected $loader;
+    protected ProjectTemplateEngineLoader $loader;
 
     protected function setUp(): void
     {
-        $this->loader = new ProjectTemplateLoader();
-    }
-
-    protected function tearDown(): void
-    {
-        $this->loader = null;
+        $this->loader = new ProjectTemplateEngineLoader();
     }
 
     public function testConstructor()
@@ -191,38 +184,5 @@ class PhpEngineTest extends TestCase
         $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
 
         $this->assertSame($this->loader, $engine->getLoader());
-    }
-}
-
-class ProjectTemplateEngine extends PhpEngine
-{
-    public function getLoader(): LoaderInterface
-    {
-        return $this->loader;
-    }
-}
-
-class ProjectTemplateLoader extends Loader
-{
-    public $templates = [];
-
-    public function setTemplate($name, $content)
-    {
-        $template = new TemplateReference($name, 'php');
-        $this->templates[$template->getLogicalName()] = $content;
-    }
-
-    public function load(TemplateReferenceInterface $template): Storage|false
-    {
-        if (isset($this->templates[$template->getLogicalName()])) {
-            return new StringStorage($this->templates[$template->getLogicalName()]);
-        }
-
-        return false;
-    }
-
-    public function isFresh(TemplateReferenceInterface $template, int $time): bool
-    {
-        return false;
     }
 }

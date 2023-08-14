@@ -1,6 +1,6 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
-{% block head %}
+{% block stylesheets %}
     {{  parent() }}
 
     <style>
@@ -158,6 +158,36 @@
     </style>
 {% endblock %}
 
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            new SymfonyProfilerMailerPanel();
+        });
+
+        class SymfonyProfilerMailerPanel {
+            constructor() {
+                this.#initializeEmailsTable();
+            }
+
+            #initializeEmailsTable() {
+                const emailRows = document.querySelectorAll('.mailer-email-summary-table-row');
+
+                emailRows.forEach((emailRow) => {
+                    emailRow.addEventListener('click', () => {
+                        emailRows.forEach((row) => row.classList.remove('active'));
+                        emailRow.classList.add('active');
+
+                        document.querySelectorAll('.mailer-email-details').forEach((emailDetails) => emailDetails.style.display = 'none');
+                        document.querySelector(emailRow.getAttribute('data-target')).style.display = 'block';
+                    });
+                });
+            }
+        }
+    </script>
+{% endblock %}
+
 {% block toolbar %}
     {% set events = collector.events %}
 
@@ -262,8 +292,6 @@
                         {{ _self.render_email_details(collector, transport, event.message, event.isQueued, show_transport_name) }}
                     </div>
                 {% endfor %}
-
-                <script>Sfjs.initializeMailerTable();</script>
             {% else %}
                 {% set event = (collector.events.events(transport)|first) %}
                 {{ _self.render_email_details(collector, transport, event.message, event.isQueued, show_transport_name) }}

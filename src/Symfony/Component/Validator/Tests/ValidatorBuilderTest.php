@@ -15,6 +15,7 @@ use Doctrine\Common\Annotations\PsrCachedReader;
 use Doctrine\Common\Annotations\Reader;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Validator\ObjectInitializerInterface;
@@ -24,19 +25,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ValidatorBuilderTest extends TestCase
 {
-    /**
-     * @var ValidatorBuilder
-     */
-    protected $builder;
+    use ExpectDeprecationTrait;
+
+    private ValidatorBuilder $builder;
 
     protected function setUp(): void
     {
         $this->builder = new ValidatorBuilder();
-    }
-
-    protected function tearDown(): void
-    {
-        $this->builder = null;
     }
 
     public function testAddObjectInitializer()
@@ -81,9 +76,14 @@ class ValidatorBuilderTest extends TestCase
         $this->assertSame($this->builder, $this->builder->addMethodMappings([]));
     }
 
+    /**
+     * @group legacy
+     */
     public function testEnableAnnotationMappingWithDefaultDoctrineAnnotationReader()
     {
         $this->assertSame($this->builder, $this->builder->enableAnnotationMapping());
+
+        $this->expectDeprecation('Since symfony/validator 6.4: Method "Symfony\Component\Validator\ValidatorBuilder::addDefaultDoctrineAnnotationReader()" is deprecated without replacement.');
         $this->assertSame($this->builder, $this->builder->addDefaultDoctrineAnnotationReader());
 
         $loaders = $this->builder->getLoaders();
@@ -95,11 +95,16 @@ class ValidatorBuilderTest extends TestCase
         $this->assertInstanceOf(PsrCachedReader::class, $r->getValue($loaders[0]));
     }
 
+    /**
+     * @group legacy
+     */
     public function testEnableAnnotationMappingWithCustomDoctrineAnnotationReader()
     {
         $reader = $this->createMock(Reader::class);
 
         $this->assertSame($this->builder, $this->builder->enableAnnotationMapping());
+
+        $this->expectDeprecation('Since symfony/validator 6.4: Method "Symfony\Component\Validator\ValidatorBuilder::setDoctrineAnnotationReader()" is deprecated without replacement.');
         $this->assertSame($this->builder, $this->builder->setDoctrineAnnotationReader($reader));
 
         $loaders = $this->builder->getLoaders();

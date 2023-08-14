@@ -98,7 +98,7 @@ class AbstractLoginFormAuthenticatorTest extends TestCase
 
 class ConcreteFormAuthenticator extends AbstractLoginFormAuthenticator
 {
-    private $loginUrl;
+    private string $loginUrl;
 
     public function __construct(string $loginUrl)
     {

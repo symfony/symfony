@@ -19,8 +19,8 @@ use Symfony\Component\Routing\RequestContext;
 
 class ExpressionLanguageProviderTest extends TestCase
 {
-    private $context;
-    private $expressionLanguage;
+    private RequestContext $context;
+    private ExpressionLanguage $expressionLanguage;
 
     protected function setUp(): void
     {

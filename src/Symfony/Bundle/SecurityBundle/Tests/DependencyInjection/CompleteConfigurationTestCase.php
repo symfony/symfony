@@ -716,6 +716,15 @@ abstract class CompleteConfigurationTestCase extends TestCase
         $this->assertSame(['cookies', 'executionContexts'], $ClearSiteDataConfig);
     }
 
+    public function testFirewallPatterns()
+    {
+        $container = $this->getContainer('firewall_patterns');
+        $chainRequestMatcherId = (string) $container->getDefinition('security.firewall.map')->getArgument(1)->getValues()['security.firewall.map.context.no_security'];
+        $requestMatcherId = (string) $container->getDefinition($chainRequestMatcherId)->getArgument(0)[0];
+
+        $this->assertSame('(?:^/register$|^/documentation$)', $container->getDefinition($requestMatcherId)->getArgument(0));
+    }
+
     protected function getContainer($file)
     {
         $file .= '.'.$this->getFileExtension();

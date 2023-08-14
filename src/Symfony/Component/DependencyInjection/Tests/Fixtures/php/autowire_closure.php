@@ -15,11 +15,9 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class Symfony_DI_PhpDumper_Test_Autowire_Closure extends Container
 {
     protected $parameters = [];
-    protected readonly \WeakReference $ref;
 
     public function __construct()
     {
-        $this->ref = \WeakReference::create($this);
         $this->services = $this->privates = [];
         $this->methodMap = [
             'bar' => 'getBarService',
@@ -48,13 +46,7 @@ class Symfony_DI_PhpDumper_Test_Autowire_Closure extends Container
      */
     protected static function getBarService($container)
     {
-        $containerRef = $container->ref;
-
-        return $container->services['bar'] = new \Symfony\Component\DependencyInjection\Tests\Dumper\LazyClosureConsumer(#[\Closure(name: 'foo', class: 'Symfony\\Component\\DependencyInjection\\Tests\\Compiler\\Foo')] function () use ($containerRef) {
-            $container = $containerRef->get();
-
-            return ($container->services['foo'] ??= new \Symfony\Component\DependencyInjection\Tests\Compiler\Foo());
-        }, ($container->services['baz'] ?? self::getBazService($container)), ($container->services['foo'] ??= new \Symfony\Component\DependencyInjection\Tests\Compiler\Foo())->cloneFoo(...), ($container->services['my_callable'] ??= new \Symfony\Component\DependencyInjection\Tests\Compiler\MyCallable())->__invoke(...));
+        return $container->services['bar'] = new \Symfony\Component\DependencyInjection\Tests\Dumper\LazyClosureConsumer(#[\Closure(name: 'foo', class: 'Symfony\\Component\\DependencyInjection\\Tests\\Compiler\\Foo')] fn () => ($container->services['foo'] ??= new \Symfony\Component\DependencyInjection\Tests\Compiler\Foo()), ($container->services['baz'] ?? self::getBazService($container)), ($container->services['foo'] ??= new \Symfony\Component\DependencyInjection\Tests\Compiler\Foo())->cloneFoo(...), ($container->services['my_callable'] ??= new \Symfony\Component\DependencyInjection\Tests\Compiler\MyCallable())->__invoke(...));
     }
 
     /**

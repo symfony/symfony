@@ -15,7 +15,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FixedTranslator implements TranslatorInterface
 {
-    private $translations;
+    private array $translations;
 
     public function __construct(array $translations)
     {

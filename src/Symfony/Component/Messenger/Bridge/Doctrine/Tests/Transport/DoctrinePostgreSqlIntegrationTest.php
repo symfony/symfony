@@ -11,9 +11,12 @@
 
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Tests\Transport;
 
+use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
+use Doctrine\DBAL\Tools\DsnParser;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\PostgreSqlConnection;
@@ -25,10 +28,8 @@ use Symfony\Component\Messenger\Bridge\Doctrine\Transport\PostgreSqlConnection;
  */
 class DoctrinePostgreSqlIntegrationTest extends TestCase
 {
-    /** @var Connection */
-    private $driverConnection;
-    /** @var PostgreSqlConnection */
-    private $connection;
+    private Connection $driverConnection;
+    private PostgreSqlConnection $connection;
 
     protected function setUp(): void
     {
@@ -36,7 +37,14 @@ class DoctrinePostgreSqlIntegrationTest extends TestCase
             $this->markTestSkipped('Missing POSTGRES_HOST env variable');
         }
 
-        $this->driverConnection = DriverManager::getConnection(['url' => "pgsql://postgres:password@$host"]);
+        $url = "pdo-pgsql://postgres:password@$host";
+        $params = class_exists(DsnParser::class) ? (new DsnParser())->parse($url) : ['url' => $url];
+        $config = new Configuration();
+        if (class_exists(DefaultSchemaManagerFactory::class)) {
+            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
+        }
+
+        $this->driverConnection = DriverManager::getConnection($params, $config);
         $this->connection = new PostgreSqlConnection(['table_name' => 'queue_table'], $this->driverConnection);
         $this->connection->setup();
     }

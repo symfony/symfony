@@ -20,6 +20,10 @@ use Symfony\Component\Mailer\Transport\Dsn;
 class UnsupportedSchemeException extends LogicException
 {
     private const SCHEME_TO_PACKAGE_MAP = [
+        'brevo' => [
+            'class' => Bridge\Brevo\Transport\BrevoTransportFactory::class,
+            'package' => 'symfony/brevo-mailer',
+        ],
         'gmail' => [
             'class' => Bridge\Google\Transport\GmailTransportFactory::class,
             'package' => 'symfony/google-mailer',
@@ -51,6 +55,10 @@ class UnsupportedSchemeException extends LogicException
         'postmark' => [
             'class' => Bridge\Postmark\Transport\PostmarkTransportFactory::class,
             'package' => 'symfony/postmark-mailer',
+        ],
+        'scaleway' => [
+            'class' => Bridge\Scaleway\Transport\ScalewayTransportFactory::class,
+            'package' => 'symfony/scaleway-mailer',
         ],
         'sendgrid' => [
             'class' => Bridge\Sendgrid\Transport\SendgridTransportFactory::class,

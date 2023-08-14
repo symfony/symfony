@@ -15,18 +15,16 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Templating\TemplateNameParser;
 use Symfony\Component\Templating\TemplateReference;
 
+/**
+ * @group legacy
+ */
 class TemplateNameParserTest extends TestCase
 {
-    protected $parser;
+    protected TemplateNameParser $parser;
 
     protected function setUp(): void
     {
         $this->parser = new TemplateNameParser();
-    }
-
-    protected function tearDown(): void
-    {
-        $this->parser = null;
     }
 
     /**

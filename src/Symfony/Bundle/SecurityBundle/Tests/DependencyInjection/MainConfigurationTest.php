@@ -23,7 +23,7 @@ class MainConfigurationTest extends TestCase
      * The minimal, required config needed to not have any required validation
      * issues.
      */
-    protected static $minimalConfig = [
+    protected static array $minimalConfig = [
         'providers' => [
             'stub' => [
                 'id' => 'foo',

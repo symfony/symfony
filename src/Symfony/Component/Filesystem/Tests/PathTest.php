@@ -21,7 +21,7 @@ use Symfony\Component\Filesystem\Path;
  */
 class PathTest extends TestCase
 {
-    protected $storedEnv = [];
+    protected array $storedEnv = [];
 
     protected function setUp(): void
     {

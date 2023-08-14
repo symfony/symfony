@@ -32,22 +32,18 @@ use Symfony\Component\Validator\GroupSequenceProviderInterface;
 class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
 {
     /**
-     * @var string
-     *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
      *           {@link getClassName()} instead.
      */
-    public $name;
+    public string $name;
 
     /**
-     * @var string
-     *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
      *           {@link getDefaultGroup()} instead.
      */
-    public $defaultGroup;
+    public string $defaultGroup;
 
     /**
      * @var MemberMetadata[][]
@@ -56,7 +52,7 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
      *           class' serialized representation. Do not access it. Use
      *           {@link getPropertyMetadata()} instead.
      */
-    public $members = [];
+    public array $members = [];
 
     /**
      * @var PropertyMetadata[]
@@ -65,7 +61,7 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
      *           class' serialized representation. Do not access it. Use
      *           {@link getPropertyMetadata()} instead.
      */
-    public $properties = [];
+    public array $properties = [];
 
     /**
      * @var GetterMetadata[]
@@ -74,38 +70,34 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
      *           class' serialized representation. Do not access it. Use
      *           {@link getPropertyMetadata()} instead.
      */
-    public $getters = [];
+    public array $getters = [];
 
     /**
-     * @var GroupSequence
-     *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
      *           {@link getGroupSequence()} instead.
      */
-    public $groupSequence;
+    public ?GroupSequence $groupSequence = null;
 
     /**
-     * @var bool
-     *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
      *           {@link isGroupSequenceProvider()} instead.
      */
-    public $groupSequenceProvider = false;
+    public bool $groupSequenceProvider = false;
 
     /**
      * The strategy for traversing traversable objects.
      *
      * By default, only instances of {@link \Traversable} are traversed.
      *
-     * @var int
+     * @var TraversalStrategy::*
      *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
      *           {@link getTraversalStrategy()} instead.
      */
-    public $traversalStrategy = TraversalStrategy::IMPLICIT;
+    public int $traversalStrategy = TraversalStrategy::IMPLICIT;
 
     private \ReflectionClass $reflClass;
 
@@ -346,16 +338,17 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
                     $constraint->addImplicitGroupName($this->getDefaultGroup());
                 }
 
-                $this->addPropertyMetadata($member);
-
                 if ($member instanceof MemberMetadata && !$member->isPrivate($this->name)) {
                     $property = $member->getPropertyName();
+                    $this->members[$property][] = $member;
 
                     if ($member instanceof PropertyMetadata && !isset($this->properties[$property])) {
                         $this->properties[$property] = $member;
                     } elseif ($member instanceof GetterMetadata && !isset($this->getters[$property])) {
                         $this->getters[$property] = $member;
                     }
+                } else {
+                    $this->addPropertyMetadata($member);
                 }
             }
         }

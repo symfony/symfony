@@ -19,7 +19,7 @@ use Symfony\Component\Config\Tests\Resource\ResourceStub;
 
 class ResourceCheckerConfigCacheTest extends TestCase
 {
-    private $cacheFile;
+    private string $cacheFile;
 
     protected function setUp(): void
     {

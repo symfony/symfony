@@ -139,7 +139,7 @@ EOF;
         foreach ($staticRoutes as $path => $routes) {
             $code .= sprintf("    %s => [\n", self::export($path));
             foreach ($routes as $route) {
-                $code .= sprintf("        [%s, %s, %s, %s, %s, %s, %s],\n", ...array_map([__CLASS__, 'export'], $route));
+                $code .= vsprintf("        [%s, %s, %s, %s, %s, %s, %s],\n", array_map([__CLASS__, 'export'], $route));
             }
             $code .= "    ],\n";
         }
@@ -151,7 +151,7 @@ EOF;
         foreach ($dynamicRoutes as $path => $routes) {
             $code .= sprintf("    %s => [\n", self::export($path));
             foreach ($routes as $route) {
-                $code .= sprintf("        [%s, %s, %s, %s, %s, %s, %s],\n", ...array_map([__CLASS__, 'export'], $route));
+                $code .= vsprintf("        [%s, %s, %s, %s, %s, %s, %s],\n", array_map([__CLASS__, 'export'], $route));
             }
             $code .= "    ],\n";
         }
@@ -349,7 +349,7 @@ EOF;
             $state->markTail = 0;
 
             // if the regex is too large, throw a signaling exception to recompute with smaller chunk size
-            set_error_handler(function ($type, $message) { throw str_contains($message, $this->signalingException->getMessage()) ? $this->signalingException : new \ErrorException($message); });
+            set_error_handler(fn ($type, $message) => throw str_contains($message, $this->signalingException->getMessage()) ? $this->signalingException : new \ErrorException($message));
             try {
                 preg_match($state->regex, '');
             } finally {

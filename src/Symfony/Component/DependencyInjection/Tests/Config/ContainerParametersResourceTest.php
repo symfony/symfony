@@ -16,8 +16,7 @@ use Symfony\Component\DependencyInjection\Config\ContainerParametersResource;
 
 class ContainerParametersResourceTest extends TestCase
 {
-    /** @var ContainerParametersResource */
-    private $resource;
+    private ContainerParametersResource $resource;
 
     protected function setUp(): void
     {

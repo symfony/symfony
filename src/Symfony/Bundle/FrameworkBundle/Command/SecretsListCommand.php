@@ -75,7 +75,7 @@ EOF
         $rows = [];
 
         $dump = new Dumper($output);
-        $dump = static fn (?string $v) => null === $v ? '******' : $dump($v);
+        $dump = fn ($v) => null === $v ? '******' : $dump($v);
 
         foreach ($secrets as $name => $value) {
             $rows[$name] = [$name, $dump($value)];
@@ -86,7 +86,7 @@ EOF
         }
 
         foreach ($localSecrets ?? [] as $name => $value) {
-            if (isset($rows[$name]) && !\in_array($value, ['', false, null], true)) {
+            if (isset($rows[$name])) {
                 $rows[$name][] = $dump($value);
             }
         }

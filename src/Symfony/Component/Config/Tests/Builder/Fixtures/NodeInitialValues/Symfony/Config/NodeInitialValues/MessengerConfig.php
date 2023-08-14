@@ -30,7 +30,7 @@ class MessengerConfig
     {
         if (array_key_exists('transports', $value)) {
             $this->_usedProperties['transports'] = true;
-            $this->transports = array_map(function ($v) { return new \Symfony\Config\NodeInitialValues\Messenger\TransportsConfig($v); }, $value['transports']);
+            $this->transports = array_map(fn ($v) => new \Symfony\Config\NodeInitialValues\Messenger\TransportsConfig($v), $value['transports']);
             unset($value['transports']);
         }
 
@@ -43,7 +43,7 @@ class MessengerConfig
     {
         $output = [];
         if (isset($this->_usedProperties['transports'])) {
-            $output['transports'] = array_map(function ($v) { return $v->toArray(); }, $this->transports);
+            $output['transports'] = array_map(fn ($v) => $v->toArray(), $this->transports);
         }
 
         return $output;

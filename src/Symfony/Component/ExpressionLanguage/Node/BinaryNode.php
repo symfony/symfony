@@ -55,7 +55,7 @@ class BinaryNode extends Node
             }
 
             $compiler
-                ->raw('(static function ($regexp, $str) { set_error_handler(function ($t, $m) use ($regexp, $str) { throw new \Symfony\Component\ExpressionLanguage\SyntaxError(sprintf(\'Regexp "%s" passed to "matches" is not valid\', $regexp).substr($m, 12)); }); try { return preg_match($regexp, (string) $str); } finally { restore_error_handler(); } })(')
+                ->raw('(static function ($regexp, $str) { set_error_handler(static fn ($t, $m) => throw new \Symfony\Component\ExpressionLanguage\SyntaxError(sprintf(\'Regexp "%s" passed to "matches" is not valid\', $regexp).substr($m, 12))); try { return preg_match($regexp, (string) $str); } finally { restore_error_handler(); } })(')
                 ->compile($this->nodes['right'])
                 ->raw(', ')
                 ->compile($this->nodes['left'])
@@ -194,9 +194,7 @@ class BinaryNode extends Node
 
     private function evaluateMatches(string $regexp, ?string $str): int
     {
-        set_error_handler(function ($t, $m) use ($regexp) {
-            throw new SyntaxError(sprintf('Regexp "%s" passed to "matches" is not valid', $regexp).substr($m, 12));
-        });
+        set_error_handler(static fn ($t, $m) => throw new SyntaxError(sprintf('Regexp "%s" passed to "matches" is not valid', $regexp).substr($m, 12)));
         try {
             return preg_match($regexp, (string) $str);
         } finally {

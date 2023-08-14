@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Dumper;
 
 use Composer\Autoload\ClassLoader;
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
@@ -69,7 +70,7 @@ class PhpDumper extends Dumper
     private int $variableCount;
     private ?\SplObjectStorage $inlinedDefinitions = null;
     private ?array $serviceCalls = null;
-    private array $reservedVariables = ['instance', 'class', 'this', 'container', 'containerRef'];
+    private array $reservedVariables = ['instance', 'class', 'this', 'container'];
     private ExpressionLanguage $expressionLanguage;
     private ?string $targetDirRegex = null;
     private int $targetDirMaxMatches;
@@ -87,7 +88,6 @@ class PhpDumper extends Dumper
     private array $singleUsePrivateIds = [];
     private array $preload = [];
     private bool $addGetService = false;
-    private bool $addContainerRef = false;
     private array $locatedIds = [];
     private string $serviceLocatorTag;
     private array $exportedVariables = [];
@@ -247,8 +247,8 @@ class PhpDumper extends Dumper
 
         if ($this->addGetService) {
             $code = preg_replace(
-                "/(\r?\n\r?\n    public function __construct.+?\\{\r?\n) ++([^\r\n]++)/s",
-                "\n    protected \Closure \$getService;$1        \$containerRef = $2\n        \$this->getService = static function () use (\$containerRef) { return \$containerRef->get()->getService(...\\func_get_args()); };",
+                "/\r?\n\r?\n    public function __construct.+?\\{\r?\n/s",
+                "\n    protected \Closure \$getService;$0",
                 $code,
                 1
             );
@@ -582,8 +582,23 @@ EOF;
                 continue;
             }
             $alreadyGenerated[$asGhostObject][$class] = true;
-            // register class' reflector for resource tracking
-            $this->container->getReflectionClass($class);
+
+            foreach (array_column($definition->getTag('proxy'), 'interface') ?: [$class] as $r) {
+                if (!$r = $this->container->getReflectionClass($r)) {
+                    continue;
+                }
+                do {
+                    $file = $r->getFileName();
+                    if (str_ends_with($file, ') : eval()\'d code')) {
+                        $file = substr($file, 0, strrpos($file, '(', -17));
+                    }
+                    if (is_file($file)) {
+                        $this->container->addResource(new FileResource($file));
+                    }
+                    $r = $r->getParentClass() ?: null;
+                } while ($r?->isUserDefined());
+            }
+
             if ("\n" === $proxyCode = "\n".$proxyDumper->getProxyCode($definition, $id)) {
                 continue;
             }
@@ -862,7 +877,6 @@ EOF;
         } else {
             $lazyInitialization = '';
         }
-        $this->addContainerRef = false;
 
         $code = <<<EOF
 
@@ -875,7 +889,7 @@ EOF;
 
      */
     protected static function {$methodName}(\$container$lazyInitialization)
-    {%container_ref%
+    {
 
 EOF;
 
@@ -914,16 +928,15 @@ EOF;
                 if (!$definition->isShared()) {
                     $code .= sprintf('        %s ??= ', $factory);
 
-                    if ($asFile) {
-                        $code .= "self::do(...);\n\n";
+                    if ($definition->isPublic()) {
+                        $code .= sprintf("fn () => self::%s(\$container);\n\n", $asFile ? 'do' : $methodName);
                     } else {
-                        $code .= sprintf("self::%s(...);\n\n", $methodName);
+                        $code .= sprintf("self::%s(...);\n\n", $asFile ? 'do' : $methodName);
                     }
                 }
                 $lazyLoad = $asGhostObject ? '$proxy' : 'false';
-                $this->addContainerRef = true;
 
-                $factoryCode = $asFile ? sprintf('self::do($containerRef->get(), %s)', $lazyLoad) : sprintf('self::%s($containerRef->get(), %s)', $methodName, $lazyLoad);
+                $factoryCode = $asFile ? sprintf('self::do($container, %s)', $lazyLoad) : sprintf('self::%s($container, %s)', $methodName, $lazyLoad);
                 $code .= $this->getProxyDumper()->getProxyFactoryCode($definition, $id, $factoryCode);
             }
 
@@ -945,9 +958,8 @@ EOF;
             if (!$isProxyCandidate && !$definition->isShared()) {
                 $c = implode("\n", array_map(fn ($line) => $line ? '    '.$line : $line, explode("\n", $c)));
                 $lazyloadInitialization = $definition->isLazy() ? ', $lazyLoad = true' : '';
-                $useContainerRef = $this->addContainerRef ? ' use ($containerRef)' : '';
 
-                $c = sprintf("        %s = function (\$container%s)%s {\n%s        };\n\n        return %1\$s(\$container);\n", $factory, $lazyloadInitialization, $useContainerRef, $c);
+                $c = sprintf("        %s = function (\$container%s) {\n%s        };\n\n        return %1\$s(\$container);\n", $factory, $lazyloadInitialization, $c);
             }
 
             $code .= $c;
@@ -957,8 +969,6 @@ EOF;
 
         $this->definitionVariables = $this->inlinedDefinitions = null;
         $this->referenceVariables = $this->serviceCalls = null;
-
-        $code = preg_replace('/%container_ref%/', $this->addContainerRef ? "\n        \$containerRef = \$container->ref;\n" : '', $code, 1);
 
         return [$file, $code];
     }
@@ -1196,12 +1206,7 @@ EOTXT
                 $callable[0] instanceof Reference
                 || ($callable[0] instanceof Definition && !$this->definitionVariables->contains($callable[0]))
             )) {
-                if (str_contains($initializer = $this->dumpValue($callable[0]), '$container')) {
-                    $this->addContainerRef = true;
-                    $initializer = sprintf('function () use ($containerRef) { $container = $containerRef->get(); return %s; }', $initializer);
-                } else {
-                    $initializer = 'fn () => '.$initializer;
-                }
+                $initializer = 'fn () => '.$this->dumpValue($callable[0]);
 
                 return $return.LazyClosure::getCode($initializer, $callable, $definition, $this->container, $id).$tail;
             }
@@ -1268,11 +1273,9 @@ class $class extends $baseClass
     private const DEPRECATED_PARAMETERS = [];
 
     protected \$parameters = [];
-    protected readonly \WeakReference \$ref;
 
     public function __construct()
     {
-        \$this->ref = \WeakReference::create(\$this);
 
 EOF;
         $code = str_replace("    private const DEPRECATED_PARAMETERS = [];\n\n", $this->addDeprecatedParameters(), $code);
@@ -1636,7 +1639,7 @@ EOF;
 
     public function getParameterBag(): ParameterBagInterface
     {
-        if (null === $this->parameterBag) {
+        if (!isset($this->parameterBag)) {
             $parameters = $this->parameters;
             foreach ($this->loadedDynamicParameters as $name => $loaded) {
                 $parameters[$name] = $loaded ? $this->dynamicParameters[$name] : $this->getDynamicParameter($name);
@@ -1853,12 +1856,6 @@ EOF;
                         $attribute = sprintf('#[\Closure(%s)] ', $attribute);
                     }
 
-                    if (str_contains($code, '$container')) {
-                        $this->addContainerRef = true;
-
-                        return sprintf("%sfunction () use (\$containerRef)%s {\n            \$container = \$containerRef->get();\n\n            return %s;\n        }", $attribute, $returnedType, $code);
-                    }
-
                     return sprintf('%sfn ()%s => %s', $attribute, $returnedType, $code);
                 }
 
@@ -1867,15 +1864,8 @@ EOF;
                         return 'new RewindableGenerator(fn () => new \EmptyIterator(), 0)';
                     }
 
-                    $this->addContainerRef = true;
-
                     $code = [];
-                    $code[] = 'new RewindableGenerator(function () use ($containerRef) {';
-                    $code[] = '            $container = $containerRef->get();';
-                    $code[] = '';
-
-                    $countCode = [];
-                    $countCode[] = 'function () use ($containerRef) {';
+                    $code[] = 'new RewindableGenerator(function () use ($container) {';
 
                     $operands = [0];
                     foreach ($values as $k => $v) {
@@ -1888,12 +1878,7 @@ EOF;
                         }
                     }
 
-                    $countCode[] = '            $container = $containerRef->get();';
-                    $countCode[] = '';
-                    $countCode[] = sprintf('            return %s;', implode(' + ', $operands));
-                    $countCode[] = '        }';
-
-                    $code[] = sprintf('        }, %s)', \count($operands) > 1 ? implode("\n", $countCode) : $operands[0]);
+                    $code[] = sprintf('        }, %s)', \count($operands) > 1 ? 'fn () => '.implode(' + ', $operands) : $operands[0]);
 
                     return implode("\n", $code);
                 }
@@ -1925,7 +1910,7 @@ EOF;
                     }
                     $this->addGetService = true;
 
-                    return sprintf('new \%s($container->getService, [%s%s], [%s%s])', ServiceLocator::class, $serviceMap, $serviceMap ? "\n        " : '', $serviceTypes, $serviceTypes ? "\n        " : '');
+                    return sprintf('new \%s($container->getService ??= $container->getService(...), [%s%s], [%s%s])', ServiceLocator::class, $serviceMap, $serviceMap ? "\n        " : '', $serviceTypes, $serviceTypes ? "\n        " : '');
                 }
             } finally {
                 [$this->definitionVariables, $this->referenceVariables] = $scope;

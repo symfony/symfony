@@ -74,20 +74,23 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
 
         ['name' => $name, 'file' => $file, 'line' => $line, 'file_excerpt' => $fileExcerpt] = $this->sourceContextProvider->getContext();
 
-        if ($this->dumper instanceof Connection) {
-            if (!$this->dumper->write($data)) {
-                $this->isCollected = false;
-            }
-        } elseif ($this->dumper) {
-            $this->doDump($this->dumper, $data, $name, $file, $line);
-        } else {
+        if (!$this->dumper || $this->dumper instanceof Connection && !$this->dumper->write($data)) {
             $this->isCollected = false;
+        }
+
+        $context = $data->getContext();
+        $label = $context['label'] ?? '';
+        unset($context['label']);
+        $data = $data->withContext($context);
+
+        if ($this->dumper && !$this->dumper instanceof Connection) {
+            $this->doDump($this->dumper, $data, $name, $file, $line, $label);
         }
 
         if (!$this->dataCount) {
             $this->data = [];
         }
-        $this->data[] = compact('data', 'name', 'file', 'line', 'fileExcerpt');
+        $this->data[] = compact('data', 'name', 'file', 'line', 'fileExcerpt', 'label');
         ++$this->dataCount;
 
         $this->stopwatch?->stop('dump');
@@ -110,11 +113,11 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         if (!$this->requestStack
             || !$response->headers->has('X-Debug-Token')
             || $response->isRedirection()
-            || ($response->headers->has('Content-Type') && !str_contains($response->headers->get('Content-Type'), 'html'))
+            || ($response->headers->has('Content-Type') && !str_contains($response->headers->get('Content-Type') ?? '', 'html'))
             || 'html' !== $request->getRequestFormat()
             || false === strripos($response->getContent(), '</body>')
         ) {
-            if ($response->headers->has('Content-Type') && str_contains($response->headers->get('Content-Type'), 'html')) {
+            if ($response->headers->has('Content-Type') && str_contains($response->headers->get('Content-Type') ?? '', 'html')) {
                 $dumper = new HtmlDumper('php://output', $this->charset);
                 $dumper->setDisplayOptions(['fileLinkFormat' => $this->fileLinkFormat]);
             } else {
@@ -125,7 +128,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
             }
 
             foreach ($this->data as $dump) {
-                $this->doDump($dumper, $dump['data'], $dump['name'], $dump['file'], $dump['line']);
+                $this->doDump($dumper, $dump['data'], $dump['name'], $dump['file'], $dump['line'], $dump['label'] ?? '');
             }
         }
     }
@@ -133,7 +136,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
     public function reset(): void
     {
         $this->stopwatch?->reset();
-        $this->data = [];
+        parent::reset();
         $this->dataCount = 0;
         $this->isCollected = true;
         $this->clonesCount = 0;
@@ -164,7 +167,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
     /**
      * @internal
      */
-    public function __wakeup()
+    public function __wakeup(): void
     {
         parent::__wakeup();
 
@@ -242,7 +245,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
 
             foreach ($this->data as $i => $dump) {
                 $this->data[$i] = null;
-                $this->doDump($dumper, $dump['data'], $dump['name'], $dump['file'], $dump['line']);
+                $this->doDump($dumper, $dump['data'], $dump['name'], $dump['file'], $dump['line'], $dump['label'] ?? '');
             }
 
             $this->data = [];
@@ -250,10 +253,12 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         }
     }
 
-    private function doDump(DataDumperInterface $dumper, Data $data, string $name, string $file, int $line): void
+    private function doDump(DataDumperInterface $dumper, Data $data, string $name, string $file, int $line, string $label): void
     {
         if ($dumper instanceof CliDumper) {
-            $contextDumper = function ($name, $file, $line, $fmt) {
+            $contextDumper = function ($name, $file, $line, $fmt, $label) {
+                $this->line = '' !== $label ? $this->style('meta', $label).' in ' : '';
+
                 if ($this instanceof HtmlDumper) {
                     if ($file) {
                         $s = $this->style('meta', '%s');
@@ -267,17 +272,17 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
                     } else {
                         $name = $this->style('meta', $name);
                     }
-                    $this->line = $name.' on line '.$this->style('meta', $line).':';
+                    $this->line .= $name.' on line '.$this->style('meta', $line).':';
                 } else {
-                    $this->line = $this->style('meta', $name).' on line '.$this->style('meta', $line).':';
+                    $this->line .= $this->style('meta', $name).' on line '.$this->style('meta', $line).':';
                 }
                 $this->dumpLine(0);
             };
             $contextDumper = $contextDumper->bindTo($dumper, $dumper);
-            $contextDumper($name, $file, $line, $this->fileLinkFormat);
+            $contextDumper($name, $file, $line, $this->fileLinkFormat, $label);
         } else {
             $cloner = new VarCloner();
-            $dumper->dump($cloner->cloneVar($name.' on line '.$line.':'));
+            $dumper->dump($cloner->cloneVar(('' !== $label ? $label.' in ' : '').$name.' on line '.$line.':'));
         }
         $dumper->dump($data);
     }

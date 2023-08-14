@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Doctrine\Form;
 
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\MappingException as LegacyMappingException;
 use Doctrine\Persistence\ManagerRegistry;
@@ -151,6 +152,13 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
         return null;
     }
 
+    /**
+     * @template T of object
+     *
+     * @param class-string<T> $class
+     *
+     * @return array{0:ClassMetadata<T>, 1:string}|null
+     */
     protected function getMetadata(string $class)
     {
         // normalize class name

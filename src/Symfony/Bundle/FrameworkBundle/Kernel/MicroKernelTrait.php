@@ -58,6 +58,7 @@ trait MicroKernelTrait
             $container->import($configDir.'/{services}_'.$this->environment.'.yaml');
         } else {
             $container->import($configDir.'/{services}.php');
+            $container->import($configDir.'/{services}_'.$this->environment.'.php');
         }
     }
 
@@ -111,6 +112,15 @@ trait MicroKernelTrait
         }
 
         return parent::getCacheDir();
+    }
+
+    public function getBuildDir(): string
+    {
+        if (isset($_SERVER['APP_BUILD_DIR'])) {
+            return $_SERVER['APP_BUILD_DIR'].'/'.$this->environment;
+        }
+
+        return parent::getBuildDir();
     }
 
     public function getLogDir(): string

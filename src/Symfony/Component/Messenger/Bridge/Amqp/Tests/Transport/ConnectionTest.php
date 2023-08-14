@@ -808,10 +808,10 @@ class ConnectionTest extends TestCase
 
 class TestAmqpFactory extends AmqpFactory
 {
-    private $connection;
-    private $channel;
-    private $queue;
-    private $exchange;
+    private \AMQPConnection $connection;
+    private \AMQPChannel $channel;
+    private \AMQPQueue $queue;
+    private \AMQPExchange $exchange;
 
     public function __construct(\AMQPConnection $connection, \AMQPChannel $channel, \AMQPQueue $queue, \AMQPExchange $exchange)
     {

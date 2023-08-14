@@ -29,7 +29,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class XliffLintCommandTest extends TestCase
 {
-    private $files;
+    private array $files;
 
     public function testGetHelp()
     {

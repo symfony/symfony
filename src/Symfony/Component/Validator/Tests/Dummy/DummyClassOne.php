@@ -11,6 +11,26 @@
 
 namespace Symfony\Component\Validator\Tests\Dummy;
 
+use Symfony\Component\Validator\Constraints as Assert;
+
+#[Assert\Expression(expression: '1 + 1 = 2')]
 class DummyClassOne
 {
+    /**
+     * @var string|null
+     */
+    #[Assert\NotBlank]
+    public $code;
+
+    /**
+     * @var string|null
+     */
+    #[Assert\Email]
+    public $email;
+
+    /**
+     * @var DummyClassTwo|null
+     */
+    #[Assert\Valid]
+    public $dummyClassTwo;
 }

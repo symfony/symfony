@@ -22,7 +22,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class OptionsResolverIntrospector
 {
-    private $get;
+    private \Closure $get;
 
     public function __construct(OptionsResolver $optionsResolver)
     {

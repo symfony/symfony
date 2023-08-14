@@ -12,6 +12,8 @@
 namespace Symfony\Component\AssetMapper\Factory;
 
 use Symfony\Component\AssetMapper\AssetMapperCompiler;
+use Symfony\Component\AssetMapper\Exception\CircularAssetsException;
+use Symfony\Component\AssetMapper\Exception\RuntimeException;
 use Symfony\Component\AssetMapper\MappedAsset;
 use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
 
@@ -35,22 +37,29 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
     public function createMappedAsset(string $logicalPath, string $sourcePath): ?MappedAsset
     {
         if (\in_array($logicalPath, $this->assetsBeingCreated, true)) {
-            throw new \RuntimeException(sprintf('Circular reference detected while creating asset for "%s": "%s".', $logicalPath, implode(' -> ', $this->assetsBeingCreated).' -> '.$logicalPath));
+            throw new CircularAssetsException(sprintf('Circular reference detected while creating asset for "%s": "%s".', $logicalPath, implode(' -> ', $this->assetsBeingCreated).' -> '.$logicalPath));
         }
 
         if (!isset($this->assetsCache[$logicalPath])) {
             $this->assetsBeingCreated[] = $logicalPath;
 
-            $asset = new MappedAsset($logicalPath);
-            $this->assetsCache[$logicalPath] = $asset;
-            $asset->setSourcePath($sourcePath);
+            $asset = new MappedAsset($logicalPath, $sourcePath, $this->assetsPathResolver->resolvePublicPath($logicalPath));
 
-            $asset->setPublicPathWithoutDigest($this->assetsPathResolver->resolvePublicPath($logicalPath));
-            $publicPath = $this->getPublicPath($asset);
-            $asset->setPublicPath($publicPath);
             [$digest, $isPredigested] = $this->getDigest($asset);
-            $asset->setDigest($digest, $isPredigested);
-            $asset->setContent($this->calculateContent($asset));
+
+            $asset = new MappedAsset(
+                $asset->logicalPath,
+                $asset->sourcePath,
+                $asset->publicPathWithoutDigest,
+                $this->getPublicPath($asset),
+                $this->calculateContent($asset),
+                $digest,
+                $isPredigested,
+                $asset->getDependencies(),
+                $asset->getFileDependencies(),
+            );
+
+            $this->assetsCache[$logicalPath] = $asset;
 
             array_pop($this->assetsBeingCreated);
         }
@@ -66,7 +75,7 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
     private function getDigest(MappedAsset $asset): array
     {
         // check for a pre-digested file
-        if (preg_match(self::PREDIGESTED_REGEX, $asset->getLogicalPath(), $matches)) {
+        if (preg_match(self::PREDIGESTED_REGEX, $asset->logicalPath, $matches)) {
             return [$matches[1], true];
         }
 
@@ -78,18 +87,18 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
 
     private function calculateContent(MappedAsset $asset): string
     {
-        if (isset($this->fileContentsCache[$asset->getLogicalPath()])) {
-            return $this->fileContentsCache[$asset->getLogicalPath()];
+        if (isset($this->fileContentsCache[$asset->logicalPath])) {
+            return $this->fileContentsCache[$asset->logicalPath];
         }
 
-        if (!is_file($asset->getSourcePath())) {
-            throw new \RuntimeException(sprintf('Asset source path "%s" could not be found.', $asset->getSourcePath()));
+        if (!is_file($asset->sourcePath)) {
+            throw new RuntimeException(sprintf('Asset source path "%s" could not be found.', $asset->sourcePath));
         }
 
-        $content = file_get_contents($asset->getSourcePath());
+        $content = file_get_contents($asset->sourcePath);
         $content = $this->compiler->compile($content, $asset);
 
-        $this->fileContentsCache[$asset->getLogicalPath()] = $content;
+        $this->fileContentsCache[$asset->logicalPath] = $content;
 
         return $content;
     }
@@ -99,10 +108,10 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
         [$digest, $isPredigested] = $this->getDigest($asset);
 
         if ($isPredigested) {
-            return $this->assetsPathResolver->resolvePublicPath($asset->getLogicalPath());
+            return $this->assetsPathResolver->resolvePublicPath($asset->logicalPath);
         }
 
-        $digestedPath = preg_replace_callback('/\.(\w+)$/', fn ($matches) => "-{$digest}{$matches[0]}", $asset->getLogicalPath());
+        $digestedPath = preg_replace_callback('/\.(\w+)$/', fn ($matches) => "-{$digest}{$matches[0]}", $asset->logicalPath);
 
         return $this->assetsPathResolver->resolvePublicPath($digestedPath);
     }

@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class CachePoolClearCommandTest extends TestCase
 {
-    private $cachePool;
+    private CacheItemPoolInterface $cachePool;
 
     protected function setUp(): void
     {

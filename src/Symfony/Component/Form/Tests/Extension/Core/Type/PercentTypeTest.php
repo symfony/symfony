@@ -19,7 +19,7 @@ class PercentTypeTest extends TypeTestCase
 {
     public const TESTED_TYPE = PercentType::class;
 
-    private $defaultLocale;
+    private string $defaultLocale;
 
     protected function setUp(): void
     {

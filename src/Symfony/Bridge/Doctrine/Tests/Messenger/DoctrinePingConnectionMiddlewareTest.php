@@ -15,6 +15,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bridge\Doctrine\Messenger\DoctrinePingConnectionMiddleware;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
@@ -23,11 +24,11 @@ use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 
 class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
 {
-    private $connection;
-    private $entityManager;
-    private $managerRegistry;
-    private $middleware;
-    private $entityManagerName = 'default';
+    private MockObject&Connection $connection;
+    private MockObject&EntityManagerInterface $entityManager;
+    private MockObject&ManagerRegistry $managerRegistry;
+    private DoctrinePingConnectionMiddleware $middleware;
+    private string $entityManagerName = 'default';
 
     protected function setUp(): void
     {

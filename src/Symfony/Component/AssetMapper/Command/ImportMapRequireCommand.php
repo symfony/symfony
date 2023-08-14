@@ -25,8 +25,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * @experimental
- *
  * @author Kévin Dunglas <kevin@dunglas.dev>
  */
 #[AsCommand(name: 'importmap:require', description: 'Requires JavaScript packages')]
@@ -55,6 +53,14 @@ For example:
 
     <info>php %command.full_name% lodash --preload</info>
     <info>php %command.full_name% "lodash@^4.15"</info>
+
+You can also require specific paths of a package:
+
+    <info>php %command.full_name% "chart.js/auto"</info>
+
+Or download one package/file, but alias its name in your import map:
+
+    <info>php %command.full_name% "vue/dist/vue.esm-bundler.js=vue"</info>
 
 The <info>preload</info> option will set the <info>preload</info> option in the importmap,
 which will tell the browser to preload the package. This should be used for all
@@ -114,10 +120,14 @@ EOT
                 $parts['version'] ?? null,
                 $input->getOption('download'),
                 $input->getOption('preload'),
-                null,
+                $parts['alias'] ?? $parts['package'],
                 isset($parts['registry']) && $parts['registry'] ? $parts['registry'] : null,
                 $path,
             );
+        }
+
+        if ($input->getOption('download')) {
+            $io->warning(sprintf('The --download option is experimental. It should work well with the default %s provider but check your browser console for 404 errors.', ImportMapManager::PROVIDER_JSDELIVR_ESM));
         }
 
         $newPackages = $this->importMapManager->require($packages);
@@ -129,7 +139,7 @@ EOT
                 $application = $this->getApplication();
                 if ($application instanceof Application) {
                     $projectDir = $application->getKernel()->getProjectDir();
-                    $downloadedPath = $downloadedAsset->getSourcePath();
+                    $downloadedPath = $downloadedAsset->sourcePath;
                     if (str_starts_with($downloadedPath, $projectDir)) {
                         $downloadedPath = substr($downloadedPath, \strlen($projectDir) + 1);
                     }

@@ -574,7 +574,7 @@ class InlineTest extends TestCase
      */
     public function testParseTimestampAsDateTimeObject(string $yaml, int $year, int $month, int $day, int $hour, int $minute, int $second, int $microsecond, string $timezone)
     {
-        $expected = (new \DateTime($yaml))
+        $expected = (new \DateTimeImmutable($yaml))
             ->setTimeZone(new \DateTimeZone('UTC'))
             ->setDate($year, $month, $day)
             ->setTime($hour, $minute, $second, $microsecond);
@@ -599,7 +599,7 @@ class InlineTest extends TestCase
      */
     public function testParseNestedTimestampListAsDateTimeObject(string $yaml, int $year, int $month, int $day, int $hour, int $minute, int $second, int $microsecond)
     {
-        $expected = (new \DateTime($yaml))
+        $expected = (new \DateTimeImmutable($yaml))
             ->setTimeZone(new \DateTimeZone('UTC'))
             ->setDate($year, $month, $day)
             ->setTime($hour, $minute, $second, $microsecond);

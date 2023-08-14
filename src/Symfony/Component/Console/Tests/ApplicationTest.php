@@ -52,9 +52,9 @@ use Symfony\Component\Process\Process;
 
 class ApplicationTest extends TestCase
 {
-    protected static $fixturesPath;
+    protected static string $fixturesPath;
 
-    private $colSize;
+    private string|false $colSize;
 
     protected function setUp(): void
     {
@@ -771,10 +771,15 @@ class ApplicationTest extends TestCase
         $this->assertInstanceOf(\FooCommand::class, $application->find('foo:'));
     }
 
-    public function testSetCatchExceptions()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testSetCatchExceptions(bool $catchErrors)
     {
         $application = new Application();
         $application->setAutoExit(false);
+        $application->setCatchErrors($catchErrors);
         putenv('COLUMNS=120');
         $tester = new ApplicationTester($application);
 
@@ -796,6 +801,33 @@ class ApplicationTest extends TestCase
             $this->assertInstanceOf(\Exception::class, $e, '->setCatchExceptions() sets the catch exception flag');
             $this->assertEquals('Command "foo" is not defined.', $e->getMessage(), '->setCatchExceptions() sets the catch exception flag');
         }
+    }
+
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testSetCatchErrors(bool $catchExceptions)
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions($catchExceptions);
+        $application->add((new Command('boom'))->setCode(fn () => throw new \Error('This is an error.')));
+
+        putenv('COLUMNS=120');
+        $tester = new ApplicationTester($application);
+
+        try {
+            $tester->run(['command' => 'boom']);
+            $this->fail('The exception is not catched.');
+        } catch (\Throwable $e) {
+            $this->assertInstanceOf(\Error::class, $e);
+            $this->assertSame('This is an error.', $e->getMessage());
+        }
+
+        $application->setCatchErrors(true);
+        $tester->run(['command' => 'boom']);
+        $this->assertStringContainsString('  This is an error.', $tester->getDisplay(true));
     }
 
     public function testAutoExitSetting()
@@ -2235,12 +2267,12 @@ class DisabledCommand extends Command
 #[AsCommand(name: 'signal')]
 class BaseSignableCommand extends Command
 {
-    public $signaled = false;
-    public $exitCode = 1;
-    public $signalHandlers = [];
-    public $loop = 1000;
-    private $emitsSignal;
-    private $signal;
+    public bool $signaled = false;
+    public int $exitCode = 1;
+    public array $signalHandlers = [];
+    public int $loop = 1000;
+    private bool $emitsSignal;
+    private int $signal;
 
     public function __construct(bool $emitsSignal = true, int $signal = \SIGUSR1)
     {
@@ -2351,7 +2383,7 @@ class TerminatableWithEventCommand extends Command implements SignalableCommandI
 
 class SignalEventSubscriber implements EventSubscriberInterface
 {
-    public $signaled = false;
+    public bool $signaled = false;
 
     public function onSignal(ConsoleSignalEvent $event): void
     {

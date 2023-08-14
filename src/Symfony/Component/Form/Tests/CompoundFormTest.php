@@ -26,7 +26,6 @@ use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormFactory;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\Forms;
@@ -42,15 +41,8 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class CompoundFormTest extends TestCase
 {
-    /**
-     * @var FormFactoryInterface
-     */
-    private $factory;
-
-    /**
-     * @var FormInterface
-     */
-    private $form;
+    private FormFactory $factory;
+    private FormInterface $form;
 
     protected function setUp(): void
     {

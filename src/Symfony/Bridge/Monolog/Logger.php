@@ -11,6 +11,8 @@
 
 namespace Symfony\Bridge\Monolog;
 
+trigger_deprecation('symfony/monolog-bridge', '6.4', 'The "%s" class is deprecated, use HttpKernel\'s DebugLoggerConfigurator instead.', Logger::class);
+
 use Monolog\Logger as BaseLogger;
 use Monolog\ResettableInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,7 +20,7 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+ * @deprecated since Symfony 6.4, use HttpKernel's DebugLoggerConfigurator instead
  */
 class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
 {
@@ -40,10 +42,7 @@ class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
         return 0;
     }
 
-    /**
-     * @return void
-     */
-    public function clear()
+    public function clear(): void
     {
         if ($logger = $this->getDebugLogger()) {
             $logger->clear();

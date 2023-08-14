@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * `UserValueResolver` no longer implements `ArgumentValueResolverInterface`
+
 6.3
 ---
 

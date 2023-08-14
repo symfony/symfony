@@ -17,8 +17,6 @@ use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
 /**
  * Finds and returns assets in the pipeline.
  *
- * @experimental
- *
  * @final
  */
 class AssetMapper implements AssetMapperInterface
@@ -44,21 +42,15 @@ class AssetMapper implements AssetMapperInterface
         return $this->mappedAssetFactory->createMappedAsset($logicalPath, $filePath);
     }
 
-    /**
-     * @return MappedAsset[]
-     */
-    public function allAssets(): array
+    public function allAssets(): iterable
     {
-        $assets = [];
         foreach ($this->mapperRepository->all() as $logicalPath => $filePath) {
             $asset = $this->getAsset($logicalPath);
             if (null === $asset) {
                 throw new \LogicException(sprintf('Asset "%s" could not be found.', $logicalPath));
             }
-            $assets[] = $asset;
+            yield $asset;
         }
-
-        return $assets;
     }
 
     public function getAssetFromSourcePath(string $sourcePath): ?MappedAsset
@@ -80,7 +72,7 @@ class AssetMapper implements AssetMapperInterface
 
         $asset = $this->getAsset($logicalPath);
 
-        return $asset?->getPublicPath();
+        return $asset?->publicPath;
     }
 
     private function loadManifest(): array

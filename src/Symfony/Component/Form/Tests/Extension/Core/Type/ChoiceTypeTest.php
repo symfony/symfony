@@ -22,7 +22,7 @@ class ChoiceTypeTest extends BaseTypeTestCase
 {
     public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\ChoiceType';
 
-    private $choices = [
+    private array $choices = [
         'Bernhard' => 'a',
         'Fabien' => 'b',
         'Kris' => 'c',
@@ -30,19 +30,19 @@ class ChoiceTypeTest extends BaseTypeTestCase
         'Roman' => 'e',
     ];
 
-    private $scalarChoices = [
+    private array $scalarChoices = [
         'Yes' => true,
         'No' => false,
         'n/a' => '',
     ];
 
-    private $booleanChoicesWithNull = [
+    private array $booleanChoicesWithNull = [
         'Yes' => true,
         'No' => false,
         'n/a' => null,
     ];
 
-    private $numericChoicesFlipped = [
+    private array $numericChoicesFlipped = [
         0 => 'Bernhard',
         1 => 'Fabien',
         2 => 'Kris',
@@ -50,9 +50,9 @@ class ChoiceTypeTest extends BaseTypeTestCase
         4 => 'Roman',
     ];
 
-    private $objectChoices;
+    private array $objectChoices;
 
-    protected $groupedChoices = [
+    protected array $groupedChoices = [
         'Symfony' => [
             'Bernhard' => 'a',
             'Fabien' => 'b',
@@ -75,13 +75,6 @@ class ChoiceTypeTest extends BaseTypeTestCase
             (object) ['id' => 4, 'name' => 'Jon'],
             (object) ['id' => 5, 'name' => 'Roman'],
         ];
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        $this->objectChoices = null;
     }
 
     public function testChoicesOptionExpectsArrayOrTraversable()

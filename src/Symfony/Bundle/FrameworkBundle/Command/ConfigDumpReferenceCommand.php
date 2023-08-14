@@ -23,8 +23,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
-use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -41,7 +39,7 @@ class ConfigDumpReferenceCommand extends AbstractConfigCommand
 {
     protected function configure(): void
     {
-        $commentedHelpFormats = array_map(static fn (string $format): string => sprintf('<comment>%s</comment>', $format), $this->getAvailableFormatOptions());
+        $commentedHelpFormats = array_map(fn ($format) => sprintf('<comment>%s</comment>', $format), $this->getAvailableFormatOptions());
         $helpFormats = implode('", "', $commentedHelpFormats);
 
         $this
@@ -83,14 +81,7 @@ EOF
 
         if (null === $name = $input->getArgument('name')) {
             $this->listBundles($errorIo);
-
-            $kernel = $this->getApplication()->getKernel();
-            if ($kernel instanceof ExtensionInterface
-                && ($kernel instanceof ConfigurationInterface || $kernel instanceof ConfigurationExtensionInterface)
-                && $kernel->getAlias()
-            ) {
-                $errorIo->table(['Kernel Extension'], [[$kernel->getAlias()]]);
-            }
+            $this->listNonBundleExtensions($errorIo);
 
             $errorIo->comment([
                 'Provide the name of a bundle as the first argument of this command to dump its default configuration. (e.g. <comment>config:dump-reference FrameworkBundle</comment>)',
@@ -158,6 +149,7 @@ EOF
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
     {
         if ($input->mustSuggestArgumentValuesFor('name')) {
+            $suggestions->suggestValues($this->getAvailableExtensions());
             $suggestions->suggestValues($this->getAvailableBundles());
         }
 
@@ -166,13 +158,24 @@ EOF
         }
     }
 
+    private function getAvailableExtensions(): array
+    {
+        $kernel = $this->getApplication()->getKernel();
+
+        $extensions = [];
+        foreach ($this->getContainerBuilder($kernel)->getExtensions() as $alias => $extension) {
+            $extensions[] = $alias;
+        }
+
+        return $extensions;
+    }
+
     private function getAvailableBundles(): array
     {
         $bundles = [];
 
         foreach ($this->getApplication()->getKernel()->getBundles() as $bundle) {
             $bundles[] = $bundle->getName();
-            $bundles[] = $bundle->getContainerExtension()->getAlias();
         }
 
         return $bundles;

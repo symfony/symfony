@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\SpotHit\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Notifier\Bridge\SpotHit\SpotHitTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
@@ -29,6 +30,9 @@ final class SpotHitTransportTest extends TransportTestCase
     public static function toStringProvider(): iterable
     {
         yield ['spothit://host.test?from=MyCompany', self::createTransport()];
+        yield ['spothit://host.test?from=MyCompany&smslong=1', self::createTransport()->setSmsLong(true)];
+        yield ['spothit://host.test?from=MyCompany&smslongnbr=3', self::createTransport()->setLongNBr(3)];
+        yield ['spothit://host.test?from=MyCompany&smslong=1&smslongnbr=3', self::createTransport()->setSmsLong(true)->setLongNBr(3)];
     }
 
     public static function supportedMessagesProvider(): iterable
@@ -41,5 +45,73 @@ final class SpotHitTransportTest extends TransportTestCase
     {
         yield [new ChatMessage('Hello!')];
         yield [new DummyMessage()];
+    }
+
+    public function testShouldSendAMessageUsingTheSpotHitAPI()
+    {
+        $expectedRequest = [
+            function ($method, $url, $options) {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://www.spot-hit.fr/api/envoyer/sms', $url);
+                $this->assertSame('key=&destinataires=0611223344&type=premium&message=Hello%21&expediteur=', $options['body']);
+
+                return new MockResponse(json_encode([
+                    'resultat' => ['success' => 'true'],
+                    'id' => '???',
+                ], \JSON_THROW_ON_ERROR));
+            },
+        ];
+
+        $client = new MockHttpClient($expectedRequest);
+        $transport = new SpotHitTransport('', '', $client, null);
+        $transport->send(new SmsMessage('0611223344', 'Hello!'));
+    }
+
+    public function argumentsProvider(): \Generator
+    {
+        yield [
+            function (SpotHitTransport $transport) { $transport->setSmsLong(true); },
+            function (array $bodyArguments) { $this->assertSame('1', $bodyArguments['smslong']); },
+        ];
+
+        yield [
+            function (SpotHitTransport $transport) { $transport->setLongNBr(3); },
+            function (array $bodyArguments) { $this->assertSame('3', $bodyArguments['smslongnbr']); },
+        ];
+
+        yield [
+            function (SpotHitTransport $transport) {
+                $transport->setSmsLong(true);
+                $transport->setLongNBr(3);
+            },
+            function (array $bodyArguments) {
+                $this->assertSame('1', $bodyArguments['smslong']);
+                $this->assertSame('3', $bodyArguments['smslongnbr']);
+            },
+        ];
+    }
+
+    /**
+     * @dataProvider argumentsProvider
+     */
+    public function testShouldForwardArgumentToRequest($setupTransport, $assertions)
+    {
+        $expectedRequest = [
+            function ($method, $url, $options) use ($assertions) {
+                $bodyFields = [];
+                parse_str($options['body'], $bodyFields);
+                $assertions($bodyFields);
+
+                return new MockResponse(json_encode([
+                    'resultat' => ['success' => 'true'],
+                    'id' => '???',
+                ], \JSON_THROW_ON_ERROR));
+            },
+        ];
+
+        $client = new MockHttpClient($expectedRequest);
+        $transport = new SpotHitTransport('', '', $client, null);
+        $setupTransport($transport);
+        $transport->send(new SmsMessage('0611223344', 'Hello!'));
     }
 }

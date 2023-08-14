@@ -13,21 +13,15 @@ namespace Symfony\Component\DependencyInjection\Tests\Config;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Config\ResourceCheckerInterface;
 use Symfony\Component\DependencyInjection\Config\ContainerParametersResource;
 use Symfony\Component\DependencyInjection\Config\ContainerParametersResourceChecker;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ContainerParametersResourceCheckerTest extends TestCase
 {
-    /** @var ContainerParametersResource */
-    private $resource;
-
-    /** @var ResourceCheckerInterface */
-    private $resourceChecker;
-
-    /** @var ContainerInterface */
-    private $container;
+    private ContainerParametersResource $resource;
+    private ContainerParametersResourceChecker $resourceChecker;
+    private MockObject&ContainerInterface $container;
 
     protected function setUp(): void
     {

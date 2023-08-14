@@ -17,8 +17,8 @@ use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
 
 class StaticTokenProvider implements TokenProviderInterface
 {
-    private static $db = [];
-    private static $kernelClass;
+    private static array $db = [];
+    private static ?string $kernelClass = null;
 
     public function __construct($kernel)
     {

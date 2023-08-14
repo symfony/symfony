@@ -48,6 +48,7 @@ use Symfony\Component\DependencyInjection\Tests\Compiler\AAndIInterfaceConsumer;
 use Symfony\Component\DependencyInjection\Tests\Compiler\AInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Foo;
 use Symfony\Component\DependencyInjection\Tests\Compiler\FooAnnotation;
+use Symfony\Component\DependencyInjection\Tests\Compiler\FooVoid;
 use Symfony\Component\DependencyInjection\Tests\Compiler\IInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\MyCallable;
 use Symfony\Component\DependencyInjection\Tests\Compiler\SingleMethodInterface;
@@ -76,7 +77,7 @@ class PhpDumperTest extends TestCase
 {
     use ExpectDeprecationTrait;
 
-    protected static $fixturesPath;
+    protected static string $fixturesPath;
 
     public static function setUpBeforeClass(): void
     {
@@ -337,24 +338,6 @@ class PhpDumperTest extends TestCase
             $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
         }
         $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/services9_lazy_inlined_factories.txt', $dump);
-    }
-
-    public function testNonSharedLazyDumpAsFiles()
-    {
-        $container = include self::$fixturesPath.'/containers/container_non_shared_lazy.php';
-        $container->register('non_shared_foo', \Bar\FooLazyClass::class)
-            ->setFile(realpath(self::$fixturesPath.'/includes/foo_lazy.php'))
-            ->setShared(false)
-            ->setPublic(true)
-            ->setLazy(true);
-        $container->compile();
-        $dumper = new PhpDumper($container);
-        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'inline_factories' => false, 'inline_class_loader' => false]), true);
-
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
-        }
-        $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/services_non_shared_lazy_as_files.txt', $dump);
     }
 
     public function testServicesWithAnonymousFactories()
@@ -767,6 +750,84 @@ class PhpDumperTest extends TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services13.php', $dumper->dump(), '->dump() dumps inline definitions which reference service_container');
     }
 
+    public function testNonSharedLazy()
+    {
+        $container = new ContainerBuilder();
+
+        $container
+            ->register('foo', \Bar\FooLazyClass::class)
+            ->setFile(realpath(self::$fixturesPath.'/includes/foo_lazy.php'))
+            ->setShared(false)
+            ->setLazy(true)
+            ->setPublic(true);
+
+        $container->compile();
+        $dumper = new PhpDumper($container);
+        $dump = $dumper->dump([
+            'class' => 'Symfony_DI_PhpDumper_Service_Non_Shared_Lazy',
+            'file' => __DIR__,
+            'inline_factories' => false,
+            'inline_class_loader' => false,
+        ]);
+        $this->assertStringEqualsFile(
+            self::$fixturesPath.'/php/services_non_shared_lazy_public.php',
+            '\\' === \DIRECTORY_SEPARATOR ? str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump) : $dump
+        );
+        eval('?>'.$dump);
+
+        $container = new \Symfony_DI_PhpDumper_Service_Non_Shared_Lazy();
+
+        $foo1 = $container->get('foo');
+        $this->assertTrue($foo1->resetLazyObject());
+
+        $foo2 = $container->get('foo');
+        $this->assertTrue($foo2->resetLazyObject());
+
+        $this->assertNotSame($foo1, $foo2);
+    }
+
+    public function testNonSharedLazyAsFiles()
+    {
+        $container = new ContainerBuilder();
+
+        $container
+            ->register('non_shared_foo', \Bar\FooLazyClass::class)
+            ->setFile(realpath(self::$fixturesPath.'/includes/foo_lazy.php'))
+            ->setShared(false)
+            ->setLazy(true)
+            ->setPublic(true);
+
+        $container->compile();
+        $dumper = new PhpDumper($container);
+        $dumps = $dumper->dump([
+            'class' => 'Symfony_DI_PhpDumper_Service_Non_Shared_Lazy_As_File',
+            'as_files' => true,
+            'inline_factories' => false,
+            'inline_class_loader' => false,
+        ]);
+
+        $stringDump = print_r($dumps, true);
+        $this->assertStringMatchesFormatFile(
+            self::$fixturesPath.'/php/services_non_shared_lazy_as_files.txt',
+            '\\' === \DIRECTORY_SEPARATOR ? str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $stringDump) : $stringDump
+        );
+
+        $lastDump = array_pop($dumps);
+        foreach (array_reverse($dumps) as $dump) {
+            eval('?>'.$dump);
+        }
+
+        $container = eval('?>'.$lastDump);
+
+        $foo1 = $container->get('non_shared_foo');
+        $this->assertTrue($foo1->resetLazyObject());
+
+        $foo2 = $container->get('non_shared_foo');
+        $this->assertTrue($foo2->resetLazyObject());
+
+        $this->assertNotSame($foo1, $foo2);
+    }
+
     /**
      * @testWith [false]
      *           [true]
@@ -775,7 +836,7 @@ class PhpDumperTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->register('foo', 'stdClass')->setShared(false)->setLazy(true);
-        $container->register('bar', 'stdClass')->addArgument(new Reference('foo', ContainerBuilder::EXCEPTION_ON_INVALID_REFERENCE, false))->setPublic(true);
+        $container->register('bar', 'stdClass')->addArgument(new Reference('foo', ContainerBuilder::EXCEPTION_ON_INVALID_REFERENCE))->setPublic(true);
         $container->compile();
 
         $dumper = new PhpDumper($container);
@@ -1563,6 +1624,37 @@ PHP
         $this->assertTrue($wither->resetLazyObject());
     }
 
+    public function testLazyWitherNonShared()
+    {
+        $container = new ContainerBuilder();
+        $container->register(Foo::class);
+
+        $container
+            ->register('wither', Wither::class)
+            ->setShared(false)
+            ->setLazy(true)
+            ->setPublic(true)
+            ->setAutowired(true);
+
+        $container->compile();
+        $dumper = new PhpDumper($container);
+        $dump = $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Service_Wither_Lazy_Non_Shared']);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_wither_lazy_non_shared.php', $dump);
+        eval('?>'.$dump);
+
+        $container = new \Symfony_DI_PhpDumper_Service_Wither_Lazy_Non_Shared();
+
+        $wither1 = $container->get('wither');
+        $this->assertInstanceOf(Foo::class, $wither1->foo);
+        $this->assertTrue($wither1->resetLazyObject());
+
+        $wither2 = $container->get('wither');
+        $this->assertInstanceOf(Foo::class, $wither2->foo);
+        $this->assertTrue($wither2->resetLazyObject());
+
+        $this->assertNotSame($wither1, $wither2);
+    }
+
     public function testWitherWithStaticReturnType()
     {
         $container = new ContainerBuilder();
@@ -1783,12 +1875,18 @@ PHP
     public function testLazyClosure()
     {
         $container = new ContainerBuilder();
-        $container->register('closure', 'Closure')
+        $container->register('closure1', 'Closure')
             ->setPublic('true')
             ->setFactory(['Closure', 'fromCallable'])
             ->setLazy(true)
             ->setArguments([[new Reference('foo'), 'cloneFoo']]);
+        $container->register('closure2', 'Closure')
+            ->setPublic('true')
+            ->setFactory(['Closure', 'fromCallable'])
+            ->setLazy(true)
+            ->setArguments([[new Reference('foo_void'), '__invoke']]);
         $container->register('foo', Foo::class);
+        $container->register('foo_void', FooVoid::class);
         $container->compile();
         $dumper = new PhpDumper($container);
 
@@ -1799,11 +1897,18 @@ PHP
         $container = new \Symfony_DI_PhpDumper_Test_Lazy_Closure();
 
         $cloned = Foo::$counter;
-        $this->assertInstanceOf(\Closure::class, $container->get('closure'));
+        $this->assertInstanceOf(\Closure::class, $container->get('closure1'));
         $this->assertSame($cloned, Foo::$counter);
-        $this->assertInstanceOf(Foo::class, $container->get('closure')());
+        $this->assertInstanceOf(Foo::class, $container->get('closure1')());
         $this->assertSame(1 + $cloned, Foo::$counter);
-        $this->assertSame(1, (new \ReflectionFunction($container->get('closure')))->getNumberOfParameters());
+        $this->assertSame(1, (new \ReflectionFunction($container->get('closure1')))->getNumberOfParameters());
+
+        $counter = FooVoid::$counter;
+        $this->assertInstanceOf(\Closure::class, $container->get('closure2'));
+        $this->assertSame($counter, FooVoid::$counter);
+        $container->get('closure2')('Hello');
+        $this->assertSame(1 + $counter, FooVoid::$counter);
+        $this->assertSame(1, (new \ReflectionFunction($container->get('closure2')))->getNumberOfParameters());
     }
 
     public function testLazyAutowireAttribute()

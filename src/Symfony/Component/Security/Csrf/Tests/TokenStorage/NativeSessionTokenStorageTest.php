@@ -26,10 +26,7 @@ class NativeSessionTokenStorageTest extends TestCase
 {
     private const SESSION_NAMESPACE = 'foobar';
 
-    /**
-     * @var NativeSessionTokenStorage
-     */
-    private $storage;
+    private NativeSessionTokenStorage $storage;
 
     protected function setUp(): void
     {

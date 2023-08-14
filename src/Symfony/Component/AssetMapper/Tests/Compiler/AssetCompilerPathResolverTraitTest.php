@@ -12,8 +12,8 @@
 namespace Symfony\Component\AssetMapper\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Asset\Exception\RuntimeException;
 use Symfony\Component\AssetMapper\Compiler\AssetCompilerPathResolverTrait;
+use Symfony\Component\AssetMapper\Exception\RuntimeException;
 
 class AssetCompilerPathResolverTraitTest extends TestCase
 {

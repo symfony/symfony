@@ -51,7 +51,12 @@ final class MockClock implements ClockInterface
 
     public function modify(string $modifier): void
     {
-        if (false === $modifiedNow = @$this->now->modify($modifier)) {
+        try {
+            $modifiedNow = @$this->now->modify($modifier);
+        } catch (\DateMalformedStringException) {
+            $modifiedNow = false;
+        }
+        if (false === $modifiedNow) {
             throw new \InvalidArgumentException(sprintf('Invalid modifier: "%s". Could not modify MockClock.', $modifier));
         }
 

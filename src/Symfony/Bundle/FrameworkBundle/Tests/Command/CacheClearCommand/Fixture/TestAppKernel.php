@@ -15,6 +15,7 @@ use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\HttpKernel\Kernel;
 
 class TestAppKernel extends Kernel
@@ -39,5 +40,22 @@ class TestAppKernel extends Kernel
     protected function build(ContainerBuilder $container): void
     {
         $container->register('logger', NullLogger::class);
+        $container->register(DummyFileCacheWarmer::class)
+            ->addTag('kernel.cache_warmer');
+    }
+}
+
+class DummyFileCacheWarmer implements CacheWarmerInterface
+{
+    public function isOptional(): bool
+    {
+        return false;
+    }
+
+    public function warmUp(string $cacheDir): array
+    {
+        file_put_contents($cacheDir.'/dummy.txt', 'Hello');
+
+        return [];
     }
 }

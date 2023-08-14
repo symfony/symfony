@@ -10,10 +10,11 @@
  */
 
 use Doctrine\Common\Annotations\AnnotationRegistry;
+use Doctrine\Deprecations\Deprecation;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler;
 
 // Detect if we need to serialize deprecations to a file.
-if ($file = getenv('SYMFONY_DEPRECATIONS_SERIALIZE')) {
+if (in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) && $file = getenv('SYMFONY_DEPRECATIONS_SERIALIZE')) {
     DeprecationErrorHandler::collectDeprecations($file);
 
     return;
@@ -24,8 +25,21 @@ if (!defined('PHPUNIT_COMPOSER_INSTALL') && !class_exists(\PHPUnit\TextUI\Comman
     return;
 }
 
+if (isset($fileIdentifier)) {
+    unset($GLOBALS['__composer_autoload_files'][$fileIdentifier]);
+}
+
 // Enforce a consistent locale
 setlocale(\LC_ALL, 'C');
+
+if (class_exists(Deprecation::class)) {
+    Deprecation::withoutDeduplication();
+
+    if (\PHP_VERSION_ID < 80000) {
+        // Ignore deprecations about the annotation mapping driver when it's not possible to move to the attribute driver yet
+        Deprecation::ignoreDeprecations('https://github.com/doctrine/orm/issues/10098');
+    }
+}
 
 if (!class_exists(AnnotationRegistry::class, false) && class_exists(AnnotationRegistry::class)) {
     if (method_exists(AnnotationRegistry::class, 'registerUniqueLoader')) {

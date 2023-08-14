@@ -17,10 +17,10 @@
     ],
     "require": {
         "php": ">=8.1",
-        "symfony/security-core": "^5.4|^6.0"
+        "symfony/security-core": "^5.4|^6.0|^7.0"
     },
     "require-dev": {
-        "symfony/http-foundation": "^5.4|^6.0"
+        "symfony/http-foundation": "^5.4|^6.0|^7.0"
     },
     "conflict": {
         "symfony/http-foundation": "<5.4"

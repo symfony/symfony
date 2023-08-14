@@ -17,7 +17,7 @@ use Symfony\Component\VarDumper\Dumper\ContextProvider\SourceContextProvider;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class Data implements \ArrayAccess, \Countable, \IteratorAggregate
+class Data implements \ArrayAccess, \Countable, \IteratorAggregate, \Stringable
 {
     private array $data;
     private int $position = 0;
@@ -121,6 +121,9 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
         yield from $value;
     }
 
+    /**
+     * @return mixed
+     */
     public function __get(string $key)
     {
         if (null !== $data = $this->seek($key)) {
@@ -271,7 +274,11 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
         $cursor = new Cursor();
         $cursor->hashType = -1;
         $cursor->attr = $this->context[SourceContextProvider::class] ?? [];
-        $dumper->dumpScalar($cursor, 'label', $this->context['label'] ?? '');
+        $label = $this->context['label'] ?? '';
+
+        if ($cursor->attr || '' !== $label) {
+            $dumper->dumpScalar($cursor, 'label', $label);
+        }
         $cursor->hashType = 0;
         $this->dumpItem($dumper, $cursor, $refs, $this->data[$this->position][$this->key]);
     }

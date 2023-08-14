@@ -402,6 +402,30 @@
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
                 <target>Wartość maski podsieci powinna być pomiędzy {{ min }} i {{ max }}.</target>
             </trans-unit>
+            <trans-unit id="104">
+                <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
+                <target>Nazwa pliku jest za długa. Powinna mieć {{ filename_max_length }} znak lub mniej.|Nazwa pliku jest za długa. Powinna mieć {{ filename_max_length }} znaków lub mniej.</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>The password strength is too low. Please use a stronger password.</source>
+                <target>Siła hasła jest zbyt niska. Użyj mocniejszego hasła.</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>This value contains characters that are not allowed by the current restriction-level.</source>
+                <target>Ta wartość zawiera znaki, które nie są dozwolone przez aktualny poziom ograniczeń.</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Using invisible characters is not allowed.</source>
+                <target>Używanie niewidzialnych znaków jest niedozwolone.</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Mixing numbers from different scripts is not allowed.</source>
+                <target>Mieszanie liczb z różnych skryptów jest niedozwolone.</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Using hidden overlay characters is not allowed.</source>
+                <target>Używanie ukrytych znaków nakładki jest niedozwolone.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

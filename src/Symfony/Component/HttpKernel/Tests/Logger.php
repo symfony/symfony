@@ -15,7 +15,7 @@ use Psr\Log\LoggerInterface;
 
 class Logger implements LoggerInterface
 {
-    protected $logs;
+    protected array $logs;
 
     public function __construct()
     {

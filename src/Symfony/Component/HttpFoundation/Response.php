@@ -286,7 +286,7 @@ class Response
             $charset = $this->charset ?: 'UTF-8';
             if (!$headers->has('Content-Type')) {
                 $headers->set('Content-Type', 'text/html; charset='.$charset);
-            } elseif (0 === stripos($headers->get('Content-Type'), 'text/') && false === stripos($headers->get('Content-Type'), 'charset')) {
+            } elseif (0 === stripos($headers->get('Content-Type') ?? '', 'text/') && false === stripos($headers->get('Content-Type') ?? '', 'charset')) {
                 // add the charset
                 $headers->set('Content-Type', $headers->get('Content-Type').'; charset='.$charset);
             }
@@ -503,12 +503,6 @@ class Response
             return $this;
         }
 
-        if (false === $text) {
-            $this->statusText = '';
-
-            return $this;
-        }
-
         $this->statusText = $text;
 
         return $this;
@@ -687,7 +681,7 @@ class Response
      *
      * @final
      */
-    public function getDate(): ?\DateTimeInterface
+    public function getDate(): ?\DateTimeImmutable
     {
         return $this->headers->getDate('Date');
     }
@@ -701,10 +695,7 @@ class Response
      */
     public function setDate(\DateTimeInterface $date): static
     {
-        if ($date instanceof \DateTime) {
-            $date = \DateTimeImmutable::createFromMutable($date);
-        }
-
+        $date = \DateTimeImmutable::createFromInterface($date);
         $date = $date->setTimezone(new \DateTimeZone('UTC'));
         $this->headers->set('Date', $date->format('D, d M Y H:i:s').' GMT');
 
@@ -745,13 +736,13 @@ class Response
      *
      * @final
      */
-    public function getExpires(): ?\DateTimeInterface
+    public function getExpires(): ?\DateTimeImmutable
     {
         try {
             return $this->headers->getDate('Expires');
         } catch (\RuntimeException) {
             // according to RFC 2616 invalid date formats (e.g. "0" and "-1") must be treated as in the past
-            return \DateTime::createFromFormat('U', time() - 172800);
+            return \DateTimeImmutable::createFromFormat('U', time() - 172800);
         }
     }
 
@@ -775,10 +766,7 @@ class Response
             return $this;
         }
 
-        if ($date instanceof \DateTime) {
-            $date = \DateTimeImmutable::createFromMutable($date);
-        }
-
+        $date = \DateTimeImmutable::createFromInterface($date);
         $date = $date->setTimezone(new \DateTimeZone('UTC'));
         $this->headers->set('Expires', $date->format('D, d M Y H:i:s').' GMT');
 
@@ -934,7 +922,7 @@ class Response
      *
      * @final
      */
-    public function getLastModified(): ?\DateTimeInterface
+    public function getLastModified(): ?\DateTimeImmutable
     {
         return $this->headers->getDate('Last-Modified');
     }
@@ -959,10 +947,7 @@ class Response
             return $this;
         }
 
-        if ($date instanceof \DateTime) {
-            $date = \DateTimeImmutable::createFromMutable($date);
-        }
-
+        $date = \DateTimeImmutable::createFromInterface($date);
         $date = $date->setTimezone(new \DateTimeZone('UTC'));
         $this->headers->set('Last-Modified', $date->format('D, d M Y H:i:s').' GMT');
 

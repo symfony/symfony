@@ -28,9 +28,9 @@ use Symfony\Component\Process\Process;
  */
 class ProcessTest extends TestCase
 {
-    private static $phpBin;
-    private static $process;
-    private static $sigchild;
+    private static string $phpBin;
+    private static ?Process $process = null;
+    private static bool $sigchild;
 
     public static function setUpBeforeClass(): void
     {
@@ -66,11 +66,11 @@ class ProcessTest extends TestCase
         $cmd->run();
     }
 
+    /**
+     * @group transient-on-windows
+     */
     public function testThatProcessDoesNotThrowWarningDuringRun()
     {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('This test is transient on Windows');
-        }
         @trigger_error('Test Error', \E_USER_NOTICE);
         $process = $this->getProcessForCode('sleep(3)');
         $process->run();
@@ -130,12 +130,11 @@ class ProcessTest extends TestCase
         $this->assertLessThan(15, microtime(true) - $start);
     }
 
+    /**
+     * @group transient-on-windows
+     */
     public function testWaitUntilSpecificOutput()
     {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestIncomplete('This test is too transient on Windows, help wanted to improve it');
-        }
-
         $p = $this->getProcess([self::$phpBin, __DIR__.'/KillableProcessWithOutput.php']);
         $p->start();
 
@@ -1522,6 +1521,10 @@ class ProcessTest extends TestCase
         $process->setTimeout(2);
         $process->wait();
         $this->assertFalse($process->isRunning());
+
+        if ('\\' !== \DIRECTORY_SEPARATOR && !\Closure::bind(fn () => $this->isSigchildEnabled(), $process, $process)()) {
+            $this->assertSame(0, $process->getExitCode());
+        }
     }
 
     public function testEnvCaseInsensitiveOnWindows()
@@ -1536,6 +1539,9 @@ class ProcessTest extends TestCase
         }
     }
 
+    /**
+     * @group transient-on-windows
+     */
     public function testNotTerminableInputPipe()
     {
         $process = $this->getProcess('echo foo');

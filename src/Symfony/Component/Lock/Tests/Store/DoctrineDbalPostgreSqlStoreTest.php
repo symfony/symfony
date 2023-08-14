@@ -11,9 +11,12 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception as DBALException;
+use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
+use Doctrine\DBAL\Tools\DsnParser;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
@@ -38,7 +41,7 @@ class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTestCase
             $this->markTestSkipped('Missing POSTGRES_HOST env variable');
         }
 
-        return DriverManager::getConnection(['url' => 'pgsql://postgres:password@'.getenv('POSTGRES_HOST')]);
+        return self::getDbalConnection('pdo-pgsql://postgres:password@'.getenv('POSTGRES_HOST'));
     }
 
     public function getStore(): PersistingStoreInterface
@@ -65,7 +68,7 @@ class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTestCase
     public static function getInvalidDrivers()
     {
         yield ['sqlite:///tmp/foo.db'];
-        yield [DriverManager::getConnection(['url' => 'sqlite:///tmp/foo.db'])];
+        yield [self::getDbalConnection('sqlite:///tmp/foo.db')];
     }
 
     public function testSaveAfterConflict()
@@ -164,5 +167,16 @@ class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTestCase
         $store2->waitAndSaveRead($store2Key);
 
         $this->assertTrue($store2->exists($store2Key));
+    }
+
+    private static function getDbalConnection(string $dsn): Connection
+    {
+        $params = class_exists(DsnParser::class) ? (new DsnParser(['sqlite' => 'pdo_sqlite']))->parse($dsn) : ['url' => $dsn];
+        $config = new Configuration();
+        if (class_exists(DefaultSchemaManagerFactory::class)) {
+            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
+        }
+
+        return DriverManager::getConnection($params, $config);
     }
 }

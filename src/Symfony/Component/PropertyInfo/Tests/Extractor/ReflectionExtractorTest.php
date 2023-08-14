@@ -33,10 +33,7 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class ReflectionExtractorTest extends TestCase
 {
-    /**
-     * @var ReflectionExtractor
-     */
-    private $extractor;
+    private ReflectionExtractor $extractor;
 
     protected function setUp(): void
     {

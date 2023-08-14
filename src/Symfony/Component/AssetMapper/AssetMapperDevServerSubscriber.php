@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\AssetMapper;
 
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -19,8 +20,6 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
  * Functions like a controller that returns assets from the asset mapper.
- *
- * @experimental
  *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
@@ -104,6 +103,7 @@ final class AssetMapperDevServerSubscriber implements EventSubscriberInterface
         private readonly AssetMapperInterface $assetMapper,
         string $publicPrefix = '/assets/',
         array $extensionsMap = [],
+        private readonly ?CacheItemPoolInterface $cacheMapCache = null,
     ) {
         $this->publicPrefix = rtrim($publicPrefix, '/').'/';
         $this->extensionsMap = array_merge(self::EXTENSIONS_MAP, $extensionsMap);
@@ -120,27 +120,21 @@ final class AssetMapperDevServerSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $asset = null;
-        foreach ($this->assetMapper->allAssets() as $assetCandidate) {
-            if ($pathInfo === $assetCandidate->getPublicPath()) {
-                $asset = $assetCandidate;
-                break;
-            }
-        }
+        $asset = $this->findAssetFromCache($pathInfo);
 
         if (!$asset) {
             throw new NotFoundHttpException(sprintf('Asset with public path "%s" not found.', $pathInfo));
         }
 
-        $mediaType = $this->getMediaType($asset->getPublicPath());
+        $mediaType = $this->getMediaType($asset->publicPath);
         $response = (new Response(
-            $asset->getContent(),
+            $asset->content,
             headers: $mediaType ? ['Content-Type' => $mediaType] : [],
         ))
             ->setPublic()
             ->setMaxAge(604800)
             ->setImmutable()
-            ->setEtag($asset->getDigest())
+            ->setEtag($asset->digest)
         ;
 
         $event->setResponse($response);
@@ -159,5 +153,38 @@ final class AssetMapperDevServerSubscriber implements EventSubscriberInterface
         $extension = pathinfo($path, \PATHINFO_EXTENSION);
 
         return $this->extensionsMap[$extension] ?? null;
+    }
+
+    private function findAssetFromCache(string $pathInfo): ?MappedAsset
+    {
+        $cachedAsset = null;
+        if (null !== $this->cacheMapCache) {
+            $cachedAsset = $this->cacheMapCache->getItem(hash('xxh128', $pathInfo));
+            $asset = $cachedAsset->isHit() ? $this->assetMapper->getAsset($cachedAsset->get()) : null;
+
+            if (null !== $asset && $asset->publicPath === $pathInfo) {
+                return $asset;
+            }
+        }
+
+        // we did not find a match
+        $asset = null;
+        foreach ($this->assetMapper->allAssets() as $assetCandidate) {
+            if ($pathInfo === $assetCandidate->publicPath) {
+                $asset = $assetCandidate;
+                break;
+            }
+        }
+
+        if (null === $asset) {
+            return null;
+        }
+
+        if (null !== $cachedAsset) {
+            $cachedAsset->set($asset->logicalPath);
+            $this->cacheMapCache->save($cachedAsset);
+        }
+
+        return $asset;
     }
 }

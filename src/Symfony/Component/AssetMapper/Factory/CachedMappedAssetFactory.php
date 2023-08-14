@@ -13,6 +13,7 @@ namespace Symfony\Component\AssetMapper\Factory;
 
 use Symfony\Component\AssetMapper\MappedAsset;
 use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
 
@@ -59,7 +60,8 @@ class CachedMappedAssetFactory implements MappedAssetFactoryInterface
      */
     private function collectResourcesFromAsset(MappedAsset $mappedAsset): array
     {
-        $resources = [new FileResource($mappedAsset->getSourcePath())];
+        $resources = array_map(fn (string $path) => is_dir($path) ? new DirectoryResource($path) : new FileResource($path), $mappedAsset->getFileDependencies());
+        $resources[] = new FileResource($mappedAsset->sourcePath);
 
         foreach ($mappedAsset->getDependencies() as $dependency) {
             if (!$dependency->isContentDependency) {

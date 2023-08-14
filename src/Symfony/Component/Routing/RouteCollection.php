@@ -37,7 +37,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
     /**
      * @var array<string, Alias>
      */
-    private $aliases = [];
+    private array $aliases = [];
 
     /**
      * @var array<string, ResourceInterface>

@@ -11,12 +11,10 @@
 
 namespace Symfony\Component\AssetMapper\Compiler;
 
-use Symfony\Component\Asset\Exception\RuntimeException;
+use Symfony\Component\AssetMapper\Exception\RuntimeException;
 
 /**
  * Helps resolve "../" and "./" in paths.
- *
- * @experimental
  *
  * @internal
  */

@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 
 class StaticMethodLoaderTest extends TestCase
 {
-    private $errorLevel;
+    private int $errorLevel;
 
     protected function setUp(): void
     {
@@ -119,7 +119,7 @@ abstract class AbstractStaticLoader
 
 class StaticLoaderEntity
 {
-    public static $invokedWith;
+    public static ClassMetadata $invokedWith;
 
     public static function loadMetadata(ClassMetadata $metadata)
     {

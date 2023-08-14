@@ -13,4 +13,5 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Test
 
 class PrivateService
 {
+    public $inner;
 }

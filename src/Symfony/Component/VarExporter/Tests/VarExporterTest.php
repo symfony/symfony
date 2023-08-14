@@ -127,7 +127,7 @@ class VarExporterTest extends TestCase
             \DateTime::createFromFormat('U', 0),
             \DateTimeImmutable::createFromFormat('U', 0),
             $tz = new \DateTimeZone('Europe/Paris'),
-            $interval = ($start = new \DateTime('2009-10-11', $tz))->diff(new \DateTime('2009-10-18', $tz)),
+            $interval = ($start = new \DateTimeImmutable('2009-10-11', $tz))->diff(new \DateTimeImmutable('2009-10-18', $tz)),
             new \DatePeriod($start, $interval, 4),
         ]];
 
@@ -234,6 +234,8 @@ class VarExporterTest extends TestCase
         yield ['php74-serializable', new Php74Serializable()];
 
         yield ['__unserialize-but-no-__serialize', new __UnserializeButNo__Serialize()];
+
+        yield ['__serialize-but-no-__unserialize', new __SerializeButNo__Unserialize()];
 
         yield ['unit-enum', [FooUnitEnum::Bar], true];
         yield ['readonly', new FooReadonly('k', 'v')];
@@ -452,5 +454,22 @@ class __UnserializeButNo__Serialize
     public function __unserialize(array $data): void
     {
         $this->foo = $data['foo'];
+    }
+}
+
+class __SerializeButNo__Unserialize
+{
+    public $foo;
+
+    public function __construct()
+    {
+        $this->foo = 'ccc';
+    }
+
+    public function __serialize(): array
+    {
+        return [
+            'foo' => $this->foo,
+        ];
     }
 }

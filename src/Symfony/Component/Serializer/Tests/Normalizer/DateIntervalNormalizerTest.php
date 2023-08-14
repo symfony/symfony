@@ -21,10 +21,7 @@ use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
  */
 class DateIntervalNormalizerTest extends TestCase
 {
-    /**
-     * @var DateIntervalNormalizer
-     */
-    private $normalizer;
+    private DateIntervalNormalizer $normalizer;
 
     protected function setUp(): void
     {

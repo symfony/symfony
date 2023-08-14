@@ -15,11 +15,9 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class ProjectServiceContainer extends Container
 {
     protected $parameters = [];
-    protected readonly \WeakReference $ref;
 
     public function __construct()
     {
-        $this->ref = \WeakReference::create($this);
         $this->parameters = $this->getDefaultParameters();
 
         $this->services = $this->privates = [];
@@ -330,11 +328,7 @@ class ProjectServiceContainer extends Container
      */
     protected static function getLazyContextService($container)
     {
-        $containerRef = $container->ref;
-
-        return $container->services['lazy_context'] = new \LazyContext(new RewindableGenerator(function () use ($containerRef) {
-            $container = $containerRef->get();
-
+        return $container->services['lazy_context'] = new \LazyContext(new RewindableGenerator(function () use ($container) {
             yield 'k1' => ($container->services['foo.baz'] ?? self::getFoo_BazService($container));
             yield 'k2' => $container;
         }, 2), new RewindableGenerator(fn () => new \EmptyIterator(), 0));
@@ -347,11 +341,7 @@ class ProjectServiceContainer extends Container
      */
     protected static function getLazyContextIgnoreInvalidRefService($container)
     {
-        $containerRef = $container->ref;
-
-        return $container->services['lazy_context_ignore_invalid_ref'] = new \LazyContext(new RewindableGenerator(function () use ($containerRef) {
-            $container = $containerRef->get();
-
+        return $container->services['lazy_context_ignore_invalid_ref'] = new \LazyContext(new RewindableGenerator(function () use ($container) {
             yield 0 => ($container->services['foo.baz'] ?? self::getFoo_BazService($container));
         }, 1), new RewindableGenerator(fn () => new \EmptyIterator(), 0));
     }
@@ -428,11 +418,7 @@ class ProjectServiceContainer extends Container
      */
     protected static function getTaggedIteratorService($container)
     {
-        $containerRef = $container->ref;
-
-        return $container->services['tagged_iterator'] = new \Bar(new RewindableGenerator(function () use ($containerRef) {
-            $container = $containerRef->get();
-
+        return $container->services['tagged_iterator'] = new \Bar(new RewindableGenerator(function () use ($container) {
             yield 0 => ($container->services['foo'] ?? self::getFooService($container));
             yield 1 => ($container->privates['tagged_iterator_foo'] ??= new \Bar());
         }, 2));
@@ -476,7 +462,7 @@ class ProjectServiceContainer extends Container
 
     public function getParameterBag(): ParameterBagInterface
     {
-        if (null === $this->parameterBag) {
+        if (!isset($this->parameterBag)) {
             $parameters = $this->parameters;
             foreach ($this->loadedDynamicParameters as $name => $loaded) {
                 $parameters[$name] = $loaded ? $this->dynamicParameters[$name] : $this->getDynamicParameter($name);

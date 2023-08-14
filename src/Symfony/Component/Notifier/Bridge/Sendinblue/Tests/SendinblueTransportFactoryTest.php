@@ -14,6 +14,9 @@ namespace Symfony\Component\Notifier\Bridge\Sendinblue\Tests;
 use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 
+/**
+ * @group legacy
+ */
 final class SendinblueTransportFactoryTest extends TransportFactoryTestCase
 {
     public function createFactory(): SendinblueTransportFactory

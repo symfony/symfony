@@ -1,4 +1,5 @@
 framework:
+    annotations: false
     http_method_override: false
     notifier:
         enabled: true

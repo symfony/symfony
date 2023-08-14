@@ -21,6 +21,7 @@ use Symfony\Component\VarDumper\Cloner\Data;
  */
 class HtmlDumper extends CliDumper
 {
+    /** @var callable|resource|string|null */
     public static $defaultOutput = 'php://output';
 
     protected static $themes = [
@@ -163,9 +164,7 @@ class HtmlDumper extends CliDumper
 <script>
 Sfdump = window.Sfdump || (function (doc) {
 
-if (doc.body instanceof HTMLElement) {
-    doc.body.classList.add('sf-js-enabled');
-}
+doc.documentElement.classList.add('sf-js-enabled');
 
 var rxEsc = /([.*+?^${}()|\[\]\/\\])/g,
     idRx = /\bsf-dump-\d+-ref[012]\w+\b/,
@@ -903,7 +902,7 @@ EOHTML
         }
 
         $map = static::$controlCharsMap;
-        $v = '<span class=sf-dump-'.('label' === $style ? 'default' : $style).'>'.preg_replace_callback(static::$controlCharsRx, function ($c) use ($map) {
+        $v = "<span class=sf-dump-{$style}>".preg_replace_callback(static::$controlCharsRx, function ($c) use ($map) {
             $s = $b = '<span class="sf-dump-default';
             $c = $c[$i = 0];
             if ($ns = "\r" === $c[$i] || "\n" === $c[$i]) {
@@ -943,6 +942,9 @@ EOHTML
         }
         if (isset($attr['lang'])) {
             $v = sprintf('<code class="%s">%s</code>', esc($attr['lang']), $v);
+        }
+        if ('label' === $style) {
+            $v .= ' ';
         }
 
         return $v;

@@ -35,7 +35,7 @@ class DoctrineDbalCacheAdapterSchemaListenerTest extends TestCase
         $dbalAdapter = $this->createMock(DoctrineDbalAdapter::class);
         $dbalAdapter->expects($this->once())
             ->method('configureSchema')
-            ->with($schema, $dbalConnection);
+            ->with($schema, $dbalConnection, fn () => true);
 
         $subscriber = new DoctrineDbalCacheAdapterSchemaListener([$dbalAdapter]);
         $subscriber->postGenerateSchema($event);

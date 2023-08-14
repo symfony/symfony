@@ -49,6 +49,7 @@
         </xsd:choice>
 
         <xsd:attribute name="http-method-override" type="xsd:boolean" />
+        <xsd:attribute name="handle-all-throwables" type="xsd:boolean" />
         <xsd:attribute name="trust-x-sendfile-type-header" type="xsd:boolean" />
         <xsd:attribute name="ide" type="xsd:string" />
         <xsd:attribute name="secret" type="xsd:string" />
@@ -197,7 +198,7 @@
         <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="server" type="xsd:boolean" />
         <xsd:attribute name="public-prefix" type="xsd:string" />
-        <xsd:attribute name="strict-mode" type="xsd:boolean" />
+        <xsd:attribute name="missing-import-mode" type="missing-import-mode" />
         <xsd:attribute name="importmap-path" type="xsd:string" />
         <xsd:attribute name="importmap-polyfill" type="xsd:string" />
         <xsd:attribute name="vendor-dir" type="xsd:string" />
@@ -215,6 +216,14 @@
     <xsd:complexType name="asset_mapper_attribute" mixed="true">
         <xsd:attribute name="key" type="xsd:string" use="required" />
     </xsd:complexType>
+
+    <xsd:simpleType name="missing-import-mode">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="strict" />
+            <xsd:enumeration value="warn" />
+            <xsd:enumeration value="ignore" />
+        </xsd:restriction>
+    </xsd:simpleType>
 
     <xsd:complexType name="translator">
         <xsd:sequence>
@@ -342,6 +351,7 @@
         <xsd:attribute name="default-redis-provider" type="xsd:string" />
         <xsd:attribute name="default-memcached-provider" type="xsd:string" />
         <xsd:attribute name="default-pdo-provider" type="xsd:string" />
+        <xsd:attribute name="default-doctrine-dbal-provider" type="xsd:string" />
         <xsd:attribute name="prefix-seed" type="xsd:string" />
     </xsd:complexType>
 
@@ -439,8 +449,6 @@
 
     <xsd:simpleType name="marking_store_type">
         <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="multiple_state" />
-            <xsd:enumeration value="single_state" />
             <xsd:enumeration value="method" />
         </xsd:restriction>
     </xsd:simpleType>

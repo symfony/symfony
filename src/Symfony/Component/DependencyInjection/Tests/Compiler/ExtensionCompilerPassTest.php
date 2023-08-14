@@ -22,8 +22,8 @@ use Symfony\Component\DependencyInjection\Extension\Extension;
  */
 class ExtensionCompilerPassTest extends TestCase
 {
-    private $container;
-    private $pass;
+    private ContainerBuilder $container;
+    private ExtensionCompilerPass $pass;
 
     protected function setUp(): void
     {

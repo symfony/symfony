@@ -21,7 +21,6 @@ class ChatworkMessageBodyBuilderTest extends TestCase
         $builder = new ChatworkMessageBodyBuilder();
         $builder->to(['abc', 'def']);
         $property = new \ReflectionProperty($builder, 'to');
-        $property->setAccessible(true);
         $this->assertSame(['abc', 'def'], $property->getValue($builder));
         $builder->to('ghi');
         $this->assertSame(['ghi'], $property->getValue($builder));
@@ -32,7 +31,6 @@ class ChatworkMessageBodyBuilderTest extends TestCase
         $builder = new ChatworkMessageBodyBuilder();
         $builder->selfUnread(true);
         $property = new \ReflectionProperty($builder, 'selfUnread');
-        $property->setAccessible(true);
         $this->assertTrue($property->getValue($builder));
     }
 
@@ -41,7 +39,6 @@ class ChatworkMessageBodyBuilderTest extends TestCase
         $builder = new ChatworkMessageBodyBuilder();
         $builder->body('test body');
         $property = new \ReflectionProperty($builder, 'body');
-        $property->setAccessible(true);
         $this->assertEquals('test body', $property->getValue($builder));
     }
 

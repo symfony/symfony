@@ -21,6 +21,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Compiler\CheckTypeDeclarationsPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
+use Symfony\Component\DependencyInjection\Compiler\ResolveFactoryClassPass;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -99,7 +100,7 @@ final class ContainerLintCommand extends Command
             $refl->setValue($parameterBag, true);
 
             $container->getCompilerPassConfig()->setBeforeOptimizationPasses([]);
-            $container->getCompilerPassConfig()->setOptimizationPasses([]);
+            $container->getCompilerPassConfig()->setOptimizationPasses([new ResolveFactoryClassPass()]);
             $container->getCompilerPassConfig()->setBeforeRemovingPasses([]);
         }
 

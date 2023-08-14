@@ -83,7 +83,7 @@ class PlantUmlDumperTest extends TestCase
 
         $placesMetadata = [];
         $placesMetadata['place a'] = [
-            'description' => 'My custom place description',
+            'description' => "My custom\nplace description",
         ];
         $inMemoryMetadataStore = new InMemoryMetadataStore([], $placesMetadata);
         $definition = new Definition($places, $transitions, null, $inMemoryMetadataStore);

@@ -29,20 +29,9 @@ abstract class UserPasswordValidatorTestCase extends ConstraintValidatorTestCase
     private const PASSWORD = 's3Cr3t';
     private const SALT = '^S4lt$';
 
-    /**
-     * @var TokenStorageInterface
-     */
-    protected $tokenStorage;
-
-    /**
-     * @var PasswordHasherInterface
-     */
-    protected $hasher;
-
-    /**
-     * @var PasswordHasherFactoryInterface
-     */
-    protected $hasherFactory;
+    protected TokenStorageInterface $tokenStorage;
+    protected PasswordHasherInterface $hasher;
+    protected PasswordHasherFactoryInterface $hasherFactory;
 
     protected function createValidator(): UserPasswordValidator
     {

@@ -25,14 +25,11 @@ class FormExtensionBootstrap3HorizontalLayoutTest extends AbstractBootstrap3Hori
 {
     use RuntimeLoaderProvider;
 
-    protected $testableFeatures = [
+    protected array $testableFeatures = [
         'choice_attr',
     ];
 
-    /**
-     * @var FormRenderer
-     */
-    private $renderer;
+    private FormRenderer $renderer;
 
     protected function setUp(): void
     {

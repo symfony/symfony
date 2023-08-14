@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Templating;
 
+trigger_deprecation('symfony/templating', '6.4', '"%s" is deprecated since version 6.4 and will be removed in 7.0. Use Twig instead.', EngineInterface::class);
+
 /**
  * EngineInterface is the interface each engine must implement.
  *
@@ -27,6 +29,8 @@ namespace Symfony\Component\Templating;
  * the template.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 6.4, use Twig instead
  */
 interface EngineInterface
 {

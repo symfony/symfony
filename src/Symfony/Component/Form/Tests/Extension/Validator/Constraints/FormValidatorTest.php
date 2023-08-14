@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Tests\Extension\Validator\Constraints;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
@@ -39,15 +38,8 @@ use Symfony\Component\Validator\Validation;
  */
 class FormValidatorTest extends ConstraintValidatorTestCase
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
-     * @var FormFactoryInterface
-     */
-    private $factory;
+    private EventDispatcher $dispatcher;
+    private FormFactoryInterface $factory;
 
     protected function setUp(): void
     {
@@ -272,8 +264,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ])
             ->setData($object)
             ->addViewTransformer(new CallbackTransformer(
-                fn ($data) => $data,
-                function () { throw new TransformationFailedException(); }
+                static fn ($data) => $data,
+                static fn () => throw new TransformationFailedException()
             ))
             ->getForm();
 
@@ -309,8 +301,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ])
             ->setData($object)
             ->addViewTransformer(new CallbackTransformer(
-                fn ($data) => $data,
-                function () { throw new TransformationFailedException(); }
+                static fn ($data) => $data,
+                static fn () => throw new TransformationFailedException()
             ))
             ->getForm();
 
@@ -344,8 +336,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $form = $this->getBuilder('name', '\stdClass', $options)
             ->setData($object)
             ->addViewTransformer(new CallbackTransformer(
-                fn ($data) => $data,
-                function () { throw new TransformationFailedException(); }
+                static fn ($data) => $data,
+                static fn () => throw new TransformationFailedException()
             ))
             ->getForm();
 
@@ -375,8 +367,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ])
             ->setData($object)
             ->addViewTransformer(new CallbackTransformer(
-                fn ($data) => $data,
-                function () {
+                static fn ($data) => $data,
+                static function () {
                     $failure = new TransformationFailedException();
                     $failure->setInvalidMessage('safe message to be used', ['{{ bar }}' => 'bar']);
 

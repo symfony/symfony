@@ -36,7 +36,7 @@ use Symfony\Config\AddToListConfig;
  */
 class GeneratedConfigTest extends TestCase
 {
-    private $tempDir = [];
+    private array $tempDir = [];
 
     protected function setup(): void
     {

@@ -36,7 +36,9 @@ class AssetMapperTestAppKernel extends Kernel
     {
         $loader->load(static function (ContainerBuilder $container) {
             $container->loadFromExtension('framework', [
+                'annotations' => false,
                 'http_method_override' => false,
+                'http_client' => true,
                 'assets' => null,
                 'asset_mapper' => [
                     'paths' => ['dir1', 'dir2'],

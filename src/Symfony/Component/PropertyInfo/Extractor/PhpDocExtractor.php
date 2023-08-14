@@ -38,19 +38,19 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
     /**
      * @var array<string, array{DocBlock|null, int|null, string|null}>
      */
-    private $docBlocks = [];
+    private array $docBlocks = [];
 
     /**
      * @var Context[]
      */
-    private $contexts = [];
+    private array $contexts = [];
 
-    private $docBlockFactory;
-    private $contextFactory;
-    private $phpDocTypeHelper;
-    private $mutatorPrefixes;
-    private $accessorPrefixes;
-    private $arrayMutatorPrefixes;
+    private DocBlockFactoryInterface $docBlockFactory;
+    private ContextFactory $contextFactory;
+    private PhpDocTypeHelper $phpDocTypeHelper;
+    private array $mutatorPrefixes;
+    private array $accessorPrefixes;
+    private array $arrayMutatorPrefixes;
 
     /**
      * @param string[]|null $mutatorPrefixes

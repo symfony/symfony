@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
-use PHPUnit\Framework\SkippedTestError;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\PercentType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
@@ -28,9 +28,10 @@ abstract class AbstractLayoutTestCase extends FormIntegrationTestCase
 {
     use VersionAwareTest;
 
-    protected $csrfTokenManager;
-    protected $testableFeatures = [];
-    private $defaultLocale;
+    protected MockObject&CsrfTokenManagerInterface $csrfTokenManager;
+    protected array $testableFeatures = [];
+
+    private string $defaultLocale;
 
     protected function setUp(): void
     {
@@ -55,7 +56,6 @@ abstract class AbstractLayoutTestCase extends FormIntegrationTestCase
 
     protected function tearDown(): void
     {
-        $this->csrfTokenManager = null;
         \Locale::setDefault($this->defaultLocale);
 
         parent::tearDown();
@@ -72,6 +72,9 @@ abstract class AbstractLayoutTestCase extends FormIntegrationTestCase
     protected function assertMatchesXpath($html, $expression, $count = 1)
     {
         $dom = new \DOMDocument('UTF-8');
+
+        $html = preg_replace('/(<input [^>]+)(?<!\/)>/', '$1/>', $html);
+
         try {
             // Wrap in <root> node so we can load HTML with multiple tags at
             // the top level
@@ -2511,7 +2514,7 @@ abstract class AbstractLayoutTestCase extends FormIntegrationTestCase
         $html = $this->renderWidget($form->createView());
 
         // compare plain HTML to check the whitespace
-        $this->assertSame('<input type="text" id="text" name="text" disabled="disabled" required="required" readonly="readonly" maxlength="10" pattern="\d+" class="foobar" data-foo="bar" value="value" />', $html);
+        $this->assertSame('<input type="text" id="text" name="text" disabled="disabled" required="required" readonly="readonly" maxlength="10" pattern="\d+" class="foobar" data-foo="bar" value="value">', $html);
     }
 
     public function testWidgetAttributeNameRepeatedIfTrue()
@@ -2523,7 +2526,7 @@ abstract class AbstractLayoutTestCase extends FormIntegrationTestCase
         $html = $this->renderWidget($form->createView());
 
         // foo="foo"
-        $this->assertSame('<input type="text" id="text" name="text" required="required" foo="foo" value="value" />', $html);
+        $this->assertSame('<input type="text" id="text" name="text" required="required" foo="foo" value="value">', $html);
     }
 
     public function testWidgetAttributeHiddenIfFalse()

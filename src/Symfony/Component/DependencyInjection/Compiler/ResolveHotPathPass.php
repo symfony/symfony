@@ -23,6 +23,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class ResolveHotPathPass extends AbstractRecursivePass
 {
+    protected bool $skipScalars = true;
+
     private array $resolvedIds = [];
 
     /**

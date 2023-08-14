@@ -380,8 +380,8 @@ class PdoSessionHandler extends AbstractSessionHandler
             $updateStmt = $this->pdo->prepare(
                 "UPDATE $this->table SET $this->lifetimeCol = :expiry, $this->timeCol = :time WHERE $this->idCol = :id"
             );
-            $updateStmt->bindParam(':id', $sessionId, \PDO::PARAM_STR);
-            $updateStmt->bindParam(':expiry', $expiry, \PDO::PARAM_INT);
+            $updateStmt->bindValue(':id', $sessionId, \PDO::PARAM_STR);
+            $updateStmt->bindValue(':expiry', $expiry, \PDO::PARAM_INT);
             $updateStmt->bindValue(':time', time(), \PDO::PARAM_INT);
             $updateStmt->execute();
         } catch (\PDOException $e) {

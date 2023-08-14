@@ -1863,7 +1863,7 @@ class HttpCacheTest extends HttpCacheTestCase
 
 class TestKernel implements HttpKernelInterface
 {
-    public $terminateCalled = false;
+    public bool $terminateCalled = false;
 
     public function terminate(Request $request, Response $response)
     {

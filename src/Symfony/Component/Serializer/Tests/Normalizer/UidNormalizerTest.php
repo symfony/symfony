@@ -28,10 +28,7 @@ class UidNormalizerTest extends TestCase
 {
     use ExpectDeprecationTrait;
 
-    /**
-     * @var UidNormalizer
-     */
-    private $normalizer;
+    private UidNormalizer $normalizer;
 
     protected function setUp(): void
     {

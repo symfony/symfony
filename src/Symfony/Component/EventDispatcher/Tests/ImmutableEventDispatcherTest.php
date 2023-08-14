@@ -23,15 +23,8 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class ImmutableEventDispatcherTest extends TestCase
 {
-    /**
-     * @var MockObject&EventDispatcherInterface
-     */
-    private $innerDispatcher;
-
-    /**
-     * @var ImmutableEventDispatcher
-     */
-    private $dispatcher;
+    private MockObject&EventDispatcherInterface $innerDispatcher;
+    private ImmutableEventDispatcher $dispatcher;
 
     protected function setUp(): void
     {

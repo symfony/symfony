@@ -114,7 +114,7 @@ class TranslatorTest extends TestCase
         $document->loadHTMLFile(__DIR__.'/Fixtures/ids.html');
         $document = simplexml_import_dom($document);
         $elements = $document->xpath($translator->cssToXPath($css));
-        $this->assertCount(\count($elementsId), $elementsId);
+        $this->assertCount(\count($elementsId), $elements);
         foreach ($elements as $element) {
             if (null !== $element->attributes()->id) {
                 $this->assertContains((string) $element->attributes()->id, $elementsId);
@@ -304,14 +304,14 @@ HTML
             ['li:nth-last-child(-n+1)', ['seventh-li']],
             ['li:nth-last-child(-n+3)', ['fifth-li', 'sixth-li', 'seventh-li']],
             ['ol:first-of-type', ['first-ol']],
-            ['ol:nth-child(1)', ['first-ol']],
+            ['ol:nth-child(4)', ['first-ol']],
             ['ol:nth-of-type(2)', ['second-ol']],
             ['ol:nth-last-of-type(1)', ['second-ol']],
-            ['span:only-child', ['foobar-span']],
+            ['span:only-child', ['foobar-span', 'no-siblings-of-any-type']],
             ['li div:only-child', ['li-div']],
             ['div *:only-child', ['li-div', 'foobar-span']],
             ['p:only-of-type', ['paragraph']],
-            [':only-of-type', ['html', 'li-div', 'foobar-span', 'paragraph']],
+            [':only-of-type', ['html', 'li-div', 'foobar-span', 'no-siblings-of-any-type']],
             ['div#foobar-div :only-of-type', ['foobar-span']],
             ['a:empty', ['name-anchor']],
             ['a:EMpty', ['name-anchor']],
@@ -320,8 +320,8 @@ HTML
             ['html:root', ['html']],
             ['li:root', []],
             ['* :root', []],
-            ['*:contains("link")', ['html', 'outer-div', 'tag-anchor', 'nofollow-anchor']],
-            [':CONtains("link")', ['html', 'outer-div', 'tag-anchor', 'nofollow-anchor']],
+            ['*:contains("link")', ['html', 'nil', 'outer-div', 'tag-anchor', 'nofollow-anchor']],
+            [':CONtains("link")', ['html', 'nil', 'outer-div', 'tag-anchor', 'nofollow-anchor']],
             ['*:contains("LInk")', []],  // case sensitive
             ['*:contains("e")', ['html', 'nil', 'outer-div', 'first-ol', 'first-li', 'paragraph', 'p-em']],
             ['*:contains("E")', []],  // case-sensitive

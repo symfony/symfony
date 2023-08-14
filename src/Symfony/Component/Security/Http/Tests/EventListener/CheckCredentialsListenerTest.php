@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\EventListener;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
@@ -28,9 +29,9 @@ use Symfony\Component\Security\Http\EventListener\CheckCredentialsListener;
 
 class CheckCredentialsListenerTest extends TestCase
 {
-    private $hasherFactory;
-    private $listener;
-    private $user;
+    private MockObject&PasswordHasherFactoryInterface $hasherFactory;
+    private CheckCredentialsListener $listener;
+    private InMemoryUser $user;
 
     protected function setUp(): void
     {

@@ -13,6 +13,7 @@ namespace Symfony\Component\Filesystem\Tests;
 
 use Symfony\Component\Filesystem\Exception\InvalidArgumentException;
 use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * Test class for Filesystem.
@@ -1087,20 +1088,18 @@ class FilesystemTest extends FilesystemTestCase
     {
         $this->markAsSkippedIfSymlinkIsMissing();
 
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Windows does not support creating "broken" symlinks');
-        }
+        $file = Path::join($this->workspace, 'file');
+        $link = Path::join($this->workspace, 'link');
 
-        $file = $this->workspace.'/file';
-        $link = $this->workspace.'/link';
-
+        touch($file);
         $this->filesystem->symlink($file, $link);
+        $this->filesystem->remove($file);
 
-        $this->assertEquals($file, $this->filesystem->readlink($link));
+        $this->assertEquals($file, Path::normalize($this->filesystem->readlink($link)));
         $this->assertNull($this->filesystem->readlink($link, true));
 
         touch($file);
-        $this->assertEquals($file, $this->filesystem->readlink($link, true));
+        $this->assertEquals($file, Path::normalize($this->filesystem->readlink($link, true)));
     }
 
     public function testReadLinkDefaultPathDoesNotExist()
@@ -1601,6 +1600,33 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertStringEqualsFile($filename, 'bar');
     }
 
+    public function testDumpFileFollowsSymlink()
+    {
+        $filename = $this->workspace.\DIRECTORY_SEPARATOR.'foo.txt';
+        file_put_contents($filename, 'FOO BAR');
+        $linknameA = $this->workspace.\DIRECTORY_SEPARATOR.'bar.txt';
+        $linknameB = $this->workspace.\DIRECTORY_SEPARATOR.'baz.txt';
+        $this->filesystem->symlink($filename, $linknameA);
+        $this->filesystem->symlink($linknameA, $linknameB);
+
+        $this->filesystem->dumpFile($linknameB, 'bar');
+
+        $this->assertFileExists($filename);
+        $this->assertFileExists($linknameA);
+        $this->assertFileExists($linknameB);
+        $this->assertStringEqualsFile($filename, 'bar');
+        $this->assertStringEqualsFile($linknameA, 'bar');
+        $this->assertStringEqualsFile($linknameB, 'bar');
+
+        $this->filesystem->remove($filename);
+        $this->filesystem->dumpFile($linknameB, 'baz');
+
+        $this->assertFileExists($filename);
+        $this->assertStringEqualsFile($filename, 'baz');
+        $this->assertStringEqualsFile($linknameA, 'baz');
+        $this->assertStringEqualsFile($linknameB, 'baz');
+    }
+
     public function testDumpFileWithFileScheme()
     {
         $scheme = 'file://';
@@ -1672,6 +1698,35 @@ class FilesystemTest extends FilesystemTestCase
             $this->assertFilePermissions(664, $filename);
             umask($oldMask);
         }
+    }
+
+    public function testAppendToFileFollowsSymlink()
+    {
+        $filename = $this->workspace.\DIRECTORY_SEPARATOR.'foo.txt';
+        file_put_contents($filename, 'foo');
+        $linknameA = $this->workspace.\DIRECTORY_SEPARATOR.'bar.txt';
+        $linknameB = $this->workspace.\DIRECTORY_SEPARATOR.'baz.txt';
+        $this->filesystem->symlink($filename, $linknameA);
+        $this->filesystem->symlink($linknameA, $linknameB);
+
+        $this->filesystem->appendToFile($linknameA, 'bar');
+        $this->filesystem->appendToFile($linknameB, 'baz');
+
+        $this->assertFileExists($filename);
+        $this->assertFileExists($linknameA);
+        $this->assertFileExists($linknameB);
+        $this->assertStringEqualsFile($filename, 'foobarbaz');
+        $this->assertStringEqualsFile($linknameA, 'foobarbaz');
+        $this->assertStringEqualsFile($linknameB, 'foobarbaz');
+
+        $this->filesystem->remove($filename);
+        $this->filesystem->appendToFile($linknameB, 'foo');
+        $this->filesystem->appendToFile($linknameA, 'bar');
+
+        $this->assertFileExists($filename);
+        $this->assertStringEqualsFile($filename, 'foobar');
+        $this->assertStringEqualsFile($linknameA, 'foobar');
+        $this->assertStringEqualsFile($linknameB, 'foobar');
     }
 
     public function testAppendToFileWithScheme()

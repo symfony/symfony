@@ -22,17 +22,9 @@ use Symfony\Component\Intl\Data\Bundle\Writer\TextBundleWriter;
  */
 class TextBundleWriterTest extends TestCase
 {
-    /**
-     * @var TextBundleWriter
-     */
-    private $writer;
-
-    private $directory;
-
-    /**
-     * @var Filesystem
-     */
-    private $filesystem;
+    private TextBundleWriter $writer;
+    private string $directory;
+    private Filesystem $filesystem;
 
     protected function setUp(): void
     {

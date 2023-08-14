@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Deprecate `DbalLogger`, use a middleware instead
+ * Deprecate not constructing `DoctrineDataCollector` with an instance of `DebugDataHolder`
+ * Deprecate `DoctrineDataCollector::addLogger()`, use a `DebugDataHolder` instead
+ * Deprecate `ContainerAwareLoader`, use dependency injection in your fixtures instead
+
 6.3
 ---
 
@@ -9,6 +17,7 @@ CHANGELOG
  * Deprecate `DoctrineDbalCacheAdapterSchemaSubscriber` in favor of `DoctrineDbalCacheAdapterSchemaListener`
  * Deprecate `MessengerTransportDoctrineSchemaSubscriber` in favor of `MessengerTransportDoctrineSchemaListener`
  * Deprecate `RememberMeTokenProviderDoctrineSchemaSubscriber` in favor of `RememberMeTokenProviderDoctrineSchemaListener`
+ * Add optional parameter `$isSameDatabase` to `DoctrineTokenProvider::configureSchema()`
 
 6.2
 ---

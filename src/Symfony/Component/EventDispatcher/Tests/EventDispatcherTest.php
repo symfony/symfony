@@ -23,23 +23,13 @@ class EventDispatcherTest extends TestCase
     private const postFoo = 'post.foo';
     private const preBar = 'pre.bar';
 
-    /**
-     * @var EventDispatcher
-     */
-    private $dispatcher;
-
-    private $listener;
+    private EventDispatcher $dispatcher;
+    private TestEventListener $listener;
 
     protected function setUp(): void
     {
         $this->dispatcher = $this->createEventDispatcher();
         $this->listener = new TestEventListener();
-    }
-
-    protected function tearDown(): void
-    {
-        $this->dispatcher = null;
-        $this->listener = null;
     }
 
     protected function createEventDispatcher()
@@ -446,9 +436,9 @@ class CallableClass
 
 class TestEventListener
 {
-    public $name;
-    public $preFooInvoked = false;
-    public $postFooInvoked = false;
+    public string $name;
+    public bool $preFooInvoked = false;
+    public bool $postFooInvoked = false;
 
     /* Listener methods */
 
@@ -473,9 +463,9 @@ class TestEventListener
 
 class TestWithDispatcher
 {
-    public $name;
-    public $dispatcher;
-    public $invoked = false;
+    public ?string $name = null;
+    public ?EventDispatcher $dispatcher = null;
+    public bool $invoked = false;
 
     public function foo($e, $name, $dispatcher)
     {

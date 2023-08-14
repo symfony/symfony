@@ -16,7 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class TestAbstractController extends AbstractController
 {
-    private $throwOnUnexpectedService;
+    private bool $throwOnUnexpectedService;
 
     public function __construct($throwOnUnexpectedService = true)
     {

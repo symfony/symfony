@@ -22,6 +22,7 @@ use Symfony\Component\Console\Question\Question;
 
 class ConsoleSectionOutputTest extends TestCase
 {
+    /** @var resource */
     private $stream;
 
     protected function setUp(): void
@@ -31,7 +32,7 @@ class ConsoleSectionOutputTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->stream = null;
+        unset($this->stream);
     }
 
     public function testClearAll()
@@ -131,6 +132,40 @@ class ConsoleSectionOutputTest extends TestCase
 
         rewind($output->getStream());
         $this->assertEquals($expected, stream_get_contents($output->getStream()));
+    }
+
+    public function testMaxHeightMultipleSections()
+    {
+        $expected = '';
+        $sections = [];
+
+        $firstSection = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
+        $firstSection->setMaxHeight(3);
+
+        $secondSection = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
+        $secondSection->setMaxHeight(3);
+
+        // fill the first section
+        $firstSection->writeln(['One', 'Two', 'Three']);
+        $expected .= 'One'.\PHP_EOL.'Two'.\PHP_EOL.'Three'.\PHP_EOL;
+
+        // fill the second section
+        $secondSection->writeln(['One', 'Two', 'Three']);
+        $expected .= 'One'.\PHP_EOL.'Two'.\PHP_EOL.'Three'.\PHP_EOL;
+
+        // cause overflow of second section (redraw whole section, without first line)
+        $secondSection->writeln('Four');
+        $expected .= "\x1b[3A\x1b[0J";
+        $expected .= 'Two'.\PHP_EOL.'Three'.\PHP_EOL.'Four'.\PHP_EOL;
+
+        // cause overflow of first section (redraw whole section, without first line)
+        $firstSection->writeln("Four\nFive\nSix");
+        $expected .= "\x1b[6A\x1b[0J";
+        $expected .= 'Four'.\PHP_EOL.'Five'.\PHP_EOL.'Six'.\PHP_EOL;
+        $expected .= 'Two'.\PHP_EOL.'Three'.\PHP_EOL.'Four'.\PHP_EOL;
+
+        rewind($this->stream);
+        $this->assertEquals(escapeshellcmd($expected), escapeshellcmd(stream_get_contents($this->stream)));
     }
 
     public function testMaxHeightWithoutNewLine()

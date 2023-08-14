@@ -588,7 +588,7 @@ class Crawler implements \Countable, \IteratorAggregate
         $normalizeWhitespace = 1 <= \func_num_args() ? func_get_arg(0) : true;
 
         foreach ($this->getNode(0)->childNodes as $childNode) {
-            if (\XML_TEXT_NODE !== $childNode->nodeType) {
+            if (\XML_TEXT_NODE !== $childNode->nodeType && \XML_CDATA_SECTION_NODE !== $childNode->nodeType) {
                 continue;
             }
             if (!$normalizeWhitespace) {
@@ -733,7 +733,7 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * This method only works if you have installed the CssSelector Symfony Component.
      *
-     * @throws \RuntimeException if the CssSelector Component is not available
+     * @throws \LogicException if the CssSelector Component is not available
      */
     public function filter(string $selector): static
     {
@@ -1110,7 +1110,7 @@ class Crawler implements \Countable, \IteratorAggregate
      */
     private function convertToHtmlEntities(string $htmlContent, string $charset = 'UTF-8'): string
     {
-        set_error_handler(function () { throw new \Exception(); });
+        set_error_handler(static fn () => throw new \Exception());
 
         try {
             return mb_encode_numericentity($htmlContent, [0x80, 0x10FFFF, 0, 0x1FFFFF], $charset);

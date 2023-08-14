@@ -11,9 +11,12 @@
 
 namespace Symfony\Component\Lock\Store;
 
+use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
+use Doctrine\DBAL\Tools\DsnParser;
 use Symfony\Component\Lock\BlockingSharedLockStoreInterface;
 use Symfony\Component\Lock\BlockingStoreInterface;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
@@ -30,7 +33,7 @@ use Symfony\Component\Lock\SharedLockStoreInterface;
 class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStoreInterface
 {
     private Connection $conn;
-    private static $storeRegistry = [];
+    private static array $storeRegistry = [];
 
     /**
      * You can either pass an existing database connection a Doctrine DBAL Connection
@@ -49,7 +52,28 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
             if (!class_exists(DriverManager::class)) {
                 throw new InvalidArgumentException('Failed to parse DSN. Try running "composer require doctrine/dbal".');
             }
-            $this->conn = DriverManager::getConnection(['url' => $this->filterDsn($connOrUrl)]);
+            if (class_exists(DsnParser::class)) {
+                $params = (new DsnParser([
+                    'db2' => 'ibm_db2',
+                    'mssql' => 'pdo_sqlsrv',
+                    'mysql' => 'pdo_mysql',
+                    'mysql2' => 'pdo_mysql',
+                    'postgres' => 'pdo_pgsql',
+                    'postgresql' => 'pdo_pgsql',
+                    'pgsql' => 'pdo_pgsql',
+                    'sqlite' => 'pdo_sqlite',
+                    'sqlite3' => 'pdo_sqlite',
+                ]))->parse($this->filterDsn($connOrUrl));
+            } else {
+                $params = ['url' => $this->filterDsn($connOrUrl)];
+            }
+
+            $config = new Configuration();
+            if (class_exists(DefaultSchemaManagerFactory::class)) {
+                $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
+            }
+
+            $this->conn = DriverManager::getConnection($params, $config);
         }
     }
 

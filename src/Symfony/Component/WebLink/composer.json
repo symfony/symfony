@@ -23,7 +23,7 @@
         "psr/link": "^1.1|^2.0"
     },
     "require-dev": {
-        "symfony/http-kernel": "^5.4|^6.0"
+        "symfony/http-kernel": "^5.4|^6.0|^7.0"
     },
     "conflict": {
         "symfony/http-kernel": "<5.4"

@@ -73,7 +73,7 @@ class ConsoleEventsTest extends TestCase
 
 class EventTraceSubscriber implements EventSubscriberInterface
 {
-    public $observedEvents = [];
+    public array $observedEvents = [];
 
     public static function getSubscribedEvents(): array
     {

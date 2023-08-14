@@ -409,7 +409,8 @@ class InfobipApiTransportTest extends TestCase
             ->addTextHeader('X-Infobip-IntermediateReport', 'true')
             ->addTextHeader('X-Infobip-NotifyUrl', 'https://foo.bar')
             ->addTextHeader('X-Infobip-NotifyContentType', 'application/json')
-            ->addTextHeader('X-Infobip-MessageId', 'RANDOM-CUSTOM-ID');
+            ->addTextHeader('X-Infobip-MessageId', 'RANDOM-CUSTOM-ID')
+            ->addTextHeader('X-Infobip-Track', 'false');
 
         $sentMessage = $this->transport->send($email);
 
@@ -421,6 +422,7 @@ class InfobipApiTransportTest extends TestCase
             X-Infobip-NotifyUrl: https://foo.bar
             X-Infobip-NotifyContentType: application/json
             X-Infobip-MessageId: RANDOM-CUSTOM-ID
+            X-Infobip-Track: false
             %a
             TXT,
             $sentMessage->toString()

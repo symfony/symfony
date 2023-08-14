@@ -7,11 +7,12 @@
                         http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
 
     <framework:config http-method-override="false">
+        <framework:annotations enabled="false" />
         <framework:asset-mapper
             enabled="true"
             server="true"
             public-prefix="/assets_path/"
-            strict-mode="true"
+            missing-import-mode="strict"
             importmap-path="%kernel.project_dir%/importmap.php"
             importmap-polyfill="https://cdn.example.com/polyfill.js"
             vendor-dir="%kernel.project_dir%/assets/vendor"

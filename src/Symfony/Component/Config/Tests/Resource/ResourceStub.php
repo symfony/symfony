@@ -15,7 +15,7 @@ use Symfony\Component\Config\Resource\SelfCheckingResourceInterface;
 
 class ResourceStub implements SelfCheckingResourceInterface
 {
-    private $fresh = true;
+    private bool $fresh = true;
 
     public function setFresh(bool $isFresh): void
     {

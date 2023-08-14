@@ -21,6 +21,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 
 /**
@@ -86,6 +87,14 @@ EOF
             }
         }
 
+        $reverseAliases = [];
+
+        foreach ($container->getAliases() as $id => $alias) {
+            if ('.' === ($id[0] ?? null)) {
+                $reverseAliases[(string) $alias][] = $id;
+            }
+        }
+
         uasort($serviceIds, 'strnatcmp');
 
         $io->title('Autowirable Types');
@@ -103,30 +112,47 @@ EOF
             }
             $text = [];
             $resolvedServiceId = $serviceId;
-            if (!str_starts_with($serviceId, $previousId)) {
+            if (!str_starts_with($serviceId, $previousId.' $')) {
                 $text[] = '';
-                if ('' !== $description = Descriptor::getClassDescription($serviceId, $resolvedServiceId)) {
-                    if (isset($hasAlias[$serviceId])) {
+                $previousId = preg_replace('/ \$.*/', '', $serviceId);
+                if ('' !== $description = Descriptor::getClassDescription($previousId, $resolvedServiceId)) {
+                    if (isset($hasAlias[$previousId])) {
                         continue;
                     }
                     $text[] = $description;
                 }
-                $previousId = $serviceId.' $';
             }
 
             $serviceLine = sprintf('<fg=yellow>%s</>', $serviceId);
-            if ($this->supportsHref && '' !== $fileLink = $this->getFileLink($serviceId)) {
-                $serviceLine = sprintf('<fg=yellow;href=%s>%s</>', $fileLink, $serviceId);
+            if ($this->supportsHref && '' !== $fileLink = $this->getFileLink($previousId)) {
+                $serviceLine = substr($serviceId, \strlen($previousId));
+                $serviceLine = sprintf('<fg=yellow;href=%s>%s</>', $fileLink, $previousId).('' !== $serviceLine ? sprintf('<fg=yellow>%s</>', $serviceLine) : '');
             }
 
             if ($container->hasAlias($serviceId)) {
                 $hasAlias[$serviceId] = true;
                 $serviceAlias = $container->getAlias($serviceId);
+                $alias = (string) $serviceAlias;
+
+                $target = null;
+                foreach ($reverseAliases[(string) $serviceAlias] ?? [] as $id) {
+                    if (!str_starts_with($id, '.'.$previousId.' $')) {
+                        continue;
+                    }
+                    $target = substr($id, \strlen($previousId) + 3);
+
+                    if ($previousId.' $'.(new Target($target))->getParsedName() === $serviceId) {
+                        $serviceLine .= ' - <fg=magenta>target:</><fg=cyan>'.$target.'</>';
+                        break;
+                    }
+                }
 
                 if ($container->hasDefinition($serviceAlias) && $decorated = $container->getDefinition($serviceAlias)->getTag('container.decorator')) {
-                    $serviceLine .= ' <fg=cyan>('.$decorated[0]['id'].')</>';
-                } else {
-                    $serviceLine .= ' <fg=cyan>('.$serviceAlias.')</>';
+                    $alias = $decorated[0]['id'];
+                }
+
+                if ($alias !== $target) {
+                    $serviceLine .= ' - <fg=magenta>alias:</><fg=cyan>'.$alias.'</>';
                 }
 
                 if ($serviceAlias->isDeprecated()) {

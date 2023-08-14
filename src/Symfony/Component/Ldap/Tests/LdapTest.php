@@ -21,11 +21,8 @@ use Symfony\Component\Ldap\Ldap;
 
 class LdapTest extends TestCase
 {
-    /** @var MockObject&AdapterInterface */
-    private $adapter;
-
-    /** @var Ldap */
-    private $ldap;
+    private MockObject&AdapterInterface $adapter;
+    private Ldap $ldap;
 
     protected function setUp(): void
     {

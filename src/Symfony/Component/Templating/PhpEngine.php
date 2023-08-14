@@ -17,12 +17,16 @@ use Symfony\Component\Templating\Storage\FileStorage;
 use Symfony\Component\Templating\Storage\Storage;
 use Symfony\Component\Templating\Storage\StringStorage;
 
+trigger_deprecation('symfony/templating', '6.4', '"%s" is deprecated since version 6.4 and will be removed in 7.0. Use Twig instead.', PhpEngine::class);
+
 /**
  * PhpEngine is an engine able to render PHP templates.
  *
  * @implements \ArrayAccess<string, HelperInterface>
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 6.4, use Twig instead
  */
 class PhpEngine implements EngineInterface, \ArrayAccess
 {

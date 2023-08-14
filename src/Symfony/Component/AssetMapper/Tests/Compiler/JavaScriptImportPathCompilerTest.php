@@ -12,8 +12,12 @@
 namespace Symfony\Component\AssetMapper\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
+use Symfony\Component\AssetMapper\Compiler\AssetCompilerInterface;
 use Symfony\Component\AssetMapper\Compiler\JavaScriptImportPathCompiler;
+use Symfony\Component\AssetMapper\Exception\CircularAssetsException;
+use Symfony\Component\AssetMapper\Exception\RuntimeException;
 use Symfony\Component\AssetMapper\MappedAsset;
 
 class JavaScriptImportPathCompilerTest extends TestCase
@@ -23,15 +27,14 @@ class JavaScriptImportPathCompilerTest extends TestCase
      */
     public function testCompile(string $sourceLogicalName, string $input, array $expectedDependencies)
     {
-        $asset = new MappedAsset($sourceLogicalName);
-        $asset->setPublicPathWithoutDigest('/assets/'.$sourceLogicalName);
+        $asset = new MappedAsset($sourceLogicalName, 'anything', '/assets/'.$sourceLogicalName);
 
-        $compiler = new JavaScriptImportPathCompiler(false);
+        $compiler = new JavaScriptImportPathCompiler(AssetCompilerInterface::MISSING_IMPORT_IGNORE, $this->createMock(LoggerInterface::class));
         // compile - and check that content doesn't change
         $this->assertSame($input, $compiler->compile($input, $asset, $this->createAssetMapper()));
         $actualDependencies = [];
         foreach ($asset->getDependencies() as $dependency) {
-            $actualDependencies[$dependency->asset->getLogicalPath()] = $dependency->isLazy;
+            $actualDependencies[$dependency->asset->logicalPath] = $dependency->isLazy;
         }
         $this->assertEquals($expectedDependencies, $actualDependencies);
         if ($expectedDependencies) {
@@ -165,17 +168,15 @@ class JavaScriptImportPathCompilerTest extends TestCase
      */
     public function testImportPathsCanUpdate(string $sourceLogicalName, string $input, string $sourcePublicPath, string $importedPublicPath, string $expectedOutput)
     {
-        $asset = new MappedAsset($sourceLogicalName);
-        $asset->setPublicPathWithoutDigest($sourcePublicPath);
+        $asset = new MappedAsset($sourceLogicalName, publicPathWithoutDigest: $sourcePublicPath);
 
         $assetMapper = $this->createMock(AssetMapperInterface::class);
-        $importedAsset = new MappedAsset('anything');
-        $importedAsset->setPublicPathWithoutDigest($importedPublicPath);
+        $importedAsset = new MappedAsset('anything', publicPathWithoutDigest: $importedPublicPath);
         $assetMapper->expects($this->once())
             ->method('getAsset')
             ->willReturn($importedAsset);
 
-        $compiler = new JavaScriptImportPathCompiler(false);
+        $compiler = new JavaScriptImportPathCompiler(AssetCompilerInterface::MISSING_IMPORT_IGNORE, $this->createMock(LoggerInterface::class));
         $this->assertSame($expectedOutput, $compiler->compile($input, $asset, $assetMapper));
     }
 
@@ -231,34 +232,37 @@ class JavaScriptImportPathCompilerTest extends TestCase
     }
 
     /**
-     * @dataProvider provideStrictModeTests
+     * @dataProvider provideMissingImportModeTests
      */
-    public function testStrictMode(string $sourceLogicalName, string $input, ?string $expectedExceptionMessage)
+    public function testMissingImportMode(string $sourceLogicalName, string $input, ?string $expectedExceptionMessage)
     {
         if (null !== $expectedExceptionMessage) {
-            $this->expectException(\RuntimeException::class);
+            $this->expectException(RuntimeException::class);
             $this->expectExceptionMessage($expectedExceptionMessage);
         }
 
-        $asset = new MappedAsset($sourceLogicalName);
-        $asset->setSourcePath('/path/to/app.js');
+        $asset = new MappedAsset($sourceLogicalName, '/path/to/app.js');
 
-        $compiler = new JavaScriptImportPathCompiler(true);
+        $logger = $this->createMock(LoggerInterface::class);
+        $compiler = new JavaScriptImportPathCompiler(
+            AssetCompilerInterface::MISSING_IMPORT_STRICT,
+            $logger
+        );
         $this->assertSame($input, $compiler->compile($input, $asset, $this->createAssetMapper()));
     }
 
-    public static function provideStrictModeTests(): iterable
+    public static function provideMissingImportModeTests(): iterable
     {
         yield 'importing_non_existent_file_throws_exception' => [
             'sourceLogicalName' => 'app.js',
             'input' => "import './non-existent.js';",
-            'expectedExceptionMessage' => 'Unable to find asset "non-existent.js" imported from "/path/to/app.js".',
+            'expectedExceptionMessage' => 'Unable to find asset "./non-existent.js" imported from "/path/to/app.js".',
         ];
 
         yield 'importing_file_just_missing_js_extension_adds_extra_info' => [
             'sourceLogicalName' => 'app.js',
             'input' => "import './other';",
-            'expectedExceptionMessage' => 'Unable to find asset "other" imported from "/path/to/app.js". Try adding ".js" to the end of the import - i.e. "other.js".',
+            'expectedExceptionMessage' => 'Unable to find asset "./other" imported from "/path/to/app.js". Try adding ".js" to the end of the import - i.e. "./other.js".',
         ];
 
         yield 'importing_absolute_file_path_is_ignored' => [
@@ -274,31 +278,43 @@ class JavaScriptImportPathCompilerTest extends TestCase
         ];
     }
 
+    public function testErrorMessageAvoidsCircularException()
+    {
+        $assetMapper = $this->createMock(AssetMapperInterface::class);
+        $assetMapper->expects($this->any())
+            ->method('getAsset')
+            ->willReturnCallback(function ($logicalPath) {
+                if ('htmx' === $logicalPath) {
+                    return null;
+                }
+
+                if ('htmx.js' === $logicalPath) {
+                    throw new CircularAssetsException();
+                }
+            });
+
+        $asset = new MappedAsset('htmx.js', '/path/to/app.js');
+        $compiler = new JavaScriptImportPathCompiler();
+        $content = '//** @type {import("./htmx").HtmxApi} */';
+        $compiled = $compiler->compile($content, $asset, $assetMapper);
+        // To form a good exception message, the compiler will check for the
+        // htmx.js asset, which will throw a CircularAssetsException. This
+        // should not be caught.
+        $this->assertSame($content, $compiled);
+    }
+
     private function createAssetMapper(): AssetMapperInterface
     {
         $assetMapper = $this->createMock(AssetMapperInterface::class);
         $assetMapper->expects($this->any())
             ->method('getAsset')
             ->willReturnCallback(function ($path) {
-                switch ($path) {
-                    case 'other.js':
-                        $asset = new MappedAsset('other.js');
-                        $asset->setPublicPathWithoutDigest('/assets/other.js');
-
-                        return $asset;
-                    case 'subdir/foo.js':
-                        $asset = new MappedAsset('subdir/foo.js');
-                        $asset->setPublicPathWithoutDigest('/assets/subdir/foo.js');
-
-                        return $asset;
-                    case 'styles.css':
-                        $asset = new MappedAsset('styles.css');
-                        $asset->setPublicPathWithoutDigest('/assets/styles.css');
-
-                        return $asset;
-                    default:
-                        return null;
-                }
+                return match ($path) {
+                    'other.js' => new MappedAsset('other.js', publicPathWithoutDigest: '/assets/other.js'),
+                    'subdir/foo.js' => new MappedAsset('subdir/foo.js', publicPathWithoutDigest: '/assets/subdir/foo.js'),
+                    'styles.css' => new MappedAsset('styles.css', publicPathWithoutDigest: '/assets/styles.css'),
+                    default => null,
+                };
             });
 
         return $assetMapper;

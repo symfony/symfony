@@ -69,7 +69,7 @@ class IsNullValidatorTest extends ConstraintValidatorTestCase
             [true, 'true'],
             ['', '""'],
             ['foo bar', '"foo bar"'],
-            [new \DateTime(), 'object'],
+            [new \DateTimeImmutable(), 'object'],
             [new \stdClass(), 'object'],
             [[], 'array'],
         ];

@@ -83,7 +83,7 @@
                 {% else %}
                     {{ caller.name }}
                 {% endif %}
-                line <a class="text-small sf-toggle" data-toggle-selector="#sf-trace-{{ loop.index0 }}">{{ caller.line }}</a> (<a class="text-small sf-toggle" data-toggle-selector="#sf-context-{{ loop.index0 }}">context</a>):
+                line <button type="button" class="btn-link text-small sf-toggle" data-toggle-selector="#sf-trace-{{ loop.index0 }}">{{ caller.line }}</button> (<button type="button" class="btn-link text-small sf-toggle" data-toggle-selector="#sf-context-{{ loop.index0 }}">context</button>):
             </span>
 
             <div class="sf-validator-compact hidden" id="sf-trace-{{ loop.index0 }}">

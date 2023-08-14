@@ -32,13 +32,13 @@ use Twig\Environment;
  */
 class ProfilerController
 {
-    private $templateManager;
-    private $generator;
-    private $profiler;
-    private $twig;
-    private $templates;
-    private $cspHandler;
-    private $baseDir;
+    private TemplateManager $templateManager;
+    private UrlGeneratorInterface $generator;
+    private ?Profiler $profiler;
+    private Environment $twig;
+    private array $templates;
+    private ?ContentSecurityPolicyHandler $cspHandler;
+    private ?string $baseDir;
 
     public function __construct(UrlGeneratorInterface $generator, Profiler $profiler = null, Environment $twig, array $templates, ContentSecurityPolicyHandler $cspHandler = null, string $baseDir = null)
     {
@@ -173,7 +173,6 @@ class ProfilerController
         $this->denyAccessIfProfilerDisabled();
 
         $this->cspHandler?->disableCsp();
-
 
         $session = null;
         if ($request->attributes->getBoolean('_stateless') && $request->hasSession()) {

@@ -24,7 +24,7 @@ use Symfony\Component\Translation\Translator;
 
 class TranslatorTest extends TestCase
 {
-    private $defaultLocale;
+    private string $defaultLocale;
 
     protected function setUp(): void
     {
@@ -598,11 +598,9 @@ class TranslatorTest extends TestCase
 
 class StringClass
 {
-    protected $str;
-
-    public function __construct($str)
-    {
-        $this->str = $str;
+    public function __construct(
+        protected string $str,
+    ) {
     }
 
     public function __toString(): string

@@ -17,6 +17,7 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\HttplugClient;
+use Symfony\Component\HttpClient\Messenger\PingWebhookMessageHandler;
 use Symfony\Component\HttpClient\Psr18Client;
 use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
 use Symfony\Component\HttpClient\UriTemplateHttpClient;
@@ -90,5 +91,11 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 [inline_service(\Rize\UriTemplate::class), 'expand'],
             ])
+
+        ->set('http_client.messenger.ping_webhook_handler', PingWebhookMessageHandler::class)
+            ->args([
+                service('http_client'),
+            ])
+            ->tag('messenger.message_handler')
     ;
 };

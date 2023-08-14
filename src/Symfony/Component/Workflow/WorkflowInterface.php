@@ -16,6 +16,8 @@ use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
 use Symfony\Component\Workflow\Metadata\MetadataStoreInterface;
 
 /**
+ * Describes a workflow instance.
+ *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
 interface WorkflowInterface

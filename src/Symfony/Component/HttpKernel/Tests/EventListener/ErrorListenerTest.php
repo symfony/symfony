@@ -96,7 +96,11 @@ class ErrorListenerTest extends TestCase
         }
 
         $this->assertEquals(3, $logger->countErrors());
-        $this->assertCount(3, $logger->getLogs('critical'));
+        $logs = $logger->getLogs('critical');
+        $this->assertCount(3, $logs);
+        $this->assertStringStartsWith('Uncaught PHP Exception Exception: "foo" at ErrorListenerTest.php line', $logs[0]);
+        $this->assertStringStartsWith('Uncaught PHP Exception Exception: "foo" at ErrorListenerTest.php line', $logs[1]);
+        $this->assertStringStartsWith('Exception thrown when handling an exception (RuntimeException: bar at ErrorListenerTest.php line', $logs[2]);
     }
 
     public function testHandleWithLoggerAndCustomConfiguration()

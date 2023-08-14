@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\PropertyInfo\Tests\Extractor;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\SerializerExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\AdderRemoverDummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\IgnorePropertyDummy;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
@@ -24,14 +24,11 @@ use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
  */
 class SerializerExtractorTest extends TestCase
 {
-    /**
-     * @var SerializerExtractor
-     */
-    private $extractor;
+    private SerializerExtractor $extractor;
 
     protected function setUp(): void
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
         $this->extractor = new SerializerExtractor($classMetadataFactory);
     }
 
@@ -39,7 +36,7 @@ class SerializerExtractorTest extends TestCase
     {
         $this->assertEquals(
             ['collection'],
-            $this->extractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', ['serializer_groups' => ['a']])
+            $this->extractor->getProperties(Dummy::class, ['serializer_groups' => ['a']])
         );
     }
 

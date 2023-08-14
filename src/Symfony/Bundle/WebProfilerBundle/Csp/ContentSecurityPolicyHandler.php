@@ -23,8 +23,8 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ContentSecurityPolicyHandler
 {
-    private $nonceGenerator;
-    private $cspDisabled = false;
+    private NonceGenerator $nonceGenerator;
+    private bool $cspDisabled = false;
 
     public function __construct(NonceGenerator $nonceGenerator)
     {

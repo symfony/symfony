@@ -21,6 +21,9 @@ use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
+/**
+ * @group legacy
+ */
 final class SendinblueTransportTest extends TransportTestCase
 {
     public static function createTransport(HttpClientInterface $client = null): SendinblueTransport

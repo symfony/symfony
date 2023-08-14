@@ -23,7 +23,7 @@ use Symfony\Component\Console\Output\StreamOutput;
  */
 class ProgressBarTest extends TestCase
 {
-    private $colSize;
+    private string|false $colSize;
 
     protected function setUp(): void
     {

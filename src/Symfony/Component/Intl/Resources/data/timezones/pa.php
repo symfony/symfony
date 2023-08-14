@@ -437,6 +437,5 @@ return [
         'Pacific/Wake' => 'ਵੇਕ ਆਈਲੈਂਡ ਵੇਲਾ',
         'Pacific/Wallis' => 'ਵਾਲਿਸ ਅਤੇ ਫੁਟੂਨਾ ਵੇਲਾ',
     ],
-    'Meta' => [
-    ],
+    'Meta' => [],
 ];

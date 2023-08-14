@@ -17,9 +17,9 @@ use Symfony\Component\Console\Terminal;
 
 class TerminalTest extends TestCase
 {
-    private $colSize;
-    private $lineSize;
-    private $ansiCon;
+    private string|false $colSize;
+    private string|false $lineSize;
+    private string|false $ansiCon;
 
     protected function setUp(): void
     {
@@ -41,7 +41,7 @@ class TerminalTest extends TestCase
     {
         foreach (['height', 'width', 'stty'] as $name) {
             $property = new \ReflectionProperty(Terminal::class, $name);
-            $property->setValue(null);
+            $property->setValue(null, null);
         }
     }
 

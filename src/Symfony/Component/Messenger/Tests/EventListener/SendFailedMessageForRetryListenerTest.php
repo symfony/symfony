@@ -63,32 +63,11 @@ class SendFailedMessageForRetryListenerTest extends TestCase
         $senderLocator->expects($this->once())->method('has')->willReturn(true);
         $senderLocator->expects($this->once())->method('get')->willReturn($sender);
         $retryStategy = $this->createMock(RetryStrategyInterface::class);
-        $retryStategy->expects($this->once())->method('isRetryable')->willReturn(true);
+        $retryStategy->expects($this->never())->method('isRetryable');
         $retryStategy->expects($this->once())->method('getWaitingTime')->willReturn(1000);
         $retryStrategyLocator = $this->createMock(ContainerInterface::class);
         $retryStrategyLocator->expects($this->once())->method('has')->willReturn(true);
         $retryStrategyLocator->expects($this->once())->method('get')->willReturn($retryStategy);
-
-        $listener = new SendFailedMessageForRetryListener($senderLocator, $retryStrategyLocator);
-
-        $exception = new RecoverableMessageHandlingException('retry');
-        $envelope = new Envelope(new \stdClass());
-        $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', $exception);
-
-        $listener->onMessageFailed($event);
-    }
-
-    public function testRetryIsOnlyAllowedWhenPermittedByRetryStrategy()
-    {
-        $senderLocator = $this->createMock(ContainerInterface::class);
-        $senderLocator->expects($this->never())->method('has');
-        $senderLocator->expects($this->never())->method('get');
-        $retryStrategy = $this->createMock(RetryStrategyInterface::class);
-        $retryStrategy->expects($this->once())->method('isRetryable')->willReturn(false);
-        $retryStrategy->expects($this->never())->method('getWaitingTime');
-        $retryStrategyLocator = $this->createMock(ContainerInterface::class);
-        $retryStrategyLocator->expects($this->once())->method('has')->willReturn(true);
-        $retryStrategyLocator->expects($this->once())->method('get')->willReturn($retryStrategy);
 
         $listener = new SendFailedMessageForRetryListener($senderLocator, $retryStrategyLocator);
 

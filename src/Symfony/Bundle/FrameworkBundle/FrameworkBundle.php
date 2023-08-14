@@ -17,7 +17,6 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddExpressionLan
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AssetsContextPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilderDebugDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DataCollectorTranslatorPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\EnableLoggerDebugModePass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\LoggingTranslatorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedSessionMarshallingHandlerPass;
@@ -95,8 +94,16 @@ class FrameworkBundle extends Bundle
      */
     public function boot()
     {
+        $_ENV['DOCTRINE_DEPRECATIONS'] = $_SERVER['DOCTRINE_DEPRECATIONS'] ??= 'trigger';
+
         $handler = ErrorHandler::register(null, false);
-        $this->container->get('debug.error_handler_configurator')->configure($handler);
+
+        // When upgrading an existing Symfony application from 6.2 to 6.3, and
+        // the cache is warmed up, the service is not available yet, so we need
+        // to check if it exists.
+        if ($this->container->has('debug.error_handler_configurator')) {
+            $this->container->get('debug.error_handler_configurator')->configure($handler);
+        }
 
         if ($this->container->getParameter('kernel.http_method_override')) {
             Request::enableHttpMethodParameterOverride();
@@ -175,7 +182,6 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new RemoveUnusedSessionMarshallingHandlerPass());
 
         if ($container->getParameter('kernel.debug')) {
-            $container->addCompilerPass(new EnableLoggerDebugModePass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -33);
             $container->addCompilerPass(new AddDebugLogProcessorPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 2);
             $container->addCompilerPass(new UnusedTagsPass(), PassConfig::TYPE_AFTER_REMOVING);
             $container->addCompilerPass(new ContainerBuilderDebugDumpPass(), PassConfig::TYPE_BEFORE_REMOVING, -255);

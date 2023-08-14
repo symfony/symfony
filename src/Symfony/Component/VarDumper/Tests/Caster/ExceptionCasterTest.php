@@ -378,6 +378,7 @@ array:1 [
     -file: "%sExceptionCasterTest.php"
     -line: %d
     -asString: null
+    -dataRepresentation: ? Symfony\Component\VarDumper\Cloner\Data
   }
 ]
 EODUMP;

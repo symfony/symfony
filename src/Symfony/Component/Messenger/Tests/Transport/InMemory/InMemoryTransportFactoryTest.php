@@ -24,10 +24,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  */
 class InMemoryTransportFactoryTest extends TestCase
 {
-    /**
-     * @var InMemoryTransportFactory
-     */
-    private $factory;
+    private InMemoryTransportFactory $factory;
 
     protected function setUp(): void
     {

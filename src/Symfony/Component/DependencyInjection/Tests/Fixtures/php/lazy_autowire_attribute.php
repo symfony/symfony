@@ -15,11 +15,9 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class Symfony_DI_PhpDumper_Test_Lazy_Autowire_Attribute extends Container
 {
     protected $parameters = [];
-    protected readonly \WeakReference $ref;
 
     public function __construct()
     {
-        $this->ref = \WeakReference::create($this);
         $this->services = $this->privates = [];
         $this->methodMap = [
             'bar' => 'getBarService',
@@ -79,10 +77,8 @@ class Symfony_DI_PhpDumper_Test_Lazy_Autowire_Attribute extends Container
      */
     protected static function getFoo2Service($container, $lazyLoad = true)
     {
-        $containerRef = $container->ref;
-
         if (true === $lazyLoad) {
-            return $container->privates['.lazy.Symfony\\Component\\DependencyInjection\\Tests\\Compiler\\Foo'] = $container->createProxy('FooProxy4048957', static fn () => \FooProxy4048957::createLazyProxy(static fn () => self::getFoo2Service($containerRef->get(), false)));
+            return $container->privates['.lazy.Symfony\\Component\\DependencyInjection\\Tests\\Compiler\\Foo'] = $container->createProxy('FooProxy4048957', static fn () => \FooProxy4048957::createLazyProxy(static fn () => self::getFoo2Service($container, false)));
         }
 
         return ($container->services['foo'] ??= new \Symfony\Component\DependencyInjection\Tests\Compiler\Foo());

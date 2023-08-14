@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class CountryValidatorTest extends ConstraintValidatorTestCase
 {
-    private $defaultLocale;
+    private string $defaultLocale;
 
     protected function setUp(): void
     {

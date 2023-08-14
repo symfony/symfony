@@ -27,7 +27,7 @@ class FlexStyleMicroKernel extends Kernel
         configureRoutes as traitConfigureRoutes;
     }
 
-    private $cacheDir;
+    private string $cacheDir;
 
     public function halloweenAction(\stdClass $o)
     {
@@ -69,7 +69,7 @@ class FlexStyleMicroKernel extends Kernel
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
 
-    public function __wakeup()
+    public function __wakeup(): void
     {
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
     }
@@ -101,6 +101,7 @@ class FlexStyleMicroKernel extends Kernel
                 ->arg('$halloween', '%halloween%');
 
         $c->extension('framework', [
+            'annotations' => false,
             'http_method_override' => false,
             'router' => ['utf8' => true],
         ]);

@@ -24,10 +24,7 @@ use Symfony\Component\Routing\RouteCollection;
 
 class CompiledUrlMatcherDumperTest extends TestCase
 {
-    /**
-     * @var string
-     */
-    private $dumpPath;
+    private string $dumpPath;
 
     protected function setUp(): void
     {

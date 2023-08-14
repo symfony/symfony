@@ -33,10 +33,7 @@ use Symfony\Component\Routing\RouteCollection;
  */
 abstract class Descriptor implements DescriptorInterface
 {
-    /**
-     * @var OutputInterface
-     */
-    protected $output;
+    protected OutputInterface $output;
 
     public function describe(OutputInterface $output, mixed $object, array $options = []): void
     {

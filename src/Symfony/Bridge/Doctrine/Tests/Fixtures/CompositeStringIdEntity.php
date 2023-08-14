@@ -15,16 +15,16 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
 
-/** @Entity */
+#[Entity]
 class CompositeStringIdEntity
 {
-    /** @Id @Column(type="string") */
+    #[Id, Column(type: 'string')]
     protected $id1;
 
-    /** @Id @Column(type="string") */
+    #[Id, Column(type: 'string')]
     protected $id2;
 
-    /** @Column(type="string") */
+    #[Column(type: 'string')]
     public $name;
 
     public function __construct($id1, $id2, $name)

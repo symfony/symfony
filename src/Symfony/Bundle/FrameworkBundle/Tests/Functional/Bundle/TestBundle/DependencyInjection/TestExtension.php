@@ -11,22 +11,20 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\DependencyInjection;
 
+use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\DependencyInjection\Config\CustomConfig;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 
 class TestExtension extends Extension implements PrependExtensionInterface
 {
-    private $customConfig;
+    private ?CustomConfig $customConfig = null;
 
     public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = $this->getConfiguration($configs, $container);
         $this->processConfiguration($configuration, $configs);
-
-        $container->setAlias('test.annotation_reader', new Alias('annotation_reader', true));
     }
 
     public function prepend(ContainerBuilder $container): void
@@ -39,7 +37,7 @@ class TestExtension extends Extension implements PrependExtensionInterface
         return new Configuration($this->customConfig);
     }
 
-    public function setCustomConfig($customConfig): void
+    public function setCustomConfig(CustomConfig $customConfig): void
     {
         $this->customConfig = $customConfig;
     }

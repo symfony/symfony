@@ -11,19 +11,20 @@
 
 namespace Symfony\Component\Messenger\EventListener;
 
-trigger_deprecation('symfony/messenger', '6.3', '"%s" is deprecated, use "%s" instead.', StopWorkerOnSigtermSignalListener::class, StopWorkerOnSignalsListener::class);
-
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Command\SignalableCommandInterface;
+
+trigger_deprecation('symfony/messenger', '6.3', '"%s" is deprecated, use the "%s" instead.', StopWorkerOnSigtermSignalListener::class, SignalableCommandInterface::class);
 
 /**
  * @author Tobias Schultze <http://tobion.de>
  *
- * @deprecated since Symfony 6.3, use the StopWorkerOnSignalsListener instead
+ * @deprecated since Symfony 6.3, use the {@see SignalableCommandInterface} instead
  */
 class StopWorkerOnSigtermSignalListener extends StopWorkerOnSignalsListener
 {
     public function __construct(LoggerInterface $logger = null)
     {
-        parent::__construct([SIGTERM], $logger);
+        parent::__construct(\defined('SIGTERM') ? [SIGTERM] : [], $logger);
     }
 }

@@ -78,7 +78,6 @@ class MessageConverterTest extends TestCase
         }
 
         $r = new \ReflectionProperty($expected, 'cachedBody');
-        $r->setAccessible(true);
         $r->setValue($expected, null);
         $r->setValue($converted, null);
 

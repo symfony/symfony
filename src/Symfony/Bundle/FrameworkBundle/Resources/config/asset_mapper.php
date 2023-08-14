@@ -29,6 +29,9 @@ use Symfony\Component\AssetMapper\Factory\CachedMappedAssetFactory;
 use Symfony\Component\AssetMapper\Factory\MappedAssetFactory;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapRenderer;
+use Symfony\Component\AssetMapper\ImportMap\Resolver\JsDelivrEsmResolver;
+use Symfony\Component\AssetMapper\ImportMap\Resolver\JspmResolver;
+use Symfony\Component\AssetMapper\ImportMap\Resolver\PackageResolver;
 use Symfony\Component\AssetMapper\MapperAwareAssetPackage;
 use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolver;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -83,6 +86,7 @@ return static function (ContainerConfigurator $container) {
                 service('asset_mapper'),
                 abstract_arg('asset public prefix'),
                 abstract_arg('extensions map'),
+                service('cache.asset_mapper'),
             ])
             ->tag('kernel.event_subscriber', ['event' => RequestEvent::class])
 
@@ -114,18 +118,22 @@ return static function (ContainerConfigurator $container) {
 
         ->set('asset_mapper.compiler.css_asset_url_compiler', CssAssetUrlCompiler::class)
             ->args([
-                abstract_arg('strict mode'),
+                abstract_arg('missing import mode'),
+                service('logger'),
             ])
             ->tag('asset_mapper.compiler')
+            ->tag('monolog.logger', ['channel' => 'asset_mapper'])
 
         ->set('asset_mapper.compiler.source_mapping_urls_compiler', SourceMappingUrlsCompiler::class)
             ->tag('asset_mapper.compiler')
 
         ->set('asset_mapper.compiler.javascript_import_path_compiler', JavaScriptImportPathCompiler::class)
             ->args([
-                abstract_arg('strict mode'),
+                abstract_arg('missing import mode'),
+                service('logger'),
             ])
             ->tag('asset_mapper.compiler')
+            ->tag('monolog.logger', ['channel' => 'asset_mapper'])
 
         ->set('asset_mapper.importmap.manager', ImportMapManager::class)
             ->args([
@@ -133,9 +141,39 @@ return static function (ContainerConfigurator $container) {
                 service('asset_mapper.public_assets_path_resolver'),
                 abstract_arg('importmap.php path'),
                 abstract_arg('vendor directory'),
-                abstract_arg('provider'),
+                service('asset_mapper.importmap.resolver'),
             ])
         ->alias(ImportMapManager::class, 'asset_mapper.importmap.manager')
+
+        ->set('asset_mapper.importmap.resolver', PackageResolver::class)
+            ->args([
+                abstract_arg('provider'),
+                tagged_locator('asset_mapper.importmap.resolver'),
+            ])
+
+        ->set('asset_mapper.importmap.resolver.jsdelivr_esm', JsDelivrEsmResolver::class)
+            ->args([service('http_client')])
+            ->tag('asset_mapper.importmap.resolver', ['resolver' => ImportMapManager::PROVIDER_JSDELIVR_ESM])
+
+        ->set('asset_mapper.importmap.resolver.jspm', JspmResolver::class)
+            ->args([service('http_client'), ImportMapManager::PROVIDER_JSPM])
+            ->tag('asset_mapper.importmap.resolver', ['resolver' => ImportMapManager::PROVIDER_JSPM])
+
+        ->set('asset_mapper.importmap.resolver.jspm_system', JspmResolver::class)
+            ->args([service('http_client'), ImportMapManager::PROVIDER_JSPM_SYSTEM])
+            ->tag('asset_mapper.importmap.resolver', ['resolver' => ImportMapManager::PROVIDER_JSPM_SYSTEM])
+
+        ->set('asset_mapper.importmap.resolver.skypack', JspmResolver::class)
+            ->args([service('http_client'), ImportMapManager::PROVIDER_SKYPACK])
+            ->tag('asset_mapper.importmap.resolver', ['resolver' => ImportMapManager::PROVIDER_SKYPACK])
+
+        ->set('asset_mapper.importmap.resolver.jsdelivr', JspmResolver::class)
+            ->args([service('http_client'), ImportMapManager::PROVIDER_JSDELIVR])
+            ->tag('asset_mapper.importmap.resolver', ['resolver' => ImportMapManager::PROVIDER_JSDELIVR])
+
+        ->set('asset_mapper.importmap.resolver.unpkg', JspmResolver::class)
+            ->args([service('http_client'), ImportMapManager::PROVIDER_UNPKG])
+            ->tag('asset_mapper.importmap.resolver', ['resolver' => ImportMapManager::PROVIDER_UNPKG])
 
         ->set('asset_mapper.importmap.renderer', ImportMapRenderer::class)
             ->args([

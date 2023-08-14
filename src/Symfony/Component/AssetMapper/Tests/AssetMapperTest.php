@@ -21,7 +21,7 @@ use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
 
 class AssetMapperTest extends TestCase
 {
-    private MappedAssetFactoryInterface|MockObject $mappedAssetFactory;
+    private MappedAssetFactoryInterface&MockObject $mappedAssetFactory;
 
     public function testGetAsset()
     {
@@ -43,8 +43,7 @@ class AssetMapperTest extends TestCase
     {
         $assetMapper = $this->createAssetMapper();
 
-        $file1Asset = new MappedAsset('file1.css');
-        $file1Asset->setPublicPath('/final-assets/file1-the-checksum.css');
+        $file1Asset = new MappedAsset('file1.css', publicPath: '/final-assets/file1-the-checksum.css');
         $this->mappedAssetFactory->expects($this->once())
             ->method('createMappedAsset')
             ->willReturn($file1Asset);
@@ -62,13 +61,14 @@ class AssetMapperTest extends TestCase
         $this->mappedAssetFactory->expects($this->exactly(8))
             ->method('createMappedAsset')
             ->willReturnCallback(function (string $logicalPath, string $filePath) {
-                $asset = new MappedAsset($logicalPath);
-                $asset->setPublicPath('/final-assets/'.$logicalPath);
+                $asset = new MappedAsset($logicalPath, publicPath: '/final-assets/'.$logicalPath);
 
                 return $asset;
             });
 
         $assets = $assetMapper->allAssets();
+        $this->assertIsIterable($assets);
+        $assets = iterator_to_array($assets);
         $this->assertCount(8, $assets);
         $this->assertInstanceOf(MappedAsset::class, $assets[0]);
     }
@@ -83,7 +83,7 @@ class AssetMapperTest extends TestCase
             ->willReturn(new MappedAsset('file1.css'));
 
         $asset = $assetMapper->getAssetFromSourcePath(__DIR__.'/fixtures/dir1/file1.css');
-        $this->assertSame('file1.css', $asset->getLogicalPath());
+        $this->assertSame('file1.css', $asset->logicalPath);
     }
 
     private function createAssetMapper(): AssetMapper

@@ -15,11 +15,9 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
 {
     protected $parameters = [];
-    protected readonly \WeakReference $ref;
 
     public function __construct()
     {
-        $this->ref = \WeakReference::create($this);
         $this->services = $this->privates = [];
         $this->methodMap = [
             'bar' => 'getBarService',
@@ -273,11 +271,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected static function getDoctrine_EntityListenerResolverService($container)
     {
-        $containerRef = $container->ref;
-
-        return $container->services['doctrine.entity_listener_resolver'] = new \stdClass(new RewindableGenerator(function () use ($containerRef) {
-            $container = $containerRef->get();
-
+        return $container->services['doctrine.entity_listener_resolver'] = new \stdClass(new RewindableGenerator(function () use ($container) {
             yield 0 => ($container->services['doctrine.listener'] ?? self::getDoctrine_ListenerService($container));
         }, 1));
     }
@@ -526,11 +520,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected static function getMailer_TransportFactoryService($container)
     {
-        $containerRef = $container->ref;
-
-        return $container->services['mailer.transport_factory'] = new \FactoryCircular(new RewindableGenerator(function () use ($containerRef) {
-            $container = $containerRef->get();
-
+        return $container->services['mailer.transport_factory'] = new \FactoryCircular(new RewindableGenerator(function () use ($container) {
             yield 0 => ($container->services['mailer.transport_factory.amazon'] ?? self::getMailer_TransportFactory_AmazonService($container));
             yield 1 => ($container->services['mailer_inline.transport_factory.amazon'] ?? self::getMailerInline_TransportFactory_AmazonService($container));
         }, 2));

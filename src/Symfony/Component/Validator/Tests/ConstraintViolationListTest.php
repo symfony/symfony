@@ -17,16 +17,11 @@ use Symfony\Component\Validator\ConstraintViolationList;
 
 class ConstraintViolationListTest extends TestCase
 {
-    protected $list;
+    protected ConstraintViolationList $list;
 
     protected function setUp(): void
     {
         $this->list = new ConstraintViolationList();
-    }
-
-    protected function tearDown(): void
-    {
-        $this->list = null;
     }
 
     public function testInit()

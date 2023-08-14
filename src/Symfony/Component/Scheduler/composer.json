@@ -21,14 +21,15 @@
     ],
     "require": {
         "php": ">=8.1",
-        "symfony/clock": "^6.3"
+        "symfony/clock": "^6.3|^7.0"
     },
     "require-dev": {
         "dragonmantank/cron-expression": "^3.1",
-        "symfony/cache": "^5.4|^6.0",
-        "symfony/dependency-injection": "^5.4|^6.0",
-        "symfony/lock": "^5.4|^6.0",
-        "symfony/messenger": "^6.3"
+        "symfony/cache": "^5.4|^6.0|^7.0",
+        "symfony/console": "^5.4|^6.0|^7.0",
+        "symfony/dependency-injection": "^5.4|^6.0|^7.0",
+        "symfony/lock": "^5.4|^6.0|^7.0",
+        "symfony/messenger": "^6.3|^7.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Scheduler\\": "" },

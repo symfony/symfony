@@ -33,6 +33,9 @@ class WhenTestWithAttributes
     ], groups: ['foo'])]
     private $bar;
 
+    #[When(expression: 'true', constraints: new NotNull(), groups: ['foo'])]
+    private $qux;
+
     #[When(expression: 'true', constraints: [
         new NotNull(),
         new NotBlank(),

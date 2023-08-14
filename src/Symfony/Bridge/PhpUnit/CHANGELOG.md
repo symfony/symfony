@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add support for mocking the `enum_exists` function
+ * Enable reporting of deprecations triggered by Doctrine by default
 
 6.2
 ---

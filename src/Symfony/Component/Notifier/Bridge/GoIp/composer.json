@@ -1,0 +1,33 @@
+{
+    "name": "symfony/go-ip-notifier",
+    "type": "symfony-notifier-bridge",
+    "description": "Symfony GoIP Notifier Bridge",
+    "keywords": ["sms", "goip", "gsm-over-ip", "notifier"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ahmed Ghanem",
+            "email": "ahmedghanem7361@gmail.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "symfony/http-client": "^5.4|^6.0|^7.0",
+        "symfony/notifier": "^6.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Symfony\\Component\\Notifier\\Bridge\\GoIp\\": ""
+        },
+
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

@@ -59,7 +59,6 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
 
         $container
             ->register('a', 'stdClass')
-            ->setPublic(false)
             ->addTag('doctrine.event_listener', [
                 'event' => 'bar',
             ])
@@ -238,7 +237,7 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
             ])
         ;
 
-        $this->expectDeprecation('Since symfony/doctrine-bridge 6.3: Using Doctrine subscribers as services is deprecated, declare listeners instead');
+        $this->expectDeprecation('Since symfony/doctrine-bridge 6.3: Registering "d" as a Doctrine subscriber is deprecated. Register it as a listener instead, using e.g. the #[AsDoctrineListener] attribute.');
         $this->process($container);
 
         $eventManagerDef = $container->getDefinition('doctrine.dbal.default_connection.event_manager');
@@ -322,7 +321,7 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
             ])
         ;
 
-        $this->expectDeprecation('Since symfony/doctrine-bridge 6.3: Using Doctrine subscribers as services is deprecated, declare listeners instead');
+        $this->expectDeprecation('Since symfony/doctrine-bridge 6.3: Registering "d" as a Doctrine subscriber is deprecated. Register it as a listener instead, using e.g. the #[AsDoctrineListener] attribute.');
         $this->process($container);
 
         $eventManagerDef = $container->getDefinition('doctrine.dbal.default_connection.event_manager');
@@ -389,7 +388,6 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
         ;
         $container
             ->register('f', 'stdClass')
-            ->setPublic(false)
             ->addTag('doctrine.event_listener', [
                 'event' => 'bar',
             ])
@@ -416,7 +414,7 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
             ])
         ;
 
-        $this->expectDeprecation('Since symfony/doctrine-bridge 6.3: Using Doctrine subscribers as services is deprecated, declare listeners instead');
+        $this->expectDeprecation('Since symfony/doctrine-bridge 6.3: Registering "d" as a Doctrine subscriber is deprecated. Register it as a listener instead, using e.g. the #[AsDoctrineListener] attribute.');
         $this->process($container);
 
         $eventManagerDef = $container->getDefinition('doctrine.dbal.default_connection.event_manager');
@@ -460,7 +458,6 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
 
         $container
             ->register('a', 'stdClass')
-            ->setPublic(false)
             ->addTag('doctrine.event_listener', [
                 'event' => 'bar',
                 'priority' => 3,
@@ -468,7 +465,6 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
         ;
         $container
             ->register('b', 'stdClass')
-            ->setPublic(false)
             ->addTag('doctrine.event_listener', [
                 'event' => 'bar',
             ])

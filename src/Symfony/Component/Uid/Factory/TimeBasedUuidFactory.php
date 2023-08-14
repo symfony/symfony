@@ -16,9 +16,15 @@ use Symfony\Component\Uid\Uuid;
 
 class TimeBasedUuidFactory
 {
+    /**
+     * @var class-string<Uuid&TimeBasedUidInterface>
+     */
     private string $class;
     private ?Uuid $node;
 
+    /**
+     * @param class-string<Uuid&TimeBasedUidInterface> $class
+     */
     public function __construct(string $class, Uuid $node = null)
     {
         $this->class = $class;

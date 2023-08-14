@@ -14,16 +14,13 @@ namespace Symfony\Component\Validator\Tests\Fixtures;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @Assert\DisableAutoMapping
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
+#[Assert\DisableAutoMapping]
 class PropertyInfoLoaderNoAutoMappingEntity
 {
     public $string;
 
-    /**
-     * @Assert\EnableAutoMapping
-     */
+    #[Assert\EnableAutoMapping]
     public $autoMappingExplicitlyEnabled;
 }

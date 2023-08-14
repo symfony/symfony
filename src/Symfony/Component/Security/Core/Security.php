@@ -24,19 +24,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class Security implements AuthorizationCheckerInterface
 {
-    /**
-     * @deprecated since Symfony 6.2, use \Symfony\Bundle\SecurityBundle\Security::ACCESS_DENIED_ERROR instead
-     */
     public const ACCESS_DENIED_ERROR = '_security.403_error';
-
-    /**
-     * @deprecated since Symfony 6.2, use \Symfony\Bundle\SecurityBundle\Security::AUTHENTICATION_ERROR instead
-     */
     public const AUTHENTICATION_ERROR = '_security.last_error';
-
-    /**
-     * @deprecated since Symfony 6.2, use \Symfony\Bundle\SecurityBundle\Security::LAST_USERNAME instead
-     */
     public const LAST_USERNAME = '_security.last_username';
 
     /**

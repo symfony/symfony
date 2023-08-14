@@ -146,7 +146,7 @@ class ParentTestService2
 
     public function setContainer(ContainerInterface $container)
     {
-        $previous = $this->container;
+        $previous = $this->container ?? null;
         $this->container = $container;
 
         return $previous;

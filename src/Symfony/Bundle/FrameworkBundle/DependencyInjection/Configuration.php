@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 use Doctrine\Common\Annotations\Annotation;
 use Doctrine\DBAL\Connection;
 use Psr\Log\LogLevel;
+use Seld\JsonLint\JsonParser;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\Asset\Package;
 use Symfony\Component\AssetMapper\AssetMapper;
@@ -41,6 +42,7 @@ use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
 use Symfony\Component\RemoteEvent\RemoteEvent;
 use Symfony\Component\Scheduler\Schedule;
 use Symfony\Component\Semaphore\Semaphore;
+use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Uid\Factory\UuidFactory;
@@ -74,7 +76,7 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->beforeNormalization()
-                ->ifTrue(function ($v) { return !isset($v['assets']) && isset($v['templating']) && class_exists(Package::class); })
+                ->ifTrue(fn ($v) => !isset($v['assets']) && isset($v['templating']) && class_exists(Package::class))
                 ->then(function ($v) {
                     $v['assets'] = [];
 
@@ -119,7 +121,7 @@ class Configuration implements ConfigurationInterface
                     ->prototype('scalar')->end()
                 ->end()
                 ->arrayNode('trusted_hosts')
-                    ->beforeNormalization()->ifString()->then(function ($v) { return [$v]; })->end()
+                    ->beforeNormalization()->ifString()->then(fn ($v) => [$v])->end()
                     ->prototype('scalar')->end()
                 ->end()
                 ->scalarNode('trusted_proxies')->end()
@@ -127,7 +129,7 @@ class Configuration implements ConfigurationInterface
                     ->fixXmlConfig('trusted_header')
                     ->performNoDeepMerging()
                     ->defaultValue(['x-forwarded-for', 'x-forwarded-port', 'x-forwarded-proto'])
-                    ->beforeNormalization()->ifString()->then(function ($v) { return $v ? array_map('trim', explode(',', $v)) : []; })->end()
+                    ->beforeNormalization()->ifString()->then(fn ($v) => $v ? array_map('trim', explode(',', $v)) : [])->end()
                     ->enumPrototype()
                         ->values([
                             'forwarded',
@@ -149,7 +151,7 @@ class Configuration implements ConfigurationInterface
             return ContainerBuilder::willBeAvailable($package, $class, $parentPackages);
         };
 
-        $enableIfStandalone = static fn (string $package, string $class) => !class_exists(FullStack::class) && $willBeAvailable($package, $class) ? 'canBeDisabled' : 'canBeEnabled';
+        $enableIfStandalone = fn (string $package, string $class) => !class_exists(FullStack::class) && $willBeAvailable($package, $class) ? 'canBeDisabled' : 'canBeEnabled';
 
         $this->addCsrfSection($rootNode);
         $this->addFormSection($rootNode, $enableIfStandalone);
@@ -406,7 +408,7 @@ class Configuration implements ConfigurationInterface
                                                 ->values(['method'])
                                             ->end()
                                             ->scalarNode('property')
-                                                ->defaultValue('marking')
+                                                ->cannotBeEmpty()
                                             ->end()
                                             ->scalarNode('service')
                                                 ->cannotBeEmpty()
@@ -416,12 +418,12 @@ class Configuration implements ConfigurationInterface
                                     ->arrayNode('supports')
                                         ->beforeNormalization()
                                             ->ifString()
-                                            ->then(function ($v) { return [$v]; })
+                                            ->then(fn ($v) => [$v])
                                         ->end()
                                         ->prototype('scalar')
                                             ->cannotBeEmpty()
                                             ->validate()
-                                                ->ifTrue(function ($v) { return !class_exists($v) && !interface_exists($v, false); })
+                                                ->ifTrue(fn ($v) => !class_exists($v) && !interface_exists($v, false))
                                                 ->thenInvalid('The supported class or interface "%s" does not exist.')
                                             ->end()
                                         ->end()
@@ -465,6 +467,10 @@ class Configuration implements ConfigurationInterface
                                         ->beforeNormalization()
                                             ->always()
                                             ->then(function ($places) {
+                                                if (!\is_array($places)) {
+                                                    throw new InvalidConfigurationException('The "places" option must be an array in workflow configuration.');
+                                                }
+
                                                 // It's an indexed array of shape  ['place1', 'place2']
                                                 if (isset($places[0]) && \is_string($places[0])) {
                                                     return array_map(function (string $place) {
@@ -510,6 +516,10 @@ class Configuration implements ConfigurationInterface
                                         ->beforeNormalization()
                                             ->always()
                                             ->then(function ($transitions) {
+                                                if (!\is_array($transitions)) {
+                                                    throw new InvalidConfigurationException('The "transitions" option must be an array in workflow configuration.');
+                                                }
+
                                                 // It's an indexed array, we let the validation occur
                                                 if (isset($transitions[0]) && \is_array($transitions[0])) {
                                                     return $transitions;
@@ -542,7 +552,7 @@ class Configuration implements ConfigurationInterface
                                                 ->arrayNode('from')
                                                     ->beforeNormalization()
                                                         ->ifString()
-                                                        ->then(function ($v) { return [$v]; })
+                                                        ->then(fn ($v) => [$v])
                                                     ->end()
                                                     ->requiresAtLeastOneElement()
                                                     ->prototype('scalar')
@@ -552,7 +562,7 @@ class Configuration implements ConfigurationInterface
                                                 ->arrayNode('to')
                                                     ->beforeNormalization()
                                                         ->ifString()
-                                                        ->then(function ($v) { return [$v]; })
+                                                        ->then(fn ($v) => [$v])
                                                     ->end()
                                                     ->requiresAtLeastOneElement()
                                                     ->prototype('scalar')
@@ -774,8 +784,8 @@ class Configuration implements ConfigurationInterface
                                     ->scalarNode('version_strategy')->defaultNull()->end()
                                     ->scalarNode('version')
                                         ->beforeNormalization()
-                                        ->ifTrue(function ($v) { return '' === $v; })
-                                        ->then(function ($v) { return; })
+                                        ->ifTrue(fn ($v) => '' === $v)
+                                        ->then(fn () => null)
                                         ->end()
                                     ->end()
                                     ->scalarNode('version_format')->defaultNull()->end()
@@ -870,9 +880,10 @@ class Configuration implements ConfigurationInterface
                             ->info('The public path where the assets will be written to (and served from when "server" is true)')
                             ->defaultValue('/assets/')
                         ->end()
-                        ->booleanNode('strict_mode')
-                            ->info('If true, an exception will be thrown if an asset cannot be found when imported from JavaScript or CSS files - e.g. "import \'./non-existent.js\'"')
-                            ->defaultValue(true)
+                        ->enumNode('missing_import_mode')
+                            ->values(['strict', 'warn', 'ignore'])
+                            ->info('Behavior if an asset cannot be found when imported from JavaScript or CSS files - e.g. "import \'./non-existent.js\'". "strict" means an exception is thrown, "warn" means a warning is logged, "ignore" means the import is left as-is.')
+                            ->defaultValue('warn')
                         ->end()
                         ->arrayNode('extensions')
                             ->info('Key-value pair of file extensions set to their mime type.')
@@ -901,8 +912,8 @@ class Configuration implements ConfigurationInterface
                             ->defaultValue('%kernel.project_dir%/assets/vendor')
                         ->end()
                         ->scalarNode('provider')
-                            ->info('The provider (CDN) to use', class_exists(ImportMapManager::class) ? sprintf(' (e.g.: "%s").', implode('", "', ImportMapManager::PROVIDERS)) : '.')
-                            ->defaultValue('jspm')
+                            ->info('The provider (CDN) to use'.(class_exists(ImportMapManager::class) ? sprintf(' (e.g.: "%s").', implode('", "', ImportMapManager::PROVIDERS)) : '.'))
+                            ->defaultValue('jsdelivr.esm')
                         ->end()
                     ->end()
                 ->end()
@@ -923,7 +934,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->arrayNode('fallbacks')
                             ->info('Defaults to the value of "default_locale".')
-                            ->beforeNormalization()->ifString()->then(function ($v) { return [$v]; })->end()
+                            ->beforeNormalization()->ifString()->then(fn ($v) => [$v])->end()
                             ->prototype('scalar')->end()
                             ->defaultValue([])
                         ->end()
@@ -1114,6 +1125,10 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('default_context')
                             ->normalizeKeys(false)
                             ->useAttributeAsKey('name')
+                            ->beforeNormalization()
+                                ->ifTrue(fn () => $this->debug && class_exists(JsonParser::class))
+                                ->then(fn (array $v) => $v + [JsonDecode::DETAILED_ERROR_MESSAGES => true])
+                            ->end()
                             ->defaultValue([])
                             ->prototype('variable')->end()
                         ->end()
@@ -1188,7 +1203,7 @@ class Configuration implements ConfigurationInterface
                             ->prototype('array')
                                 ->fixXmlConfig('adapter')
                                 ->beforeNormalization()
-                                    ->ifTrue(function ($v) { return isset($v['provider']) && \is_array($v['adapters'] ?? $v['adapter'] ?? null) && 1 < \count($v['adapters'] ?? $v['adapter']); })
+                                    ->ifTrue(fn ($v) => isset($v['provider']) && \is_array($v['adapters'] ?? $v['adapter'] ?? null) && 1 < \count($v['adapters'] ?? $v['adapter']))
                                     ->thenInvalid('Pool cannot have a "provider" while more than one adapter is defined')
                                 ->end()
                                 ->children()
@@ -1236,7 +1251,7 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                             ->validate()
-                                ->ifTrue(function ($v) { return isset($v['cache.app']) || isset($v['cache.system']); })
+                                ->ifTrue(fn ($v) => isset($v['cache.app']) || isset($v['cache.system']))
                                 ->thenInvalid('"cache.app" and "cache.system" are reserved names')
                             ->end()
                         ->end()
@@ -1377,7 +1392,7 @@ class Configuration implements ConfigurationInterface
                     ->end()
                     ->addDefaultsIfNotSet()
                     ->validate()
-                        ->ifTrue(static fn (array $config) => $config['enabled'] && !$config['resources'])
+                        ->ifTrue(fn ($config) => $config['enabled'] && !$config['resources'])
                         ->thenInvalid('At least one resource must be defined.')
                     ->end()
                     ->fixXmlConfig('resource')
@@ -1492,12 +1507,12 @@ class Configuration implements ConfigurationInterface
                     ->fixXmlConfig('transport')
                     ->fixXmlConfig('bus', 'buses')
                     ->validate()
-                        ->ifTrue(function ($v) { return isset($v['buses']) && \count($v['buses']) > 1 && null === $v['default_bus']; })
+                        ->ifTrue(fn ($v) => isset($v['buses']) && \count($v['buses']) > 1 && null === $v['default_bus'])
                         ->thenInvalid('You must specify the "default_bus" if you define more than one bus.')
                     ->end()
                     ->validate()
-                        ->ifTrue(static function ($v): bool { return isset($v['buses']) && null !== $v['default_bus'] && !isset($v['buses'][$v['default_bus']]); })
-                        ->then(static function (array $v): void { throw new InvalidConfigurationException(sprintf('The specified default bus "%s" is not configured. Available buses are "%s".', $v['default_bus'], implode('", "', array_keys($v['buses'])))); })
+                        ->ifTrue(fn ($v) => isset($v['buses']) && null !== $v['default_bus'] && !isset($v['buses'][$v['default_bus']]))
+                        ->then(fn ($v) => throw new InvalidConfigurationException(sprintf('The specified default bus "%s" is not configured. Available buses are "%s".', $v['default_bus'], implode('", "', array_keys($v['buses'])))))
                     ->end()
                     ->children()
                         ->arrayNode('routing')
@@ -1624,7 +1639,7 @@ class Configuration implements ConfigurationInterface
                             ->info('Reset container services after each message.')
                             ->setDeprecated('symfony/framework-bundle', '6.1', 'Option "%node%" at "%path%" is deprecated. It does nothing and will be removed in version 7.0.')
                             ->validate()
-                                ->ifTrue(static fn ($v) => true !== $v)
+                                ->ifTrue(fn ($v) => true !== $v)
                                 ->thenInvalid('The "framework.messenger.reset_on_message" configuration option can be set to "true" only. To prevent services resetting after each message you can set the "--no-reset" option in "messenger:consume" command.')
                             ->end()
                         ->end()
@@ -1643,22 +1658,12 @@ class Configuration implements ConfigurationInterface
                                 ->children()
                                     ->arrayNode('default_middleware')
                                         ->beforeNormalization()
-                                            ->ifTrue(function ($defaultMiddleware) { return \is_string($defaultMiddleware) || \is_bool($defaultMiddleware); })
-                                            ->then(function ($defaultMiddleware): array {
-                                                if (\is_string($defaultMiddleware) && 'allow_no_handlers' === $defaultMiddleware) {
-                                                    return [
-                                                        'enabled' => true,
-                                                        'allow_no_handlers' => true,
-                                                        'allow_no_senders' => true,
-                                                    ];
-                                                }
-
-                                                return [
-                                                    'enabled' => $defaultMiddleware,
-                                                    'allow_no_handlers' => false,
-                                                    'allow_no_senders' => true,
-                                                ];
-                                            })
+                                            ->ifTrue(fn ($v) => \is_string($v) || \is_bool($v))
+                                            ->then(fn ($v) => [
+                                                'enabled' => 'allow_no_handlers' === $v ? true : $v,
+                                                'allow_no_handlers' => 'allow_no_handlers' === $v,
+                                                'allow_no_senders' => true,
+                                            ])
                                         ->end()
                                         ->canBeDisabled()
                                         ->children()
@@ -1669,8 +1674,8 @@ class Configuration implements ConfigurationInterface
                                     ->arrayNode('middleware')
                                         ->performNoDeepMerging()
                                         ->beforeNormalization()
-                                            ->ifTrue(function ($v) { return \is_string($v) || (\is_array($v) && !\is_int(key($v))); })
-                                            ->then(function ($v) { return [$v]; })
+                                            ->ifTrue(fn ($v) => \is_string($v) || (\is_array($v) && !\is_int(key($v))))
+                                            ->then(fn ($v) => [$v])
                                         ->end()
                                         ->defaultValue([])
                                         ->arrayPrototype()
@@ -1863,7 +1868,7 @@ class Configuration implements ConfigurationInterface
                                     ->normalizeKeys(false)
                                     ->variablePrototype()->end()
                                 ->end()
-                                ->append($this->addHttpClientRetrySection())
+                                ->append($this->createHttpClientRetrySection())
                             ->end()
                         ->end()
                         ->scalarNode('mock_response_factory')
@@ -1885,11 +1890,11 @@ class Configuration implements ConfigurationInterface
                                     })
                                 ->end()
                                 ->validate()
-                                    ->ifTrue(function ($v) { return !isset($v['scope']) && !isset($v['base_uri']); })
+                                    ->ifTrue(fn ($v) => !isset($v['scope']) && !isset($v['base_uri']))
                                     ->thenInvalid('Either "scope" or "base_uri" should be defined.')
                                 ->end()
                                 ->validate()
-                                    ->ifTrue(function ($v) { return !empty($v['query']) && !isset($v['base_uri']); })
+                                    ->ifTrue(fn ($v) => !empty($v['query']) && !isset($v['base_uri']))
                                     ->thenInvalid('"query" applies to "base_uri" but no base URI is defined.')
                                 ->end()
                                 ->children()
@@ -2011,7 +2016,7 @@ class Configuration implements ConfigurationInterface
                                         ->normalizeKeys(false)
                                         ->variablePrototype()->end()
                                     ->end()
-                                    ->append($this->addHttpClientRetrySection())
+                                    ->append($this->createHttpClientRetrySection())
                                 ->end()
                             ->end()
                         ->end()
@@ -2021,7 +2026,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addHttpClientRetrySection()
+    private function createHttpClientRetrySection(): ArrayNodeDefinition
     {
         $root = new NodeBuilder();
 
@@ -2175,7 +2180,7 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('channel_policy')
                             ->useAttributeAsKey('name')
                             ->prototype('array')
-                                ->beforeNormalization()->ifString()->then(function (string $v) { return [$v]; })->end()
+                                ->beforeNormalization()->ifString()->then(fn ($v) => [$v])->end()
                                 ->prototype('scalar')->end()
                             ->end()
                         ->end()
@@ -2225,7 +2230,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addRemoteEventSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
+    private function addRemoteEventSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
             ->children()
@@ -2447,7 +2452,7 @@ class Configuration implements ConfigurationInterface
                                         ->info('Allows only a given list of hosts to be used in links href attributes.')
                                         ->defaultValue(null)
                                         ->validate()
-                                            ->ifTrue(function ($v) { return !\is_array($v) && null !== $v; })
+                                            ->ifTrue(fn ($v) => !\is_array($v) && null !== $v)
                                             ->thenInvalid('The "allowed_link_hosts" parameter must be an array or null')
                                         ->end()
                                     ->end()
@@ -2463,7 +2468,7 @@ class Configuration implements ConfigurationInterface
                                         ->info('Allows only a given list of hosts to be used in media source attributes (img, audio, video, ...).')
                                         ->defaultValue(null)
                                         ->validate()
-                                            ->ifTrue(function ($v) { return !\is_array($v) && null !== $v; })
+                                            ->ifTrue(fn ($v) => !\is_array($v) && null !== $v)
                                             ->thenInvalid('The "allowed_media_hosts" parameter must be an array or null')
                                         ->end()
                                     ->end()

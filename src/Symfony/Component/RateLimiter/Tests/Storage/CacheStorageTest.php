@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\RateLimiter\Tests\Storage;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
@@ -19,8 +20,8 @@ use Symfony\Component\RateLimiter\Storage\CacheStorage;
 
 class CacheStorageTest extends TestCase
 {
-    private $pool;
-    private $storage;
+    private MockObject&CacheItemPoolInterface $pool;
+    private CacheStorage $storage;
 
     protected function setUp(): void
     {

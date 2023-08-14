@@ -13,9 +13,6 @@ namespace Symfony\Component\Messenger\Message;
 
 use Symfony\Component\Messenger\Envelope;
 
-/**
- * @internal
- */
 final class RedispatchMessage
 {
     /**

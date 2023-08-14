@@ -23,7 +23,7 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
     protected $encodingImpl;
     protected $decodingImpl;
 
-    private $defaultContext = [
+    private array $defaultContext = [
         JsonDecode::ASSOCIATIVE => true,
     ];
 

@@ -116,7 +116,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
     /**
      * @internal
      */
-    public function __wakeup()
+    public function __wakeup(): void
     {
         if (\is_bool($this->exists)) {
             $this->exists = [$this->exists, null];

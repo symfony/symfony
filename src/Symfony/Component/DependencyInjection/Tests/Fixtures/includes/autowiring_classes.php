@@ -38,6 +38,16 @@ class Foo
     }
 }
 
+class FooVoid
+{
+    public static int $counter = 0;
+
+    public function __invoke(string $name): void
+    {
+        ++self::$counter;
+    }
+}
+
 class Bar
 {
     public function __construct(Foo $foo)
@@ -524,6 +534,13 @@ class NonAutowirableDecorator implements DecoratorInterface
 final class ElsaAction
 {
     public function __construct(NotExisting $notExisting)
+    {
+    }
+}
+
+class ParametersLikeDefaultValue
+{
+    public function __construct(string $parameterLike = '%not%one%parameter%here%', string $willBeSetToKeepFirstArgumentDefaultValue = 'ok')
     {
     }
 }

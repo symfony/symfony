@@ -16,9 +16,9 @@ use Symfony\Component\Mime\Email;
 use Symfony\Component\Notifier\Bridge\FakeSms\FakeSmsEmailTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
+use Symfony\Component\Notifier\Test\Transport\DummyMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Tests\Mailer\DummyMailer;
-use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 

@@ -18,9 +18,8 @@ use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
-use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
+use Symfony\Component\Notifier\Test\Transport\DummyMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
-use Symfony\Component\Notifier\Transport\NullTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 

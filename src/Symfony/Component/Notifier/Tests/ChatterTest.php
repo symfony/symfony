@@ -17,7 +17,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Notifier\Chatter;
 use Symfony\Component\Notifier\Message\SentMessage;
-use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
+use Symfony\Component\Notifier\Test\Transport\DummyMessage;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
 class ChatterTest extends TestCase

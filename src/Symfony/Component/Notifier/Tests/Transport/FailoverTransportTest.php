@@ -16,6 +16,7 @@ use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\RuntimeException;
 use Symfony\Component\Notifier\Exception\TransportExceptionInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
+use Symfony\Component\Notifier\Test\Transport\DummyMessage;
 use Symfony\Component\Notifier\Transport\FailoverTransport;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 

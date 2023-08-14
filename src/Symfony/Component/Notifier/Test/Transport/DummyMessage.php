@@ -9,13 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Notifier\Tests\Transport;
+namespace Symfony\Component\Notifier\Test\Transport;
 
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 
 /**
  * @author Jan Schädlich <jan.schaedlich@sensiolabs.de>
+ *
+ * @internal
  */
 class DummyMessage implements MessageInterface
 {

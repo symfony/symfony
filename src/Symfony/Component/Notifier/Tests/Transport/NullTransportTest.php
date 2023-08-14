@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Notifier\Test\Transport\DummyMessage;
 use Symfony\Component\Notifier\Transport\NullTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 

@@ -25,5 +25,16 @@
         <argument type="service" id="bar_service"/>
       </argument>
     </service>
+
+    <service id="locator_dependent_inline_service" class="ArrayObject">
+      <argument type="service_locator">
+        <argument key="foo" type="service">
+          <service class="stdClass"/>
+        </argument>
+        <argument key="bar" type="service">
+          <service class="stdClass"/>
+        </argument>
+      </argument>
+    </service>
   </services>
 </container>

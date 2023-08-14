@@ -1,5 +1,5 @@
 {
-    "name": "symfony/goip-notifier",
+    "name": "symfony/go-ip-notifier",
     "type": "symfony-notifier-bridge",
     "description": "Symfony GoIP Notifier Bridge",
     "keywords": ["sms", "goip", "gsm-over-ip", "notifier"],
@@ -22,7 +22,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Symfony\\Component\\Notifier\\Bridge\\GoIP\\": ""
+            "Symfony\\Component\\Notifier\\Bridge\\GoIp\\": ""
         },
 
         "exclude-from-classmap": [

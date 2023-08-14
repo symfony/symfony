@@ -45,7 +45,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             Bridge\FreeMobile\FreeMobileTransportFactory::class => false,
             Bridge\GatewayApi\GatewayApiTransportFactory::class => false,
             Bridge\Gitter\GitterTransportFactory::class => false,
-            Bridge\GoIP\GoIPTransportFactory::class => false,
+            Bridge\GoIp\GoIpTransportFactory::class => false,
             Bridge\GoogleChat\GoogleChatTransportFactory::class => false,
             Bridge\Infobip\InfobipTransportFactory::class => false,
             Bridge\Iqsms\IqsmsTransportFactory::class => false,
@@ -171,7 +171,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['twitter', 'symfony/twitter-notifier'];
         yield ['zendesk', 'symfony/zendesk-notifier'];
         yield ['zulip', 'symfony/zulip-notifier'];
-        yield ['goip', 'symfony/goip-notifier'];
+        yield ['goip', 'symfony/go-ip-notifier'];
     }
 
     /**

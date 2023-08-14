@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Notifier\Bridge\GoIP;
+namespace Symfony\Component\Notifier\Bridge\GoIp;
 
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
@@ -19,11 +19,11 @@ use Symfony\Component\Notifier\Transport\Dsn;
 /**
  * @author Ahmed Ghanem <ahmedghanem7361@gmail.com>
  */
-final class GoIPTransportFactory extends AbstractTransportFactory
+final class GoIpTransportFactory extends AbstractTransportFactory
 {
     private const SCHEME_NAME = 'goip';
 
-    public function create(Dsn $dsn): GoIPTransport
+    public function create(Dsn $dsn): GoIpTransport
     {
         if (self::SCHEME_NAME !== $dsn->getScheme()) {
             throw new UnsupportedSchemeException($dsn, self::SCHEME_NAME, $this->getSupportedSchemes());
@@ -36,7 +36,7 @@ final class GoIPTransportFactory extends AbstractTransportFactory
             throw new InvalidArgumentException(sprintf('The provided SIM-Slot: "%s" is not valid.', $simSlot));
         }
 
-        return (new GoIPTransport($username, $password, $simSlot, $this->client, $this->dispatcher))
+        return (new GoIpTransport($username, $password, $simSlot, $this->client, $this->dispatcher))
             ->setHost($dsn->getHost())
             ->setPort($dsn->getPort());
     }

@@ -439,6 +439,10 @@ class XmlFileLoaderTest extends TestCase
 
         $values = ['foo' => new Reference('foo_service'), 0 => new Reference('bar_service')];
         $this->assertEquals([new ServiceLocatorArgument($values)], $container->getDefinition('locator_dependent_service_mixed')->getArguments());
+
+        $inlinedServiceArguments = $container->getDefinition('locator_dependent_inline_service')->getArguments();
+        $this->assertEquals((new Definition(\stdClass::class))->setPublic(false), $container->getDefinition((string) $inlinedServiceArguments[0]->getValues()['foo']));
+        $this->assertEquals((new Definition(\stdClass::class))->setPublic(false), $container->getDefinition((string) $inlinedServiceArguments[0]->getValues()['bar']));
     }
 
     public function testParseServiceClosure()

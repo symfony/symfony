@@ -18,6 +18,7 @@ use Symfony\Component\Config\Builder\ConfigBuilderGenerator;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Dumper\YamlDumper;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -223,5 +224,8 @@ class PhpFileLoaderTest extends TestCase
 
         $values = ['foo' => new Reference('foo_service'), 0 => new Reference('bar_service')];
         $this->assertEquals([new ServiceLocatorArgument($values)], $container->getDefinition('locator_dependent_service_mixed')->getArguments());
+
+        $values = ['foo' => new Definition(\stdClass::class), 'bar' => new Definition(\stdClass::class)];
+        $this->assertEquals([new ServiceLocatorArgument($values)], $container->getDefinition('locator_dependent_inline_service')->getArguments());
     }
 }

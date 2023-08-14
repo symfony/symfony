@@ -12,6 +12,7 @@
 namespace Symfony\Component\AssetMapper\Factory;
 
 use Symfony\Component\AssetMapper\AssetMapperCompiler;
+use Symfony\Component\AssetMapper\Exception\CircularAssetsException;
 use Symfony\Component\AssetMapper\Exception\RuntimeException;
 use Symfony\Component\AssetMapper\MappedAsset;
 use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
@@ -36,7 +37,7 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
     public function createMappedAsset(string $logicalPath, string $sourcePath): ?MappedAsset
     {
         if (\in_array($logicalPath, $this->assetsBeingCreated, true)) {
-            throw new RuntimeException(sprintf('Circular reference detected while creating asset for "%s": "%s".', $logicalPath, implode(' -> ', $this->assetsBeingCreated).' -> '.$logicalPath));
+            throw new CircularAssetsException(sprintf('Circular reference detected while creating asset for "%s": "%s".', $logicalPath, implode(' -> ', $this->assetsBeingCreated).' -> '.$logicalPath));
         }
 
         if (!isset($this->assetsCache[$logicalPath])) {

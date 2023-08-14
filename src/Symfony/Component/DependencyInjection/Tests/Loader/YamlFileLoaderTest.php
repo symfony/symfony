@@ -433,6 +433,10 @@ class YamlFileLoaderTest extends TestCase
 
         $values = ['foo' => new Reference('foo_service'), 0 => new Reference('bar_service')];
         $this->assertEquals([new ServiceLocatorArgument($values)], $container->getDefinition('locator_dependent_service_mixed')->getArguments());
+
+        $inlinedServiceArguments = $container->getDefinition('locator_dependent_inline_service')->getArguments();
+        $this->assertEquals(new Definition(\stdClass::class), $container->getDefinition((string) $inlinedServiceArguments[0]->getValues()['foo'][0]));
+        $this->assertEquals(new Definition(\stdClass::class), $container->getDefinition((string) $inlinedServiceArguments[0]->getValues()['bar'][0]));
     }
 
     public function testParseServiceClosure()

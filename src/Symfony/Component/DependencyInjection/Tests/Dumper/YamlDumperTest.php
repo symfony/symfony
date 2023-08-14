@@ -17,12 +17,16 @@ use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Dumper\YamlDumper;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithDefaultArrayAttribute;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithDefaultEnumAttribute;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithDefaultObjectAttribute;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument;
@@ -151,6 +155,34 @@ class YamlDumperTest extends TestCase
         $dumper = new YamlDumper($container);
 
         $this->assertEquals(file_get_contents(self::$fixturesPath.'/yaml/services_with_enumeration.yml'), $dumper->dump());
+    }
+
+    /**
+     * @requires PHP 8.1
+     *
+     * @dataProvider provideDefaultClasses
+     */
+    public function testDumpHandlesDefaultAttribute($class, $expectedFile)
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('foo', $class)
+            ->setPublic(true)
+            ->setAutowired(true)
+            ->setArguments([2 => true]);
+
+        (new AutowirePass())->process($container);
+
+        $dumper = new YamlDumper($container);
+
+        $this->assertSame(file_get_contents(self::$fixturesPath.'/yaml/'.$expectedFile), $dumper->dump());
+    }
+
+    public static function provideDefaultClasses()
+    {
+        yield [FooClassWithDefaultArrayAttribute::class, 'services_with_default_array.yml'];
+        yield [FooClassWithDefaultObjectAttribute::class, 'services_with_default_object.yml'];
+        yield [FooClassWithDefaultEnumAttribute::class, 'services_with_default_enumeration.yml'];
     }
 
     public function testDumpServiceWithAbstractArgument()

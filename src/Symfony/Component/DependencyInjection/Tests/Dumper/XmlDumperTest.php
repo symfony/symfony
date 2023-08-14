@@ -17,11 +17,15 @@ use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Dumper\XmlDumper;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithDefaultArrayAttribute;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithDefaultEnumAttribute;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithDefaultObjectAttribute;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument;
@@ -285,6 +289,34 @@ class XmlDumperTest extends TestCase
         $dumper = new XmlDumper($container);
 
         $this->assertEquals(file_get_contents(self::$fixturesPath.'/xml/services_with_enumeration.xml'), $dumper->dump());
+    }
+
+    /**
+     * @requires PHP 8.1
+     *
+     * @dataProvider provideDefaultClasses
+     */
+    public function testDumpHandlesDefaultAttribute($class, $expectedFile)
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('foo', $class)
+            ->setPublic(true)
+            ->setAutowired(true)
+            ->setArguments([2 => true]);
+
+        (new AutowirePass())->process($container);
+
+        $dumper = new XmlDumper($container);
+
+        $this->assertSame(file_get_contents(self::$fixturesPath.'/xml/'.$expectedFile), $dumper->dump());
+    }
+
+    public static function provideDefaultClasses()
+    {
+        yield [FooClassWithDefaultArrayAttribute::class, 'services_with_default_array.xml'];
+        yield [FooClassWithDefaultObjectAttribute::class, 'services_with_default_object.xml'];
+        yield [FooClassWithDefaultEnumAttribute::class, 'services_with_default_enumeration.xml'];
     }
 
     public function testDumpServiceWithAbstractArgument()

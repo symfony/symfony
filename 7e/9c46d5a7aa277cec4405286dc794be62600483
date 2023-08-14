@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-08-11T07:03:08Z
+
+It'd be great adding an integration test case that runs both a compiled container and a ContainerBuilder on this situation. Historically this wasn't supported due to technical reasons. Maybe these limitations have been removed but a test case would ensure that's true, and that it remains so (maybe there's already a test case that covers this already?)
+Can you please have a look?
+
+---------------------------------------------------------------------------
+
+by ruudk at 2023-08-12T07:30:10Z
+
+@nicolas-grekas Added the extra tests. Changed the base branch to 6.3 because this is only supported there, not on 5.4.
+
+---------------------------------------------------------------------------
+
+by ruudk at 2023-08-12T11:20:55Z
+
+The failing test is not related to this PR.

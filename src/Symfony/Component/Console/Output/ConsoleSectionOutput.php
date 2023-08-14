@@ -119,8 +119,7 @@ class ConsoleSectionOutput extends StreamOutput
             // re-add the line break (that has been removed in the above `explode()` for
             // - every line that is not the last line
             // - if $newline is required, also add it to the last line
-            // - if it's not new line, but input ending with `\PHP_EOL`
-            if ($i < $count || $newline || str_ends_with($input, \PHP_EOL)) {
+            if ($i < $count || $newline) {
                 $lineContent .= \PHP_EOL;
             }
 
@@ -168,6 +167,12 @@ class ConsoleSectionOutput extends StreamOutput
      */
     protected function doWrite(string $message, bool $newline)
     {
+        // Simulate newline behavior for consistent output formatting, avoiding extra logic
+        if (!$newline && str_ends_with($message, \PHP_EOL)) {
+            $message = substr($message, 0, -\strlen(\PHP_EOL));
+            $newline = true;
+        }
+
         if (!$this->isDecorated()) {
             parent::doWrite($message, $newline);
 

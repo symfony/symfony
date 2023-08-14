@@ -31,4 +31,11 @@ class DummyClassTwo
      * @Assert\Email
      */
     public $email;
+
+    /**
+     * @var DummyClassOne|null
+     *
+     * @Assert\DisableAutoMapping()
+     */
+    public $dummyClassOne;
 }

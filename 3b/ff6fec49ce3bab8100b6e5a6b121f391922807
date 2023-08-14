@@ -1,0 +1,125 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-12-31T20:33:12Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.3 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-01-01T16:36:58Z
+
+Hey!
+
+I think @loic425 has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2023-01-03T19:56:59Z
+
+Nitpicking: the title of this PR mentions “constaints” instead of “constraints”.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-04-18T13:40:09Z
+
+What can we do here to unlock the PR?
+
+---------------------------------------------------------------------------
+
+by macintoshplus at 2023-04-18T14:12:56Z
+
+> What can we do here to unlock the PR?
+
+Hi Nicolas,
+
+Thank you for your interest in this PR.
+
+What way to display the validation constraint that changes parameters and has been removed by Symfony?
+
+I have tried to display `Valid` assert in the dump command but, some others constraint is in the same situation.
+
+IMHO two choices:
+- display parameters on top
+- display the Symfony native constraints used to change the parameters (my first choice in this PR)
+
+I'm available on Symfony Slack (Jean-Baptiste N.) or Twitter (@jbnahan69) to discuss this in French if you want.
+
+---------------------------------------------------------------------------
+
+by macintoshplus at 2023-07-11T08:14:20Z
+
+Hi @nicolas-grekas, @loic425,
+
+I have changed the property options displayed on debug output.
+
+The 3 options (cascadeStrategy, autoMappingStrategy, traversalStrategy) it's now visible before property validators.
+
+```
+Symfony\Component\Validator\Tests\Dummy\DummyClassOne
+-----------------------------------------------------
+
++---------------+----------------------------------------------------+---------+------------------------------------------------------------+
+| Property      | Name                                               | Groups  | Options                                                    |
++---------------+----------------------------------------------------+---------+------------------------------------------------------------+
+| -             | Symfony\Component\Validator\Constraints\Expression | Default | [                                                          |
+|               |                                                    |         |   "expression" => "1 + 1 = 2",                             |
+|               |                                                    |         |   "message" => "This value is not valid.",                 |
+|               |                                                    |         |   "payload" => null,                                       |
+|               |                                                    |         |   "values" => []                                           |
+|               |                                                    |         | ]                                                          |
+| firstArgument | property options                                   |         | [                                                          |
+|               |                                                    |         |   "cascadeStrategy" => "Cascade",                          |
+|               |                                                    |         |   "autoMappingStrategy" => "Not supported",                |
+|               |                                                    |         |   "traversalStrategy" => "Implicit"                        |
+|               |                                                    |         | ]                                                          |
+| firstArgument | Symfony\Component\Validator\Constraints\NotBlank   | Default | [                                                          |
+|               |                                                    |         |   "allowNull" => false,                                    |
+|               |                                                    |         |   "message" => "This value should not be blank.",          |
+|               |                                                    |         |   "normalizer" => null,                                    |
+|               |                                                    |         |   "payload" => null                                        |
+|               |                                                    |         | ]                                                          |
+| firstArgument | Symfony\Component\Validator\Constraints\Email      | Default | [                                                          |
+|               |                                                    |         |   "message" => "This value is not a valid email address.", |
+|               |                                                    |         |   "mode" => null,                                          |
+|               |                                                    |         |   "normalizer" => null,                                    |
+|               |                                                    |         |   "payload" => null                                        |
+|               |                                                    |         | ]                                                          |
++---------------+----------------------------------------------------+---------+------------------------------------------------------------+
+```
+
+---------------------------------------------------------------------------
+
+by loic425 at 2023-07-11T12:54:37Z
+
+@nicolas-grekas I think we need [this PR first](https://github.com/symfony/symfony/pull/50935) to be sure of the behaviour.
+
+---------------------------------------------------------------------------
+
+by macintoshplus at 2023-07-16T18:38:49Z
+
+@loic425, @nicolas-grekas I have rebased this PR and update tests.

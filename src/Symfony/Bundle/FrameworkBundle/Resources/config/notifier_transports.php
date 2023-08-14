@@ -303,7 +303,7 @@ return static function (ContainerConfigurator $container) {
         ->set('notifier.transport_factory.redlink', Bridge\Redlink\RedlinkTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')
             ->tag('texter.transport_factory')
-        ->set('notifier.transport_factory.goip', Bridge\GoIp\GoIpTransportFactory::class)
+        ->set('notifier.transport_factory.go-ip', Bridge\GoIp\GoIpTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')
             ->tag('texter.transport_factory')
     ;

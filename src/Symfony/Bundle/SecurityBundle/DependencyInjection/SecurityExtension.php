@@ -56,6 +56,7 @@ use Symfony\Component\Security\Core\Authorization\Strategy\UnanimousStrategy;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\User\ChainUserChecker;
 use Symfony\Component\Security\Core\User\ChainUserProvider;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\Debug\TraceableAuthenticatorManagerListener;
@@ -172,10 +173,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $this->createFirewalls($config, $container);
         $this->createAuthorization($config, $container);
         $this->createRoleHierarchy($config, $container);
-
-        if ($config['password_hashers']) {
-            $this->createHashers($config['password_hashers'], $container);
-        }
+        $this->createHashers($config['password_hashers'] += [PasswordAuthenticatedUserInterface::class => ['algorithm' => 'auto']], $container);
 
         if (class_exists(Application::class)) {
             $loader->load('console.php');

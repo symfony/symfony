@@ -30,6 +30,7 @@ use Symfony\Component\PasswordHasher\Hasher\PlaintextPasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Strategy\AffirmativeStrategy;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticatorManager;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
@@ -404,6 +405,9 @@ abstract class CompleteConfigurationTestCase extends TestCase
                 'time_cost' => null,
                 'migrate_from' => [],
             ],
+            PasswordAuthenticatedUserInterface::class => [
+                'algorithm' => 'auto',
+            ],
         ]], $container->getDefinition('security.password_hasher_factory')->getArguments());
     }
 
@@ -457,6 +461,9 @@ abstract class CompleteConfigurationTestCase extends TestCase
                 'class' => SodiumPasswordHasher::class,
                 'arguments' => [8, 128 * 1024 * 1024],
             ],
+            PasswordAuthenticatedUserInterface::class => [
+                'algorithm' => 'auto',
+            ],
         ]], $container->getDefinition('security.password_hasher_factory')->getArguments());
     }
 
@@ -509,6 +516,9 @@ abstract class CompleteConfigurationTestCase extends TestCase
             'JMS\FooBundle\Entity\User7' => [
                 'class' => $sodium ? SodiumPasswordHasher::class : NativePasswordHasher::class,
                 'arguments' => $sodium ? [256, 1] : [1, 262144, null, \PASSWORD_ARGON2I],
+            ],
+            PasswordAuthenticatedUserInterface::class => [
+                'algorithm' => 'auto',
             ],
         ]], $container->getDefinition('security.password_hasher_factory')->getArguments());
     }
@@ -571,6 +581,9 @@ abstract class CompleteConfigurationTestCase extends TestCase
                 'time_cost' => 1,
                 'migrate_from' => ['bcrypt'],
             ],
+            PasswordAuthenticatedUserInterface::class => [
+                'algorithm' => 'auto',
+            ],
         ]], $container->getDefinition('security.password_hasher_factory')->getArguments());
     }
 
@@ -619,6 +632,9 @@ abstract class CompleteConfigurationTestCase extends TestCase
             'JMS\FooBundle\Entity\User7' => [
                 'class' => NativePasswordHasher::class,
                 'arguments' => [null, null, 15, \PASSWORD_BCRYPT],
+            ],
+            PasswordAuthenticatedUserInterface::class => [
+                'algorithm' => 'auto',
             ],
         ]], $container->getDefinition('security.password_hasher_factory')->getArguments());
     }

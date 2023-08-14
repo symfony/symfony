@@ -94,7 +94,7 @@ class UnsupportedSchemeException extends LogicException
         ],
         'goip' => [
             'class' => Bridge\GoIp\GoIpTransportFactory::class,
-            'package' => 'symfony/goip-notifier',
+            'package' => 'symfony/go-ip-notifier',
         ],
         'googlechat' => [
             'class' => Bridge\GoogleChat\GoogleChatTransportFactory::class,

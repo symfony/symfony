@@ -173,7 +173,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['twitter', 'symfony/twitter-notifier'];
         yield ['zendesk', 'symfony/zendesk-notifier'];
         yield ['zulip', 'symfony/zulip-notifier'];
-        yield ['goip', 'symfony/goip-notifier'];
+        yield ['goip', 'symfony/go-ip-notifier'];
     }
 
     /**

@@ -31,4 +31,11 @@ class DummyClassOne
      * @Assert\Email
      */
     public $email;
+
+    /**
+     * @var DummyClassTwo|null
+     *
+     * @Assert\Valid()
+     */
+    public $dummyClassTwo;
 }

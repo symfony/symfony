@@ -26,3 +26,14 @@ services:
             - !service_locator
                 'foo': '@foo_service'
                 '0': '@bar_service'
+
+    locator_dependent_inline_service:
+        class: ArrayObject
+        arguments:
+            - !service_locator
+                'foo':
+                    - !service
+                        class: stdClass
+                'bar':
+                    - !service
+                        class: stdClass

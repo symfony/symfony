@@ -36,29 +36,44 @@ class DebugCommandTest extends TestCase
 Symfony\Component\Validator\Tests\Dummy\DummyClassOne
 -----------------------------------------------------
 
-+----------+----------------------------------------------------+------------------------+------------------------------------------------------------+
-| Property | Name                                               | Groups                 | Options                                                    |
-+----------+----------------------------------------------------+------------------------+------------------------------------------------------------+
-| -        | Symfony\Component\Validator\Constraints\Expression | Default, DummyClassOne | [                                                          |
-|          |                                                    |                        |   "expression" => "1 + 1 = 2",                             |
-|          |                                                    |                        |   "message" => "This value is not valid.",                 |
-|          |                                                    |                        |   "negate" => true,                                        |
-|          |                                                    |                        |   "payload" => null,                                       |
-|          |                                                    |                        |   "values" => []                                           |
-|          |                                                    |                        | ]                                                          |
-| code     | Symfony\Component\Validator\Constraints\NotBlank   | Default, DummyClassOne | [                                                          |
-|          |                                                    |                        |   "allowNull" => false,                                    |
-|          |                                                    |                        |   "message" => "This value should not be blank.",          |
-|          |                                                    |                        |   "normalizer" => null,                                    |
-|          |                                                    |                        |   "payload" => null                                        |
-|          |                                                    |                        | ]                                                          |
-| email    | Symfony\Component\Validator\Constraints\Email      | Default, DummyClassOne | [                                                          |
-|          |                                                    |                        |   "message" => "This value is not a valid email address.", |
-|          |                                                    |                        |   "mode" => null,                                          |
-|          |                                                    |                        |   "normalizer" => null,                                    |
-|          |                                                    |                        |   "payload" => null                                        |
-|          |                                                    |                        | ]                                                          |
-+----------+----------------------------------------------------+------------------------+------------------------------------------------------------+
++---------------+----------------------------------------------------+------------------------+------------------------------------------------------------+
+| Property      | Name                                               | Groups                 | Options                                                    |
++---------------+----------------------------------------------------+------------------------+------------------------------------------------------------+
+| -             | Symfony\Component\Validator\Constraints\Expression | Default, DummyClassOne | [                                                          |
+|               |                                                    |                        |   "expression" => "1 + 1 = 2",                             |
+|               |                                                    |                        |   "message" => "This value is not valid.",                 |
+|               |                                                    |                        |   "negate" => true,                                        |
+|               |                                                    |                        |   "payload" => null,                                       |
+|               |                                                    |                        |   "values" => []                                           |
+|               |                                                    |                        | ]                                                          |
+| code          | property options                                   |                        | [                                                          |
+|               |                                                    |                        |   "cascadeStrategy" => "None",                             |
+|               |                                                    |                        |   "autoMappingStrategy" => "None",                         |
+|               |                                                    |                        |   "traversalStrategy" => "None"                            |
+|               |                                                    |                        | ]                                                          |
+| code          | Symfony\Component\Validator\Constraints\NotBlank   | Default, DummyClassOne | [                                                          |
+|               |                                                    |                        |   "allowNull" => false,                                    |
+|               |                                                    |                        |   "message" => "This value should not be blank.",          |
+|               |                                                    |                        |   "normalizer" => null,                                    |
+|               |                                                    |                        |   "payload" => null                                        |
+|               |                                                    |                        | ]                                                          |
+| email         | property options                                   |                        | [                                                          |
+|               |                                                    |                        |   "cascadeStrategy" => "None",                             |
+|               |                                                    |                        |   "autoMappingStrategy" => "None",                         |
+|               |                                                    |                        |   "traversalStrategy" => "None"                            |
+|               |                                                    |                        | ]                                                          |
+| email         | Symfony\Component\Validator\Constraints\Email      | Default, DummyClassOne | [                                                          |
+|               |                                                    |                        |   "message" => "This value is not a valid email address.", |
+|               |                                                    |                        |   "mode" => null,                                          |
+|               |                                                    |                        |   "normalizer" => null,                                    |
+|               |                                                    |                        |   "payload" => null                                        |
+|               |                                                    |                        | ]                                                          |
+| dummyClassTwo | property options                                   |                        | [                                                          |
+|               |                                                    |                        |   "cascadeStrategy" => "Cascade",                          |
+|               |                                                    |                        |   "autoMappingStrategy" => "None",                         |
+|               |                                                    |                        |   "traversalStrategy" => "Implicit"                        |
+|               |                                                    |                        | ]                                                          |
++---------------+----------------------------------------------------+------------------------+------------------------------------------------------------+
 
 TXT
             , $tester->getDisplay(true)
@@ -77,56 +92,86 @@ TXT
 Symfony\Component\Validator\Tests\Dummy\DummyClassOne
 -----------------------------------------------------
 
-+----------+----------------------------------------------------+------------------------+------------------------------------------------------------+
-| Property | Name                                               | Groups                 | Options                                                    |
-+----------+----------------------------------------------------+------------------------+------------------------------------------------------------+
-| -        | Symfony\Component\Validator\Constraints\Expression | Default, DummyClassOne | [                                                          |
-|          |                                                    |                        |   "expression" => "1 + 1 = 2",                             |
-|          |                                                    |                        |   "message" => "This value is not valid.",                 |
-|          |                                                    |                        |   "negate" => true,                                        |
-|          |                                                    |                        |   "payload" => null,                                       |
-|          |                                                    |                        |   "values" => []                                           |
-|          |                                                    |                        | ]                                                          |
-| code     | Symfony\Component\Validator\Constraints\NotBlank   | Default, DummyClassOne | [                                                          |
-|          |                                                    |                        |   "allowNull" => false,                                    |
-|          |                                                    |                        |   "message" => "This value should not be blank.",          |
-|          |                                                    |                        |   "normalizer" => null,                                    |
-|          |                                                    |                        |   "payload" => null                                        |
-|          |                                                    |                        | ]                                                          |
-| email    | Symfony\Component\Validator\Constraints\Email      | Default, DummyClassOne | [                                                          |
-|          |                                                    |                        |   "message" => "This value is not a valid email address.", |
-|          |                                                    |                        |   "mode" => null,                                          |
-|          |                                                    |                        |   "normalizer" => null,                                    |
-|          |                                                    |                        |   "payload" => null                                        |
-|          |                                                    |                        | ]                                                          |
-+----------+----------------------------------------------------+------------------------+------------------------------------------------------------+
++---------------+----------------------------------------------------+------------------------+------------------------------------------------------------+
+| Property      | Name                                               | Groups                 | Options                                                    |
++---------------+----------------------------------------------------+------------------------+------------------------------------------------------------+
+| -             | Symfony\Component\Validator\Constraints\Expression | Default, DummyClassOne | [                                                          |
+|               |                                                    |                        |   "expression" => "1 + 1 = 2",                             |
+|               |                                                    |                        |   "message" => "This value is not valid.",                 |
+|               |                                                    |                        |   "negate" => true,                                        |
+|               |                                                    |                        |   "payload" => null,                                       |
+|               |                                                    |                        |   "values" => []                                           |
+|               |                                                    |                        | ]                                                          |
+| code          | property options                                   |                        | [                                                          |
+|               |                                                    |                        |   "cascadeStrategy" => "None",                             |
+|               |                                                    |                        |   "autoMappingStrategy" => "None",                         |
+|               |                                                    |                        |   "traversalStrategy" => "None"                            |
+|               |                                                    |                        | ]                                                          |
+| code          | Symfony\Component\Validator\Constraints\NotBlank   | Default, DummyClassOne | [                                                          |
+|               |                                                    |                        |   "allowNull" => false,                                    |
+|               |                                                    |                        |   "message" => "This value should not be blank.",          |
+|               |                                                    |                        |   "normalizer" => null,                                    |
+|               |                                                    |                        |   "payload" => null                                        |
+|               |                                                    |                        | ]                                                          |
+| email         | property options                                   |                        | [                                                          |
+|               |                                                    |                        |   "cascadeStrategy" => "None",                             |
+|               |                                                    |                        |   "autoMappingStrategy" => "None",                         |
+|               |                                                    |                        |   "traversalStrategy" => "None"                            |
+|               |                                                    |                        | ]                                                          |
+| email         | Symfony\Component\Validator\Constraints\Email      | Default, DummyClassOne | [                                                          |
+|               |                                                    |                        |   "message" => "This value is not a valid email address.", |
+|               |                                                    |                        |   "mode" => null,                                          |
+|               |                                                    |                        |   "normalizer" => null,                                    |
+|               |                                                    |                        |   "payload" => null                                        |
+|               |                                                    |                        | ]                                                          |
+| dummyClassTwo | property options                                   |                        | [                                                          |
+|               |                                                    |                        |   "cascadeStrategy" => "Cascade",                          |
+|               |                                                    |                        |   "autoMappingStrategy" => "None",                         |
+|               |                                                    |                        |   "traversalStrategy" => "Implicit"                        |
+|               |                                                    |                        | ]                                                          |
++---------------+----------------------------------------------------+------------------------+------------------------------------------------------------+
 
 Symfony\Component\Validator\Tests\Dummy\DummyClassTwo
 -----------------------------------------------------
 
-+----------+----------------------------------------------------+------------------------+------------------------------------------------------------+
-| Property | Name                                               | Groups                 | Options                                                    |
-+----------+----------------------------------------------------+------------------------+------------------------------------------------------------+
-| -        | Symfony\Component\Validator\Constraints\Expression | Default, DummyClassTwo | [                                                          |
-|          |                                                    |                        |   "expression" => "1 + 1 = 2",                             |
-|          |                                                    |                        |   "message" => "This value is not valid.",                 |
-|          |                                                    |                        |   "negate" => true,                                        |
-|          |                                                    |                        |   "payload" => null,                                       |
-|          |                                                    |                        |   "values" => []                                           |
-|          |                                                    |                        | ]                                                          |
-| code     | Symfony\Component\Validator\Constraints\NotBlank   | Default, DummyClassTwo | [                                                          |
-|          |                                                    |                        |   "allowNull" => false,                                    |
-|          |                                                    |                        |   "message" => "This value should not be blank.",          |
-|          |                                                    |                        |   "normalizer" => null,                                    |
-|          |                                                    |                        |   "payload" => null                                        |
-|          |                                                    |                        | ]                                                          |
-| email    | Symfony\Component\Validator\Constraints\Email      | Default, DummyClassTwo | [                                                          |
-|          |                                                    |                        |   "message" => "This value is not a valid email address.", |
-|          |                                                    |                        |   "mode" => null,                                          |
-|          |                                                    |                        |   "normalizer" => null,                                    |
-|          |                                                    |                        |   "payload" => null                                        |
-|          |                                                    |                        | ]                                                          |
-+----------+----------------------------------------------------+------------------------+------------------------------------------------------------+
++---------------+----------------------------------------------------+------------------------+------------------------------------------------------------+
+| Property      | Name                                               | Groups                 | Options                                                    |
++---------------+----------------------------------------------------+------------------------+------------------------------------------------------------+
+| -             | Symfony\Component\Validator\Constraints\Expression | Default, DummyClassTwo | [                                                          |
+|               |                                                    |                        |   "expression" => "1 + 1 = 2",                             |
+|               |                                                    |                        |   "message" => "This value is not valid.",                 |
+|               |                                                    |                        |   "negate" => true,                                        |
+|               |                                                    |                        |   "payload" => null,                                       |
+|               |                                                    |                        |   "values" => []                                           |
+|               |                                                    |                        | ]                                                          |
+| code          | property options                                   |                        | [                                                          |
+|               |                                                    |                        |   "cascadeStrategy" => "None",                             |
+|               |                                                    |                        |   "autoMappingStrategy" => "None",                         |
+|               |                                                    |                        |   "traversalStrategy" => "None"                            |
+|               |                                                    |                        | ]                                                          |
+| code          | Symfony\Component\Validator\Constraints\NotBlank   | Default, DummyClassTwo | [                                                          |
+|               |                                                    |                        |   "allowNull" => false,                                    |
+|               |                                                    |                        |   "message" => "This value should not be blank.",          |
+|               |                                                    |                        |   "normalizer" => null,                                    |
+|               |                                                    |                        |   "payload" => null                                        |
+|               |                                                    |                        | ]                                                          |
+| email         | property options                                   |                        | [                                                          |
+|               |                                                    |                        |   "cascadeStrategy" => "None",                             |
+|               |                                                    |                        |   "autoMappingStrategy" => "None",                         |
+|               |                                                    |                        |   "traversalStrategy" => "None"                            |
+|               |                                                    |                        | ]                                                          |
+| email         | Symfony\Component\Validator\Constraints\Email      | Default, DummyClassTwo | [                                                          |
+|               |                                                    |                        |   "message" => "This value is not a valid email address.", |
+|               |                                                    |                        |   "mode" => null,                                          |
+|               |                                                    |                        |   "normalizer" => null,                                    |
+|               |                                                    |                        |   "payload" => null                                        |
+|               |                                                    |                        | ]                                                          |
+| dummyClassOne | property options                                   |                        | [                                                          |
+|               |                                                    |                        |   "cascadeStrategy" => "None",                             |
+|               |                                                    |                        |   "autoMappingStrategy" => "Disabled",                     |
+|               |                                                    |                        |   "traversalStrategy" => "None"                            |
+|               |                                                    |                        | ]                                                          |
++---------------+----------------------------------------------------+------------------------+------------------------------------------------------------+
 
 TXT
             , $tester->getDisplay(true)

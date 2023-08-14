@@ -38,10 +38,10 @@
 # Serializer
 /src/Symfony/Component/Serializer/ @dunglas
 # Security
-/src/Symfony/Bridge/Doctrine/Security/ @wouterj @chalasr
-/src/Symfony/Bundle/SecurityBundle/ @wouterj @chalasr
-/src/Symfony/Component/Security/ @wouterj @chalasr
-/src/Symfony/Component/Ldap/Security/ @wouterj @chalasr
+/src/Symfony/Bridge/Doctrine/Security/ @chalasr
+/src/Symfony/Bundle/SecurityBundle/ @chalasr
+/src/Symfony/Component/Security/ @chalasr
+/src/Symfony/Component/Ldap/Security/ @chalasr
 # Scheduler
 /src/Symfony/Component/Scheduler/ @kbond
 # TwigBundle

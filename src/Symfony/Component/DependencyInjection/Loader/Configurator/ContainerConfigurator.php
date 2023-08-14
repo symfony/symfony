@@ -119,7 +119,7 @@ function inline_service(string $class = null): InlineServiceConfigurator
 /**
  * Creates a service locator.
  *
- * @param ReferenceConfigurator[] $values
+ * @param array<ReferenceConfigurator|InlineServiceConfigurator> $values
  */
 function service_locator(array $values): ServiceLocatorArgument
 {

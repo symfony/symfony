@@ -48,9 +48,9 @@ class ConsoleSectionOutput extends StreamOutput
     public function setMaxHeight(int $maxHeight): void
     {
         // when changing max height, clear output of current section and redraw again with the new height
-        $existingContent = $this->popStreamContentUntilCurrentSection($this->maxHeight ? min($this->maxHeight, $this->lines) : $this->lines);
-
+        $previousMaxHeight = $this->maxHeight;
         $this->maxHeight = $maxHeight;
+        $existingContent = $this->popStreamContentUntilCurrentSection($previousMaxHeight ? min($previousMaxHeight, $this->lines) : $this->lines);
 
         parent::doWrite($this->getVisibleContent(), false);
         parent::doWrite($existingContent, false);
@@ -213,7 +213,7 @@ class ConsoleSectionOutput extends StreamOutput
                 break;
             }
 
-            $numberOfLinesToClear += $section->lines;
+            $numberOfLinesToClear += $section->maxHeight ? min($section->lines, $section->maxHeight) : $section->lines;
             if ('' !== $sectionContent = $section->getVisibleContent()) {
                 if (!str_ends_with($sectionContent, \PHP_EOL)) {
                     $sectionContent .= \PHP_EOL;

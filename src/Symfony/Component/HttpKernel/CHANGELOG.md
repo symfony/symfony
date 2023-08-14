@@ -14,6 +14,7 @@ CHANGELOG
  * Deprecate `Kernel::stripComments()`
  * Support the `!` character at the beginning of a string as a negation operator in the url filter of the profiler
  * Deprecate `UriSigner`, use `UriSigner` from the HttpFoundation component instead
+ * Add `#[MapRequestHeader]` to map and validate request header from `Request::$headers` to typed objects
 
 6.3
 ---

@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Notifier\Bridge\GoIP\Tests;
+namespace Symfony\Component\Notifier\Bridge\GoIp\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
-use Symfony\Component\Notifier\Bridge\GoIP\GoIPOptions;
-use Symfony\Component\Notifier\Bridge\GoIP\GoIPTransport;
+use Symfony\Component\Notifier\Bridge\GoIp\GoIpOptions;
+use Symfony\Component\Notifier\Bridge\GoIp\GoIpTransport;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\TransportExceptionInterface;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -26,16 +26,16 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Ahmed Ghanem <ahmedghanem7361@gmail.com>
  */
-final class GoIPTransportTest extends TransportTestCase
+final class GoIpTransportTest extends TransportTestCase
 {
     public static function toStringProvider(): iterable
     {
         yield ['goip://host.test:4000?sim_slot=4', self::createTransport()];
     }
 
-    public static function createTransport(HttpClientInterface $client = null): GoIPTransport
+    public static function createTransport(HttpClientInterface $client = null): GoIpTransport
     {
-        return (new GoIPTransport('user', 'pass', 4, $client ?? new MockHttpClient()))
+        return (new GoIpTransport('user', 'pass', 4, $client ?? new MockHttpClient()))
             ->setHost('host.test')
             ->setPort(4000);
     }
@@ -43,7 +43,7 @@ final class GoIPTransportTest extends TransportTestCase
     public static function supportedMessagesProvider(): iterable
     {
         $message = new SmsMessage('0611223344', 'Hello!');
-        $message->options((new GoIPOptions())->setSimSlot(3));
+        $message->options((new GoIpOptions())->setSimSlot(3));
 
         yield [$message];
     }

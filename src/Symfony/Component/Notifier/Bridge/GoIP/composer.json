@@ -22,7 +22,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Symfony\\Component\\Notifier\\Bridge\\GoIP\\": ""
+            "Symfony\\Component\\Notifier\\Bridge\\GoIp\\": ""
         },
 
         "exclude-from-classmap": [

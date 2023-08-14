@@ -2799,7 +2799,7 @@ class FrameworkExtension extends Extension
             NotifierBridge\FreeMobile\FreeMobileTransportFactory::class => 'notifier.transport_factory.free-mobile',
             NotifierBridge\GatewayApi\GatewayApiTransportFactory::class => 'notifier.transport_factory.gateway-api',
             NotifierBridge\Gitter\GitterTransportFactory::class => 'notifier.transport_factory.gitter',
-            NotifierBridge\GoIP\GoIPTransportFactory::class => 'notifier.transport_factory.goip',
+            NotifierBridge\GoIp\GoIpTransportFactory::class => 'notifier.transport_factory.goip',
             NotifierBridge\GoogleChat\GoogleChatTransportFactory::class => 'notifier.transport_factory.google-chat',
             NotifierBridge\Infobip\InfobipTransportFactory::class => 'notifier.transport_factory.infobip',
             NotifierBridge\Iqsms\IqsmsTransportFactory::class => 'notifier.transport_factory.iqsms',

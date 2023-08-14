@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Notifier\Bridge\GoIP;
+namespace Symfony\Component\Notifier\Bridge\GoIp;
 
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 
 /**
  * @author Ahmed Ghanem <ahmedghanem7361@gmail.com>
  */
-final class GoIPOptions implements MessageOptionsInterface
+final class GoIpOptions implements MessageOptionsInterface
 {
     private array $options = [];
 

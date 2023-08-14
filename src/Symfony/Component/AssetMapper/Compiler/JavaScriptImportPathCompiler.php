@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\AssetMapper\AssetDependency;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
+use Symfony\Component\AssetMapper\Exception\CircularAssetsException;
 use Symfony\Component\AssetMapper\Exception\RuntimeException;
 use Symfony\Component\AssetMapper\MappedAsset;
 
@@ -57,8 +58,12 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
             if (!$dependentAsset) {
                 $message = sprintf('Unable to find asset "%s" imported from "%s".', $matches[1], $asset->sourcePath);
 
-                if (null !== $assetMapper->getAsset(sprintf('%s.js', $resolvedPath))) {
-                    $message .= sprintf(' Try adding ".js" to the end of the import - i.e. "%s.js".', $matches[1]);
+                try {
+                    if (null !== $assetMapper->getAsset(sprintf('%s.js', $resolvedPath))) {
+                        $message .= sprintf(' Try adding ".js" to the end of the import - i.e. "%s.js".', $matches[1]);
+                    }
+                } catch (CircularAssetsException $e) {
+                    // avoid circular error if there is self-referencing import comments
                 }
 
                 $this->handleMissingImport($message);

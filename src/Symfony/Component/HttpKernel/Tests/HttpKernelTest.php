@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -477,6 +478,34 @@ class HttpKernelTest extends TestCase
         Request::setTrustedProxies([], -1);
     }
 
+    public function testVerifyRequestStackPushPopCallOrderDuringHandle()
+    {
+        $request = new Request();
+        $stack = new RequestStack();
+        $dispatcher = new EventDispatcher();
+        $kernel = $this->getHttpKernel($dispatcher, null, $stack);
+
+        $response = $kernel->handle($request, HttpKernelInterface::MAIN_REQUEST);
+        self::assertNull($stack->getMainRequest());
+        $response->send();
+        self::assertNull($stack->getMainRequest());
+    }
+
+    public function testVerifyRequestStackPushPopWithStreamedResponse()
+    {
+        $request = new Request();
+        $stack = new RequestStack();
+        $dispatcher = new EventDispatcher();
+        $kernel = $this->getHttpKernel($dispatcher, [new TestController(), 'streamedResponseController'], $stack);
+
+        $response = $kernel->handle($request, HttpKernelInterface::MAIN_REQUEST);
+        self::assertNotNull($stack->getMainRequest());
+        ob_start();
+        $response->send();
+        self::assertSame('foo', ob_get_clean());
+        self::assertNull($stack->getMainRequest());
+    }
+
     private function getHttpKernel(EventDispatcherInterface $eventDispatcher, $controller = null, RequestStack $requestStack = null, array $arguments = [], bool $handleAllThrowables = false)
     {
         $controller ??= fn () => new Response('Hello');
@@ -513,6 +542,13 @@ class TestController
     public function controller()
     {
         return new Response('foo');
+    }
+
+    public function streamedResponseController()
+    {
+        return new StreamedResponse(function () {
+            echo 'foo';
+        });
     }
 
     public static function staticController()

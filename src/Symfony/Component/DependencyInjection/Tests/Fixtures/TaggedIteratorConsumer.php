@@ -13,7 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 
-final class IteratorConsumer
+final class TaggedIteratorConsumer
 {
     public function __construct(
         #[TaggedIterator('foo_bar', indexAttribute: 'foo')]

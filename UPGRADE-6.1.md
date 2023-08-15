@@ -27,11 +27,6 @@ FrameworkBundle
    To prevent services resetting after each message the "--no-reset" option in "messenger:consume" command can be set
  * Deprecate not setting the `http_method_override` config option. The default value will change to `false` in 7.0.
 
-HttpKernel
-----------
-
- * Deprecate StreamedResponseListener, it's not needed anymore
-
 Routing
 -------
 

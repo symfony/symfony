@@ -70,6 +70,23 @@ class RateLimiterFactoryTest extends TestCase
         $factory->create('key');
     }
 
+    public function testCustomLimit()
+    {
+        $factory = new RateLimiterFactory(
+            [
+                'policy' => 'sliding_window',
+                'id' => 'test',
+                'limit' => 5,
+                'interval' => '5 seconds',
+            ],
+            new InMemoryStorage()
+        );
+
+        $rateLimiter = $factory->create('key', 10);
+        $rateLimit = $rateLimiter->consume(0);
+        $this->assertSame(10, $rateLimit->getRemainingTokens());
+    }
+
     public static function invalidConfigProvider()
     {
         yield [MissingOptionsException::class, [

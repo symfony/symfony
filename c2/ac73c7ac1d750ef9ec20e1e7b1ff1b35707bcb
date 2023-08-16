@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-08-12T12:53:11Z
+
+Do we really need this? My feeling is that we now have the `??` operator and it's nicer to use.
+
+---------------------------------------------------------------------------
+
+by antonkomarev at 2023-08-12T13:01:03Z
+
+I'd prefer to use native `??`. It feels more obvious about the result.
+
+---------------------------------------------------------------------------
+
+by Rastishka at 2023-08-12T13:20:27Z
+
+> Do we really need this? My feeling is that we now have the `??` operator and it's nicer to use.
+
+Yes we need, because setting default value also prevents throwing exception when node does not exist (methods text() and html() act similar).
+
+So this code:
+```
+try {
+    $value = $dom->filter('a.someclass')->attr('href');
+} catch (\InvalidArgumentException $e) {
+    $value = '';
+}
+```
+can be simplifies to
+` $value = $dom->filter('a.someclass')->attr('href', '');`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-08-14T09:17:04Z
+
+Please also update the UPGRADE-6.4.md file, and please rebase to get rid of merge commits (PRs shouldn't contain any).

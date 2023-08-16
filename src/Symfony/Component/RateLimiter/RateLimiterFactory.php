@@ -48,12 +48,11 @@ final class RateLimiterFactory
     {
         $id = $this->config['id'].'-'.$key;
         $lock = $this->lockFactory?->createLock($id);
-        $limit = $limit ?? $this->config['limit'];
 
         return match ($this->config['policy']) {
-            'token_bucket' => new TokenBucketLimiter($id, $limit, $this->config['rate'], $this->storage, $lock),
-            'fixed_window' => new FixedWindowLimiter($id, $limit, $this->config['interval'], $this->storage, $lock),
-            'sliding_window' => new SlidingWindowLimiter($id, $limit, $this->config['interval'], $this->storage, $lock),
+            'token_bucket' => new TokenBucketLimiter($id, $limit ?? $this->config['limit'], $this->config['rate'], $this->storage, $lock),
+            'fixed_window' => new FixedWindowLimiter($id, $limit ?? $this->config['limit'], $this->config['interval'], $this->storage, $lock),
+            'sliding_window' => new SlidingWindowLimiter($id, $limit ?? $this->config['limit'], $this->config['interval'], $this->storage, $lock),
             'no_limit' => new NoLimiter(),
             default => throw new \LogicException(sprintf('Limiter policy "%s" does not exists, it must be either "token_bucket", "sliding_window", "fixed_window" or "no_limit".', $this->config['policy'])),
         };

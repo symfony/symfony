@@ -44,7 +44,7 @@ final class RateLimiterFactory
     /**
      * Parsing a custom limit to this function will overwrite the limit in your configuration for this request.
      */
-    public function create(string $key = null, ?int $limit = null): LimiterInterface
+    public function create(string $key = null, int $limit = null): LimiterInterface
     {
         $id = $this->config['id'].'-'.$key;
         $lock = $this->lockFactory?->createLock($id);

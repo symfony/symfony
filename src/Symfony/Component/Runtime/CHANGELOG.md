@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+* Add the environnement variable `APP_RUNTIME_MODE`
+
 5.4
 ---
 

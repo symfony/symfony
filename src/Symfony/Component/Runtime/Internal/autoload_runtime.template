@@ -12,6 +12,16 @@ if (!is_object($app)) {
     throw new TypeError(sprintf('Invalid return value: callable object expected, "%s" returned from "%s".', get_debug_type($app), $_SERVER['SCRIPT_FILENAME']));
 }
 
+if (null === ($_ENV['APP_RUNTIME_MODE'] ??= $_SERVER['APP_RUNTIME_MODE'] ?? null)) {
+    if ($_ENV['FRANKENPHP_WORKER'] ?? $_SERVER['FRANKENPHP_WORKER'] ?? false) {
+        $_ENV['APP_RUNTIME_MODE'] = 'worker';
+    } elseif (\PHP_SAPI === 'cli' || \PHP_SAPI === 'phpdbg') {
+        $_ENV['APP_RUNTIME_MODE'] = 'cli';
+    } else {
+        $_ENV['APP_RUNTIME_MODE'] = 'web';
+    }
+}
+
 $runtime = $_SERVER['APP_RUNTIME'] ?? $_ENV['APP_RUNTIME'] ?? %runtime_class%;
 $runtime = new $runtime(($_SERVER['APP_RUNTIME_OPTIONS'] ?? $_ENV['APP_RUNTIME_OPTIONS'] ?? []) + %runtime_options%);
 

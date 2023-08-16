@@ -61,6 +61,11 @@ DoctrineBridge
  * Deprecate `DoctrineDataCollector::addLogger()`, use a `DebugDataHolder` instead
  * Deprecate `ContainerAwareLoader`, use dependency injection in your fixtures instead
 
+DomCrawler
+----------
+
+ * Add argument `$default` to `Crawler::attr()`
+
 ErrorHandler
 ------------
 

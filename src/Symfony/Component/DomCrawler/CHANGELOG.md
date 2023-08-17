@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add argument `$normalizeWhitespace` to `Crawler::innerText()`
+ * Add argument `$default` to `Crawler::attr()`
 
 6.4
 ---

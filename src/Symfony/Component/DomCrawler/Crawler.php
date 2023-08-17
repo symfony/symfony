@@ -504,9 +504,8 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * @throws \InvalidArgumentException When current node is empty
      */
-    public function attr(string $attribute/* , string $default = null */): ?string
+    public function attr(string $attribute, string $default = null): ?string
     {
-        $default = \func_num_args() > 1 ? func_get_arg(1) : null;
         if (!$this->nodes) {
             if (null !== $default) {
                 return $default;

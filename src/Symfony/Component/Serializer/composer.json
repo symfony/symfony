@@ -36,6 +36,7 @@
         "symfony/mime": "^5.4|^6.0|^7.0",
         "symfony/property-access": "^5.4|^6.0|^7.0",
         "symfony/property-info": "^5.4.24|^6.2.11|^7.0",
+        "symfony/translation-contracts": "^2.5|^3",
         "symfony/uid": "^5.4|^6.0|^7.0",
         "symfony/validator": "^5.4|^6.0|^7.0",
         "symfony/var-dumper": "^5.4|^6.0|^7.0",

@@ -15,16 +15,14 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class ChildA
 {
-    /**
-     * @Assert\Valid
-     * @Assert\NotNull
-     * @Assert\NotBlank
-     */
+    #[Assert\Valid]
+    #[Assert\NotNull]
+    #[Assert\NotBlank]
     public $name;
     /**
      * @var ChildB
-     * @Assert\Valid
-     * @Assert\NotNull
      */
+    #[Assert\Valid]
+    #[Assert\NotNull]
     public $childB;
 }

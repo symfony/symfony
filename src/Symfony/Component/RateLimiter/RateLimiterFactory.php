@@ -43,6 +43,7 @@ final class RateLimiterFactory
 
     /**
      * Parsing a custom limit to this function will overwrite the limit in your configuration for this request.
+     * When using a NoLimiter the limit will be ignored.
      */
     public function create(string $key = null, int $limit = null): LimiterInterface
     {

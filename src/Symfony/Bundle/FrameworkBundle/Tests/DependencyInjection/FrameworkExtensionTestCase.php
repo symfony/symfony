@@ -636,7 +636,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->expectException(InvalidConfigurationException::class);
         $container = $this->createContainer();
         $loader = new FrameworkExtension();
-        $loader->load([['http_method_override' => false, 'router' => true]], $container);
+        $loader->load([['http_method_override' => false, 'handle_all_throwables' => true, 'php_errors' => ['log' => true], 'router' => true]], $container);
     }
 
     public function testSession()
@@ -1816,11 +1816,11 @@ abstract class FrameworkExtensionTestCase extends TestCase
     public function testRemovesResourceCheckerConfigCacheFactoryArgumentOnlyIfNoDebug()
     {
         $container = $this->createContainer(['kernel.debug' => true]);
-        (new FrameworkExtension())->load([['annotations' => false, 'http_method_override' => false]], $container);
+        (new FrameworkExtension())->load([['annotations' => false, 'http_method_override' => false, 'handle_all_throwables' => true, 'php_errors' => ['log' => true]]], $container);
         $this->assertCount(1, $container->getDefinition('config_cache_factory')->getArguments());
 
         $container = $this->createContainer(['kernel.debug' => false]);
-        (new FrameworkExtension())->load([['annotations' => false, 'http_method_override' => false]], $container);
+        (new FrameworkExtension())->load([['annotations' => false, 'http_method_override' => false, 'handle_all_throwables' => true, 'php_errors' => ['log' => true]]], $container);
         $this->assertEmpty($container->getDefinition('config_cache_factory')->getArguments());
     }
 
@@ -1851,21 +1851,21 @@ abstract class FrameworkExtensionTestCase extends TestCase
     public function testRobotsTagListenerIsRegisteredInDebugMode()
     {
         $container = $this->createContainer(['kernel.debug' => true]);
-        (new FrameworkExtension())->load([['annotations' => false, 'http_method_override' => false]], $container);
+        (new FrameworkExtension())->load([['annotations' => false, 'http_method_override' => false, 'handle_all_throwables' => true, 'php_errors' => ['log' => true]]], $container);
         $this->assertTrue($container->has('disallow_search_engine_index_response_listener'), 'DisallowRobotsIndexingListener should be registered');
 
         $definition = $container->getDefinition('disallow_search_engine_index_response_listener');
         $this->assertTrue($definition->hasTag('kernel.event_subscriber'), 'DisallowRobotsIndexingListener should have the correct tag');
 
         $container = $this->createContainer(['kernel.debug' => true]);
-        (new FrameworkExtension())->load([['annotations' => false, 'http_method_override' => false, 'disallow_search_engine_index' => false]], $container);
+        (new FrameworkExtension())->load([['annotations' => false, 'http_method_override' => false, 'handle_all_throwables' => true, 'php_errors' => ['log' => true], 'disallow_search_engine_index' => false]], $container);
         $this->assertFalse(
             $container->has('disallow_search_engine_index_response_listener'),
             'DisallowRobotsIndexingListener should not be registered when explicitly disabled'
         );
 
         $container = $this->createContainer(['kernel.debug' => false]);
-        (new FrameworkExtension())->load([['annotations' => false, 'http_method_override' => false]], $container);
+        (new FrameworkExtension())->load([['annotations' => false, 'http_method_override' => false, 'handle_all_throwables' => true, 'php_errors' => ['log' => true]]], $container);
         $this->assertFalse($container->has('disallow_search_engine_index_response_listener'), 'DisallowRobotsIndexingListener should NOT be registered');
     }
 

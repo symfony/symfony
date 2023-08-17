@@ -35,7 +35,13 @@ class ConfigurationTest extends TestCase
     public function testDefaultConfig()
     {
         $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(true), [['http_method_override' => false, 'secret' => 's3cr3t', 'serializer' => ['default_context' => ['foo' => 'bar']]]]);
+        $config = $processor->processConfiguration(new Configuration(true), [[
+            'http_method_override' => false,
+            'handle_all_throwables' => true,
+            'php_errors' => ['log' => true],
+            'secret' => 's3cr3t',
+            'serializer' => ['default_context' => ['foo' => 'bar']],
+        ]]);
 
         $this->assertEquals(self::getBundleDefaultConfig(), $config);
     }
@@ -59,7 +65,12 @@ class ConfigurationTest extends TestCase
         $processor = new Processor();
         $processor->processConfiguration(
             new Configuration(true),
-            [['http_method_override' => false, 'session' => ['name' => $sessionName]]]
+            [[
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
+                'session' => ['name' => $sessionName, 'cookie_secure' => 'auto', 'cookie_samesite' => 'lax'],
+            ]]
         );
     }
 
@@ -79,7 +90,12 @@ class ConfigurationTest extends TestCase
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
-        $config = $processor->processConfiguration($configuration, [['http_method_override' => false, 'assets' => null]]);
+        $config = $processor->processConfiguration($configuration, [[
+            'http_method_override' => false,
+            'handle_all_throwables' => true,
+            'php_errors' => ['log' => true],
+            'assets' => null,
+        ]]);
 
         $defaultConfig = [
             'enabled' => true,
@@ -100,7 +116,12 @@ class ConfigurationTest extends TestCase
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
-        $config = $processor->processConfiguration($configuration, [['http_method_override' => false, 'asset_mapper' => null]]);
+        $config = $processor->processConfiguration($configuration, [[
+            'http_method_override' => false,
+            'handle_all_throwables' => true,
+            'php_errors' => ['log' => true],
+            'asset_mapper' => null,
+        ]]);
 
         $defaultConfig = [
             'enabled' => true,
@@ -130,6 +151,8 @@ class ConfigurationTest extends TestCase
         $config = $processor->processConfiguration($configuration, [
             [
                 'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'assets' => [
                     'packages' => [
                         $packageName => [],
@@ -163,6 +186,8 @@ class ConfigurationTest extends TestCase
         $processor->processConfiguration($configuration, [
                 [
                     'http_method_override' => false,
+                    'handle_all_throwables' => true,
+                    'php_errors' => ['log' => true],
                     'assets' => $assetConfig,
                 ],
             ]);
@@ -211,6 +236,8 @@ class ConfigurationTest extends TestCase
         $config = $processor->processConfiguration($configuration, [
             [
                 'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'lock' => $lockConfig,
             ],
         ]);
@@ -272,12 +299,16 @@ class ConfigurationTest extends TestCase
         $config = $processor->processConfiguration($configuration, [
             [
                 'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'lock' => [
                     'payload' => 'flock',
                 ],
             ],
             [
                 'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'lock' => [
                     'payload' => 'semaphore',
                 ],
@@ -305,6 +336,8 @@ class ConfigurationTest extends TestCase
         $config = $processor->processConfiguration($configuration, [
             [
                 'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'semaphore' => $semaphoreConfig,
             ],
         ]);
@@ -358,6 +391,8 @@ class ConfigurationTest extends TestCase
         $processor->processConfiguration($configuration, [
             'framework' => [
                 'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'messenger' => [
                     'default_bus' => null,
                     'buses' => [
@@ -376,6 +411,8 @@ class ConfigurationTest extends TestCase
         $config = $processor->processConfiguration($configuration, [
             [
                 'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'messenger' => [
                     'default_bus' => 'existing_bus',
                     'buses' => [
@@ -391,6 +428,8 @@ class ConfigurationTest extends TestCase
             ],
             [
                 'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'messenger' => [
                     'buses' => [
                         'common_bus' => [
@@ -440,6 +479,8 @@ class ConfigurationTest extends TestCase
         $processor->processConfiguration($configuration, [
             [
                 'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'messenger' => [
                     'default_bus' => 'foo',
                     'buses' => [
@@ -459,6 +500,8 @@ class ConfigurationTest extends TestCase
         $config = $processor->processConfiguration($configuration, [
             [
                 'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'lock' => ['enabled' => false],
             ],
         ]);
@@ -477,6 +520,8 @@ class ConfigurationTest extends TestCase
         $processor->processConfiguration($configuration, [
             [
                 'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'lock' => ['enabled' => true],
             ],
         ]);
@@ -486,6 +531,7 @@ class ConfigurationTest extends TestCase
     {
         return [
             'http_method_override' => false,
+            'handle_all_throwables' => true,
             'trust_x_sendfile_type_header' => false,
             'ide' => '%env(default::SYMFONY_IDE)%',
             'default_locale' => 'en',

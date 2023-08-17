@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolver;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
+use Symfony\Component\HttpKernel\Attribute\MapRequestHeader;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Attribute\ValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestPayloadValueResolver;
@@ -669,6 +670,64 @@ class RequestPayloadValueResolverTest extends TestCase
             $this->assertSame('Test', $validationFailedException->getViolations()[1]->getMessage());
         }
     }
+
+    public function testHeaderPayloadValidationErrorWithValidationGroups()
+    {
+        $serializer = new Serializer([new ObjectNormalizer()]);
+        $validator = (new ValidatorBuilder())->enableAnnotationMapping()->getValidator();
+        $resolver = new RequestPayloadValueResolver($serializer, $validator);
+
+        $request = Request::create('/');
+
+        $argument = new ArgumentMetadata('HeaderPayload', HeaderPayload::class, false, false, null, false, [
+            MapRequestHeader::class => new MapRequestHeader(validationGroups: ['strict']),
+        ]);
+
+        $arguments = $resolver->resolve($request, $argument);
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $event = new ControllerArgumentsEvent($kernel, function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        try {
+            $resolver->onKernelControllerArguments($event);
+            $this->fail(sprintf('Expected "%s" to be thrown.', HttpException::class));
+        } catch (HttpException $e) {
+            $validationFailedException = $e->getPrevious();
+            $this->assertSame(422, $e->getStatusCode());
+            $this->assertInstanceOf(ValidationFailedException::class, $validationFailedException);
+            $this->assertSame('userAgent', $validationFailedException->getViolations()[0]->getPropertyPath());
+            $this->assertSame('This value should be equal to "Mozilla".', $validationFailedException->getViolations()[0]->getMessage());
+            $this->assertSame('host', $validationFailedException->getViolations()[1]->getPropertyPath());
+            $this->assertSame('This value should be equal to "symfony.com".', $validationFailedException->getViolations()[1]->getMessage());
+        }
+    }
+
+    public function testHeaderPayloadDefaultValidationPassed()
+    {
+        $payload = new HeaderPayload(
+            'Symfony',
+            'localhost'
+        );
+
+        $serializer = new Serializer([new ObjectNormalizer()]);
+        $validator = (new ValidatorBuilder())->enableAnnotationMapping()->getValidator();
+        $resolver = new RequestPayloadValueResolver($serializer, $validator);
+
+        $request = Request::create('/');
+
+        $argument = new ArgumentMetadata('HeaderPayload', HeaderPayload::class, false, false, null, false, [
+            MapRequestHeader::class => new MapRequestHeader(),
+        ]);
+
+        $arguments = $resolver->resolve($request, $argument);
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $event = new ControllerArgumentsEvent($kernel, function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $resolver->onKernelControllerArguments($event);
+
+        $this->assertEquals([$payload], $event->getArguments());
+    }
 }
 
 class RequestPayload
@@ -685,5 +744,18 @@ class QueryPayload
 {
     public function __construct(public readonly float $page)
     {
+    }
+}
+
+class HeaderPayload
+{
+    public function __construct(
+        #[Assert\EqualTo('Symfony')]
+        #[Assert\EqualTo('Mozilla', groups: ['strict'])]
+        public readonly string $userAgent,
+
+        #[Assert\EqualTo('symfony.com', groups: ['strict'])]
+        public readonly string $host
+    ) {
     }
 }

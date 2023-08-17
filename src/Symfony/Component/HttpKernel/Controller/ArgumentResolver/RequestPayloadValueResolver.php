@@ -15,6 +15,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
+use Symfony\Component\HttpKernel\Attribute\MapRequestHeader;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
@@ -66,6 +67,7 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
     {
         $attribute = $argument->getAttributesOfType(MapQueryString::class, ArgumentMetadata::IS_INSTANCEOF)[0]
             ?? $argument->getAttributesOfType(MapRequestPayload::class, ArgumentMetadata::IS_INSTANCEOF)[0]
+            ?? $argument->getAttributesOfType(MapRequestHeader::class, ArgumentMetadata::IS_INSTANCEOF)[0]
             ?? null;
 
         if (!$attribute) {
@@ -92,9 +94,13 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
             } elseif ($argument instanceof MapRequestPayload) {
                 $payloadMapper = 'mapRequestPayload';
                 $validationFailedCode = $argument->validationFailedStatusCode;
+            } elseif ($argument instanceof MapRequestHeader) {
+                $payloadMapper = 'mapRequestHeader';
+                $validationFailedCode = $argument->validationFailedStatusCode;
             } else {
                 continue;
             }
+
             $request = $event->getRequest();
 
             if (!$type = $argument->metadata->getType()) {
@@ -193,5 +199,18 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
         } catch (NotEncodableValueException $e) {
             throw new HttpException(Response::HTTP_BAD_REQUEST, sprintf('Request payload contains invalid "%s" data.', $format), $e);
         }
+    }
+
+    private function mapRequestHeader(Request $request, string $type, MapRequestHeader $attribute): ?object
+    {
+        $headers = [];
+        $requestHeaders = $request->headers->all();
+
+        array_walk($requestHeaders, function ($value, $key) use (&$headers) {
+            $key = lcfirst(str_replace('-', '', ucwords($key, '-')));
+            $headers[$key] = $value[0];
+        });
+
+        return $this->serializer->denormalize($headers, $type, null, self::CONTEXT_DESERIALIZE + $attribute->serializationContext);
     }
 }

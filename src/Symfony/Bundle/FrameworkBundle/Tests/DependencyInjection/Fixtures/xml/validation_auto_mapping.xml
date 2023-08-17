@@ -7,7 +7,7 @@
         <framework:annotations enabled="false" />
         <framework:php-errors log="true" />
         <framework:property-info enabled="true" />
-        <framework:validation>
+        <framework:validation email-validation-mode="html5">
             <framework:auto-mapping namespace="App\">
                 <framework:service>foo</framework:service>
                 <framework:service>bar</framework:service>

@@ -49,6 +49,7 @@ framework:
         paths: ['%kernel.project_dir%/Fixtures/translations']
     validation:
         enabled: true
+        email_validation_mode: html5
     annotations: false
     serializer:
          enabled:                    true

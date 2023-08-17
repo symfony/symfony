@@ -31,7 +31,7 @@
         <framework:translator enabled="true" fallback="fr" logging="true" cache-dir="%kernel.cache_dir%/translations">
             <framework:path>%kernel.project_dir%/Fixtures/translations</framework:path>
         </framework:translator>
-        <framework:validation enabled="true" />
+        <framework:validation enabled="true" email-validation-mode="html5" />
         <framework:annotations enabled="false" />
         <framework:php-errors log="true" />
         <framework:serializer enabled="true" enable-annotations="true" name-converter="serializer.name_converter.camel_case_to_snake_case" circular-reference-handler="my.circular.reference.handler" max-depth-handler="my.max.depth.handler">

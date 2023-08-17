@@ -1018,6 +1018,15 @@ class Configuration implements ConfigurationInterface
     private function addValidationSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
+            ->validate()
+                ->always(function ($v) {
+                    if ($v['validation']['enabled'] && !\array_key_exists('email_validation_mode', $v['validation'])) {
+                        trigger_deprecation('symfony/framework-bundle', '6.4', 'Not setting the "framework.validation.email_validation_mode" config option is deprecated. It will default to "html5" in 7.0.');
+                    }
+
+                    return $v;
+                })
+            ->end()
             ->children()
                 ->arrayNode('validation')
                     ->info('validation configuration')
@@ -2350,6 +2359,23 @@ class Configuration implements ConfigurationInterface
     private function addUidSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
+            ->validate()
+                ->always(function ($v) {
+                    if ($v['uid']['enabled']) {
+                        if (!\array_key_exists('default_uuid_version', $v['uid'])) {
+                            trigger_deprecation('symfony/framework-bundle', '6.4', 'Not setting the "framework.uid.default_uuid_version" config option is deprecated. It will default to "7" in 7.0.');
+                        }
+
+                        if (!\array_key_exists('time_based_uuid_version', $v['uid'])) {
+                            trigger_deprecation('symfony/framework-bundle', '6.4', 'Not setting the "framework.uid.time_based_uuid_version" config option is deprecated. It will default to "7" in 7.0.');
+                        }
+                    }
+
+                    $v['uid'] += ['default_uuid_version' => 6, 'time_based_uuid_version' => 6];
+
+                    return $v;
+                })
+            ->end()
             ->children()
                 ->arrayNode('uid')
                     ->info('Uid configuration')
@@ -2357,7 +2383,6 @@ class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->enumNode('default_uuid_version')
-                            ->defaultValue(6)
                             ->values([7, 6, 4, 1])
                         ->end()
                         ->enumNode('name_based_uuid_version')
@@ -2368,7 +2393,6 @@ class Configuration implements ConfigurationInterface
                             ->cannotBeEmpty()
                         ->end()
                         ->enumNode('time_based_uuid_version')
-                            ->defaultValue(6)
                             ->values([7, 6, 1])
                         ->end()
                         ->scalarNode('time_based_uuid_node')

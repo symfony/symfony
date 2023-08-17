@@ -8,6 +8,6 @@
     <framework:config http-method-override="false" handle-all-throwables="true">
         <framework:annotations enabled="false" />
         <framework:php-errors log="true" />
-        <framework:validation translation-domain="messages" />
+        <framework:validation translation-domain="messages" email-validation-mode="html5" />
     </framework:config>
 </container>

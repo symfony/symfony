@@ -8,6 +8,7 @@ $container->loadFromExtension('framework', [
     'secret' => 's3cr3t',
     'validation' => [
         'enabled' => true,
+        'email_validation_mode' => 'html5',
         'static_method' => false,
     ],
 ]);

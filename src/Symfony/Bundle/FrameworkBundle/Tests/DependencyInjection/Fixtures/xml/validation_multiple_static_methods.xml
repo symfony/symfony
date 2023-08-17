@@ -9,7 +9,7 @@
     <framework:config secret="s3cr3t" http-method-override="false" handle-all-throwables="true">
         <framework:annotations enabled="false" />
         <framework:php-errors log="true" />
-        <framework:validation enabled="true">
+        <framework:validation enabled="true" email-validation-mode="html5">
             <framework:static-method>loadFoo</framework:static-method>
             <framework:static-method>loadBar</framework:static-method>
         </framework:validation>

@@ -22,14 +22,30 @@ final class MockClock implements ClockInterface
 {
     private \DateTimeImmutable $now;
 
+    /**
+     * @throws \DateMalformedStringException When $now is invalid
+     * @throws \DateInvalidTimeZoneException When $timezone is invalid
+     */
     public function __construct(\DateTimeImmutable|string $now = 'now', \DateTimeZone|string $timezone = null)
     {
-        if (\is_string($timezone)) {
+        if (\PHP_VERSION_ID >= 80300 && \is_string($timezone)) {
             $timezone = new \DateTimeZone($timezone);
+        } elseif (\is_string($timezone)) {
+            try {
+                $timezone = new \DateTimeZone($timezone);
+            } catch (\Exception $e) {
+                throw new \DateInvalidTimeZoneException($e->getMessage(), $e->getCode(), $e);
+            }
         }
 
-        if (\is_string($now)) {
+        if (\PHP_VERSION_ID >= 80300 && \is_string($now)) {
             $now = new \DateTimeImmutable($now, $timezone ?? new \DateTimeZone('UTC'));
+        } elseif (\is_string($now)) {
+            try {
+                $now = new \DateTimeImmutable($now, $timezone ?? new \DateTimeZone('UTC'));
+            } catch (\Exception $e) {
+                throw new \DateMalformedStringException($e->getMessage(), $e->getCode(), $e);
+            }
         }
 
         $this->now = null !== $timezone ? $now->setTimezone($timezone) : $now;
@@ -49,24 +65,37 @@ final class MockClock implements ClockInterface
         $this->now = (new \DateTimeImmutable($now, $timezone))->setTimezone($timezone);
     }
 
+    /**
+     * @throws \DateMalformedStringException When $modifier is invalid
+     */
     public function modify(string $modifier): void
     {
-        try {
-            $modifiedNow = @$this->now->modify($modifier);
-        } catch (\DateMalformedStringException) {
-            $modifiedNow = false;
-        }
-        if (false === $modifiedNow) {
-            throw new \InvalidArgumentException(sprintf('Invalid modifier: "%s". Could not modify MockClock.', $modifier));
+        if (\PHP_VERSION_ID < 80300) {
+            $this->now = @$this->now->modify($modifier) ?: throw new \DateMalformedStringException(error_get_last()['message'] ?? sprintf('Invalid modifier: "%s". Could not modify MockClock.', $modifier));
+
+            return;
         }
 
-        $this->now = $modifiedNow;
+        $this->now = $this->now->modify($modifier);
     }
 
+    /**
+     * @throws \DateInvalidTimeZoneException When the timezone name is invalid
+     */
     public function withTimeZone(\DateTimeZone|string $timezone): static
     {
+        if (\PHP_VERSION_ID >= 80300 && \is_string($timezone)) {
+            $timezone = new \DateTimeZone($timezone);
+        } elseif (\is_string($timezone)) {
+            try {
+                $timezone = new \DateTimeZone($timezone);
+            } catch (\Exception $e) {
+                throw new \DateInvalidTimeZoneException($e->getMessage(), $e->getCode(), $e);
+            }
+        }
+
         $clone = clone $this;
-        $clone->now = $clone->now->setTimezone(\is_string($timezone) ? new \DateTimeZone($timezone) : $timezone);
+        $clone->now = $clone->now->setTimezone($timezone);
 
         return $clone;
     }

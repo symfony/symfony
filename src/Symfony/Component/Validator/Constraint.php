@@ -46,6 +46,8 @@ abstract class Constraint
 
     /**
      * Maps error codes to the names of their constants.
+     *
+     * @var array<string, string>
      */
     protected const ERROR_NAMES = [];
 

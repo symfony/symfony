@@ -159,7 +159,7 @@ class ConsoleSectionOutputTest extends TestCase
         $expected .= 'Two'.\PHP_EOL.'Three'.\PHP_EOL.'Four'.\PHP_EOL;
 
         // cause overflow of first section (redraw whole section, without first line)
-        $firstSection->writeln("Four\nFive\nSix");
+        $firstSection->writeln('Four'.\PHP_EOL.'Five'.\PHP_EOL.'Six');
         $expected .= "\x1b[6A\x1b[0J";
         $expected .= 'Four'.\PHP_EOL.'Five'.\PHP_EOL.'Six'.\PHP_EOL;
         $expected .= 'Two'.\PHP_EOL.'Three'.\PHP_EOL.'Four'.\PHP_EOL;
@@ -290,5 +290,17 @@ class ConsoleSectionOutputTest extends TestCase
 
         rewind($output->getStream());
         $this->assertSame('What\'s your favorite super hero?'.\PHP_EOL."\x1b[2A\x1b[0J", stream_get_contents($output->getStream()));
+    }
+
+    public function testWriteWithoutNewLine()
+    {
+        $sections = [];
+        $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
+
+        $output->write('Foo'.\PHP_EOL);
+        $output->write('Bar');
+
+        rewind($output->getStream());
+        $this->assertEquals(escapeshellcmd('Foo'.\PHP_EOL.'Bar'.\PHP_EOL), escapeshellcmd(stream_get_contents($output->getStream())));
     }
 }

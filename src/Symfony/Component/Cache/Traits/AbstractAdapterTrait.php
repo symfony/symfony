@@ -51,8 +51,6 @@ trait AbstractAdapterTrait
      * Fetches several cache items.
      *
      * @param array $ids The cache identifiers to fetch
-     *
-     * @return array|\Traversable
      */
     abstract protected function doFetch(array $ids): iterable;
 

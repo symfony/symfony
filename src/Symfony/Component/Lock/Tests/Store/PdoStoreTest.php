@@ -42,7 +42,7 @@ class PdoStoreTest extends AbstractStoreTestCase
         @unlink(self::$dbFile);
     }
 
-    protected function getClockDelay()
+    protected function getClockDelay(): int
     {
         return 1000000;
     }

@@ -44,7 +44,7 @@ class MemcachedStoreTest extends AbstractStoreTestCase
         }
     }
 
-    protected function getClockDelay()
+    protected function getClockDelay(): int
     {
         return 1000000;
     }

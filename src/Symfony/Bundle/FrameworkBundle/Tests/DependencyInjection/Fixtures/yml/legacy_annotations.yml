@@ -5,3 +5,6 @@ framework:
         debug: true
         file_cache_dir: '%kernel.cache_dir%/annotations'
     http_method_override: true
+    handle_all_throwables: true
+    php_errors:
+        log: true

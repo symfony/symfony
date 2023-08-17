@@ -85,6 +85,11 @@ FrameworkBundle
  * [BC break] Add native return type to `Translator` and to `Application::reset()`
  * Deprecate the integration of Doctrine annotations, either uninstall the `doctrine/annotations` package or disable
    the integration by setting `framework.annotations` to `false`
+ * Deprecate not setting the `framework.handle_all_throwables` config option; it will default to `true` in 7.0
+ * Deprecate not setting the `framework.php_errors.log` config option; it will default to `true` in 7.0
+ * Deprecate not setting the `framework.session.cookie_secure` config option; it will default to `auto` in 7.0
+ * Deprecate not setting the `framework.session.cookie_samesite` config option; it will default to `lax` in 7.0
+ * Deprecate not setting the `framework.session.handler_id` config option; it will default to `session.handler.native_file` when `framework.session.save_path` is set or `null` otherwise in 7.0
 
 HttpFoundation
 --------------

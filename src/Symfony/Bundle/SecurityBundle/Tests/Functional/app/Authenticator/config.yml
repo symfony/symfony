@@ -1,13 +1,19 @@
 framework:
     annotations: false
     http_method_override: false
+    handle_all_throwables: true
     secret: test
     router: { resource: "%kernel.project_dir%/%kernel.test_case%/routing.yml", utf8: true }
     test: ~
     default_locale: en
     profiler: false
     session:
+        handler_id: null
         storage_factory_id: session.storage.factory.mock_file
+        cookie_secure: auto
+        cookie_samesite: lax
+    php_errors:
+        log: true
 
 services:
     logger: { class: Psr\Log\NullLogger }

@@ -90,6 +90,9 @@ class Configuration implements ConfigurationInterface
 
                         $v['http_method_override'] = true;
                     }
+                    if (!isset($v['handle_all_throwables'])) {
+                        trigger_deprecation('symfony/framework-bundle', '6.4', 'Not setting the "framework.handle_all_throwables" config option is deprecated. It will default to "true" in 7.0.');
+                    }
 
                     return $v;
                 })
@@ -655,13 +658,34 @@ class Configuration implements ConfigurationInterface
     private function addSessionSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
+            ->validate()
+                ->always(function (array $v): array {
+                    if ($v['session']['enabled']) {
+                        if (!\array_key_exists('cookie_secure', $v['session'])) {
+                            trigger_deprecation('symfony/framework-bundle', '6.4', 'Not setting the "framework.session.cookie_secure" config option is deprecated. It will default to "auto" in 7.0.');
+                        }
+
+                        if (!\array_key_exists('cookie_samesite', $v['session'])) {
+                            trigger_deprecation('symfony/framework-bundle', '6.4', 'Not setting the "framework.session.cookie_samesite" config option is deprecated. It will default to "lax" in 7.0.');
+                        }
+
+                        if (!\array_key_exists('handler_id', $v['session'])) {
+                            trigger_deprecation('symfony/framework-bundle', '6.4', 'Not setting the "framework.session.handler_id" config option is deprecated. It will default to "session.handler.native_file" when "framework.session.save_path" is set or "null" otherwise in 7.0.');
+                        }
+                    }
+
+                    $v['session'] += ['cookie_samesite' => null, 'handler_id' => 'session.handler.native_file'];
+
+                    return $v;
+                })
+            ->end()
             ->children()
                 ->arrayNode('session')
                     ->info('session configuration')
                     ->canBeEnabled()
                     ->children()
                         ->scalarNode('storage_factory_id')->defaultValue('session.storage.factory.native')->end()
-                        ->scalarNode('handler_id')->defaultValue('session.handler.native_file')->end()
+                        ->scalarNode('handler_id')->end()
                         ->scalarNode('name')
                             ->validate()
                                 ->ifTrue(function ($v) {
@@ -677,7 +701,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('cookie_domain')->end()
                         ->enumNode('cookie_secure')->values([true, false, 'auto'])->end()
                         ->booleanNode('cookie_httponly')->defaultTrue()->end()
-                        ->enumNode('cookie_samesite')->values([null, Cookie::SAMESITE_LAX, Cookie::SAMESITE_STRICT, Cookie::SAMESITE_NONE])->defaultNull()->end()
+                        ->enumNode('cookie_samesite')->values([null, Cookie::SAMESITE_LAX, Cookie::SAMESITE_STRICT, Cookie::SAMESITE_NONE])->end()
                         ->booleanNode('use_cookies')->end()
                         ->scalarNode('gc_divisor')->end()
                         ->scalarNode('gc_probability')->defaultValue(1)->end()
@@ -1264,6 +1288,17 @@ class Configuration implements ConfigurationInterface
     private function addPhpErrorsSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
+            ->validate()
+                ->always(function (array $v): array {
+                    if (!\array_key_exists('log', $v['php_errors'])) {
+                        trigger_deprecation('symfony/framework-bundle', '6.4', 'Not setting the "framework.php_errors.log" config option is deprecated. It will default to "true" in 7.0.');
+
+                        $v['php_errors']['log'] = $this->debug;
+                    }
+
+                    return $v;
+                })
+            ->end()
             ->children()
                 ->arrayNode('php_errors')
                     ->info('PHP errors handling configuration')
@@ -1272,7 +1307,6 @@ class Configuration implements ConfigurationInterface
                         ->variableNode('log')
                             ->info('Use the application logger instead of the PHP logger for logging PHP errors.')
                             ->example('"true" to use the default configuration: log all errors. "false" to disable. An integer bit field of E_* constants, or an array mapping E_* constants to log levels.')
-                            ->defaultValue($this->debug)
                             ->treatNullLike($this->debug)
                             ->beforeNormalization()
                                 ->ifArray()

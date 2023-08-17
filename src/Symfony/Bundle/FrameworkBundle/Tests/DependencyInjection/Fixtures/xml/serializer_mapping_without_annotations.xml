@@ -4,8 +4,9 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:framework="http://symfony.com/schema/dic/symfony">
 
-    <framework:config http-method-override="false">
+    <framework:config http-method-override="false" handle-all-throwables="true">
         <framework:annotations enabled="false" />
+        <framework:php-errors log="true" />
         <framework:serializer enable-annotations="false">
             <framework:mapping>
                 <framework:path>%kernel.project_dir%/Fixtures/TestBundle/Resources/config/serializer_mapping/files</framework:path>

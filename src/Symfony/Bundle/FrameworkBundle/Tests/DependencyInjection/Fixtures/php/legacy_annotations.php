@@ -7,4 +7,6 @@ $container->loadFromExtension('framework', [
         'file_cache_dir' => '%kernel.cache_dir%/annotations',
     ],
     'http_method_override' => false,
+    'handle_all_throwables' => true,
+    'php_errors' => ['log' => true],
 ]);

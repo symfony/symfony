@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Throw `DateMalformedStringException`/`DateInvalidTimeZoneException` when appropriate
+
 6.3
 ---
 

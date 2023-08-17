@@ -209,15 +209,15 @@ class SymfonyStyleTest extends TestCase
 
         rewind($output->getStream());
         $this->assertEquals($answer, $givenAnswer);
-        $this->assertEquals(
+        $this->assertEquals(escapeshellcmd(
             'start'.\PHP_EOL. // write start
             'foo'.\PHP_EOL. // write foo
             "\x1b[1A\x1b[0Jfoo and bar".\PHP_EOL. // complete line
-            \PHP_EOL.\PHP_EOL." \033[32mDummy question?\033[39m:".\PHP_EOL.' > '.\PHP_EOL.\PHP_EOL.\PHP_EOL. // question
-            'foo2'.\PHP_EOL.\PHP_EOL. // write foo2
+            \PHP_EOL." \033[32mDummy question?\033[39m:".\PHP_EOL.' > '.\PHP_EOL.\PHP_EOL. // question
+            'foo2'.\PHP_EOL. // write foo2
             'bar2'.\PHP_EOL. // write bar
-            "\033[12A\033[0J", // clear 12 lines (11 output lines and one from the answer input return)
-            stream_get_contents($output->getStream())
+            "\033[9A\033[0J"), // clear 9 lines (8 output lines and one from the answer input return)
+            escapeshellcmd(stream_get_contents($output->getStream()))
         );
     }
 }

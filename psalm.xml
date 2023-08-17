@@ -38,7 +38,16 @@
                 <referencedClass name="ReflectionIntersectionType"/>
                 <referencedClass name="UnitEnum"/>
             </errorLevel>
-       </UndefinedDocblockClass>
+        </UndefinedDocblockClass>
+        <UnusedClass>
+            <errorLevel type="suppress">
+                <!--
+                    Because we don't analyze our tests or fixtures, we will
+                    get a lot of false positives regarding unused classes.
+                -->
+                <directory name="src/Symfony" />
+            </errorLevel>
+        </UnusedClass>
         <UnusedConstructor>
             <errorLevel type="suppress">
                 <!--

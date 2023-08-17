@@ -92,26 +92,19 @@ class MockClockTest extends TestCase
 
     public static function provideInvalidModifyStrings(): iterable
     {
-        yield 'Named holiday is not recognized' => [
-            'Halloween',
-            'Invalid modifier: "Halloween". Could not modify MockClock.',
-        ];
-
-        yield 'empty string' => [
-            '',
-            'Invalid modifier: "". Could not modify MockClock.',
-        ];
+        yield 'Named holiday is not recognized' => ['Halloween'];
+        yield 'empty string' => [''];
     }
 
     /**
      * @dataProvider provideInvalidModifyStrings
      */
-    public function testModifyThrowsOnInvalidString(string $modifiedNow, string $expectedMessage)
+    public function testModifyThrowsOnInvalidString(string $modifiedNow)
     {
         $clock = new MockClock((new \DateTimeImmutable('2112-09-17 23:53:00.999Z'))->setTimezone(new \DateTimeZone('UTC')));
 
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage($expectedMessage);
+        $this->expectException(\DateMalformedStringException::class);
+        $this->expectExceptionMessage("Failed to parse time string ($modifiedNow)");
 
         $clock->modify($modifiedNow);
     }

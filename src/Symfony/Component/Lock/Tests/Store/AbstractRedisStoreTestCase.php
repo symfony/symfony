@@ -25,7 +25,7 @@ abstract class AbstractRedisStoreTestCase extends AbstractStoreTestCase
 {
     use ExpiringStoreTestTrait;
 
-    protected function getClockDelay()
+    protected function getClockDelay(): int
     {
         return 250000;
     }

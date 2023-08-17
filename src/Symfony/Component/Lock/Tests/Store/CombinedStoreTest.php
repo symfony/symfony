@@ -32,7 +32,7 @@ class CombinedStoreTest extends AbstractStoreTestCase
     use ExpiringStoreTestTrait;
     use SharedLockStoreTestTrait;
 
-    protected function getClockDelay()
+    protected function getClockDelay(): int
     {
         return 250000;
     }

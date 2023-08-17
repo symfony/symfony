@@ -57,6 +57,11 @@ class StreamedResponse extends Response
         return $this;
     }
 
+    public function getCallback(): \Closure
+    {
+        return ($this->callback)(...);
+    }
+
     /**
      * This method only sends the headers once.
      *

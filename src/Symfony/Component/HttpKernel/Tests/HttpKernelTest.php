@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -455,6 +456,23 @@ class HttpKernelTest extends TestCase
         $kernel = $this->getHttpKernel($dispatcher, null, $stack);
 
         $kernel->handle($request, HttpKernelInterface::MAIN_REQUEST);
+    }
+
+    public function testVerifyRequestStackPushPopWithStreamedResponse()
+    {
+        $request = new Request();
+        $stack = new RequestStack();
+        $dispatcher = new EventDispatcher();
+        $kernel = $this->getHttpKernel($dispatcher, fn () => new StreamedResponse(function () use ($stack) {
+            echo $stack->getMainRequest()::class;
+        }), $stack);
+
+        $response = $kernel->handle($request, HttpKernelInterface::MAIN_REQUEST);
+        self::assertNull($stack->getMainRequest());
+        ob_start();
+        $response->send();
+        self::assertSame(Request::class, ob_get_clean());
+        self::assertNull($stack->getMainRequest());
     }
 
     public function testInconsistentClientIpsOnMainRequests()

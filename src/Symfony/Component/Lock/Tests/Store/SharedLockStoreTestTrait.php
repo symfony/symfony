@@ -22,10 +22,8 @@ trait SharedLockStoreTestTrait
 {
     /**
      * @see AbstractStoreTestCase::getStore()
-     *
-     * @return PersistingStoreInterface
      */
-    abstract protected function getStore();
+    abstract protected function getStore(): PersistingStoreInterface;
 
     public function testSharedLockReadFirst()
     {

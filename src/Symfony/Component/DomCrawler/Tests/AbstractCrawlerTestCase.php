@@ -305,6 +305,9 @@ abstract class AbstractCrawlerTestCase extends TestCase
         } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->attr() throws an \InvalidArgumentException if the node list is empty');
         }
+
+        $this->assertSame('my value', $this->createTestCrawler()->filterXPath('//notexists')->attr('class', 'my value'));
+        $this->assertSame('my value', $this->createTestCrawler()->filterXPath('//li')->attr('attr-not-exists', 'my value'));
     }
 
     public function testMissingAttrValueIsNull()

@@ -20,7 +20,8 @@
     },
     "require": {
         "php": ">=8.1",
-        "psr/clock": "^1.0"
+        "psr/clock": "^1.0",
+        "symfony/polyfill-php83": "^1.28"
     },
     "autoload": {
         "files": [ "Resources/now.php" ],

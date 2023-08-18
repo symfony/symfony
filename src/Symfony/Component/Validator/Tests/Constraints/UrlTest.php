@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 /**
  * @author Renan Taranto <renantaranto@gmail.com>
@@ -46,7 +46,7 @@ class UrlTest extends TestCase
     public function testAttributes()
     {
         $metadata = new ClassMetadata(UrlDummy::class);
-        self::assertTrue((new AnnotationLoader())->loadClassMetadata($metadata));
+        self::assertTrue((new AttributeLoader())->loadClassMetadata($metadata));
 
         [$aConstraint] = $metadata->properties['a']->getConstraints();
         self::assertSame(['http', 'https'], $aConstraint->protocols);

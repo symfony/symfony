@@ -1024,6 +1024,16 @@ class Configuration implements ConfigurationInterface
                         trigger_deprecation('symfony/framework-bundle', '6.4', 'Not setting the "framework.validation.email_validation_mode" config option is deprecated. It will default to "html5" in 7.0.');
                     }
 
+                    if (isset($v['enable_annotations'])) {
+                        trigger_deprecation('symfony/framework-bundle', '6.4', 'Option "enable_annotations" at "framework.validation" is deprecated. Use the "enable_attributes" option instead.');
+
+                        if (!isset($v['enable_attributes'])) {
+                            $v['enable_attributes'] = $v['enable_annotations'];
+                        } else {
+                            throw new LogicException('The "enable_annotations" and "enable_attributes" options at path "framework.validation" must not be both set. Only the "enable_attributes" option must be used.');
+                        }
+                    }
+
                     return $v;
                 })
             ->end()
@@ -1033,7 +1043,8 @@ class Configuration implements ConfigurationInterface
                     ->{$enableIfStandalone('symfony/validator', Validation::class)}()
                     ->children()
                         ->scalarNode('cache')->end()
-                        ->booleanNode('enable_annotations')->{!class_exists(FullStack::class) ? 'defaultTrue' : 'defaultFalse'}()->end()
+                        ->booleanNode('enable_annotations')->end()
+                        ->booleanNode('enable_attributes')->{!class_exists(FullStack::class) ? 'defaultTrue' : 'defaultFalse'}()->end()
                         ->arrayNode('static_method')
                             ->defaultValue(['loadValidatorMetadata'])
                             ->prototype('scalar')->end()
@@ -1139,10 +1150,25 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->arrayNode('serializer')
+                    ->validate()
+                    ->always(function ($v) {
+                        if (isset($v['enable_annotations'])) {
+                            trigger_deprecation('symfony/framework-bundle', '6.4', 'Option "enable_annotations" at "framework.serializer" is deprecated. Use the "enable_attributes" option instead.');
+
+                            if (!isset($v['enable_attributes'])) {
+                                $v['enable_attributes'] = $v['enable_annotations'];
+                            } else {
+                                throw new LogicException('The "enable_annotations" and "enable_attributes" options at path "framework.serializer" must not be both set. Only the "enable_attributes" option must be used.');
+                            }
+                        }
+
+                        return $v;
+                    })->end()
                     ->info('serializer configuration')
                     ->{$enableIfStandalone('symfony/serializer', Serializer::class)}()
                     ->children()
-                        ->booleanNode('enable_annotations')->{!class_exists(FullStack::class) ? 'defaultTrue' : 'defaultFalse'}()->end()
+                        ->booleanNode('enable_annotations')->end()
+                        ->booleanNode('enable_attributes')->{!class_exists(FullStack::class) ? 'defaultTrue' : 'defaultFalse'}()->end()
                         ->scalarNode('name_converter')->end()
                         ->scalarNode('circular_reference_handler')->end()
                         ->scalarNode('max_depth_handler')->end()

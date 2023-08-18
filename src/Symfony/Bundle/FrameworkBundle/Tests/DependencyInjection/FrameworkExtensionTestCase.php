@@ -1241,7 +1241,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame([$xmlMappings], $calls[3][1]);
         $i = 3;
         if ($annotations) {
-            $this->assertSame('enableAnnotationMapping', $calls[++$i][0]);
+            $this->assertSame('enableAttributeMapping', $calls[++$i][0]);
         }
         $this->assertSame('addMethodMapping', $calls[++$i][0]);
         $this->assertSame(['loadValidatorMetadata'], $calls[$i][1]);
@@ -1251,7 +1251,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     public function testValidationService()
     {
-        $container = $this->createContainerFromFile('validation_annotations', ['kernel.charset' => 'UTF-8'], false);
+        $container = $this->createContainerFromFile('validation_attributes', ['kernel.charset' => 'UTF-8'], false);
 
         $this->assertInstanceOf(ValidatorInterface::class, $container->get('validator.alias'));
     }
@@ -1282,14 +1282,14 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertEquals('file%link%format', $container->getParameter('debug.file_link_format'));
     }
 
-    public function testValidationAnnotations()
+    public function testValidationAttributes()
     {
-        $container = $this->createContainerFromFile('validation_annotations');
+        $container = $this->createContainerFromFile('validation_attributes');
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
         $this->assertCount(7, $calls);
-        $this->assertSame('enableAnnotationMapping', $calls[4][0]);
+        $this->assertSame('enableAttributeMapping', $calls[4][0]);
         $this->assertSame('addMethodMapping', $calls[5][0]);
         $this->assertSame(['loadValidatorMetadata'], $calls[5][1]);
         $this->assertSame('setMappingCache', $calls[6][0]);
@@ -1309,7 +1309,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
         $this->assertCount(8, $calls);
-        $this->assertSame('enableAnnotationMapping', $calls[4][0]);
+        $this->assertSame('enableAttributeMapping', $calls[4][0]);
         if (method_exists(ValidatorBuilder::class, 'setDoctrineAnnotationReader')) {
             $this->assertSame('setDoctrineAnnotationReader', $calls[5][0]);
             $this->assertEquals([new Reference('annotation_reader')], $calls[5][1]);
@@ -1328,7 +1328,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         require_once __DIR__.'/Fixtures/TestBundle/TestBundle.php';
 
-        $container = $this->createContainerFromFile('validation_annotations', [
+        $container = $this->createContainerFromFile('validation_attributes', [
             'kernel.bundles' => ['TestBundle' => 'Symfony\\Bundle\\FrameworkBundle\\Tests\\TestBundle'],
             'kernel.bundles_metadata' => ['TestBundle' => ['namespace' => 'Symfony\\Bundle\\FrameworkBundle\\Tests', 'path' => __DIR__.'/Fixtures/TestBundle']],
         ]);
@@ -1338,7 +1338,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertCount(8, $calls);
         $this->assertSame('addXmlMappings', $calls[3][0]);
         $this->assertSame('addYamlMappings', $calls[4][0]);
-        $this->assertSame('enableAnnotationMapping', $calls[5][0]);
+        $this->assertSame('enableAttributeMapping', $calls[5][0]);
         $this->assertSame('addMethodMapping', $calls[6][0]);
         $this->assertSame(['loadValidatorMetadata'], $calls[6][1]);
         $this->assertSame('setMappingCache', $calls[7][0]);
@@ -1364,7 +1364,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         require_once __DIR__.'/Fixtures/CustomPathBundle/src/CustomPathBundle.php';
 
-        $container = $this->createContainerFromFile('validation_annotations', [
+        $container = $this->createContainerFromFile('validation_attributes', [
             'kernel.bundles' => ['CustomPathBundle' => 'Symfony\\Bundle\\FrameworkBundle\\Tests\\CustomPathBundle'],
             'kernel.bundles_metadata' => ['TestBundle' => ['namespace' => 'Symfony\\Bundle\\FrameworkBundle\\Tests', 'path' => __DIR__.'/Fixtures/CustomPathBundle']],
         ]);
@@ -1399,7 +1399,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame('addXmlMappings', $calls[3][0]);
         $i = 3;
         if ($annotations) {
-            $this->assertSame('enableAnnotationMapping', $calls[++$i][0]);
+            $this->assertSame('enableAttributeMapping', $calls[++$i][0]);
         }
         $this->assertSame('setMappingCache', $calls[++$i][0]);
         $this->assertEquals([new Reference('validator.mapping.cache.adapter')], $calls[$i][1]);

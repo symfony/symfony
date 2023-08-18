@@ -15,14 +15,14 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Cascade;
 use Symfony\Component\Validator\Mapping\CascadingStrategy;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 class CascadeTest extends TestCase
 {
     public function testCascadeAttribute()
     {
         $metadata = new ClassMetadata(CascadeDummy::class);
-        $loader = new AnnotationLoader();
+        $loader = new AttributeLoader();
         self::assertSame(CascadingStrategy::NONE, $metadata->getCascadingStrategy());
         self::assertTrue($loader->loadClassMetadata($metadata));
         self::assertSame(CascadingStrategy::CASCADE, $metadata->getCascadingStrategy());

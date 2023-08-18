@@ -41,7 +41,7 @@
         "symfony/stopwatch": "^5.4|^6.0|^7.0",
         "symfony/translation": "^5.4|^6.0|^7.0",
         "symfony/uid": "^5.4|^6.0|^7.0",
-        "symfony/validator": "^5.4.25|~6.2.12|^6.3.1|^7.0",
+        "symfony/validator": "^6.4|^7.0",
         "symfony/var-dumper": "^5.4|^6.0|^7.0",
         "doctrine/collections": "^1.0|^2.0",
         "doctrine/data-fixtures": "^1.1",
@@ -63,7 +63,7 @@
         "symfony/property-info": "<5.4",
         "symfony/security-bundle": "<5.4",
         "symfony/security-core": "<6.4",
-        "symfony/validator": "<5.4.25|>=6,<6.2.12|>=6.3,<6.3.1"
+        "symfony/validator": "<6.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bridge\\Doctrine\\": "" },

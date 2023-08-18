@@ -14,14 +14,14 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\NotEqualTo;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 class NotEqualToTest extends TestCase
 {
     public function testAttributes()
     {
         $metadata = new ClassMetadata(NotEqualToDummy::class);
-        $loader = new AnnotationLoader();
+        $loader = new AttributeLoader();
         self::assertTrue($loader->loadClassMetadata($metadata));
 
         [$aConstraint] = $metadata->properties['a']->getConstraints();

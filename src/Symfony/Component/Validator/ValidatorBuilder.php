@@ -49,7 +49,7 @@ class ValidatorBuilder
     private array $yamlMappings = [];
     private array $methodMappings = [];
     private ?Reader $annotationReader = null;
-    private bool $enableAnnotationMapping = false;
+    private bool $enableAttributeMapping = false;
     private ?MetadataFactoryInterface $metadataFactory = null;
     private ConstraintValidatorFactoryInterface $validatorFactory;
     private ?CacheItemPoolInterface $mappingCache = null;
@@ -187,30 +187,55 @@ class ValidatorBuilder
     }
 
     /**
-     * Enables annotation and attribute based constraint mapping.
+     * @deprecated since Symfony 6.4, use "enableAttributeMapping()" instead.
      *
      * @return $this
      */
     public function enableAnnotationMapping(): static
     {
+        trigger_deprecation('symfony/validator', '6.4', 'Method "%s()" is deprecated, use "enableAttributeMapping()" instead.', __METHOD__);
+
+        return $this->enableAttributeMapping();
+    }
+
+    /**
+     * Enables attribute based constraint mapping.
+     *
+     * @return $this
+     */
+    public function enableAttributeMapping(): static
+    {
         if (null !== $this->metadataFactory) {
             throw new ValidatorException('You cannot enable annotation mapping after setting a custom metadata factory. Configure your metadata factory instead.');
         }
 
-        $this->enableAnnotationMapping = true;
+        $this->enableAttributeMapping = true;
 
         return $this;
     }
 
     /**
-     * Disables annotation and attribute based constraint mapping.
+     * @deprecated since Symfony 6.4, use "disableAttributeMapping()" instead
      *
      * @return $this
      */
     public function disableAnnotationMapping(): static
     {
-        $this->enableAnnotationMapping = false;
+        trigger_deprecation('symfony/validator', '6.4', 'Method "%s()" is deprecated, use "disableAttributeMapping()" instead.', __METHOD__);
+
         $this->annotationReader = null;
+
+        return $this->disableAttributeMapping();
+    }
+
+    /**
+     * Disables attribute based constraint mapping.
+     *
+     * @return $this
+     */
+    public function disableAttributeMapping(): static
+    {
+        $this->enableAttributeMapping = false;
 
         return $this;
     }
@@ -250,7 +275,7 @@ class ValidatorBuilder
      */
     public function setMetadataFactory(MetadataFactoryInterface $metadataFactory): static
     {
-        if (\count($this->xmlMappings) > 0 || \count($this->yamlMappings) > 0 || \count($this->methodMappings) > 0 || $this->enableAnnotationMapping) {
+        if (\count($this->xmlMappings) > 0 || \count($this->yamlMappings) > 0 || \count($this->methodMappings) > 0 || $this->enableAttributeMapping) {
             throw new ValidatorException('You cannot set a custom metadata factory after adding custom mappings. You should do either of both.');
         }
 
@@ -344,7 +369,7 @@ class ValidatorBuilder
             $loaders[] = new StaticMethodLoader($methodName);
         }
 
-        if ($this->enableAnnotationMapping) {
+        if ($this->enableAttributeMapping) {
             $loaders[] = new AnnotationLoader($this->annotationReader);
         }
 

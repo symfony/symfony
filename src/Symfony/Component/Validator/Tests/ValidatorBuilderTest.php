@@ -81,7 +81,7 @@ class ValidatorBuilderTest extends TestCase
      */
     public function testEnableAnnotationMappingWithDefaultDoctrineAnnotationReader()
     {
-        $this->assertSame($this->builder, $this->builder->enableAnnotationMapping());
+        $this->assertSame($this->builder, $this->builder->enableAttributeMapping());
 
         $this->expectDeprecation('Since symfony/validator 6.4: Method "Symfony\Component\Validator\ValidatorBuilder::addDefaultDoctrineAnnotationReader()" is deprecated without replacement.');
         $this->assertSame($this->builder, $this->builder->addDefaultDoctrineAnnotationReader());
@@ -102,7 +102,7 @@ class ValidatorBuilderTest extends TestCase
     {
         $reader = $this->createMock(Reader::class);
 
-        $this->assertSame($this->builder, $this->builder->enableAnnotationMapping());
+        $this->assertSame($this->builder, $this->builder->enableAttributeMapping());
 
         $this->expectDeprecation('Since symfony/validator 6.4: Method "Symfony\Component\Validator\ValidatorBuilder::setDoctrineAnnotationReader()" is deprecated without replacement.');
         $this->assertSame($this->builder, $this->builder->setDoctrineAnnotationReader($reader));
@@ -116,9 +116,27 @@ class ValidatorBuilderTest extends TestCase
         $this->assertSame($reader, $r->getValue($loaders[0]));
     }
 
-    public function testDisableAnnotationMapping()
+    /**
+     * @group legacy
+     */
+    public function testExpectDeprecationWhenEnablingAnnotationMapping()
     {
-        $this->assertSame($this->builder, $this->builder->disableAnnotationMapping());
+        $this->expectDeprecation('Since symfony/validator 6.4: Method "Symfony\Component\Validator\ValidatorBuilder::enableAnnotationMapping()" is deprecated, use "enableAttributeMapping()" instead.');
+        $this->builder->enableAnnotationMapping();
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testExpectDeprecationWhenDisablingAnnotationMapping()
+    {
+        $this->expectDeprecation('Since symfony/validator 6.4: Method "Symfony\Component\Validator\ValidatorBuilder::disableAnnotationMapping()" is deprecated, use "disableAttributeMapping()" instead.');
+        $this->builder->disableAnnotationMapping();
+    }
+
+    public function testDisableAttributeMapping()
+    {
+        $this->assertSame($this->builder, $this->builder->disableAttributeMapping());
     }
 
     public function testSetMappingCache()

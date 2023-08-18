@@ -1,0 +1,99 @@
+---------------------------------------------------------------------------
+
+by stof at 2023-08-09T15:45:52Z
+
+I think it might be more readable with a separate `renderBlock` method instead of an optional argument, allowing to easily distinguish whether we only render a block of the template and not the full block (especially when the list of variables become long and is defined inline rather than using a `$context` variable).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-08-09T16:06:46Z
+
+In order to prevent code duplication, we could add renderBlock but keep the new argument on renderView. Otherwise we'll need a new renderBlockView and it should duplicate most of the code in renderView/render. I'm not keen on adding renderBlockView.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-08-09T16:33:03Z
+
+Mmm, even adding renderBlock requires duplicating from render.
+
+Another idea might be to use the parameters array to add options, for example `['@block' => 'the_block']`.
+Can we reference a variable named `@block` from inside a twig template? If not, then this convention is safe from collisions.
+But it's more difficult to discover.
+
+With all this in mind, I think I prefer the additional argument.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2023-08-09T17:22:43Z
+
+I prefer the separate methods approach too, as it is more aligned with SRP and also results in a better argument order.
+```php
+return $this->renderBlock('foo.html.twig', 'the_block', $context);
+```
+
+<details><summary>An alternative could be moving the duplicated code to new private methods</summary>
+<p>
+
+```php
+private function normalizeViewParameters(array $parameters): array
+{
+    foreach ($parameters as $k => $v) {
+        if ($v instanceof FormInterface) {
+            $parameters[$k] = $v->createView();
+        }
+    }
+
+    return $parameters;
+}
+
+private function prepareResponse(Response $response, array $parameters, string $content): Response
+{
+    if (200 === $response->getStatusCode()) {
+        foreach ($parameters as $v) {
+            if ($v instanceof FormInterface && $v->isSubmitted() && !$v->isValid()) {
+                $response->setStatusCode(422);
+                break;
+            }
+        }
+    }
+
+    $response->setContent($content);
+
+    return $response;
+}
+```
+
+</p>
+</details>
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-08-09T17:45:08Z
+
+OK, thanks for the feedback :)
+
+PR updated to add method `AbstractController::renderBlock()` and argument `$block` to `renderView()`
+
+---------------------------------------------------------------------------
+
+by yceruto at 2023-08-09T18:29:17Z
+
+by the way, I would do the same for `renderBlockView()`, and use `normalizeViewParameters()` (defined in my previous comment) to avoid duplication. The LogicException is not included as it's a different method, so the message changes.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2023-08-09T18:42:01Z
+
+Full suggestion https://gist.github.com/yceruto/fc5594963df6a642c34111eea1a82b17
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-08-09T20:48:39Z
+
+I'm not sold on renderViewBlock. There I still like the additional argument for renderView...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-08-17T12:38:41Z
+
+Friendly ping @symfony/mergers

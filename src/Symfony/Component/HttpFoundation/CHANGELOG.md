@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Make `HeaderBag::getDate()`, `Response::getDate()`, `getExpires()` and `getLastModified()` return a `DateTimeImmutable`
+ * Add `ParameterBag::match()` to check whether a parameter matches a regular expression
 
 6.3
 ---

@@ -114,6 +114,26 @@ class ParameterBagTest extends TestCase
         $this->assertFalse($bag->has('unknown'), '->has() return false if a parameter is not defined');
     }
 
+    public function testMatch()
+    {
+        $bag = new ParameterBag(['foo' => 'bar', 'foobar' => 'foo101bar']);
+
+        $this->assertTrue($bag->match('foo', '/^bar$/'));
+        $this->assertTrue($bag->match('foobar', '/^[a-zA-Z]{3}\d{3}[a-zA-Z]{3}$/'));
+        $this->assertFalse($bag->match('baz', '/^foobarbaz$/'));
+        $this->assertFalse($bag->match('', '/^foobarbaz$/'));
+    }
+
+    public function testMatchExceptionWithInvalidRegexp()
+    {
+        $bag = new ParameterBag(['foo' => 'bar']);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Parameter "regexp" is not a valid regular expression.');
+
+        $bag->match('foo', '/\d+');
+    }
+
     public function testGetAlpha()
     {
         $bag = new ParameterBag(['word' => 'foo_BAR_012', 'bool' => true, 'integer' => 123]);

@@ -113,12 +113,10 @@ class ParameterBag implements \IteratorAggregate, \Countable
     /**
      * Checks whether the given parameter matches the given regular expression.
      *
-     * @param string $key
-     * @param string $regexp
-     * @return boolean Returns true if the paramter matches the regular expression.
-     *                 However, false is returned if the parameter is either not defined or if the parameter did not match the regular expression.
-     * 
-     * @throws \InvalidArgumentException InvalidArgumentException is thrown if regexp is not a valid regular expression.
+     * @return bool Returns true if the paramter matches the regular expression.
+     *              However, false is returned if the parameter is either not defined or if the parameter did not match the regular expression.
+     *
+     * @throws \InvalidArgumentException if regexp is not a valid regular expression
      */
     public function match(string $key, string $regexp): bool
     {
@@ -126,17 +124,17 @@ class ParameterBag implements \IteratorAggregate, \Countable
             return false;
         }
 
-        if (strlen($regexp) < 2 || ($regexp[0] !== '/' || $regexp[strlen($regexp) - 1] !== '/')) {
+        if (\strlen($regexp) < 2 || ('/' !== $regexp[0] || '/' !== $regexp[\strlen($regexp) - 1])) {
             throw new \InvalidArgumentException('Parameter "regexp" is not a valid regular expression.');
         }
-        
+
         $match = preg_match($regexp, $this->getString($key));
 
-        if ($match === false) {
+        if (false === $match) {
             throw new \InvalidArgumentException('Parameter "regexp" is not a valid regular expression.');
         }
 
-        return $match === 1;
+        return 1 === $match;
     }
 
     /**

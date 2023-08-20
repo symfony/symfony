@@ -124,14 +124,10 @@ class ParameterBag implements \IteratorAggregate, \Countable
             return false;
         }
 
-        if (\strlen($regexp) < 2 || ('/' !== $regexp[0] || '/' !== $regexp[\strlen($regexp) - 1])) {
-            throw new \InvalidArgumentException('Parameter "regexp" is not a valid regular expression.');
-        }
-
-        $match = preg_match($regexp, $this->getString($key));
+        $match = @preg_match($regexp, $this->getString($key));
 
         if (false === $match) {
-            throw new \InvalidArgumentException('Parameter "regexp" is not a valid regular expression.');
+            throw new \InvalidArgumentException(sprintf('Parameter "regexp" is not a valid regular expression: "%s".', preg_last_error_msg()));
         }
 
         return 1 === $match;

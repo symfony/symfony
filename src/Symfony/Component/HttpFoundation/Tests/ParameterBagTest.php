@@ -129,9 +129,19 @@ class ParameterBagTest extends TestCase
         $bag = new ParameterBag(['foo' => 'bar']);
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Parameter "regexp" is not a valid regular expression.');
+        $this->expectExceptionMessage('Parameter "regexp" is not a valid regular expression: "Internal error".');
 
         $bag->match('foo', '/\d+');
+    }
+
+    public function testMatchExceptionWithPregLastErrorMsg()
+    {
+        $bag = new ParameterBag(['foobar' => 'foobar foobar foobar']);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Parameter "regexp" is not a valid regular expression: "Backtrack limit exhausted".');
+
+        $bag->match('foobar', '/(?:\D+|<\d+>)*[!?]/');
     }
 
     public function testGetAlpha()

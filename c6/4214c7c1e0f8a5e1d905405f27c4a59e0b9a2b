@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2023-08-16T07:39:17Z
+
+In order to address the failing Psalm job, I've opened #51395.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-08-17T13:22:47Z
+
+I'm wondering how we could make these work:
+```php
+#[AutowireLocator([
+	'cache' => new SubscribedService(type: CacheInterface::class: attributes: [new Target('my.cache')]),
+	'blobs' => new TaggedLocator('blob'),
+)]
+ContainerInterface $container,
+```
+
+Any idea?
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-08-17T13:44:32Z
+
+I thought that too! I was going to take a look at this possibility after this was merged.
+
+BTW, your example can't be an array, it needs to be:
+
+```php
+#[AutowireLocator(
+    cache: new SubscribedService(type: CacheInterface::class: attributes: [new Target('my.cache')]),
+    blobs: new TaggedLocator('blob'),
+)]
+ContainerInterface $container,
+```
+
+(just making sure you're ok with this syntax)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-08-21T08:22:36Z
+
+I just noticed the failures on high+low deps, can you please have a look?
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-08-21T12:33:56Z
+
+I believe the test suite will be fixed once merged because of the http-kernel's requirement on this `AutowireLocator`. Or should I add a conditional in the test?

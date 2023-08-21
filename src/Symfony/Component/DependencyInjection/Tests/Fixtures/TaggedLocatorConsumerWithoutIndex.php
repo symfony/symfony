@@ -14,12 +14,16 @@ namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
 
-final class LocatorConsumerFactory
+final class TaggedLocatorConsumerWithoutIndex
 {
-    public function __invoke(
-        #[TaggedLocator('foo_bar', indexAttribute: 'key')]
-        ContainerInterface $locator
-    ): LocatorConsumer {
-        return new LocatorConsumer($locator);
+    public function __construct(
+        #[TaggedLocator('foo_bar')]
+        private ContainerInterface $locator,
+    ) {
+    }
+
+    public function getLocator(): ContainerInterface
+    {
+        return $this->locator;
     }
 }

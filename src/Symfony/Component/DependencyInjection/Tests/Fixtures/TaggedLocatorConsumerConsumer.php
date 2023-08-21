@@ -11,14 +11,14 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
-final class LocatorConsumerConsumer
+final class TaggedLocatorConsumerConsumer
 {
     public function __construct(
-        private LocatorConsumer $locatorConsumer
+        private TaggedLocatorConsumer $locatorConsumer
     ) {
     }
 
-    public function getLocatorConsumer(): LocatorConsumer
+    public function getLocatorConsumer(): TaggedLocatorConsumer
     {
         return $this->locatorConsumer;
     }

@@ -14,7 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
 
-final class LocatorConsumer
+final class TaggedLocatorConsumer
 {
     public function __construct(
         #[TaggedLocator('foo_bar', indexAttribute: 'foo')]

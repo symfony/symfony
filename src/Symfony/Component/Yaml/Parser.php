@@ -200,7 +200,7 @@ class Parser
                         )
                     ) {
                         $block = $values['value'];
-                        if (isset($matches['value']) && $matches['value'] === '>-') {
+                        if (isset($matches['value']) && '>-' === $matches['value']) {
                             // this is a block scalar indicator. The real value is on the next lines.
                             $block .= "\n".$this->getNextEmbedBlock($this->getCurrentLineIndentation() + \strlen($values['leadspaces']) + 1);
                         } else {

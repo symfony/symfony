@@ -1,0 +1,87 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-08-14T09:23:24Z
+
+Test case added, thanks for the review.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-08-15T10:39:23Z
+
+I am not convinced that a function named `now()` should return another date than the current date (according to the underlying clock). Shouldn't this rather be a different function?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-08-15T12:22:58Z
+
+I agree with @xabbuh
+
+---------------------------------------------------------------------------
+
+by wouterj at 2023-08-15T12:29:09Z
+
+It reads nicely if we allow only relative modifiers: `now('+10 minutes')`
+But I agree with @xabbuh and @chalasr for absolute modifiers `now('2023-01-01')` does feel wrong.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-08-15T13:24:04Z
+
+`now()->modify('+10minutes')` reads even better imho. Let's just keep `now()` return now?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-08-16T06:57:22Z
+
+PR updated: it now leverages https://github.com/symfony/polyfill/pull/440 so that we throw a `DateMalformedStringException` when the provided modifier is invalid. I also updated `MockClock` to throw this exception / DateInvalidTimeZoneException when appropriate.
+
+> now('+10 minutes')
+
+Yes, this reads perfectly fine
+
+> now('2023-01-01') does feel wrong.
+
+I don't see any issue with that personally. This is trivial to understand to me.
+Introducing another function would feel worse, especially considering we cannot differentiate between relative and absolute modifiers.
+
+> now()->modify('+10minutes') reads even better imho.
+
+It doesn't to me, especially considering the fact this misses proper error handling. Also considering this is supposed to replace `new \DateTimeImmutable('+10minutes')`: if the number of keystrokes is not clearly reduced, this fails the target to me.
+
+Please reconsider :)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-08-16T07:52:21Z
+
+I still like the modifier and the reading, while I understand the concerns, I would go with this PR 👍🏻
+
+---------------------------------------------------------------------------
+
+by stof at 2023-08-16T17:48:32Z
+
+I'm wondering whether the change to MockClock should really be bundled in the same PR (and so in the same commit in the final history). This would hide entirely the behavior change in MockClock even for people reading the full git history and not just the changelog (which filters out minor changes).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-08-17T01:07:03Z
+
+I won't block but I think it's not worth it
+
+---------------------------------------------------------------------------
+
+by antonkomarev at 2023-08-17T05:22:47Z
+
+I think that explicitly calling a modify method is a much more obvious way to get a modified date from now.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-08-17T09:29:52Z
+
+PR updated with error handling moved to #51412
+
+> explicitly calling a modify method
+
+there are two major differences with `now()->modify($foo)`:
+- error handling (could be alleviated by #51415)
+- timezone handling: `$date->modify('Europe/Paris')` does nothing, while `now('Europe/Paris')` would work as we'd expect.

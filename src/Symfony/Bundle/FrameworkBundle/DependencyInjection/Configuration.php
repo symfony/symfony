@@ -661,11 +661,19 @@ class Configuration implements ConfigurationInterface
                         }
 
                         if (!\array_key_exists('handler_id', $v['session'])) {
-                            trigger_deprecation('symfony/framework-bundle', '6.4', 'Not setting the "framework.session.handler_id" config option is deprecated. It will default to "session.handler.native_file" when "framework.session.save_path" is set or "null" otherwise in 7.0.');
+                            if (!\array_key_exists('save_path', $v['session'])) {
+                                trigger_deprecation('symfony/framework-bundle', '6.4', 'Not setting the "framework.session.save_path" config option when the "framework.session.handler_id" config option is not set either is deprecated. Both options will default to "null" in 7.0.');
+                            } else {
+                                trigger_deprecation('symfony/framework-bundle', '6.4', 'Not setting the "framework.session.handler_id" config option is deprecated. It will default to "session.handler.native_file" when "framework.session.save_path" is set or "null" otherwise in 7.0.');
+                            }
                         }
                     }
 
-                    $v['session'] += ['cookie_samesite' => null, 'handler_id' => 'session.handler.native_file'];
+                    $v['session'] += [
+                        'cookie_samesite' => null,
+                        'handler_id' => 'session.handler.native_file',
+                        'save_path' => '%kernel.cache_dir%/sessions',
+                    ];
 
                     return $v;
                 })
@@ -697,7 +705,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('gc_divisor')->end()
                         ->scalarNode('gc_probability')->defaultValue(1)->end()
                         ->scalarNode('gc_maxlifetime')->end()
-                        ->scalarNode('save_path')->defaultValue('%kernel.cache_dir%/sessions')->end()
+                        ->scalarNode('save_path')->end()
                         ->integerNode('metadata_update_threshold')
                             ->defaultValue(0)
                             ->info('seconds to wait between 2 session metadata updates')

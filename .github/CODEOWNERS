@@ -44,6 +44,8 @@
 /src/Symfony/Component/Ldap/Security/ @chalasr
 # Scheduler
 /src/Symfony/Component/Scheduler/ @kbond
+# Translation
+/src/Symfony/Component/Translation/ @welcomattic
 # TwigBundle
 /src/Symfony/Bundle/TwigBundle/ @yceruto
 # WebLink

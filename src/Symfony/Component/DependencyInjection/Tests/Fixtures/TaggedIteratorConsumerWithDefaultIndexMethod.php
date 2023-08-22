@@ -4,7 +4,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 
-final class IteratorConsumerWithDefaultIndexMethod
+final class TaggedIteratorConsumerWithDefaultIndexMethod
 {
     public function __construct(
         #[TaggedIterator(tag: 'foo_bar', defaultIndexMethod: 'getDefaultFooName')]

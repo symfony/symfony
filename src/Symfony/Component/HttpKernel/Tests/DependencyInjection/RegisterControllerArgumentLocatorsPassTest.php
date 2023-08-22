@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireCallable;
+use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
 use Symfony\Component\DependencyInjection\Attribute\Target;
@@ -516,7 +517,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         /** @var ServiceLocator $locator */
         $locator = $container->get($locatorId)->get('foo::fooAction');
 
-        $this->assertCount(2, $locator->getProvidedServices());
+        $this->assertCount(3, $locator->getProvidedServices());
 
         $this->assertTrue($locator->has('iterator'));
         $this->assertInstanceOf(RewindableGenerator::class, $argIterator = $locator->get('iterator'));
@@ -529,6 +530,12 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertTrue($argLocator->has('baz'));
 
         $this->assertSame(iterator_to_array($argIterator), [$argLocator->get('bar'), $argLocator->get('baz')]);
+
+        $this->assertTrue($locator->has('container'));
+        $this->assertInstanceOf(ServiceLocator::class, $argLocator = $locator->get('container'));
+        $this->assertCount(2, $argLocator);
+        $this->assertTrue($argLocator->has('bar'));
+        $this->assertTrue($argLocator->has('baz'));
     }
 }
 
@@ -669,6 +676,7 @@ class WithTaggedIteratorAndTaggedLocator
     public function fooAction(
         #[TaggedIterator('foobar')] iterable $iterator,
         #[TaggedLocator('foobar')] ServiceLocator $locator,
+        #[AutowireLocator('bar', 'baz')] ContainerInterface $container,
     ) {
     }
 }

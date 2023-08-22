@@ -13,13 +13,13 @@ namespace Symfony\Component\Serializer\Tests\Mapping\Loader;
 
 use Symfony\Component\Serializer\Exception\MappingException;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
-use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 
-class AnnotationLoaderWithAttributesTest extends AnnotationLoaderTestCase
+class AttributeLoaderWithAttributesTest extends AttributeLoaderTestCase
 {
-    protected function createLoader(): AnnotationLoader
+    protected function createLoader(): AttributeLoader
     {
-        return new AnnotationLoader();
+        return new AttributeLoader();
     }
 
     protected function getNamespace(): string

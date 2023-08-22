@@ -14,17 +14,18 @@ namespace Symfony\Component\Serializer\Tests\Mapping\Loader;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 
 /**
  * @group legacy
  */
-class AnnotationLoaderWithDoctrineAnnotationsTest extends AnnotationLoaderTestCase
+class AnnotationLoaderWithDoctrineAnnotationsTest extends AttributeLoaderTestCase
 {
     use ExpectDeprecationTrait;
 
     protected function setUp(): void
     {
-        $this->expectDeprecation('Since symfony/serializer 6.4: Passing a "Doctrine\Common\Annotations\AnnotationReader" instance as argument 1 to "Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader::__construct()" is deprecated, pass null or omit the parameter instead.');
+        $this->expectDeprecation('Since symfony/serializer 6.4: Passing a "Doctrine\Common\Annotations\AnnotationReader" instance as argument 1 to "Symfony\Component\Serializer\Mapping\Loader\AttributeLoader::__construct()" is deprecated, pass null or omit the parameter instead.');
 
         parent::setUp();
     }
@@ -158,7 +159,7 @@ class AnnotationLoaderWithDoctrineAnnotationsTest extends AnnotationLoaderTestCa
         parent::testIgnoreGetterWithRequiredParameterIfIgnoreAnnotationIsUsed();
     }
 
-    protected function createLoader(): AnnotationLoader
+    protected function createLoader(): AttributeLoader
     {
         return new AnnotationLoader(new AnnotationReader());
     }

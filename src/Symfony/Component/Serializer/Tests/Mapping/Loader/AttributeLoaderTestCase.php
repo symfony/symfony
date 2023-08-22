@@ -12,12 +12,14 @@
 namespace Symfony\Component\Serializer\Tests\Mapping\Loader;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Serializer\Exception\MappingException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
 use Symfony\Component\Serializer\Tests\Mapping\Loader\Features\ContextMappingTestTrait;
 use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
@@ -25,9 +27,10 @@ use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-abstract class AnnotationLoaderTestCase extends TestCase
+abstract class AttributeLoaderTestCase extends TestCase
 {
     use ContextMappingTestTrait;
+    use ExpectDeprecationTrait;
 
     protected AnnotationLoader $loader;
 
@@ -210,7 +213,16 @@ abstract class AnnotationLoaderTestCase extends TestCase
         self::assertSame(['a'], $attributesMetadata['baz']->getGroups());
     }
 
-    abstract protected function createLoader(): AnnotationLoader;
+    /**
+     * @group legacy
+     */
+    public function testExpectedDeprecationOnLoadAnnotationsCall()
+    {
+        $this->expectDeprecation('Since symfony/serializer 6.4: Method "Symfony\Component\Serializer\Mapping\Loader\AttributeLoader::loadAnnotations()" is deprecated without replacement.');
+        $this->loader->loadAnnotations(new \ReflectionClass(\stdClass::class));
+    }
+
+    abstract protected function createLoader(): AttributeLoader;
 
     abstract protected function getNamespace(): string;
 

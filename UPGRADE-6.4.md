@@ -199,7 +199,7 @@ Serializer
 ----------
 
  * Deprecate Doctrine annotations support in favor of native attributes
- * Deprecate passing an annotation reader to the constructor of `AnnotationLoader`
+ * Deprecate `AnnotationLoader`, use `AttributeLoader` instead
 
 Templating
 ----------

@@ -15,6 +15,9 @@ CHANGELOG
  * Remove the annotation reader parameter from the constructor signature of `AnnotationLoader`
  * Remove `ValidatorBuilder::setDoctrineAnnotationReader()`
  * Remove `ValidatorBuilder::addDefaultDoctrineAnnotationReader()`
+ * Remove `ValidatorBuilder::enableAnnotationMapping()`, use `ValidatorBuilder::enableAttributeMapping()` instead
+ * Remove `ValidatorBuilder::disableAnnotationMapping()`, use `ValidatorBuilder::disableAttributeMapping()` instead
+ * Remove `AnnotationLoader`, use `AttributeLoader` instead
 
 6.4
 ---

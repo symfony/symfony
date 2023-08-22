@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\ObjectInitializerInterface;
 use Symfony\Component\Validator\Validator\RecursiveValidator;
@@ -22,8 +21,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ValidatorBuilderTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     private ValidatorBuilder $builder;
 
     protected function setUp(): void
@@ -71,24 +68,6 @@ class ValidatorBuilderTest extends TestCase
     public function testAddMethodMappings()
     {
         $this->assertSame($this->builder, $this->builder->addMethodMappings([]));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testExpectDeprecationWhenEnablingAnnotationMapping()
-    {
-        $this->expectDeprecation('Since symfony/validator 6.4: Method "Symfony\Component\Validator\ValidatorBuilder::enableAnnotationMapping()" is deprecated, use "enableAttributeMapping()" instead.');
-        $this->assertSame($this->builder, $this->builder->enableAnnotationMapping());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testExpectDeprecationWhenDisablingAnnotationMapping()
-    {
-        $this->expectDeprecation('Since symfony/validator 6.4: Method "Symfony\Component\Validator\ValidatorBuilder::disableAnnotationMapping()" is deprecated, use "disableAttributeMapping()" instead.');
-        $this->assertSame($this->builder, $this->builder->disableAnnotationMapping());
     }
 
     public function testDisableAttributeMapping()

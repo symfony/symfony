@@ -16,7 +16,6 @@ use Symfony\Component\Validator\Context\ExecutionContextFactory;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
-use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
@@ -182,18 +181,6 @@ class ValidatorBuilder
     }
 
     /**
-     * @deprecated since Symfony 6.4, use "enableAttributeMapping()" instead.
-     *
-     * @return $this
-     */
-    public function enableAnnotationMapping(): static
-    {
-        trigger_deprecation('symfony/validator', '6.4', 'Method "%s()" is deprecated, use "enableAttributeMapping()" instead.', __METHOD__);
-
-        return $this->enableAttributeMapping();
-    }
-
-    /**
      * Enables attribute-based constraint mapping.
      *
      * @return $this
@@ -207,18 +194,6 @@ class ValidatorBuilder
         $this->enableAttributeMapping = true;
 
         return $this;
-    }
-
-    /**
-     * @deprecated since Symfony 6.4, use "disableAttributeMapping()" instead
-     *
-     * @return $this
-     */
-    public function disableAnnotationMapping(): static
-    {
-        trigger_deprecation('symfony/validator', '6.4', 'Method "%s()" is deprecated, use "disableAttributeMapping()" instead.', __METHOD__);
-
-        return $this->disableAttributeMapping();
     }
 
     /**

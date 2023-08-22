@@ -210,6 +210,8 @@ FrameworkBundle
  * Make the `framework.uid.default_uuid_version` config option default to `7`
  * Make the `framework.uid.time_based_uuid_version` config option default to `7`
  * Make the `framework.validation.email_validation_mode` config option default to `html5`
+ * Remove the `framework.validation.enable_annotations` config option, use `framework.validation.enable_attributes` instead
+ * Remove the `framework.serializer.enable_annotations` config option, use `framework.serializer.enable_attributes` instead
 
 HttpFoundation
 --------------
@@ -472,9 +474,11 @@ Validator
  * Remove `VALIDATION_MODE_LOOSE` from `Email` constraint, use `VALIDATION_MODE_HTML5` instead
  * Remove constraint `ExpressionLanguageSyntax`, use `ExpressionSyntax` instead
  * Remove Doctrine annotations support in favor of native attributes
- * Remove the annotation reader parameter from the constructor signature of `AnnotationLoader`
  * Remove `ValidatorBuilder::setDoctrineAnnotationReader()`
  * Remove `ValidatorBuilder::addDefaultDoctrineAnnotationReader()`
+ * Remove `ValidatorBuilder::enableAnnotationMapping()`, use `ValidatorBuilder::enableAttributeMapping()` instead
+ * Remove `ValidatorBuilder::disableAnnotationMapping()`, use `ValidatorBuilder::disableAttributeMapping()` instead
+ * Remove `AnnotationLoader`, use `AttributeLoader` instead
 
 VarDumper
 ---------

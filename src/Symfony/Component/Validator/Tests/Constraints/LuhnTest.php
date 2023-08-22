@@ -14,14 +14,14 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Luhn;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 class LuhnTest extends TestCase
 {
     public function testAttributes()
     {
         $metadata = new ClassMetadata(LuhnDummy::class);
-        $loader = new AnnotationLoader();
+        $loader = new AttributeLoader();
         self::assertTrue($loader->loadClassMetadata($metadata));
 
         [$bConstraint] = $metadata->properties['b']->getConstraints();

@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Timezone;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 /**
  * @author Javier Spagnoletti <phansys@gmail.com>
@@ -69,7 +69,7 @@ class TimezoneTest extends TestCase
     public function testAttributes()
     {
         $metadata = new ClassMetadata(TimezoneDummy::class);
-        self::assertTrue((new AnnotationLoader())->loadClassMetadata($metadata));
+        self::assertTrue((new AttributeLoader())->loadClassMetadata($metadata));
 
         [$aConstraint] = $metadata->properties['a']->getConstraints();
         self::assertSame(\DateTimeZone::ALL, $aConstraint->zone);

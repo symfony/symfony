@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 class EmailTest extends TestCase
 {
@@ -64,7 +64,7 @@ class EmailTest extends TestCase
     public function testAttribute()
     {
         $metadata = new ClassMetadata(EmailDummy::class);
-        (new AnnotationLoader())->loadClassMetadata($metadata);
+        (new AttributeLoader())->loadClassMetadata($metadata);
 
         [$aConstraint] = $metadata->properties['a']->constraints;
         self::assertNull($aConstraint->mode);

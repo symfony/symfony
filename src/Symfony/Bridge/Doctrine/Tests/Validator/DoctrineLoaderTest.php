@@ -39,7 +39,7 @@ class DoctrineLoaderTest extends TestCase
     public function testLoadClassMetadata()
     {
         $validator = Validation::createValidatorBuilder()
-            ->enableAnnotationMapping(true)
+            ->enableAttributeMapping()
             ->addLoader(new DoctrineLoader(DoctrineTestHelper::createTestEntityManager(), '{^Symfony\\\\Bridge\\\\Doctrine\\\\Tests\\\\Fixtures\\\\DoctrineLoader}'))
             ->getValidator()
         ;
@@ -142,7 +142,7 @@ class DoctrineLoaderTest extends TestCase
     {
         $validator = Validation::createValidatorBuilder()
             ->addMethodMapping('loadValidatorMetadata')
-            ->enableAnnotationMapping(true)
+            ->enableAttributeMapping()
             ->addLoader(new DoctrineLoader(DoctrineTestHelper::createTestEntityManager(), '{^Symfony\\\\Bridge\\\\Doctrine\\\\Tests\\\\Fixtures\\\\DoctrineLoader}'))
             ->getValidator()
         ;
@@ -159,7 +159,7 @@ class DoctrineLoaderTest extends TestCase
     public function testFieldMappingsConfiguration()
     {
         $validator = Validation::createValidatorBuilder()
-            ->enableAnnotationMapping(true)
+            ->enableAttributeMapping()
             ->addXmlMappings([__DIR__.'/../Resources/validator/BaseUser.xml'])
             ->addLoader(
                 new DoctrineLoader(
@@ -200,7 +200,7 @@ class DoctrineLoaderTest extends TestCase
     public function testClassNoAutoMapping()
     {
         $validator = Validation::createValidatorBuilder()
-            ->enableAnnotationMapping(true)
+            ->enableAttributeMapping()
             ->addLoader(new DoctrineLoader(DoctrineTestHelper::createTestEntityManager(), '{.*}'))
             ->getValidator();
 

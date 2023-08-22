@@ -1657,8 +1657,8 @@ class FrameworkExtension extends Extension
         $definition = $container->findDefinition('validator.email');
         $definition->replaceArgument(0, $config['email_validation_mode']);
 
-        if (\array_key_exists('enable_annotations', $config) && $config['enable_annotations']) {
-            $validatorBuilder->addMethodCall('enableAnnotationMapping', [true]);
+        if (\array_key_exists('enable_attributes', $config) && $config['enable_attributes']) {
+            $validatorBuilder->addMethodCall('enableAttributeMapping', [true]);
             if ($this->isInitializedConfigEnabled('annotations') && method_exists(ValidatorBuilder::class, 'setDoctrineAnnotationReader')) {
                 $validatorBuilder->addMethodCall('setDoctrineAnnotationReader', [new Reference('annotation_reader')]);
             }
@@ -1930,7 +1930,7 @@ class FrameworkExtension extends Extension
         }
 
         $serializerLoaders = [];
-        if (isset($config['enable_annotations']) && $config['enable_annotations']) {
+        if (isset($config['enable_attributes']) && $config['enable_attributes']) {
             if ($container->getParameter('kernel.debug')) {
                 $container->removeDefinition('serializer.mapping.cache_class_metadata_factory');
             }

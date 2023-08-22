@@ -14,7 +14,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\CssColor;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 /**
  * @author Mathieu Santostefano <msantostefano@protonmail.com>
@@ -24,7 +24,7 @@ final class CssColorTest extends TestCase
     public function testAttributes()
     {
         $metadata = new ClassMetadata(CssColorDummy::class);
-        $loader = new AnnotationLoader();
+        $loader = new AttributeLoader();
         self::assertTrue($loader->loadClassMetadata($metadata));
 
         [$aConstraint] = $metadata->properties['a']->getConstraints();

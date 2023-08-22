@@ -9,7 +9,7 @@
     <framework:config secret="s3cr3t" http-method-override="false" handle-all-throwables="true">
         <framework:annotations enabled="true" />
         <framework:php-errors log="true" />
-        <framework:validation enabled="true" enable-annotations="true" email-validation-mode="html5" />
+        <framework:validation enabled="true" enable-attributes="true" email-validation-mode="html5" />
     </framework:config>
 
     <services>

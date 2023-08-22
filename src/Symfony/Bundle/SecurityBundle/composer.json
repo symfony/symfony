@@ -39,7 +39,7 @@
         "symfony/dom-crawler": "^5.4|^6.0|^7.0",
         "symfony/expression-language": "^5.4|^6.0|^7.0",
         "symfony/form": "^5.4|^6.0|^7.0",
-        "symfony/framework-bundle": "^5.4|^6.0|^7.0",
+        "symfony/framework-bundle": "^6.4|^7.0",
         "symfony/http-client": "^5.4|^6.0|^7.0",
         "symfony/ldap": "^5.4|^6.0|^7.0",
         "symfony/process": "^5.4|^6.0|^7.0",
@@ -48,7 +48,7 @@
         "symfony/translation": "^5.4|^6.0|^7.0",
         "symfony/twig-bundle": "^5.4|^6.0|^7.0",
         "symfony/twig-bridge": "^5.4|^6.0|^7.0",
-        "symfony/validator": "^5.4|^6.0|^7.0",
+        "symfony/validator": "^6.4|^7.0",
         "symfony/yaml": "^5.4|^6.0|^7.0",
         "twig/twig": "^2.13|^3.0.4",
         "web-token/jwt-checker": "^3.1",
@@ -61,7 +61,7 @@
     "conflict": {
         "symfony/browser-kit": "<5.4",
         "symfony/console": "<5.4",
-        "symfony/framework-bundle": "<6.3",
+        "symfony/framework-bundle": "<6.4",
         "symfony/http-client": "<5.4",
         "symfony/ldap": "<5.4",
         "symfony/twig-bundle": "<5.4"

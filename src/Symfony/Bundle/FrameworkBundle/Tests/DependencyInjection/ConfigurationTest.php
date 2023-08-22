@@ -591,7 +591,7 @@ class ConfigurationTest extends TestCase
             ],
             'validation' => [
                 'enabled' => !class_exists(FullStack::class),
-                'enable_annotations' => !class_exists(FullStack::class),
+                'enable_attributes' => !class_exists(FullStack::class),
                 'static_method' => ['loadValidatorMetadata'],
                 'translation_domain' => 'validators',
                 'mapping' => [
@@ -612,7 +612,7 @@ class ConfigurationTest extends TestCase
             'serializer' => [
                 'default_context' => ['foo' => 'bar', JsonDecode::DETAILED_ERROR_MESSAGES => true],
                 'enabled' => true,
-                'enable_annotations' => !class_exists(FullStack::class),
+                'enable_attributes' => !class_exists(FullStack::class),
                 'mapping' => ['paths' => []],
             ],
             'property_access' => [

@@ -15,14 +15,14 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Unique;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 class UniqueTest extends TestCase
 {
     public function testAttributes()
     {
         $metadata = new ClassMetadata(UniqueDummy::class);
-        $loader = new AnnotationLoader();
+        $loader = new AttributeLoader();
         self::assertTrue($loader->loadClassMetadata($metadata));
 
         [$bConstraint] = $metadata->properties['b']->getConstraints();

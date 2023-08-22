@@ -32,7 +32,7 @@
         "symfony/ldap": "^5.4|^6.0|^7.0",
         "symfony/string": "^5.4|^6.0|^7.0",
         "symfony/translation": "^5.4|^6.0|^7.0",
-        "symfony/validator": "^5.4|^6.0|^7.0",
+        "symfony/validator": "^6.4|^7.0",
         "psr/log": "^1|^2|^3"
     },
     "conflict": {

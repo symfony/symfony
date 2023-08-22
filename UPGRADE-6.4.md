@@ -94,6 +94,8 @@ FrameworkBundle
  * Deprecate not setting the `framework.uid.default_uuid_version` config option; it will default to `7` in 7.0
  * Deprecate not setting the `framework.uid.time_based_uuid_version` config option; it will default to `7` in 7.0
  * Deprecate not setting the `framework.validation.email_validation_mode` config option; it will default to `html5` in 7.0
+ * Deprecate `framework.validation.enable_annotations`, use `framework.validation.enable_attributes` instead
+ * Deprecate `framework.serializer.enable_annotations`, use `framework.serializer.enable_attributes` instead
 
 HttpFoundation
 --------------
@@ -158,3 +160,6 @@ Validator
  * Deprecate passing an annotation reader to the constructor signature of `AnnotationLoader`
  * Deprecate `ValidatorBuilder::setDoctrineAnnotationReader()`
  * Deprecate `ValidatorBuilder::addDefaultDoctrineAnnotationReader()`
+ * Deprecate `ValidatorBuilder::enableAnnotationMapping()`, use `ValidatorBuilder::enableAttributeMapping()` instead
+ * Deprecate `ValidatorBuilder::disableAnnotationMapping()`, use `ValidatorBuilder::disableAttributeMapping()` instead
+ * Deprecate `AnnotationLoader`, use `AttributeLoader` instead

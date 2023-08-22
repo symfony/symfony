@@ -14,14 +14,14 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 class TypeTest extends TestCase
 {
     public function testAttributes()
     {
         $metadata = new ClassMetadata(TypeDummy::class);
-        self::assertTrue((new AnnotationLoader())->loadClassMetadata($metadata));
+        self::assertTrue((new AttributeLoader())->loadClassMetadata($metadata));
 
         [$aConstraint] = $metadata->properties['a']->getConstraints();
         self::assertSame('integer', $aConstraint->type);

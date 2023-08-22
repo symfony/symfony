@@ -18,13 +18,12 @@ use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 /**
  * @group legacy
  */
-class AnnotationLoaderWithLegacyAnnotationsTest extends AnnotationLoaderTest
+class AnnotationLoaderWithLegacyAnnotationsTest extends AttributeLoaderTest
 {
     use ExpectDeprecationTrait;
 
     public function testLoadClassMetadataReturnsTrueIfSuccessful()
     {
-        $this->expectDeprecation('Since symfony/validator 6.4: Passing a "Doctrine\Common\Annotations\AnnotationReader" instance as argument 1 to "Symfony\Component\Validator\Mapping\Loader\AnnotationLoader::__construct()" is deprecated, pass null or omit the parameter instead.');
         $this->expectDeprecation('Since symfony/validator 6.4: Class "Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity" uses Doctrine Annotations to configure validation constraints, which is deprecated. Use PHP attributes instead.');
         $this->expectDeprecation('Since symfony/validator 6.4: Property "Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity::$firstName" uses Doctrine Annotations to configure validation constraints, which is deprecated. Use PHP attributes instead.');
         $this->expectDeprecation('Since symfony/validator 6.4: Property "Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity::$childA" uses Doctrine Annotations to configure validation constraints, which is deprecated. Use PHP attributes instead.');
@@ -38,16 +37,8 @@ class AnnotationLoaderWithLegacyAnnotationsTest extends AnnotationLoaderTest
         parent::testLoadClassMetadataReturnsTrueIfSuccessful();
     }
 
-    public function testLoadClassMetadataReturnsFalseIfNotSuccessful()
-    {
-        $this->expectDeprecation('Since symfony/validator 6.4: Passing a "Doctrine\Common\Annotations\AnnotationReader" instance as argument 1 to "Symfony\Component\Validator\Mapping\Loader\AnnotationLoader::__construct()" is deprecated, pass null or omit the parameter instead.');
-
-        parent::testLoadClassMetadataReturnsFalseIfNotSuccessful();
-    }
-
     public function testLoadClassMetadata()
     {
-        $this->expectDeprecation('Since symfony/validator 6.4: Passing a "Doctrine\Common\Annotations\AnnotationReader" instance as argument 1 to "Symfony\Component\Validator\Mapping\Loader\AnnotationLoader::__construct()" is deprecated, pass null or omit the parameter instead.');
         $this->expectDeprecation('Since symfony/validator 6.4: Class "Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity" uses Doctrine Annotations to configure validation constraints, which is deprecated. Use PHP attributes instead.');
         $this->expectDeprecation('Since symfony/validator 6.4: Property "Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity::$firstName" uses Doctrine Annotations to configure validation constraints, which is deprecated. Use PHP attributes instead.');
         $this->expectDeprecation('Since symfony/validator 6.4: Property "Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity::$childA" uses Doctrine Annotations to configure validation constraints, which is deprecated. Use PHP attributes instead.');
@@ -63,7 +54,6 @@ class AnnotationLoaderWithLegacyAnnotationsTest extends AnnotationLoaderTest
 
     public function testLoadParentClassMetadata()
     {
-        $this->expectDeprecation('Since symfony/validator 6.4: Passing a "Doctrine\Common\Annotations\AnnotationReader" instance as argument 1 to "Symfony\Component\Validator\Mapping\Loader\AnnotationLoader::__construct()" is deprecated, pass null or omit the parameter instead.');
         $this->expectDeprecation('Since symfony/validator 6.4: Property "Symfony\Component\Validator\Tests\Fixtures\Annotation\EntityParent::$other" uses Doctrine Annotations to configure validation constraints, which is deprecated. Use PHP attributes instead.');
 
         parent::testLoadParentClassMetadata();
@@ -71,7 +61,6 @@ class AnnotationLoaderWithLegacyAnnotationsTest extends AnnotationLoaderTest
 
     public function testLoadClassMetadataAndMerge()
     {
-        $this->expectDeprecation('Since symfony/validator 6.4: Passing a "Doctrine\Common\Annotations\AnnotationReader" instance as argument 1 to "Symfony\Component\Validator\Mapping\Loader\AnnotationLoader::__construct()" is deprecated, pass null or omit the parameter instead.');
         $this->expectDeprecation('Since symfony/validator 6.4: Property "Symfony\Component\Validator\Tests\Fixtures\Annotation\EntityParent::$other" uses Doctrine Annotations to configure validation constraints, which is deprecated. Use PHP attributes instead.');
         $this->expectDeprecation('Since symfony/validator 6.4: Class "Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity" uses Doctrine Annotations to configure validation constraints, which is deprecated. Use PHP attributes instead.');
         $this->expectDeprecation('Since symfony/validator 6.4: Property "Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity::$firstName" uses Doctrine Annotations to configure validation constraints, which is deprecated. Use PHP attributes instead.');
@@ -88,7 +77,6 @@ class AnnotationLoaderWithLegacyAnnotationsTest extends AnnotationLoaderTest
 
     public function testLoadGroupSequenceProviderAnnotation()
     {
-        $this->expectDeprecation('Since symfony/validator 6.4: Passing a "Doctrine\Common\Annotations\AnnotationReader" instance as argument 1 to "Symfony\Component\Validator\Mapping\Loader\AnnotationLoader::__construct()" is deprecated, pass null or omit the parameter instead.');
         $this->expectDeprecation('Since symfony/validator 6.4: Class "Symfony\Component\Validator\Tests\Fixtures\Annotation\GroupSequenceProviderEntity" uses Doctrine Annotations to configure validation constraints, which is deprecated. Use PHP attributes instead.');
 
         parent::testLoadGroupSequenceProviderAnnotation();

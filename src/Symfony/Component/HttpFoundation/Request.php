@@ -239,6 +239,9 @@ class Request
         self::HEADER_X_FORWARDED_PREFIX => 'X_FORWARDED_PREFIX',
     ];
 
+    /** @var bool */
+    private $isIisRewrite = false;
+
     /**
      * @param array                $query      The GET parameters
      * @param array                $request    The POST parameters
@@ -1759,11 +1762,10 @@ class Request
     {
         $requestUri = '';
 
-        if ('1' == $this->server->get('IIS_WasUrlRewritten') && '' != $this->server->get('UNENCODED_URL')) {
+        if ($this->isIisRewrite() && '' != $this->server->get('UNENCODED_URL')) {
             // IIS7 with URL Rewrite: make sure we get the unencoded URL (double slash problem)
             $requestUri = $this->server->get('UNENCODED_URL');
             $this->server->remove('UNENCODED_URL');
-            $this->server->remove('IIS_WasUrlRewritten');
         } elseif ($this->server->has('REQUEST_URI')) {
             $requestUri = $this->server->get('REQUEST_URI');
 
@@ -1962,7 +1964,13 @@ class Request
      */
     private function getUrlencodedPrefix(string $string, string $prefix): ?string
     {
-        if (!str_starts_with(rawurldecode($string), $prefix)) {
+        if ($this->isIisRewrite()) {
+            // ISS with UrlRewriteModule might report SCRIPT_NAME/PHP_SELF with wrong case
+            // see https://github.com/php/php-src/issues/11981
+            if (0 !== stripos(rawurldecode($string), $prefix)) {
+                return null;
+            }
+        } elseif (!str_starts_with(rawurldecode($string), $prefix)) {
             return null;
         }
 
@@ -2090,5 +2098,21 @@ class Request
 
         // Now the IP chain contains only untrusted proxies and the client IP
         return $clientIps ? array_reverse($clientIps) : [$firstTrustedIp];
+    }
+
+    /**
+     * Is this IIS with UrlRewriteModule?
+     *
+     * This method consumes, caches and removed the IIS_WasUrlRewritten env var,
+     * so we don't inherit it to sub-requests.
+     */
+    private function isIisRewrite(): bool
+    {
+        if (1 === $this->server->getInt('IIS_WasUrlRewritten')) {
+            $this->isIisRewrite = true;
+            $this->server->remove('IIS_WasUrlRewritten');
+        }
+
+        return $this->isIisRewrite;
     }
 }

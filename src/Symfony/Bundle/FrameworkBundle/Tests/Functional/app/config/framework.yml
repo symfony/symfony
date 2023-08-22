@@ -4,7 +4,7 @@ framework:
     handle_all_throwables: true
     secret:        test
     router:        { resource: "%kernel.project_dir%/%kernel.test_case%/routing.yml", utf8: true }
-    validation:    { enabled: true, enable_annotations: true, email_validation_mode: html5 }
+    validation:    { enabled: true, enable_attributes: true, email_validation_mode: html5 }
     csrf_protection: true
     form:
         enabled: true

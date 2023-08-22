@@ -521,7 +521,7 @@ class RequestPayloadValueResolverTest extends TestCase
         $payload->title = 'A long title, so the validation passes';
 
         $serializer = new Serializer([new ObjectNormalizer()]);
-        $validator = (new ValidatorBuilder())->enableAnnotationMapping()->getValidator();
+        $validator = (new ValidatorBuilder())->enableAttributeMapping()->getValidator();
         $resolver = new RequestPayloadValueResolver($serializer, $validator);
 
         $request = Request::create('/', $method, $input);
@@ -547,7 +547,7 @@ class RequestPayloadValueResolverTest extends TestCase
         $input = ['price' => '50', 'title' => 'Too short'];
 
         $serializer = new Serializer([new ObjectNormalizer()]);
-        $validator = (new ValidatorBuilder())->enableAnnotationMapping()->getValidator();
+        $validator = (new ValidatorBuilder())->enableAttributeMapping()->getValidator();
         $resolver = new RequestPayloadValueResolver($serializer, $validator);
 
         $argument = new ArgumentMetadata('valid', RequestPayload::class, false, false, null, false, [

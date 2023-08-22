@@ -14,7 +14,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintChoiceWithPreset;
 
 class ChoiceTest extends TestCase
@@ -29,7 +29,7 @@ class ChoiceTest extends TestCase
     public function testAttributes()
     {
         $metadata = new ClassMetadata(ChoiceDummy::class);
-        $loader = new AnnotationLoader();
+        $loader = new AttributeLoader();
         self::assertTrue($loader->loadClassMetadata($metadata));
 
         /** @var Choice $aConstraint */

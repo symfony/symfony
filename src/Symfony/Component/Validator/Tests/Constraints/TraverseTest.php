@@ -14,7 +14,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Validator\Mapping\TraversalStrategy;
 
 class TraverseTest extends TestCase
@@ -22,7 +22,7 @@ class TraverseTest extends TestCase
     public function testPositiveAttributes()
     {
         $metadata = new ClassMetadata(TraverseDummy::class);
-        $loader = new AnnotationLoader();
+        $loader = new AttributeLoader();
         self::assertTrue($loader->loadClassMetadata($metadata));
         self::assertSame(TraversalStrategy::TRAVERSE, $metadata->getTraversalStrategy());
     }
@@ -30,7 +30,7 @@ class TraverseTest extends TestCase
     public function testNegativeAttribute()
     {
         $metadata = new ClassMetadata(DoNotTraverseMe::class);
-        $loader = new AnnotationLoader();
+        $loader = new AttributeLoader();
         self::assertTrue($loader->loadClassMetadata($metadata));
         self::assertSame(TraversalStrategy::NONE, $metadata->getTraversalStrategy());
     }

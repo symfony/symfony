@@ -21,6 +21,8 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 /**
  * Loads validation metadata using PHP attributes.
  *
+ * @deprecated since Symfony 6.4, use {@see AttributeLoader} instead
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Alexander M. Turek <me@derrabus.de>
  */

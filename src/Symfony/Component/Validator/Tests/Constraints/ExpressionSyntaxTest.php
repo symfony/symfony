@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\ExpressionSyntax;
 use Symfony\Component\Validator\Constraints\ExpressionSyntaxValidator;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 class ExpressionSyntaxTest extends TestCase
 {
@@ -41,7 +41,7 @@ class ExpressionSyntaxTest extends TestCase
         yield 'named arguments' => [new ExpressionSyntax(service: 'my_service')];
 
         $metadata = new ClassMetadata(ExpressionSyntaxDummy::class);
-        self::assertTrue((new AnnotationLoader())->loadClassMetadata($metadata));
+        self::assertTrue((new AttributeLoader())->loadClassMetadata($metadata));
 
         yield 'attribute' => [$metadata->properties['b']->constraints[0]];
     }
@@ -49,7 +49,7 @@ class ExpressionSyntaxTest extends TestCase
     public function testAttributes()
     {
         $metadata = new ClassMetadata(ExpressionSyntaxDummy::class);
-        self::assertTrue((new AnnotationLoader())->loadClassMetadata($metadata));
+        self::assertTrue((new AttributeLoader())->loadClassMetadata($metadata));
 
         [$aConstraint] = $metadata->properties['a']->getConstraints();
         self::assertNull($aConstraint->service);

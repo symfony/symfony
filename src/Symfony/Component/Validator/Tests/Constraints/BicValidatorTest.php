@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints\BicValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class BicValidatorTest extends ConstraintValidatorTestCase
@@ -74,7 +74,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
     public function testInvalidComparisonToPropertyPathFromAttribute()
     {
         $classMetadata = new ClassMetadata(BicDummy::class);
-        (new AnnotationLoader())->loadClassMetadata($classMetadata);
+        (new AttributeLoader())->loadClassMetadata($classMetadata);
 
         [$constraint] = $classMetadata->properties['bic1']->constraints;
 
@@ -116,7 +116,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
     public function testInvalidComparisonToValueFromAttribute()
     {
         $classMetadata = new ClassMetadata(BicDummy::class);
-        (new AnnotationLoader())->loadClassMetadata($classMetadata);
+        (new AttributeLoader())->loadClassMetadata($classMetadata);
 
         [$constraint] = $classMetadata->properties['bic1']->constraints;
 

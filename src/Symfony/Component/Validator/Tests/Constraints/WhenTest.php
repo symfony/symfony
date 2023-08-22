@@ -20,6 +20,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\MissingOptionsException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Validator\Tests\Constraints\Fixtures\WhenTestWithAttributes;
 
 final class WhenTest extends TestCase
@@ -43,7 +44,7 @@ final class WhenTest extends TestCase
 
     public function testAttributes()
     {
-        $loader = new AnnotationLoader();
+        $loader = new AttributeLoader();
         $metadata = new ClassMetadata(WhenTestWithAttributes::class);
 
         self::assertTrue($loader->loadClassMetadata($metadata));

@@ -14,14 +14,14 @@ namespace Symfony\Bridge\Doctrine\Tests\Validator\Constraints;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 class UniqueEntityTest extends TestCase
 {
     public function testAttributeWithDefaultProperty()
     {
         $metadata = new ClassMetadata(UniqueEntityDummyOne::class);
-        $loader = new AnnotationLoader();
+        $loader = new AttributeLoader();
         self::assertTrue($loader->loadClassMetadata($metadata));
 
         /** @var UniqueEntity $constraint */
@@ -35,7 +35,7 @@ class UniqueEntityTest extends TestCase
     public function testAttributeWithCustomizedService()
     {
         $metadata = new ClassMetadata(UniqueEntityDummyTwo::class);
-        $loader = new AnnotationLoader();
+        $loader = new AttributeLoader();
         self::assertTrue($loader->loadClassMetadata($metadata));
 
         /** @var UniqueEntity $constraint */
@@ -50,7 +50,7 @@ class UniqueEntityTest extends TestCase
     public function testAttributeWithGroupsAndPaylod()
     {
         $metadata = new ClassMetadata(UniqueEntityDummyThree::class);
-        $loader = new AnnotationLoader();
+        $loader = new AttributeLoader();
         self::assertTrue($loader->loadClassMetadata($metadata));
 
         /** @var UniqueEntity $constraint */

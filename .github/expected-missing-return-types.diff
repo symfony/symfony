@@ -65,6 +65,13 @@ diff --git a/src/Symfony/Component/Console/Command/Command.php b/src/Symfony/Com
 +    protected function configure(): void
      {
      }
+@@ -181,5 +181,5 @@ class Command
+      * @see setCode()
+      */
+-    protected function execute(InputInterface $input, OutputInterface $output)
++    protected function execute(InputInterface $input, OutputInterface $output): int
+     {
+         throw new LogicException('You must override the execute() method in the concrete command class.');
 @@ -195,5 +195,5 @@ class Command
       * @return void
       */

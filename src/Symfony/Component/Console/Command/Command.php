@@ -180,7 +180,7 @@ class Command
      *
      * @see setCode()
      */
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         throw new LogicException('You must override the execute() method in the concrete command class.');
     }

@@ -28,11 +28,20 @@ final class DefaultLoginRateLimiter extends AbstractRequestRateLimiter
 {
     private RateLimiterFactory $globalFactory;
     private RateLimiterFactory $localFactory;
+    private string $secret;
 
-    public function __construct(RateLimiterFactory $globalFactory, RateLimiterFactory $localFactory)
+    /**
+     * @param non-empty-string $secret A secret to use for hashing the IP address and username
+     */
+    public function __construct(RateLimiterFactory $globalFactory, RateLimiterFactory $localFactory, #[\SensitiveParameter] string $secret = '')
     {
+        if ('' === $secret) {
+            trigger_deprecation('symfony/security-http', '6.4', 'Calling "%s()" with an empty secret is deprecated. A non-empty secret will be mandatory in version 7.0.', __METHOD__);
+            // throw new \Symfony\Component\Security\Core\Exception\InvalidArgumentException('A non-empty secret is required.');
+        }
         $this->globalFactory = $globalFactory;
         $this->localFactory = $localFactory;
+        $this->secret = $secret;
     }
 
     protected function getLimiters(Request $request): array
@@ -41,8 +50,13 @@ final class DefaultLoginRateLimiter extends AbstractRequestRateLimiter
         $username = preg_match('//u', $username) ? mb_strtolower($username, 'UTF-8') : strtolower($username);
 
         return [
-            $this->globalFactory->create($request->getClientIp()),
-            $this->localFactory->create($username.'-'.$request->getClientIp()),
+            $this->globalFactory->create($this->hash($request->getClientIp())),
+            $this->localFactory->create($this->hash($username.'-'.$request->getClientIp())),
         ];
+    }
+
+    private function hash(string $data): string
+    {
+        return strtr(substr(base64_encode(hash_hmac('sha256', $data, $this->secret, true)), 0, 8), '/+', '._');
     }
 }

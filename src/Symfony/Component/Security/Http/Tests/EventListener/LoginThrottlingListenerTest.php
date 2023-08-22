@@ -47,7 +47,7 @@ class LoginThrottlingListenerTest extends TestCase
             'limit' => 6,
             'interval' => '1 minute',
         ], new InMemoryStorage());
-        $limiter = new DefaultLoginRateLimiter($globalLimiter, $localLimiter);
+        $limiter = new DefaultLoginRateLimiter($globalLimiter, $localLimiter, '$3cre7');
 
         $this->listener = new LoginThrottlingListener($this->requestStack, $limiter);
     }

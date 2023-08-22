@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by stof at 2023-08-18T13:24:35Z
+
+This should be in the same PR than https://github.com/symfony/symfony/pull/51426 instead of being a separate PR IMO, as this is about the FrameworkBundle semantic configuration related to the same change.
+We don't require each PR to change only one of the packages. It is actually quite the opposite. The main reason to have a mono-repo is to allow to have one change spanning multiple packages.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-08-22T11:41:38Z
+
+Addressed your comments @derrabus, thank you!

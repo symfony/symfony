@@ -389,7 +389,7 @@ class FrameworkExtension extends Extension
         } else {
             $container->getDefinition('argument_resolver.request_payload')
                 ->setArguments([])
-                ->addError('You can neither use "#[MapRequestPayload]", "#[MapQueryString]" nor #[MapRequestHeader] since the Serializer component is not '
+                ->addError('You can neither use "#[MapRequestPayload]" nor "#[MapQueryString]" since the Serializer component is not '
                     .(class_exists(Serializer::class) ? 'enabled. Try setting "framework.serializer.enabled" to true.' : 'installed. Try running "composer require symfony/serializer-pack".')
                 )
                 ->addTag('container.error')

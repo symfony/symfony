@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpKernel\Attribute;
 
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestPayloadValueResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestHeaderValueResolver;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 
@@ -22,9 +22,10 @@ class MapRequestHeader extends ValueResolver
     public ArgumentMetadata $metadata;
 
     public function __construct(
+        public readonly string|array|null $name = null,
         public readonly array $serializationContext = [],
         public readonly string|GroupSequence|array|null $validationGroups = null,
-        string $resolver = RequestPayloadValueResolver::class,
+        string $resolver = RequestHeaderValueResolver::class,
         public readonly int $validationFailedStatusCode = Response::HTTP_UNPROCESSABLE_ENTITY,
     ) {
         parent::__construct($resolver);

@@ -16,9 +16,6 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\LogicException;
 
-/**
- * @Target({"CLASS", "PROPERTY", "METHOD", "ANNOTATION"})
- */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class When extends Composite
 {

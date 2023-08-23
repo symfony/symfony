@@ -29,7 +29,6 @@ use Symfony\Component\Validator\Constraints\Sequentially;
 use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 
@@ -37,7 +36,7 @@ class AttributeLoaderTest extends TestCase
 {
     public function testLoadClassMetadataReturnsTrueIfSuccessful()
     {
-        $loader = $this->createAnnotationLoader();
+        $loader = $this->createAttributeLoader();
         $metadata = new ClassMetadata($this->getFixtureNamespace().'\Entity');
 
         $this->assertTrue($loader->loadClassMetadata($metadata));
@@ -45,7 +44,7 @@ class AttributeLoaderTest extends TestCase
 
     public function testLoadClassMetadataReturnsFalseIfNotSuccessful()
     {
-        $loader = $this->createAnnotationLoader();
+        $loader = $this->createAttributeLoader();
         $metadata = new ClassMetadata('\stdClass');
 
         $this->assertFalse($loader->loadClassMetadata($metadata));
@@ -53,7 +52,7 @@ class AttributeLoaderTest extends TestCase
 
     public function testLoadClassMetadata()
     {
-        $loader = $this->createAnnotationLoader();
+        $loader = $this->createAttributeLoader();
         $namespace = $this->getFixtureNamespace();
 
         $metadata = new ClassMetadata($namespace.'\Entity');
@@ -105,11 +104,11 @@ class AttributeLoaderTest extends TestCase
     }
 
     /**
-     * Test MetaData merge with parent annotation.
+     * Test MetaData merge with parent attribute.
      */
     public function testLoadParentClassMetadata()
     {
-        $loader = $this->createAnnotationLoader();
+        $loader = $this->createAttributeLoader();
         $namespace = $this->getFixtureNamespace();
 
         // Load Parent MetaData
@@ -124,11 +123,11 @@ class AttributeLoaderTest extends TestCase
     }
 
     /**
-     * Test MetaData merge with parent annotation.
+     * Test MetaData merge with parent attribute.
      */
     public function testLoadClassMetadataAndMerge()
     {
-        $loader = $this->createAnnotationLoader();
+        $loader = $this->createAttributeLoader();
         $namespace = $this->getFixtureNamespace();
 
         // Load Parent MetaData
@@ -196,9 +195,9 @@ class AttributeLoaderTest extends TestCase
         $this->assertInstanceOf(NotNull::class, $otherMetadata[1]->getConstraints()[0]);
     }
 
-    public function testLoadGroupSequenceProviderAnnotation()
+    public function testLoadGroupSequenceProviderAttribute()
     {
-        $loader = $this->createAnnotationLoader();
+        $loader = $this->createAttributeLoader();
         $namespace = $this->getFixtureNamespace();
 
         $metadata = new ClassMetadata($namespace.'\GroupSequenceProviderEntity');
@@ -211,7 +210,7 @@ class AttributeLoaderTest extends TestCase
         $this->assertEquals($expected, $metadata);
     }
 
-    protected function createAnnotationLoader(): AnnotationLoader
+    protected function createAttributeLoader(): AttributeLoader
     {
         return new AttributeLoader();
     }

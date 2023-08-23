@@ -26,7 +26,7 @@ class Callback extends Constraint
 
     public function __construct(array|string|callable $callback = null, array $groups = null, mixed $payload = null, array $options = [])
     {
-        // Invocation through annotations with an array parameter only
+        // Invocation through attributes with an array parameter only
         if (\is_array($callback) && 1 === \count($callback) && isset($callback['value'])) {
             $callback = $callback['value'];
         }

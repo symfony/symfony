@@ -31,8 +31,10 @@ CHANGELOG
  * Deprecate not setting the `framework.php_errors.log` config option; it will default to `true` in 7.0
  * Deprecate not setting the `framework.session.cookie_secure` config option; it will default to `auto` in 7.0
  * Deprecate not setting the `framework.session.cookie_samesite` config option; it will default to `lax` in 7.0
- * Deprecate not setting the `framework.session.handler_id` config option; it will default to `session.handler.native_file` when `framework.session.save_path` is set or `null` otherwise in 7.0
- * Deprecate not setting the `framework.session.save_path` config option when `framework.session.handler_id` is not set; it will default to `null` in 7.0
+ * Deprecate not setting either `framework.session.handler_id` or `save_path` config options; `handler_id` will
+   default to null in 7.0 if `save_path` is not set and to `session.handler.native_file` otherwise
+ * Deprecate not setting the `framework.session.handler_id` config option; it will default to null,
+   unless `save_path` is set, which will make it default to `session.handler.native_file` in 7.0
  * Deprecate not setting the `framework.uid.default_uuid_version` config option; it will default to `7` in 7.0
  * Deprecate not setting the `framework.uid.time_based_uuid_version` config option; it will default to `7` in 7.0
  * Deprecate not setting the `framework.validation.email_validation_mode` config option; it will default to `html5` in 7.0

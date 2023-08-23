@@ -127,11 +127,14 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
                 throw new LogicException(sprintf('Found SerializedName and SerializedPath annotations on property "%s" of class "%s".', $name, $class));
             }
 
-            $groups = $metadata->getGroups();
-            if (!$groups && ($context[AbstractNormalizer::GROUPS] ?? [])) {
+            $metadataGroups = $metadata->getGroups();
+            $contextGroups = (array) ($context[AbstractNormalizer::GROUPS] ?? []);
+
+            if ($contextGroups && !$metadataGroups) {
                 continue;
             }
-            if ($groups && !array_intersect($groups, (array) ($context[AbstractNormalizer::GROUPS] ?? []))) {
+
+            if ($metadataGroups && !array_intersect($metadataGroups, $contextGroups) && !\in_array('*', $contextGroups, true)) {
                 continue;
             }
 

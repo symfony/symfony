@@ -19,6 +19,7 @@ use Symfony\Component\AssetMapper\AssetMapperRepository;
 use Symfony\Component\AssetMapper\Command\AssetMapperCompileCommand;
 use Symfony\Component\AssetMapper\Command\DebugAssetMapperCommand;
 use Symfony\Component\AssetMapper\Command\ImportMapExportCommand;
+use Symfony\Component\AssetMapper\Command\ImportMapInstallCommand;
 use Symfony\Component\AssetMapper\Command\ImportMapRemoveCommand;
 use Symfony\Component\AssetMapper\Command\ImportMapRequireCommand;
 use Symfony\Component\AssetMapper\Command\ImportMapUpdateCommand;
@@ -200,6 +201,10 @@ return static function (ContainerConfigurator $container) {
             ->tag('console.command')
 
         ->set('asset_mapper.importmap.command.export', ImportMapExportCommand::class)
+            ->args([service('asset_mapper.importmap.manager')])
+            ->tag('console.command')
+
+        ->set('asset_mapper.importmap.command.install', ImportMapInstallCommand::class)
             ->args([service('asset_mapper.importmap.manager')])
             ->tag('console.command')
     ;

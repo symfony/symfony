@@ -373,6 +373,43 @@ class ImportMapManagerTest extends TestCase
         $this->assertSame('contents of cowsay.js', $actualContents);
     }
 
+    public function testDownloadMissingPackages()
+    {
+        $rootDir = __DIR__.'/../fixtures/download';
+        $manager = $this->createImportMapManager(['assets' => ''], $rootDir);
+
+        $this->packageResolver->expects($this->once())
+            ->method('resolvePackages')
+            ->willReturn([
+                self::resolvedPackage('@hotwired/stimulus', 'https://cdn.jsdelivr.net/npm/stimulus@3.2.1/+esm', true, content: 'contents of stimulus.js'),
+            ])
+        ;
+
+        $downloadedPackages = $manager->downloadMissingPackages();
+        $actualImportMap = require $rootDir.'/importmap.php';
+        $expectedImportMap = [
+            '@hotwired/stimulus' => [
+                'downloaded_to' => 'vendor/@hotwired/stimulus.js',
+                'url' => 'https://cdn.jsdelivr.net/npm/stimulus@3.2.1/+esm',
+            ],
+            'lodash' => [
+                'downloaded_to' => 'vendor/lodash.js',
+                'url' => 'https://ga.jspm.io/npm:lodash@4.17.21/lodash.js',
+            ],
+        ];
+        $this->assertEquals($expectedImportMap, $actualImportMap);
+
+        $expectedDownloadedFiles = [
+            'assets/vendor/@hotwired/stimulus.js' => 'contents of stimulus.js',
+        ];
+        foreach ($expectedDownloadedFiles as $file => $expectedContents) {
+            $this->assertFileExists($rootDir.'/'.$file);
+            $actualContents = file_get_contents($rootDir.'/'.$file);
+            $this->assertSame($expectedContents, $actualContents);
+            unlink($rootDir.'/'.$file);
+        }
+    }
+
     /**
      * @dataProvider getPackageNameTests
      */

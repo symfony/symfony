@@ -77,6 +77,7 @@
         "phpdocumentor/reflection-docblock": "<3.2.2",
         "phpdocumentor/type-resolver": "<1.4.0",
         "symfony/asset": "<6.4",
+        "symfony/asset-mapper": "<6.4",
         "symfony/clock": "<6.4",
         "symfony/console": "<6.4",
         "symfony/dotenv": "<6.4",

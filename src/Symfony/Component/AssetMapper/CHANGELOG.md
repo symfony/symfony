@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Mark the component as non experimental
+ * Add a `importmap:install` command to download all missing downloaded packages
 
 6.3
 ---

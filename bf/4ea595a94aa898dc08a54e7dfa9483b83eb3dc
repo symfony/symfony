@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by Victor-Truhanovich at 2023-08-16T09:39:26Z
+
+The PR was recreated because Milestone was not appointed in PR https://github.com/symfony/symfony/pull/51394
+
+---------------------------------------------------------------------------
+
+by mtarld at 2023-08-22T06:36:54Z
+
+Just one last thing, you should take care about fabbot errors: https://fabbot.io/report/symfony/symfony/51399/418bdea59c858a48dca18e493353454e16628aa1
+
+---------------------------------------------------------------------------
+
+by mtarld at 2023-08-22T09:24:26Z
+
+Oh, sorry my bad, I didn't check why fabbot was yelling... Actually it's a false positive, the comments are legit here!
+
+---------------------------------------------------------------------------
+
+by Victor-Truhanovich at 2023-08-22T10:06:49Z
+
+@mtarld I rollbacked code style changes

@@ -33,6 +33,7 @@ use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
@@ -138,6 +139,29 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertSame('notfoo', $test->foo);
         $this->assertSame('baz', $test->baz);
         $this->assertNull($test->notfoo);
+    }
+
+    public function testDenormalizeWithSnakeCaseNestedAttributes()
+    {
+        $factory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $normalizer = new ObjectNormalizer($factory, new CamelCaseToSnakeCaseNameConverter());
+        $data = [
+            'one' => [
+                'two_three' => 'fooBar',
+            ],
+        ];
+        $test = $normalizer->denormalize($data, SnakeCaseNestedDummy::class, 'any');
+        $this->assertSame('fooBar', $test->fooBar);
+    }
+
+    public function testNormalizeWithSnakeCaseNestedAttributes()
+    {
+        $factory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $normalizer = new ObjectNormalizer($factory, new CamelCaseToSnakeCaseNameConverter());
+        $dummy = new SnakeCaseNestedDummy();
+        $dummy->fooBar = 'fooBar';
+        $test = $normalizer->normalize($dummy, 'any');
+        $this->assertSame(['one' => ['two_three' => 'fooBar']], $test);
     }
 
     public function testDenormalizeWithNestedAttributes()
@@ -859,6 +883,14 @@ class NestedDummyWithConstructor
         public $baz,
     ) {
     }
+}
+
+class SnakeCaseNestedDummy
+{
+    /**
+     * @SerializedPath("[one][two_three]")
+     */
+    public $fooBar;
 }
 
 /**

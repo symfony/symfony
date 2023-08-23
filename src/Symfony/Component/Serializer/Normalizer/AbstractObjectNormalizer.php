@@ -326,13 +326,15 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $mappedClass = $this->getMappedClass($normalizedData, $type, $context);
 
         $nestedAttributes = $this->getNestedAttributes($mappedClass);
-        $nestedData = [];
+        $nestedData = $originalNestedData = [];
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
         foreach ($nestedAttributes as $property => $serializedPath) {
             if (null === $value = $propertyAccessor->getValue($normalizedData, $serializedPath)) {
                 continue;
             }
-            $nestedData[$property] = $value;
+            $convertedProperty = $this->nameConverter ? $this->nameConverter->normalize($property, $mappedClass, $format, $context) : $property;
+            $nestedData[$convertedProperty] = $value;
+            $originalNestedData[$property] = $value;
             $normalizedData = $this->removeNestedValue($serializedPath->getElements(), $normalizedData);
         }
 
@@ -345,7 +347,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             if ($this->nameConverter) {
                 $notConverted = $attribute;
                 $attribute = $this->nameConverter->denormalize($attribute, $resolvedClass, $format, $context);
-                if (isset($nestedData[$notConverted]) && !isset($nestedData[$attribute])) {
+                if (isset($nestedData[$notConverted]) && !isset($originalNestedData[$attribute])) {
                     throw new LogicException(sprintf('Duplicate values for key "%s" found. One value is set via the SerializedPath annotation: "%s", the other one is set via the SerializedName annotation: "%s".', $notConverted, implode('->', $nestedAttributes[$notConverted]->getElements()), $attribute));
                 }
             }

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-08-22T17:26:51Z
+
+Just for the record, I'm working on deprecating the serializer's AnnotationLoader too (and replacing it by an AttributeLoader). 🙂 I'll include this same undeprecation in the coming PR

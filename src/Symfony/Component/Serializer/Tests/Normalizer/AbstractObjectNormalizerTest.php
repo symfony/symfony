@@ -866,9 +866,7 @@ class NestedDummyWithConstructor
 
 class SnakeCaseNestedDummy
 {
-    /**
-     * @SerializedPath("[one][two_three]")
-     */
+    #[SerializedPath('[one][two_three]')]
     public $fooBar;
 }
 

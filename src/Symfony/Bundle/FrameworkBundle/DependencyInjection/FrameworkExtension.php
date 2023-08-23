@@ -181,7 +181,6 @@ use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Validator\ObjectInitializerInterface;
 use Symfony\Component\Validator\Validation;
-use Symfony\Component\Validator\ValidatorBuilder;
 use Symfony\Component\Webhook\Controller\WebhookController;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
 use Symfony\Component\Workflow;
@@ -1232,10 +1231,15 @@ class FrameworkExtension extends Extension
         $container->setParameter('session.storage.options', $options);
 
         // session handler (the internal callback registered with PHP session management)
-        if (null === $config['handler_id']) {
+        if (null === ($config['handler_id'] ?? $config['save_path'] ?? null)) {
             $config['save_path'] = null;
             $container->setAlias('session.handler', 'session.handler.native');
         } else {
+            $config['handler_id'] ??= 'session.handler.native_file';
+
+            if (!\array_key_exists('save_path', $config)) {
+                $config['save_path'] = '%kernel.cache_dir%/sessions';
+            }
             $container->resolveEnvPlaceholders($config['handler_id'], null, $usedEnvs);
 
             if ($usedEnvs || preg_match('#^[a-z]++://#', $config['handler_id'])) {

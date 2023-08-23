@@ -669,7 +669,7 @@ class Configuration implements ConfigurationInterface
                             trigger_deprecation('symfony/framework-bundle', '6.4', 'Not setting the "framework.session.cookie_samesite" config option is deprecated. It will default to "lax" in 7.0.');
                         }
 
-                        if (!\array_key_exists('handler_id', $v['session']) && !\array_key_exists('handler_id', $v['save_path'])) {
+                        if (!\array_key_exists('handler_id', $v['session']) && !\array_key_exists('save_path', $v['session'])) {
                             trigger_deprecation('symfony/framework-bundle', '6.4', 'Not setting either "framework.session.handler_id" or "save_path" config options is deprecated; "handler_id" will default to null in 7.0 if "save_path" is not set and to "session.handler.native_file" otherwise.');
                         }
                     }

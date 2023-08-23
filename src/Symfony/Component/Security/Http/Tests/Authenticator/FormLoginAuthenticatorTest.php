@@ -23,6 +23,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerI
 use Symfony\Component\Security\Http\Authenticator\FormLoginAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\Tests\Authenticator\Fixtures\PasswordUpgraderProvider;
 
@@ -124,6 +125,44 @@ class FormLoginAuthenticatorTest extends TestCase
 
         $this->setUpAuthenticator(['post_only' => $postOnly]);
         $this->authenticator->authenticate($request);
+    }
+
+    /**
+     * @dataProvider postOnlyDataProvider
+     */
+    public function testHandleNonStringPasswordWithArray(bool $postOnly)
+    {
+        $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessage('The key "_password" must be a string, "array" given.');
+
+        $request = Request::create('/login_check', 'POST', ['_username' => 'foo', '_password' => []]);
+        $request->setSession($this->createSession());
+
+        $this->setUpAuthenticator(['post_only' => $postOnly]);
+        $this->authenticator->authenticate($request);
+    }
+
+    /**
+     * @dataProvider postOnlyDataProvider
+     */
+    public function testHandleNonStringPasswordWithToString(bool $postOnly)
+    {
+        $passwordObject = new class() {
+            public function __toString()
+            {
+                return 's$cr$t';
+            }
+        };
+
+        $request = Request::create('/login_check', 'POST', ['_username' => 'foo', '_password' => $passwordObject]);
+        $request->setSession($this->createSession());
+
+        $this->setUpAuthenticator(['post_only' => $postOnly]);
+        $passport = $this->authenticator->authenticate($request);
+
+        /** @var PasswordCredentials $credentialsBadge */
+        $credentialsBadge = $passport->getBadge(PasswordCredentials::class);
+        $this->assertSame('s$cr$t', $credentialsBadge->getPassword());
     }
 
     public static function postOnlyDataProvider()

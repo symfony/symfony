@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-08-10T08:21:23Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.4" but it seems your PR description refers to branch "6.3".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by jmsche at 2023-08-10T08:28:56Z
+
+Hmm the error spotted by fabbot can't be applied as is. Should I put backticks around the command instead?
+
+AppVeyor, Integration (8.1) & Unit Tests (8.1) failures are unrelated to this PR.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-08-10T13:53:42Z
+
+> Hmm the error spotted by fabbot can't be applied as is
+
+Couldn't we apply it? It is suggesting:
+
+> Run "php bin/console importmap:require "%s" --download"
+
+Are you worried about how the the `"` around the entire command and. the extra `"` around the argument look? If so, I think it's ok: the full `bin/console` command is legal.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-08-10T14:01:24Z
+
+Anyway, the command will be _better_ with quotes arounds the package name. Depending on the package name, it might require quoting to make the command valid.
+
+---------------------------------------------------------------------------
+
+by jmsche at 2023-08-11T06:20:17Z
+
+Added quotes around the package name :)
+
+---------------------------------------------------------------------------
+
+by jmsche at 2023-08-16T09:04:51Z
+
+@weaverryan will be done :)

@@ -57,7 +57,10 @@ use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberTwo;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyObjectWithEnumConstructor;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyObjectWithEnumProperty;
 use Symfony\Component\Serializer\Tests\Fixtures\FalseBuiltInDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\FooImplementationDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\FooInterfaceDummyDenormalizer;
 use Symfony\Component\Serializer\Tests\Fixtures\NormalizableTraversableDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\ObjectCollectionPropertyDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Php74Full;
 use Symfony\Component\Serializer\Tests\Fixtures\Php80WithPromotedTypedConstructor;
 use Symfony\Component\Serializer\Tests\Fixtures\TraversableDummy;
@@ -708,6 +711,21 @@ class SerializerTest extends TestCase
         $this->expectException(NotNormalizableValueException::class);
         $serializer = new Serializer([new ArrayDenormalizer()], ['json' => new JsonEncoder()]);
         $serializer->deserialize('["42"]', 'int[]', 'json');
+    }
+
+    public function testDeserializeOnObjectWithObjectCollectionProperty()
+    {
+        $serializer = new Serializer([new FooInterfaceDummyDenormalizer(), new ObjectNormalizer(null, null, null, new PhpDocExtractor())], [new JsonEncoder()]);
+
+        $obj = $serializer->deserialize('{"foo":[{"name":"bar"}]}', ObjectCollectionPropertyDummy::class, 'json');
+        $this->assertInstanceOf(ObjectCollectionPropertyDummy::class, $obj);
+
+        $fooDummyObjects = $obj->getFoo();
+        $this->assertCount(1, $fooDummyObjects);
+
+        $fooDummyObject = $fooDummyObjects[0];
+        $this->assertInstanceOf(FooImplementationDummy::class, $fooDummyObject);
+        $this->assertSame('bar', $fooDummyObject->name);
     }
 
     public function testDeserializeWrappedScalar()

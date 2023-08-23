@@ -359,9 +359,12 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
 
                 $supportedTypes = $normalizer->getSupportedTypes($format);
 
+                $doesClassRepresentCollection = str_ends_with($class, '[]');
+
                 foreach ($supportedTypes as $supportedType => $isCacheable) {
                     if (\in_array($supportedType, ['*', 'object'], true)
                         || $class !== $supportedType && ('object' !== $genericType || !is_subclass_of($class, $supportedType))
+                        && !($doesClassRepresentCollection && str_ends_with($supportedType, '[]') && is_subclass_of(strstr($class, '[]', true), strstr($supportedType, '[]', true)))
                     ) {
                         continue;
                     }

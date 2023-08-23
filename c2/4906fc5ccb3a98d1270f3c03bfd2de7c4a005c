@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by jmsche at 2023-08-11T06:52:02Z
+
+AppVeyor failure unrelated.
+I guess Unit Tests 8.2 fail because this branch is not merged in 7.0 yet :smile:
+Not sure about Psalm, I think it's okay.
+
+---------------------------------------------------------------------------
+
+by jmsche at 2023-08-16T11:24:37Z
+
+Updated PR with rewording, thrown exception is no version found & added a test :)

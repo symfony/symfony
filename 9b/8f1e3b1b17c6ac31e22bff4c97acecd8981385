@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-08-23T09:50:12Z
+
+I'd say [this PR](https://github.com/symfony/symfony/pull/51455) should be merged before this one to fix the errors raised by `AttributeLoader`.
+
+I fixed the `Configuration.php` file, thank you for the edits on it about default values

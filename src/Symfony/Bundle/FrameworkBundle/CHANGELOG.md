@@ -19,8 +19,6 @@ CHANGELOG
  * Deprecate not setting the `framework.session.cookie_samesite` config option; it will default to `lax` in 7.0
  * Deprecate not setting either `framework.session.handler_id` or `save_path` config options; `handler_id` will
    default to null in 7.0 if `save_path` is not set and to `session.handler.native_file` otherwise
- * Deprecate not setting the `framework.session.handler_id` config option; it will default to null,
-   unless `save_path` is set, which will make it default to `session.handler.native_file` in 7.0
  * Deprecate not setting the `framework.uid.default_uuid_version` config option; it will default to `7` in 7.0
  * Deprecate not setting the `framework.uid.time_based_uuid_version` config option; it will default to `7` in 7.0
  * Deprecate not setting the `framework.validation.email_validation_mode` config option; it will default to `html5` in 7.0

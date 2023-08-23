@@ -30,9 +30,10 @@ use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 
-class AnnotationLoaderTest extends TestCase
+class AttributeLoaderTest extends TestCase
 {
     public function testLoadClassMetadataReturnsTrueIfSuccessful()
     {
@@ -212,7 +213,7 @@ class AnnotationLoaderTest extends TestCase
 
     protected function createAnnotationLoader(): AnnotationLoader
     {
-        return new AnnotationLoader();
+        return new AttributeLoader();
     }
 
     protected function getFixtureNamespace(): string

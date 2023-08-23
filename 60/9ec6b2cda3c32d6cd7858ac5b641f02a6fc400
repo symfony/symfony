@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2023-08-23T12:12:07Z
+
+Please also include the other two changes from `AbstractObjectNormalizerTest`: `AnnotationLoader` is constructed with an annotation reader twice which shouldn't be necessary anymore.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-08-23T12:23:32Z
+
+One less thing to change in the other PRs is always good to take :slightly_smiling_face: I updated this one

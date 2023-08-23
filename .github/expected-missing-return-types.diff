@@ -521,3 +521,13 @@ diff --git a/src/Symfony/Contracts/Translation/LocaleAwareInterface.php b/src/Sy
 +    public function setLocale(string $locale): void;
  
      /**
+diff --git a/src/Symfony/Contracts/Translation/TranslatorTrait.php b/src/Symfony/Contracts/Translation/TranslatorTrait.php
+--- a/src/Symfony/Contracts/Translation/TranslatorTrait.php
++++ b/src/Symfony/Contracts/Translation/TranslatorTrait.php
+@@ -26,5 +26,5 @@ trait TranslatorTrait
+      * @return void
+      */
+-    public function setLocale(string $locale)
++    public function setLocale(string $locale): void
+     {
+         $this->locale = $locale;

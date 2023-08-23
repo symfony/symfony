@@ -142,7 +142,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testDenormalizeWithSnakeCaseNestedAttributes()
     {
-        $factory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $factory = new ClassMetadataFactory(new AnnotationLoader());
         $normalizer = new ObjectNormalizer($factory, new CamelCaseToSnakeCaseNameConverter());
         $data = [
             'one' => [
@@ -155,7 +155,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testNormalizeWithSnakeCaseNestedAttributes()
     {
-        $factory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $factory = new ClassMetadataFactory(new AnnotationLoader());
         $normalizer = new ObjectNormalizer($factory, new CamelCaseToSnakeCaseNameConverter());
         $dummy = new SnakeCaseNestedDummy();
         $dummy->fooBar = 'fooBar';
@@ -866,9 +866,7 @@ class NestedDummyWithConstructor
 
 class SnakeCaseNestedDummy
 {
-    /**
-     * @SerializedPath("[one][two_three]")
-     */
+    #[SerializedPath('[one][two_three]')]
     public $fooBar;
 }
 

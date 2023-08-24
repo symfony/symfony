@@ -412,7 +412,7 @@ class ImportMapManager
             if (null !== $entryOptions->path) {
                 if (!$asset = $this->assetMapper->getAsset($entryOptions->path)) {
                     if ($entryOptions->isDownloaded) {
-                        throw new \InvalidArgumentException(sprintf('The "%s" downloaded asset is missing. Run "php bin/console importmap:require "%s" --download".', $entryOptions->path, $entryOptions->importName));
+                        throw new \InvalidArgumentException(sprintf('The "%s" downloaded asset is missing. Run "php bin/console importmap:install".', $entryOptions->path));
                     }
 
                     throw new \InvalidArgumentException(sprintf('The asset "%s" mentioned in "%s" cannot be found in any asset map paths.', $entryOptions->path, basename($this->importMapConfigPath)));

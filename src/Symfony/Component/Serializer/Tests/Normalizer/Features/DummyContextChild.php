@@ -13,7 +13,7 @@ namespace Symfony\Component\Serializer\Tests\Normalizer\Features;
 
 use Symfony\Component\Serializer\Annotation\Context;
 
-#[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY | \Attribute::IS_REPEATABLE)]
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY | \Attribute::IS_REPEATABLE)]
 class DummyContextChild extends Context
 {
 }

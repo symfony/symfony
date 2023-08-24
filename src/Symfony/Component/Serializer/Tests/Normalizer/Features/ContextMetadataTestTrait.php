@@ -82,6 +82,7 @@ trait ContextMetadataTestTrait
         return [
             [ContextMetadataDummy::class],
             [ContextChildMetadataDummy::class],
+            [ClassAndPropertyContextMetadataDummy::class],
         ];
     }
 
@@ -100,7 +101,7 @@ trait ContextMetadataTestTrait
 class ContextMetadataDummy
 {
     /**
-     * @var \DateTime
+     * @var \DateTimeImmutable
      */
     #[Groups(['extended', 'simple'])]
     #[Context([DateTimeNormalizer::FORMAT_KEY => \DateTimeInterface::RFC3339])]
@@ -118,7 +119,7 @@ class ContextMetadataDummy
 class ContextChildMetadataDummy
 {
     /**
-     * @var \DateTime
+     * @var \DateTimeImmutable
      */
     #[Groups(['extended', 'simple'])]
     #[DummyContextChild([DateTimeNormalizer::FORMAT_KEY => \DateTimeInterface::RFC3339])]
@@ -133,10 +134,28 @@ class ContextChildMetadataDummy
     public $date;
 }
 
+#[Context(context: [DateTimeNormalizer::FORMAT_KEY => \DateTimeInterface::RFC3339])]
+#[Context(
+    context: [DateTimeNormalizer::FORMAT_KEY => \DateTimeInterface::RFC3339_EXTENDED],
+    groups: ['extended'],
+)]
+class ClassAndPropertyContextMetadataDummy
+{
+    /**
+     * @var \DateTimeImmutable
+     */
+    #[Groups(['extended', 'simple'])]
+    #[Context(
+        denormalizationContext: [DateTimeNormalizer::FORMAT_KEY => 'd/m/Y'],
+        groups: ['simple'],
+    )]
+    public $date;
+}
+
 class ContextMetadataNamingDummy
 {
     /**
-     * @var \DateTime
+     * @var \DateTimeImmutable
      */
     #[Context([DateTimeNormalizer::FORMAT_KEY => 'd/m/Y'])]
     public $createdAt;

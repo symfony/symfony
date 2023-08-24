@@ -134,6 +134,7 @@ class CliDumper extends AbstractDumper
     public function dumpScalar(Cursor $cursor, string $type, string|int|float|bool|null $value)
     {
         $this->dumpKey($cursor);
+        $this->collapseNextHash = $this->expandNextHash = false;
 
         $style = 'const';
         $attr = $cursor->attr;
@@ -197,6 +198,7 @@ class CliDumper extends AbstractDumper
     public function dumpString(Cursor $cursor, string $str, bool $bin, int $cut)
     {
         $this->dumpKey($cursor);
+        $this->collapseNextHash = $this->expandNextHash = false;
         $attr = $cursor->attr;
 
         if ($bin) {
@@ -290,6 +292,7 @@ class CliDumper extends AbstractDumper
         $this->colors ??= $this->supportsColors();
 
         $this->dumpKey($cursor);
+        $this->expandNextHash = false;
         $attr = $cursor->attr;
 
         if ($this->collapseNextHash) {

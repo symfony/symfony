@@ -13,9 +13,10 @@ namespace Symfony\Component\Routing\Tests\Loader;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Routing\Loader\AnnotationFileLoader;
-use Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\FooClass;
+use Symfony\Component\Routing\Loader\AttributeFileLoader;
+use Symfony\Component\Routing\Tests\Fixtures\AttributedClasses\FooClass;
 use Symfony\Component\Routing\Tests\Fixtures\AttributesFixtures\AttributesClassParamAfterCommaController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributesFixtures\AttributesClassParamAfterParenthesisController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributesFixtures\AttributesClassParamInlineAfterCommaController;
@@ -25,30 +26,32 @@ use Symfony\Component\Routing\Tests\Fixtures\AttributesFixtures\AttributesClassP
 use Symfony\Component\Routing\Tests\Fixtures\AttributesFixtures\AttributesClassParamQuotedAfterCommaController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributesFixtures\AttributesClassParamQuotedAfterParenthesisController;
 use Symfony\Component\Routing\Tests\Fixtures\OtherAnnotatedClasses\VariadicClass;
-use Symfony\Component\Routing\Tests\Fixtures\TraceableAnnotationClassLoader;
+use Symfony\Component\Routing\Tests\Fixtures\TraceableAttributeClassLoader;
 
-class AnnotationFileLoaderTest extends TestCase
+class AttributeFileLoaderTest extends TestCase
 {
-    private AnnotationFileLoader $loader;
-    private TraceableAnnotationClassLoader $classLoader;
+    use ExpectDeprecationTrait;
+
+    private AttributeFileLoader $loader;
+    private TraceableAttributeClassLoader $classLoader;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->classLoader = new TraceableAnnotationClassLoader();
-        $this->loader = new AnnotationFileLoader(new FileLocator(), $this->classLoader);
+        $this->classLoader = new TraceableAttributeClassLoader();
+        $this->loader = new AttributeFileLoader(new FileLocator(), $this->classLoader);
     }
 
     public function testLoad()
     {
-        self::assertCount(0, $this->loader->load(__DIR__.'/../Fixtures/AnnotatedClasses/FooClass.php'));
+        self::assertCount(0, $this->loader->load(__DIR__.'/../Fixtures/AttributedClasses/FooClass.php'));
         self::assertSame([FooClass::class], $this->classLoader->foundClasses);
     }
 
     public function testLoadTraitWithClassConstant()
     {
-        self::assertCount(0, $this->loader->load(__DIR__.'/../Fixtures/AnnotatedClasses/FooTrait.php'));
+        self::assertCount(0, $this->loader->load(__DIR__.'/../Fixtures/AttributedClasses/FooTrait.php'));
         self::assertSame([], $this->classLoader->foundClasses);
     }
 
@@ -70,8 +73,8 @@ class AnnotationFileLoaderTest extends TestCase
      */
     public function testLoadAnonymousClass()
     {
-        $this->classLoader = new TraceableAnnotationClassLoader(new AnnotationReader());
-        $this->loader = new AnnotationFileLoader(new FileLocator(), $this->classLoader);
+        $this->classLoader = new TraceableAttributeClassLoader(new AnnotationReader());
+        $this->loader = new AttributeFileLoader(new FileLocator(), $this->classLoader);
 
         self::assertCount(0, $this->loader->load(__DIR__.'/../Fixtures/OtherAnnotatedClasses/AnonymousClassInTrait.php'));
         self::assertSame([], $this->classLoader->foundClasses);
@@ -79,7 +82,7 @@ class AnnotationFileLoaderTest extends TestCase
 
     public function testLoadAbstractClass()
     {
-        self::assertNull($this->loader->load(__DIR__.'/../Fixtures/AnnotatedClasses/AbstractClass.php'));
+        self::assertNull($this->loader->load(__DIR__.'/../Fixtures/AttributedClasses/AbstractClass.php'));
         self::assertSame([], $this->classLoader->foundClasses);
     }
 
@@ -90,9 +93,19 @@ class AnnotationFileLoaderTest extends TestCase
         $this->assertTrue($this->loader->supports($fixture), '->supports() returns true if the resource is loadable');
         $this->assertFalse($this->loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
 
-        $this->assertTrue($this->loader->supports($fixture, 'annotation'), '->supports() checks the resource type if specified');
         $this->assertTrue($this->loader->supports($fixture, 'attribute'), '->supports() checks the resource type if specified');
         $this->assertFalse($this->loader->supports($fixture, 'foo'), '->supports() checks the resource type if specified');
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testSupportsAnnotations()
+    {
+        $fixture = __DIR__.'/../Fixtures/annotated.php';
+
+        $this->expectDeprecation('Since symfony/routing 6.4: The "annotation" route type is deprecated, use the "attribute" route type instead.');
+        $this->assertTrue($this->loader->supports($fixture, 'annotation'), '->supports() checks the resource type if specified');
     }
 
     public function testLoadAttributesClassAfterComma()

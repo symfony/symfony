@@ -139,6 +139,10 @@ FrameworkBundle
   | `framework.validation.email_validation_mode` | `'loose'`                  | `'html5'`                                                                   |
  * Deprecate `framework.validation.enable_annotations`, use `framework.validation.enable_attributes` instead
  * Deprecate `framework.serializer.enable_annotations`, use `framework.serializer.enable_attributes` instead
+ * Deprecate the `routing.loader.annotation` service, use the `routing.loader.attribute` service instead
+ * Deprecate the `routing.loader.annotation.directory` service, use the `routing.loader.attribute.directory` service instead
+ * Deprecate the `routing.loader.annotation.file` service, use the `routing.loader.attribute.file` service instead
+ * Deprecate `AnnotatedRouteControllerLoader`, use `AttributeRouteControllerLoader` instead
 
 HttpFoundation
 --------------
@@ -181,6 +185,9 @@ Routing
  * [BC break] Add native return type to `AnnotationClassLoader::setResolver()`
  * Deprecate Doctrine annotations support in favor of native attributes
  * Deprecate passing an annotation reader as first argument to `AnnotationClassLoader` (new signature: `__construct(?string $env = null)`)
+ * Deprecate `AnnotationClassLoader`, use `AttributeClassLoader` instead
+ * Deprecate `AnnotationDirectoryLoader`, use `AttributeDirectoryLoader` instead
+ * Deprecate `AnnotationFileLoader`, use `AttributeFileLoader` instead
 
 Security
 --------

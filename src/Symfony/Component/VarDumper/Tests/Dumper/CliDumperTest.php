@@ -13,6 +13,8 @@ namespace Symfony\Component\VarDumper\Tests\Dumper;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Caster\CutStub;
+use Symfony\Component\VarDumper\Cloner\Data;
+use Symfony\Component\VarDumper\Cloner\Stub;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\AbstractDumper;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
@@ -547,6 +549,44 @@ EOTXT
         $dumper->dump($cloner->cloneVar($value));
 
         $this->assertSame($expectedOut, $out);
+    }
+
+    public function testCollapse()
+    {
+        $stub = new Stub();
+        $stub->type = Stub::TYPE_OBJECT;
+        $stub->class = 'stdClass';
+        $stub->position = 1;
+
+        $data = new Data([
+            [
+                $stub,
+            ],
+            [
+                "\0~collapse=1\0foo" => 123,
+                "\0+\0bar" => [1 => 2],
+            ],
+            [
+                'bar' => 123,
+            ]
+        ]);
+
+        $dumper = new CliDumper();
+        $dump = $dumper->dump($data, true);
+
+        $this->assertSame(
+            <<<'EOTXT'
+{
+  foo: 123
+  +"bar": array:1 [
+    "bar" => 123
+  ]
+}
+
+EOTXT
+            ,
+            $dump
+        );
     }
 
     private function getSpecialVars()

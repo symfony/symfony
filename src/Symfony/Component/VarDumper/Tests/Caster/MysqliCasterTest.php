@@ -30,7 +30,6 @@ class MysqliCasterTest extends TestCase
 
         $xCast = <<<EODUMP
 mysqli_driver {%A
-  +reconnect: false
   +report_mode: 3
 }
 EODUMP;

@@ -156,7 +156,7 @@ class DataPart extends TextPart
             throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
         }
         foreach (['body', 'charset', 'subtype', 'disposition', 'name', 'encoding'] as $name) {
-            if (null !== $this->_parent[$name] && !\is_string($this->_parent[$name])) {
+            if (null !== $this->_parent[$name] && !\is_string($this->_parent[$name]) && !$this->_parent[$name] instanceof File) {
                 throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
             }
             $r = new \ReflectionProperty(TextPart::class, $name);

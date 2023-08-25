@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-08-11T03:46:42Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.4" but it seems your PR description refers to branch "6.3".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by Seb33300 at 2023-08-16T08:26:28Z
+
+> Please add test cases with `_stateless => true` for both success and failure handlers to prevent regressions
+
+@chalasr tests added
+
+---------------------------------------------------------------------------
+
+by stloyd at 2023-08-21T14:21:13Z
+
+@wouterj @chalasr Could you have a second look at this?
+
+I can confirm the fix on HWIOAuthBundle. Before:
+```
+PHPUnit 9.6.11 by Sebastian Bergmann and contributors.
+
+Testing /Users/stloyd/Documents/HWIOAuthBundle/tests/Functional
+
+<!-- Session was used while the request was declared stateless. (500 Internal Server Error) -->
+// error page printed
+```
+
+After:
+```
+PHPUnit 9.6.11 by Sebastian Bergmann and contributors.
+
+Testing /Users/stloyd/Documents/HWIOAuthBundle/tests/Functional
+
+Time: 00:00.090, Memory: 18.00 MB
+
+OK (1 test, 4 assertions)
+```
+
+---------------------------------------------------------------------------
+
+by stloyd at 2023-08-25T08:53:10Z
+
+@fabpot / @nicolas-grekas or anyone else can check this fix? I would love to have it in near 6.3 release
+
+---------------------------------------------------------------------------
+
+by Seb33300 at 2023-08-25T09:26:44Z
+
+August is usually a period of holidays in europe so @chalasr and @wouterj may not be available this week.
+Let's see next week :)

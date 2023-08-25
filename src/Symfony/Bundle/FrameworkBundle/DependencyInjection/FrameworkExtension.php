@@ -1851,12 +1851,6 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('serializer.normalizer.translatable');
         }
 
-        // compat with Symfony < 6.3
-        if (!is_subclass_of(ProblemNormalizer::class, SerializerAwareInterface::class)) {
-            $container->getDefinition('serializer.normalizer.problem')
-                ->setArguments(['%kernel.debug%']);
-        }
-
         $serializerLoaders = [];
         if (isset($config['enable_attributes']) && $config['enable_attributes']) {
             if ($container->getParameter('kernel.debug')) {

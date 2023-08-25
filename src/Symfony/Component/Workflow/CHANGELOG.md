@@ -10,6 +10,7 @@ CHANGELOG
  * Add a profiler
  * Add support for multiline descriptions in PlantUML diagrams
  * Add PHP attributes to register listeners and guards
+ * Deprecate `GuardEvent::getContext()` method that will be removed in 7.0
 
 6.2
 ---

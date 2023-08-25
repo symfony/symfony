@@ -162,3 +162,8 @@ Validator
  * Deprecate `ValidatorBuilder::enableAnnotationMapping()`, use `ValidatorBuilder::enableAttributeMapping()` instead
  * Deprecate `ValidatorBuilder::disableAnnotationMapping()`, use `ValidatorBuilder::disableAttributeMapping()` instead
  * Deprecate `AnnotationLoader`, use `AttributeLoader` instead
+
+Workflow
+--------
+
+* Deprecate `GuardEvent::getContext()` method that will be removed in 7.0

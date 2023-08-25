@@ -1,0 +1,72 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-07-25T20:04:39Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by guillaumesmo at 2023-07-25T22:44:26Z
+
+The fix is less clean than expected because the new OIDC feature relies on this bug.
+
+The Badge user loader used to have priority over the firewall user provider. This was changed so that the OIDC Badge user loader only kicks in when no user provider is set (not sure how, however).
+
+So the priorities are now as follows:
+1. Provided user loader in the new Badge constructor
+2. Firewall user provider
+3. OIDC user loader
+
+Alternative solutions:
+- add a configuration to oidc to enable the default user loader
+- add a property to UserBadge to indicate the loader must not override the firewall user loader, instead of the callable wrapper
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-07-26T17:20:35Z
+
+Can you add a test case please?
+
+@vincentchalamon can you have a look please?
+
+---------------------------------------------------------------------------
+
+by guillaumesmo at 2023-08-23T08:44:18Z
+
+Hi all, what can I do to move this PR forward?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-08-23T14:31:41Z
+
+"BC break" is not a proper description when fixing a regression. It doesn't tell which case is solved.
+Can you please figure out something a bit more descriptive?
+
+---------------------------------------------------------------------------
+
+by guillaumesmo at 2023-08-23T14:43:32Z
+
+> "BC break" is not a proper description when fixing a regression. It doesn't tell which case is solved. Can you please figure out something a bit more descriptive?
+
+Sure, done

@@ -7,6 +7,22 @@ in 5.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.4.0...v5.4.1
 
+* 5.4.28 (2023-08-26)
+
+ * bug #51474 [Serializer] Fix wrong InvalidArgumentException thrown (mtarld)
+ * bug #51473 [VarDumper] Fix managing collapse state in CliDumper (nicolas-grekas)
+ * bug #51445 [Security] FormLoginAuthenticator: fail for non-string password (dmaicher)
+ * bug #51424 [HttpFoundation] Fix base URI detection on IIS with UrlRewriteModule (derrabus)
+ * bug #48840 [Validator] Dump Valid constraints on debug command (macintoshplus)
+ * bug #51223 [Console] Fix linewraps in `OutputFormatter` (maxbeckers)
+ * bug #51307 [DependencyInjection] fix dump xml with array/object/enum default value (Jean-Beru)
+ * bug #51328 [Messenger] Always return bool from messenger amqp connection nack (Danielss89)
+ * bug #51295 [Mailer] update Brevo SMTP host (bastien-wink)
+ * bug #51301 [FrameworkBundle] add missing default-doctrine-dbal-provider cache pool attribute to XSD (xabbuh)
+ * bug #51296 [Process] Fix silencing `wait` when using a sigchild-enabled binary (nicolas-grekas)
+ * bug #51201 [Workflow] fix MermaidDumper when place contains special char (lyrixx)
+ * bug #51061 [DoctrineBridge] Bugfix - Allow to remove LazyLoaded listeners by object (VincentLanglet)
+
 * 5.4.27 (2023-07-31)
 
  * bug #51178 [Finder] Revert "Fix children condition in ExcludeDirectoryFilterIterator" (derrabus)

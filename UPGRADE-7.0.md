@@ -490,6 +490,7 @@ Workflow
 --------
 
  * Require explicit argument when calling `Definition::setInitialPlaces()`
+ * `GuardEvent::getContext()` method has been removed. Method was not supposed to be called within guard event listeners as it always returned an empty array anyway.
 
 Yaml
 ----

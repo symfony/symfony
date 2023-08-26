@@ -147,7 +147,7 @@ final class MailerSendApiTransport extends AbstractApiTransport
             $filename = $headers->getHeaderParameter('Content-Disposition', 'filename');
 
             $att = [
-                'content' => $attachment->bodyToString(),
+                'content' => base64_encode($attachment->getBody()),
                 'filename' => $filename,
             ];
 

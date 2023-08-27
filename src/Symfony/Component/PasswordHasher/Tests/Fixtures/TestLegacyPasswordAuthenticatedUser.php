@@ -41,11 +41,6 @@ final class TestLegacyPasswordAuthenticatedUser implements LegacyPasswordAuthent
         return;
     }
 
-    public function getUsername(): string
-    {
-        return $this->username;
-    }
-
     public function getUserIdentifier(): string
     {
         return $this->username;

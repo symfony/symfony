@@ -115,10 +115,6 @@ class FakeCustomToken implements TokenInterface
     {
     }
 
-    public function getUsername(): string
-    {
-    }
-
     public function getUserIdentifier(): string
     {
     }

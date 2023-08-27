@@ -17,11 +17,6 @@ final class CustomUser implements UserInterface
         $this->roles = $roles;
     }
 
-    public function getUsername(): string
-    {
-        return $this->username;
-    }
-
     public function getUserIdentifier(): string
     {
         return $this->username;

@@ -1790,13 +1790,14 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('serializer.normalizer.mime_message');
         }
 
+        if ($container->getParameter('kernel.debug')) {
+            $container->removeDefinition('serializer.mapping.cache_class_metadata_factory');
+        }
+
         $serializerLoaders = [];
         if (isset($config['enable_annotations']) && $config['enable_annotations']) {
             if (\PHP_VERSION_ID < 80000 && !$this->annotationsConfigEnabled) {
                 throw new \LogicException('"enable_annotations" on the serializer cannot be set as the PHP version is lower than 8 and Annotations support is disabled. Consider upgrading PHP.');
-            }
-            if ($container->getParameter('kernel.debug')) {
-                $container->removeDefinition('serializer.mapping.cache_class_metadata_factory');
             }
 
             $annotationLoader = new Definition(

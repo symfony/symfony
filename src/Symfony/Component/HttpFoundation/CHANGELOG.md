@@ -4,6 +4,9 @@ CHANGELOG
 7.1
 ---
 
+ * Add optional `$expirationParameter` argument to `UriSigner::__construct()`
+ * Add optional `$expiration` argument to `UriSigner::sign()`
+ * Rename `$parameter` argument of `UriSigner::__construct()` to `$hashParameter`
  * Add `UploadedFile::getClientOriginalPath()`
 
 7.0

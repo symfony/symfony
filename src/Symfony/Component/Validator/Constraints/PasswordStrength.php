@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
-final class PasswordStrength extends Constraint
+class PasswordStrength extends Constraint
 {
     public const STRENGTH_VERY_WEAK = 0;
     public const STRENGTH_WEAK = 1;

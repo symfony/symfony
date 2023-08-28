@@ -14,6 +14,7 @@ CHANGELOG
  * Deprecate `ValidatorBuilder::enableAnnotationMapping()`, use `ValidatorBuilder::enableAttributeMapping()` instead
  * Deprecate `ValidatorBuilder::disableAnnotationMapping()`, use `ValidatorBuilder::disableAttributeMapping()` instead
  * Deprecate `AnnotationLoader`, use `AttributeLoader` instead
+ * Remove `final` modifier on `PasswordStrength` and `PasswordStrengthValidator`
 
 6.3
 ---

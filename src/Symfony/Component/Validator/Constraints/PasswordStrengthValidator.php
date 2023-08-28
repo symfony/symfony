@@ -16,7 +16,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
-final class PasswordStrengthValidator extends ConstraintValidator
+class PasswordStrengthValidator extends ConstraintValidator
 {
     /**
      * @param (\Closure(string):PasswordStrength::STRENGTH_*)|null $passwordStrengthEstimator

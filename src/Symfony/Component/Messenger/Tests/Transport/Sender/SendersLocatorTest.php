@@ -56,17 +56,19 @@ class SendersLocatorTest extends TestCase
     {
         $firstSender = $this->createMock(SenderInterface::class);
         $secondSender = $this->createMock(SenderInterface::class);
+        $thirdSender = $this->createMock(SenderInterface::class);
         $sendersLocator = $this->createContainer([
             'first' => $firstSender,
             'second' => $secondSender,
+            'third' => $thirdSender,
         ]);
         $locator = new SendersLocator([
             DummyMessage::class => ['first'],
-            '*' => ['second'],
+            '*' => ['second', 'third'],
         ], $sendersLocator);
 
         $this->assertSame(['first' => $firstSender], iterator_to_array($locator->getSenders(new Envelope(new DummyMessage('a')))), 'Unexpected senders for configured message');
-        $this->assertSame(['second' => $secondSender], iterator_to_array($locator->getSenders(new Envelope(new SecondMessage()))), 'Unexpected senders for unconfigured message');
+        $this->assertSame(['second' => $secondSender, 'third' => $thirdSender], iterator_to_array($locator->getSenders(new Envelope(new SecondMessage()))), 'Unexpected senders for unconfigured message');
     }
 
     private function createContainer(array $senders): ContainerInterface

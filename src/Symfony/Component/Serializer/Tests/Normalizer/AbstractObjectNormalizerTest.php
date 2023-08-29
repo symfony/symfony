@@ -36,6 +36,7 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\BackedEnumNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -768,6 +769,23 @@ class AbstractObjectNormalizerTest extends TestCase
 
         $this->assertSame('called', $object->bar);
     }
+
+    public function testDenormalizeUnionOfEnums()
+    {
+        $serializer = new Serializer([
+            new BackedEnumNormalizer(),
+            new ObjectNormalizer(
+                classMetadataFactory: new ClassMetadataFactory(new AnnotationLoader()),
+                propertyTypeExtractor: new PropertyInfoExtractor([], [new ReflectionExtractor()]),
+            ),
+        ]);
+
+        $normalized = $serializer->normalize(new DummyWithEnumUnion(EnumA::A));
+        $this->assertEquals(new DummyWithEnumUnion(EnumA::A), $serializer->denormalize($normalized, DummyWithEnumUnion::class));
+
+        $normalized = $serializer->normalize(new DummyWithEnumUnion(EnumB::B));
+        $this->assertEquals(new DummyWithEnumUnion(EnumB::B), $serializer->denormalize($normalized, DummyWithEnumUnion::class));
+    }
 }
 
 class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
@@ -1147,5 +1165,23 @@ class NotSerializable
     public function __sleep(): array
     {
         throw new \Error('not serializable');
+    }
+}
+
+enum EnumA: string
+{
+    case A = 'a';
+}
+
+enum EnumB: string
+{
+    case B = 'b';
+}
+
+class DummyWithEnumUnion
+{
+    public function __construct(
+        public readonly EnumA|EnumB $enum,
+    ) {
     }
 }

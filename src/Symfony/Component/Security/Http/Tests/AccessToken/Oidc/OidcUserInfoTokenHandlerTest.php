@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\OidcUser;
 use Symfony\Component\Security\Http\AccessToken\Oidc\OidcUserInfoTokenHandler;
+use Symfony\Component\Security\Http\Authenticator\FallbackUserLoader;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -47,7 +48,7 @@ class OidcUserInfoTokenHandlerTest extends TestCase
         $userBadge = (new OidcUserInfoTokenHandler($clientMock, null, $claim))->getUserBadgeFrom($accessToken);
         $actualUser = $userBadge->getUserLoader()();
 
-        $this->assertEquals(new UserBadge($expected, fn () => $expectedUser, $claims), $userBadge);
+        $this->assertEquals(new UserBadge($expected, new FallbackUserLoader(fn () => $expectedUser), $claims), $userBadge);
         $this->assertInstanceOf(OidcUser::class, $actualUser);
         $this->assertEquals($expectedUser, $actualUser);
         $this->assertEquals($claims, $userBadge->getAttributes());

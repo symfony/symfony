@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Http\AccessToken\AccessTokenHandlerInterface;
 use Symfony\Component\Security\Http\AccessToken\Oidc\Exception\MissingClaimException;
+use Symfony\Component\Security\Http\Authenticator\FallbackUserLoader;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -46,7 +47,7 @@ final class OidcUserInfoTokenHandler implements AccessTokenHandlerInterface
             }
 
             // UserLoader argument can be overridden by a UserProvider on AccessTokenAuthenticator::authenticate
-            return new UserBadge($claims[$this->claim], fn () => $this->createUser($claims), $claims);
+            return new UserBadge($claims[$this->claim], new FallbackUserLoader(fn () => $this->createUser($claims)), $claims);
         } catch (\Exception $e) {
             $this->logger?->error('An error occurred on OIDC server.', [
                 'error' => $e->getMessage(),

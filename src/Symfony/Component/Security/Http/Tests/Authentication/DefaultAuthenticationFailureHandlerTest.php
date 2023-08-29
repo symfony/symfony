@@ -47,6 +47,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
 
         $this->session = $this->createMock(SessionInterface::class);
         $this->request = $this->createMock(Request::class);
+        $this->request->attributes = new ParameterBag(['_stateless' => false]);
         $this->request->expects($this->any())->method('getSession')->willReturn($this->session);
         $this->exception = $this->getMockBuilder(AuthenticationException::class)->onlyMethods(['getMessage'])->getMock();
     }
@@ -84,6 +85,17 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
     public function testExceptionIsPersistedInSession()
     {
         $this->session->expects($this->once())
+            ->method('set')->with(SecurityRequestAttributes::AUTHENTICATION_ERROR, $this->exception);
+
+        $handler = new DefaultAuthenticationFailureHandler($this->httpKernel, $this->httpUtils, [], $this->logger);
+        $handler->onAuthenticationFailure($this->request, $this->exception);
+    }
+
+    public function testExceptionIsNotPersistedInSessionOnStatelessRequest()
+    {
+        $this->request->attributes = new ParameterBag(['_stateless' => true]);
+
+        $this->session->expects($this->never())
             ->method('set')->with(SecurityRequestAttributes::AUTHENTICATION_ERROR, $this->exception);
 
         $handler = new DefaultAuthenticationFailureHandler($this->httpKernel, $this->httpUtils, [], $this->logger);

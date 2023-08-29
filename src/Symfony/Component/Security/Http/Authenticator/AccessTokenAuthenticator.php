@@ -59,7 +59,7 @@ class AccessTokenAuthenticator implements AuthenticatorInterface
         }
 
         $userBadge = $this->accessTokenHandler->getUserBadgeFrom($accessToken);
-        if ($this->userProvider) {
+        if ($this->userProvider && (null === $userBadge->getUserLoader() || $userBadge->getUserLoader() instanceof FallbackUserLoader)) {
             $userBadge->setUserLoader($this->userProvider->loadUserByIdentifier(...));
         }
 

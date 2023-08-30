@@ -552,11 +552,6 @@ class CustomToken implements TokenInterface
         $this->user = $user;
     }
 
-    public function getUsername(): string
-    {
-        return $this->user->getUserIdentifier();
-    }
-
     public function getUserIdentifier(): string
     {
         return $this->getUserIdentifier();

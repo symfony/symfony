@@ -12,9 +12,15 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\Scheduler\Messenger\SchedulerTransportFactory;
+use Symfony\Component\Scheduler\Messenger\ServiceCallMessageHandler;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
+        ->set('scheduler.messenger.service_call_message_handler', ServiceCallMessageHandler::class)
+            ->args([
+                tagged_locator('scheduler.task'),
+            ])
+            ->tag('messenger.message_handler')
         ->set('scheduler.messenger_transport_factory', SchedulerTransportFactory::class)
             ->args([
                 tagged_locator('scheduler.schedule_provider', 'name'),

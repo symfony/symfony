@@ -10,6 +10,9 @@ services:
     Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummySchedule:
         autoconfigure: true
 
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyTask:
+        autoconfigure: true
+
     clock:
         synthetic: true
 

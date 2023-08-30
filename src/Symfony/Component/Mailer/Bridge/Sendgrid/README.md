@@ -17,25 +17,29 @@ where:
  - `KEY` is your Sendgrid API Key
 
 
-Webhook:
---------
-Create route:
+Webhook
+-------
+
+Create a route:
+
 ```yaml
 framework:
     webhook:
         routing:
             sendgrid:
                 service: mailer.webhook.request_parser.sendgrid
-                secret: '!SENDGRID_VALIDATION_SECRET!' #Leave blank if you dont want to use the signature validation
+                secret: '!SENDGRID_VALIDATION_SECRET!' # Leave blank if you dont want to use the signature validation
 ```
-Create consumer:
+
+And a consume:
+
 ```php
 #[\Symfony\Component\RemoteEvent\Attribute\AsRemoteEventConsumer(name: 'sendgrid')]
 class SendGridConsumer implements ConsumerInterface
 {
     public function consume(RemoteEvent|MailerDeliveryEvent $event): void
     {
-        //your code
+        // your code
     }
 }
 ```

@@ -115,6 +115,13 @@ abstract class AbstractTransport implements TransportInterface
         return array_map(fn (Address $a) => $a->toString(), $addresses);
     }
 
+    public function setLogger(LoggerInterface $logger): static
+    {
+        $this->logger = $logger;
+
+        return $this;
+    }
+
     protected function getLogger(): LoggerInterface
     {
         return $this->logger;

@@ -20,10 +20,12 @@
         "symfony/mailer": "^5.4.21|^6.2.7|^7.0"
     },
     "require-dev": {
-        "symfony/http-client": "^5.4|^6.0|^7.0"
+        "symfony/http-client": "^5.4|^6.0|^7.0",
+        "symfony/webhook": "^6.3|^7.0"
     },
     "conflict": {
-        "symfony/mime": "<6.2"
+        "symfony/mime": "<6.2",
+        "symfony/http-foundation": "<6.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Mailer\\Bridge\\Sendgrid\\": "" },

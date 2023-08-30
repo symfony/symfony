@@ -32,6 +32,13 @@ final class GuardEvent extends Event
         $this->transitionBlockerList = new TransitionBlockerList();
     }
 
+    public function getContext(): array
+    {
+        trigger_deprecation('symfony/workflow', '6.4', 'The %s::getContext() method is deprecated and will be removed in 7.0. You should no longer call this method as it always returns an empty array when invoked within a guard listener.', __CLASS__);
+
+        return parent::getContext();
+    }
+
     public function getTransition(): Transition
     {
         return parent::getTransition();

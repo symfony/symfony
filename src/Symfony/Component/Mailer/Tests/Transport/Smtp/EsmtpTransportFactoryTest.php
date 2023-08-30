@@ -110,6 +110,23 @@ class EsmtpTransportFactoryTest extends TransportFactoryTestCase
         ];
 
         $transport = new EsmtpTransport('example.com', 465, true, null, $logger);
+        /** @var SocketStream $stream */
+        $stream = $transport->getStream();
+        $streamOptions = $stream->getStreamOptions();
+        $streamOptions['ssl']['peer_fingerprint'] = '6A1CF3B08D175A284C30BC10DE19162307C7286E';
+        $stream->setStreamOptions($streamOptions);
+
+        yield [
+            new Dsn('smtps', 'example.com', '', '', 465, ['peer_fingerprint' => '6A1CF3B08D175A284C30BC10DE19162307C7286E']),
+            $transport,
+        ];
+
+        yield [
+            Dsn::fromString('smtps://:@example.com?peer_fingerprint=6A1CF3B08D175A284C30BC10DE19162307C7286E'),
+            $transport,
+        ];
+
+        $transport = new EsmtpTransport('example.com', 465, true, null, $logger);
         $transport->setLocalDomain('example.com');
 
         yield [

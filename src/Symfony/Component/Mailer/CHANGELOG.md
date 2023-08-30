@@ -6,6 +6,11 @@ CHANGELOG
 
  * Remove the OhMySmtp bridge in favor of the MailPace bridge
 
+6.4
+---
+
+ * Add DSN parameter `peer_fingerprint` to verify TLS certificate fingerprint
+
 6.3
 ---
 

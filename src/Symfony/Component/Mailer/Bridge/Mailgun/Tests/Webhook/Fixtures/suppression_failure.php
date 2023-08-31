@@ -6,7 +6,7 @@ $wh = new MailerDeliveryEvent(MailerDeliveryEvent::DROPPED, 'G9Bn5sl1TC6nu79C8C0
 $wh->setRecipientEmail('alice@example.com');
 $wh->setTags(['my_tag_1', 'my_tag_2']);
 $wh->setMetadata(['my_var_1' => 'Mailgun Variable #1', 'my-var-2' => 'awesome']);
-$wh->setDate(\DateTimeImmutable::createFromFormat('U.u', 1521233195.375624));
+$wh->setDate(\DateTimeImmutable::createFromFormat('U.u', '1521233195.375624'));
 $wh->setReason('Not delivering to previously bounced address');
 
 return $wh;

@@ -50,8 +50,8 @@ final class MailgunPayloadConverter implements PayloadConverterInterface
             };
             $event = new MailerEngagementEvent($name, $payload['id'], $payload);
         }
-        if (!$date = \DateTimeImmutable::createFromFormat('U.u', $payload['timestamp'])) {
-            throw new ParseException(sprintf('Invalid date "%s".', $payload['timestamp']));
+        if (!$date = \DateTimeImmutable::createFromFormat('U.u', sprintf('%.6F', $payload['timestamp']))) {
+            throw new ParseException(sprintf('Invalid date "%s".', sprintf('%.6F', $payload['timestamp'])));
         }
         $event->setDate($date);
         $event->setRecipientEmail($payload['recipient']);

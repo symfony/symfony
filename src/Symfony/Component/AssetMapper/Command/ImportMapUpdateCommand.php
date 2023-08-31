@@ -11,9 +11,11 @@
 
 namespace Symfony\Component\AssetMapper\Command;
 
+use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -21,7 +23,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * @author Kévin Dunglas <kevin@dunglas.dev>
  */
-#[AsCommand(name: 'importmap:update', description: 'Updates all JavaScript packages to their latest versions')]
+#[AsCommand(name: 'importmap:update', description: 'Updates JavaScript packages to their latest versions')]
 final class ImportMapUpdateCommand extends Command
 {
     public function __construct(
@@ -33,21 +35,37 @@ final class ImportMapUpdateCommand extends Command
     protected function configure(): void
     {
         $this
+            ->addArgument('packages', InputArgument::IS_ARRAY | InputArgument::OPTIONAL, 'List of packages\' names')
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command will update all from the 3rd part packages
 in <comment>importmap.php</comment> to their latest version, including downloaded packages.
 
    <info>php %command.full_name%</info>
+
+Or specific packages only:
+
+    <info>php %command.full_name% <packages></info>
 EOT
-            );
+            )
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-        $this->importMapManager->update();
+        $packages = $input->getArgument('packages');
 
-        $io->success('Updated all packages in importmap.php.');
+        $io = new SymfonyStyle($input, $output);
+        $updatedPackages = $this->importMapManager->update($packages);
+
+        if (0 < \count($packages)) {
+            $io->success(sprintf(
+                'Updated %s package%s in importmap.php.',
+                implode(', ', array_map(static fn (ImportMapEntry $entry): string => $entry->importName, $updatedPackages)),
+                1 < \count($updatedPackages) ? 's' : '',
+            ));
+        } else {
+            $io->success('Updated all packages in importmap.php.');
+        }
 
         return Command::SUCCESS;
     }

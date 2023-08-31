@@ -88,7 +88,7 @@ class ImportMapManager
      */
     public function require(array $packages): array
     {
-        return $this->updateImportMapConfig(false, $packages, []);
+        return $this->updateImportMapConfig(false, $packages, [], []);
     }
 
     /**
@@ -98,15 +98,17 @@ class ImportMapManager
      */
     public function remove(array $packages): void
     {
-        $this->updateImportMapConfig(false, [], $packages);
+        $this->updateImportMapConfig(false, [], $packages, []);
     }
 
     /**
-     * Updates all existing packages to the latest version.
+     * Updates either all existing packages or the specified ones to the latest version.
+     *
+     * @return ImportMapEntry[]
      */
-    public function update(): array
+    public function update(array $packages = []): array
     {
-        return $this->updateImportMapConfig(true, [], []);
+        return $this->updateImportMapConfig(true, [], [], $packages);
     }
 
     /**
@@ -190,7 +192,7 @@ class ImportMapManager
      *
      * @return ImportMapEntry[]
      */
-    private function updateImportMapConfig(bool $update, array $packagesToRequire, array $packagesToRemove): array
+    private function updateImportMapConfig(bool $update, array $packagesToRequire, array $packagesToRemove, array $packagesToUpdate): array
     {
         $currentEntries = $this->loadImportMapEntries();
 
@@ -205,7 +207,7 @@ class ImportMapManager
 
         if ($update) {
             foreach ($currentEntries as $importName => $entry) {
-                if (null === $entry->url) {
+                if (null === $entry->url || (0 !== \count($packagesToUpdate) && !\in_array($importName, $packagesToUpdate, true))) {
                     continue;
                 }
 

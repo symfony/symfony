@@ -38,6 +38,7 @@ return static function (ContainerConfigurator $container) {
         ->set('property_info.cache', PropertyInfoCacheExtractor::class)
             ->decorate('property_info')
             ->args([service('property_info.cache.inner'), service('cache.property_info')])
+            ->tag('kernel.reset', ['method' => 'reset'])
 
         // Extractor
         ->set('property_info.reflection_extractor', ReflectionExtractor::class)

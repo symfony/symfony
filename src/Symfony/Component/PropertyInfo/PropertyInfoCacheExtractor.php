@@ -12,6 +12,7 @@
 namespace Symfony\Component\PropertyInfo;
 
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Adds a PSR-6 cache layer on top of an extractor.
@@ -20,7 +21,7 @@ use Psr\Cache\CacheItemPoolInterface;
  *
  * @final
  */
-class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, PropertyInitializableExtractorInterface
+class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, PropertyInitializableExtractorInterface, ResetInterface
 {
     private $propertyInfoExtractor;
     private $cacheItemPool;
@@ -86,6 +87,15 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, Prop
     public function isInitializable(string $class, string $property, array $context = []): ?bool
     {
         return $this->extract('isInitializable', [$class, $property, $context]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        unset($this->arrayCache);
+        $this->arrayCache = [];
     }
 
     /**

@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\ErrorHandler\Error\FatalError;
 use Symfony\Component\ErrorHandler\Error\OutOfMemoryError;
+use Symfony\Component\ErrorHandler\ErrorEnhancer\BlamedErrorEnhancer;
 use Symfony\Component\ErrorHandler\ErrorEnhancer\ClassNotFoundErrorEnhancer;
 use Symfony\Component\ErrorHandler\ErrorEnhancer\ErrorEnhancerInterface;
 use Symfony\Component\ErrorHandler\ErrorEnhancer\UndefinedFunctionErrorEnhancer;
@@ -681,6 +682,7 @@ class ErrorHandler
             new UndefinedFunctionErrorEnhancer(),
             new UndefinedMethodErrorEnhancer(),
             new ClassNotFoundErrorEnhancer(),
+            new BlamedErrorEnhancer(),
         ];
     }
 

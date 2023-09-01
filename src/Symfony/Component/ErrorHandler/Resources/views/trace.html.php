@@ -18,13 +18,31 @@
         <span class="block trace-file-path">
             in
             <a href="<?= $fileLink; ?>">
-                <?= implode(\DIRECTORY_SEPARATOR, array_slice($filePathParts, 0, -1)).\DIRECTORY_SEPARATOR; ?><strong><?= end($filePathParts); ?></strong>
+                <?= implode(\DIRECTORY_SEPARATOR, array_slice($filePathParts, 0, -1)).\DIRECTORY_SEPARATOR; ?><strong><?= end($filePathParts); ?></strong>:<?= $lineNumber; ?>
             </a>
             <?php if ('compact' === $style && $trace['function']) { ?>
                 <span class="trace-type"><?= $trace['type']; ?></span>
                 <span class="trace-method"><?= $trace['function']; ?></span>
             <?php } ?>
-            (line <?= $lineNumber; ?>)
+            <?php if ($trace['author']) { ?>
+                <span
+                    class="trace-blame"
+                    title="<?= sprintf(
+                        "commited by %s (%s) at %s\n%s",
+                        $trace['commiter']['name'],
+                        $trace['commiter']['mail'],
+                        $trace['commiter']['time']->format(DateTimeInterface::RFC3339),
+                        $trace['summary'],
+                    ); ?>"
+                >
+                    <?= sprintf(
+                        'by %s (%s) at %s',
+                        $trace['author']['name'],
+                        $trace['author']['mail'],
+                        $trace['author']['time']->format(DateTimeInterface::RFC3339),
+                    ); ?>
+                </span>
+            <?php } ?>
             <span class="icon icon-copy hidden" data-clipboard-text="<?php echo implode(\DIRECTORY_SEPARATOR, $filePathParts).':'.$lineNumber; ?>">
                 <?php echo $this->include('assets/images/icon-copy.svg'); ?>
             </span>

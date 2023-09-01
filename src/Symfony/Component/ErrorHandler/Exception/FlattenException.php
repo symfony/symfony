@@ -313,6 +313,9 @@ class FlattenException
             'file' => $file,
             'line' => $line,
             'args' => [],
+            'author' => $entry['author'] ?? null,
+            'commiter' => $entry['commiter'] ?? null,
+            'summary' => $entry['summary'] ?? null,
         ];
         foreach ($trace as $entry) {
             $class = '';
@@ -332,6 +335,9 @@ class FlattenException
                 'file' => $entry['file'] ?? null,
                 'line' => $entry['line'] ?? null,
                 'args' => isset($entry['args']) ? $this->flattenArgs($entry['args']) : [],
+                'author' => $entry['author'] ?? null,
+                'commiter' => $entry['commiter'] ?? null,
+                'summary' => $entry['summary'] ?? null,
             ];
         }
 

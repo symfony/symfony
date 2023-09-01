@@ -68,7 +68,7 @@ class InMemoryUserProviderTest extends TestCase
         $provider->createUser(new InMemoryUser('fabien', 'foo'));
     }
 
-    public function testLoadUserByUsernameDoesNotExist()
+    public function testLoadUserByIdentifierDoesNotExist()
     {
         $this->expectException(UserNotFoundException::class);
         $provider = new InMemoryUserProvider();

@@ -164,7 +164,7 @@ trait MicroKernelTrait
             $container->addObjectResource($this);
             $container->fileExists($this->getBundlesPath());
 
-            $configureContainer = new \ReflectionMethod($this, 'configureContainer');
+            $configureContainer = (new \ReflectionClass($this))->getMethod('configureContainer');
             $configuratorClass = $configureContainer->getNumberOfParameters() > 0 && ($type = $configureContainer->getParameters()[0]->getType()) instanceof \ReflectionNamedType && !$type->isBuiltin() ? $type->getName() : null;
 
             if ($configuratorClass && !is_a(ContainerConfigurator::class, $configuratorClass, true)) {
@@ -207,7 +207,7 @@ trait MicroKernelTrait
         $kernelLoader->setCurrentDir(\dirname($file));
         $collection = new RouteCollection();
 
-        $configureRoutes = new \ReflectionMethod($this, 'configureRoutes');
+        $configureRoutes = (new \ReflectionClass($this))->getMethod('configureRoutes');
         $configuratorClass = $configureRoutes->getNumberOfParameters() > 0 && ($type = $configureRoutes->getParameters()[0]->getType()) instanceof \ReflectionNamedType && !$type->isBuiltin() ? $type->getName() : null;
 
         if ($configuratorClass && !is_a(RoutingConfigurator::class, $configuratorClass, true)) {

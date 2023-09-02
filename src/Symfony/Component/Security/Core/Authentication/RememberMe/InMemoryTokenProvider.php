@@ -42,7 +42,7 @@ class InMemoryTokenProvider implements TokenProviderInterface
 
         $token = new PersistentToken(
             $this->tokens[$series]->getClass(),
-            method_exists($this->tokens[$series], 'getUserIdentifier') ? $this->tokens[$series]->getUserIdentifier() : $this->tokens[$series]->getUsername(),
+            $this->tokens[$series]->getUserIdentifier(),
             $series,
             $tokenValue,
             $lastUsed

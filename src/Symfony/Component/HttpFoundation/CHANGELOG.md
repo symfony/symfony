@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Make `HeaderBag::getDate()`, `Response::getDate()`, `getExpires()` and `getLastModified()` return a `DateTimeImmutable`
+ * Support root-level `Generator` in `StreamedJsonResponse`
 
 6.3
 ---

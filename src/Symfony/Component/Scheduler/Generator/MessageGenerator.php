@@ -33,6 +33,9 @@ final class MessageGenerator implements MessageGeneratorInterface
         $this->waitUntil = new \DateTimeImmutable('@0');
     }
 
+    /**
+     * @return \Generator<MessageContext, object>
+     */
     public function getMessages(): \Generator
     {
         $checkpoint = $this->checkpoint();
@@ -61,7 +64,6 @@ final class MessageGenerator implements MessageGeneratorInterface
             /** @var RecurringMessage $recurringMessage */
             [$time, $index, $recurringMessage] = $heap->extract();
             $id = $recurringMessage->getId();
-            $message = $recurringMessage->getMessage();
             $trigger = $recurringMessage->getTrigger();
             $yield = true;
 
@@ -77,7 +79,11 @@ final class MessageGenerator implements MessageGeneratorInterface
             }
 
             if ($yield) {
-                yield (new MessageContext($this->name, $id, $trigger, $time, $nextTime)) => $message;
+                $context = new MessageContext($this->name, $id, $trigger, $time, $nextTime);
+                foreach ($recurringMessage->getMessages($context) as $message) {
+                    yield $context => $message;
+                }
+
                 $checkpoint->save($time, $index);
             }
         }

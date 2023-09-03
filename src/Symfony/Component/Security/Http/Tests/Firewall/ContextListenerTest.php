@@ -562,15 +562,6 @@ class CustomToken implements TokenInterface
         return $this->getUserIdentifier();
     }
 
-    public function isAuthenticated(): bool
-    {
-        return true;
-    }
-
-    public function setAuthenticated(bool $isAuthenticated)
-    {
-    }
-
     public function eraseCredentials(): void
     {
     }

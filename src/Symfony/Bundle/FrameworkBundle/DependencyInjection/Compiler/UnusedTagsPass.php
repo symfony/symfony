@@ -22,7 +22,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class UnusedTagsPass implements CompilerPassInterface
 {
     private const KNOWN_TAGS = [
-        'annotations.cached_reader',
         'asset_mapper.compiler',
         'asset_mapper.importmap.resolver',
         'assets.package',

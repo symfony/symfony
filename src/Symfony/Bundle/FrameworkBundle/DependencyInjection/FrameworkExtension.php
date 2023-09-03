@@ -161,10 +161,8 @@ use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\ProblemNormalizer;
 use Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer;
 use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\String\LazyString;
 use Symfony\Component\String\Slugger\SluggerInterface;
@@ -715,7 +713,6 @@ class FrameworkExtension extends Extension
             ->addTag('routing.route_loader');
 
         $container->setParameter('container.behavior_describing_tags', [
-            'annotations.cached_reader',
             'container.do_not_inline',
             'container.service_locator',
             'container.service_subscriber',
@@ -1857,10 +1854,7 @@ class FrameworkExtension extends Extension
                 $container->removeDefinition('serializer.mapping.cache_class_metadata_factory');
             }
 
-            $annotationLoader = new Definition(
-                AnnotationLoader::class,
-                [new Reference('annotation_reader', ContainerInterface::NULL_ON_INVALID_REFERENCE)]
-            );
+            $annotationLoader = new Definition(AnnotationLoader::class);
 
             $serializerLoaders[] = $annotationLoader;
         }

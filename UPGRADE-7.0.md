@@ -303,6 +303,7 @@ Security
  * Add argument `$badgeFqcn` to `Passport::addBadge()`
  * Add argument `$lifetime` to `LoginLinkHandlerInterface::createLoginLink()`
  * Require explicit argument when calling `TokenStorage::setToken()`
+ * Calling the constructor of `DefaultLoginRateLimiter` with an empty secret now throws an `InvalidArgumentException`
 
 SecurityBundle
 --------------

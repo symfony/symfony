@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add argument `$badgeFqcn` to `Passport::addBadge()`
  * Add argument `$lifetime` to `LoginLinkHandlerInterface::createLoginLink()`
+ * Calling the constructor of `DefaultLoginRateLimiter` with an empty secret now throws an `InvalidArgumentException`
 
 6.4
 ---

@@ -19,7 +19,7 @@ use Symfony\Component\Scheduler\ScheduleProviderInterface;
 
 final class MessageGenerator implements MessageGeneratorInterface
 {
-    private Schedule $schedule;
+    private ?Schedule $schedule = null;
     private TriggerHeap $triggerHeap;
     private ?\DateTimeImmutable $waitUntil;
 
@@ -35,6 +35,12 @@ final class MessageGenerator implements MessageGeneratorInterface
     public function getMessages(): \Generator
     {
         $checkpoint = $this->checkpoint();
+
+        if ($this->schedule?->shouldRestart()) {
+            unset($this->triggerHeap);
+            $this->waitUntil = new \DateTimeImmutable('@0');
+            $this->schedule->setRestart(false);
+        }
 
         if (!$this->waitUntil
             || $this->waitUntil > ($now = $this->clock->now())

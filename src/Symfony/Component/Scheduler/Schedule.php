@@ -21,19 +21,54 @@ final class Schedule implements ScheduleProviderInterface
     private array $messages = [];
     private ?LockInterface $lock = null;
     private ?CacheInterface $state = null;
+    private bool $shouldRestart = false;
+
+    public static function with(RecurringMessage $message, RecurringMessage ...$messages): static
+    {
+        return static::doAdd(new self(), $message, ...$messages);
+    }
 
     /**
      * @return $this
      */
     public function add(RecurringMessage $message, RecurringMessage ...$messages): static
     {
+        $this->setRestart(true);
+
+        return static::doAdd($this, $message, ...$messages);
+    }
+
+    private static function doAdd(self $schedule, RecurringMessage $message, RecurringMessage ...$messages): static
+    {
         foreach ([$message, ...$messages] as $m) {
-            if (isset($this->messages[$m->getId()])) {
+            if (isset($schedule->messages[$m->getId()])) {
                 throw new LogicException('Duplicated schedule message.');
             }
 
-            $this->messages[$m->getId()] = $m;
+            $schedule->messages[$m->getId()] = $m;
         }
+
+        return $schedule;
+    }
+
+    /**
+     * @return $this
+     */
+    public function remove(RecurringMessage $message): static
+    {
+        unset($this->messages[$message->getId()]);
+        $this->setRestart(true);
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function clear(): static
+    {
+        $this->messages = [];
+        $this->setRestart(true);
 
         return $this;
     }
@@ -82,5 +117,15 @@ final class Schedule implements ScheduleProviderInterface
     public function getSchedule(): static
     {
         return $this;
+    }
+
+    public function shouldRestart(): bool
+    {
+        return $this->shouldRestart;
+    }
+
+    public function setRestart(bool $shouldRestart): bool
+    {
+        return $this->shouldRestart = $shouldRestart;
     }
 }

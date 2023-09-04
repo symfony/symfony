@@ -26,12 +26,15 @@ use Symfony\Component\AssetMapper\ImportMap\Resolver\ResolvedImportMapPackage;
 use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolver;
 use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class ImportMapManagerTest extends TestCase
 {
     private Filesystem $filesystem;
     private AssetMapperInterface $assetMapper;
     private PackageResolverInterface&MockObject $packageResolver;
+    private HttpClientInterface&MockObject $httpClient;
 
     protected function setUp(): void
     {
@@ -378,12 +381,14 @@ class ImportMapManagerTest extends TestCase
         $rootDir = __DIR__.'/../fixtures/download';
         $manager = $this->createImportMapManager(['assets' => ''], $rootDir);
 
-        $this->packageResolver->expects($this->once())
-            ->method('resolvePackages')
-            ->willReturn([
-                self::resolvedPackage('@hotwired/stimulus', 'https://cdn.jsdelivr.net/npm/stimulus@3.2.1/+esm', true, content: 'contents of stimulus.js'),
-            ])
-        ;
+        $response = $this->createMock(ResponseInterface::class);
+        $response->expects($this->once())
+            ->method('getContent')
+            ->willReturn('contents of stimulus.js');
+
+        $this->httpClient->expects($this->once())
+            ->method('request')
+            ->willReturn($response);
 
         $downloadedPackages = $manager->downloadMissingPackages();
         $actualImportMap = require $rootDir.'/importmap.php';
@@ -506,6 +511,7 @@ class ImportMapManagerTest extends TestCase
 
         $mapper = $this->createAssetMapper($pathResolver, $dirs, $rootDir);
         $this->packageResolver = $this->createMock(PackageResolverInterface::class);
+        $this->httpClient = $this->createMock(HttpClientInterface::class);
 
         return new ImportMapManager(
             $mapper,
@@ -513,6 +519,7 @@ class ImportMapManagerTest extends TestCase
             $rootDir.'/importmap.php',
             $rootDir.'/assets/vendor',
             $this->packageResolver,
+            $this->httpClient,
         );
     }
 

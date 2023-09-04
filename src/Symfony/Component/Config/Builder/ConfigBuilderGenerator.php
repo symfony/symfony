@@ -260,7 +260,6 @@ public function NAME(string $VAR, TYPE $VALUE): static
         $comment .= sprintf(' * @psalm-return (TValue is array ? %s : static)'."\n ", $childClass->getFqcn());
         $comment = "/**\n$comment*/\n";
 
-
         if (null === $key = $node->getKeyAttribute()) {
             $body = '
 COMMENTpublic function NAME(mixed $value = []): CLASS|static
@@ -544,10 +543,5 @@ public function NAME(string $key, mixed $value): static
         }
 
         return [] !== $r->getValue($node);
-    }
-
-    private function getType(string $classType, bool $hasNormalizationClosures): string
-    {
-        return $classType.($hasNormalizationClosures ? '|scalar' : '');
     }
 }

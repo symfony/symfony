@@ -43,56 +43,56 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
         }
     }
 
-    public static function isValid(string $ulid): bool
+    public static function isValid(string $uid): bool
     {
-        if (26 !== \strlen($ulid)) {
+        if (26 !== \strlen($uid)) {
             return false;
         }
 
-        if (26 !== strspn($ulid, '0123456789ABCDEFGHJKMNPQRSTVWXYZabcdefghjkmnpqrstvwxyz')) {
+        if (26 !== strspn($uid, '0123456789ABCDEFGHJKMNPQRSTVWXYZabcdefghjkmnpqrstvwxyz')) {
             return false;
         }
 
-        return $ulid[0] <= '7';
+        return $uid[0] <= '7';
     }
 
-    public static function fromString(string $ulid): static
+    public static function fromString(string $uid): static
     {
-        if (36 === \strlen($ulid) && preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$}Di', $ulid)) {
-            $ulid = uuid_parse($ulid);
-        } elseif (22 === \strlen($ulid) && 22 === strspn($ulid, BinaryUtil::BASE58[''])) {
-            $ulid = str_pad(BinaryUtil::fromBase($ulid, BinaryUtil::BASE58), 16, "\0", \STR_PAD_LEFT);
+        if (36 === \strlen($uid) && preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$}Di', $uid)) {
+            $uid = uuid_parse($uid);
+        } elseif (22 === \strlen($uid) && 22 === strspn($uid, BinaryUtil::BASE58[''])) {
+            $uid = str_pad(BinaryUtil::fromBase($uid, BinaryUtil::BASE58), 16, "\0", \STR_PAD_LEFT);
         }
 
-        if (16 !== \strlen($ulid)) {
-            return match (strtr($ulid, 'z', 'Z')) {
+        if (16 !== \strlen($uid)) {
+            return match (strtr($uid, 'z', 'Z')) {
                 self::NIL => new NilUlid(),
                 self::MAX => new MaxUlid(),
-                default => new static($ulid),
+                default => new static($uid),
             };
         }
 
-        $ulid = bin2hex($ulid);
-        $ulid = sprintf('%02s%04s%04s%04s%04s%04s%04s',
-            base_convert(substr($ulid, 0, 2), 16, 32),
-            base_convert(substr($ulid, 2, 5), 16, 32),
-            base_convert(substr($ulid, 7, 5), 16, 32),
-            base_convert(substr($ulid, 12, 5), 16, 32),
-            base_convert(substr($ulid, 17, 5), 16, 32),
-            base_convert(substr($ulid, 22, 5), 16, 32),
-            base_convert(substr($ulid, 27, 5), 16, 32)
+        $uid = bin2hex($uid);
+        $uid = sprintf('%02s%04s%04s%04s%04s%04s%04s',
+            base_convert(substr($uid, 0, 2), 16, 32),
+            base_convert(substr($uid, 2, 5), 16, 32),
+            base_convert(substr($uid, 7, 5), 16, 32),
+            base_convert(substr($uid, 12, 5), 16, 32),
+            base_convert(substr($uid, 17, 5), 16, 32),
+            base_convert(substr($uid, 22, 5), 16, 32),
+            base_convert(substr($uid, 27, 5), 16, 32)
         );
 
-        if (self::NIL === $ulid) {
+        if (self::NIL === $uid) {
             return new NilUlid();
         }
 
-        if (self::MAX === $ulid = strtr($ulid, 'abcdefghijklmnopqrstuv', 'ABCDEFGHJKMNPQRSTVWXYZ')) {
+        if (self::MAX === $uid = strtr($uid, 'abcdefghijklmnopqrstuv', 'ABCDEFGHJKMNPQRSTVWXYZ')) {
             return new MaxUlid();
         }
 
         $u = new static(self::NIL);
-        $u->uid = $ulid;
+        $u->uid = $uid;
 
         return $u;
     }

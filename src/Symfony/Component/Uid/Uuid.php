@@ -42,50 +42,50 @@ class Uuid extends AbstractUid
         }
     }
 
-    public static function fromString(string $uuid): static
+    public static function fromString(string $uid): static
     {
-        if (22 === \strlen($uuid) && 22 === strspn($uuid, BinaryUtil::BASE58[''])) {
-            $uuid = str_pad(BinaryUtil::fromBase($uuid, BinaryUtil::BASE58), 16, "\0", \STR_PAD_LEFT);
+        if (22 === \strlen($uid) && 22 === strspn($uid, BinaryUtil::BASE58[''])) {
+            $uid = str_pad(BinaryUtil::fromBase($uid, BinaryUtil::BASE58), 16, "\0", \STR_PAD_LEFT);
         }
 
-        if (16 === \strlen($uuid)) {
+        if (16 === \strlen($uid)) {
             // don't use uuid_unparse(), it's slower
-            $uuid = bin2hex($uuid);
-            $uuid = substr_replace($uuid, '-', 8, 0);
-            $uuid = substr_replace($uuid, '-', 13, 0);
-            $uuid = substr_replace($uuid, '-', 18, 0);
-            $uuid = substr_replace($uuid, '-', 23, 0);
-        } elseif (26 === \strlen($uuid) && Ulid::isValid($uuid)) {
+            $uid = bin2hex($uid);
+            $uid = substr_replace($uid, '-', 8, 0);
+            $uid = substr_replace($uid, '-', 13, 0);
+            $uid = substr_replace($uid, '-', 18, 0);
+            $uid = substr_replace($uid, '-', 23, 0);
+        } elseif (26 === \strlen($uid) && Ulid::isValid($uid)) {
             $ulid = new NilUlid();
-            $ulid->uid = strtoupper($uuid);
-            $uuid = $ulid->toRfc4122();
+            $ulid->uid = strtoupper($uid);
+            $uid = $ulid->toRfc4122();
         }
 
-        if (__CLASS__ !== static::class || 36 !== \strlen($uuid)) {
-            return new static($uuid);
+        if (__CLASS__ !== static::class || 36 !== \strlen($uid)) {
+            return new static($uid);
         }
 
-        if (self::NIL === $uuid) {
+        if (self::NIL === $uid) {
             return new NilUuid();
         }
 
-        if (self::MAX === $uuid = strtr($uuid, 'F', 'f')) {
+        if (self::MAX === $uid = strtr($uid, 'F', 'f')) {
             return new MaxUuid();
         }
 
-        if (!\in_array($uuid[19], ['8', '9', 'a', 'b', 'A', 'B'], true)) {
-            return new self($uuid);
+        if (!\in_array($uid[19], ['8', '9', 'a', 'b', 'A', 'B'], true)) {
+            return new self($uid);
         }
 
-        return match ((int) $uuid[14]) {
-            UuidV1::TYPE => new UuidV1($uuid),
-            UuidV3::TYPE => new UuidV3($uuid),
-            UuidV4::TYPE => new UuidV4($uuid),
-            UuidV5::TYPE => new UuidV5($uuid),
-            UuidV6::TYPE => new UuidV6($uuid),
-            UuidV7::TYPE => new UuidV7($uuid),
-            UuidV8::TYPE => new UuidV8($uuid),
-            default => new self($uuid),
+        return match ((int) $uid[14]) {
+            UuidV1::TYPE => new UuidV1($uid),
+            UuidV3::TYPE => new UuidV3($uid),
+            UuidV4::TYPE => new UuidV4($uid),
+            UuidV5::TYPE => new UuidV5($uid),
+            UuidV6::TYPE => new UuidV6($uid),
+            UuidV7::TYPE => new UuidV7($uid),
+            UuidV8::TYPE => new UuidV8($uid),
+            default => new self($uid),
         };
     }
 
@@ -130,21 +130,21 @@ class Uuid extends AbstractUid
         return new UuidV8($uuid);
     }
 
-    public static function isValid(string $uuid): bool
+    public static function isValid(string $uid): bool
     {
-        if (self::NIL === $uuid && \in_array(static::class, [__CLASS__, NilUuid::class], true)) {
+        if (self::NIL === $uid && \in_array(static::class, [__CLASS__, NilUuid::class], true)) {
             return true;
         }
 
-        if (self::MAX === strtr($uuid, 'F', 'f') && \in_array(static::class, [__CLASS__, MaxUuid::class], true)) {
+        if (self::MAX === strtr($uid, 'F', 'f') && \in_array(static::class, [__CLASS__, MaxUuid::class], true)) {
             return true;
         }
 
-        if (!preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){2}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$}Di', $uuid)) {
+        if (!preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){2}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$}Di', $uid)) {
             return false;
         }
 
-        return __CLASS__ === static::class || static::TYPE === (int) $uuid[14];
+        return __CLASS__ === static::class || static::TYPE === (int) $uid[14];
     }
 
     public function toBinary(): string

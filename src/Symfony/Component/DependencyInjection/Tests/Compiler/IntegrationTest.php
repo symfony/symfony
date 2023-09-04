@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -47,6 +48,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\LocatorConsumerWithDefa
 use Symfony\Component\DependencyInjection\Tests\Fixtures\LocatorConsumerWithDefaultIndexMethodAndWithDefaultPriorityMethod;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\LocatorConsumerWithDefaultPriorityMethod;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\LocatorConsumerWithoutIndex;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\LocatorConsumerWithServiceSubscriber;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\StaticMethodTag;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedConsumerWithExclude;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService1;
@@ -1084,6 +1086,66 @@ class IntegrationTest extends TestCase
         $this->assertTrue($locator->has(AutoconfiguredService1::class));
         $this->assertTrue($locator->has(AutoconfiguredService2::class));
         $this->assertFalse($locator->has(TaggedConsumerWithExclude::class));
+    }
+
+    public function testAutowireAttributeHasPriorityOverBindings()
+    {
+        $container = new ContainerBuilder();
+        $container->register(FooTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar', ['key' => 'tagged_service'])
+        ;
+        $container->register(LocatorConsumerWithServiceSubscriber::class)
+            ->setBindings([
+                '$locator' => new BoundArgument(new Reference('service_container'), false),
+            ])
+            ->setPublic(true)
+            ->setAutowired(true)
+            ->addTag('container.service_subscriber')
+        ;
+        $container->register('subscribed_service', \stdClass::class)
+            ->setPublic(true)
+        ;
+
+        $container->compile();
+
+        /** @var LocatorConsumerWithServiceSubscriber $s */
+        $s = $container->get(LocatorConsumerWithServiceSubscriber::class);
+
+        self::assertInstanceOf(ContainerInterface::class, $subscriberLocator = $s->getContainer());
+        self::assertTrue($subscriberLocator->has('subscribed_service'));
+        self::assertNotSame($subscriberLocator, $taggedLocator = $s->getLocator());
+        self::assertInstanceOf(ContainerInterface::class, $taggedLocator);
+        self::assertTrue($taggedLocator->has('tagged_service'));
+    }
+
+    public function testBindingsWithAutowireAttributeAndAutowireFalse()
+    {
+        $container = new ContainerBuilder();
+        $container->register(FooTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar', ['key' => 'tagged_service'])
+        ;
+        $container->register(LocatorConsumerWithServiceSubscriber::class)
+            ->setBindings([
+                '$locator' => new BoundArgument(new Reference('service_container'), false),
+            ])
+            ->setPublic(true)
+            ->setAutowired(false)
+            ->addTag('container.service_subscriber')
+        ;
+        $container->register('subscribed_service', \stdClass::class)
+            ->setPublic(true)
+        ;
+
+        $container->compile();
+
+        /** @var LocatorConsumerWithServiceSubscriber $s */
+        $s = $container->get(LocatorConsumerWithServiceSubscriber::class);
+
+        self::assertNull($s->getContainer());
+        self::assertInstanceOf(ContainerInterface::class, $taggedLocator = $s->getLocator());
+        self::assertSame($container, $taggedLocator);
     }
 }
 

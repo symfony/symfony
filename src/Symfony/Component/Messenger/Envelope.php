@@ -17,6 +17,8 @@ use Symfony\Component\Messenger\Stamp\StampInterface;
  * A message wrapped in an envelope with stamps (configurations, markers, ...).
  *
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
+ *
+ * @template TMessage of object
  */
 final class Envelope
 {
@@ -24,11 +26,15 @@ final class Envelope
      * @var array<class-string<StampInterface>, list<StampInterface>>
      */
     private array $stamps = [];
+
+    /**
+     * @var TMessage|Envelope<TMessage>
+     */
     private object $message;
 
     /**
-     * @param object|Envelope  $message
-     * @param StampInterface[] $stamps
+     * @param TMessage|Envelope<TMessage> $message
+     * @param StampInterface[]            $stamps
      */
     public function __construct(object $message, array $stamps = [])
     {
@@ -42,6 +48,7 @@ final class Envelope
     /**
      * Makes sure the message is in an Envelope and adds the given stamps.
      *
+     * @param TMessage         $message
      * @param StampInterface[] $stamps
      */
     public static function wrap(object $message, array $stamps = []): self
@@ -123,6 +130,9 @@ final class Envelope
         return $this->stamps;
     }
 
+    /**
+     * @return TMessage|Envelope<TMessage>
+     */
     public function getMessage(): object
     {
         return $this->message;

@@ -17,6 +17,8 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 
 /**
  * @author Antonio Pauletich <antonio.pauletich95@gmail.com>
+ *
+ * @implements TransportFactoryInterface<BeanstalkdTransport>
  */
 class BeanstalkdTransportFactory implements TransportFactoryInterface
 {

@@ -16,6 +16,8 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
+ *
+ * @implements TransportFactoryInterface<TransportInterface>
  */
 class TransportFactory implements TransportFactoryInterface
 {

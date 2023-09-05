@@ -18,6 +18,8 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
+ *
+ * @implements TransportFactoryInterface<AmazonSqsTransport>
  */
 class AmazonSqsTransportFactory implements TransportFactoryInterface
 {

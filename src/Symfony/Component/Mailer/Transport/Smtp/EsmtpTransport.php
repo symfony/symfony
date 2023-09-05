@@ -184,6 +184,7 @@ class EsmtpTransport extends SmtpTransport
             return;
         }
 
+        $code = null;
         $authNames = [];
         $errors = [];
         $modes = array_map('strtolower', $modes);
@@ -192,7 +193,6 @@ class EsmtpTransport extends SmtpTransport
                 continue;
             }
 
-            $code = null;
             $authNames[] = $authenticator->getAuthKeyword();
             try {
                 $authenticator->authenticate($this);

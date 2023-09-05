@@ -99,7 +99,7 @@ final class Vote
     /**
      * @param string|string[] $messages
      */
-    public function setMessages(string|array $messages)
+    public function setMessages(string|array $messages): void
     {
         $this->messages = (array) $messages;
         foreach ($this->messages as $message) {
@@ -109,7 +109,7 @@ final class Vote
         }
     }
 
-    public function addMessage(string $message)
+    public function addMessage(string $message): void
     {
         $this->messages[] = $message;
     }

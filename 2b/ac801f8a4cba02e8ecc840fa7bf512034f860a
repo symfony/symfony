@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by Ferror at 2023-08-13T19:33:53Z
+
+> If you make the `TransportFactoryInterface` generic, you need to update the PHPDoc on every implementation accordingly.
+
+Did as requested :)
+
+---------------------------------------------------------------------------
+
+by Ferror at 2023-09-04T10:44:18Z
+
+@derrabus WDYT?

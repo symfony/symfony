@@ -153,7 +153,7 @@ class EntityValueResolverTest extends TestCase
         $request = new Request();
         $request->attributes->set('id', 'test');
 
-        $argument = $this->createArgument('stdClass', new MapEntity(id: 'id'));
+        $argument = $this->createArgument('stdClass', new MapEntity(id: 'id', message: 'Test'));
 
         $repository = $this->getMockBuilder(ObjectRepository::class)->getMock();
         $repository->expects($this->once())
@@ -167,6 +167,7 @@ class EntityValueResolverTest extends TestCase
             ->willReturn($repository);
 
         $this->expectException(NotFoundHttpException::class);
+        $this->expectExceptionMessage('Test');
 
         $resolver->resolve($request, $argument);
     }

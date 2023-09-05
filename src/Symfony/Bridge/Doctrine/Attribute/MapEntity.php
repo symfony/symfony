@@ -31,6 +31,7 @@ class MapEntity extends ValueResolver
         public ?bool $evictCache = null,
         bool $disabled = false,
         string $resolver = EntityValueResolver::class,
+        public ?string $message = null,
     ) {
         parent::__construct($resolver, $disabled);
     }
@@ -46,6 +47,7 @@ class MapEntity extends ValueResolver
         $clone->stripNull ??= $defaults->stripNull ?? false;
         $clone->id ??= $defaults->id;
         $clone->evictCache ??= $defaults->evictCache ?? false;
+        $clone->message ??= $defaults->message;
 
         return $clone;
     }

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by stof at 2023-09-04T11:58:06Z
+
+The upgrade-7.0 file must also be updated
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-09-04T12:48:33Z
+
+Actually, it has been already done last week:
+
+https://github.com/symfony/symfony/blob/d1774f4f159e13dffd2f9a7dddc5fb8861ad882f/UPGRADE-7.0.md?plain=1#L489-L493
+
+---------------------------------------------------------------------------
+
+by stof at 2023-09-04T12:50:46Z
+
+ah OK. so this is something that has been forgotten in https://github.com/symfony/symfony/pull/51493 actually.

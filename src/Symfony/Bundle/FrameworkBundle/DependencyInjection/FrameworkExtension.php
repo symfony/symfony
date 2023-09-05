@@ -113,6 +113,9 @@ use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Bridge as MessengerBridge;
+use Symfony\Component\Messenger\Bridge\Kafka\Callback\CallbackManager;
+use Symfony\Component\Messenger\Bridge\Kafka\Callback\CallbackProcessorInterface;
+use Symfony\Component\Messenger\Bridge\Kafka\Transport\KafkaFactory;
 use Symfony\Component\Messenger\Command\StatsCommand;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnSignalsListener;
 use Symfony\Component\Messenger\Handler\BatchHandlerInterface;
@@ -2151,6 +2154,13 @@ class FrameworkExtension extends Extension
             $container->getDefinition('messenger.transport.beanstalkd.factory')->addTag('messenger.transport_factory');
         }
 
+        if (ContainerBuilder::willBeAvailable('symfony/kafka-messenger', MessengerBridge\Kafka\Transport\KafkaTransportFactory::class, ['symfony/framework-bundle', 'symfony/messenger'])) {
+            $container->getDefinition('messenger.transport.kafka.factory')->addTag('messenger.transport_factory');
+
+            $container->registerForAutoconfiguration(CallbackProcessorInterface::class)
+                ->addTag('messenger.transport.kafka.callback_processor');
+        }
+
         if (!class_exists(StopWorkerOnSignalsListener::class)) {
             $container->removeDefinition('messenger.listener.stop_worker_signals_listener');
         } elseif ($config['stop_worker_on_signals']) {
@@ -2213,6 +2223,9 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('messenger.transport.redis.factory');
             $container->removeDefinition('messenger.transport.sqs.factory');
             $container->removeDefinition('messenger.transport.beanstalkd.factory');
+            $container->removeDefinition('messenger.transport.kafka.factory');
+            $container->removeDefinition(CallbackManager::class);
+            $container->removeDefinition(KafkaFactory::class);
             $container->removeAlias(SerializerInterface::class);
         } else {
             $container->getDefinition('messenger.transport.symfony_serializer')

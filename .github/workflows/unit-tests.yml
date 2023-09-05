@@ -21,7 +21,7 @@ jobs:
     name: Unit Tests
 
     env:
-      extensions: amqp,apcu,igbinary,intl,mbstring,memcached,redis,relay
+      extensions: amqp,apcu,igbinary,intl,mbstring,memcached,redis,relay,rdkafka
 
     strategy:
       matrix:
@@ -42,6 +42,16 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 2
+
+      - name: Install system dependencies
+        run: |
+          echo "::group::apt-get update"
+          sudo apt-get update
+          echo "::endgroup::"
+
+          echo "::group::install tools & libraries"
+          sudo apt-get install librdkafka-dev
+          echo "::endgroup::"
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2

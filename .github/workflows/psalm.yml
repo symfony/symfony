@@ -22,10 +22,21 @@ jobs:
     env:
       php-version: '8.1'
     steps:
+      - name: Install system dependencies
+        run: |
+          echo "::group::apt-get update"
+          sudo apt-get update
+          echo "::endgroup::"
+
+          echo "::group::install tools & libraries"
+          sudo apt-get install librdkafka-dev
+          echo "::endgroup::"
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ env.php-version }}
+          extensions: "rdkafka"
           ini-values: "memory_limit=-1"
           coverage: none
 

@@ -346,6 +346,64 @@ class EnvVarProcessorTest extends TestCase
         $this->assertSame('hello', $result);
     }
 
+    public function testGetValidEnvDateTime()
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $dateString = '2023-09-06 10:21:11';
+
+        $result = $processor->getEnv('date_time', 'foo', function ($name) use ($dateString) {
+            $this->assertSame('foo', $name);
+
+            return $dateString;
+        });
+
+        $this->assertEquals(new \DateTime($dateString), $result);
+    }
+
+    public function testGetInvalidEnvDateTime()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Env var "foo" is not a valid date time string.');
+
+        $processor = new EnvVarProcessor(new Container());
+
+        $processor->getEnv('date_time', 'foo', function ($name) {
+            $this->assertSame('foo', $name);
+
+            return 'foo';
+        });
+    }
+
+    public function testGetValidEnvDateTimeImmutable()
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $dateString = '2023-09-06 10:21:11';
+
+        $result = $processor->getEnv('date_time_immutable', 'foo', function ($name) use ($dateString) {
+            $this->assertSame('foo', $name);
+
+            return $dateString;
+        });
+
+        $this->assertEquals(new \DateTimeImmutable($dateString), $result);
+    }
+
+    public function testGetInvalidEnvDateTimeImmutable()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Env var "foo" is not a valid date time string.');
+
+        $processor = new EnvVarProcessor(new Container());
+
+        $processor->getEnv('date_time_immutable', 'foo', function ($name) {
+            $this->assertSame('foo', $name);
+
+            return 'foo';
+        });
+    }
+
     /**
      * @dataProvider validJson
      */

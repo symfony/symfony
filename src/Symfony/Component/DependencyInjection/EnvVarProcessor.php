@@ -57,6 +57,8 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             'enum' => \BackedEnum::class,
             'shuffle' => 'array',
             'defined' => 'bool',
+            'date_time' => \DateTime::class,
+            'date_time_immutable' => \DateTimeImmutable::class,
         ];
     }
 
@@ -215,7 +217,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
                 throw new RuntimeException(sprintf('Unsupported env var prefix "%s".', $prefix));
             }
 
-            if (!\in_array($prefix, ['string', 'bool', 'not', 'int', 'float'], true)) {
+            if (!\in_array($prefix, ['string', 'bool', 'not', 'int', 'float', 'date_time', 'date_time_immutable'], true)) {
                 return null;
             }
         }
@@ -339,6 +341,22 @@ class EnvVarProcessor implements EnvVarProcessorInterface
 
         if ('trim' === $prefix) {
             return trim($env);
+        }
+
+        if ('date_time' === $prefix) {
+            try {
+                return new \DateTime($env);
+            } catch (\Exception) {
+                throw new RuntimeException(sprintf('Env var "%s" is not a valid date time string.', $name));
+            }
+        }
+
+        if ('date_time_immutable' === $prefix) {
+            try {
+                return new \DateTimeImmutable($env);
+            } catch (\Exception) {
+                throw new RuntimeException(sprintf('Env var "%s" is not a valid date time string.', $name));
+            }
         }
 
         throw new RuntimeException(sprintf('Unsupported env var prefix "%s" for env name "%s".', $prefix, $name));

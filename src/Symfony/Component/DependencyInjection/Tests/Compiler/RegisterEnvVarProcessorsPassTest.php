@@ -51,6 +51,8 @@ class RegisterEnvVarProcessorsPassTest extends TestCase
             'enum' => [\BackedEnum::class],
             'shuffle' => ['array'],
             'defined' => ['bool'],
+            'date_time' => [\DateTime::class],
+            'date_time_immutable' => [\DateTimeImmutable::class],
         ];
 
         $this->assertSame($expected, $container->getParameterBag()->getProvidedTypes());

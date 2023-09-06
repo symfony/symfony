@@ -269,13 +269,25 @@ class HtmlErrorRenderer implements ErrorRendererInterface
             // highlight_file could throw warnings
             // see https://bugs.php.net/25725
             $code = @highlight_file($file, true);
-            // remove main code/span tags
-            $code = preg_replace('#^<code.*?>\s*<span.*?>(.*)</span>\s*</code>#s', '\\1', $code);
-            // split multiline spans
-            $code = preg_replace_callback('#<span ([^>]++)>((?:[^<]*+<br \/>)++[^<]*+)</span>#', function ($m) {
-                return "<span $m[1]>".str_replace('<br />', "</span><br /><span $m[1]>", $m[2]).'</span>';
-            }, $code);
-            $content = explode('<br />', $code);
+            if (\PHP_VERSION_ID >= 80300) {
+                // remove main pre/code tags
+                $code = preg_replace('#^<pre.*?>\s*<code.*?>(.*)</code>\s*</pre>#s', '\\1', $code);
+                // split multiline code tags
+                $code = preg_replace_callback('#<code ([^>]++)>((?:[^<]*+\\n)++[^<]*+)</code>#', function ($m) {
+                    return "<code $m[1]>".str_replace("\n", "</code>\n<code $m[1]>", $m[2]).'</code>';
+                }, $code);
+                // Convert spaces to html entities to preserve indentation when rendered
+                $code = str_replace(' ', '&nbsp;', $code);
+                $content = explode("\n", $code);
+            } else {
+                // remove main code/span tags
+                $code = preg_replace('#^<code.*?>\s*<span.*?>(.*)</span>\s*</code>#s', '\\1', $code);
+                // split multiline spans
+                $code = preg_replace_callback('#<span ([^>]++)>((?:[^<]*+<br \/>)++[^<]*+)</span>#', function ($m) {
+                    return "<span $m[1]>".str_replace('<br />', "</span><br /><span $m[1]>", $m[2]).'</span>';
+                }, $code);
+                $content = explode('<br />', $code);
+            }
 
             $lines = [];
             if (0 > $srcContext) {

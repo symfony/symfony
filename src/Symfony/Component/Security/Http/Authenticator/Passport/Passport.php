@@ -37,7 +37,7 @@ class Passport
      *                                          SelfValidatingPassport if no credentials should be checked
      * @param BadgeInterface[]     $badges
      */
-    public function __construct(UserBadge $userBadge, CredentialsInterface $credentials, array $badges = [])
+    public function __construct(BadgeInterface $userBadge, CredentialsInterface $credentials, array $badges = [])
     {
         $this->addBadge($userBadge);
         $this->addBadge($credentials);

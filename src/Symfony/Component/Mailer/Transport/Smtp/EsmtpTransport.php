@@ -193,6 +193,7 @@ class EsmtpTransport extends SmtpTransport
                 continue;
             }
 
+            $code = null;
             $authNames[] = $authenticator->getAuthKeyword();
             try {
                 $authenticator->authenticate($this);

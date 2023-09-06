@@ -44,7 +44,7 @@ class ConfigBuilderCacheWarmer implements CacheWarmerInterface
      */
     public function warmUp(string $cacheDir)
     {
-        $generator = new ConfigBuilderGenerator($cacheDir);
+        $generator = new ConfigBuilderGenerator($this->kernel->getBuildDir());
 
         foreach ($this->kernel->getBundles() as $bundle) {
             $extension = $bundle->getContainerExtension();

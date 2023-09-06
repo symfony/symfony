@@ -29,6 +29,12 @@ class NovuOptionsTest extends TestCase
             null,
             null,
             null,
+            [
+                'email' => [
+                    'from' => 'no-reply@example.com',
+                    'senderName' => 'No-Reply',
+                ],
+            ],
             [],
         );
 
@@ -40,6 +46,12 @@ class NovuOptionsTest extends TestCase
                 'phone' => null,
                 'avatar' => null,
                 'locale' => null,
+                'overrides' => [
+                    'email' => [
+                        'from' => 'no-reply@example.com',
+                        'senderName' => 'No-Reply',
+                    ],
+                ],
             ],
             $options->toArray()
         );

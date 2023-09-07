@@ -62,8 +62,6 @@ Available strategies
 
 **PriorityStrategy** : Takes a list of `StrategyInterface` and stops at the first non-abstain (either `Grant` or `Deny`).
 
-**RandomStrategy** TODO
-
 **RequestHeaderStrategy** : Will look for a truthy value in the given `$name` header.
 
 **RequestQueryStrategy** : Will look for a truthy value in the given `$name` query string parameter.

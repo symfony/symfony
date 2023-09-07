@@ -11,14 +11,12 @@
 
 namespace Symfony\Component\FeatureToggle\Tests;
 
-use Generator;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\FeatureToggle\Feature;
 use Symfony\Component\FeatureToggle\FeatureCollection;
 use Symfony\Component\FeatureToggle\FeatureNotFoundException;
 use Symfony\Component\FeatureToggle\Strategy\GrantStrategy;
-use function is_a;
 
 /**
  * @covers \Symfony\Component\FeatureToggle\FeatureCollection
@@ -71,7 +69,7 @@ final class FeatureCollectionTest extends TestCase
             ),
         ]);
 
-        $featureCollection->withFeatures(function (): Generator {
+        $featureCollection->withFeatures(function (): \Generator {
             yield new Feature(
                 name: 'fake-3',
                 description: 'Fake description 3',

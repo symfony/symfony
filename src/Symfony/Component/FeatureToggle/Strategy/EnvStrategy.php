@@ -12,8 +12,6 @@
 namespace Symfony\Component\FeatureToggle\Strategy;
 
 use Symfony\Component\FeatureToggle\StrategyResult;
-use function filter_var;
-use const FILTER_VALIDATE_BOOL;
 
 final class EnvStrategy implements StrategyInterface
 {
@@ -30,6 +28,6 @@ final class EnvStrategy implements StrategyInterface
             return StrategyResult::Abstain;
         }
 
-        return filter_var($value, FILTER_VALIDATE_BOOL) ? StrategyResult::Grant : StrategyResult::Deny;
+        return filter_var($value, \FILTER_VALIDATE_BOOL) ? StrategyResult::Grant : StrategyResult::Deny;
     }
 }

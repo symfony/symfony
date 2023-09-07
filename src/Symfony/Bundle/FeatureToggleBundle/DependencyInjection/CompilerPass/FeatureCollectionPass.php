@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FeatureToggleBundle\DependencyInjection\CompilerPass;
 
-use Closure;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -29,8 +28,8 @@ final class FeatureCollectionPass implements CompilerPassInterface
         $collection = $container->getDefinition('toggle_feature.feature_collection');
 
         foreach ($this->findAndSortTaggedServices('feature_toggle.feature_provider', $container) as $provider) {
-            $collectionDefinition = (new Definition(Closure::class))
-                ->setFactory([Closure::class, 'fromCallable'])
+            $collectionDefinition = (new Definition(\Closure::class))
+                ->setFactory([\Closure::class, 'fromCallable'])
                 ->setArguments([[$provider, 'provide']])
             ;
 

@@ -17,8 +17,6 @@ use Symfony\Bundle\FeatureToggleBundle\DependencyInjection\FeatureToggleExtensio
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\FeatureToggle\Strategy\StrategyInterface;
-use function array_column;
-use function in_array;
 
 /**
  * @covers \Symfony\Bundle\FeatureToggleBundle\DependencyInjection\FeatureToggleExtension
@@ -110,7 +108,7 @@ final class FeatureToggleExtensionTest extends TestCase
 
         foreach ($expectedServiceIds as $expectedServiceId) {
             self::assertContains($expectedServiceId, $serviceIds);
-            if (in_array($expectedServiceId, $serviceIds, true)) {
+            if (\in_array($expectedServiceId, $serviceIds, true)) {
                 $serviceDefinition = $containerBuilder->getDefinition($expectedServiceId);
 
                 self::assertTrue(

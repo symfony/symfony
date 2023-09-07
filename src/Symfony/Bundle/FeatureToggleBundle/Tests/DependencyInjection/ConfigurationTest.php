@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FeatureToggleBundle\Tests\DependencyInjection;
 
-use Generator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FeatureToggleBundle\DependencyInjection\Configuration;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -48,7 +47,7 @@ final class ConfigurationTest extends TestCase
     }
 
 
-    public static function provideValidStrategyNameConfigurationTest(): Generator
+    public static function provideValidStrategyNameConfigurationTest(): \Generator
     {
         yield 'simple name' => ['foobar'];
         yield 'underscore name' => ['foo_bar'];
@@ -78,7 +77,7 @@ final class ConfigurationTest extends TestCase
         self::assertArrayHasKey($strategyName, $config['strategies']);
     }
 
-    public static function provideValidFeatureNameConfigurationTest(): Generator
+    public static function provideValidFeatureNameConfigurationTest(): \Generator
     {
         yield 'simple name' => ['foobar'];
         yield 'underscore name' => ['foo_bar'];

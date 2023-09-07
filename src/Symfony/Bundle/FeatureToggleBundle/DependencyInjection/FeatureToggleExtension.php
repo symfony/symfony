@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FeatureToggleBundle\DependencyInjection;
 
-use DateTimeImmutable;
 use Symfony\Bundle\FeatureToggleBundle\Strategy\CustomStrategy;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -24,7 +23,6 @@ use Symfony\Component\FeatureToggle\Strategy\StrategyInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Routing\Router;
 use Twig\Environment;
-use function array_map;
 
 /**
  * @phpstan-import-type ConfigurationType from Configuration
@@ -108,8 +106,8 @@ final class FeatureToggleExtension extends Extension
 
         return match ($type) {
             'date' => $definition->setArguments([
-                '$from' => new Definition(DateTimeImmutable::class, [$with['from']]),
-                '$until' => new Definition(DateTimeImmutable::class, [$with['until']]),
+                '$from' => new Definition(\DateTimeImmutable::class, [$with['from']]),
+                '$until' => new Definition(\DateTimeImmutable::class, [$with['until']]),
                 '$includeFrom' => $with['includeFrom'],
                 '$includeUntil' => $with['includeUntil'],
             ]),

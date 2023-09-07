@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FeatureToggleBundle\DataCollector;
 
-use Closure;
 use Symfony\Component\FeatureToggle\Feature;
 use Symfony\Component\FeatureToggle\FeatureCollection;
 use Symfony\Component\FeatureToggle\Strategy\StrategyInterface;
@@ -65,8 +64,8 @@ final class FeatureCheckerDataCollector extends DataCollector implements LateDat
     public function collect(Request $request, Response $response, \Throwable $exception = null): void
     {
         foreach ($this->featureCollection as $feature) {
-            $strategy = (Closure::bind(fn(): StrategyInterface => $this->strategy, $feature, Feature::class))();
-            $default = (Closure::bind(fn(): bool => $this->default, $feature, Feature::class))();
+            $strategy = (\Closure::bind(fn(): StrategyInterface => $this->strategy, $feature, Feature::class))();
+            $default = (\Closure::bind(fn(): bool => $this->default, $feature, Feature::class))();
 
             $this->data['features'][$feature->getName()] = [
                 'default' => $default,

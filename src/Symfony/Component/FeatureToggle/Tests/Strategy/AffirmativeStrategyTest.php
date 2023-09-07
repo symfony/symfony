@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\FeatureToggle\Tests\Strategy;
 
-use Generator;
 use Symfony\Component\FeatureToggle\Strategy\AffirmativeStrategy;
 use Symfony\Component\FeatureToggle\Strategy\OuterStrategiesInterface;
 use Symfony\Component\FeatureToggle\Strategy\StrategyInterface;
@@ -28,7 +27,7 @@ final class AffirmativeStrategyTest extends AbstractOuterStrategiesTestCase
         self::assertTrue(is_a(AffirmativeStrategy::class, OuterStrategiesInterface::class, true));
     }
 
-    public static function generatesValidStrategies(): Generator
+    public static function generatesValidStrategies(): \Generator
     {
         yield 'no strategies' => [
             [],

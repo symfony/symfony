@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\FeatureToggle\Tests\Strategy;
 
-use DateTimeImmutable;
-use Generator;
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Psr\Clock\ClockInterface;
 use Symfony\Component\FeatureToggle\Strategy\DateStrategy;
@@ -26,16 +23,16 @@ final class DateStrategyTest extends TestCase
 {
     private static ClockInterface $nowClock;
 
-    private static function generateClock(DateTimeImmutable|null $now = null): ClockInterface
+    private static function generateClock(\DateTimeImmutable|null $now = null): ClockInterface
     {
-        $now = $now ?? DateTimeImmutable::createFromFormat('!d/m/Y', (new DateTimeImmutable())->format('d/m/Y'));
+        $now = $now ?? \DateTimeImmutable::createFromFormat('!d/m/Y', (new \DateTimeImmutable())->format('d/m/Y'));
 
         return new class($now) implements ClockInterface {
-            public function __construct(private DateTimeImmutable $now)
+            public function __construct(private \DateTimeImmutable $now)
             {
             }
 
-            public function now(): DateTimeImmutable
+            public function now(): \DateTimeImmutable
             {
                 return $this->now;
             }
@@ -49,13 +46,13 @@ final class DateStrategyTest extends TestCase
 
     public function testItRequiresAtLeastOneDate(): void
     {
-        self::expectException(InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         self::expectExceptionMessage('Either from or until must be provided.');
 
         new DateStrategy(self::generateClock());
     }
 
-    public static function generateValidDates(): Generator
+    public static function generateValidDates(): \Generator
     {
         $now = self::generateClock()->now();
 

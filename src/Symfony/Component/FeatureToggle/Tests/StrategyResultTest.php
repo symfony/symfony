@@ -11,17 +11,15 @@
 
 namespace Symfony\Component\FeatureToggle\Tests;
 
-use Generator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\FeatureToggle\StrategyResult;
-use function constant;
 
 /**
  * @covers \Symfony\Component\FeatureToggle\StrategyResult
  */
 final class StrategyResultTest extends TestCase
 {
-    public static function generateValidUseCases(): Generator
+    public static function generateValidUseCases(): \Generator
     {
         // Grant
         yield "grant should ignore fallback #1" => [

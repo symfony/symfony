@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\FeatureToggle\Tests;
 
-use Generator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\FeatureToggle\Feature;
 use Symfony\Component\FeatureToggle\Strategy\StrategyInterface;
@@ -41,7 +40,7 @@ final class FeatureTest extends TestCase
         self::addToAssertionCount(1);
     }
 
-    public static function generateValidStrategy(): Generator
+    public static function generateValidStrategy(): \Generator
     {
         // Grant
         yield "grant and default 'true'" => [

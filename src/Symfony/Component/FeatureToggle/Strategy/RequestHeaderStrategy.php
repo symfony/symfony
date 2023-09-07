@@ -12,8 +12,6 @@
 namespace Symfony\Component\FeatureToggle\Strategy;
 
 use Symfony\Component\FeatureToggle\StrategyResult;
-use function filter_var;
-use const FILTER_VALIDATE_BOOL;
 
 // TODO: make it case insensitive ?
 final class RequestHeaderStrategy implements StrategyInterface
@@ -29,6 +27,6 @@ final class RequestHeaderStrategy implements StrategyInterface
             return StrategyResult::Abstain;
         }
 
-        return filter_var($_SERVER['HTTP_'.$this->headerName], FILTER_VALIDATE_BOOL) ? StrategyResult::Grant : StrategyResult::Deny;
+        return filter_var($_SERVER['HTTP_'.$this->headerName], \FILTER_VALIDATE_BOOL) ? StrategyResult::Grant : StrategyResult::Deny;
     }
 }

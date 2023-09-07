@@ -12,7 +12,6 @@
 namespace Symfony\Component\FeatureToggle\Strategy;
 
 use Symfony\Component\FeatureToggle\StrategyResult;
-use InvalidArgumentException;
 use Psr\Clock\ClockInterface;
 
 final class DateStrategy implements StrategyInterface
@@ -25,7 +24,7 @@ final class DateStrategy implements StrategyInterface
         private readonly bool $includeUntil = true,
     ) {
         if (null === $this->from && null === $this->until) {
-            throw new InvalidArgumentException('Either from or until must be provided.');
+            throw new \InvalidArgumentException('Either from or until must be provided.');
         }
     }
 

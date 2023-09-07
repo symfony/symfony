@@ -11,12 +11,10 @@
 
 namespace Symfony\Component\FeatureToggle\Tests\Strategy;
 
-use Generator;
 use Symfony\Component\FeatureToggle\Strategy\OuterStrategiesInterface;
 use Symfony\Component\FeatureToggle\Strategy\PriorityStrategy;
 use Symfony\Component\FeatureToggle\Strategy\StrategyInterface;
 use Symfony\Component\FeatureToggle\StrategyResult;
-use function is_a;
 
 /**
  * @covers \Symfony\Component\FeatureToggle\Strategy\PriorityStrategy
@@ -28,7 +26,7 @@ final class PriorityStrategyTest extends AbstractOuterStrategiesTestCase
         self::assertTrue(is_a(PriorityStrategy::class, OuterStrategiesInterface::class, true));
     }
 
-    public static function generatesValidStrategies(): Generator
+    public static function generatesValidStrategies(): \Generator
     {
         yield 'no strategies' => [
             [],

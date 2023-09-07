@@ -11,20 +11,15 @@
 
 namespace Symfony\Component\FeatureToggle;
 
-use ArrayIterator;
-use Closure;
-use IteratorAggregate;
 use Psr\Container\ContainerInterface;
-use function array_values;
-use function is_callable;
 
-/** @implements IteratorAggregate<int, Feature> */
-final class FeatureCollection implements ContainerInterface, IteratorAggregate
+/** @implements \IteratorAggregate<int, Feature> */
+final class FeatureCollection implements ContainerInterface, \IteratorAggregate
 {
     /** @var array<string, Feature>|null */
     private array|null $features = null;
 
-    /** @var array<iterable<Feature>|(Closure(): iterable<Feature>)> */
+    /** @var array<iterable<Feature>|(\Closure(): iterable<Feature>)> */
     private array $featureProviders = [];
 
     /**
@@ -36,18 +31,18 @@ final class FeatureCollection implements ContainerInterface, IteratorAggregate
     }
 
     /**
-     * @param iterable<Feature>|(Closure(): iterable<Feature>) $features
+     * @param iterable<Feature>|(\Closure(): iterable<Feature>) $features
      */
-    private function append(iterable|Closure $features): void
+    private function append(iterable|\Closure $features): void
     {
         $this->featureProviders[] = $features;
         $this->features = null;
     }
 
     /**
-     * @param iterable<Feature>|(Closure(): iterable<Feature>) $features
+     * @param iterable<Feature>|(\Closure(): iterable<Feature>) $features
      */
-    public function withFeatures(iterable|Closure $features): self
+    public function withFeatures(iterable|\Closure $features): self
     {
         $this->append($features);
 
@@ -92,12 +87,12 @@ final class FeatureCollection implements ContainerInterface, IteratorAggregate
     }
 
     /**
-     * @return ArrayIterator<int, Feature>
+     * @return \ArrayIterator<int, Feature>
      */
-    public function getIterator(): ArrayIterator
+    public function getIterator(): \ArrayIterator
     {
         $this->compile();
 
-        return new ArrayIterator(array_values($this->features));
+        return new \ArrayIterator(array_values($this->features));
     }
 }

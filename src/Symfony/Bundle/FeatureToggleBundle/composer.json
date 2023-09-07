@@ -20,7 +20,6 @@
         "symfony/contracts": "^3.3",
         "symfony/config": "^6.3",
         "symfony/dependency-injection": "^6.3",
-        "symfony/options-resolver": "^6.3",
         "symfony/http-kernel": "^6.3"
     },
     "require-dev": {
@@ -29,7 +28,7 @@
         "symfony/twig-bridge": "^6.3"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Bundle\\FeatureToggle\\": "" },
+        "psr-4": { "Symfony\\Bundle\\FeatureToggleBundle\\": "" },
         "exclude-from-classmap": [
             "/Tests/"
         ]

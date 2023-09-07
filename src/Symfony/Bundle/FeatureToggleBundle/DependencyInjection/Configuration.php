@@ -11,12 +11,8 @@
 
 namespace Symfony\Bundle\FeatureToggleBundle\DependencyInjection;
 
-use InvalidArgumentException;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-use function implode;
-use function sprintf;
-use function trim;
 
 /**
  * @phpstan-type ConfigurationType array{
@@ -93,37 +89,37 @@ final class Configuration implements ConfigurationInterface
                                 $validator = match ($strategy['type']) {
                                     'date' => static function (array $with): void {
                                         if ('' === trim((string)$with['from'] . (string)$with['until'])) {
-                                            throw new InvalidArgumentException('Either "from" or "until" must be provided.');
+                                            throw new \InvalidArgumentException('Either "from" or "until" must be provided.');
                                         }
                                     },
                                     'not' => static function (array $with): void {
                                         if ('' === (string)$with['strategy']) {
-                                            throw new InvalidArgumentException('"strategy" must be provided.');
+                                            throw new \InvalidArgumentException('"strategy" must be provided.');
                                         }
                                     },
                                     'env' => static function (array $with): void {
                                         if ('' === (string)$with['name']) {
-                                            throw new InvalidArgumentException('"name" must be provided.');
+                                            throw new \InvalidArgumentException('"name" must be provided.');
                                         }
                                     },
                                     'native_request_header' => static function (array $with): void {
                                         if ('' === (string)$with['name']) {
-                                            throw new InvalidArgumentException('"name" must be provided.');
+                                            throw new \InvalidArgumentException('"name" must be provided.');
                                         }
                                     },
                                     'native_request_query' => static function (array $with): void {
                                         if ('' === (string)$with['name']) {
-                                            throw new InvalidArgumentException('"name" must be provided.');
+                                            throw new \InvalidArgumentException('"name" must be provided.');
                                         }
                                     },
                                     'request_attribute' => static function (array $with): void {
                                         if ('' === (string)$with['name']) {
-                                            throw new InvalidArgumentException('"name" must be provided.');
+                                            throw new \InvalidArgumentException('"name" must be provided.');
                                         }
                                     },
                                     'priority', 'affirmative' => static function (array $with): void {
                                         if ([] === (array)$with['strategies']) {
-                                            throw new InvalidArgumentException('"strategies" must be provided.');
+                                            throw new \InvalidArgumentException('"strategies" must be provided.');
                                         }
                                     },
                                     default => static fn(): bool => true,

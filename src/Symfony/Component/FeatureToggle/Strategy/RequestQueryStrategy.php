@@ -12,8 +12,6 @@
 namespace Symfony\Component\FeatureToggle\Strategy;
 
 use Symfony\Component\FeatureToggle\StrategyResult;
-use function filter_var;
-use const FILTER_VALIDATE_BOOL;
 
 // TODO: make it case insensitive ?
 final class RequestQueryStrategy implements StrategyInterface
@@ -29,6 +27,6 @@ final class RequestQueryStrategy implements StrategyInterface
             return StrategyResult::Abstain;
         }
 
-        return filter_var($_GET[$this->queryParameterName], FILTER_VALIDATE_BOOL) ? StrategyResult::Grant : StrategyResult::Deny;
+        return filter_var($_GET[$this->queryParameterName], \FILTER_VALIDATE_BOOL) ? StrategyResult::Grant : StrategyResult::Deny;
     }
 }

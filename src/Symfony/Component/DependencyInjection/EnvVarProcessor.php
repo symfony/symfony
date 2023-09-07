@@ -61,7 +61,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             'shuffle' => 'array',
             'defined' => 'bool',
             'date_time' => \DateTimeImmutable::class,
-            'format_date_time' => 'string',
+            'date_time_format' => 'string',
         ];
     }
 
@@ -157,9 +157,9 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             }
         }
 
-        if ('format_date_time' === $prefix) {
+        if ('date_time_format' === $prefix) {
             if (false === $i) {
-                throw new RuntimeException(sprintf('Invalid env "format_date_time:%s": a format specifier should be provided.', $name));
+                throw new RuntimeException(sprintf('Invalid env "date_time_format:%s": a format specifier should be provided.', $name));
             }
 
             $next = substr($name, $i + 1);

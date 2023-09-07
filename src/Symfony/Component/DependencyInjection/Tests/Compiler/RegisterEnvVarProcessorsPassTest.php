@@ -52,7 +52,7 @@ class RegisterEnvVarProcessorsPassTest extends TestCase
             'shuffle' => ['array'],
             'defined' => ['bool'],
             'date_time' => [\DateTimeImmutable::class],
-            'format_date_time' => ['string'],
+            'date_time_format' => ['string'],
         ];
 
         $this->assertSame($expected, $container->getParameterBag()->getProvidedTypes());

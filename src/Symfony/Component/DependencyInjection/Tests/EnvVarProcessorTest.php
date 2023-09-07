@@ -421,7 +421,7 @@ class EnvVarProcessorTest extends TestCase
 
         $dateTime = new \DateTimeImmutable();
 
-        $result = $processor->getEnv('format_date_time', $format.':foo', function ($name) use ($dateTime) {
+        $result = $processor->getEnv('date_time_format', $format.':foo', function ($name) use ($dateTime) {
             $this->assertSame('foo', $name);
 
             return $dateTime;

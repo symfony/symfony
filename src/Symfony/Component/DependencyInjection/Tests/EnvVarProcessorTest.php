@@ -428,7 +428,7 @@ class EnvVarProcessorTest extends TestCase
         });
 
         $this->assertEquals(
-            $dateTime->format(null === strpos($format, '%') ? $format : urldecode($format)),
+            $dateTime->format($format),
             $result,
         );
     }
@@ -441,9 +441,8 @@ class EnvVarProcessorTest extends TestCase
             ['Y-m-d'],
             ['Y.m.d'],
             ['Y m d'],
-            ['Y-m-d H%3Ai%3As'],
             ['...'],
-            ['YYY'],
+            ['KKK'],
         ];
     }
 

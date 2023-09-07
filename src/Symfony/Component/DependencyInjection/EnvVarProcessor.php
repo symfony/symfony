@@ -30,7 +30,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
     /**
      * @param \Traversable<EnvVarLoaderInterface>|null $loaders
      */
-    public function __construct(ContainerInterface $container, \Traversable $loaders = null, ?ClockInterface $clock = null)
+    public function __construct(ContainerInterface $container, \Traversable $loaders = null, ClockInterface $clock = null)
     {
         $this->container = $container;
         $this->loaders = $loaders ?? new \ArrayIterator();
@@ -168,11 +168,6 @@ class EnvVarProcessor implements EnvVarProcessorInterface
 
             if (!$dateTime instanceof \DateTimeImmutable) {
                 throw new RuntimeException(sprintf('Resolved value of "%s" did not result in a "%s" class instance.', $next, \DateTimeImmutable::class));
-            }
-
-
-            if (null !== strpos($format, '%')) {
-                $format = urldecode($format);
             }
 
             return $dateTime->format($format);
@@ -377,7 +372,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
                     return $this->clock->now();
                 }
 
-                return new \DateTimeImmutable(timezone:  $this->clock?->now()->getTimeZone());
+                return new \DateTimeImmutable(timezone: $this->clock?->now()->getTimeZone());
             } catch (\Exception) {
                 throw new RuntimeException(sprintf('Env var "%s" is not a valid date time string.', $name));
             }

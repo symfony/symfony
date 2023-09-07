@@ -76,11 +76,7 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
         $sql = 'DELETE FROM rememberme_token WHERE series=:series';
         $paramValues = ['series' => $series];
         $paramTypes = ['series' => ParameterType::STRING];
-        if (method_exists($this->conn, 'executeStatement')) {
-            $this->conn->executeStatement($sql, $paramValues, $paramTypes);
-        } else {
-            $this->conn->executeUpdate($sql, $paramValues, $paramTypes);
-        }
+        $this->conn->executeStatement($sql, $paramValues, $paramTypes);
     }
 
     /**
@@ -101,11 +97,7 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
             'lastUsed' => Types::DATETIME_IMMUTABLE,
             'series' => ParameterType::STRING,
         ];
-        if (method_exists($this->conn, 'executeStatement')) {
-            $updated = $this->conn->executeStatement($sql, $paramValues, $paramTypes);
-        } else {
-            $updated = $this->conn->executeUpdate($sql, $paramValues, $paramTypes);
-        }
+        $updated = $this->conn->executeStatement($sql, $paramValues, $paramTypes);
         if ($updated < 1) {
             throw new TokenNotFoundException('No token found.');
         }
@@ -131,11 +123,7 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
             'value' => ParameterType::STRING,
             'lastUsed' => Types::DATETIME_IMMUTABLE,
         ];
-        if (method_exists($this->conn, 'executeStatement')) {
-            $this->conn->executeStatement($sql, $paramValues, $paramTypes);
-        } else {
-            $this->conn->executeUpdate($sql, $paramValues, $paramTypes);
-        }
+        $this->conn->executeStatement($sql, $paramValues, $paramTypes);
     }
 
     public function verifyToken(PersistentTokenInterface $token, #[\SensitiveParameter] string $tokenValue): bool

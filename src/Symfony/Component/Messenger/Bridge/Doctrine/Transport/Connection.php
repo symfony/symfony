@@ -403,11 +403,7 @@ class Connection implements ResetInterface
     protected function executeStatement(string $sql, array $parameters = [], array $types = []): int|string
     {
         try {
-            if (method_exists($this->driverConnection, 'executeStatement')) {
-                $stmt = $this->driverConnection->executeStatement($sql, $parameters, $types);
-            } else {
-                $stmt = $this->driverConnection->executeUpdate($sql, $parameters, $types);
-            }
+            $stmt = $this->driverConnection->executeStatement($sql, $parameters, $types);
         } catch (TableNotFoundException $e) {
             if ($this->driverConnection->isTransactionActive()) {
                 throw $e;
@@ -417,11 +413,7 @@ class Connection implements ResetInterface
             if ($this->autoSetup) {
                 $this->setup();
             }
-            if (method_exists($this->driverConnection, 'executeStatement')) {
-                $stmt = $this->driverConnection->executeStatement($sql, $parameters, $types);
-            } else {
-                $stmt = $this->driverConnection->executeUpdate($sql, $parameters, $types);
-            }
+            $stmt = $this->driverConnection->executeStatement($sql, $parameters, $types);
         }
 
         return $stmt;
@@ -481,11 +473,10 @@ class Connection implements ResetInterface
         $comparator = $this->createComparator($schemaManager);
         $schemaDiff = $this->compareSchemas($comparator, method_exists($schemaManager, 'introspectSchema') ? $schemaManager->introspectSchema() : $schemaManager->createSchema(), $this->getSchema());
         $platform = $this->driverConnection->getDatabasePlatform();
-        $exec = method_exists($this->driverConnection, 'executeStatement') ? 'executeStatement' : 'exec';
 
         if (!method_exists(SchemaDiff::class, 'getCreatedSchemas')) {
             foreach ($schemaDiff->toSaveSql($platform) as $sql) {
-                $this->driverConnection->$exec($sql);
+                $this->driverConnection->executeStatement($sql);
             }
 
             return;
@@ -493,27 +484,27 @@ class Connection implements ResetInterface
 
         if ($platform->supportsSchemas()) {
             foreach ($schemaDiff->getCreatedSchemas() as $schema) {
-                $this->driverConnection->$exec($platform->getCreateSchemaSQL($schema));
+                $this->driverConnection->executeStatement($platform->getCreateSchemaSQL($schema));
             }
         }
 
         if ($platform->supportsSequences()) {
             foreach ($schemaDiff->getAlteredSequences() as $sequence) {
-                $this->driverConnection->$exec($platform->getAlterSequenceSQL($sequence));
+                $this->driverConnection->executeStatement($platform->getAlterSequenceSQL($sequence));
             }
 
             foreach ($schemaDiff->getCreatedSequences() as $sequence) {
-                $this->driverConnection->$exec($platform->getCreateSequenceSQL($sequence));
+                $this->driverConnection->executeStatement($platform->getCreateSequenceSQL($sequence));
             }
         }
 
         foreach ($platform->getCreateTablesSQL($schemaDiff->getCreatedTables()) as $sql) {
-            $this->driverConnection->$exec($sql);
+            $this->driverConnection->executeStatement($sql);
         }
 
         foreach ($schemaDiff->getAlteredTables() as $tableDiff) {
             foreach ($platform->getAlterTableSQL($tableDiff) as $sql) {
-                $this->driverConnection->$exec($sql);
+                $this->driverConnection->executeStatement($sql);
             }
         }
     }

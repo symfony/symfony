@@ -413,6 +413,41 @@ class EnvVarProcessorTest extends TestCase
     }
 
     /**
+     * @dataProvider dateTimeFormats
+     */
+    public function testGetEnvDateTimeFormat($format)
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $dateTime = new \DateTimeImmutable();
+
+        $result = $processor->getEnv('format_date_time', $format.':foo', function ($name) use ($dateTime) {
+            $this->assertSame('foo', $name);
+
+            return $dateTime;
+        });
+
+        $this->assertEquals(
+            $dateTime->format(null === strpos($format, '%') ? $format : urldecode($format)),
+            $result,
+        );
+    }
+
+    public static function dateTimeFormats()
+    {
+        return [
+            [''],
+            ['c'],
+            ['Y-m-d'],
+            ['Y.m.d'],
+            ['Y m d'],
+            ['Y-m-d H%3Ai%3As'],
+            ['...'],
+            ['YYY'],
+        ];
+    }
+
+    /**
      * @dataProvider validJson
      */
     public function testGetEnvJson($value, $processed)

@@ -20,7 +20,7 @@ use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
-use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
+use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 
 /**
  * @author Ryan Weaver <ryan@symfonycasts.com>
@@ -32,7 +32,8 @@ class FailedMessagesRemoveCommand extends AbstractFailedMessagesCommand
     {
         $this
             ->setDefinition([
-                new InputArgument('id', InputArgument::REQUIRED | InputArgument::IS_ARRAY, 'Specific message id(s) to remove'),
+                new InputArgument('id', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, 'Specific message id(s) to remove'),
+                new InputOption('all', null, InputOption::VALUE_NONE, 'Remove all failed messages from the transport'),
                 new InputOption('force', null, InputOption::VALUE_NONE, 'Force the operation without confirmation'),
                 new InputOption('transport', null, InputOption::VALUE_OPTIONAL, 'Use a specific failure transport', self::DEFAULT_TRANSPORT_OPTION),
                 new InputOption('show-messages', null, InputOption::VALUE_NONE, 'Display messages before removing it (if multiple ids are given)'),
@@ -43,6 +44,10 @@ The <info>%command.name%</info> removes given messages that are pending in the f
     <info>php %command.full_name% {id1} [{id2} ...]</info>
 
 The specific ids can be found via the messenger:failed:show command.
+
+You can remove all failed messages from the failure transport by using the "--all" option:
+
+    <info>php %command.full_name% --all</info>
 EOF
             )
         ;
@@ -61,18 +66,32 @@ EOF
 
         $shouldForce = $input->getOption('force');
         $ids = (array) $input->getArgument('id');
-        $shouldDisplayMessages = $input->getOption('show-messages') || 1 === \count($ids);
-        $this->removeMessages($failureTransportName, $ids, $receiver, $io, $shouldForce, $shouldDisplayMessages);
+        $shouldDeleteAllMessages = $input->getOption('all');
 
-        return 0;
-    }
+        $idsCount = \count($ids);
+        if (!$shouldDeleteAllMessages && !$idsCount) {
+            throw new RuntimeException('Please specify at least one message id. If you want to remove all failed messages, use the "--all" option.');
+        } elseif ($shouldDeleteAllMessages && $idsCount) {
+            throw new RuntimeException('You cannot specify message ids when using the "--all" option.');
+        }
 
-    private function removeMessages(string $failureTransportName, array $ids, ReceiverInterface $receiver, SymfonyStyle $io, bool $shouldForce, bool $shouldDisplayMessages): void
-    {
+        $shouldDisplayMessages = $input->getOption('show-messages') || 1 === $idsCount;
+
         if (!$receiver instanceof ListableReceiverInterface) {
             throw new RuntimeException(sprintf('The "%s" receiver does not support removing specific messages.', $failureTransportName));
         }
 
+        if ($shouldDeleteAllMessages) {
+            $this->removeAllMessages($receiver, $io, $shouldForce, $shouldDisplayMessages);
+        } else {
+            $this->removeMessagesById($ids, $receiver, $io, $shouldForce, $shouldDisplayMessages);
+        }
+
+        return 0;
+    }
+
+    private function removeMessagesById(array $ids, ListableReceiverInterface $receiver, SymfonyStyle $io, bool $shouldForce, bool $shouldDisplayMessages): void
+    {
         foreach ($ids as $id) {
             $this->phpSerializer?->acceptPhpIncompleteClass();
             try {
@@ -98,5 +117,32 @@ EOF
                 $io->note(sprintf('Message with id %s not removed.', $id));
             }
         }
+    }
+
+    private function removeAllMessages(ListableReceiverInterface $receiver, SymfonyStyle $io, bool $shouldForce, bool $shouldDisplayMessages): void
+    {
+        if (!$shouldForce) {
+            if ($receiver instanceof MessageCountAwareInterface) {
+                $question = sprintf('Do you want to permanently remove all (%d) messages?', $receiver->getMessageCount());
+            } else {
+                $question = 'Do you want to permanently remove all failed messages?';
+            }
+
+            if (!$io->confirm($question, false)) {
+                return;
+            }
+        }
+
+        $count = 0;
+        foreach ($receiver->all() as $envelope) {
+            if ($shouldDisplayMessages) {
+                $this->displaySingleMessage($envelope, $io);
+            }
+
+            $receiver->reject($envelope);
+            ++$count;
+        }
+
+        $io->note(sprintf('%d messages were removed.', $count));
     }
 }

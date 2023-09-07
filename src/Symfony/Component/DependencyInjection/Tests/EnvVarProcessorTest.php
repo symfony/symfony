@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -358,7 +359,43 @@ class EnvVarProcessorTest extends TestCase
             return $dateString;
         });
 
-        $this->assertEquals(new \DateTime($dateString), $result);
+        $this->assertEquals(
+            new \DateTimeImmutable($dateString),
+            $result,
+        );
+
+        $this->assertInstanceOf(
+            \DateTimeImmutable::class,
+            $processor->getEnv('date_time', 'foo', fn () => null),
+        );
+
+        $this->assertInstanceOf(
+            \DateTimeImmutable::class,
+            $processor->getEnv('date_time', 'foo', fn () => ''),
+        );
+    }
+
+    public function testGetValidEnvDateTimeWithClock()
+    {
+        if (!class_exists(MockClock::class)) {
+            $this->markTestSkipped('Testing date_time processor with clock requires the Symfony Clock component to be installed.');
+        }
+
+        $dateString = '2023-09-06 10:21:11';
+        $clock = new MockClock($dateString);
+
+        $processor = new EnvVarProcessor(new Container(), null, $clock);
+
+        $expectedResult = new \DateTimeImmutable($dateString, $clock->now()->getTimezone());
+        $result = $processor->getEnv('date_time', 'foo', function ($name) use ($dateString) {
+            $this->assertSame('foo', $name);
+
+            return $dateString;
+        });
+
+        $this->assertEquals($expectedResult, $result);
+        $this->assertEquals($expectedResult, $processor->getEnv('date_time', 'foo', fn () => null));
+        $this->assertEquals($expectedResult, $processor->getEnv('date_time', 'foo', fn () => ''));
     }
 
     public function testGetInvalidEnvDateTime()
@@ -369,35 +406,6 @@ class EnvVarProcessorTest extends TestCase
         $processor = new EnvVarProcessor(new Container());
 
         $processor->getEnv('date_time', 'foo', function ($name) {
-            $this->assertSame('foo', $name);
-
-            return 'foo';
-        });
-    }
-
-    public function testGetValidEnvDateTimeImmutable()
-    {
-        $processor = new EnvVarProcessor(new Container());
-
-        $dateString = '2023-09-06 10:21:11';
-
-        $result = $processor->getEnv('date_time_immutable', 'foo', function ($name) use ($dateString) {
-            $this->assertSame('foo', $name);
-
-            return $dateString;
-        });
-
-        $this->assertEquals(new \DateTimeImmutable($dateString), $result);
-    }
-
-    public function testGetInvalidEnvDateTimeImmutable()
-    {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Env var "foo" is not a valid date time string.');
-
-        $processor = new EnvVarProcessor(new Container());
-
-        $processor->getEnv('date_time_immutable', 'foo', function ($name) {
             $this->assertSame('foo', $name);
 
             return 'foo';

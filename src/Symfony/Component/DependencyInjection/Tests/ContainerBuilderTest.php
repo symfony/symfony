@@ -167,7 +167,7 @@ class ContainerBuilderTest extends TestCase
                 return [];
             }
 
-            public function get(string $name): array|bool|string|int|float|\UnitEnum|null
+            public function get(string $name): array|bool|string|int|float|\UnitEnum|\DateTimeInterface|null
             {
                 return null;
             }
@@ -176,7 +176,7 @@ class ContainerBuilderTest extends TestCase
             {
             }
 
-            public function set(string $name, \UnitEnum|float|int|bool|array|string|null $value): void
+            public function set(string $name, \DateTimeInterface|\UnitEnum|float|int|bool|array|string|null $value): void
             {
             }
 

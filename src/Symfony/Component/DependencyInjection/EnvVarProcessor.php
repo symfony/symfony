@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use Psr\Clock\ClockInterface;
 use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -23,15 +24,17 @@ class EnvVarProcessor implements EnvVarProcessorInterface
     private ContainerInterface $container;
     /** @var \Traversable<EnvVarLoaderInterface> */
     private \Traversable $loaders;
+    private readonly ?ClockInterface $clock;
     private array $loadedVars = [];
 
     /**
      * @param \Traversable<EnvVarLoaderInterface>|null $loaders
      */
-    public function __construct(ContainerInterface $container, \Traversable $loaders = null)
+    public function __construct(ContainerInterface $container, \Traversable $loaders = null, ?ClockInterface $clock = null)
     {
         $this->container = $container;
         $this->loaders = $loaders ?? new \ArrayIterator();
+        $this->clock = $clock;
     }
 
     public static function getProvidedTypes(): array
@@ -57,8 +60,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             'enum' => \BackedEnum::class,
             'shuffle' => 'array',
             'defined' => 'bool',
-            'date_time' => \DateTime::class,
-            'date_time_immutable' => \DateTimeImmutable::class,
+            'date_time' => \DateTimeImmutable::class,
         ];
     }
 
@@ -217,7 +219,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
                 throw new RuntimeException(sprintf('Unsupported env var prefix "%s".', $prefix));
             }
 
-            if (!\in_array($prefix, ['string', 'bool', 'not', 'int', 'float', 'date_time', 'date_time_immutable'], true)) {
+            if (!\in_array($prefix, ['string', 'bool', 'not', 'int', 'float', 'date_time'], true)) {
                 return null;
             }
         }
@@ -345,15 +347,15 @@ class EnvVarProcessor implements EnvVarProcessorInterface
 
         if ('date_time' === $prefix) {
             try {
-                return new \DateTime($env);
-            } catch (\Exception) {
-                throw new RuntimeException(sprintf('Env var "%s" is not a valid date time string.', $name));
-            }
-        }
+                if (null !== $env && '' !== $env) {
+                    return new \DateTimeImmutable($env, $this->clock?->now()->getTimeZone());
+                }
 
-        if ('date_time_immutable' === $prefix) {
-            try {
-                return new \DateTimeImmutable($env);
+                if ($this->clock) {
+                    return $this->clock->now();
+                }
+
+                return new \DateTimeImmutable(timezone:  $this->clock?->now()->getTimeZone());
             } catch (\Exception) {
                 throw new RuntimeException(sprintf('Env var "%s" is not a valid date time string.', $name));
             }

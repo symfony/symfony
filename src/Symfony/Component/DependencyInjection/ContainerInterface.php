@@ -57,7 +57,7 @@ interface ContainerInterface extends PsrContainerInterface
     public function initialized(string $id): bool;
 
     /**
-     * @return array|bool|string|int|float|\UnitEnum|null
+     * @return array|bool|string|int|float|\UnitEnum|\DateTimeInterface|null
      *
      * @throws ParameterNotFoundException if the parameter is not defined
      */
@@ -68,5 +68,5 @@ interface ContainerInterface extends PsrContainerInterface
     /**
      * @return void
      */
-    public function setParameter(string $name, array|bool|string|int|float|\UnitEnum|null $value);
+    public function setParameter(string $name, array|bool|string|int|float|\UnitEnum|\DateTimeInterface|null $value);
 }

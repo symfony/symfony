@@ -30,7 +30,7 @@ class ContainerBag extends FrozenParameterBag implements ContainerBagInterface
         return $this->container->getParameterBag()->all();
     }
 
-    public function get(string $name): array|bool|string|int|float|\UnitEnum|null
+    public function get(string $name): array|bool|string|int|float|\UnitEnum|\DateTimeInterface|null
     {
         return $this->container->getParameter($name);
     }

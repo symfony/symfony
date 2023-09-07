@@ -53,7 +53,7 @@ class FrozenParameterBag extends ParameterBag
     /**
      * @return never
      */
-    public function set(string $name, array|bool|string|int|float|\UnitEnum|null $value)
+    public function set(string $name, array|bool|string|int|float|\UnitEnum|\DateTimeInterface|null $value)
     {
         throw new LogicException('Impossible to call set() on a frozen ParameterBag.');
     }

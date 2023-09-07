@@ -41,6 +41,7 @@ class FrozenParameterBagTest extends TestCase
         $this->expectException(\LogicException::class);
         $bag = new FrozenParameterBag([]);
         $bag->set('foo', 'bar');
+        $bag->set('foo', new \DateTimeImmutable());
     }
 
     public function testAdd()

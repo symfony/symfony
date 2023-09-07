@@ -52,7 +52,7 @@ class ProjectServiceContainer extends Container
         return $container->services['foo'] = new \FooClass\Foo();
     }
 
-    public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null
+    public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|\DateTimeInterface|null
     {
         if (isset(self::DEPRECATED_PARAMETERS[$name])) {
             trigger_deprecation(...self::DEPRECATED_PARAMETERS[$name]);

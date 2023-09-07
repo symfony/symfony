@@ -113,7 +113,7 @@ class Container implements ContainerInterface, ResetInterface
     /**
      * Gets a parameter.
      *
-     * @return array|bool|string|int|float|\UnitEnum|null
+     * @return array|bool|string|int|float|\UnitEnum|\DateTimeInterface|null
      *
      * @throws ParameterNotFoundException if the parameter is not defined
      */
@@ -130,7 +130,7 @@ class Container implements ContainerInterface, ResetInterface
     /**
      * @return void
      */
-    public function setParameter(string $name, array|bool|string|int|float|\UnitEnum|null $value)
+    public function setParameter(string $name, array|bool|string|int|float|\UnitEnum|\DateTimeInterface|null $value)
     {
         $this->parameterBag->set($name, $value);
     }

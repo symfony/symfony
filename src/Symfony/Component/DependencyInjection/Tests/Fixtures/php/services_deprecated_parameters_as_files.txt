@@ -88,7 +88,7 @@ class ProjectServiceContainer extends Container
         return class_exists($class, false) ? $class::do($this, $lazyLoad) : $service;
     }
 
-    public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null
+    public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|\DateTimeInterface|null
     {
         if (isset(self::DEPRECATED_PARAMETERS[$name])) {
             trigger_deprecation(...self::DEPRECATED_PARAMETERS[$name]);

@@ -51,8 +51,7 @@ class RegisterEnvVarProcessorsPassTest extends TestCase
             'enum' => [\BackedEnum::class],
             'shuffle' => ['array'],
             'defined' => ['bool'],
-            'date_time' => [\DateTime::class],
-            'date_time_immutable' => [\DateTimeImmutable::class],
+            'date_time' => [\DateTimeImmutable::class],
         ];
 
         $this->assertSame($expected, $container->getParameterBag()->getProvidedTypes());
@@ -70,7 +69,7 @@ class RegisterEnvVarProcessorsPassTest extends TestCase
     public function testBadProcessor()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid type "foo" returned by "Symfony\Component\DependencyInjection\Tests\Compiler\BadProcessor::getProvidedTypes()", expected one of "array", "bool", "float", "int", "string", "BackedEnum", "DateTime", "DateTimeImmutable".');
+        $this->expectExceptionMessage('Invalid type "foo" returned by "Symfony\Component\DependencyInjection\Tests\Compiler\BadProcessor::getProvidedTypes()", expected one of "array", "bool", "float", "int", "string", "BackedEnum", "DateTimeImmutable".');
         $container = new ContainerBuilder();
         $container->register('foo', BadProcessor::class)->addTag('container.env_var_processor');
 

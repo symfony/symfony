@@ -59,7 +59,7 @@ class ParameterBag implements ParameterBagInterface
         return $this->deprecatedParameters;
     }
 
-    public function get(string $name): array|bool|string|int|float|\UnitEnum|null
+    public function get(string $name): array|bool|string|int|float|\UnitEnum|\DateTimeInterface|null
     {
         if (!\array_key_exists($name, $this->parameters)) {
             if (!$name) {
@@ -103,7 +103,7 @@ class ParameterBag implements ParameterBagInterface
     /**
      * @return void
      */
-    public function set(string $name, array|bool|string|int|float|\UnitEnum|null $value)
+    public function set(string $name, array|bool|string|int|float|\UnitEnum|\DateTimeImmutable|null $value)
     {
         if (is_numeric($name)) {
             trigger_deprecation('symfony/dependency-injection', '6.2', sprintf('Using numeric parameter name "%s" is deprecated and will throw as of 7.0.', $name));

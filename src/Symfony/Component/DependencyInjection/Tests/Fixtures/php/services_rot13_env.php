@@ -71,7 +71,7 @@ class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
         ]);
     }
 
-    public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null
+    public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|\DateTimeInterface|null
     {
         if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || \array_key_exists($name, $this->parameters))) {
             throw new ParameterNotFoundException($name);

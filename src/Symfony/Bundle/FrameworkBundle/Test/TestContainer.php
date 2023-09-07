@@ -51,7 +51,7 @@ class TestContainer extends Container
         return $this->getPublicContainer()->getParameterBag();
     }
 
-    public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null
+    public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|\DateTimeInterface|null
     {
         return $this->getPublicContainer()->getParameter($name);
     }

@@ -646,7 +646,7 @@ class ProjectServiceContainer extends Container
         return $instance;
     }
 
-    public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null
+    public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|\DateTimeInterface|null
     {
         if (isset($this->buildParameters[$name])) {
             return $this->buildParameters[$name];

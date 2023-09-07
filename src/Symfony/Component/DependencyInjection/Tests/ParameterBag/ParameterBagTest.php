@@ -27,6 +27,7 @@ class ParameterBagTest extends TestCase
         $bag = new ParameterBag($parameters = [
             'foo' => 'foo',
             'bar' => 'bar',
+            'date_time' => new \DateTimeImmutable(),
         ]);
         $this->assertEquals($parameters, $bag->all(), '__construct() takes an array of parameters as its first argument');
     }
@@ -71,6 +72,10 @@ class ParameterBagTest extends TestCase
 
         $bag->set('foo', 'baz');
         $this->assertEquals('baz', $bag->get('foo'), '->set() overrides previously set parameter');
+
+        $dateTime = new \DateTimeImmutable();
+        $bag->set('foo', $dateTime);
+        $this->assertEquals($dateTime, $bag->get('foo'), '->set() sets \DateTimeImmutable object');
 
         try {
             $bag->get('baba');

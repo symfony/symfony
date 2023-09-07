@@ -217,8 +217,11 @@ trait RedisTrait
                     }
                     $sentinel = new \RedisSentinel($host, $port, $params['timeout'], (string) $params['persistent_id'], $params['retry_interval'], $params['read_timeout'], ...$extra);
 
-                    if ($address = $sentinel->getMasterAddrByName($params['redis_sentinel'])) {
-                        [$host, $port] = $address;
+                    try {
+                        if ($address = $sentinel->getMasterAddrByName($params['redis_sentinel'])) {
+                            [$host, $port] = $address;
+                        }
+                    } catch (\RedisException $e) {
                     }
                 } while (++$hostIndex < \count($hosts) && !$address);
 

@@ -20,7 +20,6 @@ use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\VarDumper\Caster\ReflectionCaster;
-use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 
 /**
@@ -85,13 +84,11 @@ class DebugExtension extends Extension
             ;
         }
 
-        if (method_exists(CliDumper::class, 'setDisplayOptions')) {
-            $container->getDefinition('var_dumper.cli_dumper')
-                ->addMethodCall('setDisplayOptions', [[
-                    'fileLinkFormat' => new Reference('debug.file_link_formatter', ContainerBuilder::IGNORE_ON_INVALID_REFERENCE),
-                ]])
-            ;
-        }
+        $container->getDefinition('var_dumper.cli_dumper')
+            ->addMethodCall('setDisplayOptions', [[
+                'fileLinkFormat' => new Reference('debug.file_link_formatter', ContainerBuilder::IGNORE_ON_INVALID_REFERENCE),
+            ]])
+        ;
 
         if (!class_exists(Command::class) || !class_exists(ServerLogCommand::class)) {
             $container->removeDefinition('monolog.command.server_log');

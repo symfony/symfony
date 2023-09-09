@@ -30,6 +30,11 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
 {
     use LoggerAwareTrait;
 
+    /**
+     * @internal
+     */
+    protected const NS_SEPARATOR = ':';
+
     private bool $storeSerialized;
     private array $values = [];
     private array $tags = [];
@@ -108,7 +113,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
 
             return true;
         }
-        \assert('' !== CacheItem::validateKey($key));
+        \assert('' !== CacheItem::validateKey($key, static::NS_SEPARATOR));
 
         return isset($this->expiries[$key]) && !$this->deleteItem($key);
     }
@@ -138,7 +143,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
 
     public function deleteItem(mixed $key): bool
     {
-        \assert('' !== CacheItem::validateKey($key));
+        \assert('' !== CacheItem::validateKey($key, static::NS_SEPARATOR));
         unset($this->values[$key], $this->tags[$key], $this->expiries[$key]);
 
         return true;
@@ -357,7 +362,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
     {
         foreach ($keys as $key) {
             if (!\is_string($key) || !isset($this->expiries[$key])) {
-                CacheItem::validateKey($key);
+                CacheItem::validateKey($key, static::NS_SEPARATOR);
             }
         }
 

@@ -21,6 +21,8 @@ use Symfony\Contracts\Cache\CallbackInterface;
 
 abstract class AdapterTestCase extends CachePoolTest
 {
+    protected static ?string $allowPsr6Keys = ':';
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -38,6 +40,16 @@ abstract class AdapterTestCase extends CachePoolTest
             $this->skippedTests['testDeleteItemsInvalidKeys'] = 'Keys are checked only when assert() is enabled.';
         } catch (\Exception $e) {
         }
+    }
+
+    public static function invalidKeys(): array
+    {
+        $keys = parent::invalidKeys();
+        if (null !== static::$allowPsr6Keys) {
+            $keys = array_filter($keys, fn ($key) => !\is_string($key[0] ?? null) || false === strpbrk($key[0], static::$allowPsr6Keys));
+        }
+
+        return $keys;
     }
 
     public function testGet()

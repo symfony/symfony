@@ -127,7 +127,7 @@ final class CacheItem implements ItemInterface
      *
      * @throws InvalidArgumentException When $key is not valid
      */
-    public static function validateKey($key): string
+    public static function validateKey($key, string $allowChars = null): string
     {
         if (!\is_string($key)) {
             throw new InvalidArgumentException(sprintf('Cache key must be string, "%s" given.', get_debug_type($key)));
@@ -135,8 +135,9 @@ final class CacheItem implements ItemInterface
         if ('' === $key) {
             throw new InvalidArgumentException('Cache key length must be greater than zero.');
         }
-        if (false !== strpbrk($key, self::RESERVED_CHARACTERS)) {
-            throw new InvalidArgumentException(sprintf('Cache key "%s" contains reserved characters "%s".', $key, self::RESERVED_CHARACTERS));
+        $reservedChars = null === $allowChars ? self::RESERVED_CHARACTERS : str_replace(str_split($allowChars), '', self::RESERVED_CHARACTERS);
+        if ('' !== $reservedChars && false !== strpbrk($key, $reservedChars)) {
+            throw new InvalidArgumentException(sprintf('Cache key "%s" contains reserved characters "%s".', $key, $reservedChars));
         }
 
         return $key;

@@ -346,7 +346,7 @@ trait AbstractAdapterTrait
         if (\is_string($key) && isset($this->ids[$key])) {
             return $this->namespace.$this->namespaceVersion.$this->ids[$key];
         }
-        \assert('' !== CacheItem::validateKey($key));
+        \assert('' !== CacheItem::validateKey($key, static::NS_SEPARATOR));
         $this->ids[$key] = $key;
 
         if (\count($this->ids) > 1000) {

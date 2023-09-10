@@ -15,7 +15,6 @@ use Symfony\Bundle\FrameworkBundle\Console\Descriptor\Descriptor;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
-use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -34,12 +33,10 @@ use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 #[AsCommand(name: 'debug:autowiring', description: 'List classes/interfaces you can use for autowiring')]
 class DebugAutowiringCommand extends ContainerDebugCommand
 {
-    private bool $supportsHref;
     private ?FileLinkFormatter $fileLinkFormatter;
 
     public function __construct(string $name = null, FileLinkFormatter $fileLinkFormatter = null)
     {
-        $this->supportsHref = method_exists(OutputFormatterStyle::class, 'setHref');
         $this->fileLinkFormatter = $fileLinkFormatter;
         parent::__construct($name);
     }
@@ -124,7 +121,7 @@ EOF
             }
 
             $serviceLine = sprintf('<fg=yellow>%s</>', $serviceId);
-            if ($this->supportsHref && '' !== $fileLink = $this->getFileLink($previousId)) {
+            if ('' !== $fileLink = $this->getFileLink($previousId)) {
                 $serviceLine = substr($serviceId, \strlen($previousId));
                 $serviceLine = sprintf('<fg=yellow;href=%s>%s</>', $fileLink, $previousId).('' !== $serviceLine ? sprintf('<fg=yellow>%s</>', $serviceLine) : '');
             }

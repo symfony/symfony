@@ -54,6 +54,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\DenormalizableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyFirstChildQuux;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberOne;
+use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberThree;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberTwo;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyObjectWithEnumConstructor;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyObjectWithEnumProperty;
@@ -476,6 +477,18 @@ class SerializerTest extends TestCase
 
         $example = new DummyMessageNumberTwo();
         $example->setNested($nested);
+
+        $serializer = $this->serializerWithClassDiscriminator();
+
+        $serialized = $serializer->serialize($example, 'json');
+        $deserialized = $serializer->deserialize($serialized, DummyMessageInterface::class, 'json');
+
+        $this->assertEquals($example, $deserialized);
+    }
+
+    public function testDeserializeAndSerializeNestedAbstractAndInterfacedObjectsWithTheClassMetadataDiscriminator()
+    {
+        $example = new DummyMessageNumberThree();
 
         $serializer = $this->serializerWithClassDiscriminator();
 

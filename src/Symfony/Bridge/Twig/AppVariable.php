@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Twig;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -152,16 +153,12 @@ class AppVariable
     public function getFlashes(string|array $types = null): array
     {
         try {
-            if (null === $session = $this->getSession()) {
-                return [];
-            }
+            $session = $this->getSession();
         } catch (\RuntimeException) {
             return [];
         }
 
-        // In 7.0 (when symfony/http-foundation: 6.4 is required) this can be updated to
-        // check if the session is an instance of FlashBagAwareSessionInterface
-        if (!method_exists($session, 'getFlashBag')) {
+        if (!$session instanceof FlashBagAwareSessionInterface) {
             return [];
         }
 

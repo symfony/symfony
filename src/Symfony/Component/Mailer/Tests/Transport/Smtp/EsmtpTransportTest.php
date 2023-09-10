@@ -192,6 +192,28 @@ class EsmtpTransportTest extends TestCase
             $stream->getCommands()
         );
     }
+
+    public function testConstructorWithEmptyAuthenticator()
+    {
+        $stream = new DummyStream();
+        $transport = new EsmtpTransport(stream: $stream);
+        $transport->setUsername('testuser');
+        $transport->setPassword('p4ssw0rd');
+        $transport->setAuthenticators([]); // if no authenticators defined, then there needs to be a TransportException
+
+        $message = new Email();
+        $message->from('sender@example.org');
+        $message->addTo('recipient@example.org');
+        $message->text('.');
+
+        try {
+            $transport->send($message);
+            $this->fail('Symfony\Component\Mailer\Exception\TransportException to be thrown');
+        } catch (TransportException $e) {
+            $this->assertStringStartsWith('Failed to find an authenticator supported by the SMTP server, which currently supports: "plain", "login", "cram-md5", "xoauth2".', $e->getMessage());
+            $this->assertEquals(504, $e->getCode());
+        }
+    }
 }
 
 class CustomEsmtpTransport extends EsmtpTransport

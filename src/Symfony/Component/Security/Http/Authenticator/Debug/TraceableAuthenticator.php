@@ -54,7 +54,7 @@ final class TraceableAuthenticator implements AuthenticatorInterface, Interactiv
                         'resolved' => $badge->isResolved(),
                     ];
                 },
-                $this->passport->getBadges(),
+                $this->passport?->getBadges() ?? [],
             ),
         ];
     }

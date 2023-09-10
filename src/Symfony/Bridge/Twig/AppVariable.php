@@ -13,7 +13,7 @@ namespace Symfony\Bridge\Twig;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -112,7 +112,7 @@ class AppVariable
     /**
      * Returns the current session.
      */
-    public function getSession(): ?Session
+    public function getSession(): ?SessionInterface
     {
         if (!isset($this->requestStack)) {
             throw new \RuntimeException('The "app.session" variable is not available.');
@@ -168,6 +168,12 @@ class AppVariable
                 return [];
             }
         } catch (\RuntimeException) {
+            return [];
+        }
+
+        // In 7.0 (when symfony/http-foundation: 6.4 is required) this can be updated to
+        // check if the session is an instance of FlashBagAwareSessionInterface
+        if (!method_exists($session, 'getFlashBag')) {
             return [];
         }
 

@@ -18,6 +18,8 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 /**
  * @author Alexander Schranz <alexander@suluio>
  * @author Antoine Bluchet <soyuka@gmail.com>
+ *
+ * @implements TransportFactoryInterface<RedisTransport>
  */
 class RedisTransportFactory implements TransportFactoryInterface
 {

@@ -59,10 +59,7 @@ final class DoctrineTestHelper
         $config->setProxyNamespace('SymfonyTests\Doctrine');
         $config->setMetadataDriverImpl(new AttributeDriver([__DIR__.'/../Tests/Fixtures' => 'Symfony\Bridge\Doctrine\Tests\Fixtures'], true));
         $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
-
-        if (method_exists($config, 'setLazyGhostObjectEnabled')) {
-            $config->setLazyGhostObjectEnabled(true);
-        }
+        $config->setLazyGhostObjectEnabled(true);
 
         return $config;
     }

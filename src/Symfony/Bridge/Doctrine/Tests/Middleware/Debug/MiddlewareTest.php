@@ -52,9 +52,7 @@ class MiddlewareTest extends TestCase
 
         $config = ORMSetup::createConfiguration(true);
         $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
-        if (method_exists($config, 'setLazyGhostObjectEnabled')) {
-            $config->setLazyGhostObjectEnabled(true);
-        }
+        $config->setLazyGhostObjectEnabled(true);
         $this->debugDataHolder = new DebugDataHolder();
         $config->setMiddlewares([new Middleware($this->debugDataHolder, $this->stopwatch)]);
 

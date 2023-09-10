@@ -18,6 +18,8 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 
 /**
  * @author Ryan Weaver <ryan@symfonycasts.com>
+ *
+ * @implements TransportFactoryInterface<SyncTransport>
  */
 class SyncTransportFactory implements TransportFactoryInterface
 {

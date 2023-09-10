@@ -80,7 +80,6 @@ final class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifi
             'series' => ParameterType::STRING,
         ];
         $updated = $this->conn->executeStatement($sql, $paramValues, $paramTypes);
-
         if ($updated < 1) {
             throw new TokenNotFoundException('No token found.');
         }

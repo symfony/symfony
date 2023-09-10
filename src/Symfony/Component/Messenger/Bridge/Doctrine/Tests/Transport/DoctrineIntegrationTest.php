@@ -13,7 +13,6 @@ namespace Symfony\Component\Messenger\Bridge\Doctrine\Tests\Transport;
 
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\DriverManager;
-use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Tools\DsnParser;
@@ -59,18 +58,14 @@ class DoctrineIntegrationTest extends TestCase
     {
         $this->connection->send('{"message": "Hi i am delayed"}', ['type' => DummyMessage::class], 600000);
 
-        $stmt = $this->driverConnection->createQueryBuilder()
+        $result = $this->driverConnection->createQueryBuilder()
             ->select('m.available_at')
             ->from('messenger_messages', 'm')
             ->where('m.body = :body')
-            ->setParameter('body', '{"message": "Hi i am delayed"}');
-        if (method_exists($stmt, 'executeQuery')) {
-            $stmt = $stmt->executeQuery();
-        } else {
-            $stmt = $stmt->execute();
-        }
+            ->setParameter('body', '{"message": "Hi i am delayed"}')
+            ->executeQuery();
 
-        $available_at = new \DateTimeImmutable($stmt instanceof Result ? $stmt->fetchOne() : $stmt->fetchColumn());
+        $available_at = new \DateTimeImmutable($result->fetchOne());
 
         $now = new \DateTimeImmutable('now + 60 seconds');
         $this->assertGreaterThan($now, $available_at);
@@ -186,7 +181,7 @@ class DoctrineIntegrationTest extends TestCase
         $this->assertEquals('the body', $envelope['body']);
     }
 
-    private function formatDateTime(\DateTimeImmutable $dateTime)
+    private function formatDateTime(\DateTimeImmutable $dateTime): string
     {
         return $dateTime->format($this->driverConnection->getDatabasePlatform()->getDateTimeFormatString());
     }

@@ -195,11 +195,7 @@ class CovertTest extends TestCase
             ['x-symfony' => ['3.4']]
         );
 
-        if (method_exists(Cookie::class, 'create')) {
-            $cookie = Cookie::create('city', 'Lille', new \DateTime('Wed, 13 Jan 2021 22:23:01 GMT'));
-        } else {
-            $cookie = new Cookie('city', 'Lille', new \DateTime('Wed, 13 Jan 2021 22:23:01 GMT'));
-        }
+        $cookie = Cookie::create('city', 'Lille', new \DateTime('Wed, 13 Jan 2021 22:23:01 GMT'));
 
         $sfResponse->headers->setCookie($cookie);
         $body = Psr7Stream::create();

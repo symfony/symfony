@@ -127,9 +127,7 @@ class DoctrineTokenProviderTest extends TestCase
             $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
         }
 
-        if (method_exists($config, 'setLazyGhostObjectEnabled')) {
-            $config->setLazyGhostObjectEnabled(true);
-        }
+        $config->setLazyGhostObjectEnabled(true);
 
         $connection = DriverManager::getConnection([
             'driver' => 'pdo_sqlite',

@@ -1,0 +1,88 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-06-27T10:27:04Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-06-27T10:27:06Z
+
+It looks like you unchecked the "Allow edits from maintainer" box. That is fine, but please note that if you have multiple commits, you'll need to squash your commits into one before this can be merged. Or, you can check the "Allow edits from maintainers" box and the maintainer can squash for you.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-06-27T11:07:59Z
+
+The failing tests on the low-deps run look related.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2023-06-27T20:05:32Z
+
+Thank you for this PR.
+
+I see you replaced the return type from class `Session` to interface `FlashBagAwareSessionInterface`. This is not always correct. It could be a Session that do not implement FlashBag feature.
+
+I suggest to change it to `SessionInterface`
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2023-06-27T20:18:21Z
+
+I was hesitating if this was a bugfix or not. But with @GromNaN arguments, I agree. This is a feature.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-06-28T13:25:17Z
+
+I think, if we change the return type to `?SessionInterface`, we can file it as a bugfix. Using a custom implementation of the `SessionInterface` should've worked in Symfony 5 and it stopped working because of a too narrow native return type in Symfony 6. I believe this breaking change was unintended.
+
+---------------------------------------------------------------------------
+
+by Dirkhuethorst at 2023-07-17T08:26:13Z
+
+I've changed the return type to SessionInterface, but now the Psalm check fails because in the AppVariable class the Flashbag of the session is accessed.
+
+`src/Symfony/Bridge/Twig/AppVariable.php:147:30: UndefinedInterfaceMethod: Method Symfony\Component\HttpFoundation\Session\SessionInterface::getFlashBag does not exist (see https://psalm.dev/181)`
+
+I am not sure how to proceed with this issue
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-07-17T08:38:15Z
+
+You can `return []` if `$session` is not an instance of `FlashBagAwareSessionInterface` or `!method_exists($session, 'getFlashBag')`.
+
+---------------------------------------------------------------------------
+
+by Dirkhuethorst at 2023-07-17T08:41:47Z
+
+> You can `return []` if `$session` is not an instance of `FlashBagAwareSessionInterface`.
+
+Won't that break backwards compatibility  with http-foundation 5.4 where the FlashBagAwareSessionInterface does not exist?

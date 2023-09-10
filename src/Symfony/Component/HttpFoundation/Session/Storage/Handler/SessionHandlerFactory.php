@@ -75,8 +75,7 @@ class SessionHandlerFactory
                 $config = new Configuration();
                 $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
 
-                $connection = DriverManager::getConnection($params, $config);
-                $connection = method_exists($connection, 'getNativeConnection') ? $connection->getNativeConnection() : $connection->getWrappedConnection();
+                $connection = DriverManager::getConnection($params, $config)->getNativeConnection();
                 // no break;
 
             case str_starts_with($connection, 'mssql://'):

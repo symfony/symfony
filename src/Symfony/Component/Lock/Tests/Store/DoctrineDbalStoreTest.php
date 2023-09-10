@@ -97,6 +97,8 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
     }
 
     /**
+     * @param class-string<AbstractPlatform>
+     *
      * @dataProvider providePlatforms
      */
     public function testCreatesTableInTransaction(string $platform)
@@ -128,7 +130,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
             ->willReturn(true);
 
         $platform = $this->createMock($platform);
-        $platform->method(method_exists(AbstractPlatform::class, 'getCreateTablesSQL') ? 'getCreateTablesSQL' : 'getCreateTableSQL')
+        $platform->method('getCreateTablesSQL')
             ->willReturn(['create sql stmt']);
 
         $conn->method('getDatabasePlatform')
@@ -144,10 +146,8 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
     public static function providePlatforms(): \Generator
     {
         yield [\Doctrine\DBAL\Platforms\PostgreSQLPlatform::class];
-        yield [\Doctrine\DBAL\Platforms\PostgreSQL94Platform::class];
         yield [\Doctrine\DBAL\Platforms\SqlitePlatform::class];
         yield [\Doctrine\DBAL\Platforms\SQLServerPlatform::class];
-        yield [\Doctrine\DBAL\Platforms\SQLServer2012Platform::class];
     }
 
     public function testTableCreationInTransactionNotSupported()
@@ -178,7 +178,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
             ->willReturn(true);
 
         $platform = $this->createMock(AbstractPlatform::class);
-        $platform->method(method_exists(AbstractPlatform::class, 'getCreateTablesSQL') ? 'getCreateTablesSQL' : 'getCreateTableSQL')
+        $platform->method('getCreateTablesSQL')
             ->willReturn(['create sql stmt']);
 
         $conn->expects($this->atLeast(2))
@@ -220,7 +220,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
             ->willReturn(false);
 
         $platform = $this->createMock(AbstractPlatform::class);
-        $platform->method(method_exists(AbstractPlatform::class, 'getCreateTablesSQL') ? 'getCreateTablesSQL' : 'getCreateTableSQL')
+        $platform->method('getCreateTablesSQL')
             ->willReturn(['create sql stmt']);
 
         $conn->method('getDatabasePlatform')

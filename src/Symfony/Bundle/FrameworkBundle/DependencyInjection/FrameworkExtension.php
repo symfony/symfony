@@ -41,7 +41,6 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
-use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Clock\ClockInterface;
@@ -75,7 +74,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\Glob;
-use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
 use Symfony\Component\Form\Extension\HtmlSanitizer\Type\TextTypeHtmlSanitizerExtension;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormTypeExtensionInterface;
@@ -95,8 +93,6 @@ use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\Attribute\AsTargetedValueResolver;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
-use Symfony\Component\HttpKernel\Controller\ArgumentResolver\BackedEnumValueResolver;
-use Symfony\Component\HttpKernel\Controller\ArgumentResolver\UidValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
@@ -113,7 +109,6 @@ use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Bridge as MessengerBridge;
-use Symfony\Component\Messenger\Command\StatsCommand;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnSignalsListener;
 use Symfony\Component\Messenger\Handler\BatchHandlerInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
@@ -150,7 +145,6 @@ use Symfony\Component\RateLimiter\Storage\CacheStorage;
 use Symfony\Component\RemoteEvent\Attribute\AsRemoteEventConsumer;
 use Symfony\Component\RemoteEvent\RemoteEvent;
 use Symfony\Component\Routing\Loader\AnnotationClassLoader;
-use Symfony\Component\Routing\Loader\Psr4DirectoryLoader;
 use Symfony\Component\Scheduler\Attribute\AsSchedule;
 use Symfony\Component\Scheduler\Messenger\SchedulerTransportFactory;
 use Symfony\Component\Security\Core\AuthenticationEvents;
@@ -167,10 +161,7 @@ use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\ProblemNormalizer;
-use Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer;
 use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\String\LazyString;
 use Symfony\Component\String\Slugger\SluggerInterface;
@@ -182,7 +173,6 @@ use Symfony\Component\Translation\PseudoLocalizationTranslator;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Uid\Factory\UuidFactory;
 use Symfony\Component\Uid\UuidV4;
-use Symfony\Component\Validator\Constraints\WhenValidator;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Validator\ObjectInitializerInterface;
@@ -227,11 +217,6 @@ class FrameworkExtension extends Extension
         }
 
         $loader->load('web.php');
-
-        if (!class_exists(BackedEnumValueResolver::class)) {
-            $container->removeDefinition('argument_resolver.backed_enum_resolver');
-        }
-
         $loader->load('services.php');
         $loader->load('fragment_renderer.php');
         $loader->load('error_renderer.php');
@@ -775,11 +760,6 @@ class FrameworkExtension extends Extension
         if (!ContainerBuilder::willBeAvailable('symfony/translation', Translator::class, ['symfony/framework-bundle', 'symfony/form'])) {
             $container->removeDefinition('form.type_extension.upload.validator');
         }
-        if (!method_exists(CachingFactoryDecorator::class, 'reset')) {
-            $container->getDefinition('form.choice_list_factory.cached')
-                ->clearTag('kernel.reset')
-            ;
-        }
     }
 
     private function registerHttpCacheConfiguration(array $config, ContainerBuilder $container, bool $httpMethodOverride): void
@@ -1217,10 +1197,6 @@ class FrameworkExtension extends Extension
         if (null !== $config['default_uri']) {
             $container->getDefinition('router.request_context')
                 ->replaceArgument(0, $config['default_uri']);
-        }
-
-        if (!class_exists(Psr4DirectoryLoader::class)) {
-            $container->removeDefinition('routing.loader.psr4');
         }
 
         if ($this->isInitializedConfigEnabled('annotations') && (new \ReflectionClass(AnnotationClassLoader::class))->hasProperty('reader')) {
@@ -1688,10 +1664,6 @@ class FrameworkExtension extends Extension
         if (!class_exists(ExpressionLanguage::class)) {
             $container->removeDefinition('validator.expression_language');
         }
-
-        if (!class_exists(WhenValidator::class)) {
-            $container->removeDefinition('validator.when');
-        }
     }
 
     private function registerValidatorMapping(ContainerBuilder $container, array $config, array &$files): void
@@ -1911,7 +1883,7 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('serializer.encoder.yaml');
         }
 
-        if (!class_exists(UnwrappingDenormalizer::class) || !$this->isInitializedConfigEnabled('property_access')) {
+        if (!$this->isInitializedConfigEnabled('property_access')) {
             $container->removeDefinition('serializer.denormalizer.unwrapping');
         }
 
@@ -1921,12 +1893,6 @@ class FrameworkExtension extends Extension
 
         if (!class_exists(Translator::class)) {
             $container->removeDefinition('serializer.normalizer.translatable');
-        }
-
-        // compat with Symfony < 6.3
-        if (!is_subclass_of(ProblemNormalizer::class, SerializerAwareInterface::class)) {
-            $container->getDefinition('serializer.normalizer.problem')
-                ->setArguments(['%kernel.debug%']);
         }
 
         $serializerLoaders = [];
@@ -2125,7 +2091,7 @@ class FrameworkExtension extends Extension
             throw new LogicException('Messenger support cannot be enabled as the Messenger component is not installed. Try running "composer require symfony/messenger".');
         }
 
-        if (!$this->hasConsole() || !class_exists(StatsCommand::class)) {
+        if (!$this->hasConsole()) {
             $container->removeDefinition('console.command.messenger_stats');
         }
 
@@ -2370,10 +2336,6 @@ class FrameworkExtension extends Extension
 
     private function registerCacheConfiguration(array $config, ContainerBuilder $container): void
     {
-        if (!class_exists(DefaultMarshaller::class)) {
-            $container->removeDefinition('cache.default_marshaller');
-        }
-
         $version = new Parameter('container.build_id');
         $container->getDefinition('cache.adapter.apcu')->replaceArgument(2, $version);
         $container->getDefinition('cache.adapter.system')->replaceArgument(2, $version);
@@ -2434,16 +2396,10 @@ class FrameworkExtension extends Extension
                 $container->register($name, TagAwareAdapter::class)
                     ->addArgument(new Reference('.'.$name.'.inner'))
                     ->addArgument(true !== $pool['tags'] ? new Reference($pool['tags']) : null)
+                    ->addMethodCall('setLogger', [new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)])
                     ->setPublic($pool['public'])
                     ->addTag('cache.taggable', ['pool' => $name])
-                ;
-
-                if (method_exists(TagAwareAdapter::class, 'setLogger')) {
-                    $container
-                        ->getDefinition($name)
-                        ->addMethodCall('setLogger', [new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)])
-                        ->addTag('monolog.logger', ['channel' => 'cache']);
-                }
+                    ->addTag('monolog.logger', ['channel' => 'cache']);
 
                 $pool['name'] = $tagAwareId = $name;
                 $pool['public'] = false;
@@ -2469,7 +2425,7 @@ class FrameworkExtension extends Extension
             $container->setDefinition($name, $definition);
         }
 
-        if (method_exists(PropertyAccessor::class, 'createCache')) {
+        if (class_exists(PropertyAccessor::class)) {
             $propertyAccessDefinition = $container->register('cache.property_access', AdapterInterface::class);
 
             if (!$container->getParameter('kernel.debug')) {
@@ -2514,19 +2470,15 @@ class FrameworkExtension extends Extension
             $this->registerRetryableHttpClient($retryOptions, 'http_client', $container);
         }
 
-        if ($hasUriTemplate = class_exists(UriTemplateHttpClient::class)) {
-            if (ContainerBuilder::willBeAvailable('guzzlehttp/uri-template', \GuzzleHttp\UriTemplate\UriTemplate::class, [])) {
-                $container->setAlias('http_client.uri_template_expander', 'http_client.uri_template_expander.guzzle');
-            } elseif (ContainerBuilder::willBeAvailable('rize/uri-template', \Rize\UriTemplate::class, [])) {
-                $container->setAlias('http_client.uri_template_expander', 'http_client.uri_template_expander.rize');
-            }
-
-            $container
-                ->getDefinition('http_client.uri_template')
-                ->setArgument(2, $defaultUriTemplateVars);
-        } elseif ($defaultUriTemplateVars) {
-            throw new LogicException('Support for URI template requires symfony/http-client 6.3 or higher, try upgrading.');
+        if (ContainerBuilder::willBeAvailable('guzzlehttp/uri-template', \GuzzleHttp\UriTemplate\UriTemplate::class, [])) {
+            $container->setAlias('http_client.uri_template_expander', 'http_client.uri_template_expander.guzzle');
+        } elseif (ContainerBuilder::willBeAvailable('rize/uri-template', \Rize\UriTemplate::class, [])) {
+            $container->setAlias('http_client.uri_template_expander', 'http_client.uri_template_expander.rize');
         }
+
+        $container
+            ->getDefinition('http_client.uri_template')
+            ->setArgument(2, $defaultUriTemplateVars);
 
         foreach ($config['scoped_clients'] as $name => $scopeConfig) {
             if ($container->has($name)) {
@@ -2558,16 +2510,14 @@ class FrameworkExtension extends Extension
                 $this->registerRetryableHttpClient($retryOptions, $name, $container);
             }
 
-            if ($hasUriTemplate) {
-                $container
-                    ->register($name.'.uri_template', UriTemplateHttpClient::class)
-                    ->setDecoratedService($name, null, 7) // Between TraceableHttpClient (5) and RetryableHttpClient (10)
-                    ->setArguments([
-                        new Reference($name.'.uri_template.inner'),
-                        new Reference('http_client.uri_template_expander', ContainerInterface::NULL_ON_INVALID_REFERENCE),
-                        $defaultUriTemplateVars,
-                    ]);
-            }
+            $container
+                ->register($name.'.uri_template', UriTemplateHttpClient::class)
+                ->setDecoratedService($name, null, 7) // Between TraceableHttpClient (5) and RetryableHttpClient (10)
+                ->setArguments([
+                    new Reference($name.'.uri_template.inner'),
+                    new Reference('http_client.uri_template_expander', ContainerInterface::NULL_ON_INVALID_REFERENCE),
+                    $defaultUriTemplateVars,
+                ]);
 
             $container->registerAliasForArgument($name, HttpClientInterface::class);
 
@@ -3020,10 +2970,6 @@ class FrameworkExtension extends Extension
         if (isset($config['name_based_uuid_namespace'])) {
             $container->getDefinition('name_based_uuid.factory')
                 ->setArguments([$config['name_based_uuid_namespace']]);
-        }
-
-        if (!class_exists(UidValueResolver::class)) {
-            $container->removeDefinition('argument_resolver.uid');
         }
     }
 

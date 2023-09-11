@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2023-09-11T12:57:53Z
+
+> The changelog file must be updated
+
+Done for TwigBundle and TwigBridge. Not sure if I need to do that for the other bundles/components as well.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-09-11T12:59:30Z
+
+@derrabus I think it is OK as is.

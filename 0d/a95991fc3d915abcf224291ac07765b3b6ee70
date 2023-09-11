@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2023-09-06T21:37:50Z
+
+Thank you. Does this affect 5.4 or 6.3 as well? If that's the case, please retarget your PR.
+
+---------------------------------------------------------------------------
+
+by PhilETaylor at 2023-09-06T21:40:22Z
+
+looks like it needs to be 5.4. https://github.com/symfony/symfony/blob/fcb754a1c08ef0b283f1f0caf0c8666098cb7fb6/src/Symfony/Component/ErrorHandler/ErrorRenderer/HtmlErrorRenderer.php#L271
+
+---------------------------------------------------------------------------
+
+by PhilETaylor at 2023-09-06T21:54:18Z
+
+its late and my eyes sleepy, but I think Ive downgraded it ok, and removed short function syntax in my original to be compatible with PHP 7 also. Should be ok to test now.

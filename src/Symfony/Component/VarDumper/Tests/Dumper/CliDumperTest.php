@@ -553,6 +553,10 @@ EOTXT
 
     public function testCollapse()
     {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('This test cannot be run on Windows.');
+        }
+
         $stub = new Stub();
         $stub->type = Stub::TYPE_OBJECT;
         $stub->class = 'stdClass';

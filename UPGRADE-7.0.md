@@ -462,6 +462,7 @@ TwigBundle
  * Remove option `twig.autoescape`; create a class that implements your escaping strategy
    (check `FileExtensionEscapingStrategy::guess()` for inspiration) and reference it using
    the `twig.autoescape_service` option instead
+ * Drop support for Twig 2
 
 Validator
 ---------

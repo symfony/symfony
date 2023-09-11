@@ -18,7 +18,7 @@
     "require": {
         "php": ">=8.2",
         "symfony/translation-contracts": "^2.5|^3",
-        "twig/twig": "^2.13|^3.0.4"
+        "twig/twig": "^3.0.4"
     },
     "require-dev": {
         "egulias/email-validator": "^2.1.10|^3|^4",

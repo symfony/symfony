@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.0
+---
+
+ * Drop support for Twig 2
+
 6.3
 ---
 

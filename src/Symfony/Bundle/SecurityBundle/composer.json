@@ -29,7 +29,7 @@
         "symfony/password-hasher": "^5.4|^6.0",
         "symfony/security-core": "^6.2",
         "symfony/security-csrf": "^5.4|^6.0",
-        "symfony/security-http": "^6.3"
+        "symfony/security-http": "^6.3.4"
     },
     "require-dev": {
         "doctrine/annotations": "^1.10.4|^2",

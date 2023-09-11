@@ -58,12 +58,14 @@ class DoctrineIntegrationTest extends TestCase
     {
         $this->connection->send('{"message": "Hi i am delayed"}', ['type' => DummyMessage::class], 600000);
 
-        $result = $this->driverConnection->createQueryBuilder()
+        $qb = $this->driverConnection->createQueryBuilder()
             ->select('m.available_at')
             ->from('messenger_messages', 'm')
             ->where('m.body = :body')
-            ->setParameter('body', '{"message": "Hi i am delayed"}')
-            ->executeQuery();
+            ->setParameter('body', '{"message": "Hi i am delayed"}');
+
+        // DBAL 2 compatibility
+        $result = method_exists($qb, 'executeQuery') ? $qb->executeQuery() : $qb->execute();
 
         $available_at = new \DateTimeImmutable($result->fetchOne());
 

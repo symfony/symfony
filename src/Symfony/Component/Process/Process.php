@@ -1618,7 +1618,7 @@ class Process implements \IteratorAggregate
             return '""';
         }
         if ('\\' !== \DIRECTORY_SEPARATOR) {
-            return "'".str_replace("'", "'\\''", $argument)."'";
+            return str_replace("'", "'\\''", $argument);
         }
         if (str_contains($argument, "\0")) {
             $argument = str_replace("\0", '?', $argument);

@@ -1553,7 +1553,7 @@ class FrameworkExtension extends Extension
             TranslationBridge\Crowdin\CrowdinProviderFactory::class => 'translation.provider_factory.crowdin',
             TranslationBridge\Loco\LocoProviderFactory::class => 'translation.provider_factory.loco',
             TranslationBridge\Lokalise\LokaliseProviderFactory::class => 'translation.provider_factory.lokalise',
-            PhraseProviderFactory::class => 'translation.provider_factory.phrase',
+            TranslationBridge\Phrase\PhraseProviderFactory::class => 'translation.provider_factory.phrase',
         ];
 
         $parentPackages = ['symfony/framework-bundle', 'symfony/translation', 'symfony/http-client'];

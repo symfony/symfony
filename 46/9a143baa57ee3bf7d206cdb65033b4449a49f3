@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by vtsykun at 2023-09-11T16:55:27Z
+
+Looks like the random bug #51105 is back again.
+https://github.com/symfony/symfony/actions/runs/6149268135/job/16684768491#step:8:8976

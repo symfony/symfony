@@ -20,6 +20,8 @@ use Symfony\Component\Webhook\Test\AbstractRequestParserTestCase;
 
 /**
  * @author WoutervanderLoop.nl <info@woutervanderloop.nl>
+ *
+ * @requires extension openssl
  */
 class SendgridWrongSecretRequestParserTest extends AbstractRequestParserTestCase
 {

@@ -107,7 +107,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install system dependencies
         run: |
@@ -191,7 +191,7 @@ jobs:
       #    sudo rm -rf .phpunit
       #    [ -d .phpunit.bak ] && mv .phpunit.bak .phpunit
 
-      - uses: marceloprado/has-changed-path@v1
+      - uses: marceloprado/has-changed-path@v1.0.1
         id: changed-translation-files
         with:
           paths: src/**/Resources/translations/*.xlf

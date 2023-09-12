@@ -58,12 +58,12 @@ class Security extends InternalSecurity implements AuthorizationCheckerInterface
     public const ACCESS_DENIED_ERROR = SecurityRequestAttributes::ACCESS_DENIED_ERROR;
 
     /**
-     * @deprecated since Symfony 6.4, use SecurityRequestAttributes::ACCESS_DENIED_ERROR instead
+     * @deprecated since Symfony 6.4, use SecurityRequestAttributes::AUTHENTICATION_ERROR instead
      */
     public const AUTHENTICATION_ERROR = SecurityRequestAttributes::AUTHENTICATION_ERROR;
 
     /**
-     * @deprecated since Symfony 6.4, use SecurityRequestAttributes::ACCESS_DENIED_ERROR instead
+     * @deprecated since Symfony 6.4, use SecurityRequestAttributes::LAST_USERNAME instead
      */
     public const LAST_USERNAME = SecurityRequestAttributes::LAST_USERNAME;
 

@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2023-09-11T15:12:00Z
+
+Simon, thanks for this improvement. I like it!
+
+About the removal of the previous icon license, I'd say there's no problem.
+
+-----
+
+While reviewing this, I found two other occurrences of `toggle-button` in the `form` panel:
+
+https://github.com/symfony/symfony/blob/d8a4b3c16a08be15aa24e0899bbdcb34c3fef002/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Collector/form.html.twig#L408-L410
+
+https://github.com/symfony/symfony/blob/d8a4b3c16a08be15aa24e0899bbdcb34c3fef002/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Collector/form.html.twig#L500-L502
+
+Would you have some time to try to update those too? If you can't, we can tackle that in another PR. Thanks.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-09-11T15:41:54Z
+
+> While reviewing this, I found two other occurrences of `toggle-button` in the `form` panel:
+
+That's not the same icon: it uses a "[Tabler icon but in base64](https://github.com/symfony/symfony/blob/d8a4b3c16a08be15aa24e0899bbdcb34c3fef002/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Collector/form.html.twig#L100)" ..  would you like to change it for a "chevron" ?
+
+(i rather ask if you did not see)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2023-09-11T16:02:35Z
+
+@smnandre I didn't realize they were different icons. Sorry.
+
+In any case, we should probably be consistent and use a chevron in all examples related to expand/collapse elements. Another thing; the current icon in form seem to NOT be working because I always see the `[+]`, no matter if it's expanded or collapsed. So, maybe leave it for another PR?
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-09-11T20:53:39Z
+
+> @smnandre I didn't realize they were different icons. Sorry.
+
+Don't be @javiereguiluz , i missed it entirely so .. :)
+
+Works for me to leave the rest for another PR..  i'm feeling we may raise other questions / needs.

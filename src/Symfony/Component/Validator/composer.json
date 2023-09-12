@@ -43,6 +43,7 @@
     "conflict": {
         "doctrine/lexer": "<1.1",
         "symfony/dependency-injection": "<6.4",
+        "symfony/doctrine-bridge": "<7.0",
         "symfony/expression-language": "<6.4",
         "symfony/http-kernel": "<6.4",
         "symfony/intl": "<6.4",

@@ -1,7 +1,7 @@
-ToggleFeatureBundle
+FeatureToggleBundle
 ===================
 
-ToggleFeatureBundle provides a tight integration of the Symfony ToggleFeature
+FeatureToggleBundle provides a tight integration of the Symfony ToggleFeature
 component into the Symfony full-stack framework.
 
 **This Bundle is experimental**.

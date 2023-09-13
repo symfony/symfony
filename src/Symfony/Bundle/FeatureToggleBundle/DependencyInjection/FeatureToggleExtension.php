@@ -75,7 +75,7 @@ final class FeatureToggleExtension extends Extension
             $features[] = new Reference($featureName);
         }
 
-        $container->getDefinition('toggle_feature.provider.in_memory')
+        $container->getDefinition('feature_toggle.provider.in_memory')
             ->setArguments([
                 '$features' => $features,
             ])
@@ -102,7 +102,7 @@ final class FeatureToggleExtension extends Extension
      */
     private function generateStrategy(string $type, array $with): Definition
     {
-        $definition = new ChildDefinition("toggle_feature.abstract_strategy.{$type}");
+        $definition = new ChildDefinition("feature_toggle.abstract_strategy.{$type}");
 
         return match ($type) {
             'date' => $definition->setArguments([

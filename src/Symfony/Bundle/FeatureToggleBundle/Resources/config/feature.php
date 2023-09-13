@@ -9,17 +9,17 @@ use Symfony\Component\FeatureToggle\FeatureCollection;
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('toggle_feature.feature_collection', FeatureCollection::class)
+    $services->set('feature_toggle.feature_collection', FeatureCollection::class)
         ->args([
             '$features' => [],
         ])
     ;
 
-    $services->set('toggle_feature.feature_checker', FeatureChecker::class)
+    $services->set('feature_toggle.feature_checker', FeatureChecker::class)
         ->args([
-            '$features' => service('toggle_feature.feature_collection'),
+            '$features' => service('feature_toggle.feature_collection'),
             '$whenNotFound' => false,
         ])
     ;
-    $services->alias(FeatureCheckerInterface::class, service('toggle_feature.feature_checker'));
+    $services->alias(FeatureCheckerInterface::class, service('feature_toggle.feature_checker'));
 };

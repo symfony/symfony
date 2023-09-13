@@ -7,9 +7,9 @@ use Symfony\Bundle\FeatureToggleBundle\Twig\FeatureEnabledExtension;
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('toggle_feature.twig_extension', FeatureEnabledExtension::class)
+    $services->set('feature_toggle.twig_extension', FeatureEnabledExtension::class)
         ->args([
-            service('toggle_feature.feature_checker'),
+            service('feature_toggle.feature_checker'),
         ])
         ->tag('twig.extension')
     ;

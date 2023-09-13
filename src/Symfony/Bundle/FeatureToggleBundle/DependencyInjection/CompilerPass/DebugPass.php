@@ -25,8 +25,8 @@ final class DebugPass implements CompilerPassInterface
             return;
         }
 
-        $container->register('debug.toggle_feature.feature_checker', TraceableFeatureChecker::class)
-            ->setDecoratedService('toggle_feature.feature_checker')
+        $container->register('debug.feature_toggle.feature_checker', TraceableFeatureChecker::class)
+            ->setDecoratedService('feature_toggle.feature_checker')
             ->setArguments([
                 '$featureChecker' => new Reference('.inner'),
                 '$dataCollector' => new Reference('feature_toggle.data_collector'),

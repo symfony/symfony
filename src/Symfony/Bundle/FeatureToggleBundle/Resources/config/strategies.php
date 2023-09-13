@@ -13,7 +13,7 @@ use Symfony\Component\FeatureToggle\Strategy\RequestHeaderStrategy;
 use Symfony\Component\FeatureToggle\Strategy\RequestQueryStrategy;
 
 return static function (ContainerConfigurator $container) {
-    $prefix = 'toggle_feature.abstract_strategy.';
+    $prefix = 'feature_toggle.abstract_strategy.';
 
     $services = $container->services();
     $services->set($prefix.'grant', GrantStrategy::class)->abstract();

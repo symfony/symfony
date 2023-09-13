@@ -34,7 +34,7 @@ final class FeatureToggleExtension extends Extension
         /** @var ConfigurationType $config */
         $config = $this->processConfiguration(new Configuration(), $configs);
 
-        $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__) . '/Resources/config'));
+        $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));
         $loader->load('feature.php');
         $loader->load('providers.php');
         $loader->load('strategies.php');

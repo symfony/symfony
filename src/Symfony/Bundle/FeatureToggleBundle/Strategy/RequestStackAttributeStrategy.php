@@ -35,7 +35,7 @@ final class RequestStackAttributeStrategy implements StrategyInterface
             return StrategyResult::Abstain;
         }
 
-        if ($currentRequest->attributes->has($this->attributeName) === false) {
+        if (false === $currentRequest->attributes->has($this->attributeName)) {
             return StrategyResult::Abstain;
         }
 

@@ -38,14 +38,13 @@ final class ConfigurationTest extends TestCase
     public function testDefaultConfig(): void
     {
         $processor = new Processor();
-        $config    = $processor->processConfiguration(
+        $config = $processor->processConfiguration(
             new Configuration(),
             [],
         );
 
         self::assertEquals(self::getBundleDefaultConfig(), $config);
     }
-
 
     public static function provideValidStrategyNameConfigurationTest(): \Generator
     {
@@ -60,7 +59,7 @@ final class ConfigurationTest extends TestCase
     public function testValidStrategyNameConfiguration(string $strategyName): void
     {
         $processor = new Processor();
-        $config    = $processor->processConfiguration(
+        $config = $processor->processConfiguration(
             new Configuration(),
             [
                 [
@@ -90,16 +89,16 @@ final class ConfigurationTest extends TestCase
     public function testValidFeatureNameConfiguration(string $featureName): void
     {
         $processor = new Processor();
-        $config    = $processor->processConfiguration(
+        $config = $processor->processConfiguration(
             new Configuration(),
             [
                 [
                     'features' => [
                         [
-                            'name'        => $featureName,
+                            'name' => $featureName,
                             'description' => "This is the description of {$featureName}",
-                            'strategy'    => 'fake-strategy',
-                            'default'     => false,
+                            'strategy' => 'fake-strategy',
+                            'default' => false,
                         ],
                     ],
                 ],
@@ -121,7 +120,7 @@ final class ConfigurationTest extends TestCase
                 [
                     'features' => [
                         [
-                            'name'     => 'some-feature',
+                            'name' => 'some-feature',
                             'strategy' => 'fake-strategy',
                         ],
                     ],
@@ -142,7 +141,7 @@ final class ConfigurationTest extends TestCase
                 [
                     'features' => [
                         [
-                            'name'    => 'some-feature',
+                            'name' => 'some-feature',
                             'default' => false,
                         ],
                     ],

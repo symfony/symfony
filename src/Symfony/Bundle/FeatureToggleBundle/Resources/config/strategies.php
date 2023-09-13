@@ -18,7 +18,7 @@ return static function (ContainerConfigurator $container) {
     $services = $container->services();
     $services->set($prefix.'grant', GrantStrategy::class)->abstract();
     $services->set($prefix.'not', NotStrategy::class)->abstract()->args([
-        '$inner' => abstract_arg('Defined in FeatureToggleExtension')
+        '$inner' => abstract_arg('Defined in FeatureToggleExtension'),
     ]);
     $services->set($prefix.'env', EnvStrategy::class)->abstract()->args([
         '$envName' => abstract_arg('Defined in FeatureToggleExtension'),

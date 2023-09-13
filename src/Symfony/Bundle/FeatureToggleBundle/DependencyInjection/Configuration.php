@@ -19,13 +19,11 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  *   strategies: array<string, ConfigurationStrategy>,
  *   features: array<string, ConfigurationFeature>
  * }
- *
  * @phpstan-type ConfigurationStrategy array{
  *   name: string,
  *   type: string,
  *   with: array<string, mixed>
  * }
- *
  * @phpstan-type ConfigurationFeature array{
  *   name: string,
  *   description: string,
@@ -68,7 +66,7 @@ final class Configuration implements ConfigurationInterface
                         ->beforeNormalization()
                             ->always()
                             ->then(static function (array $strategy): array {
-                                $defaultWith = match($strategy['type']) {
+                                $defaultWith = match ($strategy['type']) {
                                     'date' => ['from' => null, 'until' => null, 'includeFrom' => false, 'includeUntil' => false],
                                     'not' => ['strategy' => null],
                                     'env', 'native_request_header', 'native_request_query', 'request_attribute' => ['name' => null],
@@ -88,41 +86,41 @@ final class Configuration implements ConfigurationInterface
                                 /** @var ConfigurationStrategy $strategy */
                                 $validator = match ($strategy['type']) {
                                     'date' => static function (array $with): void {
-                                        if ('' === trim((string)$with['from'] . (string)$with['until'])) {
+                                        if ('' === trim((string) $with['from'].(string) $with['until'])) {
                                             throw new \InvalidArgumentException('Either "from" or "until" must be provided.');
                                         }
                                     },
                                     'not' => static function (array $with): void {
-                                        if ('' === (string)$with['strategy']) {
+                                        if ('' === (string) $with['strategy']) {
                                             throw new \InvalidArgumentException('"strategy" must be provided.');
                                         }
                                     },
                                     'env' => static function (array $with): void {
-                                        if ('' === (string)$with['name']) {
+                                        if ('' === (string) $with['name']) {
                                             throw new \InvalidArgumentException('"name" must be provided.');
                                         }
                                     },
                                     'native_request_header' => static function (array $with): void {
-                                        if ('' === (string)$with['name']) {
+                                        if ('' === (string) $with['name']) {
                                             throw new \InvalidArgumentException('"name" must be provided.');
                                         }
                                     },
                                     'native_request_query' => static function (array $with): void {
-                                        if ('' === (string)$with['name']) {
+                                        if ('' === (string) $with['name']) {
                                             throw new \InvalidArgumentException('"name" must be provided.');
                                         }
                                     },
                                     'request_attribute' => static function (array $with): void {
-                                        if ('' === (string)$with['name']) {
+                                        if ('' === (string) $with['name']) {
                                             throw new \InvalidArgumentException('"name" must be provided.');
                                         }
                                     },
                                     'priority', 'affirmative' => static function (array $with): void {
-                                        if ([] === (array)$with['strategies']) {
+                                        if ([] === (array) $with['strategies']) {
                                             throw new \InvalidArgumentException('"strategies" must be provided.');
                                         }
                                     },
-                                    default => static fn(): bool => true,
+                                    default => static fn (): bool => true,
                                 };
 
                                 $validator($strategy['with']);

@@ -10,6 +10,7 @@ CHANGELOG
  * Add `AbstractTriggerDecorator`
  * Make `ScheduledStamp` "send-able"
  * Add `ScheduledStamp` to `RedispatchMessage`
+ * Add `from()` to `CheckpointInterface`
 
 6.3
 ---

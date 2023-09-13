@@ -158,6 +158,15 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
         return array_values($resolvedPackages);
     }
 
+    public function getPackageVersion(string $url): ?string
+    {
+        if (1 === preg_match("#^https://cdn.jsdelivr.net/npm/(?<package>(?:@[a-z0-9-~][a-z0-9-._~]*/)?[a-z0-9-~][a-z0-9-._~]*)@(?<version>[\w\._-]+)(?<subpath>/.*)?$#", $url, $matches)) {
+            return $matches['version'];
+        }
+
+        return null;
+    }
+
     /**
      * Parses the very specific import syntax used by jsDelivr.
      *

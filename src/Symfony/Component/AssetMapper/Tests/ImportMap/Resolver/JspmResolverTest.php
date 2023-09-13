@@ -158,4 +158,21 @@ class JspmResolverTest extends TestCase
             'expectedDownloadedFiles' => [],
         ];
     }
+
+    /**
+     * @dataProvider provideGetPackageVersion
+     */
+    public function testGetPackageVersion(string $url, ?string $expected)
+    {
+        $resolver = new JspmResolver();
+
+        $this->assertSame($expected, $resolver->getPackageVersion($url));
+    }
+
+    public static function provideGetPackageVersion(): iterable
+    {
+        yield 'with no result' => ['https://ga.jspm.io/npm:lodash/lodash.js', null];
+        yield 'with a package name' => ['https://ga.jspm.io/npm:lodash@1.2.3/lodash.js', '1.2.3'];
+        yield 'with a dash in the package_name' => ['https://ga.jspm.io/npm:lodash-dependency@9.8.7/lodash-dependency.js', '9.8.7'];
+    }
 }

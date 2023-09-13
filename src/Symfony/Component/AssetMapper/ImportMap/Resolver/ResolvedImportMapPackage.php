@@ -19,6 +19,7 @@ final class ResolvedImportMapPackage
         public readonly PackageRequireOptions $requireOptions,
         public readonly string $url,
         public readonly ?string $content = null,
+        public readonly ?string $version = null,
     ) {
     }
 }

@@ -17,6 +17,7 @@ use Symfony\Component\AssetMapper\AssetMapperDevServerSubscriber;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\AssetMapperRepository;
 use Symfony\Component\AssetMapper\Command\AssetMapperCompileCommand;
+use Symfony\Component\AssetMapper\Command\ImportMapAuditCommand;
 use Symfony\Component\AssetMapper\Command\DebugAssetMapperCommand;
 use Symfony\Component\AssetMapper\Command\ImportMapInstallCommand;
 use Symfony\Component\AssetMapper\Command\ImportMapRemoveCommand;
@@ -27,6 +28,7 @@ use Symfony\Component\AssetMapper\Compiler\JavaScriptImportPathCompiler;
 use Symfony\Component\AssetMapper\Compiler\SourceMappingUrlsCompiler;
 use Symfony\Component\AssetMapper\Factory\CachedMappedAssetFactory;
 use Symfony\Component\AssetMapper\Factory\MappedAssetFactory;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapAuditor;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapRenderer;
@@ -193,6 +195,13 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('script HTML attributes'),
             ])
 
+        ->set('asset_mapper.importmap.auditor', ImportMapAuditor::class)
+        ->args([
+            service('asset_mapper.importmap.config_reader'),
+            service('asset_mapper.importmap.resolver'),
+            service('http_client'),
+        ])
+
         ->set('asset_mapper.importmap.command.require', ImportMapRequireCommand::class)
             ->args([
                 service('asset_mapper.importmap.manager'),
@@ -211,6 +220,10 @@ return static function (ContainerConfigurator $container) {
 
         ->set('asset_mapper.importmap.command.install', ImportMapInstallCommand::class)
             ->args([service('asset_mapper.importmap.manager')])
+            ->tag('console.command')
+
+        ->set('asset_mapper.importmap.command.audit', ImportMapAuditCommand::class)
+            ->args([service('asset_mapper.importmap.auditor')])
             ->tag('console.command')
     ;
 };

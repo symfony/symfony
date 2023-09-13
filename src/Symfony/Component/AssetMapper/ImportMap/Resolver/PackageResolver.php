@@ -26,4 +26,9 @@ final class PackageResolver implements PackageResolverInterface
         return $this->locator->get($this->provider)
             ->resolvePackages($packagesToRequire);
     }
+
+    public function getPackageVersion(string $url): ?string
+    {
+        return $this->locator->get($this->provider)->getPackageVersion($url);
+    }
 }

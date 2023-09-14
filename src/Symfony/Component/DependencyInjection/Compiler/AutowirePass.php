@@ -14,7 +14,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireCallable;
-use Symfony\Component\DependencyInjection\Attribute\AutowireCustom;
+use Symfony\Component\DependencyInjection\Attribute\AutowireableAttributeInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
 use Symfony\Component\DependencyInjection\Attribute\MapDecorated;
 use Symfony\Component\DependencyInjection\Attribute\Target;
@@ -304,17 +304,18 @@ class AutowirePass extends AbstractRecursivePass
             };
 
             if ($checkAttributes) {
-                foreach ($parameter->getAttributes(AutowireCustom::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+                $autowireAttributes = array_merge(
+                    $parameter->getAttributes(Autowire::class, \ReflectionAttribute::IS_INSTANCEOF),
+                    $parameter->getAttributes(AutowireableAttributeInterface::class, \ReflectionAttribute::IS_INSTANCEOF)
+                );
+
+                foreach ($autowireAttributes as $attribute) {
                     $attribute = $attribute->newInstance();
-                    $reference = $attribute->buildReference($this->container, $parameter);
 
-                    $arguments[$index] = $reference;
+                    if ($attribute instanceof AutowireableAttributeInterface) {
+                        $attribute = $attribute->getAutowireAttribute($parameter);
+                    }
 
-                    continue 2;
-                }
-
-                foreach ($parameter->getAttributes(Autowire::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
-                    $attribute = $attribute->newInstance();
                     $invalidBehavior = $parameter->allowsNull() ? ContainerInterface::NULL_ON_INVALID_REFERENCE : ContainerBuilder::EXCEPTION_ON_INVALID_REFERENCE;
 
                     try {

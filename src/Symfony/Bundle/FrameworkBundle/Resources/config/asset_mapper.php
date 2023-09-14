@@ -143,6 +143,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('importmap.php path'),
                 abstract_arg('vendor directory'),
                 service('asset_mapper.importmap.resolver'),
+                service('http_client'),
             ])
         ->alias(ImportMapManager::class, 'asset_mapper.importmap.manager')
 

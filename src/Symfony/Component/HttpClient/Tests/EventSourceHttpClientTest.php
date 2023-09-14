@@ -110,6 +110,33 @@ TXT;
         }
     }
 
+    public function testPostServerSentEvents()
+    {
+        $chunk = new DataChunk(0, '');
+        $response = new MockResponse('', ['canceled' => false, 'http_method' => 'POST', 'url' => 'http://localhost:8080/events', 'response_headers' => ['content-type: text/event-stream']]);
+        $responseStream = new ResponseStream((function () use ($response, $chunk) {
+            yield $response => new FirstChunk();
+            yield $response => $chunk;
+            yield $response => new ErrorChunk(0, 'timeout');
+        })());
+
+        $hasCorrectHeaders = function ($options) {
+            $this->assertSame(['Accept: text/event-stream', 'Cache-Control: no-cache'], $options['headers']);
+            $this->assertSame('mybody', $options['body']);
+
+            return true;
+        };
+
+        $httpClient = $this->createMock(HttpClientInterface::class);
+
+        $httpClient->method('request')->with('POST', 'http://localhost:8080/events', $this->callback($hasCorrectHeaders))->willReturn($response);
+
+        $httpClient->method('stream')->willReturn($responseStream);
+
+        $es = new EventSourceHttpClient($httpClient);
+        $res = $es->connect('http://localhost:8080/events', ['body' => 'mybody'], 'POST');
+    }
+
     /**
      * @dataProvider contentTypeProvider
      */

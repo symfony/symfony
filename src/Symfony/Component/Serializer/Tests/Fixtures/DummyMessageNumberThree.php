@@ -11,16 +11,9 @@
 
 namespace Symfony\Component\Serializer\Tests\Fixtures;
 
-use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
-
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
-#[DiscriminatorMap(typeProperty: 'type', mapping: [
-    'one' => DummyMessageNumberOne::class,
-    'two' => DummyMessageNumberTwo::class,
-    'three' => DummyMessageNumberThree::class,
-])]
-interface DummyMessageInterface
+class DummyMessageNumberThree extends \stdClass implements DummyMessageInterface
 {
 }

@@ -17,7 +17,6 @@ use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\MarkingStore\MethodMarkingStore;
 use Symfony\Component\Workflow\Metadata\InMemoryMetadataStore;
 use Symfony\Component\Workflow\Registry;
-use Symfony\Component\Workflow\SupportStrategy\ClassInstanceSupportStrategy;
 use Symfony\Component\Workflow\SupportStrategy\InstanceOfSupportStrategy;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\TransitionBlockerList;
@@ -36,25 +35,19 @@ class WorkflowExtensionTest extends TestCase
             new Transition('t2', 'waiting_for_payment', 'processed'),
         ];
 
-        $metadataStore = null;
-        if (class_exists(InMemoryMetadataStore::class)) {
-            $transitionsMetadata = new \SplObjectStorage();
-            $transitionsMetadata->attach($this->t1, ['title' => 't1 title']);
-            $metadataStore = new InMemoryMetadataStore(
-                ['title' => 'workflow title'],
-                ['orderer' => ['title' => 'ordered title']],
-                $transitionsMetadata
-            );
-        }
+        $transitionsMetadata = new \SplObjectStorage();
+        $transitionsMetadata->attach($this->t1, ['title' => 't1 title']);
+        $metadataStore = new InMemoryMetadataStore(
+            ['title' => 'workflow title'],
+            ['orderer' => ['title' => 'ordered title']],
+            $transitionsMetadata
+        );
         $definition = new Definition($places, $transitions, null, $metadataStore);
         $workflow = new Workflow($definition, new MethodMarkingStore());
 
         $registry = new Registry();
-        $addWorkflow = method_exists($registry, 'addWorkflow') ? 'addWorkflow' : 'add';
-        $supportStrategy = class_exists(InstanceOfSupportStrategy::class)
-            ? new InstanceOfSupportStrategy(Subject::class)
-            : new ClassInstanceSupportStrategy(Subject::class);
-        $registry->$addWorkflow($workflow, $supportStrategy);
+        $supportStrategy = new InstanceOfSupportStrategy(Subject::class);
+        $registry->addWorkflow($workflow, $supportStrategy);
         $this->extension = new WorkflowExtension($registry);
     }
 

@@ -184,6 +184,7 @@ class EsmtpTransport extends SmtpTransport
             return;
         }
 
+        $code = null;
         $authNames = [];
         $errors = [];
         $modes = array_map('strtolower', $modes);

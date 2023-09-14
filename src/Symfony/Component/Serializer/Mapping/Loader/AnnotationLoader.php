@@ -57,6 +57,7 @@ class AnnotationLoader implements LoaderInterface
         $className = $reflectionClass->name;
         $loaded = false;
         $classGroups = [];
+        $classContextAnnotation = null;
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();
 
@@ -71,6 +72,12 @@ class AnnotationLoader implements LoaderInterface
 
             if ($annotation instanceof Groups) {
                 $classGroups = $annotation->getGroups();
+
+                continue;
+            }
+
+            if ($annotation instanceof Context) {
+                $classContextAnnotation = $annotation;
             }
         }
 
@@ -81,6 +88,10 @@ class AnnotationLoader implements LoaderInterface
             }
 
             if ($property->getDeclaringClass()->name === $className) {
+                if ($classContextAnnotation) {
+                    $this->setAttributeContextsForGroups($classContextAnnotation, $attributesMetadata[$property->name]);
+                }
+
                 foreach ($classGroups as $group) {
                     $attributesMetadata[$property->name]->addGroup($group);
                 }

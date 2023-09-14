@@ -127,15 +127,13 @@ class DoctrineTokenProviderTest extends TestCase
             $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
         }
 
-        if (method_exists($config, 'setLazyGhostObjectEnabled')) {
-            $config->setLazyGhostObjectEnabled(true);
-        }
+        $config->setLazyGhostObjectEnabled(true);
 
         $connection = DriverManager::getConnection([
             'driver' => 'pdo_sqlite',
             'memory' => true,
         ], $config);
-        $connection->{method_exists($connection, 'executeStatement') ? 'executeStatement' : 'executeUpdate'}(<<< 'SQL'
+        $connection->executeStatement(<<< 'SQL'
             CREATE TABLE rememberme_token (
                 series   char(88)     UNIQUE PRIMARY KEY NOT NULL,
                 value    char(88)     NOT NULL,

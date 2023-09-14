@@ -49,7 +49,7 @@ class EntityUserProviderTest extends TestCase
         $this->assertSame($user1, $provider->refreshUser($user1));
     }
 
-    public function testLoadUserByUsername()
+    public function testLoadUserByIdentifier()
     {
         $em = DoctrineTestHelper::createTestEntityManager();
         $this->createSchema($em);
@@ -64,7 +64,7 @@ class EntityUserProviderTest extends TestCase
         $this->assertSame($user, $provider->loadUserByIdentifier('user1'));
     }
 
-    public function testLoadUserByUsernameWithUserLoaderRepositoryAndWithoutProperty()
+    public function testLoadUserByIdentifierWithUserLoaderRepositoryAndWithoutProperty()
     {
         $user = new User(1, 1, 'user1');
 
@@ -86,7 +86,7 @@ class EntityUserProviderTest extends TestCase
         $this->assertSame($user, $provider->loadUserByIdentifier('user1'));
     }
 
-    public function testLoadUserByUsernameWithNonUserLoaderRepositoryAndWithoutProperty()
+    public function testLoadUserByIdentifierWithNonUserLoaderRepositoryAndWithoutProperty()
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('You must either make the "Symfony\Bridge\Doctrine\Tests\Fixtures\User" entity Doctrine Repository ("Doctrine\ORM\EntityRepository") implement "Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface" or set the "property" option in the corresponding entity provider configuration.');
@@ -150,7 +150,7 @@ class EntityUserProviderTest extends TestCase
         $this->assertTrue($provider->supportsClass($user2::class));
     }
 
-    public function testLoadUserByUserNameShouldLoadUserWhenProperInterfaceProvided()
+    public function testLoadUserByIdentifierShouldLoadUserWhenProperInterfaceProvided()
     {
         $repository = $this->createMock(UserLoaderRepository::class);
         $repository->expects($this->once())
@@ -168,7 +168,7 @@ class EntityUserProviderTest extends TestCase
         $provider->loadUserByIdentifier('name');
     }
 
-    public function testLoadUserByUserNameShouldDeclineInvalidInterface()
+    public function testLoadUserByIdentifierShouldDeclineInvalidInterface()
     {
         $this->expectException(\InvalidArgumentException::class);
         $repository = $this->createMock(ObjectRepository::class);

@@ -26,12 +26,15 @@ use Symfony\Component\AssetMapper\ImportMap\Resolver\ResolvedImportMapPackage;
 use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolver;
 use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class ImportMapManagerTest extends TestCase
 {
     private Filesystem $filesystem;
     private AssetMapperInterface $assetMapper;
     private PackageResolverInterface&MockObject $packageResolver;
+    private HttpClientInterface&MockObject $httpClient;
 
     protected function setUp(): void
     {
@@ -373,17 +376,77 @@ class ImportMapManagerTest extends TestCase
         $this->assertSame('contents of cowsay.js', $actualContents);
     }
 
+    public function testUpdateWithSpecificPackages()
+    {
+        $rootDir = __DIR__.'/../fixtures/importmaps_for_writing';
+        $manager = $this->createImportMapManager(['assets' => ''], $rootDir);
+
+        $map = [
+            'lodash' => [
+                'url' => 'https://ga.jspm.io/npm:lodash@1.2.3/lodash.js',
+            ],
+            'cowsay' => [
+                'url' => 'https://ga.jspm.io/npm:cowsay@4.5.6/cowsay.umd.js',
+                'downloaded_to' => 'vendor/cowsay.js',
+            ],
+            'bootstrap' => [
+                'url' => 'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.esm.js',
+                'preload' => true,
+            ],
+            'app' => [
+                'path' => 'app.js',
+            ],
+        ];
+        $mapString = var_export($map, true);
+        file_put_contents($rootDir.'/importmap.php', "<?php\n\nreturn {$mapString};\n");
+        $this->filesystem->mkdir($rootDir.'/assets/vendor');
+        file_put_contents($rootDir.'/assets/vendor/cowsay.js', 'cowsay.js original contents');
+        file_put_contents($rootDir.'/assets/app.js', 'app.js contents');
+
+        $this->packageResolver->expects($this->once())
+            ->method('resolvePackages')
+            ->willReturn([
+                self::resolvedPackage('cowsay', 'https://ga.jspm.io/npm:cowsay@4.5.9/cowsay.umd.js', download: true, content: 'updated contents of cowsay.js'),
+            ])
+        ;
+
+        $manager->update(['cowsay']);
+        $actualImportMap = require $rootDir.'/importmap.php';
+        $expectedImportMap = [
+            'lodash' => [
+                'url' => 'https://ga.jspm.io/npm:lodash@1.2.3/lodash.js',
+            ],
+            'cowsay' => [
+                'url' => 'https://ga.jspm.io/npm:cowsay@4.5.9/cowsay.umd.js',
+                'downloaded_to' => 'vendor/cowsay.js',
+            ],
+            'bootstrap' => [
+                'url' => 'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.esm.js',
+                'preload' => true,
+            ],
+            'app' => [
+                'path' => 'app.js',
+            ],
+        ];
+        $this->assertEquals($expectedImportMap, $actualImportMap);
+        $this->assertFileExists($rootDir.'/assets/vendor/cowsay.js');
+        $actualContents = file_get_contents($rootDir.'/assets/vendor/cowsay.js');
+        $this->assertSame('updated contents of cowsay.js', $actualContents);
+    }
+
     public function testDownloadMissingPackages()
     {
         $rootDir = __DIR__.'/../fixtures/download';
         $manager = $this->createImportMapManager(['assets' => ''], $rootDir);
 
-        $this->packageResolver->expects($this->once())
-            ->method('resolvePackages')
-            ->willReturn([
-                self::resolvedPackage('@hotwired/stimulus', 'https://cdn.jsdelivr.net/npm/stimulus@3.2.1/+esm', true, content: 'contents of stimulus.js'),
-            ])
-        ;
+        $response = $this->createMock(ResponseInterface::class);
+        $response->expects($this->once())
+            ->method('getContent')
+            ->willReturn('contents of stimulus.js');
+
+        $this->httpClient->expects($this->once())
+            ->method('request')
+            ->willReturn($response);
 
         $downloadedPackages = $manager->downloadMissingPackages();
         $actualImportMap = require $rootDir.'/importmap.php';
@@ -506,6 +569,7 @@ class ImportMapManagerTest extends TestCase
 
         $mapper = $this->createAssetMapper($pathResolver, $dirs, $rootDir);
         $this->packageResolver = $this->createMock(PackageResolverInterface::class);
+        $this->httpClient = $this->createMock(HttpClientInterface::class);
 
         return new ImportMapManager(
             $mapper,
@@ -513,6 +577,7 @@ class ImportMapManagerTest extends TestCase
             $rootDir.'/importmap.php',
             $rootDir.'/assets/vendor',
             $this->packageResolver,
+            $this->httpClient,
         );
     }
 

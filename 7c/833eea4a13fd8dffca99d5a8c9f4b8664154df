@@ -1,0 +1,89 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-09-04T18:21:55Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-09-04T22:38:49Z
+
+This looks like a new feature to me, especially since we need to change a method signature. Also, please note that we usually don't merge changes that are not covered by tests.
+
+---------------------------------------------------------------------------
+
+by wivaku at 2023-09-05T09:35:42Z
+
+What you say makes sense. Technically it's indeed not a bug. At the same time, was not sure it really deserved being called a feature.
+As the change maintains backwards compatibility (before: always GET, after: optional argument that defaults to GET) and `connect()` is basically a wrapper to `request()` where both GET and POST are allowed, I was not sure if a test is needed.
+My knowledge of the internals of the code is not sufficient to add a test.
+Can someone help?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-09-05T09:38:33Z
+
+@wivaku we still need tests to cover the new feature you are adding (which is here to prevent regressing on it which would break it).
+
+and anything that is not a bug fix is treated as a new feature going into the next minor version.
+Btw, adding support for POST requests is definitely a new feature.
+
+---------------------------------------------------------------------------
+
+by wivaku at 2023-09-05T09:41:13Z
+
+What both of you say makes sense. Technically it's indeed not a bug. At the same time, was not sure it really deserved being called a feature.  POST was already allowed (using `request`) and `connect` is basically a wrapper that sets the headers for `request`.
+
+As the change maintains backwards compatibility (before: always GET, after: optional argument that defaults to GET) and `connect()` is basically a wrapper to `request()` where both GET and POST are allowed, I was not sure if a test is needed. Totally fine if you feel it does need a test.
+
+My knowledge of the internals of the code is not sufficient to add one though.
+Can someone help?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-09-05T10:10:12Z
+
+@wivaku ``Add support for POST requests in `EventSourceHttpClient::connect()` `` is definitely describing a feature addition. And this is exactly what this PR does.
+Btw, the changelog also needs to be updated.
+
+And the rule is that anything that is not a bug fix goes into the next minor version. It is not about deserving being called a feature or no.
+
+> As the change maintains backwards compatibility (before: always GET, after: optional argument that defaults to GET) and `connect()` is basically a wrapper to `request()` where both GET and POST are allowed, I was not sure if a test is needed. Totally fine if you feel it does need a test.
+
+The new test is not there to ensure this PR maintains backward compatibility (that's what the existing test ensure). It is there to ensure that **future* PRs do not break the change you introduce in this one.
+Without a test covering this feature, there is nothing preventing the support of POST requests to be broken by a future change (your own app would then become the CI reporting that this got broken, hopefully in your own CI if you have one or in production if it is not covered, but that would leave you with 1 month until the next patch release to get a fix being released...)
+
+> My knowledge of the internals of the code is not sufficient to add one though.
+
+Look at the existing tests of the EventSourceHttpClient. The test for POST will be quite similar except that the mock will expect being called with a POST method.
+
+---------------------------------------------------------------------------
+
+by wivaku at 2023-09-05T11:43:49Z
+
+Ok, attempted to add test. Similar to the GET test, but only checking the response, not the responseStream as this is already covered by the GET test.
+
+All this, including Mockery tests are quite new to me, so apologies if I'm doing something wrong.
+
+Because of my lack of experience the way I read the Mockery test is confusing to me: in the test I specify that the response will be for the method and then I test if the response I get is indeed that response.

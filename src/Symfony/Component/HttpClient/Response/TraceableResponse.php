@@ -57,7 +57,9 @@ class TraceableResponse implements ResponseInterface, StreamableInterface
     public function __destruct()
     {
         try {
-            $this->response->__destruct();
+            if (method_exists($this->response, '__destruct')) {
+                $this->response->__destruct();
+            }
         } finally {
             if ($this->event && $this->event->isStarted()) {
                 $this->event->stop();

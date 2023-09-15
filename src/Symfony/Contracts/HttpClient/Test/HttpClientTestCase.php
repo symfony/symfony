@@ -785,7 +785,7 @@ abstract class HttpClientTestCase extends TestCase
      * @throws ServerExceptionInterface
      * @throws TimeoutExceptionInterface
      */
-    public function testTimeoutIsNotAFatalError(): void
+    public function testTimeoutIsNotAFatalError()
     {
         usleep(300000); // wait for the previous test to release the server
         $client = $this->getHttpClient(__FUNCTION__);
@@ -818,7 +818,7 @@ abstract class HttpClientTestCase extends TestCase
      * @throws TransportExceptionInterface
      * @throws ServerExceptionInterface
      */
-    public function testTimeoutOnStream(): void
+    public function testTimeoutOnStream()
     {
         $client = $this->getHttpClient(__FUNCTION__);
         $response = $client->request('GET', 'http://localhost:8057/timeout-body');
@@ -853,7 +853,7 @@ abstract class HttpClientTestCase extends TestCase
     /**
      * @throws TransportExceptionInterface
      */
-    public function testUncheckedTimeoutThrows(): void
+    public function testUncheckedTimeoutThrows()
     {
         $client = $this->getHttpClient(__FUNCTION__);
         $response = $client->request('GET', 'http://localhost:8057/timeout-body');
@@ -871,7 +871,7 @@ abstract class HttpClientTestCase extends TestCase
      * @throws RedirectionExceptionInterface
      * @throws ClientExceptionInterface
      */
-    public function testTimeoutWithActiveConcurrentStream(): void
+    public function testTimeoutWithActiveConcurrentStream()
     {
         $p1 = TestHttpServer::start(8067);
         $p2 = TestHttpServer::start(8077);
@@ -989,7 +989,7 @@ abstract class HttpClientTestCase extends TestCase
         }
     }
 
-    public function testGetEncodedContentAfterDestruct(): void
+    public function testGetEncodedContentAfterDestruct()
     {
         $client = $this->getHttpClient(__FUNCTION__);
 
@@ -1112,7 +1112,7 @@ abstract class HttpClientTestCase extends TestCase
      * @throws DecodingExceptionInterface
      * @throws ClientExceptionInterface
      */
-    public function testQuery(): void
+    public function testQuery()
     {
         $client = $this->getHttpClient(__FUNCTION__);
         $response = $client->request('GET', 'http://localhost:8057/?a=a', [

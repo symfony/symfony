@@ -254,7 +254,7 @@ class MarkdownDescriptor extends Descriptor
                 foreach ($tagData as $parameters) {
                     $output .= "\n".'- Tag: `'.$tagName.'`';
                     foreach ($parameters as $name => $value) {
-                        $output .= "\n".'    - '.ucfirst($name).': '.$value;
+                        $output .= "\n".'    - '.ucfirst($name).': '.(\is_array($value) ? $this->formatParameter($value) : $value);
                     }
                 }
             }

@@ -209,6 +209,10 @@ class TextDescriptor extends Descriptor
                             if (!isset($maxTags[$key])) {
                                 $maxTags[$key] = \strlen($key);
                             }
+                            if (\is_array($value)) {
+                                $value = $this->formatParameter($value);
+                            }
+
                             if (\strlen($value) > $maxTags[$key]) {
                                 $maxTags[$key] = \strlen($value);
                             }
@@ -233,7 +237,11 @@ class TextDescriptor extends Descriptor
                     foreach ($this->sortByPriority($definition->getTag($showTag)) as $key => $tag) {
                         $tagValues = [];
                         foreach ($tagsNames as $tagName) {
-                            $tagValues[] = $tag[$tagName] ?? '';
+                            if (\is_array($tagValue = $tag[$tagName] ?? '')) {
+                                $tagValue = $this->formatParameter($tagValue);
+                            }
+
+                            $tagValues[] = $tagValue;
                         }
                         if (0 === $key) {
                             $tableRows[] = array_merge([$serviceId], $tagValues, [$definition->getClass()]);
@@ -275,7 +283,7 @@ class TextDescriptor extends Descriptor
             $tagInformation = [];
             foreach ($tags as $tagName => $tagData) {
                 foreach ($tagData as $tagParameters) {
-                    $parameters = array_map(fn ($key, $value) => sprintf('<info>%s</info>: %s', $key, $value), array_keys($tagParameters), array_values($tagParameters));
+                    $parameters = array_map(fn ($key, $value) => sprintf('<info>%s</info>: %s', $key, \is_array($value) ? $this->formatParameter($value) : $value), array_keys($tagParameters), array_values($tagParameters));
                     $parameters = implode(', ', $parameters);
 
                     if ('' === $parameters) {

@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\Tests\AccessToken\Oidc;
 
 use Jose\Component\Core\AlgorithmManager;
 use Jose\Component\Core\JWK;
+use Jose\Component\Core\JWKSet;
 use Jose\Component\Signature\Algorithm\ES256;
 use Jose\Component\Signature\JWSBuilder;
 use Jose\Component\Signature\Serializer\CompactSerializer;
@@ -32,9 +33,9 @@ class OidcTokenHandlerTest extends TestCase
     private const AUDIENCE = 'Symfony OIDC';
 
     /**
-     * @dataProvider getClaims
+     * @dataProvider getClaimsAndJwk
      */
-    public function testGetsUserIdentifierFromSignedToken(string $claim, string $expected)
+    public function testGetsUserIdentifierFromSignedToken(string $claim, string $expected, JWK|JWKSet $jwk)
     {
         $time = time();
         $claims = [
@@ -54,7 +55,7 @@ class OidcTokenHandlerTest extends TestCase
 
         $userBadge = (new OidcTokenHandler(
             new ES256(),
-            $this->getJWK(),
+            $jwk,
             self::AUDIENCE,
             ['https://www.example.com'],
             $claim,
@@ -69,10 +70,12 @@ class OidcTokenHandlerTest extends TestCase
         $this->assertEquals($claims['sub'], $actualUser->getUserIdentifier());
     }
 
-    public static function getClaims(): iterable
+    public static function getClaimsAndJwk(): iterable
     {
-        yield ['sub', 'e21bf182-1538-406e-8ccb-e25a17aba39f'];
-        yield ['email', 'foo@example.com'];
+        yield ['sub', 'e21bf182-1538-406e-8ccb-e25a17aba39f', self::getJWK()];
+        yield ['email', 'foo@example.com', self::getJWK()];
+        yield ['sub', 'e21bf182-1538-406e-8ccb-e25a17aba39f', self::getJWKSet()];
+        yield ['email', 'foo@example.com', self::getJWKSet()];
     }
 
     /**
@@ -176,5 +179,17 @@ class OidcTokenHandlerTest extends TestCase
             'y' => 'KYl-qyZ26HobuYwlQh-r0iHX61thfP82qqEku7i0woo',
             'd' => 'iA_TV2zvftni_9aFAQwFO_9aypfJFCSpcCyevDvz220',
         ]);
+    }
+
+    private static function getJWKSet(): JWKSet
+    {
+        // tip: use https://mkjwk.org/ to generate a JWK
+        return new JWKSet([new JWK([
+            'kty' => 'EC',
+            'crv' => 'P-256',
+            'x' => '0QEAsI1wGI-dmYatdUZoWSRWggLEpyzopuhwk-YUnA4',
+            'y' => 'KYl-qyZ26HobuYwlQh-r0iHX61thfP82qqEku7i0woo',
+            'd' => 'iA_TV2zvftni_9aFAQwFO_9aypfJFCSpcCyevDvz220',
+        ])]);
     }
 }

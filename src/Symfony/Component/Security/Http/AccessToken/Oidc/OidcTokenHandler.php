@@ -15,7 +15,7 @@ use Jose\Component\Checker;
 use Jose\Component\Checker\ClaimCheckerManager;
 use Jose\Component\Core\Algorithm;
 use Jose\Component\Core\AlgorithmManager;
-use Jose\Component\Core\JWK;
+use Jose\Component\Core\JWKSet;
 use Jose\Component\Signature\JWSTokenSupport;
 use Jose\Component\Signature\JWSVerifier;
 use Jose\Component\Signature\Serializer\CompactSerializer;
@@ -39,7 +39,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
 
     public function __construct(
         private Algorithm $signatureAlgorithm,
-        private JWK $jwk,
+        private JWKSet $jwkSet,
         private string $audience,
         private array $issuers,
         private string $claim = 'sub',
@@ -62,7 +62,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
             $claims = json_decode($jws->getPayload(), true);
 
             // Verify the signature
-            if (!$jwsVerifier->verifyWithKey($jws, $this->jwk, 0)) {
+            if (!$jwsVerifier->verifyWithKeySet($jws, $this->jwkSet, 0)) {
                 throw new InvalidSignatureException();
             }
 

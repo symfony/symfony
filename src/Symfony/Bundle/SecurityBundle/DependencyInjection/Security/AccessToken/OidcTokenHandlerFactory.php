@@ -12,6 +12,8 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken;
 
 use Jose\Component\Core\Algorithm;
+use Jose\Component\Core\JWK;
+use Jose\Component\Core\JWKSet;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -45,9 +47,20 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
             );
         }
 
-        $tokenHandlerDefinition->replaceArgument(1, (new ChildDefinition('security.access_token_handler.oidc.jwk'))
-            ->replaceArgument(0, $config['key'])
-        );
+        if (!isset($config['jwks_url']) && !isset($config['key'])) {
+            throw new LogicException('You should defined key or jwks_url parameter in configuration.');
+        }
+
+        if (isset($config['jwks_url'])) {
+            $jwksJson = file_get_contents($config['jwks_url']);
+        } elseif (isset($config['key'])) {
+            $jwksJson = json_encode((new JWKSet([JWK::createFromJson($config['key'])]))->jsonSerialize());
+        }
+
+        $jwkSetDefinition = (new ChildDefinition('security.access_token_handler.oidc.jwk_set'))
+            ->replaceArgument(0, $jwksJson);
+
+        $tokenHandlerDefinition->replaceArgument(1, $jwkSetDefinition);
     }
 
     public function getKey(): string
@@ -80,7 +93,9 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
                     ->end()
                     ->scalarNode('key')
                         ->info('JSON-encoded JWK used to sign the token (must contain a "kty" key).')
-                        ->isRequired()
+                    ->end()
+                    ->scalarNode('jwks_url')
+                        ->info('Url to retrieve JWKSet JSON-encoded (must contain a "keys" key).')
                     ->end()
                 ->end()
             ->end()

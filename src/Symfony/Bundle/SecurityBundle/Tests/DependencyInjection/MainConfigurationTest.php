@@ -191,4 +191,27 @@ class MainConfigurationTest extends TestCase
         $configuration = new MainConfiguration(['stub' => $factory], []);
         $configuration->getConfigTreeBuilder();
     }
+
+    public function testHasherThrowsOnServiceIdWithMigrate()
+    {
+        $config = [
+            'password_hashers' => [
+                'legacy' => 'bcrypt',
+                'custom' => [
+                    'id' => 'app.custom_hasher',
+                    'migrate_from' => 'legacy',
+                ],
+            ],
+        ];
+
+        $config = array_merge(static::$minimalConfig, $config);
+
+        $processor = new Processor();
+        $configuration = new MainConfiguration([], []);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Invalid configuration for path "security.password_hashers.custom": You cannot use "migrate_from" when using a custom service id');
+
+        $processor->processConfiguration($configuration, [$config]);
+    }
 }

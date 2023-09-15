@@ -928,7 +928,7 @@ abstract class HttpClientTestCase extends TestCase
         }
     }
 
-    public function testTimeoutOnDestruct(): void
+    public function testTimeoutOnDestruct()
     {
         $p1 = TestHttpServer::start(8067);
         $p2 = TestHttpServer::start(8077);

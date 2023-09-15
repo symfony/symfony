@@ -13,7 +13,6 @@ namespace Symfony\Component\Security\Http\Tests\AccessToken\Oidc;
 
 use Jose\Component\Core\AlgorithmManager;
 use Jose\Component\Core\JWK;
-use Jose\Component\Core\JWKSet;
 use Jose\Component\Signature\Algorithm\ES256;
 use Jose\Component\Signature\JWSBuilder;
 use Jose\Component\Signature\Serializer\CompactSerializer;
@@ -55,7 +54,7 @@ class OidcTokenHandlerTest extends TestCase
 
         $userBadge = (new OidcTokenHandler(
             new ES256(),
-            $this->getJWKSet(),
+            $this->getJWK(),
             self::AUDIENCE,
             ['https://www.example.com'],
             $claim,
@@ -89,7 +88,7 @@ class OidcTokenHandlerTest extends TestCase
 
         (new OidcTokenHandler(
             new ES256(),
-            $this->getJWKSet(),
+            $this->getJWK(),
             self::AUDIENCE,
             ['https://www.example.com'],
             'sub',
@@ -148,7 +147,7 @@ class OidcTokenHandlerTest extends TestCase
 
         (new OidcTokenHandler(
             new ES256(),
-            self::getJWKSet(),
+            self::getJWK(),
             self::AUDIENCE,
             ['https://www.example.com'],
             'email',
@@ -177,10 +176,5 @@ class OidcTokenHandlerTest extends TestCase
             'y' => 'KYl-qyZ26HobuYwlQh-r0iHX61thfP82qqEku7i0woo',
             'd' => 'iA_TV2zvftni_9aFAQwFO_9aypfJFCSpcCyevDvz220',
         ]);
-    }
-
-    private static function getJWKSet(): JWKSet
-    {
-        return new JWKSet([self::getJWK()]);
     }
 }

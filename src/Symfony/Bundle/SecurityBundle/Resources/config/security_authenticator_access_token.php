@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Jose\Component\Core\Algorithm;
+use Jose\Component\Core\JWK;
 use Jose\Component\Core\JWKSet;
 use Jose\Component\Signature\Algorithm\ES256;
 use Jose\Component\Signature\Algorithm\ES384;
@@ -74,6 +75,13 @@ return static function (ContainerConfigurator $container) {
                 'sub',
                 service('logger')->nullOnInvalid(),
                 service('clock'),
+            ])
+
+        ->set('security.access_token_handler.oidc.jwk', JWK::class)
+            ->abstract()
+            ->factory([JWK::class, 'createFromJson'])
+            ->args([
+                abstract_arg('signature key'),
             ])
 
         ->set('security.access_token_handler.oidc.jwk_set', JWKSet::class)

@@ -12,8 +12,6 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken;
 
 use Jose\Component\Core\Algorithm;
-use Jose\Component\Core\JWK;
-use Jose\Component\Core\JWKSet;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -53,14 +51,14 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
 
         if (isset($config['jwks_url'])) {
             $jwksJson = file_get_contents($config['jwks_url']);
+            $jwkDefinition = (new ChildDefinition('security.access_token_handler.oidc.jwk_set'))
+                ->replaceArgument(0, $jwksJson);
         } elseif (isset($config['key'])) {
-            $jwksJson = json_encode((new JWKSet([JWK::createFromJson($config['key'])]))->jsonSerialize());
+            $jwkDefinition = (new ChildDefinition('security.access_token_handler.oidc.jwk'))
+                ->replaceArgument(0, $config['key']);
         }
 
-        $jwkSetDefinition = (new ChildDefinition('security.access_token_handler.oidc.jwk_set'))
-            ->replaceArgument(0, $jwksJson);
-
-        $tokenHandlerDefinition->replaceArgument(1, $jwkSetDefinition);
+        $tokenHandlerDefinition->replaceArgument(1, $jwkDefinition);
     }
 
     public function getKey(): string

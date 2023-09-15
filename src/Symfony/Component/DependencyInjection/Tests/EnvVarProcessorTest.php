@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\EnvVarLoaderInterface;
 use Symfony\Component\DependencyInjection\EnvVarProcessor;
 use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\IntBackedEnum;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\StringBackedEnum;
@@ -413,15 +414,20 @@ class EnvVarProcessorTest extends TestCase
     }
 
     /**
-     * @dataProvider dateTimeFormats
+     * @dataProvider validDateTimeFormats
      */
-    public function testGetEnvDateTimeFormat($format)
+    public function testGetEnvValidDateTimeFormat($format)
     {
-        $processor = new EnvVarProcessor(new Container());
+        $parameterName = 'format_variable';
+
+        $container = new Container();
+        $container->setParameter($parameterName, $format);
+
+        $processor = new EnvVarProcessor($container);
 
         $dateTime = new \DateTimeImmutable();
 
-        $result = $processor->getEnv('date_time_format', $format.':foo', function ($name) use ($dateTime) {
+        $result = $processor->getEnv('date_time_format', $parameterName.':foo', function ($name) use ($dateTime) {
             $this->assertSame('foo', $name);
 
             return $dateTime;
@@ -433,7 +439,7 @@ class EnvVarProcessorTest extends TestCase
         );
     }
 
-    public static function dateTimeFormats()
+    public static function validDateTimeFormats()
     {
         return [
             [''],
@@ -443,6 +449,57 @@ class EnvVarProcessorTest extends TestCase
             ['Y m d'],
             ['...'],
             ['KKK'],
+            ['Y-m-d H:i:s'],
+        ];
+    }
+
+    public function testGetEnvdDateTimeFormatParameterNotSet()
+    {
+        $parameterName = 'format_variable';
+
+        $this->expectException(ParameterNotFoundException::class);
+        $this->expectExceptionMessage(sprintf('You have requested a non-existent parameter "%s".', $parameterName));
+
+        $processor = new EnvVarProcessor(new Container());
+
+        $processor->getEnv('date_time_format', $parameterName.':foo', function ($name) {
+            $this->assertSame('foo', $name);
+
+            return new \DateTimeImmutable();
+        });
+    }
+
+    /**
+     * @dataProvider invalidDateTimeFormats
+     */
+    public function testGetEnvInvalidDateTimeFormat($format)
+    {
+        $parameterName = 'format_variable';
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(
+            sprintf('Invalid parameter "%s" type provided. Expected "string" got "%s".', $parameterName, gettype($format)),
+        );
+
+        $container = new Container();
+        $container->setParameter($parameterName, $format);
+
+        $processor = new EnvVarProcessor($container);
+        $processor->getEnv('date_time_format', $parameterName.':foo', function ($name) {
+            $this->assertSame('foo', $name);
+
+            return new \DateTimeImmutable();
+        });
+    }
+
+    public static function invalidDateTimeFormats()
+    {
+        return [
+            [null],
+            [123],
+            [123.123],
+            [[]],
+            [['c']],
         ];
     }
 

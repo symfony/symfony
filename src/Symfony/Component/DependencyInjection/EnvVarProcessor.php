@@ -163,7 +163,12 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             }
 
             $next = substr($name, $i + 1);
-            $format = substr($name, 0, $i);
+            $formatParameterName = substr($name, 0, $i);
+            $format = $this->container->getParameter($formatParameterName);
+            if (!is_string($format)) {
+                throw new RuntimeException(sprintf('Invalid parameter "%s" type provided. Expected "string" got "%s".', $formatParameterName, gettype($format)));
+            }
+
             $dateTime = $getEnv($next);
 
             if (!$dateTime instanceof \DateTimeImmutable) {

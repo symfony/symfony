@@ -29,16 +29,23 @@ final class SignatureAlgorithmFactory
             case 'ES256':
             case 'ES384':
             case 'ES512':
-            case 'RS256':
                 if (!class_exists(Algorithm::class.'\\'.$algorithm)) {
                     throw new \LogicException(sprintf('You cannot use the "%s" signature algorithm since "web-token/jwt-signature-algorithm-ecdsa" is not installed. Try running "composer require web-token/jwt-signature-algorithm-ecdsa".', $algorithm));
                 }
 
                 $algorithm = Algorithm::class.'\\'.$algorithm;
+                break;
+            case 'RS256':
+                if (!class_exists(Algorithm::class.'\\'.$algorithm)) {
+                    throw new \LogicException(sprintf('You cannot use the "%s" signature algorithm since "web-token/jwt-signature-algorithm-rsa" is not installed. Try running "composer require web-token/jwt-signature-algorithm-rsa".', $algorithm));
+                }
 
-                return new $algorithm();
+                $algorithm = Algorithm::class.'\\'.$algorithm;
+                break;
+            default:
+                throw new InvalidArgumentException(sprintf('Unsupported signature algorithm "%s". Only ES* and RS256 algorithms are supported. If you want to use another algorithm, create your TokenHandler as a service.', $algorithm));
         }
 
-        throw new InvalidArgumentException(sprintf('Unsupported signature algorithm "%s". Only ES* algorithms are supported. If you want to use another algorithm, create your TokenHandler as a service.', $algorithm));
+        return new $algorithm();
     }
 }

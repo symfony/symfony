@@ -35,7 +35,8 @@
         "symfony/translation": "^6.4|^7.0",
         "psr/log": "^1|^2|^3",
         "web-token/jwt-checker": "^3.1",
-        "web-token/jwt-signature-algorithm-ecdsa": "^3.1"
+        "web-token/jwt-signature-algorithm-ecdsa": "^3.1",
+        "web-token/jwt-signature-algorithm-rsa": "^3.1"
     },
     "conflict": {
         "symfony/clock": "<6.4",

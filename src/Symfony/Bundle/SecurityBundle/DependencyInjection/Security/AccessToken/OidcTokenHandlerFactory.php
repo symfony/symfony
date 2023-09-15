@@ -39,7 +39,7 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
 
         // @see Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SignatureAlgorithmFactory
         // for supported algorithms
-        if (\in_array($config['algorithm'], ['ES256', 'ES384', 'ES512'], true)) {
+        if (\in_array($config['algorithm'], ['ES256', 'ES384', 'ES512', 'RS256'], true)) {
             $tokenHandlerDefinition->replaceArgument(0, new Reference('security.access_token_handler.oidc.signature.'.$config['algorithm']));
         } else {
             $tokenHandlerDefinition->replaceArgument(0, (new ChildDefinition('security.access_token_handler.oidc.signature'))

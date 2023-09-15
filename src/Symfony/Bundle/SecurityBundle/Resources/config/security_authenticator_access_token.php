@@ -16,6 +16,7 @@ use Jose\Component\Core\JWKSet;
 use Jose\Component\Signature\Algorithm\ES256;
 use Jose\Component\Signature\Algorithm\ES384;
 use Jose\Component\Signature\Algorithm\ES512;
+use Jose\Component\Signature\Algorithm\RS256;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SignatureAlgorithmFactory;
 use Symfony\Component\Security\Http\AccessToken\ChainAccessTokenExtractor;
 use Symfony\Component\Security\Http\AccessToken\FormEncodedBodyExtractor;
@@ -100,5 +101,9 @@ return static function (ContainerConfigurator $container) {
         ->set('security.access_token_handler.oidc.signature.ES512', ES512::class)
             ->parent('security.access_token_handler.oidc.signature')
             ->args(['index_0' => 'ES512'])
+
+        ->set('security.access_token_handler.oidc.signature.RS256', RS256::class)
+            ->parent('security.access_token_handler.oidc.signature')
+            ->args(['index_0' => 'RS256'])
     ;
 };

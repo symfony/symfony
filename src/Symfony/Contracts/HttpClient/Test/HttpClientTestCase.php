@@ -895,7 +895,7 @@ abstract class HttpClientTestCase extends TestCase
         }
     }
 
-    public function testTimeoutOnInitialize(): void
+    public function testTimeoutOnInitialize()
     {
         $p1 = TestHttpServer::start(8067);
         $p2 = TestHttpServer::start(8077);
@@ -963,7 +963,7 @@ abstract class HttpClientTestCase extends TestCase
     /**
      * @throws TransportExceptionInterface
      */
-    public function testDestruct(): void
+    public function testDestruct()
     {
         $client = $this->getHttpClient(__FUNCTION__);
 
@@ -976,7 +976,7 @@ abstract class HttpClientTestCase extends TestCase
         $this->assertLessThan(4, $duration);
     }
 
-    public function testGetContentAfterDestruct(): void
+    public function testGetContentAfterDestruct()
     {
         $client = $this->getHttpClient(__FUNCTION__);
 
@@ -1071,7 +1071,7 @@ abstract class HttpClientTestCase extends TestCase
      * @requires extension zlib
      * @throws TransportExceptionInterface
      */
-    public function testAutoEncodingRequest(): void
+    public function testAutoEncodingRequest()
     {
         $client = $this->getHttpClient(__FUNCTION__);
         $response = $client->request('GET', 'http://localhost:8057');
@@ -1094,7 +1094,7 @@ abstract class HttpClientTestCase extends TestCase
      * @throws RedirectionExceptionInterface
      * @throws ClientExceptionInterface
      */
-    public function testBaseUri(): void
+    public function testBaseUri()
     {
         $client = $this->getHttpClient(__FUNCTION__);
         $response = $client->request('GET', '../404', [
@@ -1130,7 +1130,7 @@ abstract class HttpClientTestCase extends TestCase
      * @throws RedirectionExceptionInterface
      * @throws ClientExceptionInterface
      */
-    public function testInformationalResponse(): void
+    public function testInformationalResponse()
     {
         $client = $this->getHttpClient(__FUNCTION__);
         $response = $client->request('GET', 'http://localhost:8057/103');
@@ -1145,7 +1145,7 @@ abstract class HttpClientTestCase extends TestCase
      * @throws TransportExceptionInterface
      * @throws ServerExceptionInterface
      */
-    public function testInformationalResponseStream(): void
+    public function testInformationalResponseStream()
     {
         $client = $this->getHttpClient(__FUNCTION__);
         $response = $client->request('GET', 'http://localhost:8057/103');
@@ -1170,7 +1170,7 @@ abstract class HttpClientTestCase extends TestCase
      * @requires extension zlib
      * @throws TransportExceptionInterface
      */
-    public function testUserlandEncodingRequest(): void
+    public function testUserlandEncodingRequest()
     {
         $client = $this->getHttpClient(__FUNCTION__);
         $response = $client->request('GET', 'http://localhost:8057', [
@@ -1193,7 +1193,7 @@ abstract class HttpClientTestCase extends TestCase
      * @requires extension zlib
      * @throws TransportExceptionInterface
      */
-    public function testGzipBroken(): void
+    public function testGzipBroken()
     {
         $client = $this->getHttpClient(__FUNCTION__);
         $response = $client->request('GET', 'http://localhost:8057/gzip-broken');
@@ -1208,7 +1208,7 @@ abstract class HttpClientTestCase extends TestCase
      * @throws RedirectionExceptionInterface
      * @throws ClientExceptionInterface
      */
-    public function testMaxDuration(): void
+    public function testMaxDuration()
     {
         $client = $this->getHttpClient(__FUNCTION__);
         $response = $client->request('GET', 'http://localhost:8057/max-duration', [
@@ -1231,7 +1231,7 @@ abstract class HttpClientTestCase extends TestCase
     /**
      * @throws TransportExceptionInterface
      */
-    public function testWithOptions(): void
+    public function testWithOptions()
     {
         $client = $this->getHttpClient(__FUNCTION__);
         $client2 = $client->withOptions(['base_uri' => 'http://localhost:8057/']);

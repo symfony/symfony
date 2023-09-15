@@ -1009,7 +1009,7 @@ abstract class HttpClientTestCase extends TestCase
      * @throws RedirectionExceptionInterface
      * @throws TransportExceptionInterface
      */
-    public function testProxy(): void
+    public function testProxy()
     {
         $client = $this->getHttpClient(__FUNCTION__);
         $response = $client->request('GET', 'http://localhost:8057/', [
@@ -1046,7 +1046,7 @@ abstract class HttpClientTestCase extends TestCase
         $this->assertMatchesRegularExpression('#^http://(localhost|127\.0\.0\.1):8057/$#', $body['REQUEST_URI']);
     }
 
-    public function testNoProxy(): void
+    public function testNoProxy()
     {
         putenv('no_proxy='.$_SERVER['no_proxy'] = 'example.com, localhost');
 

@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\HttpClient\HttpClient;
 
 /**
  * Configures a token handler for decoding and validating an OIDC token.
@@ -50,9 +51,16 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
         }
 
         if (isset($config['jwks_url'])) {
-            $jwksJson = file_get_contents($config['jwks_url']);
+            if (!class_exists(HttpClient::class)) {
+                throw new LogicException(sprintf('You cannot use "%s" as the HttpClient component is not installed. Try running "composer require symfony/http-client".', __CLASS__));
+            }
+            $httpClient = HttpClient::create();
+            $response = $httpClient->request(
+                'GET',
+                $config['jwks_url']
+            );
             $jwkDefinition = (new ChildDefinition('security.access_token_handler.oidc.jwk_set'))
-                ->replaceArgument(0, $jwksJson);
+                ->replaceArgument(0, $response->getContent());
         } elseif (isset($config['key'])) {
             $jwkDefinition = (new ChildDefinition('security.access_token_handler.oidc.jwk'))
                 ->replaceArgument(0, $config['key']);

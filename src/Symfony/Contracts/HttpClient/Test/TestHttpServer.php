@@ -19,9 +19,10 @@ class TestHttpServer
     private static array $process = [];
 
     /**
-     * @param string|null $workingDirectory
+     * @param int $port
+     * @return Process
      */
-    public static function start(int $port = 8057/* , string $workingDirectory = null */): Process
+    public static function start(int $port = 8057): Process
     {
         $workingDirectory = \func_get_args()[1] ?? __DIR__.'/Fixtures/web';
 

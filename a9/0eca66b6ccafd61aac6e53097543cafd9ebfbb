@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2023-09-15T08:47:38Z
+
+This must be merged on 6.4 (because of the BC break, which is allowed in 6.4 for experimental components, but not for a patch release).
+
+---------------------------------------------------------------------------
+
+by valtzu at 2023-09-15T08:47:58Z
+
+> I was working on the same.
+
+@fabpot Would you like to take over this, or if you had done work on this already, discard this MR as you probably have better knowledge in this :sweat_smile:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-09-15T08:49:28Z
+
+> > I was working on the same.
+>
+> @fabpot Would you like to take over this, or if you had done work on this already, discard this MR as you probably have better knowledge in this 😅
+
+Actually, I like your code better, so if you take into account my few comments, I will be able to merge it fast.
+
+---------------------------------------------------------------------------
+
+by valtzu at 2023-09-15T13:58:16Z
+
+Sorry I think I misunderstood your comment @fabpot and retargeted this to 6.4 :sweat_smile:
+
+The triggers have changed quite much between the 6.3&6.4  branches, but I should still target 6.3 and leave conflict resolution to someone else?
+
+Oh my, I think I have notified everyone... sorry guys!
+
+I will finish for today not to cause any more trouble.

@@ -13,17 +13,18 @@ namespace Symfony\Component\Scheduler\Trigger;
 
 use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
 
-class PeriodicalTrigger implements TriggerInterface
+class PeriodicalTrigger implements StatefulTriggerInterface
 {
     private float $intervalInSeconds = 0.0;
-    private \DateTimeImmutable $from;
+    private ?\DateTimeImmutable $from;
     private \DateTimeImmutable $until;
     private \DatePeriod $period;
     private string $description;
+    private string|int|float|\DateInterval $interval;
 
     public function __construct(
         string|int|float|\DateInterval $interval,
-        string|\DateTimeImmutable $from = new \DateTimeImmutable(),
+        string|\DateTimeImmutable|null $from = null,
         string|\DateTimeImmutable $until = new \DateTimeImmutable('3000-01-01'),
     ) {
         $this->from = \is_string($from) ? new \DateTimeImmutable($from) : $from;
@@ -70,7 +71,7 @@ class PeriodicalTrigger implements TriggerInterface
                     $this->description = sprintf('every %s seconds', $this->intervalInSeconds);
                 }
             } else {
-                $this->period = new \DatePeriod($this->from, $i, $this->until);
+                $this->interval = $i;
             }
         } catch (\Exception $e) {
             throw new InvalidArgumentException(sprintf('Invalid interval "%s": ', $interval instanceof \DateInterval ? 'instance of \DateInterval' : $interval).$e->getMessage(), 0, $e);
@@ -82,15 +83,22 @@ class PeriodicalTrigger implements TriggerInterface
         return $this->description;
     }
 
+    public function continue(\DateTimeImmutable $startedAt): void
+    {
+        $this->from ??= $startedAt;
+    }
+
     public function getNextRunDate(\DateTimeImmutable $run): ?\DateTimeImmutable
     {
+        $this->from ??= $run;
+
         if ($this->intervalInSeconds) {
             if ($this->until <= $run) {
                 return null;
             }
 
-            $fromDate = min($this->from, $run);
-            $from = $fromDate->format('U.u');
+            $fromDate = $this->from;
+            $from = (float) $fromDate->format('U.u');
             $delta = $run->format('U.u') - $from;
             $recurrencesPassed = floor($delta / $this->intervalInSeconds);
             $nextRunTimestamp = sprintf('%.6F', ($recurrencesPassed + 1) * $this->intervalInSeconds + $from);
@@ -103,6 +111,7 @@ class PeriodicalTrigger implements TriggerInterface
             return $this->until > $nextRun ? $nextRun : null;
         }
 
+        $this->period ??= new \DatePeriod($this->from, $this->interval, $this->until);
         $iterator = $this->period->getIterator();
         while ($run >= $next = $iterator->current()) {
             $iterator->next();
@@ -126,6 +135,6 @@ class PeriodicalTrigger implements TriggerInterface
 
     private function calcInterval(\DateInterval $interval): float
     {
-        return $this->from->setTimestamp(0)->add($interval)->format('U.u');
+        return (float) (new \DateTimeImmutable('@0'))->add($interval)->format('U.u');
     }
 }

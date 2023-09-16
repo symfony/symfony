@@ -48,6 +48,7 @@ CHANGELOG
  * Deprecate not setting the `framework.validation.email_validation_mode` config option; it will default to `html5` in 7.0
  * Deprecate `framework.validation.enable_annotations`, use `framework.validation.enable_attributes` instead
  * Deprecate `framework.serializer.enable_annotations`, use `framework.serializer.enable_attributes` instead
+ * Add `array $tokenAttributes = []` optional parameter to `KernelBrowser::loginUser()`
 
 6.3
 ---

@@ -1471,12 +1471,12 @@ class Bar
 class DummyUnionType
 {
     /**
-     * @var \DateTime|bool|null
+     * @var \DateTimeImmutable|bool|null
      */
     public $changed = false;
 
     /**
-     * @param \DateTime|bool|null
+     * @param \DateTimeImmutable|bool|null
      *
      * @return $this
      */

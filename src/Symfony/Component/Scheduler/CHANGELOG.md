@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Mark the component as non experimental
+ * [BC BREAK] Add `from()` to `CheckpointInterface`
  * Add `--date` and `--all` options to the `schedule:debug` command
  * Allow setting timezone of next run date in CronExpressionTrigger
  * Add `AbstractTriggerDecorator`

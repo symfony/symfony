@@ -22,6 +22,7 @@ CHANGELOG
 6.4
 ---
 
+ * Add `is_valid` function to the `Expression` constraint, its behavior is the same as `ValidatorInterface::validate`
  * Allow single integer for the `versions` option of the `Uuid` constraint
  * Allow single constraint to be passed to the `constraints` option of the `When` constraint
  * Deprecate Doctrine annotations support in favor of native attributes

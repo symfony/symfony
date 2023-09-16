@@ -95,12 +95,15 @@ class KernelBrowser extends HttpKernelBrowser
     }
 
     /**
-     * @param UserInterface $user
+     * @param UserInterface        $user
+     * @param array<string, mixed> $tokenAttributes
      *
      * @return $this
      */
-    public function loginUser(object $user, string $firewallContext = 'main'): static
+    public function loginUser(object $user, string $firewallContext = 'main'/* , array $tokenAttributes = [] */): static
     {
+        $tokenAttributes = 2 < \func_num_args() ? func_get_arg(2) : [];
+
         if (!interface_exists(UserInterface::class)) {
             throw new \LogicException(sprintf('"%s" requires symfony/security-core to be installed. Try running "composer require symfony/security-core".', __METHOD__));
         }
@@ -110,6 +113,7 @@ class KernelBrowser extends HttpKernelBrowser
         }
 
         $token = new TestBrowserToken($user->getRoles(), $user, $firewallContext);
+        $token->setAttributes($tokenAttributes);
 
         $container = $this->getContainer();
         $container->get('security.untracked_token_storage')->setToken($token);

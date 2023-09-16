@@ -16,6 +16,7 @@ use Symfony\Component\Clock\Clock;
 use Symfony\Component\Scheduler\RecurringMessage;
 use Symfony\Component\Scheduler\Schedule;
 use Symfony\Component\Scheduler\ScheduleProviderInterface;
+use Symfony\Component\Scheduler\Trigger\StatefulTriggerInterface;
 
 final class MessageGenerator implements MessageGeneratorInterface
 {
@@ -43,9 +44,10 @@ final class MessageGenerator implements MessageGeneratorInterface
             return;
         }
 
+        $startTime = $checkpoint->from();
         $lastTime = $checkpoint->time();
         $lastIndex = $checkpoint->index();
-        $heap = $this->heap($lastTime);
+        $heap = $this->heap($lastTime, $startTime);
 
         while (!$heap->isEmpty() && $heap->top()[0] <= $now) {
             /** @var \DateTimeImmutable $time */
@@ -79,7 +81,7 @@ final class MessageGenerator implements MessageGeneratorInterface
         $checkpoint->release($now, $this->waitUntil);
     }
 
-    private function heap(\DateTimeImmutable $time): TriggerHeap
+    private function heap(\DateTimeImmutable $time, \DateTimeImmutable $startTime): TriggerHeap
     {
         if (isset($this->triggerHeap) && $this->triggerHeap->time <= $time) {
             return $this->triggerHeap;
@@ -88,7 +90,13 @@ final class MessageGenerator implements MessageGeneratorInterface
         $heap = new TriggerHeap($time);
 
         foreach ($this->schedule()->getRecurringMessages() as $index => $recurringMessage) {
-            if (!$nextTime = $recurringMessage->getTrigger()->getNextRunDate($time)) {
+            $trigger  = $recurringMessage->getTrigger();
+
+            if ($trigger instanceof StatefulTriggerInterface) {
+                $trigger->continue($startTime);
+            }
+
+            if (!$nextTime = $trigger->getNextRunDate($time)) {
                 continue;
             }
 

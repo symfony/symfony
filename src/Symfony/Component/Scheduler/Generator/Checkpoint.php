@@ -16,6 +16,7 @@ use Symfony\Contracts\Cache\CacheInterface;
 
 final class Checkpoint implements CheckpointInterface
 {
+    private \DateTimeImmutable $from;
     private \DateTimeImmutable $time;
     private int $index = -1;
     private bool $reset = false;
@@ -41,12 +42,20 @@ final class Checkpoint implements CheckpointInterface
             $this->save($now, -1);
         }
 
-        $this->time ??= $now;
         if ($this->cache) {
-            $this->save(...$this->cache->get($this->name, fn () => [$now, -1]));
+            [$this->time, $this->index, $this->from] = $this->cache->get($this->name, fn () => [$now, -1, $now]) + [2 => $now];
+            $this->save($this->time, $this->index);
         }
 
+        $this->time ??= $now;
+        $this->from ??= $now;
+
         return true;
+    }
+
+    public function from(): \DateTimeImmutable
+    {
+        return $this->from;
     }
 
     public function time(): \DateTimeImmutable
@@ -63,7 +72,8 @@ final class Checkpoint implements CheckpointInterface
     {
         $this->time = $time;
         $this->index = $index;
-        $this->cache?->get($this->name, fn () => [$time, $index], \INF);
+        $this->from ??= $time;
+        $this->cache?->get($this->name, fn () => [$time, $index, $this->from], \INF);
     }
 
     /**

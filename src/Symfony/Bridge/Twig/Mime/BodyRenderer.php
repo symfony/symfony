@@ -18,6 +18,7 @@ use Symfony\Component\Mime\HtmlToTextConverter\DefaultHtmlToTextConverter;
 use Symfony\Component\Mime\HtmlToTextConverter\HtmlToTextConverterInterface;
 use Symfony\Component\Mime\HtmlToTextConverter\LeagueHtmlToMarkdownConverter;
 use Symfony\Component\Mime\Message;
+use Symfony\Component\Translation\LocaleSwitcher;
 use Twig\Environment;
 
 /**
@@ -28,12 +29,14 @@ final class BodyRenderer implements BodyRendererInterface
     private Environment $twig;
     private array $context;
     private HtmlToTextConverterInterface $converter;
+    private ?LocaleSwitcher $localeSwitcher = null;
 
-    public function __construct(Environment $twig, array $context = [], HtmlToTextConverterInterface $converter = null)
+    public function __construct(Environment $twig, array $context = [], HtmlToTextConverterInterface $converter = null, LocaleSwitcher $localeSwitcher = null)
     {
         $this->twig = $twig;
         $this->context = $context;
         $this->converter = $converter ?: (interface_exists(HtmlConverterInterface::class) ? new LeagueHtmlToMarkdownConverter() : new DefaultHtmlToTextConverter());
+        $this->localeSwitcher = $localeSwitcher;
     }
 
     public function render(Message $message): void
@@ -47,30 +50,42 @@ final class BodyRenderer implements BodyRendererInterface
             return;
         }
 
-        $messageContext = $message->getContext();
+        $callback = function () use ($message) {
+            $messageContext = $message->getContext();
 
-        if (isset($messageContext['email'])) {
-            throw new InvalidArgumentException(sprintf('A "%s" context cannot have an "email" entry as this is a reserved variable.', get_debug_type($message)));
+            if (isset($messageContext['email'])) {
+                throw new InvalidArgumentException(sprintf('A "%s" context cannot have an "email" entry as this is a reserved variable.', get_debug_type($message)));
+            }
+
+            $vars = array_merge($this->context, $messageContext, [
+                'email' => new WrappedTemplatedEmail($this->twig, $message),
+            ]);
+
+            if ($template = $message->getTextTemplate()) {
+                $message->text($this->twig->render($template, $vars));
+            }
+
+            if ($template = $message->getHtmlTemplate()) {
+                $message->html($this->twig->render($template, $vars));
+            }
+
+            $message->markAsRendered();
+
+            // if text body is empty, compute one from the HTML body
+            if (!$message->getTextBody() && null !== $html = $message->getHtmlBody()) {
+                $text = $this->converter->convert(\is_resource($html) ? stream_get_contents($html) : $html, $message->getHtmlCharset());
+                $message->text($text, $message->getHtmlCharset());
+            }
+        };
+
+        $locale = $message->getLocale();
+
+        if ($locale && $this->localeSwitcher) {
+            $this->localeSwitcher->runWithLocale($locale, $callback);
+
+            return;
         }
 
-        $vars = array_merge($this->context, $messageContext, [
-            'email' => new WrappedTemplatedEmail($this->twig, $message),
-        ]);
-
-        if ($template = $message->getTextTemplate()) {
-            $message->text($this->twig->render($template, $vars));
-        }
-
-        if ($template = $message->getHtmlTemplate()) {
-            $message->html($this->twig->render($template, $vars));
-        }
-
-        $message->markAsRendered();
-
-        // if text body is empty, compute one from the HTML body
-        if (!$message->getTextBody() && null !== $html = $message->getHtmlBody()) {
-            $text = $this->converter->convert(\is_resource($html) ? stream_get_contents($html) : $html, $message->getHtmlCharset());
-            $message->text($text, $message->getHtmlCharset());
-        }
+        $callback();
     }
 }

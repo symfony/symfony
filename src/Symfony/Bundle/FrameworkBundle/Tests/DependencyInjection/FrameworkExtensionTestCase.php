@@ -1572,6 +1572,12 @@ abstract class FrameworkExtensionTestCase extends TestCase
     public function testSerializerCacheUsedWithoutAnnotationsAndMappingFiles()
     {
         $container = $this->createContainerFromFile('serializer_mapping_without_annotations', ['kernel.debug' => true, 'kernel.container_class' => __CLASS__]);
+        $this->assertFalse($container->hasDefinition('serializer.mapping.cache_class_metadata_factory'));
+    }
+
+    public function testSerializerCacheUsedWithoutAnnotationsAndMappingFilesNoDebug()
+    {
+        $container = $this->createContainerFromFile('serializer_mapping_without_annotations', ['kernel.debug' => false, 'kernel.container_class' => __CLASS__]);
         $this->assertTrue($container->hasDefinition('serializer.mapping.cache_class_metadata_factory'));
     }
 

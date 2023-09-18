@@ -9,6 +9,7 @@ CHANGELOG
  * Deprecate constraint `ExpressionLanguageSyntax`, use `ExpressionSyntax` instead
  * Add method `__toString()` to `ConstraintViolationInterface` & `ConstraintViolationListInterface`
  * Allow creating constraints with required arguments
+ * Add `caseInsensitive` option for `Validator\Constraints\Language`
 
 6.0
 ---

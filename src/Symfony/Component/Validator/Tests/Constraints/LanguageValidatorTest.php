@@ -178,4 +178,84 @@ class LanguageValidatorTest extends ConstraintValidatorTestCase
 
         $this->assertNoViolation();
     }
+
+    /**
+     * @dataProvider getCaseInsensitiveValidLanguages
+     */
+    public function testCaseInsensitiveValidLanguages($language)
+    {
+        $constraint = new Language([
+            'message' => 'myMessage',
+            'caseInsensitive' => true,
+        ]);
+
+        $this->validator->validate($language, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider getCaseInsensitiveAlpha3ValidLanguages
+     */
+    public function testCaseInsensitiveValidAlpha3Languages($language)
+    {
+        $constraint = new Language([
+            'message' => 'myMessage',
+            'alpha3' => true,
+            'caseInsensitive' => true,
+        ]);
+
+        $this->validator->validate($language, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider getCaseInsensitiveAlpha3InvalidLanguages
+     */
+    public function testCaseInsensitiveInvalidAlpha3Languages($language)
+    {
+        $constraint = new Language([
+            'message' => 'myMessage',
+            'alpha3' => true,
+            'caseInsensitive' => true,
+        ]);
+
+        $this->validator->validate($language, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"' . strtolower($language) . '"')
+            ->setCode(Language::NO_SUCH_LANGUAGE_ERROR)
+            ->assertRaised();
+    }
+
+    public function getCaseInsensitiveValidLanguages()
+    {
+        return [
+            ['EN'],
+            ['eN'],
+            ['MY'],
+            ['My'],
+        ];
+    }
+
+    public static function getCaseInsensitiveAlpha3ValidLanguages()
+    {
+        return [
+            ['DEU'],
+            ['ENG'],
+            ['FRA'],
+            ['fRA'],
+            ['EnG'],
+        ];
+    }
+
+    public static function getCaseInsensitiveAlpha3InvalidLanguages()
+    {
+        return [
+            ['FOOBAR'],
+            ['zzz'],
+            ['zzZ'],
+        ];
+    }
 }

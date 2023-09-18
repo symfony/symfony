@@ -53,7 +53,7 @@ class TranslatorTest extends TestCase
     /**
      * @dataProvider getTransTests
      */
-    public function testTrans($expected, $id, $parameters)
+    public function testTrans($expected, $id, $parameters) :void
     {
         $translator = $this->getTranslator();
 
@@ -63,7 +63,7 @@ class TranslatorTest extends TestCase
     /**
      * @dataProvider getTransChoiceTests
      */
-    public function testTransChoiceWithExplicitLocale($expected, $id, $number)
+    public function testTransChoiceWithExplicitLocale($expected, $id, $number) :void
     {
         $translator = $this->getTranslator();
 
@@ -75,7 +75,7 @@ class TranslatorTest extends TestCase
      *
      * @dataProvider getTransChoiceTests
      */
-    public function testTransChoiceWithDefaultLocale($expected, $id, $number)
+    public function testTransChoiceWithDefaultLocale($expected, $id, $number) :void
     {
         $translator = $this->getTranslator();
 
@@ -85,7 +85,7 @@ class TranslatorTest extends TestCase
     /**
      * @dataProvider getTransChoiceTests
      */
-    public function testTransChoiceWithEnUsPosix($expected, $id, $number)
+    public function testTransChoiceWithEnUsPosix($expected, $id, $number) :void
     {
         $translator = $this->getTranslator();
         $translator->setLocale('en_US_POSIX');
@@ -103,7 +103,7 @@ class TranslatorTest extends TestCase
     /**
      * @requires extension intl
      */
-    public function testGetLocaleReturnsDefaultLocaleIfNotSet()
+    public function testGetLocaleReturnsDefaultLocaleIfNotSet() :void
     {
         $translator = $this->getTranslator();
 
@@ -114,7 +114,7 @@ class TranslatorTest extends TestCase
         $this->assertEquals('en', $translator->getLocale());
     }
 
-    public static function getTransTests()
+    public static function getTransTests(): array
     {
         return [
             ['Symfony is great!', 'Symfony is great!', []],
@@ -122,7 +122,7 @@ class TranslatorTest extends TestCase
         ];
     }
 
-    public static function getTransChoiceTests()
+    public static function getTransChoiceTests(): array
     {
         return [
             ['There are no apples', '{0} There are no apples|{1} There is one apple|]1,Inf] There are %count% apples', 0],
@@ -139,14 +139,14 @@ class TranslatorTest extends TestCase
     /**
      * @dataProvider getInterval
      */
-    public function testInterval($expected, $number, $interval)
+    public function testInterval($expected, $number, $interval) :void
     {
         $translator = $this->getTranslator();
 
         $this->assertEquals($expected, $translator->trans($interval.' foo|[1,Inf[ bar', ['%count%' => $number]));
     }
 
-    public static function getInterval()
+    public static function getInterval(): array
     {
         return [
             ['foo', 3, '{1,2, 3 ,4}'],
@@ -164,14 +164,14 @@ class TranslatorTest extends TestCase
     /**
      * @dataProvider getChooseTests
      */
-    public function testChoose($expected, $id, $number, $locale = null)
+    public function testChoose($expected, $id, $number, $locale = null):void
     {
         $translator = $this->getTranslator();
 
         $this->assertEquals($expected, $translator->trans($id, ['%count%' => $number], null, $locale));
     }
 
-    public function testReturnMessageIfExactlyOneStandardRuleIsGiven()
+    public function testReturnMessageIfExactlyOneStandardRuleIsGiven():void
     {
         $translator = $this->getTranslator();
 
@@ -181,7 +181,7 @@ class TranslatorTest extends TestCase
     /**
      * @dataProvider getNonMatchingMessages
      */
-    public function testThrowExceptionIfMatchingMessageCannotBeFound($id, $number)
+    public function testThrowExceptionIfMatchingMessageCannotBeFound($id, $number): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $translator = $this->getTranslator();
@@ -189,7 +189,7 @@ class TranslatorTest extends TestCase
         $translator->trans($id, ['%count%' => $number]);
     }
 
-    public static function getNonMatchingMessages()
+    public static function getNonMatchingMessages(): array
     {
         return [
             ['{0} There are no apples|{1} There is one apple', 2],
@@ -199,7 +199,7 @@ class TranslatorTest extends TestCase
         ];
     }
 
-    public static function getChooseTests()
+    public static function getChooseTests(): array
     {
         return [
             ['There are no apples', '{0} There are no apples|{1} There is one apple|]1,Inf] There are %count% apples', 0],
@@ -295,7 +295,7 @@ class TranslatorTest extends TestCase
     /**
      * @dataProvider failingLangcodes
      */
-    public function testFailedLangcodes($nplural, $langCodes)
+    public function testFailedLangcodes($nplural, $langCodes): void
     {
         $matrix = $this->generateTestData($langCodes);
         $this->validateMatrix($nplural, $matrix, false);
@@ -304,7 +304,7 @@ class TranslatorTest extends TestCase
     /**
      * @dataProvider successLangcodes
      */
-    public function testLangcodes($nplural, $langCodes)
+    public function testLangcodes($nplural, $langCodes): void
     {
         $matrix = $this->generateTestData($langCodes);
         $this->validateMatrix($nplural, $matrix);
@@ -351,7 +351,7 @@ class TranslatorTest extends TestCase
      * @param string $nplural Plural expected
      * @param array  $matrix  Containing langcodes and their plural index values
      */
-    protected function validateMatrix(string $nplural, array $matrix, bool $expectSuccess = true)
+    protected function validateMatrix(string $nplural, array $matrix, bool $expectSuccess = true): void
     {
         foreach ($matrix as $langCode => $data) {
             $indexes = array_flip($data);
@@ -363,7 +363,7 @@ class TranslatorTest extends TestCase
         }
     }
 
-    protected function generateTestData($langCodes)
+    protected function generateTestData($langCodes): array
     {
         $translator = new class() {
             use TranslatorTrait {

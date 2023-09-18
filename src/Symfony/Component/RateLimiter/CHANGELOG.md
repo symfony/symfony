@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Add `SlidingWindowLimiter::reserve()`
+
 6.2
 ---
 

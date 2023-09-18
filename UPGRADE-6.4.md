@@ -123,6 +123,11 @@ PsrHttpMessageBridge
 
  * Remove `ArgumentValueResolverInterface` from `PsrServerRequestResolver`
 
+RateLimiter
+-----------
+
+ * Deprecate `SlidingWindow::getRetryAfter`, use `SlidingWindow::calculateTimeForTokens` instead
+
 Routing
 -------
 

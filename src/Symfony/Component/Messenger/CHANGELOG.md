@@ -6,6 +6,7 @@ CHANGELOG
 
  * Deprecate `StopWorkerOnSignalsListener` in favor of using the `SignalableCommandInterface`
  * Add `HandlerDescriptor::getOptions`
+ * Add support for multiple Redis Sentinel hosts
 
 6.3
 ---

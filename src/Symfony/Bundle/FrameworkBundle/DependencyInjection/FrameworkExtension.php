@@ -1891,16 +1891,16 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('serializer.normalizer.mime_message');
         }
 
+        if ($container->getParameter('kernel.debug')) {
+            $container->removeDefinition('serializer.mapping.cache_class_metadata_factory');
+        }
+
         if (!class_exists(Translator::class)) {
             $container->removeDefinition('serializer.normalizer.translatable');
         }
 
         $serializerLoaders = [];
         if (isset($config['enable_attributes']) && $config['enable_attributes']) {
-            if ($container->getParameter('kernel.debug')) {
-                $container->removeDefinition('serializer.mapping.cache_class_metadata_factory');
-            }
-
             $annotationLoader = new Definition(
                 AnnotationLoader::class,
                 [new Reference('annotation_reader', ContainerInterface::NULL_ON_INVALID_REFERENCE)]

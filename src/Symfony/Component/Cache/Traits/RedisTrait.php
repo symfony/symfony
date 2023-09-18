@@ -202,6 +202,7 @@ trait RedisTrait
                 do {
                     $host = $hosts[$hostIndex]['host'] ?? $hosts[$hostIndex]['path'];
                     $port = $hosts[$hostIndex]['port'] ?? 0;
+                    $passAuth = \defined('Redis::OPT_NULL_MULTIBULK_AS_NULL') && isset($params['auth']);
                     $address = false;
 
                     if (isset($hosts[$hostIndex]['host']) && $tls) {
@@ -211,11 +212,27 @@ trait RedisTrait
                     if (!isset($params['redis_sentinel'])) {
                         break;
                     }
-                    $extra = [];
-                    if (\defined('Redis::OPT_NULL_MULTIBULK_AS_NULL') && isset($params['auth'])) {
-                        $extra = [$params['auth']];
+
+                    if (version_compare(phpversion('redis'), '6.0.0', '>=')) {
+                        $options = [
+                            'host' => $host,
+                            'port' => $port,
+                            'connectTimeout' => $params['timeout'],
+                            'persistent' => $params['persistent_id'],
+                            'retryInterval' => $params['retry_interval'],
+                            'readTimeout' => $params['read_timeout'],
+                        ];
+
+                        if ($passAuth) {
+                            $options['auth'] = $params['auth'];
+                        }
+
+                        $sentinel = new \RedisSentinel($options);
+                    } else {
+                        $extra = $passAuth ? [$params['auth']] : [];
+
+                        $sentinel = new \RedisSentinel($host, $port, $params['timeout'], (string) $params['persistent_id'], $params['retry_interval'], $params['read_timeout'], ...$extra);
                     }
-                    $sentinel = new \RedisSentinel($host, $port, $params['timeout'], (string) $params['persistent_id'], $params['retry_interval'], $params['read_timeout'], ...$extra);
 
                     try {
                         if ($address = $sentinel->getMasterAddrByName($params['redis_sentinel'])) {

@@ -37,11 +37,13 @@ class Language extends Constraint
 
     public $message = 'This value is not a valid language.';
     public $alpha3 = false;
+    public $caseInsensitive = false;
 
     public function __construct(
         array $options = null,
         string $message = null,
         bool $alpha3 = null,
+        bool $caseInsensitive = null,
         array $groups = null,
         mixed $payload = null
     ) {
@@ -53,5 +55,6 @@ class Language extends Constraint
 
         $this->message = $message ?? $this->message;
         $this->alpha3 = $alpha3 ?? $this->alpha3;
+        $this->caseInsensitive = $caseInsensitive ?? $this->caseInsensitive;
     }
 }

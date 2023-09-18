@@ -43,6 +43,8 @@ class LanguageValidator extends ConstraintValidator
 
         $value = (string) $value;
 
+        $value = $constraint->caseInsensitive ? mb_strtolower($value, 'UTF-8') : $value;
+
         if ($constraint->alpha3 ? !Languages::alpha3CodeExists($value) : !Languages::exists($value)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))

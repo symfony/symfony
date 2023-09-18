@@ -15,6 +15,7 @@ CHANGELOG
  * Deprecate `ValidatorBuilder::enableAnnotationMapping()`, use `ValidatorBuilder::enableAttributeMapping()` instead
  * Deprecate `ValidatorBuilder::disableAnnotationMapping()`, use `ValidatorBuilder::disableAttributeMapping()` instead
  * Deprecate `AnnotationLoader`, use `AttributeLoader` instead
+ * Add `caseInsensitive` option for `Validator\Constraints\Language`
 
 6.3
 ---

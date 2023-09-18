@@ -49,6 +49,17 @@ class PasswordHasherFactoryTest extends TestCase
         $this->assertEquals($expectedHasher->hash('foo', ''), $hasher->hash('foo', ''));
     }
 
+    public function testGetHasherWithInstance()
+    {
+        $factory = new PasswordHasherFactory([
+            PasswordAuthenticatedUserInterface::class => ['instance' => new MessageDigestPasswordHasher('sha1')],
+        ]);
+
+        $hasher = $factory->getPasswordHasher($this->createMock(PasswordAuthenticatedUserInterface::class));
+        $expectedHasher = new MessageDigestPasswordHasher('sha1');
+        $this->assertEquals($expectedHasher->hash('foo', ''), $hasher->hash('foo', ''));
+    }
+
     public function testGetHasherWithClassName()
     {
         $factory = new PasswordHasherFactory([
@@ -152,6 +163,28 @@ class PasswordHasherFactoryTest extends TestCase
         $factory = new PasswordHasherFactory([
             'digest_hasher' => $digest = new MessageDigestPasswordHasher('sha256'),
             SomeUser::class => ['algorithm' => 'sodium', 'migrate_from' => ['bcrypt', 'digest_hasher']],
+        ]);
+
+        $hasher = $factory->getPasswordHasher(SomeUser::class);
+        $this->assertInstanceOf(MigratingPasswordHasher::class, $hasher);
+
+        $this->assertTrue($hasher->verify((new SodiumPasswordHasher())->hash('foo', null), 'foo', null));
+        $this->assertTrue($hasher->verify((new NativePasswordHasher(null, null, null, \PASSWORD_BCRYPT))->hash('foo', null), 'foo', null));
+        $this->assertTrue($hasher->verify($digest->hash('foo', null), 'foo', null));
+        $this->assertStringStartsWith(\SODIUM_CRYPTO_PWHASH_STRPREFIX, $hasher->hash('foo', null));
+    }
+
+    public function testMigrateFromWithCustomInstance()
+    {
+        if (!SodiumPasswordHasher::isSupported()) {
+            $this->markTestSkipped('Sodium is not available');
+        }
+
+        $sodium = new SodiumPasswordHasher();
+
+        $factory = new PasswordHasherFactory([
+            'digest_hasher' => $digest = new MessageDigestPasswordHasher('sha256'),
+            SomeUser::class => ['instance' => $sodium, 'migrate_from' => ['bcrypt', 'digest_hasher']],
         ]);
 
         $hasher = $factory->getPasswordHasher(SomeUser::class);

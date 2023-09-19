@@ -8,6 +8,7 @@
     cacheDirectory="./.github/psalm/cache/"
     errorBaseline=".github/psalm/psalm.baseline.xml"
     findUnusedBaselineEntry="false"
+    findUnusedCode="false"
 >
     <projectFiles>
         <directory name="src" />

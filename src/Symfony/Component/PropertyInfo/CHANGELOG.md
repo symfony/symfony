@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Make properties writable when a setter in camelCase exists, similar to the camelCase getter
+
 6.1
 ---
 

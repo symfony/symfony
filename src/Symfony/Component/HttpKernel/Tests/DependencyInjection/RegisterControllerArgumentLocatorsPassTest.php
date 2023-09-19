@@ -494,7 +494,6 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertSame('foo', $locator->get('customAutowire'));
         $this->assertInstanceOf(FooInterface::class, $autowireCallable = $locator->get('autowireCallable'));
         $this->assertInstanceOf(LazyClosure::class, $autowireCallable);
-        $this->assertInstanceOf(\stdClass::class, $autowireCallable->service);
         $this->assertFalse($locator->has('service2'));
     }
 

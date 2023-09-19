@@ -1206,7 +1206,17 @@ EOTXT
                 $callable[0] instanceof Reference
                 || ($callable[0] instanceof Definition && !$this->definitionVariables->contains($callable[0]))
             )) {
-                $initializer = 'fn () => '.$this->dumpValue($callable[0]);
+                $initializer = $this->dumpValue($callable[0]);
+
+                if ($callable[0] instanceof Definition && $callable[0]->isShared()) {
+                    $initializer = 'function () { static $instance; return $instance ??= '.$initializer.'; }';
+
+                    if (str_contains($initializer, '$container')) {
+                        $initializer = str_replace($initializer, ' use ($container)', 11, 0);
+                    }
+                } else {
+                    $initializer = 'fn () => '.$initializer;
+                }
 
                 return $return.LazyClosure::getCode($initializer, $callable, $definition, $this->container, $id).$tail;
             }

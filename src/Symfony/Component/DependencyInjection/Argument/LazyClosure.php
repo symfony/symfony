@@ -13,7 +13,6 @@ namespace Symfony\Component\DependencyInjection\Argument;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\VarExporter\ProxyHelper;
@@ -25,26 +24,9 @@ use Symfony\Component\VarExporter\ProxyHelper;
  */
 class LazyClosure
 {
-    public readonly object $service;
-
     public function __construct(
-        private \Closure $initializer,
+        protected readonly \Closure $service,
     ) {
-        unset($this->service);
-    }
-
-    public function __get(mixed $name): mixed
-    {
-        if ('service' !== $name) {
-            throw new InvalidArgumentException(sprintf('Cannot read property "%s" from a lazy closure.', $name));
-        }
-
-        if (isset($this->initializer)) {
-            $this->service = ($this->initializer)();
-            unset($this->initializer);
-        }
-
-        return $this->service;
     }
 
     public static function getCode(string $initializer, array $callable, Definition $definition, ContainerBuilder $container, ?string $id): string
@@ -88,7 +70,7 @@ class LazyClosure
         }
 
         $code = 'new class('.$initializer.') extends \\'.self::class
-            .$code.' { '.($methodReflector->hasReturnType() && 'void' === (string) $methodReflector->getReturnType() ? '' : 'return ').'$this->service->'.$callable[1].'('.$args.'); } '
+            .$code.' { '.($methodReflector->hasReturnType() && 'void' === (string) $methodReflector->getReturnType() ? '' : 'return ').'($this->service)()->'.$callable[1].'('.$args.'); } '
             .'}';
 
         return $asClosure ? '('.$code.')->'.$method.'(...)' : $code;

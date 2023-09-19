@@ -1062,9 +1062,17 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 $callable[0] instanceof Reference
                 || $callable[0] instanceof Definition && !isset($inlineServices[spl_object_hash($callable[0])])
             )) {
-                $initializer = function () use ($callable, &$inlineServices) {
-                    return $this->doResolveServices($callable[0], $inlineServices);
-                };
+                if ($callable[0] instanceof Definition && $callable[0]->isShared()) {
+                    $initializer = function () use ($callable, &$inlineServices) {
+                        static $instance;
+
+                        return $instance ??= $this->doResolveServices($callable[0], $inlineServices);
+                    };
+                } else {
+                    $initializer = function () use ($callable, &$inlineServices) {
+                        return $this->doResolveServices($callable[0], $inlineServices);
+                    };
+                }
 
                 $proxy = eval('return '.LazyClosure::getCode('$initializer', $callable, $definition, $this, $id).';');
                 $this->shareService($definition, $proxy, $id, $inlineServices);

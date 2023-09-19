@@ -9,11 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Test;
+use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
+use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestBundle;
 
-trait WebTestAssertionsTrait
-{
-    use BrowserKitAssertionsTrait;
-    use DomCrawlerAssertionsTrait;
-    use HttpClientAssertionsTrait;
-}
+return [
+    new FrameworkBundle(),
+    new TestBundle(),
+];

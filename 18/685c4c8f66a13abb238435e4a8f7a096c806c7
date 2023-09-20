@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2023-09-13T06:26:11Z
+
+Thank you.
+
+We don't allow merge commits. Please perform a rebase and squash your commits.
+
+---------------------------------------------------------------------------
+
+by AurelienPillevesse at 2023-09-14T10:55:23Z
+
+In addition to the !is_array verification, verifying that it's a string should be added no?
+What do you think about it ?
+
+---------------------------------------------------------------------------
+
+by Oipnet at 2023-09-18T07:38:03Z
+
+@AurelienPillevesse
+
+When something other than a string is passed, the message seems rather explicit.
+
+**_Argument #2 ($value) must be of type string, DateTime given_**
+
+What do you think should happen if you don't have a string?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-09-18T07:46:27Z
+
+> When something other than a string is passed, the message seems rather explicit.
+>
+> **_Argument #2 ($value) must be of type string, DateTime given_**
+
+This is fine, I think.

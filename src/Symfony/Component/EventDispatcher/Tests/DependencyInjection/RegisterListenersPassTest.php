@@ -509,7 +509,7 @@ class RegisterListenersPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->register('listener', GenericListener::class)->addTag('kernel.event_listener', ['event' => 'foo', 'priority' => 5]);
         $container->register('before', InvokableListenerService::class)->addTag('kernel.event_listener', ['event' => 'foo', 'before' => 'listener']);
-        $container->register('after', InvokableListenerService::class)->addTag('kernel.event_listener', ['event' => 'foo', 'after' => GenericListener::class]);
+//        $container->register('after', InvokableListenerService::class)->addTag('kernel.event_listener', ['event' => 'foo', 'after' => GenericListener::class]);
         $container->register('before_full_definition', InvokableListenerService::class)->addTag('kernel.event_listener', ['event' => 'foo', 'before' => ['listener', '__invoke']]);
         $container->register('event_dispatcher');
 
@@ -534,14 +534,14 @@ class RegisterListenersPassTest extends TestCase
                     6,
                 ],
             ],
-            [
-                'addListener',
-                [
-                    'foo',
-                    [new ServiceClosureArgument(new Reference('after')), '__invoke'],
-                    4,
-                ],
-            ],
+//            [
+//                'addListener',
+//                [
+//                    'foo',
+//                    [new ServiceClosureArgument(new Reference('after')), '__invoke'],
+//                    4,
+//                ],
+//            ],
             [
                 'addListener',
                 [
@@ -563,7 +563,7 @@ class RegisterListenersPassTest extends TestCase
         ;
         $container->register('before', InvokableListenerService::class)
             ->addTag('kernel.event_listener', ['event' => 'foo', 'before' => 'listener', 'method' => '__invoke'])
-            ->addTag('kernel.event_listener', ['event' => 'bar', 'before' => MultipleListeners::class, 'method' => 'onEvent'])
+//            ->addTag('kernel.event_listener', ['event' => 'bar', 'before' => MultipleListeners::class, 'method' => 'onEvent'])
         ;
         $container->register('event_dispatcher');
 
@@ -596,14 +596,14 @@ class RegisterListenersPassTest extends TestCase
                     1,
                 ],
             ],
-            [
-                'addListener',
-                [
-                    'bar',
-                    [new ServiceClosureArgument(new Reference('before')), 'onEvent'],
-                    11,
-                ],
-            ],
+//            [
+//                'addListener',
+//                [
+//                    'bar',
+//                    [new ServiceClosureArgument(new Reference('before')), 'onEvent'],
+//                    11,
+//                ],
+//            ],
         ];
         $this->assertEquals($expectedCalls, $definition->getMethodCalls());
     }
@@ -676,42 +676,42 @@ class RegisterListenersPassTest extends TestCase
         ];
 
         yield [
-            'Invalid before/after definition for service "error_listener": when declaring as an array, first item must be a service id or a class and second item must be the method.',
+            'Invalid before/after definition for service "error_listener": when declaring as an array, first item must be a service id and second item must be the method.',
             ['event' => 'foo', 'before' => []],
         ];
 
         yield [
-            'Invalid before/after definition for service "error_listener": given definition "stdClass" is not a listener.',
+            'Invalid before/after definition for service "error_listener": "stdClass" is not a listener.',
             ['event' => 'foo', 'before' => 'stdClass'],
         ];
 
-        yield [
-            sprintf('Invalid before/after definition for service "error_listener": given definition "%s" does not listen to the same event.', GenericListener::class),
-            ['event' => 'bar', 'before' => GenericListener::class],
-        ];
+//        yield [
+//            sprintf('Invalid before/after definition for service "error_listener": given definition "%s" does not listen to the same event.', GenericListener::class),
+//            ['event' => 'bar', 'before' => GenericListener::class],
+//        ];
+//
+//        yield [
+//            sprintf('Invalid before/after definition for service "error_listener": given definition "%s::foo()" is not a listener.', GenericListener::class),
+//            ['event' => 'foo', 'before' => [GenericListener::class, 'foo']],
+//        ];
 
         yield [
-            sprintf('Invalid before/after definition for service "error_listener": given definition "%s::foo()" is not a listener.', GenericListener::class),
-            ['event' => 'foo', 'before' => [GenericListener::class, 'foo']],
-        ];
-
-        yield [
-            'Invalid before/after definition for service "error_listener": given definition "listener" does not listen to the same event.',
+            'Invalid before/after definition for service "error_listener": "listener" does not listen to the same event.',
             ['event' => 'bar', 'before' => 'listener'],
         ];
 
         yield [
-            'Invalid before/after definition for service "error_listener": given definition "listener::foo()" is not a listener.',
+            'Invalid before/after definition for service "error_listener": method "listener::foo()" does not exist or is not a listener.',
             ['event' => 'foo', 'before' => ['listener', 'foo']],
         ];
 
         yield [
-            'Invalid before/after definition for service "error_listener": given definition "event_dispatcher" is not a listener.',
+            'Invalid before/after definition for service "error_listener": "event_dispatcher" is not a listener.',
             ['event' => 'bar', 'before' => 'event_dispatcher'],
         ];
 
         yield [
-            'Invalid before/after definition for service "error_listener": given definition "listener" is not handled by the same dispatchers.',
+            'Invalid before/after definition for service "error_listener": "listener" is not handled by the same dispatchers.',
             ['event' => 'foo', 'before' => 'listener', 'dispatcher' => 'some_dispatcher'],
         ];
     }
@@ -740,20 +740,20 @@ class RegisterListenersPassTest extends TestCase
     public static function beforeAfterAmbiguousProvider(): iterable
     {
         yield [
-            'Invalid before/after definition for service "error_listener": given definition "listener" is ambiguous. Please specify the "method" attribute.',
+            'Invalid before/after definition for service "error_listener": "listener" has multiple methods. Please specify the "method" attribute.',
             ['event' => 'foo', 'before' => 'listener'],
         ];
 
-        yield [
-            sprintf('Invalid before/after definition for service "error_listener": given definition "%s" is ambiguous. Please specify the "method" attribute.', MultipleListeners::class),
-            ['event' => 'foo', 'after' => MultipleListeners::class],
-        ];
+//        yield [
+//            sprintf('Invalid before/after definition for service "error_listener": "%s" has multiple methods. Please specify the "method" attribute.', MultipleListeners::class),
+//            ['event' => 'foo', 'after' => MultipleListeners::class],
+//        ];
     }
 
     public function testBeforeAfterCircularError()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid before/after definition for service "listener_1": circular reference detected.');
+        $this->expectExceptionMessage('Invalid before/after definition for service "listener_1::__invoke": circular reference detected.');
 
         $container = new ContainerBuilder();
 

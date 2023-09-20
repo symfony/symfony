@@ -78,9 +78,9 @@ class CliErrorRenderer implements ErrorRendererInterface
         foreach ($sourceCodeExtract as $lineNumber => $code) {
             $lineNumberFormatted = sprintf("%{$maxLineNumberLengthInDigits}d |", $lineNumber);
             if ($lineNumber === $exceptionLineNumber) {
-                $content .= $this->textRedBackground($lineNumberFormatted);
+                $content .= $this->textBrightRed('-> '.$lineNumberFormatted);
             } else {
-                $content .= $this->textGray($lineNumberFormatted);
+                $content .= '   '.$this->textGray($lineNumberFormatted);
             }
 
             $content .= sprintf(" %s\n", rtrim($code));

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2023-07-31T16:50:22Z
+
+Ping @bendavies can you try this patch plz?
+
+---------------------------------------------------------------------------
+
+by bendavies at 2023-08-15T18:07:06Z
+
+> Friendly ping @bendavies can you please try this patch and report back?
+
+@nicolas-grekas i'm afraid i'm afk on holiday for 3 weeks. i can check when i'm back if you can wait.
+
+---------------------------------------------------------------------------
+
+by bendavies at 2023-09-08T09:31:49Z
+
+yes, this seems to resolve the issue.

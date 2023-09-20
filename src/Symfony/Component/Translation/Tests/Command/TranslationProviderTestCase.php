@@ -55,6 +55,22 @@ abstract class TranslationProviderTestCase extends TestCase
         return new TranslationProviderCollection($collection);
     }
 
+    protected function createYamlFile(array $messages = ['node' => 'NOTE'], $targetLanguage = 'en', $fileNamePattern = 'messages.%locale%.yml'): string
+    {
+        $yamlContent = '';
+        foreach ($messages as $key => $value) {
+            $yamlContent .= "$key: $value\n";
+        }
+        $yamlContent .= "\n";
+
+        $filename = sprintf('%s/%s', $this->translationAppDir.'/translations', str_replace('%locale%', $targetLanguage, $fileNamePattern));
+        file_put_contents($filename, $yamlContent);
+
+        $this->files[] = $filename;
+
+        return $filename;
+    }
+
     protected function createFile(array $messages = ['note' => 'NOTE'], $targetLanguage = 'en', $fileNamePattern = 'messages.%locale%.xlf', string $xlfVersion = 'xlf12'): string
     {
         if ('xlf12' === $xlfVersion) {

@@ -95,6 +95,7 @@ final class TranslationPullCommand extends Command
                 new InputOption('domains', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Specify the domains to pull.'),
                 new InputOption('locales', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Specify the locales to pull.'),
                 new InputOption('format', null, InputOption::VALUE_OPTIONAL, 'Override the default output format.', 'xlf12'),
+                new InputOption('as-tree', null, InputOption::VALUE_OPTIONAL, 'Write messages as a tree-like structure. Needs --format=yaml. The given value defines the level where to switch to inline YAML'),
             ])
             ->setHelp(<<<'EOF'
 The <info>%command.name%</> command pulls translations from the given provider. Only
@@ -126,6 +127,7 @@ EOF
         $locales = $input->getOption('locales') ?: $this->enabledLocales;
         $domains = $input->getOption('domains');
         $format = $input->getOption('format');
+        $asTree = (int) $input->getOption('as-tree');
         $xliffVersion = '1.2';
 
         if ($intlIcu && !$force) {
@@ -142,6 +144,8 @@ EOF
             'path' => end($this->transPaths),
             'xliff_version' => $xliffVersion,
             'default_locale' => $this->defaultLocale,
+            'as_tree' => (bool) $asTree,
+            'inline' => $asTree,
         ];
 
         if (!$domains) {

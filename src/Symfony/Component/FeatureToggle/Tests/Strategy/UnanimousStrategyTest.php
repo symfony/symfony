@@ -11,13 +11,12 @@
 
 namespace Symfony\Component\FeatureToggle\Tests\Strategy;
 
-use Symfony\Component\FeatureToggle\Strategy\AffirmativeStrategy;
 use Symfony\Component\FeatureToggle\Strategy\StrategyInterface;
 use Symfony\Component\FeatureToggle\Strategy\UnanimousStrategy;
 use Symfony\Component\FeatureToggle\StrategyResult;
 
 /**
- * @covers \Symfony\Component\FeatureToggle\Strategy\AffirmativeStrategy
+ * @covers \Symfony\Component\FeatureToggle\Strategy\UnanimousStrategy
  */
 final class UnanimousStrategyTest extends AbstractOuterStrategiesTestCase
 {

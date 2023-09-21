@@ -36,7 +36,6 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         '%40' => '@',
         '%3A' => ':',
         '%21' => '!',
-        '%3B' => ';',
         '%2C' => ',',
         '%2A' => '*',
     ];

@@ -1,0 +1,9 @@
+services:
+    _defaults:
+        public: true
+
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\LoggerController:
+        tags: ['controller.service_arguments']
+
+    logger:
+        class: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Logger\TestLoggerWithoutHandler

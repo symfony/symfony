@@ -33,7 +33,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 final class Configuration implements ConfigurationInterface
 {
-    private const KNOWN_STRATEGY_TYPES = ['grant', 'deny', 'not', 'date', 'env', 'native_request_header', 'native_request_query', 'request_attribute', 'priority', 'affirmative'];
+    private const KNOWN_STRATEGY_TYPES = ['grant', 'deny', 'not', 'date', 'env', 'request_header', 'request_query', 'request_attribute', 'priority', 'affirmative'];
 
     public function getConfigTreeBuilder(): TreeBuilder
     {
@@ -55,7 +55,7 @@ final class Configuration implements ConfigurationInterface
                                 ->isRequired()
                                 ->cannotBeEmpty()
                                 ->info(sprintf('Can be one of : %s. Or a service ID.', implode(', ', self::KNOWN_STRATEGY_TYPES)))
-                                ->example('native_request_header')
+                                ->example('request_header')
                             ->end()
                             ->variableNode('with')
                                 ->defaultValue([])
@@ -69,7 +69,7 @@ final class Configuration implements ConfigurationInterface
                                 $defaultWith = match ($strategy['type']) {
                                     'date' => ['from' => null, 'until' => null, 'includeFrom' => false, 'includeUntil' => false],
                                     'not' => ['strategy' => null],
-                                    'env', 'native_request_header', 'native_request_query', 'request_attribute' => ['name' => null],
+                                    'env', 'request_header', 'request_query', 'request_attribute' => ['name' => null],
                                     'priority', 'affirmative' => ['strategies' => null],
                                     default => [],
                                 };
@@ -100,12 +100,12 @@ final class Configuration implements ConfigurationInterface
                                             throw new \InvalidArgumentException('"name" must be provided.');
                                         }
                                     },
-                                    'native_request_header' => static function (array $with): void {
+                                    'request_header' => static function (array $with): void {
                                         if ('' === (string) $with['name']) {
                                             throw new \InvalidArgumentException('"name" must be provided.');
                                         }
                                     },
-                                    'native_request_query' => static function (array $with): void {
+                                    'request_query' => static function (array $with): void {
                                         if ('' === (string) $with['name']) {
                                             throw new \InvalidArgumentException('"name" must be provided.');
                                         }

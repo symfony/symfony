@@ -112,8 +112,8 @@ final class FeatureToggleExtension extends Extension
                 '$includeUntil' => $with['includeUntil'],
             ]),
             'env' => $definition->setArguments(['$envName' => $with['name']]),
-            'native_request_header' => $definition->setArguments(['$headerName' => $with['name']]),
-            'native_request_query' => $definition->setArguments(['$queryParameterName' => $with['name']]),
+            'request_header' => $definition->setArguments(['$headerName' => $with['name']]),
+            'request_query' => $definition->setArguments(['$queryParameterName' => $with['name']]),
             'request_attribute' => $definition->setArguments(['$attributeName' => $with['name']]), // Check if RequestStack class exists
             'priority', 'affirmative' => $definition->setArguments([
                 '$strategies' => array_map(

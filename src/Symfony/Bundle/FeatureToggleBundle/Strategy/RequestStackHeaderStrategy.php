@@ -14,19 +14,19 @@ namespace Symfony\Bundle\FeatureToggleBundle\Strategy;
 use Symfony\Component\FeatureToggle\StrategyResult;
 use Symfony\Component\HttpFoundation\Request;
 
-final class RequestStackAttributeStrategy extends RequestStackStrategy
+final class RequestStackHeaderStrategy extends RequestStackStrategy
 {
     public function __construct(
-        private readonly string $attributeName,
+        private readonly string $headerName,
     ) {
     }
 
     protected function computeRequest(Request $request): StrategyResult
     {
-        if (false === $request->attributes->has($this->attributeName)) {
+        if (false === $request->headers->has($this->headerName)) {
             return StrategyResult::Abstain;
         }
 
-        return $request->attributes->getBoolean($this->attributeName) ? StrategyResult::Grant : StrategyResult::Deny;
+        return \filter_var($request->headers->get($this->headerName), \FILTER_VALIDATE_BOOL) ? StrategyResult::Grant : StrategyResult::Deny;
     }
 }

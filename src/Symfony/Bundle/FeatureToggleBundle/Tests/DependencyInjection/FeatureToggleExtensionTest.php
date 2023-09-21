@@ -47,13 +47,13 @@ final class FeatureToggleExtensionTest extends TestCase
                         'with' => ['name' => 'SOME_ENV'],
                     ],
                     [
-                        'name' => 'native_request_header.feature-strategy',
-                        'type' => 'native_request_header',
+                        'name' => 'request_header.feature-strategy',
+                        'type' => 'request_header',
                         'with' => ['name' => 'SOME-HEADER-NAME'],
                     ],
                     [
-                        'name' => 'native_request_query.feature-strategy',
-                        'type' => 'native_request_query',
+                        'name' => 'request_query.feature-strategy',
+                        'type' => 'request_query',
                         'with' => ['name' => 'some_query_parameter'],
                     ],
                     [

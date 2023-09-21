@@ -13,7 +13,7 @@ namespace Symfony\Component\FeatureToggle\Strategy;
 
 use Symfony\Component\FeatureToggle\StrategyResult;
 
-final class AffirmativeStrategy implements OuterStrategiesInterface
+final class AffirmativeStrategy
 {
     /**
      * @param iterable<StrategyInterface> $strategies
@@ -39,10 +39,5 @@ final class AffirmativeStrategy implements OuterStrategiesInterface
         }
 
         return $result;
-    }
-
-    public function getInnerStrategies(): iterable
-    {
-        return $this->strategies;
     }
 }

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\FeatureToggle\Tests\Strategy;
 
-use Symfony\Component\FeatureToggle\Strategy\OuterStrategiesInterface;
 use Symfony\Component\FeatureToggle\Strategy\PriorityStrategy;
 use Symfony\Component\FeatureToggle\Strategy\StrategyInterface;
 use Symfony\Component\FeatureToggle\StrategyResult;
@@ -21,11 +20,6 @@ use Symfony\Component\FeatureToggle\StrategyResult;
  */
 final class PriorityStrategyTest extends AbstractOuterStrategiesTestCase
 {
-    public function testEnsureItExposesInnerStrategies(): void
-    {
-        self::assertTrue(is_a(PriorityStrategy::class, OuterStrategiesInterface::class, true));
-    }
-
     public static function generatesValidStrategies(): \Generator
     {
         yield 'no strategies' => [

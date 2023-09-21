@@ -12,7 +12,6 @@
 namespace Symfony\Component\FeatureToggle\Tests\Strategy;
 
 use Symfony\Component\FeatureToggle\Strategy\AffirmativeStrategy;
-use Symfony\Component\FeatureToggle\Strategy\OuterStrategiesInterface;
 use Symfony\Component\FeatureToggle\Strategy\StrategyInterface;
 use Symfony\Component\FeatureToggle\StrategyResult;
 use function is_a;
@@ -22,11 +21,6 @@ use function is_a;
  */
 final class AffirmativeStrategyTest extends AbstractOuterStrategiesTestCase
 {
-    public function testEnsureItExposesInnerStrategies(): void
-    {
-        self::assertTrue(is_a(AffirmativeStrategy::class, OuterStrategiesInterface::class, true));
-    }
-
     public static function generatesValidStrategies(): \Generator
     {
         yield 'no strategies' => [

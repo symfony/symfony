@@ -11,6 +11,7 @@ use Symfony\Component\FeatureToggle\Strategy\EnvStrategy;
 use Symfony\Component\FeatureToggle\Strategy\GrantStrategy;
 use Symfony\Component\FeatureToggle\Strategy\NotStrategy;
 use Symfony\Component\FeatureToggle\Strategy\PriorityStrategy;
+use Symfony\Component\FeatureToggle\Strategy\UnanimousStrategy;
 
 return static function (ContainerConfigurator $container) {
     $prefix = 'feature_toggle.abstract_strategy.';
@@ -43,6 +44,9 @@ return static function (ContainerConfigurator $container) {
         '$strategies' => abstract_arg('Defined in FeatureToggleExtension'),
     ]);
     $services->set($prefix.'affirmative', AffirmativeStrategy::class)->abstract()->args([
+        '$strategies' => abstract_arg('Defined in FeatureToggleExtension'),
+    ]);
+    $services->set($prefix.'unanimous', UnanimousStrategy::class)->abstract()->args([
         '$strategies' => abstract_arg('Defined in FeatureToggleExtension'),
     ]);
 };

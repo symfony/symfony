@@ -33,7 +33,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 final class Configuration implements ConfigurationInterface
 {
-    private const KNOWN_STRATEGY_TYPES = ['grant', 'deny', 'not', 'date', 'env', 'request_header', 'request_query', 'request_attribute', 'priority', 'affirmative'];
+    private const KNOWN_STRATEGY_TYPES = ['grant', 'deny', 'not', 'date', 'env', 'request_header', 'request_query', 'request_attribute', 'priority', 'affirmative', 'unanimous'];
 
     public function getConfigTreeBuilder(): TreeBuilder
     {
@@ -70,7 +70,7 @@ final class Configuration implements ConfigurationInterface
                                     'date' => ['from' => null, 'until' => null, 'includeFrom' => false, 'includeUntil' => false],
                                     'not' => ['strategy' => null],
                                     'env', 'request_header', 'request_query', 'request_attribute' => ['name' => null],
-                                    'priority', 'affirmative' => ['strategies' => null],
+                                    'priority', 'affirmative', 'unanimous' => ['strategies' => null],
                                     default => [],
                                 };
 
@@ -115,7 +115,7 @@ final class Configuration implements ConfigurationInterface
                                             throw new \InvalidArgumentException('"name" must be provided.');
                                         }
                                     },
-                                    'priority', 'affirmative' => static function (array $with): void {
+                                    'priority', 'affirmative', 'unanimous' => static function (array $with): void {
                                         if ([] === (array) $with['strategies']) {
                                             throw new \InvalidArgumentException('"strategies" must be provided.');
                                         }

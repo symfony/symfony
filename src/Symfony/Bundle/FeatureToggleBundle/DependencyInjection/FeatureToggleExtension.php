@@ -115,7 +115,7 @@ final class FeatureToggleExtension extends Extension
             'request_header' => $definition->setArguments(['$headerName' => $with['name']]),
             'request_query' => $definition->setArguments(['$queryParameterName' => $with['name']]),
             'request_attribute' => $definition->setArguments(['$attributeName' => $with['name']]), // Check if RequestStack class exists
-            'priority', 'affirmative' => $definition->setArguments([
+            'priority', 'affirmative', 'unanimous' => $definition->setArguments([
                 '$strategies' => array_map(
                     static fn (string $referencedStrategyName): Reference => new Reference($referencedStrategyName), // @phpstan-ignore-line
                     (array) $with['strategies'],

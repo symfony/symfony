@@ -13,12 +13,13 @@ namespace Symfony\Component\FeatureToggle\Tests\Strategy;
 
 use Symfony\Component\FeatureToggle\Strategy\AffirmativeStrategy;
 use Symfony\Component\FeatureToggle\Strategy\StrategyInterface;
+use Symfony\Component\FeatureToggle\Strategy\UnanimousStrategy;
 use Symfony\Component\FeatureToggle\StrategyResult;
 
 /**
  * @covers \Symfony\Component\FeatureToggle\Strategy\AffirmativeStrategy
  */
-final class AffirmativeStrategyTest extends AbstractOuterStrategiesTestCase
+final class UnanimousStrategyTest extends AbstractOuterStrategiesTestCase
 {
     public static function generatesValidStrategies(): \Generator
     {
@@ -60,7 +61,7 @@ final class AffirmativeStrategyTest extends AbstractOuterStrategiesTestCase
                 self::generateStrategy(StrategyResult::Deny),
                 self::generateStrategy(StrategyResult::Grant),
             ],
-            StrategyResult::Grant,
+            StrategyResult::Deny,
         ];
 
         yield 'if one denies after at least one grant' => [
@@ -69,7 +70,7 @@ final class AffirmativeStrategyTest extends AbstractOuterStrategiesTestCase
                 self::generateStrategy(StrategyResult::Grant),
                 self::generateStrategy(StrategyResult::Deny),
             ],
-            StrategyResult::Grant,
+            StrategyResult::Deny,
         ];
     }
 
@@ -80,7 +81,7 @@ final class AffirmativeStrategyTest extends AbstractOuterStrategiesTestCase
      */
     public function testItComputesCorrectly(iterable $strategies, StrategyResult $expected): void
     {
-        $affirmativeStrategy = new AffirmativeStrategy($strategies);
+        $affirmativeStrategy = new UnanimousStrategy($strategies);
 
         self::assertSame($expected, $affirmativeStrategy->compute());
     }

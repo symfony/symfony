@@ -72,6 +72,11 @@ final class FeatureToggleExtensionTest extends TestCase
                         'with' => ['strategies' => ['env.feature-strategy', 'grant.feature-strategy']],
                     ],
                     [
+                        'name' => 'unanimous.feature-strategy',
+                        'type' => 'unanimous',
+                        'with' => ['strategies' => ['env.feature-strategy', 'grant.feature-strategy']],
+                    ],
+                    [
                         'name' => 'not.feature-strategy',
                         'type' => 'not',
                         'with' => ['strategy' => 'grant.feature-strategy'],

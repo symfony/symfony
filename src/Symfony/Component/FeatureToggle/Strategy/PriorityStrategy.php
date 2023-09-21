@@ -13,7 +13,7 @@ namespace Symfony\Component\FeatureToggle\Strategy;
 
 use Symfony\Component\FeatureToggle\StrategyResult;
 
-final class PriorityStrategy
+final class PriorityStrategy implements StrategyInterface
 {
     /**
      * @param iterable<StrategyInterface> $strategies

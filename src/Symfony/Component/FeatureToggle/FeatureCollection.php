@@ -87,9 +87,9 @@ final class FeatureCollection implements ContainerInterface, \IteratorAggregate
     }
 
     /**
-     * @return \ArrayIterator<int, Feature>
+     * @return \Traversable<int, Feature>
      */
-    public function getIterator(): \ArrayIterator
+    public function getIterator(): \Traversable
     {
         $this->compile();
 

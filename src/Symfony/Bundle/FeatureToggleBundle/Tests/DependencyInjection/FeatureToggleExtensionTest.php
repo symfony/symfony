@@ -39,7 +39,7 @@ final class FeatureToggleExtensionTest extends TestCase
                     [
                         'name' => 'date.feature-strategy',
                         'type' => 'date',
-                        'with' => ['from' => '-2 days'],
+                        'with' => ['since' => '-2 days'],
                     ],
                     [
                         'name' => 'env.feature-strategy',

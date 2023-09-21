@@ -106,9 +106,9 @@ final class FeatureToggleExtension extends Extension
 
         return match ($type) {
             'date' => $definition->setArguments([
-                '$from' => new Definition(\DateTimeImmutable::class, [$with['from']]),
+                '$since' => new Definition(\DateTimeImmutable::class, [$with['since']]),
                 '$until' => new Definition(\DateTimeImmutable::class, [$with['until']]),
-                '$includeFrom' => $with['includeFrom'],
+                '$includeSince' => $with['includeSince'],
                 '$includeUntil' => $with['includeUntil'],
             ]),
             'env' => $definition->setArguments(['$envName' => $with['name']]),

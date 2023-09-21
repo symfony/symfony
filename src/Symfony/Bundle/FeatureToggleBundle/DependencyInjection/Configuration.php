@@ -67,7 +67,7 @@ final class Configuration implements ConfigurationInterface
                             ->always()
                             ->then(static function (array $strategy): array {
                                 $defaultWith = match ($strategy['type']) {
-                                    'date' => ['from' => null, 'until' => null, 'includeFrom' => false, 'includeUntil' => false],
+                                    'date' => ['since' => null, 'until' => null, 'includeSince' => false, 'includeUntil' => false],
                                     'not' => ['strategy' => null],
                                     'env', 'request_header', 'request_query', 'request_attribute' => ['name' => null],
                                     'priority', 'affirmative', 'unanimous' => ['strategies' => null],
@@ -86,8 +86,8 @@ final class Configuration implements ConfigurationInterface
                                 /** @var ConfigurationStrategy $strategy */
                                 $validator = match ($strategy['type']) {
                                     'date' => static function (array $with): void {
-                                        if ('' === trim((string) $with['from'].(string) $with['until'])) {
-                                            throw new \InvalidArgumentException('Either "from" or "until" must be provided.');
+                                        if ('' === trim((string) $with['since'].(string) $with['until'])) {
+                                            throw new \InvalidArgumentException('Either "since" or "until" must be provided.');
                                         }
                                     },
                                     'not' => static function (array $with): void {

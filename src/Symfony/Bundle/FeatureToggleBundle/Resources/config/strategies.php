@@ -25,9 +25,9 @@ return static function (ContainerConfigurator $container) {
         '$envName' => abstract_arg('Defined in FeatureToggleExtension'),
     ]);
     $services->set($prefix.'date', DateStrategy::class)->abstract()->args([
-        '$from' => abstract_arg('Defined in FeatureToggleExtension'),
+        '$since' => abstract_arg('Defined in FeatureToggleExtension'),
         '$until' => abstract_arg('Defined in FeatureToggleExtension'),
-        '$includeFrom' => abstract_arg('Defined in FeatureToggleExtension'),
+        '$includeSince' => abstract_arg('Defined in FeatureToggleExtension'),
         '$includeUntil' => abstract_arg('Defined in FeatureToggleExtension'),
         '$clock' => service('clock')->nullOnInvalid(),
     ]);

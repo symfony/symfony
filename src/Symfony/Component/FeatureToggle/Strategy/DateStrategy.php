@@ -18,12 +18,12 @@ final class DateStrategy implements StrategyInterface
 {
     public function __construct(
         private readonly ClockInterface $clock,
-        private readonly \DateTimeImmutable|null $from = null,
+        private readonly \DateTimeImmutable|null $since = null,
         private readonly \DateTimeImmutable|null $until = null,
-        private readonly bool $includeFrom = true,
+        private readonly bool $includeSince = true,
         private readonly bool $includeUntil = true,
     ) {
-        if (null === $this->from && null === $this->until) {
+        if (null === $this->since && null === $this->until) {
             throw new \InvalidArgumentException('Either from or until must be provided.');
         }
     }
@@ -32,12 +32,12 @@ final class DateStrategy implements StrategyInterface
     {
         $now = $this->clock->now();
 
-        if (null !== $this->from) {
-            if ($this->includeFrom && $this->from > $now) {
+        if (null !== $this->since) {
+            if ($this->includeSince && $this->since > $now) {
                 return StrategyResult::Deny;
             }
 
-            if (!$this->includeFrom && $this->from >= $now) {
+            if (!$this->includeSince && $this->since >= $now) {
                 return StrategyResult::Deny;
             }
         }

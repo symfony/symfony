@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\RateLimiter\Policy;
 
+use Psr\Clock\ClockInterface;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\RateLimiter\Exception\ReserveNotSupportedException;
 use Symfony\Component\RateLimiter\LimiterInterface;
@@ -37,7 +38,7 @@ final class SlidingWindowLimiter implements LimiterInterface
     private int $limit;
     private int $interval;
 
-    public function __construct(string $id, int $limit, \DateInterval $interval, StorageInterface $storage, LockInterface $lock = null)
+    public function __construct(string $id, int $limit, \DateInterval $interval, StorageInterface $storage, LockInterface $lock = null, private ?ClockInterface $clock = null)
     {
         $this->storage = $storage;
         $this->lock = $lock;
@@ -58,15 +59,15 @@ final class SlidingWindowLimiter implements LimiterInterface
         try {
             $window = $this->storage->fetch($this->id);
             if (!$window instanceof SlidingWindow) {
-                $window = new SlidingWindow($this->id, $this->interval);
+                $window = new SlidingWindow($this->id, $this->interval, $this->clock);
             } elseif ($window->isExpired()) {
-                $window = SlidingWindow::createFromPreviousWindow($window, $this->interval);
+                $window = SlidingWindow::createFromPreviousWindow($window, $this->interval, $this->clock);
             }
 
             $hitCount = $window->getHitCount();
             $availableTokens = $this->getAvailableTokens($hitCount);
             if ($availableTokens < $tokens) {
-                return new RateLimit($availableTokens, $window->getRetryAfter(), false, $this->limit);
+                return new RateLimit($availableTokens, $window->getRetryAfter(), false, $this->limit, $this->clock);
             }
 
             $window->add($tokens);
@@ -75,7 +76,7 @@ final class SlidingWindowLimiter implements LimiterInterface
                 $this->storage->save($window);
             }
 
-            return new RateLimit($this->getAvailableTokens($window->getHitCount()), $window->getRetryAfter(), true, $this->limit);
+            return new RateLimit($this->getAvailableTokens($window->getHitCount()), $window->getRetryAfter(), true, $this->limit, $this->clock);
         } finally {
             $this->lock?->release();
         }

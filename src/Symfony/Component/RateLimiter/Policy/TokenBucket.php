@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\RateLimiter\Policy;
 
+use Psr\Clock\ClockInterface;
 use Symfony\Component\RateLimiter\LimiterStateInterface;
 
 /**
@@ -32,7 +33,7 @@ final class TokenBucket implements LimiterStateInterface
      * @param Rate       $rate          the fill rate and time of this bucket
      * @param float|null $timer         the current timer of the bucket, defaulting to microtime(true)
      */
-    public function __construct(string $id, int $initialTokens, Rate $rate, float $timer = null)
+    public function __construct(string $id, int $initialTokens, Rate $rate, float $timer = null, ClockInterface $clock = null)
     {
         if ($initialTokens < 1) {
             throw new \InvalidArgumentException(sprintf('Cannot set the limit of "%s" to 0, as that would never accept any hit.', TokenBucketLimiter::class));
@@ -41,7 +42,7 @@ final class TokenBucket implements LimiterStateInterface
         $this->id = $id;
         $this->tokens = $this->burstSize = $initialTokens;
         $this->rate = $rate;
-        $this->timer = $timer ?? microtime(true);
+        $this->timer = $timer ?? $clock?->now()->format('U.u') ?? microtime(true);
     }
 
     public function getId(): string

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\RateLimiter;
 
+use Psr\Clock\ClockInterface;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -30,7 +31,7 @@ final class RateLimiterFactory
     private StorageInterface $storage;
     private ?LockFactory $lockFactory;
 
-    public function __construct(array $config, StorageInterface $storage, LockFactory $lockFactory = null)
+    public function __construct(array $config, StorageInterface $storage, LockFactory $lockFactory = null, private ?ClockInterface $clock = null)
     {
         $this->storage = $storage;
         $this->lockFactory = $lockFactory;
@@ -47,10 +48,10 @@ final class RateLimiterFactory
         $lock = $this->lockFactory?->createLock($id);
 
         return match ($this->config['policy']) {
-            'token_bucket' => new TokenBucketLimiter($id, $this->config['limit'], $this->config['rate'], $this->storage, $lock),
-            'fixed_window' => new FixedWindowLimiter($id, $this->config['limit'], $this->config['interval'], $this->storage, $lock),
-            'sliding_window' => new SlidingWindowLimiter($id, $this->config['limit'], $this->config['interval'], $this->storage, $lock),
-            'no_limit' => new NoLimiter(),
+            'token_bucket' => new TokenBucketLimiter($id, $this->config['limit'], $this->config['rate'], $this->storage, $lock, $this->clock),
+            'fixed_window' => new FixedWindowLimiter($id, $this->config['limit'], $this->config['interval'], $this->storage, $lock, $this->clock),
+            'sliding_window' => new SlidingWindowLimiter($id, $this->config['limit'], $this->config['interval'], $this->storage, $lock, $this->clock),
+            'no_limit' => new NoLimiter($this->clock),
             default => throw new \LogicException(sprintf('Limiter policy "%s" does not exists, it must be either "token_bucket", "sliding_window", "fixed_window" or "no_limit".', $this->config['policy'])),
         };
     }

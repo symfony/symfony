@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\RateLimiter\Storage;
 
+use Psr\Clock\ClockInterface;
 use Symfony\Component\RateLimiter\LimiterStateInterface;
 
 /**
@@ -19,6 +20,10 @@ use Symfony\Component\RateLimiter\LimiterStateInterface;
 class InMemoryStorage implements StorageInterface
 {
     private array $buckets = [];
+
+    public function __construct(private ?ClockInterface $clock = null)
+    {
+    }
 
     public function save(LimiterStateInterface $limiterState): void
     {
@@ -32,7 +37,7 @@ class InMemoryStorage implements StorageInterface
         }
 
         [$expireAt, $limiterState] = $this->buckets[$limiterStateId];
-        if (null !== $expireAt && $expireAt <= microtime(true)) {
+        if (null !== $expireAt && $expireAt <= ($this->clock?->now()->format('U.u') ?? microtime(true))) {
             unset($this->buckets[$limiterStateId]);
 
             return null;
@@ -53,7 +58,7 @@ class InMemoryStorage implements StorageInterface
     private function getExpireAt(LimiterStateInterface $limiterState): ?float
     {
         if (null !== $expireSeconds = $limiterState->getExpirationTime()) {
-            return microtime(true) + $expireSeconds;
+            return (float) ($this->clock?->now()->format('U.u') ?? microtime(true)) + $expireSeconds;
         }
 
         return $this->buckets[$limiterState->getId()][0] ?? null;

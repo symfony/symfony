@@ -139,7 +139,7 @@ final class FeatureCheckerDataCollector extends DataCollector implements LateDat
     }
 
     /**
-     * @return list<FeatureType>|Data
+     * @phpstan-return list<FeatureType>|Data
      */
     public function getFeatures(): array|Data
     {
@@ -147,7 +147,7 @@ final class FeatureCheckerDataCollector extends DataCollector implements LateDat
     }
 
     /**
-     * @return list<ToggleType>|Data
+     * @phpstan-return list<ToggleType>|Data
      */
     public function getToggles(): array|Data
     {

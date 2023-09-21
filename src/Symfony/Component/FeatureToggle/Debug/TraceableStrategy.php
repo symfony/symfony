@@ -12,11 +12,10 @@
 namespace Symfony\Component\FeatureToggle\Debug;
 
 use Symfony\Bundle\FeatureToggleBundle\DataCollector\FeatureCheckerDataCollector;
-use Symfony\Component\FeatureToggle\Strategy\OuterStrategyInterface;
 use Symfony\Component\FeatureToggle\Strategy\StrategyInterface;
 use Symfony\Component\FeatureToggle\StrategyResult;
 
-final class TraceableStrategy implements StrategyInterface, OuterStrategyInterface
+final class TraceableStrategy implements StrategyInterface
 {
     public function __construct(
         private readonly StrategyInterface $strategy,
@@ -34,10 +33,5 @@ final class TraceableStrategy implements StrategyInterface, OuterStrategyInterfa
         $this->dataCollector->collectComputeStop($result);
 
         return $result;
-    }
-
-    public function getInnerStrategy(): StrategyInterface
-    {
-        return $this->strategy;
     }
 }

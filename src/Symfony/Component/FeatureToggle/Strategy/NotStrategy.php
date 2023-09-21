@@ -13,7 +13,7 @@ namespace Symfony\Component\FeatureToggle\Strategy;
 
 use Symfony\Component\FeatureToggle\StrategyResult;
 
-final class NotStrategy implements OuterStrategyInterface
+final class NotStrategy
 {
     public function __construct(
         private readonly StrategyInterface $inner,
@@ -29,10 +29,5 @@ final class NotStrategy implements OuterStrategyInterface
             StrategyResult::Grant   => StrategyResult::Deny,
             StrategyResult::Deny    => StrategyResult::Grant,
         };
-    }
-
-    public function getInnerStrategy(): StrategyInterface
-    {
-        return $this->inner;
     }
 }

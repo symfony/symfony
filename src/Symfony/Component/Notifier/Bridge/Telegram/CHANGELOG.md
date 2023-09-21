@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+* Add support for `sendLocation` API method
+
 6.3
 ---
 

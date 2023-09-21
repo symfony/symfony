@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\Telegram;
 
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -116,6 +115,7 @@ final class TelegramTransport extends AbstractTransport
             isset($options['message_id']) => 'editMessageText',
             isset($options['callback_query_id']) => 'answerCallbackQuery',
             isset($options['photo']) => 'sendPhoto',
+            (isset($options['longitude']) && isset($options['latitude'])) => 'sendLocation',
             default => 'sendMessage',
         };
     }

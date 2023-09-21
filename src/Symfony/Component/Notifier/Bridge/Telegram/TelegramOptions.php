@@ -156,4 +156,15 @@ final class TelegramOptions implements MessageOptionsInterface
 
         return $this;
     }
+
+    /**
+     * @return $this
+     */
+    public function location(float $latitude, float $longitude): static
+    {
+        $this->options['latitude'] = $latitude;
+        $this->options['longitude'] = $longitude;
+
+        return $this;
+    }
 }

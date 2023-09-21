@@ -411,4 +411,70 @@ JSON;
         $this->assertEquals(1, $sentMessage->getMessageId());
         $this->assertEquals('telegram://api.telegram.org?channel=testChannel', $sentMessage->getTransport());
     }
+
+    public function testSendLocationWithOptions()
+    {
+        $response = $this->createMock(ResponseInterface::class);
+        $response->expects($this->exactly(2))
+            ->method('getStatusCode')
+            ->willReturn(200);
+
+        $content = <<<JSON
+            {
+                "ok": true,
+                "result": {
+                    "message_id": 1,
+                    "from": {
+                        "id": 12345678,
+                        "is_bot": true,
+                        "first_name": "YourBot",
+                        "username": "YourBot"
+                    },
+                    "chat": {
+                        "id": 1234567890,
+                        "first_name": "John",
+                        "last_name": "Doe",
+                        "username": "JohnDoe",
+                        "type": "private"
+                    },
+                    "date": 1459958199,
+                    "location": {
+                         "latitude": 48.8566,
+                         "longitude": 2.3522
+                    }
+                }
+            }
+JSON;
+
+        $response->expects($this->once())
+            ->method('getContent')
+            ->willReturn($content)
+        ;
+
+        $expectedBody = [
+            'latitude' => 48.8566,
+            'longitude' => 2.3522,
+            'chat_id' => 'testChannel',
+            'parse_mode' => 'MarkdownV2',
+        ];
+
+        $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response, $expectedBody): ResponseInterface {
+            $this->assertStringEndsWith('/sendLocation', $url);
+            $this->assertSame($expectedBody, json_decode($options['body'], true));
+
+            return $response;
+        });
+
+        $transport = self::createTransport($client, 'testChannel');
+
+        $messageOptions = new TelegramOptions();
+        $messageOptions
+            ->location(48.8566, 2.3522)
+        ;
+
+        $sentMessage = $transport->send(new ChatMessage('', $messageOptions));
+
+        $this->assertEquals(1, $sentMessage->getMessageId());
+        $this->assertEquals('telegram://api.telegram.org?channel=testChannel', $sentMessage->getTransport());
+    }
 }

@@ -249,9 +249,13 @@ class KernelTest extends TestCase
 
     /**
      * @dataProvider getStripCommentsCodes
+     *
+     * @group legacy
      */
     public function testStripComments(string $source, string $expected)
     {
+        $this->expectDeprecation('Since symfony/http-kernel 6.4: Method "Symfony\Component\HttpKernel\Kernel::stripComments()" is deprecated without replacement.');
+
         $output = Kernel::stripComments($source);
 
         // Heredocs are preserved, making the output mixing Unix and Windows line

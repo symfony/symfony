@@ -107,6 +107,7 @@ HttpKernel
 
  * [BC break] `BundleInterface` no longer extends `ContainerAwareInterface`
  * [BC break] Add native return types to `TraceableEventDispatcher` and to `MergeExtensionConfigurationPass`
+ * Deprecate `Kernel::stripComments()`
 
 Messenger
 ---------

@@ -35,7 +35,7 @@ final class ConfigurationTest extends TestCase
         return ['strategies' => [], 'features' => []];
     }
 
-    public function testDefaultConfig(): void
+    public function testDefaultConfig()
     {
         $processor = new Processor();
         $config = $processor->processConfiguration(
@@ -56,7 +56,7 @@ final class ConfigurationTest extends TestCase
     /**
      * @dataProvider provideValidStrategyNameConfigurationTest
      */
-    public function testValidStrategyNameConfiguration(string $strategyName): void
+    public function testValidStrategyNameConfiguration(string $strategyName)
     {
         $processor = new Processor();
         $config = $processor->processConfiguration(
@@ -86,7 +86,7 @@ final class ConfigurationTest extends TestCase
     /**
      * @dataProvider provideValidFeatureNameConfigurationTest
      */
-    public function testValidFeatureNameConfiguration(string $featureName): void
+    public function testValidFeatureNameConfiguration(string $featureName)
     {
         $processor = new Processor();
         $config = $processor->processConfiguration(
@@ -108,7 +108,7 @@ final class ConfigurationTest extends TestCase
         self::assertArrayHasKey($featureName, $config['features']);
     }
 
-    public function testFeatureRequiresDescriptionKey(): void
+    public function testFeatureRequiresDescriptionKey()
     {
         self::expectException(InvalidConfigurationException::class);
         self::expectExceptionMessage('The child config "default" under "feature_toggle.features.some-feature" must be configured: Will be used as a fallback mechanism if the strategy return StrategyResult::Abstain.');
@@ -129,7 +129,7 @@ final class ConfigurationTest extends TestCase
         );
     }
 
-    public function testFeatureRequiresStrategyKey(): void
+    public function testFeatureRequiresStrategyKey()
     {
         self::expectException(InvalidConfigurationException::class);
         self::expectExceptionMessage('The child config "strategy" under "feature_toggle.features.some-feature" must be configured: Strategy to be used for this feature. Can be one of "feature_toggle.strategies[].name" or a valid service id that implements StrategyInterface::class.');

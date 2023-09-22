@@ -101,7 +101,7 @@ final class FeatureToggleExtensionTest extends TestCase
         return new ContainerBuilder(new ParameterBag(['kernel.debug' => true]));
     }
 
-    public function testStrategiesAreDefinedAsServicesAndTagged(): void
+    public function testStrategiesAreDefinedAsServicesAndTagged()
     {
         $extension = new FeatureToggleExtension();
 
@@ -127,7 +127,7 @@ final class FeatureToggleExtensionTest extends TestCase
         }
     }
 
-    public function testAutoconfigurationForInterfaces(): void
+    public function testAutoconfigurationForInterfaces()
     {
         $extension = new FeatureToggleExtension();
 

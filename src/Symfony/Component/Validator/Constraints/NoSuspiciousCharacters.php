@@ -102,12 +102,12 @@ class NoSuspiciousCharacters extends Constraint
 
         parent::__construct($options, $groups, $payload);
 
-        $this->restrictionLevelMessage ??= $restrictionLevelMessage;
-        $this->invisibleMessage ??= $invisibleMessage;
-        $this->mixedNumbersMessage ??= $mixedNumbersMessage;
-        $this->hiddenOverlayMessage ??= $hiddenOverlayMessage;
-        $this->checks ??= $checks;
-        $this->restrictionLevel ??= $restrictionLevel;
-        $this->locales ??= $locales;
+        $this->restrictionLevelMessage = $restrictionLevelMessage ?? $this->restrictionLevelMessage;
+        $this->invisibleMessage = $invisibleMessage ?? $this->invisibleMessage;
+        $this->mixedNumbersMessage = $mixedNumbersMessage ?? $this->mixedNumbersMessage;
+        $this->hiddenOverlayMessage = $hiddenOverlayMessage ?? $this->hiddenOverlayMessage;
+        $this->checks = $checks ?? $this->checks;
+        $this->restrictionLevel = $restrictionLevel ?? $this->restrictionLevel;
+        $this->locales = $locales ?? $this->locales;
     }
 }

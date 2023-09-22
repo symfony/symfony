@@ -316,7 +316,7 @@ JSON;
 
         $expectedBody = [
             'chat_id' => 'testChannel',
-            'text' => 'I contain special characters \_ \* \[ \] \( \) \~ \` \> \# \+ \- \= \| \{ \} \. \! to send\.',
+            'text' => 'I contain special characters \_ \* \[ \] \( \) \~ \` \> \# \+ \- \= \| \{ \} \. \! \\\\ to send\.',
             'parse_mode' => 'MarkdownV2',
         ];
 
@@ -328,7 +328,7 @@ JSON;
 
         $transport = self::createTransport($client, 'testChannel');
 
-        $transport->send(new ChatMessage('I contain special characters _ * [ ] ( ) ~ ` > # + - = | { } . ! to send.'));
+        $transport->send(new ChatMessage('I contain special characters _ * [ ] ( ) ~ ` > # + - = | { } . ! \\ to send.'));
     }
 
     public function testSendPhotoWithOptions()

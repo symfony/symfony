@@ -30,13 +30,17 @@ class SessionAuthenticationStrategy implements SessionAuthenticationStrategyInte
     public const NONE = 'none';
     public const MIGRATE = 'migrate';
     public const INVALIDATE = 'invalidate';
+    public const CSRF_KEEP = 'keep';
+    public const CSRF_CLEAR = 'clear';
 
     private string $strategy;
     private ?ClearableTokenStorageInterface $csrfTokenStorage = null;
+    private string $csrfMigrationStrategy;
 
-    public function __construct(string $strategy, ClearableTokenStorageInterface $csrfTokenStorage = null)
+    public function __construct(string $strategy, ClearableTokenStorageInterface $csrfTokenStorage = null, string $csrfMigrationStrategy = self::CSRF_CLEAR)
     {
         $this->strategy = $strategy;
+        $this->csrfMigrationStrategy = $csrfMigrationStrategy;
 
         if (self::MIGRATE === $strategy) {
             $this->csrfTokenStorage = $csrfTokenStorage;
@@ -55,7 +59,7 @@ class SessionAuthenticationStrategy implements SessionAuthenticationStrategyInte
             case self::MIGRATE:
                 $request->getSession()->migrate(true);
 
-                if ($this->csrfTokenStorage) {
+                if ($this->csrfTokenStorage && $this->csrfMigrationStrategy === self::CSRF_CLEAR) {
                     $this->csrfTokenStorage->clear();
                 }
 

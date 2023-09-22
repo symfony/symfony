@@ -116,6 +116,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 param('security.authentication.session_strategy.strategy'),
                 service('security.csrf.token_storage')->ignoreOnInvalid(),
+                param('security.authentication.session_strategy.csrf_migration_strategy'),
             ])
         ->alias(SessionAuthenticationStrategyInterface::class, 'security.authentication.session_strategy')
 

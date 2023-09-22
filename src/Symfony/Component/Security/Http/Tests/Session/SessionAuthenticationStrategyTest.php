@@ -70,6 +70,18 @@ class SessionAuthenticationStrategyTest extends TestCase
         $strategy->onAuthentication($this->getRequest($session), $this->createMock(TokenInterface::class));
     }
 
+    public function testCsrfTokensAreKept()
+    {
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects($this->once())->method('migrate')->with($this->equalTo(true));
+
+        $csrfStorage = $this->createMock(ClearableTokenStorageInterface::class);
+        $csrfStorage->expects($this->never())->method('clear');
+
+        $strategy = new SessionAuthenticationStrategy(SessionAuthenticationStrategy::MIGRATE, $csrfStorage, SessionAuthenticationStrategy::CSRF_KEEP);
+        $strategy->onAuthentication($this->getRequest($session), $this->createMock(TokenInterface::class));
+    }
+
     private function getRequest($session = null)
     {
         $request = $this->createMock(Request::class);

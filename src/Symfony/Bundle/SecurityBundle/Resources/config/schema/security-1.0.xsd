@@ -20,6 +20,7 @@
         </xsd:choice>
         <xsd:attribute name="access-denied-url" type="xsd:string" />
         <xsd:attribute name="session-fixation-strategy" type="session_fixation_strategy" />
+        <xsd:attribute name="csrf-migration-strategy" type="csrf_migration_strategy" />
         <xsd:attribute name="hide-user-not-found" type="xsd:boolean" />
         <xsd:attribute name="always-authenticate-before-granting" type="xsd:boolean" />
         <xsd:attribute name="erase-credentials" type="xsd:boolean" />
@@ -49,6 +50,13 @@
             <xsd:enumeration value="none" />
             <xsd:enumeration value="migrate" />
             <xsd:enumeration value="invalidate" />
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="csrf_migration_strategy">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="keep" />
+            <xsd:enumeration value="clear" />
         </xsd:restriction>
     </xsd:simpleType>
 

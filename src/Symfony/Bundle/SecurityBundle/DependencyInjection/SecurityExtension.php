@@ -146,6 +146,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $container->setParameter('security.access.denied_url', $config['access_denied_url']);
         $container->setParameter('security.authentication.manager.erase_credentials', $config['erase_credentials']);
         $container->setParameter('security.authentication.session_strategy.strategy', $config['session_fixation_strategy']);
+        $container->setParameter('security.authentication.session_strategy.csrf_migration_strategy', $config['csrf_migration_strategy']);
 
         if (isset($config['access_decision_manager']['service'])) {
             $container->setAlias('security.access.decision_manager', $config['access_decision_manager']['service']);

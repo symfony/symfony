@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * `UserValueResolver` no longer implements `ArgumentValueResolverInterface`
+ * Add CSRF migration strategy to `SessionAuthenticationStrategy`
 
 6.3
 ---

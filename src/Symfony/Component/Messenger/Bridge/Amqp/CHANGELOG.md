@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add option to use transactions for publishing
+
 6.0
 ---
 

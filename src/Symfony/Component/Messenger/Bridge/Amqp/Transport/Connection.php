@@ -54,6 +54,7 @@ class Connection
         'read_timeout',
         'write_timeout',
         'confirm_timeout',
+        'transactional',
         'connect_timeout',
         'rpc_timeout',
         'cacert',
@@ -128,6 +129,7 @@ class Connection
      *   * write_timeout: Timeout in for outcome activity. Note: 0 or greater seconds. May be fractional.
      *   * connect_timeout: Connection timeout. Note: 0 or greater seconds. May be fractional.
      *   * confirm_timeout: Timeout in seconds for confirmation, if none specified transport will not wait for message confirmation. Note: 0 or greater seconds. May be fractional.
+     *   * transactional: Enable or not using transactions for publishing (Default: false)
      *   * queues[name]: An array of queues, keyed by the name
      *     * binding_keys: The binding keys (if any) to bind to this queue
      *     * binding_arguments: Arguments to be used while binding the queue.
@@ -251,6 +253,14 @@ class Connection
             && 0 < \count($invalidExchangeOptions = array_diff(array_keys($options['exchange']), self::AVAILABLE_EXCHANGE_OPTIONS))) {
             throw new LogicException(sprintf('Invalid exchange option(s) "%s" passed to the AMQP Messenger transport.', implode('", "', $invalidExchangeOptions)));
         }
+
+        $transactional = isset($options['transactional']) && filter_var($options['transactional'], \FILTER_VALIDATE_BOOL);
+        $confirmTimeout = ('' !== ($options['confirm_timeout'] ?? ''));
+
+        if ($transactional && $confirmTimeout) {
+            throw new LogicException(sprintf('Confirm timeout cannot be used on transactional channel.'));
+        }
+
     }
 
     private static function normalizeQueueArguments(array $arguments): array
@@ -334,8 +344,13 @@ class Connection
         $attributes['headers'] = array_merge($attributes['headers'] ?? [], $headers);
         $attributes['delivery_mode'] ??= 2;
         $attributes['timestamp'] ??= time();
+        $transactional = isset($this->connectionOptions['transactional']) && filter_var($this->connectionOptions['transactional'], \FILTER_VALIDATE_BOOL);
 
         $this->lastActivityTime = time();
+
+        if ($transactional) {
+            $exchange->getChannel()->startTransaction();
+        }
 
         $exchange->publish(
             $body,
@@ -343,6 +358,10 @@ class Connection
             $amqpStamp ? $amqpStamp->getFlags() : \AMQP_NOPARAM,
             $attributes
         );
+
+        if ($transactional) {
+            $exchange->getChannel()->commitTransaction();
+        }
 
         if ('' !== ($this->connectionOptions['confirm_timeout'] ?? '')) {
             $this->channel()->waitForConfirm((float) $this->connectionOptions['confirm_timeout']);

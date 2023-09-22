@@ -96,7 +96,7 @@ EOT
         return str_replace($this->projectDir.'/', '', $path);
     }
 
-    private function shortenPath($path): string
+    private function shortenPath(string $path): string
     {
         $limit = 50;
 

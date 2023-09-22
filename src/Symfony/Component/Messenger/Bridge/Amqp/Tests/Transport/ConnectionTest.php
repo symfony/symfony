@@ -786,9 +786,31 @@ class ConnectionTest extends TestCase
 
         $amqpExchange->method('getChannel')->willReturn($amqpChannel);
 
-        $amqpChannel->expects($this->once())->method('startTransaction');
-        $amqpExchange->expects($this->once())->method('publish')->with('body', null, \AMQP_NOPARAM, ['headers' => [], 'delivery_mode' => 2, 'timestamp' => time()]);
-        $amqpChannel->expects($this->once())->method('commitTransaction');
+        $startedTransaction = false;
+        $amqpChannel->expects($this->once())->method('startTransaction')->willReturnCallback(
+            function () use (&$startedTransaction) {
+                $startedTransaction = true;
+            }
+        );
+
+
+        $published = false;
+        $amqpExchange->expects($this->once())->method('publish')->with(
+            'body',
+            null,
+            \AMQP_NOPARAM,
+            ['headers' => [], 'delivery_mode' => 2, 'timestamp' => time()]
+        )->willReturnCallback(function () use (&$startedTransaction, &$published) {
+            $this->assertTrue($startedTransaction);
+            $published = true;
+        });
+
+
+        $amqpChannel->expects($this->once())->method('commitTransaction')->willReturnCallback(
+            function () use (&$published) {
+                $this->assertTrue($published);
+            }
+        );
 
         $connection = Connection::fromDsn('amqp://localhost?transactional=1', [], $factory);
         $connection->publish('body');

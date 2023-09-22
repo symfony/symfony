@@ -765,8 +765,10 @@ class ConnectionTest extends TestCase
             $this->createMock(\AMQPConnection::class),
             $amqpChannel = $this->createMock(\AMQPChannel::class),
             $this->createMock(\AMQPQueue::class),
-            $this->createMock(\AMQPExchange::class)
+            $amqpExchange = $this->createMock(\AMQPExchange::class)
         );
+
+        $amqpExchange->method('getChannel')->willReturn($amqpChannel);
 
         $amqpChannel->expects($this->never())->method('startTransaction');
         $amqpChannel->expects($this->never())->method('commitTransaction');

@@ -12,12 +12,15 @@
 namespace Symfony\Component\FeatureToggle;
 
 use Psr\Container\ContainerInterface;
+use function array_key_exists;
+use function array_shift;
+use function is_callable;
 
 /** @implements \IteratorAggregate<int, Feature> */
 final class FeatureCollection implements ContainerInterface, \IteratorAggregate
 {
-    /** @var array<string, Feature>|null */
-    private array|null $features = null;
+    /** @var array<string, Feature> */
+    private array $features = [];
 
     /** @var array<iterable<Feature>|(\Closure(): iterable<Feature>)> */
     private array $featureProviders = [];
@@ -36,7 +39,6 @@ final class FeatureCollection implements ContainerInterface, \IteratorAggregate
     private function append(iterable|\Closure $features): void
     {
         $this->featureProviders[] = $features;
-        $this->features = null;
     }
 
     /**
@@ -49,18 +51,13 @@ final class FeatureCollection implements ContainerInterface, \IteratorAggregate
         return $this;
     }
 
-    /**
-     * @phpstan-assert-if-true null $this->features
-     */
-    private function compile(): void
+    private function findFeature(string $featureName): ?Feature
     {
-        if (null !== $this->features) {
-            return;
+        if (array_key_exists($featureName, $this->features)) {
+            return $this->features[$featureName];
         }
 
-        $this->features = [];
-
-        foreach ($this->featureProviders as $featureProvider) {
+        while (($featureProvider = array_shift($this->featureProviders)) !== null) {
             if (is_callable($featureProvider)) {
                 $featureProvider = $featureProvider();
             }
@@ -68,13 +65,18 @@ final class FeatureCollection implements ContainerInterface, \IteratorAggregate
             foreach ($featureProvider as $feature) {
                 $this->features[$feature->getName()] = $feature;
             }
+
+            if (array_key_exists($featureName, $this->features)) {
+                return $this->features[$featureName];
+            }
         }
+
+        return null;
     }
 
     public function has(string $id): bool
     {
-        $this->compile();
-        return array_key_exists($id, $this->features);
+        return $this->findFeature($id) !== null;
     }
 
     /**
@@ -82,8 +84,7 @@ final class FeatureCollection implements ContainerInterface, \IteratorAggregate
      */
     public function get(string $id): Feature
     {
-        $this->compile();
-        return $this->features[$id] ?? throw new FeatureNotFoundException($id);
+        return $this->findFeature($id) ?? throw new FeatureNotFoundException($id);
     }
 
     /**
@@ -91,7 +92,7 @@ final class FeatureCollection implements ContainerInterface, \IteratorAggregate
      */
     public function getIterator(): \Traversable
     {
-        $this->compile();
+        $this->findFeature('');
 
         return new \ArrayIterator(array_values($this->features));
     }

@@ -795,7 +795,6 @@ class ConnectionTest extends TestCase
             }
         );
 
-
         $published = false;
         $amqpExchange->expects($this->once())->method('publish')->with(
             'body',
@@ -806,7 +805,6 @@ class ConnectionTest extends TestCase
             $this->assertTrue($startedTransaction);
             $published = true;
         });
-
 
         $amqpChannel->expects($this->once())->method('commitTransaction')->willReturnCallback(
             function () use (&$published) {

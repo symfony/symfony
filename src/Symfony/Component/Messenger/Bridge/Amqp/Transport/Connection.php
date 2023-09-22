@@ -260,7 +260,6 @@ class Connection
         if ($transactional && $confirmTimeout) {
             throw new LogicException('Confirm timeout cannot be used on transactional channel.');
         }
-
     }
 
     private static function normalizeQueueArguments(array $arguments): array

@@ -27,6 +27,6 @@ final class RequestStackHeaderStrategy extends RequestStackStrategy
             return StrategyResult::Abstain;
         }
 
-        return \filter_var($request->headers->get($this->headerName), \FILTER_VALIDATE_BOOL) ? StrategyResult::Grant : StrategyResult::Deny;
+        return filter_var($request->headers->get($this->headerName), \FILTER_VALIDATE_BOOL) ? StrategyResult::Grant : StrategyResult::Deny;
     }
 }

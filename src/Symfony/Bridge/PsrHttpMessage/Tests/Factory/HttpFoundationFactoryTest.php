@@ -208,7 +208,6 @@ class HttpFoundationFactoryTest extends TestCase
     {
         $reflection = new \ReflectionClass($this->factory);
         $createUploadedFile = $reflection->getMethod('createUploadedFile');
-        $createUploadedFile->setAccessible(true);
 
         return $createUploadedFile->invokeArgs($this->factory, [$uploadedFile]);
     }

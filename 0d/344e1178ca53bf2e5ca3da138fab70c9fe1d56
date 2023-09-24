@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by alamirault at 2023-09-21T16:33:52Z
+
+Hum, I understand now !
+But shouldn't we use `class_exists` instead ? Like is done in codebase ?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-09-21T18:13:46Z
+
+We could do that, yes.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-09-22T09:44:44Z
+
+given that this method is not used anywhere in the HttpKernel component and does not depend on anything else in the component (its only dependency is `token_get_all`), maybe we should copy it in the PhpDumper of the DI component as a private method and deprecate the Kernel method.
+
+---------------------------------------------------------------------------
+
+by alamirault at 2023-09-22T17:09:49Z
+
+I deprecated method in `Kernel` and created a private in `PhpDumper`

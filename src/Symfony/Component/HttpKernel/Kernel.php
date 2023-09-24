@@ -774,9 +774,13 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      *
      * We don't use the PHP php_strip_whitespace() function
      * as we want the content to be readable and well-formatted.
+     *
+     * @deprecated since Symfony 6.4 without replacement
      */
     public static function stripComments(string $source): string
     {
+        trigger_deprecation('symfony/http-kernel', '6.4', 'Method "%s()" is deprecated without replacement.', __METHOD__);
+
         if (!\function_exists('token_get_all')) {
             return $source;
         }

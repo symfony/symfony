@@ -108,10 +108,8 @@ class PhpDumper extends Dumper
 
     /**
      * Sets the dumper to be used when dumping proxies in the generated container.
-     *
-     * @return void
      */
-    public function setProxyDumper(DumperInterface $proxyDumper)
+    public function setProxyDumper(DumperInterface $proxyDumper): void
     {
         $this->proxyDumper = $proxyDumper;
         $this->hasProxyDumper = !$proxyDumper instanceof NullDumper;

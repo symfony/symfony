@@ -96,7 +96,7 @@ final class DebugCommand extends Command
             }
             $io->table(
                 ['Message', 'Trigger', 'Next Run'],
-                array_filter(array_map(self::renderRecurringMessage(...), $messages, array_fill(0, count($messages), $date), array_fill(0, count($messages), $input->getOption('all')))),
+                array_filter(array_map(self::renderRecurringMessage(...), $messages, array_fill(0, \count($messages), $date), array_fill(0, \count($messages), $input->getOption('all')))),
             );
         }
 

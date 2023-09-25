@@ -90,7 +90,7 @@ final class MessageGenerator implements MessageGeneratorInterface
         $heap = new TriggerHeap($time);
 
         foreach ($this->schedule()->getRecurringMessages() as $index => $recurringMessage) {
-            $trigger  = $recurringMessage->getTrigger();
+            $trigger = $recurringMessage->getTrigger();
 
             if ($trigger instanceof StatefulTriggerInterface) {
                 $trigger->continue($startTime);

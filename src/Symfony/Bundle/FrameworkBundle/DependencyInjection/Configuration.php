@@ -1836,7 +1836,7 @@ class Configuration implements ConfigurationInterface
                                     continue;
                                 }
                                 if (\is_array($scopedConfig['retry_failed'])) {
-                                    $scopedConfig['retry_failed'] = $scopedConfig['retry_failed'] + $config['default_options']['retry_failed'];
+                                    $scopedConfig['retry_failed'] += $config['default_options']['retry_failed'];
                                 }
                             }
 

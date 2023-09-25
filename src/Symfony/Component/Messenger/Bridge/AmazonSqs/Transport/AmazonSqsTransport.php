@@ -34,7 +34,7 @@ class AmazonSqsTransport implements TransportInterface, SetupableTransportInterf
     private ?SenderInterface $sender;
 
     /**
-     * @param MessageCountAwareInterface&ReceiverInterface|null $receiver
+     * @param (MessageCountAwareInterface&ReceiverInterface)|null $receiver
      */
     public function __construct(Connection $connection, SerializerInterface $serializer = null, ReceiverInterface $receiver = null, SenderInterface $sender = null)
     {

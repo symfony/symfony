@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Constraints\Luhn;
 use Symfony\Component\Validator\Constraints\NotCompromisedPassword;
 use Symfony\Component\Validator\Constraints\NotCompromisedPasswordValidator;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
@@ -223,7 +223,7 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
         yield 'named arguments' => [new NotCompromisedPassword(skipOnError: true)];
     }
 
-    private function createHttpClientStub(?string $returnValue = null): HttpClientInterface
+    private function createHttpClientStub(string $returnValue = null): HttpClientInterface
     {
         $httpClientStub = $this->createMock(HttpClientInterface::class);
         $httpClientStub->method('request')->willReturnCallback(

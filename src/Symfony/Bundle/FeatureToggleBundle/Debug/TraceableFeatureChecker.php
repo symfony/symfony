@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\FeatureToggle\Debug;
+namespace Symfony\Bundle\FeatureToggleBundle\Debug;
 
 use Symfony\Bundle\FeatureToggleBundle\DataCollector\FeatureCheckerDataCollector;
 use Symfony\Component\FeatureToggle\FeatureCheckerInterface;

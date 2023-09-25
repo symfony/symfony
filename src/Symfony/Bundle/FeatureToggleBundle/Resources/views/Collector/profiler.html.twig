@@ -3,36 +3,32 @@
 {% block page_title 'Feature Toggle' %}
 
 {% block toolbar %}
-    {% set icon %}
-        <img alt="Feature Toggle" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAABVElEQVRIie2UO0oEURBFzxM/YGroAgQNxETUwEzwiytQ8/GzAhfhEnQNYqaJ4IyCv1QjERQjB1HEQDkGU8qzmRkHNJwLTcOtqtNVr6sb2mrrX6X2qOvqsfpi63qJmjW1O2emDN4P7AHDQAW4BpaznEpcCRgHxsLfAR4z7xKYTyndFTu/VKvqtNqnXkR3VXW6zrQzETtTuwre+Y9J1I2AFeHWg2d1s5Gz2sxDPVHLGfxVfVLLjeBZ7XExL7wKQEd4g8AVsA8MAIvAB/DrA4AjYKiR15mZK8BbwA+A3hbg3003j9ZGelen1A51O86x8iu5VntUxyvnxnoAlzL4YdxnmsDnIqfUzPta0wv1I4Kbapf6EGs32wBeVU/VzoJ39rWmxQ9tFxgBboBbYDJjnlB76QmYAEapnf1WwTsHFlJK9/VG7lZXY2WfbV3PUVOy8Ktoq62/6xORLdg+h+zBmgAAAABJRU5ErkJggg==" />
-        <span class="sf-toolbar-value">{{ collector.features|length }}</span>
-        <span class="sf-toolbar-label">Features</span>
-    {% endset %}
+    {% if 0 < collector.toggles|length %}
+        {% set icon %}
+            <img alt="Feature Toggle" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAABVElEQVRIie2UO0oEURBFzxM/YGroAgQNxETUwEzwiytQ8/GzAhfhEnQNYqaJ4IyCv1QjERQjB1HEQDkGU8qzmRkHNJwLTcOtqtNVr6sb2mrrX6X2qOvqsfpi63qJmjW1O2emDN4P7AHDQAW4BpaznEpcCRgHxsLfAR4z7xKYTyndFTu/VKvqtNqnXkR3VXW6zrQzETtTuwre+Y9J1I2AFeHWg2d1s5Gz2sxDPVHLGfxVfVLLjeBZ7XExL7wKQEd4g8AVsA8MAIvAB/DrA4AjYKiR15mZK8BbwA+A3hbg3003j9ZGelen1A51O86x8iu5VntUxyvnxnoAlzL4YdxnmsDnIqfUzPta0wv1I4Kbapf6EGs32wBeVU/VzoJ39rWmxQ9tFxgBboBbYDJjnlB76QmYAEapnf1WwTsHFlJK9/VG7lZXY2WfbV3PUVOy8Ktoq62/6xORLdg+h+zBmgAAAABJRU5ErkJggg==" />
+            <span class="sf-toolbar-value">{{ collector.toggles|length }}</span>
+            <span class="sf-toolbar-label">Toggles</span>
+        {% endset %}
 
-    {% set text %}
-        <div class="sf-toolbar-info-group">
-            <div class="sf-toolbar-info-piece">
-                <b>Toggles</b>
-                {% for toggle in collector.toggles %}
-                    {% set unknown = collector.features[toggle['feature']] is not defined %}
-                    {% set color = not unknown and toggle['result'] ? 'green' : 'red' %}
-                    <span class="sf-toolbar-status sf-toolbar-status-{{ color }}">
-                        {{ unknown ? '✗' : '' }}{{ toggle['feature'] }}
-                    </span>
-                {% endfor %}
+        {% set text %}
+            <div class="sf-toolbar-info-group">
+                <div class="sf-toolbar-info-piece">
+                    <b>Toggles</b>
+                    {% for toggle in collector.toggles %}
+                        <span class="sf-toolbar-status sf-toolbar-status-{{ toggle['result'] ? 'green' : 'red' }}">
+                            {{ toggle['feature'] }}
+                        </span>
+                    {% endfor %}
+                </div>
             </div>
-            <div class="sf-toolbar-info-piece">
-                <b>Features</b>
-                <span class="sf-toolbar-status sf-toolbar-status-none">{{ collector.features|length }}</span>
-            </div>
-        </div>
-    {% endset %}
+        {% endset %}
 
-    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url }) }}
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url }) }}
+    {% endif %}
 {% endblock %}
 
 {% block menu %}
-    <span class="label {{ collector.features|length is same as(0) ? 'disabled' }}">
+    <span class="label {{ collector.toggles|length is same as(0) ? 'disabled' }}">
         <span class="icon"><img alt="Feature Toggle" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAABVElEQVRIie2UO0oEURBFzxM/YGroAgQNxETUwEzwiytQ8/GzAhfhEnQNYqaJ4IyCv1QjERQjB1HEQDkGU8qzmRkHNJwLTcOtqtNVr6sb2mrrX6X2qOvqsfpi63qJmjW1O2emDN4P7AHDQAW4BpaznEpcCRgHxsLfAR4z7xKYTyndFTu/VKvqtNqnXkR3VXW6zrQzETtTuwre+Y9J1I2AFeHWg2d1s5Gz2sxDPVHLGfxVfVLLjeBZ7XExL7wKQEd4g8AVsA8MAIvAB/DrA4AjYKiR15mZK8BbwA+A3hbg3003j9ZGelen1A51O86x8iu5VntUxyvnxnoAlzL4YdxnmsDnIqfUzPta0wv1I4Kbapf6EGs32wBeVU/VzoJ39rWmxQ9tFxgBboBbYDJjnlB76QmYAEapnf1WwTsHFlJK9/VG7lZXY2WfbV3PUVOy8Ktoq62/6xORLdg+h+zBmgAAAABJRU5ErkJggg==" /></span>
         <strong>Feature toggle</strong>
     </span>
@@ -99,7 +95,7 @@
                     <td>
                         <span class="badge badge-{{ result }}">
                             {{ result|capitalize }}
-                            {%- if collector.features[toggle['feature']] is not defined %}
+                            {%- if toggle['computes'] is empty %}
                                 (unknown)
                             {% elseif (toggle['computes']|first).result.name|lower is same as 'abstain' %}
                                 (default)
@@ -121,34 +117,6 @@
     {% else %}
         <div class="empty">
             <p>No feature toggle checked</p>
-        </div>
-    {% endif %}
-
-    <h2>Available features</h2>
-    {% if collector.features|length > 0 %}
-        <table>
-            <thead>
-            <tr>
-                <th>Name</th>
-                <th>Default</th>
-                <th>Description</th>
-                <th>Strategy</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for featureName, featureData in collector.features %}
-                <tr>
-                    <td>{{ featureName }}</td>
-                    <td>{{ featureData.default|json_encode }}</td>
-                    <td>{{ featureData.description }}</td>
-                    <td>{{ profiler_dump(featureData.strategy) }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <div class="empty">
-            <p>No features configured</p>
         </div>
     {% endif %}
 {% endblock %}

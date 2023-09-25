@@ -20,21 +20,9 @@ use Symfony\Component\Config\Definition\Processor;
  * @covers \Symfony\Bundle\FeatureToggleBundle\DependencyInjection\Configuration
  *
  * @uses \Symfony\Component\Config\Definition\Processor
- *
- * @phpstan-import-type ConfigurationType from Configuration
- * @phpstan-import-type ConfigurationStrategy from Configuration
- * @phpstan-import-type ConfigurationFeature from Configuration
  */
 final class ConfigurationTest extends TestCase
 {
-    /**
-     * @return ConfigurationType
-     */
-    public static function getBundleDefaultConfig(): array
-    {
-        return ['strategies' => [], 'features' => []];
-    }
-
     public function testDefaultConfig()
     {
         $processor = new Processor();
@@ -43,7 +31,7 @@ final class ConfigurationTest extends TestCase
             [],
         );
 
-        self::assertEquals(self::getBundleDefaultConfig(), $config);
+        self::assertEquals(['strategies' => [], 'features' => []], $config);
     }
 
     public static function provideValidStrategyNameConfigurationTest(): \Generator

@@ -14,23 +14,6 @@ namespace Symfony\Bundle\FeatureToggleBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
-/**
- * @phpstan-type ConfigurationType array{
- *   strategies: array<string, ConfigurationStrategy>,
- *   features: array<string, ConfigurationFeature>
- * }
- * @phpstan-type ConfigurationStrategy array{
- *   name: string,
- *   type: string,
- *   with: array<string, mixed>
- * }
- * @phpstan-type ConfigurationFeature array{
- *   name: string,
- *   description: string,
- *   default: bool,
- *   strategy: string,
- * }
- */
 final class Configuration implements ConfigurationInterface
 {
     private const KNOWN_STRATEGY_TYPES = ['grant', 'deny', 'not', 'date', 'env', 'request_header', 'request_query', 'request_attribute', 'priority', 'affirmative', 'unanimous'];
@@ -83,7 +66,6 @@ final class Configuration implements ConfigurationInterface
                         ->validate()
                             ->always()
                             ->then(static function (array $strategy): array {
-                                /** @var ConfigurationStrategy $strategy */
                                 $validator = match ($strategy['type']) {
                                     'date' => static function (array $with): void {
                                         if ('' === trim((string) $with['since'].(string) $with['until'])) {

@@ -24,14 +24,10 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Routing\Router;
 use Twig\Environment;
 
-/**
- * @phpstan-import-type ConfigurationType from Configuration
- */
 final class FeatureToggleExtension extends Extension
 {
     public function load(array $configs, ContainerBuilder $container): void
     {
-        /** @var ConfigurationType $config */
         $config = $this->processConfiguration(new Configuration(), $configs);
 
         $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));

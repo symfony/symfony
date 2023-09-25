@@ -16,13 +16,4 @@ enum StrategyResult
     case Grant;
     case Deny;
     case Abstain;
-
-    public function isEnabled(bool $fallback): bool
-    {
-        return match($this) {
-            self::Grant => true,
-            self::Deny => false,
-            self::Abstain => $fallback,
-        };
-    }
 }

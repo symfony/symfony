@@ -23,14 +23,9 @@ use Symfony\Component\FeatureToggle\Strategy\StrategyInterface;
  *
  * @uses \Symfony\Component\DependencyInjection\ContainerBuilder
  * @uses \Symfony\Component\DependencyInjection\ParameterBag\ParameterBag
- *
- * @phpstan-import-type ConfigurationType from Configuration
  */
 final class FeatureToggleExtensionTest extends TestCase
 {
-    /**
-     * @return list<ConfigurationType>
-     */
     public function getConfig(): array
     {
         return [

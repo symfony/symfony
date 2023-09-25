@@ -35,6 +35,10 @@ final class Feature
 
     public function isEnabled(): bool
     {
-        return $this->strategy->compute()->isEnabled($this->default);
+        return match($this->strategy->compute()) {
+            StrategyResult::Grant => true,
+            StrategyResult::Deny => false,
+            StrategyResult::Abstain => $this->default,
+        };
     }
 }

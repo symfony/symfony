@@ -11,11 +11,11 @@
 
 namespace Symfony\Bundle\FeatureToggleBundle\DependencyInjection\CompilerPass;
 
+use Symfony\Bundle\FeatureToggleBundle\Debug\TraceableFeatureChecker;
+use Symfony\Bundle\FeatureToggleBundle\Debug\TraceableStrategy;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\FeatureToggle\Debug\TraceableFeatureChecker;
-use Symfony\Component\FeatureToggle\Debug\TraceableStrategy;
 
 final class DebugPass implements CompilerPassInterface
 {

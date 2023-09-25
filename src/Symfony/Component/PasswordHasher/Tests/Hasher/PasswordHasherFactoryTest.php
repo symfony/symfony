@@ -216,29 +216,6 @@ class PasswordHasherFactoryTest extends TestCase
         $this->assertTrue($hasher->verify($digest->hash('foo', null), 'foo', null));
         $this->assertStringStartsWith(\SODIUM_CRYPTO_PWHASH_STRPREFIX, $hasher->hash('foo', null));
     }
-
-    /**
-     * @group legacy
-     */
-    public function testMigrateFromLegacy()
-    {
-        if (!SodiumPasswordHasher::isSupported()) {
-            $this->markTestSkipped('Sodium is not available');
-        }
-
-        $factory = new PasswordHasherFactory([
-            'plaintext_encoder' => $plaintext = new PlaintextPasswordEncoder(),
-            SomeUser::class => ['algorithm' => 'sodium', 'migrate_from' => ['bcrypt', 'plaintext_encoder']],
-        ]);
-
-        $hasher = $factory->getPasswordHasher(SomeUser::class);
-        $this->assertInstanceOf(MigratingPasswordHasher::class, $hasher);
-
-        $this->assertTrue($hasher->verify((new SodiumPasswordHasher())->hash('foo', null), 'foo', null));
-        $this->assertTrue($hasher->verify((new NativePasswordHasher(null, null, null, \PASSWORD_BCRYPT))->hash('foo', null), 'foo', null));
-        $this->assertTrue($hasher->verify($plaintext->encodePassword('foo', null), 'foo', null));
-        $this->assertStringStartsWith(\SODIUM_CRYPTO_PWHASH_STRPREFIX, $hasher->hash('foo', null));
-    }
 }
 
 class SomeUser implements PasswordAuthenticatedUserInterface

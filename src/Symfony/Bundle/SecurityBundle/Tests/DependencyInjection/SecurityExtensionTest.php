@@ -892,7 +892,6 @@ class SecurityExtensionTest extends TestCase
         $container = $this->getRawContainer();
 
         $container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
             'password_hashers' => [
                 'legacy' => 'md5',
                 'App\User' => [

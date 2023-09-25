@@ -721,7 +721,10 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     {
         // a custom hasher service
         if (isset($config['id'])) {
-            return new Reference($config['id']);
+            return $config['migrate_from'] ?? false ? [
+                'instance' => new Reference($config['id']),
+                'migrate_from' => $config['migrate_from'],
+            ] : new Reference($config['id']);
         }
 
         if ($config['migrate_from'] ?? false) {

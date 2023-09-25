@@ -168,11 +168,11 @@ EOF
         foreach ($propertyMetadata as $metadata) {
             $autoMapingStrategy = 'Not supported';
             if ($metadata instanceof GenericMetadata) {
-                switch ($metadata->getAutoMappingStrategy()) {
-                    case AutoMappingStrategy::ENABLED: $autoMapingStrategy = 'Enabled'; break;
-                    case AutoMappingStrategy::DISABLED: $autoMapingStrategy = 'Disabled'; break;
-                    case AutoMappingStrategy::NONE: $autoMapingStrategy = 'None'; break;
-                }
+                $autoMapingStrategy = match ($metadata->getAutoMappingStrategy()) {
+                    AutoMappingStrategy::ENABLED => 'Enabled',
+                    AutoMappingStrategy::DISABLED => 'Disabled',
+                    AutoMappingStrategy::NONE => 'None',
+                };
             }
             $traversalStrategy = 'None';
             if (TraversalStrategy::TRAVERSE === $metadata->getTraversalStrategy()) {

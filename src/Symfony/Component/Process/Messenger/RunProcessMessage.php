@@ -27,6 +27,6 @@ class RunProcessMessage implements \Stringable
 
     public function __toString(): string
     {
-        return \implode(' ', $this->command);
+        return implode(' ', $this->command);
     }
 }

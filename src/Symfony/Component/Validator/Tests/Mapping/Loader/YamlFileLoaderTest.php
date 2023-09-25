@@ -21,12 +21,12 @@ use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
-use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
-use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\GroupSequenceProviderEntity;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintWithRequiredArgument;
 use Symfony\Component\Validator\Tests\Fixtures\Entity_81;
+use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
+use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\GroupSequenceProviderEntity;
 
 class YamlFileLoaderTest extends TestCase
 {

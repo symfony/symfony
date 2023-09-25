@@ -259,7 +259,7 @@ EOF
         $completionPaths = [];
         foreach ($paths as $key => $values) {
             if (\is_array($values)) {
-                $completionPaths = $completionPaths + self::buildPathsCompletion($values, $prefix.$key.'.');
+                $completionPaths += self::buildPathsCompletion($values, $prefix.$key.'.');
             } else {
                 $completionPaths[$prefix.$key] = null;
             }

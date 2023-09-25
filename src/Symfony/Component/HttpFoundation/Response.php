@@ -372,7 +372,7 @@ class Response
                 $newValues = null === $previousValues ? $values : array_diff($values, $previousValues);
             }
 
-            foreach ($newValues  as $value) {
+            foreach ($newValues as $value) {
                 header($name.': '.$value, $replace, $this->statusCode);
             }
 

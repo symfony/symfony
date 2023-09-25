@@ -27,10 +27,10 @@ interface StreamingEngineInterface
      *
      * The implementation should output the content directly to the client.
      *
+     * @return void
+     *
      * @throws \RuntimeException if the template cannot be rendered
      * @throws \LogicException   if the template cannot be streamed
-     *
-     * @return void
      */
     public function stream(string|TemplateReferenceInterface $name, array $parameters = []);
 }

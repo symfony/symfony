@@ -1,0 +1,37 @@
+{
+    "name": "symfony/mapper",
+    "type": "library",
+    "description": "Object to object mapper",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "psr/container": "^2.0"
+    },
+    "require-dev": {
+        "symfony/property-access": "^6.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Symfony\\Component\\Mapper\\": ""
+        },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "suggest": {
+        "symfony/property-access": "To use getters and setters"
+    }
+}

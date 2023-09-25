@@ -63,6 +63,22 @@
                 <referencedClass name="SensitiveParameter"/>
             </errorLevel>
         </UndefinedAttributeClass>
+        <InvalidArgument>
+          <errorLevel type="suppress">
+              <referencedFunction name="SplObjectStorage::offsetGet"/>
+              <referencedFunction name="SplObjectStorage::offsetSet"/>
+          </errorLevel>
+        </InvalidArgument>
+        <InvalidReturnStatement>
+          <errorLevel type="suppress">
+            <file name="src/Symfony/Component/Mapper/ObjectMapper.php" />
+          </errorLevel>
+        </InvalidReturnStatement>
+        <InvalidReturnType>
+          <errorLevel type="suppress">
+            <file name="src/Symfony/Component/Mapper/ObjectMapper.php" />
+          </errorLevel>
+        </InvalidReturnType>
     </issueHandlers>
 
     <forbiddenFunctions>

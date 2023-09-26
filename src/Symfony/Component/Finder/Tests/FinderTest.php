@@ -482,35 +482,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
         ]), $finder->in(self::toAbsolute('gitignore/git_root/search_root'))->getIterator());
     }
 
-    /**
-     * @runInSeparateProcess
-     */
-    public function testIgnoreVCSIgnoredWithOpenBasedir()
-    {
-        if (\ini_get('open_basedir')) {
-            $this->markTestSkipped('Cannot test when open_basedir is set');
-        }
-
-        $finder = $this->buildFinder();
-        $this->assertSame(
-            $finder,
-            $finder
-                ->ignoreVCS(true)
-                ->ignoreDotFiles(true)
-                ->ignoreVCSIgnored(true)
-        );
-
-        $this->iniSet('open_basedir', \dirname(__DIR__, 5).\PATH_SEPARATOR.self::toAbsolute('gitignore/search_root'));
-
-        $this->assertIterator(self::toAbsolute([
-            'gitignore/search_root/b.txt',
-            'gitignore/search_root/c.txt',
-            'gitignore/search_root/dir',
-            'gitignore/search_root/dir/a.txt',
-            'gitignore/search_root/dir/c.txt',
-        ]), $finder->in(self::toAbsolute('gitignore/search_root'))->getIterator());
-    }
-
     public function testIgnoreVCSCanBeDisabledAfterFirstIteration()
     {
         $finder = $this->buildFinder();
@@ -1056,6 +1027,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             self::$tmpDir.\DIRECTORY_SEPARATOR.'Zephire.php',
             self::$tmpDir.\DIRECTORY_SEPARATOR.'test.php',
             __DIR__.\DIRECTORY_SEPARATOR.'GitignoreTest.php',
+            __DIR__.\DIRECTORY_SEPARATOR.'FinderOpenBasedirTest.php',
             __DIR__.\DIRECTORY_SEPARATOR.'FinderTest.php',
             __DIR__.\DIRECTORY_SEPARATOR.'GlobTest.php',
             self::$tmpDir.\DIRECTORY_SEPARATOR.'qux_0_1.php',
@@ -1623,14 +1595,5 @@ class FinderTest extends Iterator\RealIteratorTestCase
     protected function buildFinder()
     {
         return Finder::create()->exclude('gitignore');
-    }
-
-    protected function iniSet(string $varName, string $newValue): void
-    {
-        if ('open_basedir' === $varName && $deprecationsFile = getenv('SYMFONY_DEPRECATIONS_SERIALIZE')) {
-            $newValue .= \PATH_SEPARATOR.$deprecationsFile;
-        }
-
-        parent::iniSet('open_basedir', $newValue);
     }
 }

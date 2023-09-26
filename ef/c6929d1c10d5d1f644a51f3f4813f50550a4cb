@@ -1,0 +1,336 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2023-08-17T09:20:08Z
+
+> The native `DateTime/Immutable` classes have some legacy that we can get rid of by creating a child class.
+
+Nice. 🙂
+
+> This also opens the possibility to add more methods to this `DateTime` class in the future if we want to.
+
+That's my biggest fear about adding such a class, tbh.
+
+If by "more methods" we mean polyfills for features that will be added in future PHP versions: yes, totally. But please, let's not open this class up for all kinds of utility methods. 🙈
+
+Oh, and please add tests for that new class. 🙏🏻
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-08-17T09:39:19Z
+
+> > This also opens the possibility to add more methods to this `DateTime` class in the future if we want to.
+>
+> That's my biggest fear about adding such a class, tbh.
+>
+> If by "more methods" we mean polyfills for features that will be added in future PHP versions: yes, totally. But please, let's not open this class up for all kinds of utility methods. 🙈
+
+We don't want to create a new [Carbon](https://github.com/briannesbitt/Carbon/blob/master/src/Carbon/Carbon.php) class.
+
+---------------------------------------------------------------------------
+
+by antonkomarev at 2023-08-17T09:52:08Z
+
+Have you looked at the Brick DateTime library? Its API looks very good and has many types for many cases. Much more stricter and more powerful than Carbon.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-08-17T10:18:31Z
+
+> We don't want to create a new [Carbon](https://github.com/briannesbitt/Carbon/blob/master/src/Carbon/Carbon.php) class.
+
+My point exactly.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-08-17T10:37:03Z
+
+PR ready, with tests !
+
+> We don't want to create a new Carbon
+
+Same here, I stroke the line in the PR description. Guarding this is why we have a core-team :)
+
+> Have you looked at the Brick DateTime library
+
+I didn't, but we just ruled such approaches out so :shrug:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-08-18T09:20:50Z
+
+Next steps to consider:
+- doctrine types (https://github.com/doctrine/DoctrineBundle/issues/1696 would be nice to help with that, help wanted)
+- form types
+
+But before, votes pending @symfony/mergers ;)
+
+---------------------------------------------------------------------------
+
+by wouterj at 2023-08-18T13:09:09Z
+
+I think it's not a good idea to name this class similar to one from PHP's stdlib that has different behavior. You'll have to scroll up to the use statements to know if `new DateTime` means the PHP or Symfony one in any project.
+
+The only case where this is desired is our polyfill packages, which provide polyfills for stdlib features. Eventhough all behavior changes in this class are probably the desired behavior for `DateTime` of all PHP internal devs, there is no official agreement/RFC that this is truly the behavior of the next PHP version as far as I know. We should make sure not to pretend to make a polyfill.
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-08-18T13:10:28Z
+
+> I think it's not a good idea to name this class similar to one from PHP's stdlib that has different behavior.
+
+`Timestamp`?
+
+---------------------------------------------------------------------------
+
+by Kocal at 2023-08-18T16:39:35Z
+
+To me, PHP should have only offered a `DateTime` class (no `DateTimeImmutable`) which would be immutable, and I understand that you want to improve things.
+
+But I don't think this is the job of a framework / component to do that, as the class name is identical but for a totally different and breaking behavior. Sure you explicity import it, but people will need to check twice if this `DateTime` is imported from the Symfony Clock or is the one from PHP core.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-08-21T10:11:11Z
+
+`DateTime` has my preference. It's how it should have been from the beginning. Unless they go with a very very bad BC break, PHP can't fix this. The ship has sailed on the topic :shrug: .
+
+Figuring out the namespace requires a basic IDE and hovering the symbol, no need to scroll up. For ppl that don't use `use` for root-namespaced classes (following Symfony's recommended CS), there's nothing to do.
+
+> there is no official agreement/RFC that this is truly the behavior of the next PHP version
+
+I'm not sure to get what you mean here. The proposed class is not a polyfill. It's a stricter DateTime. We don't need any agreement from php-core to be future proof, thanks to LSP.
+
+Still, if we want another name, I'd propose `Now`.
+This came to my mind when I realized that the implementation of the `now($modifier)` helper can be reduced to the following (if you look at the attached patch, the implementation has a few more lines, but that's just for optimizing performance.):
+
+```php
+function now(string $modifier = 'now')
+{
+    return new Now($modifier);
+}
+```
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-08-21T12:36:34Z
+
+Not a fan of `Now`:
+
+```php
+public function getLastUpdated(): Now
+```
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-08-21T12:56:20Z
+
+`ClockDateTime` would be descriptive. Even if that repeats the `Symfony\Component\Clock` namespace.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-08-21T13:52:49Z
+
+`BetterDateTime`? because why not :sweat_smile:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-08-21T13:57:42Z
+
+DateMark
+DatePoint
+DateTick
+?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2023-08-21T15:36:26Z
+
+To be honest, since typing my previous message I'm a bit on the fence on whether we should want this feature at all. I don't feel comfortable with a framework that "fixes"/"patches" the standard library.
+In my eye, Symfony has always provided low and high level APIs *on top of* the standard library. This is strong: you're not writing some custom language based on PHP, you're just writing PHP. I like how we as Symfony developers aren't "writing Symfony" like everyone used to say in the jQuery days, but most people in the community are aware that they are writing PHP.
+
+Of course, this is only one class, hence I'm not 100% against it, but if we accept this, would we also accept e.g. adding new namespaced functions that introduce strict error handling to stdlib functions that currently return false on error? (i.e. https://github.com/azjezz/psl) And if we don't (I hope we don't!), why would we accept this?
+
+---
+
+This is a language issue that should be solved on language level imho. Create a new date time object (you can directly properly namespace it) and make it behave like it should with our current experience. In a major version or two, deprecate the current date time objects and we're done. PHP has managed much bigger API BC breaks like this (e.g. `mysql_*` to MySQLi/PDO).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-08-21T16:34:44Z
+
+The core motivation for adding this class on my side is to be able to create date-time instances that leverage the global static clock. Aka to make `new DateTime` mockable. That's a unique feature that can't be provided by any future PHP version. The rest is a nice bonus to me and I'd agree with you if strictness was the only argument.
+
+One could say that the `now()` helper is enough, but it can't be used as a default argument value. Adding the class would:
+```php
+function foo(DateTime $date = new DateTime) {...}
+```
+
+---------------------------------------------------------------------------
+
+by wouterj at 2023-09-03T16:07:01Z
+
+Thanks for the explanation. While using Cronos, I haven't found the need to `new DateTime` as a default value, but I can see the added value of it for the Clock component. Now, your `Now` name suggestion also makes lots of sense :)
+
+I'm now learning towards reducing this class to exactly this use-case: being the `now()` equivalent for cases where you need a constant expression, without all the "API improvements". Something along the lines of this:
+
+```php
+class Now extends \DateTimeImmutable
+{
+    public function __construct()
+    {
+        $now = Clock::get()->now();
+
+        parent::__construct($now->format('c'), $now->getTimezone());
+    }
+}
+```
+
+This does not broaden the scope of the Clock component and keeps us far away from inventing our own language :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-09-12T12:17:08Z
+
+I've renamed the class to `Moment`, so that we can keep the constructor argument and make it possible to use this class to build not only "now". Keeping only `Now` without constructor arguments still allows doing `$now->modify($foo)`. The limitation is thus going to be mostly annoying without much benefits.
+
+I think the extra bits are also desired: polyfilling the exceptions from 8.3 and making return types stricters. We're not inventing our language here. Instead, we're providing a consistent behavior across versions of PHP. Something PHP itself cannot do without a time travel machine or bad BC breaks.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-09-12T12:37:30Z
+
+I like the `Moment` wording 😍
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2023-09-12T12:43:32Z
+
+I'm not a big fan of the `Moment` name. The dictionary description is _"moment = a very short period of time"_, so this can be confusing.
+
+You may know it but: JavaScript has the same problem as PHP with a badly-designed Date object ... so they are introducing `Temporal` as its replacement. See https://tc39.es/proposal-temporal/docs/
+
+---------------------------------------------------------------------------
+
+by stof at 2023-09-12T12:47:06Z
+
+@javiereguiluz as the class still has to extend DateTimeImmutable (to work with the clock interface), I don't think Temporal can be used as inpiration here.
+
+However, if someone is motivated, this Temporal API of EcmaScript could become the inspiration for a PHP RFC...
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-09-12T13:00:29Z
+
+It is also a point in time:
+<img width="667" alt="CleanShot 2023-09-12 at 15 00 02@2x" src="https://github.com/symfony/symfony/assets/995707/0a96482b-792b-469e-913c-bd5c86be1b92">
+
+---------------------------------------------------------------------------
+
+by stof at 2023-09-12T13:25:39Z
+
+For that matter, the Temporal proposal of Javascript uses `Instant` as the class name for the object representing an exact time (but note that DateTimeImmutable is not really the equivalent of that object)
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-09-12T13:29:18Z
+
+I still prefer `Timestamp` but `Moment` works too.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-09-12T14:07:18Z
+
+~Let's go with `Instant` then? PHP cannot be exactly like JS anyway :)~
+For `Timestamp`, I usually use this noun for UNIX timestamps. I guess that's because I'm not a native speaker.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-09-13T08:22:24Z
+
+~PR updated to use the word `Instant`. Votes pending :)~
+
+---------------------------------------------------------------------------
+
+by aaa2000 at 2023-09-13T08:49:09Z
+
+Maybe `DatePoint` https://period.thephpleague.com/5.0/datepoint/
+
+---------------------------------------------------------------------------
+
+by remi-vasco at 2023-09-13T09:38:14Z
+
+My 2 cents: Instant indicate clearly the notion of time. DatePoint, DateMark, ... make me imagine that I am working with a date object (which is not existing AFAIK), not a date time.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-09-13T09:39:55Z
+
+I also prefer `DatePoint` or `Timepoint` (`PointInTime`)
+
+---------------------------------------------------------------------------
+
+by bendavies at 2023-09-13T09:51:01Z
+
+regarding the naming of things, [brick/date-time](https://github.com/brick/date-time) contains an `Instant` class, and many others - `brick/date-time` broadly follows [JSR 310](https://jcp.org/aboutJava/communityprocess/pfd/jsr310/JSR-310-guide.html).
+
+`Instant` may be a poor name as in brick/jsr 310 it is defined a `A single instantaneous point on the time line.` - i.e. it is not zoned, unlike `ZonedDateTime`.
+
+---------------------------------------------------------------------------
+
+by craigh at 2023-09-13T12:24:03Z
+
+`ImmutableDateTime extends \DateTimeImmutable`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-09-13T13:59:38Z
+
+Naming things :facepalm:
+
+`DatePoint` would work for me. `Moment` also. ~I've reverted to `Moment`~ as I think @OskarStark's answer to @javiereguiluz's makes sense.
+
+> Instant may be a poor name as in brick/jsr 310 it is defined a A single instantaneous point on the time line. - i.e. it is not zoned, unlike ZonedDateTime.
+
+same in JS, that's two implementations that use the word for the same thing - not zoned. That's a good argument against `Instant`.
+
+> ImmutableDateTime extends \DateTimeImmutable
+
+Hell no, "immutable" is just a noisy artifact from the past
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-09-13T17:12:37Z
+
+I love `Timepoint`  <3
+
+I like DatePoint too, but TimePoint has the big advantage to separate the "nature"/"essence" of the object from its representation.
+
+If someone works with "planet lifespans" perdiods ... Using TimePoint feels more abstract and universal.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-09-14T08:30:30Z
+
+~I like it too! PR updated, `TimePoint` FTW!~
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-09-22T10:59:36Z
+
+`TimePoint` is fine for me. I prefer `DatePoint` as "Date" makes a closer association with `DateTime` than the word "Time".
+
+But we can also call it `RyansDate` - that's probably my favorite 😇
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-09-26T15:59:41Z
+
+Updated to `DatePoint` 🤘
+
+I like that typing `Date` when using autocompletion might help discover the new class.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-09-26T16:06:02Z
+
+That makes sense 👍🏻😃

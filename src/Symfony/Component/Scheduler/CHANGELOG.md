@@ -11,7 +11,7 @@ CHANGELOG
  * Add `AbstractTriggerDecorator`
  * Make `ScheduledStamp` "send-able"
  * Add `ScheduledStamp` to `RedispatchMessage`
- * Allow modifying the Schedule at runtime
+ * Allow modifying Schedule instances at runtime
 
 6.3
 ---

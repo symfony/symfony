@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by kbond at 2023-09-07T15:08:45Z
+
+Interesting, is this a companion PR for #51542?
+
+---------------------------------------------------------------------------
+
+by Jeroeny at 2023-09-07T16:05:01Z
+
+@kbond they don't depend on each other. But when both of them are merged, it enables a lot of capabilities for the Scheduler.

@@ -33,7 +33,8 @@ use Symfony\Component\Mime\RawMessage;
  */
 class SendmailTransport extends AbstractTransport
 {
-    private string $command = '/usr/sbin/sendmail -bs';
+    private const SENDMAIL_FHS_PATH = '/usr/sbin/sendmail -bs';
+    private string $command;
     private ProcessStream $stream;
     private ?SmtpTransport $transport = null;
 
@@ -59,6 +60,8 @@ class SendmailTransport extends AbstractTransport
             }
 
             $this->command = $command;
+        } else {
+            $this->command = \ini_get('sendmail_path') ?: self::SENDMAIL_FHS_PATH;
         }
 
         $this->stream = new ProcessStream();

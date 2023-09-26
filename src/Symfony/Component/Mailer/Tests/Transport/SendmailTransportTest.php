@@ -38,13 +38,24 @@ class SendmailTransportTest extends TestCase
 
     public function testToString()
     {
+        $previousSendmailPath = \ini_set('sendmail_path', '');
         $t = new SendmailTransport();
         $this->assertEquals('smtp://sendmail', (string) $t);
     }
 
     public function testToStringNonSmtp()
     {
+        $previousSendmailPath = \ini_set('sendmail_path', '');
         $t = new SendmailTransport('/usr/sbin/sendmail -t -i');
+        \ini_set('sendmail_path', $previousSendmailPath);
+        $this->assertEquals('sendmail://default', (string) $t);
+    }
+
+    public function testToStringPhpConfig()
+    {
+        $previousSendmailPath = \ini_set('sendmail_path', '/usr/sbin/sendmail -t -i');
+        $t = new SendmailTransport();
+        \ini_set('sendmail_path', $previousSendmailPath);
         $this->assertEquals('sendmail://default', (string) $t);
     }
 

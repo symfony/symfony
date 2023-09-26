@@ -8,6 +8,7 @@ CHANGELOG
  * Add `HandlerDescriptor::getOptions`
  * Add support for multiple Redis Sentinel hosts
  * Add `--all` option to the `messenger:failed:remove` command
+ * `RejectRedeliveredMessageException` implements `UnrecoverableExceptionInterface` in order to not be retried
 
 6.3
 ---

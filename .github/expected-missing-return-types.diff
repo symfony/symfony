@@ -1512,6 +1512,16 @@ diff --git a/src/Symfony/Component/Cache/Traits/FilesystemCommonTrait.php b/src/
 +    public function __wakeup(): void
      {
          throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
+diff --git a/src/Symfony/Component/Clock/ClockAwareTrait.php b/src/Symfony/Component/Clock/ClockAwareTrait.php
+--- a/src/Symfony/Component/Clock/ClockAwareTrait.php
++++ b/src/Symfony/Component/Clock/ClockAwareTrait.php
+@@ -33,5 +33,5 @@ trait ClockAwareTrait
+      * @return DatePoint
+      */
+-    protected function now(): \DateTimeImmutable
++    protected function now(): DatePoint
+     {
+         $now = ($this->clock ??= new Clock())->now();
 diff --git a/src/Symfony/Component/Config/ConfigCacheInterface.php b/src/Symfony/Component/Config/ConfigCacheInterface.php
 --- a/src/Symfony/Component/Config/ConfigCacheInterface.php
 +++ b/src/Symfony/Component/Config/ConfigCacheInterface.php

@@ -83,7 +83,7 @@ class SendmailTransport extends AbstractTransport
             return (string) $this->transport;
         }
 
-        return 'smtp://sendmail';
+        return 'sendmail://default';
     }
 
     protected function doSend(SentMessage $message): void

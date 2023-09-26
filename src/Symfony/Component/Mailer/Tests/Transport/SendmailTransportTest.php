@@ -42,6 +42,12 @@ class SendmailTransportTest extends TestCase
         $this->assertEquals('smtp://sendmail', (string) $t);
     }
 
+    public function testToStringNonSmtp()
+    {
+        $t = new SendmailTransport('/usr/sbin/sendmail -t -i');
+        $this->assertEquals('sendmail://default', (string) $t);
+    }
+
     public function testToIsUsedWhenRecipientsAreNotSet()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {

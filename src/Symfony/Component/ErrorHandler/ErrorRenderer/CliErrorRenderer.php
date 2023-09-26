@@ -62,7 +62,7 @@ class CliErrorRenderer implements ErrorRendererInterface
         $exceptionPathInformation = $this->textGray($this->makePathRelative($exceptionFilePath)).$this->textBrightWhite(sprintf('%s:%d', $exceptionFileName, $exceptionLineNumber))."\n";
         $content .= $this->textGray('at ').$this->renderAsLink($exceptionPathInformation, $exception->getFile(), $exceptionLineNumber);
 
-        $sourceCode = file($exception->getFile());
+        $sourceCode = file_exists($exception->getFile()) ? file($exception->getFile()) : false;
         if (false === $sourceCode) {
             return $content."\n";
         }

@@ -398,6 +398,7 @@ class Connection
                 $this->group,
                 $this->consumer,
                 [$this->stream => $messageId],
+                1,
                 1
             );
         } catch (\RedisException|\Relay\Exception $e) {

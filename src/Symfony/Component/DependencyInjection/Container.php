@@ -373,13 +373,9 @@ class Container implements ContainerInterface, ResetInterface
             $localName = $name;
         }
 
-        if ($processors->has($prefix)) {
-            $processor = $processors->get($prefix);
-        } else {
-            $processor = new EnvVarProcessor($this);
-            if (false === $i) {
-                $prefix = '';
-            }
+        $processor = $processors->has($prefix) ? $processors->get($prefix) : new EnvVarProcessor($this);
+        if (false === $i) {
+            $prefix = '';
         }
 
         $this->resolving[$envName] = true;

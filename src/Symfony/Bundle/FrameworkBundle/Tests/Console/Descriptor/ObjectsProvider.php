@@ -169,6 +169,7 @@ class ObjectsProvider
                 ->addTag('tag1', ['attr1' => 'val1', 'attr2' => 'val2'])
                 ->addTag('tag1', ['attr3' => 'val3'])
                 ->addTag('tag2')
+                ->addTag('tag3', ['array_attr' => ['foo', 'bar', [[[['ccc']]]]]])
                 ->addMethodCall('setMailer', [new Reference('mailer')])
                 ->setFactory([new Reference('factory.service'), 'get']),
             '.definition_3' => $definition3

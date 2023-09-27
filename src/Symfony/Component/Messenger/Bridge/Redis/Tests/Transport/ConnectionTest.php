@@ -118,7 +118,7 @@ class ConnectionTest extends TestCase
         $redis = $this->createMock(\Redis::class);
 
         $redis->expects($this->exactly(3))->method('xreadgroup')
-            ->with('symfony', 'consumer', ['queue' => 0], 1, null)
+            ->with('symfony', 'consumer', ['queue' => 0], 1, 1)
             ->willReturn(['queue' => [['message' => json_encode(['body' => 'Test', 'headers' => []])]]]);
 
         $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
@@ -212,7 +212,7 @@ class ConnectionTest extends TestCase
         $redis = $this->createMock(\Redis::class);
 
         $redis->expects($this->exactly(1))->method('xreadgroup')
-            ->with('symfony', 'consumer', ['queue' => '0'], 1, null)
+            ->with('symfony', 'consumer', ['queue' => '0'], 1, 1)
             ->willReturn(['queue' => [['message' => '{"body":"1","headers":[]}']]]);
 
         $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
@@ -237,11 +237,11 @@ class ConnectionTest extends TestCase
             ->willReturnCallback(function (...$args) {
                 static $series = [
                     // first call for pending messages
-                    [['symfony', 'consumer', ['queue' => '0'], 1, null], []],
+                    [['symfony', 'consumer', ['queue' => '0'], 1, 1], []],
                     // second call because of claimed message (redisid-123)
-                    [['symfony', 'consumer', ['queue' => '0'], 1, null], []],
+                    [['symfony', 'consumer', ['queue' => '0'], 1, 1], []],
                     // third call because of no result (other consumer claimed message redisid-123)
-                    [['symfony', 'consumer', ['queue' => '>'], 1, null], []],
+                    [['symfony', 'consumer', ['queue' => '>'], 1, 1], []],
                 ];
 
                 [$expectedArgs, $return] = array_shift($series);
@@ -273,9 +273,9 @@ class ConnectionTest extends TestCase
             ->willReturnCallback(function (...$args) {
                 static $series = [
                     // first call for pending messages
-                    [['symfony', 'consumer', ['queue' => '0'], 1, null], []],
+                    [['symfony', 'consumer', ['queue' => '0'], 1, 1], []],
                     // second call because of claimed message (redisid-123)
-                    [['symfony', 'consumer', ['queue' => '0'], 1, null], ['queue' => [['message' => '{"body":"1","headers":[]}']]]],
+                    [['symfony', 'consumer', ['queue' => '0'], 1, 1], ['queue' => [['message' => '{"body":"1","headers":[]}']]]],
                 ];
 
                 [$expectedArgs, $return] = array_shift($series);

@@ -103,6 +103,31 @@ class PhpFileLoaderTest extends TestCase
         $this->assertSame('html', $defaultsRoute->getDefault('_format'));
     }
 
+    public function testLoadingRouteWithCollectionDefaults()
+    {
+        $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
+        $routes = $loader->load('collection-defaults.php');
+
+        $this->assertCount(2, $routes);
+
+        $defaultsRoute = $routes->get('defaultsA');
+        $this->assertSame(['GET'], $defaultsRoute->getMethods());
+        $this->assertArrayHasKey('attribute', $defaultsRoute->getDefaults());
+        $this->assertTrue($defaultsRoute->getDefault('_stateless'));
+        $this->assertSame('/defaultsA', $defaultsRoute->getPath());
+        $this->assertSame('en', $defaultsRoute->getDefault('_locale'));
+        $this->assertSame('html', $defaultsRoute->getDefault('_format'));
+
+        // The second route has a specific method and is not stateless, overwriting the collection settings
+        $defaultsRoute = $routes->get('defaultsB');
+        $this->assertSame(['POST'], $defaultsRoute->getMethods());
+        $this->assertArrayHasKey('attribute', $defaultsRoute->getDefaults());
+        $this->assertFalse($defaultsRoute->getDefault('_stateless'));
+        $this->assertSame('/defaultsB', $defaultsRoute->getPath());
+        $this->assertSame('en', $defaultsRoute->getDefault('_locale'));
+        $this->assertSame('html', $defaultsRoute->getDefault('_format'));
+    }
+
     public function testLoadingImportedRoutesWithDefaults()
     {
         $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures']));

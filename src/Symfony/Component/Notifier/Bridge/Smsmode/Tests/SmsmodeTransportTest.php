@@ -80,6 +80,27 @@ final class SmsmodeTransportTest extends TransportTestCase
         self::assertSame('foo', $sentMessage->getMessageId());
     }
 
+    public function testHttpClientHasMandatoryHeaderAccept()
+    {
+        $message = new SmsMessage('+33612345678', 'Hello!');
+
+        $response = $this->createMock(ResponseInterface::class);
+        $response->expects(self::exactly(2))->method('getStatusCode')->willReturn(201);
+        $response->expects(self::once())->method('getContent')->willReturn(json_encode(['messageId' => 'foo']));
+
+        $transport = $this->createTransport(new MockHttpClient(function (string $method, string $url, array $options) use ($response): ResponseInterface {
+            $this->assertSame('POST', $method);
+            $this->assertSame('https://rest.smsmode.com/sms/v1/messages', $url);
+            $this->assertSame('Accept: application/json', $options['normalized_headers']['accept'][0]);
+
+            return $response;
+        }), 'foo');
+
+        $result = $transport->send($message);
+
+        $this->assertSame('foo', $result->getMessageId());
+    }
+
     public static function toStringProvider(): iterable
     {
         yield ['smsmode://rest.smsmode.com?from=test_from', self::createTransport()];

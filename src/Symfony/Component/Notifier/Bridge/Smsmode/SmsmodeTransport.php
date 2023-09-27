@@ -69,7 +69,10 @@ final class SmsmodeTransport extends AbstractTransport
         }
 
         $response = $this->client->request('POST', $endpoint, [
-            'headers' => ['X-Api-Key' => $this->apiKey],
+            'headers' => [
+                'X-Api-Key' => $this->apiKey,
+                'Accept' => 'application/json',
+            ],
             'json' => array_filter($options),
         ]);
 

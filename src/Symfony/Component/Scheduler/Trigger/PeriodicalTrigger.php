@@ -24,7 +24,7 @@ class PeriodicalTrigger implements StatefulTriggerInterface
 
     public function __construct(
         string|int|float|\DateInterval $interval,
-        string|\DateTimeImmutable|null $from = null,
+        string|\DateTimeImmutable $from = null,
         string|\DateTimeImmutable $until = new \DateTimeImmutable('3000-01-01'),
     ) {
         $this->from = \is_string($from) ? new \DateTimeImmutable($from) : $from;

@@ -12,18 +12,21 @@
 namespace Symfony\Component\Scheduler;
 
 use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
+use Symfony\Component\Scheduler\Generator\MessageContext;
 use Symfony\Component\Scheduler\Trigger\CronExpressionTrigger;
 use Symfony\Component\Scheduler\Trigger\JitterTrigger;
+use Symfony\Component\Scheduler\Trigger\MessageProviderInterface;
 use Symfony\Component\Scheduler\Trigger\PeriodicalTrigger;
+use Symfony\Component\Scheduler\Trigger\StaticMessageProvider;
 use Symfony\Component\Scheduler\Trigger\TriggerInterface;
 
-final class RecurringMessage
+final class RecurringMessage implements MessageProviderInterface
 {
     private string $id;
 
     private function __construct(
         private readonly TriggerInterface $trigger,
-        private readonly object $message,
+        private readonly MessageProviderInterface $provider,
     ) {
     }
 
@@ -37,35 +40,53 @@ final class RecurringMessage
      *  * A relative date format as supported by \DateInterval;
      *  * A \DateInterval instance.
      *
+     * @param MessageProviderInterface|object $message A message provider that yields messages or a static message that will be dispatched on every trigger
+     *
      * @see https://en.wikipedia.org/wiki/ISO_8601#Durations
      * @see https://php.net/datetime.formats.relative
      */
-    public static function every(string|int|\DateInterval $frequency, object $message, string|\DateTimeImmutable|null $from = null, string|\DateTimeImmutable $until = new \DateTimeImmutable('3000-01-01')): self
+    public static function every(string|int|\DateInterval $frequency, object $message, string|\DateTimeImmutable $from = null, string|\DateTimeImmutable $until = new \DateTimeImmutable('3000-01-01')): self
     {
-        return new self(new PeriodicalTrigger($frequency, $from, $until), $message);
+        return self::trigger(new PeriodicalTrigger($frequency, $from, $until), $message);
     }
 
+    /**
+     * @param MessageProviderInterface|object $message A message provider that yields messages or a static message that will be dispatched on every trigger
+     */
     public static function cron(string $expression, object $message, \DateTimeZone|string $timezone = null): self
     {
         if (!str_contains($expression, '#')) {
-            return new self(CronExpressionTrigger::fromSpec($expression, null, $timezone), $message);
+            return self::trigger(CronExpressionTrigger::fromSpec($expression, null, $timezone), $message);
         }
 
         if (!$message instanceof \Stringable) {
             throw new InvalidArgumentException('A message must be stringable to use "hashed" cron expressions.');
         }
 
-        return new self(CronExpressionTrigger::fromSpec($expression, (string) $message, $timezone), $message);
+        return self::trigger(CronExpressionTrigger::fromSpec($expression, (string) $message, $timezone), $message);
     }
 
+    /**
+     * @param MessageProviderInterface|object $message A message provider that yields messages or a static message that will be dispatched on every trigger
+     */
     public static function trigger(TriggerInterface $trigger, object $message): self
     {
-        return new self($trigger, $message);
+        if ($message instanceof MessageProviderInterface) {
+            return new self($trigger, $message);
+        }
+
+        try {
+            $description = $message instanceof \Stringable ? (string) $message : serialize($message);
+        } catch (\Exception) {
+            $description = $message::class;
+        }
+
+        return new self($trigger, new StaticMessageProvider([$message], $description));
     }
 
     public function withJitter(int $maxSeconds = 60): self
     {
-        return new self(new JitterTrigger($this->trigger, $maxSeconds), $this->message);
+        return new self(new JitterTrigger($this->trigger, $maxSeconds), $this->provider);
     }
 
     /**
@@ -77,23 +98,22 @@ final class RecurringMessage
             return $this->id;
         }
 
-        try {
-            $message = $this->message instanceof \Stringable ? (string) $this->message : serialize($this->message);
-        } catch (\Exception) {
-            $message = '';
-        }
-
         return $this->id = hash('crc32c', implode('', [
-            $this->message::class,
-            $message,
+            $this->provider::class,
+            $this->provider->getId(),
             $this->trigger::class,
             (string) $this->trigger,
         ]));
     }
 
-    public function getMessage(): object
+    public function getMessages(MessageContext $context): iterable
     {
-        return $this->message;
+        return $this->provider->getMessages($context);
+    }
+
+    public function getProvider(): MessageProviderInterface
+    {
+        return $this->provider;
     }
 
     public function getTrigger(): TriggerInterface

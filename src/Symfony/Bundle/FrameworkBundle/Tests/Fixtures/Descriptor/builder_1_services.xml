@@ -15,6 +15,9 @@
         <parameter name="attr3">val3</parameter>
       </tag>
       <tag name="tag2"/>
+      <tag name="tag3">
+        <parameter name="array_attr">["foo","bar",[[[["ccc"]]]]]</parameter>
+      </tag>
     </tags>
   </definition>
   <definition id=".definition_3" class="Full\Qualified\Class3" public="false" synthetic="false" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" deprecated="false" file="/path/to/file">

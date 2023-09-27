@@ -84,26 +84,45 @@ class Connection
             throw new InvalidArgumentException('Redis Sentinel support requires ext-redis>=5.2, or ext-relay.');
         }
 
-        if (null !== $sentinelMaster && ($redis instanceof \RedisCluster || \is_array($host))) {
+        if (null !== $sentinelMaster && $redis instanceof \RedisCluster) {
             throw new InvalidArgumentException('Cannot configure Redis Sentinel and Redis Cluster instance at the same time.');
         }
 
-        if (\is_array($host) || $redis instanceof \RedisCluster) {
+        if ((\is_array($host) && null === $sentinelMaster) || $redis instanceof \RedisCluster) {
             $hosts = \is_string($host) ? [$host.':'.$port] : $host; // Always ensure we have an array
             $this->redis = static fn () => self::initializeRedisCluster($redis, $hosts, $auth, $options);
         } else {
-            if (null !== $sentinelMaster) {
-                $sentinelClass = \extension_loaded('redis') ? \RedisSentinel::class : Sentinel::class;
-                $sentinelClient = new $sentinelClass($host, $port, $options['timeout'], $options['persistent_id'], $options['retry_interval'], $options['read_timeout']);
+            $this->redis = static function () use ($redis, $sentinelMaster, $host, $port, $options, $auth) {
+                if (null !== $sentinelMaster) {
+                    $sentinelClass = \extension_loaded('redis') ? \RedisSentinel::class : Sentinel::class;
+                    $hostIndex = 0;
+                    $hosts = \is_array($host) ? $host : [['scheme' => 'tcp', 'host' => $host, 'port' => $port]];
+                    do {
+                        $host = $hosts[$hostIndex]['host'];
+                        $port = $hosts[$hostIndex]['port'] ?? 0;
+                        $tls = 'tls' === $hosts[$hostIndex]['scheme'];
+                        $address = false;
 
-                if (!$address = $sentinelClient->getMasterAddrByName($sentinelMaster)) {
-                    throw new InvalidArgumentException(sprintf('Failed to retrieve master information from master name "%s" and address "%s:%d".', $sentinelMaster, $host, $port));
+                        if (isset($hosts[$hostIndex]['host']) && $tls) {
+                            $host = 'tls://'.$host;
+                        }
+
+                        try {
+                            $sentinel = new $sentinelClass($host, $port, $options['timeout'], $options['persistent_id'], $options['retry_interval'], $options['read_timeout']);
+                            if ($address = $sentinel->getMasterAddrByName($sentinelMaster)) {
+                                [$host, $port] = $address;
+                            }
+                        } catch (\RedisException|\Relay\Exception $redisException) {
+                        }
+                    } while (++$hostIndex < \count($hosts) && !$address);
+
+                    if (!$address) {
+                        throw new InvalidArgumentException(sprintf('Failed to retrieve master information from sentinel "%s".', $sentinelMaster), previous: $redisException ?? null);
+                    }
                 }
 
-                [$host, $port] = $address;
-            }
-
-            $this->redis = static fn () => self::initializeRedis($redis ?? (\extension_loaded('redis') ? new \Redis() : new Relay()), $host, $port, $auth, $options);
+                return self::initializeRedis($redis ?? (\extension_loaded('redis') ? new \Redis() : new Relay()), $host, $port, $auth, $options);
+            };
         }
 
         if (!$options['lazy']) {
@@ -206,6 +225,32 @@ class Connection
         $pass = '' !== ($parsedUrl['pass'] ?? '') ? urldecode($parsedUrl['pass']) : null;
         $user = '' !== ($parsedUrl['user'] ?? '') ? urldecode($parsedUrl['user']) : null;
         $options['auth'] ??= null !== $pass && null !== $user ? [$user, $pass] : ($pass ?? $user);
+
+        if (isset($parsedUrl['query'])) {
+            parse_str($parsedUrl['query'], $query);
+
+            if (isset($query['host'])) {
+                $tls = 'rediss' === $parsedUrl['scheme'];
+                $tcpScheme = $tls ? 'tls' : 'tcp';
+
+                if (!\is_array($hosts = $query['host'])) {
+                    throw new InvalidArgumentException(sprintf('Invalid Redis DSN: "%s".', $dsn));
+                }
+                foreach ($hosts as $host => $parameters) {
+                    if (\is_string($parameters)) {
+                        parse_str($parameters, $parameters);
+                    }
+                    if (false === $i = strrpos($host, ':')) {
+                        $hosts[$host] = ['scheme' => $tcpScheme, 'host' => $host, 'port' => 6379] + $parameters;
+                    } elseif ($port = (int) substr($host, 1 + $i)) {
+                        $hosts[$host] = ['scheme' => $tcpScheme, 'host' => substr($host, 0, $i), 'port' => $port] + $parameters;
+                    } else {
+                        $hosts[$host] = ['scheme' => 'unix', 'host' => substr($host, 0, $i)] + $parameters;
+                    }
+                }
+                $parsedUrl['host'] = array_values($hosts);
+            }
+        }
 
         if (isset($parsedUrl['host'])) {
             $options['host'] = $parsedUrl['host'] ?? $options['host'];
@@ -353,6 +398,7 @@ class Connection
                 $this->group,
                 $this->consumer,
                 [$this->stream => $messageId],
+                1,
                 1
             );
         } catch (\RedisException|\Relay\Exception $e) {

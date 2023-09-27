@@ -13,7 +13,6 @@ namespace Symfony\Component\Lock;
 
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
-use Psr\Log\NullLogger;
 
 /**
  * Factory provides method to create locks.

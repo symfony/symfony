@@ -16,6 +16,7 @@ use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Middleware\StackMiddleware;
 use Symfony\Component\Messenger\Middleware\TraceableMiddleware;
+use Symfony\Component\Messenger\Middleware\TraceableStack;
 use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Stopwatch\Stopwatch;
@@ -139,5 +140,93 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
 
         $traced->handle($envelope, new StackMiddleware(new \ArrayIterator([null, $middleware])));
         $this->assertSame(1, $middleware->calls);
+    }
+
+    public function testClonedTraceableStackUnstacksIndependently()
+    {
+        // import TraceableStack
+        class_exists(TraceableMiddleware::class);
+
+        $stackMiddleware = new StackMiddleware([
+            null,
+            $this->createMock(MiddlewareInterface::class),
+            $this->createMock(MiddlewareInterface::class),
+        ]);
+
+        $stopwatch = $this->createMock(Stopwatch::class);
+
+        $traceableStack = new TraceableStack($stackMiddleware, $stopwatch, 'command_bus', 'messenger.middleware');
+        $clonedStack = clone $traceableStack;
+
+        $traceableStackMiddleware1 = $traceableStack->next();
+        $traceableStackMiddleware2 = $traceableStack->next();
+        $traceableStackTail = $traceableStack->next();
+        self::assertSame($stackMiddleware, $traceableStackTail);
+
+        // unstack clonedStack independently
+        $clonedStackMiddleware1 = $clonedStack->next();
+        self::assertSame($traceableStackMiddleware1, $clonedStackMiddleware1);
+        self::assertNotSame($traceableStackMiddleware2, $clonedStackMiddleware1);
+
+        $clonedStackMiddleware2 = $clonedStack->next();
+        self::assertSame($traceableStackMiddleware2, $clonedStackMiddleware2);
+
+        $clonedStackTail = $clonedStack->next();
+        self::assertNotSame($stackMiddleware, $clonedStackTail, 'stackMiddleware was also cloned');
+    }
+
+    public function testClonedTraceableStackUsesSameStopwatch()
+    {
+        // import TraceableStack
+        class_exists(TraceableMiddleware::class);
+
+        $middlewareIterable = [null, $this->createMock(MiddlewareInterface::class)];
+
+        $stackMiddleware = new StackMiddleware($middlewareIterable);
+
+        $stopwatch = $this->createMock(Stopwatch::class);
+        $stopwatch->expects($this->exactly(2))->method('isStarted')->willReturn(true);
+
+        $startSeries = [
+            [$this->matches('"%sMiddlewareInterface%s" on "command_bus"'), 'messenger.middleware'],
+            [$this->identicalTo('Tail on "command_bus"'), 'messenger.middleware'],
+            [$this->matches('"%sMiddlewareInterface%s" on "command_bus"'), 'messenger.middleware'],
+            [$this->identicalTo('Tail on "command_bus"'), 'messenger.middleware'],
+        ];
+        $stopwatch->expects($this->exactly(4))
+            ->method('start')
+            ->willReturnCallback(function (string $name, string $category = null) use (&$startSeries) {
+                [$constraint, $expectedCategory] = array_shift($startSeries);
+
+                $constraint->evaluate($name);
+                $this->assertSame($expectedCategory, $category);
+
+                return $this->createMock(StopwatchEvent::class);
+            })
+        ;
+
+        $stopSeries = [
+            $this->matches('"%sMiddlewareInterface%s" on "command_bus"'),
+            $this->matches('"%sMiddlewareInterface%s" on "command_bus"'),
+        ];
+        $stopwatch->expects($this->exactly(2))
+            ->method('stop')
+            ->willReturnCallback(function (string $name) use (&$stopSeries) {
+                $constraint = array_shift($stopSeries);
+                $constraint->evaluate($name);
+
+                return $this->createMock(StopwatchEvent::class);
+            })
+        ;
+
+        $traceableStack = new TraceableStack($stackMiddleware, $stopwatch, 'command_bus', 'messenger.middleware');
+        $clonedStack = clone $traceableStack;
+
+        // unstack the stacks independently
+        $traceableStack->next();
+        $traceableStack->next();
+
+        $clonedStack->next();
+        $clonedStack->next();
     }
 }

@@ -45,6 +45,16 @@ diff --git a/src/Symfony/Component/BrowserKit/AbstractBrowser.php b/src/Symfony/
 +    protected function filterResponse(object $response): Response
      {
          return $response;
+diff --git a/src/Symfony/Component/Clock/ClockAwareTrait.php b/src/Symfony/Component/Clock/ClockAwareTrait.php
+--- a/src/Symfony/Component/Clock/ClockAwareTrait.php
++++ b/src/Symfony/Component/Clock/ClockAwareTrait.php
+@@ -33,5 +33,5 @@ trait ClockAwareTrait
+      * @return DatePoint
+      */
+-    protected function now(): \DateTimeImmutable
++    protected function now(): DatePoint
+     {
+         $now = ($this->clock ??= new Clock())->now();
 diff --git a/src/Symfony/Component/Config/Definition/Builder/NodeDefinition.php b/src/Symfony/Component/Config/Definition/Builder/NodeDefinition.php
 --- a/src/Symfony/Component/Config/Definition/Builder/NodeDefinition.php
 +++ b/src/Symfony/Component/Config/Definition/Builder/NodeDefinition.php

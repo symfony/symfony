@@ -95,6 +95,72 @@ class MessageGeneratorTest extends TestCase
         }
     }
 
+    public function testGetMessagesFromScheduleProviderWithRestart()
+    {
+        $first = (object) ['id' => 'first'];
+        $startTime = '22:12:00';
+        $runs = [
+            '22:12:00' => [],
+            '22:12:01' => [],
+            '22:13:00' => [$first],
+            '22:13:01' => [],
+        ];
+        $schedule = [[$first, '22:13:00', '22:14:00']];
+
+        // for referencing
+        $now = self::makeDateTime($startTime);
+
+        $clock = $this->createMock(ClockInterface::class);
+        $clock->method('now')->willReturnReference($now);
+
+        foreach ($schedule as $i => $s) {
+            if (\is_array($s)) {
+                $schedule[$i] = $this->createMessage(...$s);
+            }
+        }
+
+        $scheduleProvider = new class($schedule) implements ScheduleProviderInterface {
+            private Schedule $schedule;
+
+            public function __construct(array $schedule)
+            {
+                $this->schedule = Schedule::with(...$schedule);
+                $this->schedule->stateful(new ArrayAdapter());
+            }
+
+            public function getSchedule(): Schedule
+            {
+                return $this->schedule;
+            }
+
+            public function add(RecurringMessage $message): self
+            {
+                $this->schedule->add($message);
+
+                return $this;
+            }
+        };
+
+        $scheduler = new MessageGenerator($scheduleProvider, 'dummy', $clock);
+
+        // Warmup. The first run always returns nothing.
+        $this->assertSame([], iterator_to_array($scheduler->getMessages(), false));
+
+        $toAdd = (object) ['id' => 'added-after-start'];
+
+        foreach ($runs as $time => $expected) {
+            $now = self::makeDateTime($time);
+            $this->assertSame($expected, iterator_to_array($scheduler->getMessages(), false));
+        }
+
+        $scheduleProvider->add($this->createMessage($toAdd, '22:13:10', '22:13:11'));
+
+        $this->assertSame([], iterator_to_array($scheduler->getMessages(), false));
+
+        $now = self::makeDateTime('22:13:10');
+        $this->assertSame([$toAdd], iterator_to_array($scheduler->getMessages(), false));
+    }
+
     public function testYieldedContext()
     {
         // for referencing

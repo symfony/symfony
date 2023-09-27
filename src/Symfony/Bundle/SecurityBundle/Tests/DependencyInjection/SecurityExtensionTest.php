@@ -857,6 +857,32 @@ class SecurityExtensionTest extends TestCase
         $this->assertFalse($container->has('security.authorization_checker'));
     }
 
+    public function testCustomHasherWithMigrateFrom()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', [
+            'password_hashers' => [
+                'legacy' => 'md5',
+                'App\User' => [
+                    'id' => 'App\Security\CustomHasher',
+                    'migrate_from' => 'legacy',
+                ],
+            ],
+            'firewalls' => ['main' => ['http_basic' => true]],
+        ]);
+
+        $container->compile();
+
+        $hashersMap = $container->getDefinition('security.password_hasher_factory')->getArgument(0);
+
+        $this->assertArrayHasKey('App\User', $hashersMap);
+        $this->assertEquals($hashersMap['App\User'], [
+            'instance' => new Reference('App\Security\CustomHasher'),
+            'migrate_from' => ['legacy'],
+        ]);
+    }
+
     protected function getRawContainer()
     {
         $container = new ContainerBuilder();

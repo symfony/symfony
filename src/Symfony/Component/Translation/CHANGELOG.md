@@ -7,6 +7,12 @@ CHANGELOG
  * Remove `PhpStringTokenParser`
  * Remove `PhpExtractor` in favor of `PhpAstExtractor`
 
+6.4
+---
+
+ * Give current locale to `LocaleSwitcher::runWithLocale()`'s callback
+ * Add `--as-tree` option to `translation:pull` command to write YAML messages as a tree-like structure
+
 6.3
 ---
 

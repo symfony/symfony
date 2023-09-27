@@ -88,4 +88,9 @@ class TraceableStack implements StackInterface
         }
         $this->currentEvent = null;
     }
+
+    public function __clone()
+    {
+        $this->stack = clone $this->stack;
+    }
 }

@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Validator\Constraints\Expression;
+use Symfony\Component\Validator\Constraints\ExpressionLanguageProvider;
 use Symfony\Component\Validator\Constraints\ExpressionValidator;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Range;
@@ -359,10 +360,8 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
      */
     public function testCompileIsValid(string $expression, array $names, string $expected)
     {
-        $provider = new ExpressionValidator();
-
         $expressionLanguage = new ExpressionLanguage();
-        $expressionLanguage->registerProvider($provider);
+        $expressionLanguage->registerProvider(new ExpressionLanguageProvider());
 
         $result = $expressionLanguage->compile($expression, $names);
 

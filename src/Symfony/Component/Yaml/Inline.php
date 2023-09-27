@@ -157,7 +157,7 @@ class Inline
                     } elseif (floor($value) == $value && $repr == $value) {
                         // Preserve float data type since storing a whole number will result in integer value.
                         if (!str_contains($repr, 'E')) {
-                            $repr = $repr.'.0';
+                            $repr .= '.0';
                         }
                     }
                 } else {

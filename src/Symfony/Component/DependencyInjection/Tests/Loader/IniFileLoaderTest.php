@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
 
 class IniFileLoaderTest extends TestCase
 {
-    protected ContainerBuilder$container;
+    protected ContainerBuilder $container;
     protected IniFileLoader $loader;
 
     protected function setUp(): void

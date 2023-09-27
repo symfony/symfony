@@ -73,7 +73,7 @@ final class TelegramTransport extends AbstractTransport
 
         if (!isset($options['parse_mode']) || TelegramOptions::PARSE_MODE_MARKDOWN_V2 === $options['parse_mode']) {
             $options['parse_mode'] = TelegramOptions::PARSE_MODE_MARKDOWN_V2;
-            $options['text'] = preg_replace('/([_*\[\]()~`>#+\-=|{}.!])/', '\\\\$1', $message->getSubject());
+            $options['text'] = preg_replace('/([_*\[\]()~`>#+\-=|{}.!\\\\])/', '\\\\$1', $message->getSubject());
         }
 
         if (isset($options['photo'])) {

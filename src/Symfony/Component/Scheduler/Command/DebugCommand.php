@@ -18,7 +18,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Scheduler\RecurringMessage;
 use Symfony\Component\Scheduler\ScheduleProviderInterface;
 use Symfony\Contracts\Service\ServiceProviderInterface;
@@ -95,8 +94,8 @@ final class DebugCommand extends Command
                 continue;
             }
             $io->table(
-                ['Message', 'Trigger', 'Next Run'],
-                array_filter(array_map(self::renderRecurringMessage(...), $messages, array_fill(0, count($messages), $date), array_fill(0, count($messages), $input->getOption('all')))),
+                ['Trigger', 'Provider', 'Next Run'],
+                array_filter(array_map(self::renderRecurringMessage(...), $messages, array_fill(0, \count($messages), $date), array_fill(0, \count($messages), $input->getOption('all')))),
             );
         }
 
@@ -108,19 +107,13 @@ final class DebugCommand extends Command
      */
     private static function renderRecurringMessage(RecurringMessage $recurringMessage, \DateTimeImmutable $date, bool $all): ?array
     {
-        $message = $recurringMessage->getMessage();
         $trigger = $recurringMessage->getTrigger();
-
-        if ($message instanceof Envelope) {
-            $message = $message->getMessage();
-        }
 
         $next = $trigger->getNextRunDate($date)?->format('r') ?? '-';
         if ('-' === $next && !$all) {
             return null;
         }
-        $name = $message instanceof \Stringable ? (string) $message : (new \ReflectionClass($message))->getShortName();
 
-        return [$name, (string) $trigger, $next];
+        return [(string) $trigger, $recurringMessage->getProvider()::class, $next];
     }
 }

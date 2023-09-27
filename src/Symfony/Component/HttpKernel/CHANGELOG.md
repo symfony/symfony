@@ -22,6 +22,7 @@ CHANGELOG
  * Add argument `$validationFailedStatusCode` to `#[MapQueryString]` and `#[MapRequestPayload]`
  * Add argument `$debug` to `Logger`
  * Add class `DebugLoggerConfigurator`
+ * Deprecate `Kernel::stripComments()`
 
 6.3
 ---

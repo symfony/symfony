@@ -86,8 +86,6 @@ class RedisProxiesTest extends TestCase
     public function testRedis6Proxy($class, $stub)
     {
         if (version_compare(phpversion('redis'), '6.0.0', '<')) {
-            $this->markTestIncomplete('To be re-enabled when phpredis v6 becomes stable');
-
             $stub = file_get_contents("https://raw.githubusercontent.com/phpredis/phpredis/develop/{$stub}.stub.php");
             $stub = preg_replace('/^class /m', 'return; \0', $stub);
             $stub = preg_replace('/^return; class ([a-zA-Z]++)/m', 'interface \1StubInterface', $stub, 1);
@@ -107,7 +105,7 @@ class RedisProxiesTest extends TestCase
                 continue;
             }
             $return = $method->getReturnType() instanceof \ReflectionNamedType && 'void' === (string) $method->getReturnType() ? '' : 'return ';
-            $methods[] = "\n    ".ProxyHelper::exportSignature($method, false, $args)."\n".<<<EOPHP
+            $methods[] = "\n    ".str_replace('timeout = 0.0', 'timeout = 0', ProxyHelper::exportSignature($method, false, $args))."\n".<<<EOPHP
                 {
                     {$return}(\$this->lazyObjectState->realInstance ??= (\$this->lazyObjectState->initializer)())->{$method->name}({$args});
                 }

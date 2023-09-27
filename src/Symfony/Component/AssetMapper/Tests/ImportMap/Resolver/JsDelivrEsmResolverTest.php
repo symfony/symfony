@@ -235,21 +235,49 @@ class JsDelivrEsmResolverTest extends TestCase
         ];
     }
 
-    public function testImportRegex()
+    /**
+     * @dataProvider provideImportRegex
+     */
+    public function testImportRegex(string $subject, array $expectedPackages)
     {
-        $subject = 'import{Color as t}from"/npm/@kurkle/color@0.3.2/+esm";import t from"/npm/jquery@3.7.0/+esm";import e from"/npm/popper.js@1.16.1/+esm";console.log("yo");';
         preg_match_all(JsDelivrEsmResolver::IMPORT_REGEX, $subject, $matches);
 
-        $this->assertCount(3, $matches[0]);
-        $this->assertSame([
-            '@kurkle/color',
-            'jquery',
-            'popper.js',
-        ], $matches[1]);
-        $this->assertSame([
-            '0.3.2',
-            '3.7.0',
-            '1.16.1',
-        ], $matches[2]);
+        $this->assertCount(\count($expectedPackages), $matches[0]);
+        $expectedNames = [];
+        $expectedVersions = [];
+        foreach ($expectedPackages as $packageData) {
+            $expectedNames[] = $packageData[0];
+            $expectedVersions[] = $packageData[1];
+        }
+        $this->assertSame($expectedNames, $matches[1]);
+        $this->assertSame($expectedVersions, $matches[2]);
+    }
+
+    public static function provideImportRegex(): iterable
+    {
+        yield 'standard import format' => [
+            'import{Color as t}from"/npm/@kurkle/color@0.3.2/+esm";import t from"/npm/jquery@3.7.0/+esm";import e from"/npm/popper.js@1.16.1/+esm";console.log("yo");',
+            [
+                ['@kurkle/color', '0.3.2'],
+                ['jquery', '3.7.0'],
+                ['popper.js', '1.16.1'],
+            ],
+        ];
+
+        yield 'export and import format' => [
+            'export*from"/npm/@vue/runtime-dom@3.3.4/+esm";const e=()=>{};export{e as compile};export default null;',
+            [
+                ['@vue/runtime-dom', '3.3.4'],
+            ],
+        ];
+
+        yield 'multiple export format & import' => [
+            'import{defineComponent as e,nextTick as t,createVNode as n,getCurrentInstance as r,watchPostEffect as s,onMounted as o,onUnmounted as i,h as a,BaseTransition as l,BaseTransitionPropsValidators as c,Fragment as u,Static as p,useTransitionState as f,onUpdated as d,toRaw as m,getTransitionRawChildren as h,setTransitionHooks as v,resolveTransitionHooks as g,createRenderer as _,createHydrationRenderer as b,camelize as y,callWithAsyncErrorHandling as C}from"/npm/@vue/runtime-core@3.3.4/+esm";export*from"/npm/@vue/runtime-core@3.3.4/+esm";import{isArray as S,camelize as E,toNumber as A,hyphenate as w,extend as T,EMPTY_OBJ as x,isObject as P,looseToNumber as k,looseIndexOf as L,isSet as N,looseEqual as $,isFunction as R,isString as M,invokeArrayFns as V,isOn as B,isModelListener as D,capitalize as I,isSpecialBooleanAttr as O,includeBooleanAttr as F}from"/npm/@vue/shared@3.3.4/+esm";const U="undefined"!=typeof document?',
+            [
+                ['@vue/runtime-core', '3.3.4'],
+                ['@vue/runtime-core', '3.3.4'],
+                ['@vue/shared', '3.3.4'],
+            ],
+        ];
     }
 }

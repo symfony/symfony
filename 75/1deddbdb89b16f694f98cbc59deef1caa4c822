@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by bendavies at 2023-09-27T08:44:53Z
+
+yes it does.
+
+could use tags like the with [security](https://github.com/symfony/symfony/blob/6.4/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Compiler/AddExpressionLanguageProvidersPass.php) and [routing](https://github.com/symfony/symfony/blob/6.4/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/AddExpressionLanguageProvidersPass.php)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-09-27T08:46:43Z
+
+Let's wait for someone to need that :)
+The alternative would be to redefine the `validator.expression_language_provider` service.

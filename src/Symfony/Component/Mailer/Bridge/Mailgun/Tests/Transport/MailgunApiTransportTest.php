@@ -61,6 +61,8 @@ class MailgunApiTransportTest extends TestCase
         $deliveryTime = (new \DateTimeImmutable('2020-03-20 13:01:00'))->format(\DateTimeInterface::RFC2822);
 
         $email = new Email();
+        $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
+        $email->getHeaders()->addTextHeader('h:sender', $envelope->getSender()->toString());
         $email->getHeaders()->addTextHeader('h:X-Mailgun-Variables', $json);
         $email->getHeaders()->addTextHeader('h:foo', 'foo-value');
         $email->getHeaders()->addTextHeader('t:text', 'text-value');
@@ -69,7 +71,6 @@ class MailgunApiTransportTest extends TestCase
         $email->getHeaders()->addTextHeader('template', 'template-value');
         $email->getHeaders()->addTextHeader('recipient-variables', 'recipient-variables-value');
         $email->getHeaders()->addTextHeader('amp-html', 'amp-html-value');
-        $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
 
         $transport = new MailgunApiTransport('ACCESS_KEY', 'DOMAIN');
         $method = new \ReflectionMethod(MailgunApiTransport::class, 'getPayload');
@@ -78,6 +79,8 @@ class MailgunApiTransportTest extends TestCase
         $this->assertArrayHasKey('h:X-Mailgun-Variables', $payload);
         $this->assertEquals($json, $payload['h:X-Mailgun-Variables']);
 
+        $this->assertArrayHasKey('h:sender', $payload);
+        $this->assertEquals($envelope->getSender()->toString(), $payload['h:sender']);
         $this->assertArrayHasKey('h:foo', $payload);
         $this->assertEquals('foo-value', $payload['h:foo']);
         $this->assertArrayHasKey('t:text', $payload);

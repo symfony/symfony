@@ -848,6 +848,10 @@ class DebugClassLoader
         $phpTypes = [];
         $docTypes = [];
 
+        if (\count($typesMap) > 1 && array_key_exists('callable', $typesMap)) {
+            return;
+        }
+
         foreach ($typesMap as $n => $t) {
             if ('null' === $n) {
                 $nullable = true;

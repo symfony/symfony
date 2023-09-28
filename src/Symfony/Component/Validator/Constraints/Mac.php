@@ -18,6 +18,7 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
  * Validates that a value is a valid MAC address.
  *
  * @Annotation
+ *
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
  * @author Ninos Ego <me@ninosego.de>

@@ -62,7 +62,7 @@ class MacTest extends TestCase
 
 class MacDummy
 {
-    #[Mac( message: 'myMessage', normalizer: 'trim')]
+    #[Mac(message: 'myMessage', normalizer: 'trim')]
     private $a;
 
     #[Mac(groups: ['my_group'], payload: 'some attached data')]

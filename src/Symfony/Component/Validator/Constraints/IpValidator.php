@@ -21,12 +21,10 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Joseph Bielawski <stloyd@gmail.com>
+ * @author Ninos Ego <me@ninosego.de>
  */
 class IpValidator extends ConstraintValidator
 {
-    /**
-     * @return void
-     */
     public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Ip) {
@@ -48,8 +46,8 @@ class IpValidator extends ConstraintValidator
         }
 
         $flag = match ($constraint->version) {
-            Ip::V4 => \FILTER_FLAG_IPV4,
-            Ip::V6 => \FILTER_FLAG_IPV6,
+            Ip::V4, Ip::V4_ONLY_PRIV, Ip::V4_ONLY_RES => \FILTER_FLAG_IPV4,
+            Ip::V6, Ip::V6_ONLY_PRIV, Ip::V6_ONLY_RES => \FILTER_FLAG_IPV6,
             Ip::V4_NO_PRIV => \FILTER_FLAG_IPV4 | \FILTER_FLAG_NO_PRIV_RANGE,
             Ip::V6_NO_PRIV => \FILTER_FLAG_IPV6 | \FILTER_FLAG_NO_PRIV_RANGE,
             Ip::ALL_NO_PRIV => \FILTER_FLAG_NO_PRIV_RANGE,
@@ -63,6 +61,21 @@ class IpValidator extends ConstraintValidator
         };
 
         if (!filter_var($value, \FILTER_VALIDATE_IP, $flag)) {
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Ip::INVALID_IP_ERROR)
+                ->addViolation();
+
+            return;
+        }
+
+        $inverseFlag = match ($constraint->version) {
+            Ip::V4_ONLY_PRIV, Ip::V6_ONLY_PRIV, Ip::ALL_ONLY_PRIV => \FILTER_FLAG_NO_PRIV_RANGE,
+            Ip::V4_ONLY_RES, Ip::V6_ONLY_RES, Ip::ALL_ONLY_RES => \FILTER_FLAG_NO_RES_RANGE,
+            default => 0,
+        };
+
+        if ($inverseFlag && filter_var($value, \FILTER_VALIDATE_IP, $inverseFlag)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Ip::INVALID_IP_ERROR)

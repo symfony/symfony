@@ -95,7 +95,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
     {
         $this->validator->validate(
             "\n\t2001:0db8:85a3:0000:0000:8a2e:0370:7334\r\n",
-            new Ip(version: \Symfony\Component\Validator\Constraints\Ip::V6, normalizer: 'trim')
+            new Ip(version: Ip::V6, normalizer: 'trim')
         );
 
         $this->assertNoViolation();

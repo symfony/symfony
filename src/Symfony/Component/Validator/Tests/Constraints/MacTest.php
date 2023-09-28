@@ -12,19 +12,19 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Validator\Constraints\Ip;
+use Symfony\Component\Validator\Constraints\Mac;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 /**
- * @author Renan Taranto <renantaranto@gmail.com>
+ * @author Ninos Ego <me@ninosego.de>
  */
-class IpTest extends TestCase
+class MacTest extends TestCase
 {
     public function testNormalizerCanBeSet()
     {
-        $ip = new Ip(['normalizer' => 'trim']);
+        $ip = new Mac(['normalizer' => 'trim']);
 
         $this->assertEquals('trim', $ip->normalizer);
     }
@@ -33,14 +33,14 @@ class IpTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("string" given).');
-        new Ip(['normalizer' => 'Unknown Callable']);
+        new Mac(['normalizer' => 'Unknown Callable']);
     }
 
     public function testInvalidNormalizerObjectThrowsException()
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("stdClass" given).');
-        new Ip(['normalizer' => new \stdClass()]);
+        new Mac(['normalizer' => new \stdClass()]);
     }
 
     public function testAttributes()
@@ -50,28 +50,21 @@ class IpTest extends TestCase
         self::assertTrue($loader->loadClassMetadata($metadata));
 
         [$aConstraint] = $metadata->properties['a']->getConstraints();
-        self::assertSame(Ip::ALL, $aConstraint->version);
+        self::assertSame('myMessage', $aConstraint->message);
+        self::assertSame('trim', $aConstraint->normalizer);
+        self::assertSame(['Default', 'IpDummy'], $aConstraint->groups);
 
         [$bConstraint] = $metadata->properties['b']->getConstraints();
-        self::assertSame(Ip::V6, $bConstraint->version);
-        self::assertSame('myMessage', $bConstraint->message);
-        self::assertSame('trim', $bConstraint->normalizer);
-        self::assertSame(['Default', 'IpDummy'], $bConstraint->groups);
-
-        [$cConstraint] = $metadata->properties['c']->getConstraints();
-        self::assertSame(['my_group'], $cConstraint->groups);
-        self::assertSame('some attached data', $cConstraint->payload);
+        self::assertSame(['my_group'], $bConstraint->groups);
+        self::assertSame('some attached data', $bConstraint->payload);
     }
 }
 
-class IpDummy
+class MacDummy
 {
-    #[Ip]
+    #[Mac( message: 'myMessage', normalizer: 'trim')]
     private $a;
 
-    #[Ip(version: Ip::V6, message: 'myMessage', normalizer: 'trim')]
+    #[Mac(groups: ['my_group'], payload: 'some attached data')]
     private $b;
-
-    #[Ip(groups: ['my_group'], payload: 'some attached data')]
-    private $c;
 }

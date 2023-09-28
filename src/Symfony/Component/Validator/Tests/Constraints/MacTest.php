@@ -24,9 +24,9 @@ class MacTest extends TestCase
 {
     public function testNormalizerCanBeSet()
     {
-        $ip = new Mac(['normalizer' => 'trim']);
+        $mac = new Mac(['normalizer' => 'trim']);
 
-        $this->assertEquals('trim', $ip->normalizer);
+        $this->assertEquals('trim', $mac->normalizer);
     }
 
     public function testInvalidNormalizerThrowsException()
@@ -45,14 +45,14 @@ class MacTest extends TestCase
 
     public function testAttributes()
     {
-        $metadata = new ClassMetadata(IpDummy::class);
+        $metadata = new ClassMetadata(MacDummy::class);
         $loader = new AttributeLoader();
         self::assertTrue($loader->loadClassMetadata($metadata));
 
         [$aConstraint] = $metadata->properties['a']->getConstraints();
         self::assertSame('myMessage', $aConstraint->message);
         self::assertSame('trim', $aConstraint->normalizer);
-        self::assertSame(['Default', 'IpDummy'], $aConstraint->groups);
+        self::assertSame(['Default', 'MacDummy'], $aConstraint->groups);
 
         [$bConstraint] = $metadata->properties['b']->getConstraints();
         self::assertSame(['my_group'], $bConstraint->groups);

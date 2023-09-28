@@ -157,6 +157,7 @@ Templating
 Validator
 ---------
 
+ * Changed default version flag from `V4` to `ALL` (also `V6`) in `Ip` constraint
  * Deprecate Doctrine annotations support in favor of native attributes
  * Deprecate `ValidatorBuilder::setDoctrineAnnotationReader()`
  * Deprecate `ValidatorBuilder::addDefaultDoctrineAnnotationReader()`

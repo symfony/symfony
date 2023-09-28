@@ -38,6 +38,7 @@ class Mac extends Constraint
 
     public $message = 'This is not a valid MAC address.';
 
+    /** @var callable|null */
     public $normalizer;
 
     public function __construct(

@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\CacheWarmer\ConfigBuilderCacheWarmer;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Kernel;
 
@@ -63,8 +64,11 @@ class ConfigBuilderCacheWarmerTest extends TestCase
                 return $this->varDir.'/cache';
             }
 
-            public function registerContainerConfiguration(LoaderInterface $loader)
+            public function registerContainerConfiguration(LoaderInterface $loader): void
             {
+                $loader->load(static function (ContainerBuilder $container) {
+                    $container->loadFromExtension('framework', ['http_method_override' => false]);
+                });
             }
         };
         $kernel->boot();

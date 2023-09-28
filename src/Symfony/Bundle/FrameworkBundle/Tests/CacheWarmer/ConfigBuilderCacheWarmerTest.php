@@ -67,7 +67,12 @@ class ConfigBuilderCacheWarmerTest extends TestCase
             public function registerContainerConfiguration(LoaderInterface $loader): void
             {
                 $loader->load(static function (ContainerBuilder $container) {
-                    $container->loadFromExtension('framework', ['http_method_override' => false]);
+                    $container->loadFromExtension('framework', [
+                        'annotations' => false,
+                        'handle_all_throwables' => true,
+                        'http_method_override' => false,
+                        'php_errors' => ['log' => true],
+                    ]);
                 });
             }
         };

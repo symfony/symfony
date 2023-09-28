@@ -65,7 +65,12 @@ class FileProfilerStorage implements ProfilerStorageInterface
             [$csvToken, $csvIp, $csvMethod, $csvUrl, $csvTime, $csvParent, $csvStatusCode] = $values;
             $csvTime = (int) $csvTime;
 
-            if ($ip && !str_contains($csvIp, $ip) || $url && !str_contains($csvUrl, $url) || $method && !str_contains($csvMethod, $method) || $statusCode && !str_contains($csvStatusCode, $statusCode)) {
+            $urlFilter = false;
+            if ($url) {
+                $urlFilter = str_starts_with($url, '!') ? str_contains($csvUrl, substr($url, 1)) : !str_contains($csvUrl, $url);
+            }
+
+            if ($ip && !str_contains($csvIp, $ip) || $urlFilter || $method && !str_contains($csvMethod, $method) || $statusCode && !str_contains($csvStatusCode, $statusCode)) {
                 continue;
             }
 

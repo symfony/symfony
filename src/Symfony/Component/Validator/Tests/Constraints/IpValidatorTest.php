@@ -185,6 +185,15 @@ class IpValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    public static function getValidPublicIpsV4()
+    {
+        return [
+            ['8.0.0.0'],
+            ['90.0.0.0'],
+            ['110.0.0.110'],
+        ];
+    }
+
     public static function getInvalidIpsV4()
     {
         return [
@@ -231,7 +240,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @dataProvider getValidReservedIpsV4
+     * @dataProvider getInvalidPrivateIpsV4
      */
     public function testInvalidOnlyPrivateIpsV4($ip)
     {
@@ -255,6 +264,11 @@ class IpValidatorTest extends ConstraintValidatorTestCase
             ['172.16.0.0'],
             ['192.168.1.0'],
         ];
+    }
+
+    public static function getInvalidPrivateIpsV4()
+    {
+        return array_merge(self::getValidPublicIpsV4(), self::getValidReservedIpsV4());
     }
 
     /**
@@ -288,7 +302,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @dataProvider getValidPrivateIpsV4
+     * @dataProvider getInvalidReservedIpsV4
      */
     public function testInvalidOnlyReservedIpsV4($ip)
     {
@@ -312,6 +326,11 @@ class IpValidatorTest extends ConstraintValidatorTestCase
             ['240.0.0.1'],
             ['255.255.255.255'],
         ];
+    }
+
+    public static function getInvalidReservedIpsV4()
+    {
+        return array_merge(self::getValidPublicIpsV4(), self::getValidPrivateIpsV4());
     }
 
     /**

@@ -243,6 +243,7 @@ HttpKernel
  * Remove `HttpKernelInterface::MASTER_REQUEST`
  * Remove `terminate_on_cache_hit` option from `HttpCache`
  * Require explicit argument when calling `ConfigDataCollector::setKernel()`, `RouterListener::setCurrentRequest()`
+ * Remove `Kernel::stripComments()`
 
 Lock
 ----

@@ -27,8 +27,11 @@ final class MappedAsset
     public readonly string $content;
     public readonly string $digest;
     public readonly bool $isPredigested;
+    public readonly bool $isVendor;
 
     /**
+     * Assets whose content affects the content of this asset.
+     *
      * @var MappedAsset[]
      */
     private array $dependencies = [];
@@ -55,6 +58,7 @@ final class MappedAsset
         string $content = null,
         string $digest = null,
         bool $isPredigested = null,
+        bool $isVendor = false,
         array $dependencies = [],
         array $fileDependencies = [],
         array $javaScriptImports = [],
@@ -78,6 +82,7 @@ final class MappedAsset
         if (null !== $isPredigested) {
             $this->isPredigested = $isPredigested;
         }
+        $this->isVendor = $isVendor;
         $this->dependencies = $dependencies;
         $this->fileDependencies = $fileDependencies;
         $this->javaScriptImports = $javaScriptImports;

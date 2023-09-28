@@ -40,7 +40,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
                 }
 
                 if ('module_in_importmap_remote' === $importName) {
-                    return new ImportMapEntry('module_in_importmap_local_asset', url: 'https://example.com/module.js');
+                    return new ImportMapEntry('module_in_importmap_local_asset', version: '1.2.3');
                 }
 
                 return null;

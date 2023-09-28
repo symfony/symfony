@@ -26,8 +26,9 @@ CHANGELOG
  * Deprecate `framework.validation.enable_annotations`, use `framework.validation.enable_attributes` instead
  * Deprecate `framework.serializer.enable_annotations`, use `framework.serializer.enable_attributes` instead
  * Add `array $tokenAttributes = []` optional parameter to `KernelBrowser::loginUser()`
- * Add support for relative URLs in BrowserKit's redirect assertion.
+ * Add support for relative URLs in BrowserKit's redirect assertion
  * Change BrowserKitAssertionsTrait::getClient() to be protected
+ * Deprecate the `framework.asset_mapper.provider` config option
 
 6.3
 ---

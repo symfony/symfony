@@ -29,8 +29,9 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
     private array $fileContentsCache = [];
 
     public function __construct(
-        private PublicAssetsPathResolverInterface $assetsPathResolver,
-        private AssetMapperCompiler $compiler,
+        private readonly PublicAssetsPathResolverInterface $assetsPathResolver,
+        private readonly AssetMapperCompiler $compiler,
+        private readonly string $vendorDir,
     ) {
     }
 
@@ -43,7 +44,8 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
         if (!isset($this->assetsCache[$logicalPath])) {
             $this->assetsBeingCreated[] = $logicalPath;
 
-            $asset = new MappedAsset($logicalPath, $sourcePath, $this->assetsPathResolver->resolvePublicPath($logicalPath));
+            $isVendor = $this->isVendor($sourcePath);
+            $asset = new MappedAsset($logicalPath, $sourcePath, $this->assetsPathResolver->resolvePublicPath($logicalPath), isVendor: $isVendor);
 
             [$digest, $isPredigested] = $this->getDigest($asset);
 
@@ -55,6 +57,7 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
                 $this->calculateContent($asset),
                 $digest,
                 $isPredigested,
+                $isVendor,
                 $asset->getDependencies(),
                 $asset->getFileDependencies(),
                 $asset->getJavaScriptImports(),
@@ -115,5 +118,13 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
         $digestedPath = preg_replace_callback('/\.(\w+)$/', fn ($matches) => "-{$digest}{$matches[0]}", $asset->logicalPath);
 
         return $this->assetsPathResolver->resolvePublicPath($digestedPath);
+    }
+
+    private function isVendor(string $sourcePath): bool
+    {
+        $sourcePath = realpath($sourcePath);
+        $vendorDir = realpath($this->vendorDir);
+
+        return $sourcePath && str_starts_with($sourcePath, $vendorDir);
     }
 }

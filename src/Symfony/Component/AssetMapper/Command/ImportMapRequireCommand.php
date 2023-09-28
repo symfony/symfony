@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\AssetMapper\Command;
 
-use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\AssetMapper\ImportMap\PackageRequireOptions;
@@ -32,7 +30,6 @@ final class ImportMapRequireCommand extends Command
 {
     public function __construct(
         private readonly ImportMapManager $importMapManager,
-        private readonly AssetMapperInterface $assetMapper,
         private readonly string $projectDir,
     ) {
         parent::__construct();
@@ -42,7 +39,7 @@ final class ImportMapRequireCommand extends Command
     {
         $this
             ->addArgument('packages', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'The packages to add')
-            ->addOption('download', 'd', InputOption::VALUE_NONE, 'Download packages locally')
+            ->addOption('entrypoint', null, InputOption::VALUE_NONE, 'Make the package(s) an entrypoint?')
             ->addOption('path', null, InputOption::VALUE_REQUIRED, 'The local path where the package lives relative to the project root')
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command adds packages to <comment>importmap.php</comment> usually
@@ -113,10 +110,9 @@ EOT
             $packages[] = new PackageRequireOptions(
                 $parts['package'],
                 $parts['version'] ?? null,
-                $input->getOption('download'),
                 $parts['alias'] ?? $parts['package'],
-                isset($parts['registry']) && $parts['registry'] ? $parts['registry'] : null,
                 $path,
+                $input->getOption('entrypoint'),
             );
         }
 
@@ -124,19 +120,6 @@ EOT
         if (1 === \count($newPackages)) {
             $newPackage = $newPackages[0];
             $message = sprintf('Package "%s" added to importmap.php', $newPackage->importName);
-
-            if ($newPackage->isDownloaded && null !== $downloadedAsset = $this->assetMapper->getAsset($newPackage->path)) {
-                $application = $this->getApplication();
-                if ($application instanceof Application) {
-                    $projectDir = $application->getKernel()->getProjectDir();
-                    $downloadedPath = $downloadedAsset->sourcePath;
-                    if (str_starts_with($downloadedPath, $projectDir)) {
-                        $downloadedPath = substr($downloadedPath, \strlen($projectDir) + 1);
-                    }
-
-                    $message .= sprintf(' and downloaded locally to "%s"', $downloadedPath);
-                }
-            }
 
             $message .= '.';
         } else {

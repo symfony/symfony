@@ -69,7 +69,7 @@ class AssetMapperCompileCommandTest extends TestCase
 
         $finder = new Finder();
         $finder->in($targetBuildDir)->files();
-        $this->assertCount(10, $finder); // 7 files + manifest.json & importmap.json + entrypoint.file6.json
+        $this->assertCount(12, $finder); // 9 files + manifest.json & importmap.json + entrypoint.file6.json
         $this->assertFileExists($targetBuildDir.'/manifest.json');
 
         $this->assertSame([
@@ -78,6 +78,8 @@ class AssetMapperCompileCommandTest extends TestCase
             'file2.js',
             'file3.css',
             'file4.js',
+            'lodash.js',
+            'stimulus.js',
             'subdir/file5.js',
             'subdir/file6.js',
         ], array_keys(json_decode(file_get_contents($targetBuildDir.'/manifest.json'), true)));

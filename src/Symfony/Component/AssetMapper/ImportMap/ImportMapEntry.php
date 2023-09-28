@@ -24,16 +24,14 @@ final class ImportMapEntry
          * The path to the asset if local or downloaded.
          */
         public readonly ?string $path = null,
-        public readonly ?string $url = null,
-        public readonly bool $isDownloaded = false,
+        public readonly ?string $version = null,
         public readonly ImportMapType $type = ImportMapType::JS,
         public readonly bool $isEntrypoint = false,
-        public readonly ?string $version = null,
     ) {
     }
 
-    public function isRemote(): bool
+    public function isRemotePackage(): bool
     {
-        return (bool) $this->url;
+        return null !== $this->version;
     }
 }

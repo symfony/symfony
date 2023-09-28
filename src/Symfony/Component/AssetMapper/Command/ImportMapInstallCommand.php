@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\AssetMapper\Command;
 
-use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
+use Symfony\Component\AssetMapper\ImportMap\RemotePackageDownloader;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * Downloads all assets that should be downloaded.
@@ -27,7 +29,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 final class ImportMapInstallCommand extends Command
 {
     public function __construct(
-        private readonly ImportMapManager $importMapManager,
+        private readonly RemotePackageDownloader $packageDownloader,
+        private readonly string $projectDir,
     ) {
         parent::__construct();
     }
@@ -36,8 +39,36 @@ final class ImportMapInstallCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $downloadedPackages = $this->importMapManager->downloadMissingPackages();
-        $io->success(sprintf('Downloaded %d assets.', \count($downloadedPackages)));
+        $finishedCount = 0;
+        $progressBar = new ProgressBar($output);
+        $progressBar->setFormat('<info>%current%/%max%</info> %bar% %url%');
+        $downloadedPackages = $this->packageDownloader->downloadPackages(function (string $package, string $event, ResponseInterface $response, int $totalPackages) use (&$finishedCount, $progressBar) {
+            $progressBar->setMessage($response->getInfo('url'), 'url');
+            if (0 === $progressBar->getMaxSteps()) {
+                $progressBar->setMaxSteps($totalPackages);
+                $progressBar->start();
+            }
+
+            if ('finished' === $event) {
+                ++$finishedCount;
+                $progressBar->advance();
+            }
+        });
+        $progressBar->finish();
+        $progressBar->clear();
+
+        if (!$downloadedPackages) {
+            $io->success('No assets to install.');
+
+            return Command::SUCCESS;
+        }
+
+        $io->success(sprintf(
+            'Downloaded %d asset%s into %s.',
+            \count($downloadedPackages),
+            1 === \count($downloadedPackages) ? '' : 's',
+            str_replace($this->projectDir.'/', '', $this->packageDownloader->getVendorDir()),
+        ));
 
         return Command::SUCCESS;
     }

@@ -69,6 +69,8 @@ class MailgunHttpTransportTest extends TestCase
             $this->assertStringContainsString('Subject: Hello!', $content);
             $this->assertStringContainsString('To: Saif Eddin <saif.gmati@symfony.com>', $content);
             $this->assertStringContainsString('From: Fabien <fabpot@symfony.com>', $content);
+            $this->assertStringContainsString('Sender: Senior Fabien Eddin <fabpot@symfony.com>', $content);
+            $this->assertStringContainsString('h:sender: "Senior Fabien Eddin" <fabpot@symfony.com>', $content);
             $this->assertStringContainsString('Hello There!', $content);
 
             return new MockResponse(json_encode(['id' => 'foobar']), [
@@ -79,10 +81,16 @@ class MailgunHttpTransportTest extends TestCase
         $transport->setPort(8984);
 
         $mail = new Email();
+        $toAddress = new Address('saif.gmati@symfony.com', 'Saif Eddin');
+        $fromAddress = new Address('fabpot@symfony.com', 'Fabien');
+        $senderAddress = new Address('fabpot@symfony.com', 'Senior Fabien Eddin');
         $mail->subject('Hello!')
-            ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
-            ->from(new Address('fabpot@symfony.com', 'Fabien'))
+            ->to($toAddress)
+            ->from($fromAddress)
+            ->sender($senderAddress)
             ->text('Hello There!');
+
+        $mail->getHeaders()->addHeader('h:sender', $mail->getSender()->toString());
 
         $message = $transport->send($mail);
 

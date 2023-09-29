@@ -317,6 +317,21 @@ XML;
         $this->assertSame(['@index' => 0.123, '#' => 'Name'], $this->encoder->decode($source, 'xml'));
     }
 
+    public function testNoTypeCastRootAttribute()
+    {
+        $source = <<<XML
+<?xml version="1.0"?>
+<document a="123"></document>
+XML;
+
+        $data = $this->encoder->decode($source, 'xml', ['xml_type_cast_attributes' => false]);
+        $expected = [
+            '@a' => '123',
+            '#' => '',
+        ];
+        $this->assertSame($expected, $data);
+    }
+
     public function testNoTypeCastAttribute()
     {
         $source = <<<XML

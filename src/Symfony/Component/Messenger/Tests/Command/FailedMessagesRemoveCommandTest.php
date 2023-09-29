@@ -12,9 +12,11 @@
 namespace Symfony\Component\Messenger\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineReceiver;
 use Symfony\Component\Messenger\Command\FailedMessagesRemoveCommand;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
@@ -207,7 +209,7 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $globalFailureReceiverName = 'failure_receiver';
 
         $receiver = $this->createMock(ListableReceiverInterface::class);
-        $receiver->expects($this->once())->method('all')->with(50)->willReturn([
+        $receiver->expects($this->once())->method('all')->willReturn([
             Envelope::wrap(new \stdClass(), [new TransportMessageIdStamp('2ab50dfa1fbf')]),
             Envelope::wrap(new \stdClass(), [new TransportMessageIdStamp('78c2da843723')]),
         ]);
@@ -233,7 +235,7 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $anotherFailureReceiverName = 'another_receiver';
 
         $receiver = $this->createMock(ListableReceiverInterface::class);
-        $receiver->expects($this->once())->method('all')->with(50)->willReturn([
+        $receiver->expects($this->once())->method('all')->willReturn([
             Envelope::wrap(new \stdClass(), [new TransportMessageIdStamp('2ab50dfa1fbf')]),
             Envelope::wrap(new \stdClass(), [new TransportMessageIdStamp('78c2da843723')]),
         ]);
@@ -252,5 +254,101 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $suggestions = $tester->complete(['--transport', $anotherFailureReceiverName, ' ']);
 
         $this->assertSame(['2ab50dfa1fbf', '78c2da843723'], $suggestions);
+    }
+
+    public function testOptionAllIsSetWithIdsThrows()
+    {
+        $globalFailureReceiverName = 'failure_receiver';
+
+        $serviceLocator = $this->createMock(ServiceLocator::class);
+        $serviceLocator->expects($this->once())->method('has')->with($globalFailureReceiverName)->willReturn(true);
+        $serviceLocator->expects($this->any())->method('get')->with($globalFailureReceiverName)->willReturn($this->createMock(ListableReceiverInterface::class));
+
+        $command = new FailedMessagesRemoveCommand('failure_receiver', $serviceLocator);
+        $tester = new CommandTester($command);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('You cannot specify message ids when using the "--all" option.');
+        $tester->execute(['id' => [20], '--all' => true]);
+    }
+
+    public function testOptionAllIsSetWithoutForceAsksConfirmation()
+    {
+        $globalFailureReceiverName = 'failure_receiver';
+
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $serviceLocator = $this->createMock(ServiceLocator::class);
+        $serviceLocator->expects($this->once())->method('has')->with($globalFailureReceiverName)->willReturn(true);
+        $serviceLocator->expects($this->any())->method('get')->with($globalFailureReceiverName)->willReturn($receiver);
+
+        $command = new FailedMessagesRemoveCommand('failure_receiver', $serviceLocator);
+        $tester = new CommandTester($command);
+
+        $tester->execute(['--all' => true]);
+
+        $this->assertSame(0, $tester->getStatusCode());
+        $this->assertStringContainsString('Do you want to permanently remove all failed messages? (yes/no)', $tester->getDisplay());
+    }
+
+    public function testOptionAllIsSetWithoutForceAsksConfirmationOnMessageCountAwareInterface()
+    {
+        $globalFailureReceiverName = 'failure_receiver';
+
+        $receiver = $this->createMock(DoctrineReceiver::class);
+        $receiver->expects($this->once())->method('getMessageCount')->willReturn(2);
+
+        $serviceLocator = $this->createMock(ServiceLocator::class);
+        $serviceLocator->expects($this->once())->method('has')->with($globalFailureReceiverName)->willReturn(true);
+        $serviceLocator->expects($this->any())->method('get')->with($globalFailureReceiverName)->willReturn($receiver);
+
+        $command = new FailedMessagesRemoveCommand('failure_receiver', $serviceLocator);
+        $tester = new CommandTester($command);
+
+        $tester->execute(['--all' => true]);
+
+        $this->assertSame(0, $tester->getStatusCode());
+        $this->assertStringContainsString('Do you want to permanently remove all (2) messages? (yes/no)', $tester->getDisplay());
+    }
+
+    public function testOptionAllIsNotSetNorIdsThrows()
+    {
+        $globalFailureReceiverName = 'failure_receiver';
+
+        $serviceLocator = $this->createMock(ServiceLocator::class);
+        $serviceLocator->expects($this->once())->method('has')->with($globalFailureReceiverName)->willReturn(true);
+        $serviceLocator->expects($this->any())->method('get')->with($globalFailureReceiverName)->willReturn($this->createMock(ListableReceiverInterface::class));
+
+        $command = new FailedMessagesRemoveCommand('failure_receiver', $serviceLocator);
+        $tester = new CommandTester($command);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Please specify at least one message id. If you want to remove all failed messages, use the "--all" option.');
+        $tester->execute([]);
+    }
+
+    public function testRemoveAllMessages()
+    {
+        $globalFailureReceiverName = 'failure_receiver';
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+
+        $series = [
+            new Envelope(new \stdClass()),
+            new Envelope(new \stdClass()),
+            new Envelope(new \stdClass()),
+            new Envelope(new \stdClass()),
+        ];
+
+        $receiver->expects($this->once())->method('all')->willReturn($series);
+
+        $serviceLocator = $this->createMock(ServiceLocator::class);
+        $serviceLocator->expects($this->once())->method('has')->with($globalFailureReceiverName)->willReturn(true);
+        $serviceLocator->expects($this->any())->method('get')->with($globalFailureReceiverName)->willReturn($receiver);
+
+        $command = new FailedMessagesRemoveCommand($globalFailureReceiverName, $serviceLocator);
+        $tester = new CommandTester($command);
+        $tester->execute(['--all' => true, '--force' => true, '--show-messages' => true]);
+
+        $this->assertStringContainsString('Failed Message Details', $tester->getDisplay());
+        $this->assertStringContainsString('4 messages were removed.', $tester->getDisplay());
     }
 }

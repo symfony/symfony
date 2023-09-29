@@ -797,14 +797,10 @@ class AbstractObjectNormalizerTest extends TestCase
         ];
 
         $obj = new class() {
-            /**
-             * @SerializedName("1")
-             */
+            #[SerializedName('1')]
             public $foo;
 
-            /**
-             * @SerializedName("99")
-             */
+            #[SerializedName('99')]
             public $baz;
         };
 

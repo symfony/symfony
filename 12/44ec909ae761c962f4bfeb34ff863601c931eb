@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-09-27T17:38:18Z
+
+Can you please check the history of this line? Could this be linked to a feature we broke at some point?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-09-29T06:52:02Z
+
+6.4 for sure
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-09-29T09:12:24Z
+
+I switched the base branch to `6.4`.

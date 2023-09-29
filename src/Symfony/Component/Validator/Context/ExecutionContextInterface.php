@@ -126,7 +126,7 @@ interface ExecutionContextInterface
      *
      * @return void
      */
-    public function setNode(mixed $value, ?object $object, MetadataInterface $metadata = null, string $propertyPath);
+    public function setNode(mixed $value, ?object $object, ?MetadataInterface $metadata, string $propertyPath);
 
     /**
      * Warning: Should not be called by user code, to be used by the validator engine only.

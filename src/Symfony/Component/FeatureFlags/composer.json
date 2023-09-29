@@ -1,0 +1,30 @@
+{
+    "name": "symfony/feature-flags",
+    "type": "library",
+    "description": "Provide feature flags mechanism.",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "psr/clock": "^1.0",
+        "psr/container": "^2.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\FeatureFlags\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

@@ -9,6 +9,7 @@ CHANGELOG
  * Deprecate passing an annotation reader to the constructor of `AnnotationLoader`
  * Allow the `Groups` attribute/annotation on classes
  * JsonDecode: Add `json_decode_detailed_errors` option
+ * Make `ProblemNormalizer` give details about Messenger's `ValidationFailedException`
 
 6.3
 ---

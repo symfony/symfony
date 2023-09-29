@@ -12,8 +12,10 @@
 namespace Symfony\Component\EventDispatcher\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\Attribute\ArgumentResolver\GenericEventSubjectResolver;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class EventDispatcherTest extends TestCase
@@ -132,6 +134,15 @@ class EventDispatcherTest extends TestCase
         $event = new Event();
         $return = $this->dispatcher->dispatch($event, self::preFoo);
         $this->assertSame($event, $return);
+    }
+
+    public function testDispatchGenericEvent()
+    {
+        $this->dispatcher->addListener('dummy', [$this->listener, 'preDummy']);
+        $this->dispatcher->addListener('dummy', $this->listener->postDummy(...));
+        $this->dispatcher->dispatch(new GenericEvent('dummy subject'), 'dummy');
+        $this->assertTrue($this->listener->preGenericEventInvoked);
+        $this->assertTrue($this->listener->postGenericEventInvoked);
     }
 
     public function testDispatchForClosure()
@@ -439,6 +450,8 @@ class TestEventListener
     public string $name;
     public bool $preFooInvoked = false;
     public bool $postFooInvoked = false;
+    public $preGenericEventInvoked = null;
+    public $postGenericEventInvoked = null;
 
     /* Listener methods */
 
@@ -454,6 +467,16 @@ class TestEventListener
         if (!$this->preFooInvoked) {
             $e->stopPropagation();
         }
+    }
+
+    public function preDummy(#[GenericEventSubjectResolver] mixed $subject, GenericEvent $event)
+    {
+        $this->preGenericEventInvoked = $subject === $event->getSubject();
+    }
+
+    public function postDummy(#[GenericEventSubjectResolver] mixed $subject, GenericEvent $event)
+    {
+        $this->postGenericEventInvoked = $subject === $event->getSubject();
     }
 
     public function __invoke()

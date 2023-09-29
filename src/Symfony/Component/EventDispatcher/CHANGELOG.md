@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Add `#[ArgumentResolverInterface]` to resolve listener args
+
 6.0
 ---
 

@@ -12,6 +12,7 @@
 namespace Symfony\Component\EventDispatcher;
 
 use Psr\EventDispatcher\StoppableEventInterface;
+use Symfony\Component\EventDispatcher\Attribute\ArgumentResolverInterface;
 use Symfony\Component\EventDispatcher\Debug\WrappedListener;
 
 /**
@@ -217,7 +218,8 @@ class EventDispatcher implements EventDispatcherInterface
             if ($stoppable && $event->isPropagationStopped()) {
                 break;
             }
-            $listener($event, $eventName, $this);
+
+            $listener(...$this->getListenerArguments($listener, $eventName, $event));
         }
     }
 
@@ -266,5 +268,27 @@ class EventDispatcher implements EventDispatcherInterface
         }
 
         return $this->optimized[$eventName];
+    }
+
+    /**
+     * @param callable $listener
+     */
+    private function getListenerArguments(mixed $listener, string $eventName, object $event): array
+    {
+        $arguments = [$event, $eventName, $this];
+
+        $wrappedistener = $listener instanceof WrappedListener ? $listener->getWrappedListener() : $listener;
+        $reflectionParameters = \is_array($wrappedistener)
+            ? (new \ReflectionMethod($wrappedistener[0], $wrappedistener[1]))->getParameters()
+            : (new \ReflectionFunction($wrappedistener))->getParameters();
+
+        foreach ($reflectionParameters as $parameter) {
+            $argumentResolver = $parameter->getAttributes(ArgumentResolverInterface::class, \ReflectionAttribute::IS_INSTANCEOF)[0] ?? null;
+            if (null !== $argumentResolver) {
+                array_unshift($arguments, $argumentResolver->newInstance()->resolve($event));
+            }
+        }
+
+        return $arguments;
     }
 }

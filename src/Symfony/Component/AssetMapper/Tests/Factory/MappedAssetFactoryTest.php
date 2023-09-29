@@ -20,6 +20,7 @@ use Symfony\Component\AssetMapper\Compiler\CssAssetUrlCompiler;
 use Symfony\Component\AssetMapper\Compiler\JavaScriptImportPathCompiler;
 use Symfony\Component\AssetMapper\Exception\RuntimeException;
 use Symfony\Component\AssetMapper\Factory\MappedAssetFactory;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\AssetMapper\MappedAsset;
 use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
 
@@ -115,7 +116,7 @@ class MappedAssetFactoryTest extends TestCase
     private function createFactory(AssetCompilerInterface $extraCompiler = null): MappedAssetFactory
     {
         $compilers = [
-            new JavaScriptImportPathCompiler(),
+            new JavaScriptImportPathCompiler($this->createMock(ImportMapManager::class)),
             new CssAssetUrlCompiler(),
         ];
         if ($extraCompiler) {

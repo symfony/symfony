@@ -12,7 +12,6 @@
 namespace Factory;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\AssetMapper\AssetDependency;
 use Symfony\Component\AssetMapper\Factory\CachedMappedAssetFactory;
 use Symfony\Component\AssetMapper\Factory\MappedAssetFactoryInterface;
 use Symfony\Component\AssetMapper\MappedAsset;
@@ -93,14 +92,8 @@ class CachedMappedAssetFactoryTest extends TestCase
 
         $deeplyNestedAsset = new MappedAsset('file4.js', realpath(__DIR__.'/../fixtures/dir2/file4.js'));
 
-        $dependentOnContentAsset->addDependency(new AssetDependency($deeplyNestedAsset, isContentDependency: true));
-        $mappedAsset->addDependency(new AssetDependency($dependentOnContentAsset, isContentDependency: true));
-
-        $notDependentOnContentAsset = new MappedAsset(
-            'already-abcdefVWXYZ0123456789.digested.css',
-            __DIR__.'/../fixtures/dir2/already-abcdefVWXYZ0123456789.digested.css',
-        );
-        $mappedAsset->addDependency(new AssetDependency($notDependentOnContentAsset, isContentDependency: false));
+        $dependentOnContentAsset->addDependency($deeplyNestedAsset);
+        $mappedAsset->addDependency($dependentOnContentAsset);
 
         // just adding any file as an example
         $mappedAsset->addFileDependency(__DIR__.'/../fixtures/importmap.php');

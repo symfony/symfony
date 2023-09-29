@@ -12,7 +12,6 @@
 namespace Symfony\Component\AssetMapper\Compiler;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\AssetMapper\AssetDependency;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\Exception\RuntimeException;
 use Symfony\Component\AssetMapper\MappedAsset;
@@ -54,7 +53,7 @@ final class CssAssetUrlCompiler implements AssetCompilerInterface
                 return $matches[0];
             }
 
-            $asset->addDependency(new AssetDependency($dependentAsset));
+            $asset->addDependency($dependentAsset);
             $relativePath = $this->createRelativePath($asset->publicPathWithoutDigest, $dependentAsset->publicPath);
 
             return 'url("'.$relativePath.'")';

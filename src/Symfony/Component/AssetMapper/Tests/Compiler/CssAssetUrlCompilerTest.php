@@ -13,7 +13,6 @@ namespace Symfony\Component\AssetMapper\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\AssetMapper\AssetDependency;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\Compiler\AssetCompilerInterface;
 use Symfony\Component\AssetMapper\Compiler\CssAssetUrlCompiler;
@@ -29,11 +28,8 @@ class CssAssetUrlCompilerTest extends TestCase
         $compiler = new CssAssetUrlCompiler(AssetCompilerInterface::MISSING_IMPORT_IGNORE, $this->createMock(LoggerInterface::class));
         $asset = new MappedAsset($sourceLogicalName, 'anything', '/assets/'.$sourceLogicalName);
         $this->assertSame($expectedOutput, $compiler->compile($input, $asset, $this->createAssetMapper()));
-        $assetDependencyLogicalPaths = array_map(fn (AssetDependency $dependency) => $dependency->asset->logicalPath, $asset->getDependencies());
+        $assetDependencyLogicalPaths = array_map(fn (MappedAsset $dependency) => $dependency->logicalPath, $asset->getDependencies());
         $this->assertSame($expectedDependencies, $assetDependencyLogicalPaths);
-        if ($expectedDependencies) {
-            $this->assertTrue($asset->getDependencies()[0]->isContentDependency);
-        }
     }
 
     public static function provideCompileTests(): iterable

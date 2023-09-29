@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by valtzu at 2023-08-24T18:24:09Z
+
+Added a test case to demonstrate the issue.
+
+---
+
+I wonder if `HandledStamp` should still be dropped :thinking:

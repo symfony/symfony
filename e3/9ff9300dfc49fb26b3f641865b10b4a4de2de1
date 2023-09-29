@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-03-16T10:36:46Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.3" but it seems your PR description refers to branch "6.2".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by elevado at 2023-09-22T13:08:29Z
+
+@xabbuh / @derrabus
+
+We spoked about this pull request. As discussed, I tested whether this error already existed in version 6.0, however it is only from version 6.2 onwards.
+
+In AbstractObjectNormalizer.php, the block from line 311 to 324 has been added.
+
+However the cause of the error is the array_merge() in line 324.
+
+https://github.com/symfony/symfony/blob/6a9f47c6940e86f9cbb5d67867335cde3b1ce5f8/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php#L311-L324
+
+Therefore, an update from 5.4 LTS to 6.4 LTS will definitely result in a breaking change.
+
+Can you please check and release this pull request as a second reviewer so that this fix goes into 6.4.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-09-24T16:28:24Z
+
+@elevado Can you rebase your changes on the `6.3` branch please?

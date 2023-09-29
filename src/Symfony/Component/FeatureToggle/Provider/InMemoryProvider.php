@@ -12,20 +12,36 @@
 namespace Symfony\Component\FeatureToggle\Provider;
 
 use Symfony\Component\FeatureToggle\Feature;
-use Symfony\Component\FeatureToggle\FeatureCollection;
+use function array_keys;
+use function array_reduce;
 
 final class InMemoryProvider implements ProviderInterface
 {
     /**
+     * @var array<string, Feature> $features
+     */
+    private readonly array $features;
+
+    /**
      * @param list<Feature> $features
      */
     public function __construct(
-        private readonly array $features,
+        array $features,
     ) {
+        $this->features = array_reduce($features, static function (array $features, Feature $feature): array {
+            $features[$feature->getName()] = $feature;
+
+            return $features;
+        }, []);
     }
 
-    public function provide(): FeatureCollection
+    public function get(string $featureName): ?Feature
     {
-        return new FeatureCollection($this->features);
+        return $this->features[$featureName] ?? null;
+    }
+
+    public function names(): array
+    {
+        return array_keys($this->features);
     }
 }

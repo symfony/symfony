@@ -20,7 +20,7 @@ return static function (ContainerConfigurator $container) {
 
     $services->set('feature_toggle.feature_collection', FeatureCollection::class)
         ->args([
-            '$features' => [],
+            '$providers' => tagged_iterator('feature_toggle.feature_provider')
         ])
     ;
 

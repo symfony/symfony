@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FeatureToggleBundle;
 
 use Symfony\Bundle\FeatureToggleBundle\DependencyInjection\CompilerPass\DebugPass;
-use Symfony\Bundle\FeatureToggleBundle\DependencyInjection\CompilerPass\FeatureCollectionPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -20,7 +19,6 @@ final class FeatureToggleBundle extends Bundle
 {
     public function build(ContainerBuilder $container): void
     {
-        $container->addCompilerPass(new FeatureCollectionPass());
         $container->addCompilerPass(new DebugPass());
     }
 }

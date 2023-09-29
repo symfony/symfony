@@ -26,9 +26,9 @@ use Symfony\Component\FeatureToggle\Strategy\GrantStrategy;
  */
 final class FeatureCollectionTest extends TestCase
 {
-    public function testEnsureItIsIterable(): void
+    public function testEnsureItListFeatureNames(): void
     {
-        $featureCollection = new FeatureCollection([
+        $featureCollection = FeatureCollection::withFeatures([
             new Feature(
                 name: 'fake-1',
                 description: 'Fake description 1',
@@ -43,51 +43,14 @@ final class FeatureCollectionTest extends TestCase
             ),
         ]);
 
-        self::assertIsIterable($featureCollection);
-        self::assertCount(2, $featureCollection);
+        self::assertIsIterable($featureCollection->names());
+        self::assertCount(2, $featureCollection->names());
+        self::assertSame(['fake-1', 'fake-2'], $featureCollection->names());
     }
 
     public function testEnsureItImplementsContainerInterface(): void
     {
         self::assertTrue(is_a(FeatureCollection::class, ContainerInterface::class, true));
-    }
-
-    public function testEnsureItIsMergeableWithDifferentTypesOfIterable(): void
-    {
-        $featureCollection = new FeatureCollection([
-            new Feature(
-                name: 'fake-1',
-                description: 'Fake description 1',
-                default: true,
-                strategy: new GrantStrategy()
-            ),
-            new Feature(
-                name: 'fake-2',
-                description: 'Fake description 2',
-                default: true,
-                strategy: new GrantStrategy()
-            ),
-        ]);
-
-        $featureCollection->withFeatures(function (): \Generator {
-            yield new Feature(
-                name: 'fake-3',
-                description: 'Fake description 3',
-                default: true,
-                strategy: new GrantStrategy()
-            );
-        });
-
-        self::assertCount(3, $featureCollection);
-
-        $featureCollection->withFeatures([new Feature(
-            name: 'fake-4',
-            description: 'Fake description 4',
-            default: true,
-            strategy: new GrantStrategy()
-        )]);
-
-        self::assertCount(4, $featureCollection);
     }
 
     public function testItCanFindTheFeature(): void
@@ -106,7 +69,7 @@ final class FeatureCollectionTest extends TestCase
             strategy: new GrantStrategy()
         );
 
-        $featureCollection = new FeatureCollection([$featureFake1, $featureFake2]);
+        $featureCollection = FeatureCollection::withFeatures([$featureFake1, $featureFake2]);
 
         self::assertTrue($featureCollection->has('fake-1'));
         self::assertSame($featureFake1, $featureCollection->get('fake-1'));
@@ -117,7 +80,7 @@ final class FeatureCollectionTest extends TestCase
 
     public function testItThrowsWhenFeatureNotFound(): void
     {
-        $featureCollection = new FeatureCollection([]);
+        $featureCollection = FeatureCollection::withFeatures([]);
 
         self::assertFalse($featureCollection->has('not-found-1'));
 

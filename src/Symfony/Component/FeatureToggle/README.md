@@ -25,7 +25,7 @@ use Symfony\Component\FeatureToggle\FeatureChecker;
 use Symfony\Component\FeatureToggle\FeatureCollection;
 use Symfony\Component\FeatureToggle\Strategy\RequestQueryStrategy;
 
-$features = new FeatureCollection([
+$features = FeatureCollection::withFeatures([
     new Feature(
         name: 'new_feature',
         description: 'My new feature',
@@ -50,6 +50,10 @@ Available strategies
 
 **AffirmativeStrategy** : Takes a list of `StrategyInterface` and stops at the first `Grant`.
 
+**PriorityStrategy** : Takes a list of `StrategyInterface` and stops at the first non-abstain (either `Grant` or `Deny`).
+
+**UnanimousStrategy** : Takes a list of `StrategyInterface` and stops at the first `Deny`. Will return `Deny` if at least one found. `Grant` If at least one found and no `Deny`. `Abstain` otherwise.
+
 **DateStrategy** : Grant if current date is after the `$from` and before the `$until` ones.
 
 **DenyStrategy** : Always Denies.
@@ -59,8 +63,6 @@ Available strategies
 **GrantStrategy** : Always Grants.
 
 **NotStrategy** : Takes a `StrategyInterface` and inverts its returned value (except if abstained).
-
-**PriorityStrategy** : Takes a list of `StrategyInterface` and stops at the first non-abstain (either `Grant` or `Deny`).
 
 **RequestHeaderStrategy** : Will look for a truthy value in the given `$name` header.
 

@@ -33,14 +33,14 @@ final class FeatureCheckerTest extends TestCase
     public function testItCorrectlyCheckTheFeaturesEvenIfNotFound(): void
     {
         $featureChecker = new FeatureChecker(
-            new FeatureCollection([]),
+            FeatureCollection::withFeatures([]),
             true
         );
 
         self::assertTrue($featureChecker->isEnabled('not-found-1'));
 
         $featureChecker = new FeatureChecker(
-            new FeatureCollection([
+            FeatureCollection::withFeatures([
                 new Feature(
                     name: 'fake-1',
                     description: 'Fake description 1',

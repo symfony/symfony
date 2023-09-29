@@ -11,9 +11,14 @@
 
 namespace Symfony\Component\FeatureToggle\Provider;
 
-use Symfony\Component\FeatureToggle\FeatureCollection;
+use Symfony\Component\FeatureToggle\Feature;
 
 interface ProviderInterface
 {
-    public function provide(): FeatureCollection;
+    public function get(string $featureName): ?Feature;
+
+    /**
+     * @return list<string>
+     */
+    public function names(): array;
 }

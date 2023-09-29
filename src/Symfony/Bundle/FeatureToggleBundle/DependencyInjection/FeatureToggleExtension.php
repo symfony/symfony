@@ -13,12 +13,14 @@ namespace Symfony\Bundle\FeatureToggleBundle\DependencyInjection;
 
 use Symfony\Bundle\FeatureToggleBundle\Strategy\CustomStrategy;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\FeatureToggle\Feature;
+use Symfony\Component\FeatureToggle\Provider\ProviderInterface;
 use Symfony\Component\FeatureToggle\Strategy\StrategyInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Routing\Router;
@@ -28,6 +30,10 @@ final class FeatureToggleExtension extends Extension
 {
     public function load(array $configs, ContainerBuilder $container): void
     {
+        $container->registerForAutoconfiguration(ProviderInterface::class)
+            ->addTag('feature_toggle.feature_provider')
+        ;
+
         $config = $this->processConfiguration(new Configuration(), $configs);
 
         $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));
@@ -53,34 +59,26 @@ final class FeatureToggleExtension extends Extension
         }
     }
 
-    /**
-     * @param ConfigurationType $config
-     */
     private function loadFeatures(ContainerBuilder $container, array $config): void
     {
         $features = [];
         foreach ($config['features'] as $featureName => $featureConfig) {
-            $definition = new Definition(Feature::class, [
-                '$name' => $featureName,
-                '$description' => $featureConfig['description'],
-                '$default' => $featureConfig['default'],
-                '$strategy' => new Reference($featureConfig['strategy']),
-            ]);
-            $container->setDefinition($featureName, $definition);
-
-            $features[] = new Reference($featureName);
+            $features[$featureName] = new ServiceClosureArgument((new Definition(Feature::class))
+                ->setShared(false)
+                ->setArguments([
+                    $featureName,
+                    $featureConfig['description'],
+                    $featureConfig['default'],
+                    new Reference($featureConfig['strategy']),
+                ]))
+            ;
         }
 
-        $container->getDefinition('feature_toggle.provider.in_memory')
-            ->setArguments([
-                '$features' => $features,
-            ])
+        $container->getDefinition('feature_toggle.provider.lazy_in_memory')
+            ->setArgument('$features', $features)
         ;
     }
 
-    /**
-     * @param ConfigurationType $config
-     */
     private function loadStrategies(ContainerBuilder $container, array $config): void
     {
         $container->registerForAutoconfiguration(StrategyInterface::class)

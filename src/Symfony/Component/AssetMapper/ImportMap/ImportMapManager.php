@@ -108,7 +108,7 @@ class ImportMapManager
         $downloadedPackages = [];
 
         foreach ($entries as $entry) {
-            if (!$entry->isDownloaded || $this->assetMapper->getAsset($entry->path)) {
+            if (!$entry->isDownloaded || $this->findAsset($entry->path)) {
                 continue;
             }
 
@@ -211,7 +211,7 @@ class ImportMapManager
         $rawImportMapData = [];
         foreach ($allEntries as $entry) {
             if ($entry->path) {
-                $asset = $this->assetMapper->getAsset($entry->path);
+                $asset = $this->findAsset($entry->path);
 
                 if (!$asset) {
                     if ($entry->isDownloaded) {
@@ -330,11 +330,15 @@ class ImportMapManager
             }
 
             $path = $requireOptions->path;
-            if (is_file($path)) {
-                $path = $this->assetMapper->getAssetFromSourcePath($path)?->logicalPath;
-                if (null === $path) {
-                    throw new \LogicException(sprintf('The path "%s" of the package "%s" cannot be found in any asset map paths.', $requireOptions->path, $requireOptions->packageName));
-                }
+            if (!$asset = $this->findAsset($path)) {
+                throw new \LogicException(sprintf('The path "%s" of the package "%s" cannot be found: either pass the logical name of the asset or a relative path starting with "./".', $requireOptions->path, $requireOptions->packageName));
+            }
+
+            $rootImportMapDir = $this->importMapConfigReader->getRootDirectory();
+            // convert to a relative path (or fallback to the logical path)
+            $path = $asset->logicalPath;
+            if ($rootImportMapDir && str_starts_with(realpath($asset->sourcePath), realpath($rootImportMapDir))) {
+                $path = './'.substr(realpath($asset->sourcePath), \strlen(realpath($rootImportMapDir)) + 1);
             }
 
             $newEntry = new ImportMapEntry(
@@ -384,7 +388,7 @@ class ImportMapManager
             return;
         }
 
-        $asset = $this->assetMapper->getAsset($entry->path);
+        $asset = $this->findAsset($entry->path);
 
         if (!$asset) {
             throw new \LogicException(sprintf('The path "%s" of the package "%s" cannot be found in any asset map paths.', $entry->path, $entry->importName));
@@ -418,7 +422,7 @@ class ImportMapManager
             return $currentImportEntries;
         }
 
-        if (!$asset = $this->assetMapper->getAsset($entry->path)) {
+        if (!$asset = $this->findAsset($entry->path)) {
             // should only be possible at this point for root importmap.php entries
             throw new \InvalidArgumentException(sprintf('The asset "%s" mentioned in "importmap.php" cannot be found in any asset map paths.', $entry->path));
         }
@@ -498,7 +502,7 @@ class ImportMapManager
             throw new \InvalidArgumentException(sprintf('The entrypoint "%s" is a remote package and cannot be used as an entrypoint.', $entryName));
         }
 
-        $asset = $this->assetMapper->getAsset($rootImportEntries->get($entryName)->path);
+        $asset = $this->findAsset($rootImportEntries->get($entryName)->path);
         if (!$asset) {
             throw new \InvalidArgumentException(sprintf('The path "%s" of the entrypoint "%s" mentioned in "importmap.php" cannot be found in any asset map paths.', $rootImportEntries->get($entryName)->path, $entryName));
         }
@@ -528,5 +532,21 @@ class ImportMapManager
     private static function getImportMapTypeFromFilename(string $path): ImportMapType
     {
         return str_ends_with($path, '.css') ? ImportMapType::CSS : ImportMapType::JS;
+    }
+
+    /**
+     * Finds the MappedAsset allowing for a "logical path", relative or absolute filesystem path.
+     */
+    private function findAsset(string $path): ?MappedAsset
+    {
+        if ($asset = $this->assetMapper->getAsset($path)) {
+            return $asset;
+        }
+
+        if (str_starts_with($path, '.')) {
+            $path = $this->importMapConfigReader->getRootDirectory().'/'.$path;
+        }
+
+        return $this->assetMapper->getAssetFromSourcePath($path);
     }
 }

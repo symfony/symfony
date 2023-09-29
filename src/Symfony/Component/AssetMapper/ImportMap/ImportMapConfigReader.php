@@ -107,4 +107,9 @@ class ImportMapConfigReader
 
         EOF);
     }
+
+    public function getRootDirectory(): string
+    {
+        return \dirname($this->importMapConfigPath);
+    }
 }

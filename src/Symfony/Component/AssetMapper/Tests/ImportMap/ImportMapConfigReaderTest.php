@@ -102,4 +102,10 @@ EOF;
 
         $this->assertSame($originalImportMapData, $newImportMapData);
     }
+
+    public function testGetRootDirectory()
+    {
+        $configReader = new ImportMapConfigReader(__DIR__.'/../fixtures/importmap.php');
+        $this->assertSame(__DIR__.'/../fixtures', $configReader->getRootDirectory());
+    }
 }

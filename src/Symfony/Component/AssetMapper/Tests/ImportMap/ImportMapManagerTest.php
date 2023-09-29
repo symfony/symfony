@@ -65,6 +65,9 @@ class ImportMapManagerTest extends TestCase
         $manager = $this->createImportMapManager();
         $this->mockImportMap($importMapEntries);
         $this->mockAssetMapper($mappedAssets);
+        $this->configReader->expects($this->any())
+            ->method('getRootDirectory')
+            ->willReturn('/fake/root');
 
         $this->assertEquals($expectedData, $manager->getRawImportMapData());
     }
@@ -255,7 +258,7 @@ class ImportMapManagerTest extends TestCase
                 'imports_simple' => [
                     'path' => '/assets/imports_simple-d1g3st.js',
                     'type' => 'js',
-                ]
+                ],
             ],
         ];
 
@@ -301,6 +304,51 @@ class ImportMapManagerTest extends TestCase
                 'app.css' => [
                     'path' => '/assets/app.css',
                     'type' => 'css',
+                ],
+            ],
+        ];
+
+        yield 'it handles a relative path file' => [
+            [
+                new ImportMapEntry(
+                    'app',
+                    path: './assets/app.js',
+                ),
+            ],
+            [
+                new MappedAsset(
+                    'app.js',
+                    // /fake/root is the mocked root directory
+                    '/fake/root/assets/app.js',
+                    publicPath: '/assets/app.js',
+                ),
+            ],
+            [
+                'app' => [
+                    'path' => '/assets/app.js',
+                    'type' => 'js',
+                ],
+            ],
+        ];
+
+        yield 'it handles an absolute path file' => [
+            [
+                new ImportMapEntry(
+                    'app',
+                    path: '/some/path/assets/app.js',
+                ),
+            ],
+            [
+                new MappedAsset(
+                    'app.js',
+                    '/some/path/assets/app.js',
+                    publicPath: '/assets/app.js',
+                ),
+            ],
+            [
+                'app' => [
+                    'path' => '/assets/app.js',
+                    'type' => 'js',
                 ],
             ],
         ];
@@ -609,19 +657,22 @@ class ImportMapManagerTest extends TestCase
                 foreach ($expectedDownloadedFiles as $file => $contents) {
                     $expectedPath = self::$writableRoot.'/assets/vendor/'.$file;
                     if (realpath($expectedPath) === realpath($sourcePath)) {
-                        return new MappedAsset('vendor/'.$file);
+                        return new MappedAsset('vendor/'.$file, $sourcePath);
                     }
                 }
 
                 if (str_ends_with($sourcePath, 'some_file.js')) {
                     // physical file we point to in one test
-                    return new MappedAsset('some_file.js');
+                    return new MappedAsset('some_file.js', $sourcePath);
                 }
 
                 return null;
             })
         ;
 
+        $this->configReader->expects($this->any())
+            ->method('getRootDirectory')
+            ->willReturn(self::$writableRoot);
         $this->configReader->expects($this->once())
             ->method('getEntries')
             ->willReturn(new ImportMapEntries())
@@ -789,7 +840,8 @@ class ImportMapManagerTest extends TestCase
             'resolvedPackages' => [],
             'expectedImportMap' => [
                 'some/module' => [
-                    'path' => 'some_file.js',
+                    // converted to relative path
+                    'path' => './assets/some_file.js',
                 ],
             ],
             'expectedDownloadedFiles' => [],
@@ -849,7 +901,7 @@ class ImportMapManagerTest extends TestCase
 
         $this->mockAssetMapper([
             new MappedAsset('vendor/moo.js', self::$writableRoot.'/assets/vendor/moo.js'),
-        ]);
+        ], false);
         $this->assetMapper->expects($this->any())
             ->method('getAssetFromSourcePath')
             ->willReturnCallback(function (string $sourcePath) {
@@ -932,6 +984,9 @@ class ImportMapManagerTest extends TestCase
             ])
         ;
 
+        $this->configReader->expects($this->any())
+            ->method('getRootDirectory')
+            ->willReturn(self::$writableRoot);
         $this->configReader->expects($this->once())
             ->method('writeEntries')
             ->with($this->callback(function (ImportMapEntries $entries) {
@@ -947,10 +1002,6 @@ class ImportMapManagerTest extends TestCase
         $this->mockAssetMapper([
             new MappedAsset('vendor/cowsay.js', self::$writableRoot.'/assets/vendor/cowsay.js'),
         ]);
-        $this->assetMapper->expects($this->once())
-            ->method('getAssetFromSourcePath')
-            ->willReturn(new MappedAsset('vendor/cowsay.js'))
-        ;
 
         $manager->update(['cowsay']);
         $actualContents = file_get_contents(self::$writableRoot.'/assets/vendor/cowsay.js');
@@ -968,13 +1019,14 @@ class ImportMapManagerTest extends TestCase
         $this->mockAssetMapper([
             // fake that vendor/lodash.js exists, but not stimulus
             new MappedAsset('vendor/lodash.js'),
-        ]);
-        $this->assetMapper->expects($this->once())
+        ], false);
+        $this->assetMapper->expects($this->any())
             ->method('getAssetFromSourcePath')
-            ->with($this->callback(function (string $sourcePath) {
-                return str_ends_with($sourcePath, 'assets/vendor/@hotwired/stimulus.js');
-            }))
-            ->willReturn(new MappedAsset('vendor/@hotwired/stimulus.js'))
+            ->willReturnCallback(function (string $sourcePath) {
+                if (str_ends_with($sourcePath, 'assets/vendor/@hotwired/stimulus.js')) {
+                    return new MappedAsset('vendor/@hotwired/stimulus.js');
+                }
+            })
         ;
 
         $response = $this->createMock(ResponseInterface::class);
@@ -1125,13 +1177,51 @@ class ImportMapManagerTest extends TestCase
     /**
      * @param MappedAsset[] $mappedAssets
      */
-    private function mockAssetMapper(array $mappedAssets): void
+    private function mockAssetMapper(array $mappedAssets, bool $mockGetAssetFromSourcePath = true): void
     {
         $this->assetMapper->expects($this->any())
             ->method('getAsset')
             ->willReturnCallback(function (string $logicalPath) use ($mappedAssets) {
                 foreach ($mappedAssets as $asset) {
                     if ($asset->logicalPath === $logicalPath) {
+                        return $asset;
+                    }
+                }
+
+                return null;
+            })
+        ;
+
+        if (!$mockGetAssetFromSourcePath) {
+            return;
+        }
+
+        $this->assetMapper->expects($this->any())
+            ->method('getAssetFromSourcePath')
+            ->willReturnCallback(function (string $sourcePath) use ($mappedAssets) {
+                // collapse ../ in paths and ./ in paths to mimic the realpath AssetMapper uses
+                $unCollapsePath = function (string $path) {
+                    $parts = explode('/', $path);
+                    $newParts = [];
+                    foreach ($parts as $part) {
+                        if ('..' === $part) {
+                            array_pop($newParts);
+
+                            continue;
+                        }
+
+                        if ('.' !== $part) {
+                            $newParts[] = $part;
+                        }
+                    }
+
+                    return implode('/', $newParts);
+                };
+
+                $sourcePath = $unCollapsePath($sourcePath);
+
+                foreach ($mappedAssets as $asset) {
+                    if (isset($asset->sourcePath) && $unCollapsePath($asset->sourcePath) === $sourcePath) {
                         return $asset;
                     }
                 }

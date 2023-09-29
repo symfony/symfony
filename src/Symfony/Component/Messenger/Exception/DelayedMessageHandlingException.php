@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Messenger\Exception;
 
+use Symfony\Component\Messenger\Envelope;
+
 /**
  * When handling queued messages from {@link DispatchAfterCurrentBusMiddleware},
  * some handlers caused an exception. This exception contains all those handler exceptions.
@@ -20,9 +22,12 @@ namespace Symfony\Component\Messenger\Exception;
 class DelayedMessageHandlingException extends RuntimeException
 {
     private array $exceptions;
+    private Envelope $envelope;
 
-    public function __construct(array $exceptions)
+    public function __construct(array $exceptions, Envelope $envelope)
     {
+        $this->envelope = $envelope;
+
         $exceptionMessages = implode(", \n", array_map(
             fn (\Throwable $e) => $e::class.': '.$e->getMessage(),
             $exceptions
@@ -42,5 +47,10 @@ class DelayedMessageHandlingException extends RuntimeException
     public function getExceptions(): array
     {
         return $this->exceptions;
+    }
+
+    public function getEnvelope(): Envelope
+    {
+        return $this->envelope;
     }
 }

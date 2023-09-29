@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ImportMap\Providers;
+namespace Symfony\Component\AssetMapper\Tests\ImportMap\Resolver;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\ImportMap\PackageRequireOptions;
@@ -69,6 +69,10 @@ class JsDelivrEsmResolverTest extends TestCase
                     'url' => '/lodash@1.2.3/+esm',
                     'response' => ['url' => 'https://cdn.jsdelivr.net/npm/lodash.js@1.2.3/+esm'],
                 ],
+                [
+                    'url' => '/v1/packages/npm/lodash@1.2.3/entrypoints',
+                    'response' => ['body' => ['entrypoints' => []]],
+                ],
             ],
             'expectedResolvedPackages' => [
                 'lodash' => [
@@ -87,6 +91,10 @@ class JsDelivrEsmResolverTest extends TestCase
                 [
                     'url' => '/lodash@2.1.3/+esm',
                     'response' => ['url' => 'https://cdn.jsdelivr.net/npm/lodash.js@2.1.3/+esm'],
+                ],
+                [
+                    'url' => '/v1/packages/npm/lodash@2.1.3/entrypoints',
+                    'response' => ['body' => ['entrypoints' => []]],
                 ],
             ],
             'expectedResolvedPackages' => [
@@ -107,6 +115,10 @@ class JsDelivrEsmResolverTest extends TestCase
                     'url' => '/@hotwired/stimulus@3.1.3/+esm',
                     'response' => ['url' => 'https://cdn.jsdelivr.net/npm/@hotwired/stimulus.js@3.1.3/+esm'],
                 ],
+                [
+                    'url' => '/v1/packages/npm/@hotwired/stimulus@3.1.3/entrypoints',
+                    'response' => ['body' => ['entrypoints' => []]],
+                ],
             ],
             'expectedResolvedPackages' => [
                 '@hotwired/stimulus' => [
@@ -126,6 +138,10 @@ class JsDelivrEsmResolverTest extends TestCase
                     'url' => '/chart.js@3.0.1/auto/+esm',
                     'response' => ['url' => 'https://cdn.jsdelivr.net/npm/chart.js@3.0.1/auto/+esm'],
                 ],
+                [
+                    'url' => '/v1/packages/npm/chart.js@3.0.1/entrypoints',
+                    'response' => ['body' => ['entrypoints' => []]],
+                ],
             ],
             'expectedResolvedPackages' => [
                 'chart.js/auto' => [
@@ -144,6 +160,10 @@ class JsDelivrEsmResolverTest extends TestCase
                 [
                     'url' => '/@chart/chart.js@3.0.1/auto/+esm',
                     'response' => ['url' => 'https://cdn.jsdelivr.net/npm/@chart/chart.js@3.0.1/auto/+esm'],
+                ],
+                [
+                    'url' => '/v1/packages/npm/@chart/chart.js@3.0.1/entrypoints',
+                    'response' => ['body' => ['entrypoints' => []]],
                 ],
             ],
             'expectedResolvedPackages' => [
@@ -166,6 +186,10 @@ class JsDelivrEsmResolverTest extends TestCase
                         'url' => 'https://cdn.jsdelivr.net/npm/lodash.js@1.2.3/+esm',
                         'body' => 'contents of file',
                     ],
+                ],
+                [
+                    'url' => '/v1/packages/npm/lodash@1.2.3/entrypoints',
+                    'response' => ['body' => ['entrypoints' => []]],
                 ],
             ],
             'expectedResolvedPackages' => [
@@ -191,6 +215,10 @@ class JsDelivrEsmResolverTest extends TestCase
                         'body' => 'import{Color as t}from"/npm/@kurkle/color@0.3.2/+esm";console.log("yo");',
                     ],
                 ],
+                [
+                    'url' => '/v1/packages/npm/lodash@1.2.3/entrypoints',
+                    'response' => ['body' => ['entrypoints' => []]],
+                ],
                 // @kurkle/color
                 [
                     'url' => '/v1/packages/npm/@kurkle/color/resolved?specifier=0.3.2',
@@ -202,6 +230,10 @@ class JsDelivrEsmResolverTest extends TestCase
                         'url' => 'https://cdn.jsdelivr.net/npm/@kurkle/color@0.3.2/+esm',
                         'body' => 'import*as t from"/npm/@popperjs/core@2.11.7/+esm";// hello world',
                     ],
+                ],
+                [
+                    'url' => '/v1/packages/npm/@kurkle/color@0.3.2/entrypoints',
+                    'response' => ['body' => ['entrypoints' => []]],
                 ],
                 // @popperjs/core
                 [
@@ -215,6 +247,10 @@ class JsDelivrEsmResolverTest extends TestCase
                         // point back to the original to try to confuse things or cause extra work
                         'body' => 'import*as t from"/npm/lodash@1.2.9/+esm";// hello from popper',
                     ],
+                ],
+                [
+                    'url' => '/v1/packages/npm/@popperjs/core@2.11.7/entrypoints',
+                    'response' => ['body' => ['entrypoints' => []]],
                 ],
             ],
             'expectedResolvedPackages' => [
@@ -230,6 +266,82 @@ class JsDelivrEsmResolverTest extends TestCase
                 '@popperjs/core' => [
                     'url' => 'https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/+esm',
                     'content' => 'import*as t from"lodash";// hello from popper',
+                ],
+            ],
+        ];
+
+        yield 'require single CSS package' => [
+            'packages' => [new PackageRequireOptions('bootstrap/dist/css/bootstrap.min.css')],
+            'expectedRequests' => [
+                [
+                    'url' => '/v1/packages/npm/bootstrap/resolved?specifier=%2A',
+                    'response' => ['body' => ['version' => '3.3.0']],
+                ],
+                [
+                    // CSS is detected: +esm is left off
+                    'url' => '/bootstrap@3.3.0/dist/css/bootstrap.min.css',
+                    'response' => ['url' => 'https://cdn.jsdelivr.net/npm/bootstrap.js@3.3.0/dist/css/bootstrap.min.css'],
+                ],
+            ],
+            'expectedResolvedPackages' => [
+                'bootstrap/dist/css/bootstrap.min.css' => [
+                    'url' => 'https://cdn.jsdelivr.net/npm/bootstrap.js@3.3.0/dist/css/bootstrap.min.css',
+                ],
+            ],
+        ];
+
+        yield 'require package with style key grabs the CSS' => [
+            'packages' => [new PackageRequireOptions('bootstrap', '^5')],
+            'expectedRequests' => [
+                [
+                    'url' => '/v1/packages/npm/bootstrap/resolved?specifier=%5E5',
+                    'response' => ['body' => ['version' => '5.2.0']],
+                ],
+                [
+                    'url' => '/bootstrap@5.2.0/+esm',
+                    'response' => ['url' => 'https://cdn.jsdelivr.net/npm/bootstrap.js@5.2.0/+esm'],
+                ],
+                [
+                    'url' => '/v1/packages/npm/bootstrap@5.2.0/entrypoints',
+                    'response' => ['body' => ['entrypoints' => [
+                        'css' => ['file' => '/dist/css/bootstrap.min.css'],
+                    ]]],
+                ],
+                [
+                    'url' => '/v1/packages/npm/bootstrap/resolved?specifier=5.2.0',
+                    'response' => ['body' => ['version' => '5.2.0']],
+                ],
+                [
+                    // grab the found CSS
+                    'url' => '/bootstrap@5.2.0/dist/css/bootstrap.min.css',
+                    'response' => ['url' => 'https://cdn.jsdelivr.net/npm/bootstrap.js@5.2.0/dist/css/bootstrap.min.css'],
+                ],
+            ],
+            'expectedResolvedPackages' => [
+                'bootstrap' => [
+                    'url' => 'https://cdn.jsdelivr.net/npm/bootstrap.js@5.2.0/+esm',
+                ],
+                'bootstrap/dist/css/bootstrap.min.css' => [
+                    'url' => 'https://cdn.jsdelivr.net/npm/bootstrap.js@5.2.0/dist/css/bootstrap.min.css',
+                ],
+            ],
+        ];
+
+        yield 'require path in package skips grabbing the style key' => [
+            'packages' => [new PackageRequireOptions('bootstrap/dist/modal.js', '^5')],
+            'expectedRequests' => [
+                [
+                    'url' => '/v1/packages/npm/bootstrap/resolved?specifier=%5E5',
+                    'response' => ['body' => ['version' => '5.2.0']],
+                ],
+                [
+                    'url' => '/bootstrap@5.2.0/dist/modal.js/+esm',
+                    'response' => ['url' => 'https://cdn.jsdelivr.net/npm/bootstrap.js@5.2.0/dist/modal.js+esm'],
+                ],
+            ],
+            'expectedResolvedPackages' => [
+                'bootstrap/dist/modal.js' => [
+                    'url' => 'https://cdn.jsdelivr.net/npm/bootstrap.js@5.2.0/dist/modal.js+esm',
                 ],
             ],
         ];

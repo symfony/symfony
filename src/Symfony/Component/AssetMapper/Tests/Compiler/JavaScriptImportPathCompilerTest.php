@@ -18,6 +18,8 @@ use Symfony\Component\AssetMapper\Compiler\AssetCompilerInterface;
 use Symfony\Component\AssetMapper\Compiler\JavaScriptImportPathCompiler;
 use Symfony\Component\AssetMapper\Exception\CircularAssetsException;
 use Symfony\Component\AssetMapper\Exception\RuntimeException;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\AssetMapper\MappedAsset;
 
 class JavaScriptImportPathCompilerTest extends TestCase
@@ -25,21 +27,32 @@ class JavaScriptImportPathCompilerTest extends TestCase
     /**
      * @dataProvider provideCompileTests
      */
-    public function testCompile(string $sourceLogicalName, string $input, array $expectedDependencies)
+    public function testCompile(string $sourceLogicalName, string $input, array $expectedJavaScriptImports)
     {
         $asset = new MappedAsset($sourceLogicalName, 'anything', '/assets/'.$sourceLogicalName);
 
-        $compiler = new JavaScriptImportPathCompiler(AssetCompilerInterface::MISSING_IMPORT_IGNORE, $this->createMock(LoggerInterface::class));
+        $importMapManager = $this->createMock(ImportMapManager::class);
+        $importMapManager->expects($this->any())
+            ->method('findRootImportMapEntry')
+            ->willReturnCallback(function ($importName) {
+                if ('module_in_importmap_local_asset' === $importName) {
+                    return new ImportMapEntry('module_in_importmap_local_asset', 'module_in_importmap_local_asset.js');
+                }
+
+                if ('module_in_importmap_remote' === $importName) {
+                    return new ImportMapEntry('module_in_importmap_local_asset', url: 'https://example.com/module.js');
+                }
+
+                return null;
+            });
+        $compiler = new JavaScriptImportPathCompiler($importMapManager);
         // compile - and check that content doesn't change
         $this->assertSame($input, $compiler->compile($input, $asset, $this->createAssetMapper()));
-        $actualDependencies = [];
-        foreach ($asset->getDependencies() as $dependency) {
-            $actualDependencies[$dependency->asset->logicalPath] = $dependency->isLazy;
+        $actualImports = [];
+        foreach ($asset->getJavaScriptImports() as $import) {
+            $actualImports[$import->importName] = ['lazy' => $import->isLazy, 'asset' => $import->asset?->logicalPath, 'add' => $import->addImplicitlyToImportMap];
         }
-        $this->assertEquals($expectedDependencies, $actualDependencies);
-        if ($expectedDependencies) {
-            $this->assertFalse($asset->getDependencies()[0]->isContentDependency);
-        }
+        $this->assertEquals($expectedJavaScriptImports, $actualImports);
     }
 
     public static function provideCompileTests(): iterable
@@ -47,7 +60,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
         yield 'dynamic_simple_double_quotes' => [
             'sourceLogicalName' => 'app.js',
             'input' => 'import("./other.js");',
-            'expectedDependencies' => ['other.js' => true],
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => true, 'asset' => 'other.js', 'add' => true]],
         ];
 
         yield 'dynamic_simple_multiline' => [
@@ -57,109 +70,227 @@ class JavaScriptImportPathCompilerTest extends TestCase
                 import("./other.js");
                 EOF
             ,
-            'expectedDependencies' => ['other.js' => true],
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => true, 'asset' => 'other.js', 'add' => true]],
         ];
 
         yield 'dynamic_simple_single_quotes' => [
             'sourceLogicalName' => 'app.js',
             'input' => 'import(\'./other.js\');',
-            'expectedDependencies' => ['other.js' => true],
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => true, 'asset' => 'other.js', 'add' => true]],
         ];
 
         yield 'dynamic_simple_tick_quotes' => [
             'sourceLogicalName' => 'app.js',
             'input' => 'import(`./other.js`);',
-            'expectedDependencies' => ['other.js' => true],
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => true, 'asset' => 'other.js', 'add' => true]],
         ];
 
         yield 'dynamic_resolves_multiple' => [
             'sourceLogicalName' => 'app.js',
             'input' => 'import("./other.js"); import("./subdir/foo.js");',
-            'expectedDependencies' => ['other.js' => true, 'subdir/foo.js' => true],
-        ];
-
-        yield 'dynamic_avoid_resolving_non_relative_imports' => [
-            'sourceLogicalName' => 'app.js',
-            'input' => 'import("other.js");',
-            'expectedDependencies' => [],
+            'expectedJavaScriptImports' => [
+                '/assets/other.js' => ['lazy' => true, 'asset' => 'other.js', 'add' => true],
+                '/assets/subdir/foo.js' => ['lazy' => true, 'asset' => 'subdir/foo.js', 'add' => true],
+            ],
         ];
 
         yield 'dynamic_resolves_dynamic_imports_later_in_file' => [
             'sourceLogicalName' => 'app.js',
             'input' => "console.log('Hello test!');\n import('./subdir/foo.js').then(() => console.log('inside promise!'));",
-            'expectedDependencies' => ['subdir/foo.js' => true],
+            'expectedJavaScriptImports' => [
+                '/assets/subdir/foo.js' => ['lazy' => true, 'asset' => 'subdir/foo.js', 'add' => true],
+            ],
         ];
 
         yield 'dynamic_correctly_moves_to_higher_directories' => [
             'sourceLogicalName' => 'subdir/app.js',
             'input' => 'import("../other.js");',
-            'expectedDependencies' => ['other.js' => true],
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => true, 'asset' => 'other.js', 'add' => true]],
         ];
 
         yield 'static_named_import_double_quotes' => [
             'sourceLogicalName' => 'app.js',
             'input' => 'import { myFunction } from "./other.js";',
-            'expectedDependencies' => ['other.js' => false],
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => false, 'asset' => 'other.js', 'add' => true]],
         ];
 
         yield 'static_named_import_single_quotes' => [
             'sourceLogicalName' => 'app.js',
             'input' => 'import { myFunction } from \'./other.js\';',
-            'expectedDependencies' => ['other.js' => false],
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => false, 'asset' => 'other.js', 'add' => true]],
         ];
 
         yield 'static_default_import' => [
             'sourceLogicalName' => 'app.js',
             'input' => 'import myFunction from "./other.js";',
-            'expectedDependencies' => ['other.js' => false],
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => false, 'asset' => 'other.js', 'add' => true]],
         ];
 
         yield 'static_default_and_named_import' => [
             'sourceLogicalName' => 'app.js',
             'input' => 'import myFunction, { helperFunction } from "./other.js";',
-            'expectedDependencies' => ['other.js' => false],
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => false, 'asset' => 'other.js', 'add' => true]],
         ];
 
         yield 'static_import_everything' => [
             'sourceLogicalName' => 'app.js',
             'input' => 'import * as myModule from "./other.js";',
-            'expectedDependencies' => ['other.js' => false],
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => false, 'asset' => 'other.js', 'add' => true]],
         ];
 
         yield 'static_import_just_for_side_effects' => [
             'sourceLogicalName' => 'app.js',
             'input' => 'import "./other.js";',
-            'expectedDependencies' => ['other.js' => false],
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => false, 'asset' => 'other.js', 'add' => true]],
         ];
 
         yield 'mix_of_static_and_dynamic_imports' => [
             'sourceLogicalName' => 'app.js',
             'input' => 'import "./other.js"; import("./subdir/foo.js");',
-            'expectedDependencies' => ['other.js' => false, 'subdir/foo.js' => true],
+            'expectedJavaScriptImports' => [
+                '/assets/other.js' => ['lazy' => false, 'asset' => 'other.js', 'add' => true],
+                '/assets/subdir/foo.js' => ['lazy' => true, 'asset' => 'subdir/foo.js', 'add' => true],
+            ],
         ];
 
         yield 'extra_import_word_does_not_cause_issues' => [
             'sourceLogicalName' => 'app.js',
             'input' => "// about to do an import\nimport('./other.js');",
-            'expectedDependencies' => ['other.js' => true],
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => true, 'asset' => 'other.js', 'add' => true]],
         ];
 
         yield 'import_on_one_line_then_module_name_on_next_is_ok' => [
             'sourceLogicalName' => 'app.js',
             'input' => "import \n    './other.js';",
-            'expectedDependencies' => ['other.js' => false],
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => false, 'asset' => 'other.js', 'add' => true]],
         ];
 
-        yield 'importing_a_css_file_is_not_included' => [
+        yield 'importing_a_css_file_is_included' => [
             'sourceLogicalName' => 'app.js',
             'input' => "import './styles.css';",
-            'expectedDependencies' => [],
+            'expectedJavaScriptImports' => ['/assets/styles.css' => ['lazy' => false, 'asset' => 'styles.css', 'add' => true]],
         ];
 
-        yield 'importing_non_existent_file_without_strict_mode_is_ignored' => [
+        yield 'importing_non_existent_file_without_strict_mode_is_ignored_still_listed_as_an_import' => [
             'sourceLogicalName' => 'app.js',
             'input' => "import './non-existent.js';",
-            'expectedDependencies' => [],
+            'expectedJavaScriptImports' => ['./non-existent.js' => ['lazy' => false, 'asset' => null, 'add' => false]],
+        ];
+
+        yield 'single_line_comment_at_start_ignored' => [
+            'sourceLogicalName' => 'app.js',
+            'input' => <<<EOF
+                const fun;
+                // import("./other.js");
+                EOF
+            ,
+            'expectedJavaScriptImports' => [],
+        ];
+
+        yield 'single_line_comment_with_whitespace_before_is_ignored' => [
+            'sourceLogicalName' => 'app.js',
+            'input' => <<<EOF
+                const fun;
+                 // import("./other.js");
+                EOF
+            ,
+            'expectedJavaScriptImports' => [],
+        ];
+
+        yield 'single_line_comment_with_more_text_before_import_ignored' => [
+            'sourceLogicalName' => 'app.js',
+            'input' => <<<EOF
+                const fun;
+                // this is not going to be parsed import("./other.js");
+                EOF
+            ,
+            'expectedJavaScriptImports' => [],
+        ];
+
+        yield 'single_line_comment_not_at_start_is_parsed' => [
+            'sourceLogicalName' => 'app.js',
+            'input' => <<<EOF
+                const fun;
+                console.log('// I am not really a comment'); import("./other.js");
+                EOF
+            ,
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => true, 'asset' => 'other.js', 'add' => true]],
+        ];
+
+        yield 'multi_line_comment_with_start_and_end_before_import_is_found' => [
+            'sourceLogicalName' => 'app.js',
+            'input' => <<<EOF
+                const fun;
+                /* comment */ import("./other.js");
+                EOF
+            ,
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => true, 'asset' => 'other.js', 'add' => true]],
+        ];
+
+        yield 'multi_line_comment_with_import_between_start_and_end_ignored' => [
+            'sourceLogicalName' => 'app.js',
+            'input' => <<<EOF
+                const fun;
+                    /* comment import("./other.js"); */
+                EOF
+            ,
+            'expectedJavaScriptImports' => [],
+        ];
+
+        yield 'multi_line_comment_with_no_end_parsed_for_safety' => [
+            'sourceLogicalName' => 'app.js',
+            'input' => <<<EOF
+                const fun;
+                    /* comment import("./other.js");
+                EOF
+            ,
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => true, 'asset' => 'other.js', 'add' => true]],
+        ];
+
+        yield 'multi_line_comment_with_no_end_found_eventually_ignored' => [
+            'sourceLogicalName' => 'app.js',
+            'input' => <<<EOF
+                const fun;
+                    /* comment import("./other.js");
+                    and more
+                    */
+                EOF
+            ,
+            'expectedJavaScriptImports' => [],
+        ];
+
+        yield 'multi_line_comment_with_text_before_is_parsed' => [
+            'sourceLogicalName' => 'app.js',
+            'input' => <<<EOF
+                const fun;
+                    console.log('/* not a comment'); import("./other.js");
+                EOF
+            ,
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => true, 'asset' => 'other.js', 'add' => true]],
+        ];
+
+        yield 'bare_import_not_in_importmap' => [
+            'sourceLogicalName' => 'app.js',
+            'input' => 'import "some_module";',
+            'expectedJavaScriptImports' => ['some_module' => ['lazy' => false, 'asset' => null, 'add' => false]],
+        ];
+
+        yield 'bare_import_in_importmap_with_local_asset' => [
+            'sourceLogicalName' => 'app.js',
+            'input' => 'import "module_in_importmap_local_asset";',
+            'expectedJavaScriptImports' => ['module_in_importmap_local_asset' => ['lazy' => false, 'asset' => 'module_in_importmap_local_asset.js', 'add' => false]],
+        ];
+
+        yield 'bare_import_in_importmap_but_remote' => [
+            'sourceLogicalName' => 'app.js',
+            'input' => 'import "module_in_importmap_remote";',
+            'expectedJavaScriptImports' => ['module_in_importmap_remote' => ['lazy' => false, 'asset' => null, 'add' => false]],
+        ];
+
+        yield 'absolute_import_added_as_dependency_only' => [
+            'sourceLogicalName' => 'app.js',
+            'input' => 'import "https://example.com/module.js";',
+            'expectedJavaScriptImports' => ['https://example.com/module.js' => ['lazy' => false, 'asset' => null, 'add' => false]],
         ];
     }
 
@@ -176,7 +307,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
             ->method('getAsset')
             ->willReturn($importedAsset);
 
-        $compiler = new JavaScriptImportPathCompiler(AssetCompilerInterface::MISSING_IMPORT_IGNORE, $this->createMock(LoggerInterface::class));
+        $compiler = new JavaScriptImportPathCompiler($this->createMock(ImportMapManager::class));
         $this->assertSame($expectedOutput, $compiler->compile($input, $asset, $assetMapper));
     }
 
@@ -245,6 +376,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
 
         $logger = $this->createMock(LoggerInterface::class);
         $compiler = new JavaScriptImportPathCompiler(
+            $this->createMock(ImportMapManager::class),
             AssetCompilerInterface::MISSING_IMPORT_STRICT,
             $logger
         );
@@ -294,7 +426,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
             });
 
         $asset = new MappedAsset('htmx.js', '/path/to/app.js');
-        $compiler = new JavaScriptImportPathCompiler();
+        $compiler = new JavaScriptImportPathCompiler($this->createMock(ImportMapManager::class));
         $content = '//** @type {import("./htmx").HtmxApi} */';
         $compiled = $compiler->compile($content, $asset, $assetMapper);
         // To form a good exception message, the compiler will check for the
@@ -313,6 +445,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
                     'other.js' => new MappedAsset('other.js', publicPathWithoutDigest: '/assets/other.js'),
                     'subdir/foo.js' => new MappedAsset('subdir/foo.js', publicPathWithoutDigest: '/assets/subdir/foo.js'),
                     'styles.css' => new MappedAsset('styles.css', publicPathWithoutDigest: '/assets/styles.css'),
+                    'module_in_importmap_local_asset.js' => new MappedAsset('module_in_importmap_local_asset.js', publicPathWithoutDigest: '/assets/module_in_importmap_local_asset.js'),
                     default => null,
                 };
             });

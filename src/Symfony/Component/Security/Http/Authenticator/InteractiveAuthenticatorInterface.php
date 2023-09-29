@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Http\Authenticator;
 
 /**
- * This is an extension of the authenticator interface that must
+ * This is an extension of the authenticator interface that may
  * be used by interactive authenticators.
  *
  * Interactive login requires explicit user action (e.g. a login

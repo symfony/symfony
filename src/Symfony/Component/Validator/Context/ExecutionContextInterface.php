@@ -122,7 +122,7 @@ interface ExecutionContextInterface
      * @param object|null $object       The currently validated object
      * @param string      $propertyPath The property path to the current value
      */
-    public function setNode(mixed $value, ?object $object, MetadataInterface $metadata = null, string $propertyPath): void;
+    public function setNode(mixed $value, ?object $object, ?MetadataInterface $metadata, string $propertyPath): void;
 
     /**
      * Warning: Should not be called by user code, to be used by the validator engine only.

@@ -12,7 +12,6 @@
 namespace Symfony\Component\AssetMapper\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\AssetMapper\AssetDependency;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\Compiler\SourceMappingUrlsCompiler;
 use Symfony\Component\AssetMapper\MappedAsset;
@@ -50,11 +49,8 @@ class SourceMappingUrlsCompilerTest extends TestCase
             publicPathWithoutDigest: '/assets/'.$sourceLogicalName,
         );
         $this->assertSame($expectedOutput, $compiler->compile($input, $asset, $assetMapper));
-        $assetDependencyLogicalPaths = array_map(fn (AssetDependency $dependency) => $dependency->asset->logicalPath, $asset->getDependencies());
+        $assetDependencyLogicalPaths = array_map(fn (MappedAsset $dependency) => $dependency->logicalPath, $asset->getDependencies());
         $this->assertSame($expectedDependencies, $assetDependencyLogicalPaths);
-        if ($expectedDependencies) {
-            $this->assertTrue($asset->getDependencies()[0]->isContentDependency);
-        }
     }
 
     public static function provideCompileTests(): iterable

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ImportMap\Providers;
+namespace Symfony\Component\AssetMapper\Tests\ImportMap\Resolver;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
@@ -142,27 +142,6 @@ class JspmResolverTest extends TestCase
             'expectedDownloadedFiles' => [
                 'assets/vendor/lodash.js',
             ],
-        ];
-
-        yield 'single_package_that_preloads' => [
-            'packages' => [new PackageRequireOptions('lodash', preload: true)],
-            'expectedInstallRequest' => ['lodash'],
-            'responseMap' => [
-                'lodash' => 'https://ga.jspm.io/npm:lodash@1.2.3/lodash.js',
-                'lodash_dep' => 'https://ga.jspm.io/npm:dep@1.0.0/lodash_dep.js',
-            ],
-            'expectedResolvedPackages' => [
-                'lodash' => [
-                    'url' => 'https://ga.jspm.io/npm:lodash@1.2.3/lodash.js',
-                    'preload' => true,
-                ],
-                'lodash_dep' => [
-                    'url' => 'https://ga.jspm.io/npm:dep@1.0.0/lodash_dep.js',
-                    // shares the preload - even though it wasn't strictly required
-                    'preload' => true,
-                ],
-            ],
-            'expectedDownloadedFiles' => [],
         ];
 
         yield 'single_package_with_jspm_custom_registry' => [

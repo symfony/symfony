@@ -26,6 +26,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\Php74Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php7Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php7ParentDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php81Dummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\SnakeCaseDummy;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -405,6 +406,20 @@ class ReflectionExtractorTest extends TestCase
             ['Guid', true],
             ['guid', false],
         ];
+    }
+
+    public function testIsReadableSnakeCase()
+    {
+        $this->assertTrue($this->extractor->isReadable(SnakeCaseDummy::class, 'snake_property'));
+        $this->assertTrue($this->extractor->isReadable(SnakeCaseDummy::class, 'snake_readonly'));
+    }
+
+    public function testIsWriteableSnakeCase()
+    {
+        $this->assertTrue($this->extractor->isWritable(SnakeCaseDummy::class, 'snake_property'));
+        $this->assertFalse($this->extractor->isWritable(SnakeCaseDummy::class, 'snake_readonly'));
+        // Ensure that it's still possible to write to the property using the (old) snake name
+        $this->assertTrue($this->extractor->isWritable(SnakeCaseDummy::class, 'snake_method'));
     }
 
     public function testSingularize()

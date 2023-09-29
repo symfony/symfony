@@ -36,6 +36,7 @@
         "symfony/validator": "^6.4|^7.0"
     },
     "conflict": {
+        "symfony/console": "<6.4",
         "symfony/event-dispatcher": "<6.4",
         "symfony/event-dispatcher-contracts": "<2.5",
         "symfony/framework-bundle": "<6.4",

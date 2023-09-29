@@ -65,7 +65,7 @@ class File extends Constraint
     protected int|string|null $maxSize = null;
 
     /**
-     * @param array<string, string|string[]>|string[]|string $extensions
+     * @param array<string|string[]>|string $extensions
      */
     public function __construct(
         array $options = null,

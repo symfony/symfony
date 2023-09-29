@@ -20,7 +20,6 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Schema\Schema;
 use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\SkippedTestSuiteError;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
 
@@ -34,7 +33,7 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
     public static function setUpBeforeClass(): void
     {
         if (!\extension_loaded('pdo_sqlite')) {
-            throw new SkippedTestSuiteError('Extension pdo_sqlite required.');
+            self::markTestSkipped('Extension pdo_sqlite required.');
         }
 
         self::$dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');

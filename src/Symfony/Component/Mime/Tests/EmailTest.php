@@ -658,4 +658,34 @@ EOF;
         $body2 = $email->getBody();
         $this->assertNotSame($body1, $body2, 'The two bodies must not reference the same object, so the body cache does not ensure that the hash for the DKIM signature is unique.');
     }
+
+    public function testAttachmentBodyIsPartOfTheSerializationEmailPayloadWhenUsingAttachMethod()
+    {
+        $email = new Email();
+        $email->attach(file_get_contents(__DIR__.\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR.'foo_attachment.txt') ?: '');
+
+        $this->assertTrue(str_contains(serialize($email), 'foo_bar_xyz_123'));
+    }
+
+    public function testAttachmentBodyIsNotPartOfTheSerializationEmailPayloadWhenUsingAttachFromPathMethod()
+    {
+        $email = new Email();
+        $email->attachFromPath(__DIR__.\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR.'foo_attachment.txt');
+
+        $this->assertFalse(str_contains(serialize($email), 'foo_bar_xyz_123'));
+    }
+
+    public function testEmailsWithAttachmentsWhichAreAFileInstanceCanBeUnserialized()
+    {
+        $email = new Email();
+        $email->attachFromPath(__DIR__.\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR.'foo_attachment.txt');
+
+        $email = unserialize(serialize($email));
+        $this->assertInstanceOf(Email::class, $email);
+
+        $attachments = $email->getAttachments();
+
+        $this->assertCount(1, $attachments);
+        $this->assertStringContainsString('foo_bar_xyz_123', $attachments[0]->getBody());
+    }
 }

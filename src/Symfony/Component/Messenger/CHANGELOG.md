@@ -19,6 +19,7 @@ CHANGELOG
  * Deprecate `StopWorkerOnSignalsListener` in favor of using the `SignalableCommandInterface`
  * Add `HandlerDescriptor::getOptions`
  * Add support for multiple Redis Sentinel hosts
+ * Add `--all` option to the `messenger:failed:remove` command
 
 6.3
 ---

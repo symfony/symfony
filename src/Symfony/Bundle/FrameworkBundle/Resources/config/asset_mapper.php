@@ -18,7 +18,6 @@ use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\AssetMapperRepository;
 use Symfony\Component\AssetMapper\Command\AssetMapperCompileCommand;
 use Symfony\Component\AssetMapper\Command\DebugAssetMapperCommand;
-use Symfony\Component\AssetMapper\Command\ImportMapExportCommand;
 use Symfony\Component\AssetMapper\Command\ImportMapInstallCommand;
 use Symfony\Component\AssetMapper\Command\ImportMapRemoveCommand;
 use Symfony\Component\AssetMapper\Command\ImportMapRequireCommand;
@@ -28,6 +27,7 @@ use Symfony\Component\AssetMapper\Compiler\JavaScriptImportPathCompiler;
 use Symfony\Component\AssetMapper\Compiler\SourceMappingUrlsCompiler;
 use Symfony\Component\AssetMapper\Factory\CachedMappedAssetFactory;
 use Symfony\Component\AssetMapper\Factory\MappedAssetFactory;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapRenderer;
 use Symfony\Component\AssetMapper\ImportMap\Resolver\JsDelivrEsmResolver;
@@ -100,6 +100,7 @@ return static function (ContainerConfigurator $container) {
                 param('kernel.project_dir'),
                 abstract_arg('public directory name'),
                 param('kernel.debug'),
+                service('event_dispatcher')->nullOnInvalid(),
             ])
             ->tag('console.command')
 
@@ -130,17 +131,23 @@ return static function (ContainerConfigurator $container) {
 
         ->set('asset_mapper.compiler.javascript_import_path_compiler', JavaScriptImportPathCompiler::class)
             ->args([
+                service('asset_mapper.importmap.manager'),
                 abstract_arg('missing import mode'),
                 service('logger'),
             ])
             ->tag('asset_mapper.compiler')
             ->tag('monolog.logger', ['channel' => 'asset_mapper'])
 
+        ->set('asset_mapper.importmap.config_reader', ImportMapConfigReader::class)
+            ->args([
+                abstract_arg('importmap.php path'),
+            ])
+
         ->set('asset_mapper.importmap.manager', ImportMapManager::class)
             ->args([
                 service('asset_mapper'),
                 service('asset_mapper.public_assets_path_resolver'),
-                abstract_arg('importmap.php path'),
+                service('asset_mapper.importmap.config_reader'),
                 abstract_arg('vendor directory'),
                 service('asset_mapper.importmap.resolver'),
                 service('http_client'),
@@ -180,6 +187,7 @@ return static function (ContainerConfigurator $container) {
         ->set('asset_mapper.importmap.renderer', ImportMapRenderer::class)
             ->args([
                 service('asset_mapper.importmap.manager'),
+                service('assets.packages')->nullOnInvalid(),
                 param('kernel.charset'),
                 abstract_arg('polyfill URL'),
                 abstract_arg('script HTML attributes'),
@@ -198,10 +206,6 @@ return static function (ContainerConfigurator $container) {
             ->tag('console.command')
 
         ->set('asset_mapper.importmap.command.update', ImportMapUpdateCommand::class)
-            ->args([service('asset_mapper.importmap.manager')])
-            ->tag('console.command')
-
-        ->set('asset_mapper.importmap.command.export', ImportMapExportCommand::class)
             ->args([service('asset_mapper.importmap.manager')])
             ->tag('console.command')
 

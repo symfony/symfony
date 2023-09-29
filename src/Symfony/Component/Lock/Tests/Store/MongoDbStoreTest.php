@@ -13,7 +13,6 @@ namespace Symfony\Component\Lock\Tests\Store;
 
 use MongoDB\Client;
 use MongoDB\Driver\Exception\ConnectionTimeoutException;
-use PHPUnit\Framework\SkippedTestSuiteError;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
@@ -33,14 +32,14 @@ class MongoDbStoreTest extends AbstractStoreTestCase
     public static function setupBeforeClass(): void
     {
         if (!class_exists(\MongoDB\Client::class)) {
-            throw new SkippedTestSuiteError('The mongodb/mongodb package is required.');
+            self::markTestSkipped('The mongodb/mongodb package is required.');
         }
 
         $client = self::getMongoClient();
         try {
             $client->listDatabases();
         } catch (ConnectionTimeoutException $e) {
-            throw new SkippedTestSuiteError('MongoDB server not found.');
+            self::markTestSkipped('MongoDB server not found.');
         }
     }
 

@@ -19,14 +19,20 @@ namespace Symfony\Component\AssetMapper\ImportMap;
 final class ImportMapEntry
 {
     public function __construct(
-        /**
-         * The logical path to this asset if local or downloaded.
-         */
         public readonly string $importName,
+        /**
+         * The path to the asset if local or downloaded.
+         */
         public readonly ?string $path = null,
         public readonly ?string $url = null,
         public readonly bool $isDownloaded = false,
-        public readonly bool $preload = false,
+        public readonly ImportMapType $type = ImportMapType::JS,
+        public readonly bool $isEntrypoint = false,
     ) {
+    }
+
+    public function isRemote(): bool
+    {
+        return (bool) $this->url;
     }
 }

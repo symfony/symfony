@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
-use PHPUnit\Framework\SkippedTestSuiteError;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Internal\ClientState;
@@ -318,7 +317,7 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         }
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            throw new SkippedTestSuiteError('Testing with the "vulcain" is not supported on Windows.');
+            self::markTestSkipped('Testing with the "vulcain" is not supported on Windows.');
         }
 
         $process = new Process(['vulcain'], null, [
@@ -335,14 +334,14 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
 
         if (!$process->isRunning()) {
             if ('\\' !== \DIRECTORY_SEPARATOR && 127 === $process->getExitCode()) {
-                throw new SkippedTestSuiteError('vulcain binary is missing');
+                self::markTestSkipped('vulcain binary is missing');
             }
 
             if ('\\' !== \DIRECTORY_SEPARATOR && 126 === $process->getExitCode()) {
-                throw new SkippedTestSuiteError('vulcain binary is not executable');
+                self::markTestSkipped('vulcain binary is not executable');
             }
 
-            throw new SkippedTestSuiteError((new ProcessFailedException($process))->getMessage());
+            self::markTestSkipped((new ProcessFailedException($process))->getMessage());
         }
 
         self::$vulcainStarted = true;

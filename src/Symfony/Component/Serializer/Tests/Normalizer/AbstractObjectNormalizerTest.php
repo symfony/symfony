@@ -786,6 +786,28 @@ class AbstractObjectNormalizerTest extends TestCase
         $normalized = $serializer->normalize(new DummyWithEnumUnion(EnumB::B));
         $this->assertEquals(new DummyWithEnumUnion(EnumB::B), $serializer->denormalize($normalized, DummyWithEnumUnion::class));
     }
+
+    public function testDenormalizeWithNumberAsSerializedNameAndNoArrayReindex()
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadata();
+
+        $data = [
+            '1' => 'foo',
+            '99' => 'baz',
+        ];
+
+        $obj = new class() {
+            #[SerializedName('1')]
+            public $foo;
+
+            #[SerializedName('99')]
+            public $baz;
+        };
+
+        $test = $normalizer->denormalize($data, $obj::class);
+        $this->assertSame('foo', $test->foo);
+        $this->assertSame('baz', $test->baz);
+    }
 }
 
 class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer

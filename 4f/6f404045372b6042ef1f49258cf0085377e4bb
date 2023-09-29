@@ -1,0 +1,82 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-09-14T15:30:39Z
+
+> When using --download, this will break assets referenced by url() / @import (except data: ones of course). To fix this, we'd need to parse those and fetch them, recursively.
+
+I'll check into that - we already do something similar for CSS.
+
+> Also I'm wondering: currently, the importmap recipe adds a link tag. Could we leverage this new feat to not do this in the recipe anymore? Would be nice :)
+
+Right now, I believe that `link` tag will be removed. Instead, we'll either start the user's `importmap.php` with an `app.css` entry. Or (what I'm leaning to now) is exactly like Encore: in `assets/app.js`, you'd `import './styles/app.css'`. That would trigger the link tag.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-09-14T19:01:38Z
+
+> Right now, I believe that `link` tag will be removed. Instead, we'll either start the user's `importmap.php` with an `app.css` entry. Or (what I'm leaning to now) is exactly like Encore: in `assets/app.js`, you'd `import './styles/app.css'`. That would trigger the link tag.
+
+Please don't.
+Until now, the asset-mapper component is about building on web standards. This `import './styles/app.css'` in JS file is a totally non-standard feature added by webpack.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-09-15T00:56:14Z
+
+> Until now, the asset-mapper component is about building on web standards. This import './styles/app.css' in JS file is a totally non-standard feature added by webpack.
+
+That's 100% true. But it's also massively user-friendly. To be precise, there are 2 different sides to this:
+
+A) The ability to have `'type' => 'css'` in `importmap.php` - super nice because you can `importmap:require` CSS files instead of needing to manage `link` tags manually or downloading vendor CSS if you want to avoid a CDN.
+
+B) The ability to `import './some.css'`. Totally non-standard, totally optional, but very convenient. This can be used in lazy Stimulus controllers to import CSS only when it's needed.
+
+If/when web standards catch up, we can migrate to whatever that standard is. As a compromise, we could put `app.css` inside of `importmap.php` instead of importing it by default in `app.js`. `importmap.php` is already a combination of "importmap standard" + "Symfony additions". Users would still be able to import CSS files from their JavaScript files. But if we set up their main `app.css` file in `importmap.php`, then we could better encourage import CSS only when needed.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-09-15T10:07:09Z
+
+Having the JS being the trigger to load the CSS is very bad from a performance point of view: the CSS must be render-blocking while the recommended setup is to run the JS code as `defer` (so non-blocking).
+Relying on an import in the JS to load the CSS through the importmap hack that makes `import 'app.css'` load a JS script adding a link tag would lead to a huge FOUC on page load because you would render the page with no CSS at all.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-09-15T11:11:09Z
+
+>  Having the JS being the trigger to load the CSS is very bad from a performance point of view: the CSS must be render-blocking while the recommended setup is to run the JS code as defer (so non-blocking).
+Relying on an import in the JS to load the CSS through the importmap hack that makes import 'app.css' load a JS script adding a link tag would lead to a huge FOUC on page load because you would render the page with no CSS at all.
+
+You're totally right. Fortunately, that behavior will only be for non-preloaded CSS. The basic idea is:
+
+* A) If a CSS file is `preload => true`, then an actual `<link rel="stylesheet">` is added. An importmap entry is also added (to avoid an error in case you DO import the CSS from JS), but it's a noop.
+
+* B) If a CSS file is `preload => false`, then it uses the importmap trick that you mentioned. This is the case where you have some lazily-loaded JS file that imports the CSS file.
+
+Btw, a CSS file can be `preload => true` either because it is directly in `importmap.php` with `preload: true`, or it is non-lazily imported by an entrypoint on the page (this entrypoint idea is still on my machine locally only, I'm finishing some tests).
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-09-18T01:36:20Z
+
+I need to fix a few tests, but PR is ready for review & description has been updated. This is now a robust system for handling CSS and it's fun to use :).
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-09-23T12:52:56Z
+
+Test failures are unrelated or expected (due to the high deps grabbing 7.0 code that doesn't contain the code from the PR).
+
+This is ready for review! You can see some example usage at https://github.com/weaverryan/ux/tree/assetmapper-css/ux.symfony.com
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-09-27T18:14:48Z
+
+~~FYI - tracking down some last details on this...~~
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-09-28T00:53:45Z
+
+Found / fixed a problem with cascading the preload into "remote" importmap entries. This is ready again.

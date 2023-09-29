@@ -226,7 +226,7 @@ class TextPart extends AbstractPart
     public function __sleep(): array
     {
         // convert resources to strings for serialization
-        if (null !== $this->seekable || $this->body instanceof File) {
+        if (null !== $this->seekable) {
             $this->body = $this->getBody();
             $this->seekable = null;
         }

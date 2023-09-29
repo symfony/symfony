@@ -40,7 +40,7 @@ class ProfilerController
     private ?ContentSecurityPolicyHandler $cspHandler;
     private ?string $baseDir;
 
-    public function __construct(UrlGeneratorInterface $generator, Profiler $profiler = null, Environment $twig, array $templates, ContentSecurityPolicyHandler $cspHandler = null, string $baseDir = null)
+    public function __construct(UrlGeneratorInterface $generator, ?Profiler $profiler, Environment $twig, array $templates, ContentSecurityPolicyHandler $cspHandler = null, string $baseDir = null)
     {
         $this->generator = $generator;
         $this->profiler = $profiler;

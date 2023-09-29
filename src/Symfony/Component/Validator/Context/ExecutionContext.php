@@ -121,7 +121,7 @@ class ExecutionContext implements ExecutionContextInterface
         $this->cachedObjectsRefs = new \SplObjectStorage();
     }
 
-    public function setNode(mixed $value, ?object $object, MetadataInterface $metadata = null, string $propertyPath): void
+    public function setNode(mixed $value, ?object $object, ?MetadataInterface $metadata, string $propertyPath): void
     {
         $this->value = $value;
         $this->object = $object;

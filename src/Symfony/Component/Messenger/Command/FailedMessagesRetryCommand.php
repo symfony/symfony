@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Command;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\SignalableCommandInterface;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -36,17 +37,20 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
 #[AsCommand(name: 'messenger:failed:retry', description: 'Retry one or more messages from the failure transport')]
-class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand
+class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand implements SignalableCommandInterface
 {
     private EventDispatcherInterface $eventDispatcher;
     private MessageBusInterface $messageBus;
     private ?LoggerInterface $logger;
+    private ?array $signals;
+    private ?Worker $worker = null;
 
-    public function __construct(?string $globalReceiverName, ServiceProviderInterface $failureTransports, MessageBusInterface $messageBus, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, PhpSerializer $phpSerializer = null)
+    public function __construct(?string $globalReceiverName, ServiceProviderInterface $failureTransports, MessageBusInterface $messageBus, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, PhpSerializer $phpSerializer = null, array $signals = null)
     {
         $this->eventDispatcher = $eventDispatcher;
         $this->messageBus = $messageBus;
         $this->logger = $logger;
+        $this->signals = $signals;
 
         parent::__construct($globalReceiverName, $failureTransports, $phpSerializer);
     }
@@ -123,6 +127,24 @@ EOF
         return 0;
     }
 
+    public function getSubscribedSignals(): array
+    {
+        return $this->signals ?? [\SIGTERM, \SIGINT];
+    }
+
+    public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
+    {
+        if (!$this->worker) {
+            return false;
+        }
+
+        $this->logger?->info('Received signal {signal}.', ['signal' => $signal, 'transport_names' => $this->worker->getMetadata()->getTransportNames()]);
+
+        $this->worker->stop();
+
+        return 0;
+    }
+
     private function runInteractive(string $failureTransportName, SymfonyStyle $io, bool $shouldForce): void
     {
         $receiver = $this->failureTransports->get($failureTransportName);
@@ -187,7 +209,7 @@ EOF
         };
         $this->eventDispatcher->addListener(WorkerMessageReceivedEvent::class, $listener);
 
-        $worker = new Worker(
+        $this->worker = new Worker(
             [$failureTransportName => $receiver],
             $this->messageBus,
             $this->eventDispatcher,
@@ -195,8 +217,9 @@ EOF
         );
 
         try {
-            $worker->run();
+            $this->worker->run();
         } finally {
+            $this->worker = null;
             $this->eventDispatcher->removeListener(WorkerMessageReceivedEvent::class, $listener);
         }
 

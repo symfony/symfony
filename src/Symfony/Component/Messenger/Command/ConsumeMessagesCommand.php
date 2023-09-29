@@ -15,6 +15,7 @@ use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\SignalableCommandInterface;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\InvalidOptionException;
@@ -39,7 +40,7 @@ use Symfony\Component\Messenger\Worker;
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
 #[AsCommand(name: 'messenger:consume', description: 'Consume messages')]
-class ConsumeMessagesCommand extends Command
+class ConsumeMessagesCommand extends Command implements SignalableCommandInterface
 {
     private RoutableMessageBus $routableBus;
     private ContainerInterface $receiverLocator;
@@ -49,8 +50,10 @@ class ConsumeMessagesCommand extends Command
     private ?ResetServicesListener $resetServicesListener;
     private array $busIds;
     private ?ContainerInterface $rateLimiterLocator;
+    private ?array $signals;
+    private ?Worker $worker = null;
 
-    public function __construct(RoutableMessageBus $routableBus, ContainerInterface $receiverLocator, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, array $receiverNames = [], ResetServicesListener $resetServicesListener = null, array $busIds = [], ContainerInterface $rateLimiterLocator = null)
+    public function __construct(RoutableMessageBus $routableBus, ContainerInterface $receiverLocator, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, array $receiverNames = [], ResetServicesListener $resetServicesListener = null, array $busIds = [], ContainerInterface $rateLimiterLocator = null, array $signals = null)
     {
         $this->routableBus = $routableBus;
         $this->receiverLocator = $receiverLocator;
@@ -60,6 +63,7 @@ class ConsumeMessagesCommand extends Command
         $this->resetServicesListener = $resetServicesListener;
         $this->busIds = $busIds;
         $this->rateLimiterLocator = $rateLimiterLocator;
+        $this->signals = $signals;
 
         parent::__construct();
     }
@@ -222,14 +226,19 @@ EOF
 
         $bus = $input->getOption('bus') ? $this->routableBus->getMessageBus($input->getOption('bus')) : $this->routableBus;
 
-        $worker = new Worker($receivers, $bus, $this->eventDispatcher, $this->logger, $rateLimiters);
+        $this->worker = new Worker($receivers, $bus, $this->eventDispatcher, $this->logger, $rateLimiters);
         $options = [
             'sleep' => $input->getOption('sleep') * 1000000,
         ];
         if ($queues = $input->getOption('queues')) {
             $options['queues'] = $queues;
         }
-        $worker->run($options);
+
+        try {
+            $this->worker->run($options);
+        } finally {
+            $this->worker = null;
+        }
 
         return 0;
     }
@@ -245,6 +254,24 @@ EOF
         if ($input->mustSuggestOptionValuesFor('bus')) {
             $suggestions->suggestValues($this->busIds);
         }
+    }
+
+    public function getSubscribedSignals(): array
+    {
+        return $this->signals ?? [\SIGTERM, \SIGINT];
+    }
+
+    public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
+    {
+        if (!$this->worker) {
+            return false;
+        }
+
+        $this->logger?->info('Received signal {signal}.', ['signal' => $signal, 'transport_names' => $this->worker->getMetadata()->getTransportNames()]);
+
+        $this->worker->stop();
+
+        return 0;
     }
 
     private function convertToBytes(string $memoryLimit): int

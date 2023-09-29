@@ -2098,6 +2098,16 @@ class FrameworkExtension extends Extension
             $container->getDefinition('messenger.transport.beanstalkd.factory')->addTag('messenger.transport_factory');
         }
 
+        if ($config['stop_worker_on_signals'] && $this->hasConsole()) {
+            $container->getDefinition('console.command.messenger_consume_messages')
+                ->replaceArgument(8, $config['stop_worker_on_signals']);
+            $container->getDefinition('console.command.messenger_failed_messages_retry')
+                ->replaceArgument(6, $config['stop_worker_on_signals']);
+        }
+
+        if ($this->hasConsole() && $container->hasDefinition('messenger.listener.stop_worker_signals_listener')) {
+            $container->getDefinition('messenger.listener.stop_worker_signals_listener')->clearTag('kernel.event_subscriber');
+        }
         if ($config['stop_worker_on_signals']) {
             $container->getDefinition('messenger.listener.stop_worker_signals_listener')->replaceArgument(0, $config['stop_worker_on_signals']);
         }

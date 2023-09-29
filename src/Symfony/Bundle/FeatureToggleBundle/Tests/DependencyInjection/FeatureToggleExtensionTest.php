@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FeatureToggleBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\FeatureToggleBundle\DependencyInjection\Configuration;
 use Symfony\Bundle\FeatureToggleBundle\DependencyInjection\FeatureToggleExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;

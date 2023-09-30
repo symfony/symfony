@@ -14,6 +14,7 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\Messenger\Exception\ValidationFailedException as MessageValidationFailedException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer;
@@ -99,6 +100,30 @@ class ProblemNormalizerTest extends TestCase
         ];
 
         $exception = new ValidationFailedException('Validation Failed', new ConstraintViolationList([new ConstraintViolation('Invalid value', '', [], '', null, null)]));
+        $exception = new HttpException(422, 'Validation Failed', $exception);
+        $this->assertSame($expected, $this->normalizer->normalize(FlattenException::createFromThrowable($exception), null, ['exception' => $exception]));
+    }
+
+    public function testNormalizeMessageValidationFailedException()
+    {
+        $this->normalizer->setSerializer(new Serializer([new ConstraintViolationListNormalizer()]));
+
+        $expected = [
+            'type' => 'https://symfony.com/errors/validation',
+            'title' => 'Validation Failed',
+            'status' => 422,
+            'detail' => 'Invalid value',
+            'violations' => [
+                [
+                    'propertyPath' => '',
+                    'title' => 'Invalid value',
+                    'template' => '',
+                    'parameters' => [],
+                ],
+            ],
+        ];
+
+        $exception = new MessageValidationFailedException(new \stdClass(), new ConstraintViolationList([new ConstraintViolation('Invalid value', '', [], '', null, null)]));
         $exception = new HttpException(422, 'Validation Failed', $exception);
         $this->assertSame($expected, $this->normalizer->normalize(FlattenException::createFromThrowable($exception), null, ['exception' => $exception]));
     }

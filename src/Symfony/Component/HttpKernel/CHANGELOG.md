@@ -12,6 +12,7 @@ CHANGELOG
  * Add argument `$debug` to `Logger`
  * Add class `DebugLoggerConfigurator`
  * Deprecate `Kernel::stripComments()`
+ * Support the `!` character at the beginning of a string as a negation operator in the url filter of the profiler
 
 6.3
 ---

@@ -7,6 +7,23 @@ in 5.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.4.0...v5.4.1
 
+* 5.4.29 (2023-09-30)
+
+ * bug #51701 [Serializer] Fix parsing XML root node attributes (mtarld)
+ * bug #51588 [FrameworkBundle] Always use buildDir as `ConfigBuilderGenerator` outputDir (HypeMC)
+ * bug #51675 [Messenger] Fix cloned TraceableStack not unstacking the stack independently  (krciga22)
+ * bug #51198 [DependencyInjection] Fix autocasting `null` env values to empty string with `container.env_var_processors_locator` (fancyweb)
+ * bug #51683 [Cache] Fix support for Redis Sentinel using php-redis 6.0.0 (Qonstrukt)
+ * bug #51686 [SecurityBundle][PasswordHasher] Fix password migration with custom hasher service with security bundle config (ogizanagi)
+ * bug #51671 [FrameworkBundle] Fix support for `translator.default_path` in XML (HeahDude)
+ * bug #51659 [HttpClient] Fix TraceableResponse if response has no destruct method (maxhelias)
+ * bug #51598 [Cache] fix using multiple Redis Sentinel hosts when the first one is not resolvable (digilist)
+ * bug #51497 [FrameworkBundle] no serializer mapping cache in debug mode without enable_annotations (soyuka)
+ * bug #51645 [String] Update wcswidth data with Unicode 15.1 (fancyweb)
+ * bug #51586 [ErrorHandler] Handle PHP 8.3 `highlight_file` function output changes  (PhilETaylor)
+ * bug #47221 [Serializer] Fallback looking for DiscriminatorMap on interfaces (Caligone)
+ * bug #51511 [PasswordHasher] Avoid passing `null` to `hash_pbkdf2()` (sdespont)
+
 * 5.4.28 (2023-08-26)
 
  * bug #51474 [Serializer] Fix wrong InvalidArgumentException thrown (mtarld)

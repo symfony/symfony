@@ -716,7 +716,7 @@ class FrameworkExtension extends Extension
                     ];
                     if ($reflector instanceof \ReflectionMethod) {
                         if (isset($tagAttributes['method'])) {
-                            throw new LogicException(sprintf('%s attribute cannot declare a method on "%s::%s()".', $attribute::class, $reflector->class, $reflector->name));
+                            throw new LogicException(sprintf('"%s" attribute cannot declare a method on "%s::%s()".', $attribute::class, $reflector->class, $reflector->name));
                         }
                         $tagAttributes['method'] = $reflector->getName();
                     }

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by kbond at 2023-09-19T14:36:22Z
+
+On the topic of nested exceptions. I'm looking for feedback on #51331 - getting the context of these exceptions. In the case of `HandlerFailedException`: what handler threw the exception. Is there a way currently?
+
+---------------------------------------------------------------------------
+
+by Jeroeny at 2023-09-30T13:20:08Z
+
+@nicolas-grekas Done. I also changed usages of `HandlerFailedException::getNestedExceptions()`  to `getWrappedExceptions()`.

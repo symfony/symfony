@@ -26,6 +26,7 @@ CHANGELOG
  * Deprecate `framework.serializer.enable_annotations`, use `framework.serializer.enable_attributes` instead
  * Add `array $tokenAttributes = []` optional parameter to `KernelBrowser::loginUser()`
  * Add support for relative URLs in BrowserKit's redirect assertion.
+ * Change BrowserKitAssertionsTrait::getClient() to be protected
 
 6.3
 ---

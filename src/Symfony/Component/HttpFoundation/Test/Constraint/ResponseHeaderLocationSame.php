@@ -53,11 +53,11 @@ final class ResponseHeaderLocationSame extends Constraint
         }
 
         if (str_starts_with($url, '//')) {
-            return "{$this->request->getScheme()}:{$url}";
+            return sprintf('%s:%s', $this->request->getScheme(), $url);
         }
 
         if (str_starts_with($url, '/')) {
-            return "{$this->request->getSchemeAndHttpHost()}{$url}";
+            return $this->request->getSchemeAndHttpHost().$url;
         }
 
         return $url;

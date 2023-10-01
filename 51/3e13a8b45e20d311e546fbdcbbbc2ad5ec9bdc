@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by valtzu at 2023-09-01T06:32:17Z
+
+What could also be a cool feature here is add `transports` property to both attributes/tags, then if it is set, wrap `ServiceCallMessage` in [`RedispatchMessage`](https://github.com/symfony/symfony/blob/6.4/src/Symfony/Component/Messenger/Message/RedispatchMessage.php).
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-09-01T12:03:59Z
+
+This looks nice! I'll give a proper review and help finish up for 6.4 when I have some time.
+
+What are you thinking for commands? I was thinking:
+
+```php
+#[AsCronTask(expression: '* * * * *', arguments: 'arg --option')]
+class MyCommand extends Command
+{
+}
+
+---------------------------------------------------------------------------
+
+by valtzu at 2023-09-02T09:47:32Z
+
+> What are you thinking for commands?
+
+I was hoping we don't need such, as business logic usually is wrapped in a separate class and commands just act as an entry point, just like controllers. But I think this is only my reality.
+
+About the attribute syntax for commands, `ArrayInput` syntax was my first thought, but I see `RunCommandMessage` uses string input so probably your suggestion makes the most sense if the approach would be to produce those instead of `ServiceCallMessage`. Also `StringInput` syntax is less verbose and since the whole point here is to make thing easier,  that's the way to go then.
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-09-07T15:05:15Z
+
+Looking good! Glad you got commands working - using `RunCommandMessage` is exactly what I was thinking.
+
+---------------------------------------------------------------------------
+
+by valtzu at 2023-09-14T08:03:36Z
+
+~~I didn't realize it's possible to use `RedispatchMessage` without explicitly defining the transports (and rely on `routing` configuration), we need to add support for that also. Probably rename `transports` to `redispatch` and allow boolean.~~
+
+Hmm, ok it does not seem possible after all, if transportNames are not defined, then the message is not dispatched to any transport – unlike the Messenger docs are stating.

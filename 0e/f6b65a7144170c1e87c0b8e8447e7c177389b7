@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2023-09-03T14:18:46Z
+
+Thank you. Please be aware that we never merge new features without any tests.
+
+---------------------------------------------------------------------------
+
+by Jeroeny at 2023-09-04T08:58:09Z
+
+@derrabus Thanks for the hint, added tests.
+
+---------------------------------------------------------------------------
+
+by Jeroeny at 2023-09-14T08:50:49Z
+
+Added the changelog entry

@@ -75,11 +75,12 @@ final class RecurringMessage implements MessageProviderInterface
             return new self($trigger, $message);
         }
 
+        $description = '';
         try {
             $description = $message instanceof \Stringable ? (string) $message : serialize($message);
         } catch (\Exception) {
-            $description = $message::class;
         }
+        $description = sprintf('%s(%s)', $message::class, $description);
 
         return new self($trigger, new StaticMessageProvider([$message], $description));
     }

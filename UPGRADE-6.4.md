@@ -113,6 +113,7 @@ Messenger
 ---------
 
  * Deprecate `StopWorkerOnSignalsListener` in favor of using the `SignalableCommandInterface`
+ * Deprecate `HandlerFailedException::getNestedExceptions()`, `HandlerFailedException::getNestedExceptionsOfClass()` and  `DelayedMessageHandlingException::getExceptions()` which are replaced by a new `getWrappedExceptions()` method
 
 MonologBridge
 -------------

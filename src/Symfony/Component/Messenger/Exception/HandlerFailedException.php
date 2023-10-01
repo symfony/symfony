@@ -13,8 +13,10 @@ namespace Symfony\Component\Messenger\Exception;
 
 use Symfony\Component\Messenger\Envelope;
 
-class HandlerFailedException extends RuntimeException
+class HandlerFailedException extends RuntimeException implements WrappedExceptionsInterface
 {
+    use WrappedExceptionsTrait;
+
     private array $exceptions;
     private Envelope $envelope;
 
@@ -46,15 +48,24 @@ class HandlerFailedException extends RuntimeException
     }
 
     /**
+     * @deprecated since Symfony 6.4, use {@see self::getWrappedExceptions()} instead
+     *
      * @return \Throwable[]
      */
     public function getNestedExceptions(): array
     {
+        trigger_deprecation('symfony/messenger', '6.4', 'The "%s()" method is deprecated, use "%s::getWrappedExceptions" instead.', __METHOD__, self::class);
+
         return $this->exceptions;
     }
 
+    /**
+     * @deprecated since Symfony 6.4, use {@see self::getWrappedExceptions()} instead
+     */
     public function getNestedExceptionOfClass(string $exceptionClassName): array
     {
+        trigger_deprecation('symfony/messenger', '6.4', 'The "%s()" method is deprecated, use "%s::getWrappedExceptions" instead.', __METHOD__, self::class);
+
         return array_values(
             array_filter(
                 $this->exceptions,

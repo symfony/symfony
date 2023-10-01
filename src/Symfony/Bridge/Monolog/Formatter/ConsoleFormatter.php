@@ -188,7 +188,7 @@ final class ConsoleFormatter implements FormatterInterface
             $this->dumper->setColors($colors);
         }
 
-        if (($data['data'] ?? null) instanceof Data) {
+        if (\is_array($data) && ($data['data'] ?? null) instanceof Data) {
             $data = $data['data'];
         } elseif (!$data instanceof Data) {
             $data = $this->cloner->cloneVar($data);

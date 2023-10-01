@@ -66,7 +66,7 @@ class ImpersonateUrlGenerator
             return '';
         }
 
-        if (!$this->isImpersonatedUser() && $identifier == SwitchUserListener::EXIT_VALUE){
+        if (!$this->isImpersonatedUser() && SwitchUserListener::EXIT_VALUE == $identifier) {
             return '';
         }
 

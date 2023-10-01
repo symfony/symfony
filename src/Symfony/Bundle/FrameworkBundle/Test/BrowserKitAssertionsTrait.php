@@ -162,7 +162,7 @@ trait BrowserKitAssertionsTrait
         self::assertThat(self::getClient(), $constraint, $message);
     }
 
-    private static function getClient(AbstractBrowser $newClient = null): ?AbstractBrowser
+    protected static function getClient(AbstractBrowser $newClient = null): ?AbstractBrowser
     {
         static $client;
 

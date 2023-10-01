@@ -94,7 +94,7 @@
         "symfony/property-access": "<5.4",
         "symfony/serializer": "<6.4",
         "symfony/security-csrf": "<5.4",
-        "symfony/security-core": "<5.4",
+        "symfony/security-core": "<6.4",
         "symfony/stopwatch": "<5.4",
         "symfony/translation": "<6.2.8",
         "symfony/twig-bridge": "<5.4",

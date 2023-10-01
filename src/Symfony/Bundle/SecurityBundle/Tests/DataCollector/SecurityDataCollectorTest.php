@@ -28,6 +28,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Voter\TraceableVoter;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Role\RoleHierarchy;
 use Symfony\Component\Security\Core\User\InMemoryUser;
@@ -432,6 +433,10 @@ class SecurityDataCollectorTest extends TestCase
 final class DummyVoter implements VoterInterface
 {
     public function vote(TokenInterface $token, mixed $subject, array $attributes): int
+    {
+    }
+
+    public function getVote(TokenInterface $token, mixed $subject, array $attributes): Vote
     {
     }
 }

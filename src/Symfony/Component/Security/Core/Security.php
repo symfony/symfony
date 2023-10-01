@@ -14,6 +14,7 @@ namespace Symfony\Component\Security\Core;
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\SecurityBundle\Security as NewSecurityHelper;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -58,12 +59,24 @@ class Security implements AuthorizationCheckerInterface
      */
     public function isGranted(mixed $attributes, mixed $subject = null): bool
     {
-        return $this->container->get('security.authorization_checker')
-            ->isGranted($attributes, $subject);
+        return $this->getDecision($attributes, $subject)->isGranted();
     }
 
     public function getToken(): ?TokenInterface
     {
         return $this->container->get('security.token_storage')->getToken();
+    }
+
+    /**
+     * Get the access decision against the current authentication token and optionally supplied subject.
+     */
+    public function getDecision(mixed $attribute, mixed $subject = null): AccessDecision
+    {
+        $checker = $this->container->get('security.authorization_checker');
+        if (method_exists($checker, 'getDecision')) {
+            return $checker->getDecision($attribute, $subject);
+        }
+
+        return $checker->isGranted($attribute, $subject) ? AccessDecision::createGranted() : AccessDecision::createDenied();
     }
 }

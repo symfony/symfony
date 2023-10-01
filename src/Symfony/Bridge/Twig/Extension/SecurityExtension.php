@@ -69,12 +69,22 @@ final class SecurityExtension extends AbstractExtension
         return $this->impersonateUrlGenerator->generateExitPath($exitTo);
     }
 
+    public function getImpersonatePath(string $identifier = null): string
+    {
+        if (null === $this->impersonateUrlGenerator) {
+            return '';
+        }
+
+        return $this->impersonateUrlGenerator->generateImpersonationPath($identifier);
+    }
+
     public function getFunctions(): array
     {
         return [
             new TwigFunction('is_granted', $this->isGranted(...)),
             new TwigFunction('impersonation_exit_url', $this->getImpersonateExitUrl(...)),
             new TwigFunction('impersonation_exit_path', $this->getImpersonateExitPath(...)),
+            new TwigFunction('impersonation_path', $this->getImpersonatePath(...)),
         ];
     }
 }

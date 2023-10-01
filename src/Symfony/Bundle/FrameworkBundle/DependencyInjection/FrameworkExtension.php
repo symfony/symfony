@@ -145,6 +145,8 @@ use Symfony\Component\RateLimiter\Storage\CacheStorage;
 use Symfony\Component\RemoteEvent\Attribute\AsRemoteEventConsumer;
 use Symfony\Component\RemoteEvent\RemoteEvent;
 use Symfony\Component\Routing\Loader\AnnotationClassLoader;
+use Symfony\Component\Scheduler\Attribute\AsCronTask;
+use Symfony\Component\Scheduler\Attribute\AsPeriodicTask;
 use Symfony\Component\Scheduler\Attribute\AsSchedule;
 use Symfony\Component\Scheduler\Messenger\SchedulerTransportFactory;
 use Symfony\Component\Security\Core\AuthenticationEvents;
@@ -702,6 +704,26 @@ class FrameworkExtension extends Extension
         $container->registerAttributeForAutoconfiguration(AsSchedule::class, static function (ChildDefinition $definition, AsSchedule $attribute): void {
             $definition->addTag('scheduler.schedule_provider', ['name' => $attribute->name]);
         });
+        foreach ([AsPeriodicTask::class, AsCronTask::class] as $taskAttributeClass) {
+            $container->registerAttributeForAutoconfiguration(
+                $taskAttributeClass,
+                static function (ChildDefinition $definition, AsPeriodicTask|AsCronTask $attribute, \ReflectionClass|\ReflectionMethod $reflector): void {
+                    $tagAttributes = get_object_vars($attribute) + [
+                        'trigger' => match ($attribute::class) {
+                            AsPeriodicTask::class => 'every',
+                            AsCronTask::class => 'cron',
+                        },
+                    ];
+                    if ($reflector instanceof \ReflectionMethod) {
+                        if (isset($tagAttributes['method'])) {
+                            throw new LogicException(sprintf('%s attribute cannot declare a method on "%s::%s()".', $attribute::class, $reflector->class, $reflector->name));
+                        }
+                        $tagAttributes['method'] = $reflector->getName();
+                    }
+                    $definition->addTag('scheduler.task', $tagAttributes);
+                }
+            );
+        }
 
         if (!$container->getParameter('kernel.debug')) {
             // remove tagged iterator argument for resource checkers

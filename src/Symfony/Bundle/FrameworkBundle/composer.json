@@ -56,7 +56,7 @@
         "symfony/notifier": "^5.4|^6.0|^7.0",
         "symfony/process": "^5.4|^6.0|^7.0",
         "symfony/rate-limiter": "^5.4|^6.0|^7.0",
-        "symfony/scheduler": "^6.3|^7.0",
+        "symfony/scheduler": "^6.4|^7.0",
         "symfony/security-bundle": "^5.4|^6.0|^7.0",
         "symfony/semaphore": "^5.4|^6.0|^7.0",
         "symfony/serializer": "^6.4|^7.0",

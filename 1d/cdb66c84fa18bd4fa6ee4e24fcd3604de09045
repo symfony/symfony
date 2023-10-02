@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by stof at 2023-10-02T13:58:54Z
+
+@nicolas-grekas don't we have the same issue in TreeBuilder (and any other place using protected properties that are unset actually) ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-10-02T14:10:55Z
+
+> don't we have the same issue in TreeBuilder (and any other place using protected properties that are unset actually) ?
+
+Correct, and fixed. I didn't find any other occurrence but I did a change something in HttpClient because it made more sense to make the property nullable.

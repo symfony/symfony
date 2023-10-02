@@ -18,7 +18,6 @@ use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\FormRenderer;
-use Symfony\Component\Form\FormView;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
@@ -30,31 +29,6 @@ use Twig\Loader\FilesystemLoader;
  */
 class FormExtensionBootstrap5LayoutTest extends AbstractBootstrap5LayoutTestCase
 {
-    use RuntimeLoaderProvider;
-
-    private FormRenderer $renderer;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $loader = new FilesystemLoader([
-            __DIR__.'/../../Resources/views/Form',
-            __DIR__.'/Fixtures/templates/form',
-        ]);
-
-        $environment = new Environment($loader, ['strict_variables' => true]);
-        $environment->addExtension(new TranslationExtension(new StubTranslator()));
-        $environment->addExtension(new FormExtension());
-
-        $rendererEngine = new TwigRendererEngine([
-            'bootstrap_5_layout.html.twig',
-            'custom_widgets.html.twig',
-        ], $environment);
-        $this->renderer = new FormRenderer($rendererEngine, $this->getMockBuilder(CsrfTokenManagerInterface::class)->getMock());
-        $this->registerTwigRuntimeLoader($environment, $this->renderer);
-    }
-
     public function testStartTagHasNoActionAttributeWhenActionIsEmpty()
     {
         $form = $this->factory->create(FormType::class, null, [
@@ -106,57 +80,27 @@ HTML
             , trim($this->renderWidget($view)));
     }
 
-    protected function renderForm(FormView $view, array $vars = []): string
+    protected function getTemplatePaths(): array
     {
-        return $this->renderer->renderBlock($view, 'form', $vars);
+        return [
+            __DIR__.'/../../Resources/views/Form',
+            __DIR__.'/Fixtures/templates/form',
+        ];
     }
 
-    protected function renderLabel(FormView $view, $label = null, array $vars = []): string
+    protected function getTwigExtensions(): array
     {
-        if (null !== $label) {
-            $vars += ['label' => $label];
-        }
-
-        return $this->renderer->searchAndRenderBlock($view, 'label', $vars);
+        return [
+            new TranslationExtension(new StubTranslator()),
+            new FormExtension(),
+        ];
     }
 
-    protected function renderHelp(FormView $view): string
+    protected function getThemes(): array
     {
-        return $this->renderer->searchAndRenderBlock($view, 'help');
-    }
-
-    protected function renderErrors(FormView $view): string
-    {
-        return $this->renderer->searchAndRenderBlock($view, 'errors');
-    }
-
-    protected function renderWidget(FormView $view, array $vars = []): string
-    {
-        return $this->renderer->searchAndRenderBlock($view, 'widget', $vars);
-    }
-
-    protected function renderRow(FormView $view, array $vars = []): string
-    {
-        return $this->renderer->searchAndRenderBlock($view, 'row', $vars);
-    }
-
-    protected function renderRest(FormView $view, array $vars = []): string
-    {
-        return $this->renderer->searchAndRenderBlock($view, 'rest', $vars);
-    }
-
-    protected function renderStart(FormView $view, array $vars = []): string
-    {
-        return $this->renderer->renderBlock($view, 'form_start', $vars);
-    }
-
-    protected function renderEnd(FormView $view, array $vars = []): string
-    {
-        return $this->renderer->renderBlock($view, 'form_end', $vars);
-    }
-
-    protected function setTheme(FormView $view, array $themes, $useDefaultThemes = true): void
-    {
-        $this->renderer->setTheme($view, $themes, $useDefaultThemes);
+        return [
+            'bootstrap_5_layout.html.twig',
+            'custom_widgets.html.twig',
+        ];
     }
 }

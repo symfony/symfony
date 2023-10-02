@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\Twig\Tests\Extension;
+namespace Symfony\Bridge\Twig\Test\Traits;
 
 use Symfony\Component\Form\FormRenderer;
 use Twig\Environment;

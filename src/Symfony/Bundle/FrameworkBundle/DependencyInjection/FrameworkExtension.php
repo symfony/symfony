@@ -1690,9 +1690,8 @@ class FrameworkExtension extends Extension
 
         if (!class_exists(ExpressionLanguage::class)) {
             $container->removeDefinition('validator.expression_language');
-        }
-
-        if (!class_exists(ExpressionLanguageProvider::class)) {
+            $container->removeDefinition('validator.expression_language_provider');
+        } elseif (!class_exists(ExpressionLanguageProvider::class)) {
             $container->removeDefinition('validator.expression_language_provider');
         }
     }

@@ -88,7 +88,7 @@ class TwigExtension extends Extension
             }
 
             if (ContainerBuilder::willBeAvailable('symfony/translation', LocaleSwitcher::class, ['symfony/framework-bundle'])) {
-                $container->getDefinition('twig.mime_body_renderer')->setArgument('$localeSwitcher', new Reference('translation.locale_switcher'));
+                $container->getDefinition('twig.mime_body_renderer')->setArgument('$localeSwitcher', new Reference('translation.locale_switcher', ContainerBuilder::IGNORE_ON_INVALID_REFERENCE));
             }
         }
 

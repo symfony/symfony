@@ -36,9 +36,18 @@ class ImpersonateUrlGenerator
         $this->firewallMap = $firewallMap;
     }
 
-    public function generateImpersonationPath(string $identifier = null): string
+    public function generateImpersonationPath(string $identifier): string
     {
         return $this->buildPath(null, $identifier);
+    }
+
+    public function generateImpersonationUrl(string $identifier): string
+    {
+        if (null === $request = $this->requestStack->getCurrentRequest()) {
+            return '';
+        }
+
+        return $request->getUriForPath($this->buildPath(null, $identifier));
     }
 
     public function generateExitPath(string $targetUri = null): string

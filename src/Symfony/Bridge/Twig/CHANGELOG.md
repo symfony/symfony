@@ -7,6 +7,7 @@ CHANGELOG
  * Allow an array to be passed as the first argument to the `importmap()` Twig function
  * Add `TemplatedEmail::locale()` to set the locale for the email rendering
  * Add `AppVariable::getEnabledLocales()` to retrieve the enabled locales
+ * Add `impersonation_path()` and `impersonation_url()` Twig functions
 
 6.3
 ---

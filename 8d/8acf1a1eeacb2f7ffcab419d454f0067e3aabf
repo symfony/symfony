@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2023-10-02T13:20:42Z
+
+That's brilliant!
+
+---------------------------------------------------------------------------
+
+by stof at 2023-10-02T13:27:07Z
+
+@nicolas-grekas can you do the same for the polyfill mono-repo then ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-10-02T13:28:02Z
+
+On it. Meanwhile I updated the PR for the contracts.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-10-02T17:49:34Z
+
+i appreciate the effort to keep symfony/symfony available as a package, but what for exactly?
+
+i assumed git clone+link would be the better practice for dev
+
+---------------------------------------------------------------------------
+
+by wouterj at 2023-10-02T18:02:04Z
+
+In short:
+
+- We can't remove the package, it will break applications on <3.4 beyond fixable
+- We can't keep the package, but no longer propagate new tags to Packagist
+- There is a big "marketing value" in making releases on the mono repo
+- Marking Symfony as abandoned gives the wrong signal, unless you are well into the community and are aware of the Flex initiative
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-10-02T18:19:10Z
+
+i was thinking `"abandoned": "Use individual symfony/* packages instead"`
+
+then yes, signaling something to all existing installations could create some drama and/or unnessecary work. Perhaps it's not worth it.

@@ -68,3 +68,7 @@ uid:
 send_notification:
     path:     /send_notification
     defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\NotificationController::indexAction }
+
+log:
+    path:     /log
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\LoggerController::index }

@@ -1,0 +1,13 @@
+services:
+    _defaults:
+        public: true
+
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\LoggerController:
+        tags: ['controller.service_arguments']
+
+    monolog.handler.test:
+        class: Monolog\Handler\TestHandler
+
+    logger:
+        class: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Logger\TestLogger
+        arguments: ['@monolog.handler.test']

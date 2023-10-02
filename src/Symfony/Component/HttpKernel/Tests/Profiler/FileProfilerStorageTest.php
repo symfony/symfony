@@ -203,12 +203,19 @@ class FileProfilerStorageTest extends TestCase
         $profile->setMethod('GET');
         $this->storage->write($profile);
 
+        $profile = new Profile('webp');
+        $profile->setIp('127.0.0.1');
+        $profile->setUrl('http://foo.bar/img.webp');
+        $profile->setMethod('GET');
+        $this->storage->write($profile);
+
         $this->assertCount(1, $this->storage->find('127.0.0.1', 'http://foo.bar/\'', 10, 'GET'), '->find() accepts single quotes in URLs');
         $this->assertCount(1, $this->storage->find('127.0.0.1', 'http://foo.bar/"', 10, 'GET'), '->find() accepts double quotes in URLs');
         $this->assertCount(1, $this->storage->find('127.0.0.1', 'http://foo\\bar/', 10, 'GET'), '->find() accepts backslash in URLs');
         $this->assertCount(1, $this->storage->find('127.0.0.1', 'http://foo.bar/;', 10, 'GET'), '->find() accepts semicolon in URLs');
         $this->assertCount(1, $this->storage->find('127.0.0.1', 'http://foo.bar/%', 10, 'GET'), '->find() does not interpret a "%" as a wildcard in the URL');
         $this->assertCount(1, $this->storage->find('127.0.0.1', 'http://foo.bar/_', 10, 'GET'), '->find() does not interpret a "_" as a wildcard in the URL');
+        $this->assertCount(6, $this->storage->find('127.0.0.1', '!.webp', 10, 'GET'), '->find() does not interpret a "!" at the beginning as a negation operator in the URL');
     }
 
     public function testStoreTime()

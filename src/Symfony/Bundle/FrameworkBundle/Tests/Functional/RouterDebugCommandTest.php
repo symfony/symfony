@@ -96,6 +96,20 @@ class RouterDebugCommandTest extends AbstractWebTestCase
         $this->assertSame($expectedSuggestions, $tester->complete($input));
     }
 
+    /**
+     * @testWith    ["txt"]
+     *              ["xml"]
+     *              ["json"]
+     *              ["md"]
+     */
+    public function testShowAliases(string $format)
+    {
+        $tester = $this->createCommandTester();
+
+        $this->assertSame(0, $tester->execute(['--show-aliases' => true, '--format' => $format]));
+        $this->assertStringContainsString('my_custom_alias', $tester->getDisplay());
+    }
+
     public static function provideCompletionSuggestions()
     {
         yield 'option --format' => [

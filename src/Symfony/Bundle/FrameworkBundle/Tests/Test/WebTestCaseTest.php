@@ -23,6 +23,7 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Cookie as HttpFoundationCookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Test\Constraint\ResponseHeaderLocationSame;
 
 class WebTestCaseTest extends TestCase
 {
@@ -55,8 +56,32 @@ class WebTestCaseTest extends TestCase
     {
         $this->getResponseTester(new Response('', 301, ['Location' => 'https://example.com/']))->assertResponseRedirects('https://example.com/');
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('is redirected and has header "Location" with value "https://example.com/".');
+        $this->expectExceptionMessageMatches('#is redirected and has header "Location" (with value|matching) "https://example\.com/"\.#');
         $this->getResponseTester(new Response('', 301))->assertResponseRedirects('https://example.com/');
+    }
+
+    public function testAssertResponseRedirectsWithLocationWithoutHost()
+    {
+        if (!class_exists(ResponseHeaderLocationSame::class)) {
+            $this->markTestSkipped('Requires symfony/http-foundation 6.3 or higher.');
+        }
+
+        $this->getResponseTester(new Response('', 301, ['Location' => 'https://example.com/']))->assertResponseRedirects('/');
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('is redirected and has header "Location" matching "/".');
+        $this->getResponseTester(new Response('', 301))->assertResponseRedirects('/');
+    }
+
+    public function testAssertResponseRedirectsWithLocationWithoutScheme()
+    {
+        if (!class_exists(ResponseHeaderLocationSame::class)) {
+            $this->markTestSkipped('Requires symfony/http-foundation 6.3 or higher.');
+        }
+
+        $this->getResponseTester(new Response('', 301, ['Location' => 'https://example.com/']))->assertResponseRedirects('//example.com/');
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('is redirected and has header "Location" matching "//example.com/".');
+        $this->getResponseTester(new Response('', 301))->assertResponseRedirects('//example.com/');
     }
 
     public function testAssertResponseRedirectsWithStatusCode()
@@ -71,7 +96,7 @@ class WebTestCaseTest extends TestCase
     {
         $this->getResponseTester(new Response('', 302, ['Location' => 'https://example.com/']))->assertResponseRedirects('https://example.com/', 302);
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessageMatches('#(:?\( )?is redirected and has header "Location" with value "https://example\.com/" (:?\) )?and status code is 301\.#');
+        $this->expectExceptionMessageMatches('#(:?\( )?is redirected and has header "Location" (with value|matching) "https://example\.com/" (:?\) )?and status code is 301\.#');
         $this->getResponseTester(new Response('', 302))->assertResponseRedirects('https://example.com/', 301);
     }
 
@@ -330,7 +355,11 @@ class WebTestCaseTest extends TestCase
         $client = $this->createMock(KernelBrowser::class);
         $client->expects($this->any())->method('getResponse')->willReturn($response);
 
-        $request = new Request();
+        $request = new Request([], [], [], [], [], [
+            'HTTPS' => 'on',
+            'SERVER_PORT' => 443,
+            'SERVER_NAME' => 'example.com',
+        ]);
         $request->setFormat('custom', ['application/vnd.myformat']);
         $client->expects($this->any())->method('getRequest')->willReturn($request);
 

@@ -49,6 +49,8 @@ CHANGELOG
  * Deprecate `framework.validation.enable_annotations`, use `framework.validation.enable_attributes` instead
  * Deprecate `framework.serializer.enable_annotations`, use `framework.serializer.enable_attributes` instead
  * Add `array $tokenAttributes = []` optional parameter to `KernelBrowser::loginUser()`
+ * Add support for relative URLs in BrowserKit's redirect assertion.
+ * Change BrowserKitAssertionsTrait::getClient() to be protected
 
 6.3
 ---
@@ -71,6 +73,7 @@ CHANGELOG
  * Deprecate the `Http\Client\HttpClient` service, use `Psr\Http\Client\ClientInterface` instead
  * Add `stop_worker_on_signals` configuration option to `messenger` to define signals which would stop a worker
  * Add support for `--all` option to clear all cache pools with `cache:pool:clear` command
+ * Add `--show-aliases` option to `debug:router` command
 
 6.2
 ---

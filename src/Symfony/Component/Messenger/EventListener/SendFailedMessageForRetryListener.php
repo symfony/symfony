@@ -125,7 +125,7 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
         // if ALL nested Exceptions are an instance of UnrecoverableExceptionInterface we should not retry
         if ($e instanceof HandlerFailedException) {
             $shouldNotRetry = true;
-            foreach ($e->getNestedExceptions() as $nestedException) {
+            foreach ($e->getWrappedExceptions() as $nestedException) {
                 if ($nestedException instanceof RecoverableExceptionInterface) {
                     return true;
                 }

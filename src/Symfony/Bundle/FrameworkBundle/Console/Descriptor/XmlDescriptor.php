@@ -35,7 +35,7 @@ class XmlDescriptor extends Descriptor
 {
     protected function describeRouteCollection(RouteCollection $routes, array $options = []): void
     {
-        $this->writeDocument($this->getRouteCollectionDocument($routes));
+        $this->writeDocument($this->getRouteCollectionDocument($routes, $options));
     }
 
     protected function describeRoute(Route $route, array $options = []): void
@@ -141,13 +141,21 @@ class XmlDescriptor extends Descriptor
         $this->write($dom->saveXML());
     }
 
-    private function getRouteCollectionDocument(RouteCollection $routes): \DOMDocument
+    private function getRouteCollectionDocument(RouteCollection $routes, array $options): \DOMDocument
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($routesXML = $dom->createElement('routes'));
 
         foreach ($routes->all() as $name => $route) {
             $routeXML = $this->getRouteDocument($route, $name);
+            if (($showAliases ??= $options['show_aliases'] ?? false) && $aliases = ($reverseAliases ??= $this->getReverseAliases($routes))[$name] ?? []) {
+                $routeXML->firstChild->appendChild($aliasesXML = $routeXML->createElement('aliases'));
+                foreach ($aliases as $alias) {
+                    $aliasesXML->appendChild($aliasXML = $routeXML->createElement('alias'));
+                    $aliasXML->appendChild(new \DOMText($alias));
+                }
+            }
+
             $routesXML->appendChild($routesXML->ownerDocument->importNode($routeXML->childNodes->item(0), true));
         }
 

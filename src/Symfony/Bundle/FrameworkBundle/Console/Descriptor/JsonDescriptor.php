@@ -37,6 +37,9 @@ class JsonDescriptor extends Descriptor
         $data = [];
         foreach ($routes->all() as $name => $route) {
             $data[$name] = $this->getRouteData($route);
+            if (($showAliases ??= $options['show_aliases'] ?? false) && $aliases = ($reverseAliases ??= $this->getReverseAliases($routes))[$name] ?? []) {
+                $data[$name]['aliases'] = $aliases;
+            }
         }
 
         $this->writeData($data, $options);

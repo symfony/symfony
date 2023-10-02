@@ -39,6 +39,9 @@ class MarkdownDescriptor extends Descriptor
                 $this->write("\n\n");
             }
             $this->describeRoute($route, ['name' => $name]);
+            if (($showAliases ??= $options['show_aliases'] ?? false) && $aliases = ($reverseAliases ??= $this->getReverseAliases($routes))[$name] ?? []) {
+                $this->write(sprintf("- Aliases: \n%s", implode("\n", array_map(static fn (string $alias): string => sprintf('    - %s', $alias), $aliases))));
+            }
         }
         $this->write("\n");
     }

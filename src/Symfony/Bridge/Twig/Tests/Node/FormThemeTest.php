@@ -13,7 +13,7 @@ namespace Symfony\Bridge\Twig\Tests\Node;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Node\FormThemeNode;
-use Symfony\Bridge\Twig\Tests\Extension\RuntimeLoaderProvider;
+use Symfony\Bridge\Twig\Test\Traits\RuntimeLoaderProvider;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\FormRendererEngineInterface;
 use Twig\Compiler;

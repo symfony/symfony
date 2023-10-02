@@ -84,9 +84,36 @@ final class SlidingWindow implements LimiterStateInterface
         return (int) floor($this->hitCountForLastWindow * (1 - $percentOfCurrentTimeFrame) + $this->hitCount);
     }
 
+    /**
+     * @deprecated since Symfony 6.4, use {@see self::calculateTimeForTokens} instead
+     */
     public function getRetryAfter(): \DateTimeImmutable
     {
-        return \DateTimeImmutable::createFromFormat('U.u', sprintf('%.6F', $this->windowEndAt));
+        trigger_deprecation('symfony/ratelimiter', '6.4', 'The "%s()" method is deprecated, use "%s::calculateTimeForTokens" instead.', __METHOD__, self::class);
+
+        return \DateTimeImmutable::createFromFormat('U.u', sprintf('%.6F', microtime(true) + $this->calculateTimeForTokens(max(1, $this->getHitCount()), 1)));
+    }
+
+    public function calculateTimeForTokens(int $maxSize, int $tokens): float
+    {
+        $remaining = $maxSize - $this->getHitCount();
+        if ($remaining >= $tokens) {
+            return 0;
+        }
+
+        $time = microtime(true);
+        $startOfWindow = $this->windowEndAt - $this->intervalInSeconds;
+        $timePassed = $time - $startOfWindow;
+        $windowPassed = min($timePassed / $this->intervalInSeconds, 1);
+        $releasable = max(1, $maxSize - floor($this->hitCountForLastWindow * (1 - $windowPassed)));
+        $remainingWindow = $this->intervalInSeconds - $timePassed;
+        $needed = $tokens - $remaining;
+
+        if ($releasable >= $needed) {
+            return $needed * ($remainingWindow / max(1, $releasable));
+        }
+
+        return ($this->windowEndAt - $time) + ($needed - $releasable) * ($this->intervalInSeconds / $maxSize);
     }
 
     public function __serialize(): array

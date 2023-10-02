@@ -56,6 +56,7 @@ class RouterDebugCommand extends Command
             ->setDefinition([
                 new InputArgument('name', InputArgument::OPTIONAL, 'A route name'),
                 new InputOption('show-controllers', null, InputOption::VALUE_NONE, 'Show assigned controllers in overview'),
+                new InputOption('show-aliases', null, InputOption::VALUE_NONE, 'Show aliases in overview'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw route(s)'),
             ])
@@ -92,6 +93,7 @@ EOF
                     'format' => $input->getOption('format'),
                     'raw_text' => $input->getOption('raw'),
                     'show_controllers' => $input->getOption('show-controllers'),
+                    'show_aliases' => $input->getOption('show-aliases'),
                     'output' => $io,
                 ]);
 
@@ -120,6 +122,7 @@ EOF
                 'format' => $input->getOption('format'),
                 'raw_text' => $input->getOption('raw'),
                 'show_controllers' => $input->getOption('show-controllers'),
+                'show_aliases' => $input->getOption('show-aliases'),
                 'output' => $io,
                 'container' => $container,
             ]);

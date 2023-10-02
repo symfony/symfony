@@ -58,6 +58,7 @@ class TemplatedEmailTest extends TestCase
         $e->to('you@example.com');
         $e->textTemplate('email.txt.twig');
         $e->htmlTemplate('email.html.twig');
+        $e->locale('en');
         $e->context(['foo' => 'bar']);
         $e->addPart(new DataPart('Some Text file', 'test.txt'));
         $expected = clone $e;
@@ -66,6 +67,7 @@ class TemplatedEmailTest extends TestCase
 {
     "htmlTemplate": "email.html.twig",
     "textTemplate": "email.txt.twig",
+    "locale": "en",
     "context": {
         "foo": "bar"
     },

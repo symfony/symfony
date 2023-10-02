@@ -18,8 +18,10 @@ use Symfony\Component\Mime\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\HtmlToTextConverter\DefaultHtmlToTextConverter;
 use Symfony\Component\Mime\HtmlToTextConverter\HtmlToTextConverterInterface;
 use Symfony\Component\Mime\Part\Multipart\AlternativePart;
+use Symfony\Component\Translation\LocaleSwitcher;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
+use Twig\TwigFunction;
 
 class BodyRendererTest extends TestCase
 {
@@ -131,7 +133,16 @@ HTML;
         $this->assertEquals('Text', $email->getTextBody());
     }
 
-    private function prepareEmail(?string $text, ?string $html, array $context = [], HtmlToTextConverterInterface $converter = null): TemplatedEmail
+    public function testRenderWithLocale()
+    {
+        $localeSwitcher = new LocaleSwitcher('en', []);
+        $email = $this->prepareEmail(null, 'Locale: {{ locale_switcher_locale() }}', [], new DefaultHtmlToTextConverter(), $localeSwitcher, 'fr');
+
+        $this->assertEquals('Locale: fr', $email->getTextBody());
+        $this->assertEquals('Locale: fr', $email->getHtmlBody());
+    }
+
+    private function prepareEmail(?string $text, ?string $html, array $context = [], HtmlToTextConverterInterface $converter = null, LocaleSwitcher $localeSwitcher = null, string $locale = null): TemplatedEmail
     {
         $twig = new Environment(new ArrayLoader([
             'text' => $text,
@@ -139,12 +150,19 @@ HTML;
             'document.txt' => 'Some text document...',
             'image.jpg' => 'Some image data',
         ]));
-        $renderer = new BodyRenderer($twig, [], $converter);
+
+        if ($localeSwitcher instanceof LocaleSwitcher) {
+            $twig->addFunction(new TwigFunction('locale_switcher_locale', [$localeSwitcher, 'getLocale']));
+        }
+
+        $renderer = new BodyRenderer($twig, [], $converter, $localeSwitcher);
         $email = (new TemplatedEmail())
             ->to('fabien@symfony.com')
             ->from('helene@symfony.com')
+            ->locale($locale)
             ->context($context)
         ;
+
         if (null !== $text) {
             $email->textTemplate('text');
         }

@@ -180,7 +180,7 @@ class SwitchUserListener extends AbstractListener
         $this->userChecker->checkPostAuth($user);
 
         $roles = $user->getRoles();
-        $roles[] = 'ROLE_PREVIOUS_ADMIN';
+        $roles[] = 'IS_IMPERSONATOR';
         $originatedFromUri = str_replace('/&', '/?', preg_replace('#[&?]'.$this->usernameParameter.'=[^&]*#', '', $request->getRequestUri()));
         $token = new SwitchUserToken($user, $this->firewallName, $roles, $token, $originatedFromUri);
 

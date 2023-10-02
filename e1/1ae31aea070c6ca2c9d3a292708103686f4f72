@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2023-10-02T10:19:18Z
+
+Should we also add `impersonate_url()` to be consistent with `impersonate_exit_*` exposing both `path` and `url` functions in Twig ?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-10-02T10:40:34Z
+
+I think that's a good idea, I added the new function

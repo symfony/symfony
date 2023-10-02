@@ -136,57 +136,57 @@ class Request
     protected $content;
 
     /**
-     * @var string[]
+     * @var string[]|null
      */
     protected $languages;
 
     /**
-     * @var string[]
+     * @var string[]|null
      */
     protected $charsets;
 
     /**
-     * @var string[]
+     * @var string[]|null
      */
     protected $encodings;
 
     /**
-     * @var string[]
+     * @var string[]|null
      */
     protected $acceptableContentTypes;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $pathInfo;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $requestUri;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $baseUrl;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $basePath;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $method;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $format;
 
     /**
-     * @var SessionInterface|callable(): SessionInterface
+     * @var SessionInterface|callable():SessionInterface|null
      */
     protected $session;
 
@@ -282,16 +282,16 @@ class Request
         $this->headers = new HeaderBag($this->server->getHeaders());
 
         $this->content = $content;
-        unset($this->languages);
-        unset($this->charsets);
-        unset($this->encodings);
-        unset($this->acceptableContentTypes);
-        unset($this->pathInfo);
-        unset($this->requestUri);
-        unset($this->baseUrl);
-        unset($this->basePath);
-        unset($this->method);
-        unset($this->format);
+        $this->languages = null;
+        $this->charsets = null;
+        $this->encodings = null;
+        $this->acceptableContentTypes = null;
+        $this->pathInfo = null;
+        $this->requestUri = null;
+        $this->baseUrl = null;
+        $this->basePath = null;
+        $this->method = null;
+        $this->format = null;
     }
 
     /**
@@ -468,16 +468,16 @@ class Request
             $dup->server = new ServerBag($server);
             $dup->headers = new HeaderBag($dup->server->getHeaders());
         }
-        unset($dup->languages);
-        unset($dup->charsets);
-        unset($dup->encodings);
-        unset($dup->acceptableContentTypes);
-        unset($dup->pathInfo);
-        unset($dup->requestUri);
-        unset($dup->baseUrl);
-        unset($dup->basePath);
-        unset($dup->method);
-        unset($dup->format);
+        $dup->languages = null;
+        $dup->charsets = null;
+        $dup->encodings = null;
+        $dup->acceptableContentTypes = null;
+        $dup->pathInfo = null;
+        $dup->requestUri = null;
+        $dup->baseUrl = null;
+        $dup->basePath = null;
+        $dup->method = null;
+        $dup->format = null;
 
         if (!$dup->get('_format') && $this->get('_format')) {
             $dup->attributes->set('_format', $this->get('_format'));
@@ -1182,7 +1182,7 @@ class Request
      */
     public function setMethod(string $method)
     {
-        unset($this->method);
+        $this->method = null;
         $this->server->set('REQUEST_METHOD', $method);
     }
 
@@ -1201,7 +1201,7 @@ class Request
      */
     public function getMethod(): string
     {
-        if (isset($this->method)) {
+        if (null !== $this->method) {
             return $this->method;
         }
 
@@ -1249,7 +1249,7 @@ class Request
      */
     public function getMimeType(string $format): ?string
     {
-        if (!isset(static::$formats)) {
+        if (null === static::$formats) {
             static::initializeFormats();
         }
 
@@ -1263,7 +1263,7 @@ class Request
      */
     public static function getMimeTypes(string $format): array
     {
-        if (!isset(static::$formats)) {
+        if (null === static::$formats) {
             static::initializeFormats();
         }
 
@@ -1280,7 +1280,7 @@ class Request
             $canonicalMimeType = trim(substr($mimeType, 0, $pos));
         }
 
-        if (!isset(static::$formats)) {
+        if (null === static::$formats) {
             static::initializeFormats();
         }
 
@@ -1305,7 +1305,7 @@ class Request
      */
     public function setFormat(?string $format, string|array $mimeTypes)
     {
-        if (!isset(static::$formats)) {
+        if (null === static::$formats) {
             static::initializeFormats();
         }
 
@@ -1586,13 +1586,13 @@ class Request
      */
     public function getPreferredFormat(?string $default = 'html'): ?string
     {
-        if (isset($this->preferredFormat) || null !== $preferredFormat = $this->getRequestFormat(null)) {
-            return $this->preferredFormat ??= $preferredFormat;
+        if ($this->preferredFormat ??= $this->getRequestFormat(null)) {
+            return $this->preferredFormat;
         }
 
         foreach ($this->getAcceptableContentTypes() as $mimeType) {
-            if ($preferredFormat = $this->getFormat($mimeType)) {
-                return $this->preferredFormat = $preferredFormat;
+            if ($this->preferredFormat = $this->getFormat($mimeType)) {
+                return $this->preferredFormat;
             }
         }
 
@@ -1639,7 +1639,7 @@ class Request
      */
     public function getLanguages(): array
     {
-        if (isset($this->languages)) {
+        if (null !== $this->languages) {
             return $this->languages;
         }
 

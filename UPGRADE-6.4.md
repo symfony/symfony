@@ -108,6 +108,7 @@ HttpKernel
  * [BC break] `BundleInterface` no longer extends `ContainerAwareInterface`
  * [BC break] Add native return types to `TraceableEventDispatcher` and to `MergeExtensionConfigurationPass`
  * Deprecate `Kernel::stripComments()`
+ * Deprecate `UriSigner`, use `UriSigner` from the HttpFoundation component instead
 
 Messenger
 ---------

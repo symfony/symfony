@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by welcoMattic at 2023-06-16T08:14:39Z
+
+I've update the examples in PR description. Now we allow assertion on a single URL (with method and optional body). I've added the opposition assertion `assertHttpClientHasNotBeenCalledForUrl` and `assertHttpClientCountRequests`.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2023-09-19T12:47:49Z
+
+@nicolas-grekas
+
+> Random thoughts:
+>
+> No need for checking headers using these?
+
+Sure, I can add header checks :+1:
+
+> Can't we remove the $client argument somehow? (don't we have it in the context somewhere?)
+
+~As `BrowserKitAssertionTrait::getClient` is private, we don't have any other way to get the client here. Should we dig deep to find a way to do?~
+
+We have access to this trait through `WebTestAssertionsTrait` in `WebTestCase`, so we can call `static::getClient()`
+
+> WHat about defaulting $httpClientId default to `http_client`?
+
+Nice idea
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-09-20T12:29:08Z
+
+Same thoughts as Nicolas: if we can remove the need for the client arg and service name (when using the default), I think I’ll really dig it!
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2023-09-20T14:03:50Z
+
+@weaverryan it's done :) I've removed it https://github.com/symfony/symfony/pull/50662/files#diff-be0ff1fa989a87452ee0ecc8a932f09d50d59d3ecb4c6bce9565202aa254bd37R23.
+
+Through traits we have access to `getClient` from `BrowserKitAssertionsTrait`, et tada!

@@ -61,6 +61,10 @@ send_email:
     path:     /send_email
     defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\EmailController::indexAction }
 
+http_client_call:
+    path:     /http_client_call
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\HttpClientController::index }
+
 uid:
     resource: "../../Controller/UidController.php"
     type: "annotation"

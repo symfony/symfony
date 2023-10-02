@@ -18,6 +18,8 @@ namespace Symfony\Component\Messenger\Exception;
  */
 trait WrappedExceptionsTrait
 {
+    private array $exceptions;
+
     /**
      * @return \Throwable[]
      */

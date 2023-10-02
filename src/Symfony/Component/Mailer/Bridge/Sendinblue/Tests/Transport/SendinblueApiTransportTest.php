@@ -37,7 +37,7 @@ class SendinblueApiTransportTest extends TestCase
         $this->assertSame($expected, (string) $transport);
     }
 
-    public static function getTransportData()
+    public static function getTransportData(): \Generator
     {
         yield [
             new SendinblueApiTransport('ACCESS_KEY'),
@@ -144,6 +144,47 @@ class SendinblueApiTransportTest extends TestCase
             ->addReplyTo('foo@bar.fr')
             ->addPart(new DataPart('body'))
         ;
+
+        $message = $transport->send($mail);
+
+        $this->assertSame('foobar', $message->getMessageId());
+    }
+
+    /**
+     * IDN (internationalized domain names) like kältetechnik-xyz.de need to be transformed to ACE
+     * (ASCII Compatible Encoding) e.g.xn--kltetechnik-xyz-0kb.de, otherwise SendinBlue api answers with 400 http code.
+     *
+     * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
+     */
+    public function testSendForIdnDomains()
+    {
+        $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
+            $this->assertSame('POST', $method);
+            $this->assertSame('https://api.sendinblue.com:8984/v3/smtp/email', $url);
+            $this->assertStringContainsString('Accept: */*', $options['headers'][2] ?? $options['request_headers'][1]);
+
+            $body = json_decode($options['body'], true);
+            // to
+            $this->assertSame('kältetechnik@xn--kltetechnik-xyz-0kb.de', $body['to'][0]['email']);
+            $this->assertSame('Kältetechnik Xyz', $body['to'][0]['name']);
+            // sender
+            $this->assertSame('info@xn--kltetechnik-xyz-0kb.de', $body['sender']['email']);
+            $this->assertSame('Kältetechnik Xyz', $body['sender']['name']);
+
+            return new MockResponse(json_encode(['messageId' => 'foobar']), [
+                'http_code' => 201,
+            ]);
+        });
+
+        $transport = new SendinblueApiTransport('ACCESS_KEY', $client);
+        $transport->setPort(8984);
+
+        $mail = new Email();
+        $mail->subject('Hello!')
+            ->to(new Address('kältetechnik@kältetechnik-xyz.de', 'Kältetechnik Xyz'))
+            ->from(new Address('info@kältetechnik-xyz.de', 'Kältetechnik Xyz'))
+            ->text('Hello here!')
+            ->html('Hello there!');
 
         $message = $transport->send($mail);
 

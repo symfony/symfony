@@ -93,6 +93,11 @@ final class MessageGenerator implements MessageGeneratorInterface
         $checkpoint->release($now, $this->waitUntil);
     }
 
+    public function getSchedule(): Schedule
+    {
+        return $this->schedule ??= $this->scheduleProvider->getSchedule();
+    }
+
     private function heap(\DateTimeImmutable $time, \DateTimeImmutable $startTime): TriggerHeap
     {
         if (isset($this->triggerHeap) && $this->triggerHeap->time <= $time) {
@@ -101,7 +106,7 @@ final class MessageGenerator implements MessageGeneratorInterface
 
         $heap = new TriggerHeap($time);
 
-        foreach ($this->schedule()->getRecurringMessages() as $index => $recurringMessage) {
+        foreach ($this->getSchedule()->getRecurringMessages() as $index => $recurringMessage) {
             $trigger = $recurringMessage->getTrigger();
 
             if ($trigger instanceof StatefulTriggerInterface) {
@@ -118,13 +123,8 @@ final class MessageGenerator implements MessageGeneratorInterface
         return $this->triggerHeap = $heap;
     }
 
-    private function schedule(): Schedule
-    {
-        return $this->schedule ??= $this->scheduleProvider->getSchedule();
-    }
-
     private function checkpoint(): Checkpoint
     {
-        return $this->checkpoint ??= new Checkpoint('scheduler_checkpoint_'.$this->name, $this->schedule()->getLock(), $this->schedule()->getState());
+        return $this->checkpoint ??= new Checkpoint('scheduler_checkpoint_'.$this->name, $this->getSchedule()->getLock(), $this->getSchedule()->getState());
     }
 }

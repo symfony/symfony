@@ -13,6 +13,8 @@ CHANGELOG
  * Add `ScheduledStamp` to `RedispatchMessage`
  * Allow modifying Schedule instances at runtime
  * Add `MessageProviderInterface` to trigger unique messages at runtime
+ * Add `PreRunEvent` and `PostRunEvent` events
+ * Add `DispatchSchedulerEventListener`
 
 6.3
 ---

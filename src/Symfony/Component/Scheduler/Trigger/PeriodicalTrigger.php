@@ -30,18 +30,11 @@ class PeriodicalTrigger implements StatefulTriggerInterface
         $this->from = \is_string($from) ? new \DateTimeImmutable($from) : $from;
         $this->until = \is_string($until) ? new \DateTimeImmutable($until) : $until;
 
-        if (\is_int($interval) || \is_float($interval)) {
-            if (0 >= $interval) {
+        if (\is_int($interval) || \is_float($interval) || \is_string($interval) && ctype_digit($interval)) {
+            if (0 >= (int) $interval) {
                 throw new InvalidArgumentException('The "$interval" argument must be greater than zero.');
             }
 
-            $this->intervalInSeconds = $interval;
-            $this->description = sprintf('every %d seconds', $this->intervalInSeconds);
-
-            return;
-        }
-
-        if (\is_string($interval) && ctype_digit($interval)) {
             $this->intervalInSeconds = (int) $interval;
             $this->description = sprintf('every %d seconds', $this->intervalInSeconds);
 

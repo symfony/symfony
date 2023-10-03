@@ -50,6 +50,10 @@ class ImportMapRendererTest extends TestCase
                     'path' => 'https://cdn.example.com/assets/remote-d1g35t.js',
                     'type' => 'js',
                 ],
+                'es-module-shim' => [
+                    'path' => 'https://ga.jspm.io/npm:es-module-shims',
+                    'type' => 'js',
+                ],
             ]);
 
         $assetPackages = $this->createMock(Packages::class);
@@ -64,11 +68,14 @@ class ImportMapRendererTest extends TestCase
                 return '/subdirectory/'.$path;
             });
 
-        $renderer = new ImportMapRenderer($importMapManager, $assetPackages);
+        $renderer = new ImportMapRenderer($importMapManager, $assetPackages, polyfillImportName: 'es-module-shim');
         $html = $renderer->render(['app']);
 
         $this->assertStringContainsString('<script type="importmap">', $html);
-        $this->assertStringContainsString('https://ga.jspm.io/npm:es-module-shims', $html);
+        // polyfill is rendered as a normal script tag
+        $this->assertStringContainsString('<script async src="https://ga.jspm.io/npm:es-module-shims"></script>', $html);
+        // and is hidden from the import map
+        $this->assertStringNotContainsString('"es-module-shim"', $html);
         $this->assertStringContainsString('import \'app\';', $html);
 
         // preloaded js file
@@ -93,9 +100,26 @@ class ImportMapRendererTest extends TestCase
         $this->assertStringNotContainsString('https://ga.jspm.io/npm:es-module-shims', $renderer->render([]));
     }
 
+    public function testDefaultPolyfillUsedIfNotInImportmap()
+    {
+        $importMapManager = $this->createMock(ImportMapManager::class);
+        $importMapManager->expects($this->once())
+            ->method('getImportMapData')
+            ->with(['app'])
+            ->willReturn([]);
+
+        $renderer = new ImportMapRenderer(
+            $importMapManager,
+            $this->createMock(Packages::class),
+            polyfillImportName: 'es-module-shims',
+        );
+        $html = $renderer->render(['app']);
+        $this->assertStringContainsString('<script async src="https://ga.jspm.io/npm:es-module-shims@', $html);
+    }
+
     public function testCustomScriptAttributes()
     {
-        $renderer = new ImportMapRenderer($this->createBasicImportMapManager(), null, 'UTF-8', 'https://polyfillUrl.example', [
+        $renderer = new ImportMapRenderer($this->createBasicImportMapManager(), null, 'UTF-8', 'es-module-shims', [
             'something' => true,
             'data-turbo-track' => 'reload',
         ]);
@@ -126,6 +150,10 @@ class ImportMapRendererTest extends TestCase
             ->willReturn([
                 'app' => [
                     'path' => 'app.js',
+                    'type' => 'js',
+                ],
+                'es-module-shims' => [
+                    'path' => 'https://polyfillUrl.example',
                     'type' => 'js',
                 ],
             ])

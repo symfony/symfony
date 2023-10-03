@@ -33,7 +33,6 @@ use Symfony\Bundle\MercureBundle\MercureBundle;
 use Symfony\Component\Asset\PackageInterface;
 use Symfony\Component\AssetMapper\AssetMapper;
 use Symfony\Component\AssetMapper\Compiler\AssetCompilerInterface;
-use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -1378,7 +1377,7 @@ class FrameworkExtension extends Extension
 
         $container
             ->getDefinition('asset_mapper.importmap.renderer')
-            ->replaceArgument(3, $config['importmap_polyfill'] ?? ImportMapManager::POLYFILL_URL)
+            ->replaceArgument(3, $config['importmap_polyfill'])
             ->replaceArgument(4, $config['importmap_script_attributes'])
         ;
     }

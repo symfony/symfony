@@ -15,6 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapRenderer;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\WebLink\GenericLinkProvider;
 
 class ImportMapRendererTest extends TestCase
 {
@@ -129,5 +132,41 @@ class ImportMapRendererTest extends TestCase
         ;
 
         return $importMapManager;
+    }
+
+    public function testItAddsPreloadLinks()
+    {
+        $importMapManager = $this->createMock(ImportMapManager::class);
+        $importMapManager->expects($this->once())
+            ->method('getImportMapData')
+            ->willReturn([
+                'app_js_preload' => [
+                    'path' => '/assets/app-preload-d1g35t.js',
+                    'type' => 'js',
+                    'preload' => true,
+                ],
+                'app_css_preload' => [
+                    'path' => '/assets/styles/app-preload-d1g35t.css',
+                    'type' => 'css',
+                    'preload' => true,
+                ],
+                'app_css_no_preload' => [
+                    'path' => '/assets/styles/app-nopreload-d1g35t.css',
+                    'type' => 'css',
+                ],
+            ]);
+
+        $request = Request::create('/foo');
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        $renderer = new ImportMapRenderer($importMapManager, requestStack: $requestStack);
+        $renderer->render(['app']);
+
+        $linkProvider = $request->attributes->get('_links');
+        $this->assertInstanceOf(GenericLinkProvider::class, $linkProvider);
+        $this->assertCount(1, $linkProvider->getLinks());
+        $this->assertSame(['preload'], $linkProvider->getLinks()[0]->getRels());
+        $this->assertSame('/assets/styles/app-preload-d1g35t.css', $linkProvider->getLinks()[0]->getHref());
     }
 }

@@ -9,6 +9,7 @@ CHANGELOG
  * Add "entrypoints" concept to the importmap
  * Always download packages locally instead of using a CDN
  * Allow relative path strings in the importmap
+ * Automatically set `_links` attribute for preload CSS files for WebLink integration
  * Add `PreAssetsCompileEvent` event when running `asset-map:compile`
  * Add support for importmap paths to use the Asset component (for subdirectories)
  * Removed the `importmap:export` command

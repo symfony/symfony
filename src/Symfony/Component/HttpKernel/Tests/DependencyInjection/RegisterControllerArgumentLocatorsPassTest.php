@@ -676,7 +676,7 @@ class WithTaggedIteratorAndTaggedLocator
     public function fooAction(
         #[TaggedIterator('foobar')] iterable $iterator,
         #[TaggedLocator('foobar')] ServiceLocator $locator,
-        #[AutowireLocator('bar', 'baz')] ContainerInterface $container,
+        #[AutowireLocator(['bar', 'baz'])] ContainerInterface $container,
     ) {
     }
 }

@@ -17,11 +17,11 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
 final class AutowireLocatorConsumer
 {
     public function __construct(
-        #[AutowireLocator(
+        #[AutowireLocator([
             BarTagClass::class,
-            with_key: FooTagClass::class,
-            nullable: '?invalid',
-        )]
+            'with_key' => FooTagClass::class,
+            'nullable' => '?invalid',
+        ])]
         public readonly ContainerInterface $locator,
     ) {
     }

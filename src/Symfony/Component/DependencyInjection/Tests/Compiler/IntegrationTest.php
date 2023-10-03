@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -32,6 +33,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\Attribute\CustomPropert
 use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfiguredInterface2;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfiguredService1;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfiguredService2;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\AutowireIteratorConsumer;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\AutowireLocatorConsumer;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\BarTagClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooBarTaggedClass;
@@ -392,6 +394,7 @@ class IntegrationTest extends TestCase
     public function testLocatorConfiguredViaAttribute()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('some.parameter', 'foo');
         $container->register(BarTagClass::class)
             ->setPublic(true)
         ;
@@ -411,6 +414,36 @@ class IntegrationTest extends TestCase
         self::assertSame($container->get(BarTagClass::class), $s->locator->get(BarTagClass::class));
         self::assertSame($container->get(FooTagClass::class), $s->locator->get('with_key'));
         self::assertFalse($s->locator->has('nullable'));
+        self::assertSame('foo', $s->locator->get('subscribed'));
+    }
+
+    public function testIteratorConfiguredViaAttribute()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('some.parameter', 'foo');
+        $container->register(BarTagClass::class)
+            ->setPublic(true)
+        ;
+        $container->register(FooTagClass::class)
+            ->setPublic(true)
+        ;
+        $container->register(AutowireIteratorConsumer::class)
+            ->setAutowired(true)
+            ->setPublic(true)
+        ;
+
+        $container->compile();
+
+        /** @var AutowireIteratorConsumer $s */
+        $s = $container->get(AutowireIteratorConsumer::class);
+
+        self::assertInstanceOf(RewindableGenerator::class, $s->iterator);
+
+        $values = iterator_to_array($s->iterator);
+        self::assertCount(3, $values);
+        self::assertSame($container->get(BarTagClass::class), $values[BarTagClass::class]);
+        self::assertSame($container->get(FooTagClass::class), $values['with_key']);
+        self::assertSame('foo', $values['subscribed']);
     }
 
     public function testTaggedServiceWithIndexAttributeAndDefaultMethodConfiguredViaAttribute()

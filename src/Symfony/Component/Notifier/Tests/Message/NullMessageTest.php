@@ -32,7 +32,7 @@ class NullMessageTest extends TestCase
         $this->assertSame($message->getOptions(), $nullMessage->getOptions());
 
         (null === $message->getTransport())
-            ? $this->assertSame(null, $nullMessage->getTransport())
+            ? $this->assertNull($nullMessage->getTransport())
             : $this->assertSame($message->getTransport(), $nullMessage->getTransport());
     }
 

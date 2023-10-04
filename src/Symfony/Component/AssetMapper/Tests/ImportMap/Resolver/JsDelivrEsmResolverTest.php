@@ -268,7 +268,7 @@ class JsDelivrEsmResolverTest extends TestCase
     /**
      * @dataProvider provideDownloadPackagesTests
      */
-    public function testDownloadPackages(array $importMapEntries, array $expectedRequests, array $expectedContents)
+    public function testDownloadPackages(array $importMapEntries, array $expectedRequests, array $expectedReturn, array $expectedDependencies = [])
     {
         $responses = [];
         foreach ($expectedRequests as $expectedRequest) {
@@ -283,10 +283,14 @@ class JsDelivrEsmResolverTest extends TestCase
         $httpClient = new MockHttpClient($responses);
 
         $provider = new JsDelivrEsmResolver($httpClient);
-        $actualContents = $provider->downloadPackages($importMapEntries);
-        $this->assertCount(\count($expectedContents), $actualContents);
-        $actualContents = array_map('trim', $actualContents);
-        $this->assertSame($expectedContents, $actualContents);
+        $actualReturn = $provider->downloadPackages($importMapEntries);
+
+        foreach ($actualReturn as $key => $data) {
+            $actualReturn[$key]['content'] = trim($data['content']);
+        }
+        $this->assertCount(\count($expectedReturn), $actualReturn);
+
+        $this->assertSame($expectedReturn, $actualReturn);
         $this->assertSame(\count($expectedRequests), $httpClient->getRequestsCount());
     }
 
@@ -301,7 +305,7 @@ class JsDelivrEsmResolverTest extends TestCase
                 ],
             ],
             [
-                'lodash' => 'lodash contents',
+                'lodash' => ['content' => 'lodash contents', 'dependencies' => []],
             ],
         ];
 
@@ -314,7 +318,7 @@ class JsDelivrEsmResolverTest extends TestCase
                 ],
             ],
             [
-                'lodash' => 'lodash contents',
+                'lodash' => ['content' => 'lodash contents', 'dependencies' => []],
             ],
         ];
 
@@ -327,7 +331,7 @@ class JsDelivrEsmResolverTest extends TestCase
                 ],
             ],
             [
-                'lodash' => 'chart.js contents',
+                'lodash' => ['content' => 'chart.js contents', 'dependencies' => []],
             ],
         ];
 
@@ -340,7 +344,7 @@ class JsDelivrEsmResolverTest extends TestCase
                 ],
             ],
             [
-                'lodash' => 'bootstrap.css contents',
+                'lodash' => ['content' => 'bootstrap.css contents', 'dependencies' => []],
             ],
         ];
 
@@ -365,9 +369,9 @@ class JsDelivrEsmResolverTest extends TestCase
                 ],
             ],
             [
-                'lodash' => 'lodash contents',
-                'chart.js/auto' => 'chart.js contents',
-                'bootstrap/dist/bootstrap.css' => 'bootstrap.css contents',
+                'lodash' => ['content' => 'lodash contents', 'dependencies' => []],
+                'chart.js/auto' => ['content' => 'chart.js contents', 'dependencies' => []],
+                'bootstrap/dist/bootstrap.css' => ['content' => 'bootstrap.css contents', 'dependencies' => []],
             ],
         ];
 
@@ -382,11 +386,14 @@ class JsDelivrEsmResolverTest extends TestCase
                 ],
             ],
             [
-                '@chart.js/auto' => 'import{Color as t}from"@kurkle/color";function e(){}const i=(()=',
+                '@chart.js/auto' => [
+                    'content' => 'import{Color as t}from"@kurkle/color";function e(){}const i=(()=',
+                    'dependencies' => ['@kurkle/color'],
+                ],
             ],
         ];
 
-        yield 'js importmap is removed' => [
+        yield 'js sourcemap is removed' => [
             [
                 '@chart.js/auto' => self::createRemoteEntry('chart.js/auto', version: '1.2.3'),
             ],
@@ -398,7 +405,10 @@ class JsDelivrEsmResolverTest extends TestCase
                 ],
             ],
             [
-                '@chart.js/auto' => 'as Ticks,ta as TimeScale,ia as TimeSeriesScale,oo as Title,wo as Tooltip,Ci as _adapters,us as _detectPlatform,Ye as animator,Si as controllers,tn as default,St as defaults,Pn as elements,qi as layouts,ko as plugins,na as registerables,Ps as registry,sa as scales};',
+                '@chart.js/auto' => [
+                    'content' => 'as Ticks,ta as TimeScale,ia as TimeSeriesScale,oo as Title,wo as Tooltip,Ci as _adapters,us as _detectPlatform,Ye as animator,Si as controllers,tn as default,St as defaults,Pn as elements,qi as layouts,ko as plugins,na as registerables,Ps as registry,sa as scales};',
+                    'dependencies' => [],
+                ],
             ],
         ];
 
@@ -412,7 +422,10 @@ class JsDelivrEsmResolverTest extends TestCase
                 ],
             ],
             [
-                'lodash' => 'print-table-row{display:table-row!important}.d-print-table-cell{display:table-cell!important}.d-print-flex{display:flex!important}.d-print-inline-flex{display:inline-flex!important}.d-print-none{display:none!important}}',
+                'lodash' => [
+                    'content' => 'print-table-row{display:table-row!important}.d-print-table-cell{display:table-cell!important}.d-print-flex{display:flex!important}.d-print-inline-flex{display:inline-flex!important}.d-print-none{display:none!important}}',
+                    'dependencies' => [],
+                ],
             ],
         ];
     }

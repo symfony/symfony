@@ -62,7 +62,12 @@ class RemotePackageDownloaderTest extends TestCase
                 ['foo' => $entry1, 'bar.js/file' => $entry2, 'baz' => $entry3, 'different_specifier' => $entry4],
                 $progressCallback
             )
-            ->willReturn(['foo' => 'foo content', 'bar.js/file' => 'bar content', 'baz' => 'baz content', 'different_specifier' => 'different content']);
+            ->willReturn([
+                'foo' => ['content' => 'foo content', 'dependencies' => []],
+                'bar.js/file' => ['content' => 'bar content', 'dependencies' => []],
+                'baz' => ['content' => 'baz content', 'dependencies' => ['foo']],
+                'different_specifier' => ['content' => 'different content', 'dependencies' => []],
+            ]);
 
         $downloader = new RemotePackageDownloader(
             $remotePackageStorage,
@@ -82,10 +87,10 @@ class RemotePackageDownloaderTest extends TestCase
         $installed = require self::$writableRoot.'/assets/vendor/installed.php';
         $this->assertEquals(
             [
-                'foo' => ['version' => '1.0.0'],
-                'bar.js/file' => ['version' => '1.0.0'],
-                'baz' => ['version' => '1.0.0'],
-                'different_specifier' => ['version' => '1.0.0'],
+                'foo' => ['version' => '1.0.0', 'dependencies' => []],
+                'bar.js/file' => ['version' => '1.0.0', 'dependencies' => []],
+                'baz' => ['version' => '1.0.0', 'dependencies' => ['foo']],
+                'different_specifier' => ['version' => '1.0.0', 'dependencies' => []],
             ],
             $installed
         );
@@ -95,9 +100,9 @@ class RemotePackageDownloaderTest extends TestCase
     {
         $this->filesystem->mkdir(self::$writableRoot.'/assets/vendor');
         $installed = [
-            'foo' => ['version' => '1.0.0'],
-            'bar.js/file' => ['version' => '1.0.0'],
-            'baz' => ['version' => '1.0.0'],
+            'foo' => ['version' => '1.0.0', 'dependencies' => []],
+            'bar.js/file' => ['version' => '1.0.0', 'dependencies' => []],
+            'baz' => ['version' => '1.0.0', 'dependencies' => []],
         ];
         file_put_contents(
             self::$writableRoot.'/assets/vendor/installed.php',
@@ -125,7 +130,10 @@ class RemotePackageDownloaderTest extends TestCase
 
         $packageResolver->expects($this->once())
             ->method('downloadPackages')
-            ->willReturn(['bar.js/file' => 'new bar content', 'baz' => 'new baz content']);
+            ->willReturn([
+                'bar.js/file' => ['content' => 'new bar content', 'dependencies' => []],
+                'baz' => ['content' => 'new baz content', 'dependencies' => []],
+            ]);
 
         $downloader = new RemotePackageDownloader(
             new RemotePackageStorage(self::$writableRoot.'/assets/vendor'),
@@ -144,9 +152,9 @@ class RemotePackageDownloaderTest extends TestCase
         $installed = require self::$writableRoot.'/assets/vendor/installed.php';
         $this->assertEquals(
             [
-                'foo' => ['version' => '1.0.0'],
-                'bar.js/file' => ['version' => '1.0.0'],
-                'baz' => ['version' => '1.1.0'],
+                'foo' => ['version' => '1.0.0', 'dependencies' => []],
+                'bar.js/file' => ['version' => '1.0.0', 'dependencies' => []],
+                'baz' => ['version' => '1.1.0', 'dependencies' => []],
             ],
             $installed
         );

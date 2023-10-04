@@ -152,7 +152,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
     /**
      * @param ImportMapEntry[] $importMapEntries
      *
-     * @return array<string, string>
+     * @return array<string, array{content: string, dependencies: string[]}>
      */
     public function downloadPackages(array $importMapEntries, callable $progressCallback = null): array
     {
@@ -180,7 +180,12 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
             if ($progressCallback) {
                 $progressCallback($package, 'started', $response, \count($responses));
             }
-            $contents[$package] = $this->makeImportsBare($response->getContent());
+
+            $dependencies = [];
+            $contents[$package] = [
+                'content' => $this->makeImportsBare($response->getContent(), $dependencies),
+                'dependencies' => $dependencies,
+            ];
             if ($progressCallback) {
                 $progressCallback($package, 'finished', $response, \count($responses));
             }
@@ -226,9 +231,14 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
      *
      * Replaces those with normal import "package/name" statements.
      */
-    private function makeImportsBare(string $content): string
+    private function makeImportsBare(string $content, array &$dependencies): string
     {
-        $content = preg_replace_callback(self::IMPORT_REGEX, fn ($m) => sprintf('from"%s"', $m[1]), $content);
+        $content = preg_replace_callback(self::IMPORT_REGEX, function ($matches) use (&$dependencies) {
+            $packageName = $matches[1];
+            $dependencies[] = $packageName;
+
+            return sprintf('from"%s"', $packageName);
+        }, $content);
 
         // source maps are not also downloaded - so remove the sourceMappingURL
         $content = preg_replace('{//# sourceMappingURL=.*$}m', '', $content);

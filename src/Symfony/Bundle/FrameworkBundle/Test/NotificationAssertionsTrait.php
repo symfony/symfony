@@ -29,7 +29,7 @@ trait NotificationAssertionsTrait
 
     public static function assertQueuedNotificationCount(int $count, string $transportName = null, string $message = ''): void
     {
-        self::assertThat(self::getMessageMailerEvents(), new NotifierConstraint\NotificationCount($count, $transportName, true), $message);
+        self::assertThat(self::getNotificationEvents(), new NotifierConstraint\NotificationCount($count, $transportName, true), $message);
     }
 
     public static function assertNotificationIsQueued(MessageEvent $event, string $message = ''): void

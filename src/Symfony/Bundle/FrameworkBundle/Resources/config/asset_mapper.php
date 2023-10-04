@@ -20,6 +20,7 @@ use Symfony\Component\AssetMapper\Command\AssetMapperCompileCommand;
 use Symfony\Component\AssetMapper\Command\DebugAssetMapperCommand;
 use Symfony\Component\AssetMapper\Command\ImportMapAuditCommand;
 use Symfony\Component\AssetMapper\Command\ImportMapInstallCommand;
+use Symfony\Component\AssetMapper\Command\ImportMapOutdatedCommand;
 use Symfony\Component\AssetMapper\Command\ImportMapRemoveCommand;
 use Symfony\Component\AssetMapper\Command\ImportMapRequireCommand;
 use Symfony\Component\AssetMapper\Command\ImportMapUpdateCommand;
@@ -32,6 +33,7 @@ use Symfony\Component\AssetMapper\ImportMap\ImportMapAuditor;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapRenderer;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapUpdateChecker;
 use Symfony\Component\AssetMapper\ImportMap\RemotePackageDownloader;
 use Symfony\Component\AssetMapper\ImportMap\Resolver\JsDelivrEsmResolver;
 use Symfony\Component\AssetMapper\MapperAwareAssetPackage;
@@ -179,6 +181,11 @@ return static function (ContainerConfigurator $container) {
             service('asset_mapper.importmap.config_reader'),
             service('http_client'),
         ])
+        ->set('asset_mapper.importmap.update_checker', ImportMapUpdateChecker::class)
+        ->args([
+            service('asset_mapper.importmap.config_reader'),
+            service('http_client'),
+        ])
 
         ->set('asset_mapper.importmap.command.require', ImportMapRequireCommand::class)
             ->args([
@@ -204,6 +211,10 @@ return static function (ContainerConfigurator $container) {
 
         ->set('asset_mapper.importmap.command.audit', ImportMapAuditCommand::class)
             ->args([service('asset_mapper.importmap.auditor')])
+            ->tag('console.command')
+
+        ->set('asset_mapper.importmap.command.outdated', ImportMapOutdatedCommand::class)
+            ->args([service('asset_mapper.importmap.update_checker')])
             ->tag('console.command')
     ;
 };

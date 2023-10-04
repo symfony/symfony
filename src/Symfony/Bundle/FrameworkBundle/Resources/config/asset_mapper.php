@@ -24,6 +24,7 @@ use Symfony\Component\AssetMapper\Command\ImportMapOutdatedCommand;
 use Symfony\Component\AssetMapper\Command\ImportMapRemoveCommand;
 use Symfony\Component\AssetMapper\Command\ImportMapRequireCommand;
 use Symfony\Component\AssetMapper\Command\ImportMapUpdateCommand;
+use Symfony\Component\AssetMapper\CompiledAssetMapperConfigReader;
 use Symfony\Component\AssetMapper\Compiler\CssAssetUrlCompiler;
 use Symfony\Component\AssetMapper\Compiler\JavaScriptImportPathCompiler;
 use Symfony\Component\AssetMapper\Compiler\SourceMappingUrlsCompiler;
@@ -40,6 +41,7 @@ use Symfony\Component\AssetMapper\ImportMap\RemotePackageDownloader;
 use Symfony\Component\AssetMapper\ImportMap\RemotePackageStorage;
 use Symfony\Component\AssetMapper\ImportMap\Resolver\JsDelivrEsmResolver;
 use Symfony\Component\AssetMapper\MapperAwareAssetPackage;
+use Symfony\Component\AssetMapper\Path\LocalPublicAssetsFilesystem;
 use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolver;
 
 return static function (ContainerConfigurator $container) {
@@ -48,7 +50,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('asset_mapper.repository'),
                 service('asset_mapper.mapped_asset_factory'),
-                service('asset_mapper.public_assets_path_resolver'),
+                service('asset_mapper.compiled_asset_mapper_config_reader'),
             ])
         ->alias(AssetMapperInterface::class, 'asset_mapper')
 
@@ -76,9 +78,17 @@ return static function (ContainerConfigurator $container) {
 
         ->set('asset_mapper.public_assets_path_resolver', PublicAssetsPathResolver::class)
             ->args([
-                param('kernel.project_dir'),
                 abstract_arg('asset public prefix'),
-                abstract_arg('public directory name'),
+            ])
+
+        ->set('asset_mapper.local_public_assets_filesystem', LocalPublicAssetsFilesystem::class)
+            ->args([
+                abstract_arg('public directory'),
+            ])
+
+        ->set('asset_mapper.compiled_asset_mapper_config_reader', CompiledAssetMapperConfigReader::class)
+            ->args([
+                abstract_arg('public assets directory'),
             ])
 
         ->set('asset_mapper.asset_package', MapperAwareAssetPackage::class)
@@ -100,12 +110,11 @@ return static function (ContainerConfigurator $container) {
 
         ->set('asset_mapper.command.compile', AssetMapperCompileCommand::class)
             ->args([
-                service('asset_mapper.public_assets_path_resolver'),
+                service('asset_mapper.compiled_asset_mapper_config_reader'),
                 service('asset_mapper'),
                 service('asset_mapper.importmap.generator'),
-                service('filesystem'),
+                service('asset_mapper.local_public_assets_filesystem'),
                 param('kernel.project_dir'),
-                abstract_arg('public directory name'),
                 param('kernel.debug'),
                 service('event_dispatcher')->nullOnInvalid(),
             ])
@@ -163,7 +172,7 @@ return static function (ContainerConfigurator $container) {
         ->set('asset_mapper.importmap.generator', ImportMapGenerator::class)
             ->args([
                 service('asset_mapper'),
-                service('asset_mapper.public_assets_path_resolver'),
+                service('asset_mapper.compiled_asset_mapper_config_reader'),
                 service('asset_mapper.importmap.config_reader'),
             ])
 

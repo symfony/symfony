@@ -21,18 +21,11 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class PreAssetsCompileEvent extends Event
 {
-    private string $outputDir;
     private OutputInterface $output;
 
-    public function __construct(string $outputDir, OutputInterface $output)
+    public function __construct(OutputInterface $output)
     {
-        $this->outputDir = $outputDir;
         $this->output = $output;
-    }
-
-    public function getOutputDir(): string
-    {
-        return $this->outputDir;
     }
 
     public function getOutput(): OutputInterface

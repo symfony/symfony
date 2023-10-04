@@ -1353,13 +1353,17 @@ class FrameworkExtension extends Extension
             ->setArgument(0, $paths)
             ->setArgument(2, $excludedPathPatterns);
 
-        $publicDirName = $this->getPublicDirectoryName($container);
         $container->getDefinition('asset_mapper.public_assets_path_resolver')
-            ->setArgument(1, $config['public_prefix'])
-            ->setArgument(2, $publicDirName);
+            ->setArgument(0, $config['public_prefix']);
 
-        $container->getDefinition('asset_mapper.command.compile')
-            ->setArgument(5, $publicDirName);
+        $publicDirectory = $this->getPublicDirectory($container);
+        $publicAssetsDirectory = rtrim($publicDirectory.'/'.ltrim($config['public_prefix'], '/'), '/');
+        $container->getDefinition('asset_mapper.local_public_assets_filesystem')
+            ->setArgument(0, $publicDirectory)
+        ;
+
+        $container->getDefinition('asset_mapper.compiled_asset_mapper_config_reader')
+            ->setArgument(0, $publicAssetsDirectory);
 
         if (!$config['server']) {
             $container->removeDefinition('asset_mapper.dev_server_subscriber');
@@ -3163,11 +3167,12 @@ class FrameworkExtension extends Extension
         $config['enabled'] = $value;
     }
 
-    private function getPublicDirectoryName(ContainerBuilder $container): string
+    private function getPublicDirectory(ContainerBuilder $container): string
     {
-        $defaultPublicDir = 'public';
+        $projectDir = $container->getParameter('kernel.project_dir');
+        $defaultPublicDir = $projectDir.'/public';
 
-        $composerFilePath = $container->getParameter('kernel.project_dir').'/composer.json';
+        $composerFilePath = $projectDir.'/composer.json';
 
         if (!file_exists($composerFilePath)) {
             return $defaultPublicDir;
@@ -3176,6 +3181,6 @@ class FrameworkExtension extends Extension
         $container->addResource(new FileResource($composerFilePath));
         $composerConfig = json_decode(file_get_contents($composerFilePath), true);
 
-        return $composerConfig['extra']['public-dir'] ?? $defaultPublicDir;
+        return isset($composerConfig['extra']['public-dir']) ? $projectDir.'/'.$composerConfig['extra']['public-dir'] : $defaultPublicDir;
     }
 }

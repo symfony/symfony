@@ -17,9 +17,4 @@ interface PublicAssetsPathResolverInterface
      * The path that should be prefixed on all asset paths to point to the output location.
      */
     public function resolvePublicPath(string $logicalPath): string;
-
-    /**
-     * Returns the filesystem path to where assets are stored when compiled.
-     */
-    public function getPublicFilesystemPath(): string;
 }

@@ -51,7 +51,7 @@ class AssetMapperCompileCommandTest extends TestCase
         $this->filesystem->mkdir($targetBuildDir);
         file_put_contents($targetBuildDir.'/manifest.json', '{}');
         file_put_contents($targetBuildDir.'/importmap.json', '{}');
-        file_put_contents($targetBuildDir.'/entrypoint.file6.json', '[]]');
+        file_put_contents($targetBuildDir.'/entrypoint.file6.json', '[]');
 
         $command = $application->find('asset-map:compile');
         $tester = new CommandTester($command);
@@ -119,7 +119,6 @@ class AssetMapperCompileCommandTest extends TestCase
         $listenerCalled = false;
         $dispatcher->addListener(PreAssetsCompileEvent::class, function (PreAssetsCompileEvent $event) use (&$listenerCalled) {
             $listenerCalled = true;
-            $this->assertSame(realpath(__DIR__.'/../Fixtures').'/public/assets', $event->getOutputDir());
             $this->assertInstanceOf(OutputInterface::class, $event->getOutput());
         });
 

@@ -14,6 +14,7 @@ namespace Symfony\Component\AssetMapper\Tests\ImportMap;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
+use Symfony\Component\AssetMapper\CompiledAssetMapperConfigReader;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntries;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
@@ -21,13 +22,12 @@ use Symfony\Component\AssetMapper\ImportMap\ImportMapGenerator;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapType;
 use Symfony\Component\AssetMapper\ImportMap\JavaScriptImport;
 use Symfony\Component\AssetMapper\MappedAsset;
-use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 class ImportMapGeneratorTest extends TestCase
 {
     private AssetMapperInterface&MockObject $assetMapper;
-    private PublicAssetsPathResolverInterface&MockObject $pathResolver;
+    private CompiledAssetMapperConfigReader&MockObject $compiledConfigReader;
     private ImportMapConfigReader&MockObject $configReader;
     private ImportMapGenerator $importMapGenerator;
 
@@ -565,10 +565,13 @@ class ImportMapGeneratorTest extends TestCase
                 'path' => 'https://anyurl.com/stimulus',
             ],
         ];
-        $this->writeFile('public/assets/importmap.json', json_encode($importmapData));
-        $this->pathResolver->expects($this->once())
-            ->method('getPublicFilesystemPath')
-            ->willReturn(self::$writableRoot.'/public/assets');
+        $this->compiledConfigReader->expects($this->once())
+            ->method('configExists')
+            ->with('importmap.json')
+            ->willReturn(true);
+        $this->compiledConfigReader->expects($this->once())
+            ->method('loadConfig')
+            ->willReturn($importmapData);
 
         $this->assertEquals($importmapData, $manager->getRawImportMapData());
     }
@@ -651,17 +654,20 @@ class ImportMapGeneratorTest extends TestCase
             'app',
             '/assets/foo.js',
         ];
-        $this->writeFile('public/assets/entrypoint.foo.json', json_encode($entrypointData));
-        $this->pathResolver->expects($this->once())
-            ->method('getPublicFilesystemPath')
-            ->willReturn(self::$writableRoot.'/public/assets');
+        $this->compiledConfigReader->expects($this->once())
+            ->method('configExists')
+            ->with('entrypoint.foo.json')
+            ->willReturn(true);
+        $this->compiledConfigReader->expects($this->once())
+            ->method('loadConfig')
+            ->willReturn($entrypointData);
 
         $this->assertEquals($entrypointData, $manager->findEagerEntrypointImports('foo'));
     }
 
     private function createImportMapGenerator(): ImportMapGenerator
     {
-        $this->pathResolver = $this->createMock(PublicAssetsPathResolverInterface::class);
+        $this->compiledConfigReader = $this->createMock(CompiledAssetMapperConfigReader::class);
         $this->assetMapper = $this->createMock(AssetMapperInterface::class);
         $this->configReader = $this->createMock(ImportMapConfigReader::class);
 
@@ -676,7 +682,7 @@ class ImportMapGeneratorTest extends TestCase
 
         return $this->importMapGenerator = new ImportMapGenerator(
             $this->assetMapper,
-            $this->pathResolver,
+            $this->compiledConfigReader,
             $this->configReader,
         );
     }
@@ -687,15 +693,6 @@ class ImportMapGeneratorTest extends TestCase
             ->method('getEntries')
             ->willReturn(new ImportMapEntries($importMapEntries))
         ;
-    }
-
-    private function writeFile(string $filename, string $content): void
-    {
-        $path = \dirname(self::$writableRoot.'/'.$filename);
-        if (!is_dir($path)) {
-            mkdir($path, 0777, true);
-        }
-        file_put_contents(self::$writableRoot.'/'.$filename, $content);
     }
 
     private static function createLocalEntry(string $importName, string $path, ImportMapType $type = ImportMapType::JS, bool $isEntrypoint = false): ImportMapEntry

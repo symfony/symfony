@@ -1616,6 +1616,12 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertFalse($container->hasDefinition('serializer'));
     }
 
+    public function testTypeInfoEnabled()
+    {
+        $container = $this->createContainerFromFile('type_info');
+        $this->assertTrue($container->has('type_info.resolver'));
+    }
+
     public function testPropertyInfoEnabled()
     {
         $container = $this->createContainerFromFile('property_info');

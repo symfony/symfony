@@ -53,6 +53,7 @@ use Symfony\Component\Console\DataCollector\CommandDataCollector;
 use Symfony\Component\Console\Debug\CliRequest;
 use Symfony\Component\Console\Messenger\RunCommandMessageHandler;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -167,6 +168,8 @@ use Symfony\Component\Translation\Extractor\PhpAstExtractor;
 use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Component\Translation\PseudoLocalizationTranslator;
 use Symfony\Component\Translation\Translator;
+use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver;
 use Symfony\Component\Uid\Factory\UuidFactory;
 use Symfony\Component\Uid\UuidV4;
 use Symfony\Component\Validator\Constraints\ExpressionLanguageProvider;
@@ -386,6 +389,10 @@ class FrameworkExtension extends Extension
                 ->clearTag('kernel.event_subscriber');
 
             $container->removeDefinition('console.command.serializer_debug');
+        }
+
+        if ($this->readConfigEnabled('type_info', $container, $config['type_info'])) {
+            $this->registerTypeInfoConfiguration($container, $loader);
         }
 
         if ($propertyInfoEnabled) {
@@ -1950,6 +1957,25 @@ class FrameworkExtension extends Extension
 
         if ($container->getParameter('kernel.debug')) {
             $container->removeDefinition('property_info.cache');
+        }
+    }
+
+    private function registerTypeInfoConfiguration(ContainerBuilder $container, PhpFileLoader $loader): void
+    {
+        if (!class_exists(Type::class)) {
+            throw new LogicException('TypeInfo support cannot be enabled as the TypeInfo component is not installed. Try running "composer require symfony/type-info".');
+        }
+
+        $loader->load('type_info.php');
+
+        if (ContainerBuilder::willBeAvailable('phpstan/phpdoc-parser', PhpDocParser::class, ['symfony/framework-bundle', 'symfony/type-info'])) {
+            $container->register('type_info.resolver.string', StringTypeResolver::class);
+
+            /** @var ServiceLocatorArgument $resolversLocator */
+            $resolversLocator = $container->getDefinition('type_info.resolver')->getArgument(0);
+            $resolversLocator->setValues($resolversLocator->getValues() + [
+                'string' => new Reference('type_info.resolver.string'),
+            ]);
         }
     }
 

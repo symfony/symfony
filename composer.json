@@ -109,6 +109,7 @@
         "symfony/translation": "self.version",
         "symfony/twig-bridge": "self.version",
         "symfony/twig-bundle": "self.version",
+        "symfony/type-info": "self.version",
         "symfony/uid": "self.version",
         "symfony/validator": "self.version",
         "symfony/var-dumper": "self.version",

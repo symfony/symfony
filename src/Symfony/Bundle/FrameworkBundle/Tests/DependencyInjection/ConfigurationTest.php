@@ -28,6 +28,7 @@ use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
 use Symfony\Component\Scheduler\Messenger\SchedulerTransportFactory;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
+use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\Uid\Factory\UuidFactory;
 
 class ConfigurationTest extends TestCase
@@ -623,6 +624,9 @@ class ConfigurationTest extends TestCase
                 'magic_set' => true,
                 'throw_exception_on_invalid_index' => false,
                 'throw_exception_on_invalid_property_path' => true,
+            ],
+            'type_info' => [
+                'enabled' => !class_exists(FullStack::class) && class_exists(Type::class),
             ],
             'property_info' => [
                 'enabled' => !class_exists(FullStack::class),

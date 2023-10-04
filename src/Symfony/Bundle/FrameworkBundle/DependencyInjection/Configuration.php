@@ -44,6 +44,7 @@ use Symfony\Component\Semaphore\Semaphore;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
+use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\Uid\Factory\UuidFactory;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Webhook\Controller\WebhookController;
@@ -164,6 +165,7 @@ class Configuration implements ConfigurationInterface
         $this->addAnnotationsSection($rootNode);
         $this->addSerializerSection($rootNode, $enableIfStandalone);
         $this->addPropertyAccessSection($rootNode, $willBeAvailable);
+        $this->addTypeInfoSection($rootNode, $enableIfStandalone);
         $this->addPropertyInfoSection($rootNode, $enableIfStandalone);
         $this->addCacheSection($rootNode, $willBeAvailable);
         $this->addPhpErrorsSection($rootNode);
@@ -1157,6 +1159,18 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('property_info')
                     ->info('Property info configuration')
                     ->{$enableIfStandalone('symfony/property-info', PropertyInfoExtractorInterface::class)}()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addTypeInfoSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('type_info')
+                    ->info('Type info configuration')
+                    ->{$enableIfStandalone('symfony/type-info', Type::class)}()
                 ->end()
             ->end()
         ;

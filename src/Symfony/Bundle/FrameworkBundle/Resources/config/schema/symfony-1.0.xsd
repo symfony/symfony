@@ -27,6 +27,7 @@
             <xsd:element name="property-access" type="property_access" minOccurs="0" maxOccurs="1" />
             <xsd:element name="scheduler" type="scheduler" minOccurs="0" maxOccurs="1" />
             <xsd:element name="serializer" type="serializer" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="type-info" type="type_info" minOccurs="0" maxOccurs="1" />
             <xsd:element name="property-info" type="property_info" minOccurs="0" maxOccurs="1" />
             <xsd:element name="cache" type="cache" minOccurs="0" maxOccurs="1" />
             <xsd:element name="workflow" type="workflow" minOccurs="0" maxOccurs="unbounded" />
@@ -325,6 +326,10 @@
         <xsd:attribute name="name-converter" type="xsd:string" />
         <xsd:attribute name="circular-reference-handler" type="xsd:string" />
         <xsd:attribute name="max-depth-handler" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="type_info">
+        <xsd:attribute name="enabled" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="property_info">

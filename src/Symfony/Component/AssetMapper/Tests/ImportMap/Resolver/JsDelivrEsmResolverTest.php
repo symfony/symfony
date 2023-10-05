@@ -392,4 +392,21 @@ class JsDelivrEsmResolverTest extends TestCase
             ],
         ];
     }
+
+    /**
+     * @dataProvider provideGetPackageVersion
+     */
+    public function testGetPackageVersion(string $url, ?string $expected)
+    {
+        $resolver = new JsDelivrEsmResolver();
+
+        $this->assertSame($expected, $resolver->getPackageVersion($url));
+    }
+
+    public static function provideGetPackageVersion(): iterable
+    {
+        yield 'with no result' => ['https://cdn.jsdelivr.net/npm/lodash.js/+esm', null];
+        yield 'with a package name' => ['https://cdn.jsdelivr.net/npm/lodash.js@1.2.3/+esm', '1.2.3'];
+        yield 'with a dash in the package_name' => ['https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/+esm', '2.11.7'];
+    }
 }

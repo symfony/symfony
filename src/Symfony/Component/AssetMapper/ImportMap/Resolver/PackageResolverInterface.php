@@ -26,4 +26,9 @@ interface PackageResolverInterface
      * @return ResolvedImportMapPackage[] The import map entries that should be added
      */
     public function resolvePackages(array $packagesToRequire): array;
+
+    /**
+     * Tries to extract the package's version from its URL.
+     */
+    public function getPackageVersion(string $url): ?string;
 }

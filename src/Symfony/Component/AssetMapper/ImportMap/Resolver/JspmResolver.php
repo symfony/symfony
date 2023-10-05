@@ -96,4 +96,13 @@ final class JspmResolver implements PackageResolverInterface
             throw $e;
         }
     }
+
+    public function getPackageVersion(string $url): ?string
+    {
+        if (1 === preg_match("#^https://ga.jspm.io/npm:(?<package>(?:@[a-z0-9-~][a-z0-9-._~]*/)?[a-z0-9-~][a-z0-9-._~]*)@(?<version>[\w\._-]+)(?<subpath>/.*)?$#", $url, $matches)) {
+            return $matches['version'];
+        }
+
+        return null;
+    }
 }

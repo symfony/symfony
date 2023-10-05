@@ -38,7 +38,7 @@ class ImportMapConfigReader
 
         $entries = new ImportMapEntries();
         foreach ($importMapConfig ?? [] as $importName => $data) {
-            $validKeys = ['path', 'url', 'downloaded_to', 'type', 'entrypoint'];
+            $validKeys = ['path', 'url', 'downloaded_to', 'type', 'entrypoint', 'version'];
             if ($invalidKeys = array_diff(array_keys($data), $validKeys)) {
                 throw new \InvalidArgumentException(sprintf('The following keys are not valid for the importmap entry "%s": "%s". Valid keys are: "%s".', $importName, implode('", "', $invalidKeys), implode('", "', $validKeys)));
             }
@@ -57,6 +57,7 @@ class ImportMapConfigReader
                 isDownloaded: isset($data['downloaded_to']),
                 type: $type,
                 isEntrypoint: $isEntry,
+                version: $data['version'] ?? null,
             ));
         }
 
@@ -82,6 +83,9 @@ class ImportMapConfigReader
             }
             if ($entry->isEntrypoint) {
                 $config['entrypoint'] = true;
+            }
+            if ($entry->version) {
+                $config['version'] = $entry->version;
             }
             $importMapConfig[$entry->importName] = $config;
         }

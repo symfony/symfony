@@ -28,7 +28,7 @@
         "symfony/asset-mapper": "^6.3|^7.0",
         "symfony/dependency-injection": "^5.4|^6.0|^7.0",
         "symfony/finder": "^5.4|^6.0|^7.0",
-        "symfony/form": "^6.3|^7.0",
+        "symfony/form": "^6.4|^7.0",
         "symfony/html-sanitizer": "^6.1|^7.0",
         "symfony/http-foundation": "^5.4|^6.0|^7.0",
         "symfony/http-kernel": "^6.4|^7.0",

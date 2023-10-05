@@ -37,7 +37,7 @@ class ImportMapAuditor
     {
         $entries = $this->configReader->getEntries();
 
-        if ([] === $entries) {
+        if (!$entries) {
             return [];
         }
 
@@ -67,7 +67,7 @@ class ImportMapAuditor
         ]);
 
         if (200 !== $response->getStatusCode()) {
-            throw new RuntimeException(sprintf('Error %d auditing packages. Response: %s', $response->getStatusCode(), $response->getContent(false)));
+            throw new RuntimeException(sprintf('Error %d auditing packages. Response:'.$response->getContent(false), $response->getStatusCode()));
         }
 
         foreach ($response->toArray() as $advisory) {
@@ -75,7 +75,7 @@ class ImportMapAuditor
                 if (
                     null === $vulnerability['package']
                     || 'npm' !== $vulnerability['package']['ecosystem']
-                    || !array_key_exists($package = $vulnerability['package']['name'], $installed)
+                    || !\array_key_exists($package = $vulnerability['package']['name'], $installed)
                 ) {
                     continue;
                 }
@@ -105,7 +105,7 @@ class ImportMapAuditor
     {
         foreach (explode(',', $ranges) as $rangeString) {
             $range = explode(' ', trim($rangeString));
-            if (1 === count($range)) {
+            if (1 === \count($range)) {
                 $range = ['=', $range[0]];
             }
 

@@ -72,12 +72,12 @@ class ImportMapAuditCommand extends Command
         $rows = [];
 
         $packagesWithoutVersion = [];
-        $vulnerabilitiesCount = array_map(fn() => 0, self::SEVERITY_COLORS);
+        $vulnerabilitiesCount = array_map(fn () => 0, self::SEVERITY_COLORS);
         foreach ($audit as $packageAudit) {
             if (!$packageAudit->version) {
                 $packagesWithoutVersion[] = $packageAudit->package;
             }
-            foreach($packageAudit->vulnerabilities as $vulnerability) {
+            foreach ($packageAudit->vulnerabilities as $vulnerability) {
                 $rows[] = [
                     sprintf('<fg=%s>%s</>', self::SEVERITY_COLORS[$vulnerability->severity] ?? 'default', ucfirst($vulnerability->severity)),
                     $vulnerability->summary,
@@ -89,16 +89,16 @@ class ImportMapAuditCommand extends Command
                 ++$vulnerabilitiesCount[$vulnerability->severity];
             }
         }
-        $packagesCount = count($audit);
-        $packagesWithoutVersionCount = count($packagesWithoutVersion);
+        $packagesCount = \count($audit);
+        $packagesWithoutVersionCount = \count($packagesWithoutVersion);
 
-        if ([] === $rows && 0 === $packagesWithoutVersionCount) {
+        if (!$rows && !$packagesWithoutVersionCount) {
             $this->io->info('No vulnerabilities found.');
 
             return self::SUCCESS;
         }
 
-        if ([] !== $rows) {
+        if ($rows) {
             $table = $this->io->createTable();
             $table->setHeaders([
                 'Severity',
@@ -131,10 +131,10 @@ class ImportMapAuditCommand extends Command
             $vulnerabilityCount = 0;
             $vulnerabilitySummary = [];
             foreach ($vulnerabilitiesCount as $severity => $count) {
-                if (0 === $count) {
+                if (!$count) {
                     continue;
                 }
-                $vulnerabilitySummary[] = sprintf(  '%d %s', $count, ucfirst($severity));
+                $vulnerabilitySummary[] = sprintf('%d %s', $count, ucfirst($severity));
                 $vulnerabilityCount += $count;
             }
             $this->io->text(sprintf('%d vulnerabilit%s found: %s',
@@ -149,7 +149,7 @@ class ImportMapAuditCommand extends Command
 
     private function displayJson(array $audit): int
     {
-        $vulnerabilitiesCount = array_map(fn() => 0, self::SEVERITY_COLORS);
+        $vulnerabilitiesCount = array_map(fn () => 0, self::SEVERITY_COLORS);
 
         $json = [
             'packages' => [],

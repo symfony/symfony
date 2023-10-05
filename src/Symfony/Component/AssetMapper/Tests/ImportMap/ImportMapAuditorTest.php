@@ -17,10 +17,8 @@ use Symfony\Component\AssetMapper\ImportMap\ImportMapAuditor;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntries;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
-use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapPackageAudit;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapPackageAuditVulnerability;
-use Symfony\Component\AssetMapper\ImportMap\Resolver\PackageResolver;
 use Symfony\Component\AssetMapper\ImportMap\Resolver\PackageResolverInterface;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -45,26 +43,26 @@ class ImportMapAuditorTest extends TestCase
     {
         $this->httpClient->setResponseFactory(new MockResponse(json_encode([
             [
-                "ghsa_id" => "GHSA-abcd-1234-efgh",
-                "cve_id" => "CVE-2050-00000",
-                "url" => "https =>//api.github.com/repos/repo/a-package/security-advisories/GHSA-abcd-1234-efgh",
-                "summary" => "A short summary of the advisory.",
-                "severity" => "critical",
-                "vulnerabilities" => [
+                'ghsa_id' => 'GHSA-abcd-1234-efgh',
+                'cve_id' => 'CVE-2050-00000',
+                'url' => 'https =>//api.github.com/repos/repo/a-package/security-advisories/GHSA-abcd-1234-efgh',
+                'summary' => 'A short summary of the advisory.',
+                'severity' => 'critical',
+                'vulnerabilities' => [
                     [
-                        "package" => ["ecosystem" => "pip", "name" => "json5"],
-                        "vulnerable_version_range" => ">= 1.0.0, < 1.0.1",
-                        "first_patched_version" => "1.0.1",
+                        'package' => ['ecosystem' => 'pip', 'name' => 'json5'],
+                        'vulnerable_version_range' => '>= 1.0.0, < 1.0.1',
+                        'first_patched_version' => '1.0.1',
                     ],
                     [
-                        "package" => ["ecosystem" => "npm", "name" => "json5"],
-                        "vulnerable_version_range" => ">= 1.0.0, < 1.0.1",
-                        "first_patched_version" => "1.0.1",
+                        'package' => ['ecosystem' => 'npm', 'name' => 'json5'],
+                        'vulnerable_version_range' => '>= 1.0.0, < 1.0.1',
+                        'first_patched_version' => '1.0.1',
                     ],
                     [
-                        "package" => ["ecosystem" => "npm", "name" => "another-package"],
-                        "vulnerable_version_range" => ">= 1.0.0, < 1.0.1",
-                        "first_patched_version" => "1.0.2",
+                        'package' => ['ecosystem' => 'npm', 'name' => 'another-package'],
+                        'vulnerable_version_range' => '>= 1.0.0, < 1.0.1',
+                        'first_patched_version' => '1.0.2',
                     ],
                 ],
             ],
@@ -111,16 +109,16 @@ class ImportMapAuditorTest extends TestCase
     {
         $this->httpClient->setResponseFactory(new MockResponse(json_encode([
             [
-                "ghsa_id" => "GHSA-abcd-1234-efgh",
-                "cve_id" => "CVE-2050-00000",
-                "url" => "https =>//api.github.com/repos/repo/a-package/security-advisories/GHSA-abcd-1234-efgh",
-                "summary" => "A short summary of the advisory.",
-                "severity" => "critical",
-                "vulnerabilities" => [
+                'ghsa_id' => 'GHSA-abcd-1234-efgh',
+                'cve_id' => 'CVE-2050-00000',
+                'url' => 'https =>//api.github.com/repos/repo/a-package/security-advisories/GHSA-abcd-1234-efgh',
+                'summary' => 'A short summary of the advisory.',
+                'severity' => 'critical',
+                'vulnerabilities' => [
                     [
-                        "package" => ["ecosystem" => "npm", "name" => "json5"],
-                        "vulnerable_version_range" => $versionRange,
-                        "first_patched_version" => "1.0.1",
+                        'package' => ['ecosystem' => 'npm', 'name' => 'json5'],
+                        'vulnerable_version_range' => $versionRange,
+                        'first_patched_version' => '1.0.1',
                     ],
                 ],
             ],
@@ -135,7 +133,7 @@ class ImportMapAuditorTest extends TestCase
 
         $audit = $this->importMapAuditor->audit();
 
-        $this->assertSame($expectMatch, 0 < count($audit[0]->vulnerabilities));
+        $this->assertSame($expectMatch, 0 < \count($audit[0]->vulnerabilities));
     }
 
     public function provideAuditWithVersionRange(): iterable

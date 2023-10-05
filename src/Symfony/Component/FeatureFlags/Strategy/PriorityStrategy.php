@@ -12,8 +12,9 @@
 namespace Symfony\Component\FeatureFlags\Strategy;
 
 use Symfony\Component\FeatureFlags\StrategyResult;
+use function iterator_to_array;
 
-final class PriorityStrategy implements StrategyInterface
+final class PriorityStrategy implements StrategyInterface, OuterStrategiesInterface
 {
     /**
      * @param iterable<StrategyInterface> $strategies
@@ -35,5 +36,10 @@ final class PriorityStrategy implements StrategyInterface
         }
 
         return $result;
+    }
+
+    public function getInnerStrategies(): array
+    {
+        return iterator_to_array($this->strategies);
     }
 }

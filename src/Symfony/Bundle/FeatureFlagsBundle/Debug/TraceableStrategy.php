@@ -12,10 +12,11 @@
 namespace Symfony\Bundle\FeatureFlagsBundle\Debug;
 
 use Symfony\Bundle\FeatureFlagsBundle\DataCollector\FeatureCheckerDataCollector;
+use Symfony\Component\FeatureFlags\Strategy\OuterStrategyInterface;
 use Symfony\Component\FeatureFlags\Strategy\StrategyInterface;
 use Symfony\Component\FeatureFlags\StrategyResult;
 
-final class TraceableStrategy implements StrategyInterface
+final class TraceableStrategy implements StrategyInterface, OuterStrategyInterface
 {
     public function __construct(
         private readonly StrategyInterface $strategy,
@@ -33,5 +34,10 @@ final class TraceableStrategy implements StrategyInterface
         $this->dataCollector->collectComputeStop($result);
 
         return $result;
+    }
+
+    public function getInnerStrategy(): StrategyInterface
+    {
+        return $this->strategy;
     }
 }

@@ -13,7 +13,7 @@ namespace Symfony\Component\FeatureFlags\Strategy;
 
 use Symfony\Component\FeatureFlags\StrategyResult;
 
-final class NotStrategy implements StrategyInterface
+final class NotStrategy implements StrategyInterface, OuterStrategyInterface
 {
     public function __construct(
         private readonly StrategyInterface $inner,
@@ -29,5 +29,10 @@ final class NotStrategy implements StrategyInterface
             StrategyResult::Grant   => StrategyResult::Deny,
             StrategyResult::Deny    => StrategyResult::Grant,
         };
+    }
+
+    public function getInnerStrategy(): StrategyInterface
+    {
+        return $this->inner;
     }
 }

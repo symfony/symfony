@@ -11,10 +11,11 @@
 
 namespace Symfony\Bundle\FeatureFlagsBundle\Strategy;
 
+use Symfony\Component\FeatureFlags\Strategy\OuterStrategyInterface;
 use Symfony\Component\FeatureFlags\Strategy\StrategyInterface;
 use Symfony\Component\FeatureFlags\StrategyResult;
 
-final class CustomStrategy implements StrategyInterface
+final class CustomStrategy implements StrategyInterface, OuterStrategyInterface
 {
     public function __construct(
         private readonly StrategyInterface $inner,
@@ -24,5 +25,10 @@ final class CustomStrategy implements StrategyInterface
     public function compute(): StrategyResult
     {
         return $this->inner->compute();
+    }
+
+    public function getInnerStrategy(): StrategyInterface
+    {
+        return $this->inner;
     }
 }

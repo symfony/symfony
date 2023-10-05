@@ -40,6 +40,7 @@ final class FeatureFlagsExtension extends Extension
         $loader->load('feature.php');
         $loader->load('providers.php');
         $loader->load('strategies.php');
+        $loader->load('console.php');
 
         // Configuration
         $this->loadStrategies($container, $config);

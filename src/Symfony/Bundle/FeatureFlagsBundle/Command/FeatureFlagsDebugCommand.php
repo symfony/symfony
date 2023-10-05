@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FeatureFlagsBundle\Command;
 
-use Closure;
 use Symfony\Bundle\FeatureFlagsBundle\Debug\TraceableStrategy;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -24,16 +23,6 @@ use Symfony\Component\FeatureFlags\Provider\ProviderInterface;
 use Symfony\Component\FeatureFlags\Strategy\OuterStrategiesInterface;
 use Symfony\Component\FeatureFlags\Strategy\OuterStrategyInterface;
 use Symfony\Component\FeatureFlags\Strategy\StrategyInterface;
-use function array_map;
-use function array_slice;
-use function chunk_split;
-use function count;
-use function implode;
-use function json_encode;
-use function levenshtein;
-use function sprintf;
-use function str_repeat;
-use function strlen;
 
 /**
  * A console command for retrieving information about feature flags.
@@ -99,7 +88,7 @@ EOF
             foreach ($featureProvider->names() as $featureName) {
                 if (
                     !\in_array($featureName, $candidates, true)
-                    && (str_contains($featureName, $debuggingFeatureName) || levenshtein($featureName, $debuggingFeatureName) <= \strlen($featureName) / 3)
+                    && (str_contains($featureName, $debuggingFeatureName) || \levenshtein($featureName, $debuggingFeatureName) <= \strlen($featureName) / 3)
                 ) {
                     $candidates[] = $featureName;
                 }
@@ -111,12 +100,12 @@ EOF
                 $featureFoundName = $featureName;
                 $featureFoundProviders[] = $providerName;
 
-                if (count($featureFoundProviders) > 1) {
+                if (\count($featureFoundProviders) > 1) {
                     continue;
                 }
 
                 $feature = $featureProvider->get($featureName);
-                $featureGetDefault = Closure::bind(fn(): bool => $feature->default, $feature, Feature::class);
+                $featureGetDefault = \Closure::bind(fn (): bool => $feature->default, $feature, Feature::class);
 
                 $io
                     ->createTable()
@@ -124,10 +113,10 @@ EOF
                     ->setHeaders(['Name', 'Description', 'Default', 'Provider', 'Strategy Tree'])
                     ->addRow([
                         $featureName,
-                        chunk_split($feature->getDescription(), 40, "\n"),
-                        json_encode($featureGetDefault()),
+                        \chunk_split($feature->getDescription(), 40, "\n"),
+                        \json_encode($featureGetDefault()),
                         $providerName,
-                        $this->getStrategyTreeFromFeature($feature)
+                        $this->getStrategyTreeFromFeature($feature),
                     ])
                     ->setStyle('compact')
                     ->render()
@@ -141,15 +130,15 @@ EOF
             return 0;
         }
 
-        $warning = sprintf(
+        $warning = \sprintf(
             "\"%s\" not found in any of the following providers :\n%s",
             $debuggingFeatureName,
-            implode("\n", array_map(fn (string $providerName) => '  * '.$providerName, $providerNames)),
+            \implode("\n", \array_map(fn (string $providerName) => '  * '.$providerName, $providerNames)),
         );
-        if (0 < count($candidates)) {
-            $warning .= sprintf(
+        if (0 < \count($candidates)) {
+            $warning .= \sprintf(
                 "\n\nDid you mean \"%s\"?",
-                implode('", "', $candidates),
+                \implode('", "', $candidates),
             );
         }
         $io->warning($warning);
@@ -182,15 +171,15 @@ EOF
 
                 $feature = $featureProvider->get($featureName);
 
-                $featureGetDefault = Closure::bind(fn(): bool => $feature->default, $feature, Feature::class);
-                $featureGetStrategy = Closure::bind(fn(): StrategyInterface => $feature->strategy, $feature, Feature::class);
+                $featureGetDefault = \Closure::bind(fn (): bool => $feature->default, $feature, Feature::class);
+                $featureGetStrategy = \Closure::bind(fn (): StrategyInterface => $feature->strategy, $feature, Feature::class);
 
                 $strategy = $featureGetStrategy();
                 $strategyClass = $strategy::class;
                 $strategyId = null;
 
                 if ($strategy instanceof TraceableStrategy) {
-                    $strategyGetId = Closure::bind(fn(): string => $strategy->strategyId, $strategy, TraceableStrategy::class);
+                    $strategyGetId = \Closure::bind(fn (): string => $strategy->strategyId, $strategy, TraceableStrategy::class);
 
                     $strategyId = $strategyGetId();
                     $strategyClass = $strategy->getInnerStrategy()::class;
@@ -203,17 +192,16 @@ EOF
 
                 $rowFeatureName = $featureName;
 
-                if (count($groupedFeatureProviders[$featureName]) > 1) {
-                    $rowFeatureName .= " (⚠️ duplicated)";
+                if (\count($groupedFeatureProviders[$featureName]) > 1) {
+                    $rowFeatureName .= ' (⚠️ duplicated)';
                 }
 
                 $tableRows[] = [
                     $rowFeatureName,
-                    chunk_split($feature->getDescription(), 40, "\n"),
-                    json_encode($featureGetDefault()),
-                    $strategyString
+                    \chunk_split($feature->getDescription(), 40, "\n"),
+                    \json_encode($featureGetDefault()),
+                    $strategyString,
                 ];
-
             }
             $io->table($tableHeaders, $tableRows);
         }
@@ -227,7 +215,7 @@ EOF
 
     private function getStrategyTreeFromFeature(Feature $feature): string
     {
-        $featureGetStrategy = Closure::bind(fn(): StrategyInterface => $feature->strategy, $feature, Feature::class);
+        $featureGetStrategy = \Closure::bind(fn (): StrategyInterface => $feature->strategy, $feature, Feature::class);
 
         $strategyTree = $this->getStrategyTree($featureGetStrategy());
 
@@ -239,12 +227,12 @@ EOF
         $children = [];
 
         if ($strategy instanceof TraceableStrategy) {
-            $strategyGetId = Closure::bind(fn(): string => $strategy->strategyId, $strategy, TraceableStrategy::class);
+            $strategyGetId = \Closure::bind(fn (): string => $strategy->strategyId, $strategy, TraceableStrategy::class);
 
             return $this->getStrategyTree($strategy->getInnerStrategy(), $strategyGetId());
         } elseif ($strategy instanceof OuterStrategiesInterface) {
-            $children = array_map(
-                fn(StrategyInterface $strategyInterface): array => $this->getStrategyTree($strategyInterface),
+            $children = \array_map(
+                fn (StrategyInterface $strategyInterface): array => $this->getStrategyTree($strategyInterface),
                 $strategy->getInnerStrategies()
             );
         } elseif ($strategy instanceof OuterStrategyInterface) {
@@ -261,7 +249,7 @@ EOF
     private function convertStrategyTreeToString(array $strategyTree, int $indent = 0): string
     {
         $childIndicator = 'L ';
-        $spaces = str_repeat(' ', $indent * strlen($childIndicator));
+        $spaces = \str_repeat(' ', $indent * \strlen($childIndicator));
 
         $prefix = '' === $spaces ? '' : "{$spaces}{$childIndicator}";
 
@@ -274,7 +262,7 @@ EOF
         $row .= "\n";
 
         foreach ($strategyTree['children'] as $child) {
-            $row .= $this->convertStrategyTreeToString($child, ($indent + 1));
+            $row .= $this->convertStrategyTreeToString($child, $indent + 1);
         }
 
         return "{$prefix}{$row}";
@@ -285,21 +273,21 @@ EOF
      */
     private function renderDuplicateWarnings(SymfonyStyle $io, string $featureName, array $providerNames): void
     {
-        $duplicatesCount = count($providerNames) - 1;
+        $duplicatesCount = \count($providerNames) - 1;
         if (0 === $duplicatesCount) {
             return;
         }
 
-        $providerNames = array_slice($providerNames, -$duplicatesCount);
+        $providerNames = \array_slice($providerNames, -$duplicatesCount);
 
         if (1 === $duplicatesCount) {
-            $warningMessage = sprintf("Found 1 duplicate for \"%s\" feature, which will probably never be used, in those providers:", $featureName);
+            $warningMessage = \sprintf('Found 1 duplicate for "%s" feature, which will probably never be used, in those providers:', $featureName);
         } else {
-            $warningMessage = sprintf("Found %d duplicates for \"%s\" feature, which will probably never be used, in those providers:", $duplicatesCount, $featureName);
+            $warningMessage = \sprintf('Found %d duplicates for "%s" feature, which will probably never be used, in those providers:', $duplicatesCount, $featureName);
         }
 
-        $warningMessage.= "\n";
-        $warningMessage.= implode("\n", array_map(fn(string $providerName): string => '  * '.$providerName, $providerNames));
+        $warningMessage .= "\n";
+        $warningMessage .= \implode("\n", \array_map(fn (string $providerName): string => '  * '.$providerName, $providerNames));
 
         $io->warning($warningMessage);
     }

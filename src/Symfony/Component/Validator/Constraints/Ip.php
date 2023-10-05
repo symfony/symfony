@@ -100,7 +100,7 @@ class Ip extends Constraint
      */
     protected static $errorNames = self::ERROR_NAMES;
 
-    public $version = self::ALL;
+    public $version = self::V4;
 
     public $message = 'This is not a valid IP address.';
 

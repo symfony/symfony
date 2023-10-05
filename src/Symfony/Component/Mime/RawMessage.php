@@ -48,12 +48,9 @@ class RawMessage implements \Serializable
             return;
         }
 
-        $message = '';
         foreach ($this->message as $chunk) {
-            $message .= $chunk;
             yield $chunk;
         }
-        $this->message = $message;
     }
 
     /**

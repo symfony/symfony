@@ -31,11 +31,6 @@ class MacAddress extends Constraint
         self::INVALID_MAC_ERROR => 'INVALID_MAC_ERROR',
     ];
 
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
     public string $message = 'This is not a valid MAC address.';
 
     /** @var callable|null */

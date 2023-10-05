@@ -8,6 +8,7 @@ CHANGELOG
  * Deprecate not constructing `DoctrineDataCollector` with an instance of `DebugDataHolder`
  * Deprecate `DoctrineDataCollector::addLogger()`, use a `DebugDataHolder` instead
  * Deprecate `ContainerAwareLoader`, use dependency injection in your fixtures instead
+ * Always pass the `Request` object to `EntityValueResolver`'s expression
 
 6.3
 ---

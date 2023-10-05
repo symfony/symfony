@@ -1,0 +1,282 @@
+---------------------------------------------------------------------------
+
+by antonkomarev at 2023-09-28T08:50:49Z
+
+It will be great to add screenshots how it looks like right now.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2023-09-28T09:23:31Z
+
+@antonkomarev I've updated the PR to include the before screenshots.
+
+---------------------------------------------------------------------------
+
+by evertharmeling at 2023-09-28T09:27:46Z
+
+Nice! Could we maybe use more specific icons instead of checkmarks for the 3 main bullet points? Something like:
+- A <img width="30" src="https://tabler-icons.io/static/tabler-icons/icons-png/tag.png" /> [tag](https://tabler-icons.io/i/tag) for the version
+- A <img width="30" src="https://tabler-icons.io/static/tabler-icons/icons-png/folder.png" /> [directory](https://tabler-icons.io/i/folder) for the path
+- A <img width="30" src="https://tabler-icons.io/static/tabler-icons/icons-png/terminal-2.png" /> [terminal](https://tabler-icons.io/i/terminal-2) (could not a find a specific icon for debug :)) for the debug mode
+
+The list contains 'important' information and I feel it's easily to not read them because it's just another list of bullet points.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-09-28T09:31:13Z
+
+Really nice and clean.
+
+I'd suggest separating the 3 factual (& positive-ish) elements from the item requiring user action
+
+--
+
+✅  You are using Symfony XXX version
+✅  Your application is ready at XXX
+✅  Debug mode is activated
+
+❓ Your homepage is not configured: create your first page.
+
+--
+
+I have a feeling that more people will wonder, 'cool, it works, what do I do now?' than 'why is this page displayed?'... but with no certitude.
+
+---------------------------------------------------------------------------
+
+by antonkomarev at 2023-09-28T10:30:49Z
+
+Good point, but I suggest having a warning sign near the debug mode:
+⚠️ Debug mode is activated
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2023-09-28T10:55:42Z
+
+Thank you all for your nice reviews. I'm going to iterate over some of these ideas and will come back with an update.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-09-28T11:47:14Z
+
+Since we usually don't merge features into x.0 releases, what's preventing us from merging this into 6.4?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-09-28T11:49:53Z
+
+I tend to agree with @derrabus here. We communicate regularly than the X.4 releases contains all the new features and Y.0 cleans the deprecated APIs. So this should go in 6.4.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2023-09-28T13:10:20Z
+
+@derrabus @stof this is the classic "engineering vs product" problem.
+
+Engineering team says that new features must go to 6.4 because X.0 branches don't get new features.
+
+But for Product team it's important that this new design is only visible in Symfony 7.0 and up, because this is the new design for Symfony 7, not Symfony 6.4 and 7.
+
+-----
+
+Personally, I'd make an exception here and merge this into 7.0 only. But I'll do what the team decides 🙏  Thanks!
+
+---------------------------------------------------------------------------
+
+by 94noni at 2023-09-28T13:53:17Z
+
+the previous PR updating the design was done on [v4.4+v5.0](https://github.com/symfony/symfony/pull/33189)
+it would be nice to keep same logic (moreover as .4 are LTS so displayed during long time after initial release)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-09-28T14:44:17Z
+
+7.0 sounds fine to me (it's not "a feature" per se but more like a refresh of the design for a major version).
+
+---------------------------------------------------------------------------
+
+by MGDSoft at 2023-09-29T00:35:54Z
+
+What are your thoughts on adding a subtle motion effect to the stars and water?
+
+---------------------------------------------------------------------------
+
+by sstok at 2023-10-02T14:05:48Z
+
+> What are your thoughts on adding a subtle motion effect to the stars and water?
+
+Motion effects don't add anything useful here, and might cause trouble on the front of accessibility as movement can cause motion sickness for people with motion sensitivity.
+
+https://www.linkedin.com/advice/0/how-do-you-avoid-animation-overload-motion
+
+---------------------------------------------------------------------------
+
+by MGDSoft at 2023-10-02T14:39:48Z
+
+> > What are your thoughts on adding a subtle motion effect to the stars and water?
+>
+> Motion effects don't add anything useful here, and might cause trouble on the front of accessibility as movement can cause motion sickness for people with motion sensitivity.
+>
+> https://www.linkedin.com/advice/0/how-do-you-avoid-animation-overload-motion
+
+Well, then, 50% of webpages have motion on their homepage, and they are all incorrect.
+
+https://laravel.com/
+https://nextjs.org/
+https://www.meteor.com/
+
+I believe adding some effects will generate more excitement for newcomers interested in learning Symfony. For example, when I install Drupal, I encounter an unattractive default page that prompts me to leave quickly.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-10-02T15:26:26Z
+
+The current page is animated, right? So, I suppose the new version will be as well.
+
+---------------------------------------------------------------------------
+
+by MGDSoft at 2023-10-02T15:45:50Z
+
+> The current page is animated, right? So, I suppose the new version will be as well.
+
+If I'm correct, @javiereguiluz, I didn't notice any effect on the page; I only saw the background color change (which is cool).
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-10-02T18:47:42Z
+
+```css
+@media (prefers-reduced-motion) {
+  /* styles to apply if a user's device settings are set to reduced motion */
+}
+```
+
+I believe animation is not a problem if we leverage this media query
+
+https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion
+
+---------------------------------------------------------------------------
+
+by MGDSoft at 2023-10-02T22:04:00Z
+
+It's just an idea but something like this, We can do better, of course, if everyone agrees.
+
+https://github.com/symfony/symfony/assets/3816465/537f9c1b-bc50-473f-998b-c880067fae2d
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2023-10-03T08:16:36Z
+
+@MGDSoft can you please share the CSS code that you used to add that subtle animation? Thanks!
+
+---------------------------------------------------------------------------
+
+by MGDSoft at 2023-10-03T08:30:55Z
+
+ofc!
+
+Waves (SVG is the same)
+```javascript
+function renderWavesSvg()
+{
+    return <<<SVG
+                <svg aria-hidden="true" focusable="false" style="pointer-events: none" class="wave" width="100%" height="50px" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1920 75"><defs>
+                <style>
+                .a{fill:none}.b{clip-path:url(#a)}.c,.d {fill: var(--light-color); }.d{opacity:0.5;isolation:isolate;}
+                @keyframes waveMotion {
+                    0% {
+                        transform: scaleX(1) translateX(0);
+                    }
+                    50% {
+                        transform: scaleX(1.5) translateX(-30%);
+                    }
+                    0% {
+                        transform: scaleX(1) translateX(0);
+                    }
+                }
+                .b:nth-child(5) {
+                    animation: waveMotion 10s infinite alternate;
+                }
+
+                .b:nth-child(2) {
+                    animation: waveMotion 8s infinite alternate;
+                }
+
+                .b:nth-child(3) {
+                    animation: waveMotion 9s infinite alternate;
+                }
+
+                .b:nth-child(4) {
+                    animation: waveMotion 4s infinite alternate;
+                }
+                </style><clipPath id="a"><rect class="a" width="1920" height="75"></rect></clipPath></defs><g class="b"><path class="c" d="M1963,327H-105V65A2647.49,2647.49,0,0,1,431,19c217.7,3.5,239.6,30.8,470,36,297.3,6.7,367.5-36.2,642-28a2511.41,2511.41,0,0,1,420,48"></path></g><g class="b"><path class="d" d="M-127,404H1963V44c-140.1-28-343.3-46.7-566,22-75.5,23.3-118.5,45.9-162,64-48.6,20.2-404.7,128-784,0C355.2,97.7,341.6,78.3,235,50,86.6,10.6-41.8,6.9-127,10"></path></g><g class="b"><path class="d" d="M1979,462-155,446V106C251.8,20.2,576.6,15.9,805,30c167.4,10.3,322.3,32.9,680,56,207,13.4,378,20.3,494,24"></path></g><g class="b"><path class="d" d="M1998,484H-243V100c445.8,26.8,794.2-4.1,1035-39,141-20.4,231.1-40.1,378-45,349.6-11.6,636.7,73.8,828,150"></path></g></svg>
+            SVG;
+}
+```
+
+STARS
+
+```css
+@keyframes stars{
+    0% {
+        transform: translateX(0) translateY(0px);
+    }
+    33% {
+        transform: translateX(-20px)  translateY(-20px);
+    }
+    66% {
+        transform: translateX(-40px) translateY(-40px);
+    }
+    100% {
+        transform: translateX(0px)  translateY(0px);
+    }
+}
+header:after {
+    animation: stars 15s infinite;
+}
+```
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2023-10-03T15:44:29Z
+
+Thank you all for your reviews. I've made these changes:
+
+* Use different icons in the list of items
+* Separate the "What do do next?" item and turned it into "Next Step"
+* Added the nice animation proposed by @MGDSoft (thanks!) but I made it slower to make it more subtle
+* Added a slight blur to stars to increase readability
+
+This is how it looks now:
+
+| Smartphone | Tablet | Desktop
+| ---------- | ------ | -------
+| ![smartphone](https://github.com/symfony/symfony/assets/73419/94e712db-ba4f-4eb9-86b9-53a5f3e66d50) | ![tablet](https://github.com/symfony/symfony/assets/73419/d1120323-5d7c-430c-a7c6-6c3ba12e7794) | ![desktop](https://github.com/symfony/symfony/assets/73419/a3172e29-af0a-4bc5-9f35-1c79ebcf0246)
+
+And this is in movement:
+
+https://github.com/symfony/symfony/assets/73419/7b5d3219-e8dd-4864-ac73-cd99ab18a883
+
+---------------------------------------------------------------------------
+
+by yceruto at 2023-10-03T16:04:56Z
+
+I love these improvements! ❤️
+
+---------------------------------------------------------------------------
+
+by yceruto at 2023-10-03T16:08:27Z
+
+On a wide screen, it looks great, but perhaps on mobile we should add more space between texts as it looks a bit cramped.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-10-03T16:57:50Z
+
+Love it, thx @javiereguiluz for this!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2023-10-03T17:40:32Z
+
+I've tweaked some margins/paddings/spacing as requested. Thanks.

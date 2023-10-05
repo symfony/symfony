@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
  * @author Ninos Ego <me@ninosego.de>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
-class Mac extends Constraint
+class MacAddress extends Constraint
 {
     public const INVALID_MAC_ERROR = 'a183fbff-6968-43b4-82a2-cc5cf7150036';
 

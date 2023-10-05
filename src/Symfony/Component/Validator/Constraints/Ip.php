@@ -19,7 +19,6 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
  * Validates that a value is a valid IP address.
  *
  * @Annotation
- *
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
  * @author Bernhard Schussek <bschussek@gmail.com>

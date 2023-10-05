@@ -23,10 +23,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class MacValidator extends ConstraintValidator
 {
-    /**
-     * @return void
-     */
-    public function validate(mixed $value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof Mac) {
             throw new UnexpectedTypeException($constraint, Mac::class);

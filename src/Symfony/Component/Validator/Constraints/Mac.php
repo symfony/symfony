@@ -46,7 +46,7 @@ class Mac extends Constraint
         string $message = null,
         callable $normalizer = null,
         array $groups = null,
-        mixed $payload = null
+        mixed $payload = null,
     ) {
         parent::__construct($options, $groups, $payload);
 

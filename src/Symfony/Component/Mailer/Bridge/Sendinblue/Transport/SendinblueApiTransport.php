@@ -171,7 +171,7 @@ final class SendinblueApiTransport extends AbstractApiTransport
 
     private function stringifyAddress(Address $address): array
     {
-        $stringifiedAddress = ['email' => $address->getAddress()];
+        $stringifiedAddress = ['email' => $address->getEncodedAddress()];
 
         if ($address->getName()) {
             $stringifiedAddress['name'] = $address->getName();

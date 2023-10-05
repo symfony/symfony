@@ -172,7 +172,7 @@ final class BrevoApiTransport extends AbstractApiTransport
 
     private function formatAddress(Address $address): array
     {
-        $formattedAddress = ['email' => $address->getAddress()];
+        $formattedAddress = ['email' => $address->getEncodedAddress()];
 
         if ($address->getName()) {
             $formattedAddress['name'] = $address->getName();

@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-02T18:27:58Z
+
+Can you add a testcase or extend an existing one?
+
+From my POV this makes sense.
+
+Let's see what others think before you check the tests. Thanks
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2023-10-02T20:26:40Z
+
+> Can you add a testcase or extend an existing one?
+>
+> From my POV this makes sense.
+>
+> Let's see what others think before you check the tests. Thanks
+
+@OskarStark I've already extended an [exiting one](https://github.com/symfony/symfony/pull/51800/files#diff-92ed254b959bf4b4dc3efbd3dc399df97dec5bae56631a07d00aafea62d0ebc5R337), not sure what else I can test here, the request is either present or not.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-02T20:32:13Z
+
+Oh sorry, didn't realized it. All good then. 😃

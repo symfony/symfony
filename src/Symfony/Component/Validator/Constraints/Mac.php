@@ -36,7 +36,7 @@ class MacAddress extends Constraint
      */
     protected static $errorNames = self::ERROR_NAMES;
 
-    public $message = 'This is not a valid MAC address.';
+    public string $message = 'This is not a valid MAC address.';
 
     /** @var callable|null */
     public $normalizer;

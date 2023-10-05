@@ -1,0 +1,68 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2023-09-20T11:04:06Z
+
+This looks like a nice proposal to me. Thanks Hubert.
+
+I have a minor comment about the command output. At the bottom we can see this:
+
+```
+5 packages audited
+* jquery
+* bootstrap
+* json5
+* semver
+* minimist
+
+9 vulnerabilities found
+* 0 Info
+* 0 Low
+* 6 Moderate
+* 2 High
+* 1 Critical
+```
+
+Two comments:
+
+* I'd remove the "N packages audited" because this list could be very long in practice and we already have that information in the `Package` column of the table above
+* I'd change the "N vulnerabilities found" to display them in a single line and omit the categories that have `0` issues (and sort the rest from highest to lowest)
+
+So, this is how the output would look like:
+
+```
+9 vulnerabilities found: 1 Critical / 2 High / 6 Moderate
+```
+
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2023-09-21T12:16:27Z
+
+> * I'd remove the "N packages audited" because this list could be very long in practice and we already have that information in the `Package` column of the table above
+
+We can keep it to inform that, there were n packages that could not be audited.
+
+> * I'd change the "N vulnerabilities found" to display them in a single line and omit the categories that have `0` issues (and sort the rest from highest to lowest)
+
+Good idea. I made changes and updated screenshots in the PR description.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-09-29T18:33:13Z
+
+We've merged in some changes to AssetMapper - let me know if you need help finishing this / fixing the conflicts :).
+
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2023-10-03T13:05:21Z
+
+> We've merged in some changes to AssetMapper - let me know if you need help finishing this / fixing the conflicts :).
+
+@weaverryan Thanks for the proposal. I rebased this PR, it should be OK now.
+
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2023-10-03T14:37:11Z
+
+> This is good to go. It's going to conflict with my https://github.com/symfony/symfony/pull/51786, which adds a version key to importmap.php (a bit similar to what's done in this PR), but if this is merged first, I can patch things up over in my PR after.
+
+You can ping me when your PR is merged. I'll update mine.

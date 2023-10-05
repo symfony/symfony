@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-10-04T17:45:19Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.4" but it seems your PR description refers to branch "6.4 / 5.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-10-04T19:34:11Z
+
+That code goes all the way back to the original PR for the failure transport system. I can't remember why I had this, however. Since we're dealing with the failure transport, this seems like a safe area, but I'd still probably do it for 6.4.

@@ -412,9 +412,11 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                         true
                     );
                     $context['not_normalizable_value_exceptions'][] = $exception;
-
-                    return $reflectionClass->newInstanceWithoutConstructor();
                 }
+            }
+
+            if(count($context['not_normalizable_value_exceptions'])) {
+                return $reflectionClass->newInstanceWithoutConstructor();
             }
 
             if ($constructor->isConstructor()) {

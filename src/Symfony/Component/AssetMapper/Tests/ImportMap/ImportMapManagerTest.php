@@ -458,6 +458,11 @@ class ImportMapManagerTest extends TestCase
                 isEntrypoint: true,
             ),
             new ImportMapEntry(
+                'entry3',
+                path: 'entry3.js',
+                isEntrypoint: true,
+            ),
+            new ImportMapEntry(
                 'normal_js_file',
                 path: 'normal_js_file.js',
             ),
@@ -482,6 +487,11 @@ class ImportMapManagerTest extends TestCase
             'imported_file2.js',
             publicPathWithoutDigest: '/assets/imported_file2.js',
             publicPath: '/assets/imported_file2-d1g35t.js',
+        );
+        $importedFile3 = new MappedAsset(
+            'imported_file3.js',
+            publicPathWithoutDigest: '/assets/imported_file3.js',
+            publicPath: '/assets/imported_file3-d1g35t.js',
         );
         $normalJsFile = new MappedAsset(
             'normal_js_file.js',
@@ -527,8 +537,16 @@ class ImportMapManagerTest extends TestCase
                     new JavaScriptImport('/assets/styles/file2.css', isLazy: false, asset: $importedCss2, addImplicitlyToImportMap: true),
                 ]
             ),
+            new MappedAsset(
+                'entry3.js',
+                publicPath: '/assets/entry3-d1g35t.js',
+                javaScriptImports: [
+                    new JavaScriptImport('/assets/imported_file3.js', isLazy: false, asset: $importedFile3),
+                ],
+            ),
             $importedFile1,
             $importedFile2,
+            // $importedFile3,
             $normalJsFile,
             $importedCss1,
             $importedCss2,
@@ -542,6 +560,7 @@ class ImportMapManagerTest extends TestCase
             'entry1' => [
                 'path' => '/assets/entry1-d1g35t.js',
                 'type' => 'js',
+                'preload' => true, // Rendered entry points are preloaded
             ],
             '/assets/imported_file1.js' => [
                 'path' => '/assets/imported_file1-d1g35t.js',
@@ -551,6 +570,7 @@ class ImportMapManagerTest extends TestCase
             'entry2' => [
                 'path' => '/assets/entry2-d1g35t.js',
                 'type' => 'js',
+                'preload' => true,  // Rendered entry points are preloaded
             ],
             '/assets/imported_file2.js' => [
                 'path' => '/assets/imported_file2-d1g35t.js',
@@ -577,6 +597,10 @@ class ImportMapManagerTest extends TestCase
                 'type' => 'css',
                 'preload' => true,
             ],
+            'entry3' => [
+                'path' => '/assets/entry3-d1g35t.js',
+                'type' => 'js', // No preload (entry point not "rendered")
+            ],
             'never_imported_css' => [
                 'path' => '/assets/styles/never_imported_css-d1g35t.css',
                 'type' => 'css',
@@ -598,6 +622,7 @@ class ImportMapManagerTest extends TestCase
             'normal_js_file',
 
             // importmap entries never imported
+            'entry3',
             'never_imported_css',
         ], array_keys($actualImportMapData));
     }

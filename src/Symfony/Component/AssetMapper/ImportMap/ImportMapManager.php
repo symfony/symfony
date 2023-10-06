@@ -87,23 +87,22 @@ class ImportMapManager
     {
         $rawImportMapData = $this->getRawImportMapData();
         $finalImportMapData = [];
-        foreach ($entrypointNames as $entry) {
-            $finalImportMapData[$entry] = $rawImportMapData[$entry];
-            foreach ($this->findEagerEntrypointImports($entry) as $dependency) {
-                if (isset($finalImportMapData[$dependency])) {
+        foreach ($entrypointNames as $entrypointName) {
+            $entrypointImports = $this->findEagerEntrypointImports($entrypointName);
+            // Entrypoint modules must be preloaded before their dependencies
+            foreach ([$entrypointName, ...$entrypointImports] as $import) {
+                if (isset($finalImportMapData[$import])) {
                     continue;
                 }
 
-                if (!isset($rawImportMapData[$dependency])) {
-                    // missing dependency - rely on browser or compilers to warn
+                // Missing dependency - rely on browser or compilers to warn
+                if (!isset($rawImportMapData[$import])) {
                     continue;
                 }
 
-                // re-order the final array by order of dependencies
-                $finalImportMapData[$dependency] = $rawImportMapData[$dependency];
-                // and mark for preloading
-                $finalImportMapData[$dependency]['preload'] = true;
-                unset($rawImportMapData[$dependency]);
+                $finalImportMapData[$import] = $rawImportMapData[$import];
+                $finalImportMapData[$import]['preload'] = true;
+                unset($rawImportMapData[$import]);
             }
         }
 

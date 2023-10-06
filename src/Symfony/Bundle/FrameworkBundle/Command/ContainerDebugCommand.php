@@ -44,6 +44,7 @@ class ContainerDebugCommand extends Command
             ->setDefinition([
                 new InputArgument('name', InputArgument::OPTIONAL, 'A service name (foo)'),
                 new InputOption('show-arguments', null, InputOption::VALUE_NONE, 'Show arguments in services'),
+                new InputOption('with-aliases', null, InputOption::VALUE_NONE, 'Display aliases for a single service'),
                 new InputOption('show-hidden', null, InputOption::VALUE_NONE, 'Show hidden (internal) services'),
                 new InputOption('tag', null, InputOption::VALUE_REQUIRED, 'Show all services with a specific tag'),
                 new InputOption('tags', null, InputOption::VALUE_NONE, 'Display tagged services for an application'),
@@ -153,6 +154,7 @@ EOF
         $helper = new DescriptorHelper();
         $options['format'] = $input->getOption('format');
         $options['show_arguments'] = $input->getOption('show-arguments');
+        $options['with_aliases'] = $input->getOption('with-aliases');
         $options['show_hidden'] = $input->getOption('show-hidden');
         $options['raw_text'] = $input->getOption('raw');
         $options['output'] = $io;

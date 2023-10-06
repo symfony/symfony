@@ -50,7 +50,7 @@ class IpTest extends TestCase
         self::assertTrue($loader->loadClassMetadata($metadata));
 
         [$aConstraint] = $metadata->properties['a']->getConstraints();
-        self::assertSame(Ip::ALL, $aConstraint->version);
+        self::assertSame(Ip::V4, $aConstraint->version);
 
         [$bConstraint] = $metadata->properties['b']->getConstraints();
         self::assertSame(Ip::V6, $bConstraint->version);

@@ -17,7 +17,6 @@ use Jose\Component\Signature\Algorithm\ES256;
 use Jose\Component\Signature\JWSBuilder;
 use Jose\Component\Signature\Serializer\CompactSerializer;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\OidcUser;
 use Symfony\Component\Security\Http\AccessToken\Oidc\OidcTokenHandler;
@@ -49,16 +48,12 @@ class OidcTokenHandlerTest extends TestCase
         $token = $this->buildJWS(json_encode($claims));
         $expectedUser = new OidcUser(...$claims);
 
-        $loggerMock = $this->createMock(LoggerInterface::class);
-        $loggerMock->expects($this->never())->method('error');
-
         $userBadge = (new OidcTokenHandler(
             new ES256(),
             $this->getJWK(),
             self::AUDIENCE,
             ['https://www.example.com'],
             $claim,
-            $loggerMock,
         ))->getUserBadgeFrom($token);
         $actualUser = $userBadge->getUserLoader()();
 
@@ -78,13 +73,10 @@ class OidcTokenHandlerTest extends TestCase
     /**
      * @dataProvider getInvalidTokens
      */
-    public function testThrowsAnErrorIfTokenIsInvalid(string $token)
+    public function testThrowsAnErrorIfTokenIsInvalid(string $token, $expectedMessage)
     {
         $this->expectException(BadCredentialsException::class);
-        $this->expectExceptionMessage('Invalid credentials.');
-
-        $loggerMock = $this->createMock(LoggerInterface::class);
-        $loggerMock->expects($this->once())->method('error');
+        $this->expectExceptionMessage($expectedMessage);
 
         (new OidcTokenHandler(
             new ES256(),
@@ -92,14 +84,13 @@ class OidcTokenHandlerTest extends TestCase
             self::AUDIENCE,
             ['https://www.example.com'],
             'sub',
-            $loggerMock,
         ))->getUserBadgeFrom($token);
     }
 
     public static function getInvalidTokens(): iterable
     {
         // Invalid token
-        yield ['invalid'];
+        yield ['invalid', 'Unable to parse the token.'];
         // Token is expired
         yield [
             self::buildJWS(json_encode([
@@ -111,6 +102,7 @@ class OidcTokenHandlerTest extends TestCase
                 'sub' => 'e21bf182-1538-406e-8ccb-e25a17aba39f',
                 'email' => 'foo@example.com',
             ])),
+            'At least one of the expected token claims is invalid or missing.',
         ];
         // Invalid audience
         yield [
@@ -123,16 +115,14 @@ class OidcTokenHandlerTest extends TestCase
                 'sub' => 'e21bf182-1538-406e-8ccb-e25a17aba39f',
                 'email' => 'foo@example.com',
             ])),
+            'At least one of the expected token claims is invalid or missing.',
         ];
     }
 
     public function testThrowsAnErrorIfUserPropertyIsMissing()
     {
         $this->expectException(BadCredentialsException::class);
-        $this->expectExceptionMessage('Invalid credentials.');
-
-        $loggerMock = $this->createMock(LoggerInterface::class);
-        $loggerMock->expects($this->once())->method('error');
+        $this->expectExceptionMessage('The "email" claim is missing from the token.');
 
         $time = time();
         $claims = [
@@ -151,7 +141,6 @@ class OidcTokenHandlerTest extends TestCase
             self::AUDIENCE,
             ['https://www.example.com'],
             'email',
-            $loggerMock,
         ))->getUserBadgeFrom($token);
     }
 

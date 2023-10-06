@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Http\Tests\AccessToken\Oidc;
 
 use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\OidcUser;
 use Symfony\Component\Security\Http\AccessToken\Oidc\OidcUserInfoTokenHandler;
@@ -64,7 +63,7 @@ class OidcUserInfoTokenHandlerTest extends TestCase
     public function testThrowsAnExceptionIfUserPropertyIsMissing()
     {
         $this->expectException(BadCredentialsException::class);
-        $this->expectExceptionMessage('Invalid credentials.');
+        $this->expectExceptionMessage('The "sub" claim is missing from the OIDC UserInfo response.');
 
         $response = ['foo' => 'bar'];
 
@@ -78,11 +77,7 @@ class OidcUserInfoTokenHandlerTest extends TestCase
             ->method('request')->with('GET', '', ['auth_bearer' => 'a-secret-token'])
             ->willReturn($responseMock);
 
-        $loggerMock = $this->createMock(LoggerInterface::class);
-        $loggerMock->expects($this->once())
-            ->method('error');
-
-        $handler = new OidcUserInfoTokenHandler($clientMock, $loggerMock);
+        $handler = new OidcUserInfoTokenHandler($clientMock);
         $handler->getUserBadgeFrom('a-secret-token');
     }
 }

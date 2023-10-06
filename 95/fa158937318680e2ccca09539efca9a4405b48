@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-10-04T15:23:08Z
+
+PR updated and ready. Big Hurray to @kbond for the tests :pray: :hugs:
+
+---------------------------------------------------------------------------
+
+by KerianMM at 2023-10-05T05:48:47Z
+
+TaggedIterator and TaggedLocator attributes are they still use full?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-10-05T13:09:18Z
+
+@KerianMM that's an open question. I see no hurry in deprecating them, I'd be fine waiting for 7.1.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-10-05T14:14:41Z
+
+Why not improving the existing attributes instead of adding new ones ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-10-05T14:29:21Z
+
+> Why not improving the existing attributes instead of adding new ones ?
+
+Because I think it's important to push the `Autowire*` convention. It helps discovering/remembering those autowiring-related attributes.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-10-05T15:07:11Z
+
+> I didn't deprecate TaggedIterator nor TaggedLocator. We could, but maybe we should wait for 7.1?
+
+👍 to do it on 7.1 and give time to people having them since 5.3. The docs should probably recommend the new ones asap though
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-06T06:16:39Z
+
+I updated the syntax for `#[AutowireLocator]`:
+* https://github.com/symfony/symfony-docs/pull/18993
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-06T06:18:47Z
+
+> Last but not least, this adds support for nesting SubscribedService objects in the list of described services. This provides feature-parity with what we can do when implementing ServiceSubscriberInterface.
+
+Can you add a code example please? Thanks
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-10-06T06:57:03Z
+
+What's in ServiceSubscriberInterface:
+https://github.com/symfony/symfony/blob/d27190a4cf8560b77d8aaab65104e51a2dd5c06c/src/Symfony/Contracts/Service/ServiceSubscriberInterface.php#L53-L57
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-06T08:23:18Z
+
+Updated

@@ -13,6 +13,7 @@ namespace Symfony\Component\Asset;
 
 use Symfony\Component\Asset\Context\ContextInterface;
 use Symfony\Component\Asset\Context\NullContext;
+use Symfony\Component\Asset\VersionStrategy\JsonManifestVersionStrategy;
 use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
 
 /**
@@ -41,6 +42,15 @@ class Package implements PackageInterface
     {
         if ($this->isAbsoluteUrl($path)) {
             return $path;
+        }
+
+        if ($this->versionStrategy instanceof JsonManifestVersionStrategy) {
+            $basePath = $this->getBasePath();
+            // Only prepend basePath when using packages
+            if ($basePath !== '/') {
+                $basePath = substr($basePath, 1);
+                $path = $basePath.$path;
+            }
         }
 
         return $this->versionStrategy->applyVersion($path);

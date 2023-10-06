@@ -12,7 +12,6 @@
 namespace Symfony\Component\AssetMapper\ImportMap;
 
 use Symfony\Component\AssetMapper\Exception\RuntimeException;
-use Symfony\Component\AssetMapper\ImportMap\Resolver\PackageResolverInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -24,7 +23,6 @@ class ImportMapAuditor
 
     public function __construct(
         private readonly ImportMapConfigReader $configReader,
-        private readonly PackageResolverInterface $packageResolver,
         HttpClientInterface $httpClient = null,
     ) {
         $this->httpClient = $httpClient ?? HttpClient::create();
@@ -48,10 +46,10 @@ class ImportMapAuditor
         $installed = [];
         $affectsQuery = [];
         foreach ($entries as $entry) {
-            if (null === $entry->url) {
+            if (!$entry->isRemotePackage()) {
                 continue;
             }
-            $version = $entry->version ?? $this->packageResolver->getPackageVersion($entry->url);
+            $version = $entry->version;
 
             $installed[$entry->importName] ??= [];
             $installed[$entry->importName][] = $version;

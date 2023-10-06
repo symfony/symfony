@@ -34,7 +34,6 @@ use Symfony\Component\Asset\PackageInterface;
 use Symfony\Component\AssetMapper\AssetMapper;
 use Symfony\Component\AssetMapper\Compiler\AssetCompilerInterface;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
-use Symfony\Component\AssetMapper\ImportMap\Resolver\PackageResolverInterface;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -1364,8 +1363,12 @@ class FrameworkExtension extends Extension
             ->setArgument(1, $config['missing_import_mode']);
 
         $container
-            ->getDefinition('asset_mapper.importmap.manager')
-            ->replaceArgument(3, $config['vendor_dir'])
+            ->getDefinition('asset_mapper.importmap.remote_package_downloader')
+            ->replaceArgument(2, $config['vendor_dir'])
+        ;
+        $container
+            ->getDefinition('asset_mapper.mapped_asset_factory')
+            ->replaceArgument(2, $config['vendor_dir'])
         ;
 
         $container
@@ -1374,18 +1377,10 @@ class FrameworkExtension extends Extension
         ;
 
         $container
-            ->getDefinition('asset_mapper.importmap.resolver')
-            ->replaceArgument(0, $config['provider'])
-        ;
-
-        $container
             ->getDefinition('asset_mapper.importmap.renderer')
             ->replaceArgument(3, $config['importmap_polyfill'] ?? ImportMapManager::POLYFILL_URL)
             ->replaceArgument(4, $config['importmap_script_attributes'])
         ;
-
-        $container->registerForAutoconfiguration(PackageResolverInterface::class)
-            ->addTag('asset_mapper.importmap.resolver');
     }
 
     /**

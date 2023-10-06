@@ -18,7 +18,6 @@ use Seld\JsonLint\JsonParser;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\Asset\Package;
 use Symfony\Component\AssetMapper\AssetMapper;
-use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\Cache\Adapter\DoctrineAdapter;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
@@ -940,8 +939,7 @@ class Configuration implements ConfigurationInterface
                             ->defaultValue('%kernel.project_dir%/assets/vendor')
                         ->end()
                         ->scalarNode('provider')
-                            ->info('The provider (CDN) to use'.(class_exists(ImportMapManager::class) ? sprintf(' (e.g.: "%s").', implode('", "', ImportMapManager::PROVIDERS)) : '.'))
-                            ->defaultValue('jsdelivr.esm')
+                            ->setDeprecated('symfony/framework-bundle', '6.4', 'Option "%node%" at "%path%" is deprecated and does nothing. Remove it.')
                         ->end()
                     ->end()
                 ->end()

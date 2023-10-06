@@ -11,10 +11,10 @@
 
 return [
     '@hotwired/stimulus' => [
-        'url' => 'https://unpkg.com/@hotwired/stimulus@3.2.1/dist/stimulus.js',
+        'version' => '3.2.1',
     ],
     'lodash' => [
-        'url' => 'https://ga.jspm.io/npm:lodash@4.17.21/lodash.js',
+        'version' => '4.17.21',
     ],
     'file6' => [
         'path' => 'subdir/file6.js',

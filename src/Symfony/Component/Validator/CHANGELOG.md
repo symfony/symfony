@@ -4,7 +4,6 @@ CHANGELOG
 6.4
 ---
 
- * Add `Mac` constraint
  * Add `*_ONLY_PRIV` and `*_ONLY_RES` versions to `Ip` constraint
  * Add `is_valid` function to the `Expression` constraint, its behavior is the same as `ValidatorInterface::validate`
  * Allow single integer for the `versions` option of the `Uuid` constraint

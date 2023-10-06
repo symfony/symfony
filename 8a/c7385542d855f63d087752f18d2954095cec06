@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-01-20T14:09:31Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.3" but it seems your PR description refers to branch "6.3 for features / 5.4, 6.0, 6.1, or 6.2 for bug fixes".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by thePanz at 2023-01-20T15:06:28Z
+
+> This is a new feature, so please target `6.3`, thanks
+
+OK, thanks for clarifying :+1:  (sad that we're still on sf v5.4 :sob: )
+
+---------------------------------------------------------------------------
+
+by thePanz at 2023-01-20T15:34:33Z
+
+@OskarStark thanks for reviewing.
+
+I guess the failed CIs are not due to this PR (pSaml and appveyor reports errors not related to the messenger component)

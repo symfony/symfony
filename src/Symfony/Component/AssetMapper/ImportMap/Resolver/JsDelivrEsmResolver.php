@@ -77,7 +77,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
             $requiredPackages[$i][4] = $version;
 
             if (!$filePath) {
-                $cssEntrypointResponses[$options->packageName] = $this->httpClient->request('GET', sprintf(self::URL_PATTERN_ENTRYPOINT, $packageName, $version));
+                $cssEntrypointResponses[$packageName] = $this->httpClient->request('GET', sprintf(self::URL_PATTERN_ENTRYPOINT, $packageName, $version));
             }
         }
 
@@ -130,7 +130,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
                 continue;
             }
 
-            $packagesToRequire[] = new PackageRequireOptions($packageName.$cssFile, $version);
+            $packagesToRequire[] = new PackageRequireOptions($package.$cssFile, $version);
         }
 
         try {

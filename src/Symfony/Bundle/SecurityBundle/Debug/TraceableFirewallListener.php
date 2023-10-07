@@ -17,13 +17,14 @@ use Symfony\Bundle\SecurityBundle\Security\LazyFirewallContext;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Http\Authenticator\Debug\TraceableAuthenticatorManagerListener;
 use Symfony\Component\Security\Http\Firewall\FirewallListenerInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Firewall collecting called security listeners and authenticators.
  *
  * @author Robin Chalas <robin.chalas@gmail.com>
  */
-final class TraceableFirewallListener extends FirewallListener
+final class TraceableFirewallListener extends FirewallListener implements ResetInterface
 {
     private array $wrappedListeners = [];
     private array $authenticatorsInfo = [];
@@ -39,6 +40,12 @@ final class TraceableFirewallListener extends FirewallListener
     public function getAuthenticatorsInfo(): array
     {
         return $this->authenticatorsInfo;
+    }
+
+    public function reset(): void
+    {
+        $this->wrappedListeners = [];
+        $this->authenticatorsInfo = [];
     }
 
     protected function callListeners(RequestEvent $event, iterable $listeners): void

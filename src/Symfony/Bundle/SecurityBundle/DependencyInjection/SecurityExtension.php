@@ -536,6 +536,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 ->register('debug.security.firewall.authenticator.'.$id, TraceableAuthenticatorManagerListener::class)
                 ->setDecoratedService('security.firewall.authenticator.'.$id)
                 ->setArguments([new Reference('debug.security.firewall.authenticator.'.$id.'.inner')])
+                ->addTag('kernel.reset', ['method' => 'reset'])
             ;
         }
 

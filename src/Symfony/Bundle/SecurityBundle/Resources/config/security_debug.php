@@ -36,6 +36,7 @@ return static function (ContainerConfigurator $container) {
                 service('security.logout_url_generator'),
             ])
             ->tag('kernel.event_subscriber')
+            ->tag('kernel.reset', ['method' => 'reset'])
         ->alias('security.firewall', 'debug.security.firewall')
     ;
 };

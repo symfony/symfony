@@ -339,7 +339,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             $normalizedData = $this->removeNestedValue($serializedPath->getElements(), $normalizedData);
         }
 
-        $normalizedData = $normalizedData + $nestedData;
+        $normalizedData = $nestedData + $normalizedData;
 
         $object = $this->instantiateObject($normalizedData, $mappedClass, $context, new \ReflectionClass($mappedClass), $allowedAttributes, $format);
         $resolvedClass = ($this->objectClassResolver)($object);

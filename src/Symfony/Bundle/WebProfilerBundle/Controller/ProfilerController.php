@@ -14,6 +14,7 @@ namespace Symfony\Bundle\WebProfilerBundle\Controller;
 use Symfony\Bundle\FullStack;
 use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
 use Symfony\Bundle\WebProfilerBundle\Profiler\TemplateManager;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -321,6 +322,28 @@ class ProfilerController
         $xdebugInfo = ob_get_clean();
 
         return new Response($xdebugInfo, 200, ['Content-Type' => 'text/html']);
+    }
+
+    /**
+     * Downloads the custom web fonts used in the profiler.
+     *
+     * @throws NotFoundHttpException
+     */
+    public function downloadFontAction(string $fontName): Response
+    {
+        $this->denyAccessIfProfilerDisabled();
+        if ('JetBrainsMono' !== $fontName) {
+            throw new NotFoundHttpException(sprintf('Font file "%s.woff2" not found.', $fontName));
+        }
+
+        $fontFile = \dirname(__DIR__).'/Resources/fonts/'.$fontName.'.woff2';
+        if (!is_file($fontFile) || !is_readable($fontFile)) {
+            throw new NotFoundHttpException(sprintf('Cannot read font file "%s".', $fontFile));
+        }
+
+        $this->profiler?->disable();
+
+        return new BinaryFileResponse($fontFile, 200, ['Content-Type' => 'font/woff2']);
     }
 
     /**

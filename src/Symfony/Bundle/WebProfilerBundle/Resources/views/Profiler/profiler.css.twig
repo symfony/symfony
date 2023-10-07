@@ -324,9 +324,18 @@ button,hr,input{overflow:visible}progress,sub,sup{vertical-align:baseline}[type=
     --card-label-color: var(--tab-active-color);
 }
 
-{# Embedded font
+{# Webfonts
    ========================================================================= #}
-{{ include('@WebProfiler/Profiler/fonts.css.twig') }}
+@font-face {
+    font-family: 'JetBrainsMono';
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    src:
+        local('JetBrainsMono'),
+        local('JetBrains Mono'),
+        url('{{ url('_profiler_download_font', {fontName: 'JetBrainsMono'}) }}') format('woff2');
+}
 
 {# Basic styles
    ========================================================================= #}
@@ -980,6 +989,10 @@ tr.status-warning td {
     font-weight: 500;
     font-size: 18px;
     margin: 0;
+}
+#header h1 a {
+    display: flex;
+    color: inherit;
 }
 .theme-dark #header h1 {
     color: var(--gray-200);

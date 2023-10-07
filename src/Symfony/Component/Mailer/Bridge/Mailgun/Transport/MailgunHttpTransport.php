@@ -53,6 +53,7 @@ class MailgunHttpTransport extends AbstractHttpTransport
     protected function doSendHttp(SentMessage $message): ResponseInterface
     {
         $body = new FormDataPart([
+            'h:sender' => $message->getEnvelope()->getSender()->toString(),
             'to' => implode(',', $this->stringifyAddresses($message->getEnvelope()->getRecipients())),
             'message' => new DataPart($message->toString(), 'message.mime'),
         ]);

@@ -808,6 +808,28 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertSame('foo', $test->foo);
         $this->assertSame('baz', $test->baz);
     }
+
+    public function testDenormalizeWithCorrectOrderOfAttributeAndProperty()
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadata();
+
+        $data = [
+            'id' => 'root-level-id',
+            'data' => [
+                'id' => 'nested-id',
+            ],
+        ];
+
+        $obj = new class() {
+            /**
+             * @SerializedPath("[data][id]")
+             */
+            public $id;
+        };
+
+        $test = $normalizer->denormalize($data, $obj::class);
+        $this->assertSame('nested-id', $test->id);
+    }
 }
 
 class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer

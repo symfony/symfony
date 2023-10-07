@@ -28,6 +28,7 @@ CHANGELOG
 6.4
 ---
 
+ * Add `HttpClientAssertionsTrait`
  * Add `AbstractController::renderBlock()` and `renderBlockView()`
  * Add native return type to `Translator` and to `Application::reset()`
  * Deprecate the integration of Doctrine annotations, either uninstall the `doctrine/annotations` package or disable the integration by setting `framework.annotations` to `false`
@@ -49,8 +50,9 @@ CHANGELOG
  * Deprecate `framework.validation.enable_annotations`, use `framework.validation.enable_attributes` instead
  * Deprecate `framework.serializer.enable_annotations`, use `framework.serializer.enable_attributes` instead
  * Add `array $tokenAttributes = []` optional parameter to `KernelBrowser::loginUser()`
- * Add support for relative URLs in BrowserKit's redirect assertion.
+ * Add support for relative URLs in BrowserKit's redirect assertion
  * Change BrowserKitAssertionsTrait::getClient() to be protected
+ * Deprecate the `framework.asset_mapper.provider` config option
 
 6.3
 ---

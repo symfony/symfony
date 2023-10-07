@@ -2,7 +2,7 @@
     "name": "symfony/contracts",
     "type": "library",
     "description": "A set of abstractions extracted out of the Symfony components",
-    "keywords": ["abstractions", "contracts", "decoupling", "interfaces", "interoperability", "standards"],
+    "keywords": ["abstractions", "contracts", "decoupling", "interfaces", "interoperability", "standards", "dev"],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [

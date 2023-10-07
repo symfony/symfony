@@ -146,7 +146,7 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
         }
 
         // remote entries have no MappedAsset
-        if ($importMapEntry->isRemote()) {
+        if ($importMapEntry->isRemotePackage()) {
             return null;
         }
 
@@ -158,7 +158,10 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
         try {
             $resolvedPath = $this->resolvePath(\dirname($asset->logicalPath), $importedModule);
         } catch (RuntimeException $e) {
-            $this->handleMissingImport(sprintf('Error processing import in "%s": ', $asset->sourcePath).$e->getMessage(), $e);
+            // avoid warning about vendor imports - these are often comments
+            if (!$asset->isVendor) {
+                $this->handleMissingImport(sprintf('Error processing import in "%s": ', $asset->sourcePath).$e->getMessage(), $e);
+            }
 
             return null;
         }
@@ -179,7 +182,10 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
             // avoid circular error if there is self-referencing import comments
         }
 
-        $this->handleMissingImport($message);
+        // avoid warning about vendor imports - these are often comments
+        if (!$asset->isVendor) {
+            $this->handleMissingImport($message);
+        }
 
         return null;
     }

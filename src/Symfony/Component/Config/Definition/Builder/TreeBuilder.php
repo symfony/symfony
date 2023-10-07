@@ -20,8 +20,8 @@ use Symfony\Component\Config\Definition\NodeInterface;
  */
 class TreeBuilder implements NodeParentInterface
 {
-    protected NodeInterface $tree;
-    protected NodeDefinition $root;
+    protected ?NodeInterface $tree = null;
+    protected ?NodeDefinition $root = null;
 
     public function __construct(string $name, string $type = 'array', NodeBuilder $builder = null)
     {
@@ -50,7 +50,7 @@ class TreeBuilder implements NodeParentInterface
     public function setPathSeparator(string $separator): void
     {
         // unset last built as changing path separator changes all nodes
-        unset($this->tree);
+        $this->tree = null;
 
         $this->root->setPathSeparator($separator);
     }

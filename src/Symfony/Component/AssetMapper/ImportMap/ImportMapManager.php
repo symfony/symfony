@@ -15,8 +15,6 @@ use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\ImportMap\Resolver\PackageResolverInterface;
 use Symfony\Component\AssetMapper\MappedAsset;
 use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
-use Symfony\Component\HttpClient\HttpClient;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Kévin Dunglas <kevin@dunglas.dev>
@@ -26,43 +24,17 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class ImportMapManager
 {
-    public const PROVIDER_JSPM = 'jspm';
-    public const PROVIDER_JSPM_SYSTEM = 'jspm.system';
-    public const PROVIDER_SKYPACK = 'skypack';
-    public const PROVIDER_JSDELIVR = 'jsdelivr';
-    public const PROVIDER_JSDELIVR_ESM = 'jsdelivr.esm';
-    public const PROVIDER_UNPKG = 'unpkg';
-    public const PROVIDERS = [
-        self::PROVIDER_JSPM,
-        self::PROVIDER_JSPM_SYSTEM,
-        self::PROVIDER_SKYPACK,
-        self::PROVIDER_JSDELIVR,
-        self::PROVIDER_JSDELIVR_ESM,
-        self::PROVIDER_UNPKG,
-    ];
-
     public const POLYFILL_URL = 'https://ga.jspm.io/npm:es-module-shims@1.7.2/dist/es-module-shims.js';
-
-    /**
-     * @see https://regex101.com/r/2cR9Rh/1
-     *
-     * Partially based on https://github.com/dword-design/package-name-regex
-     */
-    private const PACKAGE_PATTERN = '/^(?:https?:\/\/[\w\.-]+\/)?(?:(?<registry>\w+):)?(?<package>(?:@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*)(?:@(?<version>[\w\._-]+))?(?:(?<subpath>\/.*))?$/';
     public const IMPORT_MAP_CACHE_FILENAME = 'importmap.json';
     public const ENTRYPOINT_CACHE_FILENAME_PATTERN = 'entrypoint.%s.json';
-
-    private readonly HttpClientInterface $httpClient;
 
     public function __construct(
         private readonly AssetMapperInterface $assetMapper,
         private readonly PublicAssetsPathResolverInterface $assetsPathResolver,
         private readonly ImportMapConfigReader $importMapConfigReader,
-        private readonly string $vendorDir,
+        private readonly RemotePackageDownloader $packageDownloader,
         private readonly PackageResolverInterface $resolver,
-        HttpClientInterface $httpClient = null,
     ) {
-        $this->httpClient = $httpClient ?? HttpClient::create();
     }
 
     /**
@@ -97,33 +69,6 @@ class ImportMapManager
         return $this->updateImportMapConfig(true, [], [], $packages);
     }
 
-    /**
-     * Downloads all missing downloaded packages.
-     *
-     * @return string[] The downloaded packages
-     */
-    public function downloadMissingPackages(): array
-    {
-        $entries = $this->importMapConfigReader->getEntries();
-        $downloadedPackages = [];
-
-        foreach ($entries as $entry) {
-            if (!$entry->isDownloaded || $this->findAsset($entry->path)) {
-                continue;
-            }
-
-            $this->downloadPackage(
-                $entry->importName,
-                $this->httpClient->request('GET', $entry->url)->getContent(),
-                self::getImportMapTypeFromFilename($entry->url),
-            );
-
-            $downloadedPackages[] = $entry->importName;
-        }
-
-        return $downloadedPackages;
-    }
-
     public function findRootImportMapEntry(string $moduleName): ?ImportMapEntry
     {
         $entries = $this->importMapConfigReader->getEntries();
@@ -142,23 +87,22 @@ class ImportMapManager
     {
         $rawImportMapData = $this->getRawImportMapData();
         $finalImportMapData = [];
-        foreach ($entrypointNames as $entry) {
-            $finalImportMapData[$entry] = $rawImportMapData[$entry];
-            foreach ($this->findEagerEntrypointImports($entry) as $dependency) {
-                if (isset($finalImportMapData[$dependency])) {
+        foreach ($entrypointNames as $entrypointName) {
+            $entrypointImports = $this->findEagerEntrypointImports($entrypointName);
+            // Entrypoint modules must be preloaded before their dependencies
+            foreach ([$entrypointName, ...$entrypointImports] as $import) {
+                if (isset($finalImportMapData[$import])) {
                     continue;
                 }
 
-                if (!isset($rawImportMapData[$dependency])) {
-                    // missing dependency - rely on browser or compilers to warn
+                // Missing dependency - rely on browser or compilers to warn
+                if (!isset($rawImportMapData[$import])) {
                     continue;
                 }
 
-                // re-order the final array by order of dependencies
-                $finalImportMapData[$dependency] = $rawImportMapData[$dependency];
-                // and mark for preloading
-                $finalImportMapData[$dependency]['preload'] = true;
-                unset($rawImportMapData[$dependency]);
+                $finalImportMapData[$import] = $rawImportMapData[$import];
+                $finalImportMapData[$import]['preload'] = true;
+                unset($rawImportMapData[$import]);
             }
         }
 
@@ -214,18 +158,18 @@ class ImportMapManager
                 $asset = $this->findAsset($entry->path);
 
                 if (!$asset) {
-                    if ($entry->isDownloaded) {
-                        throw new \InvalidArgumentException(sprintf('The "%s" downloaded asset is missing. Run "php bin/console importmap:install".', $entry->path));
-                    }
-
                     throw new \InvalidArgumentException(sprintf('The asset "%s" cannot be found in any asset map paths.', $entry->path));
                 }
-
-                $path = $asset->publicPath;
             } else {
-                $path = $entry->url;
+                $sourcePath = $this->packageDownloader->getDownloadedPath($entry->importName);
+                $asset = $this->assetMapper->getAssetFromSourcePath($sourcePath);
+
+                if (!$asset) {
+                    throw new \InvalidArgumentException(sprintf('The "%s" vendor asset is missing. Run "php bin/console importmap:install".', $entry->importName));
+                }
             }
 
+            $path = $asset->publicPath;
             $data = ['path' => $path, 'type' => $entry->type->value];
             $rawImportMapData[$entry->importName] = $data;
         }
@@ -238,8 +182,8 @@ class ImportMapManager
      */
     public static function parsePackageName(string $packageName): ?array
     {
-        // https://regex101.com/r/MDz0bN/1
-        $regex = '/(?:(?P<registry>[^:\n]+):)?((?P<package>@?[^=@\n]+))(?:@(?P<version>[^=\s\n]+))?(?:=(?P<alias>[^\s\n]+))?/';
+        // https://regex101.com/r/z1nj7P/1
+        $regex = '/((?P<package>@?[^=@\n]+))(?:@(?P<version>[^=\s\n]+))?(?:=(?P<alias>[^\s\n]+))?/';
 
         if (!preg_match($regex, $packageName, $matches)) {
             return null;
@@ -274,27 +218,18 @@ class ImportMapManager
         if ($update) {
             foreach ($currentEntries as $entry) {
                 $importName = $entry->importName;
-                if (null === $entry->url || (0 !== \count($packagesToUpdate) && !\in_array($importName, $packagesToUpdate, true))) {
+                if (!$entry->isRemotePackage() || ($packagesToUpdate && !\in_array($importName, $packagesToUpdate, true))) {
                     continue;
                 }
 
                 // assume the import name === package name, unless we can parse
                 // the true package name from the URL
                 $packageName = $importName;
-                $registry = null;
-
-                // try to grab the package name & jspm "registry" from the URL
-                if (str_starts_with($entry->url, 'https://ga.jspm.io') && 1 === preg_match(self::PACKAGE_PATTERN, $entry->url, $matches)) {
-                    $packageName = $matches['package'];
-                    $registry = $matches['registry'] ?? null;
-                }
 
                 $packagesToRequire[] = new PackageRequireOptions(
                     $packageName,
                     null,
-                    $entry->isDownloaded,
                     $importName,
-                    $registry,
                 );
 
                 // remove it: then it will be re-added
@@ -305,6 +240,7 @@ class ImportMapManager
 
         $newEntries = $this->requirePackages($packagesToRequire, $currentEntries);
         $this->importMapConfigReader->writeEntries($currentEntries);
+        $this->packageDownloader->downloadPackages();
 
         return $newEntries;
     }
@@ -345,6 +281,7 @@ class ImportMapManager
                 $requireOptions->packageName,
                 path: $path,
                 type: self::getImportMapTypeFromFilename($requireOptions->path),
+                isEntrypoint: $requireOptions->entrypoint,
             );
             $importMapEntries->add($newEntry);
             $addedEntries[] = $newEntry;
@@ -358,22 +295,13 @@ class ImportMapManager
         $resolvedPackages = $this->resolver->resolvePackages($packagesToRequire);
         foreach ($resolvedPackages as $resolvedPackage) {
             $importName = $resolvedPackage->requireOptions->importName ?: $resolvedPackage->requireOptions->packageName;
-            $path = null;
-            $type = self::getImportMapTypeFromFilename($resolvedPackage->url);
-            if ($resolvedPackage->requireOptions->download) {
-                if (null === $resolvedPackage->content) {
-                    throw new \LogicException(sprintf('The contents of package "%s" were not downloaded.', $resolvedPackage->requireOptions->packageName));
-                }
-
-                $path = $this->downloadPackage($importName, $resolvedPackage->content, $type);
-            }
 
             $newEntry = new ImportMapEntry(
                 $importName,
-                path: $path,
-                url: $resolvedPackage->url,
-                isDownloaded: $resolvedPackage->requireOptions->download,
-                type: $type,
+                path: $resolvedPackage->requireOptions->path,
+                version: $resolvedPackage->version,
+                type: $resolvedPackage->type,
+                isEntrypoint: $resolvedPackage->requireOptions->entrypoint,
             );
             $importMapEntries->add($newEntry);
             $addedEntries[] = $newEntry;
@@ -418,7 +346,7 @@ class ImportMapManager
         }
 
         // remote packages aren't in the asset mapper & so don't have dependencies
-        if ($entry->isRemote()) {
+        if ($entry->isRemotePackage()) {
             return $currentImportEntries;
         }
 
@@ -457,26 +385,6 @@ class ImportMapManager
         return $currentImportEntries;
     }
 
-    private function downloadPackage(string $packageName, string $packageContents, ImportMapType $importMapType): string
-    {
-        $vendorPath = $this->vendorDir.'/'.$packageName;
-        // add an extension of there is none
-        if (!str_contains($packageName, '.')) {
-            $vendorPath .= '.'.$importMapType->value;
-        }
-
-        @mkdir(\dirname($vendorPath), 0777, true);
-        file_put_contents($vendorPath, $packageContents);
-
-        if (null === $mappedAsset = $this->assetMapper->getAssetFromSourcePath($vendorPath)) {
-            unlink($vendorPath);
-
-            throw new \LogicException(sprintf('The package was downloaded to "%s", but this path does not appear to be in any of your asset paths.', $vendorPath));
-        }
-
-        return $mappedAsset->logicalPath;
-    }
-
     /**
      * Given an importmap entry name, finds all the non-lazy module imports in its chain.
      *
@@ -498,7 +406,7 @@ class ImportMapManager
             throw new \InvalidArgumentException(sprintf('The entrypoint "%s" is not an entry point in "importmap.php". Set "entrypoint" => true to make it available as an entrypoint.', $entryName));
         }
 
-        if ($rootImportEntries->get($entryName)->isRemote()) {
+        if ($rootImportEntries->get($entryName)->isRemotePackage()) {
             throw new \InvalidArgumentException(sprintf('The entrypoint "%s" is a remote package and cannot be used as an entrypoint.', $entryName));
         }
 

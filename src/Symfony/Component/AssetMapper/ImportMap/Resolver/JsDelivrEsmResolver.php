@@ -12,6 +12,8 @@
 namespace Symfony\Component\AssetMapper\ImportMap\Resolver;
 
 use Symfony\Component\AssetMapper\Exception\RuntimeException;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapType;
 use Symfony\Component\AssetMapper\ImportMap\PackageRequireOptions;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
@@ -54,14 +56,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
                 continue;
             }
 
-            $filePath = '';
-            $i = strpos($packageName, '/');
-
-            if ($i && (!str_starts_with($packageName, '@') || $i = strpos($packageName, '/', $i + 1))) {
-                // @vendor/package/filepath or package/filepath
-                $filePath = substr($packageName, $i);
-                $packageName = substr($packageName, 0, $i);
-            }
+            [$packageName, $filePath] = self::splitPackageNameAndFilePath($packageName);
 
             $response = $this->httpClient->request('GET', sprintf($this->versionUrlPattern, $packageName, urlencode($constraint)));
             $requiredPackages[] = [$options, $response, $packageName, $filePath, /* resolved version */ null];
@@ -82,7 +77,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
             $requiredPackages[$i][4] = $version;
 
             if (!$filePath) {
-                $cssEntrypointResponses[$options->packageName] = $this->httpClient->request('GET', sprintf(self::URL_PATTERN_ENTRYPOINT, $packageName, $version));
+                $cssEntrypointResponses[$packageName] = $this->httpClient->request('GET', sprintf(self::URL_PATTERN_ENTRYPOINT, $packageName, $version));
             }
         }
 
@@ -103,16 +98,12 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
                 continue;
             }
 
-            // final URL where it was redirected to
-            $url = $response->getInfo('url');
-            $content = null;
-
-            if ($options->download) {
-                $content = $this->parseJsDelivrImports($response->getContent(), $packagesToRequire, $options->download);
-            }
-
             $packageName = trim($options->packageName, '/');
-            $resolvedPackages[$packageName] = new ResolvedImportMapPackage($options, $url, $content);
+            $contentType = $response->getHeaders()['content-type'][0] ?? '';
+            $type = str_starts_with($contentType, 'text/css') ? ImportMapType::CSS : ImportMapType::JS;
+            $resolvedPackages[$packageName] = new ResolvedImportMapPackage($options, $version, $type);
+
+            $packagesToRequire = array_merge($packagesToRequire, $this->fetchPackageRequirementsFromImports($response->getContent()));
         }
 
         try {
@@ -139,7 +130,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
                 continue;
             }
 
-            $packagesToRequire[] = new PackageRequireOptions($packageName.$cssFile, $version, $options->download);
+            $packagesToRequire[] = new PackageRequireOptions($package.$cssFile, $version);
         }
 
         try {
@@ -159,23 +150,96 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
     }
 
     /**
+     * @param ImportMapEntry[] $importMapEntries
+     *
+     * @return array<string, string>
+     */
+    public function downloadPackages(array $importMapEntries, callable $progressCallback = null): array
+    {
+        $responses = [];
+
+        foreach ($importMapEntries as $package => $entry) {
+            [$packageName, $filePath] = self::splitPackageNameAndFilePath($entry->importName);
+            $pattern = ImportMapType::CSS === $entry->type ? $this->distUrlCssPattern : $this->distUrlPattern;
+            $url = sprintf($pattern, $packageName, $entry->version, $filePath);
+
+            $responses[$package] = $this->httpClient->request('GET', $url);
+        }
+
+        $errors = [];
+        $contents = [];
+        foreach ($responses as $package => $response) {
+            if (200 !== $response->getStatusCode()) {
+                $errors[] = [$package, $response];
+                continue;
+            }
+
+            if ($progressCallback) {
+                $progressCallback($package, 'started', $response, \count($responses));
+            }
+            $contents[$package] = $this->makeImportsBare($response->getContent());
+            if ($progressCallback) {
+                $progressCallback($package, 'finished', $response, \count($responses));
+            }
+        }
+
+        try {
+            ($errors[0][1] ?? null)?->getHeaders();
+        } catch (HttpExceptionInterface $e) {
+            $response = $e->getResponse();
+            $packages = implode('", "', array_column($errors, 0));
+
+            throw new RuntimeException(sprintf('Error %d downloading packages from jsDelivr for "%s". Check your package names. Response: ', $response->getStatusCode(), $packages).$response->getContent(false), 0, $e);
+        }
+
+        return $contents;
+    }
+
+    /**
      * Parses the very specific import syntax used by jsDelivr.
      *
      * Replaces those with normal import "package/name" statements and
      * records the package as a dependency, so it can be downloaded and
      * added to the importmap.
+     *
+     * @return PackageRequireOptions[]
      */
-    private function parseJsDelivrImports(string $content, array &$dependencies, bool $download): string
+    private function fetchPackageRequirementsFromImports(string $content): array
     {
         // imports from jsdelivr follow a predictable format
-        $content = preg_replace_callback(self::IMPORT_REGEX, function ($matches) use (&$dependencies, $download) {
-            $packageName = $matches[1];
-            $version = $matches[2];
+        preg_match_all(self::IMPORT_REGEX, $content, $matches);
+        $dependencies = [];
+        foreach ($matches[1] as $index => $packageName) {
+            $version = $matches[2][$index];
 
-            $dependencies[] = new PackageRequireOptions($packageName, $version, $download);
+            $dependencies[] = new PackageRequireOptions($packageName, $version);
+        }
 
-            return sprintf('from"%s"', $packageName);
-        }, $content);
+        return $dependencies;
+    }
+
+    private static function splitPackageNameAndFilePath(string $packageName): array
+    {
+        $filePath = '';
+        $i = strpos($packageName, '/');
+
+        if ($i && (!str_starts_with($packageName, '@') || $i = strpos($packageName, '/', $i + 1))) {
+            // @vendor/package/filepath or package/filepath
+            $filePath = substr($packageName, $i);
+            $packageName = substr($packageName, 0, $i);
+        }
+
+        return [$packageName, $filePath];
+    }
+
+    /**
+     * Parses the very specific import syntax used by jsDelivr.
+     *
+     * Replaces those with normal import "package/name" statements.
+     */
+    private function makeImportsBare(string $content): string
+    {
+        $content = preg_replace_callback(self::IMPORT_REGEX, fn ($m) => sprintf('from"%s"', $m[1]), $content);
 
         // source maps are not also downloaded - so remove the sourceMappingURL
         $content = preg_replace('{//# sourceMappingURL=.*$}m', '', $content);

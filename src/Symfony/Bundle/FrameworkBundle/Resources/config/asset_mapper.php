@@ -18,6 +18,7 @@ use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\AssetMapperRepository;
 use Symfony\Component\AssetMapper\Command\AssetMapperCompileCommand;
 use Symfony\Component\AssetMapper\Command\DebugAssetMapperCommand;
+use Symfony\Component\AssetMapper\Command\ImportMapAuditCommand;
 use Symfony\Component\AssetMapper\Command\ImportMapInstallCommand;
 use Symfony\Component\AssetMapper\Command\ImportMapRemoveCommand;
 use Symfony\Component\AssetMapper\Command\ImportMapRequireCommand;
@@ -27,12 +28,12 @@ use Symfony\Component\AssetMapper\Compiler\JavaScriptImportPathCompiler;
 use Symfony\Component\AssetMapper\Compiler\SourceMappingUrlsCompiler;
 use Symfony\Component\AssetMapper\Factory\CachedMappedAssetFactory;
 use Symfony\Component\AssetMapper\Factory\MappedAssetFactory;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapAuditor;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapRenderer;
+use Symfony\Component\AssetMapper\ImportMap\RemotePackageDownloader;
 use Symfony\Component\AssetMapper\ImportMap\Resolver\JsDelivrEsmResolver;
-use Symfony\Component\AssetMapper\ImportMap\Resolver\JspmResolver;
-use Symfony\Component\AssetMapper\ImportMap\Resolver\PackageResolver;
 use Symfony\Component\AssetMapper\MapperAwareAssetPackage;
 use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolver;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -51,6 +52,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('asset_mapper.public_assets_path_resolver'),
                 service('asset_mapper_compiler'),
+                abstract_arg('vendor directory'),
             ])
 
         ->set('asset_mapper.cached_mapped_asset_factory', CachedMappedAssetFactory::class)
@@ -148,41 +150,20 @@ return static function (ContainerConfigurator $container) {
                 service('asset_mapper'),
                 service('asset_mapper.public_assets_path_resolver'),
                 service('asset_mapper.importmap.config_reader'),
-                abstract_arg('vendor directory'),
+                service('asset_mapper.importmap.remote_package_downloader'),
                 service('asset_mapper.importmap.resolver'),
-                service('http_client'),
             ])
         ->alias(ImportMapManager::class, 'asset_mapper.importmap.manager')
 
-        ->set('asset_mapper.importmap.resolver', PackageResolver::class)
+        ->set('asset_mapper.importmap.remote_package_downloader', RemotePackageDownloader::class)
             ->args([
-                abstract_arg('provider'),
-                tagged_locator('asset_mapper.importmap.resolver'),
+                service('asset_mapper.importmap.config_reader'),
+                service('asset_mapper.importmap.resolver'),
+                abstract_arg('vendor directory'),
             ])
 
-        ->set('asset_mapper.importmap.resolver.jsdelivr_esm', JsDelivrEsmResolver::class)
+        ->set('asset_mapper.importmap.resolver', JsDelivrEsmResolver::class)
             ->args([service('http_client')])
-            ->tag('asset_mapper.importmap.resolver', ['resolver' => ImportMapManager::PROVIDER_JSDELIVR_ESM])
-
-        ->set('asset_mapper.importmap.resolver.jspm', JspmResolver::class)
-            ->args([service('http_client'), ImportMapManager::PROVIDER_JSPM])
-            ->tag('asset_mapper.importmap.resolver', ['resolver' => ImportMapManager::PROVIDER_JSPM])
-
-        ->set('asset_mapper.importmap.resolver.jspm_system', JspmResolver::class)
-            ->args([service('http_client'), ImportMapManager::PROVIDER_JSPM_SYSTEM])
-            ->tag('asset_mapper.importmap.resolver', ['resolver' => ImportMapManager::PROVIDER_JSPM_SYSTEM])
-
-        ->set('asset_mapper.importmap.resolver.skypack', JspmResolver::class)
-            ->args([service('http_client'), ImportMapManager::PROVIDER_SKYPACK])
-            ->tag('asset_mapper.importmap.resolver', ['resolver' => ImportMapManager::PROVIDER_SKYPACK])
-
-        ->set('asset_mapper.importmap.resolver.jsdelivr', JspmResolver::class)
-            ->args([service('http_client'), ImportMapManager::PROVIDER_JSDELIVR])
-            ->tag('asset_mapper.importmap.resolver', ['resolver' => ImportMapManager::PROVIDER_JSDELIVR])
-
-        ->set('asset_mapper.importmap.resolver.unpkg', JspmResolver::class)
-            ->args([service('http_client'), ImportMapManager::PROVIDER_UNPKG])
-            ->tag('asset_mapper.importmap.resolver', ['resolver' => ImportMapManager::PROVIDER_UNPKG])
 
         ->set('asset_mapper.importmap.renderer', ImportMapRenderer::class)
             ->args([
@@ -193,10 +174,15 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('script HTML attributes'),
             ])
 
+        ->set('asset_mapper.importmap.auditor', ImportMapAuditor::class)
+        ->args([
+            service('asset_mapper.importmap.config_reader'),
+            service('http_client'),
+        ])
+
         ->set('asset_mapper.importmap.command.require', ImportMapRequireCommand::class)
             ->args([
                 service('asset_mapper.importmap.manager'),
-                service('asset_mapper'),
                 param('kernel.project_dir'),
             ])
             ->tag('console.command')
@@ -210,7 +196,14 @@ return static function (ContainerConfigurator $container) {
             ->tag('console.command')
 
         ->set('asset_mapper.importmap.command.install', ImportMapInstallCommand::class)
-            ->args([service('asset_mapper.importmap.manager')])
+            ->args([
+                service('asset_mapper.importmap.remote_package_downloader'),
+                param('kernel.project_dir'),
+            ])
+            ->tag('console.command')
+
+        ->set('asset_mapper.importmap.command.audit', ImportMapAuditCommand::class)
+            ->args([service('asset_mapper.importmap.auditor')])
             ->tag('console.command')
     ;
 };

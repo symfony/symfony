@@ -113,6 +113,14 @@ class MappedAssetFactoryTest extends TestCase
         $this->assertTrue($asset->isPredigested);
     }
 
+    public function testCreateMappedAssetInVendor()
+    {
+        $assetMapper = $this->createFactory();
+        $asset = $assetMapper->createMappedAsset('lodash.js', __DIR__.'/../fixtures/assets/vendor/lodash.js');
+        $this->assertSame('lodash.js', $asset->logicalPath);
+        $this->assertTrue($asset->isVendor);
+    }
+
     private function createFactory(AssetCompilerInterface $extraCompiler = null): MappedAssetFactory
     {
         $compilers = [
@@ -137,7 +145,8 @@ class MappedAssetFactoryTest extends TestCase
 
         $factory = new MappedAssetFactory(
             $pathResolver,
-            $compiler
+            $compiler,
+            __DIR__.'/../fixtures/assets/vendor',
         );
 
         // mock the AssetMapper to behave like normal: by calling back to the factory

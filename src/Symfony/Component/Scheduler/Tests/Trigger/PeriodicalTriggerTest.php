@@ -73,6 +73,8 @@ class PeriodicalTriggerTest extends TestCase
         yield ['3600.5'];
         yield ['-3600'];
         yield [-3600];
+        yield ['0'];
+        yield [0];
     }
 
     /**

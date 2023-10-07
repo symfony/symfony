@@ -199,7 +199,10 @@ final class EntityValueResolver implements ValueResolverInterface
         }
 
         $repository = $manager->getRepository($options->class);
-        $variables = array_merge($request->attributes->all(), ['repository' => $repository]);
+        $variables = array_merge($request->attributes->all(), [
+            'repository' => $repository,
+            'request' => $request,
+        ]);
 
         try {
             return $this->expressionLanguage->evaluate($options->expr, $variables);

@@ -75,7 +75,7 @@ class HandlerFailedExceptionTest extends TestCase
         $exception2 = new MyOwnException('second');
         $exception3 = new MyOwnException('third');
 
-        $handlerException = new HandlerFailedException($envelope, [$exception1, $exception2, new DelayedMessageHandlingException([$exception3])]);
+        $handlerException = new HandlerFailedException($envelope, [$exception1, $exception2, new DelayedMessageHandlingException([$exception3], $envelope)]);
         $this->assertSame([$exception1, $exception2, $exception3], $handlerException->getWrappedExceptions(recursive: true));
     }
 
@@ -86,7 +86,7 @@ class HandlerFailedExceptionTest extends TestCase
         $exception2 = new MyOwnException('second');
         $exception3 = new MyOwnException('third');
 
-        $handlerException = new HandlerFailedException($envelope, ['first' => $exception1, 'second' => $exception2, new DelayedMessageHandlingException(['third' => $exception3])]);
+        $handlerException = new HandlerFailedException($envelope, ['first' => $exception1, 'second' => $exception2, new DelayedMessageHandlingException(['third' => $exception3], $envelope)]);
         $this->assertSame(['first' => $exception1, 'second' => $exception2, 'third' => $exception3], $handlerException->getWrappedExceptions(recursive: true));
     }
 
@@ -97,7 +97,7 @@ class HandlerFailedExceptionTest extends TestCase
         $exception2 = new MyOwnException('second');
         $exception3 = new MyOwnException('third');
 
-        $handlerException = new HandlerFailedException($envelope, [$exception1, $exception2, new DelayedMessageHandlingException([$exception3])]);
+        $handlerException = new HandlerFailedException($envelope, [$exception1, $exception2, new DelayedMessageHandlingException([$exception3], $envelope)]);
         $this->assertSame([$exception2, $exception3], $handlerException->getWrappedExceptions(class: MyOwnException::class, recursive: true));
     }
 }

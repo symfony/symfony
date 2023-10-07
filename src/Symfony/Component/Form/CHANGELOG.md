@@ -16,6 +16,8 @@ CHANGELOG
    `model_timezone` option in `DateType`, `DateTimeType`, and `TimeType`
  * Deprecate `PostSetDataEvent::setData()`, use `PreSetDataEvent::setData()` instead
  * Deprecate `PostSubmitEvent::setData()`, use `PreSubmitDataEvent::setData()` or `SubmitDataEvent::setData()` instead
+ * Add `duplicate_preferred_choices` option in `ChoiceType`
+ * Add `$duplicatePreferredChoices` parameter to `ChoiceListFactoryInterface::createView()`
 
 6.3
 ---

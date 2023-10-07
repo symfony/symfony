@@ -43,11 +43,7 @@ class ImportMapConfigReaderTest extends TestCase
 <?php
 return [
     'remote_package' => [
-        'url' => 'https://unpkg.com/@hotwired/stimulus@3.2.1/dist/stimulus.js',
-    ],
-    'remote_package_downloaded' => [
-        'downloaded_to' => 'vendor/lodash.js',
-        'url' => 'https://ga.jspm.io/npm:lodash@4.17.21/lodash.js',
+        'version' => '3.2.1',
     ],
     'local_package' => [
         'path' => 'app.js',
@@ -69,28 +65,23 @@ EOF;
         $this->assertInstanceOf(ImportMapEntries::class, $entries);
         /** @var ImportMapEntry[] $allEntries */
         $allEntries = iterator_to_array($entries);
-        $this->assertCount(5, $allEntries);
+        $this->assertCount(4, $allEntries);
 
         $remotePackageEntry = $allEntries[0];
         $this->assertSame('remote_package', $remotePackageEntry->importName);
         $this->assertNull($remotePackageEntry->path);
-        $this->assertSame('https://unpkg.com/@hotwired/stimulus@3.2.1/dist/stimulus.js', $remotePackageEntry->url);
-        $this->assertFalse($remotePackageEntry->isDownloaded);
+        $this->assertSame('3.2.1', $remotePackageEntry->version);
         $this->assertSame('js', $remotePackageEntry->type->value);
         $this->assertFalse($remotePackageEntry->isEntrypoint);
 
-        $remotePackageDownloadedEntry = $allEntries[1];
-        $this->assertSame('https://ga.jspm.io/npm:lodash@4.17.21/lodash.js', $remotePackageDownloadedEntry->url);
-        $this->assertSame('vendor/lodash.js', $remotePackageDownloadedEntry->path);
-
-        $localPackageEntry = $allEntries[2];
-        $this->assertNull($localPackageEntry->url);
+        $localPackageEntry = $allEntries[1];
+        $this->assertNull($localPackageEntry->version);
         $this->assertSame('app.js', $localPackageEntry->path);
 
-        $typeCssEntry = $allEntries[3];
+        $typeCssEntry = $allEntries[2];
         $this->assertSame('css', $typeCssEntry->type->value);
 
-        $entryPointEntry = $allEntries[4];
+        $entryPointEntry = $allEntries[3];
         $this->assertTrue($entryPointEntry->isEntrypoint);
 
         // now save the original raw data from importmap.php and delete the file

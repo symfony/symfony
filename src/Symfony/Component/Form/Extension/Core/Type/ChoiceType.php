@@ -342,6 +342,7 @@ class ChoiceType extends AbstractType
             'choice_attr' => null,
             'choice_translation_parameters' => [],
             'preferred_choices' => [],
+            'duplicate_preferred_choices' => true,
             'group_by' => null,
             'empty_data' => $emptyData,
             'placeholder' => $placeholderDefault,
@@ -371,6 +372,7 @@ class ChoiceType extends AbstractType
         $resolver->setAllowedTypes('choice_translation_parameters', ['null', 'array', 'callable', ChoiceTranslationParameters::class]);
         $resolver->setAllowedTypes('placeholder_attr', ['array']);
         $resolver->setAllowedTypes('preferred_choices', ['array', \Traversable::class, 'callable', 'string', PropertyPath::class, PreferredChoice::class]);
+        $resolver->setAllowedTypes('duplicate_preferred_choices', 'bool');
         $resolver->setAllowedTypes('group_by', ['null', 'callable', 'string', PropertyPath::class, GroupBy::class]);
     }
 
@@ -453,7 +455,8 @@ class ChoiceType extends AbstractType
             $options['choice_name'],
             $options['group_by'],
             $options['choice_attr'],
-            $options['choice_translation_parameters']
+            $options['choice_translation_parameters'],
+            $options['duplicate_preferred_choices'],
         );
     }
 }

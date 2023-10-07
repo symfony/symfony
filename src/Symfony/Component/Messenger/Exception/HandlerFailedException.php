@@ -17,7 +17,6 @@ class HandlerFailedException extends RuntimeException implements WrappedExceptio
 {
     use WrappedExceptionsTrait;
 
-    private array $exceptions;
     private Envelope $envelope;
 
     /**
@@ -54,7 +53,7 @@ class HandlerFailedException extends RuntimeException implements WrappedExceptio
      */
     public function getNestedExceptions(): array
     {
-        trigger_deprecation('symfony/messenger', '6.4', 'The "%s()" method is deprecated, use "%s::getWrappedExceptions" instead.', __METHOD__, self::class);
+        trigger_deprecation('symfony/messenger', '6.4', 'The "%s()" method is deprecated, use "%s::getWrappedExceptions()" instead.', __METHOD__, self::class);
 
         return $this->exceptions;
     }
@@ -64,7 +63,7 @@ class HandlerFailedException extends RuntimeException implements WrappedExceptio
      */
     public function getNestedExceptionOfClass(string $exceptionClassName): array
     {
-        trigger_deprecation('symfony/messenger', '6.4', 'The "%s()" method is deprecated, use "%s::getWrappedExceptions" instead.', __METHOD__, self::class);
+        trigger_deprecation('symfony/messenger', '6.4', 'The "%s()" method is deprecated, use "%s::getWrappedExceptions()" instead.', __METHOD__, self::class);
 
         return array_values(
             array_filter(

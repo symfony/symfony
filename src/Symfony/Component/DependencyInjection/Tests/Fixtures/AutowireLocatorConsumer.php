@@ -12,16 +12,19 @@
 namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
 use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
+use Symfony\Contracts\Service\Attribute\SubscribedService;
 
 final class AutowireLocatorConsumer
 {
     public function __construct(
-        #[AutowireLocator(
+        #[AutowireLocator([
             BarTagClass::class,
-            with_key: FooTagClass::class,
-            nullable: '?invalid',
-        )]
+            'with_key' => FooTagClass::class,
+            'nullable' => '?invalid',
+            'subscribed' => new SubscribedService(type: 'string', attributes: new Autowire('%some.parameter%')),
+        ])]
         public readonly ContainerInterface $locator,
     ) {
     }

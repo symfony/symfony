@@ -17,6 +17,7 @@ CHANGELOG
 
  * Make `HeaderBag::getDate()`, `Response::getDate()`, `getExpires()` and `getLastModified()` return a `DateTimeImmutable`
  * Support root-level `Generator` in `StreamedJsonResponse`
+ * Add `UriSigner` from the HttpKernel component
 
 6.3
 ---

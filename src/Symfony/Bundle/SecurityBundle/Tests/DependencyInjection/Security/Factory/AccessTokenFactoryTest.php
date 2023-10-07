@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Security\Factory;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\CasTokenHandlerFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\OidcTokenHandlerFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\OidcUserInfoTokenHandlerFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\ServiceTokenHandlerFactory;
@@ -74,6 +75,27 @@ class AccessTokenFactoryTest extends TestCase
 
         $this->assertTrue($container->hasDefinition('security.authenticator.access_token.firewall1'));
         $this->assertTrue($container->hasDefinition('security.access_token_handler.firewall1'));
+    }
+
+    public function testCasTokenHandlerConfiguration()
+    {
+        $container = new ContainerBuilder();
+        $config = [
+            'token_handler' => ['cas' => ['validation_url' => 'https://www.example.com/cas/validate']],
+        ];
+
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+        $finalizedConfig = $this->processConfig($config, $factory);
+
+        $factory->createAuthenticator($container, 'firewall1', $finalizedConfig, 'userprovider');
+
+        $this->assertTrue($container->hasDefinition('security.access_token_handler.cas'));
+
+        $arguments = $container->getDefinition('security.access_token_handler.cas')->getArguments();
+        $this->assertSame((string) $arguments[0], 'request_stack');
+        $this->assertSame($arguments[1], 'https://www.example.com/cas/validate');
+        $this->assertSame($arguments[2], 'cas');
+        $this->assertNull($arguments[3]);
     }
 
     public function testOidcUserInfoTokenHandlerConfigurationWithExistingClient()
@@ -218,6 +240,7 @@ class AccessTokenFactoryTest extends TestCase
             new ServiceTokenHandlerFactory(),
             new OidcUserInfoTokenHandlerFactory(),
             new OidcTokenHandlerFactory(),
+            new CasTokenHandlerFactory(),
         ];
     }
 }

@@ -17,6 +17,8 @@ use Jose\Component\Signature\Algorithm\ES256;
 use Jose\Component\Signature\JWSBuilder;
 use Jose\Component\Signature\Serializer\CompactSerializer;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class AccessTokenTest extends AbstractWebTestCase
@@ -377,6 +379,29 @@ class AccessTokenTest extends AbstractWebTestCase
 
         $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_oidc.yml']);
         $client->request('GET', '/foo', [], [], ['HTTP_AUTHORIZATION' => sprintf('Bearer %s', $token)]);
+        $response = $client->getResponse();
+
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame(['message' => 'Welcome @dunglas!'], json_decode($response->getContent(), true));
+    }
+
+    public function testCasSuccess()
+    {
+        $casResponse = new MockResponse(<<<BODY
+            <cas:serviceResponse xmlns:cas='http://www.yale.edu/tp/cas'>
+                <cas:authenticationSuccess>
+                    <cas:user>dunglas</cas:user>
+                    <cas:proxyGrantingTicket>PGTIOU-84678-8a9d</cas:proxyGrantingTicket>
+                </cas:authenticationSuccess>
+            </cas:serviceResponse>
+        BODY
+        );
+
+        $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_cas.yml']);
+        $client->getContainer()->set('Symfony\Contracts\HttpClient\HttpClientInterface', new MockHttpClient($casResponse));
+
+        $client->request('GET', '/foo?ticket=PGTIOU-84678-8a9d', [], [], []);
         $response = $client->getResponse();
 
         $this->assertInstanceOf(Response::class, $response);

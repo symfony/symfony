@@ -23,6 +23,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterLdapLocat
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterTokenUsageTrackingPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\ReplaceDecoratedRememberMeHandlerPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\SortFirewallListenersPass;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\CasTokenHandlerFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\OidcTokenHandlerFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\OidcUserInfoTokenHandlerFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\ServiceTokenHandlerFactory;
@@ -78,6 +79,7 @@ class SecurityBundle extends Bundle
             new ServiceTokenHandlerFactory(),
             new OidcUserInfoTokenHandlerFactory(),
             new OidcTokenHandlerFactory(),
+            new CasTokenHandlerFactory(),
         ]));
 
         $extension->addUserProviderFactory(new InMemoryFactory());

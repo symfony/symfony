@@ -28,8 +28,9 @@ class LegacyManagerRegistryTest extends TestCase
 {
     public static function setUpBeforeClass(): void
     {
-        $test = new PhpDumperTest();
-        $test->testDumpContainerWithProxyServiceWillShareProxies();
+        if (!class_exists(\LazyServiceProjectServiceContainer::class, false)) {
+            eval('?>'.PhpDumperTest::dumpLazyServiceProjectServiceContainer());
+        }
     }
 
     public function testResetService()

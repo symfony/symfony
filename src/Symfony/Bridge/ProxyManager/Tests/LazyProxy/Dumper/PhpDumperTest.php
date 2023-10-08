@@ -42,7 +42,7 @@ class PhpDumperTest extends TestCase
     public function testDumpContainerWithProxyServiceWillShareProxies()
     {
         if (!class_exists(\LazyServiceProjectServiceContainer::class, false)) {
-            eval('?>'.$this->dumpLazyServiceProjectServiceContainer());
+            eval('?>'.self::dumpLazyServiceProjectServiceContainer());
         }
 
         $container = new \LazyServiceProjectServiceContainer();
@@ -60,7 +60,7 @@ class PhpDumperTest extends TestCase
         $this->assertSame($proxy, $container->get('foo'));
     }
 
-    private function dumpLazyServiceProjectServiceContainer()
+    public static function dumpLazyServiceProjectServiceContainer(): string
     {
         $container = new ContainerBuilder();
 

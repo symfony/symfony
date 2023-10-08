@@ -201,7 +201,7 @@ class Request
     protected $defaultLocale = 'en';
 
     /**
-     * @var array<string, string[]>
+     * @var array<string, string[]>|null
      */
     protected static $formats;
 

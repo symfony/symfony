@@ -23,7 +23,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * @author Kévin Dunglas <kevin@dunglas.dev>
  */
-#[AsCommand(name: 'importmap:update', description: 'Updates JavaScript packages to their latest versions')]
+#[AsCommand(name: 'importmap:update', description: 'Update JavaScript packages to their latest versions')]
 final class ImportMapUpdateCommand extends Command
 {
     public function __construct(

@@ -39,7 +39,7 @@ use Symfony\Component\Translation\Writer\TranslationWriterInterface;
  *
  * @final
  */
-#[AsCommand(name: 'translation:extract', description: 'Extract missing translations keys from code to translation files.')]
+#[AsCommand(name: 'translation:extract', description: 'Extract missing translations keys from code to translation files')]
 class TranslationUpdateCommand extends Command
 {
     private const ASC = 'asc';

@@ -20,7 +20,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(name: 'importmap:audit', description: 'Checks for security vulnerability advisories in dependencies')]
+#[AsCommand(name: 'importmap:audit', description: 'Check for security vulnerability advisories for dependencies')]
 class ImportMapAuditCommand extends Command
 {
     private const SEVERITY_COLORS = [

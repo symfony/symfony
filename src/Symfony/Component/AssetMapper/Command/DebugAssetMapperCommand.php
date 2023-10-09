@@ -24,7 +24,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
-#[AsCommand(name: 'debug:asset-map', description: 'Outputs all mapped assets.')]
+#[AsCommand(name: 'debug:asset-map', description: 'Output all mapped assets')]
 final class DebugAssetMapperCommand extends Command
 {
     private bool $didShortenPaths = false;

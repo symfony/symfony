@@ -821,9 +821,7 @@ class AbstractObjectNormalizerTest extends TestCase
         ];
 
         $obj = new class() {
-            /**
-             * @SerializedPath("[data][id]")
-             */
+            #[SerializedPath('[data][id]')]
             public $id;
         };
 

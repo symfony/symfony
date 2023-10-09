@@ -24,6 +24,7 @@ final class AutowireLocatorConsumer
             'with_key' => FooTagClass::class,
             'nullable' => '?invalid',
             'subscribed' => new SubscribedService(type: 'string', attributes: new Autowire('%some.parameter%')),
+            'subscribed1' => new Autowire('%some.parameter%'),
         ])]
         public readonly ContainerInterface $locator,
     ) {

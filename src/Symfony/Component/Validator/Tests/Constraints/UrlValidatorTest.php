@@ -309,7 +309,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
             ['ftp://example.com'],
             ['file://127.0.0.1'],
             ['git://[::1]/'],
-            ['file://path'],
+            ['file:///path'],
         ];
     }
 }

@@ -38,9 +38,9 @@ class ProxyCacheWarmer implements CacheWarmerInterface
     }
 
     /**
-     * @return string[] A list of files to preload on PHP 7.4+
+     * @param string|null $buildDir
      */
-    public function warmUp(string $cacheDir): array
+    public function warmUp(string $cacheDir /* , string $buildDir = null */): array
     {
         $files = [];
         foreach ($this->registry->getManagers() as $em) {

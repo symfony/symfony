@@ -44,7 +44,10 @@ class AnnotationsCacheWarmer extends AbstractPhpFileCacheWarmer
         parent::__construct($phpArrayFile);
     }
 
-    protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter): bool
+    /**
+     * @param string|null $buildDir
+     */
+    protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter /* , string $buildDir = null */): bool
     {
         $annotatedClassPatterns = $cacheDir.'/annotations.map';
 

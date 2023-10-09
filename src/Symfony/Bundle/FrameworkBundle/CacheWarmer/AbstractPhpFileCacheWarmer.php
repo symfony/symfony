@@ -35,15 +35,16 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
     }
 
     /**
-     * @return string[] A list of classes to preload on PHP 7.4+
+     * @param string|null $buildDir
      */
-    public function warmUp(string $cacheDir): array
+    public function warmUp(string $cacheDir /* , string $buildDir = null */): array
     {
+        $buildDir = 1 < \func_num_args() ? func_get_arg(1) : null;
         $arrayAdapter = new ArrayAdapter();
 
         spl_autoload_register([ClassExistenceResource::class, 'throwOnRequiredClass']);
         try {
-            if (!$this->doWarmUp($cacheDir, $arrayAdapter)) {
+            if (!$this->doWarmUp($cacheDir, $arrayAdapter, $buildDir)) {
                 return [];
             }
         } finally {
@@ -78,7 +79,9 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
     }
 
     /**
+     * @param string|null $buildDir
+     *
      * @return bool false if there is nothing to warm-up
      */
-    abstract protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter): bool;
+    abstract protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter /* , string $buildDir = null */): bool;
 }

@@ -38,11 +38,17 @@ class ConfigBuilderCacheWarmer implements CacheWarmerInterface
     }
 
     /**
-     * @return string[]
+     * @param string|null $buildDir
      */
-    public function warmUp(string $cacheDir): array
+    public function warmUp(string $cacheDir /* , string $buildDir = null */): array
     {
-        $generator = new ConfigBuilderGenerator($this->kernel->getBuildDir());
+        $buildDir = 1 < \func_num_args() ? func_get_arg(1) : null;
+
+        if (!$buildDir) {
+            return [];
+        }
+
+        $generator = new ConfigBuilderGenerator($buildDir);
 
         foreach ($this->kernel->getBundles() as $bundle) {
             $extension = $bundle->getContainerExtension();

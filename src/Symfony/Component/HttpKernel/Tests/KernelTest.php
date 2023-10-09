@@ -562,6 +562,7 @@ EOF
         $kernel->boot();
 
         $this->assertTrue($kernel->warmedUp);
+        $this->assertSame($kernel->getBuildDir(), $kernel->warmedUpBuildDir);
     }
 
     public function testServicesResetter()
@@ -756,6 +757,8 @@ class CustomProjectDirKernel extends Kernel implements WarmableInterface
 {
     public bool $warmedUp = false;
 
+    public ?string $warmedUpBuildDir = null;
+
     public function __construct(
         private readonly ?\Closure $buildContainer = null,
         private readonly ?HttpKernelInterface $httpKernel = null,
@@ -778,9 +781,10 @@ class CustomProjectDirKernel extends Kernel implements WarmableInterface
         return __DIR__.'/Fixtures';
     }
 
-    public function warmUp(string $cacheDir): array
+    public function warmUp(string $cacheDir, string $buildDir = null): array
     {
         $this->warmedUp = true;
+        $this->warmedUpBuildDir = $buildDir;
 
         return [];
     }

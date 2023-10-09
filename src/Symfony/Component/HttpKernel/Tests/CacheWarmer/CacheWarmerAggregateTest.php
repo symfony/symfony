@@ -93,6 +93,40 @@ class CacheWarmerAggregateTest extends TestCase
         $aggregate->warmUp(__DIR__);
     }
 
+    public function testWarmupPassBuildDir()
+    {
+        $warmer = $this->createMock(CacheWarmerInterface::class);
+        $warmer
+            ->expects($this->once())
+            ->method('isOptional')
+            ->willReturn(false);
+        $warmer
+            ->expects($this->once())
+            ->method('warmUp')
+            ->with('cache_dir', 'build_dir');
+
+        $aggregate = new CacheWarmerAggregate([$warmer]);
+        $aggregate->enableOptionalWarmers();
+        $aggregate->warmUp('cache_dir', 'build_dir');
+    }
+
+    public function testWarmupOnOptionalWarmerDoNotPassBuildDir()
+    {
+        $warmer = $this->createMock(CacheWarmerInterface::class);
+        $warmer
+            ->expects($this->once())
+            ->method('isOptional')
+            ->willReturn(true);
+        $warmer
+            ->expects($this->once())
+            ->method('warmUp')
+            ->with('cache_dir', null);
+
+        $aggregate = new CacheWarmerAggregate([$warmer]);
+        $aggregate->enableOptionalWarmers();
+        $aggregate->warmUp('cache_dir', 'build_dir');
+    }
+
     public function testWarmupWhenDebugDisplaysWarmupDuration()
     {
         $warmer = $this->createMock(CacheWarmerInterface::class);
@@ -115,7 +149,7 @@ class CacheWarmerAggregateTest extends TestCase
             ->method('warmUp');
 
         $aggregate = new CacheWarmerAggregate([$warmer]);
-        $aggregate->warmUp(__DIR__, $io);
+        $aggregate->warmUp(__DIR__, null, $io);
     }
 
     public function testWarmupWhenNotDebugDoesntDisplayWarmupDuration()
@@ -140,6 +174,6 @@ class CacheWarmerAggregateTest extends TestCase
             ->method('warmUp');
 
         $aggregate = new CacheWarmerAggregate([$warmer]);
-        $aggregate->warmUp(__DIR__, $io);
+        $aggregate->warmUp(__DIR__, null, $io);
     }
 }

@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\CacheWarmer\ConfigBuilderCacheWarmer;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Kernel;
@@ -39,7 +40,7 @@ class ConfigBuilderCacheWarmerTest extends TestCase
 
     public function testBuildDirIsUsedAsConfigBuilderOutputDir()
     {
-        $kernel = new class($this->varDir) extends Kernel {
+        $kernel = new class($this->varDir) extends Kernel implements CompilerPassInterface {
             private $varDir;
 
             public function __construct(string $varDir)
@@ -75,11 +76,24 @@ class ConfigBuilderCacheWarmerTest extends TestCase
                     ]);
                 });
             }
+
+            public function process(ContainerBuilder $container): void
+            {
+                $container->removeDefinition('config_builder.warmer');
+            }
         };
         $kernel->boot();
 
+        self::assertDirectoryDoesNotExist($kernel->getBuildDir().'/Symfony');
+        self::assertDirectoryDoesNotExist($kernel->getCacheDir().'/Symfony');
+
         $warmer = new ConfigBuilderCacheWarmer($kernel);
         $warmer->warmUp($kernel->getCacheDir());
+
+        self::assertDirectoryDoesNotExist($kernel->getBuildDir().'/Symfony');
+        self::assertDirectoryDoesNotExist($kernel->getCacheDir().'/Symfony');
+
+        $warmer->warmUp($kernel->getCacheDir(), $kernel->getBuildDir());
 
         self::assertDirectoryExists($kernel->getBuildDir().'/Symfony');
         self::assertDirectoryDoesNotExist($kernel->getCacheDir().'/Symfony');

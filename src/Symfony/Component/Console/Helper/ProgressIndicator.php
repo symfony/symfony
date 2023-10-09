@@ -228,7 +228,7 @@ class ProgressIndicator
         return [
             'indicator' => fn (self $indicator) => $indicator->indicatorValues[$indicator->indicatorCurrent % \count($indicator->indicatorValues)],
             'message' => fn (self $indicator) => $indicator->message,
-            'elapsed' => fn (self $indicator) => Helper::formatTime(time() - $indicator->startTime),
+            'elapsed' => fn (self $indicator) => Helper::formatTime(time() - $indicator->startTime, 2),
             'memory' => fn () => Helper::formatMemory(memory_get_usage(true)),
         ];
     }

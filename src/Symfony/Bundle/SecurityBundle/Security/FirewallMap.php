@@ -57,7 +57,7 @@ class FirewallMap implements FirewallMapInterface
 
     public function getNamedFirewallConfig(string $name): ?FirewallConfig
     {
-        return $this->container->get($name);
+        return $this->container->get($name)->getConfig();
     }
 
     private function getFirewallContext(Request $request): ?FirewallContext

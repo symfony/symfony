@@ -71,8 +71,7 @@ class UrlValidator extends ConstraintValidator
             $value = ($constraint->normalizer)($value);
         }
 
-
-        if (in_array('file', $constraint->protocols, true) &&
+        if (\in_array('file', $constraint->protocols, true) &&
             preg_match('~^file://(?:/ (?:[\pL\pN\-._\~!$&\'()*+,;=:@]|%%[0-9A-Fa-f]{2})* )*$~ixu', $value)) {
             return;
         }

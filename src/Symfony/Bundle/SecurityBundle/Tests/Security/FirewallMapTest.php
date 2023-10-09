@@ -16,6 +16,7 @@ use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\Security\Http\Firewall\ExceptionListener;
@@ -89,6 +90,20 @@ class FirewallMapTest extends TestCase
         $this->assertEquals($firewallConfig, $firewallMap->getFirewallConfig($request));
         $this->assertEquals('security.firewall.map.context.foo', $request->attributes->get(self::ATTRIBUTE_FIREWALL_CONTEXT));
         $this->assertEquals($expectedState, $request->attributes->get('_stateless'));
+    }
+
+    public function testGetNamedFirewallConfig()
+    {
+        $firewallContext = new FirewallContext([], null, null, $firewallConfig = new FirewallConfig('main', 'user_checker'));
+        $container = new Container();
+        $container->set('foo', $firewallContext);
+        $firewallMap = new FirewallMap($container, []);
+
+        $this->assertSame($firewallConfig, $firewallMap->getNamedFirewallConfig('foo'));
+
+        $this->expectException(ServiceNotFoundException::class);
+
+        $firewallMap->getNamedFirewallConfig('bar');
     }
 
     public static function providesStatefulStatelessRequests(): \Generator

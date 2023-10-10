@@ -27,12 +27,10 @@ final class MessageCount extends Constraint
         return sprintf('%s has sent "%d" messages', $this->bus ? $this->bus.' ' : '', $this->expectedValue);
     }
 
-
     protected function matches($other): bool
     {
         return $this->expectedValue === \count($other);
     }
-
 
     protected function failureDescription($other): string
     {

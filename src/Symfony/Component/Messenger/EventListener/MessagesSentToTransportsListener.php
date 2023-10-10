@@ -49,27 +49,29 @@ class MessagesSentToTransportsListener implements EventSubscriberInterface, Rese
         ];
     }
 
-    public function getSentMessages(): array
+    public function getSentMessagesByFQCN(array $messages, ?string $className): array
     {
-        return $this->sentMessages;
-    }
-
-    public function getSentMessagesByBus(?string $busName): array
-    {
-        if (null === $busName) {
-            return $this->getSentMessages();
-        }
-
-        return array_filter($this->sentMessages, fn ($message) => $message['busName'] === $busName);
-    }
-
-    public function getSentMessagesByClassName(?string $className): array
-    {
-        if (null === $className) {
-            return $this->getSentMessages();
-        }
-
         return array_filter($this->sentMessages, fn ($message) => $message['message']::class === $className);
+    }
+
+    public function getSentMessages(?string $busName, ?string $messageFQCN): array
+    {
+        if (null === $busName && null === $messageFQCN) {
+            return $this->sentMessages;
+        }
+
+        if (null === $busName) {
+            return array_filter($this->sentMessages, fn ($message) => $message['message']::class === $messageFQCN);
+        }
+
+        if (null === $messageFQCN) {
+            return array_filter($this->sentMessages, fn ($message) => $message['busName'] === $busName);
+        }
+
+        return array_filter(
+            array_filter($this->sentMessages, fn ($message) => $message['message']::class === $messageFQCN),
+            fn ($message) => $message['busName'] === $busName
+        );
     }
 
     public function reset(): void

@@ -26,20 +26,20 @@ final class MessengerTest extends AbstractWebTestCase
         $client = $this->createClient(['test_case' => 'Messenger', 'root_config' => 'config.yml', 'debug' => true]);
         $response = $client->request('GET', '/send_messenger_message');
 
-        $this->assertMessagesByBusCount(6);
-        $this->assertMessagesByBusCount(2, 'event.bus');
-        $this->assertMessagesByBusCount(4, 'query.bus');
+        self::assertMessagesCount(6);
+        self::assertMessagesCount(2, busName: 'event.bus');
+        self::assertMessagesCount(4, busName: 'query.bus');
 
-        $this->assertMessagesOfClassCount(2, DummyCommand::class);
-        $this->assertMessagesOfClassCount(3, DummyQuery::class);
-        $this->assertMessagesOfClassCount(1, DummyMessage::class);
+        self::assertMessagesCount(2, messageFQCN: DummyCommand::class);
+        self::assertMessagesCount(3, messageFQCN: DummyQuery::class);
+        self::assertMessagesCount(1, messageFQCN: DummyMessage::class);
 
         /** @var DummyMessage[] $dummyMessages */
-        $dummyMessages = $this::getDispatchedMessagesByClassName(DummyMessage::class);
+        $dummyMessages = self::getDispatchedMessages(messageFQCN: DummyMessage::class);
         self::assertCount(1, $dummyMessages);
         self::assertStringContainsString('dummy message text', $dummyMessages[0]->getMessage());
 
-        $messagesFromQueryBus = $this::getDispatchedMessagesByBusName('query.bus');
+        $messagesFromQueryBus = self::getDispatchedMessages(busName: 'query.bus');
         self::assertCount(4, $messagesFromQueryBus);
 
         self::assertInstanceOf(DummyMessage::class, $messagesFromQueryBus[0]);

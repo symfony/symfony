@@ -236,5 +236,6 @@ return static function (ContainerConfigurator $container) {
 
         ->set('messenger.sent_messages_to_transport_listener', MessagesSentToTransportsListener::class)
             ->tag('kernel.event_subscriber')
+            ->tag('kernel.reset', ['method'=>'reset'])
     ;
 };

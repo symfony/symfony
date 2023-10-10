@@ -21,47 +21,25 @@ use Symfony\Component\Messenger\Test\Constraint as MessengerConstraint;
 trait MessengerAssertionsTrait
 {
     /**
-     * @param int         $count   the expected number of messages
-     * @param string|null $busName The busName to consider. If null all the collected messages will be counted.
+     * @param int         $count       The expected number of messages
+     * @param string|null $busName     The busName to consider
+     * @param string|null $messageFQCN The message object class name to consider
      */
-    public static function assertMessagesByBusCount(int $count, string $busName = null, string $message = ''): void
+    public static function assertMessagesCount(int $count, string $busName = null, string $messageFQCN = null, string $message = ''): void
     {
-        self::assertThat(self::getDispatchedMessagesByBusName($busName), new MessengerConstraint\MessageCount($count, $busName), $message);
+        self::assertThat(self::getDispatchedMessages($busName, $messageFQCN), new MessengerConstraint\MessageCount($count, $busName), $message);
     }
 
-    /**
-     * @param int    $count     the expected number of messages of the given class
-     * @param string $className the message object class name
-     */
-    public static function assertMessagesOfClassCount(int $count, string $className, string $message = ''): void
-    {
-        self::assertThat(self::getDispatchedMessagesByClassName($className), new MessengerConstraint\MessageCount($count, $className), $message);
-    }
-
-    public static function getDispatchedMessagesByBusName(?string $busName, bool $ordered = false): array
+    public static function getDispatchedMessages(string $busName = null, string $messageFQCN = null): array
     {
         $container = static::getContainer();
         if ($container->has('messenger.sent_messages_to_transport_listener')) {
             /** @var MessagesSentToTransportsListener $listener */
             $listener = $container->get('messenger.sent_messages_to_transport_listener');
 
-            return array_column($listener->getSentMessagesByBus($busName), 'message');
+            return array_column($listener->getSentMessages($busName, $messageFQCN), 'message');
         }
         static::fail('A client must have Messenger enabled to make messages assertions .
          Did you forget to require symfony/messenger ?');
-    }
-
-    public static function getDispatchedMessagesByClassName(string $className): array
-    {
-        $container = static::getContainer();
-
-        if ($container->has('messenger.sent_messages_to_transport_listener')) {
-            /** @var MessagesSentToTransportsListener $listener */
-            $listener = $container->get('messenger.sent_messages_to_transport_listener');
-
-            return array_column($listener->getSentMessagesByClassName($className), 'message');
-        }
-        static::fail('A client must have Messenger enabled to make messages assertions.
-        Did you forget to require symfony/messenger ? ');
     }
 }

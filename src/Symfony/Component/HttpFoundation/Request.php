@@ -152,9 +152,9 @@ class Request
     protected string $defaultLocale = 'en';
 
     /**
-     * @var array<string, string[]>
+     * @var array<string, string[]>|null
      */
-    protected static array $formats;
+    protected static ?array $formats = null;
 
     protected static ?\Closure $requestFactory = null;
 
@@ -1499,7 +1499,11 @@ class Request
      */
     public function getPreferredFormat(?string $default = 'html'): ?string
     {
-        if ($this->preferredFormat ??= $this->getRequestFormat(null)) {
+        if (!isset($this->preferredFormat) && null !== $preferredFormat = $this->getRequestFormat(null)) {
+            $this->preferredFormat = $preferredFormat;
+        }
+
+        if ($this->preferredFormat ?? null) {
             return $this->preferredFormat;
         }
 

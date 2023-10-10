@@ -1,0 +1,27 @@
+imports:
+    - { resource: ../config/default.yml }
+    - { resource: services.yml }
+
+framework:
+
+    messenger:
+        default_bus: event.bus
+
+        buses:
+            event.bus:
+                default_middleware:
+                    allow_no_handlers: true
+
+            query.bus:
+                default_middleware:
+                    allow_no_handlers: true
+
+        transports:
+            sync: 'sync://'
+
+        routing:
+            'Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyQuery': 'sync'
+            'Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyCommand': 'sync'
+            'Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage': 'sync'
+
+

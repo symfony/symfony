@@ -4,6 +4,7 @@ CHANGELOG
 6.4
 ---
 
+ * Add `MessengerAssertionsTrait`
  * Add `HttpClientAssertionsTrait`
  * Add `AbstractController::renderBlock()` and `renderBlockView()`
  * Add native return type to `Translator` and to `Application::reset()`

@@ -18,6 +18,7 @@ use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportF
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
 use Symfony\Component\Messenger\EventListener\AddErrorDetailsStampListener;
 use Symfony\Component\Messenger\EventListener\DispatchPcntlSignalListener;
+use Symfony\Component\Messenger\EventListener\MessagesSentToTransportsListener;
 use Symfony\Component\Messenger\EventListener\ResetServicesListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTransportListener;
@@ -232,5 +233,8 @@ return static function (ContainerConfigurator $container) {
                 service('messenger.default_bus'),
             ])
             ->tag('messenger.message_handler')
+
+        ->set('messenger.sent_messages_to_transport_listener', MessagesSentToTransportsListener::class)
+            ->tag('kernel.event_subscriber')
     ;
 };

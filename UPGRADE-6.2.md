@@ -132,10 +132,6 @@ VarDumper
 Workflow
 --------
 
- * The `Registry` is marked as internal and should not be used directly. use a tagged locator instead
-    ```
-    tagged_locator('workflow', 'name')
-    ```
  * The first argument of `WorkflowDumpCommand` should be a `ServiceLocator` of
    all workflows indexed by names
  * Deprecate calling `Definition::setInitialPlaces()` without arguments

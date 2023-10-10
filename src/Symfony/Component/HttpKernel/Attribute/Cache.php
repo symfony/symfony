@@ -13,6 +13,10 @@ namespace Symfony\Component\HttpKernel\Attribute;
 
 /**
  * Describes the default HTTP cache headers on controllers.
+ * Headers defined in the Cache attribute are ignored if they are already set
+ * by the controller.
+ *
+ * @see https://symfony.com/doc/current/http_cache.html#making-your-responses-http-cacheable
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -38,27 +42,46 @@ final class Cache
         public int|string|null $smaxage = null,
 
         /**
-         * Whether the response is public or not.
+         * If true, the contents will be stored in a public cache and served to all
+         * the next requests.
          */
         public ?bool $public = null,
 
         /**
-         * Whether or not the response must be revalidated.
+         * If true, the response is not served stale by a cache in any circumstance
+         * without first revalidating with the origin.
          */
         public bool $mustRevalidate = false,
 
         /**
-         * Additional "Vary:"-headers.
+         * Set "Vary" header.
+         *
+         * Example:
+         * ['Accept-Encoding', 'User-Agent']
+         *
+         * @see https://symfony.com/doc/current/http_cache/cache_vary.html
+         *
+         * @var string[]
          */
         public array $vary = [],
 
         /**
          * An expression to compute the Last-Modified HTTP header.
+         *
+         * The expression is evaluated by the ExpressionLanguage component, it
+         * receives all the request attributes and the resolved controller arguments.
+         *
+         * The result of the expression must be a DateTimeInterface.
          */
         public ?string $lastModified = null,
 
         /**
          * An expression to compute the ETag HTTP header.
+         *
+         * The expression is evaluated by the ExpressionLanguage component, it
+         * receives all the request attributes and the resolved controller arguments.
+         *
+         * The result must be a string that will be hashed.
          */
         public ?string $etag = null,
 

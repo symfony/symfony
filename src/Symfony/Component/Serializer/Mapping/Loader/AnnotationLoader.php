@@ -47,7 +47,7 @@ class AnnotationLoader implements LoaderInterface
         private readonly ?Reader $reader = null,
     ) {
         if ($reader) {
-            trigger_deprecation('symfony/validator', '6.4', 'Passing a "%s" instance as argument 1 to "%s()" is deprecated, pass null or omit the parameter instead.', get_debug_type($reader), __METHOD__);
+            trigger_deprecation('symfony/serializer', '6.4', 'Passing a "%s" instance as argument 1 to "%s()" is deprecated, pass null or omit the parameter instead.', get_debug_type($reader), __METHOD__);
         }
     }
 

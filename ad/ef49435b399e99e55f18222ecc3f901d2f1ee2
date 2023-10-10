@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-12-23T14:47:15Z
+
+Hey!
+
+I think @alexandre-daubois has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-08-14T19:59:35Z
+
+@wouterj Can you have a look at this PR?
+
+---------------------------------------------------------------------------
+
+by TCM-dev at 2023-10-06T16:08:39Z
+
+Are there any news about this MR being merged ? I just discovered this problem myself and tested the fix proposed, it works flawlessly on my end.
+
+When the consumption rate is low enough, I never get throttled, and when it's too high, once everyt okens are consumed, it waits to get new tokens like it's supposed to.

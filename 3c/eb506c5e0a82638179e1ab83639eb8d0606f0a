@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2023-10-08T12:17:08Z
+
+I think we can simplify this to just replace the existing `elapsed` parameter with the new format. We do not promise backwards compatible CLI output, and I would argue that interactive elements like the progress bar should never be interpreted by any program anyways.
+
+---------------------------------------------------------------------------
+
+by maxbeckers at 2023-10-09T09:05:06Z
+
+Thanks @wouterj and @OskarStark for your input. I now changed it.

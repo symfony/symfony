@@ -17,13 +17,6 @@ use Symfony\Component\Cache\Traits\RedisTrait;
 
 class RedisTraitTest extends TestCase
 {
-    public static function setUpBeforeClass(): void
-    {
-        if (!getenv('REDIS_CLUSTER_HOSTS')) {
-            throw new SkippedTestSuiteError('REDIS_CLUSTER_HOSTS env var is not defined.');
-        }
-    }
-
     /**
      * @dataProvider provideCreateConnection
      */
@@ -64,5 +57,32 @@ class RedisTraitTest extends TestCase
                 'RedisArray',
             ],
         ];
+    }
+
+    public function testClearUsesValidType()
+    {
+        if (!class_exists(\Redis::class)) {
+            throw new SkippedTestSuiteError(sprintf('The "%s" class is required.', \Redis::class));
+        }
+        $redisMock = $this->getMockBuilder(\Redis::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $redisMock->method('info')->willReturn(['redis_version' => '3.0.0']);
+        $redisMock->expects(self::once())
+            ->method('scan')
+            ->with(null, 'some-namespace*', 1000, 'string')
+            ->willReturn([0, []]);
+        $mock = new class($redisMock) {
+            use RedisTrait {
+                doClear as public;
+            }
+
+            public function __construct($redis)
+            {
+                $this->redis = $redis;
+            }
+        };
+
+        $mock->doClear('some-namespace');
     }
 }

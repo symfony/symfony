@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2023-10-09T07:55:27Z
+
+the right solution is actually to add a `null` default value there (otherwise, we break BC for child classes)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-10-09T08:01:55Z
+
+changed it to initialise the properties with `null` instead

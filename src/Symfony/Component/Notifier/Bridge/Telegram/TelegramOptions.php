@@ -115,6 +115,16 @@ final class TelegramOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
+    public function uploadPhoto(string $path): static
+    {
+        $this->options['upload']['photo'] = $path;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
     public function replyTo(int $messageId): static
     {
         $this->options['reply_to_message_id'] = $messageId;
@@ -152,6 +162,154 @@ final class TelegramOptions implements MessageOptionsInterface
 
         if ($cacheTime > 0) {
             $this->options['cache_time'] = $cacheTime;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function location(float $latitude, float $longitude): static
+    {
+        $this->options['location'] = ['latitude' => $latitude, 'longitude' => $longitude];
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function venue(float $latitude, float $longitude, string $title, string $address): static
+    {
+        $this->options['venue'] = [
+            'latitude' => $latitude,
+            'longitude' => $longitude,
+            'title' => $title,
+            'address' => $address,
+        ];
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function document(string $url): static
+    {
+        $this->options['document'] = $url;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function uploadDocument(string $path): static
+    {
+        $this->options['upload']['document'] = $path;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function video(string $url): static
+    {
+        $this->options['video'] = $url;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function uploadVideo(string $path): static
+    {
+        $this->options['upload']['video'] = $path;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function audio(string $url): static
+    {
+        $this->options['audio'] = $url;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function uploadAudio(string $path): static
+    {
+        $this->options['upload']['audio'] = $path;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function animation(string $url): static
+    {
+        $this->options['animation'] = $url;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function uploadAnimation(string $path): static
+    {
+        $this->options['upload']['animation'] = $path;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function sticker(string $url, string $emoji = null): static
+    {
+        $this->options['sticker'] = $url;
+        $this->options['emoji'] = $emoji;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function uploadSticker(string $path, string $emoji = null): static
+    {
+        $this->options['upload']['sticker'] = $path;
+        $this->options['emoji'] = $emoji;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function contact(string $phoneNumber, string $firstName, string $lastName = null, string $vCard = null): static
+    {
+        $this->options['contact'] = [
+            'phone_number' => $phoneNumber,
+            'first_name' => $firstName,
+        ];
+
+        if (null !== $lastName) {
+            $this->options['contact']['last_name'] = $lastName;
+        }
+
+        if (null !== $vCard) {
+            $this->options['contact']['vcard'] = $vCard;
         }
 
         return $this;

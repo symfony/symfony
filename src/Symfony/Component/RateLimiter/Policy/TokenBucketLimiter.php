@@ -70,7 +70,6 @@ final class TokenBucketLimiter implements LimiterInterface
             if ($availableTokens >= $tokens) {
                 // tokens are now available, update bucket
                 $bucket->setTokens($availableTokens - $tokens);
-                $bucket->setTimer($now);
 
                 $reservation = new Reservation($now, new RateLimit($bucket->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U', floor($now)), true, $this->maxBurst));
             } else {
@@ -87,7 +86,6 @@ final class TokenBucketLimiter implements LimiterInterface
                 // at $now + $waitDuration all tokens will be reserved for this process,
                 // so no tokens are left for other processes.
                 $bucket->setTokens($availableTokens - $tokens);
-                $bucket->setTimer($now);
 
                 $reservation = new Reservation($now + $waitDuration, new RateLimit(0, \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), false, $this->maxBurst));
             }

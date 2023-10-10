@@ -99,6 +99,18 @@ final class Rate
         return $cycles * $this->refillAmount;
     }
 
+    /**
+     * Calculates total amount in seconds of refill intervals during $duration (for maintain strict refill frequency).
+     *
+     * @param float $duration interval in seconds
+     */
+    public function calculateRefillInterval(float $duration): int
+    {
+        $cycleTime = TimeUtil::dateIntervalToSeconds($this->refillTime);
+
+        return floor($duration / $cycleTime) * $cycleTime;
+    }
+
     public function __toString(): string
     {
         return $this->refillTime->format('P%yY%mM%dDT%HH%iM%sS').'-'.$this->refillAmount;

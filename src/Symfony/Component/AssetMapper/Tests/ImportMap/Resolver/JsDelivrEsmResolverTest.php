@@ -293,7 +293,7 @@ class JsDelivrEsmResolverTest extends TestCase
     public static function provideDownloadPackagesTests()
     {
         yield 'single package' => [
-            ['lodash' => new ImportMapEntry('lodash', version: '1.2.3')],
+            ['lodash' => new ImportMapEntry('lodash', version: '1.2.3', packageName: 'lodash')],
             [
                 [
                     'url' => '/lodash@1.2.3/+esm',
@@ -306,7 +306,7 @@ class JsDelivrEsmResolverTest extends TestCase
         ];
 
         yield 'package with path' => [
-            ['lodash' => new ImportMapEntry('chart.js/auto', version: '4.5.6')],
+            ['lodash' => new ImportMapEntry('chart.js/auto', version: '4.5.6', packageName: 'chart.js', filePath: '/auto')],
             [
                 [
                     'url' => '/chart.js@4.5.6/auto/+esm',
@@ -319,7 +319,7 @@ class JsDelivrEsmResolverTest extends TestCase
         ];
 
         yield 'css file' => [
-            ['lodash' => new ImportMapEntry('bootstrap/dist/bootstrap.css', version: '5.0.6', type: ImportMapType::CSS)],
+            ['lodash' => new ImportMapEntry('bootstrap/dist/bootstrap.css', version: '5.0.6', type: ImportMapType::CSS, packageName: 'bootstrap', filePath: '/dist/bootstrap.css')],
             [
                 [
                     'url' => '/bootstrap@5.0.6/dist/bootstrap.css',
@@ -333,9 +333,9 @@ class JsDelivrEsmResolverTest extends TestCase
 
         yield 'multiple files' => [
             [
-                'lodash' => new ImportMapEntry('lodash', version: '1.2.3'),
-                'chart.js/auto' => new ImportMapEntry('chart.js/auto', version: '4.5.6'),
-                'bootstrap/dist/bootstrap.css' => new ImportMapEntry('bootstrap/dist/bootstrap.css', version: '5.0.6', type: ImportMapType::CSS),
+                'lodash' => new ImportMapEntry('lodash', version: '1.2.3', packageName: 'lodash'),
+                'chart.js/auto' => new ImportMapEntry('chart.js/auto', version: '4.5.6', packageName: 'chart.js', filePath: '/auto'),
+                'bootstrap/dist/bootstrap.css' => new ImportMapEntry('bootstrap/dist/bootstrap.css', version: '5.0.6', type: ImportMapType::CSS, packageName: 'bootstrap', filePath: '/dist/bootstrap.css'),
             ],
             [
                 [
@@ -360,7 +360,7 @@ class JsDelivrEsmResolverTest extends TestCase
 
         yield 'make imports relative' => [
             [
-                '@chart.js/auto' => new ImportMapEntry('chart.js/auto', version: '1.2.3'),
+                '@chart.js/auto' => new ImportMapEntry('chart.js/auto', version: '1.2.3', packageName: 'chart.js', filePath: '/auto'),
             ],
             [
                 [
@@ -375,7 +375,7 @@ class JsDelivrEsmResolverTest extends TestCase
 
         yield 'js importmap is removed' => [
             [
-                '@chart.js/auto' => new ImportMapEntry('chart.js/auto', version: '1.2.3'),
+                '@chart.js/auto' => new ImportMapEntry('chart.js/auto', version: '1.2.3', packageName: 'chart.js', filePath: '/auto'),
             ],
             [
                 [
@@ -390,7 +390,7 @@ class JsDelivrEsmResolverTest extends TestCase
         ];
 
         yield 'css file removes importmap' => [
-            ['lodash' => new ImportMapEntry('bootstrap/dist/bootstrap.css', version: '5.0.6', type: ImportMapType::CSS)],
+            ['lodash' => new ImportMapEntry('bootstrap/dist/bootstrap.css', version: '5.0.6', type: ImportMapType::CSS, packageName: 'bootstrap', filePath: '/dist/bootstrap.css')],
             [
                 [
                     'url' => '/bootstrap@5.0.6/dist/bootstrap.css',

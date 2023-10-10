@@ -15,6 +15,7 @@ CHANGELOG
  * Add a `importmap:install` command to download all missing downloaded packages
  * Allow specifying packages to update for the `importmap:update` command
  * Add a `importmap:audit` command to check for security vulnerability advisories in dependencies
+ * Add a `importmap:outdated` command to check for outdated packages
 
 6.3
 ---

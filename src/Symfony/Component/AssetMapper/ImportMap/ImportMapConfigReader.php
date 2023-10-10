@@ -68,12 +68,16 @@ class ImportMapConfigReader
                 throw new RuntimeException(sprintf('The importmap entry "%s" cannot have both a "path" and "version" option.', $importName));
             }
 
+            [$packageName, $filePath] = self::splitPackageNameAndFilePath($importName);
+
             $entries->add(new ImportMapEntry(
                 $importName,
                 path: $path,
                 version: $version,
                 type: $type,
                 isEntrypoint: $isEntry,
+                packageName: $packageName,
+                filePath: $filePath,
             ));
         }
 
@@ -143,5 +147,19 @@ class ImportMapConfigReader
         }
 
         return substr($url, $lastAt + 1, $nextSlash - $lastAt - 1);
+    }
+
+    public static function splitPackageNameAndFilePath(string $packageName): array
+    {
+        $filePath = '';
+        $i = strpos($packageName, '/');
+
+        if ($i && (!str_starts_with($packageName, '@') || $i = strpos($packageName, '/', $i + 1))) {
+            // @vendor/package/filepath or package/filepath
+            $filePath = substr($packageName, $i);
+            $packageName = substr($packageName, 0, $i);
+        }
+
+        return [$packageName, $filePath];
     }
 }

@@ -1,0 +1,62 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-10-08T01:49:25Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-10-08T01:49:28Z
+
+It looks like you unchecked the "Allow edits from maintainer" box. That is fine, but please note that if you have multiple commits, you'll need to squash your commits into one before this can be merged. Or, you can check the "Allow edits from maintainers" box and the maintainer can squash for you.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-10-08T10:17:11Z
+
+Unlike magic methods, isn't this a situation you can deal with on your side?
+
+---------------------------------------------------------------------------
+
+by crynobone at 2023-10-08T10:22:14Z
+
+![CleanShot 2023-10-08 at 09 50 15](https://github.com/symfony/symfony/assets/172966/84d103aa-c396-4974-bcd7-11ebd7ae0e43)
+
+The error on Symfony 7 is the same with as before, and also causing Symfony own tests to failed on 7.0 branch:
+
+![CleanShot 2023-10-08 at 18 21 09](https://github.com/symfony/symfony/assets/172966/0f39a877-a8e6-4262-b850-4749fafdbbfd)
+
+~~https://github.com/symfony/symfony/actions/runs/6442148533/job/17492677886~~
+
+https://github.com/symfony/symfony/actions/runs/6442148533/job/17492678134
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-10-09T08:02:42Z
+
+see also #51904

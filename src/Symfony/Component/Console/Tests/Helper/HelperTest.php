@@ -20,26 +20,31 @@ class HelperTest extends TestCase
     public static function formatTimeProvider()
     {
         return [
-            [0,      '< 1 sec'],
-            [1,      '1 sec'],
-            [2,      '2 secs'],
-            [59,     '59 secs'],
-            [60,     '1 min'],
-            [61,     '1 min'],
-            [119,    '1 min'],
-            [120,    '2 mins'],
-            [121,    '2 mins'],
-            [3599,   '59 mins'],
-            [3600,   '1 hr'],
-            [7199,   '1 hr'],
-            [7200,   '2 hrs'],
-            [7201,   '2 hrs'],
-            [86399,  '23 hrs'],
-            [86400,  '1 day'],
-            [86401,  '1 day'],
-            [172799, '1 day'],
-            [172800, '2 days'],
-            [172801, '2 days'],
+            [0,      '< 1 sec', 1],
+            [0.95,   '< 1 sec', 1],
+            [1,      '1 sec', 1],
+            [2,      '2 secs', 2],
+            [59,     '59 secs', 1],
+            [59.21,  '59 secs', 1],
+            [60,     '1 min', 2],
+            [61,     '1 min, 1 sec', 2],
+            [119,    '1 min, 59 secs', 2],
+            [120,    '2 mins', 2],
+            [121,    '2 mins, 1 sec', 2],
+            [3599,   '59 mins, 59 secs', 2],
+            [3600,   '1 hr', 2],
+            [7199,   '1 hr, 59 mins', 2],
+            [7200,   '2 hrs', 2],
+            [7201,   '2 hrs', 2],
+            [86399,  '23 hrs, 59 mins', 2],
+            [86399,  '23 hrs, 59 mins, 59 secs', 3],
+            [86400,  '1 day', 2],
+            [86401,  '1 day', 2],
+            [172799, '1 day, 23 hrs', 2],
+            [172799, '1 day, 23 hrs, 59 mins, 59 secs', 4],
+            [172800, '2 days', 2],
+            [172801, '2 days', 2],
+            [172801, '2 days, 1 sec', 4],
         ];
     }
 
@@ -55,13 +60,10 @@ class HelperTest extends TestCase
 
     /**
      * @dataProvider formatTimeProvider
-     *
-     * @param int    $secs
-     * @param string $expectedFormat
      */
-    public function testFormatTime($secs, $expectedFormat)
+    public function testFormatTime(int|float $secs, string $expectedFormat, int $precision)
     {
-        $this->assertEquals($expectedFormat, Helper::formatTime($secs));
+        $this->assertEquals($expectedFormat, Helper::formatTime($secs, $precision));
     }
 
     /**

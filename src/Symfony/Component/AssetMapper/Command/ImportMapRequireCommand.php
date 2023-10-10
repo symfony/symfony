@@ -25,7 +25,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * @author Kévin Dunglas <kevin@dunglas.dev>
  */
-#[AsCommand(name: 'importmap:require', description: 'Requires JavaScript packages')]
+#[AsCommand(name: 'importmap:require', description: 'Require JavaScript packages')]
 final class ImportMapRequireCommand extends Command
 {
     public function __construct(

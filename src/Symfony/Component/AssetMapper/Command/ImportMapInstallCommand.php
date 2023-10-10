@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  *
  * @author Jonathan Scheiber <contact@jmsche.fr>
  */
-#[AsCommand(name: 'importmap:install', description: 'Downloads all assets that should be downloaded')]
+#[AsCommand(name: 'importmap:install', description: 'Download all assets that should be downloaded')]
 final class ImportMapInstallCommand extends Command
 {
     public function __construct(

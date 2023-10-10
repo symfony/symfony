@@ -1,0 +1,127 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-09-27T14:27:38Z
+
+Do you know if there is an option to send documents?
+
+---------------------------------------------------------------------------
+
+by igrizzli at 2023-09-27T14:52:04Z
+
+> Do you know if there is an option to send documents?
+
+Yes, i can add this feature on this weekend
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-09-27T14:55:20Z
+
+Oh that would be great 😍
+
+---------------------------------------------------------------------------
+
+by igrizzli at 2023-09-28T17:29:08Z
+
+@OskarStark sending photo, location and document are exclusive options, it's can be combined in single message between themselves. Should we validate it, to avoid implicit behavior? If we should - Which level is better to use for validation TelegramOptions or TelegramTransport?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-09-28T18:04:41Z
+
+I really like to validate such things, but we can't validate all the things plus we tightly couple the transport to the API, in this case, if things get changed we need to release new code, that's not ideal.
+
+So let's not validate it, document it properly with a note/warning and let the API throw the error message if someone wants to send all of them together.
+
+---------------------------------------------------------------------------
+
+by igrizzli at 2023-09-28T21:28:35Z
+
+@OskarStark I have added document and all other telegram send types, can you look implementation? And if it ok i will finish it with tests and docs.
+
+Also i have question about tests, since we are mocking real telegram api in tests, would it be ok to use single sample file for all types in tests, to avoid adding large binary to repo?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-09-29T05:49:07Z
+
+> Also i have question about tests, since we are mocking real telegram api in tests, would it be ok to use single sample file for all types in tests, to avoid adding large binary to repo?
+
+Yes
+
+Can you please update PR title, header, CHANGELOG etc. and mention also the `document`? Thanks
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-09-29T05:53:57Z
+
+I saw you added a lot more, like audio, venue etc. very nice.
+
+Please keep the CHANGELOG short and add a list of newly added capabilities. I will update the PR title
+
+---------------------------------------------------------------------------
+
+by igrizzli at 2023-09-29T08:41:45Z
+
+PR in work now, i have not added docs and tests yet, i have some doubt about implementation, after we will fix or approve them i will finish with docs and tests
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-09-29T09:03:50Z
+
+Let's wait for @stof or @fabpot to have a look 👍
+
+---------------------------------------------------------------------------
+
+by stof at 2023-09-29T09:14:04Z
+
+The fact that many of those methods are incompatible with each other as they trigger the usage of different endpoints (with an order that is not even related to which one was configured first or last, but an ordered list of which ones wins based on the order of cases in your matching) looks like a confusing API. But this was already the case before.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-09-29T09:23:42Z
+
+> But this was already the case before.
+
+Exactly, shall we throw exceptions if one of those apis/endpoints was already used within the TelegramOptions class? I voted against and let the API bubble up the error
+
+---------------------------------------------------------------------------
+
+by igrizzli at 2023-09-29T09:54:25Z
+
+> > But this was already the case before.
+>
+> Exactly, shall we throw exceptions if one of those apis/endpoints was already used within the TelegramOptions class? I voted against and let the API bubble up the error
+
+I have tested it - API will not throw error, they just ignore options which not match endpoint API. So if we will try to send photo and document we will send only photo, because `sendPhoto` endpoint first in match.
+```
+$this->chatter->send(new ChatMessage('photo', (new TelegramOptions())->uploadPhoto('fixtures/photo.png')->uploadDocument('fixtures/document.xlsx')));
+```
+
+May be it will be better if will throw exception if multiple endpoints match options?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-09-29T10:38:20Z
+
+Lets keep it simple for now
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-09-29T16:42:26Z
+
+Don't miss applying this patch from fabbot
+
+---------------------------------------------------------------------------
+
+by igrizzli at 2023-10-01T21:01:57Z
+
+Tests and docs done.
+I have also added validation if options targeted to different endpoints, because adding it in a future will be BC.
+
+I have used in tests single file for all endpoints because in real we just need any binary file for testing, and adding multiple fixture files, especially videos, to repo can significantly increase repo size and provide legal issue. But if you think that is critical i will replace it with matched type files.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-09T18:42:46Z
+
+Good to go @nicolas-grekas ?

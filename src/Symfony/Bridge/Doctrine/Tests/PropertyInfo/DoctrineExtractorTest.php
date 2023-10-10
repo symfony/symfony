@@ -23,9 +23,11 @@ use Doctrine\ORM\ORMSetup;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\PropertyInfo\DoctrineExtractor;
 use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineDummy;
+use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineEmbeddable;
 use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineEnum;
 use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineGeneratedValue;
 use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineRelation;
+use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineWithEmbedded;
 use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\EnumInt;
 use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\EnumString;
 use Symfony\Component\PropertyInfo\Type;
@@ -35,7 +37,7 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class DoctrineExtractorTest extends TestCase
 {
-    private function createExtractor()
+    private function createExtractor(): DoctrineExtractor
     {
         $config = ORMSetup::createConfiguration(true);
         $config->setMetadataDriverImpl(new AttributeDriver([__DIR__.'/../Tests/Fixtures' => 'Symfony\Bridge\Doctrine\Tests\Fixtures'], true));
@@ -116,7 +118,7 @@ class DoctrineExtractorTest extends TestCase
     /**
      * @dataProvider typesProvider
      */
-    public function testExtract($property, array $type = null)
+    public function testExtract(string $property, array $type = null)
     {
         $this->assertEquals($type, $this->createExtractor()->getTypes(DoctrineDummy::class, $property, []));
     }
@@ -126,11 +128,11 @@ class DoctrineExtractorTest extends TestCase
         $expectedTypes = [new Type(
             Type::BUILTIN_TYPE_OBJECT,
             false,
-            'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineEmbeddable'
+            DoctrineEmbeddable::class
         )];
 
         $actualTypes = $this->createExtractor()->getTypes(
-            'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineWithEmbedded',
+            DoctrineWithEmbedded::class,
             'embedded',
             []
         );
@@ -150,9 +152,9 @@ class DoctrineExtractorTest extends TestCase
         $this->assertNull($this->createExtractor()->getTypes(DoctrineEnum::class, 'enumCustom', []));
     }
 
-    public static function typesProvider()
+    public static function typesProvider(): array
     {
-        $provider = [
+        return [
             ['id', [new Type(Type::BUILTIN_TYPE_INT)]],
             ['guid', [new Type(Type::BUILTIN_TYPE_STRING)]],
             ['bigint', [new Type(Type::BUILTIN_TYPE_STRING)]],
@@ -235,8 +237,6 @@ class DoctrineExtractorTest extends TestCase
             )]],
             ['json', null],
         ];
-
-        return $provider;
     }
 
     public function testGetPropertiesCatchException()

@@ -178,11 +178,8 @@ class Connection implements ResetInterface
 
             // Append pessimistic write lock to FROM clause if db platform supports it
             $sql = $query->getSQL();
-            if (($fromPart = $query->getQueryPart('from'))
-                && ($table = $fromPart[0]['table'] ?? null)
-                && ($alias = $fromPart[0]['alias'] ?? null)
-            ) {
-                $fromClause = sprintf('%s %s', $table, $alias);
+            if (preg_match('/FROM (.+) WHERE/', (string) $sql, $matches)) {
+                $fromClause = $matches[1];
                 $sql = str_replace(
                     sprintf('FROM %s WHERE', $fromClause),
                     sprintf('FROM %s WHERE', $this->driverConnection->getDatabasePlatform()->appendLockHint($fromClause, LockMode::PESSIMISTIC_WRITE)),

@@ -25,7 +25,7 @@ class Groups
     private readonly array $groups;
 
     /**
-     * @param string|string[] $groups
+     * @param string|string[] $groups The groups to define on the attribute target
      */
     public function __construct(string|array $groups)
     {

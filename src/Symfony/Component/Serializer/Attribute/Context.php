@@ -22,7 +22,10 @@ class Context
     private array $groups;
 
     /**
-     * @param string|string[] $groups
+     * @param array<string, mixed> $context                The common context to use when serializing or deserializing
+     * @param array<string, mixed> $normalizationContext   The context to use when serializing
+     * @param array<string, mixed> $denormalizationContext The context to use when deserializing
+     * @param string|string[]      $groups                 The groups to use when serializing or deserializing
      *
      * @throws InvalidArgumentException
      */

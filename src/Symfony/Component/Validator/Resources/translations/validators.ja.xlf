@@ -402,6 +402,30 @@
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
                 <target>ネットマスクの値は、{{ min }}から{{ max }}の間にある必要があります。</target>
             </trans-unit>
+            <trans-unit id="104">
+                <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
+                <target>ファイル名が長すぎます。ファイル名の長さは{{ filename_max_length }}文字以下でなければなりません。</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>The password strength is too low. Please use a stronger password.</source>
+                <target>パスワードの強度が弱すぎます。より強いパスワードを使用してください。</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>This value contains characters that are not allowed by the current restriction-level.</source>
+                <target>この値は現在の制限レベルで許可されていない文字を含んでいます。</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Using invisible characters is not allowed.</source>
+                <target>不可視文字は使用できません。</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Mixing numbers from different scripts is not allowed.</source>
+                <target>異なる種類の数字を使うことはできません。</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Using hidden overlay characters is not allowed.</source>
+                <target>隠れたオーバレイ文字は使用できません。</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

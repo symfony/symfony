@@ -28,8 +28,12 @@ class AutowireLocator extends Autowire
     /**
      * @see ServiceSubscriberInterface::getSubscribedServices()
      *
-     * @param string|array<string|SubscribedService> $services An explicit list of services or a tag name
-     * @param string|string[]                        $exclude  A service or a list of services to exclude
+     * @param string|array<string|SubscribedService> $services              A tag name or an explicit list of service ids
+     * @param string|null                            $indexAttribute        The name of the attribute that defines the key referencing each service in the locator
+     * @param string|null                            $defaultIndexMethod    The static method that should be called to get each service's key when their tag doesn't define the previous attribute
+     * @param string|null                            $defaultPriorityMethod The static method that should be called to get each service's priority when their tag doesn't define the "priority" attribute
+     * @param string|array                           $exclude               A service id or a list of service ids to exclude
+     * @param bool                                   $excludeSelf           Whether to automatically exclude the referencing service from the locator
      */
     public function __construct(
         string|array $services,

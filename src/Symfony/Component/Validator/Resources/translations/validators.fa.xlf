@@ -402,6 +402,30 @@
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
                 <target>مقدار ماسک شبکه (NetMask) باید بین {{ min }} و {{ max }} باشد.</target>
             </trans-unit>
+            <trans-unit id="104">
+                <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
+                <target>نام فایل طولانی است. نام فایل باید {{ filename_max_length }} کاراکتر یا کمتر باشد.|نام فایل طولانی است. نام فایل باید {{ filename_max_length }} کاراکتر یا کمتر باشد.</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>The password strength is too low. Please use a stronger password.</source>
+                <target>رمز عبور ضعیف است. لطفا از رمز عبور قوی‌تری استفاده کنید.</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>This value contains characters that are not allowed by the current restriction-level.</source>
+                <target>این مقدار حاوی کاراکترهایی است که در سطح محدودیت فعلی مجاز نیستند.</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Using invisible characters is not allowed.</source>
+                <target>استفاده از کاراکترهای نامرئی مجاز نمی‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Mixing numbers from different scripts is not allowed.</source>
+                <target>مخلوط کردن اعداد از اسکریپت های مختلف مجاز نیست.</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Using hidden overlay characters is not allowed.</source>
+                <target>استفاده از کاراکترهای همپوشانی پنهان (hidden overlay characters) مجاز نیست.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

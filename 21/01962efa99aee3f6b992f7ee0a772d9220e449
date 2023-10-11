@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-08-08T15:09:32Z
+
+Please always rebase, we don't accept PRs with merge commits in their history.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-08-11T14:35:24Z
+
+Sorry, tried to rebase using GitHub UI but it ended in a merge commit :sweat_smile:
+Should be good now.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-08-11T17:16:01Z
+
+We could deprecate `--all` and just clear all pools when the `pools` argument is not specified.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-10T14:26:23Z
+
+> We could deprecate --all and just clear all pools when the pools argument is not specified.
+
+To me this could be done in a separate PR, while this has some implicit drawbacks IMHO, because you could clear more than expected 👎
+
+I would go with this PR as is
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-10T14:38:02Z
+
+One last proposal from a DX perspective could be to give autocompletion for the possible values?

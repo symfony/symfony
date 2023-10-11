@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2023-10-04T19:48:47Z
+
+The only problem would be: Google Pagespeed and other performances tests/tools rate really bad if you preload a CSS you do not use "quickly"
+
+```
+Modern browsers are already pretty good at prioritizing resources, that's why it's important to use preload sparingly and only preload the most critical resources.
+```
+
+https://web.dev/preload-critical-assets/#how-preloading-works
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-10-04T19:53:23Z
+
+> The only problem would be: Google Pagespeed and other performances tests/tools rate really bad if you preload a CSS you do not use "quickly"
+
+But if we KNOW that what we are preloading WILL be `<link rel="stylesheet">` inside the initial HTML, then we would be good, right?
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-10-04T20:35:00Z
+
+> > The only problem would be: Google Pagespeed and other performances tests/tools rate really bad if you preload a CSS you do not use "quickly"
+>
+> But if we KNOW that what we are preloading WILL be `<link rel="stylesheet">` inside the initial HTML, then we would be good, right?
+
+I'll really need to try it "in the wild" (ux.symfony.com ? 👼)  to be 100% sure... but i'd say "yes" :)
+
+And anyone so obsessed with performances still can call manually the stylesheets so i'm not worried :)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-10-06T17:41:44Z
+
+high-deps for asset mapper failing because 6.4 hasn't been merged up to 7.0, so FWBundle & AssetMapper tests are using not-yet-up-to-date code.

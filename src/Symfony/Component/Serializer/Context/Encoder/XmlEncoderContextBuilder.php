@@ -144,4 +144,12 @@ final class XmlEncoderContextBuilder implements ContextBuilderInterface
     {
         return $this->with(XmlEncoder::VERSION, $version);
     }
+
+    /**
+     * Configures whether to wrap strings within CDATA sections.
+     */
+    public function withCdataWrapping(?bool $cdataWrapping): static
+    {
+        return $this->with(XmlEncoder::CDATA_WRAPPING, $cdataWrapping);
+    }
 }

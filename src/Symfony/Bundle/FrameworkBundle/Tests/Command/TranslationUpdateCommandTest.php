@@ -161,6 +161,13 @@ class TranslationUpdateCommandTest extends TestCase
         $this->assertEquals($expectedPaths, $filteredTransPaths);
     }
 
+    public function testWriteMessagesWithUpdateSourceOption()
+    {
+        $tester = $this->createCommandTester(['messages' => ['foo' => 'foo']]);
+        $tester->execute(['command' => 'translation:extract', 'locale' => 'en', '--force' => true, '--update-source' => true]);
+        $this->assertMatchesRegularExpression('/Translation files were successfully updated\./', $tester->getDisplay());
+    }
+
     protected function setUp(): void
     {
         $this->fs = new Filesystem();

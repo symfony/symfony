@@ -165,4 +165,20 @@ class XliffFileDumperTest extends TestCase
             $dumper->formatCatalogue($catalogue, 'messages', ['default_locale' => 'fr_FR', 'xliff_version' => '2.0'])
         );
     }
+
+    public function testFormatCatalogueWithSourceMetadata()
+    {
+        $catalogue = new MessageCatalogue('en_US');
+        $catalogue->add([
+            'foo' => 'bar',
+        ]);
+        $catalogue->setMetadata('foo', ['source' => 'foo_source']);
+
+        $dumper = new XliffFileDumper('xliff');
+
+        $this->assertStringEqualsFile(
+            __DIR__.'/../Fixtures/resources-source-meta.xliff',
+            $dumper->formatCatalogue($catalogue, 'messages', ['default_locale' => 'fr_FR'])
+        );
+    }
 }

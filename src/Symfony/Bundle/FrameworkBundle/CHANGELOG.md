@@ -16,6 +16,7 @@ CHANGELOG
  * Deprecate `session.sid_length` and `session.sid_bits_per_character` config options
  * Add the ability to use an existing service as a lock/semaphore resource
  * Add support for configuring multiple serializer instances via the configuration
+ * Add a `translation:update-xliff-sources` command to use de default locale target in the `source` tag of XLIFF files
 
 7.1
 ---

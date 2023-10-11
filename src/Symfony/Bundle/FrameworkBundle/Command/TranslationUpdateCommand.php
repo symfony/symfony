@@ -75,6 +75,7 @@ class TranslationUpdateCommand extends Command
                 new InputOption('dump-messages', null, InputOption::VALUE_NONE, 'Should the messages be dumped in the console'),
                 new InputOption('force', null, InputOption::VALUE_NONE, 'Should the extract be done'),
                 new InputOption('clean', null, InputOption::VALUE_NONE, 'Should clean not found messages'),
+                new InputOption('update-source', null, InputOption::VALUE_NONE, 'Should update source tag in XLIFF'),
                 new InputOption('domain', null, InputOption::VALUE_OPTIONAL, 'Specify the domain to extract'),
                 new InputOption('sort', null, InputOption::VALUE_OPTIONAL, 'Return list of messages sorted alphabetically (only works with --dump-messages)', 'asc'),
                 new InputOption('as-tree', null, InputOption::VALUE_OPTIONAL, 'Dump the messages as a tree-like structure: The given value defines the level where to switch to inline YAML'),
@@ -266,7 +267,31 @@ EOF
                 $bundleTransPath = end($transPaths);
             }
 
-            $this->writer->write($operation->getResult(), $format, ['path' => $bundleTransPath, 'default_locale' => $this->defaultLocale, 'xliff_version' => $xliffVersion, 'as_tree' => $input->getOption('as-tree'), 'inline' => $input->getOption('as-tree') ?? 0]);
+            $resultCatalogue = $operation->getResult();
+            $writerOptions = ['path' => $bundleTransPath, 'default_locale' => $this->defaultLocale, 'xliff_version' => $xliffVersion, 'as_tree' => $input->getOption('as-tree'), 'inline' => $input->getOption('as-tree') ?? 0];
+
+            if (true === $input->getOption('update-source')) {
+                $defaultLocaleCatalogue = $this->loadCurrentMessages($this->defaultLocale, $transPaths);
+
+                $domains = (null !== $domain) ? [$domain] : $resultCatalogue->getDomains();
+
+                // Update source metadata with default locale target for each message in result catalogue
+                foreach ($domains as $domain) {
+                    foreach ($resultCatalogue->all($domain) as $key => $value) {
+                        if (!$defaultLocaleCatalogue->has($key, $domain)) {
+                            continue;
+                        }
+
+                        $resultMetadata = $resultCatalogue->getMetadata($key, $domain);
+                        if (!isset($resultMetadata['source']) || $resultMetadata['source'] === $key) {
+                            $resultMetadata['source'] = $defaultLocaleCatalogue->get($key, $domain);
+                            $resultCatalogue->setMetadata($key, $resultMetadata, $domain);
+                        }
+                    }
+                }
+            }
+
+            $this->writer->write($resultCatalogue, $format, $writerOptions);
 
             if (true === $input->getOption('dump-messages')) {
                 $resultMessage .= ' and translation files were updated';

@@ -352,7 +352,7 @@ class ProfilerControllerTest extends WebTestCase
         $this->assertStringContainsString('PHP License', $client->getResponse()->getContent());
     }
 
-    public function testDownloadFontActionWithProfilerDisabled()
+    public function testFontActionWithProfilerDisabled()
     {
         $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage('The profiler must be enabled.');
@@ -361,10 +361,10 @@ class ProfilerControllerTest extends WebTestCase
         $twig = $this->createMock(Environment::class);
 
         $controller = new ProfilerController($urlGenerator, null, $twig, []);
-        $controller->downloadFontAction('JetBrainsMono');
+        $controller->fontAction('JetBrainsMono');
     }
 
-    public function testDownloadFontActionWithInvalidFontName()
+    public function testFontActionWithInvalidFontName()
     {
         $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage('Font file "InvalidFontName.woff2" not found.');
@@ -374,7 +374,7 @@ class ProfilerControllerTest extends WebTestCase
         $twig = $this->createMock(Environment::class);
 
         $controller = new ProfilerController($urlGenerator, $profiler, $twig, []);
-        $controller->downloadFontAction('InvalidFontName');
+        $controller->fontAction('InvalidFontName');
     }
 
     public function testDownloadFontAction()

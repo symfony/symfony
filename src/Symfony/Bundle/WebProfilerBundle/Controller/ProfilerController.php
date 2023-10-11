@@ -325,11 +325,11 @@ class ProfilerController
     }
 
     /**
-     * Downloads the custom web fonts used in the profiler.
+     * Returns the custom web fonts used in the profiler.
      *
      * @throws NotFoundHttpException
      */
-    public function downloadFontAction(string $fontName): Response
+    public function fontAction(string $fontName): Response
     {
         $this->denyAccessIfProfilerDisabled();
         if ('JetBrainsMono' !== $fontName) {

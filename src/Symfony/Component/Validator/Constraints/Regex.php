@@ -15,6 +15,8 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 /**
+ * Validates that a value matches a regular expression.
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
@@ -33,6 +35,13 @@ class Regex extends Constraint
     /** @var callable|null */
     public $normalizer;
 
+    /**
+     * @param string|array<string,mixed>|null $pattern     The regular expression to match
+     * @param string|null                     $htmlPattern The pattern to use in the HTML5 pattern attribute
+     * @param bool|null                       $match       Whether to validate the value matches the configured pattern or not (defaults to false)
+     * @param string[]|null                   $groups
+     * @param array<string,mixed>             $options
+     */
     public function __construct(
         string|array|null $pattern,
         string $message = null,

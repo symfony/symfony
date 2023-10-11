@@ -14,6 +14,8 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 
 /**
+ * Validates a collection with constraints defined for specific keys.
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
@@ -33,7 +35,13 @@ class Collection extends Composite
     public string $extraFieldsMessage = 'This field was not expected.';
     public string $missingFieldsMessage = 'This field is missing.';
 
-    public function __construct(array $fields = null, array $groups = null, mixed $payload = null, bool $allowExtraFields = null, bool $allowMissingFields = null, string $extraFieldsMessage = null, string $missingFieldsMessage = null)
+    /**
+     * @param array<string,Constraint>|array<string,mixed>|null $fields             An associative array defining keys in the collection and their constraints
+     * @param string[]|null                                     $groups
+     * @param bool|null                                         $allowExtraFields   Whether to allow additional keys not declared in the configured fields (defaults to false)
+     * @param bool|null                                         $allowMissingFields Whether to allow the collection to lack some fields declared in the configured fields (defaults to false)
+     */
+    public function __construct(mixed $fields = null, array $groups = null, mixed $payload = null, bool $allowExtraFields = null, bool $allowMissingFields = null, string $extraFieldsMessage = null, string $missingFieldsMessage = null)
     {
         if (\is_array($fields)
             && (($firstField = reset($fields)) instanceof Constraint

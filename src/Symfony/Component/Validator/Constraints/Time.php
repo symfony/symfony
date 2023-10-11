@@ -14,6 +14,8 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 
 /**
+ * Validates that a value is a valid time that follows the H:i:s format.
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
@@ -30,6 +32,11 @@ class Time extends Constraint
     public bool $withSeconds = true;
     public string $message = 'This value is not a valid time.';
 
+    /**
+     * @param array<string,mixed>|null $options
+     * @param string[]|null            $groups
+     * @param bool|null                $withSeconds Whether to allow seconds in the given value (defaults to true)
+     */
     public function __construct(
         array $options = null,
         string $message = null,

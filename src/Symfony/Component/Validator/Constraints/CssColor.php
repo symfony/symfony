@@ -15,6 +15,8 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 /**
+ * Validates that a value is a valid CSS color.
+ *
  * @author Mathieu Santostefano <msantostefano@protonmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
@@ -60,7 +62,9 @@ class CssColor extends Constraint
     public array|string $formats;
 
     /**
-     * @param array|string $formats The types of CSS colors allowed (e.g. hexadecimal only, RGB and HSL only, etc.).
+     * @param string[]|string|array<string,mixed> $formats The types of CSS colors allowed ({@see https://symfony.com/doc/current/reference/constraints/CssColor.html#formats})
+     * @param string[]|null                       $groups
+     * @param array<string,mixed>|null            $options
      */
     public function __construct(array|string $formats = [], string $message = null, array $groups = null, $payload = null, array $options = null)
     {

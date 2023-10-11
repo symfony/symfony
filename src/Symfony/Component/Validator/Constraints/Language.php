@@ -16,6 +16,10 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\LogicException;
 
 /**
+ * Validates that a value is a valid language Unicode language identifier.
+ *
+ * @see https://unicode.org/reports/tr35/#Unicode_language_identifier
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
@@ -30,6 +34,11 @@ class Language extends Constraint
     public string $message = 'This value is not a valid language.';
     public bool $alpha3 = false;
 
+    /**
+     * @param array<string,mixed>|null $options
+     * @param bool|null                $alpha3  Pass true to validate the language with three-letter code (ISO 639-2 (2T)) or false with two-letter code (ISO 639-1) (defaults to false)
+     * @param string[]|null            $groups
+     */
     public function __construct(
         array $options = null,
         string $message = null,

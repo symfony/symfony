@@ -15,6 +15,8 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 /**
+ * Validates that a value is not blank.
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -32,6 +34,11 @@ class NotBlank extends Constraint
     /** @var callable|null */
     public $normalizer;
 
+    /**
+     * @param array<string,mixed>|null $options
+     * @param bool|null                $allowNull Whether to allow null values (defaults to false)
+     * @param string[]|null            $groups
+     */
     public function __construct(array $options = null, string $message = null, bool $allowNull = null, callable $normalizer = null, array $groups = null, mixed $payload = null)
     {
         parent::__construct($options ?? [], $groups, $payload);

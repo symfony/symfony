@@ -12,6 +12,8 @@
 namespace Symfony\Component\Validator\Constraints;
 
 /**
+ * Validates that a value is a positive number.
+ *
  * @author Jan Schädlich <jan.schaedlich@sensiolabs.de>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]

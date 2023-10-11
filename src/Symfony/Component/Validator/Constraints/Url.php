@@ -15,6 +15,8 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 /**
+ * Validates that a value is a valid URL string.
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
@@ -32,6 +34,12 @@ class Url extends Constraint
     /** @var callable|null */
     public $normalizer;
 
+    /**
+     * @param array<string,mixed>|null $options
+     * @param string[]|null            $protocols        The protocols considered to be valid for the URL (e.g. http, https, ftp, etc.) (defaults to ['http', 'https']
+     * @param bool|null                $relativeProtocol Whether to accept URL without the protocol (i.e. //example.com) (defaults to false)
+     * @param string[]|null            $groups
+     */
     public function __construct(
         array $options = null,
         string $message = null,

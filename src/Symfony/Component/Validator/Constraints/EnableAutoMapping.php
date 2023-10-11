@@ -25,6 +25,9 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_CLASS)]
 class EnableAutoMapping extends Constraint
 {
+    /**
+     * @param array<string,mixed>|null $options
+     */
     public function __construct(array $options = null)
     {
         if (\is_array($options) && \array_key_exists('groups', $options)) {

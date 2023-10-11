@@ -14,6 +14,8 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 
 /**
+ * Validates that a value is of a specific data type.
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
@@ -28,6 +30,11 @@ class Type extends Constraint
     public string $message = 'This value should be of type {{ type }}.';
     public string|array|null $type = null;
 
+    /**
+     * @param string|string[]|array<string,mixed>|null $type    The type(s) to enforce on the value
+     * @param string[]|null                            $groups
+     * @param array<string,mixed>                      $options
+     */
     public function __construct(string|array|null $type, string $message = null, array $groups = null, mixed $payload = null, array $options = [])
     {
         if (\is_array($type) && \is_string(key($type))) {

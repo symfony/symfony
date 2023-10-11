@@ -15,6 +15,10 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\LogicException;
 
 /**
+ * Validates that the given string does not contain characters used in spoofing security attacks.
+ *
+ * @see https://www.php.net/manual/en/class.spoofchecker.php
+ *
  * @author Mathieu Lechat <mathieu.lechat@les-tilleuls.coop>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
@@ -78,8 +82,12 @@ class NoSuspiciousCharacters extends Constraint
     public ?array $locales = null;
 
     /**
-     * @param int-mask-of<self::CHECK_*>|null $checks
-     * @param self::RESTRICTION_LEVEL_*|null  $restrictionLevel
+     * @param array<string,mixed>|null                    $options
+     * @param int-mask-of<self::CHECK_*>|null             $checks           A bitmask of the checks to perform on the string (defaults to all checks)
+     * @param int-mask-of<self::RESTRICTION_LEVEL_*>|null $restrictionLevel Configures the set of acceptable characters for the validated string through a specified "level" (defaults to
+     *                                                                      {@see NoSuspiciousCharacters::RESTRICTION_LEVEL_MODERATE} on ICU >= 58, {@see NoSuspiciousCharacters::RESTRICTION_LEVEL_SINGLE_SCRIPT} otherwise)
+     * @param string[]|null                               $locales          Restrict the string's characters to those normally used with these locales. Pass null to use the default locales configured for the NoSuspiciousCharactersValidator. (defaults to null)
+     * @param string[]|null                               $groups
      */
     public function __construct(
         array $options = null,

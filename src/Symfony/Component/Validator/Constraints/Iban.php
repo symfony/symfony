@@ -14,6 +14,10 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 
 /**
+ * Validates that a value is a valid bank account number according to the IBAN format.
+ *
+ * @see https://en.wikipedia.org/wiki/International_Bank_Account_Number
+ *
  * @author Manuel Reinhard <manu@sprain.ch>
  * @author Michael Schummel
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -37,6 +41,10 @@ class Iban extends Constraint
 
     public string $message = 'This is not a valid International Bank Account Number (IBAN).';
 
+    /**
+     * @param array<string,mixed>|null $options
+     * @param string[]|null            $groups
+     */
     public function __construct(array $options = null, string $message = null, array $groups = null, mixed $payload = null)
     {
         parent::__construct($options, $groups, $payload);

@@ -17,6 +17,8 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\LogicException;
 
 /**
+ * Validates that a value is a valid email address.
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
@@ -43,6 +45,11 @@ class Email extends Constraint
     /** @var callable|null */
     public $normalizer;
 
+    /**
+     * @param array<string,mixed>|null     $options
+     * @param self::VALIDATION_MODE_*|null $mode    The pattern used to validate the email address; pass null to use the default mode configured for the EmailValidator
+     * @param string[]|null                $groups
+     */
     public function __construct(
         array $options = null,
         string $message = null,

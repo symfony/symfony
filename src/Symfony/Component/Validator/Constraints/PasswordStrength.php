@@ -15,6 +15,8 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
+ * Validates that the given password has reached a minimum strength.
+ *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
@@ -36,6 +38,11 @@ final class PasswordStrength extends Constraint
 
     public int $minScore;
 
+    /**
+     * @param array<string,mixed>|null $options
+     * @param self::STRENGTH_*|null    $minScore The minimum required strength of the password (defaults to {@see PasswordStrength::STRENGTH_MEDIUM})
+     * @param string[]|null            $groups
+     */
     public function __construct(array $options = null, int $minScore = null, array $groups = null, mixed $payload = null, string $message = null)
     {
         $options['minScore'] ??= self::STRENGTH_MEDIUM;

@@ -17,6 +17,8 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 /**
  * Validates that a value is a valid CIDR notation.
  *
+ * @see https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing
+ *
  * @author Sorin Pop <popsorin15@gmail.com>
  * @author Calin Bolea <calin.bolea@gmail.com>
  */
@@ -43,6 +45,13 @@ class Cidr extends Constraint
     public int $netmaskMin = 0;
     public int $netmaskMax;
 
+    /**
+     * @param array<string,mixed>|null $options
+     * @param string|null              $version    The CIDR version to validate (4, 6 or all, defaults to all)
+     * @param int|null                 $netmaskMin The lowest valid for a valid netmask (defaults to 0)
+     * @param int|null                 $netmaskMax The biggest valid for a valid netmask (defaults to 32 for IPv4, 128 for IPv6)
+     * @param string[]|null            $groups
+     */
     public function __construct(
         array $options = null,
         string $version = null,

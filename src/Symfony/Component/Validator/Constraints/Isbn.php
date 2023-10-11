@@ -14,6 +14,10 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 
 /**
+ * Validates that a value is a valid ISBN according to ISBN-10 or ISBN-13 formats.
+ *
+ * @see https://en.wikipedia.org/wiki/ISBN
+ *
  * @author The Whole Life To Learn <thewholelifetolearn@gmail.com>
  * @author Manuel Reinhard <manu@sprain.ch>
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -44,6 +48,12 @@ class Isbn extends Constraint
     public ?string $type = null;
     public ?string $message = null;
 
+    /**
+     * @param self::ISBN_*|array<string,mixed>|null $type    The type of ISBN to validate (i.e. {@see Isbn::ISBN_10}, {@see Isbn::ISBN_13} or null to accept both, defaults to null)
+     * @param string|null                           $message If defined, this message has priority over the others
+     * @param string[]|null                         $groups
+     * @param array<string,mixed>                   $options
+     */
     public function __construct(
         string|array $type = null,
         string $message = null,

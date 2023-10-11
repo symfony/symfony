@@ -1,0 +1,8 @@
+---------------------------------------------------------------------------
+
+by 77web at 2023-10-11T02:02:24Z
+
+memo:
+These new messages are used for `NonSuspiciousCharacters` constraint.
+Target values will be actually checked by `\Spoofchecker`
+https://www.php.net/manual/en/class.spoofchecker.php

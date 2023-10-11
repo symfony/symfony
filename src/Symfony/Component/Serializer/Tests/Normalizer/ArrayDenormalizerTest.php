@@ -13,6 +13,8 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
@@ -28,38 +30,26 @@ class ArrayDenormalizerTest extends TestCase
         $this->denormalizer->setDenormalizer($this->serializer);
     }
 
-    public function testDenormalize()
+    /**
+     * @dataProvider getTestArrays
+     */
+    public function testDenormalize(array $input, array $expected, string $type, string $format, array $context = [])
     {
-        $series = [
-            [[['foo' => 'one', 'bar' => 'two']], new ArrayDummy('one', 'two')],
-            [[['foo' => 'three', 'bar' => 'four']], new ArrayDummy('three', 'four')],
-        ];
-
-        $this->serializer->expects($this->exactly(2))
+        $this->serializer->expects($this->atLeastOnce())
             ->method('denormalize')
-            ->willReturnCallback(function ($data) use (&$series) {
-                [$expectedArgs, $return] = array_shift($series);
-                $this->assertSame($expectedArgs, [$data]);
+            ->willReturnCallback(function ($data, $type, $format, $context) use ($input) {
+                $key = (int) trim($context['deserialization_path'], '[]');
+                $expected = $input[$key];
+                $this->assertSame($expected, $data);
 
-                return $return;
-            })
-        ;
+                try {
+                    return class_exists($type) ? new $type(...$data) : $data;
+                } catch (\Throwable $e) {
+                    throw new NotNormalizableValueException($e->getMessage(), $e->getCode(), $e);
+                }
+            });
 
-        $result = $this->denormalizer->denormalize(
-            [
-                ['foo' => 'one', 'bar' => 'two'],
-                ['foo' => 'three', 'bar' => 'four'],
-            ],
-            __NAMESPACE__.'\ArrayDummy[]'
-        );
-
-        $this->assertEquals(
-            [
-                new ArrayDummy('one', 'two'),
-                new ArrayDummy('three', 'four'),
-            ],
-            $result
-        );
+        $this->assertEquals($expected, $this->denormalizer->denormalize($input, $type, $format, $context));
     }
 
     public function testSupportsValidArray()
@@ -108,6 +98,74 @@ class ArrayDenormalizerTest extends TestCase
             )
         );
     }
+
+    public static function getTestArrays(): array
+    {
+        return [
+            'array<ArrayDummy>' => [
+                [
+                    ['foo' => 'one', 'bar' => 'two'],
+                    ['foo' => 'three', 'bar' => 'four'],
+                ],
+                [
+                    new ArrayDummy('one', 'two'),
+                    new ArrayDummy('three', 'four'),
+                ],
+                __NAMESPACE__.'\ArrayDummy[]',
+                'json',
+            ],
+
+            'array<ArrayDummy|UnionDummy|null>' => [
+                [
+                    ['foo' => 'one', 'bar' => 'two'],
+                    ['baz' => 'three'],
+                    null,
+                ],
+                [
+                    new ArrayDummy('one', 'two'),
+                    new UnionDummy('three'),
+                    null,
+                ],
+                'mixed[]',
+                'json',
+                [
+                    'value_type' => new Type(
+                        Type::BUILTIN_TYPE_ARRAY,
+                        collection: true,
+                        collectionValueType: [
+                            new Type(Type::BUILTIN_TYPE_OBJECT, true, ArrayDummy::class),
+                            new Type(Type::BUILTIN_TYPE_OBJECT, class: UnionDummy::class),
+                        ]
+                    ),
+                ],
+            ],
+
+            'array<ArrayDummy|string>' => [
+                [
+                    ['foo' => 'one', 'bar' => 'two'],
+                    ['foo' => 'three', 'bar' => 'four'],
+                    'string',
+                ],
+                [
+                    new ArrayDummy('one', 'two'),
+                    new ArrayDummy('three', 'four'),
+                    'string',
+                ],
+                'mixed[]',
+                'json',
+                [
+                    'value_type' => new Type(
+                        Type::BUILTIN_TYPE_ARRAY,
+                        collection: true,
+                        collectionValueType: [
+                            new Type(Type::BUILTIN_TYPE_OBJECT, class: ArrayDummy::class),
+                            new Type(Type::BUILTIN_TYPE_STRING),
+                        ]
+                    ),
+                ],
+            ],
+        ];
+    }
 }
 
 class ArrayDummy
@@ -119,5 +177,15 @@ class ArrayDummy
     {
         $this->foo = $foo;
         $this->bar = $bar;
+    }
+}
+
+class UnionDummy
+{
+    public $baz;
+
+    public function __construct($baz)
+    {
+        $this->baz = $baz;
     }
 }

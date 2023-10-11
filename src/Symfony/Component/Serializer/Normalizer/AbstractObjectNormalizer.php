@@ -444,11 +444,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 return null;
             }
 
-            $collectionValueType = $type->isCollection() ? $type->getCollectionValueTypes()[0] ?? null : null;
-
             // Fix a collection that contains the only one element
             // This is special to xml format only
-            if ('xml' === $format && null !== $collectionValueType && (!\is_array($data) || !\is_int(key($data)))) {
+            if ('xml' === $format && \count($type->getCollectionValueTypes()) > 0 && (!\is_array($data) || !\is_int(key($data)))) {
                 $data = [$data];
             }
 
@@ -464,7 +462,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 $builtinType = $type->getBuiltinType();
                 if (\is_string($data) && (XmlEncoder::FORMAT === $format || CsvEncoder::FORMAT === $format)) {
                     if ('' === $data) {
-                        if (LegacyType::BUILTIN_TYPE_ARRAY === $builtinType) {
+                        if (LegacyLegacyType::BUILTIN_TYPE_ARRAY === $builtinType) {
                             return [];
                         }
 
@@ -508,41 +506,33 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                     }
                 }
 
-                if (null !== $collectionValueType && LegacyType::BUILTIN_TYPE_OBJECT === $collectionValueType->getBuiltinType()) {
-                    $builtinType = LegacyType::BUILTIN_TYPE_OBJECT;
-                    $class = $collectionValueType->getClassName().'[]';
+                $builtinType = $type->getBuiltinType();
+                $class = $type->getClassName();
 
-                    if (\count($collectionKeyType = $type->getCollectionKeyTypes()) > 0) {
-                        $context['key_type'] = \count($collectionKeyType) > 1 ? $collectionKeyType : $collectionKeyType[0];
-                    }
-
-                    $context['value_type'] = $collectionValueType;
-                } elseif ($type->isCollection() && \count($collectionValueType = $type->getCollectionValueTypes()) > 0 && LegacyType::BUILTIN_TYPE_ARRAY === $collectionValueType[0]->getBuiltinType()) {
-                    // get inner type for any nested array
-                    [$innerType] = $collectionValueType;
-
-                    // note that it will break for any other builtinType
-                    $dimensions = '[]';
-                    while (\count($innerType->getCollectionValueTypes()) > 0 && LegacyType::BUILTIN_TYPE_ARRAY === $innerType->getBuiltinType()) {
-                        $dimensions .= '[]';
+                $innerType = $type;
+                if ($type->isCollection() && \count($type->getCollectionValueTypes()) > 0) {
+                    while (1 === \count($innerType->getCollectionValueTypes()) && LegacyType::BUILTIN_TYPE_ARRAY === $innerType->getCollectionValueTypes()[0]->getBuiltinType()) {
                         [$innerType] = $innerType->getCollectionValueTypes();
                     }
 
-                    if (null !== $innerType->getClassName()) {
-                        // the builtinType is the inner one and the class is the class followed by []...[]
-                        $builtinType = $innerType->getBuiltinType();
-                        $class = $innerType->getClassName().$dimensions;
-                    } else {
-                        // default fallback (keep it as array)
-                        $builtinType = $type->getBuiltinType();
-                        $class = $type->getClassName();
+                    $dimensions = '';
+                    $arrayType = $type;
+                    do {
+                        $dimensions .= '[]';
+                        [$arrayType] = $arrayType->getCollectionValueTypes();
+                    } while (\count($arrayType->getCollectionValueTypes()) > 0 && LegacyType::BUILTIN_TYPE_ARRAY === $arrayType->getBuiltinType());
+
+                    if (\count($innerType->getCollectionValueTypes()) > 1 || \in_array($innerType->getCollectionValueTypes()[0]->getBuiltinType(), [LegacyType::BUILTIN_TYPE_OBJECT, LegacyType::BUILTIN_TYPE_ARRAY], true)) {
+                        $builtinType = LegacyType::BUILTIN_TYPE_OBJECT;
+                        $class = $arrayType->getClassName().$dimensions;
+                        $context['value_type'] = $type;
+                        $expectedTypes['array<'.implode('|', array_map(fn (Type $t) => $t->getClassName() ?? $t->getBuiltinType(), $innerType->getCollectionValueTypes())).'>'] = true;
                     }
-                } else {
-                    $builtinType = $type->getBuiltinType();
-                    $class = $type->getClassName();
                 }
 
-                $expectedTypes[LegacyType::BUILTIN_TYPE_OBJECT === $builtinType && $class ? $class : $builtinType] = true;
+                if (!str_ends_with($class, '[]')) {
+                    $expectedTypes[LegacyType::BUILTIN_TYPE_OBJECT === $builtinType && $class ? $class : $builtinType] = true;
+                }
 
                 if (LegacyType::BUILTIN_TYPE_OBJECT === $builtinType && null !== $class) {
                     if (!$this->serializer instanceof DenormalizerInterface) {

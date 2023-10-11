@@ -1141,7 +1141,7 @@ class SerializerTest extends TestCase
                 'expectedTypes' => ['array'],
                 'path' => 'anotherCollection',
                 'useMessageForUser' => false,
-                'message' => 'Data expected to be "Symfony\Component\Serializer\Tests\Fixtures\Php74Full[]", "null" given.',
+                'message' => 'Data expected to be "array<Symfony\Component\Serializer\Tests\Fixtures\Php74Full>", "null" given.',
             ],
         ];
 

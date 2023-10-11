@@ -98,9 +98,9 @@ class XmlDescriptor extends Descriptor
         $this->writeDocument($this->getCallableDocument($callable));
     }
 
-    protected function describeContainerParameter(mixed $parameter, array $options = []): void
+    protected function describeContainerParameter(mixed $parameter, ?array $deprecation, array $options = []): void
     {
-        $this->writeDocument($this->getContainerParameterDocument($parameter, $options));
+        $this->writeDocument($this->getContainerParameterDocument($parameter, $deprecation, $options));
     }
 
     protected function describeContainerEnvVars(array $envs, array $options = []): void
@@ -235,10 +235,16 @@ class XmlDescriptor extends Descriptor
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($parametersXML = $dom->createElement('parameters'));
 
+        $deprecatedParameters = $parameters->allDeprecated();
+
         foreach ($this->sortParameters($parameters) as $key => $value) {
             $parametersXML->appendChild($parameterXML = $dom->createElement('parameter'));
             $parameterXML->setAttribute('key', $key);
             $parameterXML->appendChild(new \DOMText($this->formatParameter($value)));
+
+            if (isset($deprecatedParameters[$key])) {
+                $parameterXML->setAttribute('deprecated', sprintf('Since %s %s: %s', $deprecatedParameters[$key][0], $deprecatedParameters[$key][1], sprintf(...\array_slice($deprecatedParameters[$key], 2))));
+            }
         }
 
         return $dom;
@@ -475,13 +481,17 @@ class XmlDescriptor extends Descriptor
         return $dom;
     }
 
-    private function getContainerParameterDocument(mixed $parameter, array $options = []): \DOMDocument
+    private function getContainerParameterDocument(mixed $parameter, ?array $deprecation, array $options = []): \DOMDocument
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($parameterXML = $dom->createElement('parameter'));
 
         if (isset($options['parameter'])) {
             $parameterXML->setAttribute('key', $options['parameter']);
+
+            if ($deprecation) {
+                $parameterXML->setAttribute('deprecated', sprintf('Since %s %s: %s', $deprecation[0], $deprecation[1], sprintf(...\array_slice($deprecation, 2))));
+            }
         }
 
         $parameterXML->appendChild(new \DOMText($this->formatParameter($parameter)));

@@ -169,7 +169,13 @@ abstract class AbstractDescriptorTestCase extends TestCase
         return $data;
     }
 
-    /** @dataProvider getDescribeContainerParameterTestData */
+    /**
+     * The legacy group must be kept as deprecations will always be raised.
+     *
+     * @group legacy
+     *
+     * @dataProvider getDescribeContainerParameterTestData
+     */
     public function testDescribeContainerParameter($parameter, $expectedDescription, array $options)
     {
         $this->assertDescription($expectedDescription, $parameter, $options);
@@ -185,6 +191,9 @@ abstract class AbstractDescriptorTestCase extends TestCase
         $file = array_pop($data[1]);
         $data[1][] = ['parameter' => 'twig.form.resources'];
         $data[1][] = $file;
+        $file = array_pop($data[2]);
+        $data[2][] = ['parameter' => 'deprecated_foo'];
+        $data[2][] = $file;
 
         return $data;
     }

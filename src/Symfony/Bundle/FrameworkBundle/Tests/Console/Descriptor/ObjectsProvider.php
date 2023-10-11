@@ -80,6 +80,14 @@ class ObjectsProvider
                 'single' => FooUnitEnum::BAR,
             ],
         ]);
+
+        $parameterBag = new ParameterBag([
+            'integer' => 12,
+            'string' => 'Hello world!',
+        ]);
+        $parameterBag->deprecate('string', 'symfony/framework-bundle', '6.4');
+
+        yield 'deprecated_parameters' => $parameterBag;
     }
 
     public static function getContainerParameter()
@@ -92,10 +100,13 @@ class ObjectsProvider
             'form_div_layout.html.twig',
             'form_table_layout.html.twig',
         ]);
+        $builder->setParameter('deprecated_foo', 'bar');
+        $builder->deprecateParameter('deprecated_foo', 'symfony/framework-bundle', '6.4');
 
         return [
             'parameter' => $builder,
             'array_parameter' => $builder,
+            'deprecated_parameter' => $builder,
         ];
     }
 

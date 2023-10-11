@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-10-08T02:27:03Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.4" but it seems your PR description refers to branch "6.4 for features".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-10-08T17:30:37Z
+
+I'm having troubles with tests... i'll fix / ask help just after the implementation feedback .
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-10-09T02:03:06Z
+
+The Twig changes made those last 24h may explain (at least partially) my troubles with the tests
+
+https://github.com/twigphp/Twig/pull/3882
+https://github.com/twigphp/Twig/pull/3887
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-10-09T13:50:31Z
+
+Test errors are now unrelated
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-10-09T17:44:50Z
+
+Is there anything else i can do ? Should i rebase the commits ?

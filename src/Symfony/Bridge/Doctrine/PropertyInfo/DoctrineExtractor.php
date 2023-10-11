@@ -159,7 +159,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                     break;
                 case Type::BUILTIN_TYPE_ARRAY:
                     switch ($typeOfField) {
-                        case Types::ARRAY:
+                        case 'array':
                         case 'json_array':
                             // return null if $enumType is set, because we can't determine if collectionKeyType is string or int
                             if ($enumType) {
@@ -257,7 +257,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
             Types::BOOLEAN => Type::BUILTIN_TYPE_BOOL,
             Types::BLOB,
             Types::BINARY => Type::BUILTIN_TYPE_RESOURCE,
-            Types::OBJECT,
+            'object',
             Types::DATE_MUTABLE,
             Types::DATETIME_MUTABLE,
             Types::DATETIMETZ_MUTABLE,
@@ -268,7 +268,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
             Types::DATETIMETZ_IMMUTABLE,
             Types::TIME_IMMUTABLE,
             Types::DATEINTERVAL => Type::BUILTIN_TYPE_OBJECT,
-            Types::ARRAY,
+            'array',
             Types::SIMPLE_ARRAY,
             'json_array' => Type::BUILTIN_TYPE_ARRAY,
             default => null,

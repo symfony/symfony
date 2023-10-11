@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Logger;
 
+use Doctrine\DBAL\Logging\SQLLogger;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\Logger\DbalLogger;
@@ -20,6 +21,13 @@ use Symfony\Bridge\Doctrine\Logger\DbalLogger;
  */
 class DbalLoggerTest extends TestCase
 {
+    public static function setUpBeforeClass(): void
+    {
+        if (!class_exists(SQLLogger::class)) {
+            self::markTestSkipped('This test requires DBAL < 4');
+        }
+    }
+
     /**
      * @dataProvider getLogFixtures
      */

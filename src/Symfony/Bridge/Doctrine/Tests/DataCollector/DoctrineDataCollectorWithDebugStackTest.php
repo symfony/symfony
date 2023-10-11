@@ -32,6 +32,13 @@ class DoctrineDataCollectorWithDebugStackTest extends TestCase
 {
     use DoctrineDataCollectorTestTrait;
 
+    public static function setUpBeforeClass(): void
+    {
+        if (!class_exists(DebugStack::class)) {
+            self::markTestSkipped('This test requires DBAL < 4');
+        }
+    }
+
     public function testReset()
     {
         $queries = [

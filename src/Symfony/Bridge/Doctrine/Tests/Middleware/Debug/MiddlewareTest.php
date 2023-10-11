@@ -191,7 +191,10 @@ EOT;
     {
         $this->init();
 
-        $this->conn->setNestTransactionsWithSavepoints(true);
+        if (\defined('Doctrine\DBAL\Connection::PARAM_STR_ARRAY')) {
+            // DBAL < 4
+            $this->conn->setNestTransactionsWithSavepoints(true);
+        }
         $this->conn->beginTransaction();
         $this->conn->beginTransaction();
         $this->conn->executeStatement('INSERT INTO products(name, price, stock) VALUES ("product1", 12.5, 5)');
@@ -225,20 +228,16 @@ EOT;
     {
         return [
             'commit and exec' => [
-                static fn (Connection $conn, string $sql) => $conn->executeStatement($sql),
-                static fn (Connection $conn) => $conn->commit(),
+                static fn (Connection $conn, string $sql): int|string => $conn->executeStatement($sql),
+                static fn (Connection $conn): ?bool => $conn->commit(),
             ],
             'rollback and query' => [
-                static fn (Connection $conn, string $sql) => $conn->executeQuery($sql),
-                static fn (Connection $conn) => $conn->rollBack(),
+                static fn (Connection $conn, string $sql): Result => $conn->executeQuery($sql),
+                static fn (Connection $conn): ?bool => $conn->rollBack(),
             ],
             'prepared statement' => [
-                static function (Connection $conn, string $sql): Result {
-                    return $conn->prepare($sql)->executeQuery();
-                },
-                static function (Connection $conn): bool {
-                    return $conn->commit();
-                },
+                static fn (Connection $conn, string $sql): Result => $conn->prepare($sql)->executeQuery(),
+                static fn (Connection $conn): ?bool => $conn->commit(),
             ],
         ];
     }

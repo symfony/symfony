@@ -295,13 +295,15 @@ class ImportMapManager
         $resolvedPackages = $this->resolver->resolvePackages($packagesToRequire);
         foreach ($resolvedPackages as $resolvedPackage) {
             $importName = $resolvedPackage->requireOptions->importName ?: $resolvedPackage->requireOptions->packageName;
-
+            [$packageName, $filePath] = ImportMapConfigReader::splitPackageNameAndFilePath($importName);
             $newEntry = new ImportMapEntry(
                 $importName,
                 path: $resolvedPackage->requireOptions->path,
                 version: $resolvedPackage->version,
                 type: $resolvedPackage->type,
                 isEntrypoint: $resolvedPackage->requireOptions->entrypoint,
+                packageName: $packageName,
+                filePath: $filePath,
             );
             $importMapEntries->add($newEntry);
             $addedEntries[] = $newEntry;

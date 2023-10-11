@@ -174,6 +174,7 @@ return static function (ContainerConfigurator $container) {
                 param('kernel.charset'),
                 abstract_arg('polyfill URL'),
                 abstract_arg('script HTML attributes'),
+                service('request_stack'),
             ])
 
         ->set('asset_mapper.importmap.auditor', ImportMapAuditor::class)

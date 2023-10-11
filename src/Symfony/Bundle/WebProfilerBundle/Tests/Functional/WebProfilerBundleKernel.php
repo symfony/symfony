@@ -88,7 +88,7 @@ class WebProfilerBundleKernel extends Kernel
         $container->register('logger', NullLogger::class);
     }
 
-    public function homepageController()
+    public function homepageController(): Response
     {
         return new Response('<html><head></head><body>Homepage Controller.</body></html>');
     }

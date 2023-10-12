@@ -21,7 +21,7 @@
         "symfony/polyfill-php83": "^1.27"
     },
     "require-dev": {
-        "doctrine/dbal": "^3.6",
+        "doctrine/dbal": "^3.6|^4",
         "predis/predis": "^1.1|^2.0",
         "symfony/cache": "^6.4|^7.0",
         "symfony/dependency-injection": "^6.4|^7.0",

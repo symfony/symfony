@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by stof at 2023-10-10T12:21:10Z
+
+I'm wondering whether it make sense to do that work in the 5.4 branch while 6.4 is likely to be the active LTS by the time of the Doctrine major releases.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-10-10T13:25:37Z
+
+> I'm wondering whether it make sense to do that work in the 5.4 branch while 6.4 is likely to be the active LTS by the time of the Doctrine major releases.
+
+We will maintain ORM 2 for quite a while, so only making Symfony 6 compatible with ORM 3 would be fine. A big problem is though, that no Symfony 5 package (except VarExporter) is actively conflicting with ORM 3. It's a dev dependency everywhere. So basically, people will be able to install ORM 3 with Symfony 5 and flood our tracker with bug reports. 😢
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-12T07:22:21Z
+
+We could explicitly conflict with ORM 3 to avoid such situation
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-10-12T10:15:56Z
+
+> We could explicitly conflict with ORM 3 to avoid such situation
+
+We could've done that two years ago, yes. If we do that now, Composer will just pin an old Doctrine Bridge and move on.

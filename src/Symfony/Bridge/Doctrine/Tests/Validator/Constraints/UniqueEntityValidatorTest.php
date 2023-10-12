@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Doctrine\Tests\Validator\Constraints;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
@@ -102,7 +103,9 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             ->willReturn($repositoryMock)
         ;
 
-        $classMetadata = $this->createMock(ClassMetadataInfo::class);
+        $classMetadata = $this->createMock(
+            class_exists(ClassMetadataInfo::class) ? ClassMetadataInfo::class : ClassMetadata::class
+        );
         $classMetadata
             ->expects($this->any())
             ->method('hasField')

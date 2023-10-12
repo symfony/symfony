@@ -61,7 +61,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
         }
 
         return match ($metadata->getTypeOfField($property)) {
-            Types::ARRAY,
+            'array',
             Types::SIMPLE_ARRAY => new TypeGuess(CollectionType::class, [], Guess::MEDIUM_CONFIDENCE),
             Types::BOOLEAN => new TypeGuess(CheckboxType::class, [], Guess::HIGH_CONFIDENCE),
             Types::DATETIME_MUTABLE,

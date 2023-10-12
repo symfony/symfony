@@ -107,14 +107,14 @@ diff --git a/src/Symfony/Bridge/Doctrine/DependencyInjection/AbstractDoctrineExt
 +    protected function registerMappingDrivers(array $objectManager, ContainerBuilder $container): void
      {
          // configure metadata driver for each bundle based on the type of mapping files found
-@@ -240,5 +240,5 @@ abstract class AbstractDoctrineExtension extends Extension
+@@ -238,5 +238,5 @@ abstract class AbstractDoctrineExtension extends Extension
       * @throws \InvalidArgumentException
       */
 -    protected function assertValidMappingConfiguration(array $mappingConfig, string $objectManagerName)
 +    protected function assertValidMappingConfiguration(array $mappingConfig, string $objectManagerName): void
      {
          if (!$mappingConfig['type'] || !$mappingConfig['dir'] || !$mappingConfig['prefix']) {
-@@ -330,5 +330,5 @@ abstract class AbstractDoctrineExtension extends Extension
+@@ -328,5 +328,5 @@ abstract class AbstractDoctrineExtension extends Extension
       * @throws \InvalidArgumentException in case of unknown driver type
       */
 -    protected function loadObjectManagerCacheDriver(array $objectManager, ContainerBuilder $container, string $cacheName)
@@ -266,20 +266,37 @@ diff --git a/src/Symfony/Bridge/Doctrine/Security/RememberMe/DoctrineTokenProvid
 +    public function deleteTokenBySeries(string $series): void
      {
          $sql = 'DELETE FROM rememberme_token WHERE series=:series';
-@@ -89,5 +89,5 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
+@@ -85,5 +85,5 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
       * @return void
       */
 -    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed)
 +    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed): void
      {
          $sql = 'UPDATE rememberme_token SET value=:value, lastUsed=:lastUsed WHERE series=:series';
-@@ -115,5 +115,5 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
+@@ -107,5 +107,5 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
       * @return void
       */
 -    public function createNewToken(PersistentTokenInterface $token)
 +    public function createNewToken(PersistentTokenInterface $token): void
      {
          $sql = 'INSERT INTO rememberme_token (class, username, series, value, lastUsed) VALUES (:class, :username, :series, :value, :lastUsed)';
+diff --git a/src/Symfony/Bridge/Doctrine/Tests/Fixtures/LegacyQueryMock.php b/src/Symfony/Bridge/Doctrine/Tests/Fixtures/LegacyQueryMock.php
+--- a/src/Symfony/Bridge/Doctrine/Tests/Fixtures/LegacyQueryMock.php
++++ b/src/Symfony/Bridge/Doctrine/Tests/Fixtures/LegacyQueryMock.php
+@@ -24,5 +24,5 @@ class LegacyQueryMock extends AbstractQuery
+      * @return array|string
+      */
+-    public function getSQL()
++    public function getSQL(): array|string
+     {
+     }
+@@ -31,5 +31,5 @@ class LegacyQueryMock extends AbstractQuery
+      * @return Result|int
+      */
+-    protected function _doExecute()
++    protected function _doExecute(): Result|int
+     {
+     }
 diff --git a/src/Symfony/Bridge/Doctrine/Validator/Constraints/UniqueEntityValidator.php b/src/Symfony/Bridge/Doctrine/Validator/Constraints/UniqueEntityValidator.php
 --- a/src/Symfony/Bridge/Doctrine/Validator/Constraints/UniqueEntityValidator.php
 +++ b/src/Symfony/Bridge/Doctrine/Validator/Constraints/UniqueEntityValidator.php
@@ -394,28 +411,28 @@ diff --git a/src/Symfony/Bridge/Monolog/Processor/DebugProcessor.php b/src/Symfo
 diff --git a/src/Symfony/Bridge/Twig/AppVariable.php b/src/Symfony/Bridge/Twig/AppVariable.php
 --- a/src/Symfony/Bridge/Twig/AppVariable.php
 +++ b/src/Symfony/Bridge/Twig/AppVariable.php
-@@ -36,5 +36,5 @@ class AppVariable
+@@ -37,5 +37,5 @@ class AppVariable
       * @return void
       */
 -    public function setTokenStorage(TokenStorageInterface $tokenStorage)
 +    public function setTokenStorage(TokenStorageInterface $tokenStorage): void
      {
          $this->tokenStorage = $tokenStorage;
-@@ -44,5 +44,5 @@ class AppVariable
+@@ -45,5 +45,5 @@ class AppVariable
       * @return void
       */
 -    public function setRequestStack(RequestStack $requestStack)
 +    public function setRequestStack(RequestStack $requestStack): void
      {
          $this->requestStack = $requestStack;
-@@ -52,5 +52,5 @@ class AppVariable
+@@ -53,5 +53,5 @@ class AppVariable
       * @return void
       */
 -    public function setEnvironment(string $environment)
 +    public function setEnvironment(string $environment): void
      {
          $this->environment = $environment;
-@@ -60,5 +60,5 @@ class AppVariable
+@@ -61,5 +61,5 @@ class AppVariable
       * @return void
       */
 -    public function setDebug(bool $debug)
@@ -523,7 +540,7 @@ diff --git a/src/Symfony/Bundle/DebugBundle/DependencyInjection/Compiler/DumpDat
 diff --git a/src/Symfony/Bundle/DebugBundle/DependencyInjection/DebugExtension.php b/src/Symfony/Bundle/DebugBundle/DependencyInjection/DebugExtension.php
 --- a/src/Symfony/Bundle/DebugBundle/DependencyInjection/DebugExtension.php
 +++ b/src/Symfony/Bundle/DebugBundle/DependencyInjection/DebugExtension.php
-@@ -34,5 +34,5 @@ class DebugExtension extends Extension
+@@ -33,5 +33,5 @@ class DebugExtension extends Extension
       * @return void
       */
 -    public function load(array $configs, ContainerBuilder $container)
@@ -687,14 +704,14 @@ diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/Wor
 diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
 --- a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
-@@ -219,5 +219,5 @@ class FrameworkExtension extends Extension
+@@ -211,5 +211,5 @@ class FrameworkExtension extends Extension
       * @throws LogicException
       */
 -    public function load(array $configs, ContainerBuilder $container)
 +    public function load(array $configs, ContainerBuilder $container): void
      {
          $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));
-@@ -2979,5 +2979,5 @@ class FrameworkExtension extends Extension
+@@ -2954,5 +2954,5 @@ class FrameworkExtension extends Extension
       * @return void
       */
 -    public static function registerRateLimiter(ContainerBuilder $container, string $name, array $limiterConfig)
@@ -704,14 +721,14 @@ diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExt
 diff --git a/src/Symfony/Bundle/FrameworkBundle/FrameworkBundle.php b/src/Symfony/Bundle/FrameworkBundle/FrameworkBundle.php
 --- a/src/Symfony/Bundle/FrameworkBundle/FrameworkBundle.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/FrameworkBundle.php
-@@ -93,5 +93,5 @@ class FrameworkBundle extends Bundle
+@@ -94,5 +94,5 @@ class FrameworkBundle extends Bundle
       * @return void
       */
 -    public function boot()
 +    public function boot(): void
      {
          $_ENV['DOCTRINE_DEPRECATIONS'] = $_SERVER['DOCTRINE_DEPRECATIONS'] ??= 'trigger';
-@@ -118,5 +118,5 @@ class FrameworkBundle extends Bundle
+@@ -119,5 +119,5 @@ class FrameworkBundle extends Bundle
       * @return void
       */
 -    public function build(ContainerBuilder $container)
@@ -795,7 +812,7 @@ diff --git a/src/Symfony/Bundle/FrameworkBundle/Translation/Translator.php b/src
 diff --git a/src/Symfony/Bundle/SecurityBundle/Debug/TraceableFirewallListener.php b/src/Symfony/Bundle/SecurityBundle/Debug/TraceableFirewallListener.php
 --- a/src/Symfony/Bundle/SecurityBundle/Debug/TraceableFirewallListener.php
 +++ b/src/Symfony/Bundle/SecurityBundle/Debug/TraceableFirewallListener.php
-@@ -32,5 +32,5 @@ final class TraceableFirewallListener extends FirewallListener
+@@ -33,5 +33,5 @@ final class TraceableFirewallListener extends FirewallListener implements ResetI
       * @return array
       */
 -    public function getWrappedListeners()
@@ -865,35 +882,35 @@ diff --git a/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Compiler/Regi
 diff --git a/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Security/Factory/AbstractFactory.php b/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Security/Factory/AbstractFactory.php
 --- a/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Security/Factory/AbstractFactory.php
 +++ b/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Security/Factory/AbstractFactory.php
-@@ -56,5 +56,5 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
+@@ -53,5 +53,5 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
       * @return void
       */
 -    public function addConfiguration(NodeDefinition $node)
 +    public function addConfiguration(NodeDefinition $node): void
      {
          $builder = $node->children();
-@@ -79,5 +79,5 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
+@@ -81,5 +81,5 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
       * @return string
       */
 -    protected function createAuthenticationSuccessHandler(ContainerBuilder $container, string $id, array $config)
 +    protected function createAuthenticationSuccessHandler(ContainerBuilder $container, string $id, array $config): string
      {
          $successHandlerId = $this->getSuccessHandlerId($id);
-@@ -101,5 +101,5 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
+@@ -103,5 +103,5 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
       * @return string
       */
 -    protected function createAuthenticationFailureHandler(ContainerBuilder $container, string $id, array $config)
 +    protected function createAuthenticationFailureHandler(ContainerBuilder $container, string $id, array $config): string
      {
          $id = $this->getFailureHandlerId($id);
-@@ -121,5 +121,5 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
+@@ -123,5 +123,5 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
       * @return string
       */
 -    protected function getSuccessHandlerId(string $id)
 +    protected function getSuccessHandlerId(string $id): string
      {
          return 'security.authentication.success_handler.'.$id.'.'.str_replace('-', '_', $this->getKey());
-@@ -129,5 +129,5 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
+@@ -131,5 +131,5 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
       * @return string
       */
 -    protected function getFailureHandlerId(string $id)
@@ -1100,7 +1117,7 @@ diff --git a/src/Symfony/Bundle/TwigBundle/DependencyInjection/Configurator/Envi
 diff --git a/src/Symfony/Bundle/TwigBundle/DependencyInjection/TwigExtension.php b/src/Symfony/Bundle/TwigBundle/DependencyInjection/TwigExtension.php
 --- a/src/Symfony/Bundle/TwigBundle/DependencyInjection/TwigExtension.php
 +++ b/src/Symfony/Bundle/TwigBundle/DependencyInjection/TwigExtension.php
-@@ -40,5 +40,5 @@ class TwigExtension extends Extension
+@@ -41,5 +41,5 @@ class TwigExtension extends Extension
       * @return void
       */
 -    public function load(array $configs, ContainerBuilder $container)
@@ -1488,7 +1505,7 @@ diff --git a/src/Symfony/Component/Cache/Messenger/EarlyExpirationHandler.php b/
 diff --git a/src/Symfony/Component/Cache/Traits/AbstractAdapterTrait.php b/src/Symfony/Component/Cache/Traits/AbstractAdapterTrait.php
 --- a/src/Symfony/Component/Cache/Traits/AbstractAdapterTrait.php
 +++ b/src/Symfony/Component/Cache/Traits/AbstractAdapterTrait.php
-@@ -287,5 +287,5 @@ trait AbstractAdapterTrait
+@@ -285,5 +285,5 @@ trait AbstractAdapterTrait
       * @return void
       */
 -    public function __wakeup()
@@ -1754,7 +1771,7 @@ diff --git a/src/Symfony/Component/Config/Definition/Builder/NodeBuilder.php b/s
 diff --git a/src/Symfony/Component/Config/Definition/Builder/TreeBuilder.php b/src/Symfony/Component/Config/Definition/Builder/TreeBuilder.php
 --- a/src/Symfony/Component/Config/Definition/Builder/TreeBuilder.php
 +++ b/src/Symfony/Component/Config/Definition/Builder/TreeBuilder.php
-@@ -51,5 +51,5 @@ class TreeBuilder implements NodeParentInterface
+@@ -58,5 +58,5 @@ class TreeBuilder implements NodeParentInterface
       * @return void
       */
 -    public function setPathSeparator(string $separator)
@@ -2379,21 +2396,21 @@ diff --git a/src/Symfony/Component/Console/EventListener/ErrorListener.php b/src
 diff --git a/src/Symfony/Component/Console/Formatter/OutputFormatter.php b/src/Symfony/Component/Console/Formatter/OutputFormatter.php
 --- a/src/Symfony/Component/Console/Formatter/OutputFormatter.php
 +++ b/src/Symfony/Component/Console/Formatter/OutputFormatter.php
-@@ -85,5 +85,5 @@ class OutputFormatter implements WrappableOutputFormatterInterface
+@@ -87,5 +87,5 @@ class OutputFormatter implements WrappableOutputFormatterInterface
       * @return void
       */
 -    public function setDecorated(bool $decorated)
 +    public function setDecorated(bool $decorated): void
      {
          $this->decorated = $decorated;
-@@ -98,5 +98,5 @@ class OutputFormatter implements WrappableOutputFormatterInterface
+@@ -100,5 +100,5 @@ class OutputFormatter implements WrappableOutputFormatterInterface
       * @return void
       */
 -    public function setStyle(string $name, OutputFormatterStyleInterface $style)
 +    public function setStyle(string $name, OutputFormatterStyleInterface $style): void
      {
          $this->styles[strtolower($name)] = $style;
-@@ -125,5 +125,5 @@ class OutputFormatter implements WrappableOutputFormatterInterface
+@@ -127,5 +127,5 @@ class OutputFormatter implements WrappableOutputFormatterInterface
       * @return string
       */
 -    public function formatAndWrap(?string $message, int $width)
@@ -2542,18 +2559,18 @@ diff --git a/src/Symfony/Component/Console/Helper/Helper.php b/src/Symfony/Compo
 @@ -95,5 +95,5 @@ abstract class Helper implements HelperInterface
       * @return string
       */
--    public static function formatTime(int|float $secs)
-+    public static function formatTime(int|float $secs): string
+-    public static function formatTime(int|float $secs, int $precision = 1)
++    public static function formatTime(int|float $secs, int $precision = 1): string
      {
-         static $timeFormats = [
-@@ -127,5 +127,5 @@ abstract class Helper implements HelperInterface
+         $secs = (int) floor($secs);
+@@ -138,5 +138,5 @@ abstract class Helper implements HelperInterface
       * @return string
       */
 -    public static function formatMemory(int $memory)
 +    public static function formatMemory(int $memory): string
      {
          if ($memory >= 1024 * 1024 * 1024) {
-@@ -147,5 +147,5 @@ abstract class Helper implements HelperInterface
+@@ -158,5 +158,5 @@ abstract class Helper implements HelperInterface
       * @return string
       */
 -    public static function removeDecoration(OutputFormatterInterface $formatter, ?string $string)
@@ -2994,13 +3011,13 @@ diff --git a/src/Symfony/Component/Console/Output/ConsoleSectionOutput.php b/src
 +    public function overwrite(string|iterable $message): void
      {
          $this->clear();
-@@ -167,5 +167,5 @@ class ConsoleSectionOutput extends StreamOutput
+@@ -166,5 +166,5 @@ class ConsoleSectionOutput extends StreamOutput
       * @return void
       */
 -    protected function doWrite(string $message, bool $newline)
 +    protected function doWrite(string $message, bool $newline): void
      {
-         if (!$this->isDecorated()) {
+         // Simulate newline behavior for consistent output formatting, avoiding extra logic
 diff --git a/src/Symfony/Component/Console/Output/NullOutput.php b/src/Symfony/Component/Console/Output/NullOutput.php
 --- a/src/Symfony/Component/Console/Output/NullOutput.php
 +++ b/src/Symfony/Component/Console/Output/NullOutput.php
@@ -4562,77 +4579,77 @@ diff --git a/src/Symfony/Component/DomCrawler/AbstractUriElement.php b/src/Symfo
 diff --git a/src/Symfony/Component/DomCrawler/Crawler.php b/src/Symfony/Component/DomCrawler/Crawler.php
 --- a/src/Symfony/Component/DomCrawler/Crawler.php
 +++ b/src/Symfony/Component/DomCrawler/Crawler.php
-@@ -96,5 +96,5 @@ class Crawler implements \Countable, \IteratorAggregate
+@@ -95,5 +95,5 @@ class Crawler implements \Countable, \IteratorAggregate
       * @return void
       */
 -    public function clear()
 +    public function clear(): void
      {
          $this->nodes = [];
-@@ -115,5 +115,5 @@ class Crawler implements \Countable, \IteratorAggregate
+@@ -114,5 +114,5 @@ class Crawler implements \Countable, \IteratorAggregate
       * @throws \InvalidArgumentException when node is not the expected type
       */
 -    public function add(\DOMNodeList|\DOMNode|array|string|null $node)
 +    public function add(\DOMNodeList|\DOMNode|array|string|null $node): void
      {
          if ($node instanceof \DOMNodeList) {
-@@ -139,5 +139,5 @@ class Crawler implements \Countable, \IteratorAggregate
+@@ -138,5 +138,5 @@ class Crawler implements \Countable, \IteratorAggregate
       * @return void
       */
 -    public function addContent(string $content, string $type = null)
 +    public function addContent(string $content, string $type = null): void
      {
          if (empty($type)) {
-@@ -181,5 +181,5 @@ class Crawler implements \Countable, \IteratorAggregate
+@@ -180,5 +180,5 @@ class Crawler implements \Countable, \IteratorAggregate
       * @return void
       */
 -    public function addHtmlContent(string $content, string $charset = 'UTF-8')
 +    public function addHtmlContent(string $content, string $charset = 'UTF-8'): void
      {
          $dom = $this->parseHtmlString($content, $charset);
-@@ -217,5 +217,5 @@ class Crawler implements \Countable, \IteratorAggregate
+@@ -216,5 +216,5 @@ class Crawler implements \Countable, \IteratorAggregate
       * @return void
       */
 -    public function addXmlContent(string $content, string $charset = 'UTF-8', int $options = \LIBXML_NONET)
 +    public function addXmlContent(string $content, string $charset = 'UTF-8', int $options = \LIBXML_NONET): void
      {
          // remove the default namespace if it's the only namespace to make XPath expressions simpler
-@@ -247,5 +247,5 @@ class Crawler implements \Countable, \IteratorAggregate
+@@ -246,5 +246,5 @@ class Crawler implements \Countable, \IteratorAggregate
       * @return void
       */
 -    public function addDocument(\DOMDocument $dom)
 +    public function addDocument(\DOMDocument $dom): void
      {
          if ($dom->documentElement) {
-@@ -261,5 +261,5 @@ class Crawler implements \Countable, \IteratorAggregate
+@@ -260,5 +260,5 @@ class Crawler implements \Countable, \IteratorAggregate
       * @return void
       */
 -    public function addNodeList(\DOMNodeList $nodes)
 +    public function addNodeList(\DOMNodeList $nodes): void
      {
          foreach ($nodes as $node) {
-@@ -277,5 +277,5 @@ class Crawler implements \Countable, \IteratorAggregate
+@@ -276,5 +276,5 @@ class Crawler implements \Countable, \IteratorAggregate
       * @return void
       */
 -    public function addNodes(array $nodes)
 +    public function addNodes(array $nodes): void
      {
          foreach ($nodes as $node) {
-@@ -291,5 +291,5 @@ class Crawler implements \Countable, \IteratorAggregate
+@@ -290,5 +290,5 @@ class Crawler implements \Countable, \IteratorAggregate
       * @return void
       */
 -    public function addNode(\DOMNode $node)
 +    public function addNode(\DOMNode $node): void
      {
          if ($node instanceof \DOMDocument) {
-@@ -885,5 +885,5 @@ class Crawler implements \Countable, \IteratorAggregate
+@@ -891,5 +891,5 @@ class Crawler implements \Countable, \IteratorAggregate
       * @return void
       */
 -    public function setDefaultNamespacePrefix(string $prefix)
 +    public function setDefaultNamespacePrefix(string $prefix): void
      {
          $this->defaultNamespacePrefix = $prefix;
-@@ -893,5 +893,5 @@ class Crawler implements \Countable, \IteratorAggregate
+@@ -899,5 +899,5 @@ class Crawler implements \Countable, \IteratorAggregate
       * @return void
       */
 -    public function registerNamespace(string $prefix, string $namespace)
@@ -5280,7 +5297,7 @@ diff --git a/src/Symfony/Component/Filesystem/Filesystem.php b/src/Symfony/Compo
 diff --git a/src/Symfony/Component/Finder/Finder.php b/src/Symfony/Component/Finder/Finder.php
 --- a/src/Symfony/Component/Finder/Finder.php
 +++ b/src/Symfony/Component/Finder/Finder.php
-@@ -400,5 +400,5 @@ class Finder implements \IteratorAggregate, \Countable
+@@ -401,5 +401,5 @@ class Finder implements \IteratorAggregate, \Countable
       * @return void
       */
 -    public static function addVCSPattern(string|array $pattern)
@@ -5627,7 +5644,7 @@ diff --git a/src/Symfony/Component/Form/ButtonBuilder.php b/src/Symfony/Componen
 diff --git a/src/Symfony/Component/Form/ChoiceList/Factory/CachingFactoryDecorator.php b/src/Symfony/Component/Form/ChoiceList/Factory/CachingFactoryDecorator.php
 --- a/src/Symfony/Component/Form/ChoiceList/Factory/CachingFactoryDecorator.php
 +++ b/src/Symfony/Component/Form/ChoiceList/Factory/CachingFactoryDecorator.php
-@@ -218,5 +218,5 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
+@@ -224,5 +224,5 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
       * @return void
       */
 -    public function reset()
@@ -7268,98 +7285,98 @@ diff --git a/src/Symfony/Component/HttpFoundation/ParameterBag.php b/src/Symfony
 diff --git a/src/Symfony/Component/HttpFoundation/Request.php b/src/Symfony/Component/HttpFoundation/Request.php
 --- a/src/Symfony/Component/HttpFoundation/Request.php
 +++ b/src/Symfony/Component/HttpFoundation/Request.php
-@@ -269,5 +269,5 @@ class Request
+@@ -272,5 +272,5 @@ class Request
       * @return void
       */
 -    public function initialize(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null)
 +    public function initialize(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null): void
      {
          $this->request = new InputBag($request);
-@@ -429,5 +429,5 @@ class Request
+@@ -432,5 +432,5 @@ class Request
       * @return void
       */
 -    public static function setFactory(?callable $callable)
 +    public static function setFactory(?callable $callable): void
      {
          self::$requestFactory = $callable;
-@@ -535,5 +535,5 @@ class Request
+@@ -538,5 +538,5 @@ class Request
       * @return void
       */
 -    public function overrideGlobals()
 +    public function overrideGlobals(): void
      {
          $this->server->set('QUERY_STRING', static::normalizeQueryString(http_build_query($this->query->all(), '', '&')));
-@@ -577,5 +577,5 @@ class Request
+@@ -580,5 +580,5 @@ class Request
       * @return void
       */
 -    public static function setTrustedProxies(array $proxies, int $trustedHeaderSet)
 +    public static function setTrustedProxies(array $proxies, int $trustedHeaderSet): void
      {
          self::$trustedProxies = array_reduce($proxies, function ($proxies, $proxy) {
-@@ -620,5 +620,5 @@ class Request
+@@ -623,5 +623,5 @@ class Request
       * @return void
       */
 -    public static function setTrustedHosts(array $hostPatterns)
 +    public static function setTrustedHosts(array $hostPatterns): void
      {
          self::$trustedHostPatterns = array_map(fn ($hostPattern) => sprintf('{%s}i', $hostPattern), $hostPatterns);
-@@ -668,5 +668,5 @@ class Request
+@@ -671,5 +671,5 @@ class Request
       * @return void
       */
 -    public static function enableHttpMethodParameterOverride()
 +    public static function enableHttpMethodParameterOverride(): void
      {
          self::$httpMethodParameterOverride = true;
-@@ -755,5 +755,5 @@ class Request
+@@ -758,5 +758,5 @@ class Request
       * @return void
       */
 -    public function setSession(SessionInterface $session)
 +    public function setSession(SessionInterface $session): void
      {
          $this->session = $session;
-@@ -1178,5 +1178,5 @@ class Request
+@@ -1181,5 +1181,5 @@ class Request
       * @return void
       */
 -    public function setMethod(string $method)
 +    public function setMethod(string $method): void
      {
-         unset($this->method);
-@@ -1301,5 +1301,5 @@ class Request
+         $this->method = null;
+@@ -1304,5 +1304,5 @@ class Request
       * @return void
       */
 -    public function setFormat(?string $format, string|array $mimeTypes)
 +    public function setFormat(?string $format, string|array $mimeTypes): void
      {
-         if (!isset(static::$formats)) {
-@@ -1333,5 +1333,5 @@ class Request
+         if (null === static::$formats) {
+@@ -1336,5 +1336,5 @@ class Request
       * @return void
       */
 -    public function setRequestFormat(?string $format)
 +    public function setRequestFormat(?string $format): void
      {
          $this->format = $format;
-@@ -1365,5 +1365,5 @@ class Request
+@@ -1368,5 +1368,5 @@ class Request
       * @return void
       */
 -    public function setDefaultLocale(string $locale)
 +    public function setDefaultLocale(string $locale): void
      {
          $this->defaultLocale = $locale;
-@@ -1387,5 +1387,5 @@ class Request
+@@ -1390,5 +1390,5 @@ class Request
       * @return void
       */
 -    public function setLocale(string $locale)
 +    public function setLocale(string $locale): void
      {
          $this->setPhpDefaultLocale($this->locale = $locale);
-@@ -1744,5 +1744,5 @@ class Request
+@@ -1747,5 +1747,5 @@ class Request
       * @return string
       */
 -    protected function prepareRequestUri()
 +    protected function prepareRequestUri(): string
      {
          $requestUri = '';
-@@ -1915,5 +1915,5 @@ class Request
+@@ -1917,5 +1917,5 @@ class Request
       * @return void
       */
 -    protected static function initializeFormats()
@@ -8326,7 +8343,7 @@ diff --git a/src/Symfony/Component/HttpKernel/DependencyInjection/LoggerPass.php
 -    public function process(ContainerBuilder $container)
 +    public function process(ContainerBuilder $container): void
      {
-         $container->setAlias(LoggerInterface::class, 'logger')
+         $container->setAlias(LoggerInterface::class, 'logger');
 diff --git a/src/Symfony/Component/HttpKernel/DependencyInjection/RegisterControllerArgumentLocatorsPass.php b/src/Symfony/Component/HttpKernel/DependencyInjection/RegisterControllerArgumentLocatorsPass.php
 --- a/src/Symfony/Component/HttpKernel/DependencyInjection/RegisterControllerArgumentLocatorsPass.php
 +++ b/src/Symfony/Component/HttpKernel/DependencyInjection/RegisterControllerArgumentLocatorsPass.php
@@ -8629,7 +8646,7 @@ diff --git a/src/Symfony/Component/HttpKernel/HttpCache/SurrogateInterface.php b
 diff --git a/src/Symfony/Component/HttpKernel/HttpKernel.php b/src/Symfony/Component/HttpKernel/HttpKernel.php
 --- a/src/Symfony/Component/HttpKernel/HttpKernel.php
 +++ b/src/Symfony/Component/HttpKernel/HttpKernel.php
-@@ -96,5 +96,5 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
+@@ -111,5 +111,5 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
       * @return void
       */
 -    public function terminate(Request $request, Response $response)
@@ -8733,7 +8750,7 @@ diff --git a/src/Symfony/Component/HttpKernel/Kernel.php b/src/Symfony/Component
 +    protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, string $class, string $baseClass): void
      {
          // cache the container
-@@ -839,5 +839,5 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
+@@ -843,5 +843,5 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
       * @return void
       */
 -    public function __wakeup()
@@ -8790,14 +8807,14 @@ diff --git a/src/Symfony/Component/HttpKernel/Log/DebugLoggerInterface.php b/src
 diff --git a/src/Symfony/Component/HttpKernel/Profiler/FileProfilerStorage.php b/src/Symfony/Component/HttpKernel/Profiler/FileProfilerStorage.php
 --- a/src/Symfony/Component/HttpKernel/Profiler/FileProfilerStorage.php
 +++ b/src/Symfony/Component/HttpKernel/Profiler/FileProfilerStorage.php
-@@ -97,5 +97,5 @@ class FileProfilerStorage implements ProfilerStorageInterface
+@@ -102,5 +102,5 @@ class FileProfilerStorage implements ProfilerStorageInterface
       * @return void
       */
 -    public function purge()
 +    public function purge(): void
      {
          $flags = \FilesystemIterator::SKIP_DOTS;
-@@ -255,5 +255,5 @@ class FileProfilerStorage implements ProfilerStorageInterface
+@@ -260,5 +260,5 @@ class FileProfilerStorage implements ProfilerStorageInterface
       * @return Profile
       */
 -    protected function createProfileFromData(string $token, array $data, Profile $parent = null)
@@ -9226,14 +9243,14 @@ diff --git a/src/Symfony/Component/Lock/BlockingStoreInterface.php b/src/Symfony
 diff --git a/src/Symfony/Component/Lock/LockFactory.php b/src/Symfony/Component/Lock/LockFactory.php
 --- a/src/Symfony/Component/Lock/LockFactory.php
 +++ b/src/Symfony/Component/Lock/LockFactory.php
-@@ -40,5 +40,5 @@ class LockFactory implements LoggerAwareInterface
+@@ -39,5 +39,5 @@ class LockFactory implements LoggerAwareInterface
       * @return SharedLockInterface
       */
 -    public function createLock(string $resource, ?float $ttl = 300.0, bool $autoRelease = true): LockInterface
 +    public function createLock(string $resource, ?float $ttl = 300.0, bool $autoRelease = true): SharedLockInterface
      {
          return $this->createLockFromKey(new Key($resource), $ttl, $autoRelease);
-@@ -54,5 +54,5 @@ class LockFactory implements LoggerAwareInterface
+@@ -53,5 +53,5 @@ class LockFactory implements LoggerAwareInterface
       * @return SharedLockInterface
       */
 -    public function createLockFromKey(Key $key, ?float $ttl = 300.0, bool $autoRelease = true): LockInterface
@@ -9742,7 +9759,7 @@ diff --git a/src/Symfony/Component/Messenger/Bridge/Doctrine/Transport/PostgreSq
 diff --git a/src/Symfony/Component/Messenger/Command/ConsumeMessagesCommand.php b/src/Symfony/Component/Messenger/Command/ConsumeMessagesCommand.php
 --- a/src/Symfony/Component/Messenger/Command/ConsumeMessagesCommand.php
 +++ b/src/Symfony/Component/Messenger/Command/ConsumeMessagesCommand.php
-@@ -128,5 +128,5 @@ EOF
+@@ -132,5 +132,5 @@ EOF
       * @return void
       */
 -    protected function interact(InputInterface $input, OutputInterface $output)
@@ -9852,7 +9869,7 @@ diff --git a/src/Symfony/Component/Messenger/Transport/InMemory/InMemoryTranspor
 diff --git a/src/Symfony/Component/Messenger/Transport/InMemory/InMemoryTransportFactory.php b/src/Symfony/Component/Messenger/Transport/InMemory/InMemoryTransportFactory.php
 --- a/src/Symfony/Component/Messenger/Transport/InMemory/InMemoryTransportFactory.php
 +++ b/src/Symfony/Component/Messenger/Transport/InMemory/InMemoryTransportFactory.php
-@@ -42,5 +42,5 @@ class InMemoryTransportFactory implements TransportFactoryInterface, ResetInterf
+@@ -44,5 +44,5 @@ class InMemoryTransportFactory implements TransportFactoryInterface, ResetInterf
       * @return void
       */
 -    public function reset()
@@ -9984,7 +10001,7 @@ diff --git a/src/Symfony/Component/Mime/Part/TextPart.php b/src/Symfony/Componen
 diff --git a/src/Symfony/Component/Mime/RawMessage.php b/src/Symfony/Component/Mime/RawMessage.php
 --- a/src/Symfony/Component/Mime/RawMessage.php
 +++ b/src/Symfony/Component/Mime/RawMessage.php
-@@ -59,5 +59,5 @@ class RawMessage
+@@ -58,5 +58,5 @@ class RawMessage
       * @throws LogicException if the message is not valid
       */
 -    public function ensureValidity()
@@ -10193,7 +10210,7 @@ diff --git a/src/Symfony/Component/PropertyAccess/PropertyAccessorInterface.php 
 --- a/src/Symfony/Component/PropertyAccess/PropertyAccessorInterface.php
 +++ b/src/Symfony/Component/PropertyAccess/PropertyAccessorInterface.php
 @@ -46,5 +46,5 @@ interface PropertyAccessorInterface
-      * @return void
+      * @throws Exception\UnexpectedTypeException  If a value within the path is neither object nor array
       */
 -    public function setValue(object|array &$objectOrArray, string|PropertyPathInterface $propertyPath, mixed $value);
 +    public function setValue(object|array &$objectOrArray, string|PropertyPathInterface $propertyPath, mixed $value): void;
@@ -11572,56 +11589,56 @@ diff --git a/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php 
 diff --git a/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
 --- a/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
-@@ -143,5 +143,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -144,5 +144,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return bool
       */
 -    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */)
 +    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */): bool
      {
          return \is_object($data) && !$data instanceof \Traversable;
-@@ -151,5 +151,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -152,5 +152,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return array|string|int|float|bool|\ArrayObject|null
       */
 -    public function normalize(mixed $object, string $format = null, array $context = [])
 +    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
      {
          if (!isset($context['cache_key'])) {
-@@ -235,5 +235,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -236,5 +236,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return object
       */
 -    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null)
 +    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null): object
      {
          if ($class !== $mappedClass = $this->getMappedClass($data, $class, $context)) {
-@@ -286,5 +286,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -287,5 +287,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return string[]
       */
 -    abstract protected function extractAttributes(object $object, string $format = null, array $context = []);
 +    abstract protected function extractAttributes(object $object, string $format = null, array $context = []): array;
  
      /**
-@@ -293,5 +293,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -294,5 +294,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return mixed
       */
 -    abstract protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []);
 +    abstract protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed;
  
      /**
-@@ -300,5 +300,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -301,5 +301,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return bool
       */
 -    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */)
 +    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */): bool
      {
          return class_exists($type) || (interface_exists($type, false) && null !== $this->classDiscriminatorResolver?->getMappingForClass($type));
-@@ -308,5 +308,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -309,5 +309,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return mixed
       */
 -    public function denormalize(mixed $data, string $type, string $format = null, array $context = [])
 +    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
      {
          if (!isset($context['cache_key'])) {
-@@ -414,5 +414,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -417,5 +417,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return void
       */
 -    abstract protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = []);
@@ -11953,7 +11970,7 @@ diff --git a/src/Symfony/Component/Templating/StreamingEngineInterface.php b/src
 --- a/src/Symfony/Component/Templating/StreamingEngineInterface.php
 +++ b/src/Symfony/Component/Templating/StreamingEngineInterface.php
 @@ -33,4 +33,4 @@ interface StreamingEngineInterface
-      * @return void
+      * @throws \LogicException   if the template cannot be streamed
       */
 -    public function stream(string|TemplateReferenceInterface $name, array $parameters = []);
 +    public function stream(string|TemplateReferenceInterface $name, array $parameters = []): void;
@@ -12466,7 +12483,7 @@ diff --git a/src/Symfony/Component/Translation/Writer/TranslationWriterInterface
 diff --git a/src/Symfony/Component/Validator/Command/DebugCommand.php b/src/Symfony/Component/Validator/Command/DebugCommand.php
 --- a/src/Symfony/Component/Validator/Command/DebugCommand.php
 +++ b/src/Symfony/Component/Validator/Command/DebugCommand.php
-@@ -47,5 +47,5 @@ class DebugCommand extends Command
+@@ -51,5 +51,5 @@ class DebugCommand extends Command
       * @return void
       */
 -    protected function configure()
@@ -12476,42 +12493,42 @@ diff --git a/src/Symfony/Component/Validator/Command/DebugCommand.php b/src/Symf
 diff --git a/src/Symfony/Component/Validator/Constraint.php b/src/Symfony/Component/Validator/Constraint.php
 --- a/src/Symfony/Component/Validator/Constraint.php
 +++ b/src/Symfony/Component/Validator/Constraint.php
-@@ -197,5 +197,5 @@ abstract class Constraint
+@@ -199,5 +199,5 @@ abstract class Constraint
       * @throws InvalidOptionsException If an invalid option name is given
       */
 -    public function __set(string $option, mixed $value)
 +    public function __set(string $option, mixed $value): void
      {
          if ('groups' === $option) {
-@@ -238,5 +238,5 @@ abstract class Constraint
+@@ -240,5 +240,5 @@ abstract class Constraint
       * @return void
       */
 -    public function addImplicitGroupName(string $group)
 +    public function addImplicitGroupName(string $group): void
      {
          if (null === $this->groups && \array_key_exists('groups', (array) $this)) {
-@@ -258,5 +258,5 @@ abstract class Constraint
+@@ -260,5 +260,5 @@ abstract class Constraint
       * @see __construct()
       */
 -    public function getDefaultOption()
 +    public function getDefaultOption(): ?string
      {
          return null;
-@@ -272,5 +272,5 @@ abstract class Constraint
+@@ -274,5 +274,5 @@ abstract class Constraint
       * @see __construct()
       */
 -    public function getRequiredOptions()
 +    public function getRequiredOptions(): array
      {
          return [];
-@@ -286,5 +286,5 @@ abstract class Constraint
+@@ -288,5 +288,5 @@ abstract class Constraint
       * @return string
       */
 -    public function validatedBy()
 +    public function validatedBy(): string
      {
          return static::class.'Validator';
-@@ -300,5 +300,5 @@ abstract class Constraint
+@@ -302,5 +302,5 @@ abstract class Constraint
       * @return string|string[] One or more constant values
       */
 -    public function getTargets()
@@ -12795,7 +12812,7 @@ diff --git a/src/Symfony/Component/Validator/Constraints/EmailValidator.php b/sr
 diff --git a/src/Symfony/Component/Validator/Constraints/ExpressionValidator.php b/src/Symfony/Component/Validator/Constraints/ExpressionValidator.php
 --- a/src/Symfony/Component/Validator/Constraints/ExpressionValidator.php
 +++ b/src/Symfony/Component/Validator/Constraints/ExpressionValidator.php
-@@ -33,5 +33,5 @@ class ExpressionValidator extends ConstraintValidator
+@@ -35,5 +35,5 @@ class ExpressionValidator extends ConstraintValidator
       * @return void
       */
 -    public function validate(mixed $value, Constraint $constraint)
@@ -14278,49 +14295,49 @@ diff --git a/src/Symfony/Component/VarDumper/Dumper/CliDumper.php b/src/Symfony/
 +    public function dumpScalar(Cursor $cursor, string $type, string|int|float|bool|null $value): void
      {
          $this->dumpKey($cursor);
-@@ -196,5 +196,5 @@ class CliDumper extends AbstractDumper
+@@ -197,5 +197,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    public function dumpString(Cursor $cursor, string $str, bool $bin, int $cut)
 +    public function dumpString(Cursor $cursor, string $str, bool $bin, int $cut): void
      {
          $this->dumpKey($cursor);
-@@ -287,5 +287,5 @@ class CliDumper extends AbstractDumper
+@@ -289,5 +289,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    public function enterHash(Cursor $cursor, int $type, string|int|null $class, bool $hasChild)
 +    public function enterHash(Cursor $cursor, int $type, string|int|null $class, bool $hasChild): void
      {
          $this->colors ??= $this->supportsColors();
-@@ -326,5 +326,5 @@ class CliDumper extends AbstractDumper
+@@ -329,5 +329,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    public function leaveHash(Cursor $cursor, int $type, string|int|null $class, bool $hasChild, int $cut)
 +    public function leaveHash(Cursor $cursor, int $type, string|int|null $class, bool $hasChild, int $cut): void
      {
          if (empty($cursor->attr['cut_hash'])) {
-@@ -344,5 +344,5 @@ class CliDumper extends AbstractDumper
+@@ -347,5 +347,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    protected function dumpEllipsis(Cursor $cursor, bool $hasChild, int $cut)
 +    protected function dumpEllipsis(Cursor $cursor, bool $hasChild, int $cut): void
      {
          if ($cut) {
-@@ -362,5 +362,5 @@ class CliDumper extends AbstractDumper
+@@ -365,5 +365,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    protected function dumpKey(Cursor $cursor)
 +    protected function dumpKey(Cursor $cursor): void
      {
          if (null !== $key = $cursor->hashKey) {
-@@ -573,5 +573,5 @@ class CliDumper extends AbstractDumper
+@@ -576,5 +576,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    protected function dumpLine(int $depth, bool $endOfValue = false)
 +    protected function dumpLine(int $depth, bool $endOfValue = false): void
      {
          if ($this->colors) {
-@@ -584,5 +584,5 @@ class CliDumper extends AbstractDumper
+@@ -587,5 +587,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    protected function endValue(Cursor $cursor)
@@ -14620,7 +14637,7 @@ diff --git a/src/Symfony/Component/Workflow/Metadata/MetadataStoreInterface.php 
 diff --git a/src/Symfony/Component/Workflow/Registry.php b/src/Symfony/Component/Workflow/Registry.php
 --- a/src/Symfony/Component/Workflow/Registry.php
 +++ b/src/Symfony/Component/Workflow/Registry.php
-@@ -28,5 +28,5 @@ class Registry
+@@ -26,5 +26,5 @@ class Registry
       * @return void
       */
 -    public function addWorkflow(WorkflowInterface $workflow, WorkflowSupportStrategyInterface $supportStrategy)

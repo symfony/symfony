@@ -9,17 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\Doctrine\Middleware\Debug;
+namespace Symfony\Bridge\Doctrine\Middleware\Debug\DBAL3;
 
 use Doctrine\DBAL\Driver\Middleware\AbstractStatementMiddleware;
 use Doctrine\DBAL\Driver\Result as ResultInterface;
 use Doctrine\DBAL\Driver\Statement as StatementInterface;
 use Doctrine\DBAL\ParameterType;
+use Symfony\Bridge\Doctrine\Middleware\Debug\DebugDataHolder;
+use Symfony\Bridge\Doctrine\Middleware\Debug\Query;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * @author Laurent VOULLEMIER <laurent.voullemier@gmail.com>
- * @author Alexander M. Turek <me@derrabus.de>
  *
  * @internal
  */
@@ -39,16 +40,26 @@ final class Statement extends AbstractStatementMiddleware
         $this->query = new Query($sql);
     }
 
-    public function bindValue($param, $value, $type = null): void
+    public function bindParam($param, &$variable, $type = ParameterType::STRING, $length = null): bool
     {
-        $type ??= ParameterType::STRING;
+        $this->query->setParam($param, $variable, $type);
+
+        return parent::bindParam($param, $variable, $type, ...\array_slice(\func_get_args(), 3));
+    }
+
+    public function bindValue($param, $value, $type = ParameterType::STRING): bool
+    {
         $this->query->setValue($param, $value, $type);
 
-        parent::bindValue($param, $value, $type);
+        return parent::bindValue($param, $value, $type);
     }
 
     public function execute($params = null): ResultInterface
     {
+        if (null !== $params) {
+            $this->query->setValues($params);
+        }
+
         // clone to prevent variables by reference to change
         $this->debugDataHolder->addQuery($this->connectionName, $query = clone $this->query);
 

@@ -62,7 +62,7 @@ class MailgunApiTransportTest extends TestCase
 
         $email = new Email();
         $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
-        $email->getHeaders()->addTextHeader('h:sender', $envelope->getSender()->toString());
+        $email->getHeaders()->addTextHeader('h:Sender', $envelope->getSender()->toString());
         $email->getHeaders()->addTextHeader('h:X-Mailgun-Variables', $json);
         $email->getHeaders()->addTextHeader('h:foo', 'foo-value');
         $email->getHeaders()->addTextHeader('t:text', 'text-value');
@@ -79,8 +79,8 @@ class MailgunApiTransportTest extends TestCase
         $this->assertArrayHasKey('h:X-Mailgun-Variables', $payload);
         $this->assertEquals($json, $payload['h:X-Mailgun-Variables']);
 
-        $this->assertArrayHasKey('h:sender', $payload);
-        $this->assertEquals($envelope->getSender()->toString(), $payload['h:sender']);
+        $this->assertArrayHasKey('h:Sender', $payload);
+        $this->assertEquals($envelope->getSender()->toString(), $payload['h:Sender']);
         $this->assertArrayHasKey('h:foo', $payload);
         $this->assertEquals('foo-value', $payload['h:foo']);
         $this->assertArrayHasKey('t:text', $payload);

@@ -46,7 +46,11 @@ class DoctrineTransportFactoryTest extends TestCase
         $schemaConfig = $this->createMock(SchemaConfig::class);
         $platform = $this->createMock(AbstractPlatform::class);
         $schemaManager->method('createSchemaConfig')->willReturn($schemaConfig);
-        $driverConnection->method('getSchemaManager')->willReturn($schemaManager);
+        $driverConnection->method(
+            method_exists(\Doctrine\DBAL\Connection::class, 'createSchemaManager')
+                ? 'createSchemaManager'
+                : 'getSchemaManager'
+        )->willReturn($schemaManager);
         $driverConnection->method('getDatabasePlatform')->willReturn($platform);
         $registry = $this->createMock(ConnectionRegistry::class);
 
@@ -70,7 +74,11 @@ class DoctrineTransportFactoryTest extends TestCase
         $schemaConfig = $this->createMock(SchemaConfig::class);
         $platform = $this->createMock(PostgreSQLPlatform::class);
         $schemaManager->method('createSchemaConfig')->willReturn($schemaConfig);
-        $driverConnection->method('getSchemaManager')->willReturn($schemaManager);
+        $driverConnection->method(
+            method_exists(\Doctrine\DBAL\Connection::class, 'createSchemaManager')
+                ? 'createSchemaManager'
+                : 'getSchemaManager'
+        )->willReturn($schemaManager);
         $driverConnection->method('getDatabasePlatform')->willReturn($platform);
         $registry = $this->createMock(ConnectionRegistry::class);
 

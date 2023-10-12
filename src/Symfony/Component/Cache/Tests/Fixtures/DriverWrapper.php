@@ -15,6 +15,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\DBAL\ServerVersionProvider;
 
 class DriverWrapper implements Driver
 {
@@ -31,9 +32,9 @@ class DriverWrapper implements Driver
         return $this->driver->connect($params, $username, $password, $driverOptions);
     }
 
-    public function getDatabasePlatform(): AbstractPlatform
+    public function getDatabasePlatform(ServerVersionProvider $versionProvider = null): AbstractPlatform
     {
-        return $this->driver->getDatabasePlatform();
+        return $this->driver->getDatabasePlatform($versionProvider);
     }
 
     public function getSchemaManager(Connection $conn, AbstractPlatform $platform): AbstractSchemaManager

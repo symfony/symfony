@@ -22,7 +22,7 @@
         "symfony/polyfill-php80": "^1.16"
     },
     "require-dev": {
-        "doctrine/dbal": "^2.13|^3.0",
+        "doctrine/dbal": "^2.13|^3|^4",
         "predis/predis": "~1.0"
     },
     "conflict": {

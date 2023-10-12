@@ -21,7 +21,7 @@
         "symfony/service-contracts": "^1.1|^2|^3"
     },
     "require-dev": {
-        "doctrine/dbal": "^2.13|^3.0",
+        "doctrine/dbal": "^2.13|^3|^4",
         "doctrine/persistence": "^1.3|^2|^3",
         "symfony/property-access": "^4.4|^5.0|^6.0",
         "symfony/serializer": "^4.4|^5.0|^6.0"

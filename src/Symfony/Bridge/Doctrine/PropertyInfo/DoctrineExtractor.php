@@ -14,9 +14,8 @@ namespace Symfony\Bridge\Doctrine\PropertyInfo;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\AssociationMapping;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use Doctrine\ORM\Mapping\Embedded;
 use Doctrine\ORM\Mapping\MappingException as OrmMappingException;
 use Doctrine\Persistence\Mapping\MappingException;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
@@ -49,7 +48,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
 
         $properties = array_merge($metadata->getFieldNames(), $metadata->getAssociationNames());
 
-        if ($metadata instanceof ClassMetadataInfo && class_exists(Embedded::class) && $metadata->embeddedClasses) {
+        if ($metadata instanceof ClassMetadata && $metadata->embeddedClasses) {
             $properties = array_filter($properties, function ($property) {
                 return !str_contains($property, '.');
             });
@@ -73,7 +72,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
             $class = $metadata->getAssociationTargetClass($property);
 
             if ($metadata->isSingleValuedAssociation($property)) {
-                if ($metadata instanceof ClassMetadataInfo) {
+                if ($metadata instanceof ClassMetadata) {
                     $associationMapping = $metadata->getAssociationMapping($property);
 
                     $nullable = $this->isAssociationNullable($associationMapping);
@@ -86,11 +85,10 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
 
             $collectionKeyType = Type::BUILTIN_TYPE_INT;
 
-            if ($metadata instanceof ClassMetadataInfo) {
+            if ($metadata instanceof ClassMetadata) {
                 $associationMapping = $metadata->getAssociationMapping($property);
 
                 if (isset($associationMapping['indexBy'])) {
-                    /** @var ClassMetadataInfo $subMetadata */
                     $subMetadata = $this->entityManager->getClassMetadata($associationMapping['targetEntity']);
 
                     // Check if indexBy value is a property
@@ -102,7 +100,6 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                             // Maybe the column name is the association join column?
                             $associationMapping = $subMetadata->getAssociationMapping($fieldName);
 
-                            /** @var ClassMetadataInfo $subMetadata */
                             $indexProperty = $subMetadata->getSingleAssociationReferencedJoinColumnName($fieldName);
                             $subMetadata = $this->entityManager->getClassMetadata($associationMapping['targetEntity']);
 
@@ -130,7 +127,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
             )];
         }
 
-        if ($metadata instanceof ClassMetadataInfo && class_exists(Embedded::class) && isset($metadata->embeddedClasses[$property])) {
+        if ($metadata instanceof ClassMetadata && isset($metadata->embeddedClasses[$property])) {
             return [new Type(Type::BUILTIN_TYPE_OBJECT, false, $metadata->embeddedClasses[$property]['class'])];
         }
 
@@ -141,7 +138,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                 return null;
             }
 
-            $nullable = $metadata instanceof ClassMetadataInfo && $metadata->isNullable($property);
+            $nullable = $metadata instanceof ClassMetadata && $metadata->isNullable($property);
             $enumType = null;
             if (null !== $enumClass = $metadata->getFieldMapping($property)['enumType'] ?? null) {
                 $enumType = new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $enumClass);
@@ -233,9 +230,11 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
     /**
      * Determines whether an association is nullable.
      *
+     * @param array<string, mixed>|AssociationMapping $associationMapping
+     *
      * @see https://github.com/doctrine/doctrine2/blob/v2.5.4/lib/Doctrine/ORM/Tools/EntityGenerator.php#L1221-L1246
      */
-    private function isAssociationNullable(array $associationMapping): bool
+    private function isAssociationNullable($associationMapping): bool
     {
         if (isset($associationMapping['id']) && $associationMapping['id']) {
             return false;

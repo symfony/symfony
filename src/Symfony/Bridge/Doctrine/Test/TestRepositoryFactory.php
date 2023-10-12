@@ -12,9 +12,35 @@
 namespace Symfony\Bridge\Doctrine\Test;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Repository\RepositoryFactory;
 use Doctrine\Persistence\ObjectRepository;
+
+if ((new \ReflectionMethod(RepositoryFactory::class, 'getRepository'))->hasReturnType()) {
+    /** @internal */
+    trait GetRepositoryTrait
+    {
+        public function getRepository(EntityManagerInterface $entityManager, string $entityName): EntityRepository
+        {
+            return $this->doGetRepository($entityManager, $entityName);
+        }
+    }
+} else {
+    /** @internal */
+    trait GetRepositoryTrait
+    {
+        /**
+         * {@inheritdoc}
+         *
+         * @return ObjectRepository
+         */
+        public function getRepository(EntityManagerInterface $entityManager, $entityName)
+        {
+            return $this->doGetRepository($entityManager, $entityName);
+        }
+    }
+}
 
 /**
  * @author Andreas Braun <alcaeus@alcaeus.org>
@@ -23,17 +49,14 @@ use Doctrine\Persistence\ObjectRepository;
  */
 class TestRepositoryFactory implements RepositoryFactory
 {
+    use GetRepositoryTrait;
+
     /**
      * @var ObjectRepository[]
      */
     private $repositoryList = [];
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return ObjectRepository
-     */
-    public function getRepository(EntityManagerInterface $entityManager, $entityName)
+    private function doGetRepository(EntityManagerInterface $entityManager, string $entityName): ObjectRepository
     {
         if (__CLASS__ === static::class) {
             trigger_deprecation('symfony/doctrine-bridge', '5.3', '"%s" is deprecated and will be removed in 6.0.', __CLASS__);

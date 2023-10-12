@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-10-12T08:22:08Z
+
+Don't you have COMPOSER_NO_INTERACTION=1?
+Anyway, :+1: on my side, not worth the trouble.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2023-10-12T08:25:31Z
+
+> Don't you have COMPOSER_NO_INTERACTION=1
+
+No, we forgot to enable this flag. PR to fix that is our the way :wink:

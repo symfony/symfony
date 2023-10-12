@@ -31,14 +31,28 @@ class DoctrineCasterTest extends TestCase
 
         $collection = new PersistentCollection($this->createMock(EntityManagerInterface::class), $classMetadata, new ArrayCollection(['test']));
 
-        $expected = <<<EODUMP
-Doctrine\ORM\PersistentCollection {
-%A
-  -em: Mock_EntityManagerInterface_%s { …3}
-  -backRefFieldName: null
-  -typeClass: Doctrine\ORM\Mapping\ClassMetadata { …}
-%A
-EODUMP;
+        if (property_exists(PersistentCollection::class, 'isDirty')) {
+            // Collections >= 2
+            $expected = <<<EODUMP
+                Doctrine\ORM\PersistentCollection {
+                %A
+                  -em: Mock_EntityManagerInterface_%s { …3}
+                  -backRefFieldName: null
+                  -isDirty: false
+                  -typeClass: Doctrine\ORM\Mapping\ClassMetadata { …}
+                %A
+                EODUMP;
+        } else {
+            // Collections 1
+            $expected = <<<EODUMP
+                Doctrine\ORM\PersistentCollection {
+                %A
+                  -em: Mock_EntityManagerInterface_%s { …3}
+                  -backRefFieldName: null
+                  -typeClass: Doctrine\ORM\Mapping\ClassMetadata { …}
+                %A
+                EODUMP;
+        }
 
         $this->assertDumpMatchesFormat($expected, $collection);
     }

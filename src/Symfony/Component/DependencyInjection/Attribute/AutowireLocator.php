@@ -11,9 +11,11 @@
 
 namespace Symfony\Component\DependencyInjection\Attribute;
 
-use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Contracts\Service\Attribute\SubscribedService;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
@@ -37,14 +39,44 @@ class AutowireLocator extends Autowire
         string|array $exclude = [],
         bool $excludeSelf = true,
     ) {
-        $iterator = (new AutowireIterator($services, $indexAttribute, $defaultIndexMethod, $defaultPriorityMethod, (array) $exclude, $excludeSelf))->value;
+        if (\is_string($services)) {
+            parent::__construct(new ServiceLocatorArgument(new TaggedIteratorArgument($services, $indexAttribute, $defaultIndexMethod, true, $defaultPriorityMethod, (array) $exclude, $excludeSelf)));
 
-        if ($iterator instanceof TaggedIteratorArgument) {
-            $iterator = new TaggedIteratorArgument($iterator->getTag(), $iterator->getIndexAttribute(), $iterator->getDefaultIndexMethod(), true, $iterator->getDefaultPriorityMethod(), $iterator->getExclude(), $iterator->excludeSelf());
-        } elseif ($iterator instanceof IteratorArgument) {
-            $iterator = $iterator->getValues();
+            return;
         }
 
-        parent::__construct(new ServiceLocatorArgument($iterator));
+        $references = [];
+
+        foreach ($services as $key => $type) {
+            $attributes = [];
+
+            if ($type instanceof Autowire) {
+                $references[$key] = $type;
+                continue;
+            }
+
+            if ($type instanceof SubscribedService) {
+                $key = $type->key ?? $key;
+                $attributes = $type->attributes;
+                $type = ($type->nullable ? '?' : '').($type->type ?? throw new InvalidArgumentException(sprintf('When "%s" is used, a type must be set.', SubscribedService::class)));
+            }
+
+            if (!\is_string($type) || !preg_match('/(?(DEFINE)(?<cn>[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+))(?(DEFINE)(?<fqcn>(?&cn)(?:\\\\(?&cn))*+))^\??(?&fqcn)(?:(?:\|(?&fqcn))*+|(?:&(?&fqcn))*+)$/', $type)) {
+                throw new InvalidArgumentException(sprintf('"%s" is not a PHP type for key "%s".', \is_string($type) ? $type : get_debug_type($type), $key));
+            }
+            $optionalBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
+            if ('?' === $type[0]) {
+                $type = substr($type, 1);
+                $optionalBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
+            }
+            if (\is_int($name = $key)) {
+                $key = $type;
+                $name = null;
+            }
+
+            $references[$key] = new TypedReference($type, $type, $optionalBehavior, $name, $attributes);
+        }
+
+        parent::__construct(new ServiceLocatorArgument($references));
     }
 }

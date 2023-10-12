@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -77,6 +78,11 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
 
         foreach ($class::getSubscribedServices() as $key => $type) {
             $attributes = [];
+
+            if (!isset($serviceMap[$key]) && $type instanceof Autowire) {
+                $subscriberMap[$key] = $type;
+                continue;
+            }
 
             if ($type instanceof SubscribedService) {
                 $key = $type->key ?? $key;

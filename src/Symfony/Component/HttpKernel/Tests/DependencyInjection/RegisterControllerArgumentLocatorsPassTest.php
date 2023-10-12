@@ -520,7 +520,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         /** @var ServiceLocator $locator */
         $locator = $container->get($locatorId)->get('foo::fooAction');
 
-        $this->assertCount(7, $locator->getProvidedServices());
+        $this->assertCount(6, $locator->getProvidedServices());
 
         $this->assertTrue($locator->has('iterator1'));
         $this->assertInstanceOf(RewindableGenerator::class, $argIterator = $locator->get('iterator1'));
@@ -557,11 +557,6 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertCount(1, $argLocator);
         $this->assertTrue($argLocator->has('foo'));
         $this->assertSame('bar', $argLocator->get('foo'));
-
-        $this->assertTrue($locator->has('iterator3'));
-        $this->assertInstanceOf(RewindableGenerator::class, $argIterator = $locator->get('iterator3'));
-        $this->assertCount(1, $argIterator);
-        $this->assertSame('bar', iterator_to_array($argIterator)['foo']);
     }
 }
 
@@ -705,8 +700,7 @@ class WithTaggedIteratorAndTaggedLocator
         #[TaggedLocator('foobar')] ServiceLocator $locator1,
         #[AutowireLocator('foobar')] ServiceLocator $locator2,
         #[AutowireLocator(['bar', 'baz'])] ContainerInterface $container1,
-        #[AutowireLocator(['foo' => new SubscribedService(type: 'string', attributes: new Autowire('%some.parameter%'))])] ContainerInterface $container2,
-        #[AutowireIterator(['foo' => new SubscribedService(type: 'string', attributes: new Autowire('%some.parameter%'))])] iterable $iterator3,
+        #[AutowireLocator(['foo' => new Autowire('%some.parameter%')])] ContainerInterface $container2,
     ) {
     }
 }

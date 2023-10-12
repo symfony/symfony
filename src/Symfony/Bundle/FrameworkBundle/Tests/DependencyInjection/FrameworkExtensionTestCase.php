@@ -507,7 +507,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container = $this->createContainerFromFile('php_errors_enabled');
 
         $definition = $container->getDefinition('debug.debug_handlers_listener');
-        $this->assertEquals(new Reference('monolog.logger.php', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(1));
+        $this->assertEquals(new Reference('logger', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(1));
         $this->assertNull($definition->getArgument(2));
         $this->assertSame(-1, $container->getParameter('debug.error_handler.throw_at'));
     }
@@ -527,7 +527,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container = $this->createContainerFromFile('php_errors_log_level');
 
         $definition = $container->getDefinition('debug.debug_handlers_listener');
-        $this->assertEquals(new Reference('monolog.logger.php', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(1));
+        $this->assertEquals(new Reference('logger', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(1));
         $this->assertSame(8, $definition->getArgument(2));
     }
 
@@ -536,7 +536,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container = $this->createContainerFromFile('php_errors_log_levels');
 
         $definition = $container->getDefinition('debug.debug_handlers_listener');
-        $this->assertEquals(new Reference('monolog.logger.php', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(1));
+        $this->assertEquals(new Reference('logger', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(1));
         $this->assertSame([
             \E_NOTICE => \Psr\Log\LogLevel::ERROR,
             \E_WARNING => \Psr\Log\LogLevel::ERROR,

@@ -29,7 +29,7 @@
         "symfony/security-core": "^6.4|^7.0",
         "symfony/security-csrf": "^6.4|^7.0",
         "symfony/security-http": "^6.4|^7.0",
-        "symfony/service-contracts": "^1.10|^2|^3"
+        "symfony/service-contracts": "^2.5|^3"
     },
     "require-dev": {
         "symfony/asset": "^6.4|^7.0",

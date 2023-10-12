@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2023-10-12T18:07:34Z
+
+I've opened doctrine/orm#11001 to address the deprecations reported by the CI.

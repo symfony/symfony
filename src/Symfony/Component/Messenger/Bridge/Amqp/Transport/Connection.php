@@ -563,6 +563,10 @@ class Connection
 
     private function getRoutingKeyForMessage(?AmqpStamp $amqpStamp): ?string
     {
+        if ($amqpStamp?->isForceDefaultRoutingKey()) {
+            return $this->getDefaultPublishRoutingKey();
+        }
+
         return $amqpStamp?->getRoutingKey() ?? $this->getDefaultPublishRoutingKey();
     }
 }

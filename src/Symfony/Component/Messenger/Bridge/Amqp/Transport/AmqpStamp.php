@@ -23,6 +23,7 @@ final class AmqpStamp implements NonSendableStampInterface
     private int $flags;
     private array $attributes;
     private bool $isRetryAttempt = false;
+    private bool $forceDefaultRoutingKey = false;
 
     public function __construct(string $routingKey = null, int $flags = \AMQP_NOPARAM, array $attributes = [])
     {
@@ -46,7 +47,7 @@ final class AmqpStamp implements NonSendableStampInterface
         return $this->attributes;
     }
 
-    public static function createFromAmqpEnvelope(\AMQPEnvelope $amqpEnvelope, self $previousStamp = null, string $retryRoutingKey = null): self
+    public static function createFromAmqpEnvelope(\AMQPEnvelope $amqpEnvelope, self $previousStamp = null, string $retryRoutingKey = null, bool $forceDefaultRoutingKey = false): self
     {
         $attr = $previousStamp->attributes ?? [];
 
@@ -71,6 +72,8 @@ final class AmqpStamp implements NonSendableStampInterface
             $stamp->isRetryAttempt = true;
         }
 
+        $stamp->forceDefaultRoutingKey = $forceDefaultRoutingKey;
+
         return $stamp;
     }
 
@@ -86,5 +89,10 @@ final class AmqpStamp implements NonSendableStampInterface
             $previousStamp->flags ?? \AMQP_NOPARAM,
             array_merge($previousStamp->attributes ?? [], $attributes)
         );
+    }
+
+    public function isForceDefaultRoutingKey(): bool
+    {
+        return $this->forceDefaultRoutingKey;
     }
 }

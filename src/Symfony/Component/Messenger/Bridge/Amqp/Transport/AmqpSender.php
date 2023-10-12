@@ -15,6 +15,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
+use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -59,7 +60,8 @@ class AmqpSender implements SenderInterface
             $amqpStamp = AmqpStamp::createFromAmqpEnvelope(
                 $amqpReceivedStamp->getAmqpEnvelope(),
                 $amqpStamp,
-                $envelope->last(RedeliveryStamp::class) ? $amqpReceivedStamp->getQueueName() : null
+                $envelope->last(RedeliveryStamp::class) ? $amqpReceivedStamp->getQueueName() : null,
+                $envelope->last(SentToFailureTransportStamp::class) ? true : false
             );
         }
 

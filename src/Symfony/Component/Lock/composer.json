@@ -21,7 +21,7 @@
         "symfony/deprecation-contracts": "^2.5|^3"
     },
     "require-dev": {
-        "doctrine/dbal": "^2.13|^3.0",
+        "doctrine/dbal": "^2.13|^3|^4",
         "predis/predis": "^1.1|^2.0"
     },
     "conflict": {

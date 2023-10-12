@@ -15,7 +15,7 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\MariaDBPlatform;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
 use PHPUnit\Framework\TestCase;
@@ -25,6 +25,8 @@ use Symfony\Component\Uid\Ulid;
 
 // DBAL 2 compatibility
 class_exists('Doctrine\DBAL\Platforms\PostgreSqlPlatform');
+// DBAL 3 compatibility
+class_exists('Doctrine\DBAL\Platforms\SqlitePlatform');
 
 final class UlidTypeTest extends TestCase
 {
@@ -144,7 +146,7 @@ final class UlidTypeTest extends TestCase
     public static function provideSqlDeclarations(): \Generator
     {
         yield [new PostgreSQLPlatform(), 'UUID'];
-        yield [new SqlitePlatform(), 'BLOB'];
+        yield [new SQLitePlatform(), 'BLOB'];
         yield [new MySQLPlatform(), 'BINARY(16)'];
 
         if (class_exists(MariaDBPlatform::class)) {

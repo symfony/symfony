@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Doctrine\Tests\Security\User;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
@@ -251,12 +252,12 @@ class EntityUserProviderTest extends TestCase
     }
 }
 
-abstract class UserLoaderRepository implements ObjectRepository, UserLoaderInterface
+abstract class UserLoaderRepository extends EntityRepository implements UserLoaderInterface
 {
     abstract public function loadUserByIdentifier(string $identifier): ?UserInterface;
 }
 
-abstract class PasswordUpgraderRepository implements ObjectRepository, PasswordUpgraderInterface
+abstract class PasswordUpgraderRepository extends EntityRepository implements PasswordUpgraderInterface
 {
     abstract public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void;
 }

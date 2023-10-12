@@ -29,7 +29,6 @@ use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 use Twig\Loader\LoaderInterface;
-use Twig\Loader\SourceContextLoaderInterface;
 
 class ProfilerControllerTest extends WebTestCase
 {
@@ -353,6 +352,42 @@ class ProfilerControllerTest extends WebTestCase
         $this->assertStringContainsString('PHP License', $client->getResponse()->getContent());
     }
 
+    public function testFontActionWithProfilerDisabled()
+    {
+        $this->expectException(NotFoundHttpException::class);
+        $this->expectExceptionMessage('The profiler must be enabled.');
+
+        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+        $twig = $this->createMock(Environment::class);
+
+        $controller = new ProfilerController($urlGenerator, null, $twig, []);
+        $controller->fontAction('JetBrainsMono');
+    }
+
+    public function testFontActionWithInvalidFontName()
+    {
+        $this->expectException(NotFoundHttpException::class);
+        $this->expectExceptionMessage('Font file "InvalidFontName.woff2" not found.');
+
+        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+        $profiler = $this->createMock(Profiler::class);
+        $twig = $this->createMock(Environment::class);
+
+        $controller = new ProfilerController($urlGenerator, $profiler, $twig, []);
+        $controller->fontAction('InvalidFontName');
+    }
+
+    public function testDownloadFontAction()
+    {
+        $kernel = new WebProfilerBundleKernel();
+        $client = new KernelBrowser($kernel);
+
+        $client->request('GET', '/_profiler/font/JetBrainsMono.woff2');
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertStringContainsString('font/woff2', $client->getResponse()->headers->get('content-type'));
+    }
+
     public static function provideCspVariants()
     {
         return [
@@ -473,16 +508,12 @@ class ProfilerControllerTest extends WebTestCase
 
         $expectedTemplate = 'expected_template.html.twig';
 
-        if (Environment::MAJOR_VERSION > 1) {
-            $loader = $this->createMock(LoaderInterface::class);
-            $loader
-                ->expects($this->atLeastOnce())
-                ->method('exists')
-                ->with($this->logicalXor($expectedTemplate, 'other_template.html.twig'))
-                ->willReturn(true);
-        } else {
-            $loader = $this->createMock(SourceContextLoaderInterface::class);
-        }
+        $loader = $this->createMock(LoaderInterface::class);
+        $loader
+            ->expects($this->atLeastOnce())
+            ->method('exists')
+            ->with($this->logicalXor($expectedTemplate, 'other_template.html.twig'))
+            ->willReturn(true);
 
         $twig = $this->createMock(Environment::class);
         $twig

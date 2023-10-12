@@ -24,6 +24,7 @@ CHANGELOG
  * Allow the `Groups` attribute/annotation on classes
  * JsonDecode: Add `json_decode_detailed_errors` option
  * Make `ProblemNormalizer` give details about Messenger's `ValidationFailedException`
+ * Add `XmlEncoder::CDATA_WRAPPING` context option
 
 6.3
 ---

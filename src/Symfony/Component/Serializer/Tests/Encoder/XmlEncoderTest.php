@@ -234,13 +234,37 @@ XML;
     public function testEncodeCdataWrapping()
     {
         $array = [
-            'firstname' => 'Paul <or Me>',
+            'firstname' => 'Paul & Martha <or Me>',
         ];
 
         $expected = '<?xml version="1.0"?>'."\n".
-            '<response><firstname><![CDATA[Paul <or Me>]]></firstname></response>'."\n";
+            '<response><firstname><![CDATA[Paul & Martha <or Me>]]></firstname></response>'."\n";
 
         $this->assertEquals($expected, $this->encoder->encode($array, 'xml'));
+    }
+
+    public function testEnableCdataWrapping()
+    {
+        $array = [
+            'firstname' => 'Paul & Martha <or Me>',
+        ];
+
+        $expected = '<?xml version="1.0"?>'."\n".
+            '<response><firstname><![CDATA[Paul & Martha <or Me>]]></firstname></response>'."\n";
+
+        $this->assertEquals($expected, $this->encoder->encode($array, 'xml', ['cdata_wrapping' => true]));
+    }
+
+    public function testDisableCdataWrapping()
+    {
+        $array = [
+            'firstname' => 'Paul & Martha <or Me>',
+        ];
+
+        $expected = '<?xml version="1.0"?>'."\n".
+            '<response><firstname>Paul &amp; Martha &lt;or Me&gt;</firstname></response>'."\n";
+
+        $this->assertEquals($expected, $this->encoder->encode($array, 'xml', ['cdata_wrapping' => false]));
     }
 
     public function testEncodeScalarWithAttribute()

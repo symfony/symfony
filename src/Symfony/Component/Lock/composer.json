@@ -20,7 +20,7 @@
         "psr/log": "^1|^2|^3"
     },
     "require-dev": {
-        "doctrine/dbal": "^3.6",
+        "doctrine/dbal": "^3.6|^4",
         "predis/predis": "^1.1|^2.0"
     },
     "conflict": {

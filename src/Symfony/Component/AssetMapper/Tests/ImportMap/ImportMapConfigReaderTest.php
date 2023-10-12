@@ -56,6 +56,12 @@ return [
         'path' => 'entry.js',
         'entrypoint' => true,
     ],
+    'package/with_file.js' => [
+        'version' => '1.0.0',
+    ],
+    '@vendor/package/path/to/file.js' => [
+        'version' => '1.0.0',
+    ],
 ];
 EOF;
         file_put_contents(__DIR__.'/../fixtures/importmaps_for_writing/importmap.php', $importMap);
@@ -65,7 +71,7 @@ EOF;
         $this->assertInstanceOf(ImportMapEntries::class, $entries);
         /** @var ImportMapEntry[] $allEntries */
         $allEntries = iterator_to_array($entries);
-        $this->assertCount(4, $allEntries);
+        $this->assertCount(6, $allEntries);
 
         $remotePackageEntry = $allEntries[0];
         $this->assertSame('remote_package', $remotePackageEntry->importName);
@@ -73,6 +79,8 @@ EOF;
         $this->assertSame('3.2.1', $remotePackageEntry->version);
         $this->assertSame('js', $remotePackageEntry->type->value);
         $this->assertFalse($remotePackageEntry->isEntrypoint);
+        $this->assertSame('remote_package', $remotePackageEntry->packageName);
+        $this->assertEquals('', $remotePackageEntry->filePath);
 
         $localPackageEntry = $allEntries[1];
         $this->assertNull($localPackageEntry->version);
@@ -81,8 +89,13 @@ EOF;
         $typeCssEntry = $allEntries[2];
         $this->assertSame('css', $typeCssEntry->type->value);
 
-        $entryPointEntry = $allEntries[3];
-        $this->assertTrue($entryPointEntry->isEntrypoint);
+        $packageWithFileEntry = $allEntries[4];
+        $this->assertSame('package', $packageWithFileEntry->packageName);
+        $this->assertSame('/with_file.js', $packageWithFileEntry->filePath);
+
+        $packageWithFileEntry = $allEntries[5];
+        $this->assertSame('@vendor/package', $packageWithFileEntry->packageName);
+        $this->assertSame('/path/to/file.js', $packageWithFileEntry->filePath);
 
         // now save the original raw data from importmap.php and delete the file
         $originalImportMapData = (static fn () => include __DIR__.'/../fixtures/importmaps_for_writing/importmap.php')();

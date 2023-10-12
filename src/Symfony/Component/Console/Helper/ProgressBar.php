@@ -540,20 +540,20 @@ final class ProgressBar
 
                 return $display;
             },
-            'elapsed' => fn (self $bar) => Helper::formatTime(time() - $bar->getStartTime()),
+            'elapsed' => fn (self $bar) => Helper::formatTime(time() - $bar->getStartTime(), 2),
             'remaining' => function (self $bar) {
                 if (!$bar->getMaxSteps()) {
                     throw new LogicException('Unable to display the remaining time if the maximum number of steps is not set.');
                 }
 
-                return Helper::formatTime($bar->getRemaining());
+                return Helper::formatTime($bar->getRemaining(), 2);
             },
             'estimated' => function (self $bar) {
                 if (!$bar->getMaxSteps()) {
                     throw new LogicException('Unable to display the estimated time if the maximum number of steps is not set.');
                 }
 
-                return Helper::formatTime($bar->getEstimated());
+                return Helper::formatTime($bar->getEstimated(), 2);
             },
             'memory' => fn (self $bar) => Helper::formatMemory(memory_get_usage(true)),
             'current' => fn (self $bar) => str_pad($bar->getProgress(), $bar->getStepWidth(), ' ', \STR_PAD_LEFT),

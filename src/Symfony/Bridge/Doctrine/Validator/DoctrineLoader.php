@@ -12,7 +12,7 @@
 namespace Symfony\Bridge\Doctrine\Validator;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Mapping\ClassMetadata as OrmClassMetadata;
 use Doctrine\ORM\Mapping\MappingException as OrmMappingException;
 use Doctrine\Persistence\Mapping\MappingException;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -51,7 +51,7 @@ final class DoctrineLoader implements LoaderInterface
             return false;
         }
 
-        if (!$doctrineMetadata instanceof ClassMetadataInfo) {
+        if (!$doctrineMetadata instanceof OrmClassMetadata) {
             return false;
         }
 

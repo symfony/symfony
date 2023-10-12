@@ -146,8 +146,19 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
     public static function providePlatforms(): \Generator
     {
         yield [\Doctrine\DBAL\Platforms\PostgreSQLPlatform::class];
+
+        // DBAL < 4
+        if (class_exists(\Doctrine\DBAL\Platforms\PostgreSQL94Platform::class)) {
+            yield [\Doctrine\DBAL\Platforms\PostgreSQL94Platform::class];
+        }
+
         yield [\Doctrine\DBAL\Platforms\SqlitePlatform::class];
         yield [\Doctrine\DBAL\Platforms\SQLServerPlatform::class];
+
+        // DBAL < 4
+        if (class_exists(\Doctrine\DBAL\Platforms\SQLServer2012Platform::class)) {
+            yield [\Doctrine\DBAL\Platforms\SQLServer2012Platform::class];
+        }
     }
 
     public function testTableCreationInTransactionNotSupported()

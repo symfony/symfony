@@ -132,6 +132,17 @@ class CachePoolClearCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('[WARNING] Cache pool "cache.public_pool" could not be cleared.', $tester->getDisplay());
     }
 
+    public function testExcludedPool()
+    {
+        $tester = $this->createCommandTester(['cache.app_clearer']);
+        $tester->execute(['--all' => true, '--exclude' => ['cache.app_clearer']], ['decorated' => false]);
+
+        $tester->assertCommandIsSuccessful('cache:pool:clear exits with 0 in case of success');
+        $this->assertStringNotContainsString('Clearing all cache pools...', $tester->getDisplay());
+        $this->assertStringNotContainsString('Calling cache clearer: cache.app_clearer', $tester->getDisplay());
+        $this->assertStringContainsString('[OK] Cache was successfully cleared.', $tester->getDisplay());
+    }
+
     private function createCommandTester(array $poolNames = null)
     {
         $application = new Application(static::$kernel);

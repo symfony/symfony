@@ -11,7 +11,13 @@
 
 namespace Symfony\Component\AssetMapper\ImportMap;
 
+use Psr\Link\EvolvableLinkProviderInterface;
 use Symfony\Component\Asset\Packages;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\WebLink\EventListener\AddLinkHeaderListener;
+use Symfony\Component\WebLink\GenericLinkProvider;
+use Symfony\Component\WebLink\Link;
 
 /**
  * @author Kévin Dunglas <kevin@dunglas.dev>
@@ -27,6 +33,7 @@ class ImportMapRenderer
         private readonly string $charset = 'UTF-8',
         private readonly string|false $polyfillUrl = ImportMapManager::POLYFILL_URL,
         private readonly array $scriptAttributes = [],
+        private readonly ?RequestStack $requestStack = null,
     ) {
     }
 
@@ -66,6 +73,10 @@ class ImportMapRenderer
             $url = $this->escapeAttributeValue($url);
 
             $output .= "\n<link rel=\"stylesheet\" href=\"$url\">";
+        }
+
+        if (class_exists(AddLinkHeaderListener::class) && $request = $this->requestStack?->getCurrentRequest()) {
+            $this->addWebLinkPreloads($request, $cssLinks);
         }
 
         $scriptAttributes = $this->createAttributesString($attributes);
@@ -130,5 +141,26 @@ class ImportMapRenderer
         }
 
         return $attributeString;
+    }
+
+    private function addWebLinkPreloads(Request $request, array $cssLinks): void
+    {
+        $cssPreloadLinks = array_map(fn ($url) => new Link('preload', $url), $cssLinks);
+
+        if (null === $linkProvider = $request->attributes->get('_links')) {
+            $request->attributes->set('_links', new GenericLinkProvider($cssPreloadLinks));
+
+            return;
+        }
+
+        if (!$linkProvider instanceof EvolvableLinkProviderInterface) {
+            return;
+        }
+
+        foreach ($cssPreloadLinks as $link) {
+            $linkProvider = $linkProvider->withLink($link);
+        }
+
+        $request->attributes->set('_links', $linkProvider);
     }
 }

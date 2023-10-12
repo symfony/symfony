@@ -150,11 +150,16 @@ class JsonDescriptor extends Descriptor
         $this->writeData($this->getCallableData($callable), $options);
     }
 
-    protected function describeContainerParameter(mixed $parameter, array $options = []): void
+    protected function describeContainerParameter(mixed $parameter, ?array $deprecation, array $options = []): void
     {
         $key = $options['parameter'] ?? '';
+        $data = [$key => $parameter];
 
-        $this->writeData([$key => $parameter], $options);
+        if ($deprecation) {
+            $data['_deprecation'] = sprintf('Since %s %s: %s', $deprecation[0], $deprecation[1], sprintf(...\array_slice($deprecation, 2)));
+        }
+
+        $this->writeData($data, $options);
     }
 
     protected function describeContainerEnvVars(array $envs, array $options = []): void
@@ -221,6 +226,23 @@ class JsonDescriptor extends Descriptor
         }
 
         return $data;
+    }
+
+    protected function sortParameters(ParameterBag $parameters): array
+    {
+        $sortedParameters = parent::sortParameters($parameters);
+
+        if ($deprecated = $parameters->allDeprecated()) {
+            $deprecations = [];
+
+            foreach ($deprecated as $parameter => $deprecation) {
+                $deprecations[$parameter] = sprintf('Since %s %s: %s', $deprecation[0], $deprecation[1], sprintf(...\array_slice($deprecation, 2)));
+            }
+
+            $sortedParameters['_deprecations'] = $deprecations;
+        }
+
+        return $sortedParameters;
     }
 
     private function getContainerDefinitionData(Definition $definition, bool $omitTags = false, bool $showArguments = false, ContainerBuilder $container = null, string $id = null): array

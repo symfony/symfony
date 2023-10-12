@@ -13,6 +13,8 @@ namespace Symfony\Bridge\Doctrine\Tests\Messenger;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception as DBALException;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Result;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -24,9 +26,9 @@ use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 
 class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
 {
-    private MockObject&Connection $connection;
-    private MockObject&EntityManagerInterface $entityManager;
-    private MockObject&ManagerRegistry $managerRegistry;
+    private Connection&MockObject $connection;
+    private EntityManagerInterface&MockObject $entityManager;
+    private ManagerRegistry&MockObject $managerRegistry;
     private DoctrinePingConnectionMiddleware $middleware;
     private string $entityManagerName = 'default';
 
@@ -48,15 +50,23 @@ class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
 
     public function testMiddlewarePingOk()
     {
-        $this->connection->expects($this->once())
-            ->method('getDatabasePlatform')
-            ->will($this->throwException(new DBALException()));
+        $this->connection->method('getDatabasePlatform')
+            ->willReturn($this->mockPlatform());
+
+        $this->connection->expects($this->exactly(2))
+            ->method('executeQuery')
+            ->willReturnCallback(function () {
+                static $counter = 0;
+
+                if (1 === ++$counter) {
+                    throw $this->createMock(DBALException::class);
+                }
+
+                return $this->createMock(Result::class);
+            });
 
         $this->connection->expects($this->once())
             ->method('close')
-        ;
-        $this->connection->expects($this->once())
-            ->method('connect')
         ;
 
         $envelope = new Envelope(new \stdClass(), [
@@ -67,9 +77,8 @@ class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
 
     public function testMiddlewarePingResetEntityManager()
     {
-        $this->connection->expects($this->once())
-            ->method('getDatabasePlatform')
-            ->will($this->throwException(new DBALException()));
+        $this->connection->method('getDatabasePlatform')
+            ->willReturn($this->mockPlatform());
 
         $this->entityManager->expects($this->once())
             ->method('isOpen')
@@ -106,11 +115,16 @@ class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
         $this->connection->expects($this->never())
             ->method('close')
         ;
-        $this->connection->expects($this->never())
-            ->method('connect')
-        ;
 
         $envelope = new Envelope(new \stdClass());
         $this->middleware->handle($envelope, $this->getStackMock());
+    }
+
+    private function mockPlatform(): AbstractPlatform&MockObject
+    {
+        $platform = $this->createMock(AbstractPlatform::class);
+        $platform->method('getDummySelectSQL')->willReturn('SELECT 1');
+
+        return $platform;
     }
 }

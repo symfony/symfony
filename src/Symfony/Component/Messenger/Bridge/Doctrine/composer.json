@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=8.2",
-        "doctrine/dbal": "^3.6",
+        "doctrine/dbal": "^3.6|^4",
         "symfony/messenger": "^6.4|^7.0",
         "symfony/service-contracts": "^2.5|^3"
     },

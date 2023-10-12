@@ -39,7 +39,8 @@ return static function (ContainerConfigurator $container) {
             ->abstract()
         ->set('workflow.marking_store.method', MethodMarkingStore::class)
             ->abstract()
-        ->set('.workflow.registry', Registry::class)
+        ->set('workflow.registry', Registry::class)
+        ->alias(Registry::class, 'workflow.registry')
         ->set('workflow.security.expression_language', ExpressionLanguage::class)
     ;
 };

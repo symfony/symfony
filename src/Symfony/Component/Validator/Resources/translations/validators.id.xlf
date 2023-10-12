@@ -402,6 +402,30 @@
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
                 <target>Nilai dari netmask harus berada diantara {{ min }} dan {{ max }}.</target>
             </trans-unit>
+            <trans-unit id="104">
+                <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
+                <target>Nama file terlalu panjang. Harusnya {{ filename_max_length }} karakter atau kurang.</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>The password strength is too low. Please use a stronger password.</source>
+                <target>Kata sandi terlalu lemah. Harap gunakan kata sandi yang lebih kuat.</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>This value contains characters that are not allowed by the current restriction-level.</source>
+                <target>Nilai ini mengandung karakter yang tidak diizinkan oleh tingkat pembatasan saat ini.</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Using invisible characters is not allowed.</source>
+                <target>Penggunaan karakter tak terlihat tidak diperbolehkan.</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Mixing numbers from different scripts is not allowed.</source>
+                <target>Menggabungkan angka-angka dari skrip yang berbeda tidak diperbolehkan.</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Using hidden overlay characters is not allowed.</source>
+                <target>Penggunaan karakter overlay yang tersembunyi tidak diperbolehkan.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

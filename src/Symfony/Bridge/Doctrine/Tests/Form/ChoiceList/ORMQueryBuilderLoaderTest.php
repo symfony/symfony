@@ -16,9 +16,14 @@ use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Types\GuidType;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\ORMQueryBuilderLoader;
 use Symfony\Bridge\Doctrine\Tests\DoctrineTestHelper;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\EmbeddedIdentifierEntity;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\LegacyQueryMock;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity;
 use Symfony\Bridge\Doctrine\Types\UlidType;
@@ -45,13 +50,11 @@ class ORMQueryBuilderLoaderTest extends TestCase
         $this->checkIdentifierType(SingleIntIdEntity::class, ArrayParameterType::INTEGER);
     }
 
-    protected function checkIdentifierType($classname, $expectedType)
+    protected function checkIdentifierType(string $classname, $expectedType)
     {
         $em = DoctrineTestHelper::createTestEntityManager();
 
-        $query = $this->getMockBuilder(QueryMock::class)
-            ->onlyMethods(['setParameter', 'getResult', 'getSql', '_doExecute'])
-            ->getMock();
+        $query = $this->getQueryMock();
 
         $query
             ->method('getResult')
@@ -62,7 +65,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
             ->with('ORMQueryBuilderLoader_getEntitiesByIds_id', [1, 2], $expectedType)
             ->willReturn($query);
 
-        $qb = $this->getMockBuilder(\Doctrine\ORM\QueryBuilder::class)
+        $qb = $this->getMockBuilder(QueryBuilder::class)
             ->setConstructorArgs([$em])
             ->onlyMethods(['getQuery'])
             ->getMock();
@@ -82,9 +85,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
     {
         $em = DoctrineTestHelper::createTestEntityManager();
 
-        $query = $this->getMockBuilder(QueryMock::class)
-            ->onlyMethods(['setParameter', 'getResult', 'getSql', '_doExecute'])
-            ->getMock();
+        $query = $this->getQueryMock();
 
         $query
             ->method('getResult')
@@ -95,7 +96,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
             ->with('ORMQueryBuilderLoader_getEntitiesByIds_id', [1, 2, 3, '9223372036854775808'], ArrayParameterType::INTEGER)
             ->willReturn($query);
 
-        $qb = $this->getMockBuilder(\Doctrine\ORM\QueryBuilder::class)
+        $qb = $this->getMockBuilder(QueryBuilder::class)
             ->setConstructorArgs([$em])
             ->onlyMethods(['getQuery'])
             ->getMock();
@@ -118,9 +119,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
     {
         $em = DoctrineTestHelper::createTestEntityManager();
 
-        $query = $this->getMockBuilder(QueryMock::class)
-            ->onlyMethods(['setParameter', 'getResult', 'getSql', '_doExecute'])
-            ->getMock();
+        $query = $this->getQueryMock();
 
         $query
             ->method('getResult')
@@ -131,7 +130,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
             ->with('ORMQueryBuilderLoader_getEntitiesByIds_id', ['71c5fd46-3f16-4abb-bad7-90ac1e654a2d', 'b98e8e11-2897-44df-ad24-d2627eb7f499'], ArrayParameterType::STRING)
             ->willReturn($query);
 
-        $qb = $this->getMockBuilder(\Doctrine\ORM\QueryBuilder::class)
+        $qb = $this->getMockBuilder(QueryBuilder::class)
             ->setConstructorArgs([$em])
             ->onlyMethods(['getQuery'])
             ->getMock();
@@ -163,9 +162,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
 
         $em = DoctrineTestHelper::createTestEntityManager();
 
-        $query = $this->getMockBuilder(QueryMock::class)
-            ->onlyMethods(['setParameter', 'getResult', 'getSql', '_doExecute'])
-            ->getMock();
+        $query = $this->getQueryMock();
 
         $query
             ->method('getResult')
@@ -176,7 +173,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
             ->with('ORMQueryBuilderLoader_getEntitiesByIds_id', [Uuid::fromString('71c5fd46-3f16-4abb-bad7-90ac1e654a2d')->toBinary(), Uuid::fromString('b98e8e11-2897-44df-ad24-d2627eb7f499')->toBinary()], ArrayParameterType::STRING)
             ->willReturn($query);
 
-        $qb = $this->getMockBuilder(\Doctrine\ORM\QueryBuilder::class)
+        $qb = $this->getMockBuilder(QueryBuilder::class)
             ->setConstructorArgs([$em])
             ->onlyMethods(['getQuery'])
             ->getMock();
@@ -208,7 +205,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
 
         $em = DoctrineTestHelper::createTestEntityManager();
 
-        $qb = $this->getMockBuilder(\Doctrine\ORM\QueryBuilder::class)
+        $qb = $this->getMockBuilder(QueryBuilder::class)
             ->setConstructorArgs([$em])
             ->onlyMethods(['getQuery'])
             ->getMock();
@@ -231,9 +228,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
     {
         $em = DoctrineTestHelper::createTestEntityManager();
 
-        $query = $this->getMockBuilder(QueryMock::class)
-            ->onlyMethods(['setParameter', 'getResult', 'getSql', '_doExecute'])
-            ->getMock();
+        $query = $this->getQueryMock();
 
         $query
             ->method('getResult')
@@ -244,7 +239,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
             ->with('ORMQueryBuilderLoader_getEntitiesByIds_id_value', [1, 2, 3], ArrayParameterType::INTEGER)
             ->willReturn($query);
 
-        $qb = $this->getMockBuilder(\Doctrine\ORM\QueryBuilder::class)
+        $qb = $this->getMockBuilder(QueryBuilder::class)
             ->setConstructorArgs([$em])
             ->onlyMethods(['getQuery'])
             ->getMock();
@@ -253,7 +248,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
             ->willReturn($query);
 
         $qb->select('e')
-            ->from('Symfony\Bridge\Doctrine\Tests\Fixtures\EmbeddedIdentifierEntity', 'e');
+            ->from(EmbeddedIdentifierEntity::class, 'e');
 
         $loader = new ORMQueryBuilderLoader($qb);
         $loader->getEntitiesByIds('id.value', [1, '', 2, 3, 'foo']);
@@ -274,19 +269,14 @@ class ORMQueryBuilderLoaderTest extends TestCase
             ['Symfony\Bridge\Doctrine\Tests\Fixtures\UlidIdEntity'],
         ];
     }
-}
 
-class QueryMock extends AbstractQuery
-{
-    public function __construct()
+    /**
+     * @return (LegacyQueryMock&MockObject)|(Query&MockObject)
+     */
+    private function getQueryMock(): AbstractQuery
     {
-    }
+        $class = ((new \ReflectionClass(Query::class))->isFinal()) ? LegacyQueryMock::class : Query::class;
 
-    public function getSQL(): array|string
-    {
-    }
-
-    protected function _doExecute(): Result|int
-    {
+        return $this->createMock($class);
     }
 }

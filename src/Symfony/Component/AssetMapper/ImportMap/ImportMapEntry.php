@@ -27,6 +27,8 @@ final class ImportMapEntry
         public readonly ?string $version = null,
         public readonly ImportMapType $type = ImportMapType::JS,
         public readonly bool $isEntrypoint = false,
+        public readonly ?string $packageName = null,
+        public readonly ?string $filePath = null,
     ) {
     }
 

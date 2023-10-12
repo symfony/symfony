@@ -16,6 +16,8 @@ use Symfony\Component\Finder\Finder;
 
 class FinderTest extends Iterator\RealIteratorTestCase
 {
+    use Iterator\VfsIteratorTestTrait;
+
     public function testCreate()
     {
         $this->assertInstanceOf(Finder::class, Finder::create());
@@ -987,6 +989,72 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder = $this->buildFinder();
         $this->assertSame($finder, $finder->filter(fn (\SplFileInfo $f) => str_contains($f, 'test')));
         $this->assertIterator($this->toAbsolute(['test.php', 'test.py']), $finder->in(self::$tmpDir)->getIterator());
+    }
+
+    public function testFilterPrune()
+    {
+        $this->setupVfsProvider([
+            'x' => [
+                'a.php' => '',
+                'b.php' => '',
+                'd' => [
+                    'u.php' => '',
+                ],
+                'x' => [
+                    'd' => [
+                        'u2.php' => '',
+                    ],
+                ],
+            ],
+            'y' => [
+                'c.php' => '',
+            ],
+        ]);
+
+        $finder = $this->buildFinder();
+        $finder
+            ->in($this->vfsScheme.'://x')
+            ->filter(fn (): bool => true, true) // does nothing
+            ->filter(function (\SplFileInfo $file): bool {
+                $path = $this->stripSchemeFromVfsPath($file->getPathname());
+
+                $res = 'x/d' !== $path;
+
+                $this->vfsLog[] = [$path, 'exclude_filter', $res];
+
+                return $res;
+            }, true)
+            ->filter(fn (): bool => true, true); // does nothing
+
+        $this->assertSameVfsIterator([
+            'x/a.php',
+            'x/b.php',
+            'x/x',
+            'x/x/d',
+            'x/x/d/u2.php',
+        ], $finder->getIterator());
+
+        // "x/d" directory must be pruned early
+        // "x/x/d" directory must not be pruned
+        $this->assertSame([
+            ['x', 'is_dir', true],
+            ['x', 'list_dir_open', ['a.php', 'b.php', 'd', 'x']],
+            ['x/a.php', 'is_dir', false],
+            ['x/a.php', 'exclude_filter', true],
+            ['x/b.php', 'is_dir', false],
+            ['x/b.php', 'exclude_filter', true],
+            ['x/d', 'is_dir', true],
+            ['x/d', 'exclude_filter', false],
+            ['x/x', 'is_dir', true],
+            ['x/x', 'exclude_filter', true], // from ExcludeDirectoryFilterIterator::accept() (prune directory filter)
+            ['x/x', 'exclude_filter', true], // from CustomFilterIterator::accept() (regular filter)
+            ['x/x', 'list_dir_open', ['d']],
+            ['x/x/d', 'is_dir', true],
+            ['x/x/d', 'exclude_filter', true],
+            ['x/x/d', 'list_dir_open', ['u2.php']],
+            ['x/x/d/u2.php', 'is_dir', false],
+            ['x/x/d/u2.php', 'exclude_filter', true],
+        ], $this->vfsLog);
     }
 
     public function testFollowLinks()

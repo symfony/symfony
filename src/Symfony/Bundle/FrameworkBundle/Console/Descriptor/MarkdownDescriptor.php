@@ -71,9 +71,16 @@ class MarkdownDescriptor extends Descriptor
 
     protected function describeContainerParameters(ParameterBag $parameters, array $options = []): void
     {
+        $deprecatedParameters = $parameters->allDeprecated();
+
         $this->write("Container parameters\n====================\n");
         foreach ($this->sortParameters($parameters) as $key => $value) {
-            $this->write(sprintf("\n- `%s`: `%s`", $key, $this->formatParameter($value)));
+            $this->write(sprintf(
+                "\n- `%s`: `%s`%s",
+                $key,
+                $this->formatParameter($value),
+                isset($deprecatedParameters[$key]) ? sprintf(' *Since %s %s: %s*', $deprecatedParameters[$key][0], $deprecatedParameters[$key][1], sprintf(...\array_slice($deprecatedParameters[$key], 2))) : ''
+            ));
         }
     }
 
@@ -290,9 +297,13 @@ class MarkdownDescriptor extends Descriptor
         $this->describeContainerDefinition($container->getDefinition((string) $alias), array_merge($options, ['id' => (string) $alias]), $container);
     }
 
-    protected function describeContainerParameter(mixed $parameter, array $options = []): void
+    protected function describeContainerParameter(mixed $parameter, ?array $deprecation, array $options = []): void
     {
-        $this->write(isset($options['parameter']) ? sprintf("%s\n%s\n\n%s", $options['parameter'], str_repeat('=', \strlen($options['parameter'])), $this->formatParameter($parameter)) : $parameter);
+        if (isset($options['parameter'])) {
+            $this->write(sprintf("%s\n%s\n\n%s%s", $options['parameter'], str_repeat('=', \strlen($options['parameter'])), $this->formatParameter($parameter), $deprecation ? sprintf("\n\n*Since %s %s: %s*", $deprecation[0], $deprecation[1], sprintf(...\array_slice($deprecation, 2))) : ''));
+        } else {
+            $this->write($parameter);
+        }
     }
 
     protected function describeContainerEnvVars(array $envs, array $options = []): void

@@ -53,6 +53,8 @@ CHANGELOG
  * Add support for relative URLs in BrowserKit's redirect assertion
  * Change BrowserKitAssertionsTrait::getClient() to be protected
  * Deprecate the `framework.asset_mapper.provider` config option
+ * Add `--exclude` option to the `cache:pool:clear` command
+ * Add parameters deprecations to the output of `debug:container` command
 
 6.3
 ---

@@ -913,7 +913,7 @@ class FrameworkExtension extends Extension
 
         $loader->load('workflow.php');
 
-        $registryDefinition = $container->getDefinition('.workflow.registry');
+        $registryDefinition = $container->getDefinition('workflow.registry');
 
         foreach ($config['workflows'] as $name => $workflow) {
             $type = $workflow['type'];

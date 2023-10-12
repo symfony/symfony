@@ -158,7 +158,8 @@ class Request
 
     protected static ?\Closure $requestFactory = null;
 
-    private string $preferredFormat;
+    private ?string $preferredFormat = null;
+
     private bool $isHostValid = true;
     private bool $isForwardedValid = true;
     private bool $isSafeContentPreferred;

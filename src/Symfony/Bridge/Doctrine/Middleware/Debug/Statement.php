@@ -19,6 +19,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * @author Laurent VOULLEMIER <laurent.voullemier@gmail.com>
+ * @author Alexander M. Turek <me@derrabus.de>
  *
  * @internal
  */
@@ -38,26 +39,16 @@ final class Statement extends AbstractStatementMiddleware
         $this->query = new Query($sql);
     }
 
-    public function bindParam($param, &$variable, $type = ParameterType::STRING, $length = null): bool
+    public function bindValue($param, $value, $type = null): void
     {
-        $this->query->setParam($param, $variable, $type);
-
-        return parent::bindParam($param, $variable, $type, ...\array_slice(\func_get_args(), 3));
-    }
-
-    public function bindValue($param, $value, $type = ParameterType::STRING): bool
-    {
+        $type ??= ParameterType::STRING;
         $this->query->setValue($param, $value, $type);
 
-        return parent::bindValue($param, $value, $type);
+        parent::bindValue($param, $value, $type);
     }
 
     public function execute($params = null): ResultInterface
     {
-        if (null !== $params) {
-            $this->query->setValues($params);
-        }
-
         // clone to prevent variables by reference to change
         $this->debugDataHolder->addQuery($this->connectionName, $query = clone $this->query);
 
@@ -65,12 +56,10 @@ final class Statement extends AbstractStatementMiddleware
         $query->start();
 
         try {
-            $result = parent::execute($params);
+            return parent::execute($params);
         } finally {
             $query->stop();
             $this->stopwatch?->stop('doctrine');
         }
-
-        return $result;
     }
 }

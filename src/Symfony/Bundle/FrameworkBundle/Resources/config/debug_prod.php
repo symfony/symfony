@@ -22,12 +22,12 @@ return static function (ContainerConfigurator $container) {
         ->set('debug.error_handler_configurator', ErrorHandlerConfigurator::class)
             ->public()
             ->args([
-                service('monolog.logger.php')->nullOnInvalid(),
+                service('logger')->nullOnInvalid(),
                 null, // Log levels map for enabled error levels
                 param('debug.error_handler.throw_at'),
                 param('kernel.debug'),
                 param('kernel.debug'),
-                service('monolog.logger.deprecation')->nullOnInvalid(),
+                service('logger')->nullOnInvalid(),
             ])
             ->tag('monolog.logger', ['channel' => 'php'])
 

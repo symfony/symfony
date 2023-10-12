@@ -12,6 +12,7 @@
 namespace Symfony\Component\AssetMapper\ImportMap\Resolver;
 
 use Symfony\Component\AssetMapper\Exception\RuntimeException;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapType;
 use Symfony\Component\AssetMapper\ImportMap\PackageRequireOptions;
@@ -56,7 +57,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
                 continue;
             }
 
-            [$packageName, $filePath] = self::splitPackageNameAndFilePath($packageName);
+            [$packageName, $filePath] = ImportMapConfigReader::splitPackageNameAndFilePath($packageName);
 
             $response = $this->httpClient->request('GET', sprintf($this->versionUrlPattern, $packageName, urlencode($constraint)));
             $requiredPackages[] = [$options, $response, $packageName, $filePath, /* resolved version */ null];
@@ -159,9 +160,8 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
         $responses = [];
 
         foreach ($importMapEntries as $package => $entry) {
-            [$packageName, $filePath] = self::splitPackageNameAndFilePath($entry->importName);
             $pattern = ImportMapType::CSS === $entry->type ? $this->distUrlCssPattern : $this->distUrlPattern;
-            $url = sprintf($pattern, $packageName, $entry->version, $filePath);
+            $url = sprintf($pattern, $entry->packageName, $entry->version, $entry->filePath);
 
             $responses[$package] = $this->httpClient->request('GET', $url);
         }
@@ -216,20 +216,6 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
         }
 
         return $dependencies;
-    }
-
-    private static function splitPackageNameAndFilePath(string $packageName): array
-    {
-        $filePath = '';
-        $i = strpos($packageName, '/');
-
-        if ($i && (!str_starts_with($packageName, '@') || $i = strpos($packageName, '/', $i + 1))) {
-            // @vendor/package/filepath or package/filepath
-            $filePath = substr($packageName, $i);
-            $packageName = substr($packageName, 0, $i);
-        }
-
-        return [$packageName, $filePath];
     }
 
     /**

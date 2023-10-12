@@ -29,7 +29,8 @@
         "symfony/finder": "^6.4|^7.0",
         "symfony/framework-bundle": "^6.4|^7.0",
         "symfony/http-foundation": "^6.4|^7.0",
-        "symfony/http-kernel": "^6.4|^7.0"
+        "symfony/http-kernel": "^6.4|^7.0",
+        "symfony/web-link": "^6.4|^7.0"
     },
     "conflict": {
         "symfony/framework-bundle": "<6.4"

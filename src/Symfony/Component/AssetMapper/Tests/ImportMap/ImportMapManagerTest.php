@@ -78,7 +78,8 @@ class ImportMapManagerTest extends TestCase
             [
                 new ImportMapEntry(
                     '@hotwired/stimulus',
-                    version: '1.2.3'
+                    version: '1.2.3',
+                    packageName: '@hotwired/stimulus',
                 ),
             ],
             [
@@ -689,6 +690,8 @@ class ImportMapManagerTest extends TestCase
                         'path' => $entry->path,
                         'type' => $entry->type->value,
                         'entrypoint' => $entry->isEntrypoint,
+                        'packageName' => $entry->packageName,
+                        'filePath' => $entry->packageName,
                     ];
                 }
 
@@ -1055,10 +1058,10 @@ class ImportMapManagerTest extends TestCase
     {
         $this->remotePackageDownloader->expects($this->any())
             ->method('getDownloadedPath')
-            ->willReturnCallback(function (string $packageName) use ($importMapEntries) {
+            ->willReturnCallback(function (string $importName) use ($importMapEntries) {
                 foreach ($importMapEntries as $entry) {
-                    if ($entry->importName === $packageName) {
-                        return self::$writableRoot.'/assets/vendor/'.$packageName.'.js';
+                    if ($entry->importName === $importName) {
+                        return self::$writableRoot.'/assets/vendor/'.$importName.'.js';
                     }
                 }
 

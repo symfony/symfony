@@ -92,8 +92,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         } finally {
             $this->requestStack->pop();
 
-            if ($response instanceof StreamedResponse) {
-                $callback = $response->getCallback();
+            if ($response instanceof StreamedResponse && $callback = $response->getCallback()) {
                 $requestStack = $this->requestStack;
 
                 $response->setCallback(static function () use ($request, $callback, $requestStack) {

@@ -293,7 +293,7 @@ class JsDelivrEsmResolverTest extends TestCase
     public static function provideDownloadPackagesTests()
     {
         yield 'single package' => [
-            ['lodash' => new ImportMapEntry('lodash', version: '1.2.3', packageName: 'lodash')],
+            ['lodash' => new ImportMapEntry('lodash', version: '1.2.3', packageName: 'lodash', filePath: '')],
             [
                 [
                     'url' => '/lodash@1.2.3/+esm',
@@ -333,7 +333,7 @@ class JsDelivrEsmResolverTest extends TestCase
 
         yield 'multiple files' => [
             [
-                'lodash' => new ImportMapEntry('lodash', version: '1.2.3', packageName: 'lodash'),
+                'lodash' => new ImportMapEntry('lodash', version: '1.2.3', packageName: 'lodash', filePath: ''),
                 'chart.js/auto' => new ImportMapEntry('chart.js/auto', version: '4.5.6', packageName: 'chart.js', filePath: '/auto'),
                 'bootstrap/dist/bootstrap.css' => new ImportMapEntry('bootstrap/dist/bootstrap.css', version: '5.0.6', type: ImportMapType::CSS, packageName: 'bootstrap', filePath: '/dist/bootstrap.css'),
             ],

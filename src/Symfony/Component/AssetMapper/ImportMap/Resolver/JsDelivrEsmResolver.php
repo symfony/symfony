@@ -162,7 +162,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
         foreach ($importMapEntries as $package => $entry) {
             $pattern = ImportMapType::CSS === $entry->type ? $this->distUrlCssPattern : $this->distUrlPattern;
             if (null === $entry->packageName || null === $entry->version || null === $entry->filePath) {
-                throw new RuntimeException(sprintf('The package %s cannot be downloaded. "packageName", "version" or "filePath" must be defined.', $entry->importName));
+                throw new RuntimeException(sprintf('The package "%s" cannot be downloaded. "packageName", "version" and "filePath" must be defined.', $entry->importName));
             }
             $url = sprintf($pattern, $entry->packageName, $entry->version, $entry->filePath);
 

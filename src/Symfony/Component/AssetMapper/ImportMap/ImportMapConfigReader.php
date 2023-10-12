@@ -38,14 +38,9 @@ class ImportMapConfigReader
 
         $entries = new ImportMapEntries();
         foreach ($importMapConfig ?? [] as $importName => $data) {
-            $validKeys = ['path', 'version', 'type', 'entrypoint', 'url'];
+            $validKeys = ['path', 'version', 'type', 'entrypoint'];
             if ($invalidKeys = array_diff(array_keys($data), $validKeys)) {
                 throw new \InvalidArgumentException(sprintf('The following keys are not valid for the importmap entry "%s": "%s". Valid keys are: "%s".', $importName, implode('", "', $invalidKeys), implode('", "', $validKeys)));
-            }
-
-            // should solve itself when the config is written again
-            if (isset($data['url'])) {
-                trigger_deprecation('symfony/asset-mapper', '6.4', 'The "url" option is deprecated, use "version" instead.');
             }
 
             $type = isset($data['type']) ? ImportMapType::tryFrom($data['type']) : ImportMapType::JS;
@@ -57,10 +52,7 @@ class ImportMapConfigReader
 
             $path = $data['path'] ?? null;
             $version = $data['version'] ?? null;
-            if (null === $version && ($data['url'] ?? null)) {
-                // BC layer for 6.3->6.4
-                $version = $this->extractVersionFromLegacyUrl($data['url']);
-            }
+
             if (null === $version && null === $path) {
                 throw new RuntimeException(sprintf('The importmap entry "%s" must have either a "path" or "version" option.', $importName));
             }
@@ -128,20 +120,5 @@ class ImportMapConfigReader
     public function getRootDirectory(): string
     {
         return \dirname($this->importMapConfigPath);
-    }
-
-    private function extractVersionFromLegacyUrl(string $url): ?string
-    {
-        // URL pattern https://ga.jspm.io/npm:bootstrap@5.3.2/dist/js/bootstrap.esm.js
-        if (false === $lastAt = strrpos($url, '@')) {
-            return null;
-        }
-
-        $nextSlash = strpos($url, '/', $lastAt);
-        if (false === $nextSlash) {
-            return null;
-        }
-
-        return substr($url, $lastAt + 1, $nextSlash - $lastAt - 1);
     }
 }

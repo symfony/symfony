@@ -39,15 +39,14 @@ final class Statement extends AbstractStatementMiddleware
         $this->query = new Query($sql);
     }
 
-    public function bindValue($param, $value, $type = null): void
+    public function bindValue(int|string $param, mixed $value, ParameterType $type): void
     {
-        $type ??= ParameterType::STRING;
         $this->query->setValue($param, $value, $type);
 
         parent::bindValue($param, $value, $type);
     }
 
-    public function execute($params = null): ResultInterface
+    public function execute(): ResultInterface
     {
         // clone to prevent variables by reference to change
         $this->debugDataHolder->addQuery($this->connectionName, $query = clone $this->query);
@@ -56,7 +55,7 @@ final class Statement extends AbstractStatementMiddleware
         $query->start();
 
         try {
-            return parent::execute($params);
+            return parent::execute();
         } finally {
             $query->stop();
             $this->stopwatch?->stop('doctrine');

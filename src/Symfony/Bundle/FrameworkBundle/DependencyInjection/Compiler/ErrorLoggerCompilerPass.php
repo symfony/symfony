@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class ErrorLoggerCompilerPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition('debug.debug_handlers_listener')) {
             return;

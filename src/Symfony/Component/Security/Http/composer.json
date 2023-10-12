@@ -23,7 +23,7 @@
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/property-access": "^5.4|^6.0",
         "symfony/security-core": "^6.3",
-        "symfony/service-contracts": "^1.10|^2|^3"
+        "symfony/service-contracts": "^2.5|^3"
     },
     "require-dev": {
         "symfony/cache": "^5.4|^6.0",

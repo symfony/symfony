@@ -9,15 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FeatureFlagsBundle\Command;
+namespace Symfony\Bundle\FrameworkBundle\Command;
 
-use Symfony\Bundle\FeatureFlagsBundle\Debug\TraceableStrategy;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\FeatureFlags\Debug\TraceableStrategy;
 use Symfony\Component\FeatureFlags\Feature;
 use Symfony\Component\FeatureFlags\Provider\ProviderInterface;
 use Symfony\Component\FeatureFlags\Strategy\OuterStrategiesInterface;

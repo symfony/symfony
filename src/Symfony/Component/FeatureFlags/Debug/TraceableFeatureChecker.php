@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FeatureFlagsBundle\Debug;
+namespace Symfony\Component\FeatureFlags\Debug;
 
-use Symfony\Bundle\FeatureFlagsBundle\DataCollector\FeatureCheckerDataCollector;
+use Symfony\Component\FeatureFlags\DataCollector\FeatureCheckerDataCollector;
 use Symfony\Component\FeatureFlags\FeatureCheckerInterface;
 
 final class TraceableFeatureChecker implements FeatureCheckerInterface

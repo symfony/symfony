@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FeatureFlagsBundle\Strategy;
+namespace Symfony\Component\FeatureFlags\Strategy\HttpFoundation;
 
 use Symfony\Component\FeatureFlags\Strategy\StrategyInterface;
 use Symfony\Component\FeatureFlags\StrategyResult;

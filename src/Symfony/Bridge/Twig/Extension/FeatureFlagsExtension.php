@@ -9,23 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FeatureFlagsBundle\Twig;
+namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\FeatureFlags\FeatureCheckerInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-final class FeatureEnabledExtension extends AbstractExtension
+final class FeatureFlagsExtension extends AbstractExtension
 {
-    public function __construct(
-        private readonly FeatureCheckerInterface $featureEnabledChecker,
-    ) {
-    }
-
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('is_feature_enabled', $this->featureEnabledChecker->isEnabled(...)),
+            new TwigFunction('is_feature_enabled', [FeatureFlagsRuntime::class, 'isFeatureEnabled']),
         ];
     }
 }

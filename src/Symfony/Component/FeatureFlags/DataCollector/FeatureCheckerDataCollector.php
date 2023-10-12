@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FeatureFlagsBundle\DataCollector;
+namespace Symfony\Component\FeatureFlags\DataCollector;
 
 use Symfony\Component\FeatureFlags\StrategyResult;
 use Symfony\Component\HttpFoundation\Request;

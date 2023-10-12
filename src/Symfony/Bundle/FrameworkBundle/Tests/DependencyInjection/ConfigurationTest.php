@@ -526,6 +526,50 @@ class ConfigurationTest extends TestCase
         ]);
     }
 
+    public function testFeatureRequiresDescriptionKey()
+    {
+        self::expectException(InvalidConfigurationException::class);
+        self::expectExceptionMessage('The child config "default" under "framework.feature_flags.features.some-feature" must be configured: Will be used as a fallback mechanism if the strategy return StrategyResult::Abstain.');
+
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        $processor->processConfiguration($configuration, [
+            'framework' => [
+                'feature_flags' =>[
+                    'features' => [
+                        [
+                            'name' => 'some-feature',
+                            'strategy' => 'fake-strategy',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testFeatureRequiresStrategyKey()
+    {
+        self::expectException(InvalidConfigurationException::class);
+        self::expectExceptionMessage('The child config "strategy" under "framework.feature_flags.features.some-feature" must be configured: Strategy to be used for this feature. Can be one of "feature_flags.strategies[].name" or a valid service id that implements StrategyInterface::class.');
+
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        $processor->processConfiguration($configuration, [
+            'framework' => [
+                'feature_flags' => [
+                    'features' => [
+                        [
+                            'name' => 'some-feature',
+                            'default' => false,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
     protected static function getBundleDefaultConfig()
     {
         return [
@@ -779,6 +823,11 @@ class ConfigurationTest extends TestCase
             ],
             'remote-event' => [
                 'enabled' => false,
+            ],
+            'feature_flags' => [
+                'enabled' => false,
+                'strategies' => [],
+                'features' => [],
             ],
         ];
     }

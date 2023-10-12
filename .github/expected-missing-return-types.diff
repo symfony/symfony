@@ -242,6 +242,23 @@ diff --git a/src/Symfony/Bridge/Doctrine/Security/RememberMe/DoctrineTokenProvid
 +    public function createNewToken(PersistentTokenInterface $token): void
      {
          $sql = 'INSERT INTO rememberme_token (class, username, series, value, lastUsed) VALUES (:class, :username, :series, :value, :lastUsed)';
+diff --git a/src/Symfony/Bridge/Doctrine/Tests/Fixtures/LegacyQueryMock.php b/src/Symfony/Bridge/Doctrine/Tests/Fixtures/LegacyQueryMock.php
+--- a/src/Symfony/Bridge/Doctrine/Tests/Fixtures/LegacyQueryMock.php
++++ b/src/Symfony/Bridge/Doctrine/Tests/Fixtures/LegacyQueryMock.php
+@@ -24,5 +24,5 @@ class LegacyQueryMock extends AbstractQuery
+      * @return array|string
+      */
+-    public function getSQL()
++    public function getSQL(): array|string
+     {
+     }
+@@ -31,5 +31,5 @@ class LegacyQueryMock extends AbstractQuery
+      * @return Result|int
+      */
+-    protected function _doExecute()
++    protected function _doExecute(): Result|int
+     {
+     }
 diff --git a/src/Symfony/Bridge/Doctrine/Validator/Constraints/UniqueEntityValidator.php b/src/Symfony/Bridge/Doctrine/Validator/Constraints/UniqueEntityValidator.php
 --- a/src/Symfony/Bridge/Doctrine/Validator/Constraints/UniqueEntityValidator.php
 +++ b/src/Symfony/Bridge/Doctrine/Validator/Constraints/UniqueEntityValidator.php
@@ -636,7 +653,7 @@ diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExt
 +    public function load(array $configs, ContainerBuilder $container): void
      {
          $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));
-@@ -2903,5 +2903,5 @@ class FrameworkExtension extends Extension
+@@ -2913,5 +2913,5 @@ class FrameworkExtension extends Extension
       * @return void
       */
 -    public static function registerRateLimiter(ContainerBuilder $container, string $name, array $limiterConfig)
@@ -646,14 +663,14 @@ diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExt
 diff --git a/src/Symfony/Bundle/FrameworkBundle/FrameworkBundle.php b/src/Symfony/Bundle/FrameworkBundle/FrameworkBundle.php
 --- a/src/Symfony/Bundle/FrameworkBundle/FrameworkBundle.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/FrameworkBundle.php
-@@ -94,5 +94,5 @@ class FrameworkBundle extends Bundle
+@@ -95,5 +95,5 @@ class FrameworkBundle extends Bundle
       * @return void
       */
 -    public function boot()
 +    public function boot(): void
      {
          $_ENV['DOCTRINE_DEPRECATIONS'] = $_SERVER['DOCTRINE_DEPRECATIONS'] ??= 'trigger';
-@@ -119,5 +119,5 @@ class FrameworkBundle extends Bundle
+@@ -120,5 +120,5 @@ class FrameworkBundle extends Bundle
       * @return void
       */
 -    public function build(ContainerBuilder $container)
@@ -751,7 +768,7 @@ diff --git a/src/Symfony/Bundle/FrameworkBundle/Translation/Translator.php b/src
 diff --git a/src/Symfony/Bundle/SecurityBundle/Debug/TraceableFirewallListener.php b/src/Symfony/Bundle/SecurityBundle/Debug/TraceableFirewallListener.php
 --- a/src/Symfony/Bundle/SecurityBundle/Debug/TraceableFirewallListener.php
 +++ b/src/Symfony/Bundle/SecurityBundle/Debug/TraceableFirewallListener.php
-@@ -32,5 +32,5 @@ final class TraceableFirewallListener extends FirewallListener
+@@ -33,5 +33,5 @@ final class TraceableFirewallListener extends FirewallListener implements ResetI
       * @return array
       */
 -    public function getWrappedListeners()
@@ -821,35 +838,35 @@ diff --git a/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Compiler/Regi
 diff --git a/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Security/Factory/AbstractFactory.php b/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Security/Factory/AbstractFactory.php
 --- a/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Security/Factory/AbstractFactory.php
 +++ b/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Security/Factory/AbstractFactory.php
-@@ -56,5 +56,5 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
+@@ -53,5 +53,5 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
       * @return void
       */
 -    public function addConfiguration(NodeDefinition $node)
 +    public function addConfiguration(NodeDefinition $node): void
      {
          $builder = $node->children();
-@@ -79,5 +79,5 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
+@@ -76,5 +76,5 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
       * @return string
       */
 -    protected function createAuthenticationSuccessHandler(ContainerBuilder $container, string $id, array $config)
 +    protected function createAuthenticationSuccessHandler(ContainerBuilder $container, string $id, array $config): string
      {
          $successHandlerId = $this->getSuccessHandlerId($id);
-@@ -101,5 +101,5 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
+@@ -98,5 +98,5 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
       * @return string
       */
 -    protected function createAuthenticationFailureHandler(ContainerBuilder $container, string $id, array $config)
 +    protected function createAuthenticationFailureHandler(ContainerBuilder $container, string $id, array $config): string
      {
          $id = $this->getFailureHandlerId($id);
-@@ -121,5 +121,5 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
+@@ -118,5 +118,5 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
       * @return string
       */
 -    protected function getSuccessHandlerId(string $id)
 +    protected function getSuccessHandlerId(string $id): string
      {
          return 'security.authentication.success_handler.'.$id.'.'.str_replace('-', '_', $this->getKey());
-@@ -129,5 +129,5 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
+@@ -126,5 +126,5 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
       * @return string
       */
 -    protected function getFailureHandlerId(string $id)
@@ -2281,21 +2298,21 @@ diff --git a/src/Symfony/Component/Console/EventListener/ErrorListener.php b/src
 diff --git a/src/Symfony/Component/Console/Formatter/OutputFormatter.php b/src/Symfony/Component/Console/Formatter/OutputFormatter.php
 --- a/src/Symfony/Component/Console/Formatter/OutputFormatter.php
 +++ b/src/Symfony/Component/Console/Formatter/OutputFormatter.php
-@@ -85,5 +85,5 @@ class OutputFormatter implements WrappableOutputFormatterInterface
+@@ -87,5 +87,5 @@ class OutputFormatter implements WrappableOutputFormatterInterface
       * @return void
       */
 -    public function setDecorated(bool $decorated)
 +    public function setDecorated(bool $decorated): void
      {
          $this->decorated = $decorated;
-@@ -98,5 +98,5 @@ class OutputFormatter implements WrappableOutputFormatterInterface
+@@ -100,5 +100,5 @@ class OutputFormatter implements WrappableOutputFormatterInterface
       * @return void
       */
 -    public function setStyle(string $name, OutputFormatterStyleInterface $style)
 +    public function setStyle(string $name, OutputFormatterStyleInterface $style): void
      {
          $this->styles[strtolower($name)] = $style;
-@@ -125,5 +125,5 @@ class OutputFormatter implements WrappableOutputFormatterInterface
+@@ -127,5 +127,5 @@ class OutputFormatter implements WrappableOutputFormatterInterface
       * @return string
       */
 -    public function formatAndWrap(?string $message, int $width)
@@ -2896,13 +2913,13 @@ diff --git a/src/Symfony/Component/Console/Output/ConsoleSectionOutput.php b/src
 +    public function overwrite(string|iterable $message): void
      {
          $this->clear();
-@@ -167,5 +167,5 @@ class ConsoleSectionOutput extends StreamOutput
+@@ -166,5 +166,5 @@ class ConsoleSectionOutput extends StreamOutput
       * @return void
       */
 -    protected function doWrite(string $message, bool $newline)
 +    protected function doWrite(string $message, bool $newline): void
      {
-         if (!$this->isDecorated()) {
+         // Simulate newline behavior for consistent output formatting, avoiding extra logic
 diff --git a/src/Symfony/Component/Console/Output/NullOutput.php b/src/Symfony/Component/Console/Output/NullOutput.php
 --- a/src/Symfony/Component/Console/Output/NullOutput.php
 +++ b/src/Symfony/Component/Console/Output/NullOutput.php
@@ -7096,98 +7113,98 @@ diff --git a/src/Symfony/Component/HttpFoundation/ParameterBag.php b/src/Symfony
 diff --git a/src/Symfony/Component/HttpFoundation/Request.php b/src/Symfony/Component/HttpFoundation/Request.php
 --- a/src/Symfony/Component/HttpFoundation/Request.php
 +++ b/src/Symfony/Component/HttpFoundation/Request.php
-@@ -269,5 +269,5 @@ class Request
+@@ -272,5 +272,5 @@ class Request
       * @return void
       */
 -    public function initialize(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null)
 +    public function initialize(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null): void
      {
          $this->request = new InputBag($request);
-@@ -429,5 +429,5 @@ class Request
+@@ -432,5 +432,5 @@ class Request
       * @return void
       */
 -    public static function setFactory(?callable $callable)
 +    public static function setFactory(?callable $callable): void
      {
          self::$requestFactory = $callable;
-@@ -535,5 +535,5 @@ class Request
+@@ -538,5 +538,5 @@ class Request
       * @return void
       */
 -    public function overrideGlobals()
 +    public function overrideGlobals(): void
      {
          $this->server->set('QUERY_STRING', static::normalizeQueryString(http_build_query($this->query->all(), '', '&')));
-@@ -577,5 +577,5 @@ class Request
+@@ -580,5 +580,5 @@ class Request
       * @return void
       */
 -    public static function setTrustedProxies(array $proxies, int $trustedHeaderSet)
 +    public static function setTrustedProxies(array $proxies, int $trustedHeaderSet): void
      {
          self::$trustedProxies = array_reduce($proxies, function ($proxies, $proxy) {
-@@ -620,5 +620,5 @@ class Request
+@@ -623,5 +623,5 @@ class Request
       * @return void
       */
 -    public static function setTrustedHosts(array $hostPatterns)
 +    public static function setTrustedHosts(array $hostPatterns): void
      {
          self::$trustedHostPatterns = array_map(fn ($hostPattern) => sprintf('{%s}i', $hostPattern), $hostPatterns);
-@@ -668,5 +668,5 @@ class Request
+@@ -671,5 +671,5 @@ class Request
       * @return void
       */
 -    public static function enableHttpMethodParameterOverride()
 +    public static function enableHttpMethodParameterOverride(): void
      {
          self::$httpMethodParameterOverride = true;
-@@ -755,5 +755,5 @@ class Request
+@@ -758,5 +758,5 @@ class Request
       * @return void
       */
 -    public function setSession(SessionInterface $session)
 +    public function setSession(SessionInterface $session): void
      {
          $this->session = $session;
-@@ -1178,5 +1178,5 @@ class Request
+@@ -1181,5 +1181,5 @@ class Request
       * @return void
       */
 -    public function setMethod(string $method)
 +    public function setMethod(string $method): void
      {
          $this->method = null;
-@@ -1301,5 +1301,5 @@ class Request
+@@ -1304,5 +1304,5 @@ class Request
       * @return void
       */
 -    public function setFormat(?string $format, string|array $mimeTypes)
 +    public function setFormat(?string $format, string|array $mimeTypes): void
      {
          if (null === static::$formats) {
-@@ -1333,5 +1333,5 @@ class Request
+@@ -1336,5 +1336,5 @@ class Request
       * @return void
       */
 -    public function setRequestFormat(?string $format)
 +    public function setRequestFormat(?string $format): void
      {
          $this->format = $format;
-@@ -1365,5 +1365,5 @@ class Request
+@@ -1368,5 +1368,5 @@ class Request
       * @return void
       */
 -    public function setDefaultLocale(string $locale)
 +    public function setDefaultLocale(string $locale): void
      {
          $this->defaultLocale = $locale;
-@@ -1387,5 +1387,5 @@ class Request
+@@ -1390,5 +1390,5 @@ class Request
       * @return void
       */
 -    public function setLocale(string $locale)
 +    public function setLocale(string $locale): void
      {
          $this->setPhpDefaultLocale($this->locale = $locale);
-@@ -1756,5 +1756,5 @@ class Request
+@@ -1759,5 +1759,5 @@ class Request
       * @return string
       */
 -    protected function prepareRequestUri()
 +    protected function prepareRequestUri(): string
      {
          $requestUri = '';
-@@ -1927,5 +1927,5 @@ class Request
+@@ -1929,5 +1929,5 @@ class Request
       * @return void
       */
 -    protected static function initializeFormats()
@@ -8464,7 +8481,7 @@ diff --git a/src/Symfony/Component/HttpKernel/HttpCache/SurrogateInterface.php b
 diff --git a/src/Symfony/Component/HttpKernel/HttpKernel.php b/src/Symfony/Component/HttpKernel/HttpKernel.php
 --- a/src/Symfony/Component/HttpKernel/HttpKernel.php
 +++ b/src/Symfony/Component/HttpKernel/HttpKernel.php
-@@ -96,5 +96,5 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
+@@ -111,5 +111,5 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
       * @return void
       */
 -    public function terminate(Request $request, Response $response)
@@ -9523,7 +9540,7 @@ diff --git a/src/Symfony/Component/Messenger/Bridge/AmazonSqs/Transport/AmazonSq
 diff --git a/src/Symfony/Component/Messenger/Command/ConsumeMessagesCommand.php b/src/Symfony/Component/Messenger/Command/ConsumeMessagesCommand.php
 --- a/src/Symfony/Component/Messenger/Command/ConsumeMessagesCommand.php
 +++ b/src/Symfony/Component/Messenger/Command/ConsumeMessagesCommand.php
-@@ -128,5 +128,5 @@ EOF
+@@ -132,5 +132,5 @@ EOF
       * @return void
       */
 -    protected function interact(InputInterface $input, OutputInterface $output)
@@ -11313,56 +11330,56 @@ diff --git a/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php 
 diff --git a/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
 --- a/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
-@@ -143,5 +143,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -144,5 +144,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return bool
       */
 -    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */)
 +    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */): bool
      {
          return \is_object($data) && !$data instanceof \Traversable;
-@@ -151,5 +151,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -152,5 +152,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return array|string|int|float|bool|\ArrayObject|null
       */
 -    public function normalize(mixed $object, string $format = null, array $context = [])
 +    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
      {
          if (!isset($context['cache_key'])) {
-@@ -235,5 +235,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -236,5 +236,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return object
       */
 -    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null)
 +    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null): object
      {
          if ($class !== $mappedClass = $this->getMappedClass($data, $class, $context)) {
-@@ -286,5 +286,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -287,5 +287,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return string[]
       */
 -    abstract protected function extractAttributes(object $object, string $format = null, array $context = []);
 +    abstract protected function extractAttributes(object $object, string $format = null, array $context = []): array;
  
      /**
-@@ -293,5 +293,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -294,5 +294,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return mixed
       */
 -    abstract protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []);
 +    abstract protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed;
  
      /**
-@@ -300,5 +300,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -301,5 +301,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return bool
       */
 -    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */)
 +    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */): bool
      {
          return class_exists($type) || (interface_exists($type, false) && null !== $this->classDiscriminatorResolver?->getMappingForClass($type));
-@@ -308,5 +308,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -309,5 +309,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return mixed
       */
 -    public function denormalize(mixed $data, string $type, string $format = null, array $context = [])
 +    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
      {
          if (!isset($context['cache_key'])) {
-@@ -414,5 +414,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -417,5 +417,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return void
       */
 -    abstract protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = []);
@@ -12183,7 +12200,7 @@ diff --git a/src/Symfony/Component/Translation/Writer/TranslationWriterInterface
 diff --git a/src/Symfony/Component/Validator/Command/DebugCommand.php b/src/Symfony/Component/Validator/Command/DebugCommand.php
 --- a/src/Symfony/Component/Validator/Command/DebugCommand.php
 +++ b/src/Symfony/Component/Validator/Command/DebugCommand.php
-@@ -47,5 +47,5 @@ class DebugCommand extends Command
+@@ -51,5 +51,5 @@ class DebugCommand extends Command
       * @return void
       */
 -    protected function configure()
@@ -12193,35 +12210,35 @@ diff --git a/src/Symfony/Component/Validator/Command/DebugCommand.php b/src/Symf
 diff --git a/src/Symfony/Component/Validator/Constraint.php b/src/Symfony/Component/Validator/Constraint.php
 --- a/src/Symfony/Component/Validator/Constraint.php
 +++ b/src/Symfony/Component/Validator/Constraint.php
-@@ -236,5 +236,5 @@ abstract class Constraint
+@@ -238,5 +238,5 @@ abstract class Constraint
       * @return void
       */
 -    public function addImplicitGroupName(string $group)
 +    public function addImplicitGroupName(string $group): void
      {
          if (null === $this->groups && \array_key_exists('groups', (array) $this)) {
-@@ -256,5 +256,5 @@ abstract class Constraint
+@@ -258,5 +258,5 @@ abstract class Constraint
       * @see __construct()
       */
 -    public function getDefaultOption()
 +    public function getDefaultOption(): ?string
      {
          return null;
-@@ -270,5 +270,5 @@ abstract class Constraint
+@@ -272,5 +272,5 @@ abstract class Constraint
       * @see __construct()
       */
 -    public function getRequiredOptions()
 +    public function getRequiredOptions(): array
      {
          return [];
-@@ -284,5 +284,5 @@ abstract class Constraint
+@@ -286,5 +286,5 @@ abstract class Constraint
       * @return string
       */
 -    public function validatedBy()
 +    public function validatedBy(): string
      {
          return static::class.'Validator';
-@@ -298,5 +298,5 @@ abstract class Constraint
+@@ -300,5 +300,5 @@ abstract class Constraint
       * @return string|string[] One or more constant values
       */
 -    public function getTargets()
@@ -13971,49 +13988,49 @@ diff --git a/src/Symfony/Component/VarDumper/Dumper/CliDumper.php b/src/Symfony/
 +    public function dumpScalar(Cursor $cursor, string $type, string|int|float|bool|null $value): void
      {
          $this->dumpKey($cursor);
-@@ -195,5 +195,5 @@ class CliDumper extends AbstractDumper
+@@ -196,5 +196,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    public function dumpString(Cursor $cursor, string $str, bool $bin, int $cut)
 +    public function dumpString(Cursor $cursor, string $str, bool $bin, int $cut): void
      {
          $this->dumpKey($cursor);
-@@ -286,5 +286,5 @@ class CliDumper extends AbstractDumper
+@@ -288,5 +288,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    public function enterHash(Cursor $cursor, int $type, string|int|null $class, bool $hasChild)
 +    public function enterHash(Cursor $cursor, int $type, string|int|null $class, bool $hasChild): void
      {
          $this->colors ??= $this->supportsColors();
-@@ -325,5 +325,5 @@ class CliDumper extends AbstractDumper
+@@ -328,5 +328,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    public function leaveHash(Cursor $cursor, int $type, string|int|null $class, bool $hasChild, int $cut)
 +    public function leaveHash(Cursor $cursor, int $type, string|int|null $class, bool $hasChild, int $cut): void
      {
          if (empty($cursor->attr['cut_hash'])) {
-@@ -343,5 +343,5 @@ class CliDumper extends AbstractDumper
+@@ -346,5 +346,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    protected function dumpEllipsis(Cursor $cursor, bool $hasChild, int $cut)
 +    protected function dumpEllipsis(Cursor $cursor, bool $hasChild, int $cut): void
      {
          if ($cut) {
-@@ -361,5 +361,5 @@ class CliDumper extends AbstractDumper
+@@ -364,5 +364,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    protected function dumpKey(Cursor $cursor)
 +    protected function dumpKey(Cursor $cursor): void
      {
          if (null !== $key = $cursor->hashKey) {
-@@ -572,5 +572,5 @@ class CliDumper extends AbstractDumper
+@@ -575,5 +575,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    protected function dumpLine(int $depth, bool $endOfValue = false)
 +    protected function dumpLine(int $depth, bool $endOfValue = false): void
      {
          if ($this->colors) {
-@@ -583,5 +583,5 @@ class CliDumper extends AbstractDumper
+@@ -586,5 +586,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    protected function endValue(Cursor $cursor)

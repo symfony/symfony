@@ -20,6 +20,7 @@ use Symfony\Component\AssetMapper\Exception\CircularAssetsException;
 use Symfony\Component\AssetMapper\Exception\RuntimeException;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapType;
 use Symfony\Component\AssetMapper\MappedAsset;
 
 class JavaScriptImportPathCompilerTest extends TestCase
@@ -35,15 +36,12 @@ class JavaScriptImportPathCompilerTest extends TestCase
         $importMapManager->expects($this->any())
             ->method('findRootImportMapEntry')
             ->willReturnCallback(function ($importName) {
-                if ('module_in_importmap_local_asset' === $importName) {
-                    return new ImportMapEntry('module_in_importmap_local_asset', 'module_in_importmap_local_asset.js');
-                }
-
-                if ('module_in_importmap_remote' === $importName) {
-                    return new ImportMapEntry('module_in_importmap_local_asset', version: '1.2.3');
-                }
-
-                return null;
+                return match ($importName) {
+                    'module_in_importmap_local_asset' => ImportMapEntry::createLocal('module_in_importmap_local_asset', ImportMapType::JS, 'module_in_importmap_local_asset.js', false),
+                    'module_in_importmap_remote' => ImportMapEntry::createRemote('module_in_importmap_remote', ImportMapType::JS, '/path/to/vendor/module_in_importmap_remote.js', '1.2.3', 'could_be_anything', false),
+                    '@popperjs/core' => ImportMapEntry::createRemote('@popperjs/core', ImportMapType::JS, '/path/to/vendor/@popperjs/core.js', '1.2.3', 'could_be_anything', false),
+                    default => null,
+                };
             });
         $compiler = new JavaScriptImportPathCompiler($importMapManager);
         // compile - and check that content doesn't change
@@ -284,13 +282,19 @@ class JavaScriptImportPathCompilerTest extends TestCase
         yield 'bare_import_in_importmap_but_remote' => [
             'sourceLogicalName' => 'app.js',
             'input' => 'import "module_in_importmap_remote";',
-            'expectedJavaScriptImports' => ['module_in_importmap_remote' => ['lazy' => false, 'asset' => null, 'add' => false]],
+            'expectedJavaScriptImports' => ['module_in_importmap_remote' => ['lazy' => false, 'asset' => 'module_in_importmap_remote.js', 'add' => false]],
         ];
 
         yield 'absolute_import_added_as_dependency_only' => [
             'sourceLogicalName' => 'app.js',
             'input' => 'import "https://example.com/module.js";',
             'expectedJavaScriptImports' => ['https://example.com/module.js' => ['lazy' => false, 'asset' => null, 'add' => false]],
+        ];
+
+        yield 'bare_import_with_minimal_spaces' => [
+            'sourceLogicalName' => 'app.js',
+            'input' => 'import*as t from"@popperjs/core";',
+            'expectedJavaScriptImports' => ['@popperjs/core' => ['lazy' => false, 'asset' => 'assets/vendor/@popperjs/core.js', 'add' => false]],
         ];
     }
 
@@ -446,6 +450,16 @@ class JavaScriptImportPathCompilerTest extends TestCase
                     'subdir/foo.js' => new MappedAsset('subdir/foo.js', publicPathWithoutDigest: '/assets/subdir/foo.js'),
                     'styles.css' => new MappedAsset('styles.css', publicPathWithoutDigest: '/assets/styles.css'),
                     'module_in_importmap_local_asset.js' => new MappedAsset('module_in_importmap_local_asset.js', publicPathWithoutDigest: '/assets/module_in_importmap_local_asset.js'),
+                    default => null,
+                };
+            });
+
+        $assetMapper->expects($this->any())
+            ->method('getAssetFromSourcePath')
+            ->willReturnCallback(function ($path) {
+                return match ($path) {
+                    '/path/to/vendor/module_in_importmap_remote.js' => new MappedAsset('module_in_importmap_remote.js', publicPathWithoutDigest: '/assets/module_in_importmap_remote.js'),
+                    '/path/to/vendor/@popperjs/core.js' => new MappedAsset('assets/vendor/@popperjs/core.js', publicPathWithoutDigest: '/assets/@popperjs/core.js'),
                     default => null,
                 };
             });

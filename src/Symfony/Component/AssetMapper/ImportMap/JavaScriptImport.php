@@ -19,9 +19,10 @@ use Symfony\Component\AssetMapper\MappedAsset;
 final class JavaScriptImport
 {
     /**
-     * @param string $importName               The name of the import needed in the importmap, e.g. "/foo.js" or "react".
-     * @param bool   $isLazy                   whether this import was lazy or eager
-     * @param bool   $addImplicitlyToImportMap whether this import should be added to the importmap automatically
+     * @param string           $importName               The name of the import needed in the importmap, e.g. "/foo.js" or "react"
+     * @param bool             $isLazy                   Whether this import was lazy or eager
+     * @param MappedAsset|null $asset                    The asset that was imported, if known - needed to add to the importmap, also used to find further imports for preloading
+     * @param bool             $addImplicitlyToImportMap Whether this import should be added to the importmap automatically
      */
     public function __construct(
         public readonly string $importName,

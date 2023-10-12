@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Factory;
+namespace Symfony\Component\AssetMapper\Tests\Factory;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -116,7 +116,7 @@ class MappedAssetFactoryTest extends TestCase
     public function testCreateMappedAssetInVendor()
     {
         $assetMapper = $this->createFactory();
-        $asset = $assetMapper->createMappedAsset('lodash.js', __DIR__.'/../fixtures/assets/vendor/lodash.js');
+        $asset = $assetMapper->createMappedAsset('lodash.js', __DIR__.'/../fixtures/assets/vendor/lodash/lodash.index.js');
         $this->assertSame('lodash.js', $asset->logicalPath);
         $this->assertTrue($asset->isVendor);
     }

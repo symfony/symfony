@@ -12,7 +12,6 @@
 namespace Symfony\Component\AssetMapper\ImportMap\Resolver;
 
 use Symfony\Component\AssetMapper\Exception\RuntimeException;
-use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapType;
 use Symfony\Component\AssetMapper\ImportMap\PackageRequireOptions;
@@ -49,26 +48,26 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
         // request the version of each package
         $requiredPackages = [];
         foreach ($packagesToRequire as $options) {
-            $packageName = trim($options->packageName, '/');
+            $packageSpecifier = trim($options->packageModuleSpecifier, '/');
             $constraint = $options->versionConstraint ?? '*';
 
             // avoid resolving the same package twice
-            if (isset($resolvedPackages[$packageName])) {
+            if (isset($resolvedPackages[$packageSpecifier])) {
                 continue;
             }
 
-            [$packageName, $filePath] = ImportMapConfigReader::splitPackageNameAndFilePath($packageName);
+            [$packageName, $filePath] = ImportMapEntry::splitPackageNameAndFilePath($packageSpecifier);
 
             $response = $this->httpClient->request('GET', sprintf($this->versionUrlPattern, $packageName, urlencode($constraint)));
             $requiredPackages[] = [$options, $response, $packageName, $filePath, /* resolved version */ null];
         }
 
-        // grab the version of each package & request the contents
-        $errors = [];
-        $cssEntrypointResponses = [];
+        // use the version of each package to request the contents
+        $findVersionErrors = [];
+        $entrypointResponses = [];
         foreach ($requiredPackages as $i => [$options, $response, $packageName, $filePath]) {
             if (200 !== $response->getStatusCode()) {
-                $errors[] = [$options->packageName, $response];
+                $findVersionErrors[] = [$packageName, $response];
                 continue;
             }
 
@@ -78,49 +77,49 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
             $requiredPackages[$i][4] = $version;
 
             if (!$filePath) {
-                $cssEntrypointResponses[$packageName] = $this->httpClient->request('GET', sprintf(self::URL_PATTERN_ENTRYPOINT, $packageName, $version));
+                $entrypointResponses[$packageName] = [$this->httpClient->request('GET', sprintf(self::URL_PATTERN_ENTRYPOINT, $packageName, $version)), $version];
             }
         }
 
         try {
-            ($errors[0][1] ?? null)?->getHeaders();
+            ($findVersionErrors[0][1] ?? null)?->getHeaders();
         } catch (HttpExceptionInterface $e) {
             $response = $e->getResponse();
-            $packages = implode('", "', array_column($errors, 0));
+            $packages = implode('", "', array_column($findVersionErrors, 0));
 
-            throw new RuntimeException(sprintf('Error %d finding version from jsDelivr for "%s". Check your package names. Response: ', $response->getStatusCode(), $packages).$response->getContent(false), 0, $e);
+            throw new RuntimeException(sprintf('Error %d finding version from jsDelivr for the following packages: "%s". Check your package names. Response: ', $response->getStatusCode(), $packages).$response->getContent(false), 0, $e);
         }
 
         // process the contents of each package & add the resolved package
         $packagesToRequire = [];
+        $getContentErrors = [];
         foreach ($requiredPackages as [$options, $response, $packageName, $filePath, $version]) {
             if (200 !== $response->getStatusCode()) {
-                $errors[] = [$options->packageName, $response];
+                $getContentErrors[] = [$options->packageModuleSpecifier, $response];
                 continue;
             }
 
-            $packageName = trim($options->packageName, '/');
             $contentType = $response->getHeaders()['content-type'][0] ?? '';
             $type = str_starts_with($contentType, 'text/css') ? ImportMapType::CSS : ImportMapType::JS;
-            $resolvedPackages[$packageName] = new ResolvedImportMapPackage($options, $version, $type);
+            $resolvedPackages[$options->packageModuleSpecifier] = new ResolvedImportMapPackage($options, $version, $type);
 
             $packagesToRequire = array_merge($packagesToRequire, $this->fetchPackageRequirementsFromImports($response->getContent()));
         }
 
         try {
-            ($errors[0][1] ?? null)?->getHeaders();
+            ($getContentErrors[0][1] ?? null)?->getHeaders();
         } catch (HttpExceptionInterface $e) {
             $response = $e->getResponse();
-            $packages = implode('", "', array_column($errors, 0));
+            $packages = implode('", "', array_column($getContentErrors, 0));
 
             throw new RuntimeException(sprintf('Error %d requiring packages from jsDelivr for "%s". Check your package names. Response: ', $response->getStatusCode(), $packages).$response->getContent(false), 0, $e);
         }
 
         // process any pending CSS entrypoints
-        $errors = [];
-        foreach ($cssEntrypointResponses as $package => $cssEntrypointResponse) {
+        $entrypointErrors = [];
+        foreach ($entrypointResponses as $package => [$cssEntrypointResponse, $version]) {
             if (200 !== $cssEntrypointResponse->getStatusCode()) {
-                $errors[] = [$package, $cssEntrypointResponse];
+                $entrypointErrors[] = [$package, $cssEntrypointResponse];
                 continue;
             }
 
@@ -135,12 +134,12 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
         }
 
         try {
-            ($errors[0][1] ?? null)?->getHeaders();
+            ($entrypointErrors[0][1] ?? null)?->getHeaders();
         } catch (HttpExceptionInterface $e) {
             $response = $e->getResponse();
-            $packages = implode('", "', array_column($errors, 0));
+            $packages = implode('", "', array_column($entrypointErrors, 0));
 
-            throw new RuntimeException(sprintf('Error %d checking for a CSS entrypoint for packages from jsDelivr for "%s". Response: ', $response->getStatusCode(), $packages).$response->getContent(false), 0, $e);
+            throw new RuntimeException(sprintf('Error %d checking for a CSS entrypoint for "%s". Response: ', $response->getStatusCode(), $packages).$response->getContent(false), 0, $e);
         }
 
         if ($packagesToRequire) {
@@ -160,8 +159,12 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
         $responses = [];
 
         foreach ($importMapEntries as $package => $entry) {
+            if (!$entry->isRemotePackage()) {
+                throw new \InvalidArgumentException(sprintf('The entry "%s" is not a remote package.', $entry->importName));
+            }
+
             $pattern = ImportMapType::CSS === $entry->type ? $this->distUrlCssPattern : $this->distUrlPattern;
-            $url = sprintf($pattern, $entry->packageName, $entry->version, $entry->filePath);
+            $url = sprintf($pattern, $entry->getPackageName(), $entry->version, $entry->getPackagePathString());
 
             $responses[$package] = $this->httpClient->request('GET', $url);
         }

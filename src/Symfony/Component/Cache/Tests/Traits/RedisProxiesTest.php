@@ -79,23 +79,17 @@ class RedisProxiesTest extends TestCase
     }
 
     /**
-     * @requires extension redis
-     *
      * @testWith ["Redis", "redis"]
      *           ["RedisCluster", "redis_cluster"]
      */
     public function testRedis6Proxy($class, $stub)
     {
-        if (version_compare(phpversion('redis'), '6.0.0', '<')) {
-            $stub = file_get_contents("https://raw.githubusercontent.com/phpredis/phpredis/develop/{$stub}.stub.php");
-            $stub = preg_replace('/^class /m', 'return; \0', $stub);
-            $stub = preg_replace('/^return; class ([a-zA-Z]++)/m', 'interface \1StubInterface', $stub, 1);
-            $stub = preg_replace('/^    public const .*/m', '', $stub);
-            eval(substr($stub, 5));
-            $r = new \ReflectionClass($class.'StubInterface');
-        } else {
-            $r = new \ReflectionClass($class);
-        }
+        $stub = file_get_contents("https://raw.githubusercontent.com/phpredis/phpredis/develop/{$stub}.stub.php");
+        $stub = preg_replace('/^class /m', 'return; \0', $stub);
+        $stub = preg_replace('/^return; class ([a-zA-Z]++)/m', 'interface \1StubInterface', $stub, 1);
+        $stub = preg_replace('/^    public const .*/m', '', $stub);
+        eval(substr($stub, 5));
+        $r = new \ReflectionClass($class.'StubInterface');
 
         $proxy = file_get_contents(\dirname(__DIR__, 2)."/Traits/{$class}6Proxy.php");
         $proxy = substr($proxy, 0, 4 + strpos($proxy, '[];'));

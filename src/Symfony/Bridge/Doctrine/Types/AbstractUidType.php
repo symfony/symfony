@@ -13,6 +13,8 @@ namespace Symfony\Bridge\Doctrine\Types;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
+use Doctrine\DBAL\Types\Exception\InvalidType;
+use Doctrine\DBAL\Types\Exception\ValueNotConvertible;
 use Doctrine\DBAL\Types\Type;
 use Symfony\Component\Uid\AbstractUid;
 
@@ -33,7 +35,7 @@ abstract class AbstractUidType extends Type
         }
 
         return $platform->getBinaryTypeDeclarationSQL([
-            'length' => '16',
+            'length' => 16,
             'fixed' => true,
         ]);
     }
@@ -50,13 +52,13 @@ abstract class AbstractUidType extends Type
         }
 
         if (!\is_string($value)) {
-            throw ConversionException::conversionFailedInvalidType($value, $this->getName(), ['null', 'string', AbstractUid::class]);
+            $this->throwInvalidType($value);
         }
 
         try {
             return $this->getUidClass()::fromString($value);
         } catch (\InvalidArgumentException $e) {
-            throw ConversionException::conversionFailed($value, $this->getName(), $e);
+            $this->throwValueNotConvertible($value, $e);
         }
     }
 
@@ -78,13 +80,13 @@ abstract class AbstractUidType extends Type
         }
 
         if (!\is_string($value)) {
-            throw ConversionException::conversionFailedInvalidType($value, $this->getName(), ['null', 'string', AbstractUid::class]);
+            $this->throwInvalidType($value);
         }
 
         try {
             return $this->getUidClass()::fromString($value)->$toString();
         } catch (\InvalidArgumentException $e) {
-            throw ConversionException::conversionFailed($value, $this->getName());
+            $this->throwValueNotConvertible($value, $e);
         }
     }
 
@@ -104,5 +106,33 @@ abstract class AbstractUidType extends Type
             : 'getVarcharTypeDeclarationSQL';
 
         return $platform->getGuidTypeDeclarationSQL([]) !== $platform->$method(['fixed' => true, 'length' => 36]);
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return never
+     */
+    private function throwInvalidType($value): void
+    {
+        if (!class_exists(InvalidType::class)) {
+            throw ConversionException::conversionFailedInvalidType($value, $this->getName(), ['null', 'string', AbstractUid::class]);
+        }
+
+        throw InvalidType::new($value, $this->getName(), ['null', 'string', AbstractUid::class]);
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return never
+     */
+    private function throwValueNotConvertible($value, \Throwable $previous): void
+    {
+        if (!class_exists(ValueNotConvertible::class)) {
+            throw ConversionException::conversionFailed($value, $this->getName(), $previous);
+        }
+
+        throw ValueNotConvertible::new($value, $this->getName(), null, $previous);
     }
 }

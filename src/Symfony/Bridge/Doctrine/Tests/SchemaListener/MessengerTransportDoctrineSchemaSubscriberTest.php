@@ -49,6 +49,10 @@ class MessengerTransportDoctrineSchemaSubscriberTest extends TestCase
 
     public function testOnSchemaCreateTable()
     {
+        if (!class_exists(SchemaCreateTableEventArgs::class)) {
+            self::markTestSkipped('This test requires DBAL < 4.');
+        }
+
         $platform = $this->createMock(AbstractPlatform::class);
         $table = new Table('queue_table');
         $event = new SchemaCreateTableEventArgs($table, [], [], $platform);
@@ -80,6 +84,10 @@ class MessengerTransportDoctrineSchemaSubscriberTest extends TestCase
 
     public function testOnSchemaCreateTableNoExtraSql()
     {
+        if (!class_exists(SchemaCreateTableEventArgs::class)) {
+            self::markTestSkipped('This test requires DBAL < 4.');
+        }
+
         $platform = $this->createMock(AbstractPlatform::class);
         $table = new Table('queue_table');
         $event = new SchemaCreateTableEventArgs($table, [], [], $platform);

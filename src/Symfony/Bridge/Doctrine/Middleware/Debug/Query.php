@@ -46,10 +46,11 @@ class Query
     }
 
     /**
-     * @param string|int $param
-     * @param mixed      $variable
+     * @param string|int        $param
+     * @param mixed             $variable
+     * @param int|ParameterType $type
      */
-    public function setParam($param, &$variable, int $type): void
+    public function setParam($param, &$variable, $type): void
     {
         // Numeric indexes start at 0 in profiler
         $idx = \is_int($param) ? $param - 1 : $param;
@@ -59,10 +60,11 @@ class Query
     }
 
     /**
-     * @param string|int $param
-     * @param mixed      $value
+     * @param string|int        $param
+     * @param mixed             $value
+     * @param int|ParameterType $type
      */
-    public function setValue($param, $value, int $type): void
+    public function setValue($param, $value, $type): void
     {
         // Numeric indexes start at 0 in profiler
         $idx = \is_int($param) ? $param - 1 : $param;
@@ -95,7 +97,7 @@ class Query
     }
 
     /**
-     * @return array<int, int>
+     * @return array<int, int|ParameterType>
      */
     public function getTypes(): array
     {

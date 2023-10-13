@@ -178,13 +178,13 @@ EOT;
     {
         return [
             'commit' => [
-                static function (Connection $conn): bool {
+                static function (Connection $conn): ?bool {
                     return $conn->commit();
                 },
                 '"COMMIT"',
             ],
             'rollback' => [
-                static function (Connection $conn): bool {
+                static function (Connection $conn): ?bool {
                     return $conn->rollBack();
                 },
                 '"ROLLBACK"',
@@ -236,7 +236,7 @@ EOT;
                 static function (Connection $conn, string $sql) {
                     return $conn->executeStatement($sql);
                 },
-                static function (Connection $conn): bool {
+                static function (Connection $conn): ?bool {
                     return $conn->commit();
                 },
             ],
@@ -244,7 +244,7 @@ EOT;
                 static function (Connection $conn, string $sql): Result {
                     return $conn->executeQuery($sql);
                 },
-                static function (Connection $conn): bool {
+                static function (Connection $conn): ?bool {
                     return $conn->rollBack();
                 },
             ],
@@ -252,7 +252,7 @@ EOT;
                 static function (Connection $conn, string $sql): Result {
                     return $conn->prepare($sql)->executeQuery();
                 },
-                static function (Connection $conn): bool {
+                static function (Connection $conn): ?bool {
                     return $conn->commit();
                 },
             ],

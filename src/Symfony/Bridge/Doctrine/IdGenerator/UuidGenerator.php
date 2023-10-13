@@ -22,7 +22,7 @@ use Symfony\Component\Uid\Uuid;
 
 final class UuidGenerator extends AbstractIdGenerator
 {
-    private UuidFactory $protoFactory;
+    private readonly UuidFactory $protoFactory;
     private UuidFactory|NameBasedUuidFactory|RandomBasedUuidFactory|TimeBasedUuidFactory $factory;
     private ?string $entityGetter = null;
 

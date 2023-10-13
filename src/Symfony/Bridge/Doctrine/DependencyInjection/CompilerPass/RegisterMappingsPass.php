@@ -74,25 +74,6 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
     protected $enabledParameter;
 
     /**
-     * Naming pattern for the configuration service id, for example
-     * 'doctrine.orm.%s_configuration'.
-     */
-    private string $configurationPattern;
-
-    /**
-     * Method name to call on the configuration service. This depends on the
-     * Doctrine implementation. For example addEntityNamespace.
-     */
-    private string $registerAliasMethodName;
-
-    /**
-     * Map of alias to namespace.
-     *
-     * @var string[]
-     */
-    private array $aliasMap;
-
-    /**
      * The $managerParameters is an ordered list of container parameters that could provide the
      * name of the manager to register these namespaces and alias on. The first non-empty name
      * is used, the others skipped.
@@ -108,24 +89,32 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      * @param string|false         $enabledParameter        Service container parameter that must be
      *                                                      present to enable the mapping. Set to false
      *                                                      to not do any check, optional.
-     * @param string               $configurationPattern    Pattern for the Configuration service name
-     * @param string               $registerAliasMethodName Name of Configuration class method to
-     *                                                      register alias
+     * @param string               $configurationPattern    Pattern for the Configuration service name,
+     *                                                      for example 'doctrine.orm.%s_configuration'.
+     * @param string               $registerAliasMethodName Method name to call on the configuration service. This
+     *                                                      depends on the Doctrine implementation.
+     *                                                      For example addEntityNamespace.
      * @param string[]             $aliasMap                Map of alias to namespace
      */
-    public function __construct(Definition|Reference $driver, array $namespaces, array $managerParameters, string $driverPattern, string|false $enabledParameter = false, string $configurationPattern = '', string $registerAliasMethodName = '', array $aliasMap = [])
-    {
+    public function __construct(
+        Definition|Reference $driver,
+        array $namespaces,
+        array $managerParameters,
+        string $driverPattern,
+        string|false $enabledParameter = false,
+        private readonly string $configurationPattern = '',
+        private readonly string $registerAliasMethodName = '',
+        private readonly array $aliasMap = [],
+    ) {
         $this->driver = $driver;
         $this->namespaces = $namespaces;
         $this->managerParameters = $managerParameters;
         $this->driverPattern = $driverPattern;
         $this->enabledParameter = $enabledParameter;
-        if (\count($aliasMap) && (!$configurationPattern || !$registerAliasMethodName)) {
+
+        if ($aliasMap && (!$configurationPattern || !$registerAliasMethodName)) {
             throw new \InvalidArgumentException('configurationPattern and registerAliasMethodName are required to register namespace alias.');
         }
-        $this->configurationPattern = $configurationPattern;
-        $this->registerAliasMethodName = $registerAliasMethodName;
-        $this->aliasMap = $aliasMap;
     }
 
     /**

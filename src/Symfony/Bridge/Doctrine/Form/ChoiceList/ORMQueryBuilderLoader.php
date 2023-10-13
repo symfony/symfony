@@ -26,17 +26,9 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class ORMQueryBuilderLoader implements EntityLoaderInterface
 {
-    /**
-     * Contains the query builder that builds the query for fetching the
-     * entities.
-     *
-     * This property should only be accessed through queryBuilder.
-     */
-    private QueryBuilder $queryBuilder;
-
-    public function __construct(QueryBuilder $queryBuilder)
-    {
-        $this->queryBuilder = $queryBuilder;
+    public function __construct(
+        private readonly QueryBuilder $queryBuilder,
+    ) {
     }
 
     public function getEntities(): array

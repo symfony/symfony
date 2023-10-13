@@ -21,8 +21,9 @@ final class LockStoreSchemaListener extends AbstractSchemaListener
     /**
      * @param iterable<mixed, PersistingStoreInterface> $stores
      */
-    public function __construct(private iterable $stores)
-    {
+    public function __construct(
+        private readonly iterable $stores,
+    ) {
     }
 
     public function postGenerateSchema(GenerateSchemaEventArgs $event): void

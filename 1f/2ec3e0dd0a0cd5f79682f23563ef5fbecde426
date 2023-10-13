@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by igrizzli at 2023-10-11T16:24:48Z
+
+Good catch, thank you.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-12T07:45:11Z
+
+Ready to merge from my side
+
+---------------------------------------------------------------------------
+
+by stof at 2023-10-12T12:47:22Z
+
+The telegram tests are failing on CI with an error about an undefined key. Is it coming from that PR as well ?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-12T12:52:35Z
+
+> The telegram tests are failing on CI with an error about an undefined key. Is it coming from that PR as well ?
+
+I will check later
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-12T14:32:57Z
+
+I cannot reproduce the missing key, I tried to composer update --prefer-lowest, but tests are still passing 🤔
+
+Besides that, I think we should not write json and decode it, but write an array and encode it in the assertion. But that should be a floor up PR once green
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-13T07:07:38Z
+
+@igrizzli any idea?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-13T07:32:51Z
+
+As far as @xabbuh and I can find out so far, dropping `symfony/http-client:^5.4` helps, so now we have the same errors in high and low deps test.
+
+For the errors itself, maybe
+* https://github.com/symfony/symfony/pull/49911
+
+is related....
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-13T07:48:07Z
+
+Thanks @xabbuh, looks like `symfony/mime` was missing

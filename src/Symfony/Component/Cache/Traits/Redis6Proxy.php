@@ -538,7 +538,7 @@ class Redis6Proxy extends \Redis implements ResetInterface, LazyObjectInterface
 
     public function hscan($key, &$iterator, $pattern = null, $count = 0): \Redis|array|bool
     {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->hscan($key, $iterator, $pattern, $count, ...\array_slice(\func_get_args(), 4));
+        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->hscan($key, $iterator, ...\array_slice(\func_get_args(), 2));
     }
 
     public function incr($key, $by = 1): \Redis|false|int
@@ -888,7 +888,7 @@ class Redis6Proxy extends \Redis implements ResetInterface, LazyObjectInterface
 
     public function scan(&$iterator, $pattern = null, $count = 0, $type = null): array|false
     {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->scan($iterator, $pattern, $count, $type, ...\array_slice(\func_get_args(), 4));
+        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->scan($iterator, ...\array_slice(\func_get_args(), 1));
     }
 
     public function scard($key): \Redis|false|int
@@ -998,7 +998,7 @@ class Redis6Proxy extends \Redis implements ResetInterface, LazyObjectInterface
 
     public function sscan($key, &$iterator, $pattern = null, $count = 0): array|false
     {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->sscan($key, $iterator, $pattern, $count, ...\array_slice(\func_get_args(), 4));
+        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->sscan($key, $iterator, ...\array_slice(\func_get_args(), 2));
     }
 
     public function ssubscribe($channels, $cb): bool
@@ -1278,7 +1278,7 @@ class Redis6Proxy extends \Redis implements ResetInterface, LazyObjectInterface
 
     public function zscan($key, &$iterator, $pattern = null, $count = 0): \Redis|array|false
     {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->zscan($key, $iterator, $pattern, $count, ...\array_slice(\func_get_args(), 4));
+        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->zscan($key, $iterator, ...\array_slice(\func_get_args(), 2));
     }
 
     public function zunion($keys, $weights = null, $options = null): \Redis|array|false

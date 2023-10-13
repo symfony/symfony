@@ -46,10 +46,14 @@ class InputArgument
      */
     public function __construct(string $name, int $mode = null, string $description = '', string|bool|int|float|array $default = null, \Closure|array $suggestedValues = [])
     {
-        if (null === $mode) {
-            $mode = self::OPTIONAL;
-        } elseif ($mode > 7 || $mode < 1) {
+        // If not explicitly marked as required, we assume the value to be optional
+        $mode = self::REQUIRED === (self::REQUIRED & $mode) ? $mode : (self::OPTIONAL | $mode);
+        if ($mode > 7 || $mode < 1) {
             throw new InvalidArgumentException(sprintf('Argument mode "%s" is not valid.', $mode));
+        }
+
+        if ((self::REQUIRED | self::OPTIONAL) === ((self::REQUIRED | self::OPTIONAL) & $mode)) {
+            trigger_deprecation('symfony/console', '6.4', 'InputArgument mode should specify either required or optional.');
         }
 
         $this->name = $name;

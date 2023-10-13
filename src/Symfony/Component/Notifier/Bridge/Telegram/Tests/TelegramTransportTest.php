@@ -890,6 +890,8 @@ JSON;
 
     /**
      * @dataProvider sendFileByUploadProvider
+     *
+     * @requires extension fileinfo
      */
     public function testSendFileByUploadWithOptions(
         TelegramOptions $messageOptions,

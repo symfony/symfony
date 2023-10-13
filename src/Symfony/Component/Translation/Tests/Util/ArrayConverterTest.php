@@ -69,6 +69,34 @@ class ArrayConverterTest extends TestCase
                     ],
                 ],
             ],
+            [
+                // input
+                [
+                    'foo.' => 'foo.',
+                    '.bar' => '.bar',
+                    'abc.abc' => 'value',
+                    'bcd.bcd.' => 'value',
+                    '.cde.cde.' => 'value',
+                    '.def.def' => 'value',
+                ],
+                // expected output
+                [
+                    'foo.' => 'foo.',
+                    '.bar' => '.bar',
+                    'abc' => [
+                        'abc' => 'value',
+                    ],
+                    'bcd' => [
+                        'bcd.' => 'value',
+                    ],
+                    '.cde' => [
+                        'cde.' => 'value',
+                    ],
+                    '.def' => [
+                        'def' => 'value',
+                    ],
+                ],
+            ],
         ];
     }
 }

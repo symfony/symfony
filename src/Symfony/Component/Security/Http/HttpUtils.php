@@ -118,6 +118,11 @@ class HttpUtils
     public function checkRequestPath(Request $request, string $path)
     {
         if ('/' !== $path[0]) {
+            // Shortcut if request has already been matched before
+            if ($request->attributes->has('_route')) {
+                return $path === $request->attributes->get('_route');
+            }
+
             try {
                 // matching a request is more powerful than matching a URL path + context, so try that first
                 if ($this->urlMatcher instanceof RequestMatcherInterface) {

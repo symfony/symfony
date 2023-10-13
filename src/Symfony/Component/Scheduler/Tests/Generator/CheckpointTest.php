@@ -190,6 +190,30 @@ class CheckpointTest extends TestCase
         $this->assertFalse($concurrentLock->isAcquired());
     }
 
+    public function testWithLockResetStateAfterLockedAcquiringCache()
+    {
+        $concurrentLock = new Lock(new Key('locked'), $store = new InMemoryStore(), autoRelease: false);
+        $concurrentLock->acquire();
+        $this->assertTrue($concurrentLock->isAcquired());
+
+        $lock = new Lock(new Key('locked'), $store, autoRelease: false);
+        $checkpoint = new Checkpoint('locked', $lock, $cache = new ArrayAdapter());
+        $now = new \DateTimeImmutable('2020-02-20 20:20:20Z');
+
+        $checkpoint->save($savedTime = $now->modify('-2 min'), $savedIndex = 0);
+        $checkpoint->acquire($now->modify('-1 min'));
+
+        $two = new Checkpoint('locked', $lock, $cache);
+
+        $concurrentLock->release();
+
+        $this->assertTrue($two->acquire($now));
+        $this->assertEquals($savedTime, $two->time());
+        $this->assertEquals($savedIndex, $two->index());
+        $this->assertTrue($lock->isAcquired());
+        $this->assertFalse($concurrentLock->isAcquired());
+    }
+
     public function testWithLockKeepLock()
     {
         $lock = new Lock(new Key('lock'), new InMemoryStore());

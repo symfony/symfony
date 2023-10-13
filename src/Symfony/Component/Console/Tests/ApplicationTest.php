@@ -2151,8 +2151,12 @@ class ApplicationTest extends TestCase
 
         $command = new TerminatableWithEventCommand();
 
+        $terminateEventDispatched = false;
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber($command);
+        $dispatcher->addListener('console.terminate', function () use (&$terminateEventDispatched) {
+            $terminateEventDispatched = true;
+        });
         $application = new Application();
         $application->setAutoExit(false);
         $application->setDispatcher($dispatcher);
@@ -2167,6 +2171,7 @@ class ApplicationTest extends TestCase
 
             EOTXT;
         $this->assertSame($expected, $tester->getDisplay(true));
+        $this->assertTrue($terminateEventDispatched);
     }
 
     /**

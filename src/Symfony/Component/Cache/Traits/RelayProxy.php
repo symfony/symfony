@@ -983,22 +983,22 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
 
     public function scan(&$iterator, $match = null, $count = 0, $type = null): array|false
     {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->scan($iterator, $match, $count, $type, ...\array_slice(\func_get_args(), 4));
+        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->scan($iterator, ...\array_slice(\func_get_args(), 1));
     }
 
     public function hscan($key, &$iterator, $match = null, $count = 0): array|false
     {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->hscan($key, $iterator, $match, $count, ...\array_slice(\func_get_args(), 4));
+        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->hscan($key, $iterator, ...\array_slice(\func_get_args(), 2));
     }
 
     public function sscan($key, &$iterator, $match = null, $count = 0): array|false
     {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->sscan($key, $iterator, $match, $count, ...\array_slice(\func_get_args(), 4));
+        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->sscan($key, $iterator, ...\array_slice(\func_get_args(), 2));
     }
 
     public function zscan($key, &$iterator, $match = null, $count = 0): array|false
     {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->zscan($key, $iterator, $match, $count, ...\array_slice(\func_get_args(), 4));
+        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->zscan($key, $iterator, ...\array_slice(\func_get_args(), 2));
     }
 
     public function keys($pattern): \Relay\Relay|array|false

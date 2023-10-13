@@ -18,6 +18,7 @@
     "require": {
         "php": ">=8.2",
         "symfony/http-client": "^6.4|^7.0",
+        "symfony/mime": "^6.4|^7.0",
         "symfony/notifier": "^6.4|^7.0"
     },
     "autoload": {

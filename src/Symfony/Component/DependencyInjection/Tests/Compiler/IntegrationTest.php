@@ -55,6 +55,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService2;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService3;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService3Configurator;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService4;
+use Symfony\Contracts\Service\Attribute\SubscribedService;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
@@ -391,6 +392,10 @@ class IntegrationTest extends TestCase
 
     public function testLocatorConfiguredViaAttribute()
     {
+        if (!property_exists(SubscribedService::class, 'type')) {
+            $this->markTestSkipped('Requires symfony/service-contracts >= 3.2');
+        }
+
         $container = new ContainerBuilder();
         $container->setParameter('some.parameter', 'foo');
         $container->register(BarTagClass::class)

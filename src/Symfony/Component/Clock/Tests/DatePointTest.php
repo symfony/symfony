@@ -21,7 +21,7 @@ class DatePointTest extends TestCase
 
     public function testDatePoint()
     {
-        self::mockTime('2010-01-28 15:00:00');
+        self::mockTime('2010-01-28 15:00:00 UTC');
 
         $date = new DatePoint();
         $this->assertSame('2010-01-28 15:00:00 UTC', $date->format('Y-m-d H:i:s e'));

@@ -9,17 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
+namespace Symfony\Component\Translation\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\LoggingTranslatorPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Translation\DependencyInjection\LoggingTranslatorPass;
 use Symfony\Component\Translation\Translator;
 
-/**
- * @group legacy
- */
 class LoggingTranslatorPassTest extends TestCase
 {
     public function testProcess()

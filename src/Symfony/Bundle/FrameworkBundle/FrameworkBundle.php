@@ -13,18 +13,14 @@ namespace Symfony\Bundle\FrameworkBundle;
 
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddAnnotationsCachedReaderPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddDebugLogProcessorPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddExpressionLanguageProvidersPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AssetsContextPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilderDebugDumpPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DataCollectorTranslatorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ErrorLoggerCompilerPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\LoggingTranslatorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedSessionMarshallingHandlerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TestServiceContainerRealRefPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TestServiceContainerWeakRefPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\UnusedTagsPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\WorkflowGuardListenerPass;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
@@ -59,9 +55,12 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
 use Symfony\Component\Mime\DependencyInjection\AddMimeTypeGuesserPass;
 use Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass;
+use Symfony\Component\Routing\DependencyInjection\AddExpressionLanguageProvidersPass;
 use Symfony\Component\Routing\DependencyInjection\RoutingResolverPass;
 use Symfony\Component\Scheduler\DependencyInjection\AddScheduleMessengerPass;
 use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
+use Symfony\Component\Translation\DependencyInjection\DataCollectorTranslatorPass;
+use Symfony\Component\Translation\DependencyInjection\LoggingTranslatorPass;
 use Symfony\Component\Translation\DependencyInjection\TranslationDumperPass;
 use Symfony\Component\Translation\DependencyInjection\TranslationExtractorPass;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
@@ -71,6 +70,7 @@ use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 use Symfony\Component\Validator\DependencyInjection\AddValidatorInitializersPass;
 use Symfony\Component\VarExporter\Internal\Hydrator;
 use Symfony\Component\VarExporter\Internal\Registry;
+use Symfony\Component\Workflow\DependencyInjection\WorkflowGuardListenerPass;
 
 // Help opcache.preload discover always-needed symbols
 class_exists(ApcuAdapter::class);
@@ -157,7 +157,7 @@ class FrameworkBundle extends Bundle
         $this->addCompilerPassIfExists($container, TranslatorPass::class, PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);
         $this->addCompilerPassIfExists($container, TranslatorPathsPass::class, PassConfig::TYPE_AFTER_REMOVING);
         $container->addCompilerPass(new LoggingTranslatorPass());
-        $container->addCompilerPass(new AddExpressionLanguageProvidersPass(false));
+        $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
         $this->addCompilerPassIfExists($container, TranslationExtractorPass::class);
         $this->addCompilerPassIfExists($container, TranslationDumperPass::class);
         $container->addCompilerPass(new FragmentRendererPass());

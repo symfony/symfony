@@ -9,26 +9,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
+namespace Symfony\Component\Workflow\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 
-trigger_deprecation('symfony/framework-bundle', '6.4', 'The "%s" class is deprecated, use "%s" instead.', WorkflowGuardListenerPass::class, \Symfony\Component\Workflow\DependencyInjection\WorkflowGuardListenerPass::class);
-
 /**
  * @author Christian Flothmann <christian.flothmann@sensiolabs.de>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
- *
- * @deprecated since Symfony 6.4, use Symfony\Component\Workflow\DependencyInjection\WorkflowGuardListenerPass instead.
  */
 class WorkflowGuardListenerPass implements CompilerPassInterface
 {
-    /**
-     * @return void
-     */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasParameter('workflow.has_guard_listeners')) {
             return;

@@ -8,6 +8,7 @@ CHANGELOG
  * Multi-line text in vertical tables is aligned properly
  * The application can also catch errors with `Application::setCatchErrors(true)`
  * Add `RunCommandMessage` and `RunCommandMessageHandler`
+ * Dispatch `ConsoleTerminateEvent` after an exit on signal handling and add `ConsoleTerminateEvent::getInterruptingSignal()`
 
 6.3
 ---

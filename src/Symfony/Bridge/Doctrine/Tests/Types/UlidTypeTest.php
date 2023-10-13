@@ -28,6 +28,9 @@ class_exists('Doctrine\DBAL\Platforms\PostgreSqlPlatform');
 // DBAL 3 compatibility
 class_exists('Doctrine\DBAL\Platforms\SqlitePlatform');
 
+// DBAL 3 compatibility
+class_exists('Doctrine\DBAL\Platforms\SqlitePlatform');
+
 final class UlidTypeTest extends TestCase
 {
     private const DUMMY_ULID = '01EEDQEK6ZAZE93J8KG5B4MBJC';
@@ -87,25 +90,25 @@ final class UlidTypeTest extends TestCase
     {
         $this->expectException(ConversionException::class);
 
-        $this->type->convertToDatabaseValue(new \stdClass(), new SqlitePlatform());
+        $this->type->convertToDatabaseValue(new \stdClass(), new SQLitePlatform());
     }
 
     public function testNullConversionForDatabaseValue()
     {
-        $this->assertNull($this->type->convertToDatabaseValue(null, new SqlitePlatform()));
+        $this->assertNull($this->type->convertToDatabaseValue(null, new SQLitePlatform()));
     }
 
     public function testUlidInterfaceConvertsToPHPValue()
     {
         $ulid = $this->createMock(AbstractUid::class);
-        $actual = $this->type->convertToPHPValue($ulid, new SqlitePlatform());
+        $actual = $this->type->convertToPHPValue($ulid, new SQLitePlatform());
 
         $this->assertSame($ulid, $actual);
     }
 
     public function testUlidConvertsToPHPValue()
     {
-        $ulid = $this->type->convertToPHPValue(self::DUMMY_ULID, new SqlitePlatform());
+        $ulid = $this->type->convertToPHPValue(self::DUMMY_ULID, new SQLitePlatform());
 
         $this->assertInstanceOf(Ulid::class, $ulid);
         $this->assertEquals(self::DUMMY_ULID, $ulid->__toString());
@@ -115,19 +118,19 @@ final class UlidTypeTest extends TestCase
     {
         $this->expectException(ConversionException::class);
 
-        $this->type->convertToPHPValue('abcdefg', new SqlitePlatform());
+        $this->type->convertToPHPValue('abcdefg', new SQLitePlatform());
     }
 
     public function testNullConversionForPHPValue()
     {
-        $this->assertNull($this->type->convertToPHPValue(null, new SqlitePlatform()));
+        $this->assertNull($this->type->convertToPHPValue(null, new SQLitePlatform()));
     }
 
     public function testReturnValueIfUlidForPHPValue()
     {
         $ulid = new Ulid();
 
-        $this->assertSame($ulid, $this->type->convertToPHPValue($ulid, new SqlitePlatform()));
+        $this->assertSame($ulid, $this->type->convertToPHPValue($ulid, new SQLitePlatform()));
     }
 
     public function testGetName()
@@ -156,6 +159,6 @@ final class UlidTypeTest extends TestCase
 
     public function testRequiresSQLCommentHint()
     {
-        $this->assertTrue($this->type->requiresSQLCommentHint(new SqlitePlatform()));
+        $this->assertTrue($this->type->requiresSQLCommentHint(new SQLitePlatform()));
     }
 }

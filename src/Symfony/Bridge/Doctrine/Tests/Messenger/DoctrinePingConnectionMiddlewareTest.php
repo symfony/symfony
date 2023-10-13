@@ -13,8 +13,11 @@ namespace Symfony\Bridge\Doctrine\Tests\Messenger;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception as DBALException;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Result;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bridge\Doctrine\Messenger\DoctrinePingConnectionMiddleware;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
@@ -47,15 +50,23 @@ class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
 
     public function testMiddlewarePingOk()
     {
-        $this->connection->expects($this->once())
-            ->method('getDatabasePlatform')
-            ->will($this->throwException(new DBALException()));
+        $this->connection->method('getDatabasePlatform')
+            ->willReturn($this->mockPlatform());
+
+        $this->connection->expects($this->exactly(2))
+            ->method('executeQuery')
+            ->willReturnCallback(function () {
+                static $counter = 0;
+
+                if (1 === ++$counter) {
+                    throw $this->createMock(DBALException::class);
+                }
+
+                return $this->createMock(Result::class);
+            });
 
         $this->connection->expects($this->once())
             ->method('close')
-        ;
-        $this->connection->expects($this->once())
-            ->method('connect')
         ;
 
         $envelope = new Envelope(new \stdClass(), [
@@ -66,9 +77,8 @@ class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
 
     public function testMiddlewarePingResetEntityManager()
     {
-        $this->connection->expects($this->once())
-            ->method('getDatabasePlatform')
-            ->will($this->throwException(new DBALException()));
+        $this->connection->method('getDatabasePlatform')
+            ->willReturn($this->mockPlatform());
 
         $this->entityManager->expects($this->once())
             ->method('isOpen')
@@ -112,11 +122,17 @@ class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
         $this->connection->expects($this->never())
             ->method('close')
         ;
-        $this->connection->expects($this->never())
-            ->method('connect')
-        ;
 
         $envelope = new Envelope(new \stdClass());
         $this->middleware->handle($envelope, $this->getStackMock());
+    }
+
+    /** @return AbstractPlatform&MockObject */
+    private function mockPlatform(): AbstractPlatform
+    {
+        $platform = $this->createMock(AbstractPlatform::class);
+        $platform->method('getDummySelectSQL')->willReturn('SELECT 1');
+
+        return $platform;
     }
 }

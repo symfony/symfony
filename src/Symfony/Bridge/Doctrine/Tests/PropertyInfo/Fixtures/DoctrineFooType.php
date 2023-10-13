@@ -32,7 +32,7 @@ class DoctrineFooType extends Type
         return $platform->getClobTypeDeclarationSQL([]);
     }
 
-    public function convertToDatabaseValue($value, AbstractPlatform $platform): mixed
+    public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
     {
         if (null === $value) {
             return null;
@@ -44,7 +44,7 @@ class DoctrineFooType extends Type
         return $foo->bar;
     }
 
-    public function convertToPHPValue($value, AbstractPlatform $platform): mixed
+    public function convertToPHPValue($value, AbstractPlatform $platform): ?Foo
     {
         if (null === $value) {
             return null;

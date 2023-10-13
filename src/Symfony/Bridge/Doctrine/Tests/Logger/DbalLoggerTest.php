@@ -24,7 +24,7 @@ class DbalLoggerTest extends TestCase
     public static function setUpBeforeClass(): void
     {
         if (!class_exists(SQLLogger::class)) {
-            self::markTestSkipped('This test requires DBAL < 4');
+            self::markTestSkipped('This test requires DBAL < 4.');
         }
     }
 

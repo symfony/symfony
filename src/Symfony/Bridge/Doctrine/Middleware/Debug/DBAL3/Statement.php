@@ -35,9 +35,9 @@ final class Statement extends AbstractStatementMiddleware
         string $sql,
         private ?Stopwatch $stopwatch = null,
     ) {
-        parent::__construct($statement);
-
         $this->query = new Query($sql);
+
+        parent::__construct($statement);
     }
 
     public function bindParam($param, &$variable, $type = ParameterType::STRING, $length = null): bool

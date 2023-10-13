@@ -92,10 +92,15 @@ class InputOption
             }
         }
 
-        if (null === $mode) {
-            $mode = self::VALUE_NONE;
-        } elseif ($mode >= (self::VALUE_NEGATABLE << 1) || $mode < 1) {
+        // If not explicitly marked as required or optional, we assume the value accepts no input
+        $mode = self::VALUE_REQUIRED === (self::VALUE_REQUIRED & $mode) || self::VALUE_OPTIONAL === (self::VALUE_OPTIONAL & $mode) ? $mode : (self::VALUE_NONE | $mode);
+        if ($mode >= (self::VALUE_NEGATABLE << 1) || $mode < 1) {
             throw new InvalidArgumentException(sprintf('Option mode "%s" is not valid.', $mode));
+        }
+
+        $requirementSpecifier = ($mode & (self::VALUE_NONE | self::VALUE_REQUIRED | self::VALUE_OPTIONAL));
+        if (!(self::VALUE_NONE === $requirementSpecifier || self::VALUE_REQUIRED === $requirementSpecifier || self::VALUE_OPTIONAL === $requirementSpecifier)) {
+            trigger_deprecation('symfony/console', '6.4', 'InputOption mode should be either none, required or optional.');
         }
 
         $this->name = $name;

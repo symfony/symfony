@@ -24,7 +24,7 @@ class AnnotationLoaderWithDoctrineAnnotationsTest extends AnnotationLoaderTestCa
 
     protected function setUp(): void
     {
-        $this->expectDeprecation('Since symfony/validator 6.4: Passing a "Doctrine\Common\Annotations\AnnotationReader" instance as argument 1 to "Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader::__construct()" is deprecated, pass null or omit the parameter instead.');
+        $this->expectDeprecation('Since symfony/serializer 6.4: Passing a "Doctrine\Common\Annotations\AnnotationReader" instance as argument 1 to "Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader::__construct()" is deprecated, pass null or omit the parameter instead.');
 
         parent::setUp();
     }

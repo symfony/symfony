@@ -26,11 +26,14 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
     /**
      * @param string                                    $file             The absolute cache path
      * @param iterable<mixed, ResourceCheckerInterface> $resourceCheckers The ResourceCheckers to use for the freshness check
+     * @param string|null                               $metaFile         The absolute path to the meta file, defaults to $file.meta if null
      */
     public function __construct(
         private string $file,
         private iterable $resourceCheckers = [],
+        private ?string $metaFile = null,
     ) {
+        $this->metaFile = $metaFile ?? $file.'.meta';
     }
 
     public function getPath(): string
@@ -61,7 +64,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
             return true; // shortcut - if we don't have any checkers we don't need to bother with the meta file at all
         }
 
-        $metadata = $this->getMetaFile();
+        $metadata = $this->metaFile;
 
         if (!is_file($metadata)) {
             return false;
@@ -113,9 +116,9 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
         }
 
         if (null !== $metadata) {
-            $filesystem->dumpFile($this->getMetaFile(), serialize($metadata));
+            $filesystem->dumpFile($this->metaFile, serialize($metadata));
             try {
-                $filesystem->chmod($this->getMetaFile(), $mode, $umask);
+                $filesystem->chmod($this->metaFile, $mode, $umask);
             } catch (IOException) {
                 // discard chmod failure (some filesystem may not support it)
             }
@@ -124,14 +127,6 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
         if (\function_exists('opcache_invalidate') && filter_var(\ini_get('opcache.enable'), \FILTER_VALIDATE_BOOL)) {
             @opcache_invalidate($this->file, true);
         }
-    }
-
-    /**
-     * Gets the meta file path.
-     */
-    private function getMetaFile(): string
-    {
-        return $this->file.'.meta';
     }
 
     private function safelyUnserialize(string $file): mixed

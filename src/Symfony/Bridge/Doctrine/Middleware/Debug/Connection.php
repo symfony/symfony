@@ -14,31 +14,26 @@ namespace Symfony\Bridge\Doctrine\Middleware\Debug;
 use Doctrine\DBAL\Driver\Connection as ConnectionInterface;
 use Doctrine\DBAL\Driver\Middleware\AbstractConnectionMiddleware;
 use Doctrine\DBAL\Driver\Result;
-use Doctrine\DBAL\Driver\Statement as DriverStatement;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * @author Laurent VOULLEMIER <laurent.voullemier@gmail.com>
+ * @author Alexander M. Turek <me@derrabus.de>
  *
  * @internal
  */
 final class Connection extends AbstractConnectionMiddleware
 {
-    private $nestingLevel = 0;
-    private $debugDataHolder;
-    private $stopwatch;
-    private $connectionName;
-
-    public function __construct(ConnectionInterface $connection, DebugDataHolder $debugDataHolder, ?Stopwatch $stopwatch, string $connectionName)
-    {
+    public function __construct(
+        ConnectionInterface $connection,
+        private DebugDataHolder $debugDataHolder,
+        private ?Stopwatch $stopwatch,
+        private string $connectionName,
+    ) {
         parent::__construct($connection);
-
-        $this->debugDataHolder = $debugDataHolder;
-        $this->stopwatch = $stopwatch;
-        $this->connectionName = $connectionName;
     }
 
-    public function prepare(string $sql): DriverStatement
+    public function prepare(string $sql): Statement
     {
         return new Statement(
             parent::prepare($sql),
@@ -53,135 +48,79 @@ final class Connection extends AbstractConnectionMiddleware
     {
         $this->debugDataHolder->addQuery($this->connectionName, $query = new Query($sql));
 
-        if (null !== $this->stopwatch) {
-            $this->stopwatch->start('doctrine', 'doctrine');
-        }
-
+        $this->stopwatch?->start('doctrine', 'doctrine');
         $query->start();
 
         try {
-            $result = parent::query($sql);
+            return parent::query($sql);
         } finally {
             $query->stop();
-
-            if (null !== $this->stopwatch) {
-                $this->stopwatch->stop('doctrine');
-            }
+            $this->stopwatch?->stop('doctrine');
         }
-
-        return $result;
     }
 
     public function exec(string $sql): int
     {
         $this->debugDataHolder->addQuery($this->connectionName, $query = new Query($sql));
 
-        if (null !== $this->stopwatch) {
-            $this->stopwatch->start('doctrine', 'doctrine');
-        }
-
+        $this->stopwatch?->start('doctrine', 'doctrine');
         $query->start();
 
         try {
             $affectedRows = parent::exec($sql);
         } finally {
             $query->stop();
-
-            if (null !== $this->stopwatch) {
-                $this->stopwatch->stop('doctrine');
-            }
+            $this->stopwatch?->stop('doctrine');
         }
 
         return $affectedRows;
     }
 
-    public function beginTransaction(): bool
+    public function beginTransaction(): void
     {
-        $query = null;
-        if (1 === ++$this->nestingLevel) {
-            $this->debugDataHolder->addQuery($this->connectionName, $query = new Query('"START TRANSACTION"'));
-        }
+        $query = new Query('"START TRANSACTION"');
+        $this->debugDataHolder->addQuery($this->connectionName, $query);
 
-        if (null !== $this->stopwatch) {
-            $this->stopwatch->start('doctrine', 'doctrine');
-        }
-
-        if (null !== $query) {
-            $query->start();
-        }
+        $this->stopwatch?->start('doctrine', 'doctrine');
+        $query->start();
 
         try {
-            $ret = parent::beginTransaction();
+            parent::beginTransaction();
         } finally {
-            if (null !== $query) {
-                $query->stop();
-            }
-
-            if (null !== $this->stopwatch) {
-                $this->stopwatch->stop('doctrine');
-            }
+            $query->stop();
+            $this->stopwatch?->stop('doctrine');
         }
-
-        return $ret;
     }
 
-    public function commit(): bool
+    public function commit(): void
     {
-        $query = null;
-        if (1 === $this->nestingLevel--) {
-            $this->debugDataHolder->addQuery($this->connectionName, $query = new Query('"COMMIT"'));
-        }
+        $query = new Query('"COMMIT"');
+        $this->debugDataHolder->addQuery($this->connectionName, $query);
 
-        if (null !== $this->stopwatch) {
-            $this->stopwatch->start('doctrine', 'doctrine');
-        }
-
-        if (null !== $query) {
-            $query->start();
-        }
+        $this->stopwatch?->start('doctrine', 'doctrine');
+        $query->start();
 
         try {
-            $ret = parent::commit();
+            parent::commit();
         } finally {
-            if (null !== $query) {
-                $query->stop();
-            }
-
-            if (null !== $this->stopwatch) {
-                $this->stopwatch->stop('doctrine');
-            }
+            $query->stop();
+            $this->stopwatch?->stop('doctrine');
         }
-
-        return $ret;
     }
 
-    public function rollBack(): bool
+    public function rollBack(): void
     {
-        $query = null;
-        if (1 === $this->nestingLevel--) {
-            $this->debugDataHolder->addQuery($this->connectionName, $query = new Query('"ROLLBACK"'));
-        }
+        $query = new Query('"ROLLBACK"');
+        $this->debugDataHolder->addQuery($this->connectionName, $query);
 
-        if (null !== $this->stopwatch) {
-            $this->stopwatch->start('doctrine', 'doctrine');
-        }
-
-        if (null !== $query) {
-            $query->start();
-        }
+        $this->stopwatch?->start('doctrine', 'doctrine');
+        $query->start();
 
         try {
-            $ret = parent::rollBack();
+            parent::rollBack();
         } finally {
-            if (null !== $query) {
-                $query->stop();
-            }
-
-            if (null !== $this->stopwatch) {
-                $this->stopwatch->stop('doctrine');
-            }
+            $query->stop();
+            $this->stopwatch?->stop('doctrine');
         }
-
-        return $ret;
     }
 }

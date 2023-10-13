@@ -43,10 +43,8 @@ class DoctrineFooType extends Type
 
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
-    public function convertToDatabaseValue($value, AbstractPlatform $platform)
+    public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
     {
         if (null === $value) {
             return null;
@@ -60,10 +58,8 @@ class DoctrineFooType extends Type
 
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
-    public function convertToPHPValue($value, AbstractPlatform $platform)
+    public function convertToPHPValue($value, AbstractPlatform $platform): ?Foo
     {
         if (null === $value) {
             return null;

@@ -105,9 +105,9 @@ abstract class AbstractUidType extends Type
     private function throwValueNotConvertible(mixed $value, \Throwable $previous): never
     {
         if (!class_exists(ValueNotConvertible::class)) {
-            throw ConversionException::conversionFailed($value, $this->getName(), previous: $previous);
+            throw ConversionException::conversionFailed($value, $this->getName(), $previous);
         }
 
-        throw ValueNotConvertible::new($value, $this->getName(), previous: $previous);
+        throw ValueNotConvertible::new($value, $this->getName(), null, $previous);
     }
 }

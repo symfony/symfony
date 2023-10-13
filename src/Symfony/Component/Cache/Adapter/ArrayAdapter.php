@@ -295,7 +295,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
         }
     }
 
-    private function freeze($value, string $key): string|int|float|bool|array|null
+    private function freeze($value, string $key): string|int|float|bool|array|\UnitEnum|null
     {
         if (null === $value) {
             return 'N;';

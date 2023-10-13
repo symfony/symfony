@@ -1006,7 +1006,10 @@ class Application implements ResetInterface
                         }
 
                         if (false !== $exitCode) {
-                            exit($exitCode);
+                            $event = new ConsoleTerminateEvent($command, $event->getInput(), $event->getOutput(), $exitCode, $signal);
+                            $this->dispatcher->dispatch($event, ConsoleEvents::TERMINATE);
+
+                            exit($event->getExitCode());
                         }
                     });
                 }

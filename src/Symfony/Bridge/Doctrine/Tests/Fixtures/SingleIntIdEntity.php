@@ -19,19 +19,16 @@ use Doctrine\ORM\Mapping\Id;
 #[Entity]
 class SingleIntIdEntity
 {
-    #[Id, Column(type: 'integer')]
-    protected $id;
-
-    #[Column(type: 'string', nullable: true)]
-    public $name;
-
     #[Column(type: Types::JSON, nullable: true)]
-    public $phoneNumbers = [];
+    public mixed $phoneNumbers = [];
 
-    public function __construct($id, $name)
-    {
-        $this->id = $id;
-        $this->name = $name;
+    public function __construct(
+        #[Id, Column(type: 'integer')]
+        protected int $id,
+
+        #[Column(type: 'string', nullable: true)]
+        public ?string $name,
+    ) {
     }
 
     public function __toString(): string

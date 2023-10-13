@@ -29,11 +29,9 @@ trigger_deprecation('symfony/dependency-injection', '6.4', '"%s" is deprecated, 
  */
 class ContainerAwareLoader extends Loader
 {
-    private ContainerInterface $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        private readonly ContainerInterface $container,
+    ) {
     }
 
     /**

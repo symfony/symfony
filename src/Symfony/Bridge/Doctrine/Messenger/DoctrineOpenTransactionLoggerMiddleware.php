@@ -24,13 +24,12 @@ use Symfony\Component\Messenger\Middleware\StackInterface;
  */
 class DoctrineOpenTransactionLoggerMiddleware extends AbstractDoctrineMiddleware
 {
-    private ?LoggerInterface $logger;
-
-    public function __construct(ManagerRegistry $managerRegistry, string $entityManagerName = null, LoggerInterface $logger = null)
-    {
+    public function __construct(
+        ManagerRegistry $managerRegistry,
+        string $entityManagerName = null,
+        private readonly ?LoggerInterface $logger = null,
+    ) {
         parent::__construct($managerRegistry, $entityManagerName);
-
-        $this->logger = $logger;
     }
 
     protected function handleForManager(EntityManagerInterface $entityManager, Envelope $envelope, StackInterface $stack): Envelope

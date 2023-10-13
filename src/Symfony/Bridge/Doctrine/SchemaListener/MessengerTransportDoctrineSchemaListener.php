@@ -26,8 +26,9 @@ class MessengerTransportDoctrineSchemaListener extends AbstractSchemaListener
     /**
      * @param iterable<mixed, TransportInterface> $transports
      */
-    public function __construct(private iterable $transports)
-    {
+    public function __construct(
+        private readonly iterable $transports,
+    ) {
     }
 
     public function postGenerateSchema(GenerateSchemaEventArgs $event): void

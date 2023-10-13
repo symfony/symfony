@@ -463,7 +463,7 @@ class RedisCluster6Proxy extends \RedisCluster implements ResetInterface, LazyOb
 
     public function hscan($key, &$iterator, $pattern = null, $count = 0): array|bool
     {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->hscan($key, $iterator, $pattern, $count, ...\array_slice(\func_get_args(), 4));
+        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->hscan($key, $iterator, ...\array_slice(\func_get_args(), 2));
     }
 
     public function hrandfield($key, $options = null): \RedisCluster|array|string
@@ -738,7 +738,7 @@ class RedisCluster6Proxy extends \RedisCluster implements ResetInterface, LazyOb
 
     public function scan(&$iterator, $key_or_address, $pattern = null, $count = 0): array|bool
     {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->scan($iterator, $key_or_address, $pattern, $count, ...\array_slice(\func_get_args(), 4));
+        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->scan($iterator, ...\array_slice(\func_get_args(), 1));
     }
 
     public function scard($key): \RedisCluster|false|int
@@ -858,7 +858,7 @@ class RedisCluster6Proxy extends \RedisCluster implements ResetInterface, LazyOb
 
     public function sscan($key, &$iterator, $pattern = null, $count = 0): array|false
     {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->sscan($key, $iterator, $pattern, $count, ...\array_slice(\func_get_args(), 4));
+        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->sscan($key, $iterator, ...\array_slice(\func_get_args(), 2));
     }
 
     public function strlen($key): \RedisCluster|false|int
@@ -1103,7 +1103,7 @@ class RedisCluster6Proxy extends \RedisCluster implements ResetInterface, LazyOb
 
     public function zscan($key, &$iterator, $pattern = null, $count = 0): \RedisCluster|array|bool
     {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->zscan($key, $iterator, $pattern, $count, ...\array_slice(\func_get_args(), 4));
+        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->zscan($key, $iterator, ...\array_slice(\func_get_args(), 2));
     }
 
     public function zscore($key, $member): \RedisCluster|false|float

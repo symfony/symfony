@@ -36,7 +36,7 @@ final class TelegramTransport extends AbstractTransport
     private string $token;
     private ?string $chatChannel;
 
-    public const EXCLUSIVE_OPTIONS = [
+    private const EXCLUSIVE_OPTIONS = [
         'message_id',
         'callback_query_id',
         'photo',

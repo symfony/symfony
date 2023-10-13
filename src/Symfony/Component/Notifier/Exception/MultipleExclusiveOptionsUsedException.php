@@ -17,15 +17,16 @@ namespace Symfony\Component\Notifier\Exception;
 class MultipleExclusiveOptionsUsedException extends InvalidArgumentException
 {
     /**
-     * @param string[]      $usedExclusiveOptions
-     * @param string[]|null $exclusiveOptions
+     * @param string[] $usedExclusiveOptions
+     * @param string[] $exclusiveOptions
      */
-    public function __construct(array $usedExclusiveOptions, array $exclusiveOptions = null, \Throwable $previous = null)
+    public function __construct(array $usedExclusiveOptions, array $exclusiveOptions, \Throwable $previous = null)
     {
-        $message = sprintf('Multiple exclusive options have been used "%s".', implode('", "', $usedExclusiveOptions));
-        if (null !== $exclusiveOptions) {
-            $message .= sprintf(' Only one of %s can be used.', implode('", "', $exclusiveOptions));
-        }
+        $message = sprintf(
+            'Multiple exclusive options have been used "%s". Only one of "%s" can be used.',
+            implode('", "', $usedExclusiveOptions),
+            implode('", "', $exclusiveOptions)
+        );
 
         parent::__construct($message, 0, $previous);
     }

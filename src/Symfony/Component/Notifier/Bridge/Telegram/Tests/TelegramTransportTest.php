@@ -1242,6 +1242,6 @@ JSON;
         $transport = self::createTransport($client, 'testChannel');
 
         $this->expectException(MultipleExclusiveOptionsUsedException::class);
-        $sentMessage = $transport->send(new ChatMessage('', $messageOptions));
+        $transport->send(new ChatMessage('', $messageOptions));
     }
 }

@@ -11,30 +11,14 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Fixtures;
 
-/**
- * Class BaseUser.
- */
 class BaseUser
 {
-    /**
-     * @var int
-     */
-    private $id;
-
-    /**
-     * @var string
-     */
-    private $username;
-
     private $enabled;
 
-    /**
-     * BaseUser constructor.
-     */
-    public function __construct(int $id, string $username)
-    {
-        $this->id = $id;
-        $this->username = $username;
+    public function __construct(
+        private readonly int $id,
+        private readonly string $username,
+    ) {
     }
 
     public function getId(): int

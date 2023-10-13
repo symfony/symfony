@@ -29,10 +29,10 @@ final class Statement extends AbstractStatementMiddleware
 
     public function __construct(
         StatementInterface $statement,
-        private DebugDataHolder $debugDataHolder,
-        private string $connectionName,
+        private readonly DebugDataHolder $debugDataHolder,
+        private readonly string $connectionName,
         string $sql,
-        private ?Stopwatch $stopwatch = null,
+        private readonly ?Stopwatch $stopwatch = null,
     ) {
         parent::__construct($statement);
 

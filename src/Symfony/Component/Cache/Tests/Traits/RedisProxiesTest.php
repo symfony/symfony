@@ -78,6 +78,8 @@ class RedisProxiesTest extends TestCase
     }
 
     /**
+     * @requires extension openssl
+     *
      * @testWith ["Redis", "redis"]
      *           ["RedisCluster", "redis_cluster"]
      */

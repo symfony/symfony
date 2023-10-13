@@ -133,6 +133,9 @@ HTML;
         $this->assertEquals('Text', $email->getTextBody());
     }
 
+    /**
+     * @requires extension intl
+     */
     public function testRenderWithLocale()
     {
         $localeSwitcher = new LocaleSwitcher('en', []);

@@ -30,7 +30,6 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
 {
-    private string $connectionsParameter;
     private array $connections;
 
     /**
@@ -38,19 +37,16 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
      */
     private array $eventManagers = [];
 
-    private string $managerTemplate;
-    private string $tagPrefix;
-
     /**
      * @param string $managerTemplate sprintf() template for generating the event
      *                                manager's service ID for a connection name
      * @param string $tagPrefix       Tag prefix for listeners
      */
-    public function __construct(string $connectionsParameter, string $managerTemplate, string $tagPrefix)
-    {
-        $this->connectionsParameter = $connectionsParameter;
-        $this->managerTemplate = $managerTemplate;
-        $this->tagPrefix = $tagPrefix;
+    public function __construct(
+        private readonly string $connectionsParameter,
+        private readonly string $managerTemplate,
+        private readonly string $tagPrefix,
+    ) {
     }
 
     public function process(ContainerBuilder $container): void

@@ -115,7 +115,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
     /**
      * @dataProvider provideGuidEntityClasses
      */
-    public function testFilterEmptyUuids($entityClass)
+    public function testFilterEmptyUuids(string $entityClass)
     {
         $em = DoctrineTestHelper::createTestEntityManager();
 
@@ -149,7 +149,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
     /**
      * @dataProvider provideUidEntityClasses
      */
-    public function testFilterUid($entityClass)
+    public function testFilterUid(string $entityClass)
     {
         if (Type::hasType('uuid')) {
             Type::overrideType('uuid', UuidType::class);
@@ -192,7 +192,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
     /**
      * @dataProvider provideUidEntityClasses
      */
-    public function testUidThrowProperException($entityClass)
+    public function testUidThrowProperException(string $entityClass)
     {
         if (Type::hasType('uuid')) {
             Type::overrideType('uuid', UuidType::class);

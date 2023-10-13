@@ -20,20 +20,16 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[Entity]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    #[Id, Column(type: 'integer')]
-    protected $id1;
+    public function __construct(
+        #[Id, Column]
+        protected ?int $id1,
 
-    #[Id, Column(type: 'integer')]
-    protected $id2;
+        #[Id, Column]
+        protected ?int $id2,
 
-    #[Column(type: 'string')]
-    public $name;
-
-    public function __construct($id1, $id2, $name)
-    {
-        $this->id1 = $id1;
-        $this->id2 = $id2;
-        $this->name = $name;
+        #[Column]
+        public string $name,
+    ) {
     }
 
     public function getRoles(): array

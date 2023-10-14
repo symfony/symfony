@@ -68,13 +68,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
             return true; // shortcut - if we don't have any checkers we don't need to bother with the meta file at all
         }
 
-        $metadata = $this->getMetaFile();
-
-        if (!is_file($metadata)) {
-            return false;
-        }
-
-        $meta = $this->safelyUnserialize($metadata);
+        $meta = $this->getMeta();
 
         if (false === $meta) {
             return false;
@@ -131,6 +125,22 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
         if (\function_exists('opcache_invalidate') && filter_var(\ini_get('opcache.enable'), \FILTER_VALIDATE_BOOL)) {
             @opcache_invalidate($this->file, true);
         }
+    }
+
+    /**
+     * Returns the metadata stored for this cache.
+     *
+     * @return false|ResourceInterface[]
+     */
+    public function getMeta(): false|array
+    {
+        $metadata = $this->getMetaFile();
+
+        if (!is_file($metadata)) {
+            return false;
+        }
+
+        return $this->safelyUnserialize($metadata);
     }
 
     /**

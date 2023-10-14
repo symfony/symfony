@@ -177,6 +177,7 @@ Form
  * Require explicit argument when calling `Button/Form::setParent()`, `ButtonBuilder/FormConfigBuilder::setDataMapper()`, `TransformationFailedException::setInvalidMessage()`
  * `PostSetDataEvent::setData()` throws an exception, use `PreSetDataEvent::setData()` instead
  * `PostSubmitEvent::setData()` throws an exception, use `PreSubmitDataEvent::setData()` or `SubmitDataEvent::setData()` instead
+ * Add `$duplicatePreferredChoices` parameter to `ChoiceListFactoryInterface::createView()`
 
 FrameworkBundle
 ---------------

@@ -177,7 +177,7 @@ class InputOption
      */
     public function setDefault($default = null)
     {
-        if (self::VALUE_NONE === (self::VALUE_NONE & $this->mode) && null !== $default) {
+        if (self::VALUE_NONE === (self::VALUE_NONE & $this->mode) && !$this->isNegatable() && null !== $default) {
             throw new LogicException('Cannot set a default value when using InputOption::VALUE_NONE mode.');
         }
 

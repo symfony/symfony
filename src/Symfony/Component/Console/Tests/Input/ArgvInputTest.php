@@ -232,6 +232,12 @@ class ArgvInputTest extends TestCase
                 ['foo' => false],
                 '->parse() parses long options without a value',
             ],
+            [
+                ['cli.php'],
+                [new InputOption('foo', null, InputOption::VALUE_NONE | InputOption::VALUE_NEGATABLE, '', false)],
+                ['foo' => false],
+                '->parse() parses long options without a value',
+            ],
         ];
     }
 

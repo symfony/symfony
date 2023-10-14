@@ -212,6 +212,7 @@ FrameworkBundle
  * Make the `framework.validation.email_validation_mode` config option default to `html5`
  * Remove the `framework.validation.enable_annotations` config option, use `framework.validation.enable_attributes` instead
  * Remove the `framework.serializer.enable_annotations` config option, use `framework.serializer.enable_attributes` instead
+ * Add `array $tokenAttributes = []` optional parameter to `KernelBrowser::loginUser()`
 
 HttpFoundation
 --------------

@@ -98,8 +98,7 @@ class InputOption
             throw new InvalidArgumentException(sprintf('Option mode "%s" is not valid.', $mode));
         }
 
-        $requirementSpecifier = ($mode & (self::VALUE_NONE | self::VALUE_REQUIRED | self::VALUE_OPTIONAL));
-        if (!(self::VALUE_NONE === $requirementSpecifier || self::VALUE_REQUIRED === $requirementSpecifier || self::VALUE_OPTIONAL === $requirementSpecifier)) {
+        if (!in_array($mode & (self::VALUE_NONE | self::VALUE_REQUIRED | self::VALUE_OPTIONAL), [self::VALUE_NONE, self::VALUE_REQUIRED, self::VALUE_OPTIONAL], true)) {
             trigger_deprecation('symfony/console', '6.4', 'InputOption mode should be either none, required or optional.');
         }
 

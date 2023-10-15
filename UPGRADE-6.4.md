@@ -1,6 +1,45 @@
 UPGRADE FROM 6.3 to 6.4
 =======================
 
+Symfony 6.4 and Symfony 7.0 are released simultaneously at the end of November 2023. According to the Symfony
+release process, both versions have the same features, but Symfony 6.4 doesn't include any significant backwards
+compatibility changes.
+Minor backwards compatibility breaks are prefixed in this document with `[BC BREAK]`, make sure your code is compatible
+with these entries before upgrading. Read more about this in the [Symfony documentation](https://symfony.com/doc/6.4/setup/upgrade_minor.html).
+
+Furthermore, Symfony 6.4 comes with a set of deprecation notices to help you prepare your code for Symfony 7.0. For the
+full set of deprecations, see the `UPGRADE-7.0.md` file on the [7.0 branch](https://github.com/symfony/symfony/blob/7.0/UPGRADE-7.0.md).
+
+Table of Contents
+-----------------
+
+Bundles
+* [FrameworkBundle](#FrameworkBundle)
+* [SecurityBundle](#SecurityBundle)
+
+Bridges
+* [DoctrineBridge](#DoctrineBridge)
+* [MonologBridge](#MonologBridge)
+* [PsrHttpMessageBridge](#PsrHttpMessageBridge)
+
+Components
+* [BrowserKit](#BrowserKit)
+* [Cache](#Cache)
+* [DependencyInjection](#DependencyInjection)
+* [DomCrawler](#DomCrawler)
+* [ErrorHandler](#ErrorHandler)
+* [Form](#Form)
+* [HttpFoundation](#HttpFoundation)
+* [HttpKernel](#HttpKernel)
+* [Messenger](#Messenger)
+* [RateLimiter](#RateLimiter)
+* [Routing](#Routing)
+* [Security](#Security)
+* [Serializer](#Serializer)
+* [Templating](#Templating)
+* [Validator](#Validator)
+* [Workflow](#Workflow)
+
 BrowserKit
 ----------
 
@@ -85,15 +124,19 @@ FrameworkBundle
  * [BC break] Add native return type to `Translator` and to `Application::reset()`
  * Deprecate the integration of Doctrine annotations, either uninstall the `doctrine/annotations` package or disable
    the integration by setting `framework.annotations` to `false`
- * Deprecate not setting the `framework.handle_all_throwables` config option; it will default to `true` in 7.0
- * Deprecate not setting the `framework.php_errors.log` config option; it will default to `true` in 7.0
- * Deprecate not setting the `framework.session.cookie_secure` config option; it will default to `auto` in 7.0
- * Deprecate not setting the `framework.session.cookie_samesite` config option; it will default to `lax` in 7.0
- * Deprecate not setting either `framework.session.handler_id` or `save_path` config options; `handler_id` will
-   default to null in 7.0 if `save_path` is not set and to `session.handler.native_file` otherwise
- * Deprecate not setting the `framework.uid.default_uuid_version` config option; it will default to `7` in 7.0
- * Deprecate not setting the `framework.uid.time_based_uuid_version` config option; it will default to `7` in 7.0
- * Deprecate not setting the `framework.validation.email_validation_mode` config option; it will default to `html5` in 7.0
+ * Deprecate not setting some config options, their defaults will change in Symfony 7.0:
+
+  | option                                       | default Symfony <7.0       | default in Symfony 7.0+                                                     |
+  | -------------------------------------------- | -------------------------- | --------------------------------------------------------------------------- |
+  | `framework.http_method_override`             | `true`                     | `false`                                                                     |
+  | `framework.handle_all_throwables`            | `false`                    | `true`                                                                      |
+  | `framework.php_errors.log`                   | `'%kernel.debug%'`         | `true`                                                                      |
+  | `framework.session.cookie_secure`            | `false`                    | `'auto'`                                                                    |
+  | `framework.session.cookie_samesite`          | `null`                     | `'lax'`                                                                     |
+  | `framework.session.handler_id`               | `'session.handler.native'` | `null` if `save_path` is not set, `'session.handler.native_file'` otherwise |
+  | `framework.uid.default_uuid_version`         | `6`                        | `7`                                                                         |
+  | `framework.uid.time_based_uuid_version`      | `6`                        | `7`                                                                         |
+  | `framework.validation.email_validation_mode` | `'loose'`                  | `'html5'`                                                                   |
  * Deprecate `framework.validation.enable_annotations`, use `framework.validation.enable_attributes` instead
  * Deprecate `framework.serializer.enable_annotations`, use `framework.serializer.enable_attributes` instead
 
@@ -124,7 +167,7 @@ MonologBridge
 PsrHttpMessageBridge
 --------------------
 
- * Remove `ArgumentValueResolverInterface` from `PsrServerRequestResolver`
+ * [BC break] `PsrServerRequestResolver` no longer implements `ArgumentValueResolverInterface`
 
 RateLimiter
 -----------

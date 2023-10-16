@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by Toflar at 2023-10-16T09:47:23Z
+
+Right, important input! I'll check and add a test for that.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-10-16T09:53:31Z
+
+Should this be merged in 5.4 ? In the past, we merged most performance optimizations as new features rather than bug fixes.
+
+---------------------------------------------------------------------------
+
+by Toflar at 2023-10-16T09:54:18Z
+
+I can also target this for 6.4 if desired 👍
+
+---------------------------------------------------------------------------
+
+by Toflar at 2023-10-16T10:00:51Z
+
+Please let me know which branch to target this PR at before I start working on the tests ;)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-10-16T10:01:39Z
+
+6.4 please
+
+---------------------------------------------------------------------------
+
+by Toflar at 2023-10-16T10:47:56Z
+
+PR updated.
+
+---------------------------------------------------------------------------
+
+by Toflar at 2023-10-16T11:10:05Z
+
+@nicolas-grekas your cache key suggestion did not pass the unit tests. Would need to look closer at it but fixed it for now - maybe we can optimize it but having lunch now :)
+
+---------------------------------------------------------------------------
+
+by Toflar at 2023-10-16T11:54:18Z
+
+Ah. Yes the problem was that in this case, `$type` still needs to be part of the cache key :) Now it should be good.

@@ -25,7 +25,6 @@ use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
  */
 class ImportMapManager
 {
-    public const POLYFILL_URL = 'https://ga.jspm.io/npm:es-module-shims@1.7.2/dist/es-module-shims.js';
     public const IMPORT_MAP_CACHE_FILENAME = 'importmap.json';
     public const ENTRYPOINT_CACHE_FILENAME_PATTERN = 'entrypoint.%s.json';
 

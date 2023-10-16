@@ -37,18 +37,7 @@ class LoggerPass implements CompilerPassInterface
             return;
         }
 
-        if ($debug = $container->getParameter('kernel.debug')) {
-            // Build an expression that will be equivalent to `!in_array(PHP_SAPI, ['cli', 'phpdbg'])`
-            $debug = (new Definition('bool'))
-                ->setFactory('in_array')
-                ->setArguments([
-                    (new Definition('string'))->setFactory('constant')->setArguments(['PHP_SAPI']),
-                    ['cli', 'phpdbg'],
-                ]);
-            $debug = (new Definition('bool'))
-                ->setFactory('in_array')
-                ->setArguments([$debug, [false]]);
-        }
+        $debug = $container->getParameter('kernel.debug') && $container->getParameter('kernel.runtime_mode.web');
 
         $container->register('logger', Logger::class)
             ->setArguments([null, null, null, new Reference(RequestStack::class), $debug]);

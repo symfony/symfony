@@ -22,7 +22,7 @@ class DebugLoggerConfigurator
 
     public function __construct(DebugLoggerInterface $processor, bool $enable = null)
     {
-        if ($enable ?? !\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true)) {
+        if ($enable ?? !\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
             $this->processor = $processor;
         }
     }

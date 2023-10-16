@@ -154,6 +154,9 @@ class EnvVarProcessor implements EnvVarProcessorInterface
 
         $returnNull = false;
         if ('' === $prefix) {
+            if ('' === $name) {
+                return null;
+            }
             $returnNull = true;
             $prefix = 'string';
         }

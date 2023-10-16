@@ -187,6 +187,7 @@ return new \Container%s\ProjectServiceContainer([
     'container.build_hash' => '%s',
     'container.build_id' => '%s',
     'container.build_time' => 1563381341,
+    'container.runtime_mode' => \in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) ? 'web=0' : 'web=1',
 ], __DIR__.\DIRECTORY_SEPARATOR.'Container%s');
 
 )

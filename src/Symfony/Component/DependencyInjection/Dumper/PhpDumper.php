@@ -340,7 +340,7 @@ EOF;
 
 use Symfony\Component\DependencyInjection\Dumper\Preloader;
 
-if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
+if (in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
     return;
 }
 
@@ -388,6 +388,7 @@ return new \\Container{$hash}\\{$options['class']}([
     'container.build_hash' => '$hash',
     'container.build_id' => '$id',
     'container.build_time' => $time,
+    'container.runtime_mode' => \\in_array(\\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) ? 'web=0' : 'web=1',
 ], __DIR__.\\DIRECTORY_SEPARATOR.'Container{$hash}');
 
 EOF;
@@ -1591,7 +1592,7 @@ EOF;
             $export = $this->exportParameters([$value], '', 12, $hasEnum);
             $export = explode('0 => ', substr(rtrim($export, " ]\n"), 2, -1), 2);
 
-            if ($hasEnum || preg_match("/\\\$container->(?:getEnv\('(?:[-.\w\\\\]*+:)*+\w++'\)|targetDir\.'')/", $export[1])) {
+            if ($hasEnum || preg_match("/\\\$container->(?:getEnv\('(?:[-.\w\\\\]*+:)*+\w*+'\)|targetDir\.'')/", $export[1])) {
                 $dynamicPhp[$key] = sprintf('%s%s => %s,', $export[0], $this->export($key), $export[1]);
                 $this->dynamicParameters[$key] = true;
             } else {

@@ -18,6 +18,7 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DateTimeValueResolv
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\QueryParameterValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestAttributeValueResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestHeaderValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestPayloadValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver;
@@ -96,6 +97,13 @@ return static function (ContainerConfigurator $container) {
 
         ->set('argument_resolver.query_parameter_value_resolver', QueryParameterValueResolver::class)
             ->tag('controller.targeted_value_resolver', ['name' => QueryParameterValueResolver::class])
+
+        ->set('argument_resolver.header_value_resolver', RequestHeaderValueResolver::class)
+        ->args([
+            service('serializer'),
+            service('validator')->nullOnInvalid(),
+        ])
+        ->tag('controller.targeted_value_resolver', ['name' => RequestHeaderValueResolver::class])
 
         ->set('response_listener', ResponseListener::class)
             ->args([

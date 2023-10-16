@@ -256,7 +256,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
      * @param string|null $format  Format name, present to give the option to normalizers to act differently based on formats
      * @param array       $context Options available to the normalizer
      */
-    private function getNormalizer(mixed $data, ?string $format, array $context): ?NormalizerInterface
+    protected function getNormalizer(mixed $data, ?string $format, array $context): ?NormalizerInterface
     {
         if (\is_object($data)) {
             $type = $data::class;
@@ -333,7 +333,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
      * @param string|null $format  Format name, present to give the option to normalizers to act differently based on formats
      * @param array       $context Options available to the denormalizer
      */
-    private function getDenormalizer(mixed $data, string $class, ?string $format, array $context): ?DenormalizerInterface
+    protected function getDenormalizer(mixed $data, string $class, ?string $format, array $context): ?DenormalizerInterface
     {
         if (!isset($this->denormalizerCache[$format][$class])) {
             $this->denormalizerCache[$format][$class] = [];

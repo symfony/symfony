@@ -2550,6 +2550,23 @@ class RequestTest extends TestCase
         $this->assertSame($result, Request::getTrustedProxies());
     }
 
+    public function testTrustedValuesCache()
+    {
+        $request = Request::create('http://example.com/');
+        $request->server->set('REMOTE_ADDR', '3.3.3.3');
+        $request->headers->set('X_FORWARDED_FOR', '1.1.1.1, 2.2.2.2');
+        $request->headers->set('X_FORWARDED_PROTO', 'https');
+
+        $this->assertFalse($request->isSecure());
+
+        Request::setTrustedProxies(['3.3.3.3', '2.2.2.2'], Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO);
+        $this->assertTrue($request->isSecure());
+
+        // Header is changed, cache must not be hit now
+        $request->headers->set('X_FORWARDED_PROTO', 'http');
+        $this->assertFalse($request->isSecure());
+    }
+
     public static function trustedProxiesRemoteAddr()
     {
         return [

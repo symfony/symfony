@@ -11,21 +11,29 @@
 
 namespace Symfony\Component\Scheduler;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Lock\LockInterface;
+use Symfony\Component\Scheduler\Event\PostRunEvent;
+use Symfony\Component\Scheduler\Event\PreRunEvent;
 use Symfony\Component\Scheduler\Exception\LogicException;
 use Symfony\Contracts\Cache\CacheInterface;
 
 final class Schedule implements ScheduleProviderInterface
 {
+    public function __construct(
+        private readonly ?EventDispatcherInterface $dispatcher = null,
+    ) {
+    }
+
     /** @var array<string,RecurringMessage> */
     private array $messages = [];
     private ?LockInterface $lock = null;
     private ?CacheInterface $state = null;
     private bool $shouldRestart = false;
 
-    public static function with(RecurringMessage $message, RecurringMessage ...$messages): static
+    public function with(RecurringMessage $message, RecurringMessage ...$messages): static
     {
-        return static::doAdd(new self(), $message, ...$messages);
+        return static::doAdd(new self($this->dispatcher), $message, ...$messages);
     }
 
     /**
@@ -57,6 +65,17 @@ final class Schedule implements ScheduleProviderInterface
     public function remove(RecurringMessage $message): static
     {
         unset($this->messages[$message->getId()]);
+        $this->setRestart(true);
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function removeById(string $id): static
+    {
+        unset($this->messages[$id]);
         $this->setRestart(true);
 
         return $this;
@@ -116,6 +135,20 @@ final class Schedule implements ScheduleProviderInterface
      */
     public function getSchedule(): static
     {
+        return $this;
+    }
+
+    public function before(callable $listener, int $priority = 0): static
+    {
+        $this->dispatcher->addListener(PreRunEvent::class, $listener, $priority);
+
+        return $this;
+    }
+
+    public function after(callable $listener, int $priority = 0): static
+    {
+        $this->dispatcher->addListener(PostRunEvent::class, $listener, $priority);
+
         return $this;
     }
 

@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-10-02T09:08:41Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.4" but it seems your PR description refers to branch "6.4 for features".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by alli83 at 2023-10-03T10:40:46Z
+
+To access the Schedule, it has been decided to inject the transports via the locator service (`messenger.receiver_locator`). While it would have been possible to inject the schedules directly via the tagged locator `scheduler.schedule_provider` doing so would require memoizing the created schedule to avoid calling getSchedule() twice.

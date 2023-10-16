@@ -22,7 +22,11 @@ class RoleHierarchyVoterTest extends RoleVoterTest
      */
     public function testVoteUsingTokenThatReturnsRoleNames($roles, $attributes, $expected)
     {
-        $voter = new RoleHierarchyVoter(new RoleHierarchy(['ROLE_FOO' => ['ROLE_FOOBAR']]));
+        $voter = new RoleHierarchyVoter(new RoleHierarchy([
+            'ROLE_FOO' => ['ROLE_FOOBAR'],
+            'ROLE_FOO_*' => ['ROLE_BAR_A', 'ROLE_FOO'],
+            'ROLE_BAR_*' => ['ROLE_BAZ'],
+        ]));
 
         $this->assertSame($expected, $voter->vote($this->getTokenWithRoleNames($roles), null, $attributes));
     }
@@ -31,6 +35,9 @@ class RoleHierarchyVoterTest extends RoleVoterTest
     {
         return array_merge(parent::getVoteTests(), [
             [['ROLE_FOO'], ['ROLE_FOOBAR'], VoterInterface::ACCESS_GRANTED],
+            [['ROLE_FOO_A'], ['ROLE_BAR_A'], VoterInterface::ACCESS_GRANTED], // ROLE_FOO_A => ROLE_FOO_* => ROLE_BAR_A
+            [['ROLE_FOO_A'], ['ROLE_FOOBAR'], VoterInterface::ACCESS_GRANTED], // ROLE_FOO_A => ROLE_FOO_* => ROLE_FOO => ROLE_FOOBAR
+            [['ROLE_FOO_A'], ['ROLE_BAZ'], VoterInterface::ACCESS_GRANTED], // ROLE_FOO_A => ROLE_FOO_* => ROLE_BAR_A => ROLE_BAR_* => ROLE_BAZ
         ]);
     }
 

@@ -4,12 +4,55 @@ UPGRADE FROM 6.4 to 7.0
 Symfony 6.4 and Symfony 7.0 are released simultaneously at the end of November 2023. According to the Symfony
 release process, both versions have the same features, but Symfony 7.0 doesn't include any deprecated features.
 To upgrade, make sure to resolve all deprecation notices.
-Read more about this in the [Symfony documentation](https://symfony.com/doc/current/setup/upgrade_major.html).
+Read more about this in the [Symfony documentation](https://symfony.com/doc/7.0/setup/upgrade_major.html).
+
+Symfony 7.0 introduced many native return and property types. Read [the announcement blogpost](https://symfony.com/blog/symfony-7-0-type-declarations)
+on how to quickly make your code compatible.
+
+Table of Contents
+-----------------
+
+Bundles
+ * [FrameworkBundle](#FrameworkBundle)
+ * [SecurityBundle](#SecurityBundle)
+ * [TwigBundle](#TwigBundle)
+
+Bridges
+ * [DoctrineBridge](#DoctrineBridge)
+ * [MonologBridge](#MonologBridge)
+ * [ProxyManagerBridge](#ProxyManagerBridge)
+
+Components
+ * [Cache](#Cache)
+ * [Config](#Config)
+ * [Console](#Console)
+ * [DependencyInjection](#DependencyInjection)
+ * [DomCrawler](#DomCrawler)
+ * [ExpressionLanguage](#ExpressionLanguage)
+ * [Filesystem](#Filesystem)
+ * [Form](#Form)
+ * [HttpFoundation](#HttpFoundation)
+ * [HttpClient](#HttpClient)
+ * [HttpKernel](#HttpKernel)
+ * [Lock](#Lock)
+ * [Mailer](#Mailer)
+ * [Messenger](#Messenger)
+ * [Mime](#Mime)
+ * [PropertyAccess](#PropertyAccess)
+ * [Routing](#Routing)
+ * [Security](#Security)
+ * [Serializer](#Serializer)
+ * [Templating](#Templating)
+ * [Translation](#Translation)
+ * [Validator](#Validator)
+ * [VarDumper](#VarDumper)
+ * [Workflow](#Workflow)
+ * [Yaml](#Yaml)
 
 Cache
 -----
 
- * Add parameter `$isSameDatabase` to `DoctrineDbalAdapter::configureSchema()`
+ * Add parameter `\Closure $isSameDatabase` to `DoctrineDbalAdapter::configureSchema()`
 
 Config
 ------
@@ -47,18 +90,18 @@ Console
    ```
 
  * Require explicit argument when calling `*Command::setApplication()`, `*FormatterStyle::setForeground/setBackground()`, `Helper::setHelpSet()`, `Input*::setDefault()` and `Question::setAutocompleterCallback/setValidator()`
- * Remove `StringInput::REGEX_STRING`
+ * Remove `StringInput::REGEX_STRING`, use `StringInput::REGEX_UNQUOTED_STRING` or `StringInput::REGEX_QUOTED_STRING` instead
  * Add method `__toString()` to `InputInterface`
 
 DependencyInjection
 -------------------
 
- * Remove `#[MapDecorated]`, use `#[AutowireDecorated]` instead
+ * Rename `#[MapDecorated]` to `#[AutowireDecorated]`
  * Remove `ProxyHelper`, use `Symfony\Component\VarExporter\ProxyHelper` instead
  * Remove `ReferenceSetArgumentTrait`
  * Remove support of `@required` annotation, use the `Symfony\Contracts\Service\Attribute\Required` attribute instead
  * Require explicit argument when calling `ContainerAwareTrait::setContainer()`
- * Remove `PhpDumper` options `inline_factories_parameter` and `inline_class_loader_parameter`, use options `inline_factories` and `inline_class_loader` instead
+ * Remove `PhpDumper` options `inline_factories_parameter` and `inline_class_loader_parameter`, use options `inline_factories` and `inline_class_loader` with the direct boolean value instead
  * Parameter names of `ParameterBag` cannot be numerics
  * Remove `ContainerAwareInterface` and `ContainerAwareTrait`, use dependency injection instead
 
@@ -98,8 +141,8 @@ DependencyInjection
    ```
 
    To fetch services lazily, you can use a [service subscriber](https://symfony.com/doc/6.4/service_container/service_subscribers_locators.html#defining-a-service-subscriber).
- * Add argument `$id` and `$asGhostObject` to `DumperInterface::isProxyCandidate()` and `getProxyCode()`
- * Add argument `$source` to `FileLoader::registerClasses()`
+ * Add parameter `string $id = null` and `bool &$asGhostObject = null` to `LazyProxy\PhpDumper\DumperInterface::isProxyCandidate()` and `getProxyCode()`
+ * Add parameter `string $source = null` to `FileLoader::registerClasses()`
 
 DoctrineBridge
 --------------
@@ -112,7 +155,7 @@ DoctrineBridge
  * Remove `ContainerAwareLoader`, use dependency injection in your fixtures instead
  * `ContainerAwareEventManager::getListeners()` must be called with an event name
  * DoctrineBridge now requires `doctrine/event-manager:^2`
- * Add parameter `$isSameDatabase` to `DoctrineTokenProvider::configureSchema()`
+ * Add parameter `\Closure $isSameDatabase` to `DoctrineTokenProvider::configureSchema()`
  * Remove support for Doctrine subscribers in `ContainerAwareEventManager`, use listeners instead
 
    *Before*
@@ -155,8 +198,8 @@ DoctrineBridge
 DomCrawler
 ----------
 
- * Add argument `$normalizeWhitespace` to `Crawler::innerText()`
- * Add argument `$default` to `Crawler::attr()`
+ * Add parameter `bool $normalizeWhitespace = true` to `Crawler::innerText()`
+ * Add parameter `string $default = null` to `Crawler::attr()`
 
 ExpressionLanguage
 ------------------
@@ -166,13 +209,12 @@ ExpressionLanguage
 Filesystem
 ----------
 
- * Add argument `$lock` to `Filesystem::appendToFile()`
+ * Add parameter `bool $lock = false` to `Filesystem::appendToFile()`
 
 Form
 ----
 
- * Throw when using `DateTime` or `DateTimeImmutable` model data with a different timezone than configured with the
-   `model_timezone` option in `DateType`, `DateTimeType`, and `TimeType`
+ * Throw when using `DateTime` or `DateTimeImmutable` model data with a different timezone than configured with the `model_timezone` option in `DateType`, `DateTimeType`, and `TimeType`
  * Make the "widget" option of date/time form types default to "single_text"
  * Require explicit argument when calling `Button/Form::setParent()`, `ButtonBuilder/FormConfigBuilder::setDataMapper()`, `TransformationFailedException::setInvalidMessage()`
  * `PostSetDataEvent::setData()` throws an exception, use `PreSetDataEvent::setData()` instead
@@ -181,13 +223,12 @@ Form
 FrameworkBundle
 ---------------
 
- * Remove command `translation:update`, use `translation:extract` instead
- * Make the `http_method_override` config option default to `false`
+ * Renamed command `translation:update` to `translation:extract`
  * Remove the `Symfony\Component\Serializer\Normalizer\ObjectNormalizer` and
    `Symfony\Component\Serializer\Normalizer\PropertyNormalizer` autowiring aliases, type-hint against
    `Symfony\Component\Serializer\Normalizer\NormalizerInterface` or implement `NormalizerAwareInterface` instead
  * Remove the `Http\Client\HttpClient` service, use `Psr\Http\Client\ClientInterface` instead
- * Remove `AbstractController::renderForm()`, use `render()` instead
+ * Remove `AbstractController::renderForm()`, pass the `FormInterface` as parameter to `render()`
 
    *Before*
    ```php
@@ -199,20 +240,25 @@ FrameworkBundle
    $this->render(..., ['form' => $form]);
    ```
 
- * Remove the integration of Doctrine annotations, use native attributes instead
+ * Remove the integration of the Doctrine annotations library, use native attributes instead
  * Remove `EnableLoggerDebugModePass`, use argument `$debug` of HttpKernel's `Logger` instead
  * Remove `AddDebugLogProcessorPass::configureLogger()`, use HttpKernel's `DebugLoggerConfigurator` instead
- * Make the `framework.handle_all_throwables` config option default to `true`
- * Make the `framework.php_errors.log` config option default to `true`
- * Make the `framework.session.cookie_secure` config option default to `auto`
- * Make the `framework.session.cookie_samesite` config option default to `lax`
- * Make the `framework.session.handler_id` default to null if `save_path` is not set and to `session.handler.native_file` otherwise
- * Make the `framework.uid.default_uuid_version` config option default to `7`
- * Make the `framework.uid.time_based_uuid_version` config option default to `7`
- * Make the `framework.validation.email_validation_mode` config option default to `html5`
+ * Add `array $tokenAttributes = []` optional parameter to `KernelBrowser::loginUser()`
+ * Change default of some config options:
+
+   | option                                       | default Symfony <7.0       | default in Symfony 7.0+                                                     |
+   | -------------------------------------------- | -------------------------- | --------------------------------------------------------------------------- |
+   | `framework.http_method_override`             | `true`                     | `false`                                                                     |
+   | `framework.handle_all_throwables`            | `false`                    | `true`                                                                      |
+   | `framework.php_errors.log`                   | `'%kernel.debug%'`         | `true`                                                                      |
+   | `framework.session.cookie_secure`            | `false`                    | `auto`                                                                      |
+   | `framework.session.cookie_samesite`          | `null`                     | `'lax'`                                                                     |
+   | `framework.session.handler_id`               | `'session.handler.native'` | `null` if `save_path` is not set, `'session.handler.native_file'` otherwise |
+   | `framework.uid.default_uuid_version`         | `6`                        | `7`                                                                         |
+   | `framework.uid.time_based_uuid_version`      | `6`                        | `7`                                                                         |
+   | `framework.validation.email_validation_mode` | `'loose'`                  | `'html5'`                                                                   |
  * Remove the `framework.validation.enable_annotations` config option, use `framework.validation.enable_attributes` instead
  * Remove the `framework.serializer.enable_annotations` config option, use `framework.serializer.enable_attributes` instead
- * Add `array $tokenAttributes = []` optional parameter to `KernelBrowser::loginUser()`
 
 HttpFoundation
 --------------
@@ -222,12 +268,12 @@ HttpFoundation
    The flag `FILTER_NULL_ON_FAILURE` can be used to return `null` instead of throwing an exception.
  * The methods `ParameterBag::getInt()` and `ParameterBag::getBool()` no longer fallback to `0` or `false`
    when the value cannot be converted to the expected type. They throw a `UnexpectedValueException` instead.
- * Replace `RequestMatcher` with `ChainRequestMatcher`
- * Replace `ExpressionRequestMatcher` with `RequestMatcher\ExpressionRequestMatcher`
- * Remove `Request::getContentType()`, use `Request::getContentTypeFormat()` instead
+ * Remove `RequestMatcher`, use `ChainRequestMatcher` instead
+ * Remove `ExpressionRequestMatcher`, use `RequestMatcher\ExpressionRequestMatcher` instead
+ * Rename `Request::getContentType()` to `Request::getContentTypeFormat()`
  * Throw an `InvalidArgumentException` when calling `Request::create()` with a malformed URI
  * Require explicit argument when calling `JsonResponse::setCallback()`, `Response::setExpires/setLastModified/setEtag()`, `MockArraySessionStorage/NativeSessionStorage::setMetadataBag()`, `NativeSessionStorage::setSaveHandler()`
- * Add argument `$statusCode` to `Response::sendHeaders()` and `StreamedResponse::sendHeaders()`
+ * Add parameter `int $statusCode = null` to `Response::sendHeaders()` and `StreamedResponse::sendHeaders()`
 
 HttpClient
 ----------
@@ -237,20 +283,20 @@ HttpClient
 HttpKernel
 ----------
 
- * Add argument `$reflector` to `ArgumentResolverInterface::getArguments()` and `ArgumentMetadataFactoryInterface::createArgumentMetadata()`
+ * Add parameter `\ReflectionFunctionAbstract $reflector = null` to `ArgumentResolverInterface::getArguments()` and `ArgumentMetadataFactoryInterface::createArgumentMetadata()`
  * Remove `ArgumentValueResolverInterface`, use `ValueResolverInterface` instead
  * Remove `StreamedResponseListener`
  * Remove `AbstractSurrogate::$phpEscapeMap`
- * Remove `HttpKernelInterface::MASTER_REQUEST`
- * Remove `terminate_on_cache_hit` option from `HttpCache`
+ * Rename `HttpKernelInterface::MASTER_REQUEST` to `HttpKernelInterface::MAIN_REQUEST`
+ * Remove `terminate_on_cache_hit` option from `HttpCache`, it will now always act as `false`
  * Require explicit argument when calling `ConfigDataCollector::setKernel()`, `RouterListener::setCurrentRequest()`
  * Remove `Kernel::stripComments()`
 
 Lock
 ----
 
- * Add parameter `$isSameDatabase` to `DoctrineDbalStore::configureSchema()`
- * Remove the `gcProbablity` (notice the typo) option, use `gcProbability` instead
+ * Add parameter `\Closure $isSameDatabase` to `DoctrineDbalStore::configureSchema()`
+ * Rename `gcProbablity` (notice the typo) option to `gcProbability` in the `MongoDbStore`
 
 Mailer
 ------
@@ -260,14 +306,66 @@ Mailer
 Messenger
 ---------
 
- * Add parameter `$isSameDatabase` to `DoctrineTransport::configureSchema()`
+ * Add parameter `\Closure $isSameDatabase` to `DoctrineTransport::configureSchema()`
  * Remove `MessageHandlerInterface` and `MessageSubscriberInterface`, use `#[AsMessageHandler]` instead
+
+   *Before*
+   ```php
+   use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
+   use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
+
+   class SmsNotificationHandler implements MessageHandlerInterface
+   {
+       public function __invoke(SmsNotification $message): void
+       {
+           // ...
+       }
+   }
+
+   class UploadedImageHandler implements MessageSubscriberInterface
+   {
+       public static function getHandledMessages(): iterable
+       {
+           yield ThumbnailUploadedImage::class => ['method' => 'handleThumbnail'];
+           yield ProfilePictureUploadedImage::class => ['method' => 'handleProfilePicture'];
+       }
+
+       // ...
+   }
+   ```
+
+   *After*
+   ```php
+   use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+
+   #[AsMessageHandler]
+   class SmsNotificationHandler
+   {
+       public function __invoke(SmsNotification $message): void
+       {
+           // ...
+       }
+   }
+
+   class UploadedImageHandler
+   {
+       #[AsMessageHandler]
+       public function handleThumbnail(ThumbnailUploadedImage $message): void
+       {
+           // ...
+       }
+
+       #[AsMessageHandler]
+       public function handleThumbnail(ProfilePictureUploadedImage $message): void
+       {
+           // ...
+       }
+   }
+   ```
  * Remove `StopWorkerOnSigtermSignalListener` in favor of using the `SignalableCommandInterface`
  * Remove `StopWorkerOnSignalsListener` in favor of using the `SignalableCommandInterface`
- * Remove `Symfony\Component\Messenger\Transport\InMemoryTransport` and
-   `Symfony\Component\Messenger\Transport\InMemoryTransportFactory` in favor of
-   `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport` and
-   `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransportFactory`
+ * Rename `Symfony\Component\Messenger\Transport\InMemoryTransport` and `Symfony\Component\Messenger\Transport\InMemoryTransportFactory` to
+   `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport` and `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransportFactory` respectively
 
 Mime
 ----
@@ -295,22 +393,22 @@ ProxyManagerBridge
 Routing
 -------
 
- * Add argument `$routeParameters` to `UrlMatcher::handleRouteRequirements()`
- * Remove Doctrine annotations support in favor of native attributes
+ * Add parameter `array $routeParameters` to `UrlMatcher::handleRouteRequirements()`
+ * Remove Doctrine annotations support in favor of native attributes. Use `Symfony\Component\Routing\Annotation\Route` as native attribute now
  * Change the constructor signature of `AnnotationClassLoader` to `__construct(?string $env = null)`, passing an annotation reader as first argument is not supported anymore
 
 Security
 --------
 
- * Add argument `$badgeFqcn` to `Passport::addBadge()`
- * Add argument `$lifetime` to `LoginLinkHandlerInterface::createLoginLink()`
+ * Add parameter `string $badgeFqcn = null` to `Passport::addBadge()`
+ * Add parameter `int $lifetime = null` to `LoginLinkHandlerInterface::createLoginLink()`
  * Require explicit argument when calling `TokenStorage::setToken()`
 
 SecurityBundle
 --------------
 
  * Enabling SecurityBundle and not configuring it is not allowed, either remove the bundle or configure at least one firewall
- * Remove the `require_previous_session` config option
+ * Remove the `require_previous_session` config option from authenticators
 
 Serializer
 ----------
@@ -390,7 +488,7 @@ Serializer
    ```
 
  * Require explicit argument when calling `AttributeMetadata::setSerializedName()` and `ClassMetadata::setClassDiscriminatorMapping()`
- * Add argument `$context` to `NormalizerInterface::supportsNormalization()` and `DenormalizerInterface::supportsDenormalization()`
+ * Add parameter `array $context = []` to `NormalizerInterface::supportsNormalization()` and `DenormalizerInterface::supportsDenormalization()`
  * Remove Doctrine annotations support in favor of native attributes
  * Remove the annotation reader parameter from the constructor of `AnnotationLoader`
  * The following Normalizer classes have become final, use decoration instead of inheritance:
@@ -449,7 +547,7 @@ Serializer
 Templating
 ----------
 
- * Remove the component; use Twig instead
+ * Remove the component; use [Twig](https://twig.symfony.com) instead
 
 Translation
 -----------
@@ -475,7 +573,8 @@ Validator
  * Remove static property `$errorNames` from all constraints, use const `ERROR_NAMES` instead
  * Remove static property `$versions` from the `Ip` constraint, use the `VERSIONS` constant instead
  * Remove `VALIDATION_MODE_LOOSE` from `Email` constraint, use `VALIDATION_MODE_HTML5` instead
- * Remove constraint `ExpressionLanguageSyntax`, use `ExpressionSyntax` instead
+ * Remove constraint `ExpressionLanguageSyntax`, use `ExpressionSyntax` instead. The new constraint is ignored when the value
+   is null or blank, consistently with the other constraints in this component
  * Remove Doctrine annotations support in favor of native attributes
  * Remove `ValidatorBuilder::setDoctrineAnnotationReader()`
  * Remove `ValidatorBuilder::addDefaultDoctrineAnnotationReader()`
@@ -486,7 +585,7 @@ Validator
 VarDumper
 ---------
 
- * Add argument `$label` to `VarDumper::dump()`
+ * Add parameter `string $label = null` to `VarDumper::dump()`
  * Require explicit argument when calling `VarDumper::setHandler()`
 
 Workflow

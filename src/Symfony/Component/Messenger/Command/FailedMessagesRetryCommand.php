@@ -158,11 +158,7 @@ EOF
             // transports (like Doctrine), will cause the message
             // to be temporarily "acked", even if the user aborts
             // handling the message
-            while (true) {
-                if ($this->shouldStop) {
-                    break;
-                }
-
+            while (!$this->shouldStop) {
                 $envelopes = [];
                 $this->phpSerializer?->acceptPhpIncompleteClass();
                 try {

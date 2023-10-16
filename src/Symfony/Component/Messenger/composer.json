@@ -44,6 +44,9 @@
         "symfony/http-kernel": "<5.4",
         "symfony/serializer": "<5.4"
     },
+    "suggest": {
+        "ext-pcntl": "Take advantage of PHP's process control (PCNTL)"
+    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Messenger\\": "" },
         "exclude-from-classmap": [

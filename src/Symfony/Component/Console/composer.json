@@ -42,6 +42,9 @@
         "symfony/lock": "<5.4",
         "symfony/process": "<5.4"
     },
+    "suggest": {
+        "ext-pcntl": "Take advantage of PHP's process control (PCNTL)"
+    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Console\\": "" },
         "exclude-from-classmap": [

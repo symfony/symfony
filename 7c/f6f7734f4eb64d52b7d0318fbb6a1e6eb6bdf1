@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-10-10T10:51:49Z
+
+~~I think this is needed, but one negative I thought of. We will likely need to start the `importmap.php` recipe with the polyfill inside of it. And since vendor files are all now always downloaded, the user will need to run `importmap:install` before the page will run.~~
+
+~~We could... just for the polyfill, if not installed, revert to the CDN URL instead? Or just not render it? It seems iffy. However, missing the polyfill locally would not be an issue (we all have modern browsers). And it is HIGHLY unlikely that someone deploys with NO other vendor libraries installed in their app. And so, they would see 404 errors anyway / their `importmap:compile` command would explode due forgetting `importmap:install`.~~
+
+UPDATE
+
+All good now - here is the flow:
+
+A) If the polyfill is set to `es-module-shims` (which is the default in FrameworkBundle) BUT it is not in your importmap, then it outputs the CDN URL. This will be the default behavior.
+
+B) If the user chooses to add `es-module-shims` to their importmap (`importmap:require es-module-shims`) the system will instantly start pointing to that local file.
+
+So the default behavior is basically identical to now, but with the option to add `es-module-shims` to the `importmap.php` to serve a local file. The user can, of course, still entirely disable the importmap and avoid it entirely, or do whatever they want manually.

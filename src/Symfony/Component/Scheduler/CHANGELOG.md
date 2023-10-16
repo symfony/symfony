@@ -15,6 +15,7 @@ CHANGELOG
  * Add `MessageProviderInterface` to trigger unique messages at runtime
  * Add `PreRunEvent` and `PostRunEvent` events
  * Add `DispatchSchedulerEventListener`
+ * Add `FailureEvent` event
 
 6.3
 ---

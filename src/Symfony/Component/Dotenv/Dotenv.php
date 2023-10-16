@@ -196,7 +196,15 @@ final class Dotenv
             }
 
             // don't check existence with getenv() because of thread safety issues
-            if (!isset($loadedVars[$name]) && !$overrideExistingVars && isset($_ENV[$name])) {
+            if (
+                !$overrideExistingVars
+                && (isset($loadedVars[$name]) || isset($_ENV[$name]))
+            ) {
+                if ($notHttpName) {
+                    // copy into $_SERVER, if variable was already loaded, before Dotenv
+                    $_SERVER[$name] = $_ENV[$name];
+                }
+
                 continue;
             }
 

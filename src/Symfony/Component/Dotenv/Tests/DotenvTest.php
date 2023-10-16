@@ -218,7 +218,7 @@ class DotenvTest extends TestCase
         putenv('BAR');
         unlink($path1);
         unlink($path2);
-        rmdir($tmpdir);
+        @rmdir($tmpdir);
 
         $this->assertSame('BAR', $foo);
         $this->assertSame('BAZ', $bar);
@@ -268,7 +268,7 @@ class DotenvTest extends TestCase
         $resetContext();
         $_SERVER['TEST_APP_ENV'] = 'local';
         (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
-        $this->assertSame('localBAR', getenv('FOO'));
+        $this->assertSame('BAR', getenv('FOO'));
         $this->assertSame('EXISTING_VALUE', getenv('EXISTING_KEY'));
         $this->assertSame('EXISTING_VALUE', $_ENV['EXISTING_KEY']);
 
@@ -299,7 +299,7 @@ class DotenvTest extends TestCase
 
         $resetContext();
         (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
-        $this->assertSame('devBAR', getenv('FOO'));
+        $this->assertSame('BAR', getenv('FOO'));
         $this->assertSame('EXISTING_VALUE', getenv('EXISTING_KEY'));
         $this->assertSame('EXISTING_VALUE', $_ENV['EXISTING_KEY']);
 
@@ -314,7 +314,7 @@ class DotenvTest extends TestCase
 
         $resetContext();
         (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
-        $this->assertSame('devlocalBAR', getenv('FOO'));
+        $this->assertSame('BAR', getenv('FOO'));
         $this->assertSame('EXISTING_VALUE', getenv('EXISTING_KEY'));
         $this->assertSame('EXISTING_VALUE', $_ENV['EXISTING_KEY']);
 
@@ -347,7 +347,7 @@ class DotenvTest extends TestCase
         $resetContext();
         unset($_ENV['EXISTING_KEY'], $_SERVER['EXISTING_KEY']);
         putenv('EXISTING_KEY');
-        rmdir($tmpdir);
+        @rmdir($tmpdir);
     }
 
     public function testOverload()
@@ -379,7 +379,7 @@ class DotenvTest extends TestCase
         putenv('BAR');
         unlink($path1);
         unlink($path2);
-        rmdir($tmpdir);
+        @rmdir($tmpdir);
 
         $this->assertSame('BAR', $foo);
         $this->assertSame('BAZ', $bar);
@@ -437,6 +437,56 @@ class DotenvTest extends TestCase
         $this->assertSame('new_value', $_SERVER['TEST_ENV_VAR_OVERRIDEN']);
     }
 
+    public function testEnvVarNotIsOverriden()
+    {
+        @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
+
+        $path1 = tempnam($tmpdir, 'sf-');
+        $path2 = tempnam($tmpdir, 'sf-');
+
+        file_put_contents($path1, 'FOOBAR=');
+        file_put_contents($path2, 'FOOBAR=override');
+
+        $files = [$path2, $path1];
+
+        // default is not to override
+        (new Dotenv())->usePutenv()->load(...$files);
+
+        $this->assertSame('override', getenv('FOOBAR'));
+        $this->assertSame('override', $_ENV['FOOBAR']);
+        $this->assertSame('override', $_SERVER['FOOBAR']);
+
+        @unlink($path1);
+        @unlink($path2);
+        @rmdir($tmpdir);
+    }
+
+    public function testEnvVarNotIsOverridenWithExistingEnv()
+    {
+        putenv('FOOBAR='.($_ENV['FOOBAR'] = 'existing'));
+
+        @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
+
+        $path1 = tempnam($tmpdir, 'sf-');
+        $path2 = tempnam($tmpdir, 'sf-');
+
+        file_put_contents($path1, 'FOOBAR=');
+        file_put_contents($path2, 'FOOBAR=BAZ');
+
+        $files = [$path2, $path1];
+
+        // default is not to override
+        (new Dotenv())->usePutenv()->load(...$files);
+
+        $this->assertSame('existing', getenv('FOOBAR'));
+        $this->assertSame('existing', $_ENV['FOOBAR']);
+        $this->assertSame('existing', $_SERVER['FOOBAR']);
+
+        @unlink($path1);
+        @unlink($path2);
+        @rmdir($tmpdir);
+    }
+
     public function testMemorizingLoadedVarsNamesInSpecialVar()
     {
         // Special variable not exists
@@ -485,12 +535,12 @@ class DotenvTest extends TestCase
         putenv('DOCUMENT_ROOT=/var/www');
 
         $dotenv = (new Dotenv())->usePutenv();
-        $dotenv->populate(['FOO' => 'foo1', 'BAR' => 'bar1', 'BAZ' => 'baz1', 'DOCUMENT_ROOT' => '/boot']);
+        $dotenv->populate(['FOO' => 'foo1', 'BAR' => 'bar1', 'BAZ' => 'baz1', 'DOCUMENT_ROOT' => '/boot'], true);
 
         $this->assertSame('foo1', getenv('FOO'));
         $this->assertSame('bar1', getenv('BAR'));
         $this->assertSame('baz1', getenv('BAZ'));
-        $this->assertSame('/var/www', getenv('DOCUMENT_ROOT'));
+        $this->assertSame('/boot', getenv('DOCUMENT_ROOT'));
     }
 
     public function testGetVariablesValueFromEnvFirst()
@@ -597,6 +647,6 @@ class DotenvTest extends TestCase
         unlink($path.'.local.php');
 
         $resetContext();
-        rmdir($tmpdir);
+        @rmdir($tmpdir);
     }
 }

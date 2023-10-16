@@ -1,0 +1,74 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-10-12T00:05:54Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-12T07:19:37Z
+
+Please rebase your branch. We cannot merge PRs containing merge commits. Thanks
+
+---------------------------------------------------------------------------
+
+by fabricecw at 2023-10-12T08:31:33Z
+
+> Please rebase your branch. We cannot merge PRs containing merge commits. Thanks
+
+Thanks @OskarStark, that was unintentional. Cleaned up.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2023-10-12T22:26:59Z
+
+Lovely. Thank you for this PR. What a great first contribution!
+
+I agree with all your changes, but I am a bit hesitant on adding types to protected properties (which is not mentioned in our [BC policy](https://symfony.com/doc/current/contributing/code/bc.html)). If you want this PR to get a quick merge, I suggest you remove all unrelated changes. Example: Changing the existing properties and doing `assertSame()` on existing tests.
+
+Doing this will make sure the discussions are only focus on the `partitioned` cookie feature.
+
+Also, can you please have a look on the fabbot.io CI job?
+
+---------------------------------------------------------------------------
+
+by fabricecw at 2023-10-12T23:07:43Z
+
+I agree. Apart from a very low likelyhood of a BC, typed attributes can wait until a major release. I further reverted the `assertSame` change as suggested by @OskarStark even I like the stricter assertions.
+
+All `HttpFoundation` tests are passing.
+
+---------------------------------------------------------------------------
+
+by fabricecw at 2023-10-13T22:40:25Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by fabricecw at 2023-10-16T09:17:23Z
+
+Thanks @nicolas-grekas! That forward compatibility modification is great.
+
+As you said, it makes sense (if possible) to ship it with 6.4 so we don't fall behind the current pace of major browsers.

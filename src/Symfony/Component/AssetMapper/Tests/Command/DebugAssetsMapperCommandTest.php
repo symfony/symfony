@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Command;
+namespace Symfony\Component\AssetMapper\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Console\Application;

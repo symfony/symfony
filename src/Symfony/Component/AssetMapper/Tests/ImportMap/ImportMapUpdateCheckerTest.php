@@ -37,36 +37,38 @@ class ImportMapUpdateCheckerTest extends TestCase
     public function testGetAvailableUpdates()
     {
         $this->importMapConfigReader->method('getEntries')->willReturn(new ImportMapEntries([
-            '@hotwired/stimulus' => new ImportMapEntry(
+            '@hotwired/stimulus' => self::createRemoteEntry(
                 importName: '@hotwired/stimulus',
                 version: '3.2.1',
-                packageName: '@hotwired/stimulus',
+                packageSpecifier: '@hotwired/stimulus',
             ),
-            'json5' => new ImportMapEntry(
+            'json5' => self::createRemoteEntry(
                 importName: 'json5',
                 version: '1.0.0',
-                packageName: 'json5',
+                packageSpecifier: 'json5',
             ),
-            'bootstrap' => new ImportMapEntry(
+            'bootstrap' => self::createRemoteEntry(
                 importName: 'bootstrap',
                 version: '5.3.1',
-                packageName: 'bootstrap',
+                packageSpecifier: 'bootstrap',
             ),
-            'bootstrap/dist/css/bootstrap.min.css' => new ImportMapEntry(
+            'bootstrap/dist/css/bootstrap.min.css' => self::createRemoteEntry(
                 importName: 'bootstrap/dist/css/bootstrap.min.css',
                 version: '5.3.1',
                 type: ImportMapType::CSS,
-                packageName: 'bootstrap',
+                packageSpecifier: 'bootstrap',
             ),
-            'lodash' => new ImportMapEntry(
+            'lodash' => self::createRemoteEntry(
                 importName: 'lodash',
                 version: '4.17.21',
-                packageName: 'lodash',
+                packageSpecifier: 'lodash',
             ),
             // Local package won't appear in update list
-            'app' => new ImportMapEntry(
-                importName: 'app',
-                path: 'assets/app.js',
+            'app' => ImportMapEntry::createLocal(
+                'app',
+                ImportMapType::JS,
+                'assets/app.js',
+                false,
             ),
         ]));
 
@@ -117,9 +119,9 @@ class ImportMapUpdateCheckerTest extends TestCase
         $this->importMapConfigReader->method('getEntries')->willReturn(new ImportMapEntries($entries));
         if (null !== $expectedException) {
             $this->expectException($expectedException::class);
-            $this->updateChecker->getAvailableUpdates(array_map(fn ($entry) => $entry->packageName, $entries));
+            $this->updateChecker->getAvailableUpdates(array_map(fn ($entry) => $entry->importName, $entries));
         } else {
-            $update = $this->updateChecker->getAvailableUpdates(array_map(fn ($entry) => $entry->packageName, $entries));
+            $update = $this->updateChecker->getAvailableUpdates(array_map(fn ($entry) => $entry->importName, $entries));
             $this->assertEquals($expectedUpdateInfo, $update);
         }
     }
@@ -127,10 +129,10 @@ class ImportMapUpdateCheckerTest extends TestCase
     private function provideImportMapEntry()
     {
         yield [
-            ['@hotwired/stimulus' => new ImportMapEntry(
+            [self::createRemoteEntry(
                 importName: '@hotwired/stimulus',
                 version: '3.2.1',
-                packageName: '@hotwired/stimulus',
+                packageSpecifier: '@hotwired/stimulus',
             ),
             ],
             ['@hotwired/stimulus' => new PackageUpdateInfo(
@@ -143,10 +145,10 @@ class ImportMapUpdateCheckerTest extends TestCase
         ];
         yield [
             [
-                'bootstrap/dist/css/bootstrap.min.css' => new ImportMapEntry(
+                self::createRemoteEntry(
                     importName: 'bootstrap/dist/css/bootstrap.min.css',
                     version: '5.3.1',
-                    packageName: 'bootstrap',
+                    packageSpecifier: 'bootstrap',
                 ),
             ],
             ['bootstrap/dist/css/bootstrap.min.css' => new PackageUpdateInfo(
@@ -159,10 +161,10 @@ class ImportMapUpdateCheckerTest extends TestCase
         ];
         yield [
             [
-                'bootstrap' => new ImportMapEntry(
+                self::createRemoteEntry(
                     importName: 'bootstrap',
                     version: 'not_a_version',
-                    packageName: 'bootstrap',
+                    packageSpecifier: 'bootstrap',
                 ),
             ],
             [],
@@ -170,10 +172,10 @@ class ImportMapUpdateCheckerTest extends TestCase
         ];
         yield [
             [
-                new ImportMapEntry(
+                self::createRemoteEntry(
                     importName: 'invalid_package_name',
                     version: '1.0.0',
-                    packageName: 'invalid_package_name',
+                    packageSpecifier: 'invalid_package_name',
                 ),
             ],
             [],
@@ -200,5 +202,12 @@ class ImportMapUpdateCheckerTest extends TestCase
         ];
 
         return $map[$url] ?? new MockResponse('Not found', ['http_code' => 404]);
+    }
+
+    private static function createRemoteEntry(string $importName, string $version, ImportMapType $type = ImportMapType::JS, string $packageSpecifier = null): ImportMapEntry
+    {
+        $packageSpecifier = $packageSpecifier ?? $importName;
+
+        return ImportMapEntry::createRemote($importName, $type, path: '/vendor/any-path.js', version: $version, packageModuleSpecifier: $packageSpecifier, isEntrypoint: false);
     }
 }

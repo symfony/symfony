@@ -21,9 +21,9 @@ class RemotePackageDownloader
     private array $installed;
 
     public function __construct(
+        private readonly RemotePackageStorage $remotePackageStorage,
         private readonly ImportMapConfigReader $importMapConfigReader,
         private readonly PackageResolverInterface $packageResolver,
-        private readonly string $vendorDir,
     ) {
     }
 
@@ -51,7 +51,7 @@ class RemotePackageDownloader
             if (
                 isset($installed[$entry->importName])
                 && $installed[$entry->importName]['version'] === $entry->version
-                && file_exists($this->vendorDir.'/'.$installed[$entry->importName]['path'])
+                && $this->remotePackageStorage->isDownloaded($entry)
             ) {
                 $newInstalled[$entry->importName] = $installed[$entry->importName];
                 continue;
@@ -71,9 +71,8 @@ class RemotePackageDownloader
                 throw new \LogicException(sprintf('The package "%s" was not downloaded.', $package));
             }
 
-            $filename = $this->savePackage($package, $contents[$package], $entry->type);
+            $this->remotePackageStorage->save($entry, $contents[$package]);
             $newInstalled[$package] = [
-                'path' => $filename,
                 'version' => $entry->version,
             ];
 
@@ -90,33 +89,9 @@ class RemotePackageDownloader
         return $downloadedPackages;
     }
 
-    public function getDownloadedPath(string $importName): string
-    {
-        $installed = $this->loadInstalled();
-        if (!isset($installed[$importName])) {
-            throw new \InvalidArgumentException(sprintf('The "%s" vendor asset is missing. Run "php bin/console importmap:install".', $importName));
-        }
-
-        return $this->vendorDir.'/'.$installed[$importName]['path'];
-    }
-
     public function getVendorDir(): string
     {
-        return $this->vendorDir;
-    }
-
-    private function savePackage(string $packageName, string $packageContents, ImportMapType $importMapType): string
-    {
-        $filename = $packageName;
-        if (!str_contains(basename($packageName), '.')) {
-            $filename .= '.'.$importMapType->value;
-        }
-        $vendorPath = $this->vendorDir.'/'.$filename;
-
-        @mkdir(\dirname($vendorPath), 0777, true);
-        file_put_contents($vendorPath, $packageContents);
-
-        return $filename;
+        return $this->remotePackageStorage->getStorageDir();
     }
 
     /**
@@ -128,31 +103,21 @@ class RemotePackageDownloader
             return $this->installed;
         }
 
-        $installedPath = $this->vendorDir.'/installed.php';
+        $installedPath = $this->remotePackageStorage->getStorageDir().'/installed.php';
         $installed = is_file($installedPath) ? (static fn () => include $installedPath)() : [];
 
         foreach ($installed as $package => $data) {
-            if (!isset($data['path'])) {
-                throw new \InvalidArgumentException(sprintf('The package "%s" is missing its path.', $package));
-            }
-
             if (!isset($data['version'])) {
                 throw new \InvalidArgumentException(sprintf('The package "%s" is missing its version.', $package));
             }
-
-            if (!is_file($this->vendorDir.'/'.$data['path'])) {
-                unset($installed[$package]);
-            }
         }
 
-        $this->installed = $installed;
-
-        return $installed;
+        return $this->installed = $installed;
     }
 
     private function saveInstalled(array $installed): void
     {
         $this->installed = $installed;
-        file_put_contents($this->vendorDir.'/installed.php', sprintf('<?php return %s;', var_export($installed, true)));
+        file_put_contents($this->remotePackageStorage->getStorageDir().'/installed.php', sprintf('<?php return %s;', var_export($installed, true)));
     }
 }

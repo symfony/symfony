@@ -35,6 +35,7 @@ use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapRenderer;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapUpdateChecker;
 use Symfony\Component\AssetMapper\ImportMap\RemotePackageDownloader;
+use Symfony\Component\AssetMapper\ImportMap\RemotePackageStorage;
 use Symfony\Component\AssetMapper\ImportMap\Resolver\JsDelivrEsmResolver;
 use Symfony\Component\AssetMapper\MapperAwareAssetPackage;
 use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolver;
@@ -145,6 +146,7 @@ return static function (ContainerConfigurator $container) {
         ->set('asset_mapper.importmap.config_reader', ImportMapConfigReader::class)
             ->args([
                 abstract_arg('importmap.php path'),
+                service('asset_mapper.importmap.remote_package_storage'),
             ])
 
         ->set('asset_mapper.importmap.manager', ImportMapManager::class)
@@ -157,11 +159,16 @@ return static function (ContainerConfigurator $container) {
             ])
         ->alias(ImportMapManager::class, 'asset_mapper.importmap.manager')
 
+        ->set('asset_mapper.importmap.remote_package_storage', RemotePackageStorage::class)
+            ->args([
+                abstract_arg('vendor directory'),
+            ])
+
         ->set('asset_mapper.importmap.remote_package_downloader', RemotePackageDownloader::class)
             ->args([
+                service('asset_mapper.importmap.remote_package_storage'),
                 service('asset_mapper.importmap.config_reader'),
                 service('asset_mapper.importmap.resolver'),
-                abstract_arg('vendor directory'),
             ])
 
         ->set('asset_mapper.importmap.resolver', JsDelivrEsmResolver::class)

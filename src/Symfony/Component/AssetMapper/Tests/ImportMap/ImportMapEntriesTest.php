@@ -14,13 +14,14 @@ namespace Symfony\Component\AssetMapper\Tests\ImportMap;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntries;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapType;
 
 class ImportMapEntriesTest extends TestCase
 {
     public function testGetIterator()
     {
-        $entry1 = new ImportMapEntry('entry1', 'path1');
-        $entry2 = new ImportMapEntry('entry2', 'path2');
+        $entry1 = ImportMapEntry::createLocal('entry1', ImportMapType::JS, 'path1', true);
+        $entry2 = ImportMapEntry::createLocal('entry2', ImportMapType::CSS, 'path2', false);
 
         $entries = new ImportMapEntries([$entry1]);
         $entries->add($entry2);
@@ -30,7 +31,7 @@ class ImportMapEntriesTest extends TestCase
 
     public function testHas()
     {
-        $entries = new ImportMapEntries([new ImportMapEntry('entry1', 'path1')]);
+        $entries = new ImportMapEntries([ImportMapEntry::createLocal('entry1', ImportMapType::JS, 'path1', true)]);
 
         $this->assertTrue($entries->has('entry1'));
         $this->assertFalse($entries->has('entry2'));
@@ -38,7 +39,7 @@ class ImportMapEntriesTest extends TestCase
 
     public function testGet()
     {
-        $entry = new ImportMapEntry('entry1', 'path1');
+        $entry = ImportMapEntry::createLocal('entry1', ImportMapType::JS, 'path1', false);
         $entries = new ImportMapEntries([$entry]);
 
         $this->assertSame($entry, $entries->get('entry1'));
@@ -46,7 +47,7 @@ class ImportMapEntriesTest extends TestCase
 
     public function testRemove()
     {
-        $entries = new ImportMapEntries([new ImportMapEntry('entry1', 'path1')]);
+        $entries = new ImportMapEntries([ImportMapEntry::createLocal('entry1', ImportMapType::JS, 'path1', true)]);
         $entries->remove('entry1');
 
         $this->assertFalse($entries->has('entry1'));

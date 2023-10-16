@@ -17,6 +17,7 @@ use Symfony\Component\AssetMapper\ImportMap\ImportMapEntries;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapType;
 use Symfony\Component\AssetMapper\ImportMap\RemotePackageDownloader;
+use Symfony\Component\AssetMapper\ImportMap\RemotePackageStorage;
 use Symfony\Component\AssetMapper\ImportMap\Resolver\PackageResolverInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -42,11 +43,13 @@ class RemotePackageDownloaderTest extends TestCase
     {
         $configReader = $this->createMock(ImportMapConfigReader::class);
         $packageResolver = $this->createMock(PackageResolverInterface::class);
+        $remotePackageStorage = new RemotePackageStorage(self::$writableRoot.'/assets/vendor');
 
-        $entry1 = new ImportMapEntry('foo', version: '1.0.0');
-        $entry2 = new ImportMapEntry('bar.js/file', version: '1.0.0');
-        $entry3 = new ImportMapEntry('baz', version: '1.0.0', type: ImportMapType::CSS);
-        $importMapEntries = new ImportMapEntries([$entry1, $entry2, $entry3]);
+        $entry1 = ImportMapEntry::createRemote('foo', ImportMapType::JS, path: '/any', version: '1.0.0', packageModuleSpecifier: 'foo', isEntrypoint: false);
+        $entry2 = ImportMapEntry::createRemote('bar.js/file', ImportMapType::JS, path: '/any', version: '1.0.0', packageModuleSpecifier: 'bar.js/file', isEntrypoint: false);
+        $entry3 = ImportMapEntry::createRemote('baz', ImportMapType::CSS, path: '/any', version: '1.0.0', packageModuleSpecifier: 'baz', isEntrypoint: false);
+        $entry4 = ImportMapEntry::createRemote('different_specifier', ImportMapType::JS, path: '/any', version: '1.0.0', packageModuleSpecifier: 'custom_specifier', isEntrypoint: false);
+        $importMapEntries = new ImportMapEntries([$entry1, $entry2, $entry3, $entry4]);
 
         $configReader->expects($this->once())
             ->method('getEntries')
@@ -56,31 +59,33 @@ class RemotePackageDownloaderTest extends TestCase
         $packageResolver->expects($this->once())
             ->method('downloadPackages')
             ->with(
-                ['foo' => $entry1, 'bar.js/file' => $entry2, 'baz' => $entry3],
+                ['foo' => $entry1, 'bar.js/file' => $entry2, 'baz' => $entry3, 'different_specifier' => $entry4],
                 $progressCallback
             )
-            ->willReturn(['foo' => 'foo content', 'bar.js/file' => 'bar content', 'baz' => 'baz content']);
+            ->willReturn(['foo' => 'foo content', 'bar.js/file' => 'bar content', 'baz' => 'baz content', 'different_specifier' => 'different content']);
 
         $downloader = new RemotePackageDownloader(
+            $remotePackageStorage,
             $configReader,
             $packageResolver,
-            self::$writableRoot.'/assets/vendor',
         );
         $downloader->downloadPackages($progressCallback);
 
-        $this->assertFileExists(self::$writableRoot.'/assets/vendor/foo.js');
+        $this->assertFileExists(self::$writableRoot.'/assets/vendor/foo/foo.index.js');
         $this->assertFileExists(self::$writableRoot.'/assets/vendor/bar.js/file.js');
-        $this->assertFileExists(self::$writableRoot.'/assets/vendor/baz.css');
-        $this->assertEquals('foo content', file_get_contents(self::$writableRoot.'/assets/vendor/foo.js'));
+        $this->assertFileExists(self::$writableRoot.'/assets/vendor/baz/baz.index.css');
+        $this->assertEquals('foo content', file_get_contents(self::$writableRoot.'/assets/vendor/foo/foo.index.js'));
         $this->assertEquals('bar content', file_get_contents(self::$writableRoot.'/assets/vendor/bar.js/file.js'));
-        $this->assertEquals('baz content', file_get_contents(self::$writableRoot.'/assets/vendor/baz.css'));
+        $this->assertEquals('baz content', file_get_contents(self::$writableRoot.'/assets/vendor/baz/baz.index.css'));
+        $this->assertEquals('different content', file_get_contents(self::$writableRoot.'/assets/vendor/custom_specifier/custom_specifier.index.js'));
 
         $installed = require self::$writableRoot.'/assets/vendor/installed.php';
         $this->assertEquals(
             [
-                'foo' => ['path' => 'foo.js', 'version' => '1.0.0'],
-                'bar.js/file' => ['path' => 'bar.js/file.js', 'version' => '1.0.0'],
-                'baz' => ['path' => 'baz.css', 'version' => '1.0.0'],
+                'foo' => ['version' => '1.0.0'],
+                'bar.js/file' => ['version' => '1.0.0'],
+                'baz' => ['version' => '1.0.0'],
+                'different_specifier' => ['version' => '1.0.0'],
             ],
             $installed
         );
@@ -90,9 +95,9 @@ class RemotePackageDownloaderTest extends TestCase
     {
         $this->filesystem->mkdir(self::$writableRoot.'/assets/vendor');
         $installed = [
-            'foo' => ['path' => 'foo.js', 'version' => '1.0.0'],
-            'bar.js/file' => ['path' => 'bar.js/file.js', 'version' => '1.0.0'],
-            'baz' => ['path' => 'baz.css', 'version' => '1.0.0'],
+            'foo' => ['version' => '1.0.0'],
+            'bar.js/file' => ['version' => '1.0.0'],
+            'baz' => ['version' => '1.0.0'],
         ];
         file_put_contents(
             self::$writableRoot.'/assets/vendor/installed.php',
@@ -103,13 +108,15 @@ class RemotePackageDownloaderTest extends TestCase
         $packageResolver = $this->createMock(PackageResolverInterface::class);
 
         // matches installed version and file exists
-        $entry1 = new ImportMapEntry('foo', version: '1.0.0');
-        file_put_contents(self::$writableRoot.'/assets/vendor/foo.js', 'original foo content');
+        $entry1 = ImportMapEntry::createRemote('foo', ImportMapType::JS, path: '/any', version: '1.0.0', packageModuleSpecifier: 'foo', isEntrypoint: false);
+        @mkdir(self::$writableRoot.'/assets/vendor/foo', 0777, true);
+        file_put_contents(self::$writableRoot.'/assets/vendor/foo/foo.index.js', 'original foo content');
         // matches installed version but file does not exist
-        $entry2 = new ImportMapEntry('bar.js/file', version: '1.0.0');
+        $entry2 = ImportMapEntry::createRemote('bar.js/file', ImportMapType::JS, path: '/any', version: '1.0.0', packageModuleSpecifier: 'bar.js/file', isEntrypoint: false);
         // does not match installed version
-        $entry3 = new ImportMapEntry('baz', version: '1.1.0', type: ImportMapType::CSS);
-        file_put_contents(self::$writableRoot.'/assets/vendor/baz.css', 'original baz content');
+        $entry3 = ImportMapEntry::createRemote('baz', ImportMapType::CSS, path: '/any', version: '1.1.0', packageModuleSpecifier: 'baz', isEntrypoint: false);
+        @mkdir(self::$writableRoot.'/assets/vendor/baz', 0777, true);
+        file_put_contents(self::$writableRoot.'/assets/vendor/baz/baz.index.css', 'original baz content');
         $importMapEntries = new ImportMapEntries([$entry1, $entry2, $entry3]);
 
         $configReader->expects($this->once())
@@ -121,57 +128,38 @@ class RemotePackageDownloaderTest extends TestCase
             ->willReturn(['bar.js/file' => 'new bar content', 'baz' => 'new baz content']);
 
         $downloader = new RemotePackageDownloader(
+            new RemotePackageStorage(self::$writableRoot.'/assets/vendor'),
             $configReader,
             $packageResolver,
-            self::$writableRoot.'/assets/vendor',
         );
         $downloader->downloadPackages();
 
-        $this->assertFileExists(self::$writableRoot.'/assets/vendor/foo.js');
+        $this->assertFileExists(self::$writableRoot.'/assets/vendor/foo/foo.index.js');
         $this->assertFileExists(self::$writableRoot.'/assets/vendor/bar.js/file.js');
-        $this->assertFileExists(self::$writableRoot.'/assets/vendor/baz.css');
-        $this->assertEquals('original foo content', file_get_contents(self::$writableRoot.'/assets/vendor/foo.js'));
+        $this->assertFileExists(self::$writableRoot.'/assets/vendor/baz/baz.index.css');
+        $this->assertEquals('original foo content', file_get_contents(self::$writableRoot.'/assets/vendor/foo/foo.index.js'));
         $this->assertEquals('new bar content', file_get_contents(self::$writableRoot.'/assets/vendor/bar.js/file.js'));
-        $this->assertEquals('new baz content', file_get_contents(self::$writableRoot.'/assets/vendor/baz.css'));
+        $this->assertEquals('new baz content', file_get_contents(self::$writableRoot.'/assets/vendor/baz/baz.index.css'));
 
         $installed = require self::$writableRoot.'/assets/vendor/installed.php';
         $this->assertEquals(
             [
-                'foo' => ['path' => 'foo.js', 'version' => '1.0.0'],
-                'bar.js/file' => ['path' => 'bar.js/file.js', 'version' => '1.0.0'],
-                'baz' => ['path' => 'baz.css', 'version' => '1.1.0'],
+                'foo' => ['version' => '1.0.0'],
+                'bar.js/file' => ['version' => '1.0.0'],
+                'baz' => ['version' => '1.1.0'],
             ],
             $installed
         );
     }
 
-    public function testGetDownloadedPath()
-    {
-        $this->filesystem->mkdir(self::$writableRoot.'/assets/vendor');
-        $installed = [
-            'foo' => ['path' => 'foo-path.js', 'version' => '1.0.0'],
-        ];
-        file_put_contents(
-            self::$writableRoot.'/assets/vendor/installed.php',
-            '<?php return '.var_export($installed, true).';'
-        );
-        file_put_contents(self::$writableRoot.'/assets/vendor/foo-path.js', 'foo content');
-
-        $downloader = new RemotePackageDownloader(
-            $this->createMock(ImportMapConfigReader::class),
-            $this->createMock(PackageResolverInterface::class),
-            self::$writableRoot.'/assets/vendor',
-        );
-        $this->assertSame(realpath(self::$writableRoot.'/assets/vendor/foo-path.js'), realpath($downloader->getDownloadedPath('foo')));
-    }
-
     public function testGetVendorDir()
     {
+        $remotePackageStorage = new RemotePackageStorage('/foo/assets/vendor');
         $downloader = new RemotePackageDownloader(
+            $remotePackageStorage,
             $this->createMock(ImportMapConfigReader::class),
             $this->createMock(PackageResolverInterface::class),
-            self::$writableRoot.'/assets/vendor',
         );
-        $this->assertSame(realpath(self::$writableRoot.'/assets/vendor'), realpath($downloader->getVendorDir()));
+        $this->assertSame('/foo/assets/vendor', $downloader->getVendorDir());
     }
 }

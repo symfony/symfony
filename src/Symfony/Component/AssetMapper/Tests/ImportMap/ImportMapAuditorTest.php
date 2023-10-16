@@ -19,6 +19,7 @@ use Symfony\Component\AssetMapper\ImportMap\ImportMapEntries;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapPackageAudit;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapPackageAuditVulnerability;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapType;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -65,18 +66,9 @@ class ImportMapAuditorTest extends TestCase
             ],
         ])));
         $this->importMapConfigReader->method('getEntries')->willReturn(new ImportMapEntries([
-            '@hotwired/stimulus' => new ImportMapEntry(
-                importName: '@hotwired/stimulus',
-                version: '3.2.1',
-            ),
-            'json5' => new ImportMapEntry(
-                importName: 'json5',
-                version: '1.0.0',
-            ),
-            'lodash' => new ImportMapEntry(
-                importName: 'lodash',
-                version: '4.17.21',
-            ),
+            self::createRemoteEntry('@hotwired/stimulus', '3.2.1'),
+            self::createRemoteEntry('json5/some/file', '1.0.0'),
+            self::createRemoteEntry('lodash', '4.17.21'),
         ]));
 
         $audit = $this->importMapAuditor->audit();
@@ -118,10 +110,7 @@ class ImportMapAuditorTest extends TestCase
             ],
         ])));
         $this->importMapConfigReader->method('getEntries')->willReturn(new ImportMapEntries([
-            'json5' => new ImportMapEntry(
-                importName: 'json5',
-                version: $version,
-            ),
+            self::createRemoteEntry('json5', $version),
         ]));
 
         $audit = $this->importMapAuditor->audit();
@@ -146,15 +135,24 @@ class ImportMapAuditorTest extends TestCase
     {
         $this->httpClient->setResponseFactory(new MockResponse('Server error', ['http_code' => 500]));
         $this->importMapConfigReader->method('getEntries')->willReturn(new ImportMapEntries([
-            'json5' => new ImportMapEntry(
-                importName: 'json5',
-                version: '1.0.0',
-            ),
+            self::createRemoteEntry('json5', '1.0.0'),
         ]));
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Error 500 auditing packages. Response: Server error');
 
         $this->importMapAuditor->audit();
+    }
+
+    private static function createRemoteEntry(string $packageSpecifier, string $version): ImportMapEntry
+    {
+        return ImportMapEntry::createRemote(
+            'could_by_anything'.md5($packageSpecifier.$version),
+            ImportMapType::JS,
+            '/any/path',
+            $version,
+            $packageSpecifier,
+            false
+        );
     }
 }

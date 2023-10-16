@@ -78,10 +78,10 @@ class AssetMapperCompileCommandTest extends TestCase
             'file2.js',
             'file3.css',
             'file4.js',
-            'lodash.js',
-            'stimulus.js',
             'subdir/file5.js',
             'subdir/file6.js',
+            'vendor/@hotwired/stimulus/stimulus.index.js',
+            'vendor/lodash/lodash.index.js',
         ], array_keys(json_decode(file_get_contents($targetBuildDir.'/manifest.json'), true)));
 
         $this->assertFileExists($targetBuildDir.'/importmap.json');

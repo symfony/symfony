@@ -1363,8 +1363,8 @@ class FrameworkExtension extends Extension
             ->setArgument(1, $config['missing_import_mode']);
 
         $container
-            ->getDefinition('asset_mapper.importmap.remote_package_downloader')
-            ->replaceArgument(2, $config['vendor_dir'])
+            ->getDefinition('asset_mapper.importmap.remote_package_storage')
+            ->replaceArgument(0, $config['vendor_dir'])
         ;
         $container
             ->getDefinition('asset_mapper.mapped_asset_factory')

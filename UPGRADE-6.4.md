@@ -152,6 +152,7 @@ HttpKernel
  * [BC break] Add native return types to `TraceableEventDispatcher` and to `MergeExtensionConfigurationPass`
  * Deprecate `Kernel::stripComments()`
  * Deprecate `UriSigner`, use `UriSigner` from the HttpFoundation component instead
+ * Deprecate `FileLinkFormatter`, use `FileLinkFormatter` from the ErrorHandler component instead
 
 Messenger
 ---------

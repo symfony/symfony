@@ -17,7 +17,7 @@ use Symfony\Bundle\WebProfilerBundle\Controller\RouterController;
 use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
 use Symfony\Bundle\WebProfilerBundle\Csp\NonceGenerator;
 use Symfony\Bundle\WebProfilerBundle\Twig\WebProfilerExtension;
-use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
+use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 
 return static function (ContainerConfigurator $container) {

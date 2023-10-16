@@ -109,12 +109,8 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
         return $this->decoratedFactory->createListFromLoader($loader, $value, $filter);
     }
 
-    /**
-     * @param bool $duplicatePreferredChoices
-     */
-    public function createView(ChoiceListInterface $list, mixed $preferredChoices = null, mixed $label = null, mixed $index = null, mixed $groupBy = null, mixed $attr = null, mixed $labelTranslationParameters = []/* , bool $duplicatePreferredChoices = true */): ChoiceListView
+    public function createView(ChoiceListInterface $list, mixed $preferredChoices = null, mixed $label = null, mixed $index = null, mixed $groupBy = null, mixed $attr = null, mixed $labelTranslationParameters = [], bool $duplicatePreferredChoices = true): ChoiceListView
     {
-        $duplicatePreferredChoices = \func_num_args() > 7 ? func_get_arg(7) : true;
         $accessor = $this->propertyAccessor;
 
         if (\is_string($label)) {

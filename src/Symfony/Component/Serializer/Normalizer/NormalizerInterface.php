@@ -41,6 +41,15 @@ interface NormalizerInterface
     public function normalize(mixed $object, string $format = null, array $context = []);
 
     /**
+     * Returns a matching normalizer.
+     *
+     * @param mixed       $data    Data to get the serializer for
+     * @param string|null $format  Format name, present to give the option to normalizers to act differently based on formats
+     * @param array       $context Options available to the normalizer
+     */
+    public function getNormalizer(mixed $data, ?string $format, array $context): ?NormalizerInterface;
+
+    /**
      * Checks whether the given class is supported for normalization by this normalizer.
      *
      * @param mixed       $data    Data to normalize

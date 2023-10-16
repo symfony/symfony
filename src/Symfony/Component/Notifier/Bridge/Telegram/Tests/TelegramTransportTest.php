@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\Telegram\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramOptions;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransport;
 use Symfony\Component\Notifier\Exception\MultipleExclusiveOptionsUsedException;
@@ -25,6 +26,8 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class TelegramTransportTest extends TransportTestCase
 {
+    private const FIXTURE_FILE = __DIR__.'/Fixtures/image.png';
+
     public static function createTransport(HttpClientInterface $client = null, string $channel = null): TelegramTransport
     {
         return new TelegramTransport('token', $channel, $client ?? new MockHttpClient());
@@ -83,44 +86,34 @@ final class TelegramTransportTest extends TransportTestCase
         $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = $this->createTransport($client, 'testChannel');
-
-        $transport->send(new ChatMessage('testMessage', (new TelegramOptions())->edit(123)));
+        $transport->send(new ChatMessage(
+            'testMessage',
+            (new TelegramOptions())->edit(123))
+        );
     }
 
     public function testSendWithOptions()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(200);
-
-        $content = <<<JSON
-            {
-                "ok": true,
-                "result": {
-                    "message_id": 1,
-                    "from": {
-                        "id": 12345678,
-                        "first_name": "YourBot",
-                        "username": "YourBot"
-                    },
-                    "chat": {
-                        "id": 1234567890,
-                        "first_name": "John",
-                        "last_name": "Doe",
-                        "username": "JohnDoe",
-                        "type": "private"
-                    },
-                    "date": 1459958199,
-                    "text": "Hello from Bot!"
-                }
-            }
-JSON;
-
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn($content)
-        ;
+        $response = new JsonMockResponse([
+            'ok' => true,
+            'result' => [
+                'message_id' => 1,
+                'from' => [
+                    'id' => 12345678,
+                    'first_name' => 'YourBot',
+                    'username' => 'YourBot',
+                ],
+                'chat' => [
+                    'id' => 1234567890,
+                    'first_name' => 'John',
+                    'last_name' => 'Doe',
+                    'username' => 'JohnDoe',
+                    'type' => 'private',
+                ],
+                'date' => 1459958199,
+                'text' => 'Hello from Bot!',
+            ],
+        ]);
 
         $expectedBody = [
             'chat_id' => 'testChannel',
@@ -140,43 +133,31 @@ JSON;
         $sentMessage = $transport->send(new ChatMessage('testMessage'));
 
         $this->assertEquals(1, $sentMessage->getMessageId());
-        $this->assertEquals('telegram://api.telegram.org?channel=testChannel', $sentMessage->getTransport());
+        $this->assertSame('telegram://api.telegram.org?channel=testChannel', $sentMessage->getTransport());
     }
 
     public function testSendWithOptionForEditMessage()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(200);
-
-        $content = <<<JSON
-            {
-                "ok": true,
-                "result": {
-                    "message_id": 1,
-                    "from": {
-                        "id": 12345678,
-                        "first_name": "YourBot",
-                        "username": "YourBot"
-                    },
-                    "chat": {
-                        "id": 1234567890,
-                        "first_name": "John",
-                        "last_name": "Doe",
-                        "username": "JohnDoe",
-                        "type": "private"
-                    },
-                    "date": 1459958199,
-                    "text": "Hello from Bot!"
-                }
-            }
-JSON;
-
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn($content)
-        ;
+        $response = new JsonMockResponse([
+            'ok' => true,
+            'result' => [
+                'message_id' => 1,
+                'from' => [
+                    'id' => 12345678,
+                    'first_name' => 'YourBot',
+                    'username' => 'YourBot',
+                ],
+                'chat' => [
+                    'id' => 1234567890,
+                    'first_name' => 'John',
+                    'last_name' => 'Doe',
+                    'username' => 'JohnDoe',
+                    'type' => 'private',
+                ],
+                'date' => 1459958199,
+                'text' => 'Hello from Bot!',
+            ],
+        ]);
 
         $client = new MockHttpClient(function (string $method, string $url) use ($response): ResponseInterface {
             $this->assertStringEndsWith('/editMessageText', $url);
@@ -185,29 +166,18 @@ JSON;
         });
 
         $transport = $this->createTransport($client, 'testChannel');
-        $options = (new TelegramOptions())->edit(123);
-
-        $transport->send(new ChatMessage('testMessage', $options));
+        $transport->send(new ChatMessage(
+            'testMessage',
+            (new TelegramOptions())->edit(123)
+        ));
     }
 
     public function testSendWithOptionToAnswerCallbackQuery()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(200);
-
-        $content = <<<JSON
-            {
-                "ok": true,
-                "result": true
-            }
-JSON;
-
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn($content)
-        ;
+        $response = new JsonMockResponse([
+            'ok' => true,
+            'result' => true,
+        ]);
 
         $client = new MockHttpClient(function (string $method, string $url) use ($response): ResponseInterface {
             $this->assertStringEndsWith('/answerCallbackQuery', $url);
@@ -216,46 +186,36 @@ JSON;
         });
 
         $transport = $this->createTransport($client, 'testChannel');
-        $options = (new TelegramOptions())->answerCallbackQuery('123', true, 1);
-
-        $transport->send(new ChatMessage('testMessage', $options));
+        $transport->send(new ChatMessage(
+            'testMessage',
+            (new TelegramOptions())->answerCallbackQuery('123', true, 1)
+        ));
     }
 
     public function testSendWithChannelOverride()
     {
         $channelOverride = 'channelOverride';
 
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(200);
-        $content = <<<JSON
-            {
-                "ok": true,
-                "result": {
-                    "message_id": 1,
-                    "from": {
-                        "id": 12345678,
-                        "first_name": "YourBot",
-                        "username": "YourBot"
-                    },
-                    "chat": {
-                        "id": 1234567890,
-                        "first_name": "John",
-                        "last_name": "Doe",
-                        "username": "JohnDoe",
-                        "type": "private"
-                    },
-                    "date": 1459958199,
-                    "text": "Hello from Bot!"
-                }
-            }
-JSON;
-
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn($content)
-        ;
+        $response = new JsonMockResponse([
+            'ok' => true,
+            'result' => [
+                'message_id' => 1,
+                'from' => [
+                    'id' => 12345678,
+                    'first_name' => 'YourBot',
+                    'username' => 'YourBot',
+                ],
+                'chat' => [
+                    'id' => 1234567890,
+                    'first_name' => 'John',
+                    'last_name' => 'Doe',
+                    'username' => 'JohnDoe',
+                    'type' => 'private',
+                ],
+                'date' => 1459958199,
+                'text' => 'Hello from Bot!',
+            ],
+        ]);
 
         $expectedBody = [
             'chat_id' => $channelOverride,
@@ -277,43 +237,31 @@ JSON;
         $sentMessage = $transport->send(new ChatMessage('testMessage', $messageOptions));
 
         $this->assertEquals(1, $sentMessage->getMessageId());
-        $this->assertEquals('telegram://api.telegram.org?channel=defaultChannel', $sentMessage->getTransport());
+        $this->assertSame('telegram://api.telegram.org?channel=defaultChannel', $sentMessage->getTransport());
     }
 
     public function testSendWithMarkdownShouldEscapeSpecialCharacters()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(200);
-
-        $content = <<<JSON
-            {
-                "ok": true,
-                "result": {
-                    "message_id": 1,
-                    "from": {
-                        "id": 12345678,
-                        "first_name": "YourBot",
-                        "username": "YourBot"
-                    },
-                    "chat": {
-                        "id": 1234567890,
-                        "first_name": "John",
-                        "last_name": "Doe",
-                        "username": "JohnDoe",
-                        "type": "private"
-                    },
-                    "date": 1459958199,
-                    "text": "Hello from Bot!"
-                }
-            }
-JSON;
-
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn($content)
-        ;
+        $response = new JsonMockResponse([
+            'ok' => true,
+            'result' => [
+                'message_id' => 1,
+                'from' => [
+                    'id' => 12345678,
+                    'first_name' => 'YourBot',
+                    'username' => 'YourBot',
+                ],
+                'chat' => [
+                    'id' => 1234567890,
+                    'first_name' => 'John',
+                    'last_name' => 'Doe',
+                    'username' => 'JohnDoe',
+                    'type' => 'private',
+                ],
+                'date' => 1459958199,
+                'text' => 'Hello from Bot!',
+            ],
+        ]);
 
         $expectedBody = [
             'chat_id' => 'testChannel',
@@ -332,6 +280,9 @@ JSON;
         $transport->send(new ChatMessage('I contain special characters _ * [ ] ( ) ~ ` > # + - = | { } . ! \\ to send.'));
     }
 
+    /**
+     * @return array<array<string, array{messageOptions: TelegramOptions, endpoint: string, expectedBody: array<mixed>, responseContent: array<mixed>}>>
+     */
     public static function sendFileByHttpUrlProvider(): array
     {
         return [
@@ -345,18 +296,16 @@ JSON;
                     'parse_mode' => 'MarkdownV2',
                     'caption' => 'testMessage',
                 ],
-                'responseContent' => <<<JSON
-                    "photo": [
-                        {
-                            "file_id": "ABCDEF",
-                            "file_unique_id" : "ABCDEF1",
-                            "file_size": 1378,
-                            "width": 90,
-                            "height": 51
-                        }
+                'responseContent' => [
+                    'photo' => [
+                        'file_id' => 'ABCDEF',
+                        'file_unique_id' => 'ABCDEF1',
+                        'file_size' => 1378,
+                        'width' => 90,
+                        'height' => 51,
                     ],
-                    "caption": "testMessage"
-                    JSON,
+                    'caption' => 'testMessage',
+                ],
             ],
             'video' => [
                 'messageOptions' => (new TelegramOptions())->video('https://localhost/video.mp4'),
@@ -367,16 +316,16 @@ JSON;
                     'parse_mode' => 'MarkdownV2',
                     'caption' => 'testMessage',
                 ],
-                'responseContent' => <<<JSON
-                    "video": [
-                        {
-                            "file_id": "ABCDEF",
-                            "file_unique_id" : "ABCDEF1",
-                            "file_size": 1378
-                        }
+                'responseContent' => [
+                    'video' => [
+                        'file_id' => 'ABCDEF',
+                        'file_unique_id' => 'ABCDEF1',
+                        'file_size' => 1378,
+                        'width' => 90,
+                        'height' => 51,
                     ],
-                    "caption": "testMessage"
-                    JSON,
+                    'caption' => 'testMessage',
+                ],
             ],
             'animation' => [
                 'messageOptions' => (new TelegramOptions())->animation('https://localhost/animation.gif'),
@@ -387,16 +336,14 @@ JSON;
                     'parse_mode' => 'MarkdownV2',
                     'caption' => 'testMessage',
                 ],
-                'responseContent' => <<<JSON
-                    "animation": [
-                        {
-                            "file_id": "ABCDEF",
-                            "file_unique_id" : "ABCDEF1",
-                            "file_size": 1378
-                        }
+                'responseContent' => [
+                    'animation' => [
+                        'file_id' => 'ABCDEF',
+                        'file_unique_id' => 'ABCDEF1',
+                        'file_size' => 1378,
                     ],
-                    "caption": "testMessage"
-                    JSON,
+                    'caption' => 'testMessage',
+                ],
             ],
             'audio' => [
                 'messageOptions' => (new TelegramOptions())->audio('https://localhost/audio.ogg'),
@@ -407,16 +354,14 @@ JSON;
                     'parse_mode' => 'MarkdownV2',
                     'caption' => 'testMessage',
                 ],
-                'responseContent' => <<<JSON
-                    "audio": [
-                        {
-                            "file_id": "ABCDEF",
-                            "file_unique_id" : "ABCDEF1",
-                            "file_size": 1378
-                        }
+                'responseContent' => [
+                    'audio' => [
+                        'file_id' => 'ABCDEF',
+                        'file_unique_id' => 'ABCDEF1',
+                        'file_size' => 1378,
                     ],
-                    "caption": "testMessage"
-                    JSON,
+                    'caption' => 'testMessage',
+                ],
             ],
             'document' => [
                 'messageOptions' => (new TelegramOptions())->document('https://localhost/document.odt'),
@@ -427,18 +372,16 @@ JSON;
                     'parse_mode' => 'MarkdownV2',
                     'caption' => 'testMessage',
                 ],
-                'responseContent' => <<<JSON
-                    "document": [
-                        {
-                            "file_id": "ABCDEF",
-                            "file_unique_id" : "ABCDEF1",
-                            "file_size": 1378,
-                            "file_name": "document.odt",
-                            "mime_type": "application/vnd.oasis.opendocument.text"
-                        }
+                'responseContent' => [
+                    'document' => [
+                        'file_id' => 'ABCDEF',
+                        'file_unique_id' => 'ABCDEF1',
+                        'file_size' => 1378,
+                        'file_name' => 'document.odt',
+                        'mime_type' => 'application/vnd.oasis.opendocument.text',
                     ],
-                    "caption": "testMessage"
-                    JSON,
+                    'caption' => 'testMessage',
+                ],
             ],
             'sticker' => [
                 'messageOptions' => (new TelegramOptions())->sticker('https://localhost/sticker.webp', '🤖'),
@@ -449,22 +392,19 @@ JSON;
                     'parse_mode' => 'MarkdownV2',
                     'emoji' => '🤖',
                 ],
-                'responseContent' => <<<JSON
-                    "sticker": [
-                        {
-                            "file_id": "ABCDEF",
-                            "file_unique_id" : "ABCDEF1",
-                            "file_size": 1378,
-                            "type": "regular",
-                            "width": 100,
-                            "height": 110,
-                            "is_animated": false,
-                            "is_video": false,
-                            "emoji": "🤖"
-                        }
+                'responseContent' => [
+                    'sticker' => [
+                        'file_id' => 'ABCDEF',
+                        'file_unique_id' => 'ABCDEF1',
+                        'file_size' => 1378,
+                        'width' => 100,
+                        'height' => 110,
+                        'is_animated' => false,
+                        'is_video' => false,
+                        'emoji' => '🤖',
                     ],
-                    "caption": "testMessage"
-                    JSON,
+                    'caption' => 'testMessage',
+                    ],
             ],
             'sticker-without-emoji' => [
                 'messageOptions' => (new TelegramOptions())->sticker('https://localhost/sticker.webp'),
@@ -474,21 +414,18 @@ JSON;
                     'chat_id' => 'testChannel',
                     'parse_mode' => 'MarkdownV2',
                 ],
-                'responseContent' => <<<JSON
-                    "sticker": [
-                        {
-                            "file_id": "ABCDEF",
-                            "file_unique_id" : "ABCDEF1",
-                            "file_size": 1378,
-                            "type": "regular",
-                            "width": 100,
-                            "height": 110,
-                            "is_animated": false,
-                            "is_video": false
-                        }
+                'responseContent' => [
+                    'sticker' => [
+                        'file_id' => 'ABCDEF',
+                        'file_unique_id' => 'ABCDEF1',
+                        'file_size' => 1378,
+                        'width' => 100,
+                        'height' => 110,
+                        'is_animated' => false,
+                        'is_video' => false,
                     ],
-                    "caption": "testMessage"
-                    JSON,
+                    'caption' => 'testMessage',
+                ],
             ],
         ];
     }
@@ -500,41 +437,28 @@ JSON;
         TelegramOptions $messageOptions,
         string $endpoint,
         array $expectedBody,
-        string $responseContent,
+        array $responseContent,
     ) {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(200);
-
-        $content = <<<JSON
-            {
-                "ok": true,
-                "result": {
-                    "message_id": 1,
-                    "from": {
-                        "id": 12345678,
-                        "is_bot": true,
-                        "first_name": "YourBot",
-                        "username": "YourBot"
-                    },
-                    "chat": {
-                        "id": 1234567890,
-                        "first_name": "John",
-                        "last_name": "Doe",
-                        "username": "JohnDoe",
-                        "type": "private"
-                    },
-                    "date": 1459958199,
-                    $responseContent
-                }
-            }
-JSON;
-
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn($content)
-        ;
+        $response = new JsonMockResponse([
+            'ok' => true,
+            'result' => array_merge([
+                'message_id' => 1,
+                'from' => [
+                    'id' => 12345678,
+                    'is_bot' => true,
+                    'first_name' => 'YourBot',
+                    'username' => 'YourBot',
+                ],
+                'chat' => [
+                    'id' => 1234567890,
+                    'first_name' => 'John',
+                    'last_name' => 'Doe',
+                    'username' => 'JohnDoe',
+                    'type' => 'private',
+                ],
+                'date' => 1459958199,
+            ], $responseContent),
+        ]);
 
         $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response, $expectedBody, $endpoint): ResponseInterface {
             $this->assertStringEndsWith($endpoint, $url);
@@ -547,9 +471,12 @@ JSON;
         $sentMessage = $transport->send(new ChatMessage('testMessage', $messageOptions));
 
         $this->assertEquals(1, $sentMessage->getMessageId());
-        $this->assertEquals('telegram://api.telegram.org?channel=testChannel', $sentMessage->getTransport());
+        $this->assertSame('telegram://api.telegram.org?channel=testChannel', $sentMessage->getTransport());
     }
 
+    /**
+     * @return array<array<string, array{messageOptions: TelegramOptions, endpoint: string, expectedBody: array<mixed>, responseContent: array<mixed>}>>
+     */
     public static function sendFileByFileIdProvider(): array
     {
         return [
@@ -563,18 +490,16 @@ JSON;
                     'parse_mode' => 'MarkdownV2',
                     'caption' => 'testMessage',
                 ],
-                'responseContent' => <<<JSON
-                    "photo": [
-                        {
-                            "file_id": "ABCDEF",
-                            "file_unique_id" : "ABCDEF1",
-                            "file_size": 1378,
-                            "width": 90,
-                            "height": 51
-                        }
+                'responseContent' => [
+                    'photo' => [
+                        'file_id' => 'ABCDEF',
+                        'file_unique_id' => 'ABCDEF1',
+                        'file_size' => 1378,
+                        'width' => 90,
+                        'height' => 51,
                     ],
-                    "caption": "testMessage"
-                    JSON,
+                    'caption' => 'testMessage',
+                ],
             ],
             'video' => [
                 'messageOptions' => (new TelegramOptions())->video('ABCDEF'),
@@ -585,16 +510,14 @@ JSON;
                     'parse_mode' => 'MarkdownV2',
                     'caption' => 'testMessage',
                 ],
-                'responseContent' => <<<JSON
-                    "video": [
-                        {
-                            "file_id": "ABCDEF",
-                            "file_unique_id" : "ABCDEF1",
-                            "file_size": 1378
-                        }
+                'responseContent' => [
+                    'video' => [
+                        'file_id' => 'ABCDEF',
+                        'file_unique_id' => 'ABCDEF1',
+                        'file_size' => 1378,
                     ],
-                    "caption": "testMessage"
-                    JSON,
+                    'caption' => 'testMessage',
+                ],
             ],
             'animation' => [
                 'messageOptions' => (new TelegramOptions())->animation('ABCDEF'),
@@ -605,16 +528,14 @@ JSON;
                     'parse_mode' => 'MarkdownV2',
                     'caption' => 'testMessage',
                 ],
-                'responseContent' => <<<JSON
-                    "animation": [
-                        {
-                            "file_id": "ABCDEF",
-                            "file_unique_id" : "ABCDEF1",
-                            "file_size": 1378
-                        }
+                'responseContent' => [
+                    'animation' => [
+                        'file_id' => 'ABCDEF',
+                        'file_unique_id' => 'ABCDEF1',
+                        'file_size' => 1378,
                     ],
-                    "caption": "testMessage"
-                    JSON,
+                    'caption' => 'testMessage',
+                ],
             ],
             'audio' => [
                 'messageOptions' => (new TelegramOptions())->audio('ABCDEF'),
@@ -625,16 +546,14 @@ JSON;
                     'parse_mode' => 'MarkdownV2',
                     'caption' => 'testMessage',
                 ],
-                'responseContent' => <<<JSON
-                    "audio": [
-                        {
-                            "file_id": "ABCDEF",
-                            "file_unique_id" : "ABCDEF1",
-                            "file_size": 1378
-                        }
+                'responseContent' => [
+                    'audio' => [
+                        'file_id' => 'ABCDEF',
+                        'file_unique_id' => 'ABCDEF1',
+                        'file_size' => 1378,
                     ],
-                    "caption": "testMessage"
-                    JSON,
+                    'caption' => 'testMessage',
+                ],
             ],
             'document' => [
                 'messageOptions' => (new TelegramOptions())->document('ABCDEF'),
@@ -645,18 +564,16 @@ JSON;
                     'parse_mode' => 'MarkdownV2',
                     'caption' => 'testMessage',
                 ],
-                'responseContent' => <<<JSON
-                    "document": [
-                        {
-                            "file_id": "ABCDEF",
-                            "file_unique_id" : "ABCDEF1",
-                            "file_size": 1378,
-                            "file_name": "document.odt",
-                            "mime_type": "application/vnd.oasis.opendocument.text"
-                        }
+                'responseContent' => [
+                    'document' => [
+                        'file_id' => 'ABCDEF',
+                        'file_unique_id' => 'ABCDEF1',
+                        'file_size' => 1378,
+                        'file_name' => 'document.odt',
+                        'mime_type' => 'application/vnd.oasis.opendocument.text',
                     ],
-                    "caption": "testMessage"
-                    JSON,
+                    'caption' => 'testMessage',
+                ],
             ],
         ];
     }
@@ -668,41 +585,28 @@ JSON;
         TelegramOptions $messageOptions,
         string $endpoint,
         array $expectedBody,
-        string $responseContent,
+        array $responseContent,
     ) {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(200);
-
-        $content = <<<JSON
-            {
-                "ok": true,
-                "result": {
-                    "message_id": 1,
-                    "from": {
-                        "id": 12345678,
-                        "is_bot": true,
-                        "first_name": "YourBot",
-                        "username": "YourBot"
-                    },
-                    "chat": {
-                        "id": 1234567890,
-                        "first_name": "John",
-                        "last_name": "Doe",
-                        "username": "JohnDoe",
-                        "type": "private"
-                    },
-                    "date": 1459958199,
-                    $responseContent
-                }
-            }
-JSON;
-
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn($content)
-        ;
+        $response = new JsonMockResponse([
+            'ok' => true,
+            'result' => array_merge([
+                'message_id' => 1,
+                'from' => [
+                    'id' => 12345678,
+                    'is_bot' => true,
+                    'first_name' => 'YourBot',
+                    'username' => 'YourBot',
+                ],
+                'chat' => [
+                    'id' => 1234567890,
+                    'first_name' => 'John',
+                    'last_name' => 'Doe',
+                    'username' => 'JohnDoe',
+                    'type' => 'private',
+                ],
+                'date' => 1459958199,
+            ], $responseContent),
+        ]);
 
         $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response, $expectedBody, $endpoint): ResponseInterface {
             $this->assertStringEndsWith($endpoint, $url);
@@ -715,11 +619,12 @@ JSON;
         $sentMessage = $transport->send(new ChatMessage('testMessage', $messageOptions));
 
         $this->assertEquals(1, $sentMessage->getMessageId());
-        $this->assertEquals('telegram://api.telegram.org?channel=testChannel', $sentMessage->getTransport());
+        $this->assertSame('telegram://api.telegram.org?channel=testChannel', $sentMessage->getTransport());
     }
 
-    private const FIXTURE_FILE = __DIR__.'/fixtures.png';
-
+    /**
+     * @return array<array<string, array{messageOptions: TelegramOptions, endpoint: string, fileOption: string, expectedBody: array<mixed>, responseContent: array<mixed>}>>
+     */
     public static function sendFileByUploadProvider(): array
     {
         return [
@@ -734,18 +639,16 @@ JSON;
                     'photo' => self::FIXTURE_FILE,
                     'caption' => 'testMessage',
                 ],
-                'responseContent' => <<<JSON
-                    "photo": [
-                        {
-                            "file_id": "ABCDEF",
-                            "file_unique_id" : "ABCDEF1",
-                            "file_size": 1378,
-                            "width": 90,
-                            "height": 51
-                        }
+                'responseContent' => [
+                    'photo' => [
+                        'file_id' => 'ABCDEF',
+                        'file_unique_id' => 'ABCDEF1',
+                        'file_size' => 1378,
+                        'width' => 90,
+                        'height' => 51,
                     ],
-                    "caption": "testMessage"
-                    JSON,
+                    'caption' => 'testMessage',
+                ],
             ],
             'video' => [
                 'messageOptions' => (new TelegramOptions())->uploadVideo(self::FIXTURE_FILE),
@@ -757,16 +660,14 @@ JSON;
                     'video' => self::FIXTURE_FILE,
                     'caption' => 'testMessage',
                 ],
-                'responseContent' => <<<JSON
-                    "video": [
-                        {
-                            "file_id": "ABCDEF",
-                            "file_unique_id" : "ABCDEF1",
-                            "file_size": 1378
-                        }
+                'responseContent' => [
+                    'video' => [
+                        'file_id' => 'ABCDEF',
+                        'file_unique_id' => 'ABCDEF1',
+                        'file_size' => 1378,
                     ],
-                    "caption": "testMessage"
-                    JSON,
+                    'caption' => 'testMessage',
+                ],
             ],
             'animation' => [
                 'messageOptions' => (new TelegramOptions())->uploadAnimation(self::FIXTURE_FILE),
@@ -778,16 +679,14 @@ JSON;
                     'animation' => self::FIXTURE_FILE,
                     'caption' => 'testMessage',
                 ],
-                'responseContent' => <<<JSON
-                    "animation": [
-                        {
-                            "file_id": "ABCDEF",
-                            "file_unique_id" : "ABCDEF1",
-                            "file_size": 1378
-                        }
+                'responseContent' => [
+                    'animation' => [
+                        'file_id' => 'ABCDEF',
+                        'file_unique_id' => 'ABCDEF1',
+                        'file_size' => 1378,
                     ],
-                    "caption": "testMessage"
-                    JSON,
+                    'caption' => 'testMessage',
+                ],
             ],
             'audio' => [
                 'messageOptions' => (new TelegramOptions())->uploadAudio(self::FIXTURE_FILE),
@@ -799,16 +698,14 @@ JSON;
                     'audio' => self::FIXTURE_FILE,
                     'caption' => 'testMessage',
                 ],
-                'responseContent' => <<<JSON
-                    "audio": [
-                        {
-                            "file_id": "ABCDEF",
-                            "file_unique_id" : "ABCDEF1",
-                            "file_size": 1378
-                        }
+                'responseContent' => [
+                    'audio' => [
+                        'file_id' => 'ABCDEF',
+                        'file_unique_id' => 'ABCDEF1',
+                        'file_size' => 1378,
                     ],
-                    "caption": "testMessage"
-                    JSON,
+                    'caption' => 'testMessage',
+                ],
             ],
             'document' => [
                 'messageOptions' => (new TelegramOptions())->uploadDocument(self::FIXTURE_FILE),
@@ -820,18 +717,16 @@ JSON;
                     'document' => self::FIXTURE_FILE,
                     'caption' => 'testMessage',
                 ],
-                'responseContent' => <<<JSON
-                    "document": [
-                        {
-                            "file_id": "ABCDEF",
-                            "file_unique_id" : "ABCDEF1",
-                            "file_size": 1378,
-                            "file_name": "document.odt",
-                            "mime_type": "application/vnd.oasis.opendocument.text"
-                        }
+                'responseContent' => [
+                    'document' => [
+                        'file_id' => 'ABCDEF',
+                        'file_unique_id' => 'ABCDEF1',
+                        'file_size' => 1378,
+                        'file_name' => 'document.odt',
+                        'mime_type' => 'application/vnd.oasis.opendocument.text',
                     ],
-                    "caption": "testMessage"
-                    JSON,
+                    'caption' => 'testMessage',
+                ],
             ],
             'sticker' => [
                 'messageOptions' => (new TelegramOptions())->uploadSticker(self::FIXTURE_FILE, '🤖'),
@@ -843,22 +738,20 @@ JSON;
                     'parse_mode' => 'MarkdownV2',
                     'sticker' => self::FIXTURE_FILE,
                 ],
-                'responseContent' => <<<JSON
-                    "sticker": [
-                        {
-                            "file_id": "ABCDEF",
-                            "file_unique_id" : "ABCDEF1",
-                            "file_size": 1378,
-                            "type": "regular",
-                            "width": 100,
-                            "height": 110,
-                            "is_animated": false,
-                            "is_video": false,
-                            "emoji": "🤖"
-                        }
+                'responseContent' => [
+                    'sticker' => [
+                        'file_id' => 'ABCDEF',
+                        'file_unique_id' => 'ABCDEF1',
+                        'file_size' => 1378,
+                        'type' => 'regular',
+                        'width' => 100,
+                        'height' => 110,
+                        'is_animated' => false,
+                        'is_video' => false,
+                        'emoji' => '🤖',
                     ],
-                    "caption": "testMessage"
-                    JSON,
+                    'caption' => 'testMessage',
+                ],
             ],
             'sticker-without-emoji' => [
                 'messageOptions' => (new TelegramOptions())->uploadSticker(self::FIXTURE_FILE),
@@ -869,21 +762,19 @@ JSON;
                     'parse_mode' => 'MarkdownV2',
                     'sticker' => self::FIXTURE_FILE,
                 ],
-                'responseContent' => <<<JSON
-                    "sticker": [
-                        {
-                            "file_id": "ABCDEF",
-                            "file_unique_id" : "ABCDEF1",
-                            "file_size": 1378,
-                            "type": "regular",
-                            "width": 100,
-                            "height": 110,
-                            "is_animated": false,
-                            "is_video": false
-                        }
+                'responseContent' => [
+                    'sticker' => [
+                        'file_id' => 'ABCDEF',
+                        'file_unique_id' => 'ABCDEF1',
+                        'file_size' => 1378,
+                        'type' => 'regular',
+                        'width' => 100,
+                        'height' => 110,
+                        'is_animated' => false,
+                        'is_video' => false,
                     ],
-                    "caption": "testMessage"
-                    JSON,
+                    'caption' => 'testMessage',
+                ],
             ],
         ];
     }
@@ -898,41 +789,28 @@ JSON;
         string $endpoint,
         string $fileOption,
         array $expectedParameters,
-        string $responseContent,
+        array $responseContent,
     ) {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(200);
-
-        $content = <<<JSON
-            {
-                "ok": true,
-                "result": {
-                    "message_id": 1,
-                    "from": {
-                        "id": 12345678,
-                        "is_bot": true,
-                        "first_name": "YourBot",
-                        "username": "YourBot"
-                    },
-                    "chat": {
-                        "id": 1234567890,
-                        "first_name": "John",
-                        "last_name": "Doe",
-                        "username": "JohnDoe",
-                        "type": "private"
-                    },
-                    "date": 1459958199,
-                    $responseContent
-                }
-            }
-JSON;
-
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn($content)
-        ;
+        $response = new JsonMockResponse([
+            'ok' => true,
+            'result' => array_merge([
+                'message_id' => 1,
+                'from' => [
+                    'id' => 12345678,
+                    'is_bot' => true,
+                    'first_name' => 'YourBot',
+                    'username' => 'YourBot',
+                ],
+                'chat' => [
+                    'id' => 1234567890,
+                    'first_name' => 'John',
+                    'last_name' => 'Doe',
+                    'username' => 'JohnDoe',
+                    'type' => 'private',
+                ],
+                'date' => 1459958199,
+            ], $responseContent),
+        ]);
 
         $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response, $expectedParameters, $fileOption, $endpoint): ResponseInterface {
             $this->assertStringEndsWith($endpoint, $url);
@@ -949,7 +827,7 @@ JSON;
                 if ($key === $fileOption) {
                     $expectedBody .= <<<BODY
                         --{$matches['boundary']}
-                        Content-Disposition: form-data; name="$key"; filename="fixtures.png"
+                        Content-Disposition: form-data; name="$key"; filename="image.png"
                         Content-Type: image/png
 
                         %s
@@ -970,7 +848,7 @@ JSON;
 
                 BODY;
             $expectedBody = str_replace("\n", "\r\n", $expectedBody);
-            $expectedBody = sprintf($expectedBody, file_get_contents(__DIR__.'/fixtures.png'));
+            $expectedBody = sprintf($expectedBody, file_get_contents(self::FIXTURE_FILE));
 
             $body = '';
             do {
@@ -985,47 +863,35 @@ JSON;
         $sentMessage = $transport->send(new ChatMessage('testMessage', $messageOptions));
 
         $this->assertEquals(1, $sentMessage->getMessageId());
-        $this->assertEquals('telegram://api.telegram.org?channel=testChannel', $sentMessage->getTransport());
+        $this->assertSame('telegram://api.telegram.org?channel=testChannel', $sentMessage->getTransport());
     }
 
     public function testSendLocationWithOptions()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(200);
-
-        $content = <<<JSON
-            {
-                "ok": true,
-                "result": {
-                    "message_id": 1,
-                    "from": {
-                        "id": 12345678,
-                        "is_bot": true,
-                        "first_name": "YourBot",
-                        "username": "YourBot"
-                    },
-                    "chat": {
-                        "id": 1234567890,
-                        "first_name": "John",
-                        "last_name": "Doe",
-                        "username": "JohnDoe",
-                        "type": "private"
-                    },
-                    "date": 1459958199,
-                    "location": {
-                         "latitude": 48.8566,
-                         "longitude": 2.3522
-                    }
-                }
-            }
-JSON;
-
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn($content)
-        ;
+        $response = new JsonMockResponse([
+            'ok' => true,
+            'result' => [
+                'message_id' => 1,
+                'from' => [
+                    'id' => 12345678,
+                    'is_bot' => true,
+                    'first_name' => 'YourBot',
+                    'username' => 'YourBot',
+                ],
+                'chat' => [
+                    'id' => 1234567890,
+                    'first_name' => 'John',
+                    'last_name' => 'Doe',
+                    'username' => 'JohnDoe',
+                    'type' => 'private',
+                ],
+                'date' => 1459958199,
+                'location' => [
+                    'latitude' => 48.8566,
+                    'longitude' => 2.3522,
+                ],
+            ],
+        ]);
 
         $expectedBody = [
             'latitude' => 48.8566,
@@ -1043,63 +909,50 @@ JSON;
 
         $transport = self::createTransport($client, 'testChannel');
 
-        $messageOptions = new TelegramOptions();
-        $messageOptions
+        $messageOptions = (new TelegramOptions())
             ->location(48.8566, 2.3522)
         ;
 
         $sentMessage = $transport->send(new ChatMessage('', $messageOptions));
 
         $this->assertEquals(1, $sentMessage->getMessageId());
-        $this->assertEquals('telegram://api.telegram.org?channel=testChannel', $sentMessage->getTransport());
+        $this->assertSame('telegram://api.telegram.org?channel=testChannel', $sentMessage->getTransport());
     }
 
     public function testSendVenueWithOptions()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(200);
-
-        $content = <<<JSON
-            {
-                "ok": true,
-                "result": {
-                    "message_id": 1,
-                    "from": {
-                        "id": 12345678,
-                        "is_bot": true,
-                        "first_name": "YourBot",
-                        "username": "YourBot"
-                    },
-                    "chat": {
-                        "id": 1234567890,
-                        "first_name": "John",
-                        "last_name": "Doe",
-                        "username": "JohnDoe",
-                        "type": "private"
-                    },
-                    "date": 1459958199,
-                    "location": {
-                         "latitude": 48.8566,
-                         "longitude": 2.3522
-                    },
-                    "venue": {
-                        "location": {
-                             "latitude": 48.8566,
-                             "longitude": 2.3522
-                        },
-                        "title": "Center of Paris",
-                        "address": "France, Paris"
-                    }
-                }
-            }
-JSON;
-
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn($content)
-        ;
+        $response = new JsonMockResponse([
+            'ok' => true,
+            'result' => [
+                'message_id' => 1,
+                'from' => [
+                    'id' => 12345678,
+                    'is_bot' => true,
+                    'first_name' => 'YourBot',
+                    'username' => 'YourBot',
+                ],
+                'chat' => [
+                    'id' => 1234567890,
+                    'first_name' => 'John',
+                    'last_name' => 'Doe',
+                    'username' => 'JohnDoe',
+                    'type' => 'private',
+                ],
+                'date' => 1459958199,
+                'location' => [
+                    'latitude' => 48.8566,
+                    'longitude' => 2.3522,
+                ],
+                'venue' => [
+                    'location' => [
+                        'latitude' => 48.8566,
+                        'longitude' => 2.3522,
+                    ],
+                    'title' => 'Center of Paris',
+                    'address' => 'France, Paris',
+                ],
+            ],
+        ]);
 
         $expectedBody = [
             'latitude' => 48.8566,
@@ -1119,67 +972,55 @@ JSON;
 
         $transport = self::createTransport($client, 'testChannel');
 
-        $messageOptions = new TelegramOptions();
-        $messageOptions
+        $messageOptions = (new TelegramOptions())
             ->venue(48.8566, 2.3522, 'Center of Paris', 'France, Paris')
         ;
 
         $sentMessage = $transport->send(new ChatMessage('', $messageOptions));
 
         $this->assertEquals(1, $sentMessage->getMessageId());
-        $this->assertEquals('telegram://api.telegram.org?channel=testChannel', $sentMessage->getTransport());
+        $this->assertSame('telegram://api.telegram.org?channel=testChannel', $sentMessage->getTransport());
     }
 
     public function testSendContactWithOptions()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(200);
         $vCard = <<<V_CARD
-            BEGIN:VCARD
-            VERSION:3.0
-            N:Doe;John;;;
-            FN:John Doe
-            EMAIL;type=INTERNET;type=WORK;type=pref:johnDoe@example.org
-            TEL;type=WORK;type=pref:+330186657200
-            END:VCARD
-            V_CARD;
+BEGIN:VCARD
+VERSION:3.0
+N:Doe;John;;;
+FN:John Doe
+EMAIL;type=INTERNET;type=WORK;type=pref:johnDoe@example.org
+TEL;type=WORK;type=pref:+330186657200
+END:VCARD
+V_CARD;
 
-        $content = <<<JSON
-            {
-                "ok": true,
-                "result": {
-                    "message_id": 1,
-                    "from": {
-                        "id": 12345678,
-                        "is_bot": true,
-                        "first_name": "YourBot",
-                        "username": "YourBot"
-                    },
-                    "chat": {
-                        "id": 1234567890,
-                        "first_name": "John",
-                        "last_name": "Doe",
-                        "username": "JohnDoe",
-                        "type": "private"
-                    },
-                    "date": 1459958199,
-                    "contact": {
-                      "phone_number": "+330186657200",
-                      "first_name": "John",
-                      "last_name": "Doe",
-                      "vcard": "BEGIN:VCARD\\nVERSION:3.0\\nN:Doe;John;;;\\nFN:John Doe\\nEMAIL;type=INTERNET;type=WORK;type=pref:johnDoe@example.org\\nTEL;type=WORK;type=pref:+330186657200\\nEND:VCARD",
-                      "user_id": 1234567891
-                    }
-                }
-            }
-JSON;
-
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn($content)
-        ;
+        $response = new JsonMockResponse([
+            'ok' => true,
+            'result' => [
+                'message_id' => 1,
+                'from' => [
+                    'id' => 12345678,
+                    'is_bot' => true,
+                    'first_name' => 'YourBot',
+                    'username' => 'YourBot',
+                ],
+                'chat' => [
+                    'id' => 1234567890,
+                    'first_name' => 'John',
+                    'last_name' => 'Doe',
+                    'username' => 'JohnDoe',
+                    'type' => 'private',
+                ],
+                'date' => 1459958199,
+                'contact' => [
+                    'phone_number' => '+330186657200',
+                    'first_name' => 'John',
+                    'last_name' => 'Doe',
+                    'vcard' => $vCard,
+                    'user_id' => 1234567891,
+                ],
+            ],
+        ]);
 
         $expectedBody = [
             'phone_number' => '+330186657200',
@@ -1199,17 +1040,19 @@ JSON;
 
         $transport = self::createTransport($client, 'testChannel');
 
-        $messageOptions = new TelegramOptions();
-        $messageOptions
+        $messageOptions = (new TelegramOptions())
             ->contact('+330186657200', 'John', 'Doe', $vCard)
         ;
 
         $sentMessage = $transport->send(new ChatMessage('', $messageOptions));
 
         $this->assertEquals(1, $sentMessage->getMessageId());
-        $this->assertEquals('telegram://api.telegram.org?channel=testChannel', $sentMessage->getTransport());
+        $this->assertSame('telegram://api.telegram.org?channel=testChannel', $sentMessage->getTransport());
     }
 
+    /**
+     * @return array<string, array<int, TelegramOptions>>
+     */
     public static function exclusiveOptionsDataProvider(): array
     {
         return [

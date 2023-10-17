@@ -245,6 +245,7 @@ class ProfilerControllerTest extends WebTestCase
                 'time' => 0,
                 'parent' => null,
                 'status_code' => 200,
+                'virtual_type' => 'request',
             ],
             [
                 'token' => 'token2',
@@ -254,6 +255,7 @@ class ProfilerControllerTest extends WebTestCase
                 'time' => 0,
                 'parent' => null,
                 'status_code' => 404,
+                'virtual_type' => 'request',
             ],
         ];
         $profiler
@@ -285,6 +287,7 @@ class ProfilerControllerTest extends WebTestCase
                 'request' => $request,
                 'csp_script_nonce' => $withCsp ? 'dummy_nonce' : null,
                 'csp_style_nonce' => $withCsp ? 'dummy_nonce' : null,
+                'profile_type' => 'request',
             ]));
 
         $response = $controller->searchResultsAction($request, 'empty');

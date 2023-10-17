@@ -33,6 +33,7 @@ class Profile
     private ?int $time = null;
     private ?int $statusCode = null;
     private ?self $parent = null;
+    private ?string $virtualType = null;
 
     /**
      * @var Profile[]
@@ -161,6 +162,22 @@ class Profile
     }
 
     /**
+     * @internal
+     */
+    public function setVirtualType(?string $virtualType): void
+    {
+        $this->virtualType = $virtualType;
+    }
+
+    /**
+     * @internal
+     */
+    public function getVirtualType(): ?string
+    {
+        return $this->virtualType;
+    }
+
+    /**
      * Finds children profilers.
      *
      * @return self[]
@@ -263,6 +280,6 @@ class Profile
 
     public function __sleep(): array
     {
-        return ['token', 'parent', 'children', 'collectors', 'ip', 'method', 'url', 'time', 'statusCode'];
+        return ['token', 'parent', 'children', 'collectors', 'ip', 'method', 'url', 'time', 'statusCode', 'virtualType'];
     }
 }

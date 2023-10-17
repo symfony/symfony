@@ -69,7 +69,7 @@ diff --git a/src/Symfony/Bridge/Doctrine/DataCollector/DoctrineDataCollector.php
 diff --git a/src/Symfony/Bridge/Doctrine/DataFixtures/ContainerAwareLoader.php b/src/Symfony/Bridge/Doctrine/DataFixtures/ContainerAwareLoader.php
 --- a/src/Symfony/Bridge/Doctrine/DataFixtures/ContainerAwareLoader.php
 +++ b/src/Symfony/Bridge/Doctrine/DataFixtures/ContainerAwareLoader.php
-@@ -40,5 +40,5 @@ class ContainerAwareLoader extends Loader
+@@ -38,5 +38,5 @@ class ContainerAwareLoader extends Loader
       * @return void
       */
 -    public function addFixture(FixtureInterface $fixture)
@@ -124,7 +124,7 @@ diff --git a/src/Symfony/Bridge/Doctrine/DependencyInjection/AbstractDoctrineExt
 diff --git a/src/Symfony/Bridge/Doctrine/DependencyInjection/CompilerPass/DoctrineValidationPass.php b/src/Symfony/Bridge/Doctrine/DependencyInjection/CompilerPass/DoctrineValidationPass.php
 --- a/src/Symfony/Bridge/Doctrine/DependencyInjection/CompilerPass/DoctrineValidationPass.php
 +++ b/src/Symfony/Bridge/Doctrine/DependencyInjection/CompilerPass/DoctrineValidationPass.php
-@@ -32,5 +32,5 @@ class DoctrineValidationPass implements CompilerPassInterface
+@@ -30,5 +30,5 @@ class DoctrineValidationPass implements CompilerPassInterface
       * @return void
       */
 -    public function process(ContainerBuilder $container)
@@ -134,7 +134,7 @@ diff --git a/src/Symfony/Bridge/Doctrine/DependencyInjection/CompilerPass/Doctri
 diff --git a/src/Symfony/Bridge/Doctrine/DependencyInjection/CompilerPass/RegisterEventListenersAndSubscribersPass.php b/src/Symfony/Bridge/Doctrine/DependencyInjection/CompilerPass/RegisterEventListenersAndSubscribersPass.php
 --- a/src/Symfony/Bridge/Doctrine/DependencyInjection/CompilerPass/RegisterEventListenersAndSubscribersPass.php
 +++ b/src/Symfony/Bridge/Doctrine/DependencyInjection/CompilerPass/RegisterEventListenersAndSubscribersPass.php
-@@ -57,5 +57,5 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
+@@ -53,5 +53,5 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
       * @return void
       */
 -    public function process(ContainerBuilder $container)
@@ -144,7 +144,7 @@ diff --git a/src/Symfony/Bridge/Doctrine/DependencyInjection/CompilerPass/Regist
 diff --git a/src/Symfony/Bridge/Doctrine/DependencyInjection/CompilerPass/RegisterMappingsPass.php b/src/Symfony/Bridge/Doctrine/DependencyInjection/CompilerPass/RegisterMappingsPass.php
 --- a/src/Symfony/Bridge/Doctrine/DependencyInjection/CompilerPass/RegisterMappingsPass.php
 +++ b/src/Symfony/Bridge/Doctrine/DependencyInjection/CompilerPass/RegisterMappingsPass.php
-@@ -134,5 +134,5 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
+@@ -123,5 +123,5 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
       * @return void
       */
 -    public function process(ContainerBuilder $container)
@@ -154,21 +154,21 @@ diff --git a/src/Symfony/Bridge/Doctrine/DependencyInjection/CompilerPass/Regist
 diff --git a/src/Symfony/Bridge/Doctrine/DependencyInjection/Security/UserProvider/EntityFactory.php b/src/Symfony/Bridge/Doctrine/DependencyInjection/Security/UserProvider/EntityFactory.php
 --- a/src/Symfony/Bridge/Doctrine/DependencyInjection/Security/UserProvider/EntityFactory.php
 +++ b/src/Symfony/Bridge/Doctrine/DependencyInjection/Security/UserProvider/EntityFactory.php
-@@ -37,5 +37,5 @@ class EntityFactory implements UserProviderFactoryInterface
+@@ -34,5 +34,5 @@ class EntityFactory implements UserProviderFactoryInterface
       * @return void
       */
 -    public function create(ContainerBuilder $container, string $id, array $config)
 +    public function create(ContainerBuilder $container, string $id, array $config): void
      {
          $container
-@@ -50,5 +50,5 @@ class EntityFactory implements UserProviderFactoryInterface
+@@ -47,5 +47,5 @@ class EntityFactory implements UserProviderFactoryInterface
       * @return string
       */
 -    public function getKey()
 +    public function getKey(): string
      {
          return $this->key;
-@@ -58,5 +58,5 @@ class EntityFactory implements UserProviderFactoryInterface
+@@ -55,5 +55,5 @@ class EntityFactory implements UserProviderFactoryInterface
       * @return void
       */
 -    public function addConfiguration(NodeDefinition $node)
@@ -242,14 +242,14 @@ diff --git a/src/Symfony/Bridge/Doctrine/Logger/DbalLogger.php b/src/Symfony/Bri
 diff --git a/src/Symfony/Bridge/Doctrine/Messenger/DoctrineClearEntityManagerWorkerSubscriber.php b/src/Symfony/Bridge/Doctrine/Messenger/DoctrineClearEntityManagerWorkerSubscriber.php
 --- a/src/Symfony/Bridge/Doctrine/Messenger/DoctrineClearEntityManagerWorkerSubscriber.php
 +++ b/src/Symfony/Bridge/Doctrine/Messenger/DoctrineClearEntityManagerWorkerSubscriber.php
-@@ -34,5 +34,5 @@ class DoctrineClearEntityManagerWorkerSubscriber implements EventSubscriberInter
+@@ -32,5 +32,5 @@ class DoctrineClearEntityManagerWorkerSubscriber implements EventSubscriberInter
       * @return void
       */
 -    public function onWorkerMessageHandled()
 +    public function onWorkerMessageHandled(): void
      {
          $this->clearEntityManagers();
-@@ -42,5 +42,5 @@ class DoctrineClearEntityManagerWorkerSubscriber implements EventSubscriberInter
+@@ -40,5 +40,5 @@ class DoctrineClearEntityManagerWorkerSubscriber implements EventSubscriberInter
       * @return void
       */
 -    public function onWorkerMessageFailed()
@@ -259,21 +259,21 @@ diff --git a/src/Symfony/Bridge/Doctrine/Messenger/DoctrineClearEntityManagerWor
 diff --git a/src/Symfony/Bridge/Doctrine/Security/RememberMe/DoctrineTokenProvider.php b/src/Symfony/Bridge/Doctrine/Security/RememberMe/DoctrineTokenProvider.php
 --- a/src/Symfony/Bridge/Doctrine/Security/RememberMe/DoctrineTokenProvider.php
 +++ b/src/Symfony/Bridge/Doctrine/Security/RememberMe/DoctrineTokenProvider.php
-@@ -72,5 +72,5 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
+@@ -70,5 +70,5 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
       * @return void
       */
 -    public function deleteTokenBySeries(string $series)
 +    public function deleteTokenBySeries(string $series): void
      {
          $sql = 'DELETE FROM rememberme_token WHERE series=:series';
-@@ -85,5 +85,5 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
+@@ -83,5 +83,5 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
       * @return void
       */
 -    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed)
 +    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed): void
      {
          $sql = 'UPDATE rememberme_token SET value=:value, lastUsed=:lastUsed WHERE series=:series';
-@@ -107,5 +107,5 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
+@@ -105,5 +105,5 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
       * @return void
       */
 -    public function createNewToken(PersistentTokenInterface $token)
@@ -300,7 +300,7 @@ diff --git a/src/Symfony/Bridge/Doctrine/Tests/Fixtures/LegacyQueryMock.php b/sr
 diff --git a/src/Symfony/Bridge/Doctrine/Validator/Constraints/UniqueEntityValidator.php b/src/Symfony/Bridge/Doctrine/Validator/Constraints/UniqueEntityValidator.php
 --- a/src/Symfony/Bridge/Doctrine/Validator/Constraints/UniqueEntityValidator.php
 +++ b/src/Symfony/Bridge/Doctrine/Validator/Constraints/UniqueEntityValidator.php
-@@ -43,5 +43,5 @@ class UniqueEntityValidator extends ConstraintValidator
+@@ -41,5 +41,5 @@ class UniqueEntityValidator extends ConstraintValidator
       * @throws ConstraintDefinitionException
       */
 -    public function validate(mixed $entity, Constraint $constraint)
@@ -704,14 +704,14 @@ diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/Wor
 diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
 --- a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
-@@ -211,5 +211,5 @@ class FrameworkExtension extends Extension
+@@ -210,5 +210,5 @@ class FrameworkExtension extends Extension
       * @throws LogicException
       */
 -    public function load(array $configs, ContainerBuilder $container)
 +    public function load(array $configs, ContainerBuilder $container): void
      {
          $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));
-@@ -2954,5 +2954,5 @@ class FrameworkExtension extends Extension
+@@ -2953,5 +2953,5 @@ class FrameworkExtension extends Extension
       * @return void
       */
 -    public static function registerRateLimiter(ContainerBuilder $container, string $name, array $limiterConfig)
@@ -999,14 +999,14 @@ diff --git a/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Security/User
 diff --git a/src/Symfony/Bundle/SecurityBundle/DependencyInjection/SecurityExtension.php b/src/Symfony/Bundle/SecurityBundle/DependencyInjection/SecurityExtension.php
 --- a/src/Symfony/Bundle/SecurityBundle/DependencyInjection/SecurityExtension.php
 +++ b/src/Symfony/Bundle/SecurityBundle/DependencyInjection/SecurityExtension.php
-@@ -82,5 +82,5 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
+@@ -83,5 +83,5 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
       * @return void
       */
 -    public function prepend(ContainerBuilder $container)
 +    public function prepend(ContainerBuilder $container): void
      {
          foreach ($this->getSortedFactories() as $factory) {
-@@ -94,5 +94,5 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
+@@ -95,5 +95,5 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
       * @return void
       */
 -    public function load(array $configs, ContainerBuilder $container)
@@ -4822,6 +4822,16 @@ diff --git a/src/Symfony/Component/ErrorHandler/BufferingLogger.php b/src/Symfon
 +    public function __wakeup(): void
      {
          throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
+diff --git a/src/Symfony/Component/ErrorHandler/ErrorRenderer/FileLinkFormatter.php b/src/Symfony/Component/ErrorHandler/ErrorRenderer/FileLinkFormatter.php
+--- a/src/Symfony/Component/ErrorHandler/ErrorRenderer/FileLinkFormatter.php
++++ b/src/Symfony/Component/ErrorHandler/ErrorRenderer/FileLinkFormatter.php
+@@ -52,5 +52,5 @@ class FileLinkFormatter
+      * @return string|false
+      */
+-    public function format(string $file, int $line): string|bool
++    public function format(string $file, int $line): string|false
+     {
+         if ($fmt = $this->getFileLinkFormat()) {
 diff --git a/src/Symfony/Component/EventDispatcher/Debug/TraceableEventDispatcher.php b/src/Symfony/Component/EventDispatcher/Debug/TraceableEventDispatcher.php
 --- a/src/Symfony/Component/EventDispatcher/Debug/TraceableEventDispatcher.php
 +++ b/src/Symfony/Component/EventDispatcher/Debug/TraceableEventDispatcher.php
@@ -5654,7 +5664,7 @@ diff --git a/src/Symfony/Component/Form/ChoiceList/Factory/CachingFactoryDecorat
 diff --git a/src/Symfony/Component/Form/Command/DebugCommand.php b/src/Symfony/Component/Form/Command/DebugCommand.php
 --- a/src/Symfony/Component/Form/Command/DebugCommand.php
 +++ b/src/Symfony/Component/Form/Command/DebugCommand.php
-@@ -58,5 +58,5 @@ class DebugCommand extends Command
+@@ -59,5 +59,5 @@ class DebugCommand extends Command
       * @return void
       */
 -    protected function configure()
@@ -7285,98 +7295,98 @@ diff --git a/src/Symfony/Component/HttpFoundation/ParameterBag.php b/src/Symfony
 diff --git a/src/Symfony/Component/HttpFoundation/Request.php b/src/Symfony/Component/HttpFoundation/Request.php
 --- a/src/Symfony/Component/HttpFoundation/Request.php
 +++ b/src/Symfony/Component/HttpFoundation/Request.php
-@@ -272,5 +272,5 @@ class Request
+@@ -274,5 +274,5 @@ class Request
       * @return void
       */
 -    public function initialize(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null)
 +    public function initialize(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null): void
      {
          $this->request = new InputBag($request);
-@@ -432,5 +432,5 @@ class Request
+@@ -434,5 +434,5 @@ class Request
       * @return void
       */
 -    public static function setFactory(?callable $callable)
 +    public static function setFactory(?callable $callable): void
      {
          self::$requestFactory = $callable;
-@@ -538,5 +538,5 @@ class Request
+@@ -540,5 +540,5 @@ class Request
       * @return void
       */
 -    public function overrideGlobals()
 +    public function overrideGlobals(): void
      {
          $this->server->set('QUERY_STRING', static::normalizeQueryString(http_build_query($this->query->all(), '', '&')));
-@@ -580,5 +580,5 @@ class Request
+@@ -582,5 +582,5 @@ class Request
       * @return void
       */
 -    public static function setTrustedProxies(array $proxies, int $trustedHeaderSet)
 +    public static function setTrustedProxies(array $proxies, int $trustedHeaderSet): void
      {
          self::$trustedProxies = array_reduce($proxies, function ($proxies, $proxy) {
-@@ -623,5 +623,5 @@ class Request
+@@ -625,5 +625,5 @@ class Request
       * @return void
       */
 -    public static function setTrustedHosts(array $hostPatterns)
 +    public static function setTrustedHosts(array $hostPatterns): void
      {
          self::$trustedHostPatterns = array_map(fn ($hostPattern) => sprintf('{%s}i', $hostPattern), $hostPatterns);
-@@ -671,5 +671,5 @@ class Request
+@@ -673,5 +673,5 @@ class Request
       * @return void
       */
 -    public static function enableHttpMethodParameterOverride()
 +    public static function enableHttpMethodParameterOverride(): void
      {
          self::$httpMethodParameterOverride = true;
-@@ -758,5 +758,5 @@ class Request
+@@ -760,5 +760,5 @@ class Request
       * @return void
       */
 -    public function setSession(SessionInterface $session)
 +    public function setSession(SessionInterface $session): void
      {
          $this->session = $session;
-@@ -1181,5 +1181,5 @@ class Request
+@@ -1183,5 +1183,5 @@ class Request
       * @return void
       */
 -    public function setMethod(string $method)
 +    public function setMethod(string $method): void
      {
          $this->method = null;
-@@ -1304,5 +1304,5 @@ class Request
+@@ -1306,5 +1306,5 @@ class Request
       * @return void
       */
 -    public function setFormat(?string $format, string|array $mimeTypes)
 +    public function setFormat(?string $format, string|array $mimeTypes): void
      {
          if (null === static::$formats) {
-@@ -1336,5 +1336,5 @@ class Request
+@@ -1338,5 +1338,5 @@ class Request
       * @return void
       */
 -    public function setRequestFormat(?string $format)
 +    public function setRequestFormat(?string $format): void
      {
          $this->format = $format;
-@@ -1368,5 +1368,5 @@ class Request
+@@ -1370,5 +1370,5 @@ class Request
       * @return void
       */
 -    public function setDefaultLocale(string $locale)
 +    public function setDefaultLocale(string $locale): void
      {
          $this->defaultLocale = $locale;
-@@ -1390,5 +1390,5 @@ class Request
+@@ -1392,5 +1392,5 @@ class Request
       * @return void
       */
 -    public function setLocale(string $locale)
 +    public function setLocale(string $locale): void
      {
          $this->setPhpDefaultLocale($this->locale = $locale);
-@@ -1747,5 +1747,5 @@ class Request
+@@ -1749,5 +1749,5 @@ class Request
       * @return string
       */
 -    protected function prepareRequestUri()
 +    protected function prepareRequestUri(): string
      {
          $requestUri = '';
-@@ -1917,5 +1917,5 @@ class Request
+@@ -1919,5 +1919,5 @@ class Request
       * @return void
       */
 -    protected static function initializeFormats()
@@ -8275,16 +8285,6 @@ diff --git a/src/Symfony/Component/HttpKernel/DataCollector/RouterDataCollector.
 +    public function onKernelController(ControllerEvent $event): void
      {
          $this->controllers[$event->getRequest()] = $event->getController();
-diff --git a/src/Symfony/Component/HttpKernel/Debug/FileLinkFormatter.php b/src/Symfony/Component/HttpKernel/Debug/FileLinkFormatter.php
---- a/src/Symfony/Component/HttpKernel/Debug/FileLinkFormatter.php
-+++ b/src/Symfony/Component/HttpKernel/Debug/FileLinkFormatter.php
-@@ -53,5 +53,5 @@ class FileLinkFormatter
-      * @return string|false
-      */
--    public function format(string $file, int $line): string|bool
-+    public function format(string $file, int $line): string|false
-     {
-         if ($fmt = $this->getFileLinkFormat()) {
 diff --git a/src/Symfony/Component/HttpKernel/DependencyInjection/AddAnnotatedClassesToCachePass.php b/src/Symfony/Component/HttpKernel/DependencyInjection/AddAnnotatedClassesToCachePass.php
 --- a/src/Symfony/Component/HttpKernel/DependencyInjection/AddAnnotatedClassesToCachePass.php
 +++ b/src/Symfony/Component/HttpKernel/DependencyInjection/AddAnnotatedClassesToCachePass.php
@@ -10001,7 +10001,7 @@ diff --git a/src/Symfony/Component/Mime/Part/TextPart.php b/src/Symfony/Componen
 diff --git a/src/Symfony/Component/Mime/RawMessage.php b/src/Symfony/Component/Mime/RawMessage.php
 --- a/src/Symfony/Component/Mime/RawMessage.php
 +++ b/src/Symfony/Component/Mime/RawMessage.php
-@@ -58,5 +58,5 @@ class RawMessage
+@@ -76,5 +76,5 @@ class RawMessage
       * @throws LogicException if the message is not valid
       */
 -    public function ensureValidity()

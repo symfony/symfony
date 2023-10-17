@@ -33,17 +33,21 @@ class HeaderUtils
      *
      * Example:
      *
-     *     HeaderUtils::split("da, en-gb;q=0.8", ",;")
+     *     HeaderUtils::split('da, en-gb;q=0.8', ',;')
      *     // => ['da'], ['en-gb', 'q=0.8']]
      *
      * @param string $separators List of characters to split on, ordered by
-     *                           precedence, e.g. ",", ";=", or ",;="
+     *                           precedence, e.g. ',', ';=', or ',;='
      *
      * @return array Nested array with as many levels as there are characters in
      *               $separators
      */
     public static function split(string $header, string $separators): array
     {
+        if ('' === $separators) {
+            throw new \InvalidArgumentException('At least one separator must be specified.');
+        }
+
         $quotedSeparators = preg_quote($separators, '/');
 
         preg_match_all('
@@ -77,8 +81,8 @@ class HeaderUtils
      *
      * Example:
      *
-     *     HeaderUtils::combine([["foo", "abc"], ["bar"]])
-     *     // => ["foo" => "abc", "bar" => true]
+     *     HeaderUtils::combine([['foo', 'abc'], ['bar']])
+     *     // => ['foo' => 'abc', 'bar' => true]
      */
     public static function combine(array $parts): array
     {
@@ -95,13 +99,13 @@ class HeaderUtils
     /**
      * Joins an associative array into a string for use in an HTTP header.
      *
-     * The key and value of each entry are joined with "=", and all entries
+     * The key and value of each entry are joined with '=', and all entries
      * are joined with the specified separator and an additional space (for
      * readability). Values are quoted if necessary.
      *
      * Example:
      *
-     *     HeaderUtils::toString(["foo" => "abc", "bar" => true, "baz" => "a b c"], ",")
+     *     HeaderUtils::toString(['foo' => 'abc', 'bar' => true, 'baz' => 'a b c'], ',')
      *     // => 'foo=abc, bar, baz="a b c"'
      */
     public static function toString(array $assoc, string $separator): string
@@ -252,40 +256,37 @@ class HeaderUtils
     private static function groupParts(array $matches, string $separators, bool $first = true): array
     {
         $separator = $separators[0];
-        $partSeparators = substr($separators, 1);
-
+        $separators = substr($separators, 1);
         $i = 0;
+
+        if ('' === $separators && !$first) {
+            $parts = [''];
+
+            foreach ($matches as $match) {
+                if (!$i && isset($match['separator'])) {
+                    $i = 1;
+                    $parts[1] = '';
+                } else {
+                    $parts[$i] .= self::unquote($match[0]);
+                }
+            }
+
+            return $parts;
+        }
+
+        $parts = [];
         $partMatches = [];
-        $previousMatchWasSeparator = false;
+
         foreach ($matches as $match) {
-            if (!$first && $previousMatchWasSeparator && isset($match['separator']) && $match['separator'] === $separator) {
-                $previousMatchWasSeparator = true;
-                $partMatches[$i][] = $match;
-            } elseif (isset($match['separator']) && $match['separator'] === $separator) {
-                $previousMatchWasSeparator = true;
+            if (($match['separator'] ?? null) === $separator) {
                 ++$i;
             } else {
-                $previousMatchWasSeparator = false;
                 $partMatches[$i][] = $match;
             }
         }
 
-        $parts = [];
-        if ($partSeparators) {
-            foreach ($partMatches as $matches) {
-                $parts[] = self::groupParts($matches, $partSeparators, false);
-            }
-        } else {
-            foreach ($partMatches as $matches) {
-                $parts[] = self::unquote($matches[0][0]);
-            }
-
-            if (!$first && 2 < \count($parts)) {
-                $parts = [
-                    $parts[0],
-                    implode($separator, \array_slice($parts, 1)),
-                ];
-            }
+        foreach ($partMatches as $matches) {
+            $parts[] = '' === $separators ? self::unquote($matches[0][0]) : self::groupParts($matches, $separators, false);
         }
 
         return $parts;

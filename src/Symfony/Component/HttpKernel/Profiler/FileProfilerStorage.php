@@ -42,10 +42,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         }
     }
 
-    /**
-     * @param \Closure|null $filter A filter to apply on the list of tokens
-     */
-    public function find(?string $ip, ?string $url, ?int $limit, ?string $method, int $start = null, int $end = null, string $statusCode = null/* , \Closure $filter = null */): array
+    public function find(?string $ip, ?string $url, ?int $limit, ?string $method, int $start = null, int $end = null, string $statusCode = null, \Closure $filter = null): array
     {
         $filter = 7 < \func_num_args() ? func_get_arg(7) : null;
         $file = $this->getIndexFilename();

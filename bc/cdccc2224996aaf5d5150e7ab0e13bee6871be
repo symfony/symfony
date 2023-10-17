@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by y4roc at 2023-10-09T10:57:55Z
+
+Your solution looks great, but I see a conflict with RequestMapper.
+
+Do you tested your solution with PayloadMapper in 6.3?
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2023-10-10T02:25:05Z
+
+@y4roc Hi, you were right, my changes did cause an issue with the `RequestPayloadValueResolver` because the functionality used there was not covered on 5.4.
+I've added a test (`testCollectDenormalizationErrorsWithInvalidConstructorTypes`) so this wouldn't be a problem in the future. I've also tested my changes on 6.3 to check that there are no other failing tests.

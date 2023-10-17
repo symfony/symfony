@@ -73,7 +73,7 @@ EOT
             return Command::SUCCESS;
         }
 
-        $displayData = array_map(fn ($importName, $packageUpdateInfo) => [
+        $displayData = array_map(fn (string $importName, PackageUpdateInfo $packageUpdateInfo) => [
             'name' => $importName,
             'current' => $packageUpdateInfo->currentVersion,
             'latest' => $packageUpdateInfo->latestVersion,

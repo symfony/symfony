@@ -55,6 +55,9 @@ CHANGELOG
  * Deprecate the `framework.asset_mapper.provider` config option
  * Add `--exclude` option to the `cache:pool:clear` command
  * Add parameters deprecations to the output of `debug:container` command
+ * Change `framework.asset_mapper.importmap_polyfill` from a URL to the name of an item in the importmap
+ * Provide `$buildDir` when running `CacheWarmer` to build read-only resources
+ * Add the global `--profile` option to the console to enable profiling commands
 
 6.3
 ---

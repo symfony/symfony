@@ -12,6 +12,7 @@
 namespace Symfony\Component\AssetMapper\ImportMap;
 
 use Symfony\Component\AssetMapper\AssetMapperInterface;
+use Symfony\Component\AssetMapper\Exception\LogicException;
 use Symfony\Component\AssetMapper\ImportMap\Resolver\PackageResolverInterface;
 use Symfony\Component\AssetMapper\MappedAsset;
 use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
@@ -24,7 +25,6 @@ use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
  */
 class ImportMapManager
 {
-    public const POLYFILL_URL = 'https://ga.jspm.io/npm:es-module-shims@1.7.2/dist/es-module-shims.js';
     public const IMPORT_MAP_CACHE_FILENAME = 'importmap.json';
     public const ENTRYPOINT_CACHE_FILENAME_PATTERN = 'entrypoint.%s.json';
 
@@ -154,19 +154,9 @@ class ImportMapManager
 
         $rawImportMapData = [];
         foreach ($allEntries as $entry) {
-            if ($entry->path) {
-                $asset = $this->findAsset($entry->path);
-
-                if (!$asset) {
-                    throw new \InvalidArgumentException(sprintf('The asset "%s" cannot be found in any asset map paths.', $entry->path));
-                }
-            } else {
-                $sourcePath = $this->packageDownloader->getDownloadedPath($entry->importName);
-                $asset = $this->assetMapper->getAssetFromSourcePath($sourcePath);
-
-                if (!$asset) {
-                    throw new \InvalidArgumentException(sprintf('The "%s" vendor asset is missing. Run "php bin/console importmap:install".', $entry->importName));
-                }
+            $asset = $this->findAsset($entry->path);
+            if (!$asset) {
+                throw $this->createMissingImportMapAssetException($entry);
             }
 
             $path = $asset->publicPath;
@@ -222,12 +212,8 @@ class ImportMapManager
                     continue;
                 }
 
-                // assume the import name === package name, unless we can parse
-                // the true package name from the URL
-                $packageName = $importName;
-
                 $packagesToRequire[] = new PackageRequireOptions(
-                    $packageName,
+                    $entry->packageModuleSpecifier,
                     null,
                     $importName,
                 );
@@ -267,7 +253,7 @@ class ImportMapManager
 
             $path = $requireOptions->path;
             if (!$asset = $this->findAsset($path)) {
-                throw new \LogicException(sprintf('The path "%s" of the package "%s" cannot be found: either pass the logical name of the asset or a relative path starting with "./".', $requireOptions->path, $requireOptions->packageName));
+                throw new \LogicException(sprintf('The path "%s" of the package "%s" cannot be found: either pass the logical name of the asset or a relative path starting with "./".', $requireOptions->path, $requireOptions->importName));
             }
 
             $rootImportMapDir = $this->importMapConfigReader->getRootDirectory();
@@ -277,11 +263,11 @@ class ImportMapManager
                 $path = './'.substr(realpath($asset->sourcePath), \strlen(realpath($rootImportMapDir)) + 1);
             }
 
-            $newEntry = new ImportMapEntry(
-                $requireOptions->packageName,
-                path: $path,
-                type: self::getImportMapTypeFromFilename($requireOptions->path),
-                isEntrypoint: $requireOptions->entrypoint,
+            $newEntry = ImportMapEntry::createLocal(
+                $requireOptions->importName,
+                self::getImportMapTypeFromFilename($requireOptions->path),
+                $path,
+                $requireOptions->entrypoint,
             );
             $importMapEntries->add($newEntry);
             $addedEntries[] = $newEntry;
@@ -294,14 +280,12 @@ class ImportMapManager
 
         $resolvedPackages = $this->resolver->resolvePackages($packagesToRequire);
         foreach ($resolvedPackages as $resolvedPackage) {
-            $importName = $resolvedPackage->requireOptions->importName ?: $resolvedPackage->requireOptions->packageName;
-
-            $newEntry = new ImportMapEntry(
-                $importName,
-                path: $resolvedPackage->requireOptions->path,
-                version: $resolvedPackage->version,
-                type: $resolvedPackage->type,
-                isEntrypoint: $resolvedPackage->requireOptions->entrypoint,
+            $newEntry = $this->importMapConfigReader->createRemoteEntry(
+                $resolvedPackage->requireOptions->importName,
+                $resolvedPackage->type,
+                $resolvedPackage->version,
+                $resolvedPackage->requireOptions->packageModuleSpecifier,
+                $resolvedPackage->requireOptions->entrypoint,
             );
             $importMapEntries->add($newEntry);
             $addedEntries[] = $newEntry;
@@ -312,17 +296,9 @@ class ImportMapManager
 
     private function cleanupPackageFiles(ImportMapEntry $entry): void
     {
-        if (null === $entry->path) {
-            return;
-        }
-
         $asset = $this->findAsset($entry->path);
 
-        if (!$asset) {
-            throw new \LogicException(sprintf('The path "%s" of the package "%s" cannot be found in any asset map paths.', $entry->path, $entry->importName));
-        }
-
-        if (is_file($asset->sourcePath)) {
+        if ($asset && is_file($asset->sourcePath)) {
             @unlink($asset->sourcePath);
         }
     }
@@ -345,14 +321,9 @@ class ImportMapManager
             return $currentImportEntries;
         }
 
-        // remote packages aren't in the asset mapper & so don't have dependencies
-        if ($entry->isRemotePackage()) {
-            return $currentImportEntries;
-        }
-
         if (!$asset = $this->findAsset($entry->path)) {
             // should only be possible at this point for root importmap.php entries
-            throw new \InvalidArgumentException(sprintf('The asset "%s" mentioned in "importmap.php" cannot be found in any asset map paths.', $entry->path));
+            throw $this->createMissingImportMapAssetException($entry);
         }
 
         foreach ($asset->getJavaScriptImports() as $javaScriptImport) {
@@ -363,14 +334,15 @@ class ImportMapManager
                 continue;
             }
 
-            // check if this import requires an automatic importmap name
+            // check if this import requires an automatic importmap entry
             if ($javaScriptImport->addImplicitlyToImportMap && $javaScriptImport->asset) {
-                $nextEntry = new ImportMapEntry(
+                $nextEntry = ImportMapEntry::createLocal(
                     $importName,
-                    path: $javaScriptImport->asset->logicalPath,
-                    type: ImportMapType::tryFrom($javaScriptImport->asset->publicExtension) ?: ImportMapType::JS,
-                    isEntrypoint: false,
+                    ImportMapType::tryFrom($javaScriptImport->asset->publicExtension) ?: ImportMapType::JS,
+                    $javaScriptImport->asset->logicalPath,
+                    false,
                 );
+
                 $currentImportEntries[$importName] = $nextEntry;
             } else {
                 $nextEntry = $this->findRootImportMapEntry($importName);
@@ -456,5 +428,14 @@ class ImportMapManager
         }
 
         return $this->assetMapper->getAssetFromSourcePath($path);
+    }
+
+    private function createMissingImportMapAssetException(ImportMapEntry $entry): \InvalidArgumentException
+    {
+        if ($entry->isRemotePackage()) {
+            throw new LogicException(sprintf('The "%s" vendor asset is missing. Try running the "importmap:install" command.', $entry->importName));
+        }
+
+        throw new LogicException(sprintf('The asset "%s" cannot be found in any asset map paths.', $entry->path));
     }
 }

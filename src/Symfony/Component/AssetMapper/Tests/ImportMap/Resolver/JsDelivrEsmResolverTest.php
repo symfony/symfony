@@ -47,9 +47,9 @@ class JsDelivrEsmResolverTest extends TestCase
         $actualResolvedPackages = $provider->resolvePackages($packages);
         $this->assertCount(\count($expectedResolvedPackages), $actualResolvedPackages);
         foreach ($actualResolvedPackages as $package) {
-            $packageName = $package->requireOptions->packageName;
-            $this->assertArrayHasKey($packageName, $expectedResolvedPackages);
-            $this->assertSame($expectedResolvedPackages[$packageName]['version'], $package->version);
+            $importName = $package->requireOptions->importName;
+            $this->assertArrayHasKey($importName, $expectedResolvedPackages);
+            $this->assertSame($expectedResolvedPackages[$importName]['version'], $package->version);
         }
 
         $this->assertSame(\count($expectedRequests), $httpClient->getRequestsCount());
@@ -293,7 +293,20 @@ class JsDelivrEsmResolverTest extends TestCase
     public static function provideDownloadPackagesTests()
     {
         yield 'single package' => [
-            ['lodash' => new ImportMapEntry('lodash', version: '1.2.3', packageName: 'lodash')],
+            ['lodash' => self::createRemoteEntry('lodash', version: '1.2.3')],
+            [
+                [
+                    'url' => '/lodash@1.2.3/+esm',
+                    'body' => 'lodash contents',
+                ],
+            ],
+            [
+                'lodash' => 'lodash contents',
+            ],
+        ];
+
+        yield 'importName differs from package specifier' => [
+            ['lodash' => self::createRemoteEntry('some_alias', version: '1.2.3', packageSpecifier: 'lodash')],
             [
                 [
                     'url' => '/lodash@1.2.3/+esm',
@@ -306,7 +319,7 @@ class JsDelivrEsmResolverTest extends TestCase
         ];
 
         yield 'package with path' => [
-            ['lodash' => new ImportMapEntry('chart.js/auto', version: '4.5.6', packageName: 'chart.js', filePath: '/auto')],
+            ['lodash' => self::createRemoteEntry('chart.js/auto', version: '4.5.6')],
             [
                 [
                     'url' => '/chart.js@4.5.6/auto/+esm',
@@ -319,7 +332,7 @@ class JsDelivrEsmResolverTest extends TestCase
         ];
 
         yield 'css file' => [
-            ['lodash' => new ImportMapEntry('bootstrap/dist/bootstrap.css', version: '5.0.6', type: ImportMapType::CSS, packageName: 'bootstrap', filePath: '/dist/bootstrap.css')],
+            ['lodash' => self::createRemoteEntry('bootstrap/dist/bootstrap.css', version: '5.0.6', type: ImportMapType::CSS)],
             [
                 [
                     'url' => '/bootstrap@5.0.6/dist/bootstrap.css',
@@ -333,9 +346,9 @@ class JsDelivrEsmResolverTest extends TestCase
 
         yield 'multiple files' => [
             [
-                'lodash' => new ImportMapEntry('lodash', version: '1.2.3', packageName: 'lodash'),
-                'chart.js/auto' => new ImportMapEntry('chart.js/auto', version: '4.5.6', packageName: 'chart.js', filePath: '/auto'),
-                'bootstrap/dist/bootstrap.css' => new ImportMapEntry('bootstrap/dist/bootstrap.css', version: '5.0.6', type: ImportMapType::CSS, packageName: 'bootstrap', filePath: '/dist/bootstrap.css'),
+                'lodash' => self::createRemoteEntry('lodash', version: '1.2.3'),
+                'chart.js/auto' => self::createRemoteEntry('chart.js/auto', version: '4.5.6'),
+                'bootstrap/dist/bootstrap.css' => self::createRemoteEntry('bootstrap/dist/bootstrap.css', version: '5.0.6', type: ImportMapType::CSS),
             ],
             [
                 [
@@ -360,7 +373,7 @@ class JsDelivrEsmResolverTest extends TestCase
 
         yield 'make imports relative' => [
             [
-                '@chart.js/auto' => new ImportMapEntry('chart.js/auto', version: '1.2.3', packageName: 'chart.js', filePath: '/auto'),
+                '@chart.js/auto' => self::createRemoteEntry('chart.js/auto', version: '1.2.3'),
             ],
             [
                 [
@@ -375,7 +388,7 @@ class JsDelivrEsmResolverTest extends TestCase
 
         yield 'js importmap is removed' => [
             [
-                '@chart.js/auto' => new ImportMapEntry('chart.js/auto', version: '1.2.3', packageName: 'chart.js', filePath: '/auto'),
+                '@chart.js/auto' => self::createRemoteEntry('chart.js/auto', version: '1.2.3'),
             ],
             [
                 [
@@ -390,7 +403,7 @@ class JsDelivrEsmResolverTest extends TestCase
         ];
 
         yield 'css file removes importmap' => [
-            ['lodash' => new ImportMapEntry('bootstrap/dist/bootstrap.css', version: '5.0.6', type: ImportMapType::CSS, packageName: 'bootstrap', filePath: '/dist/bootstrap.css')],
+            ['lodash' => self::createRemoteEntry('bootstrap/dist/bootstrap.css', version: '5.0.6', type: ImportMapType::CSS)],
             [
                 [
                     'url' => '/bootstrap@5.0.6/dist/bootstrap.css',
@@ -448,5 +461,12 @@ class JsDelivrEsmResolverTest extends TestCase
                 ['@vue/shared', '3.3.4'],
             ],
         ];
+    }
+
+    private static function createRemoteEntry(string $importName, string $version, ImportMapType $type = ImportMapType::JS, string $packageSpecifier = null): ImportMapEntry
+    {
+        $packageSpecifier = $packageSpecifier ?? $importName;
+
+        return ImportMapEntry::createRemote($importName, $type, path: 'does not matter', version: $version, packageModuleSpecifier: $packageSpecifier, isEntrypoint: false);
     }
 }

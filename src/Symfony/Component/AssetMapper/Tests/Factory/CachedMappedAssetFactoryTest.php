@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Factory;
+namespace Symfony\Component\AssetMapper\Tests\Factory;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\Factory\CachedMappedAssetFactory;

@@ -14,8 +14,12 @@ namespace Symfony\Component\Scheduler\EventListener;
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
+use Symfony\Component\Messenger\Stamp\StampInterface;
+use Symfony\Component\Scheduler\Event\FailureEvent;
 use Symfony\Component\Scheduler\Event\PostRunEvent;
 use Symfony\Component\Scheduler\Event\PreRunEvent;
 use Symfony\Component\Scheduler\Messenger\ScheduledStamp;
@@ -31,11 +35,8 @@ class DispatchSchedulerEventListener implements EventSubscriberInterface
     public function onMessageHandled(WorkerMessageHandledEvent $event): void
     {
         $envelope = $event->getEnvelope();
-        if (!$scheduledStamp = $envelope->last(ScheduledStamp::class)) {
-            return;
-        }
 
-        if (!$this->scheduleProviderLocator->has($scheduledStamp->messageContext->name)) {
+        if (!$scheduledStamp = $this->getScheduledStamp($envelope)) {
             return;
         }
 
@@ -46,11 +47,7 @@ class DispatchSchedulerEventListener implements EventSubscriberInterface
     {
         $envelope = $event->getEnvelope();
 
-        if (!$scheduledStamp = $envelope->last(ScheduledStamp::class)) {
-            return;
-        }
-
-        if (!$this->scheduleProviderLocator->has($scheduledStamp->messageContext->name)) {
+        if (!$scheduledStamp = $this->getScheduledStamp($envelope)) {
             return;
         }
 
@@ -63,11 +60,36 @@ class DispatchSchedulerEventListener implements EventSubscriberInterface
         }
     }
 
+    public function onMessageFailed(WorkerMessageFailedEvent $event): void
+    {
+        $envelope = $event->getEnvelope();
+
+        if (!$scheduledStamp = $this->getScheduledStamp($envelope)) {
+            return;
+        }
+
+        $this->eventDispatcher->dispatch(new FailureEvent($this->scheduleProviderLocator->get($scheduledStamp->messageContext->name), $scheduledStamp->messageContext, $envelope->getMessage(), $event->getThrowable()));
+    }
+
+    private function getScheduledStamp(Envelope $envelope): ?StampInterface
+    {
+        if (!$scheduledStamp = $envelope->last(ScheduledStamp::class)) {
+            return null;
+        }
+
+        if (!$this->scheduleProviderLocator->has($scheduledStamp->messageContext->name)) {
+            return null;
+        }
+
+        return $scheduledStamp;
+    }
+
     public static function getSubscribedEvents(): array
     {
         return [
             WorkerMessageReceivedEvent::class => ['onMessageReceived'],
             WorkerMessageHandledEvent::class => ['onMessageHandled'],
+            WorkerMessageFailedEvent::class => ['onMessageFailed'],
         ];
     }
 }

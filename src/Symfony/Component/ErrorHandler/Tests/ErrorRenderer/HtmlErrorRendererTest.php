@@ -54,4 +54,47 @@ HTML;
             $expectedNonDebug,
         ];
     }
+
+    /**
+     * @dataProvider provideFileLinkFormats
+     */
+    public function testFileLinkFormat(\ErrorException $exception, string $fileLinkFormat, bool $withSymfonyIde, string $expected)
+    {
+        if ($withSymfonyIde) {
+            $_ENV['SYMFONY_IDE'] = $fileLinkFormat;
+        }
+        $errorRenderer = new HtmlErrorRenderer(true, null, $withSymfonyIde ? null : $fileLinkFormat);
+
+        $this->assertStringContainsString($expected, $errorRenderer->render($exception)->getAsString());
+    }
+
+    public static function provideFileLinkFormats(): iterable
+    {
+        $exception = new \ErrorException('Notice', 0, \E_USER_NOTICE);
+
+        yield 'file link format set as known IDE with SYMFONY_IDE' => [
+            $exception,
+            'vscode',
+            true,
+            'href="vscode://file/'.__DIR__,
+        ];
+        yield 'file link format set as a raw format with SYMFONY_IDE' => [
+            $exception,
+            'phpstorm://open?file=%f&line=%l',
+            true,
+            'href="phpstorm://open?file='.__DIR__,
+        ];
+        yield 'file link format set as known IDE without SYMFONY_IDE' => [
+            $exception,
+            'vscode',
+            false,
+            'href="vscode://file/'.__DIR__,
+        ];
+        yield 'file link format set as a raw format without SYMFONY_IDE' => [
+            $exception,
+            'phpstorm://open?file=%f&line=%l',
+            false,
+            'href="phpstorm://open?file='.__DIR__,
+        ];
+    }
 }

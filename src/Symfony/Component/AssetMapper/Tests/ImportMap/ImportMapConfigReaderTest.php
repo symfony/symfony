@@ -15,6 +15,8 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntries;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapType;
+use Symfony\Component\AssetMapper\ImportMap\RemotePackageStorage;
 use Symfony\Component\Filesystem\Filesystem;
 
 class ImportMapConfigReaderTest extends TestCase
@@ -59,43 +61,43 @@ return [
     'package/with_file.js' => [
         'version' => '1.0.0',
     ],
-    '@vendor/package/path/to/file.js' => [
-        'version' => '1.0.0',
-    ],
 ];
 EOF;
         file_put_contents(__DIR__.'/../fixtures/importmaps_for_writing/importmap.php', $importMap);
 
-        $reader = new ImportMapConfigReader(__DIR__.'/../fixtures/importmaps_for_writing/importmap.php');
+        $remotePackageStorage = $this->createMock(RemotePackageStorage::class);
+        $remotePackageStorage->expects($this->any())
+            ->method('getDownloadPath')
+            ->willReturnCallback(static function (string $packageModuleSpecifier, ImportMapType $type) {
+                return '/path/to/vendor/'.$packageModuleSpecifier.'.'.$type->value;
+            });
+        $reader = new ImportMapConfigReader(
+            __DIR__.'/../fixtures/importmaps_for_writing/importmap.php',
+            $remotePackageStorage,
+        );
         $entries = $reader->getEntries();
         $this->assertInstanceOf(ImportMapEntries::class, $entries);
         /** @var ImportMapEntry[] $allEntries */
         $allEntries = iterator_to_array($entries);
-        $this->assertCount(6, $allEntries);
+        $this->assertCount(5, $allEntries);
 
         $remotePackageEntry = $allEntries[0];
         $this->assertSame('remote_package', $remotePackageEntry->importName);
-        $this->assertNull($remotePackageEntry->path);
+        $this->assertSame('/path/to/vendor/remote_package.js', $remotePackageEntry->path);
         $this->assertSame('3.2.1', $remotePackageEntry->version);
         $this->assertSame('js', $remotePackageEntry->type->value);
         $this->assertFalse($remotePackageEntry->isEntrypoint);
-        $this->assertSame('remote_package', $remotePackageEntry->packageName);
-        $this->assertEquals('', $remotePackageEntry->filePath);
+        $this->assertSame('remote_package', $remotePackageEntry->packageModuleSpecifier);
 
         $localPackageEntry = $allEntries[1];
-        $this->assertNull($localPackageEntry->version);
+        $this->assertFalse($localPackageEntry->isRemotePackage());
         $this->assertSame('app.js', $localPackageEntry->path);
 
         $typeCssEntry = $allEntries[2];
         $this->assertSame('css', $typeCssEntry->type->value);
 
         $packageWithFileEntry = $allEntries[4];
-        $this->assertSame('package', $packageWithFileEntry->packageName);
-        $this->assertSame('/with_file.js', $packageWithFileEntry->filePath);
-
-        $packageWithFileEntry = $allEntries[5];
-        $this->assertSame('@vendor/package', $packageWithFileEntry->packageName);
-        $this->assertSame('/path/to/file.js', $packageWithFileEntry->filePath);
+        $this->assertSame('package/with_file.js', $packageWithFileEntry->packageModuleSpecifier);
 
         // now save the original raw data from importmap.php and delete the file
         $originalImportMapData = (static fn () => include __DIR__.'/../fixtures/importmaps_for_writing/importmap.php')();
@@ -109,7 +111,7 @@ EOF;
 
     public function testGetRootDirectory()
     {
-        $configReader = new ImportMapConfigReader(__DIR__.'/../fixtures/importmap.php');
+        $configReader = new ImportMapConfigReader(__DIR__.'/../fixtures/importmap.php', $this->createMock(RemotePackageStorage::class));
         $this->assertSame(__DIR__.'/../fixtures', $configReader->getRootDirectory());
     }
 }

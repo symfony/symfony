@@ -39,7 +39,7 @@ class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
         $this->validatorBuilder = $validatorBuilder;
     }
 
-    protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter): bool
+    protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter, string $buildDir = null): bool
     {
         $loaders = $this->validatorBuilder->getLoaders();
         $metadataFactory = new LazyLoadingMetadataFactory(new LoaderChain($loaders), $arrayAdapter);

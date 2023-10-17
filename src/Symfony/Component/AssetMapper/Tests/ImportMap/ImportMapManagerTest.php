@@ -64,7 +64,6 @@ class ImportMapManagerTest extends TestCase
         $manager = $this->createImportMapManager();
         $this->mockImportMap($importMapEntries);
         $this->mockAssetMapper($mappedAssets);
-        $this->mockDownloader($importMapEntries);
         $this->configReader->expects($this->any())
             ->method('getRootDirectory')
             ->willReturn('/fake/root');
@@ -76,16 +75,16 @@ class ImportMapManagerTest extends TestCase
     {
         yield 'it returns remote downloaded entry' => [
             [
-                new ImportMapEntry(
+                self::createRemoteEntry(
                     '@hotwired/stimulus',
                     version: '1.2.3',
-                    packageName: '@hotwired/stimulus',
+                    path: '/assets/vendor/stimulus.js'
                 ),
             ],
             [
                 new MappedAsset(
                     'vendor/@hotwired/stimulus.js',
-                    self::$writableRoot.'/assets/vendor/@hotwired/stimulus.js',
+                    '/assets/vendor/stimulus.js',
                     publicPath: '/assets/vendor/@hotwired/stimulus-d1g35t.js',
                 ),
             ],
@@ -99,20 +98,20 @@ class ImportMapManagerTest extends TestCase
 
         yield 'it returns basic local javascript file' => [
             [
-                new ImportMapEntry(
+                self::createLocalEntry(
                     'app',
-                    path: 'app.js',
+                    path: 'app.js'
                 ),
             ],
             [
                 new MappedAsset(
                     'app.js',
-                    publicPath: '/assets/app.js',
+                    publicPath: '/assets/app-d13g35t.js',
                 ),
             ],
             [
                 'app' => [
-                    'path' => '/assets/app.js',
+                    'path' => '/assets/app-d13g35t.js',
                     'type' => 'js',
                 ],
             ],
@@ -120,7 +119,7 @@ class ImportMapManagerTest extends TestCase
 
         yield 'it returns basic local css file' => [
             [
-                new ImportMapEntry(
+                self::createLocalEntry(
                     'app.css',
                     path: 'styles/app.css',
                     type: ImportMapType::CSS,
@@ -129,12 +128,12 @@ class ImportMapManagerTest extends TestCase
             [
                 new MappedAsset(
                     'styles/app.css',
-                    publicPath: '/assets/styles/app.css',
+                    publicPath: '/assets/styles/app-d13g35t.css',
                 ),
             ],
             [
                 'app.css' => [
-                    'path' => '/assets/styles/app.css',
+                    'path' => '/assets/styles/app-d13g35t.css',
                     'type' => 'css',
                 ],
             ],
@@ -147,7 +146,7 @@ class ImportMapManagerTest extends TestCase
         );
         yield 'it adds dependency to the importmap' => [
             [
-                new ImportMapEntry(
+                self::createLocalEntry(
                     'app',
                     path: 'app.js',
                 ),
@@ -155,14 +154,43 @@ class ImportMapManagerTest extends TestCase
             [
                 new MappedAsset(
                     'app.js',
-                    publicPath: '/assets/app.js',
+                    publicPath: '/assets/app-d1g3st.js',
                     javaScriptImports: [new JavaScriptImport('/assets/simple.js', isLazy: false, asset: $simpleAsset, addImplicitlyToImportMap: true)]
                 ),
                 $simpleAsset,
             ],
             [
                 'app' => [
-                    'path' => '/assets/app.js',
+                    'path' => '/assets/app-d1g3st.js',
+                    'type' => 'js',
+                ],
+                '/assets/simple.js' => [
+                    'path' => '/assets/simple-d1g3st.js',
+                    'type' => 'js',
+                ],
+            ],
+        ];
+
+        yield 'it adds dependency to the importmap from a remote asset' => [
+            [
+                self::createRemoteEntry(
+                    'bootstrap',
+                    version: '1.2.3',
+                    path: '/assets/vendor/bootstrap.js'
+                ),
+            ],
+            [
+                new MappedAsset(
+                    'app.js',
+                    sourcePath: '/assets/vendor/bootstrap.js',
+                    publicPath: '/assets/vendor/bootstrap-d1g3st.js',
+                    javaScriptImports: [new JavaScriptImport('/assets/simple.js', isLazy: false, asset: $simpleAsset, addImplicitlyToImportMap: true)]
+                ),
+                $simpleAsset,
+            ],
+            [
+                'bootstrap' => [
+                    'path' => '/assets/vendor/bootstrap-d1g3st.js',
                     'type' => 'js',
                 ],
                 '/assets/simple.js' => [
@@ -180,7 +208,7 @@ class ImportMapManagerTest extends TestCase
         );
         yield 'it processes imports recursively' => [
             [
-                new ImportMapEntry(
+                self::createLocalEntry(
                     'app',
                     path: 'app.js',
                 ),
@@ -188,7 +216,7 @@ class ImportMapManagerTest extends TestCase
             [
                 new MappedAsset(
                     'app.js',
-                    publicPath: '/assets/app.js',
+                    publicPath: '/assets/app-d1g3st.js',
                     javaScriptImports: [new JavaScriptImport('/assets/imports_simple.js', isLazy: true, asset: $eagerImportsSimpleAsset, addImplicitlyToImportMap: true)]
                 ),
                 $eagerImportsSimpleAsset,
@@ -196,7 +224,7 @@ class ImportMapManagerTest extends TestCase
             ],
             [
                 'app' => [
-                    'path' => '/assets/app.js',
+                    'path' => '/assets/app-d1g3st.js',
                     'type' => 'js',
                 ],
                 '/assets/imports_simple.js' => [
@@ -212,11 +240,11 @@ class ImportMapManagerTest extends TestCase
 
         yield 'it process can skip adding one importmap entry but still add a child' => [
             [
-                new ImportMapEntry(
+                self::createLocalEntry(
                     'app',
                     path: 'app.js',
                 ),
-                new ImportMapEntry(
+                self::createLocalEntry(
                     'imports_simple',
                     path: 'imports_simple.js',
                 ),
@@ -224,7 +252,7 @@ class ImportMapManagerTest extends TestCase
             [
                 new MappedAsset(
                     'app.js',
-                    publicPath: '/assets/app.js',
+                    publicPath: '/assets/app-d1g3st.js',
                     javaScriptImports: [new JavaScriptImport('imports_simple', isLazy: true, asset: $eagerImportsSimpleAsset, addImplicitlyToImportMap: false)]
                 ),
                 $eagerImportsSimpleAsset,
@@ -232,7 +260,7 @@ class ImportMapManagerTest extends TestCase
             ],
             [
                 'app' => [
-                    'path' => '/assets/app.js',
+                    'path' => '/assets/app-d1g3st.js',
                     'type' => 'js',
                 ],
                 '/assets/simple.js' => [
@@ -248,7 +276,7 @@ class ImportMapManagerTest extends TestCase
 
         yield 'imports with a module name are not added to the importmap' => [
             [
-                new ImportMapEntry(
+                self::createLocalEntry(
                     'app',
                     path: 'app.js',
                 ),
@@ -256,14 +284,14 @@ class ImportMapManagerTest extends TestCase
             [
                 new MappedAsset(
                     'app.js',
-                    publicPath: '/assets/app.js',
+                    publicPath: '/assets/app-d1g3st.js',
                     javaScriptImports: [new JavaScriptImport('simple', isLazy: false, asset: $simpleAsset)]
                 ),
                 $simpleAsset,
             ],
             [
                 'app' => [
-                    'path' => '/assets/app.js',
+                    'path' => '/assets/app-d1g3st.js',
                     'type' => 'js',
                 ],
             ],
@@ -271,7 +299,7 @@ class ImportMapManagerTest extends TestCase
 
         yield 'it does not process dependencies of CSS files' => [
             [
-                new ImportMapEntry(
+                self::createLocalEntry(
                     'app.css',
                     path: 'app.css',
                     type: ImportMapType::CSS,
@@ -280,13 +308,13 @@ class ImportMapManagerTest extends TestCase
             [
                 new MappedAsset(
                     'app.css',
-                    publicPath: '/assets/app.css',
+                    publicPath: '/assets/app-d1g3st.css',
                     javaScriptImports: [new JavaScriptImport('/assets/simple.js', asset: $simpleAsset)]
                 ),
             ],
             [
                 'app.css' => [
-                    'path' => '/assets/app.css',
+                    'path' => '/assets/app-d1g3st.css',
                     'type' => 'css',
                 ],
             ],
@@ -294,7 +322,7 @@ class ImportMapManagerTest extends TestCase
 
         yield 'it handles a relative path file' => [
             [
-                new ImportMapEntry(
+                self::createLocalEntry(
                     'app',
                     path: './assets/app.js',
                 ),
@@ -304,12 +332,12 @@ class ImportMapManagerTest extends TestCase
                     'app.js',
                     // /fake/root is the mocked root directory
                     '/fake/root/assets/app.js',
-                    publicPath: '/assets/app.js',
+                    publicPath: '/assets/app-d1g3st.js',
                 ),
             ],
             [
                 'app' => [
-                    'path' => '/assets/app.js',
+                    'path' => '/assets/app-d1g3st.js',
                     'type' => 'js',
                 ],
             ],
@@ -317,7 +345,7 @@ class ImportMapManagerTest extends TestCase
 
         yield 'it handles an absolute path file' => [
             [
-                new ImportMapEntry(
+                self::createLocalEntry(
                     'app',
                     path: '/some/path/assets/app.js',
                 ),
@@ -326,12 +354,12 @@ class ImportMapManagerTest extends TestCase
                 new MappedAsset(
                     'app.js',
                     '/some/path/assets/app.js',
-                    publicPath: '/assets/app.js',
+                    publicPath: '/assets/app-d1g3st.js',
                 ),
             ],
             [
                 'app' => [
-                    'path' => '/assets/app.js',
+                    'path' => '/assets/app-d1g3st.js',
                     'type' => 'js',
                 ],
             ],
@@ -367,7 +395,7 @@ class ImportMapManagerTest extends TestCase
         $this->mockAssetMapper([$entryAsset]);
         // put the entry asset in the importmap
         $this->mockImportMap([
-            new ImportMapEntry('the_entrypoint_name', path: $entryAsset->logicalPath, isEntrypoint: true),
+            ImportMapEntry::createLocal('the_entrypoint_name', ImportMapType::JS, path: $entryAsset->logicalPath, isEntrypoint: true),
         ]);
 
         $this->assertEquals($expected, $manager->getEntrypointMetadata('the_entrypoint_name'));
@@ -448,31 +476,31 @@ class ImportMapManagerTest extends TestCase
     {
         $manager = $this->createImportMapManager();
         $this->mockImportMap([
-            new ImportMapEntry(
+            self::createLocalEntry(
                 'entry1',
                 path: 'entry1.js',
                 isEntrypoint: true,
             ),
-            new ImportMapEntry(
+            self::createLocalEntry(
                 'entry2',
                 path: 'entry2.js',
                 isEntrypoint: true,
             ),
-            new ImportMapEntry(
+            self::createLocalEntry(
                 'entry3',
                 path: 'entry3.js',
                 isEntrypoint: true,
             ),
-            new ImportMapEntry(
+            self::createLocalEntry(
                 'normal_js_file',
                 path: 'normal_js_file.js',
             ),
-            new ImportMapEntry(
+            self::createLocalEntry(
                 'css_in_importmap',
                 path: 'styles/css_in_importmap.css',
                 type: ImportMapType::CSS,
             ),
-            new ImportMapEntry(
+            self::createLocalEntry(
                 'never_imported_css',
                 path: 'styles/never_imported_css.css',
                 type: ImportMapType::CSS,
@@ -631,7 +659,7 @@ class ImportMapManagerTest extends TestCase
     public function testFindRootImportMapEntry()
     {
         $manager = $this->createImportMapManager();
-        $entry1 = new ImportMapEntry('entry1', isEntrypoint: true);
+        $entry1 = ImportMapEntry::createLocal('entry1', ImportMapType::JS, '/any/path', isEntrypoint: true);
         $this->mockImportMap([$entry1]);
 
         $this->assertSame($entry1, $manager->findRootImportMapEntry('entry1'));
@@ -642,9 +670,9 @@ class ImportMapManagerTest extends TestCase
     {
         $manager = $this->createImportMapManager();
         $this->mockImportMap([
-            new ImportMapEntry('entry1', isEntrypoint: true),
-            new ImportMapEntry('entry2', isEntrypoint: true),
-            new ImportMapEntry('not_entrypoint'),
+            ImportMapEntry::createLocal('entry1', ImportMapType::JS, path: '/any', isEntrypoint: true),
+            ImportMapEntry::createLocal('entry2', ImportMapType::JS, path: '/any', isEntrypoint: true),
+            ImportMapEntry::createLocal('not_entrypoint', ImportMapType::JS, path: '/any', isEntrypoint: false),
         ]);
 
         $this->assertEquals(['entry1', 'entry2'], $manager->getEntrypointNames());
@@ -678,6 +706,7 @@ class ImportMapManagerTest extends TestCase
             ->method('getEntries')
             ->willReturn(new ImportMapEntries())
         ;
+
         $this->configReader->expects($this->once())
             ->method('writeEntries')
             ->with($this->callback(function (ImportMapEntries $entries) use ($expectedImportMap) {
@@ -686,13 +715,14 @@ class ImportMapManagerTest extends TestCase
                 $simplifiedEntries = [];
                 foreach ($entries as $entry) {
                     $simplifiedEntries[$entry->importName] = [
-                        'version' => $entry->version,
                         'path' => $entry->path,
                         'type' => $entry->type->value,
                         'entrypoint' => $entry->isEntrypoint,
-                        'packageName' => $entry->packageName,
-                        'filePath' => $entry->packageName,
                     ];
+                    if ($entry->isRemotePackage()) {
+                        $simplifiedEntries[$entry->importName]['version'] = $entry->version;
+                        $simplifiedEntries[$entry->importName]['packageModuleSpecifier'] = $entry->packageModuleSpecifier;
+                    }
                 }
 
                 $this->assertSame(array_keys($expectedImportMap), array_keys($simplifiedEntries));
@@ -798,16 +828,11 @@ class ImportMapManagerTest extends TestCase
     {
         $manager = $this->createImportMapManager();
         $this->mockImportMap([
-            new ImportMapEntry('lodash', version: '1.2.3'),
-            new ImportMapEntry('cowsay', version: '4.5.6'),
-            new ImportMapEntry('chance', version: '7.8.9'),
-            new ImportMapEntry('app', path: 'app.js'),
-            new ImportMapEntry('other', path: 'other.js'),
-        ]);
-
-        $this->mockAssetMapper([
-            new MappedAsset('vendor/moo.js', self::$writableRoot.'/assets/vendor/moo.js'),
-            new MappedAsset('app.js', self::$writableRoot.'/assets/app.js'),
+            self::createRemoteEntry('lodash', version: '1.2.3', path: '/vendor/lodash.js'),
+            self::createRemoteEntry('cowsay', version: '4.5.6', path: '/vendor/cowsay.js'),
+            self::createRemoteEntry('chance', version: '7.8.9', path: '/vendor/chance.js'),
+            self::createLocalEntry('app', path: './app.js'),
+            self::createLocalEntry('other', path: './other.js'),
         ]);
 
         $this->configReader->expects($this->once())
@@ -829,9 +854,9 @@ class ImportMapManagerTest extends TestCase
     {
         $manager = $this->createImportMapManager();
         $this->mockImportMap([
-            new ImportMapEntry('lodash', version: '1.2.3'),
-            new ImportMapEntry('bootstrap', version: '5.1.3'),
-            new ImportMapEntry('app', path: 'app.js'),
+            self::createRemoteEntry('lodash', version: '1.2.3', path: '/vendor/lodash.js'),
+            self::createRemoteEntry('bootstrap', version: '5.1.3', path: '/vendor/bootstrap.js'),
+            self::createLocalEntry('app', path: 'app.js'),
         ]);
 
         $this->packageResolver->expects($this->once())
@@ -841,8 +866,8 @@ class ImportMapManagerTest extends TestCase
                 /* @var PackageRequireOptions[] $packages */
                 $this->assertCount(2, $packages);
 
-                $this->assertSame('lodash', $packages[0]->packageName);
-                $this->assertSame('bootstrap', $packages[1]->packageName);
+                $this->assertSame('lodash', $packages[0]->packageModuleSpecifier);
+                $this->assertSame('bootstrap', $packages[1]->packageModuleSpecifier);
 
                 return true;
             }))
@@ -874,10 +899,10 @@ class ImportMapManagerTest extends TestCase
     {
         $manager = $this->createImportMapManager();
         $this->mockImportMap([
-            new ImportMapEntry('lodash', version: '1.2.3'),
-            new ImportMapEntry('cowsay', version: '4.5.6'),
-            new ImportMapEntry('bootstrap', version: '5.1.3'),
-            new ImportMapEntry('app', path: 'app.js'),
+            self::createRemoteEntry('lodash', version: '1.2.3'),
+            self::createRemoteEntry('cowsay', version: '4.5.6'),
+            self::createRemoteEntry('bootstrap', version: '5.1.3'),
+            self::createLocalEntry('app', path: 'app.js'),
         ]);
 
         $this->packageResolver->expects($this->once())
@@ -968,6 +993,15 @@ class ImportMapManagerTest extends TestCase
         $this->packageResolver = $this->createMock(PackageResolverInterface::class);
         $this->remotePackageDownloader = $this->createMock(RemotePackageDownloader::class);
 
+        // mock this to behave like normal
+        $this->configReader->expects($this->any())
+            ->method('createRemoteEntry')
+            ->willReturnCallback(function (string $importName, ImportMapType $type, string $version, string $packageModuleSpecifier, bool $isEntrypoint) {
+                $path = '/path/to/vendor/'.$packageModuleSpecifier.'.js';
+
+                return ImportMapEntry::createRemote($importName, $type, $path, $version, $packageModuleSpecifier, $isEntrypoint);
+            });
+
         return $this->importMapManager = new ImportMapManager(
             $this->assetMapper,
             $this->pathResolver,
@@ -997,7 +1031,7 @@ class ImportMapManagerTest extends TestCase
     /**
      * @param MappedAsset[] $mappedAssets
      */
-    private function mockAssetMapper(array $mappedAssets, bool $mockGetAssetFromSourcePath = true): void
+    private function mockAssetMapper(array $mappedAssets): void
     {
         $this->assetMapper->expects($this->any())
             ->method('getAsset')
@@ -1011,10 +1045,6 @@ class ImportMapManagerTest extends TestCase
                 return null;
             })
         ;
-
-        if (!$mockGetAssetFromSourcePath) {
-            return;
-        }
 
         $this->assetMapper->expects($this->any())
             ->method('getAssetFromSourcePath')
@@ -1051,25 +1081,6 @@ class ImportMapManagerTest extends TestCase
         ;
     }
 
-    /**
-     * @param ImportMapEntry[] $importMapEntries
-     */
-    private function mockDownloader(array $importMapEntries): void
-    {
-        $this->remotePackageDownloader->expects($this->any())
-            ->method('getDownloadedPath')
-            ->willReturnCallback(function (string $importName) use ($importMapEntries) {
-                foreach ($importMapEntries as $entry) {
-                    if ($entry->importName === $importName) {
-                        return self::$writableRoot.'/assets/vendor/'.$importName.'.js';
-                    }
-                }
-
-                return null;
-            })
-        ;
-    }
-
     private function writeFile(string $filename, string $content): void
     {
         $path = \dirname(self::$writableRoot.'/'.$filename);
@@ -1077,5 +1088,18 @@ class ImportMapManagerTest extends TestCase
             mkdir($path, 0777, true);
         }
         file_put_contents(self::$writableRoot.'/'.$filename, $content);
+    }
+
+    private static function createLocalEntry(string $importName, string $path, ImportMapType $type = ImportMapType::JS, bool $isEntrypoint = false): ImportMapEntry
+    {
+        return ImportMapEntry::createLocal($importName, $type, path: $path, isEntrypoint: $isEntrypoint);
+    }
+
+    private static function createRemoteEntry(string $importName, string $version, string $path = null, ImportMapType $type = ImportMapType::JS, string $packageSpecifier = null): ImportMapEntry
+    {
+        $packageSpecifier = $packageSpecifier ?? $importName;
+        $path = $path ?? '/vendor/any-path.js';
+
+        return ImportMapEntry::createRemote($importName, $type, path: $path, version: $version, packageModuleSpecifier: $packageSpecifier, isEntrypoint: false);
     }
 }

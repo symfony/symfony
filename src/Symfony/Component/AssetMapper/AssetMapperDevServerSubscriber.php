@@ -15,8 +15,10 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\HttpKernel\Profiler\Profiler;
 
 /**
  * Functions like a controller that returns assets from the asset mapper.
@@ -104,6 +106,7 @@ final class AssetMapperDevServerSubscriber implements EventSubscriberInterface
         string $publicPrefix = '/assets/',
         array $extensionsMap = [],
         private readonly ?CacheItemPoolInterface $cacheMapCache = null,
+        private readonly ?Profiler $profiler = null,
     ) {
         $this->publicPrefix = rtrim($publicPrefix, '/').'/';
         $this->extensionsMap = array_merge(self::EXTENSIONS_MAP, $extensionsMap);
@@ -126,6 +129,8 @@ final class AssetMapperDevServerSubscriber implements EventSubscriberInterface
             throw new NotFoundHttpException(sprintf('Asset with public path "%s" not found.', $pathInfo));
         }
 
+        $this->profiler?->disable();
+
         $mediaType = $this->getMediaType($asset->publicPath);
         $response = (new Response(
             $asset->content,
@@ -137,7 +142,17 @@ final class AssetMapperDevServerSubscriber implements EventSubscriberInterface
             ->setEtag($asset->digest)
         ;
 
+        $response->headers->set('X-Assets-Dev', true);
+
         $event->setResponse($response);
+        $event->stopPropagation();
+    }
+
+    public function onKernelResponse(ResponseEvent $event): void
+    {
+        if ($event->getResponse()->headers->get('X-Assets-Dev')) {
+            $event->stopPropagation();
+        }
     }
 
     public static function getSubscribedEvents(): array
@@ -145,6 +160,8 @@ final class AssetMapperDevServerSubscriber implements EventSubscriberInterface
         return [
             // priority higher than RouterListener
             KernelEvents::REQUEST => [['onKernelRequest', 35]],
+            // Highest priority possible to bypass all other listeners
+            KernelEvents::RESPONSE => [['onKernelResponse', 2048]],
         ];
     }
 

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Bundle\FrameworkBundle\EventListener\ConsoleProfilerListener;
 use Symfony\Component\HttpKernel\EventListener\ProfilerListener;
 use Symfony\Component\HttpKernel\Profiler\FileProfilerStorage;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
@@ -33,6 +34,15 @@ return static function (ContainerConfigurator $container) {
                 null,
                 param('profiler_listener.only_exceptions'),
                 param('profiler_listener.only_main_requests'),
+            ])
+            ->tag('kernel.event_subscriber')
+
+        ->set('console_profiler_listener', ConsoleProfilerListener::class)
+            ->args([
+                service('profiler'),
+                service('.virtual_request_stack'),
+                service('debug.stopwatch'),
+                service('router'),
             ])
             ->tag('kernel.event_subscriber')
     ;

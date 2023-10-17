@@ -43,6 +43,8 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand implement
     private MessageBusInterface $messageBus;
     private ?LoggerInterface $logger;
     private ?array $signals;
+    private bool $shouldStop = false;
+    private bool $forceExit = false;
     private ?Worker $worker = null;
 
     public function __construct(?string $globalReceiverName, ServiceProviderInterface $failureTransports, MessageBusInterface $messageBus, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, PhpSerializer $phpSerializer = null, array $signals = null)
@@ -141,8 +143,9 @@ EOF
         $this->logger?->info('Received signal {signal}.', ['signal' => $signal, 'transport_names' => $this->worker->getMetadata()->getTransportNames()]);
 
         $this->worker->stop();
+        $this->shouldStop = true;
 
-        return 0;
+        return $this->forceExit ? 0 : false;
     }
 
     private function runInteractive(string $failureTransportName, SymfonyStyle $io, bool $shouldForce): void
@@ -155,7 +158,7 @@ EOF
             // transports (like Doctrine), will cause the message
             // to be temporarily "acked", even if the user aborts
             // handling the message
-            while (true) {
+            while (!$this->shouldStop) {
                 $envelopes = [];
                 $this->phpSerializer?->acceptPhpIncompleteClass();
                 try {
@@ -180,7 +183,7 @@ EOF
         }
 
         // avoid success message if nothing was processed
-        if (1 <= $count) {
+        if (1 <= $count && !$this->shouldStop) {
             $io->success('All failed messages have been handled or removed!');
         }
     }
@@ -198,7 +201,12 @@ EOF
                 throw new \RuntimeException(sprintf('The message with id "%s" could not decoded, it can only be shown or removed.', $this->getMessageId($envelope) ?? '?'));
             }
 
-            $shouldHandle = $shouldForce || 'retry' === $io->choice('Please select an action', ['retry', 'delete'], 'retry');
+            $this->forceExit = true;
+            try {
+                $shouldHandle = $shouldForce || 'retry' === $io->choice('Please select an action', ['retry', 'delete'], 'retry');
+            } finally {
+                $this->forceExit = false;
+            }
 
             if ($shouldHandle) {
                 return;
@@ -257,6 +265,10 @@ EOF
         foreach ($envelopes as $envelope) {
             $singleReceiver = new SingleMessageReceiver($receiver, $envelope);
             $this->runWorker($failureTransportName, $singleReceiver, $io, $shouldForce);
+
+            if ($this->shouldStop) {
+                break;
+            }
         }
     }
 }

@@ -54,13 +54,9 @@ You can also require specific paths of a package:
 
     <info>php %command.full_name% "chart.js/auto"</info>
 
-Or download one package/file, but alias its name in your import map:
+Or require one package/file, but alias its name in your import map:
 
     <info>php %command.full_name% "vue/dist/vue.esm-bundler.js=vue"</info>
-
-The <info>download</info> option will download the package locally and point the
-importmap to it. Use this if you want to avoid using a CDN or if you want to
-ensure that the package is available even if the CDN is down.
 
 Sometimes, a package may require other packages and multiple new items may be added
 to the import map.
@@ -68,6 +64,10 @@ to the import map.
 You can also require multiple packages at once:
 
     <info>php %command.full_name% "lodash@^4.15" "@hotwired/stimulus"</info>
+
+To add an importmap entry pointing to a local file, use the <info>path</info> option:
+
+    <info>php %command.full_name% "any_module_name" --path=./assets/some_file.js</info>
 
 EOT
             );
@@ -87,15 +87,6 @@ EOT
             }
 
             $path = $input->getOption('path');
-            if (!is_file($path)) {
-                $path = $this->projectDir.'/'.$path;
-
-                if (!is_file($path)) {
-                    $io->error(sprintf('The path "%s" does not exist.', $input->getOption('path')));
-
-                    return Command::FAILURE;
-                }
-            }
         }
 
         $packages = [];
@@ -110,7 +101,7 @@ EOT
             $packages[] = new PackageRequireOptions(
                 $parts['package'],
                 $parts['version'] ?? null,
-                $parts['alias'] ?? $parts['package'],
+                $parts['alias'] ?? null,
                 $path,
                 $input->getOption('entrypoint'),
             );

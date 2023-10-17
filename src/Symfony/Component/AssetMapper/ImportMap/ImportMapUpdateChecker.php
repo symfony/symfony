@@ -34,27 +34,30 @@ class ImportMapUpdateChecker
         $updateInfos = [];
         $responses = [];
         foreach ($entries as $entry) {
-            if (null === $entry->packageName || null === $entry->version) {
+            if (!$entry->isRemotePackage()) {
                 continue;
             }
-            if (\count($packages) && !\in_array($entry->packageName, $packages, true)) {
+            if ($packages
+                && !\in_array($entry->getPackageName(), $packages, true)
+                && !\in_array($entry->importName, $packages, true)
+            ) {
                 continue;
             }
 
-            $responses[$entry->importName] = $this->httpClient->request('GET', sprintf(self::URL_PACKAGE_METADATA, $entry->packageName), ['headers' => ['Accept' => 'application/vnd.npm.install-v1+json']]);
+            $responses[$entry->importName] = $this->httpClient->request('GET', sprintf(self::URL_PACKAGE_METADATA, $entry->getPackageName()), ['headers' => ['Accept' => 'application/vnd.npm.install-v1+json']]);
         }
 
         foreach ($responses as $importName => $response) {
             $entry = $entries->get($importName);
             if (200 !== $response->getStatusCode()) {
-                throw new \RuntimeException(sprintf('Unable to get latest version for package "%s".', $entry->packageName));
+                throw new \RuntimeException(sprintf('Unable to get latest version for package "%s".', $entry->getPackageName()));
             }
-            $updateInfo = new PackageUpdateInfo($entry->packageName, $entry->version);
+            $updateInfo = new PackageUpdateInfo($entry->getPackageName(), $entry->version);
             try {
                 $updateInfo->latestVersion = json_decode($response->getContent(), true)['dist-tags']['latest'];
                 $updateInfo->updateType = $this->getUpdateType($updateInfo->currentVersion, $updateInfo->latestVersion);
             } catch (\Exception $e) {
-                throw new \RuntimeException(sprintf('Unable to get latest version for package "%s".', $entry->packageName), 0, $e);
+                throw new \RuntimeException(sprintf('Unable to get latest version for package "%s".', $entry->getPackageName()), 0, $e);
             }
             $updateInfos[$importName] = $updateInfo;
         }

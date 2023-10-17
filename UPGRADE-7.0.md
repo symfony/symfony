@@ -285,12 +285,15 @@ HttpKernel
 ----------
 
  * Add parameter `\ReflectionFunctionAbstract $reflector = null` to `ArgumentResolverInterface::getArguments()` and `ArgumentMetadataFactoryInterface::createArgumentMetadata()`
+ * Add argument `$buildDir` to `WarmableInterface`
  * Remove `ArgumentValueResolverInterface`, use `ValueResolverInterface` instead
  * Remove `StreamedResponseListener`
  * Remove `AbstractSurrogate::$phpEscapeMap`
  * Rename `HttpKernelInterface::MASTER_REQUEST` to `HttpKernelInterface::MAIN_REQUEST`
  * Remove `terminate_on_cache_hit` option from `HttpCache`, it will now always act as `false`
  * Require explicit argument when calling `ConfigDataCollector::setKernel()`, `RouterListener::setCurrentRequest()`
+ * Remove `FileLinkFormatter`, use `FileLinkFormatter` from the ErrorHandler component instead
+ * Remove `UriSigner`, use `UriSigner` from the HttpFoundation component instead
  * Remove `Kernel::stripComments()`
 
 Lock

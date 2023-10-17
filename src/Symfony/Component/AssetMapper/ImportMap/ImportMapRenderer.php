@@ -27,11 +27,13 @@ use Symfony\Component\WebLink\Link;
  */
 class ImportMapRenderer
 {
+    private const DEFAULT_ES_MODULE_SHIMS_POLYFILL_URL = 'https://ga.jspm.io/npm:es-module-shims@1.8.0/dist/es-module-shims.js';
+
     public function __construct(
         private readonly ImportMapManager $importMapManager,
         private readonly ?Packages $assetPackages = null,
         private readonly string $charset = 'UTF-8',
-        private readonly string|false $polyfillUrl = ImportMapManager::POLYFILL_URL,
+        private readonly string|false $polyfillImportName = false,
         private readonly array $scriptAttributes = [],
         private readonly ?RequestStack $requestStack = null,
     ) {
@@ -45,12 +47,19 @@ class ImportMapRenderer
         $importMap = [];
         $modulePreloads = [];
         $cssLinks = [];
+        $polyFillPath = null;
         foreach ($importMapData as $importName => $data) {
             $path = $data['path'];
 
             if ($this->assetPackages) {
                 // ltrim so the subdirectory (if needed) can be prepended
                 $path = $this->assetPackages->getUrl(ltrim($path, '/'));
+            }
+
+            // if this represents the polyfill, hide it from the import map
+            if ($importName === $this->polyfillImportName) {
+                $polyFillPath = $path;
+                continue;
             }
 
             $preload = $data['preload'] ?? false;
@@ -87,8 +96,17 @@ class ImportMapRenderer
             </script>
             HTML;
 
-        if ($this->polyfillUrl) {
-            $url = $this->escapeAttributeValue($this->polyfillUrl);
+        if (false !== $this->polyfillImportName && null === $polyFillPath) {
+            if ('es-module-shims' !== $this->polyfillImportName) {
+                throw new \InvalidArgumentException(sprintf('The JavaScript module polyfill was not found in your import map. Either disable the polyfill or run "php bin/console importmap:require "%s"" to install it.', $this->polyfillImportName));
+            }
+
+            // a fallback for the default polyfill in case it's not in the importmap
+            $polyFillPath = self::DEFAULT_ES_MODULE_SHIMS_POLYFILL_URL;
+        }
+
+        if ($polyFillPath) {
+            $url = $this->escapeAttributeValue($polyFillPath);
 
             $output .= <<<HTML
 
@@ -145,7 +163,7 @@ class ImportMapRenderer
 
     private function addWebLinkPreloads(Request $request, array $cssLinks): void
     {
-        $cssPreloadLinks = array_map(fn ($url) => new Link('preload', $url), $cssLinks);
+        $cssPreloadLinks = array_map(fn ($url) => (new Link('preload', $url))->withAttribute('as', 'style'), $cssLinks);
 
         if (null === $linkProvider = $request->attributes->get('_links')) {
             $request->attributes->set('_links', new GenericLinkProvider($cssPreloadLinks));

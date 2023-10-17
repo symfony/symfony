@@ -35,10 +35,6 @@ class ImportMapAuditor
     {
         $entries = $this->configReader->getEntries();
 
-        if (!$entries) {
-            return [];
-        }
-
         /** @var array<string, array<string, ImportMapPackageAudit>> $installed */
         $packageAudits = [];
 
@@ -51,12 +47,17 @@ class ImportMapAuditor
             }
             $version = $entry->version;
 
-            $installed[$entry->importName] ??= [];
-            $installed[$entry->importName][] = $version;
+            $packageName = $entry->getPackageName();
+            $installed[$packageName] ??= [];
+            $installed[$packageName][] = $version;
 
-            $packageVersion = $entry->importName.($version ? '@'.$version : '');
-            $packageAudits[$packageVersion] ??= new ImportMapPackageAudit($entry->importName, $version);
+            $packageVersion = $packageName.'@'.$version;
+            $packageAudits[$packageVersion] ??= new ImportMapPackageAudit($packageName, $version);
             $affectsQuery[] = $packageVersion;
+        }
+
+        if (!$affectsQuery) {
+            return [];
         }
 
         // @see https://docs.github.com/en/rest/security-advisories/global-advisories?apiVersion=2022-11-28#list-global-security-advisories
@@ -81,7 +82,7 @@ class ImportMapAuditor
                     if (!$version || !$this->versionMatches($version, $vulnerability['vulnerable_version_range'] ?? '>= *')) {
                         continue;
                     }
-                    $packageAudits[$package.($version ? '@'.$version : '')] = $packageAudits[$package.($version ? '@'.$version : '')]->withVulnerability(
+                    $packageAudits[$package.'@'.$version] = $packageAudits[$package.'@'.$version]->withVulnerability(
                         new ImportMapPackageAuditVulnerability(
                             $advisory['ghsa_id'],
                             $advisory['cve_id'],

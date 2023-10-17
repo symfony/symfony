@@ -132,7 +132,7 @@ class ConfigurationTest extends TestCase
             'missing_import_mode' => 'warn',
             'extensions' => [],
             'importmap_path' => '%kernel.project_dir%/importmap.php',
-            'importmap_polyfill' => null,
+            'importmap_polyfill' => 'es-module-shims',
             'vendor_dir' => '%kernel.project_dir%/assets/vendor',
             'importmap_script_attributes' => [],
         ];
@@ -665,7 +665,7 @@ class ConfigurationTest extends TestCase
                 'missing_import_mode' => 'warn',
                 'extensions' => [],
                 'importmap_path' => '%kernel.project_dir%/importmap.php',
-                'importmap_polyfill' => null,
+                'importmap_polyfill' => 'es-module-shims',
                 'vendor_dir' => '%kernel.project_dir%/assets/vendor',
                 'importmap_script_attributes' => [],
             ],

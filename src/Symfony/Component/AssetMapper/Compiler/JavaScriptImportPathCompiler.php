@@ -28,8 +28,8 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
 {
     use AssetCompilerPathResolverTrait;
 
-    // https://regex101.com/r/5Q38tj/1
-    private const IMPORT_PATTERN = '/(?:import\s+(?:(?:\*\s+as\s+\w+|[\w\s{},*]+)\s+from\s+)?|\bimport\()\s*[\'"`](\.\/[^\'"`]+|(\.\.\/)*[^\'"`]+)[\'"`]\s*[;\)]?/m';
+    // https://regex101.com/r/fquriB/1
+    private const IMPORT_PATTERN = '/(?:import\s*(?:(?:\*\s*as\s+\w+|[\w\s{},*]+)\s*from\s*)?|\bimport\()\s*[\'"`](\.\/[^\'"`]+|(\.\.\/)*[^\'"`]+)[\'"`]\s*[;\)]?/m';
 
     public function __construct(
         private readonly ImportMapManager $importMapManager,
@@ -145,12 +145,11 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
             return null;
         }
 
-        // remote entries have no MappedAsset
-        if ($importMapEntry->isRemotePackage()) {
-            return null;
+        if ($asset = $assetMapper->getAsset($importMapEntry->path)) {
+            return $asset;
         }
 
-        return $assetMapper->getAsset($importMapEntry->path);
+        return $assetMapper->getAssetFromSourcePath($importMapEntry->path);
     }
 
     private function findAssetForRelativeImport(string $importedModule, MappedAsset $asset, AssetMapperInterface $assetMapper): ?MappedAsset

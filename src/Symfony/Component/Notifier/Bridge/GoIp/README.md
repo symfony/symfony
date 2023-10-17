@@ -14,11 +14,10 @@ GOIP_DSN=goip://USERNAME:PASSWORD@HOST:80?sim_slot=SIM_SLOT
 
 where:
 
-- `USERNAME` GoIP Username
-- `PASSWORD` GoIP Password
-- `HOST` GoIP Hostname/IP-Address
-- `SIM_SLOT` SIM slot which will be used to send the messages (e.g. 1,
-  9, 15, 2)
+ - `USERNAME` GoIP Username
+ - `PASSWORD` GoIP Password
+ - `HOST` GoIP Hostname/IP-Address
+ - `SIM_SLOT` SIM slot which will be used to send the messages (e.g. 1, 9, 15, 2)
 
 Resources
 ---------

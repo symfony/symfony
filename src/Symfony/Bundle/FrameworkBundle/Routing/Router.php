@@ -80,10 +80,7 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
         return $this->collection;
     }
 
-    /**
-     * @return string[] A list of classes to preload on PHP 7.4+
-     */
-    public function warmUp(string $cacheDir): array
+    public function warmUp(string $cacheDir, string $buildDir = null): array
     {
         $currentDir = $this->getOption('cache_dir');
 

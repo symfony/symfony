@@ -14,6 +14,8 @@ namespace Symfony\Bundle\FrameworkBundle\Console;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\ListCommand;
+use Symfony\Component\Console\Command\TraceableCommand;
+use Symfony\Component\Console\Debug\CliRequest;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
@@ -41,6 +43,7 @@ class Application extends BaseApplication
         $inputDefinition = $this->getDefinition();
         $inputDefinition->addOption(new InputOption('--env', '-e', InputOption::VALUE_REQUIRED, 'The Environment name.', $kernel->getEnvironment()));
         $inputDefinition->addOption(new InputOption('--no-debug', null, InputOption::VALUE_NONE, 'Switch off debug mode.'));
+        $inputDefinition->addOption(new InputOption('--profile', null, InputOption::VALUE_NONE, 'Enables profiling (requires debug).'));
     }
 
     /**
@@ -78,18 +81,47 @@ class Application extends BaseApplication
 
     protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output): int
     {
+        $requestStack = null;
+        $renderRegistrationErrors = true;
+
         if (!$command instanceof ListCommand) {
             if ($this->registrationErrors) {
                 $this->renderRegistrationErrors($input, $output);
                 $this->registrationErrors = [];
+                $renderRegistrationErrors = false;
             }
-
-            return parent::doRunCommand($command, $input, $output);
         }
 
-        $returnCode = parent::doRunCommand($command, $input, $output);
+        if ($input->hasParameterOption('--profile')) {
+            $container = $this->kernel->getContainer();
 
-        if ($this->registrationErrors) {
+            if (!$this->kernel->isDebug()) {
+                if ($output instanceof ConsoleOutputInterface) {
+                    $output = $output->getErrorOutput();
+                }
+
+                (new SymfonyStyle($input, $output))->warning('Debug mode should be enabled when the "--profile" option is used.');
+            } elseif (!$container->has('debug.stopwatch')) {
+                if ($output instanceof ConsoleOutputInterface) {
+                    $output = $output->getErrorOutput();
+                }
+
+                (new SymfonyStyle($input, $output))->warning('The "--profile" option needs the Stopwatch component. Try running "composer require symfony/stopwatch".');
+            } else {
+                $command = new TraceableCommand($command, $container->get('debug.stopwatch'));
+
+                $requestStack = $container->get('.virtual_request_stack');
+                $requestStack->push(new CliRequest($command));
+            }
+        }
+
+        try {
+            $returnCode = parent::doRunCommand($command, $input, $output);
+        } finally {
+            $requestStack?->pop();
+        }
+
+        if ($renderRegistrationErrors && $this->registrationErrors) {
             $this->renderRegistrationErrors($input, $output);
             $this->registrationErrors = [];
         }

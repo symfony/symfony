@@ -13,6 +13,7 @@ namespace Symfony\Component\Mailer\Bridge\MailPace\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Mailer\Bridge\MailPace\Transport\MailPaceApiTransport;
 use Symfony\Component\Mailer\Envelope;
@@ -79,7 +80,7 @@ final class MailPaceApiTransportTest extends TestCase
             $this->assertSame('Hello!', $body['subject']);
             $this->assertSame('Hello There!', $body['textbody']);
 
-            return new MockResponse(json_encode(['id' => 'foobar', 'status' => 'pending']), [
+            return new JsonMockResponse(['id' => 'foobar', 'status' => 'pending'], [
                 'http_code' => 200,
             ]);
         });
@@ -99,11 +100,8 @@ final class MailPaceApiTransportTest extends TestCase
 
     public function testSendThrowsForErrorResponse()
     {
-        $client = new MockHttpClient(static fn (string $method, string $url, array $options): ResponseInterface => new MockResponse(json_encode(['error' => 'i\'m a teapot']), [
+        $client = new MockHttpClient(static fn (string $method, string $url, array $options): ResponseInterface => new JsonMockResponse(['error' => 'i\'m a teapot'], [
             'http_code' => 418,
-            'response_headers' => [
-                'content-type' => 'application/json',
-            ],
         ]));
         $transport = new MailPaceApiTransport('KEY', $client);
         $transport->setPort(8984);
@@ -122,7 +120,7 @@ final class MailPaceApiTransportTest extends TestCase
     public function testSendThrowsForErrorsResponse()
     {
         $client = new MockHttpClient(static function (string $method, string $url, array $options): ResponseInterface {
-            return new MockResponse(json_encode([
+            return new JsonMockResponse([
                 'errors' => [
                     'to' => [
                         'contains a blocked address',
@@ -130,11 +128,8 @@ final class MailPaceApiTransportTest extends TestCase
                     ],
                     'attachments.name' => ['Extension file type blocked, see Docs for full list of allowed file types'],
                 ],
-            ]), [
+            ], [
                 'http_code' => 400,
-                'response_headers' => [
-                    'content-type' => 'application/json',
-                ],
             ]);
         });
         $transport = new MailPaceApiTransport('KEY', $client);

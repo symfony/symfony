@@ -23,8 +23,10 @@ class ImportMapConfigReader
 {
     private ImportMapEntries $rootImportMapEntries;
 
-    public function __construct(private readonly string $importMapConfigPath)
-    {
+    public function __construct(
+        private readonly string $importMapConfigPath,
+        private readonly RemotePackageStorage $remotePackageStorage,
+    ) {
     }
 
     public function getEntries(): ImportMapEntries
@@ -38,39 +40,35 @@ class ImportMapConfigReader
 
         $entries = new ImportMapEntries();
         foreach ($importMapConfig ?? [] as $importName => $data) {
-            $validKeys = ['path', 'version', 'type', 'entrypoint'];
+            $validKeys = ['path', 'version', 'type', 'entrypoint', 'package_specifier'];
             if ($invalidKeys = array_diff(array_keys($data), $validKeys)) {
                 throw new \InvalidArgumentException(sprintf('The following keys are not valid for the importmap entry "%s": "%s". Valid keys are: "%s".', $importName, implode('", "', $invalidKeys), implode('", "', $validKeys)));
             }
 
             $type = isset($data['type']) ? ImportMapType::tryFrom($data['type']) : ImportMapType::JS;
-            $isEntry = $data['entrypoint'] ?? false;
+            $isEntrypoint = $data['entrypoint'] ?? false;
 
-            if ($isEntry && ImportMapType::JS !== $type) {
-                throw new RuntimeException(sprintf('The "entrypoint" option can only be used with the "js" type. Found "%s" in importmap.php for key "%s".', $importName, $type->value));
+            if (isset($data['path'])) {
+                if (isset($data['version'])) {
+                    throw new RuntimeException(sprintf('The importmap entry "%s" cannot have both a "path" and "version" option.', $importName));
+                }
+                if (isset($data['package_specifier'])) {
+                    throw new RuntimeException(sprintf('The importmap entry "%s" cannot have both a "path" and "package_specifier" option.', $importName));
+                }
+
+                $entries->add(ImportMapEntry::createLocal($importName, $type, $data['path'], $isEntrypoint));
+
+                continue;
             }
 
-            $path = $data['path'] ?? null;
             $version = $data['version'] ?? null;
 
             if (null === $version && null === $path) {
                 throw new RuntimeException(sprintf('The importmap entry "%s" must have either a "path" or "version" option.', $importName));
             }
-            if (null !== $version && null !== $path) {
-                throw new RuntimeException(sprintf('The importmap entry "%s" cannot have both a "path" and "version" option.', $importName));
-            }
 
-            [$packageName, $filePath] = self::splitPackageNameAndFilePath($importName);
-
-            $entries->add(new ImportMapEntry(
-                $importName,
-                path: $path,
-                version: $version,
-                type: $type,
-                isEntrypoint: $isEntry,
-                packageName: $packageName,
-                filePath: $filePath,
-            ));
+            $packageModuleSpecifier = $data['package_specifier'] ?? $importName;
+            $entries->add($this->createRemoteEntry($importName, $type, $version, $packageModuleSpecifier, $isEntrypoint));
         }
 
         return $this->rootImportMapEntries = $entries;
@@ -83,12 +81,13 @@ class ImportMapConfigReader
         $importMapConfig = [];
         foreach ($entries as $entry) {
             $config = [];
-            if ($entry->path) {
-                $path = $entry->path;
-                $config['path'] = $path;
-            }
-            if ($entry->version) {
+            if ($entry->isRemotePackage()) {
                 $config['version'] = $entry->version;
+                if ($entry->packageModuleSpecifier !== $entry->importName) {
+                    $config['package_specifier'] = $entry->packageModuleSpecifier;
+                }
+            } else {
+                $config['path'] = $entry->path;
             }
             if (ImportMapType::JS !== $entry->type) {
                 $config['type'] = $entry->type->value;
@@ -96,6 +95,7 @@ class ImportMapConfigReader
             if ($entry->isEntrypoint) {
                 $config['entrypoint'] = true;
             }
+
             $importMapConfig[$entry->importName] = $config;
         }
 
@@ -119,6 +119,13 @@ class ImportMapConfigReader
         return $map;
 
         EOF);
+    }
+
+    public function createRemoteEntry(string $importName, ImportMapType $type, string $version, string $packageModuleSpecifier, bool $isEntrypoint): ImportMapEntry
+    {
+        $path = $this->remotePackageStorage->getDownloadPath($packageModuleSpecifier, $type);
+
+        return ImportMapEntry::createRemote($importName, $type, $path, $version, $packageModuleSpecifier, $isEntrypoint);
     }
 
     public function getRootDirectory(): string

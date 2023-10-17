@@ -17,6 +17,7 @@ CHANGELOG
  * Allow specifying packages to update for the `importmap:update` command
  * Add a `importmap:audit` command to check for security vulnerability advisories in dependencies
  * Add a `importmap:outdated` command to check for outdated packages
+ * Change the polyfill used for the importmap renderer from a URL to an entry in the importmap
 
 6.3
 ---

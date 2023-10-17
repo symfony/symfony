@@ -18,12 +18,18 @@ namespace Symfony\Component\AssetMapper\ImportMap;
  */
 final class PackageRequireOptions
 {
+    public readonly string $importName;
+
     public function __construct(
-        public readonly string $packageName,
+        /**
+         * The "package-name/path" of the remote package.
+         */
+        public readonly string $packageModuleSpecifier,
         public readonly ?string $versionConstraint = null,
-        public readonly ?string $importName = null,
+        string $importName = null,
         public readonly ?string $path = null,
         public readonly bool $entrypoint = false,
     ) {
+        $this->importName = $importName ?: $packageModuleSpecifier;
     }
 }

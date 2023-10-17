@@ -30,7 +30,7 @@ class ImportMapRenderer
     private const DEFAULT_ES_MODULE_SHIMS_POLYFILL_URL = 'https://ga.jspm.io/npm:es-module-shims@1.8.0/dist/es-module-shims.js';
 
     public function __construct(
-        private readonly ImportMapManager $importMapManager,
+        private readonly ImportMapGenerator $importMapGenerator,
         private readonly ?Packages $assetPackages = null,
         private readonly string $charset = 'UTF-8',
         private readonly string|false $polyfillImportName = false,
@@ -43,7 +43,7 @@ class ImportMapRenderer
     {
         $entryPoint = (array) $entryPoint;
 
-        $importMapData = $this->importMapManager->getImportMapData($entryPoint);
+        $importMapData = $this->importMapGenerator->getImportMapData($entryPoint);
         $importMap = [];
         $modulePreloads = [];
         $cssLinks = [];

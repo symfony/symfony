@@ -15,7 +15,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\Exception\CircularAssetsException;
 use Symfony\Component\AssetMapper\Exception\RuntimeException;
-use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
 use Symfony\Component\AssetMapper\ImportMap\JavaScriptImport;
 use Symfony\Component\AssetMapper\MappedAsset;
 
@@ -32,7 +32,7 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
     private const IMPORT_PATTERN = '/(?:import\s*(?:(?:\*\s*as\s+\w+|[\w\s{},*]+)\s*from\s*)?|\bimport\()\s*[\'"`](\.\/[^\'"`]+|(\.\.\/)*[^\'"`]+)[\'"`]\s*[;\)]?/m';
 
     public function __construct(
-        private readonly ImportMapManager $importMapManager,
+        private readonly ImportMapConfigReader $importMapConfigReader,
         private readonly string $missingImportMode = self::MISSING_IMPORT_WARN,
         private readonly ?LoggerInterface $logger = null,
     ) {
@@ -139,7 +139,7 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
 
     private function findAssetForBareImport(string $importedModule, AssetMapperInterface $assetMapper): ?MappedAsset
     {
-        if (!$importMapEntry = $this->importMapManager->findRootImportMapEntry($importedModule)) {
+        if (!$importMapEntry = $this->importMapConfigReader->findRootImportMapEntry($importedModule)) {
             // don't warn on missing non-relative (bare) imports: these could be valid URLs
 
             return null;

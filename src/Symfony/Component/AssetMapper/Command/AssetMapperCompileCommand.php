@@ -14,7 +14,7 @@ namespace Symfony\Component\AssetMapper\Command;
 use Symfony\Component\AssetMapper\AssetMapper;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\Event\PreAssetsCompileEvent;
-use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapGenerator;
 use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -38,7 +38,7 @@ final class AssetMapperCompileCommand extends Command
     public function __construct(
         private readonly PublicAssetsPathResolverInterface $publicAssetsPathResolver,
         private readonly AssetMapperInterface $assetMapper,
-        private readonly ImportMapManager $importMapManager,
+        private readonly ImportMapGenerator $importMapGenerator,
         private readonly Filesystem $filesystem,
         private readonly string $projectDir,
         private readonly string $publicDirName,
@@ -81,12 +81,12 @@ EOT
         $manifestPath = $outputDir.'/'.AssetMapper::MANIFEST_FILE_NAME;
         $files[] = $manifestPath;
 
-        $importMapPath = $outputDir.'/'.ImportMapManager::IMPORT_MAP_CACHE_FILENAME;
+        $importMapPath = $outputDir.'/'.ImportMapGenerator::IMPORT_MAP_CACHE_FILENAME;
         $files[] = $importMapPath;
 
         $entrypointFilePaths = [];
-        foreach ($this->importMapManager->getEntrypointNames() as $entrypointName) {
-            $dumpedEntrypointPath = $outputDir.'/'.sprintf(ImportMapManager::ENTRYPOINT_CACHE_FILENAME_PATTERN, $entrypointName);
+        foreach ($this->importMapGenerator->getEntrypointNames() as $entrypointName) {
+            $dumpedEntrypointPath = $outputDir.'/'.sprintf(ImportMapGenerator::ENTRYPOINT_CACHE_FILENAME_PATTERN, $entrypointName);
             $files[] = $dumpedEntrypointPath;
             $entrypointFilePaths[$entrypointName] = $dumpedEntrypointPath;
         }
@@ -105,12 +105,12 @@ EOT
         $this->filesystem->dumpFile($manifestPath, json_encode($manifest, \JSON_PRETTY_PRINT));
         $io->comment(sprintf('Manifest written to <info>%s</info>', $this->shortenPath($manifestPath)));
 
-        $this->filesystem->dumpFile($importMapPath, json_encode($this->importMapManager->getRawImportMapData(), \JSON_THROW_ON_ERROR | \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_HEX_TAG));
+        $this->filesystem->dumpFile($importMapPath, json_encode($this->importMapGenerator->getRawImportMapData(), \JSON_THROW_ON_ERROR | \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_HEX_TAG));
         $io->comment(sprintf('Import map data written to <info>%s</info>.', $this->shortenPath($importMapPath)));
 
-        $entrypointNames = $this->importMapManager->getEntrypointNames();
+        $entrypointNames = $this->importMapGenerator->getEntrypointNames();
         foreach ($entrypointFilePaths as $entrypointName => $path) {
-            $this->filesystem->dumpFile($path, json_encode($this->importMapManager->getEntrypointMetadata($entrypointName), \JSON_THROW_ON_ERROR | \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_HEX_TAG));
+            $this->filesystem->dumpFile($path, json_encode($this->importMapGenerator->findEagerEntrypointImports($entrypointName), \JSON_THROW_ON_ERROR | \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_HEX_TAG));
         }
         $styledEntrypointNames = array_map(fn (string $entrypointName) => sprintf('<info>%s</>', $entrypointName), $entrypointNames);
         $io->comment(sprintf('Entrypoint metadata written for <comment>%d</> entrypoints (%s).', \count($entrypointNames), implode(', ', $styledEntrypointNames)));

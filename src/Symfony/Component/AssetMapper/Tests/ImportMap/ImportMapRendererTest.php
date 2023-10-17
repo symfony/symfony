@@ -13,7 +13,7 @@ namespace Symfony\Component\AssetMapper\Tests\ImportMap;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\Packages;
-use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapGenerator;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapRenderer;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -23,8 +23,8 @@ class ImportMapRendererTest extends TestCase
 {
     public function testBasicRender()
     {
-        $importMapManager = $this->createMock(ImportMapManager::class);
-        $importMapManager->expects($this->once())
+        $importMapGenerator = $this->createMock(ImportMapGenerator::class);
+        $importMapGenerator->expects($this->once())
             ->method('getImportMapData')
             ->with(['app'])
             ->willReturn([
@@ -68,7 +68,7 @@ class ImportMapRendererTest extends TestCase
                 return '/subdirectory/'.$path;
             });
 
-        $renderer = new ImportMapRenderer($importMapManager, $assetPackages, polyfillImportName: 'es-module-shim');
+        $renderer = new ImportMapRenderer($importMapGenerator, $assetPackages, polyfillImportName: 'es-module-shim');
         $html = $renderer->render(['app']);
 
         $this->assertStringContainsString('<script type="importmap">', $html);
@@ -96,20 +96,20 @@ class ImportMapRendererTest extends TestCase
 
     public function testNoPolyfill()
     {
-        $renderer = new ImportMapRenderer($this->createBasicImportMapManager(), null, 'UTF-8', false);
+        $renderer = new ImportMapRenderer($this->createBasicImportMapGenerator(), null, 'UTF-8', false);
         $this->assertStringNotContainsString('https://ga.jspm.io/npm:es-module-shims', $renderer->render([]));
     }
 
     public function testDefaultPolyfillUsedIfNotInImportmap()
     {
-        $importMapManager = $this->createMock(ImportMapManager::class);
-        $importMapManager->expects($this->once())
+        $importMapGenerator = $this->createMock(ImportMapGenerator::class);
+        $importMapGenerator->expects($this->once())
             ->method('getImportMapData')
             ->with(['app'])
             ->willReturn([]);
 
         $renderer = new ImportMapRenderer(
-            $importMapManager,
+            $importMapGenerator,
             $this->createMock(Packages::class),
             polyfillImportName: 'es-module-shims',
         );
@@ -119,7 +119,7 @@ class ImportMapRendererTest extends TestCase
 
     public function testCustomScriptAttributes()
     {
-        $renderer = new ImportMapRenderer($this->createBasicImportMapManager(), null, 'UTF-8', 'es-module-shims', [
+        $renderer = new ImportMapRenderer($this->createBasicImportMapGenerator(), null, 'UTF-8', 'es-module-shims', [
             'something' => true,
             'data-turbo-track' => 'reload',
         ]);
@@ -130,22 +130,22 @@ class ImportMapRendererTest extends TestCase
 
     public function testWithEntrypoint()
     {
-        $renderer = new ImportMapRenderer($this->createBasicImportMapManager());
+        $renderer = new ImportMapRenderer($this->createBasicImportMapGenerator());
         $this->assertStringContainsString("<script type=\"module\">import 'application';</script>", $renderer->render('application'));
 
-        $renderer = new ImportMapRenderer($this->createBasicImportMapManager());
+        $renderer = new ImportMapRenderer($this->createBasicImportMapGenerator());
         $this->assertStringContainsString("<script type=\"module\">import 'application\'s';</script>", $renderer->render("application's"));
 
-        $renderer = new ImportMapRenderer($this->createBasicImportMapManager());
+        $renderer = new ImportMapRenderer($this->createBasicImportMapGenerator());
         $html = $renderer->render(['foo', 'bar']);
         $this->assertStringContainsString("import 'foo';", $html);
         $this->assertStringContainsString("import 'bar';", $html);
     }
 
-    private function createBasicImportMapManager(): ImportMapManager
+    private function createBasicImportMapGenerator(): ImportMapGenerator
     {
-        $importMapManager = $this->createMock(ImportMapManager::class);
-        $importMapManager->expects($this->once())
+        $importMapGenerator = $this->createMock(ImportMapGenerator::class);
+        $importMapGenerator->expects($this->once())
             ->method('getImportMapData')
             ->willReturn([
                 'app' => [
@@ -159,13 +159,13 @@ class ImportMapRendererTest extends TestCase
             ])
         ;
 
-        return $importMapManager;
+        return $importMapGenerator;
     }
 
     public function testItAddsPreloadLinks()
     {
-        $importMapManager = $this->createMock(ImportMapManager::class);
-        $importMapManager->expects($this->once())
+        $importMapGenerator = $this->createMock(ImportMapGenerator::class);
+        $importMapGenerator->expects($this->once())
             ->method('getImportMapData')
             ->willReturn([
                 'app_js_preload' => [
@@ -188,7 +188,7 @@ class ImportMapRendererTest extends TestCase
         $requestStack = new RequestStack();
         $requestStack->push($request);
 
-        $renderer = new ImportMapRenderer($importMapManager, requestStack: $requestStack);
+        $renderer = new ImportMapRenderer($importMapGenerator, requestStack: $requestStack);
         $renderer->render(['app']);
 
         $linkProvider = $request->attributes->get('_links');

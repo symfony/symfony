@@ -547,6 +547,7 @@ Serializer
        // ...
    }
    ```
+ * Remove `AnnotationLoader`, use `AttributeLoader` instead
 
 Templating
 ----------

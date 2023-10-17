@@ -307,7 +307,3 @@ class AttributeLoader implements LoaderInterface
         return $annotations;
     }
 }
-
-if (!class_exists(AnnotationLoader::class, false)) {
-    class_alias(AttributeLoader::class, AnnotationLoader::class);
-}

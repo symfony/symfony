@@ -98,10 +98,6 @@ class CacheWarmerAggregateTest extends TestCase
         $warmer = $this->createMock(CacheWarmerInterface::class);
         $warmer
             ->expects($this->once())
-            ->method('isOptional')
-            ->willReturn(false);
-        $warmer
-            ->expects($this->once())
             ->method('warmUp')
             ->with('cache_dir', 'build_dir');
 
@@ -110,7 +106,7 @@ class CacheWarmerAggregateTest extends TestCase
         $aggregate->warmUp('cache_dir', 'build_dir');
     }
 
-    public function testWarmupOnOptionalWarmerDoNotPassBuildDir()
+    public function testWarmupOnOptionalWarmerPassBuildDir()
     {
         $warmer = $this->createMock(CacheWarmerInterface::class);
         $warmer
@@ -120,10 +116,10 @@ class CacheWarmerAggregateTest extends TestCase
         $warmer
             ->expects($this->once())
             ->method('warmUp')
-            ->with('cache_dir', null);
+            ->with('cache_dir', 'build_dir');
 
         $aggregate = new CacheWarmerAggregate([$warmer]);
-        $aggregate->enableOptionalWarmers();
+        $aggregate->enableOnlyOptionalWarmers();
         $aggregate->warmUp('cache_dir', 'build_dir');
     }
 

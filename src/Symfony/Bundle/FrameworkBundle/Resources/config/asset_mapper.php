@@ -38,7 +38,6 @@ use Symfony\Component\AssetMapper\ImportMap\RemotePackageDownloader;
 use Symfony\Component\AssetMapper\ImportMap\Resolver\JsDelivrEsmResolver;
 use Symfony\Component\AssetMapper\MapperAwareAssetPackage;
 use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolver;
-use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -92,8 +91,9 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('asset public prefix'),
                 abstract_arg('extensions map'),
                 service('cache.asset_mapper'),
+                service('profiler')->nullOnInvalid(),
             ])
-            ->tag('kernel.event_subscriber', ['event' => RequestEvent::class])
+            ->tag('kernel.event_subscriber')
 
         ->set('asset_mapper.command.compile', AssetMapperCompileCommand::class)
             ->args([

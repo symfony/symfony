@@ -30,6 +30,7 @@ class AssetMapperDevServerSubscriberFunctionalTest extends WebTestCase
         EOF, $response->getContent());
         $this->assertSame('"b3445cb7a86a0795a7af7f2004498aef"', $response->headers->get('ETag'));
         $this->assertSame('immutable, max-age=604800, public', $response->headers->get('Cache-Control'));
+        $this->assertTrue($response->headers->has('X-Assets-Dev'));
     }
 
     public function test404OnUnknownAsset()
@@ -39,6 +40,7 @@ class AssetMapperDevServerSubscriberFunctionalTest extends WebTestCase
         $client->request('GET', '/assets/unknown.css');
         $response = $client->getResponse();
         $this->assertSame(404, $response->getStatusCode());
+        $this->assertFalse($response->headers->has('X-Assets-Dev'));
     }
 
     public function test404OnInvalidDigest()

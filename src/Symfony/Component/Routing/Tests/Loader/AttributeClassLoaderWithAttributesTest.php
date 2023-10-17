@@ -11,18 +11,13 @@
 
 namespace Symfony\Component\Routing\Tests\Loader;
 
-use Doctrine\Common\Annotations\AnnotationReader;
-use Symfony\Component\Routing\Tests\Fixtures\TraceableAnnotationClassLoader;
+use Symfony\Component\Routing\Tests\Fixtures\TraceableAttributeClassLoader;
 
-/**
- * @group legacy
- */
-class AnnotationClassLoaderWithAnnotationsTest extends AnnotationClassLoaderTestCase
+class AttributeClassLoaderWithAttributesTest extends AttributeClassLoaderTestCase
 {
     protected function setUp(string $env = null): void
     {
-        $reader = new AnnotationReader();
-        $this->loader = new TraceableAnnotationClassLoader($reader, $env);
+        $this->loader = new TraceableAttributeClassLoader($env);
     }
 
     public function testDefaultRouteName()
@@ -30,11 +25,11 @@ class AnnotationClassLoaderWithAnnotationsTest extends AnnotationClassLoaderTest
         $routeCollection = $this->loader->load($this->getNamespace().'\EncodingClass');
         $defaultName = array_keys($routeCollection->all())[0];
 
-        $this->assertSame('symfony_component_routing_tests_fixtures_annotationfixtures_encodingclass_routeàction', $defaultName);
+        $this->assertSame('symfony_component_routing_tests_fixtures_attributefixtures_encodingclass_routeàction', $defaultName);
     }
 
     protected function getNamespace(): string
     {
-        return 'Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures';
+        return 'Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures';
     }
 }

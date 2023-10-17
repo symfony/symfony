@@ -67,7 +67,7 @@ http_client_call:
 
 uid:
     resource: "../../Controller/UidController.php"
-    type: "annotation"
+    type: "attribute"
 
 send_notification:
     path:     /send_notification

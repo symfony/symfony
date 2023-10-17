@@ -85,7 +85,7 @@ trait MicroKernelTrait
         }
 
         if (false !== ($fileName = (new \ReflectionObject($this))->getFileName())) {
-            $routes->import($fileName, 'annotation');
+            $routes->import($fileName, 'attribute');
         }
     }
 

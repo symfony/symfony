@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Routing\Tests\Fixtures;
 
-use Symfony\Component\Routing\Loader\AnnotationClassLoader;
+use Symfony\Component\Routing\Loader\AttributeClassLoader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-final class TraceableAnnotationClassLoader extends AnnotationClassLoader
+final class TraceableAttributeClassLoader extends AttributeClassLoader
 {
     /** @var list<string> */
     public array $foundClasses = [];

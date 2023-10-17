@@ -14,11 +14,11 @@ namespace Symfony\Component\Routing\Tests\Loader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderResolver;
-use Symfony\Component\Routing\Loader\AnnotationFileLoader;
+use Symfony\Component\Routing\Loader\AttributeFileLoader;
 use Symfony\Component\Routing\Loader\DirectoryLoader;
 use Symfony\Component\Routing\Loader\YamlFileLoader;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\Tests\Fixtures\TraceableAnnotationClassLoader;
+use Symfony\Component\Routing\Tests\Fixtures\TraceableAttributeClassLoader;
 
 class DirectoryLoaderTest extends TestCase
 {
@@ -32,7 +32,7 @@ class DirectoryLoaderTest extends TestCase
         $this->loader = new DirectoryLoader($locator);
         $resolver = new LoaderResolver([
             new YamlFileLoader($locator),
-            new AnnotationFileLoader($locator, new TraceableAnnotationClassLoader()),
+            new AttributeFileLoader($locator, new TraceableAttributeClassLoader()),
             $this->loader,
         ]);
         $this->loader->setResolver($resolver);

@@ -12,13 +12,16 @@
 namespace Symfony\Component\Routing\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Routing\Alias;
-use Symfony\Component\Routing\Loader\AnnotationClassLoader;
+use Symfony\Component\Routing\Loader\AttributeClassLoader;
 use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\AbstractClassController;
 
-abstract class AnnotationClassLoaderTestCase extends TestCase
+abstract class AttributeClassLoaderTestCase extends TestCase
 {
-    protected AnnotationClassLoader $loader;
+    use ExpectDeprecationTrait;
+
+    protected AttributeClassLoader $loader;
 
     /**
      * @dataProvider provideTestSupportsChecksResource
@@ -43,9 +46,17 @@ abstract class AnnotationClassLoaderTestCase extends TestCase
 
     public function testSupportsChecksTypeIfSpecified()
     {
-        $this->assertTrue($this->loader->supports('class', 'annotation'), '->supports() checks the resource type if specified');
         $this->assertTrue($this->loader->supports('class', 'attribute'), '->supports() checks the resource type if specified');
         $this->assertFalse($this->loader->supports('class', 'foo'), '->supports() checks the resource type if specified');
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testSupportsAnnotations()
+    {
+        $this->expectDeprecation('Since symfony/routing 6.4: The "annotation" route type is deprecated, use the "attribute" route type instead.');
+        $this->assertTrue($this->loader->supports('class', 'annotation'), '->supports() checks the resource type if specified');
     }
 
     public function testSimplePathRoute()

@@ -21,7 +21,7 @@
     },
     "require-dev": {
         "symfony/http-client": "^5.4|^6.0|^7.0",
-        "symfony/webhook": "^6.4"
+        "symfony/webhook": "^6.4|^7.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Mailer\\Bridge\\Mailjet\\": "" },

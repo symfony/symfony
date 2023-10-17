@@ -87,6 +87,7 @@ trait FilesystemCommonTrait
 
     private function write(string $file, string $data, int $expiresAt = null): bool
     {
+        $unlink = false;
         set_error_handler(__CLASS__.'::throwError');
         try {
             $tmp = $this->directory.$this->tmpSuffix ??= str_replace('/', '-', base64_encode(random_bytes(6)));
@@ -102,14 +103,22 @@ trait FilesystemCommonTrait
             }
             fwrite($h, $data);
             fclose($h);
+            $unlink = true;
 
             if (null !== $expiresAt) {
                 touch($tmp, $expiresAt ?: time() + 31556952); // 1 year in seconds
             }
 
-            return rename($tmp, $file);
+            $success = rename($tmp, $file);
+            $unlink = !$success;
+
+            return $success;
         } finally {
             restore_error_handler();
+
+            if ($unlink) {
+                @unlink($tmp);
+            }
         }
     }
 

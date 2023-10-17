@@ -15,7 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
+use Symfony\Component\Scheduler\Event\PostRunEvent;
 use Symfony\Component\Scheduler\Event\PreRunEvent;
 use Symfony\Component\Scheduler\EventListener\DispatchSchedulerEventListener;
 use Symfony\Component\Scheduler\Generator\MessageContext;
@@ -33,8 +35,8 @@ class DispatchSchedulerEventListenerTest extends TestCase
 
         $schedulerProvider = new SomeScheduleProvider([$defaultRecurringMessage]);
         $scheduleProviderLocator = $this->createMock(ContainerInterface::class);
-        $scheduleProviderLocator->expects($this->once())->method('has')->willReturn(true);
-        $scheduleProviderLocator->expects($this->once())->method('get')->willReturn($schedulerProvider);
+        $scheduleProviderLocator->expects($this->any())->method('has')->willReturn(true);
+        $scheduleProviderLocator->expects($this->any())->method('get')->willReturn($schedulerProvider);
 
         $context = new MessageContext('default', 'default', $trigger, $this->createMock(\DateTimeImmutable::class));
         $envelope = (new Envelope(new \stdClass()))->with(new ScheduledStamp($context));
@@ -42,11 +44,13 @@ class DispatchSchedulerEventListenerTest extends TestCase
         /** @var ContainerInterface $scheduleProviderLocator */
         $listener = new DispatchSchedulerEventListener($scheduleProviderLocator, $eventDispatcher = new EventDispatcher());
         $workerReceivedEvent = new WorkerMessageReceivedEvent($envelope, 'default');
+        $workerHandledEvent = new WorkerMessageHandledEvent($envelope, 'default');
         $secondListener = new TestEventListener();
 
         $eventDispatcher->addListener(PreRunEvent::class, [$secondListener, 'preRun']);
-        $eventDispatcher->addListener(PreRunEvent::class, [$secondListener, 'postRun']);
+        $eventDispatcher->addListener(PostRunEvent::class, [$secondListener, 'postRun']);
         $listener->onMessageReceived($workerReceivedEvent);
+        $listener->onMessageHandled($workerHandledEvent);
 
         $this->assertTrue($secondListener->preInvoked);
         $this->assertTrue($secondListener->postInvoked);

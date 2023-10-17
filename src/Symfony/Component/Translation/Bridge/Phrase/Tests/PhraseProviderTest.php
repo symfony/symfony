@@ -18,6 +18,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\HttpClientTrait;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Translation\Bridge\Phrase\PhraseProvider;
 use Symfony\Component\Translation\Dumper\XliffFileDumper;
@@ -453,14 +454,14 @@ class PhraseProviderTest extends TestCase
                 $this->assertSame('GET', $method);
                 $this->assertSame('https://api.phrase.com/api/v2/projects/1/locales?per_page=100&page=1', $url);
 
-                return new MockResponse(json_encode([
+                return new JsonMockResponse([
                     [
                         'id' => '5fea6ed5c21767730918a9400e420832',
                         'name' => 'de',
                         'code' => 'de',
                         'fallback_locale' => null,
                     ],
-                ], \JSON_THROW_ON_ERROR), [
+                ], [
                     'http_code' => 200,
                     'response_headers' => [
                         'pagination' => '{"total_count":31,"current_page":1,"current_per_page":25,"previous_page":null,"next_page":2}',
@@ -471,14 +472,14 @@ class PhraseProviderTest extends TestCase
                 $this->assertSame('GET', $method);
                 $this->assertSame('https://api.phrase.com/api/v2/projects/1/locales?per_page=100&page=2', $url);
 
-                return new MockResponse(json_encode([
+                return new JsonMockResponse([
                     [
                         'id' => '5fea6ed5c21767730918a9400e420832',
                         'name' => 'de',
                         'code' => 'de',
                         'fallback_locale' => null,
                     ],
-                ], \JSON_THROW_ON_ERROR), [
+                ], [
                     'http_code' => 200,
                     'response_headers' => [
                         'pagination' => '{"total_count":31,"current_page":2,"current_per_page":25,"previous_page":null,"next_page":null}',
@@ -512,12 +513,12 @@ class PhraseProviderTest extends TestCase
                 $this->assertArrayHasKey('body', $options);
                 $this->assertSame('name=nl-NL&code=nl-NL&default=0', $options['body']);
 
-                return new MockResponse(json_encode([
+                return new JsonMockResponse([
                     'id' => 'zWlsCvkeSK0EBgBVmGpZ4cySWbQ0s1Dk4',
                     'name' => 'nl-NL',
                     'code' => 'nl-NL',
                     'fallback_locale' => null,
-                ], \JSON_THROW_ON_ERROR), ['http_code' => 201]);
+                ], ['http_code' => 201]);
             },
             'download locale' => $this->getDownloadLocaleResponseMock('messages', 'zWlsCvkeSK0EBgBVmGpZ4cySWbQ0s1Dk4', ''),
         ];
@@ -1097,7 +1098,7 @@ XLIFF,
             $this->assertSame('GET', $method);
             $this->assertSame('https://api.phrase.com/api/v2/projects/1/locales?per_page=100&page=1', $url);
 
-            return new MockResponse(json_encode([
+            return new JsonMockResponse([
                 [
                     'id' => '5fea6ed5c21767730918a9400e420832',
                     'name' => 'de',
@@ -1114,7 +1115,7 @@ XLIFF,
                         'code' => 'de',
                     ],
                 ],
-            ], \JSON_THROW_ON_ERROR));
+            ]);
         };
     }
 

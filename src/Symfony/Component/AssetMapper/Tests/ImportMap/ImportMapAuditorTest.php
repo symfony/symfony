@@ -21,6 +21,7 @@ use Symfony\Component\AssetMapper\ImportMap\ImportMapPackageAudit;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapPackageAuditVulnerability;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapType;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -39,7 +40,7 @@ class ImportMapAuditorTest extends TestCase
 
     public function testAudit()
     {
-        $this->httpClient->setResponseFactory(new MockResponse(json_encode([
+        $this->httpClient->setResponseFactory(new JsonMockResponse([
             [
                 'ghsa_id' => 'GHSA-abcd-1234-efgh',
                 'cve_id' => 'CVE-2050-00000',
@@ -64,7 +65,7 @@ class ImportMapAuditorTest extends TestCase
                     ],
                 ],
             ],
-        ])));
+        ]));
         $this->importMapConfigReader->method('getEntries')->willReturn(new ImportMapEntries([
             self::createRemoteEntry('@hotwired/stimulus', '3.2.1'),
             self::createRemoteEntry('json5/some/file', '1.0.0'),
@@ -93,7 +94,7 @@ class ImportMapAuditorTest extends TestCase
      */
     public function testAuditWithVersionRange(bool $expectMatch, string $version, ?string $versionRange)
     {
-        $this->httpClient->setResponseFactory(new MockResponse(json_encode([
+        $this->httpClient->setResponseFactory(new JsonMockResponse([
             [
                 'ghsa_id' => 'GHSA-abcd-1234-efgh',
                 'cve_id' => 'CVE-2050-00000',
@@ -108,7 +109,7 @@ class ImportMapAuditorTest extends TestCase
                     ],
                 ],
             ],
-        ])));
+        ]));
         $this->importMapConfigReader->method('getEntries')->willReturn(new ImportMapEntries([
             self::createRemoteEntry('json5', $version),
         ]));

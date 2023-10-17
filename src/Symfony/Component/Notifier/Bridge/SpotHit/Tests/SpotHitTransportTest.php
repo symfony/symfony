@@ -12,7 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\SpotHit\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
-use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\Notifier\Bridge\SpotHit\SpotHitTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
@@ -55,10 +55,10 @@ final class SpotHitTransportTest extends TransportTestCase
                 $this->assertSame('https://www.spot-hit.fr/api/envoyer/sms', $url);
                 $this->assertSame('key=&destinataires=0611223344&type=premium&message=Hello%21&expediteur=', $options['body']);
 
-                return new MockResponse(json_encode([
+                return new JsonMockResponse([
                     'resultat' => ['success' => 'true'],
                     'id' => '???',
-                ], \JSON_THROW_ON_ERROR));
+                ]);
             },
         ];
 
@@ -102,10 +102,10 @@ final class SpotHitTransportTest extends TransportTestCase
                 parse_str($options['body'], $bodyFields);
                 $assertions($bodyFields);
 
-                return new MockResponse(json_encode([
+                return new JsonMockResponse([
                     'resultat' => ['success' => 'true'],
                     'id' => '???',
-                ], \JSON_THROW_ON_ERROR));
+                ]);
             },
         ];
 

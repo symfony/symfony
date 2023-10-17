@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-10-02T08:41:23Z
+
+Rebased and conflicts fixed
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2023-10-13T07:54:45Z
+
+Instead of the current strategy, what about copy-pasting the existing Annotation classes code in the new Attribute classes, and then make existing Annotation classes extends those new Attribute classes.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-10-15T10:38:58Z
+
+@fancyweb I think that the current way of doing is better for upmerges. It will be easier for potential fixes if the annotation classes remain the same. Otherwise, all fixes in `Annotation*Loader` will have to be manually reflected in `Attribute*Loader` when merging to upper branches

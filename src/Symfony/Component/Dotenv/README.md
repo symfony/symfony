@@ -27,6 +27,10 @@ $dotenv->overload(__DIR__.'/.env');
 $dotenv->loadEnv(__DIR__.'/.env');
 ```
 
+Note
+---
+Keep in mind that `$overrideExistingVars` work only with **existing** environment variables (defined before application) and not with `.env` file variables.
+
 Resources
 ---------
 

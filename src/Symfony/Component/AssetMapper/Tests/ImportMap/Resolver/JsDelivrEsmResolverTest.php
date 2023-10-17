@@ -61,7 +61,7 @@ class JsDelivrEsmResolverTest extends TestCase
             'packages' => [new PackageRequireOptions('lodash')],
             'expectedRequests' => [
                 [
-                    'url' => '/v1/packages/npm/lodash/resolved?specifier=%2A',
+                    'url' => '/v1/packages/npm/lodash/resolved',
                     'response' => ['body' => ['version' => '1.2.3']],
                 ],
                 [
@@ -196,7 +196,7 @@ class JsDelivrEsmResolverTest extends TestCase
             'packages' => [new PackageRequireOptions('bootstrap/dist/css/bootstrap.min.css')],
             'expectedRequests' => [
                 [
-                    'url' => '/v1/packages/npm/bootstrap/resolved?specifier=%2A',
+                    'url' => '/v1/packages/npm/bootstrap/resolved',
                     'response' => ['body' => ['version' => '3.3.0']],
                 ],
                 [

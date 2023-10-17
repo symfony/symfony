@@ -21,7 +21,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class JsDelivrEsmResolver implements PackageResolverInterface
 {
-    public const URL_PATTERN_VERSION = 'https://data.jsdelivr.com/v1/packages/npm/%s/resolved?specifier=%s';
+    public const URL_PATTERN_VERSION = 'https://data.jsdelivr.com/v1/packages/npm/%s/resolved';
     public const URL_PATTERN_DIST_CSS = 'https://cdn.jsdelivr.net/npm/%s@%s%s';
     public const URL_PATTERN_DIST = self::URL_PATTERN_DIST_CSS.'/+esm';
     public const URL_PATTERN_ENTRYPOINT = 'https://data.jsdelivr.com/v1/packages/npm/%s@%s/entrypoints';
@@ -32,9 +32,6 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
 
     public function __construct(
         HttpClientInterface $httpClient = null,
-        private readonly string $versionUrlPattern = self::URL_PATTERN_VERSION,
-        private readonly string $distUrlPattern = self::URL_PATTERN_DIST,
-        private readonly string $distUrlCssPattern = self::URL_PATTERN_DIST_CSS
     ) {
         $this->httpClient = $httpClient ?? HttpClient::create();
     }
@@ -49,7 +46,6 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
         $requiredPackages = [];
         foreach ($packagesToRequire as $options) {
             $packageSpecifier = trim($options->packageModuleSpecifier, '/');
-            $constraint = $options->versionConstraint ?? '*';
 
             // avoid resolving the same package twice
             if (isset($resolvedPackages[$packageSpecifier])) {
@@ -58,7 +54,11 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
 
             [$packageName, $filePath] = ImportMapEntry::splitPackageNameAndFilePath($packageSpecifier);
 
-            $response = $this->httpClient->request('GET', sprintf($this->versionUrlPattern, $packageName, urlencode($constraint)));
+            $versionUrl = sprintf(self::URL_PATTERN_VERSION, $packageName);
+            if (null !== $options->versionConstraint) {
+                $versionUrl .= '?specifier='.urlencode($options->versionConstraint);
+            }
+            $response = $this->httpClient->request('GET', $versionUrl);
             $requiredPackages[] = [$options, $response, $packageName, $filePath, /* resolved version */ null];
         }
 
@@ -72,7 +72,11 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
             }
 
             $version = $response->toArray()['version'];
-            $pattern = str_ends_with($filePath, '.css') ? $this->distUrlCssPattern : $this->distUrlPattern;
+            if (null === $version) {
+                throw new RuntimeException(sprintf('Unable to find the latest version for package "%s" - try specifying the version manually.', $packageName));
+            }
+
+            $pattern = str_ends_with($filePath, '.css') ? self::URL_PATTERN_DIST_CSS : self::URL_PATTERN_DIST;
             $requiredPackages[$i][1] = $this->httpClient->request('GET', sprintf($pattern, $packageName, $version, $filePath));
             $requiredPackages[$i][4] = $version;
 
@@ -163,7 +167,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
                 throw new \InvalidArgumentException(sprintf('The entry "%s" is not a remote package.', $entry->importName));
             }
 
-            $pattern = ImportMapType::CSS === $entry->type ? $this->distUrlCssPattern : $this->distUrlPattern;
+            $pattern = ImportMapType::CSS === $entry->type ? self::URL_PATTERN_DIST_CSS : self::URL_PATTERN_DIST;
             $url = sprintf($pattern, $entry->getPackageName(), $entry->version, $entry->getPackagePathString());
 
             $responses[$package] = $this->httpClient->request('GET', $url);

@@ -195,6 +195,7 @@ class ImportMapRendererTest extends TestCase
         $this->assertInstanceOf(GenericLinkProvider::class, $linkProvider);
         $this->assertCount(1, $linkProvider->getLinks());
         $this->assertSame(['preload'], $linkProvider->getLinks()[0]->getRels());
+        $this->assertSame(['as' => 'style'], $linkProvider->getLinks()[0]->getAttributes());
         $this->assertSame('/assets/styles/app-preload-d1g35t.css', $linkProvider->getLinks()[0]->getHref());
     }
 }

@@ -13,6 +13,7 @@ namespace Symfony\Component\Scheduler;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Lock\LockInterface;
+use Symfony\Component\Scheduler\Event\FailureEvent;
 use Symfony\Component\Scheduler\Event\PostRunEvent;
 use Symfony\Component\Scheduler\Event\PreRunEvent;
 use Symfony\Component\Scheduler\Exception\LogicException;
@@ -148,6 +149,13 @@ final class Schedule implements ScheduleProviderInterface
     public function after(callable $listener, int $priority = 0): static
     {
         $this->dispatcher->addListener(PostRunEvent::class, $listener, $priority);
+
+        return $this;
+    }
+
+    public function onFailure(callable $listener, int $priority = 0): static
+    {
+        $this->dispatcher->addListener(FailureEvent::class, $listener, $priority);
 
         return $this;
     }

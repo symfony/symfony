@@ -19,7 +19,7 @@ class_exists(ErrorHandlerFileLinkFormatter::class);
 
 if (false) {
     /**
-     * @deprecated since Symfony 6.4, use FileLinkFormatter from the ErrorHandle component instead
+     * @deprecated since Symfony 6.4, use FileLinkFormatter from the ErrorHandler component instead
      */
     class FileLinkFormatter
     {
